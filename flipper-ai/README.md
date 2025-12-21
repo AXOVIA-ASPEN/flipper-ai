@@ -1,36 +1,132 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Flipper.ai
 
-## Getting Started
+AI-powered marketplace scraper to find underpriced items for flipping profit. Automatically scrapes Craigslist, Facebook Marketplace, eBay, and OfferUp to identify flip opportunities.
 
-First, run the development server:
+## Features
+
+- **Multi-Platform Scraping** - Scrapes Craigslist, Facebook Marketplace, eBay, and OfferUp
+- **AI-Powered Analysis** - Uses Stagehand with Gemini AI for intelligent data extraction
+- **Value Estimation** - Automatically estimates market value and profit potential
+- **Opportunity Tracking** - Track items from discovery through sale
+- **Dashboard UI** - Clean interface to browse and manage opportunities
+
+## Quick Start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Install dependencies and start preview
+make preview
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Or manually:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Install dependencies
+pnpm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Run database migrations
+npx prisma migrate dev
 
-## Learn More
+# Start development server
+pnpm dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open [http://localhost:3000](http://localhost:3000) to view the dashboard.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Available Commands
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Command | Description |
+|---------|-------------|
+| `make preview` | Install deps, run migrations, start dev server |
+| `make dev` | Start development server |
+| `make build` | Build for production |
+| `make db-migrate` | Run database migrations |
+| `make db-studio` | Open Prisma Studio (database GUI) |
+| `make db-reset` | Reset database (deletes all data) |
 
-## Deploy on Vercel
+## Tech Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS
+- **Backend**: Next.js API Routes
+- **Database**: SQLite with Prisma ORM
+- **Scraping**: Stagehand with Google Gemini AI
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project Structure
+
+```
+flipper-ai/
+├── src/
+│   ├── app/
+│   │   ├── api/           # API routes
+│   │   │   ├── listings/  # Listings CRUD
+│   │   │   └── opportunities/ # Opportunities CRUD
+│   │   ├── page.tsx       # Dashboard
+│   │   └── layout.tsx     # Root layout
+│   ├── lib/
+│   │   ├── db.ts          # Prisma client
+│   │   └── value-estimator.ts # Profit calculation
+│   └── generated/
+│       └── prisma/        # Generated Prisma client
+├── prisma/
+│   ├── schema.prisma      # Database schema
+│   └── migrations/        # Migration history
+├── docs/
+│   └── PRISMA.md          # Prisma integration guide
+└── Makefile               # Build commands
+```
+
+## Environment Variables
+
+Create a `.env` file:
+
+```env
+# Database (SQLite)
+DATABASE_URL="file:./dev.db"
+
+# For scraping (optional - uses Stagehand with Gemini)
+GOOGLE_API_KEY="your-google-api-key"
+```
+
+## API Endpoints
+
+### Listings
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/listings` | Get all listings |
+| GET | `/api/listings?status=OPPORTUNITY` | Filter by status |
+| GET | `/api/listings?minScore=70` | Filter by value score |
+| POST | `/api/listings` | Create listing (from scraper) |
+| GET | `/api/listings/[id]` | Get single listing |
+| PATCH | `/api/listings/[id]` | Update listing |
+| DELETE | `/api/listings/[id]` | Delete listing |
+
+### Opportunities
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/opportunities` | Get all opportunities |
+| POST | `/api/opportunities` | Create opportunity from listing |
+
+## Database Schema
+
+See [docs/PRISMA.md](docs/PRISMA.md) for full Prisma integration details.
+
+**Key Models:**
+- `Listing` - Scraped items with value analysis
+- `Opportunity` - Flips being actively pursued
+- `ScraperJob` - Scraper run history
+- `SearchConfig` - Saved search configurations
+
+## Value Scoring
+
+Items are scored 0-100 based on:
+- **Category multipliers** - Electronics, furniture, collectibles, etc.
+- **Brand detection** - Apple, Sony, Dyson, vintage items
+- **Condition analysis** - New, like new, good, fair, poor
+- **Risk factors** - "broken", "parts only", "needs repair"
+
+Scores 70+ are automatically flagged as opportunities.
+
+## License
+
+MIT

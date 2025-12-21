@@ -51,9 +51,15 @@ model Listing {
 
   // Flip analysis
   estimatedValue  Float?        // What we think it's worth
+  estimatedLow    Float?        // Low end of estimated value range
+  estimatedHigh   Float?        // High end of estimated value range
   profitPotential Float?        // Estimated profit if flipped
   valueScore      Float?        // 0-100 score of flip potential
   status          String        @default("NEW")
+
+  // Market references (JSON)
+  comparableUrls  String?       // JSON: URLs to eBay sold listings, etc.
+  priceReasoning  String?       // Explanation of how value was estimated
 
   // Relations
   opportunity     Opportunity?

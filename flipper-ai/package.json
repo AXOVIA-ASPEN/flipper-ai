@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@browserbasehq/stagehand": "^3.0.6",
+    "@libsql/client": "^0.15.15",
+    "@prisma/adapter-libsql": "^7.2.0",
     "@prisma/client": "^7.2.0",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.562.0",

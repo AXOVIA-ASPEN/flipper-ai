@@ -103,8 +103,12 @@ export async function POST(request: NextRequest) {
         category: detectedCategory,
         postedAt: postedAt ? new Date(postedAt) : null,
         estimatedValue: estimation.estimatedValue,
+        estimatedLow: estimation.estimatedLow,
+        estimatedHigh: estimation.estimatedHigh,
         profitPotential: estimation.profitPotential,
         valueScore: estimation.valueScore,
+        comparableUrls: JSON.stringify(estimation.comparableUrls),
+        priceReasoning: estimation.reasoning,
         status: estimation.valueScore >= 70 ? "OPPORTUNITY" : "NEW",
       },
       update: {
@@ -117,8 +121,12 @@ export async function POST(request: NextRequest) {
         sellerContact,
         imageUrls: imageUrls ? JSON.stringify(imageUrls) : null,
         estimatedValue: estimation.estimatedValue,
+        estimatedLow: estimation.estimatedLow,
+        estimatedHigh: estimation.estimatedHigh,
         profitPotential: estimation.profitPotential,
         valueScore: estimation.valueScore,
+        comparableUrls: JSON.stringify(estimation.comparableUrls),
+        priceReasoning: estimation.reasoning,
       },
     });
 
