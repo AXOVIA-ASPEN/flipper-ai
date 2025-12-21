@@ -11,6 +11,10 @@ import {
   Star,
   Filter,
   Plus,
+  ImageIcon,
+  X,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 interface Listing {
@@ -35,6 +39,25 @@ interface Stats {
   avgValueScore: number;
 }
 
+// Helper to parse imageUrls JSON and get array of URLs
+function parseImageUrls(imageUrls: string | null): string[] {
+  if (!imageUrls) return [];
+  try {
+    const parsed = JSON.parse(imageUrls);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+// Image gallery modal state type
+interface ImageModalState {
+  isOpen: boolean;
+  images: string[];
+  currentIndex: number;
+  title: string;
+}
+
 export default function Dashboard() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [stats, setStats] = useState<Stats>({
@@ -46,6 +69,42 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [imageModal, setImageModal] = useState<ImageModalState>({
+    isOpen: false,
+    images: [],
+    currentIndex: 0,
+    title: "",
+  });
+
+  const openImageModal = (listing: Listing) => {
+    const images = parseImageUrls(listing.imageUrls);
+    if (images.length > 0) {
+      setImageModal({
+        isOpen: true,
+        images,
+        currentIndex: 0,
+        title: listing.title,
+      });
+    }
+  };
+
+  const closeImageModal = () => {
+    setImageModal((prev) => ({ ...prev, isOpen: false }));
+  };
+
+  const nextImage = () => {
+    setImageModal((prev) => ({
+      ...prev,
+      currentIndex: (prev.currentIndex + 1) % prev.images.length,
+    }));
+  };
+
+  const prevImage = () => {
+    setImageModal((prev) => ({
+      ...prev,
+      currentIndex: (prev.currentIndex - 1 + prev.images.length) % prev.images.length,
+    }));
+  };
 
   useEffect(() => {
     fetchListings();
@@ -309,15 +368,50 @@ export default function Dashboard() {
                       className="hover:bg-[var(--secondary)] transition-colors"
                     >
                       <td className="px-6 py-4">
-                        <div className="max-w-xs">
-                          <p className="font-medium text-[var(--foreground)] truncate">
-                            {listing.title}
-                          </p>
-                          {listing.location && (
-                            <p className="text-sm text-[var(--muted-foreground)]">
-                              {listing.location}
+                        <div className="flex items-center gap-3">
+                          {/* Product Thumbnail */}
+                          {(() => {
+                            const images = parseImageUrls(listing.imageUrls);
+                            return images.length > 0 ? (
+                              <button
+                                onClick={() => openImageModal(listing)}
+                                className="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-[var(--border)] hover:border-[var(--primary)] transition-colors group"
+                              >
+                                <img
+                                  src={images[0]}
+                                  alt={listing.title}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                  }}
+                                />
+                                <div className="hidden absolute inset-0 flex items-center justify-center bg-[var(--secondary)]">
+                                  <ImageIcon className="w-6 h-6 text-[var(--muted-foreground)]" />
+                                </div>
+                                {images.length > 1 && (
+                                  <div className="absolute bottom-1 right-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
+                                    +{images.length - 1}
+                                  </div>
+                                )}
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                              </button>
+                            ) : (
+                              <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-[var(--secondary)] flex items-center justify-center border border-[var(--border)]">
+                                <ImageIcon className="w-6 h-6 text-[var(--muted-foreground)]" />
+                              </div>
+                            );
+                          })()}
+                          <div className="max-w-xs">
+                            <p className="font-medium text-[var(--foreground)] truncate">
+                              {listing.title}
                             </p>
-                          )}
+                            {listing.location && (
+                              <p className="text-sm text-[var(--muted-foreground)]">
+                                {listing.location}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -397,7 +491,7 @@ export default function Dashboard() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <a
-              href="/api/scraper/craigslist"
+              href="/scraper"
               className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
             >
               <div className="w-10 h-10 bg-purple-200 rounded-lg flex items-center justify-center">
@@ -435,6 +529,89 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
+
+      {/* Image Gallery Modal */}
+      {imageModal.isOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
+          onClick={closeImageModal}
+        >
+          <div
+            className="relative max-w-4xl max-h-[90vh] w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={closeImageModal}
+              className="absolute -top-12 right-0 p-2 text-white hover:text-gray-300 transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Title */}
+            <div className="absolute -top-12 left-0 text-white text-sm truncate max-w-[80%]">
+              {imageModal.title}
+            </div>
+
+            {/* Main image */}
+            <div className="relative bg-[var(--card)] rounded-xl overflow-hidden">
+              <img
+                src={imageModal.images[imageModal.currentIndex]}
+                alt={`${imageModal.title} - Image ${imageModal.currentIndex + 1}`}
+                className="w-full max-h-[80vh] object-contain"
+              />
+
+              {/* Navigation arrows */}
+              {imageModal.images.length > 1 && (
+                <>
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+                </>
+              )}
+
+              {/* Image counter */}
+              {imageModal.images.length > 1 && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white text-sm px-3 py-1 rounded-full">
+                  {imageModal.currentIndex + 1} / {imageModal.images.length}
+                </div>
+              )}
+            </div>
+
+            {/* Thumbnail strip */}
+            {imageModal.images.length > 1 && (
+              <div className="flex gap-2 mt-4 justify-center overflow-x-auto pb-2">
+                {imageModal.images.map((img, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setImageModal((prev) => ({ ...prev, currentIndex: index }))}
+                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${
+                      index === imageModal.currentIndex
+                        ? "border-[var(--primary)]"
+                        : "border-transparent hover:border-gray-400"
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      alt={`Thumbnail ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
