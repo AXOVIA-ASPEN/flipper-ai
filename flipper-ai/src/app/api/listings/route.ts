@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
-import { estimateValue, detectCategory } from "@/lib/value-estimator";
+import { estimateValue, detectCategory, generatePurchaseMessage } from "@/lib/value-estimator";
 
 // GET /api/listings - Get all listings with optional filters
 export async function GET(request: NextRequest) {
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     // Detect category if not provided
     const detectedCategory = category || detectCategory(title, description);
 
-    // Estimate value
+    // Estimate value (includes all analysis fields)
     const estimation = estimateValue(
       title,
       description,
@@ -83,12 +83,21 @@ export async function POST(request: NextRequest) {
       detectedCategory
     );
 
-    // Create or update listing
+    // Generate purchase request message
+    const requestToBuy = generatePurchaseMessage(
+      title,
+      askingPrice,
+      estimation.negotiable,
+      sellerName
+    );
+
+    // Create or update listing with all fields
     const listing = await prisma.listing.upsert({
       where: {
         platform_externalId: { platform, externalId },
       },
       create: {
+        // Basic info
         externalId,
         platform,
         url,
@@ -102,16 +111,34 @@ export async function POST(request: NextRequest) {
         imageUrls: imageUrls ? JSON.stringify(imageUrls) : null,
         category: detectedCategory,
         postedAt: postedAt ? new Date(postedAt) : null,
+
+        // Value estimation
         estimatedValue: estimation.estimatedValue,
         estimatedLow: estimation.estimatedLow,
         estimatedHigh: estimation.estimatedHigh,
         profitPotential: estimation.profitPotential,
+        profitLow: estimation.profitLow,
+        profitHigh: estimation.profitHigh,
         valueScore: estimation.valueScore,
+        discountPercent: estimation.discountPercent,
+        resaleDifficulty: estimation.resaleDifficulty,
+
+        // Market references
         comparableUrls: JSON.stringify(estimation.comparableUrls),
         priceReasoning: estimation.reasoning,
+        notes: estimation.notes,
+
+        // Metadata
+        shippable: estimation.shippable,
+        negotiable: estimation.negotiable,
+        tags: JSON.stringify(estimation.tags),
+        requestToBuy,
+
+        // Status
         status: estimation.valueScore >= 70 ? "OPPORTUNITY" : "NEW",
       },
       update: {
+        // Basic info updates
         title,
         description,
         askingPrice,
@@ -120,13 +147,28 @@ export async function POST(request: NextRequest) {
         sellerName,
         sellerContact,
         imageUrls: imageUrls ? JSON.stringify(imageUrls) : null,
+
+        // Value estimation updates
         estimatedValue: estimation.estimatedValue,
         estimatedLow: estimation.estimatedLow,
         estimatedHigh: estimation.estimatedHigh,
         profitPotential: estimation.profitPotential,
+        profitLow: estimation.profitLow,
+        profitHigh: estimation.profitHigh,
         valueScore: estimation.valueScore,
+        discountPercent: estimation.discountPercent,
+        resaleDifficulty: estimation.resaleDifficulty,
+
+        // Market references updates
         comparableUrls: JSON.stringify(estimation.comparableUrls),
         priceReasoning: estimation.reasoning,
+        notes: estimation.notes,
+
+        // Metadata updates
+        shippable: estimation.shippable,
+        negotiable: estimation.negotiable,
+        tags: JSON.stringify(estimation.tags),
+        requestToBuy,
       },
     });
 

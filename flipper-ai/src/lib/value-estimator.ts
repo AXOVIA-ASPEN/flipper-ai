@@ -6,10 +6,18 @@ export interface EstimationResult {
   estimatedLow: number;
   estimatedHigh: number;
   profitPotential: number;
+  profitLow: number;
+  profitHigh: number;
   valueScore: number;
+  discountPercent: number;
+  resaleDifficulty: "VERY_EASY" | "EASY" | "MODERATE" | "HARD" | "VERY_HARD";
   confidence: "low" | "medium" | "high";
   reasoning: string;
+  notes: string;
   comparableUrls: ComparableUrl[];
+  shippable: boolean;
+  negotiable: boolean;
+  tags: string[];
 }
 
 export interface ComparableUrl {
@@ -20,44 +28,50 @@ export interface ComparableUrl {
 }
 
 // Common product categories with typical resale markup ranges
-const CATEGORY_MULTIPLIERS: Record<string, { low: number; high: number }> = {
-  electronics: { low: 1.2, high: 1.6 },
-  furniture: { low: 1.3, high: 1.8 },
-  appliances: { low: 1.1, high: 1.4 },
-  tools: { low: 1.3, high: 1.7 },
-  "video games": { low: 1.4, high: 2.0 },
-  collectibles: { low: 1.5, high: 2.5 },
-  clothing: { low: 1.1, high: 1.5 },
-  sports: { low: 1.2, high: 1.6 },
-  musical: { low: 1.3, high: 1.7 },
-  automotive: { low: 1.1, high: 1.4 },
-  default: { low: 1.2, high: 1.5 },
+const CATEGORY_MULTIPLIERS: Record<string, { low: number; high: number; difficulty: number }> = {
+  electronics: { low: 1.2, high: 1.6, difficulty: 2 },
+  furniture: { low: 1.3, high: 1.8, difficulty: 4 }, // Harder to ship
+  appliances: { low: 1.1, high: 1.4, difficulty: 4 },
+  tools: { low: 1.3, high: 1.7, difficulty: 2 },
+  "video games": { low: 1.4, high: 2.0, difficulty: 1 },
+  collectibles: { low: 1.5, high: 2.5, difficulty: 2 },
+  clothing: { low: 1.1, high: 1.5, difficulty: 3 },
+  sports: { low: 1.2, high: 1.6, difficulty: 3 },
+  musical: { low: 1.3, high: 1.7, difficulty: 3 },
+  automotive: { low: 1.1, high: 1.4, difficulty: 4 },
+  default: { low: 1.2, high: 1.5, difficulty: 3 },
 };
 
 // Keywords that indicate higher value items
 const VALUE_KEYWORDS = [
-  { pattern: /apple|iphone|ipad|macbook|airpods/i, boost: 1.2, label: "Apple product" },
-  { pattern: /samsung|galaxy/i, boost: 1.15, label: "Samsung" },
-  { pattern: /sony|playstation|ps5|ps4/i, boost: 1.2, label: "Sony/PlayStation" },
-  { pattern: /nintendo|switch/i, boost: 1.25, label: "Nintendo" },
-  { pattern: /xbox|microsoft/i, boost: 1.15, label: "Xbox/Microsoft" },
-  { pattern: /dyson/i, boost: 1.3, label: "Dyson" },
-  { pattern: /kitchenaid|vitamix/i, boost: 1.25, label: "Premium kitchen brand" },
-  { pattern: /herman miller|steelcase/i, boost: 1.4, label: "Premium furniture" },
-  { pattern: /pioneer|ddj/i, boost: 1.2, label: "DJ equipment" },
-  { pattern: /vintage|antique|retro/i, boost: 1.4, label: "Vintage/collectible" },
-  { pattern: /sealed|new in box|nib|bnib/i, boost: 1.3, label: "New/sealed condition" },
-  { pattern: /rare|limited edition/i, boost: 1.4, label: "Rare/limited" },
+  { pattern: /apple|iphone|ipad|macbook|airpods/i, boost: 1.2, label: "Apple product", tag: "apple" },
+  { pattern: /samsung|galaxy/i, boost: 1.15, label: "Samsung", tag: "samsung" },
+  { pattern: /sony|playstation|ps5|ps4/i, boost: 1.2, label: "Sony/PlayStation", tag: "sony" },
+  { pattern: /nintendo|switch/i, boost: 1.25, label: "Nintendo", tag: "nintendo" },
+  { pattern: /xbox|microsoft/i, boost: 1.15, label: "Xbox/Microsoft", tag: "xbox" },
+  { pattern: /dyson/i, boost: 1.3, label: "Dyson", tag: "dyson" },
+  { pattern: /kitchenaid|vitamix/i, boost: 1.25, label: "Premium kitchen brand", tag: "premium-kitchen" },
+  { pattern: /herman miller|steelcase/i, boost: 1.4, label: "Premium furniture", tag: "premium-furniture" },
+  { pattern: /pioneer|ddj/i, boost: 1.2, label: "DJ equipment", tag: "dj-equipment" },
+  { pattern: /vintage|antique|retro/i, boost: 1.4, label: "Vintage/collectible", tag: "vintage" },
+  { pattern: /sealed|new in box|nib|bnib/i, boost: 1.3, label: "New/sealed condition", tag: "sealed" },
+  { pattern: /rare|limited edition/i, boost: 1.4, label: "Rare/limited", tag: "rare" },
 ];
 
 // Keywords that indicate lower value or risk
 const RISK_KEYWORDS = [
-  { pattern: /broken|damaged|parts only|for parts/i, penalty: 0.3, label: "For parts only" },
-  { pattern: /needs repair|not working|doesn't work/i, penalty: 0.4, label: "Needs repair" },
-  { pattern: /scratched|dented|worn/i, penalty: 0.85, label: "Cosmetic wear" },
-  { pattern: /missing|incomplete/i, penalty: 0.6, label: "Incomplete" },
-  { pattern: /old|used heavily/i, penalty: 0.75, label: "Heavy use" },
+  { pattern: /broken|damaged|parts only|for parts/i, penalty: 0.3, label: "For parts only", tag: "for-parts" },
+  { pattern: /needs repair|not working|doesn't work/i, penalty: 0.4, label: "Needs repair", tag: "needs-repair" },
+  { pattern: /scratched|dented|worn/i, penalty: 0.85, label: "Cosmetic wear", tag: "cosmetic-wear" },
+  { pattern: /missing|incomplete/i, penalty: 0.6, label: "Incomplete", tag: "incomplete" },
+  { pattern: /old|used heavily/i, penalty: 0.75, label: "Heavy use", tag: "heavy-use" },
 ];
+
+// Keywords that indicate negotiable pricing
+const NEGOTIABLE_KEYWORDS = /obo|or best offer|negotiable|make.?offer|flexible|willing to negotiate|best offer/i;
+
+// Keywords that indicate local pickup only (not shippable)
+const LOCAL_ONLY_KEYWORDS = /local pickup|pickup only|no shipping|cash only|must pick up|local only|in person/i;
 
 // Condition multipliers
 const CONDITION_MULTIPLIERS: Record<string, number> = {
@@ -69,13 +83,19 @@ const CONDITION_MULTIPLIERS: Record<string, number> = {
   poor: 0.4,
 };
 
+// Resale difficulty levels
+const DIFFICULTY_LABELS: Record<number, "VERY_EASY" | "EASY" | "MODERATE" | "HARD" | "VERY_HARD"> = {
+  1: "VERY_EASY",
+  2: "EASY",
+  3: "MODERATE",
+  4: "HARD",
+  5: "VERY_HARD",
+};
+
 // Generate search query for a product
 function generateSearchQuery(title: string): string {
-  // Extract key terms, remove common filler words
   const fillerWords = /\b(the|a|an|and|or|for|with|in|on|at|to|of|is|it|this|that|will|can|be|has|have|was|are|were|just|very|really|new|used|great|good|nice|excellent|condition)\b/gi;
   let query = title.replace(fillerWords, " ").replace(/\s+/g, " ").trim();
-
-  // Limit to first 5-6 meaningful words
   const words = query.split(" ").filter((w) => w.length > 2).slice(0, 6);
   return words.join(" ");
 }
@@ -83,14 +103,13 @@ function generateSearchQuery(title: string): string {
 // Generate eBay sold listings URL
 function getEbaySoldUrl(title: string): string {
   const query = encodeURIComponent(generateSearchQuery(title));
-  // LH_Complete=1 and LH_Sold=1 filter for sold items only
   return `https://www.ebay.com/sch/i.html?_nkw=${query}&LH_Complete=1&LH_Sold=1&_sop=13`;
 }
 
 // Generate eBay active listings URL
 function getEbayActiveUrl(title: string): string {
   const query = encodeURIComponent(generateSearchQuery(title));
-  return `https://www.ebay.com/sch/i.html?_nkw=${query}&_sop=15`; // Sort by price + shipping: lowest first
+  return `https://www.ebay.com/sch/i.html?_nkw=${query}&_sop=15`;
 }
 
 // Generate Facebook Marketplace search URL
@@ -116,7 +135,7 @@ export function estimateValue(
 
   // Get category multiplier range
   const categoryKey = category?.toLowerCase() || "default";
-  const categoryRange = CATEGORY_MULTIPLIERS[categoryKey] || CATEGORY_MULTIPLIERS.default;
+  const categoryData = CATEGORY_MULTIPLIERS[categoryKey] || CATEGORY_MULTIPLIERS.default;
 
   // Apply condition multiplier
   const conditionKey = condition?.toLowerCase() || "good";
@@ -125,34 +144,57 @@ export function estimateValue(
   // Check for value-adding keywords
   let valueBoost = 1.0;
   const valueMatches: string[] = [];
-  for (const { pattern, boost, label } of VALUE_KEYWORDS) {
+  const tags: string[] = [categoryKey];
+
+  for (const { pattern, boost, label, tag } of VALUE_KEYWORDS) {
     if (pattern.test(fullText)) {
       valueBoost *= boost;
       valueMatches.push(label);
+      tags.push(tag);
     }
   }
 
   // Check for risk keywords
   let riskPenalty = 1.0;
   const riskMatches: string[] = [];
-  for (const { pattern, penalty, label } of RISK_KEYWORDS) {
+  let difficultyAdjust = 0;
+
+  for (const { pattern, penalty, label, tag } of RISK_KEYWORDS) {
     if (pattern.test(fullText)) {
       riskPenalty *= penalty;
       riskMatches.push(label);
+      tags.push(tag);
+      difficultyAdjust += 1;
     }
   }
 
+  // Check if negotiable
+  const negotiable = NEGOTIABLE_KEYWORDS.test(fullText);
+  if (negotiable) tags.push("negotiable");
+
+  // Check if shippable
+  const shippable = !LOCAL_ONLY_KEYWORDS.test(fullText);
+  if (!shippable) {
+    tags.push("local-only");
+    difficultyAdjust += 1;
+  }
+
   // Calculate estimated market value range
-  const baseLow = askingPrice * categoryRange.low * conditionMultiplier * valueBoost * riskPenalty;
-  const baseHigh = askingPrice * categoryRange.high * conditionMultiplier * valueBoost * riskPenalty;
+  const baseLow = askingPrice * categoryData.low * conditionMultiplier * valueBoost * riskPenalty;
+  const baseHigh = askingPrice * categoryData.high * conditionMultiplier * valueBoost * riskPenalty;
 
   const estimatedLow = Math.round(baseLow);
   const estimatedHigh = Math.round(baseHigh);
   const estimatedValue = Math.round((baseLow + baseHigh) / 2);
 
+  // Calculate discount percentage (how far below market value)
+  const discountPercent = Math.round(((estimatedValue - askingPrice) / estimatedValue) * 100);
+
   // Calculate profit potential (accounting for ~13% platform fees on eBay/Mercari)
-  const platformFees = estimatedValue * 0.13;
-  const profitPotential = Math.round(estimatedValue - askingPrice - platformFees);
+  const feeRate = 0.13;
+  const profitLow = Math.round(estimatedLow * (1 - feeRate) - askingPrice);
+  const profitHigh = Math.round(estimatedHigh * (1 - feeRate) - askingPrice);
+  const profitPotential = Math.round((profitLow + profitHigh) / 2);
 
   // Calculate value score (0-100)
   const profitMargin = profitPotential / askingPrice;
@@ -164,6 +206,12 @@ export function estimateValue(
   if (profitPotential > 100) valueScore = Math.min(100, valueScore + 10);
   if (profitPotential > 200) valueScore = Math.min(100, valueScore + 10);
 
+  // Calculate resale difficulty
+  let difficultyLevel = categoryData.difficulty + difficultyAdjust;
+  if (valueMatches.length > 0) difficultyLevel -= 1; // Known brands are easier
+  difficultyLevel = Math.max(1, Math.min(5, difficultyLevel));
+  const resaleDifficulty = DIFFICULTY_LABELS[difficultyLevel];
+
   // Determine confidence level
   let confidence: "low" | "medium" | "high" = "medium";
   if (valueMatches.length > 0 && riskMatches.length === 0) {
@@ -174,8 +222,8 @@ export function estimateValue(
 
   // Generate reasoning
   const reasons: string[] = [];
-  reasons.push(`IMPORTANT: These are algorithmic estimates. Check the reference links below for actual sold prices.`);
-  reasons.push(`Category: ${categoryKey} (${categoryRange.low}x - ${categoryRange.high}x markup)`);
+  reasons.push(`IMPORTANT: These are algorithmic estimates. Check the reference links for actual sold prices.`);
+  reasons.push(`Category: ${categoryKey} (${categoryData.low}x - ${categoryData.high}x markup)`);
   reasons.push(`Condition factor: ${conditionMultiplier}x`);
   if (valueMatches.length > 0) {
     reasons.push(`Value indicators: ${valueMatches.join(", ")}`);
@@ -184,6 +232,29 @@ export function estimateValue(
     reasons.push(`Risk factors: ${riskMatches.join(", ")}`);
   }
   reasons.push(`Platform fees estimated at 13%`);
+
+  // Generate notes (AI-style analysis)
+  const notes: string[] = [];
+  if (valueMatches.length > 0) {
+    notes.push(`${valueMatches.join(" and ")} detected - typically holds value well.`);
+  }
+  if (discountPercent >= 50) {
+    notes.push(`Listed at ${discountPercent}% below estimated market value - strong flip potential.`);
+  } else if (discountPercent >= 30) {
+    notes.push(`Decent discount at ${discountPercent}% below market.`);
+  }
+  if (negotiable) {
+    notes.push(`Price appears negotiable - could get better deal.`);
+  }
+  if (!shippable) {
+    notes.push(`Local pickup only - limits resale options to local platforms.`);
+  }
+  if (riskMatches.length > 0) {
+    notes.push(`Caution: ${riskMatches.join(", ")} - factor into resale price.`);
+  }
+  if (notes.length === 0) {
+    notes.push(`Standard listing with average flip potential.`);
+  }
 
   // Generate comparable URLs
   const comparableUrls: ComparableUrl[] = [
@@ -218,11 +289,50 @@ export function estimateValue(
     estimatedLow,
     estimatedHigh,
     profitPotential,
+    profitLow,
+    profitHigh,
     valueScore,
+    discountPercent,
+    resaleDifficulty,
     confidence,
     reasoning: reasons.join(" | "),
+    notes: notes.join(" "),
     comparableUrls,
+    shippable,
+    negotiable,
+    tags,
   };
+}
+
+// Generate a purchase request message to send to seller
+export function generatePurchaseMessage(
+  title: string,
+  askingPrice: number,
+  negotiable: boolean,
+  sellerName?: string | null
+): string {
+  const greeting = sellerName ? `Hi ${sellerName},` : "Hi,";
+  const itemRef = title.length > 50 ? title.substring(0, 47) + "..." : title;
+
+  if (negotiable) {
+    // Offer slightly below asking if negotiable
+    const offerPrice = Math.round(askingPrice * 0.85);
+    return `${greeting}
+
+I'm interested in your ${itemRef} listing. Is this item still available?
+
+Would you consider $${offerPrice} for it? I can pick up today/tomorrow and pay cash.
+
+Thanks!`;
+  } else {
+    return `${greeting}
+
+I'm interested in your ${itemRef} listing for $${askingPrice}. Is this item still available?
+
+I can pick up at your convenience and pay cash. Please let me know!
+
+Thanks!`;
+  }
 }
 
 // Determine the best category based on title/description

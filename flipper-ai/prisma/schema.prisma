@@ -50,16 +50,31 @@ model Listing {
   scrapedAt       DateTime      @default(now())
 
   // Flip analysis
-  estimatedValue  Float?        // What we think it's worth
+  estimatedValue  Float?        // What we think it's worth (midpoint)
   estimatedLow    Float?        // Low end of estimated value range
   estimatedHigh   Float?        // High end of estimated value range
   profitPotential Float?        // Estimated profit if flipped
+  profitLow       Float?        // Low end profit estimate
+  profitHigh      Float?        // High end profit estimate
   valueScore      Float?        // 0-100 score of flip potential
+  discountPercent Float?        // How far below market value (e.g., 40 = 40% below)
+  resaleDifficulty String?      // VERY_EASY, EASY, MODERATE, HARD, VERY_HARD
   status          String        @default("NEW")
 
   // Market references (JSON)
   comparableUrls  String?       // JSON: URLs to eBay sold listings, etc.
   priceReasoning  String?       // Explanation of how value was estimated
+  notes           String?       // AI-generated analysis notes
+
+  // Additional metadata for flipping
+  shippable       Boolean?      // Can be shipped (vs local pickup only)
+  estimatedWeight Float?        // Estimated weight in lbs (for shipping cost)
+  negotiable      Boolean?      // Is price negotiable? (detected from OBO, firm, etc.)
+  daysListed      Int?          // Days since originally posted
+  tags            String?       // JSON: Array of detected keywords for filtering
+
+  // AI-generated purchase request message
+  requestToBuy    String?       // AI-generated message to send to seller
 
   // Relations
   opportunity     Opportunity?
