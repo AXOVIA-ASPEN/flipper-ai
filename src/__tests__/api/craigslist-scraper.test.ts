@@ -1,6 +1,53 @@
 import { NextRequest } from 'next/server';
 import { GET, POST } from '@/app/api/scraper/craigslist/route';
 
+const mockEstimateValue = jest.fn();
+const mockDetectCategory = jest.fn();
+const mockGeneratePurchaseMessage = jest.fn();
+const mockIdentifyItem = jest.fn();
+const mockFetchMarketPrice = jest.fn();
+const mockCloseMarketBrowser = jest.fn();
+const mockAnalyzeSellability = jest.fn();
+const mockQuickDiscountCheck = jest.fn();
+
+jest.mock('@/lib/value-estimator', () => ({
+  estimateValue: (...args: unknown[]) => mockEstimateValue(...args),
+  detectCategory: (...args: unknown[]) => mockDetectCategory(...args),
+  generatePurchaseMessage: (...args: unknown[]) => mockGeneratePurchaseMessage(...args),
+}));
+
+jest.mock('@/lib/llm-identifier', () => ({
+  identifyItem: (...args: unknown[]) => mockIdentifyItem(...args),
+}));
+
+jest.mock('@/lib/market-price', () => ({
+  fetchMarketPrice: (...args: unknown[]) => mockFetchMarketPrice(...args),
+  closeBrowser: (...args: unknown[]) => mockCloseMarketBrowser(...args),
+}));
+
+jest.mock('@/lib/llm-analyzer', () => ({
+  analyzeSellability: (...args: unknown[]) => mockAnalyzeSellability(...args),
+  quickDiscountCheck: (...args: unknown[]) => mockQuickDiscountCheck(...args),
+}));
+
+const createDefaultEstimation = () => ({
+  estimatedValue: 1200,
+  estimatedLow: 1000,
+  estimatedHigh: 1400,
+  profitPotential: 400,
+  profitLow: 350,
+  profitHigh: 450,
+  valueScore: 85,
+  discountPercent: 40,
+  resaleDifficulty: "EASY",
+  comparableUrls: [{ platform: "eBay", label: "eBay", url: "https://ebay.com", type: "sold" }],
+  reasoning: "Test reasoning",
+  notes: "Test notes",
+  shippable: true,
+  negotiable: true,
+  tags: ["electronics", "craigslist"],
+});
+
 // Mock Playwright
 const mockGoto = jest.fn();
 const mockWaitForSelector = jest.fn();
@@ -55,6 +102,17 @@ function createMockRequest(
 describe('Craigslist Scraper API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    delete process.env.GOOGLE_API_KEY;
+    mockEstimateValue.mockImplementation(() => createDefaultEstimation());
+    mockDetectCategory.mockReturnValue("electronics");
+    mockGeneratePurchaseMessage.mockImplementation(
+      (title: string) => `Auto purchase message for ${title}`
+    );
+    mockIdentifyItem.mockResolvedValue(null);
+    mockFetchMarketPrice.mockResolvedValue(null);
+    mockAnalyzeSellability.mockResolvedValue(null);
+    mockQuickDiscountCheck.mockReturnValue({ passesQuickCheck: false });
+    mockCloseMarketBrowser.mockResolvedValue(undefined);
 
     // Setup mock for scraperJob
     mockJobCreate.mockResolvedValue({ id: 'job-123' });

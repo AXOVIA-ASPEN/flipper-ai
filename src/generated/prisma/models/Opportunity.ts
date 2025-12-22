@@ -42,6 +42,7 @@ export type OpportunitySumAggregateOutputType = {
 
 export type OpportunityMinAggregateOutputType = {
   id: string | null
+  userId: string | null
   listingId: string | null
   purchasePrice: number | null
   purchaseDate: Date | null
@@ -60,6 +61,7 @@ export type OpportunityMinAggregateOutputType = {
 
 export type OpportunityMaxAggregateOutputType = {
   id: string | null
+  userId: string | null
   listingId: string | null
   purchasePrice: number | null
   purchaseDate: Date | null
@@ -78,6 +80,7 @@ export type OpportunityMaxAggregateOutputType = {
 
 export type OpportunityCountAggregateOutputType = {
   id: number
+  userId: number
   listingId: number
   purchasePrice: number
   purchaseDate: number
@@ -112,6 +115,7 @@ export type OpportunitySumAggregateInputType = {
 
 export type OpportunityMinAggregateInputType = {
   id?: true
+  userId?: true
   listingId?: true
   purchasePrice?: true
   purchaseDate?: true
@@ -130,6 +134,7 @@ export type OpportunityMinAggregateInputType = {
 
 export type OpportunityMaxAggregateInputType = {
   id?: true
+  userId?: true
   listingId?: true
   purchasePrice?: true
   purchaseDate?: true
@@ -148,6 +153,7 @@ export type OpportunityMaxAggregateInputType = {
 
 export type OpportunityCountAggregateInputType = {
   id?: true
+  userId?: true
   listingId?: true
   purchasePrice?: true
   purchaseDate?: true
@@ -253,6 +259,7 @@ export type OpportunityGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 
 export type OpportunityGroupByOutputType = {
   id: string
+  userId: string | null
   listingId: string
   purchasePrice: number | null
   purchaseDate: Date | null
@@ -294,6 +301,7 @@ export type OpportunityWhereInput = {
   OR?: Prisma.OpportunityWhereInput[]
   NOT?: Prisma.OpportunityWhereInput | Prisma.OpportunityWhereInput[]
   id?: Prisma.StringFilter<"Opportunity"> | string
+  userId?: Prisma.StringNullableFilter<"Opportunity"> | string | null
   listingId?: Prisma.StringFilter<"Opportunity"> | string
   purchasePrice?: Prisma.FloatNullableFilter<"Opportunity"> | number | null
   purchaseDate?: Prisma.DateTimeNullableFilter<"Opportunity"> | Date | string | null
@@ -308,11 +316,13 @@ export type OpportunityWhereInput = {
   notes?: Prisma.StringNullableFilter<"Opportunity"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Opportunity"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Opportunity"> | Date | string
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   listing?: Prisma.XOR<Prisma.ListingScalarRelationFilter, Prisma.ListingWhereInput>
 }
 
 export type OpportunityOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrderInput | Prisma.SortOrder
   listingId?: Prisma.SortOrder
   purchasePrice?: Prisma.SortOrderInput | Prisma.SortOrder
   purchaseDate?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -327,6 +337,7 @@ export type OpportunityOrderByWithRelationInput = {
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  user?: Prisma.UserOrderByWithRelationInput
   listing?: Prisma.ListingOrderByWithRelationInput
 }
 
@@ -336,6 +347,7 @@ export type OpportunityWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.OpportunityWhereInput | Prisma.OpportunityWhereInput[]
   OR?: Prisma.OpportunityWhereInput[]
   NOT?: Prisma.OpportunityWhereInput | Prisma.OpportunityWhereInput[]
+  userId?: Prisma.StringNullableFilter<"Opportunity"> | string | null
   purchasePrice?: Prisma.FloatNullableFilter<"Opportunity"> | number | null
   purchaseDate?: Prisma.DateTimeNullableFilter<"Opportunity"> | Date | string | null
   purchaseNotes?: Prisma.StringNullableFilter<"Opportunity"> | string | null
@@ -349,11 +361,13 @@ export type OpportunityWhereUniqueInput = Prisma.AtLeast<{
   notes?: Prisma.StringNullableFilter<"Opportunity"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Opportunity"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Opportunity"> | Date | string
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   listing?: Prisma.XOR<Prisma.ListingScalarRelationFilter, Prisma.ListingWhereInput>
 }, "id" | "listingId">
 
 export type OpportunityOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrderInput | Prisma.SortOrder
   listingId?: Prisma.SortOrder
   purchasePrice?: Prisma.SortOrderInput | Prisma.SortOrder
   purchaseDate?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -380,6 +394,7 @@ export type OpportunityScalarWhereWithAggregatesInput = {
   OR?: Prisma.OpportunityScalarWhereWithAggregatesInput[]
   NOT?: Prisma.OpportunityScalarWhereWithAggregatesInput | Prisma.OpportunityScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Opportunity"> | string
+  userId?: Prisma.StringNullableWithAggregatesFilter<"Opportunity"> | string | null
   listingId?: Prisma.StringWithAggregatesFilter<"Opportunity"> | string
   purchasePrice?: Prisma.FloatNullableWithAggregatesFilter<"Opportunity"> | number | null
   purchaseDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Opportunity"> | Date | string | null
@@ -411,11 +426,13 @@ export type OpportunityCreateInput = {
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  user?: Prisma.UserCreateNestedOneWithoutOpportunitiesInput
   listing: Prisma.ListingCreateNestedOneWithoutOpportunityInput
 }
 
 export type OpportunityUncheckedCreateInput = {
   id?: string
+  userId?: string | null
   listingId: string
   purchasePrice?: number | null
   purchaseDate?: Date | string | null
@@ -447,11 +464,13 @@ export type OpportunityUpdateInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneWithoutOpportunitiesNestedInput
   listing?: Prisma.ListingUpdateOneRequiredWithoutOpportunityNestedInput
 }
 
 export type OpportunityUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   listingId?: Prisma.StringFieldUpdateOperationsInput | string
   purchasePrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -470,6 +489,7 @@ export type OpportunityUncheckedUpdateInput = {
 
 export type OpportunityCreateManyInput = {
   id?: string
+  userId?: string | null
   listingId: string
   purchasePrice?: number | null
   purchaseDate?: Date | string | null
@@ -505,6 +525,7 @@ export type OpportunityUpdateManyMutationInput = {
 
 export type OpportunityUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   listingId?: Prisma.StringFieldUpdateOperationsInput | string
   purchasePrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -528,6 +549,7 @@ export type OpportunityNullableScalarRelationFilter = {
 
 export type OpportunityCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   listingId?: Prisma.SortOrder
   purchasePrice?: Prisma.SortOrder
   purchaseDate?: Prisma.SortOrder
@@ -553,6 +575,7 @@ export type OpportunityAvgOrderByAggregateInput = {
 
 export type OpportunityMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   listingId?: Prisma.SortOrder
   purchasePrice?: Prisma.SortOrder
   purchaseDate?: Prisma.SortOrder
@@ -571,6 +594,7 @@ export type OpportunityMaxOrderByAggregateInput = {
 
 export type OpportunityMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   listingId?: Prisma.SortOrder
   purchasePrice?: Prisma.SortOrder
   purchaseDate?: Prisma.SortOrder
@@ -592,6 +616,16 @@ export type OpportunitySumOrderByAggregateInput = {
   resalePrice?: Prisma.SortOrder
   actualProfit?: Prisma.SortOrder
   fees?: Prisma.SortOrder
+}
+
+export type OpportunityListRelationFilter = {
+  every?: Prisma.OpportunityWhereInput
+  some?: Prisma.OpportunityWhereInput
+  none?: Prisma.OpportunityWhereInput
+}
+
+export type OpportunityOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type OpportunityCreateNestedOneWithoutListingInput = {
@@ -626,6 +660,48 @@ export type OpportunityUncheckedUpdateOneWithoutListingNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.OpportunityUpdateToOneWithWhereWithoutListingInput, Prisma.OpportunityUpdateWithoutListingInput>, Prisma.OpportunityUncheckedUpdateWithoutListingInput>
 }
 
+export type OpportunityCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.OpportunityCreateWithoutUserInput, Prisma.OpportunityUncheckedCreateWithoutUserInput> | Prisma.OpportunityCreateWithoutUserInput[] | Prisma.OpportunityUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.OpportunityCreateOrConnectWithoutUserInput | Prisma.OpportunityCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.OpportunityCreateManyUserInputEnvelope
+  connect?: Prisma.OpportunityWhereUniqueInput | Prisma.OpportunityWhereUniqueInput[]
+}
+
+export type OpportunityUncheckedCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.OpportunityCreateWithoutUserInput, Prisma.OpportunityUncheckedCreateWithoutUserInput> | Prisma.OpportunityCreateWithoutUserInput[] | Prisma.OpportunityUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.OpportunityCreateOrConnectWithoutUserInput | Prisma.OpportunityCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.OpportunityCreateManyUserInputEnvelope
+  connect?: Prisma.OpportunityWhereUniqueInput | Prisma.OpportunityWhereUniqueInput[]
+}
+
+export type OpportunityUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.OpportunityCreateWithoutUserInput, Prisma.OpportunityUncheckedCreateWithoutUserInput> | Prisma.OpportunityCreateWithoutUserInput[] | Prisma.OpportunityUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.OpportunityCreateOrConnectWithoutUserInput | Prisma.OpportunityCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.OpportunityUpsertWithWhereUniqueWithoutUserInput | Prisma.OpportunityUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.OpportunityCreateManyUserInputEnvelope
+  set?: Prisma.OpportunityWhereUniqueInput | Prisma.OpportunityWhereUniqueInput[]
+  disconnect?: Prisma.OpportunityWhereUniqueInput | Prisma.OpportunityWhereUniqueInput[]
+  delete?: Prisma.OpportunityWhereUniqueInput | Prisma.OpportunityWhereUniqueInput[]
+  connect?: Prisma.OpportunityWhereUniqueInput | Prisma.OpportunityWhereUniqueInput[]
+  update?: Prisma.OpportunityUpdateWithWhereUniqueWithoutUserInput | Prisma.OpportunityUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.OpportunityUpdateManyWithWhereWithoutUserInput | Prisma.OpportunityUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.OpportunityScalarWhereInput | Prisma.OpportunityScalarWhereInput[]
+}
+
+export type OpportunityUncheckedUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.OpportunityCreateWithoutUserInput, Prisma.OpportunityUncheckedCreateWithoutUserInput> | Prisma.OpportunityCreateWithoutUserInput[] | Prisma.OpportunityUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.OpportunityCreateOrConnectWithoutUserInput | Prisma.OpportunityCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.OpportunityUpsertWithWhereUniqueWithoutUserInput | Prisma.OpportunityUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.OpportunityCreateManyUserInputEnvelope
+  set?: Prisma.OpportunityWhereUniqueInput | Prisma.OpportunityWhereUniqueInput[]
+  disconnect?: Prisma.OpportunityWhereUniqueInput | Prisma.OpportunityWhereUniqueInput[]
+  delete?: Prisma.OpportunityWhereUniqueInput | Prisma.OpportunityWhereUniqueInput[]
+  connect?: Prisma.OpportunityWhereUniqueInput | Prisma.OpportunityWhereUniqueInput[]
+  update?: Prisma.OpportunityUpdateWithWhereUniqueWithoutUserInput | Prisma.OpportunityUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.OpportunityUpdateManyWithWhereWithoutUserInput | Prisma.OpportunityUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.OpportunityScalarWhereInput | Prisma.OpportunityScalarWhereInput[]
+}
+
 export type OpportunityCreateWithoutListingInput = {
   id?: string
   purchasePrice?: number | null
@@ -641,10 +717,12 @@ export type OpportunityCreateWithoutListingInput = {
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  user?: Prisma.UserCreateNestedOneWithoutOpportunitiesInput
 }
 
 export type OpportunityUncheckedCreateWithoutListingInput = {
   id?: string
+  userId?: string | null
   purchasePrice?: number | null
   purchaseDate?: Date | string | null
   purchaseNotes?: string | null
@@ -691,10 +769,167 @@ export type OpportunityUpdateWithoutListingInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneWithoutOpportunitiesNestedInput
 }
 
 export type OpportunityUncheckedUpdateWithoutListingInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  purchasePrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resalePrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  resalePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resaleUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resaleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actualProfit?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fees?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type OpportunityCreateWithoutUserInput = {
+  id?: string
+  purchasePrice?: number | null
+  purchaseDate?: Date | string | null
+  purchaseNotes?: string | null
+  resalePrice?: number | null
+  resalePlatform?: string | null
+  resaleUrl?: string | null
+  resaleDate?: Date | string | null
+  actualProfit?: number | null
+  fees?: number | null
+  status?: string
+  notes?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  listing: Prisma.ListingCreateNestedOneWithoutOpportunityInput
+}
+
+export type OpportunityUncheckedCreateWithoutUserInput = {
+  id?: string
+  listingId: string
+  purchasePrice?: number | null
+  purchaseDate?: Date | string | null
+  purchaseNotes?: string | null
+  resalePrice?: number | null
+  resalePlatform?: string | null
+  resaleUrl?: string | null
+  resaleDate?: Date | string | null
+  actualProfit?: number | null
+  fees?: number | null
+  status?: string
+  notes?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type OpportunityCreateOrConnectWithoutUserInput = {
+  where: Prisma.OpportunityWhereUniqueInput
+  create: Prisma.XOR<Prisma.OpportunityCreateWithoutUserInput, Prisma.OpportunityUncheckedCreateWithoutUserInput>
+}
+
+export type OpportunityCreateManyUserInputEnvelope = {
+  data: Prisma.OpportunityCreateManyUserInput | Prisma.OpportunityCreateManyUserInput[]
+}
+
+export type OpportunityUpsertWithWhereUniqueWithoutUserInput = {
+  where: Prisma.OpportunityWhereUniqueInput
+  update: Prisma.XOR<Prisma.OpportunityUpdateWithoutUserInput, Prisma.OpportunityUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.OpportunityCreateWithoutUserInput, Prisma.OpportunityUncheckedCreateWithoutUserInput>
+}
+
+export type OpportunityUpdateWithWhereUniqueWithoutUserInput = {
+  where: Prisma.OpportunityWhereUniqueInput
+  data: Prisma.XOR<Prisma.OpportunityUpdateWithoutUserInput, Prisma.OpportunityUncheckedUpdateWithoutUserInput>
+}
+
+export type OpportunityUpdateManyWithWhereWithoutUserInput = {
+  where: Prisma.OpportunityScalarWhereInput
+  data: Prisma.XOR<Prisma.OpportunityUpdateManyMutationInput, Prisma.OpportunityUncheckedUpdateManyWithoutUserInput>
+}
+
+export type OpportunityScalarWhereInput = {
+  AND?: Prisma.OpportunityScalarWhereInput | Prisma.OpportunityScalarWhereInput[]
+  OR?: Prisma.OpportunityScalarWhereInput[]
+  NOT?: Prisma.OpportunityScalarWhereInput | Prisma.OpportunityScalarWhereInput[]
+  id?: Prisma.StringFilter<"Opportunity"> | string
+  userId?: Prisma.StringNullableFilter<"Opportunity"> | string | null
+  listingId?: Prisma.StringFilter<"Opportunity"> | string
+  purchasePrice?: Prisma.FloatNullableFilter<"Opportunity"> | number | null
+  purchaseDate?: Prisma.DateTimeNullableFilter<"Opportunity"> | Date | string | null
+  purchaseNotes?: Prisma.StringNullableFilter<"Opportunity"> | string | null
+  resalePrice?: Prisma.FloatNullableFilter<"Opportunity"> | number | null
+  resalePlatform?: Prisma.StringNullableFilter<"Opportunity"> | string | null
+  resaleUrl?: Prisma.StringNullableFilter<"Opportunity"> | string | null
+  resaleDate?: Prisma.DateTimeNullableFilter<"Opportunity"> | Date | string | null
+  actualProfit?: Prisma.FloatNullableFilter<"Opportunity"> | number | null
+  fees?: Prisma.FloatNullableFilter<"Opportunity"> | number | null
+  status?: Prisma.StringFilter<"Opportunity"> | string
+  notes?: Prisma.StringNullableFilter<"Opportunity"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Opportunity"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Opportunity"> | Date | string
+}
+
+export type OpportunityCreateManyUserInput = {
+  id?: string
+  listingId: string
+  purchasePrice?: number | null
+  purchaseDate?: Date | string | null
+  purchaseNotes?: string | null
+  resalePrice?: number | null
+  resalePlatform?: string | null
+  resaleUrl?: string | null
+  resaleDate?: Date | string | null
+  actualProfit?: number | null
+  fees?: number | null
+  status?: string
+  notes?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type OpportunityUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  purchasePrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resalePrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  resalePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resaleUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resaleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actualProfit?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fees?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  listing?: Prisma.ListingUpdateOneRequiredWithoutOpportunityNestedInput
+}
+
+export type OpportunityUncheckedUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  listingId?: Prisma.StringFieldUpdateOperationsInput | string
+  purchasePrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resalePrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  resalePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resaleUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resaleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actualProfit?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  fees?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type OpportunityUncheckedUpdateManyWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  listingId?: Prisma.StringFieldUpdateOperationsInput | string
   purchasePrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   purchaseNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -714,6 +949,7 @@ export type OpportunityUncheckedUpdateWithoutListingInput = {
 
 export type OpportunitySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  userId?: boolean
   listingId?: boolean
   purchasePrice?: boolean
   purchaseDate?: boolean
@@ -728,11 +964,13 @@ export type OpportunitySelect<ExtArgs extends runtime.Types.Extensions.InternalA
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  user?: boolean | Prisma.Opportunity$userArgs<ExtArgs>
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["opportunity"]>
 
 export type OpportunitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  userId?: boolean
   listingId?: boolean
   purchasePrice?: boolean
   purchaseDate?: boolean
@@ -747,11 +985,13 @@ export type OpportunitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  user?: boolean | Prisma.Opportunity$userArgs<ExtArgs>
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["opportunity"]>
 
 export type OpportunitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  userId?: boolean
   listingId?: boolean
   purchasePrice?: boolean
   purchaseDate?: boolean
@@ -766,11 +1006,13 @@ export type OpportunitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  user?: boolean | Prisma.Opportunity$userArgs<ExtArgs>
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["opportunity"]>
 
 export type OpportunitySelectScalar = {
   id?: boolean
+  userId?: boolean
   listingId?: boolean
   purchasePrice?: boolean
   purchaseDate?: boolean
@@ -787,24 +1029,29 @@ export type OpportunitySelectScalar = {
   updatedAt?: boolean
 }
 
-export type OpportunityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "listingId" | "purchasePrice" | "purchaseDate" | "purchaseNotes" | "resalePrice" | "resalePlatform" | "resaleUrl" | "resaleDate" | "actualProfit" | "fees" | "status" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["opportunity"]>
+export type OpportunityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "listingId" | "purchasePrice" | "purchaseDate" | "purchaseNotes" | "resalePrice" | "resalePlatform" | "resaleUrl" | "resaleDate" | "actualProfit" | "fees" | "status" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["opportunity"]>
 export type OpportunityInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.Opportunity$userArgs<ExtArgs>
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
 }
 export type OpportunityIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.Opportunity$userArgs<ExtArgs>
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
 }
 export type OpportunityIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.Opportunity$userArgs<ExtArgs>
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
 }
 
 export type $OpportunityPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Opportunity"
   objects: {
+    user: Prisma.$UserPayload<ExtArgs> | null
     listing: Prisma.$ListingPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    userId: string | null
     listingId: string
     purchasePrice: number | null
     purchaseDate: Date | null
@@ -1213,6 +1460,7 @@ readonly fields: OpportunityFieldRefs;
  */
 export interface Prisma__OpportunityClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  user<T extends Prisma.Opportunity$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Opportunity$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   listing<T extends Prisma.ListingDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ListingDefaultArgs<ExtArgs>>): Prisma.Prisma__ListingClient<runtime.Types.Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1244,6 +1492,7 @@ export interface Prisma__OpportunityClient<T, Null = never, ExtArgs extends runt
  */
 export interface OpportunityFieldRefs {
   readonly id: Prisma.FieldRef<"Opportunity", 'String'>
+  readonly userId: Prisma.FieldRef<"Opportunity", 'String'>
   readonly listingId: Prisma.FieldRef<"Opportunity", 'String'>
   readonly purchasePrice: Prisma.FieldRef<"Opportunity", 'Float'>
   readonly purchaseDate: Prisma.FieldRef<"Opportunity", 'DateTime'>
@@ -1649,6 +1898,25 @@ export type OpportunityDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Limit how many Opportunities to delete.
    */
   limit?: number
+}
+
+/**
+ * Opportunity.user
+ */
+export type Opportunity$userArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

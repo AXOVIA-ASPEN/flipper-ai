@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState, useCallback } from "react";
 import {
   TrendingUp,
   DollarSign,
@@ -15,7 +15,48 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  Trash2,
+  CheckCircle2,
+  AlertTriangle,
+  Loader2,
+  MapPin,
+  Tag,
+  Calendar,
 } from "lucide-react";
+import { useFilterParams, FilterState } from "@/hooks/useFilterParams";
+
+// Location and category options (reused from settings page)
+const locations = [
+  { value: "", label: "All Locations" },
+  { value: "sarasota", label: "Sarasota, FL" },
+  { value: "tampa", label: "Tampa, FL" },
+  { value: "orlando", label: "Orlando, FL" },
+  { value: "miami", label: "Miami, FL" },
+  { value: "jacksonville", label: "Jacksonville, FL" },
+  { value: "sfbay", label: "San Francisco Bay Area" },
+  { value: "losangeles", label: "Los Angeles, CA" },
+  { value: "newyork", label: "New York, NY" },
+  { value: "chicago", label: "Chicago, IL" },
+  { value: "seattle", label: "Seattle, WA" },
+  { value: "austin", label: "Austin, TX" },
+  { value: "denver", label: "Denver, CO" },
+];
+
+const categories = [
+  { value: "", label: "All Categories" },
+  { value: "electronics", label: "Electronics" },
+  { value: "furniture", label: "Furniture" },
+  { value: "appliances", label: "Appliances" },
+  { value: "sporting", label: "Sporting Goods" },
+  { value: "tools", label: "Tools" },
+  { value: "jewelry", label: "Jewelry" },
+  { value: "antiques", label: "Antiques" },
+  { value: "video_gaming", label: "Video Gaming" },
+  { value: "music_instr", label: "Musical Instruments" },
+  { value: "computers", label: "Computers" },
+  { value: "cell_phones", label: "Cell Phones" },
+];
 
 interface Listing {
   id: string;
@@ -25,11 +66,13 @@ interface Listing {
   estimatedValue: number | null;
   profitPotential: number | null;
   valueScore: number | null;
+  discountPercent: number | null;
   status: string;
   location: string | null;
   url: string;
   scrapedAt: string;
   imageUrls: string | null;
+  opportunity?: { id: string } | null;
 }
 
 interface Stats {
@@ -58,7 +101,7 @@ interface ImageModalState {
   title: string;
 }
 
-export default function Dashboard() {
+function DashboardContent() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [stats, setStats] = useState<Stats>({
     totalListings: 0,
@@ -67,14 +110,22 @@ export default function Dashboard() {
     avgValueScore: 0,
   });
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<string>("all");
+  const { filters, setFilter, clearFilters, activeFilterCount } = useFilterParams();
   const [searchTerm, setSearchTerm] = useState("");
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [imageModal, setImageModal] = useState<ImageModalState>({
     isOpen: false,
     images: [],
     currentIndex: 0,
     title: "",
   });
+  const [selectedListingIds, setSelectedListingIds] = useState<Set<string>>(new Set());
+  const selectAllRef = useRef<HTMLInputElement>(null);
+
+  // Bulk operations state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [bulkActionLoading, setBulkActionLoading] = useState<string | null>(null);
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
   const openImageModal = (listing: Listing) => {
     const images = parseImageUrls(listing.imageUrls);
@@ -106,15 +157,19 @@ export default function Dashboard() {
     }));
   };
 
-  useEffect(() => {
-    fetchListings();
-  }, [filter]);
-
-  async function fetchListings() {
+  const fetchListings = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      if (filter !== "all") params.set("status", filter);
+
+      // Build query params from all filters
+      if (filters.status && filters.status !== "all") params.set("status", filters.status);
+      if (filters.location) params.set("location", filters.location);
+      if (filters.category) params.set("category", filters.category);
+      if (filters.minPrice) params.set("minPrice", filters.minPrice);
+      if (filters.maxPrice) params.set("maxPrice", filters.maxPrice);
+      if (filters.dateFrom) params.set("dateFrom", filters.dateFrom);
+      if (filters.dateTo) params.set("dateTo", filters.dateTo);
 
       const response = await fetch(`/api/listings?${params}`);
       const data = await response.json();
@@ -147,7 +202,24 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [filters]);
+
+  useEffect(() => {
+    fetchListings();
+  }, [fetchListings]);
+
+  useEffect(() => {
+    setSelectedListingIds((prev) => {
+      const validIds = new Set(listings.map((listing) => listing.id));
+      const next = new Set<string>();
+      prev.forEach((id) => {
+        if (validIds.has(id)) {
+          next.add(id);
+        }
+      });
+      return next;
+    });
+  }, [listings]);
 
   async function markAsOpportunity(listingId: string) {
     try {
@@ -162,9 +234,119 @@ export default function Dashboard() {
     }
   }
 
+  // Bulk operations
+  async function bulkAddToOpportunities() {
+    if (selectedListingIds.size === 0) return;
+    setBulkActionLoading("opportunities");
+    try {
+      const promises = Array.from(selectedListingIds).map((listingId) =>
+        fetch("/api/opportunities", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ listingId }),
+        })
+      );
+      await Promise.all(promises);
+      setSelectedListingIds(new Set());
+      fetchListings();
+    } catch (error) {
+      console.error("Failed to bulk add opportunities:", error);
+    } finally {
+      setBulkActionLoading(null);
+    }
+  }
+
+  async function bulkUpdateStatus(newStatus: string) {
+    if (selectedListingIds.size === 0) return;
+    setBulkActionLoading("status");
+    setShowStatusDropdown(false);
+    try {
+      const promises = Array.from(selectedListingIds).map((listingId) =>
+        fetch(`/api/listings/${listingId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: newStatus }),
+        })
+      );
+      await Promise.all(promises);
+      setSelectedListingIds(new Set());
+      fetchListings();
+    } catch (error) {
+      console.error("Failed to bulk update status:", error);
+    } finally {
+      setBulkActionLoading(null);
+    }
+  }
+
+  async function bulkDelete() {
+    if (selectedListingIds.size === 0) return;
+    setBulkActionLoading("delete");
+    setShowDeleteModal(false);
+    try {
+      const promises = Array.from(selectedListingIds).map((listingId) =>
+        fetch(`/api/listings/${listingId}`, {
+          method: "DELETE",
+        })
+      );
+      await Promise.all(promises);
+      setSelectedListingIds(new Set());
+      fetchListings();
+    } catch (error) {
+      console.error("Failed to bulk delete:", error);
+    } finally {
+      setBulkActionLoading(null);
+    }
+  }
+
+  function clearSelection() {
+    setSelectedListingIds(new Set());
+  }
+
   const filteredListings = listings.filter((listing) =>
     listing.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const allVisibleSelected =
+    filteredListings.length > 0 &&
+    filteredListings.every((listing) => selectedListingIds.has(listing.id));
+
+  const someVisibleSelected =
+    filteredListings.some((listing) => selectedListingIds.has(listing.id)) &&
+    !allVisibleSelected;
+
+  useEffect(() => {
+    if (selectAllRef.current) {
+      selectAllRef.current.indeterminate = someVisibleSelected;
+    }
+  }, [someVisibleSelected, allVisibleSelected]);
+
+  const toggleListingSelection = (listingId: string) => {
+    setSelectedListingIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(listingId)) {
+        next.delete(listingId);
+      } else {
+        next.add(listingId);
+      }
+      return next;
+    });
+  };
+
+  const toggleSelectAllVisible = () => {
+    if (allVisibleSelected) {
+      setSelectedListingIds((prev) => {
+        const next = new Set(prev);
+        filteredListings.forEach((listing) => next.delete(listing.id));
+        return next;
+      });
+    } else {
+      setSelectedListingIds((prev) => {
+        const next = new Set(prev);
+        filteredListings.forEach((listing) => next.add(listing.id));
+        return next;
+      });
+    }
+  };
 
   const getScoreColor = (score: number | null) => {
     if (!score) return "bg-gradient-to-r from-gray-400 to-gray-600 text-white border-gray-400 shadow-gray-500/50";
@@ -196,6 +378,11 @@ export default function Dashboard() {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
+  };
+
+  const formatPercent = (value: number | null) => {
+    if (value === null || Number.isNaN(value)) return "-";
+    return `${value}%`;
   };
 
   return (
@@ -307,8 +494,8 @@ export default function Dashboard() {
             <div className="flex items-center gap-2">
               <Filter className="w-5 h-5 text-blue-200/70" />
               <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
+                value={filters.status}
+                onChange={(e) => setFilter("status", e.target.value)}
                 className="px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50 text-white transition-all duration-300 hover:bg-white/15"
               >
                 <option value="all" className="bg-slate-800 text-white">All Listings</option>
@@ -319,6 +506,128 @@ export default function Dashboard() {
                 <option value="SOLD" className="bg-slate-800 text-white">Sold</option>
               </select>
             </div>
+            {/* Advanced Filters Toggle */}
+            <button
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 hover:bg-white/15 ${
+                activeFilterCount > 0
+                  ? "bg-purple-500/20 border-purple-400/50 text-purple-200"
+                  : "bg-white/10 border-white/20 text-blue-200/70"
+              }`}
+            >
+              <Filter className="w-4 h-4" />
+              <span>Filters</span>
+              {activeFilterCount > 0 && (
+                <span className="ml-1 px-2 py-0.5 bg-purple-500 text-white text-xs rounded-full">
+                  {activeFilterCount}
+                </span>
+              )}
+              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${showAdvancedFilters ? "rotate-180" : ""}`} />
+            </button>
+          </div>
+
+          {/* Advanced Filters Panel */}
+          <div className={`overflow-hidden transition-all duration-300 ${showAdvancedFilters ? "max-h-96 mt-4 opacity-100" : "max-h-0 opacity-0"}`}>
+            <div className="pt-4 border-t border-white/10">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Location Filter */}
+                <div>
+                  <label className="flex items-center gap-2 text-sm text-blue-200/70 mb-2">
+                    <MapPin className="w-4 h-4" />
+                    Location
+                  </label>
+                  <select
+                    value={filters.location}
+                    onChange={(e) => setFilter("location", e.target.value)}
+                    className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white transition-all duration-300 hover:bg-white/15"
+                  >
+                    {locations.map((loc) => (
+                      <option key={loc.value} value={loc.value} className="bg-slate-800 text-white">
+                        {loc.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Category Filter */}
+                <div>
+                  <label className="flex items-center gap-2 text-sm text-blue-200/70 mb-2">
+                    <Tag className="w-4 h-4" />
+                    Category
+                  </label>
+                  <select
+                    value={filters.category}
+                    onChange={(e) => setFilter("category", e.target.value)}
+                    className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white transition-all duration-300 hover:bg-white/15"
+                  >
+                    {categories.map((cat) => (
+                      <option key={cat.value} value={cat.value} className="bg-slate-800 text-white">
+                        {cat.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Price Range */}
+                <div>
+                  <label className="flex items-center gap-2 text-sm text-blue-200/70 mb-2">
+                    <DollarSign className="w-4 h-4" />
+                    Price Range
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="number"
+                      placeholder="Min $"
+                      value={filters.minPrice}
+                      onChange={(e) => setFilter("minPrice", e.target.value)}
+                      className="flex-1 px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white placeholder-blue-200/50"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Max $"
+                      value={filters.maxPrice}
+                      onChange={(e) => setFilter("maxPrice", e.target.value)}
+                      className="flex-1 px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white placeholder-blue-200/50"
+                    />
+                  </div>
+                </div>
+
+                {/* Date Range */}
+                <div>
+                  <label className="flex items-center gap-2 text-sm text-blue-200/70 mb-2">
+                    <Calendar className="w-4 h-4" />
+                    Scraped Date
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="date"
+                      value={filters.dateFrom}
+                      onChange={(e) => setFilter("dateFrom", e.target.value)}
+                      className="flex-1 px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white"
+                    />
+                    <input
+                      type="date"
+                      value={filters.dateTo}
+                      onChange={(e) => setFilter("dateTo", e.target.value)}
+                      className="flex-1 px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Clear Filters Button */}
+              {activeFilterCount > 0 && (
+                <div className="mt-4 flex justify-end">
+                  <button
+                    onClick={clearFilters}
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-red-300 hover:text-red-200 hover:bg-red-500/10 rounded-lg transition-all duration-300"
+                  >
+                    <X className="w-4 h-4" />
+                    Clear All Filters
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -328,6 +637,16 @@ export default function Dashboard() {
             <table className="w-full">
               <thead className="bg-white/5 border-b border-white/10">
                 <tr>
+                  <th className="px-4 py-4">
+                    <input
+                      ref={selectAllRef}
+                      type="checkbox"
+                      aria-label="Select all listings"
+                      checked={allVisibleSelected}
+                      onChange={toggleSelectAllVisible}
+                      className="h-4 w-4 rounded border-white/30 bg-white/10 text-blue-500 focus:ring-blue-400"
+                    />
+                  </th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-blue-200/70 uppercase tracking-wider">
                     Item
                   </th>
@@ -347,6 +666,9 @@ export default function Dashboard() {
                     Score
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-blue-200/70 uppercase tracking-wider">
+                    % Undervalued
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-blue-200/70 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -354,14 +676,14 @@ export default function Dashboard() {
               <tbody className="divide-y divide-white/10">
                 {loading ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center">
+                    <td colSpan={9} className="px-6 py-12 text-center">
                       <div className="w-12 h-12 mx-auto border-4 border-blue-400/30 border-t-blue-400 rounded-full animate-spin"></div>
                       <p className="mt-4 text-blue-200/70 animate-pulse">Loading listings...</p>
                     </td>
                   </tr>
                 ) : filteredListings.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center">
+                    <td colSpan={9} className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center gap-4">
                         <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/50 animate-pulse-slow">
                           <Package className="w-8 h-8 text-white" />
@@ -373,13 +695,26 @@ export default function Dashboard() {
                     </td>
                   </tr>
                 ) : (
-                  filteredListings.map((listing) => (
-                    <tr
-                      key={listing.id}
-                      className="hover:bg-white/5 transition-all duration-300"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
+                  filteredListings.map((listing) => {
+                    const isSelected = selectedListingIds.has(listing.id);
+                    return (
+                      <tr
+                        key={listing.id}
+                        className={`transition-all duration-300 ${
+                          isSelected ? "bg-white/10" : "hover:bg-white/5"
+                        }`}
+                      >
+                        <td className="px-4 py-4">
+                          <input
+                            type="checkbox"
+                            aria-label={`Select ${listing.title}`}
+                            checked={isSelected}
+                            onChange={() => toggleListingSelection(listing.id)}
+                            className="h-4 w-4 rounded border-white/30 bg-white/10 text-blue-500 focus:ring-blue-400"
+                          />
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
                           {/* Product Thumbnail */}
                           {(() => {
                             const images = parseImageUrls(listing.imageUrls);
@@ -466,6 +801,19 @@ export default function Dashboard() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
+                        <span
+                          className={`px-3 py-1 rounded-lg text-xs font-medium shadow-lg ${
+                            listing.discountPercent && listing.discountPercent >= 90
+                              ? "bg-gradient-to-r from-green-400 to-green-600 text-white border border-green-400/50"
+                              : listing.discountPercent && listing.discountPercent >= 70
+                              ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-white border border-yellow-400/50"
+                              : "bg-gradient-to-r from-gray-400 to-gray-600 text-white border border-gray-400/50"
+                          }`}
+                        >
+                          {formatPercent(listing.discountPercent)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <a
                             href={listing.url}
@@ -476,7 +824,7 @@ export default function Dashboard() {
                           >
                             <ExternalLink className="w-4 h-4 text-blue-200/70 group-hover:text-blue-300" />
                           </a>
-                          {listing.status !== "OPPORTUNITY" && (
+                          {!listing.opportunity && (
                             <button
                               onClick={() => markAsOpportunity(listing.id)}
                               className="p-2 bg-gradient-to-r from-green-400/20 to-emerald-600/20 hover:from-green-400/40 hover:to-emerald-600/40 rounded-lg transition-all duration-300 hover:scale-110 shadow-lg shadow-green-500/30 hover:shadow-green-500/50"
@@ -488,7 +836,8 @@ export default function Dashboard() {
                         </div>
                       </td>
                     </tr>
-                  ))
+                    );
+                  })
                 )}
               </tbody>
             </table>
@@ -623,6 +972,181 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Floating Bulk Action Bar */}
+      <div
+        className={`fixed bottom-0 left-0 right-0 z-40 transform transition-all duration-500 ease-out ${
+          selectedListingIds.size > 0
+            ? "translate-y-0 opacity-100"
+            : "translate-y-full opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="max-w-4xl mx-auto px-4 pb-6">
+          <div className="backdrop-blur-xl bg-slate-900/95 rounded-2xl border border-white/20 shadow-2xl shadow-purple-500/20 p-4">
+            <div className="flex items-center justify-between gap-4">
+              {/* Selection info */}
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/50">
+                  <CheckCircle2 className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-white font-medium">
+                    {selectedListingIds.size} item{selectedListingIds.size !== 1 ? "s" : ""} selected
+                  </p>
+                  <button
+                    onClick={clearSelection}
+                    className="text-sm text-blue-300 hover:text-blue-200 transition-colors"
+                  >
+                    Clear selection
+                  </button>
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex items-center gap-2">
+                {/* Add to Opportunities */}
+                <button
+                  onClick={bulkAddToOpportunities}
+                  disabled={bulkActionLoading !== null}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-medium"
+                >
+                  {bulkActionLoading === "opportunities" ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Star className="w-4 h-4" />
+                  )}
+                  <span className="hidden sm:inline">Add to Opportunities</span>
+                  <span className="sm:hidden">Opportunities</span>
+                </button>
+
+                {/* Status Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowStatusDropdown(!showStatusDropdown)}
+                    disabled={bulkActionLoading !== null}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-medium"
+                  >
+                    {bulkActionLoading === "status" ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Filter className="w-4 h-4" />
+                    )}
+                    <span className="hidden sm:inline">Update Status</span>
+                    <span className="sm:hidden">Status</span>
+                  </button>
+
+                  {/* Status dropdown menu */}
+                  {showStatusDropdown && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-10"
+                        onClick={() => setShowStatusDropdown(false)}
+                      />
+                      <div className="absolute bottom-full left-0 mb-2 z-20 min-w-[180px] backdrop-blur-xl bg-slate-800/95 rounded-xl border border-white/20 shadow-2xl overflow-hidden">
+                        {["NEW", "OPPORTUNITY", "CONTACTED", "PURCHASED", "SOLD"].map((status) => (
+                          <button
+                            key={status}
+                            onClick={() => bulkUpdateStatus(status)}
+                            className="w-full px-4 py-3 text-left text-white hover:bg-white/10 transition-colors flex items-center gap-2 first:rounded-t-xl last:rounded-b-xl"
+                          >
+                            <div
+                              className={`w-2 h-2 rounded-full ${
+                                status === "NEW"
+                                  ? "bg-gray-400"
+                                  : status === "OPPORTUNITY"
+                                  ? "bg-green-400"
+                                  : status === "CONTACTED"
+                                  ? "bg-blue-400"
+                                  : status === "PURCHASED"
+                                  ? "bg-purple-400"
+                                  : "bg-emerald-400"
+                              }`}
+                            />
+                            {status.charAt(0) + status.slice(1).toLowerCase()}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Delete button */}
+                <button
+                  onClick={() => setShowDeleteModal(true)}
+                  disabled={bulkActionLoading !== null}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl hover:from-red-600 hover:to-pink-700 transition-all duration-300 shadow-lg shadow-red-500/30 hover:shadow-red-500/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-medium"
+                >
+                  {bulkActionLoading === "delete" ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-4 h-4" />
+                  )}
+                  <span className="hidden sm:inline">Delete</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          onClick={() => setShowDeleteModal(false)}
+        >
+          <div
+            className="relative max-w-md w-full mx-4 backdrop-blur-xl bg-slate-900/95 rounded-2xl border border-white/20 shadow-2xl shadow-red-500/20 p-6 animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Warning icon */}
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/50 animate-pulse">
+                <AlertTriangle className="w-8 h-8 text-white" />
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="text-center mb-6">
+              <h3 className="text-xl font-bold text-white mb-2">Delete Listings?</h3>
+              <p className="text-blue-200/70">
+                You&apos;re about to delete{" "}
+                <span className="text-white font-semibold">{selectedListingIds.size}</span>{" "}
+                listing{selectedListingIds.size !== 1 ? "s" : ""}. This action cannot be undone.
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="flex-1 px-4 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all duration-300 font-medium border border-white/20"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={bulkDelete}
+                className="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl hover:from-red-600 hover:to-pink-700 transition-all duration-300 shadow-lg shadow-red-500/30 hover:shadow-red-500/50 font-medium"
+              >
+                Delete {selectedListingIds.size} item{selectedListingIds.size !== 1 ? "s" : ""}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+// Wrap with Suspense for useSearchParams
+export default function Dashboard() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-blue-400/30 border-t-blue-400 rounded-full animate-spin"></div>
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
   );
 }

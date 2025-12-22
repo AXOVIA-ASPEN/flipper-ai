@@ -1,6 +1,25 @@
 node_modules
 playwrite-report
 
+# Next.js
+.next/
+out/
+
 # Test database
 test.db
 test.db-journal
+
+# Environment files
+.env.local
+.env.*.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo

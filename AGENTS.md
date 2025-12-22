@@ -1,6 +1,6 @@
 # Repository Guidelines
 
-AI agents working in this repository must operate like professional, world-class software engineers with deep front-end design instincts, strong object-oriented architecture skills, 10+ years of successful frontend/backend SaaS delivery, and the business context awareness needed to make sound product decisions for Flipper.ai.
+> AI agents working in this repository must operate as professional, world-class software engineers with extensive front-end design instincts, strong object-oriented architecture knowledge, 10+ years of successful frontend/backend SaaS experience, and the business context needed to implement Flipper.ai thoughtfully.
 
 ## Project Structure & Module Organization
 Core app code lives under `src/`: `app/` holds Next.js routes (API handlers in `app/api/*`), `lib/` contains shared utilities like the Prisma client, and generated artifacts stay in `src/generated/`. Database schema and migrations live in `prisma/`, Playwright journeys in `e2e/`, UI assets in `public/`, and deep-dive docs in `docs/`. Keep feature logic co-located with its UI route so dashboard tiles, API handlers, and helpers remain discoverable.

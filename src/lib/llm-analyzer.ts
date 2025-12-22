@@ -1,7 +1,7 @@
 // LLM-powered sellability analysis
-// Given item identification and market data, assess flip potential
+// Given item identification and market data, assess flip potential using OpenAI ChatGPT
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import OpenAI from "openai";
 import type { ItemIdentification } from "./llm-identifier";
 import type { MarketPrice, SoldListing } from "./market-price";
 
@@ -78,17 +78,17 @@ GUIDELINES:
 - Factor in 13% platform fees when recommending list price
 - Consider shipping costs for large/heavy items`;
 
-let genAI: GoogleGenerativeAI | null = null;
+let openai: OpenAI | null = null;
 
-function getGenAI(): GoogleGenerativeAI {
-  if (!genAI) {
-    const apiKey = process.env.GOOGLE_API_KEY;
+function getOpenAI(): OpenAI {
+  if (!openai) {
+    const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
-      throw new Error("GOOGLE_API_KEY environment variable is not set");
+      throw new Error("OPENAI_API_KEY environment variable is not set");
     }
-    genAI = new GoogleGenerativeAI(apiKey);
+    openai = new OpenAI({ apiKey });
   }
-  return genAI;
+  return openai;
 }
 
 export async function analyzeSellability(
@@ -97,14 +97,13 @@ export async function analyzeSellability(
   identification: ItemIdentification,
   marketData: MarketPrice
 ): Promise<SellabilityAnalysis | null> {
-  if (!process.env.GOOGLE_API_KEY) {
-    console.log("GOOGLE_API_KEY not set, skipping LLM analysis");
+  if (!process.env.OPENAI_API_KEY) {
+    console.log("OPENAI_API_KEY not set, skipping LLM analysis");
     return null;
   }
 
   try {
-    const ai = getGenAI();
-    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const client = getOpenAI();
 
     // Format sold listings for the prompt
     const soldListingsText = marketData.soldListings
@@ -129,8 +128,23 @@ export async function analyzeSellability(
       .replace("{salesCount}", marketData.salesCount.toString())
       .replace("{soldListingsText}", soldListingsText);
 
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
+    const response = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "You are a resale market expert. Always respond with valid JSON only, no markdown formatting.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.3,
+      max_tokens: 800,
+    });
+
+    const responseText = response.choices[0]?.message?.content || "";
 
     // Extract JSON from response
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);

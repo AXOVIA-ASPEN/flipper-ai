@@ -53,6 +53,26 @@ interface Listing {
   requestToBuy: string | null;
   category: string | null;
   postedAt: string | null;
+  identifiedBrand: string | null;
+  identifiedModel: string | null;
+  identifiedVariant: string | null;
+  identifiedCondition: string | null;
+  verifiedMarketValue: number | null;
+  marketDataSource: string | null;
+  marketDataDate: string | null;
+  comparableSalesJson: string | null;
+  sellabilityScore: number | null;
+  demandLevel: string | null;
+  expectedDaysToSell: number | null;
+  authenticityRisk: string | null;
+  recommendedOffer: number | null;
+  recommendedList: number | null;
+  resaleStrategy: string | null;
+  trueDiscountPercent: number | null;
+  llmAnalyzed: boolean | null;
+  analysisDate: string | null;
+  analysisConfidence: string | null;
+  analysisReasoning: string | null;
 }
 
 interface Opportunity {
@@ -85,6 +105,13 @@ interface ComparableReference {
   label: string;
   url: string;
   type: string;
+}
+
+interface ComparableSale {
+  title: string;
+  price: number | null;
+  url: string | null;
+  soldAt: string | null;
 }
 
 function safeParseArray(value: string | null): unknown[] {
@@ -143,6 +170,47 @@ function formatRelativeDate(value: string | null) {
   if (!value) return "—";
   try {
     return formatDistanceToNow(new Date(value), { addSuffix: true });
+  } catch {
+    return "—";
+  }
+}
+
+function parseComparableSales(value: string | null): ComparableSale[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map((item) => {
+        if (!item || typeof item !== "object") return null;
+        const record = item as Record<string, unknown>;
+        return {
+          title: typeof record.title === "string" ? record.title : "Comparable Sale",
+          price: typeof record.price === "number" ? record.price : null,
+          url: typeof record.url === "string" ? record.url : null,
+          soldAt: typeof record.soldAt === "string" ? record.soldAt : null,
+        };
+      })
+      .filter((item): item is ComparableSale => Boolean(item));
+  } catch {
+    return [];
+  }
+}
+
+function formatCurrency(value: number | null | undefined) {
+  if (value === null || value === undefined) return "—";
+  return `$${value.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+}
+
+function formatPercent(value: number | null | undefined) {
+  if (value === null || value === undefined) return "—";
+  return `${value.toFixed(0)}%`;
+}
+
+function formatDateTime(value: string | null) {
+  if (!value) return "—";
+  try {
+    return new Date(value).toLocaleString();
   } catch {
     return "—";
   }
@@ -520,11 +588,102 @@ export default function OpportunitiesPage() {
                       : "—",
                 },
                 { label: "Posted", value: formatRelativeDate(opp.listing.postedAt) },
+                {
+                  label: "Identified Brand",
+                  value: opp.listing.identifiedBrand || "—",
+                },
+                {
+                  label: "Identified Model",
+                  value: opp.listing.identifiedModel || "—",
+                },
               ];
               const hasSellerDetails = opp.listing.sellerName || opp.listing.sellerContact;
+              const llmDetails = [
+                { label: "Variant", value: opp.listing.identifiedVariant },
+                {
+                  label: "Condition (LLM)",
+                  value: opp.listing.identifiedCondition,
+                },
+                {
+                  label: "LLM Analysis",
+                  value: opp.listing.llmAnalyzed ? "Completed" : null,
+                },
+              ].filter((detail) => detail.value);
+
+              const marketDetails = [
+                {
+                  label: "Verified Market Value",
+                  value: formatCurrency(opp.listing.verifiedMarketValue),
+                },
+                {
+                  label: "True Discount",
+                  value:
+                    opp.listing.trueDiscountPercent !== null
+                      ? formatPercent(opp.listing.trueDiscountPercent)
+                      : "—",
+                },
+                {
+                  label: "Market Data Source",
+                  value: opp.listing.marketDataSource || "—",
+                },
+                {
+                  label: "Market Data Date",
+                  value: formatDateTime(opp.listing.marketDataDate),
+                },
+                {
+                  label: "Sellability Score",
+                  value:
+                    opp.listing.sellabilityScore !== null
+                      ? opp.listing.sellabilityScore.toString()
+                      : "—",
+                },
+                {
+                  label: "Demand Level",
+                  value: opp.listing.demandLevel || "—",
+                },
+                {
+                  label: "Expected Days to Sell",
+                  value:
+                    opp.listing.expectedDaysToSell !== null
+                      ? `${opp.listing.expectedDaysToSell} days`
+                      : "—",
+                },
+                {
+                  label: "Authenticity Risk",
+                  value: opp.listing.authenticityRisk || "—",
+                },
+              ];
+
+              const recommendationDetails = [
+                {
+                  label: "Recommended Offer",
+                  value: formatCurrency(opp.listing.recommendedOffer),
+                },
+                {
+                  label: "Recommended List Price",
+                  value: formatCurrency(opp.listing.recommendedList),
+                },
+                {
+                  label: "Analysis Confidence",
+                  value: opp.listing.analysisConfidence || "—",
+                },
+                {
+                  label: "Analysis Date",
+                  value: formatDateTime(opp.listing.analysisDate),
+                },
+              ];
+
+              const comparableSales = parseComparableSales(opp.listing.comparableSalesJson);
+              const displayedLLMDetails = llmDetails;
+              const displayedMarketDetails = marketDetails.filter(
+                (detail) => detail.value && detail.value !== "—"
+              );
+              const displayedRecommendationDetails = recommendationDetails.filter(
+                (detail) => detail.value && detail.value !== "—"
+              );
 
               return (
-              <div
+                <div
                 key={opp.id}
                 className="group backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 overflow-hidden hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02] hover:bg-white/15"
               >
@@ -632,6 +791,77 @@ export default function OpportunitiesPage() {
                         ))}
                       </div>
 
+                      {displayedLLMDetails.length > 0 && (
+                        <div
+                          className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10"
+                          data-testid="llm-identification"
+                        >
+                          <p className="text-xs text-blue-200/70 mb-2">LLM Identification</p>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {displayedLLMDetails.map((detail) => (
+                              <div key={`${opp.id}-${detail.label}`}>
+                                <p className="text-xs text-blue-200/60 mb-1">{detail.label}</p>
+                                <p className="text-sm text-white font-medium">{detail.value}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {displayedMarketDetails.length > 0 && (
+                        <div
+                          className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10"
+                          data-testid="market-insights"
+                        >
+                          <p className="text-xs text-blue-200/70 mb-2">Market Insights</p>
+                          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            {displayedMarketDetails.map((detail) => (
+                              <div key={`${opp.id}-market-${detail.label}`}>
+                                <p className="text-xs text-blue-200/60 mb-1">{detail.label}</p>
+                                <p className="text-sm text-white font-medium">{detail.value}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {(displayedRecommendationDetails.length > 0 ||
+                        opp.listing.resaleStrategy ||
+                        opp.listing.analysisReasoning) && (
+                        <div
+                          className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10"
+                          data-testid="recommendation-details"
+                        >
+                          <p className="text-xs text-blue-200/70 mb-2">Strategy & Recommendations</p>
+                          {displayedRecommendationDetails.length > 0 && (
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                              {displayedRecommendationDetails.map((detail) => (
+                                <div key={`${opp.id}-rec-${detail.label}`}>
+                                  <p className="text-xs text-blue-200/60 mb-1">{detail.label}</p>
+                                  <p className="text-sm text-white font-medium">{detail.value}</p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          {opp.listing.resaleStrategy && (
+                            <div className="mb-3">
+                              <p className="text-xs text-blue-200/70 mb-1">Resale Strategy</p>
+                              <p className="text-sm text-white whitespace-pre-line">
+                                {opp.listing.resaleStrategy}
+                              </p>
+                            </div>
+                          )}
+                          {opp.listing.analysisReasoning && (
+                            <div>
+                              <p className="text-xs text-blue-200/70 mb-1">Analysis Reasoning</p>
+                              <p className="text-sm text-white whitespace-pre-line">
+                                {opp.listing.analysisReasoning}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
                       {listingTags.length > 0 && (
                         <div className="mb-4">
                           <p className="text-xs text-blue-200/70 mb-2">Detected Tags</p>
@@ -654,6 +884,15 @@ export default function OpportunitiesPage() {
                           <p className="text-xs text-blue-200/70 mb-2">Listing Description</p>
                           <p className="text-sm text-white whitespace-pre-line">
                             {opp.listing.description}
+                          </p>
+                        </div>
+                      )}
+
+                      {opp.listing.priceReasoning && (
+                        <div className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10">
+                          <p className="text-xs text-blue-200/70 mb-2">Pricing Reasoning</p>
+                          <p className="text-sm text-white whitespace-pre-line">
+                            {opp.listing.priceReasoning}
                           </p>
                         </div>
                       )}
@@ -682,7 +921,8 @@ export default function OpportunitiesPage() {
                         </div>
                       )}
 
-                      {opp.listing.requestToBuy && (
+                      {opp.listing.requestToBuy !== null &&
+                        opp.listing.requestToBuy !== undefined && (
                         <div className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10">
                           <div className="flex items-center justify-between gap-4">
                             <div>
@@ -726,6 +966,45 @@ export default function OpportunitiesPage() {
                                   {comp.platform} • {comp.type}
                                 </span>
                               </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {comparableSales.length > 0 && (
+                        <div className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10">
+                          <p className="text-xs text-blue-200/70 mb-2">Comparable Sold Listings</p>
+                          <div className="flex flex-col gap-3">
+                            {comparableSales.map((sale, index) => (
+                              <div
+                                key={`${opp.id}-sale-${index}`}
+                                className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2"
+                              >
+                                <div>
+                                  <p className="text-sm text-white font-medium">{sale.title}</p>
+                                  {sale.soldAt && (
+                                    <p className="text-xs text-blue-200/60">
+                                      Sold {formatDateTime(sale.soldAt)}
+                                    </p>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <span className="text-sm text-green-200 font-semibold">
+                                    {sale.price ? formatCurrency(sale.price) : "—"}
+                                  </span>
+                                  {sale.url && (
+                                    <a
+                                      href={sale.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1 text-xs text-blue-200 hover:text-white transition-colors"
+                                    >
+                                      <ExternalLink className="w-3.5 h-3.5" />
+                                      View
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
                             ))}
                           </div>
                         </div>
@@ -988,7 +1267,8 @@ export default function OpportunitiesPage() {
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </main>

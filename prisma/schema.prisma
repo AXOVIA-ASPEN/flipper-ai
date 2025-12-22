@@ -34,6 +34,8 @@ enum ListingStatus {
 // Raw listings scraped from marketplaces
 model Listing {
   id              String        @id @default(cuid())
+  userId          String?       // Owner of this listing (null for legacy/shared data)
+  user            User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
   externalId      String        // Original listing ID from the platform
   platform        String        // CRAIGSLIST, FACEBOOK_MARKETPLACE, EBAY, OFFERUP
   url             String
@@ -110,7 +112,8 @@ model Listing {
   opportunity     Opportunity?
 
   // Indexes
-  @@unique([platform, externalId])
+  @@unique([platform, externalId, userId])
+  @@index([userId])
   @@index([platform])
   @@index([status])
   @@index([valueScore])
@@ -122,6 +125,8 @@ model Listing {
 // Flip opportunities we're actively pursuing
 model Opportunity {
   id              String        @id @default(cuid())
+  userId          String?       // Owner of this opportunity
+  user            User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
   listingId       String        @unique
   listing         Listing       @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
@@ -147,6 +152,7 @@ model Opportunity {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
+  @@index([userId])
   @@index([status])
   @@index([createdAt])
 }
@@ -154,6 +160,8 @@ model Opportunity {
 // Scraper job runs
 model ScraperJob {
   id              String        @id @default(cuid())
+  userId          String?       // User who triggered the scrape
+  user            User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
   platform        String
   location        String?
   category        String?
@@ -165,6 +173,7 @@ model ScraperJob {
   completedAt     DateTime?
   createdAt       DateTime      @default(now())
 
+  @@index([userId])
   @@index([status])
   @@index([createdAt])
 }
@@ -172,6 +181,8 @@ model ScraperJob {
 // Search configurations for automated scraping
 model SearchConfig {
   id              String        @id @default(cuid())
+  userId          String?       // Owner of this config
+  user            User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
   name            String
   platform        String
   location        String
@@ -184,6 +195,7 @@ model SearchConfig {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
+  @@index([userId])
   @@index([enabled])
 }
 
@@ -200,4 +212,89 @@ model PriceHistory {
 
   @@index([productName])
   @@index([category])
+}
+
+// NextAuth.js User model
+model User {
+  id              String        @id @default(cuid())
+  email           String        @unique
+  emailVerified   DateTime?
+  name            String?
+  image           String?
+  password        String?       // Hashed password for credentials auth
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // NextAuth.js relations
+  accounts        Account[]
+  sessions        Session[]
+
+  // App-specific relations
+  settings        UserSettings?
+  listings        Listing[]
+  opportunities   Opportunity[]
+  scraperJobs     ScraperJob[]
+  searchConfigs   SearchConfig[]
+}
+
+// NextAuth.js Account model (for OAuth providers)
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+// NextAuth.js Session model
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// NextAuth.js VerificationToken model (for email verification)
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// User settings including API keys for LLM analysis
+model UserSettings {
+  id                  String    @id @default(cuid())
+  userId              String    @unique
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // API Keys (encrypted at rest)
+  openaiApiKey        String?   // Encrypted OpenAI API key
+
+  // LLM Preferences
+  llmModel            String    @default("gpt-4o-mini")
+
+  // Analysis Preferences
+  discountThreshold   Int       @default(50)  // Minimum discount % to flag as opportunity
+  autoAnalyze         Boolean   @default(true) // Auto-analyze new listings with LLM
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 }

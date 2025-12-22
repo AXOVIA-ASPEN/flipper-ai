@@ -68,6 +68,7 @@ export type ListingSumAggregateOutputType = {
 
 export type ListingMinAggregateOutputType = {
   id: string | null
+  userId: string | null
   externalId: string | null
   platform: string | null
   url: string | null
@@ -125,6 +126,7 @@ export type ListingMinAggregateOutputType = {
 
 export type ListingMaxAggregateOutputType = {
   id: string | null
+  userId: string | null
   externalId: string | null
   platform: string | null
   url: string | null
@@ -182,6 +184,7 @@ export type ListingMaxAggregateOutputType = {
 
 export type ListingCountAggregateOutputType = {
   id: number
+  userId: number
   externalId: number
   platform: number
   url: number
@@ -281,6 +284,7 @@ export type ListingSumAggregateInputType = {
 
 export type ListingMinAggregateInputType = {
   id?: true
+  userId?: true
   externalId?: true
   platform?: true
   url?: true
@@ -338,6 +342,7 @@ export type ListingMinAggregateInputType = {
 
 export type ListingMaxAggregateInputType = {
   id?: true
+  userId?: true
   externalId?: true
   platform?: true
   url?: true
@@ -395,6 +400,7 @@ export type ListingMaxAggregateInputType = {
 
 export type ListingCountAggregateInputType = {
   id?: true
+  userId?: true
   externalId?: true
   platform?: true
   url?: true
@@ -539,6 +545,7 @@ export type ListingGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 
 export type ListingGroupByOutputType = {
   id: string
+  userId: string | null
   externalId: string
   platform: string
   url: string
@@ -619,6 +626,7 @@ export type ListingWhereInput = {
   OR?: Prisma.ListingWhereInput[]
   NOT?: Prisma.ListingWhereInput | Prisma.ListingWhereInput[]
   id?: Prisma.StringFilter<"Listing"> | string
+  userId?: Prisma.StringNullableFilter<"Listing"> | string | null
   externalId?: Prisma.StringFilter<"Listing"> | string
   platform?: Prisma.StringFilter<"Listing"> | string
   url?: Prisma.StringFilter<"Listing"> | string
@@ -672,11 +680,13 @@ export type ListingWhereInput = {
   analysisDate?: Prisma.DateTimeNullableFilter<"Listing"> | Date | string | null
   analysisConfidence?: Prisma.StringNullableFilter<"Listing"> | string | null
   analysisReasoning?: Prisma.StringNullableFilter<"Listing"> | string | null
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   opportunity?: Prisma.XOR<Prisma.OpportunityNullableScalarRelationFilter, Prisma.OpportunityWhereInput> | null
 }
 
 export type ListingOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrderInput | Prisma.SortOrder
   externalId?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   url?: Prisma.SortOrder
@@ -730,15 +740,17 @@ export type ListingOrderByWithRelationInput = {
   analysisDate?: Prisma.SortOrderInput | Prisma.SortOrder
   analysisConfidence?: Prisma.SortOrderInput | Prisma.SortOrder
   analysisReasoning?: Prisma.SortOrderInput | Prisma.SortOrder
+  user?: Prisma.UserOrderByWithRelationInput
   opportunity?: Prisma.OpportunityOrderByWithRelationInput
 }
 
 export type ListingWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  platform_externalId?: Prisma.ListingPlatformExternalIdCompoundUniqueInput
+  platform_externalId_userId?: Prisma.ListingPlatformExternalIdUserIdCompoundUniqueInput
   AND?: Prisma.ListingWhereInput | Prisma.ListingWhereInput[]
   OR?: Prisma.ListingWhereInput[]
   NOT?: Prisma.ListingWhereInput | Prisma.ListingWhereInput[]
+  userId?: Prisma.StringNullableFilter<"Listing"> | string | null
   externalId?: Prisma.StringFilter<"Listing"> | string
   platform?: Prisma.StringFilter<"Listing"> | string
   url?: Prisma.StringFilter<"Listing"> | string
@@ -792,11 +804,13 @@ export type ListingWhereUniqueInput = Prisma.AtLeast<{
   analysisDate?: Prisma.DateTimeNullableFilter<"Listing"> | Date | string | null
   analysisConfidence?: Prisma.StringNullableFilter<"Listing"> | string | null
   analysisReasoning?: Prisma.StringNullableFilter<"Listing"> | string | null
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   opportunity?: Prisma.XOR<Prisma.OpportunityNullableScalarRelationFilter, Prisma.OpportunityWhereInput> | null
-}, "id" | "platform_externalId">
+}, "id" | "platform_externalId_userId">
 
 export type ListingOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrderInput | Prisma.SortOrder
   externalId?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   url?: Prisma.SortOrder
@@ -862,6 +876,7 @@ export type ListingScalarWhereWithAggregatesInput = {
   OR?: Prisma.ListingScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ListingScalarWhereWithAggregatesInput | Prisma.ListingScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Listing"> | string
+  userId?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
   externalId?: Prisma.StringWithAggregatesFilter<"Listing"> | string
   platform?: Prisma.StringWithAggregatesFilter<"Listing"> | string
   url?: Prisma.StringWithAggregatesFilter<"Listing"> | string
@@ -972,11 +987,13 @@ export type ListingCreateInput = {
   analysisDate?: Date | string | null
   analysisConfidence?: string | null
   analysisReasoning?: string | null
+  user?: Prisma.UserCreateNestedOneWithoutListingsInput
   opportunity?: Prisma.OpportunityCreateNestedOneWithoutListingInput
 }
 
 export type ListingUncheckedCreateInput = {
   id?: string
+  userId?: string | null
   externalId: string
   platform: string
   url: string
@@ -1088,11 +1105,13 @@ export type ListingUpdateInput = {
   analysisDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   analysisConfidence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   analysisReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  user?: Prisma.UserUpdateOneWithoutListingsNestedInput
   opportunity?: Prisma.OpportunityUpdateOneWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   externalId?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1151,6 +1170,7 @@ export type ListingUncheckedUpdateInput = {
 
 export type ListingCreateManyInput = {
   id?: string
+  userId?: string | null
   externalId: string
   platform: string
   url: string
@@ -1265,6 +1285,7 @@ export type ListingUpdateManyMutationInput = {
 
 export type ListingUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   externalId?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1320,13 +1341,15 @@ export type ListingUncheckedUpdateManyInput = {
   analysisReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
-export type ListingPlatformExternalIdCompoundUniqueInput = {
+export type ListingPlatformExternalIdUserIdCompoundUniqueInput = {
   platform: string
   externalId: string
+  userId: string
 }
 
 export type ListingCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   externalId?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   url?: Prisma.SortOrder
@@ -1404,6 +1427,7 @@ export type ListingAvgOrderByAggregateInput = {
 
 export type ListingMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   externalId?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   url?: Prisma.SortOrder
@@ -1461,6 +1485,7 @@ export type ListingMaxOrderByAggregateInput = {
 
 export type ListingMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   externalId?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   url?: Prisma.SortOrder
@@ -1541,6 +1566,16 @@ export type ListingScalarRelationFilter = {
   isNot?: Prisma.ListingWhereInput
 }
 
+export type ListingListRelationFilter = {
+  every?: Prisma.ListingWhereInput
+  some?: Prisma.ListingWhereInput
+  none?: Prisma.ListingWhereInput
+}
+
+export type ListingOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -1603,6 +1638,48 @@ export type ListingUpdateOneRequiredWithoutOpportunityNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ListingUpdateToOneWithWhereWithoutOpportunityInput, Prisma.ListingUpdateWithoutOpportunityInput>, Prisma.ListingUncheckedUpdateWithoutOpportunityInput>
 }
 
+export type ListingCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.ListingCreateWithoutUserInput, Prisma.ListingUncheckedCreateWithoutUserInput> | Prisma.ListingCreateWithoutUserInput[] | Prisma.ListingUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ListingCreateOrConnectWithoutUserInput | Prisma.ListingCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.ListingCreateManyUserInputEnvelope
+  connect?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+}
+
+export type ListingUncheckedCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.ListingCreateWithoutUserInput, Prisma.ListingUncheckedCreateWithoutUserInput> | Prisma.ListingCreateWithoutUserInput[] | Prisma.ListingUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ListingCreateOrConnectWithoutUserInput | Prisma.ListingCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.ListingCreateManyUserInputEnvelope
+  connect?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+}
+
+export type ListingUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.ListingCreateWithoutUserInput, Prisma.ListingUncheckedCreateWithoutUserInput> | Prisma.ListingCreateWithoutUserInput[] | Prisma.ListingUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ListingCreateOrConnectWithoutUserInput | Prisma.ListingCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.ListingUpsertWithWhereUniqueWithoutUserInput | Prisma.ListingUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.ListingCreateManyUserInputEnvelope
+  set?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+  disconnect?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+  delete?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+  connect?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+  update?: Prisma.ListingUpdateWithWhereUniqueWithoutUserInput | Prisma.ListingUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.ListingUpdateManyWithWhereWithoutUserInput | Prisma.ListingUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.ListingScalarWhereInput | Prisma.ListingScalarWhereInput[]
+}
+
+export type ListingUncheckedUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.ListingCreateWithoutUserInput, Prisma.ListingUncheckedCreateWithoutUserInput> | Prisma.ListingCreateWithoutUserInput[] | Prisma.ListingUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ListingCreateOrConnectWithoutUserInput | Prisma.ListingCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.ListingUpsertWithWhereUniqueWithoutUserInput | Prisma.ListingUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.ListingCreateManyUserInputEnvelope
+  set?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+  disconnect?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+  delete?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+  connect?: Prisma.ListingWhereUniqueInput | Prisma.ListingWhereUniqueInput[]
+  update?: Prisma.ListingUpdateWithWhereUniqueWithoutUserInput | Prisma.ListingUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.ListingUpdateManyWithWhereWithoutUserInput | Prisma.ListingUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.ListingScalarWhereInput | Prisma.ListingScalarWhereInput[]
+}
+
 export type ListingCreateWithoutOpportunityInput = {
   id?: string
   externalId: string
@@ -1658,10 +1735,12 @@ export type ListingCreateWithoutOpportunityInput = {
   analysisDate?: Date | string | null
   analysisConfidence?: string | null
   analysisReasoning?: string | null
+  user?: Prisma.UserCreateNestedOneWithoutListingsInput
 }
 
 export type ListingUncheckedCreateWithoutOpportunityInput = {
   id?: string
+  userId?: string | null
   externalId: string
   platform: string
   url: string
@@ -1788,9 +1867,443 @@ export type ListingUpdateWithoutOpportunityInput = {
   analysisDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   analysisConfidence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   analysisReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  user?: Prisma.UserUpdateOneWithoutListingsNestedInput
 }
 
 export type ListingUncheckedUpdateWithoutOpportunityInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalId?: Prisma.StringFieldUpdateOperationsInput | string
+  platform?: Prisma.StringFieldUpdateOperationsInput | string
+  url?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  askingPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrls?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scrapedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  estimatedValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  estimatedLow?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  estimatedHigh?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  profitPotential?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  profitLow?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  profitHigh?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valueScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  discountPercent?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  resaleDifficulty?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  comparableUrls?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shippable?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  estimatedWeight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  negotiable?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  daysListed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestToBuy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedBrand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedVariant?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedCondition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedMarketValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  marketDataSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketDataDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  comparableSalesJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellabilityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  demandLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expectedDaysToSell?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  authenticityRisk?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recommendedOffer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recommendedList?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  resaleStrategy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trueDiscountPercent?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmAnalyzed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  analysisDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  analysisConfidence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  analysisReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type ListingCreateWithoutUserInput = {
+  id?: string
+  externalId: string
+  platform: string
+  url: string
+  title: string
+  description?: string | null
+  askingPrice: number
+  condition?: string | null
+  location?: string | null
+  sellerName?: string | null
+  sellerContact?: string | null
+  imageUrls?: string | null
+  category?: string | null
+  postedAt?: Date | string | null
+  scrapedAt?: Date | string
+  estimatedValue?: number | null
+  estimatedLow?: number | null
+  estimatedHigh?: number | null
+  profitPotential?: number | null
+  profitLow?: number | null
+  profitHigh?: number | null
+  valueScore?: number | null
+  discountPercent?: number | null
+  resaleDifficulty?: string | null
+  status?: string
+  comparableUrls?: string | null
+  priceReasoning?: string | null
+  notes?: string | null
+  shippable?: boolean | null
+  estimatedWeight?: number | null
+  negotiable?: boolean | null
+  daysListed?: number | null
+  tags?: string | null
+  requestToBuy?: string | null
+  identifiedBrand?: string | null
+  identifiedModel?: string | null
+  identifiedVariant?: string | null
+  identifiedCondition?: string | null
+  verifiedMarketValue?: number | null
+  marketDataSource?: string | null
+  marketDataDate?: Date | string | null
+  comparableSalesJson?: string | null
+  sellabilityScore?: number | null
+  demandLevel?: string | null
+  expectedDaysToSell?: number | null
+  authenticityRisk?: string | null
+  recommendedOffer?: number | null
+  recommendedList?: number | null
+  resaleStrategy?: string | null
+  trueDiscountPercent?: number | null
+  llmAnalyzed?: boolean
+  analysisDate?: Date | string | null
+  analysisConfidence?: string | null
+  analysisReasoning?: string | null
+  opportunity?: Prisma.OpportunityCreateNestedOneWithoutListingInput
+}
+
+export type ListingUncheckedCreateWithoutUserInput = {
+  id?: string
+  externalId: string
+  platform: string
+  url: string
+  title: string
+  description?: string | null
+  askingPrice: number
+  condition?: string | null
+  location?: string | null
+  sellerName?: string | null
+  sellerContact?: string | null
+  imageUrls?: string | null
+  category?: string | null
+  postedAt?: Date | string | null
+  scrapedAt?: Date | string
+  estimatedValue?: number | null
+  estimatedLow?: number | null
+  estimatedHigh?: number | null
+  profitPotential?: number | null
+  profitLow?: number | null
+  profitHigh?: number | null
+  valueScore?: number | null
+  discountPercent?: number | null
+  resaleDifficulty?: string | null
+  status?: string
+  comparableUrls?: string | null
+  priceReasoning?: string | null
+  notes?: string | null
+  shippable?: boolean | null
+  estimatedWeight?: number | null
+  negotiable?: boolean | null
+  daysListed?: number | null
+  tags?: string | null
+  requestToBuy?: string | null
+  identifiedBrand?: string | null
+  identifiedModel?: string | null
+  identifiedVariant?: string | null
+  identifiedCondition?: string | null
+  verifiedMarketValue?: number | null
+  marketDataSource?: string | null
+  marketDataDate?: Date | string | null
+  comparableSalesJson?: string | null
+  sellabilityScore?: number | null
+  demandLevel?: string | null
+  expectedDaysToSell?: number | null
+  authenticityRisk?: string | null
+  recommendedOffer?: number | null
+  recommendedList?: number | null
+  resaleStrategy?: string | null
+  trueDiscountPercent?: number | null
+  llmAnalyzed?: boolean
+  analysisDate?: Date | string | null
+  analysisConfidence?: string | null
+  analysisReasoning?: string | null
+  opportunity?: Prisma.OpportunityUncheckedCreateNestedOneWithoutListingInput
+}
+
+export type ListingCreateOrConnectWithoutUserInput = {
+  where: Prisma.ListingWhereUniqueInput
+  create: Prisma.XOR<Prisma.ListingCreateWithoutUserInput, Prisma.ListingUncheckedCreateWithoutUserInput>
+}
+
+export type ListingCreateManyUserInputEnvelope = {
+  data: Prisma.ListingCreateManyUserInput | Prisma.ListingCreateManyUserInput[]
+}
+
+export type ListingUpsertWithWhereUniqueWithoutUserInput = {
+  where: Prisma.ListingWhereUniqueInput
+  update: Prisma.XOR<Prisma.ListingUpdateWithoutUserInput, Prisma.ListingUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.ListingCreateWithoutUserInput, Prisma.ListingUncheckedCreateWithoutUserInput>
+}
+
+export type ListingUpdateWithWhereUniqueWithoutUserInput = {
+  where: Prisma.ListingWhereUniqueInput
+  data: Prisma.XOR<Prisma.ListingUpdateWithoutUserInput, Prisma.ListingUncheckedUpdateWithoutUserInput>
+}
+
+export type ListingUpdateManyWithWhereWithoutUserInput = {
+  where: Prisma.ListingScalarWhereInput
+  data: Prisma.XOR<Prisma.ListingUpdateManyMutationInput, Prisma.ListingUncheckedUpdateManyWithoutUserInput>
+}
+
+export type ListingScalarWhereInput = {
+  AND?: Prisma.ListingScalarWhereInput | Prisma.ListingScalarWhereInput[]
+  OR?: Prisma.ListingScalarWhereInput[]
+  NOT?: Prisma.ListingScalarWhereInput | Prisma.ListingScalarWhereInput[]
+  id?: Prisma.StringFilter<"Listing"> | string
+  userId?: Prisma.StringNullableFilter<"Listing"> | string | null
+  externalId?: Prisma.StringFilter<"Listing"> | string
+  platform?: Prisma.StringFilter<"Listing"> | string
+  url?: Prisma.StringFilter<"Listing"> | string
+  title?: Prisma.StringFilter<"Listing"> | string
+  description?: Prisma.StringNullableFilter<"Listing"> | string | null
+  askingPrice?: Prisma.FloatFilter<"Listing"> | number
+  condition?: Prisma.StringNullableFilter<"Listing"> | string | null
+  location?: Prisma.StringNullableFilter<"Listing"> | string | null
+  sellerName?: Prisma.StringNullableFilter<"Listing"> | string | null
+  sellerContact?: Prisma.StringNullableFilter<"Listing"> | string | null
+  imageUrls?: Prisma.StringNullableFilter<"Listing"> | string | null
+  category?: Prisma.StringNullableFilter<"Listing"> | string | null
+  postedAt?: Prisma.DateTimeNullableFilter<"Listing"> | Date | string | null
+  scrapedAt?: Prisma.DateTimeFilter<"Listing"> | Date | string
+  estimatedValue?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  estimatedLow?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  estimatedHigh?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  profitPotential?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  profitLow?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  profitHigh?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  valueScore?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  discountPercent?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  resaleDifficulty?: Prisma.StringNullableFilter<"Listing"> | string | null
+  status?: Prisma.StringFilter<"Listing"> | string
+  comparableUrls?: Prisma.StringNullableFilter<"Listing"> | string | null
+  priceReasoning?: Prisma.StringNullableFilter<"Listing"> | string | null
+  notes?: Prisma.StringNullableFilter<"Listing"> | string | null
+  shippable?: Prisma.BoolNullableFilter<"Listing"> | boolean | null
+  estimatedWeight?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  negotiable?: Prisma.BoolNullableFilter<"Listing"> | boolean | null
+  daysListed?: Prisma.IntNullableFilter<"Listing"> | number | null
+  tags?: Prisma.StringNullableFilter<"Listing"> | string | null
+  requestToBuy?: Prisma.StringNullableFilter<"Listing"> | string | null
+  identifiedBrand?: Prisma.StringNullableFilter<"Listing"> | string | null
+  identifiedModel?: Prisma.StringNullableFilter<"Listing"> | string | null
+  identifiedVariant?: Prisma.StringNullableFilter<"Listing"> | string | null
+  identifiedCondition?: Prisma.StringNullableFilter<"Listing"> | string | null
+  verifiedMarketValue?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  marketDataSource?: Prisma.StringNullableFilter<"Listing"> | string | null
+  marketDataDate?: Prisma.DateTimeNullableFilter<"Listing"> | Date | string | null
+  comparableSalesJson?: Prisma.StringNullableFilter<"Listing"> | string | null
+  sellabilityScore?: Prisma.IntNullableFilter<"Listing"> | number | null
+  demandLevel?: Prisma.StringNullableFilter<"Listing"> | string | null
+  expectedDaysToSell?: Prisma.IntNullableFilter<"Listing"> | number | null
+  authenticityRisk?: Prisma.StringNullableFilter<"Listing"> | string | null
+  recommendedOffer?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  recommendedList?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  resaleStrategy?: Prisma.StringNullableFilter<"Listing"> | string | null
+  trueDiscountPercent?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  llmAnalyzed?: Prisma.BoolFilter<"Listing"> | boolean
+  analysisDate?: Prisma.DateTimeNullableFilter<"Listing"> | Date | string | null
+  analysisConfidence?: Prisma.StringNullableFilter<"Listing"> | string | null
+  analysisReasoning?: Prisma.StringNullableFilter<"Listing"> | string | null
+}
+
+export type ListingCreateManyUserInput = {
+  id?: string
+  externalId: string
+  platform: string
+  url: string
+  title: string
+  description?: string | null
+  askingPrice: number
+  condition?: string | null
+  location?: string | null
+  sellerName?: string | null
+  sellerContact?: string | null
+  imageUrls?: string | null
+  category?: string | null
+  postedAt?: Date | string | null
+  scrapedAt?: Date | string
+  estimatedValue?: number | null
+  estimatedLow?: number | null
+  estimatedHigh?: number | null
+  profitPotential?: number | null
+  profitLow?: number | null
+  profitHigh?: number | null
+  valueScore?: number | null
+  discountPercent?: number | null
+  resaleDifficulty?: string | null
+  status?: string
+  comparableUrls?: string | null
+  priceReasoning?: string | null
+  notes?: string | null
+  shippable?: boolean | null
+  estimatedWeight?: number | null
+  negotiable?: boolean | null
+  daysListed?: number | null
+  tags?: string | null
+  requestToBuy?: string | null
+  identifiedBrand?: string | null
+  identifiedModel?: string | null
+  identifiedVariant?: string | null
+  identifiedCondition?: string | null
+  verifiedMarketValue?: number | null
+  marketDataSource?: string | null
+  marketDataDate?: Date | string | null
+  comparableSalesJson?: string | null
+  sellabilityScore?: number | null
+  demandLevel?: string | null
+  expectedDaysToSell?: number | null
+  authenticityRisk?: string | null
+  recommendedOffer?: number | null
+  recommendedList?: number | null
+  resaleStrategy?: string | null
+  trueDiscountPercent?: number | null
+  llmAnalyzed?: boolean
+  analysisDate?: Date | string | null
+  analysisConfidence?: string | null
+  analysisReasoning?: string | null
+}
+
+export type ListingUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  externalId?: Prisma.StringFieldUpdateOperationsInput | string
+  platform?: Prisma.StringFieldUpdateOperationsInput | string
+  url?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  askingPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrls?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scrapedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  estimatedValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  estimatedLow?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  estimatedHigh?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  profitPotential?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  profitLow?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  profitHigh?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valueScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  discountPercent?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  resaleDifficulty?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  comparableUrls?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shippable?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  estimatedWeight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  negotiable?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  daysListed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestToBuy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedBrand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedVariant?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedCondition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedMarketValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  marketDataSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketDataDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  comparableSalesJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellabilityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  demandLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expectedDaysToSell?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  authenticityRisk?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recommendedOffer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recommendedList?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  resaleStrategy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trueDiscountPercent?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmAnalyzed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  analysisDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  analysisConfidence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  analysisReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  opportunity?: Prisma.OpportunityUpdateOneWithoutListingNestedInput
+}
+
+export type ListingUncheckedUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  externalId?: Prisma.StringFieldUpdateOperationsInput | string
+  platform?: Prisma.StringFieldUpdateOperationsInput | string
+  url?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  askingPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  condition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrls?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scrapedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  estimatedValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  estimatedLow?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  estimatedHigh?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  profitPotential?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  profitLow?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  profitHigh?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  valueScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  discountPercent?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  resaleDifficulty?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  comparableUrls?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shippable?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  estimatedWeight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  negotiable?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  daysListed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestToBuy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedBrand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedVariant?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedCondition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedMarketValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  marketDataSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketDataDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  comparableSalesJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellabilityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  demandLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expectedDaysToSell?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  authenticityRisk?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recommendedOffer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recommendedList?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  resaleStrategy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trueDiscountPercent?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmAnalyzed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  analysisDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  analysisConfidence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  analysisReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  opportunity?: Prisma.OpportunityUncheckedUpdateOneWithoutListingNestedInput
+}
+
+export type ListingUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   externalId?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1851,6 +2364,7 @@ export type ListingUncheckedUpdateWithoutOpportunityInput = {
 
 export type ListingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  userId?: boolean
   externalId?: boolean
   platform?: boolean
   url?: boolean
@@ -1904,11 +2418,13 @@ export type ListingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   analysisDate?: boolean
   analysisConfidence?: boolean
   analysisReasoning?: boolean
+  user?: boolean | Prisma.Listing$userArgs<ExtArgs>
   opportunity?: boolean | Prisma.Listing$opportunityArgs<ExtArgs>
 }, ExtArgs["result"]["listing"]>
 
 export type ListingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  userId?: boolean
   externalId?: boolean
   platform?: boolean
   url?: boolean
@@ -1962,10 +2478,12 @@ export type ListingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   analysisDate?: boolean
   analysisConfidence?: boolean
   analysisReasoning?: boolean
+  user?: boolean | Prisma.Listing$userArgs<ExtArgs>
 }, ExtArgs["result"]["listing"]>
 
 export type ListingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  userId?: boolean
   externalId?: boolean
   platform?: boolean
   url?: boolean
@@ -2019,10 +2537,12 @@ export type ListingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   analysisDate?: boolean
   analysisConfidence?: boolean
   analysisReasoning?: boolean
+  user?: boolean | Prisma.Listing$userArgs<ExtArgs>
 }, ExtArgs["result"]["listing"]>
 
 export type ListingSelectScalar = {
   id?: boolean
+  userId?: boolean
   externalId?: boolean
   platform?: boolean
   url?: boolean
@@ -2078,20 +2598,27 @@ export type ListingSelectScalar = {
   analysisReasoning?: boolean
 }
 
-export type ListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "externalId" | "platform" | "url" | "title" | "description" | "askingPrice" | "condition" | "location" | "sellerName" | "sellerContact" | "imageUrls" | "category" | "postedAt" | "scrapedAt" | "estimatedValue" | "estimatedLow" | "estimatedHigh" | "profitPotential" | "profitLow" | "profitHigh" | "valueScore" | "discountPercent" | "resaleDifficulty" | "status" | "comparableUrls" | "priceReasoning" | "notes" | "shippable" | "estimatedWeight" | "negotiable" | "daysListed" | "tags" | "requestToBuy" | "identifiedBrand" | "identifiedModel" | "identifiedVariant" | "identifiedCondition" | "verifiedMarketValue" | "marketDataSource" | "marketDataDate" | "comparableSalesJson" | "sellabilityScore" | "demandLevel" | "expectedDaysToSell" | "authenticityRisk" | "recommendedOffer" | "recommendedList" | "resaleStrategy" | "trueDiscountPercent" | "llmAnalyzed" | "analysisDate" | "analysisConfidence" | "analysisReasoning", ExtArgs["result"]["listing"]>
+export type ListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "externalId" | "platform" | "url" | "title" | "description" | "askingPrice" | "condition" | "location" | "sellerName" | "sellerContact" | "imageUrls" | "category" | "postedAt" | "scrapedAt" | "estimatedValue" | "estimatedLow" | "estimatedHigh" | "profitPotential" | "profitLow" | "profitHigh" | "valueScore" | "discountPercent" | "resaleDifficulty" | "status" | "comparableUrls" | "priceReasoning" | "notes" | "shippable" | "estimatedWeight" | "negotiable" | "daysListed" | "tags" | "requestToBuy" | "identifiedBrand" | "identifiedModel" | "identifiedVariant" | "identifiedCondition" | "verifiedMarketValue" | "marketDataSource" | "marketDataDate" | "comparableSalesJson" | "sellabilityScore" | "demandLevel" | "expectedDaysToSell" | "authenticityRisk" | "recommendedOffer" | "recommendedList" | "resaleStrategy" | "trueDiscountPercent" | "llmAnalyzed" | "analysisDate" | "analysisConfidence" | "analysisReasoning", ExtArgs["result"]["listing"]>
 export type ListingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.Listing$userArgs<ExtArgs>
   opportunity?: boolean | Prisma.Listing$opportunityArgs<ExtArgs>
 }
-export type ListingIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type ListingIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type ListingIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.Listing$userArgs<ExtArgs>
+}
+export type ListingIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.Listing$userArgs<ExtArgs>
+}
 
 export type $ListingPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Listing"
   objects: {
+    user: Prisma.$UserPayload<ExtArgs> | null
     opportunity: Prisma.$OpportunityPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    userId: string | null
     externalId: string
     platform: string
     url: string
@@ -2539,6 +3066,7 @@ readonly fields: ListingFieldRefs;
  */
 export interface Prisma__ListingClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  user<T extends Prisma.Listing$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   opportunity<T extends Prisma.Listing$opportunityArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$opportunityArgs<ExtArgs>>): Prisma.Prisma__OpportunityClient<runtime.Types.Result.GetResult<Prisma.$OpportunityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2570,6 +3098,7 @@ export interface Prisma__ListingClient<T, Null = never, ExtArgs extends runtime.
  */
 export interface ListingFieldRefs {
   readonly id: Prisma.FieldRef<"Listing", 'String'>
+  readonly userId: Prisma.FieldRef<"Listing", 'String'>
   readonly externalId: Prisma.FieldRef<"Listing", 'String'>
   readonly platform: Prisma.FieldRef<"Listing", 'String'>
   readonly url: Prisma.FieldRef<"Listing", 'String'>
@@ -2870,6 +3399,10 @@ export type ListingCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    * The data used to create many Listings.
    */
   data: Prisma.ListingCreateManyInput | Prisma.ListingCreateManyInput[]
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ListingIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -2940,6 +3473,10 @@ export type ListingUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    * Limit how many Listings to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ListingIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -3006,6 +3543,25 @@ export type ListingDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Listings to delete.
    */
   limit?: number
+}
+
+/**
+ * Listing.user
+ */
+export type Listing$userArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

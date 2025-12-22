@@ -175,6 +175,154 @@ describe('Listings API', () => {
       );
     });
 
+    // New filter tests for Phase 1.3.2
+    it('should filter by location (contains match)', async () => {
+      mockFindMany.mockResolvedValue([]);
+      mockCount.mockResolvedValue(0);
+
+      const request = createMockRequest('GET', '/api/listings?location=tampa');
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({ location: { contains: 'tampa' } }),
+        })
+      );
+    });
+
+    it('should filter by category', async () => {
+      mockFindMany.mockResolvedValue([]);
+      mockCount.mockResolvedValue(0);
+
+      const request = createMockRequest('GET', '/api/listings?category=electronics');
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({ category: 'electronics' }),
+        })
+      );
+    });
+
+    it('should filter by minPrice only', async () => {
+      mockFindMany.mockResolvedValue([]);
+      mockCount.mockResolvedValue(0);
+
+      const request = createMockRequest('GET', '/api/listings?minPrice=100');
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({ askingPrice: { gte: 100 } }),
+        })
+      );
+    });
+
+    it('should filter by maxPrice only', async () => {
+      mockFindMany.mockResolvedValue([]);
+      mockCount.mockResolvedValue(0);
+
+      const request = createMockRequest('GET', '/api/listings?maxPrice=500');
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({ askingPrice: { lte: 500 } }),
+        })
+      );
+    });
+
+    it('should filter by price range (minPrice and maxPrice)', async () => {
+      mockFindMany.mockResolvedValue([]);
+      mockCount.mockResolvedValue(0);
+
+      const request = createMockRequest('GET', '/api/listings?minPrice=100&maxPrice=500');
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({ askingPrice: { gte: 100, lte: 500 } }),
+        })
+      );
+    });
+
+    it('should filter by dateFrom only', async () => {
+      mockFindMany.mockResolvedValue([]);
+      mockCount.mockResolvedValue(0);
+
+      const request = createMockRequest('GET', '/api/listings?dateFrom=2025-01-01');
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            scrapedAt: { gte: new Date('2025-01-01') },
+          }),
+        })
+      );
+    });
+
+    it('should filter by dateTo only', async () => {
+      mockFindMany.mockResolvedValue([]);
+      mockCount.mockResolvedValue(0);
+
+      const request = createMockRequest('GET', '/api/listings?dateTo=2025-12-31');
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            scrapedAt: { lte: new Date('2025-12-31') },
+          }),
+        })
+      );
+    });
+
+    it('should filter by date range (dateFrom and dateTo)', async () => {
+      mockFindMany.mockResolvedValue([]);
+      mockCount.mockResolvedValue(0);
+
+      const request = createMockRequest(
+        'GET',
+        '/api/listings?dateFrom=2025-01-01&dateTo=2025-12-31'
+      );
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            scrapedAt: {
+              gte: new Date('2025-01-01'),
+              lte: new Date('2025-12-31'),
+            },
+          }),
+        })
+      );
+    });
+
+    it('should combine all new filters with existing filters', async () => {
+      mockFindMany.mockResolvedValue([]);
+      mockCount.mockResolvedValue(0);
+
+      const request = createMockRequest(
+        'GET',
+        '/api/listings?status=OPPORTUNITY&location=tampa&category=electronics&minPrice=100&maxPrice=500&dateFrom=2025-01-01'
+      );
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            status: 'OPPORTUNITY',
+            location: { contains: 'tampa' },
+            category: 'electronics',
+            askingPrice: { gte: 100, lte: 500 },
+            scrapedAt: { gte: new Date('2025-01-01') },
+          }),
+        })
+      );
+    });
+
     it('should return 500 on database error', async () => {
       mockFindMany.mockRejectedValue(new Error('Database error'));
 

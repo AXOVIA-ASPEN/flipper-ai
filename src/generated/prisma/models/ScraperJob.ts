@@ -38,6 +38,7 @@ export type ScraperJobSumAggregateOutputType = {
 
 export type ScraperJobMinAggregateOutputType = {
   id: string | null
+  userId: string | null
   platform: string | null
   location: string | null
   category: string | null
@@ -52,6 +53,7 @@ export type ScraperJobMinAggregateOutputType = {
 
 export type ScraperJobMaxAggregateOutputType = {
   id: string | null
+  userId: string | null
   platform: string | null
   location: string | null
   category: string | null
@@ -66,6 +68,7 @@ export type ScraperJobMaxAggregateOutputType = {
 
 export type ScraperJobCountAggregateOutputType = {
   id: number
+  userId: number
   platform: number
   location: number
   category: number
@@ -92,6 +95,7 @@ export type ScraperJobSumAggregateInputType = {
 
 export type ScraperJobMinAggregateInputType = {
   id?: true
+  userId?: true
   platform?: true
   location?: true
   category?: true
@@ -106,6 +110,7 @@ export type ScraperJobMinAggregateInputType = {
 
 export type ScraperJobMaxAggregateInputType = {
   id?: true
+  userId?: true
   platform?: true
   location?: true
   category?: true
@@ -120,6 +125,7 @@ export type ScraperJobMaxAggregateInputType = {
 
 export type ScraperJobCountAggregateInputType = {
   id?: true
+  userId?: true
   platform?: true
   location?: true
   category?: true
@@ -221,6 +227,7 @@ export type ScraperJobGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inter
 
 export type ScraperJobGroupByOutputType = {
   id: string
+  userId: string | null
   platform: string
   location: string | null
   category: string | null
@@ -258,6 +265,7 @@ export type ScraperJobWhereInput = {
   OR?: Prisma.ScraperJobWhereInput[]
   NOT?: Prisma.ScraperJobWhereInput | Prisma.ScraperJobWhereInput[]
   id?: Prisma.StringFilter<"ScraperJob"> | string
+  userId?: Prisma.StringNullableFilter<"ScraperJob"> | string | null
   platform?: Prisma.StringFilter<"ScraperJob"> | string
   location?: Prisma.StringNullableFilter<"ScraperJob"> | string | null
   category?: Prisma.StringNullableFilter<"ScraperJob"> | string | null
@@ -268,10 +276,12 @@ export type ScraperJobWhereInput = {
   startedAt?: Prisma.DateTimeNullableFilter<"ScraperJob"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"ScraperJob"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ScraperJob"> | Date | string
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
 export type ScraperJobOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrderInput | Prisma.SortOrder
   platform?: Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -282,6 +292,7 @@ export type ScraperJobOrderByWithRelationInput = {
   startedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  user?: Prisma.UserOrderByWithRelationInput
 }
 
 export type ScraperJobWhereUniqueInput = Prisma.AtLeast<{
@@ -289,6 +300,7 @@ export type ScraperJobWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.ScraperJobWhereInput | Prisma.ScraperJobWhereInput[]
   OR?: Prisma.ScraperJobWhereInput[]
   NOT?: Prisma.ScraperJobWhereInput | Prisma.ScraperJobWhereInput[]
+  userId?: Prisma.StringNullableFilter<"ScraperJob"> | string | null
   platform?: Prisma.StringFilter<"ScraperJob"> | string
   location?: Prisma.StringNullableFilter<"ScraperJob"> | string | null
   category?: Prisma.StringNullableFilter<"ScraperJob"> | string | null
@@ -299,10 +311,12 @@ export type ScraperJobWhereUniqueInput = Prisma.AtLeast<{
   startedAt?: Prisma.DateTimeNullableFilter<"ScraperJob"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"ScraperJob"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ScraperJob"> | Date | string
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id">
 
 export type ScraperJobOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrderInput | Prisma.SortOrder
   platform?: Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -325,6 +339,7 @@ export type ScraperJobScalarWhereWithAggregatesInput = {
   OR?: Prisma.ScraperJobScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ScraperJobScalarWhereWithAggregatesInput | Prisma.ScraperJobScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"ScraperJob"> | string
+  userId?: Prisma.StringNullableWithAggregatesFilter<"ScraperJob"> | string | null
   platform?: Prisma.StringWithAggregatesFilter<"ScraperJob"> | string
   location?: Prisma.StringNullableWithAggregatesFilter<"ScraperJob"> | string | null
   category?: Prisma.StringNullableWithAggregatesFilter<"ScraperJob"> | string | null
@@ -349,10 +364,12 @@ export type ScraperJobCreateInput = {
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
+  user?: Prisma.UserCreateNestedOneWithoutScraperJobsInput
 }
 
 export type ScraperJobUncheckedCreateInput = {
   id?: string
+  userId?: string | null
   platform: string
   location?: string | null
   category?: string | null
@@ -377,10 +394,12 @@ export type ScraperJobUpdateInput = {
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneWithoutScraperJobsNestedInput
 }
 
 export type ScraperJobUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platform?: Prisma.StringFieldUpdateOperationsInput | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -395,6 +414,7 @@ export type ScraperJobUncheckedUpdateInput = {
 
 export type ScraperJobCreateManyInput = {
   id?: string
+  userId?: string | null
   platform: string
   location?: string | null
   category?: string | null
@@ -423,6 +443,7 @@ export type ScraperJobUpdateManyMutationInput = {
 
 export type ScraperJobUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   platform?: Prisma.StringFieldUpdateOperationsInput | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -437,6 +458,7 @@ export type ScraperJobUncheckedUpdateManyInput = {
 
 export type ScraperJobCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   location?: Prisma.SortOrder
   category?: Prisma.SortOrder
@@ -456,6 +478,7 @@ export type ScraperJobAvgOrderByAggregateInput = {
 
 export type ScraperJobMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   location?: Prisma.SortOrder
   category?: Prisma.SortOrder
@@ -470,6 +493,7 @@ export type ScraperJobMaxOrderByAggregateInput = {
 
 export type ScraperJobMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   location?: Prisma.SortOrder
   category?: Prisma.SortOrder
@@ -487,6 +511,16 @@ export type ScraperJobSumOrderByAggregateInput = {
   opportunitiesFound?: Prisma.SortOrder
 }
 
+export type ScraperJobListRelationFilter = {
+  every?: Prisma.ScraperJobWhereInput
+  some?: Prisma.ScraperJobWhereInput
+  none?: Prisma.ScraperJobWhereInput
+}
+
+export type ScraperJobOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
 export type IntFieldUpdateOperationsInput = {
   set?: number
   increment?: number
@@ -495,10 +529,180 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type ScraperJobCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.ScraperJobCreateWithoutUserInput, Prisma.ScraperJobUncheckedCreateWithoutUserInput> | Prisma.ScraperJobCreateWithoutUserInput[] | Prisma.ScraperJobUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ScraperJobCreateOrConnectWithoutUserInput | Prisma.ScraperJobCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.ScraperJobCreateManyUserInputEnvelope
+  connect?: Prisma.ScraperJobWhereUniqueInput | Prisma.ScraperJobWhereUniqueInput[]
+}
+
+export type ScraperJobUncheckedCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.ScraperJobCreateWithoutUserInput, Prisma.ScraperJobUncheckedCreateWithoutUserInput> | Prisma.ScraperJobCreateWithoutUserInput[] | Prisma.ScraperJobUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ScraperJobCreateOrConnectWithoutUserInput | Prisma.ScraperJobCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.ScraperJobCreateManyUserInputEnvelope
+  connect?: Prisma.ScraperJobWhereUniqueInput | Prisma.ScraperJobWhereUniqueInput[]
+}
+
+export type ScraperJobUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.ScraperJobCreateWithoutUserInput, Prisma.ScraperJobUncheckedCreateWithoutUserInput> | Prisma.ScraperJobCreateWithoutUserInput[] | Prisma.ScraperJobUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ScraperJobCreateOrConnectWithoutUserInput | Prisma.ScraperJobCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.ScraperJobUpsertWithWhereUniqueWithoutUserInput | Prisma.ScraperJobUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.ScraperJobCreateManyUserInputEnvelope
+  set?: Prisma.ScraperJobWhereUniqueInput | Prisma.ScraperJobWhereUniqueInput[]
+  disconnect?: Prisma.ScraperJobWhereUniqueInput | Prisma.ScraperJobWhereUniqueInput[]
+  delete?: Prisma.ScraperJobWhereUniqueInput | Prisma.ScraperJobWhereUniqueInput[]
+  connect?: Prisma.ScraperJobWhereUniqueInput | Prisma.ScraperJobWhereUniqueInput[]
+  update?: Prisma.ScraperJobUpdateWithWhereUniqueWithoutUserInput | Prisma.ScraperJobUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.ScraperJobUpdateManyWithWhereWithoutUserInput | Prisma.ScraperJobUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.ScraperJobScalarWhereInput | Prisma.ScraperJobScalarWhereInput[]
+}
+
+export type ScraperJobUncheckedUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.ScraperJobCreateWithoutUserInput, Prisma.ScraperJobUncheckedCreateWithoutUserInput> | Prisma.ScraperJobCreateWithoutUserInput[] | Prisma.ScraperJobUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ScraperJobCreateOrConnectWithoutUserInput | Prisma.ScraperJobCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.ScraperJobUpsertWithWhereUniqueWithoutUserInput | Prisma.ScraperJobUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.ScraperJobCreateManyUserInputEnvelope
+  set?: Prisma.ScraperJobWhereUniqueInput | Prisma.ScraperJobWhereUniqueInput[]
+  disconnect?: Prisma.ScraperJobWhereUniqueInput | Prisma.ScraperJobWhereUniqueInput[]
+  delete?: Prisma.ScraperJobWhereUniqueInput | Prisma.ScraperJobWhereUniqueInput[]
+  connect?: Prisma.ScraperJobWhereUniqueInput | Prisma.ScraperJobWhereUniqueInput[]
+  update?: Prisma.ScraperJobUpdateWithWhereUniqueWithoutUserInput | Prisma.ScraperJobUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.ScraperJobUpdateManyWithWhereWithoutUserInput | Prisma.ScraperJobUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.ScraperJobScalarWhereInput | Prisma.ScraperJobScalarWhereInput[]
+}
+
+export type ScraperJobCreateWithoutUserInput = {
+  id?: string
+  platform: string
+  location?: string | null
+  category?: string | null
+  status?: string
+  listingsFound?: number
+  opportunitiesFound?: number
+  errorMessage?: string | null
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+}
+
+export type ScraperJobUncheckedCreateWithoutUserInput = {
+  id?: string
+  platform: string
+  location?: string | null
+  category?: string | null
+  status?: string
+  listingsFound?: number
+  opportunitiesFound?: number
+  errorMessage?: string | null
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+}
+
+export type ScraperJobCreateOrConnectWithoutUserInput = {
+  where: Prisma.ScraperJobWhereUniqueInput
+  create: Prisma.XOR<Prisma.ScraperJobCreateWithoutUserInput, Prisma.ScraperJobUncheckedCreateWithoutUserInput>
+}
+
+export type ScraperJobCreateManyUserInputEnvelope = {
+  data: Prisma.ScraperJobCreateManyUserInput | Prisma.ScraperJobCreateManyUserInput[]
+}
+
+export type ScraperJobUpsertWithWhereUniqueWithoutUserInput = {
+  where: Prisma.ScraperJobWhereUniqueInput
+  update: Prisma.XOR<Prisma.ScraperJobUpdateWithoutUserInput, Prisma.ScraperJobUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.ScraperJobCreateWithoutUserInput, Prisma.ScraperJobUncheckedCreateWithoutUserInput>
+}
+
+export type ScraperJobUpdateWithWhereUniqueWithoutUserInput = {
+  where: Prisma.ScraperJobWhereUniqueInput
+  data: Prisma.XOR<Prisma.ScraperJobUpdateWithoutUserInput, Prisma.ScraperJobUncheckedUpdateWithoutUserInput>
+}
+
+export type ScraperJobUpdateManyWithWhereWithoutUserInput = {
+  where: Prisma.ScraperJobScalarWhereInput
+  data: Prisma.XOR<Prisma.ScraperJobUpdateManyMutationInput, Prisma.ScraperJobUncheckedUpdateManyWithoutUserInput>
+}
+
+export type ScraperJobScalarWhereInput = {
+  AND?: Prisma.ScraperJobScalarWhereInput | Prisma.ScraperJobScalarWhereInput[]
+  OR?: Prisma.ScraperJobScalarWhereInput[]
+  NOT?: Prisma.ScraperJobScalarWhereInput | Prisma.ScraperJobScalarWhereInput[]
+  id?: Prisma.StringFilter<"ScraperJob"> | string
+  userId?: Prisma.StringNullableFilter<"ScraperJob"> | string | null
+  platform?: Prisma.StringFilter<"ScraperJob"> | string
+  location?: Prisma.StringNullableFilter<"ScraperJob"> | string | null
+  category?: Prisma.StringNullableFilter<"ScraperJob"> | string | null
+  status?: Prisma.StringFilter<"ScraperJob"> | string
+  listingsFound?: Prisma.IntFilter<"ScraperJob"> | number
+  opportunitiesFound?: Prisma.IntFilter<"ScraperJob"> | number
+  errorMessage?: Prisma.StringNullableFilter<"ScraperJob"> | string | null
+  startedAt?: Prisma.DateTimeNullableFilter<"ScraperJob"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"ScraperJob"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"ScraperJob"> | Date | string
+}
+
+export type ScraperJobCreateManyUserInput = {
+  id?: string
+  platform: string
+  location?: string | null
+  category?: string | null
+  status?: string
+  listingsFound?: number
+  opportunitiesFound?: number
+  errorMessage?: string | null
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+}
+
+export type ScraperJobUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  platform?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  listingsFound?: Prisma.IntFieldUpdateOperationsInput | number
+  opportunitiesFound?: Prisma.IntFieldUpdateOperationsInput | number
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ScraperJobUncheckedUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  platform?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  listingsFound?: Prisma.IntFieldUpdateOperationsInput | number
+  opportunitiesFound?: Prisma.IntFieldUpdateOperationsInput | number
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ScraperJobUncheckedUpdateManyWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  platform?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  listingsFound?: Prisma.IntFieldUpdateOperationsInput | number
+  opportunitiesFound?: Prisma.IntFieldUpdateOperationsInput | number
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 
 
 export type ScraperJobSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  userId?: boolean
   platform?: boolean
   location?: boolean
   category?: boolean
@@ -509,10 +713,12 @@ export type ScraperJobSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   startedAt?: boolean
   completedAt?: boolean
   createdAt?: boolean
+  user?: boolean | Prisma.ScraperJob$userArgs<ExtArgs>
 }, ExtArgs["result"]["scraperJob"]>
 
 export type ScraperJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  userId?: boolean
   platform?: boolean
   location?: boolean
   category?: boolean
@@ -523,10 +729,12 @@ export type ScraperJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   startedAt?: boolean
   completedAt?: boolean
   createdAt?: boolean
+  user?: boolean | Prisma.ScraperJob$userArgs<ExtArgs>
 }, ExtArgs["result"]["scraperJob"]>
 
 export type ScraperJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  userId?: boolean
   platform?: boolean
   location?: boolean
   category?: boolean
@@ -537,10 +745,12 @@ export type ScraperJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   startedAt?: boolean
   completedAt?: boolean
   createdAt?: boolean
+  user?: boolean | Prisma.ScraperJob$userArgs<ExtArgs>
 }, ExtArgs["result"]["scraperJob"]>
 
 export type ScraperJobSelectScalar = {
   id?: boolean
+  userId?: boolean
   platform?: boolean
   location?: boolean
   category?: boolean
@@ -553,13 +763,25 @@ export type ScraperJobSelectScalar = {
   createdAt?: boolean
 }
 
-export type ScraperJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "platform" | "location" | "category" | "status" | "listingsFound" | "opportunitiesFound" | "errorMessage" | "startedAt" | "completedAt" | "createdAt", ExtArgs["result"]["scraperJob"]>
+export type ScraperJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "platform" | "location" | "category" | "status" | "listingsFound" | "opportunitiesFound" | "errorMessage" | "startedAt" | "completedAt" | "createdAt", ExtArgs["result"]["scraperJob"]>
+export type ScraperJobInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.ScraperJob$userArgs<ExtArgs>
+}
+export type ScraperJobIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.ScraperJob$userArgs<ExtArgs>
+}
+export type ScraperJobIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.ScraperJob$userArgs<ExtArgs>
+}
 
 export type $ScraperJobPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ScraperJob"
-  objects: {}
+  objects: {
+    user: Prisma.$UserPayload<ExtArgs> | null
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    userId: string | null
     platform: string
     location: string | null
     category: string | null
@@ -964,6 +1186,7 @@ readonly fields: ScraperJobFieldRefs;
  */
 export interface Prisma__ScraperJobClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  user<T extends Prisma.ScraperJob$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ScraperJob$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -994,6 +1217,7 @@ export interface Prisma__ScraperJobClient<T, Null = never, ExtArgs extends runti
  */
 export interface ScraperJobFieldRefs {
   readonly id: Prisma.FieldRef<"ScraperJob", 'String'>
+  readonly userId: Prisma.FieldRef<"ScraperJob", 'String'>
   readonly platform: Prisma.FieldRef<"ScraperJob", 'String'>
   readonly location: Prisma.FieldRef<"ScraperJob", 'String'>
   readonly category: Prisma.FieldRef<"ScraperJob", 'String'>
@@ -1021,6 +1245,10 @@ export type ScraperJobFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   omit?: Prisma.ScraperJobOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScraperJobInclude<ExtArgs> | null
+  /**
    * Filter, which ScraperJob to fetch.
    */
   where: Prisma.ScraperJobWhereUniqueInput
@@ -1039,6 +1267,10 @@ export type ScraperJobFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extens
    */
   omit?: Prisma.ScraperJobOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScraperJobInclude<ExtArgs> | null
+  /**
    * Filter, which ScraperJob to fetch.
    */
   where: Prisma.ScraperJobWhereUniqueInput
@@ -1056,6 +1288,10 @@ export type ScraperJobFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Omit specific fields from the ScraperJob
    */
   omit?: Prisma.ScraperJobOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScraperJobInclude<ExtArgs> | null
   /**
    * Filter, which ScraperJob to fetch.
    */
@@ -1105,6 +1341,10 @@ export type ScraperJobFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    */
   omit?: Prisma.ScraperJobOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScraperJobInclude<ExtArgs> | null
+  /**
    * Filter, which ScraperJob to fetch.
    */
   where?: Prisma.ScraperJobWhereInput
@@ -1153,6 +1393,10 @@ export type ScraperJobFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   omit?: Prisma.ScraperJobOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScraperJobInclude<ExtArgs> | null
+  /**
    * Filter, which ScraperJobs to fetch.
    */
   where?: Prisma.ScraperJobWhereInput
@@ -1196,6 +1440,10 @@ export type ScraperJobCreateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    */
   omit?: Prisma.ScraperJobOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScraperJobInclude<ExtArgs> | null
+  /**
    * The data needed to create a ScraperJob.
    */
   data: Prisma.XOR<Prisma.ScraperJobCreateInput, Prisma.ScraperJobUncheckedCreateInput>
@@ -1227,6 +1475,10 @@ export type ScraperJobCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Exte
    * The data used to create many ScraperJobs.
    */
   data: Prisma.ScraperJobCreateManyInput | Prisma.ScraperJobCreateManyInput[]
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScraperJobIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1241,6 +1493,10 @@ export type ScraperJobUpdateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Omit specific fields from the ScraperJob
    */
   omit?: Prisma.ScraperJobOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScraperJobInclude<ExtArgs> | null
   /**
    * The data needed to update a ScraperJob.
    */
@@ -1293,6 +1549,10 @@ export type ScraperJobUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Exte
    * Limit how many ScraperJobs to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScraperJobIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1307,6 +1567,10 @@ export type ScraperJobUpsertArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Omit specific fields from the ScraperJob
    */
   omit?: Prisma.ScraperJobOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScraperJobInclude<ExtArgs> | null
   /**
    * The filter to search for the ScraperJob to update in case it exists.
    */
@@ -1334,6 +1598,10 @@ export type ScraperJobDeleteArgs<ExtArgs extends runtime.Types.Extensions.Intern
    */
   omit?: Prisma.ScraperJobOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScraperJobInclude<ExtArgs> | null
+  /**
    * Filter which ScraperJob to delete.
    */
   where: Prisma.ScraperJobWhereUniqueInput
@@ -1354,6 +1622,25 @@ export type ScraperJobDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.In
 }
 
 /**
+ * ScraperJob.user
+ */
+export type ScraperJob$userArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
+}
+
+/**
  * ScraperJob without action
  */
 export type ScraperJobDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1365,4 +1652,8 @@ export type ScraperJobDefaultArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Omit specific fields from the ScraperJob
    */
   omit?: Prisma.ScraperJobOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScraperJobInclude<ExtArgs> | null
 }

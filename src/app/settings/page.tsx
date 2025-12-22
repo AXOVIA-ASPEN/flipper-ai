@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession, signOut } from "next-auth/react";
 import {
   ArrowLeft,
   Settings as SettingsIcon,
@@ -24,6 +25,14 @@ import {
   Loader2,
   AlertCircle,
   Bookmark,
+  User,
+  Key,
+  Eye,
+  EyeOff,
+  LogOut,
+  Sparkles,
+  ExternalLink,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -65,9 +74,38 @@ const defaultSearchFormData: SearchFormData = {
   enabled: true,
 };
 
+interface UserSettings {
+  id: string;
+  userId: string;
+  openaiApiKey: string | null;
+  hasOpenaiApiKey: boolean;
+  llmModel: string;
+  discountThreshold: number;
+  autoAnalyze: boolean;
+  user: {
+    id: string;
+    email: string;
+    name: string | null;
+    image: string | null;
+  };
+}
+
 export default function SettingsPage() {
+  const { data: session, status } = useSession();
   const [saved, setSaved] = useState(false);
   const { theme, setTheme, availableThemes } = useTheme();
+
+  // User settings state
+  const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
+  const [settingsLoading, setSettingsLoading] = useState(true);
+  const [apiKey, setApiKey] = useState("");
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [savingApiKey, setSavingApiKey] = useState(false);
+  const [testingApiKey, setTestingApiKey] = useState(false);
+  const [apiKeyStatus, setApiKeyStatus] = useState<"valid" | "invalid" | "not_set" | null>(null);
+  const [llmModel, setLlmModel] = useState("gpt-4o-mini");
+  const [discountThreshold, setDiscountThreshold] = useState(50);
+  const [autoAnalyze, setAutoAnalyze] = useState(true);
 
   // Search configs state
   const [configs, setConfigs] = useState<SearchConfig[]>([]);
@@ -94,9 +132,103 @@ export default function SettingsPage() {
     { value: "denver", label: "Denver, CO" },
   ];
 
+  // Fetch user settings on mount
   useEffect(() => {
+    fetchUserSettings();
     fetchConfigs();
   }, []);
+
+  async function fetchUserSettings() {
+    try {
+      const response = await fetch("/api/user/settings");
+      const data = await response.json();
+      if (data.success && data.data) {
+        setUserSettings(data.data);
+        setLlmModel(data.data.llmModel);
+        setDiscountThreshold(data.data.discountThreshold);
+        setAutoAnalyze(data.data.autoAnalyze);
+        setApiKeyStatus(data.data.hasOpenaiApiKey ? "valid" : "not_set");
+      }
+    } catch (error) {
+      console.error("Failed to fetch user settings:", error);
+    } finally {
+      setSettingsLoading(false);
+    }
+  }
+
+  async function handleSaveApiKey() {
+    setSavingApiKey(true);
+    try {
+      const response = await fetch("/api/user/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ openaiApiKey: apiKey || null }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setUserSettings(data.data);
+        setApiKey("");
+        setApiKeyStatus(data.data.hasOpenaiApiKey ? "valid" : "not_set");
+        showConfigMessage("success", "API key saved securely");
+      } else {
+        showConfigMessage("error", data.error || "Failed to save API key");
+      }
+    } catch (error) {
+      console.error("Failed to save API key:", error);
+      showConfigMessage("error", "Failed to save API key");
+    } finally {
+      setSavingApiKey(false);
+    }
+  }
+
+  async function handleTestApiKey() {
+    setTestingApiKey(true);
+    try {
+      const response = await fetch("/api/user/settings/validate-key", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apiKey: apiKey || undefined }),
+      });
+      const data = await response.json();
+      if (data.success && data.valid) {
+        setApiKeyStatus("valid");
+        showConfigMessage("success", "API key is valid!");
+      } else {
+        setApiKeyStatus("invalid");
+        showConfigMessage("error", data.error || "API key is invalid");
+      }
+    } catch (error) {
+      console.error("Failed to test API key:", error);
+      setApiKeyStatus("invalid");
+      showConfigMessage("error", "Failed to test API key");
+    } finally {
+      setTestingApiKey(false);
+    }
+  }
+
+  async function handleSaveLlmSettings() {
+    try {
+      const response = await fetch("/api/user/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ llmModel, discountThreshold, autoAnalyze }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setUserSettings(data.data);
+        showConfigMessage("success", "LLM settings saved");
+      } else {
+        showConfigMessage("error", data.error || "Failed to save settings");
+      }
+    } catch (error) {
+      console.error("Failed to save LLM settings:", error);
+      showConfigMessage("error", "Failed to save settings");
+    }
+  }
+
+  async function handleSignOut() {
+    await signOut({ callbackUrl: "/login" });
+  }
 
   async function fetchConfigs() {
     try {
@@ -355,6 +487,239 @@ export default function SettingsPage() {
             {configMessage.text}
           </div>
         )}
+
+        {/* Account Section */}
+        <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-6 shadow-xl">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-cyan-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/50">
+              <User className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-lg font-semibold bg-gradient-to-r from-blue-200 to-cyan-200 bg-clip-text text-transparent">
+              Account
+            </h2>
+          </div>
+
+          {settingsLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="w-6 h-6 text-blue-400 animate-spin" />
+            </div>
+          ) : session?.user ? (
+            <div className="space-y-4">
+              {/* User Profile */}
+              <div className="flex items-center gap-4 p-4 rounded-lg bg-white/5 border border-white/10">
+                {session.user.image ? (
+                  <img
+                    src={session.user.image}
+                    alt={session.user.name || "User"}
+                    className="w-14 h-14 rounded-full border-2 border-purple-400/50"
+                  />
+                ) : (
+                  <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center">
+                    <User className="w-7 h-7 text-white" />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <p className="text-lg font-semibold text-white">
+                    {session.user.name || "Anonymous User"}
+                  </p>
+                  <p className="text-sm text-blue-200/60">{session.user.email}</p>
+                </div>
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/10 text-red-300 rounded-lg hover:bg-red-500/20 transition-all"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign out
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-6">
+              <p className="text-blue-200/60 mb-4">Sign in to sync your settings across devices</p>
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl hover:from-purple-600 hover:to-pink-700 transition-all shadow-lg"
+              >
+                <User className="w-5 h-5" />
+                Sign in
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {/* API Keys Section */}
+        <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-6 shadow-xl">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-600 rounded-lg flex items-center justify-center shadow-lg shadow-amber-500/50">
+              <Key className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold bg-gradient-to-r from-amber-200 to-orange-200 bg-clip-text text-transparent">
+                API Keys
+              </h2>
+              <p className="text-xs text-blue-200/50">Required for AI-powered analysis</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {/* OpenAI API Key */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium text-blue-200/90">
+                  OpenAI API Key
+                </label>
+                <div className="flex items-center gap-2">
+                  {apiKeyStatus === "valid" && (
+                    <span className="flex items-center gap-1 text-xs text-green-300">
+                      <CheckCircle className="w-3 h-3" />
+                      Connected
+                    </span>
+                  )}
+                  {apiKeyStatus === "invalid" && (
+                    <span className="flex items-center gap-1 text-xs text-red-300">
+                      <AlertCircle className="w-3 h-3" />
+                      Invalid
+                    </span>
+                  )}
+                  {apiKeyStatus === "not_set" && (
+                    <span className="flex items-center gap-1 text-xs text-yellow-300">
+                      <AlertCircle className="w-3 h-3" />
+                      Not set
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="relative">
+                <input
+                  type={showApiKey ? "text" : "password"}
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder={userSettings?.hasOpenaiApiKey ? userSettings.openaiApiKey || "••••••••••••" : "sk-..."}
+                  className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50 text-white placeholder-blue-200/30 transition-all duration-300 pr-24"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowApiKey(!showApiKey)}
+                    className="p-1 text-blue-300/50 hover:text-blue-200 transition-colors"
+                  >
+                    {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 mt-2">
+                <button
+                  onClick={handleSaveApiKey}
+                  disabled={savingApiKey}
+                  className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white text-sm rounded-lg hover:from-amber-600 hover:to-orange-700 transition-all disabled:opacity-50"
+                >
+                  {savingApiKey ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
+                  Save
+                </button>
+                <button
+                  onClick={handleTestApiKey}
+                  disabled={testingApiKey || (!apiKey && !userSettings?.hasOpenaiApiKey)}
+                  className="flex items-center gap-1 px-3 py-1.5 bg-white/10 text-blue-300 text-sm rounded-lg hover:bg-white/20 transition-all disabled:opacity-50"
+                >
+                  {testingApiKey ? <Loader2 className="w-3 h-3 animate-spin" /> : <Zap className="w-3 h-3" />}
+                  Test
+                </button>
+                <a
+                  href="https://platform.openai.com/api-keys"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 px-3 py-1.5 text-blue-300/60 text-sm hover:text-blue-200 transition-colors"
+                >
+                  Get API key
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+              <p className="mt-2 text-xs text-blue-200/40">
+                Your API key is encrypted and stored securely. It's never exposed in logs or transmitted to our servers.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* LLM Analysis Preferences */}
+        <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-6 shadow-xl">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-gradient-to-br from-violet-400 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-violet-500/50">
+              <Sparkles className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-lg font-semibold bg-gradient-to-r from-violet-200 to-purple-200 bg-clip-text text-transparent">
+              AI Analysis Preferences
+            </h2>
+          </div>
+
+          <div className="space-y-4">
+            {/* Model Selection */}
+            <div>
+              <label className="block text-sm font-medium text-blue-200/90 mb-2">
+                LLM Model
+              </label>
+              <select
+                value={llmModel}
+                onChange={(e) => setLlmModel(e.target.value)}
+                className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white"
+              >
+                <option value="gpt-4o-mini" className="bg-slate-800">GPT-4o Mini (Recommended)</option>
+                <option value="gpt-4o" className="bg-slate-800">GPT-4o (More accurate)</option>
+                <option value="gpt-4-turbo" className="bg-slate-800">GPT-4 Turbo (Highest quality)</option>
+              </select>
+              <p className="mt-1 text-xs text-blue-200/40">
+                GPT-4o Mini offers the best balance of speed and accuracy for listing analysis.
+              </p>
+            </div>
+
+            {/* Discount Threshold */}
+            <div>
+              <label className="block text-sm font-medium text-blue-200/90 mb-2">
+                Minimum Discount Threshold: {discountThreshold}%
+              </label>
+              <input
+                type="range"
+                min="10"
+                max="80"
+                value={discountThreshold}
+                onChange={(e) => setDiscountThreshold(parseInt(e.target.value))}
+                className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-purple-500"
+              />
+              <div className="flex justify-between text-xs text-blue-200/40 mt-1">
+                <span>10% (More deals)</span>
+                <span>80% (Only steep discounts)</span>
+              </div>
+            </div>
+
+            {/* Auto-Analyze Toggle */}
+            <label className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-all duration-300 cursor-pointer">
+              <div>
+                <span className="text-white">Auto-analyze new listings</span>
+                <p className="text-xs text-blue-200/40">Automatically run AI analysis on scraped listings</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAutoAnalyze(!autoAnalyze)}
+                className="p-1"
+              >
+                {autoAnalyze ? (
+                  <ToggleRight className="w-8 h-8 text-green-400" />
+                ) : (
+                  <ToggleLeft className="w-8 h-8 text-gray-400" />
+                )}
+              </button>
+            </label>
+
+            {/* Save Button */}
+            <button
+              onClick={handleSaveLlmSettings}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-lg hover:from-violet-600 hover:to-purple-700 transition-all shadow-lg"
+            >
+              <Save className="w-4 h-4" />
+              Save AI Settings
+            </button>
+          </div>
+        </div>
 
         {/* Saved Search Configurations */}
         <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-6 shadow-xl">

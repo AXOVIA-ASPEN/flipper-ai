@@ -55,7 +55,12 @@ export const ModelName = {
   Opportunity: 'Opportunity',
   ScraperJob: 'ScraperJob',
   SearchConfig: 'SearchConfig',
-  PriceHistory: 'PriceHistory'
+  PriceHistory: 'PriceHistory',
+  User: 'User',
+  Account: 'Account',
+  Session: 'Session',
+  VerificationToken: 'VerificationToken',
+  UserSettings: 'UserSettings'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -73,6 +78,7 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const ListingScalarFieldEnum = {
   id: 'id',
+  userId: 'userId',
   externalId: 'externalId',
   platform: 'platform',
   url: 'url',
@@ -133,6 +139,7 @@ export type ListingScalarFieldEnum = (typeof ListingScalarFieldEnum)[keyof typeo
 
 export const OpportunityScalarFieldEnum = {
   id: 'id',
+  userId: 'userId',
   listingId: 'listingId',
   purchasePrice: 'purchasePrice',
   purchaseDate: 'purchaseDate',
@@ -154,6 +161,7 @@ export type OpportunityScalarFieldEnum = (typeof OpportunityScalarFieldEnum)[key
 
 export const ScraperJobScalarFieldEnum = {
   id: 'id',
+  userId: 'userId',
   platform: 'platform',
   location: 'location',
   category: 'category',
@@ -171,6 +179,7 @@ export type ScraperJobScalarFieldEnum = (typeof ScraperJobScalarFieldEnum)[keyof
 
 export const SearchConfigScalarFieldEnum = {
   id: 'id',
+  userId: 'userId',
   name: 'name',
   platform: 'platform',
   location: 'location',
@@ -199,6 +208,71 @@ export const PriceHistoryScalarFieldEnum = {
 } as const
 
 export type PriceHistoryScalarFieldEnum = (typeof PriceHistoryScalarFieldEnum)[keyof typeof PriceHistoryScalarFieldEnum]
+
+
+export const UserScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  emailVerified: 'emailVerified',
+  name: 'name',
+  image: 'image',
+  password: 'password',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const AccountScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  provider: 'provider',
+  providerAccountId: 'providerAccountId',
+  refresh_token: 'refresh_token',
+  access_token: 'access_token',
+  expires_at: 'expires_at',
+  token_type: 'token_type',
+  scope: 'scope',
+  id_token: 'id_token',
+  session_state: 'session_state'
+} as const
+
+export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum]
+
+
+export const SessionScalarFieldEnum = {
+  id: 'id',
+  sessionToken: 'sessionToken',
+  userId: 'userId',
+  expires: 'expires'
+} as const
+
+export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
+
+
+export const VerificationTokenScalarFieldEnum = {
+  identifier: 'identifier',
+  token: 'token',
+  expires: 'expires'
+} as const
+
+export type VerificationTokenScalarFieldEnum = (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum]
+
+
+export const UserSettingsScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  openaiApiKey: 'openaiApiKey',
+  llmModel: 'llmModel',
+  discountThreshold: 'discountThreshold',
+  autoAnalyze: 'autoAnalyze',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserSettingsScalarFieldEnum = (typeof UserSettingsScalarFieldEnum)[keyof typeof UserSettingsScalarFieldEnum]
 
 
 export const SortOrder = {

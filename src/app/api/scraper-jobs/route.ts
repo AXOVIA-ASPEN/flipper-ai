@@ -1,15 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import { getAuthUserId } from "@/lib/auth-middleware";
 
 // GET /api/scraper-jobs - List all scraper jobs
 export async function GET(request: NextRequest) {
   try {
+    const userId = await getAuthUserId();
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
     const platform = searchParams.get("platform");
     const limit = parseInt(searchParams.get("limit") || "50");
 
     const where: Record<string, unknown> = {};
+
+    // Filter by user - show user's jobs OR legacy jobs (null userId)
+    if (userId) {
+      where.OR = [{ userId }, { userId: null }];
+    }
+
     if (status) where.status = status;
     if (platform) where.platform = platform;
 
@@ -35,6 +43,7 @@ export async function GET(request: NextRequest) {
 // POST /api/scraper-jobs - Create a new scraper job
 export async function POST(request: NextRequest) {
   try {
+    const userId = await getAuthUserId();
     const body = await request.json();
     const { platform, location, category } = body;
 
@@ -57,6 +66,7 @@ export async function POST(request: NextRequest) {
 
     const job = await prisma.scraperJob.create({
       data: {
+        userId,
         platform,
         location: location || null,
         category: category || null,

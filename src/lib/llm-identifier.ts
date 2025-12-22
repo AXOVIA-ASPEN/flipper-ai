@@ -1,7 +1,7 @@
 // LLM-powered item identification for marketplace listings
-// Uses Google Gemini to extract structured product information from listing titles/descriptions
+// Uses OpenAI ChatGPT to extract structured product information from listing titles/descriptions
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import OpenAI from "openai";
 
 export interface ItemIdentification {
   brand: string | null;
@@ -50,17 +50,17 @@ GUIDELINES:
 - searchQuery should be specific enough to find similar items but not too restrictive
 - If you can't identify the brand/model, still provide a useful searchQuery`;
 
-let genAI: GoogleGenerativeAI | null = null;
+let openai: OpenAI | null = null;
 
-function getGenAI(): GoogleGenerativeAI {
-  if (!genAI) {
-    const apiKey = process.env.GOOGLE_API_KEY;
+function getOpenAI(): OpenAI {
+  if (!openai) {
+    const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
-      throw new Error("GOOGLE_API_KEY environment variable is not set");
+      throw new Error("OPENAI_API_KEY environment variable is not set");
     }
-    genAI = new GoogleGenerativeAI(apiKey);
+    openai = new OpenAI({ apiKey });
   }
-  return genAI;
+  return openai;
 }
 
 export async function identifyItem(
@@ -70,14 +70,13 @@ export async function identifyItem(
   categoryHint: string | null
 ): Promise<ItemIdentification | null> {
   // Skip if no API key configured
-  if (!process.env.GOOGLE_API_KEY) {
-    console.log("GOOGLE_API_KEY not set, skipping LLM identification");
+  if (!process.env.OPENAI_API_KEY) {
+    console.log("OPENAI_API_KEY not set, skipping LLM identification");
     return null;
   }
 
   try {
-    const ai = getGenAI();
-    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const client = getOpenAI();
 
     const prompt = IDENTIFICATION_PROMPT
       .replace("{title}", title)
@@ -85,8 +84,23 @@ export async function identifyItem(
       .replace("{price}", askingPrice.toString())
       .replace("{category}", categoryHint || "Unknown");
 
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
+    const response = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "You are a product identification expert. Always respond with valid JSON only, no markdown formatting.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.3,
+      max_tokens: 500,
+    });
+
+    const responseText = response.choices[0]?.message?.content || "";
 
     // Extract JSON from response (handle potential markdown wrapping)
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);

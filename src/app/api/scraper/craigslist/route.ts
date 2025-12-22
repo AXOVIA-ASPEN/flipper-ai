@@ -5,6 +5,7 @@ import { estimateValue, detectCategory, generatePurchaseMessage } from "@/lib/va
 import { identifyItem } from "@/lib/llm-identifier";
 import { fetchMarketPrice, closeBrowser as closeMarketBrowser } from "@/lib/market-price";
 import { analyzeSellability, quickDiscountCheck } from "@/lib/llm-analyzer";
+import { getAuthUserId } from "@/lib/auth-middleware";
 
 // Minimum discount threshold for saving a listing (50% = must be half market value)
 const MIN_DISCOUNT_THRESHOLD = 50;
@@ -172,6 +173,7 @@ export async function POST(request: NextRequest) {
   let job = null;
 
   try {
+    const userId = await getAuthUserId();
     const body = await request.json();
     const { location, category, keywords, minPrice, maxPrice } = body;
 
@@ -185,6 +187,7 @@ export async function POST(request: NextRequest) {
     // Create scraper job record
     job = await prisma.scraperJob.create({
       data: {
+        userId,
         platform: "CRAIGSLIST",
         location,
         category,
@@ -238,8 +241,8 @@ export async function POST(request: NextRequest) {
       discount?: number;
     }> = [];
 
-    const hasLLM = !!process.env.GOOGLE_API_KEY;
-    console.log(`LLM analysis ${hasLLM ? "enabled" : "disabled (no GOOGLE_API_KEY)"}`);
+    const hasLLM = !!process.env.OPENAI_API_KEY;
+    console.log(`LLM analysis ${hasLLM ? "enabled" : "disabled (no OPENAI_API_KEY)"}`);
 
     for (const item of listings) {
       try {
@@ -336,6 +339,7 @@ export async function POST(request: NextRequest) {
 
         // Build listing data
         const listingData = {
+          userId,
           externalId: item.externalId,
           platform: "CRAIGSLIST",
           url: item.url,
@@ -408,9 +412,10 @@ export async function POST(request: NextRequest) {
         // Upsert to database
         await prisma.listing.upsert({
           where: {
-            platform_externalId: {
+            platform_externalId_userId: {
               platform: "CRAIGSLIST",
               externalId: item.externalId,
+              userId,
             },
           },
           create: listingData,

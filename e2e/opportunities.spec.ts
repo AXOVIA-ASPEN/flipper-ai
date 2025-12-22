@@ -351,6 +351,33 @@ test.describe("Feature: Opportunity Metadata", () => {
           category: "electronics",
           discountPercent: 25,
           postedAt: new Date().toISOString(),
+          identifiedBrand: "Apple",
+          identifiedModel: "MacBook Pro",
+          identifiedVariant: "M3 Max / 32GB",
+          identifiedCondition: "Like New",
+          verifiedMarketValue: 2300,
+          marketDataSource: "ebay_api",
+          marketDataDate: new Date().toISOString(),
+          comparableSalesJson: JSON.stringify([
+            {
+              title: "MacBook Pro 16\" 2024",
+              price: 2250,
+              url: "https://example.com/sold1",
+              soldAt: new Date().toISOString(),
+            },
+          ]),
+          sellabilityScore: 92,
+          demandLevel: "high",
+          expectedDaysToSell: 5,
+          authenticityRisk: "low",
+          recommendedOffer: 1400,
+          recommendedList: 2100,
+          resaleStrategy: "List locally first, then eBay with Buy It Now.",
+          trueDiscountPercent: 35,
+          llmAnalyzed: true,
+          analysisDate: new Date().toISOString(),
+          analysisConfidence: "high",
+          analysisReasoning: "Verified comps show $600 upside with fast sell-through.",
         },
       };
 
@@ -377,6 +404,11 @@ test.describe("Feature: Opportunity Metadata", () => {
     await expect(page.getByText("#apple")).toBeVisible();
     await expect(page.getByText("Purchase Message")).toBeVisible();
     await expect(page.getByRole("link", { name: /eBay Sold Search/i })).toBeVisible();
+    await expect(page.getByTestId("llm-identification")).toBeVisible();
+    await expect(page.getByTestId("market-insights")).toContainText("Verified Market Value");
+    await expect(page.getByTestId("recommendation-details")).toContainText("Recommended Offer");
+    await expect(page.getByText("Pricing Reasoning")).toBeVisible();
+    await expect(page.getByText("Comparable Sold Listings")).toBeVisible();
 
     const copyButton = page.getByRole("button", { name: /^Copy$/i });
     await copyButton.click();

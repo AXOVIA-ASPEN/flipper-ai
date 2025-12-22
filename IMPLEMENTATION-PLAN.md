@@ -186,6 +186,7 @@
 - ✅ Save and Cancel buttons close the form appropriately
 - ✅ Delete button shows confirmation dialog and triggers DELETE request
 - ✅ Opportunity cards render listing images, tags, seller info, comparable URLs, and AI purchase message with copy-to-clipboard state
+- ✅ LLM identification, verified market data, and recommended actions display with purchase message + comparable sold listings
 
 **NOT Tested**:
 - (None - major UI flows now covered in Playwright)
@@ -249,6 +250,25 @@
 **Coverage**: N/A - Excluded
 
 **Note**: Database client is mocked in all tests. No integration tests with real SQLite database.
+
+---
+
+### 9. eBay Scraper API
+**File**: `src/app/api/scraper/ebay/route.ts`  
+**Test File**: `src/__tests__/api/ebay-scraper.test.ts`  
+**Coverage**: Jest unit tests with mocked fetch + Prisma interactions
+
+**Tested Behaviors**:
+- ✅ GET metadata endpoint returns supported categories, conditions, and usage guidance
+- ✅ Validation for required OAuth token, keywords, and invalid filters surfaces explicit errors
+- ✅ Fixed-price search ingests listings, runs value estimator, and stores/upserts opportunities
+- ✅ Sold-listing fetch persists comparable sales both on the listing and in `PriceHistory`
+- ✅ Error handling for upstream API failures and Prisma writes returns 500 responses with details
+
+**NOT Tested**:
+- ❌ Pagination over 50 results (Browse API limit)  
+- ❌ Marketplace overrides beyond `EBAY_US`
+- ❌ Auction-only ingestion paths (currently annotate alongside fixed-price)
 
 ---
 
@@ -359,22 +379,101 @@
 ### 1.3 Enhanced Dashboard
 
 #### 1.3.1 Batch Operations
-- [ ] Add multi-select checkboxes to listings table
-- [ ] Implement bulk status updates
-- [ ] Add bulk delete with confirmation
-- [ ] Implement bulk "Add to Opportunities"
+- [x] Add multi-select checkboxes to listings table
+- [x] Implement bulk status updates
+- [x] Add bulk delete with confirmation
+- [x] Implement bulk "Add to Opportunities"
 
 #### 1.3.2 Improved Filtering
-- [ ] Add date range filter (scraped date)
-- [ ] Add location filter
-- [ ] Add category filter
-- [ ] Add price range slider
-- [ ] Persist filter state in URL params
+- [x] Add date range filter (scraped date)
+- [x] Add location filter
+- [x] Add category filter
+- [x] Add price range slider
+- [x] Persist filter state in URL params
 
 #### 1.3.3 Export Functionality
 - [ ] Add CSV export for listings
 - [ ] Add CSV export for opportunities
 - [ ] Include all analysis fields in export
+
+### 1.4 User Authentication & API Key Management
+
+> **NOTE**: Another agent is currently working on this section (authentication setup, UI, and integration). Coordinate before making changes here.
+
+**Goal**: Enable user accounts with secure storage of personal API keys for LLM-powered analysis.
+
+#### 1.4.1 Authentication Setup
+- [ ] Install and configure NextAuth.js
+- [ ] Add User model to Prisma schema (id, email, name, image, createdAt)
+- [ ] Implement OAuth providers (Google, GitHub)
+- [ ] Add email/password authentication option
+- [ ] Create login/register pages
+- [ ] Add session provider to app layout
+- [ ] Protect API routes with authentication middleware
+
+#### 1.4.2 User Settings Model
+- [x] Create UserSettings model in Prisma schema:
+  ```prisma
+  model UserSettings {
+    id              String   @id @default(cuid())
+    userId          String   @unique
+    user            User     @relation(fields: [userId], references: [id])
+    openaiApiKey    String?  // Encrypted
+    llmModel        String?  @default("gpt-4o-mini")
+    discountThreshold Int?   @default(50)
+    autoAnalyze     Boolean  @default(true)
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+  }
+  ```
+- [x] Add encryption for API key storage (use crypto module with app secret)
+- [x] Create migration for new models
+- [x] Generate Prisma client
+
+#### 1.4.3 User Settings API
+- [x] Create `GET /api/user/settings` - Get current user's settings
+- [x] Create `PATCH /api/user/settings` - Update settings (including API key)
+- [x] Create `POST /api/user/settings/validate-key` - Test if OpenAI key is valid
+- [x] Add API key decryption utility for backend use
+- [x] Implement secure API key masking for frontend display (show only last 4 chars)
+
+#### 1.4.4 Settings Page UI
+- [ ] Add "Account" section to `/settings` page
+- [ ] Display user profile info (name, email, avatar)
+- [ ] Add "API Keys" section with:
+  - [ ] OpenAI API key input with show/hide toggle
+  - [ ] "Test Key" button to validate
+  - [ ] Status indicator (valid/invalid/not set)
+  - [ ] Link to OpenAI API key creation page
+- [ ] Add "Analysis Preferences" section:
+  - [ ] LLM model selector (gpt-4o-mini, gpt-4o, gpt-4-turbo)
+  - [ ] Minimum discount threshold slider (default 50%)
+  - [ ] Auto-analyze toggle for new listings
+- [ ] Add logout button
+
+#### 1.4.5 Backend LLM Integration
+- [ ] Update `src/lib/llm-identifier.ts` to accept API key parameter
+- [ ] Update `src/lib/llm-analyzer.ts` to accept API key parameter
+- [ ] Update scraper route to:
+  - [ ] Fetch user's API key from UserSettings
+  - [ ] Decrypt and pass to LLM functions
+  - [ ] Fall back to env var if user key not set (for development)
+- [ ] Add user context to scraper jobs (track which user ran the scrape)
+- [ ] Update Listing model to include userId for data isolation
+
+#### 1.4.6 Data Isolation
+- [ ] Add userId field to Listing, Opportunity, ScraperJob, SearchConfig models
+- [ ] Update all API routes to filter by authenticated user
+- [ ] Migrate existing data to default user (for development)
+- [ ] Add authorization checks to prevent cross-user data access
+
+#### 1.4.7 Testing
+- [ ] Add auth mocking utilities for tests
+- [ ] Test API key encryption/decryption
+- [ ] Test settings CRUD operations
+- [ ] Test protected route access
+- [ ] E2E tests for login/logout flow
+- [ ] E2E tests for API key management
 
 ---
 
@@ -424,20 +523,20 @@
 ### 2.3 eBay Scraper
 
 #### 2.3.1 Strategy Decision
-- [ ] Evaluate: API vs scraping approach
-- [ ] Research eBay Browse API for listings
-- [ ] Document eBay partner program requirements
+- [x] Evaluate: API vs scraping approach (Browse API selected for reliability and structured data)
+- [x] Research eBay Browse API for listings (fixed-price focus with optional filters)
+- [x] Document eBay partner program requirements (OAuth token required via `EBAY_OAUTH_TOKEN`)
 
 #### 2.3.2 Implementation (Scraping Approach)
-- [ ] Create `/api/scraper/ebay/route.ts`
-- [ ] Focus on "Buy It Now" listings
-- [ ] Extract auction details if applicable
-- [ ] Handle seller reputation data
+- [x] Create `/api/scraper/ebay/route.ts`
+- [x] Focus on "Buy It Now" listings (Browse API filtered to `buyingOptions:{FIXED_PRICE}`)
+- [x] Extract auction details if applicable (annotate listings that also expose auctions)
+- [x] Handle seller reputation data (surface feedback score/percent in listing notes)
 
 #### 2.3.3 eBay Sold Data Integration
-- [ ] Scrape completed/sold listings for price validation
-- [ ] Store in PriceHistory model
-- [ ] Integrate with value estimator for accuracy
+- [x] Scrape completed/sold listings for price validation (Browse API `soldItemsOnly`)
+- [x] Store in PriceHistory model
+- [x] Integrate with value estimator for accuracy (verified market value + true discount stored on listing)
 
 ### 2.4 Unified Scraper Interface
 
@@ -735,27 +834,31 @@
 
 | Phase | Impact | Effort | Priority |
 |-------|--------|--------|----------|
-| Phase 1: Complete MVP | High | Medium | P0 - Immediate |
-| Phase 2: Multi-Platform | Very High | High | P0 - Immediate |
+| Phase 1.1-1.2: Settings + Job History | High | Medium | P0 - Done ✅ |
+| Phase 1.4: User Auth + API Keys | High | Medium | P0 - Immediate |
+| Phase 1.3: Enhanced Dashboard | Medium | Medium | P1 - Next |
+| Phase 2: Multi-Platform | Very High | High | P1 - Next |
 | Phase 3: Automation | High | Medium | P1 - Next |
 | Phase 4: AI Integration | Medium | High | P2 - Soon |
 | Phase 5: UX Polish | Medium | Medium | P2 - Soon |
-| Phase 6: Production | Critical | Medium | P1 - Next |
+| Phase 6: Production | Critical | Medium | P2 - Soon |
 | Phase 7: Advanced | Medium | Very High | P3 - Future |
 
 ---
 
 ## Recommended Execution Order
 
-1. **Phase 1.1-1.2** (Settings + Job History) - Complete the MVP
-2. **Phase 2.1** (Facebook Marketplace) - Biggest market opportunity
-3. **Phase 6.1-6.2** (Database + Auth) - Enable production use
-4. **Phase 3.1-3.2** (Scheduling + Notifications) - Automation value
-5. **Phase 2.2-2.3** (OfferUp + eBay) - Platform coverage
-6. **Phase 4.1** (AI Value Estimation) - Accuracy improvement
-7. **Phase 5** (UX Polish) - User retention
-8. **Phase 4.2-4.3** (Market Intelligence) - Advanced features
-9. **Phase 7** (Advanced Features) - Power user features
+1. **Phase 1.1-1.2** (Settings + Job History) - Complete the MVP ✅
+2. **Phase 1.4** (User Auth + API Keys) - Enable personalized LLM analysis
+3. **Phase 1.3** (Enhanced Dashboard) - Batch operations and exports
+4. **Phase 2.1** (Facebook Marketplace) - Biggest market opportunity
+5. **Phase 3.1-3.2** (Scheduling + Notifications) - Automation value
+6. **Phase 2.2-2.3** (OfferUp + eBay) - Platform coverage
+7. **Phase 4.1** (AI Value Estimation enhancements) - Accuracy improvement
+8. **Phase 5** (UX Polish) - User retention
+9. **Phase 4.2-4.3** (Market Intelligence) - Advanced features
+10. **Phase 6** (Production Infrastructure) - Scale and reliability
+11. **Phase 7** (Advanced Features) - Power user features
 
 ---
 
@@ -765,6 +868,13 @@
 - All CRUD operations functional
 - 100% test coverage on new APIs
 - Settings page fully operational
+
+### Authentication & API Keys (Phase 1.4)
+- Users can register/login with OAuth or email
+- API keys encrypted at rest, never exposed in logs
+- LLM analysis works with user-provided keys
+- Data properly isolated per user
+- Settings page allows key management with validation
 
 ### Multi-Platform (Phase 2)
 - Successfully scraping from 3+ platforms

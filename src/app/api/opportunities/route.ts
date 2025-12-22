@@ -1,18 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import { getAuthUserId } from "@/lib/auth-middleware";
 
 // GET /api/opportunities - Get all opportunities
+const VALID_STATUSES = [
+  "IDENTIFIED",
+  "CONTACTED",
+  "PURCHASED",
+  "LISTED",
+  "SOLD",
+];
+
 export async function GET(request: NextRequest) {
   try {
+    const userId = await getAuthUserId();
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status");
+    const requestedStatus = searchParams.get("status");
     const limit = parseInt(searchParams.get("limit") || "50");
     const offset = parseInt(searchParams.get("offset") || "0");
 
     const where: Record<string, unknown> = {};
-    if (status) where.status = status;
 
-    const [opportunities, total] = await Promise.all([
+    // Filter by user - show user's opportunities OR legacy opportunities (null userId)
+    if (userId) {
+      where.OR = [{ userId }, { userId: null }];
+    }
+
+    if (requestedStatus) {
+      const normalized = requestedStatus.toUpperCase();
+      if (VALID_STATUSES.includes(normalized)) {
+        where.status = normalized;
+      }
+    }
+
+    const [opportunities, total, stats] = await Promise.all([
       prisma.opportunity.findMany({
         where,
         orderBy: { createdAt: "desc" },
@@ -21,17 +42,16 @@ export async function GET(request: NextRequest) {
         include: { listing: true },
       }),
       prisma.opportunity.count({ where }),
+      prisma.opportunity.aggregate({
+        where,
+        _sum: {
+          actualProfit: true,
+          purchasePrice: true,
+          resalePrice: true,
+        },
+        _count: true,
+      }),
     ]);
-
-    // Calculate summary stats
-    const stats = await prisma.opportunity.aggregate({
-      _sum: {
-        actualProfit: true,
-        purchasePrice: true,
-        resalePrice: true,
-      },
-      _count: true,
-    });
 
     return NextResponse.json({
       opportunities,
@@ -57,6 +77,7 @@ export async function GET(request: NextRequest) {
 // POST /api/opportunities - Create an opportunity from a listing
 export async function POST(request: NextRequest) {
   try {
+    const userId = await getAuthUserId();
     const body = await request.json();
     const { listingId, notes } = body;
 
@@ -95,6 +116,7 @@ export async function POST(request: NextRequest) {
     const [opportunity] = await prisma.$transaction([
       prisma.opportunity.create({
         data: {
+          userId,
           listingId,
           notes,
           status: "IDENTIFIED",

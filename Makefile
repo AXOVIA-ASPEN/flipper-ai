@@ -1,7 +1,7 @@
 # Flipper.ai Makefile
 # ====================
 
-.PHONY: help install dev preview build start db-migrate db-studio db-reset clean test test-e2e test-e2e-ui
+.PHONY: help install dev preview build start db-migrate db-sync db-studio db-reset clean test test-e2e test-e2e-ui
 
 # Default target
 help:
@@ -13,7 +13,8 @@ help:
 	@echo "  make dev        - Start development server"
 	@echo "  make build      - Build for production"
 	@echo "  make start      - Start production server"
-	@echo "  make db-migrate - Run database migrations"
+	@echo "  make db-migrate - Run database migrations (interactive)"
+	@echo "  make db-sync    - Sync schema to database (non-interactive)"
 	@echo "  make db-studio  - Open Prisma Studio (database GUI)"
 	@echo "  make db-reset   - Reset database (WARNING: deletes all data)"
 	@echo "  make clean      - Remove build artifacts"
@@ -33,7 +34,7 @@ dev:
 	pnpm dev
 
 # Preview (alias for dev)
-preview: install db-migrate
+preview: install db-sync
 	@echo "Starting Flipper.ai preview server..."
 	@echo "Open http://localhost:3000 in your browser"
 	pnpm dev
@@ -46,9 +47,14 @@ build:
 start:
 	pnpm start
 
-# Database migrations
+# Database migrations (interactive - prompts for migration name)
 db-migrate:
 	npx prisma migrate dev
+
+# Sync schema to database (non-interactive - for development)
+db-sync:
+	npx prisma migrate deploy
+	npx prisma db push
 
 # Open Prisma Studio
 db-studio:

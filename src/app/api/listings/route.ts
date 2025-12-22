@@ -1,21 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { estimateValue, detectCategory, generatePurchaseMessage } from "@/lib/value-estimator";
+import { getAuthUserId } from "@/lib/auth-middleware";
 
 // GET /api/listings - Get all listings with optional filters
 export async function GET(request: NextRequest) {
   try {
+    const userId = await getAuthUserId();
     const { searchParams } = new URL(request.url);
     const platform = searchParams.get("platform");
     const status = searchParams.get("status");
     const minScore = searchParams.get("minScore");
+    const location = searchParams.get("location");
+    const category = searchParams.get("category");
+    const minPrice = searchParams.get("minPrice");
+    const maxPrice = searchParams.get("maxPrice");
+    const dateFrom = searchParams.get("dateFrom");
+    const dateTo = searchParams.get("dateTo");
     const limit = parseInt(searchParams.get("limit") || "50");
     const offset = parseInt(searchParams.get("offset") || "0");
 
     const where: Record<string, unknown> = {};
+
+    // Filter by user - show user's listings OR legacy listings (null userId)
+    if (userId) {
+      where.OR = [{ userId }, { userId: null }];
+    }
+
     if (platform) where.platform = platform;
     if (status) where.status = status;
     if (minScore) where.valueScore = { gte: parseFloat(minScore) };
+    if (location) where.location = { contains: location };
+    if (category) where.category = category;
+    if (minPrice || maxPrice) {
+      where.askingPrice = {
+        ...(minPrice && { gte: parseFloat(minPrice) }),
+        ...(maxPrice && { lte: parseFloat(maxPrice) }),
+      };
+    }
+    if (dateFrom || dateTo) {
+      where.scrapedAt = {
+        ...(dateFrom && { gte: new Date(dateFrom) }),
+        ...(dateTo && { lte: new Date(dateTo) }),
+      };
+    }
 
     const [listings, total] = await Promise.all([
       prisma.listing.findMany({
@@ -46,6 +74,7 @@ export async function GET(request: NextRequest) {
 // POST /api/listings - Create a new listing (usually from scraper)
 export async function POST(request: NextRequest) {
   try {
+    const userId = await getAuthUserId();
     const body = await request.json();
     const {
       externalId,
@@ -83,6 +112,27 @@ export async function POST(request: NextRequest) {
       detectedCategory
     );
 
+    // Enforce minimum discount threshold (70% or more undervalued)
+    if (!Number.isFinite(estimation.discountPercent) || estimation.discountPercent < 70) {
+      // Clean up any existing record for this listing so only premium deals remain
+      await prisma.listing.deleteMany({
+        where: {
+          platform,
+          externalId,
+          userId,
+        },
+      });
+
+      return NextResponse.json(
+        {
+          skipped: true,
+          reason: "Listing discount below 70% threshold",
+          discountPercent: estimation.discountPercent,
+        },
+        { status: 200 }
+      );
+    }
+
     // Generate purchase request message
     const requestToBuy = generatePurchaseMessage(
       title,
@@ -94,9 +144,11 @@ export async function POST(request: NextRequest) {
     // Create or update listing with all fields
     const listing = await prisma.listing.upsert({
       where: {
-        platform_externalId: { platform, externalId },
+        platform_externalId_userId: { platform, externalId, userId },
       },
       create: {
+        // User association
+        userId,
         // Basic info
         externalId,
         platform,

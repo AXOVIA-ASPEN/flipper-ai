@@ -84,6 +84,12 @@ DATABASE_URL="file:./dev.db"
 
 # For scraping (optional - uses Stagehand with Gemini)
 GOOGLE_API_KEY="your-google-api-key"
+
+# eBay Browse API (required for /api/scraper/ebay)
+EBAY_OAUTH_TOKEN="your-oauth-token"
+# Optional overrides
+EBAY_MARKETPLACE_ID="EBAY_US"
+EBAY_BROWSE_API_BASE_URL="https://api.ebay.com/buy/browse/v1"
 ```
 
 ## API Endpoints
@@ -106,6 +112,15 @@ GOOGLE_API_KEY="your-google-api-key"
 |--------|----------|-------------|
 | GET | `/api/opportunities` | Get all opportunities |
 | POST | `/api/opportunities` | Create opportunity from listing |
+
+### Scrapers
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/scraper/craigslist` | Returns supported Craigslist locations/categories |
+| POST | `/api/scraper/craigslist` | Launches the Playwright-based Craigslist scraper |
+| GET | `/api/scraper/ebay` | Returns supported eBay categories, condition enums, and parameter hints |
+| POST | `/api/scraper/ebay` | Pulls fixed-price listings via the eBay Browse API and stores opportunities |
 
 ## Database Schema
 

@@ -493,3 +493,192 @@ test.describe("Feature: Listings Data Behaviors", () => {
     expect(listingsRequestCounts.length).toBeGreaterThanOrEqual(1);
   });
 });
+
+test.describe("Feature: Advanced Filters", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/api/listings**", async (route) => {
+      const mockListings = {
+        listings: [
+          {
+            id: "test-listing-1",
+            platform: "CRAIGSLIST",
+            title: "iPhone 12 Pro",
+            askingPrice: 500,
+            estimatedValue: 700,
+            profitPotential: 150,
+            valueScore: 78,
+            status: "NEW",
+            location: "Tampa, FL",
+            category: "electronics",
+            url: "https://craigslist.org/item/1",
+            scrapedAt: new Date().toISOString(),
+            imageUrls: null,
+          },
+        ],
+        total: 1,
+        limit: 50,
+        offset: 0,
+      };
+      await route.fulfill({ json: mockListings });
+    });
+  });
+
+  test("Scenario: Advanced Filters toggle button is visible", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    // Should see the Filters button
+    const filtersButton = page.getByRole("button", { name: /Filters/i });
+    await expect(filtersButton).toBeVisible();
+  });
+
+  test("Scenario: Clicking Filters button expands advanced filters panel", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    // Click Filters button
+    const filtersButton = page.getByRole("button", { name: /Filters/i });
+    await filtersButton.click();
+
+    // Should see filter dropdowns
+    await expect(page.getByText("Location")).toBeVisible();
+    await expect(page.getByText("Category")).toBeVisible();
+    await expect(page.getByText("Price Range")).toBeVisible();
+    await expect(page.getByText("Scraped Date")).toBeVisible();
+  });
+
+  test("Scenario: Location dropdown has all options", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    // Expand filters
+    const filtersButton = page.getByRole("button", { name: /Filters/i });
+    await filtersButton.click();
+
+    // Check location dropdown options
+    await expect(page.getByRole("option", { name: "All Locations" })).toBeAttached();
+    await expect(page.getByRole("option", { name: "Tampa, FL" })).toBeAttached();
+    await expect(page.getByRole("option", { name: "Sarasota, FL" })).toBeAttached();
+  });
+
+  test("Scenario: Category dropdown has all options", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    // Expand filters
+    const filtersButton = page.getByRole("button", { name: /Filters/i });
+    await filtersButton.click();
+
+    // Check category dropdown options
+    await expect(page.getByRole("option", { name: "All Categories" })).toBeAttached();
+    await expect(page.getByRole("option", { name: "Electronics" })).toBeAttached();
+    await expect(page.getByRole("option", { name: "Furniture" })).toBeAttached();
+  });
+
+  test("Scenario: Selecting a filter updates URL params", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    // Expand filters
+    const filtersButton = page.getByRole("button", { name: /Filters/i });
+    await filtersButton.click();
+
+    // Select a category
+    const categorySelect = page.locator("select").nth(1); // Second select is category
+    await categorySelect.selectOption("electronics");
+
+    // URL should contain the filter param
+    await expect(page).toHaveURL(/category=electronics/);
+  });
+
+  test("Scenario: Filter badge shows active filter count", async ({ page }) => {
+    await page.goto("/?location=tampa&category=electronics");
+    await page.waitForLoadState("networkidle");
+
+    // Should see badge with count
+    const badge = page.locator("span").filter({ hasText: "2" }).first();
+    await expect(badge).toBeVisible();
+  });
+
+  test("Scenario: Clear All Filters button resets filters", async ({ page }) => {
+    await page.goto("/?location=tampa&category=electronics");
+    await page.waitForLoadState("networkidle");
+
+    // Expand filters
+    const filtersButton = page.getByRole("button", { name: /Filters/i });
+    await filtersButton.click();
+
+    // Click Clear All Filters
+    const clearButton = page.getByRole("button", { name: /Clear All Filters/i });
+    await clearButton.click();
+
+    // URL should be clean
+    await expect(page).toHaveURL("/");
+  });
+
+  test("Scenario: Filter selections trigger API calls with query params", async ({ page }) => {
+    const requestedUrls: string[] = [];
+
+    await page.route("**/api/listings**", async (route) => {
+      requestedUrls.push(route.request().url());
+      await route.fulfill({
+        json: { listings: [], total: 0, limit: 50, offset: 0 },
+      });
+    });
+
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    // Expand filters
+    const filtersButton = page.getByRole("button", { name: /Filters/i });
+    await filtersButton.click();
+
+    // Select location
+    const selects = page.locator("select");
+    await selects.nth(1).selectOption("tampa"); // Location select
+
+    await page.waitForTimeout(300);
+
+    // Should have made request with location param
+    expect(requestedUrls.some((url) => url.includes("location=tampa"))).toBeTruthy();
+  });
+
+  test("Scenario: Price range inputs accept numeric values", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    // Expand filters
+    const filtersButton = page.getByRole("button", { name: /Filters/i });
+    await filtersButton.click();
+
+    // Fill min price
+    const minPriceInput = page.getByPlaceholder("Min $");
+    await minPriceInput.fill("100");
+    await expect(minPriceInput).toHaveValue("100");
+
+    // Fill max price
+    const maxPriceInput = page.getByPlaceholder("Max $");
+    await maxPriceInput.fill("500");
+    await expect(maxPriceInput).toHaveValue("500");
+  });
+
+  test("Scenario: Page loads with URL params and applies filters", async ({ page }) => {
+    const requestedUrls: string[] = [];
+
+    await page.route("**/api/listings**", async (route) => {
+      requestedUrls.push(route.request().url());
+      await route.fulfill({
+        json: { listings: [], total: 0, limit: 50, offset: 0 },
+      });
+    });
+
+    // Load page with filter params in URL
+    await page.goto("/?status=OPPORTUNITY&category=electronics");
+    await page.waitForLoadState("networkidle");
+
+    // API should be called with those params
+    expect(requestedUrls.some((url) =>
+      url.includes("status=OPPORTUNITY") && url.includes("category=electronics")
+    )).toBeTruthy();
+  });
+});
