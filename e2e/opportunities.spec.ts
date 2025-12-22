@@ -174,6 +174,216 @@ test.describe("Opportunities Page", () => {
   });
 });
 
+test.describe("Feature: Opportunity Metadata", () => {
+  test("Scenario: Identified filter fetches only matching opportunities", async ({ page }) => {
+    const requestedStatuses: string[] = [];
+    const mockOpportunities = [
+      {
+        id: "opp-identified",
+        listingId: "listing-identified",
+        status: "IDENTIFIED",
+        purchasePrice: null,
+        purchaseDate: null,
+        resalePrice: null,
+        resalePlatform: null,
+        resaleUrl: null,
+        resaleDate: null,
+        actualProfit: null,
+        fees: null,
+        notes: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        listing: {
+          id: "listing-identified",
+          title: "Identified Guitar Flip",
+          askingPrice: 250,
+          estimatedValue: 400,
+          profitPotential: 90,
+          valueScore: 72,
+          platform: "CRAIGSLIST",
+          url: "https://example.com/identified",
+          location: "Austin, TX",
+          imageUrls: null,
+          condition: "good",
+          description: "Nice guitar",
+          sellerName: null,
+          sellerContact: null,
+          comparableUrls: null,
+          priceReasoning: null,
+          notes: null,
+          shippable: true,
+          negotiable: true,
+          tags: JSON.stringify(["music", "guitar"]),
+          requestToBuy: "Hi there, I'm interested!",
+          category: "music_instr",
+          postedAt: new Date().toISOString(),
+        },
+      },
+      {
+        id: "opp-purchased",
+        listingId: "listing-purchased",
+        status: "PURCHASED",
+        purchasePrice: 500,
+        purchaseDate: new Date().toISOString(),
+        resalePrice: null,
+        resalePlatform: null,
+        resaleUrl: null,
+        resaleDate: null,
+        actualProfit: null,
+        fees: null,
+        notes: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        listing: {
+          id: "listing-purchased",
+          title: "Purchased Laptop Flip",
+          askingPrice: 800,
+          estimatedValue: 1100,
+          profitPotential: 180,
+          valueScore: 80,
+          platform: "CRAIGSLIST",
+          url: "https://example.com/purchased",
+          location: "Tampa, FL",
+          imageUrls: null,
+          condition: "excellent",
+          description: "Powerful laptop",
+          sellerName: null,
+          sellerContact: null,
+          comparableUrls: null,
+          priceReasoning: null,
+          notes: null,
+          shippable: false,
+          negotiable: false,
+          tags: JSON.stringify(["laptop"]),
+          requestToBuy: null,
+          category: "electronics",
+          postedAt: new Date().toISOString(),
+        },
+      },
+    ];
+
+    await page.route("**/api/opportunities**", async (route, request) => {
+      if (request.method() !== "GET") {
+        await route.continue();
+        return;
+      }
+      const url = new URL(request.url());
+      const statusParam = url.searchParams.get("status");
+      if (statusParam) {
+        requestedStatuses.push(statusParam);
+      }
+      await route.fulfill({
+        json: {
+          opportunities: mockOpportunities,
+          stats: {
+            totalOpportunities: mockOpportunities.length,
+            totalProfit: 0,
+            totalInvested: 0,
+            totalRevenue: 0,
+          },
+        },
+      });
+    });
+
+    await page.goto("/opportunities");
+    await page.waitForLoadState("networkidle");
+
+    const identifiedButton = page.getByRole("button", { name: /Identified/i });
+    await identifiedButton.click();
+
+    await expect.poll(() => requestedStatuses.includes("IDENTIFIED")).toBeTruthy();
+    await expect(page.getByText("Identified Guitar Flip")).toBeVisible();
+    await expect(page.getByText("Purchased Laptop Flip")).not.toBeVisible();
+  });
+
+  test("Scenario: Opportunity cards show full listing metadata", async ({ page }) => {
+    await page.route("**/api/opportunities**", async (route, request) => {
+      if (request.method() !== "GET") {
+        await route.continue();
+        return;
+      }
+
+      const opportunity = {
+        id: "meta-opp-1",
+        listingId: "meta-listing-1",
+        status: "IDENTIFIED",
+        purchasePrice: null,
+        purchaseDate: null,
+        resalePrice: null,
+        resalePlatform: null,
+        resaleUrl: null,
+        resaleDate: null,
+        actualProfit: null,
+        fees: null,
+        notes: "Plan to negotiate down another $50",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        listing: {
+          id: "meta-listing-1",
+          title: "Apple MacBook Pro 16\"",
+          askingPrice: 1500,
+          estimatedValue: 2100,
+          profitPotential: 400,
+          valueScore: 88,
+          platform: "CRAIGSLIST",
+          url: "https://example.com/macbook",
+          location: "San Francisco, CA",
+          imageUrls: JSON.stringify(["https://picsum.photos/200?macbook"]),
+          condition: "like new",
+          description: "Includes box, charger, and AppleCare+ until 2025.",
+          sellerName: "Alex Seller",
+          sellerContact: "alex@example.com",
+          comparableUrls: JSON.stringify([
+            {
+              platform: "eBay",
+              label: "eBay Sold Search",
+              url: "https://ebay.com/sold/macbook",
+              type: "sold",
+            },
+          ]),
+          priceReasoning: "Consistently selling $500 above the asking price.",
+          notes: "High demand, low supply in Bay Area.",
+          shippable: true,
+          negotiable: true,
+          tags: JSON.stringify(["apple", "laptop", "sealed"]),
+          requestToBuy:
+            "Hi Alex, I'm ready to pick up the MacBook today. Would you take $1,400 cash?",
+          category: "electronics",
+          discountPercent: 25,
+          postedAt: new Date().toISOString(),
+        },
+      };
+
+      await route.fulfill({
+        json: {
+          opportunities: [opportunity],
+          stats: {
+            totalOpportunities: 1,
+            totalProfit: 0,
+            totalInvested: 0,
+            totalRevenue: 0,
+          },
+        },
+      });
+    });
+
+    await page.goto("/opportunities");
+    await page.waitForLoadState("networkidle");
+
+    await expect(page.getByText("Apple MacBook Pro 16\"")).toBeVisible();
+    await expect(page.getByText("Includes box, charger, and AppleCare+ until 2025.")).toBeVisible();
+    await expect(page.getByText("Alex Seller")).toBeVisible();
+    await expect(page.getByText("alex@example.com")).toBeVisible();
+    await expect(page.getByText("#apple")).toBeVisible();
+    await expect(page.getByText("Purchase Message")).toBeVisible();
+    await expect(page.getByRole("link", { name: /eBay Sold Search/i })).toBeVisible();
+
+    const copyButton = page.getByRole("button", { name: /^Copy$/i });
+    await copyButton.click();
+    await expect(page.getByRole("button", { name: /Copied/i })).toBeVisible();
+  });
+});
+
 test.describe("Feature: Edit Opportunity", () => {
   test.beforeEach(async ({ page }) => {
     // Mock the API responses for consistent testing
@@ -393,6 +603,14 @@ test.describe("Feature: Edit Opportunity", () => {
       await expect(notesInput).toHaveValue("Great condition, seller was flexible");
     }
   });
+
+  test("Scenario: Opportunity card displays listing image when available", async ({ page }) => {
+    await page.goto("/opportunities");
+    await page.waitForLoadState("networkidle");
+
+    const image = page.locator('img[alt="iPhone 13 Pro Max"]').first();
+    await expect(image).toBeVisible();
+  });
 });
 
 test.describe("Feature: Delete Opportunity", () => {
@@ -535,4 +753,3 @@ test.describe("Feature: Delete Opportunity", () => {
     await expect(page.getByRole("button", { name: /Cancel/i })).toBeVisible();
   });
 });
-

@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+When contributing here, act as a professional, world-class engineer with extensive front-end design experience, strong object-oriented architecture instincts, over a decade of successful frontend/backend SaaS delivery, and the business savvy required to implement Flipper.ai thoughtfully.
+
 ## Repository Overview
 
 **Flipper.ai** is an AI-powered marketplace scraper that finds underpriced items for resale profit. It scrapes Craigslist (with plans for Facebook Marketplace, eBay, and OfferUp), analyzes flip potential, and tracks opportunities through the resale lifecycle.

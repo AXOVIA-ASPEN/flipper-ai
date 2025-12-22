@@ -1,9 +1,1 @@
-{
-  "/api/listings/route": "app/api/listings/route.js",
-  "/api/opportunities/route": "app/api/opportunities/route.js",
-  "/api/scraper-jobs/route": "app/api/scraper-jobs/route.js",
-  "/api/scraper/craigslist/route": "app/api/scraper/craigslist/route.js",
-  "/opportunities/page": "app/opportunities/page.js",
-  "/page": "app/page.js",
-  "/scraper/page": "app/scraper/page.js"
-}
+{}

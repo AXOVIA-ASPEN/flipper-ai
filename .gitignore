@@ -1,1 +1,6 @@
 node_modules
+playwrite-report
+
+# Test database
+test.db
+test.db-journal

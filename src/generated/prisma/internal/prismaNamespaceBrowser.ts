@@ -105,7 +105,27 @@ export const ListingScalarFieldEnum = {
   negotiable: 'negotiable',
   daysListed: 'daysListed',
   tags: 'tags',
-  requestToBuy: 'requestToBuy'
+  requestToBuy: 'requestToBuy',
+  identifiedBrand: 'identifiedBrand',
+  identifiedModel: 'identifiedModel',
+  identifiedVariant: 'identifiedVariant',
+  identifiedCondition: 'identifiedCondition',
+  verifiedMarketValue: 'verifiedMarketValue',
+  marketDataSource: 'marketDataSource',
+  marketDataDate: 'marketDataDate',
+  comparableSalesJson: 'comparableSalesJson',
+  sellabilityScore: 'sellabilityScore',
+  demandLevel: 'demandLevel',
+  expectedDaysToSell: 'expectedDaysToSell',
+  authenticityRisk: 'authenticityRisk',
+  recommendedOffer: 'recommendedOffer',
+  recommendedList: 'recommendedList',
+  resaleStrategy: 'resaleStrategy',
+  trueDiscountPercent: 'trueDiscountPercent',
+  llmAnalyzed: 'llmAnalyzed',
+  analysisDate: 'analysisDate',
+  analysisConfidence: 'analysisConfidence',
+  analysisReasoning: 'analysisReasoning'
 } as const
 
 export type ListingScalarFieldEnum = (typeof ListingScalarFieldEnum)[keyof typeof ListingScalarFieldEnum]

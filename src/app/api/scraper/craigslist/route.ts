@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { chromium } from "playwright";
 import prisma from "@/lib/db";
 import { estimateValue, detectCategory, generatePurchaseMessage } from "@/lib/value-estimator";
+import { identifyItem } from "@/lib/llm-identifier";
+import { fetchMarketPrice, closeBrowser as closeMarketBrowser } from "@/lib/market-price";
+import { analyzeSellability, quickDiscountCheck } from "@/lib/llm-analyzer";
+
+// Minimum discount threshold for saving a listing (50% = must be half market value)
+const MIN_DISCOUNT_THRESHOLD = 50;
 
 interface CraigslistItem {
   title: string;
@@ -217,41 +223,187 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Save listings to database with value estimation
+    // Process listings with LLM analysis pipeline
+    // Only save listings that are 50%+ undervalued based on verified market data
     let savedCount = 0;
     let opportunitiesFound = 0;
+    let analyzedCount = 0;
+    let skippedCount = 0;
     const savedListings: Array<{
       title: string;
       price: string;
       location: string;
       url: string;
       imageUrl?: string;
+      discount?: number;
     }> = [];
+
+    const hasLLM = !!process.env.GOOGLE_API_KEY;
+    console.log(`LLM analysis ${hasLLM ? "enabled" : "disabled (no GOOGLE_API_KEY)"}`);
 
     for (const item of listings) {
       try {
         // Skip items without price
         if (item.price <= 0) continue;
 
-        // Detect category for estimation
+        // Detect category for algorithmic estimation
         const detectedCategory = detectCategory(item.title, item.description || null);
 
-        // Estimate value
+        // Always run algorithmic estimation as baseline
         const estimation = estimateValue(
           item.title,
           item.description || null,
           item.price,
-          null, // condition not known
+          null,
           detectedCategory
         );
+
+        // Initialize LLM analysis fields
+        let llmAnalyzed = false;
+        let identification = null;
+        let marketData = null;
+        let sellabilityAnalysis = null;
+        let verifiedMarketValue: number | null = null;
+        let trueDiscountPercent: number | null = null;
+        let meetsThreshold = false;
+
+        // LLM Analysis Pipeline (if API key is configured)
+        if (hasLLM) {
+          try {
+            // Step 1: Identify the item using LLM
+            identification = await identifyItem(
+              item.title,
+              item.description || null,
+              item.price,
+              detectedCategory
+            );
+
+            if (identification && identification.worthInvestigating) {
+              // Step 2: Fetch real market prices from eBay
+              marketData = await fetchMarketPrice(
+                identification.searchQuery,
+                identification.category
+              );
+
+              if (marketData && marketData.salesCount > 0) {
+                // Step 3: Quick check - is this potentially 40%+ undervalued?
+                const quickCheck = quickDiscountCheck(item.price, marketData);
+
+                if (quickCheck.passesQuickCheck) {
+                  // Step 4: Full LLM sellability analysis
+                  sellabilityAnalysis = await analyzeSellability(
+                    item.title,
+                    item.price,
+                    identification,
+                    marketData
+                  );
+
+                  if (sellabilityAnalysis) {
+                    llmAnalyzed = true;
+                    verifiedMarketValue = sellabilityAnalysis.verifiedMarketValue;
+                    trueDiscountPercent = sellabilityAnalysis.trueDiscountPercent;
+                    meetsThreshold = sellabilityAnalysis.meetsThreshold;
+                    analyzedCount++;
+                  }
+                }
+              }
+            }
+          } catch (llmError) {
+            console.error(`LLM analysis error for ${item.externalId}:`, llmError);
+            // Continue with algorithmic fallback
+          }
+        }
+
+        // Determine if we should save this listing
+        // With LLM: only save if verified 50%+ undervalued
+        // Without LLM: fall back to algorithmic estimation (save if valueScore >= 70)
+        const shouldSave = hasLLM
+          ? meetsThreshold && trueDiscountPercent !== null && trueDiscountPercent >= MIN_DISCOUNT_THRESHOLD
+          : estimation.valueScore >= 70;
+
+        if (!shouldSave) {
+          skippedCount++;
+          continue;
+        }
 
         // Generate purchase message
         const requestToBuy = generatePurchaseMessage(
           item.title,
           item.price,
-          estimation.negotiable,
+          estimation.negotiable || sellabilityAnalysis?.recommendedOfferPrice !== undefined,
           null
         );
+
+        // Build listing data
+        const listingData = {
+          externalId: item.externalId,
+          platform: "CRAIGSLIST",
+          url: item.url,
+          title: item.title,
+          description: item.description,
+          askingPrice: item.price,
+          location: item.location,
+          imageUrls: item.imageUrls ? JSON.stringify(item.imageUrls) : null,
+          category: identification?.category || detectedCategory,
+          postedAt: item.postedAt,
+
+          // Algorithmic estimation (baseline)
+          estimatedValue: estimation.estimatedValue,
+          estimatedLow: estimation.estimatedLow,
+          estimatedHigh: estimation.estimatedHigh,
+          profitPotential: estimation.profitPotential,
+          profitLow: estimation.profitLow,
+          profitHigh: estimation.profitHigh,
+          valueScore: estimation.valueScore,
+          discountPercent: estimation.discountPercent,
+          resaleDifficulty: estimation.resaleDifficulty,
+
+          // Market references
+          comparableUrls: JSON.stringify(estimation.comparableUrls),
+          priceReasoning: estimation.reasoning,
+          notes: sellabilityAnalysis?.resaleStrategy || estimation.notes,
+
+          // Metadata
+          shippable: estimation.shippable,
+          negotiable: estimation.negotiable,
+          tags: JSON.stringify(estimation.tags),
+          requestToBuy,
+
+          // LLM Identification
+          identifiedBrand: identification?.brand || null,
+          identifiedModel: identification?.model || null,
+          identifiedVariant: identification?.variant || null,
+          identifiedCondition: identification?.condition || null,
+
+          // Verified Market Data
+          verifiedMarketValue: verifiedMarketValue,
+          marketDataSource: marketData ? "ebay_scrape" : null,
+          marketDataDate: marketData ? new Date() : null,
+          comparableSalesJson: marketData
+            ? JSON.stringify(marketData.soldListings.slice(0, 5))
+            : null,
+
+          // LLM Sellability Analysis
+          sellabilityScore: sellabilityAnalysis?.sellabilityScore || null,
+          demandLevel: sellabilityAnalysis?.demandLevel || null,
+          expectedDaysToSell: sellabilityAnalysis?.expectedDaysToSell || null,
+          authenticityRisk: sellabilityAnalysis?.authenticityRisk || null,
+          recommendedOffer: sellabilityAnalysis?.recommendedOfferPrice || null,
+          recommendedList: sellabilityAnalysis?.recommendedListPrice || null,
+          resaleStrategy: sellabilityAnalysis?.resaleStrategy || null,
+
+          // True discount
+          trueDiscountPercent: trueDiscountPercent,
+
+          // Analysis metadata
+          llmAnalyzed,
+          analysisDate: llmAnalyzed ? new Date() : null,
+          analysisConfidence: sellabilityAnalysis?.confidence || null,
+          analysisReasoning: sellabilityAnalysis?.reasoning || null,
+
+          // Status - all saved listings are opportunities now
+          status: "OPPORTUNITY",
+        };
 
         // Upsert to database
         await prisma.listing.upsert({
@@ -261,85 +413,27 @@ export async function POST(request: NextRequest) {
               externalId: item.externalId,
             },
           },
-          create: {
-            externalId: item.externalId,
-            platform: "CRAIGSLIST",
-            url: item.url,
-            title: item.title,
-            description: item.description,
-            askingPrice: item.price,
-            location: item.location,
-            imageUrls: item.imageUrls ? JSON.stringify(item.imageUrls) : null,
-            category: detectedCategory,
-            postedAt: item.postedAt,
-
-            // Value estimation
-            estimatedValue: estimation.estimatedValue,
-            estimatedLow: estimation.estimatedLow,
-            estimatedHigh: estimation.estimatedHigh,
-            profitPotential: estimation.profitPotential,
-            profitLow: estimation.profitLow,
-            profitHigh: estimation.profitHigh,
-            valueScore: estimation.valueScore,
-            discountPercent: estimation.discountPercent,
-            resaleDifficulty: estimation.resaleDifficulty,
-
-            // Market references
-            comparableUrls: JSON.stringify(estimation.comparableUrls),
-            priceReasoning: estimation.reasoning,
-            notes: estimation.notes,
-
-            // Metadata
-            shippable: estimation.shippable,
-            negotiable: estimation.negotiable,
-            tags: JSON.stringify(estimation.tags),
-            requestToBuy,
-
-            // Status
-            status: estimation.valueScore >= 70 ? "OPPORTUNITY" : "NEW",
-          },
-          update: {
-            title: item.title,
-            description: item.description,
-            askingPrice: item.price,
-            location: item.location,
-            imageUrls: item.imageUrls ? JSON.stringify(item.imageUrls) : null,
-
-            // Update estimation
-            estimatedValue: estimation.estimatedValue,
-            estimatedLow: estimation.estimatedLow,
-            estimatedHigh: estimation.estimatedHigh,
-            profitPotential: estimation.profitPotential,
-            profitLow: estimation.profitLow,
-            profitHigh: estimation.profitHigh,
-            valueScore: estimation.valueScore,
-            discountPercent: estimation.discountPercent,
-            resaleDifficulty: estimation.resaleDifficulty,
-            comparableUrls: JSON.stringify(estimation.comparableUrls),
-            priceReasoning: estimation.reasoning,
-            notes: estimation.notes,
-            shippable: estimation.shippable,
-            negotiable: estimation.negotiable,
-            tags: JSON.stringify(estimation.tags),
-            requestToBuy,
-          },
+          create: listingData,
+          update: listingData,
         });
 
         savedCount++;
-        if (estimation.valueScore >= 70) {
-          opportunitiesFound++;
-        }
+        opportunitiesFound++;
         savedListings.push({
           title: item.title,
           price: `$${item.price}`,
           location: item.location,
           url: item.url,
           imageUrl: item.imageUrls?.[0],
+          discount: trueDiscountPercent || estimation.discountPercent,
         });
       } catch (error) {
-        console.error(`Error saving listing ${item.externalId}:`, error);
+        console.error(`Error processing listing ${item.externalId}:`, error);
       }
     }
+
+    // Clean up market price browser
+    await closeMarketBrowser();
 
     // Update job as completed
     if (job) {
@@ -347,19 +441,28 @@ export async function POST(request: NextRequest) {
         where: { id: job.id },
         data: {
           status: "COMPLETED",
-          listingsFound: savedCount,
+          listingsFound: listings.length,
           opportunitiesFound,
           completedAt: new Date(),
         },
       });
     }
 
+    const analysisMode = hasLLM ? "LLM-verified (50%+ undervalued only)" : "algorithmic (score >= 70)";
+    const message = hasLLM
+      ? `Analyzed ${listings.length} listings, found ${opportunitiesFound} opportunities (${skippedCount} didn't meet 50% threshold)`
+      : `Scraped ${listings.length} listings, found ${opportunitiesFound} opportunities`;
+
     return NextResponse.json({
       success: true,
-      message: `Successfully scraped ${listings.length} listings`,
+      message,
       listings: savedListings,
       savedCount,
       opportunitiesFound,
+      totalScraped: listings.length,
+      analyzedWithLLM: analyzedCount,
+      skippedBelowThreshold: skippedCount,
+      analysisMode,
       jobId: job?.id,
     });
   } catch (error) {

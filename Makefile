@@ -62,6 +62,8 @@ db-reset:
 clean:
 	rm -rf .next
 	rm -rf node_modules/.cache
+	rm -rf test-results/
+	rm -rf playwright-report/
 
 # Unit tests (Jest)
 test:

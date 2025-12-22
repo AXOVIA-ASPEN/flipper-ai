@@ -16,6 +16,12 @@ import {
   Trash2,
   X,
   Save,
+  Copy,
+  Mail,
+  Phone,
+  Tag as TagIcon,
+  MessageSquare,
+  User,
 } from "lucide-react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
@@ -25,6 +31,9 @@ interface Listing {
   title: string;
   askingPrice: number;
   estimatedValue: number | null;
+  estimatedLow: number | null;
+  estimatedHigh: number | null;
+  discountPercent: number | null;
   profitPotential: number | null;
   valueScore: number | null;
   platform: string;
@@ -32,6 +41,18 @@ interface Listing {
   location: string | null;
   imageUrls: string | null;
   condition: string | null;
+  description: string | null;
+  sellerName: string | null;
+  sellerContact: string | null;
+  comparableUrls: string | null;
+  priceReasoning: string | null;
+  notes: string | null;
+  shippable: boolean | null;
+  negotiable: boolean | null;
+  tags: string | null;
+  requestToBuy: string | null;
+  category: string | null;
+  postedAt: string | null;
 }
 
 interface Opportunity {
@@ -59,6 +80,74 @@ interface Stats {
   totalRevenue: number;
 }
 
+interface ComparableReference {
+  platform: string;
+  label: string;
+  url: string;
+  type: string;
+}
+
+function safeParseArray(value: string | null): unknown[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function parseStringArray(value: string | null): string[] {
+  return safeParseArray(value).filter(
+    (item): item is string => typeof item === "string" && item.length > 0
+  );
+}
+
+function parseComparableReferences(value: string | null): ComparableReference[] {
+  return safeParseArray(value)
+    .map((item) => {
+      if (!item || typeof item !== "object") return null;
+      const ref = item as Record<string, unknown>;
+      if (typeof ref.url !== "string" || !ref.url) return null;
+      return {
+        platform:
+          typeof ref.platform === "string" && ref.platform.length > 0
+            ? ref.platform
+            : "Comparable",
+        label:
+          typeof ref.label === "string" && ref.label.length > 0
+            ? ref.label
+            : typeof ref.platform === "string"
+            ? ref.platform
+            : "Comparable",
+        url: ref.url,
+        type:
+          typeof ref.type === "string" && ref.type.length > 0
+            ? ref.type
+            : "search",
+      };
+    })
+    .filter((item): item is ComparableReference => Boolean(item));
+}
+
+function formatBooleanValue(
+  value: boolean | null | undefined,
+  trueLabel = "Yes",
+  falseLabel = "No"
+) {
+  if (value === null || value === undefined) return "Unknown";
+  return value ? trueLabel : falseLabel;
+}
+
+function formatRelativeDate(value: string | null) {
+  if (!value) return "—";
+  try {
+    return formatDistanceToNow(new Date(value), { addSuffix: true });
+  } catch {
+    return "—";
+  }
+}
+
 export default function OpportunitiesPage() {
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [stats, setStats] = useState<Stats>({
@@ -72,10 +161,17 @@ export default function OpportunitiesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<Opportunity>>({});
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchOpportunities();
   }, [statusFilter]);
+
+  useEffect(() => {
+    if (!copiedMessageId) return;
+    const timeout = setTimeout(() => setCopiedMessageId(null), 2000);
+    return () => clearTimeout(timeout);
+  }, [copiedMessageId]);
 
   async function fetchOpportunities() {
     setLoading(true);
@@ -135,6 +231,18 @@ export default function OpportunitiesPage() {
     }
   }
 
+  async function handleCopyMessage(id: string, message: string) {
+    if (!message) return;
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(message);
+        setCopiedMessageId(id);
+      }
+    } catch (error) {
+      console.error("Failed to copy request message:", error);
+    }
+  }
+
   function startEditing(opp: Opportunity) {
     setEditingId(opp.id);
     setEditForm({
@@ -159,9 +267,15 @@ export default function OpportunitiesPage() {
     updateOpportunity(id, editForm);
   }
 
-  const filteredOpportunities = opportunities.filter((opp) =>
-    opp.listing.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const normalizedSearch = searchTerm.toLowerCase();
+  const filteredOpportunities = opportunities.filter((opp) => {
+    const matchesSearch = opp.listing.title
+      .toLowerCase()
+      .includes(normalizedSearch);
+    const matchesStatus =
+      statusFilter === "all" || opp.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   const statusOptions = [
     { value: "all", label: "All Statuses", icon: Package },
@@ -381,7 +495,35 @@ export default function OpportunitiesPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredOpportunities.map((opp) => (
+            {filteredOpportunities.map((opp) => {
+              const listingImages = parseStringArray(opp.listing.imageUrls);
+              const primaryImage = listingImages[0];
+              const listingTags = parseStringArray(opp.listing.tags);
+              const comparableUrls = parseComparableReferences(opp.listing.comparableUrls);
+              const metadataItems = [
+                { label: "Condition", value: opp.listing.condition || "Unknown" },
+                { label: "Category", value: opp.listing.category || "Uncategorized" },
+                {
+                  label: "Shippable",
+                  value: formatBooleanValue(opp.listing.shippable, "Yes", "Local only"),
+                },
+                {
+                  label: "Negotiable",
+                  value: formatBooleanValue(opp.listing.negotiable),
+                },
+                {
+                  label: "Discount",
+                  value:
+                    opp.listing.discountPercent !== null &&
+                    opp.listing.discountPercent !== undefined
+                      ? `${opp.listing.discountPercent.toFixed(0)}% below comps`
+                      : "—",
+                },
+                { label: "Posted", value: formatRelativeDate(opp.listing.postedAt) },
+              ];
+              const hasSellerDetails = opp.listing.sellerName || opp.listing.sellerContact;
+
+              return (
               <div
                 key={opp.id}
                 className="group backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 overflow-hidden hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02] hover:bg-white/15"
@@ -389,10 +531,10 @@ export default function OpportunitiesPage() {
                 <div className="p-6">
                   <div className="flex items-start gap-4">
                     {/* Image with glow effect */}
-                    {opp.listing.imageUrls ? (
+                    {primaryImage ? (
                       <div className="relative">
                         <img
-                          src={JSON.parse(opp.listing.imageUrls)[0]}
+                          src={primaryImage}
                           alt={opp.listing.title}
                           className="w-24 h-24 object-cover rounded-lg flex-shrink-0 ring-2 ring-white/20 group-hover:ring-purple-400/50 transition-all duration-300"
                         />
@@ -476,6 +618,140 @@ export default function OpportunitiesPage() {
                           </p>
                         </div>
                       </div>
+
+                      {/* Listing metadata */}
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                        {metadataItems.map((item) => (
+                          <div
+                            key={`${opp.id}-${item.label}`}
+                            className="backdrop-blur-sm bg-white/5 rounded-lg p-3 border border-white/10 hover:bg-white/10 transition-all duration-300"
+                          >
+                            <p className="text-xs text-blue-200/70 mb-1">{item.label}</p>
+                            <p className="text-sm font-semibold text-white">{item.value}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                      {listingTags.length > 0 && (
+                        <div className="mb-4">
+                          <p className="text-xs text-blue-200/70 mb-2">Detected Tags</p>
+                          <div className="flex flex-wrap gap-2">
+                            {listingTags.map((tag) => (
+                              <span
+                                key={`${opp.id}-${tag}`}
+                                className="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-white flex items-center gap-1"
+                              >
+                                <TagIcon className="w-3 h-3 text-purple-200" />
+                                #{tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {opp.listing.description && (
+                        <div className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10">
+                          <p className="text-xs text-blue-200/70 mb-2">Listing Description</p>
+                          <p className="text-sm text-white whitespace-pre-line">
+                            {opp.listing.description}
+                          </p>
+                        </div>
+                      )}
+
+                      {hasSellerDetails && (
+                        <div className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10">
+                          <p className="text-xs text-blue-200/70 mb-2">Seller Details</p>
+                          <div className="flex flex-col gap-2 text-sm text-white">
+                            {opp.listing.sellerName && (
+                              <span className="flex items-center gap-2">
+                                <User className="w-4 h-4 text-blue-200" />
+                                {opp.listing.sellerName}
+                              </span>
+                            )}
+                            {opp.listing.sellerContact && (
+                              <span className="flex items-center gap-2 break-all">
+                                {opp.listing.sellerContact.includes("@") ? (
+                                  <Mail className="w-4 h-4 text-blue-200" />
+                                ) : (
+                                  <Phone className="w-4 h-4 text-blue-200" />
+                                )}
+                                {opp.listing.sellerContact}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {opp.listing.requestToBuy && (
+                        <div className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10">
+                          <div className="flex items-center justify-between gap-4">
+                            <div>
+                              <p className="text-xs text-blue-200/70 mb-2 flex items-center gap-2">
+                                <MessageSquare className="w-4 h-4 text-blue-200" />
+                                Purchase Message
+                              </p>
+                              <p className="text-sm text-white whitespace-pre-line">
+                                {opp.listing.requestToBuy}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() =>
+                                handleCopyMessage(opp.id, opp.listing.requestToBuy || "")
+                              }
+                              className="flex items-center gap-2 px-3 py-1.5 text-xs bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 transition-all duration-300"
+                            >
+                              <Copy className="w-3.5 h-3.5" />
+                              {copiedMessageId === opp.id ? "Copied" : "Copy"}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {comparableUrls.length > 0 && (
+                        <div className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10">
+                          <p className="text-xs text-blue-200/70 mb-2">Comparable Listings</p>
+                          <div className="flex flex-col gap-2">
+                            {comparableUrls.map((comp, index) => (
+                              <a
+                                key={`${opp.id}-comp-${index}`}
+                                href={comp.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex flex-col rounded-lg border border-white/10 bg-white/5 px-3 py-2 hover:bg-white/10 transition-all duration-300"
+                              >
+                                <span className="text-sm font-semibold text-white">
+                                  {comp.label}
+                                </span>
+                                <span className="text-xs text-blue-200/70">
+                                  {comp.platform} • {comp.type}
+                                </span>
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {(opp.listing.priceReasoning || opp.listing.notes) && (
+                        <div className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10 space-y-4">
+                          {opp.listing.priceReasoning && (
+                            <div>
+                              <p className="text-xs text-blue-200/70 mb-2">Value Reasoning</p>
+                              <p className="text-sm text-white whitespace-pre-line">
+                                {opp.listing.priceReasoning}
+                              </p>
+                            </div>
+                          )}
+                          {opp.listing.notes && (
+                            <div>
+                              <p className="text-xs text-blue-200/70 mb-2">Listing Notes</p>
+                              <p className="text-sm text-white whitespace-pre-line">
+                                {opp.listing.notes}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
                       {/* Editing Form or Display */}
                       {editingId === opp.id ? (
                         <div className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10">
@@ -719,6 +995,3 @@ export default function OpportunitiesPage() {
     </div>
   );
 }
-
-
-

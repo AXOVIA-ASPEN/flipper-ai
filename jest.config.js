@@ -4,6 +4,8 @@ const config = {
   testEnvironment: 'node',
   roots: ['<rootDir>/src'],
   testMatch: ['**/__tests__/**/*.test.ts', '**/*.test.ts'],
+  // Exclude integration tests from default run (use pnpm test:integration)
+  testPathIgnorePatterns: ['/node_modules/', '**/*.integration.test.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },

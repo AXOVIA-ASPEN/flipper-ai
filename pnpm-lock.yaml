@@ -10,7 +10,10 @@ importers:
     dependencies:
       '@browserbasehq/stagehand':
         specifier: ^3.0.6
-        version: 3.0.6(@cfworker/json-schema@4.1.1)(@opentelemetry/api@1.9.0)(deepmerge@4.3.1)(dotenv@16.6.1)(hono@4.10.6)(zod@4.2.1)
+        version: 3.0.6(@cfworker/json-schema@4.1.1)(@opentelemetry/api@1.9.0)(deepmerge@4.3.1)(dotenv@17.2.3)(hono@4.10.6)(zod@4.2.1)
+      '@google/generative-ai':
+        specifier: ^0.21.0
+        version: 0.21.0
       '@libsql/client':
         specifier: ^0.15.15
         version: 0.15.15(bufferutil@4.1.0)
@@ -72,6 +75,9 @@ importers:
       '@types/react-dom':
         specifier: ^19
         version: 19.2.3(@types/react@19.2.7)
+      dotenv:
+        specifier: ^17.2.3
+        version: 17.2.3
       eslint:
         specifier: ^9
         version: 9.39.2(jiti@2.6.1)
@@ -565,6 +571,10 @@ packages:
     peerDependenciesMeta:
       '@modelcontextprotocol/sdk':
         optional: true
+
+  '@google/generative-ai@0.21.0':
+    resolution: {integrity: sha512-7XhUbtnlkSEZK15kN3t+tzIMxsbKm/dSkKBFalj+20NvPKe1kBY7mR2P7vuijEn+f06z5+A8bVGKO0v39cr6Wg==}
+    engines: {node: '>=18.0.0'}
 
   '@hono/node-server@1.19.6':
     resolution: {integrity: sha512-Shz/KjlIeAhfiuE93NDKVdZ7HdBVLQAfdbaXEaoAVO3ic9ibRSLGIQGkcBbFyuLr+7/1D5ZCINM8B+6IvXeMtw==}
@@ -2144,6 +2154,10 @@ packages:
 
   dotenv@16.6.1:
     resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
+    engines: {node: '>=12'}
+
+  dotenv@17.2.3:
+    resolution: {integrity: sha512-JVUnt+DUIzu87TABbhPmNfVdBDt18BLOWjMUFJMSi/Qqg7NTYtabbvSNJGOJ7afbRuv9D/lngizHtP7QyLQ+9w==}
     engines: {node: '>=12'}
 
   dunder-proto@1.0.1:
@@ -5174,7 +5188,7 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  '@browserbasehq/stagehand@3.0.6(@cfworker/json-schema@4.1.1)(@opentelemetry/api@1.9.0)(deepmerge@4.3.1)(dotenv@16.6.1)(hono@4.10.6)(zod@4.2.1)':
+  '@browserbasehq/stagehand@3.0.6(@cfworker/json-schema@4.1.1)(@opentelemetry/api@1.9.0)(deepmerge@4.3.1)(dotenv@17.2.3)(hono@4.10.6)(zod@4.2.1)':
     dependencies:
       '@ai-sdk/provider': 2.0.0
       '@anthropic-ai/sdk': 0.39.0
@@ -5185,7 +5199,7 @@ snapshots:
       ai: 5.0.116(zod@4.2.1)
       deepmerge: 4.3.1
       devtools-protocol: 0.0.1464554
-      dotenv: 16.6.1
+      dotenv: 17.2.3
       fetch-cookie: 3.2.0
       openai: 4.104.0(ws@8.18.3(bufferutil@4.1.0))(zod@4.2.1)
       pino: 9.14.0
@@ -5473,6 +5487,8 @@ snapshots:
       - bufferutil
       - supports-color
       - utf-8-validate
+
+  '@google/generative-ai@0.21.0': {}
 
   '@hono/node-server@1.19.6(hono@4.10.6)':
     dependencies:
@@ -7170,6 +7186,8 @@ snapshots:
   dom-accessibility-api@0.6.3: {}
 
   dotenv@16.6.1: {}
+
+  dotenv@17.2.3: {}
 
   dunder-proto@1.0.1:
     dependencies:

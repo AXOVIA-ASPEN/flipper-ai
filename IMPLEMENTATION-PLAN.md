@@ -129,136 +129,117 @@
 ---
 
 ### 4. Dashboard Page
-**File**: `src/app/page.tsx`
-**Test File**: `e2e/dashboard.spec.ts`
-**Coverage**: E2E only (7 tests)
+**File**: `src/app/page.tsx`  
+**Test File**: `e2e/dashboard.spec.ts`  
+**Coverage**: Playwright E2E (20+ scenarios covering gallery, filters, loading, and actions)
 
 | Feature | Tests | Status |
 |---------|-------|--------|
-| View dashboard | 1 test | ✅ Basic |
-| Stats cards display | 1 test | ✅ Basic |
-| Quick actions section | 1 test | ✅ Basic |
-| Search input | 1 test | ✅ Basic |
-| Status filter dropdown | 1 test | ✅ Basic |
-| Refresh button | 1 test | ✅ Basic |
-| Navigate to scraper | 1 test | ✅ Basic |
+| Core layout & quick actions | 7 tests | ✅ Complete |
+| Image gallery modal & navigation | 9 tests | ✅ Complete |
+| Listings filtering & search | 3 tests | ✅ Complete |
+| Refresh/navigation shortcuts | 2 tests | ✅ Complete |
+| Mark as Opportunity action | 1 test | ✅ Complete |
+| Loading & empty states | 2 tests | ✅ Complete |
 
 **Tested Behaviors**:
-- ✅ Header displays "Flipper.ai"
-- ✅ Stats cards visible (Total Listings, Opportunities, Potential Profit, Avg Score)
-- ✅ Listings table visible with columns
-- ✅ Quick actions visible (Scrape Craigslist, View Opportunities)
-- ✅ Search input accepts text
-- ✅ Status filter options exist
-- ✅ Refresh button clickable
-- ✅ Navigation to /scraper works
+- ✅ Header displays "Flipper.ai" with animated stats cards
+- ✅ Listings table renders with thumbnails, badges, and actions
+- ✅ Quick actions (Scrape Craigslist, View Opportunities) navigate correctly
+- ✅ Search input filters table rows client-side
+- ✅ Status filter sends API requests with the correct `status` query parameter
+- ✅ Mark as Opportunity button triggers `/api/opportunities` POST and refresh
+- ✅ Image gallery modal open/close via button, X, and backdrop
+- ✅ Gallery next/previous controls and thumbnail jump navigation
+- ✅ Loading spinner and empty state messaging render appropriately
 
 **NOT Tested**:
-- ❌ Image gallery modal open/close
-- ❌ Image navigation (prev/next)
-- ❌ "Mark as Opportunity" button functionality
-- ❌ Actual filtering behavior (API calls)
-- ❌ Actual search behavior (API calls)
-- ❌ Loading states
-- ❌ Error states
-- ❌ Empty state display
-- ❌ Pagination behavior
+- ❌ API/network error UI states (component currently logs to console only)
+- ❌ Pagination behavior (feature not implemented yet)
 
 ---
 
 ### 5. Opportunities Page
-**File**: `src/app/opportunities/page.tsx`
-**Test File**: `e2e/opportunities.spec.ts`
-**Coverage**: E2E only (10 tests)
+**File**: `src/app/opportunities/page.tsx`  
+**Test File**: `e2e/opportunities.spec.ts`  
+**Coverage**: Playwright E2E (30+ scenarios including edit/delete workflows)
 
 | Feature | Tests | Status |
 |---------|-------|--------|
-| View page layout | 1 test | ✅ Basic |
-| Empty state | 1 test | ✅ Basic |
-| Status filter buttons | 2 tests | ✅ Basic |
-| Search input | 1 test | ✅ Basic |
-| Navigation | 2 tests | ✅ Basic |
-| View pricing info | 1 test | ⚠️ Conditional |
-| Status badges | 1 test | ⚠️ Conditional |
-| Action buttons | 1 test | ⚠️ Conditional |
+| Page layout & stats cards | 2 tests | ✅ Complete |
+| Filters & search | 3 tests | ✅ Complete |
+| Navigation between pages | 2 tests | ✅ Complete |
+| Opportunity detail cards | 5 tests | ✅ Complete |
+| Edit mode workflow | 7 tests | ✅ Complete |
+| Delete confirmation & API calls | 5 tests | ✅ Complete |
+| Metadata & purchase message display | 2 tests | ✅ Complete |
 
 **Tested Behaviors**:
-- ✅ Header and subtitle display
-- ✅ Stats cards visible (Total Opportunities, Invested, Revenue, Profit)
-- ✅ Back button navigation
-- ✅ All status filter buttons visible
-- ✅ Search input works
-- ✅ Navigate from dashboard to opportunities
-- ⚠️ Pricing labels (conditional on data)
-- ⚠️ Edit/View buttons (conditional on data)
+- ✅ Header, subtitle, stats cards, and empty state display
+- ✅ Status filter buttons highlight active filters and search input updates
+- ✅ Identified filter triggers server fetch with `status=IDENTIFIED` and hides mismatched cards
+- ✅ Navigation between dashboard and opportunities
+- ✅ Pricing labels, status badges, and action buttons render when data exists
+- ✅ Edit button opens form populated with existing data (status, prices, notes)
+- ✅ Status dropdown cycles through IDENTIFIED → SOLD options
+- ✅ Purchase price, resale price, fees, platform, notes fields accept updates
+- ✅ Save and Cancel buttons close the form appropriately
+- ✅ Delete button shows confirmation dialog and triggers DELETE request
+- ✅ Opportunity cards render listing images, tags, seller info, comparable URLs, and AI purchase message with copy-to-clipboard state
 
 **NOT Tested**:
-- ❌ Edit mode form submission
-- ❌ Edit form field validation
-- ❌ Delete confirmation dialog
-- ❌ Delete API call
-- ❌ Status update via edit
-- ❌ Profit calculation display
-- ❌ Purchase price/resale price input
-- ❌ Fees input
-- ❌ Notes editing
-- ❌ Image display in opportunity card
+- (None - major UI flows now covered in Playwright)
 
 ---
 
 ### 6. Scraper Page
-**File**: `src/app/scraper/page.tsx`
-**Test File**: `e2e/scraper.spec.ts`
-**Coverage**: E2E only (8 tests)
+**File**: `src/app/scraper/page.tsx`  
+**Test File**: `e2e/scraper.spec.ts`  
+**Coverage**: Playwright E2E (11 tests covering form, execution, results, and history)
 
 | Feature | Tests | Status |
 |---------|-------|--------|
-| Form elements visible | 1 test | ✅ Complete |
-| Location selection | 1 test | ✅ Complete |
-| Category selection | 1 test | ✅ Complete |
-| Keywords input | 1 test | ✅ Complete |
-| Price range inputs | 1 test | ✅ Complete |
-| Start scraping | 1 test | ⚠️ Partial |
-| Platform options | 1 test | ✅ Complete |
-| Back navigation | 1 test | ✅ Complete |
+| Form elements & selectors | 5 tests | ✅ Complete |
+| Start scraping (loading state) | 1 test | ✅ Complete |
+| Form validation/option lists | 3 tests | ✅ Complete |
+| Results summary & listings preview | 1 test | ✅ Complete |
+| Error handling | 1 test | ✅ Complete |
+| Job history list & refresh | 1 test | ✅ Complete |
 
 **Tested Behaviors**:
-- ✅ All form fields visible (platform, location, category, keywords, prices)
-- ✅ Location dropdown options (sarasota, tampa, sfbay, newyork)
-- ✅ Category dropdown options (electronics, furniture, video_gaming, music_instr)
-- ✅ Platform options (craigslist enabled, facebook disabled)
-- ✅ Input fields accept values
-- ✅ Start button triggers loading state
-- ✅ Back navigation works
+- ✅ All form inputs selectable (platform, location, category, keywords, price range)
+- ✅ Start Scraping button enters loading state and calls `/api/scraper/craigslist`
+- ✅ Successful scrape displays status banner, saved count, and listing preview cards
+- ✅ Error response surfaces failure message and detailed error text
+- ✅ Saved listings preview shows image/price/link rows and overflow "+N more" indicator
+- ✅ Recent job history list renders, including completed/failed badges, counts, and errors
+- ✅ Refresh icon re-requests job history data
 
 **NOT Tested**:
-- ❌ Actual scraping API call
-- ❌ Scraping results display
-- ❌ Error handling during scrape
-- ❌ Scraped items preview
-- ❌ "Saved X listings" count display
-- ❌ Form validation
-- ❌ Loading spinner states
-- ❌ Cancel scraping
+- ❌ Form validation error messaging (no current UI feedback for invalid inputs)
+- ❌ Cancel scraping action (feature not implemented)
 
 ---
 
 ### 7. Craigslist Scraper API
-**File**: `src/app/api/scraper/craigslist/route.ts`
-**Test File**: None
-**Coverage**: ❌ No tests
+**File**: `src/app/api/scraper/craigslist/route.ts`  
+**Test File**: `src/__tests__/api/craigslist-scraper.test.ts`  
+**Coverage**: Jest unit tests with mocked Playwright + Prisma interactions
+
+**Tested Behaviors**:
+- ✅ GET endpoint returns supported platforms, categories, and locations
+- ✅ POST validates required location/category fields
+- ✅ Playwright browser lifecycle mocked (launch → context → page → close)
+- ✅ Listing extraction logic and JSON payload mapping
+- ✅ Image URL, price, and location parsing with fallbacks
+- ✅ Prisma upsert + scraper job create/update flows
+- ✅ Empty result handling and success responses
+- ✅ Error handling paths surface 400/500 responses
 
 **NOT Tested**:
-- ❌ POST /api/scraper/craigslist endpoint
-- ❌ Playwright browser automation
-- ❌ Listing extraction logic
-- ❌ Multi-selector fallback strategy
-- ❌ Image URL extraction
-- ❌ Price parsing
-- ❌ Location extraction
-- ❌ Database upsert on scrape
-- ❌ Error handling
-- ❌ Rate limiting behavior
+- ❌ Rate limiting/backoff behavior (not implemented)
+- ❌ Multi-selector fallback depth beyond primary selectors
+- ❌ Full Playwright integration (covered via mocks only)
 
 ---
 
@@ -276,18 +257,14 @@
 ### Critical (Must Fix)
 | Feature | Gap | Priority |
 |---------|-----|----------|
-| Listings API | Missing tests for GET/PATCH/DELETE by ID | P0 |
-| Craigslist Scraper | No tests at all | P0 |
-| Dashboard | No tests for image gallery modal | P1 |
-| Opportunities Page | No tests for edit/delete functionality | P1 |
+| (None) | — | — |
 
 ### Important (Should Fix)
 | Feature | Gap | Priority |
 |---------|-----|----------|
-| Listings API | No integration tests | P1 |
-| Opportunities API | Missing duplicate prevention tests | P1 |
-| Dashboard | No filtering/search behavior tests | P1 |
-| Scraper Page | No actual scraping result tests | P1 |
+| Listings API | No integration tests with the SQLite DB | P1 |
+| Dashboard | Missing user-facing error state messaging/tests | P1 |
+| Scraper Page | Cancel scraping flow not implemented/tested | P1 |
 
 ### Nice to Have
 | Feature | Gap | Priority |
@@ -302,10 +279,9 @@
 ## Recommended Test Additions
 
 ### Immediate (Before Phase 1)
-1. **Listings API [id] tests** - Add unit tests for single listing operations
-2. **Craigslist Scraper tests** - Mock Playwright, test extraction logic
-3. **Dashboard E2E** - Add image gallery and filtering tests
-4. **Opportunities E2E** - Add edit form and delete tests
+1. **Listings API integration tests** - Run Prisma against SQLite to validate CRUD with real data
+2. **Dashboard error UX** - Add UI messaging for failed listing fetches and cover with Playwright tests
+3. **Scraper cancel/validation flows** - Implement cancel button + validation feedback, then add tests
 
 ### With Each Phase
 - Every new API endpoint must have unit tests
@@ -340,45 +316,45 @@
 ### 1.1 Settings Page & Search Configurations
 
 #### 1.1.1 SearchConfig API
-- [ ] Create `GET /api/search-configs` - List all saved searches
-- [ ] Create `POST /api/search-configs` - Create new search config
-- [ ] Create `GET /api/search-configs/[id]` - Get single config
-- [ ] Create `PATCH /api/search-configs/[id]` - Update config
-- [ ] Create `DELETE /api/search-configs/[id]` - Delete config
-- [ ] Add validation with Zod schemas
+- [x] Create `GET /api/search-configs` - List all saved searches
+- [x] Create `POST /api/search-configs` - Create new search config
+- [x] Create `GET /api/search-configs/[id]` - Get single config
+- [x] Create `PATCH /api/search-configs/[id]` - Update config
+- [x] Create `DELETE /api/search-configs/[id]` - Delete config
+- [x] Add validation with Zod schemas
 
 #### 1.1.2 Settings Page UI
-- [ ] Create `/src/app/settings/page.tsx`
-- [ ] Build search config list view with enable/disable toggles
-- [ ] Create search config form (name, platform, location, category, keywords, price range)
-- [ ] Add edit/delete functionality
-- [ ] Show last run timestamp for each config
-- [ ] Add "Run Now" button per config
+- [x] Create `/src/app/settings/page.tsx`
+- [x] Build search config list view with enable/disable toggles
+- [x] Create search config form (name, platform, location, category, keywords, price range)
+- [x] Add edit/delete functionality
+- [x] Show last run timestamp for each config
+- [x] Add "Run Now" button per config
 
 #### 1.1.3 Integration
-- [ ] Connect scraper page to use saved configs
-- [ ] Add "Save as Config" button on scraper page
-- [ ] Show saved configs as quick-select options
+- [x] Connect scraper page to use saved configs
+- [x] Add "Save as Config" button on scraper page
+- [x] Show saved configs as quick-select options
 
 ### 1.2 Scraper Job History
 
 #### 1.2.1 ScraperJob API
-- [ ] Create `GET /api/scraper-jobs` - List job history with pagination
-- [ ] Create `POST /api/scraper-jobs` - Create job record (internal use)
-- [ ] Create `GET /api/scraper-jobs/[id]` - Get job details
-- [ ] Update Craigslist scraper to create job records
+- [x] Create `GET /api/scraper-jobs` - List job history with pagination
+- [x] Create `POST /api/scraper-jobs` - Create job record (internal use)
+- [x] Create `GET /api/scraper-jobs/[id]` - Get job details
+- [x] Update Craigslist scraper to create job records
 
 #### 1.2.2 Job Tracking Integration
-- [ ] Wrap scraper execution with job lifecycle (PENDING → RUNNING → COMPLETED/FAILED)
-- [ ] Track listings found and opportunities identified per job
-- [ ] Store error messages on failure
-- [ ] Record start/completion timestamps
+- [x] Wrap scraper execution with job lifecycle (PENDING → RUNNING → COMPLETED/FAILED)
+- [x] Track listings found and opportunities identified per job
+- [x] Store error messages on failure
+- [x] Record start/completion timestamps
 
 #### 1.2.3 Job History UI
-- [ ] Add "History" tab to scraper page
-- [ ] Display job list with status badges
-- [ ] Show job details modal (items found, duration, errors)
-- [ ] Add filters by status and date range
+- [x] Add "History" tab to scraper page
+- [x] Display job list with status badges
+- [x] Show job details modal (items found, duration, errors)
+- [x] Add filters by status and date range
 
 ### 1.3 Enhanced Dashboard
 

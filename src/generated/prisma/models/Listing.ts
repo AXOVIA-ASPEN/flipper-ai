@@ -38,6 +38,12 @@ export type ListingAvgAggregateOutputType = {
   discountPercent: number | null
   estimatedWeight: number | null
   daysListed: number | null
+  verifiedMarketValue: number | null
+  sellabilityScore: number | null
+  expectedDaysToSell: number | null
+  recommendedOffer: number | null
+  recommendedList: number | null
+  trueDiscountPercent: number | null
 }
 
 export type ListingSumAggregateOutputType = {
@@ -52,6 +58,12 @@ export type ListingSumAggregateOutputType = {
   discountPercent: number | null
   estimatedWeight: number | null
   daysListed: number | null
+  verifiedMarketValue: number | null
+  sellabilityScore: number | null
+  expectedDaysToSell: number | null
+  recommendedOffer: number | null
+  recommendedList: number | null
+  trueDiscountPercent: number | null
 }
 
 export type ListingMinAggregateOutputType = {
@@ -89,6 +101,26 @@ export type ListingMinAggregateOutputType = {
   daysListed: number | null
   tags: string | null
   requestToBuy: string | null
+  identifiedBrand: string | null
+  identifiedModel: string | null
+  identifiedVariant: string | null
+  identifiedCondition: string | null
+  verifiedMarketValue: number | null
+  marketDataSource: string | null
+  marketDataDate: Date | null
+  comparableSalesJson: string | null
+  sellabilityScore: number | null
+  demandLevel: string | null
+  expectedDaysToSell: number | null
+  authenticityRisk: string | null
+  recommendedOffer: number | null
+  recommendedList: number | null
+  resaleStrategy: string | null
+  trueDiscountPercent: number | null
+  llmAnalyzed: boolean | null
+  analysisDate: Date | null
+  analysisConfidence: string | null
+  analysisReasoning: string | null
 }
 
 export type ListingMaxAggregateOutputType = {
@@ -126,6 +158,26 @@ export type ListingMaxAggregateOutputType = {
   daysListed: number | null
   tags: string | null
   requestToBuy: string | null
+  identifiedBrand: string | null
+  identifiedModel: string | null
+  identifiedVariant: string | null
+  identifiedCondition: string | null
+  verifiedMarketValue: number | null
+  marketDataSource: string | null
+  marketDataDate: Date | null
+  comparableSalesJson: string | null
+  sellabilityScore: number | null
+  demandLevel: string | null
+  expectedDaysToSell: number | null
+  authenticityRisk: string | null
+  recommendedOffer: number | null
+  recommendedList: number | null
+  resaleStrategy: string | null
+  trueDiscountPercent: number | null
+  llmAnalyzed: boolean | null
+  analysisDate: Date | null
+  analysisConfidence: string | null
+  analysisReasoning: string | null
 }
 
 export type ListingCountAggregateOutputType = {
@@ -163,6 +215,26 @@ export type ListingCountAggregateOutputType = {
   daysListed: number
   tags: number
   requestToBuy: number
+  identifiedBrand: number
+  identifiedModel: number
+  identifiedVariant: number
+  identifiedCondition: number
+  verifiedMarketValue: number
+  marketDataSource: number
+  marketDataDate: number
+  comparableSalesJson: number
+  sellabilityScore: number
+  demandLevel: number
+  expectedDaysToSell: number
+  authenticityRisk: number
+  recommendedOffer: number
+  recommendedList: number
+  resaleStrategy: number
+  trueDiscountPercent: number
+  llmAnalyzed: number
+  analysisDate: number
+  analysisConfidence: number
+  analysisReasoning: number
   _all: number
 }
 
@@ -179,6 +251,12 @@ export type ListingAvgAggregateInputType = {
   discountPercent?: true
   estimatedWeight?: true
   daysListed?: true
+  verifiedMarketValue?: true
+  sellabilityScore?: true
+  expectedDaysToSell?: true
+  recommendedOffer?: true
+  recommendedList?: true
+  trueDiscountPercent?: true
 }
 
 export type ListingSumAggregateInputType = {
@@ -193,6 +271,12 @@ export type ListingSumAggregateInputType = {
   discountPercent?: true
   estimatedWeight?: true
   daysListed?: true
+  verifiedMarketValue?: true
+  sellabilityScore?: true
+  expectedDaysToSell?: true
+  recommendedOffer?: true
+  recommendedList?: true
+  trueDiscountPercent?: true
 }
 
 export type ListingMinAggregateInputType = {
@@ -230,6 +314,26 @@ export type ListingMinAggregateInputType = {
   daysListed?: true
   tags?: true
   requestToBuy?: true
+  identifiedBrand?: true
+  identifiedModel?: true
+  identifiedVariant?: true
+  identifiedCondition?: true
+  verifiedMarketValue?: true
+  marketDataSource?: true
+  marketDataDate?: true
+  comparableSalesJson?: true
+  sellabilityScore?: true
+  demandLevel?: true
+  expectedDaysToSell?: true
+  authenticityRisk?: true
+  recommendedOffer?: true
+  recommendedList?: true
+  resaleStrategy?: true
+  trueDiscountPercent?: true
+  llmAnalyzed?: true
+  analysisDate?: true
+  analysisConfidence?: true
+  analysisReasoning?: true
 }
 
 export type ListingMaxAggregateInputType = {
@@ -267,6 +371,26 @@ export type ListingMaxAggregateInputType = {
   daysListed?: true
   tags?: true
   requestToBuy?: true
+  identifiedBrand?: true
+  identifiedModel?: true
+  identifiedVariant?: true
+  identifiedCondition?: true
+  verifiedMarketValue?: true
+  marketDataSource?: true
+  marketDataDate?: true
+  comparableSalesJson?: true
+  sellabilityScore?: true
+  demandLevel?: true
+  expectedDaysToSell?: true
+  authenticityRisk?: true
+  recommendedOffer?: true
+  recommendedList?: true
+  resaleStrategy?: true
+  trueDiscountPercent?: true
+  llmAnalyzed?: true
+  analysisDate?: true
+  analysisConfidence?: true
+  analysisReasoning?: true
 }
 
 export type ListingCountAggregateInputType = {
@@ -304,6 +428,26 @@ export type ListingCountAggregateInputType = {
   daysListed?: true
   tags?: true
   requestToBuy?: true
+  identifiedBrand?: true
+  identifiedModel?: true
+  identifiedVariant?: true
+  identifiedCondition?: true
+  verifiedMarketValue?: true
+  marketDataSource?: true
+  marketDataDate?: true
+  comparableSalesJson?: true
+  sellabilityScore?: true
+  demandLevel?: true
+  expectedDaysToSell?: true
+  authenticityRisk?: true
+  recommendedOffer?: true
+  recommendedList?: true
+  resaleStrategy?: true
+  trueDiscountPercent?: true
+  llmAnalyzed?: true
+  analysisDate?: true
+  analysisConfidence?: true
+  analysisReasoning?: true
   _all?: true
 }
 
@@ -428,6 +572,26 @@ export type ListingGroupByOutputType = {
   daysListed: number | null
   tags: string | null
   requestToBuy: string | null
+  identifiedBrand: string | null
+  identifiedModel: string | null
+  identifiedVariant: string | null
+  identifiedCondition: string | null
+  verifiedMarketValue: number | null
+  marketDataSource: string | null
+  marketDataDate: Date | null
+  comparableSalesJson: string | null
+  sellabilityScore: number | null
+  demandLevel: string | null
+  expectedDaysToSell: number | null
+  authenticityRisk: string | null
+  recommendedOffer: number | null
+  recommendedList: number | null
+  resaleStrategy: string | null
+  trueDiscountPercent: number | null
+  llmAnalyzed: boolean
+  analysisDate: Date | null
+  analysisConfidence: string | null
+  analysisReasoning: string | null
   _count: ListingCountAggregateOutputType | null
   _avg: ListingAvgAggregateOutputType | null
   _sum: ListingSumAggregateOutputType | null
@@ -488,6 +652,26 @@ export type ListingWhereInput = {
   daysListed?: Prisma.IntNullableFilter<"Listing"> | number | null
   tags?: Prisma.StringNullableFilter<"Listing"> | string | null
   requestToBuy?: Prisma.StringNullableFilter<"Listing"> | string | null
+  identifiedBrand?: Prisma.StringNullableFilter<"Listing"> | string | null
+  identifiedModel?: Prisma.StringNullableFilter<"Listing"> | string | null
+  identifiedVariant?: Prisma.StringNullableFilter<"Listing"> | string | null
+  identifiedCondition?: Prisma.StringNullableFilter<"Listing"> | string | null
+  verifiedMarketValue?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  marketDataSource?: Prisma.StringNullableFilter<"Listing"> | string | null
+  marketDataDate?: Prisma.DateTimeNullableFilter<"Listing"> | Date | string | null
+  comparableSalesJson?: Prisma.StringNullableFilter<"Listing"> | string | null
+  sellabilityScore?: Prisma.IntNullableFilter<"Listing"> | number | null
+  demandLevel?: Prisma.StringNullableFilter<"Listing"> | string | null
+  expectedDaysToSell?: Prisma.IntNullableFilter<"Listing"> | number | null
+  authenticityRisk?: Prisma.StringNullableFilter<"Listing"> | string | null
+  recommendedOffer?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  recommendedList?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  resaleStrategy?: Prisma.StringNullableFilter<"Listing"> | string | null
+  trueDiscountPercent?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  llmAnalyzed?: Prisma.BoolFilter<"Listing"> | boolean
+  analysisDate?: Prisma.DateTimeNullableFilter<"Listing"> | Date | string | null
+  analysisConfidence?: Prisma.StringNullableFilter<"Listing"> | string | null
+  analysisReasoning?: Prisma.StringNullableFilter<"Listing"> | string | null
   opportunity?: Prisma.XOR<Prisma.OpportunityNullableScalarRelationFilter, Prisma.OpportunityWhereInput> | null
 }
 
@@ -526,6 +710,26 @@ export type ListingOrderByWithRelationInput = {
   daysListed?: Prisma.SortOrderInput | Prisma.SortOrder
   tags?: Prisma.SortOrderInput | Prisma.SortOrder
   requestToBuy?: Prisma.SortOrderInput | Prisma.SortOrder
+  identifiedBrand?: Prisma.SortOrderInput | Prisma.SortOrder
+  identifiedModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  identifiedVariant?: Prisma.SortOrderInput | Prisma.SortOrder
+  identifiedCondition?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedMarketValue?: Prisma.SortOrderInput | Prisma.SortOrder
+  marketDataSource?: Prisma.SortOrderInput | Prisma.SortOrder
+  marketDataDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  comparableSalesJson?: Prisma.SortOrderInput | Prisma.SortOrder
+  sellabilityScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  demandLevel?: Prisma.SortOrderInput | Prisma.SortOrder
+  expectedDaysToSell?: Prisma.SortOrderInput | Prisma.SortOrder
+  authenticityRisk?: Prisma.SortOrderInput | Prisma.SortOrder
+  recommendedOffer?: Prisma.SortOrderInput | Prisma.SortOrder
+  recommendedList?: Prisma.SortOrderInput | Prisma.SortOrder
+  resaleStrategy?: Prisma.SortOrderInput | Prisma.SortOrder
+  trueDiscountPercent?: Prisma.SortOrderInput | Prisma.SortOrder
+  llmAnalyzed?: Prisma.SortOrder
+  analysisDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  analysisConfidence?: Prisma.SortOrderInput | Prisma.SortOrder
+  analysisReasoning?: Prisma.SortOrderInput | Prisma.SortOrder
   opportunity?: Prisma.OpportunityOrderByWithRelationInput
 }
 
@@ -568,6 +772,26 @@ export type ListingWhereUniqueInput = Prisma.AtLeast<{
   daysListed?: Prisma.IntNullableFilter<"Listing"> | number | null
   tags?: Prisma.StringNullableFilter<"Listing"> | string | null
   requestToBuy?: Prisma.StringNullableFilter<"Listing"> | string | null
+  identifiedBrand?: Prisma.StringNullableFilter<"Listing"> | string | null
+  identifiedModel?: Prisma.StringNullableFilter<"Listing"> | string | null
+  identifiedVariant?: Prisma.StringNullableFilter<"Listing"> | string | null
+  identifiedCondition?: Prisma.StringNullableFilter<"Listing"> | string | null
+  verifiedMarketValue?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  marketDataSource?: Prisma.StringNullableFilter<"Listing"> | string | null
+  marketDataDate?: Prisma.DateTimeNullableFilter<"Listing"> | Date | string | null
+  comparableSalesJson?: Prisma.StringNullableFilter<"Listing"> | string | null
+  sellabilityScore?: Prisma.IntNullableFilter<"Listing"> | number | null
+  demandLevel?: Prisma.StringNullableFilter<"Listing"> | string | null
+  expectedDaysToSell?: Prisma.IntNullableFilter<"Listing"> | number | null
+  authenticityRisk?: Prisma.StringNullableFilter<"Listing"> | string | null
+  recommendedOffer?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  recommendedList?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  resaleStrategy?: Prisma.StringNullableFilter<"Listing"> | string | null
+  trueDiscountPercent?: Prisma.FloatNullableFilter<"Listing"> | number | null
+  llmAnalyzed?: Prisma.BoolFilter<"Listing"> | boolean
+  analysisDate?: Prisma.DateTimeNullableFilter<"Listing"> | Date | string | null
+  analysisConfidence?: Prisma.StringNullableFilter<"Listing"> | string | null
+  analysisReasoning?: Prisma.StringNullableFilter<"Listing"> | string | null
   opportunity?: Prisma.XOR<Prisma.OpportunityNullableScalarRelationFilter, Prisma.OpportunityWhereInput> | null
 }, "id" | "platform_externalId">
 
@@ -606,6 +830,26 @@ export type ListingOrderByWithAggregationInput = {
   daysListed?: Prisma.SortOrderInput | Prisma.SortOrder
   tags?: Prisma.SortOrderInput | Prisma.SortOrder
   requestToBuy?: Prisma.SortOrderInput | Prisma.SortOrder
+  identifiedBrand?: Prisma.SortOrderInput | Prisma.SortOrder
+  identifiedModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  identifiedVariant?: Prisma.SortOrderInput | Prisma.SortOrder
+  identifiedCondition?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedMarketValue?: Prisma.SortOrderInput | Prisma.SortOrder
+  marketDataSource?: Prisma.SortOrderInput | Prisma.SortOrder
+  marketDataDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  comparableSalesJson?: Prisma.SortOrderInput | Prisma.SortOrder
+  sellabilityScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  demandLevel?: Prisma.SortOrderInput | Prisma.SortOrder
+  expectedDaysToSell?: Prisma.SortOrderInput | Prisma.SortOrder
+  authenticityRisk?: Prisma.SortOrderInput | Prisma.SortOrder
+  recommendedOffer?: Prisma.SortOrderInput | Prisma.SortOrder
+  recommendedList?: Prisma.SortOrderInput | Prisma.SortOrder
+  resaleStrategy?: Prisma.SortOrderInput | Prisma.SortOrder
+  trueDiscountPercent?: Prisma.SortOrderInput | Prisma.SortOrder
+  llmAnalyzed?: Prisma.SortOrder
+  analysisDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  analysisConfidence?: Prisma.SortOrderInput | Prisma.SortOrder
+  analysisReasoning?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ListingCountOrderByAggregateInput
   _avg?: Prisma.ListingAvgOrderByAggregateInput
   _max?: Prisma.ListingMaxOrderByAggregateInput
@@ -651,6 +895,26 @@ export type ListingScalarWhereWithAggregatesInput = {
   daysListed?: Prisma.IntNullableWithAggregatesFilter<"Listing"> | number | null
   tags?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
   requestToBuy?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
+  identifiedBrand?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
+  identifiedModel?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
+  identifiedVariant?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
+  identifiedCondition?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
+  verifiedMarketValue?: Prisma.FloatNullableWithAggregatesFilter<"Listing"> | number | null
+  marketDataSource?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
+  marketDataDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Listing"> | Date | string | null
+  comparableSalesJson?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
+  sellabilityScore?: Prisma.IntNullableWithAggregatesFilter<"Listing"> | number | null
+  demandLevel?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
+  expectedDaysToSell?: Prisma.IntNullableWithAggregatesFilter<"Listing"> | number | null
+  authenticityRisk?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
+  recommendedOffer?: Prisma.FloatNullableWithAggregatesFilter<"Listing"> | number | null
+  recommendedList?: Prisma.FloatNullableWithAggregatesFilter<"Listing"> | number | null
+  resaleStrategy?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
+  trueDiscountPercent?: Prisma.FloatNullableWithAggregatesFilter<"Listing"> | number | null
+  llmAnalyzed?: Prisma.BoolWithAggregatesFilter<"Listing"> | boolean
+  analysisDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Listing"> | Date | string | null
+  analysisConfidence?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
+  analysisReasoning?: Prisma.StringNullableWithAggregatesFilter<"Listing"> | string | null
 }
 
 export type ListingCreateInput = {
@@ -688,6 +952,26 @@ export type ListingCreateInput = {
   daysListed?: number | null
   tags?: string | null
   requestToBuy?: string | null
+  identifiedBrand?: string | null
+  identifiedModel?: string | null
+  identifiedVariant?: string | null
+  identifiedCondition?: string | null
+  verifiedMarketValue?: number | null
+  marketDataSource?: string | null
+  marketDataDate?: Date | string | null
+  comparableSalesJson?: string | null
+  sellabilityScore?: number | null
+  demandLevel?: string | null
+  expectedDaysToSell?: number | null
+  authenticityRisk?: string | null
+  recommendedOffer?: number | null
+  recommendedList?: number | null
+  resaleStrategy?: string | null
+  trueDiscountPercent?: number | null
+  llmAnalyzed?: boolean
+  analysisDate?: Date | string | null
+  analysisConfidence?: string | null
+  analysisReasoning?: string | null
   opportunity?: Prisma.OpportunityCreateNestedOneWithoutListingInput
 }
 
@@ -726,6 +1010,26 @@ export type ListingUncheckedCreateInput = {
   daysListed?: number | null
   tags?: string | null
   requestToBuy?: string | null
+  identifiedBrand?: string | null
+  identifiedModel?: string | null
+  identifiedVariant?: string | null
+  identifiedCondition?: string | null
+  verifiedMarketValue?: number | null
+  marketDataSource?: string | null
+  marketDataDate?: Date | string | null
+  comparableSalesJson?: string | null
+  sellabilityScore?: number | null
+  demandLevel?: string | null
+  expectedDaysToSell?: number | null
+  authenticityRisk?: string | null
+  recommendedOffer?: number | null
+  recommendedList?: number | null
+  resaleStrategy?: string | null
+  trueDiscountPercent?: number | null
+  llmAnalyzed?: boolean
+  analysisDate?: Date | string | null
+  analysisConfidence?: string | null
+  analysisReasoning?: string | null
   opportunity?: Prisma.OpportunityUncheckedCreateNestedOneWithoutListingInput
 }
 
@@ -764,6 +1068,26 @@ export type ListingUpdateInput = {
   daysListed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requestToBuy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedBrand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedVariant?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedCondition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedMarketValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  marketDataSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketDataDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  comparableSalesJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellabilityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  demandLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expectedDaysToSell?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  authenticityRisk?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recommendedOffer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recommendedList?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  resaleStrategy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trueDiscountPercent?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmAnalyzed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  analysisDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  analysisConfidence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  analysisReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   opportunity?: Prisma.OpportunityUpdateOneWithoutListingNestedInput
 }
 
@@ -802,6 +1126,26 @@ export type ListingUncheckedUpdateInput = {
   daysListed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requestToBuy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedBrand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedVariant?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedCondition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedMarketValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  marketDataSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketDataDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  comparableSalesJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellabilityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  demandLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expectedDaysToSell?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  authenticityRisk?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recommendedOffer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recommendedList?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  resaleStrategy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trueDiscountPercent?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmAnalyzed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  analysisDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  analysisConfidence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  analysisReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   opportunity?: Prisma.OpportunityUncheckedUpdateOneWithoutListingNestedInput
 }
 
@@ -840,6 +1184,26 @@ export type ListingCreateManyInput = {
   daysListed?: number | null
   tags?: string | null
   requestToBuy?: string | null
+  identifiedBrand?: string | null
+  identifiedModel?: string | null
+  identifiedVariant?: string | null
+  identifiedCondition?: string | null
+  verifiedMarketValue?: number | null
+  marketDataSource?: string | null
+  marketDataDate?: Date | string | null
+  comparableSalesJson?: string | null
+  sellabilityScore?: number | null
+  demandLevel?: string | null
+  expectedDaysToSell?: number | null
+  authenticityRisk?: string | null
+  recommendedOffer?: number | null
+  recommendedList?: number | null
+  resaleStrategy?: string | null
+  trueDiscountPercent?: number | null
+  llmAnalyzed?: boolean
+  analysisDate?: Date | string | null
+  analysisConfidence?: string | null
+  analysisReasoning?: string | null
 }
 
 export type ListingUpdateManyMutationInput = {
@@ -877,6 +1241,26 @@ export type ListingUpdateManyMutationInput = {
   daysListed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requestToBuy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedBrand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedVariant?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedCondition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedMarketValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  marketDataSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketDataDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  comparableSalesJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellabilityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  demandLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expectedDaysToSell?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  authenticityRisk?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recommendedOffer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recommendedList?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  resaleStrategy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trueDiscountPercent?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmAnalyzed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  analysisDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  analysisConfidence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  analysisReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ListingUncheckedUpdateManyInput = {
@@ -914,6 +1298,26 @@ export type ListingUncheckedUpdateManyInput = {
   daysListed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requestToBuy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedBrand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedVariant?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedCondition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedMarketValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  marketDataSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketDataDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  comparableSalesJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellabilityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  demandLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expectedDaysToSell?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  authenticityRisk?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recommendedOffer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recommendedList?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  resaleStrategy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trueDiscountPercent?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmAnalyzed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  analysisDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  analysisConfidence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  analysisReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ListingPlatformExternalIdCompoundUniqueInput = {
@@ -956,6 +1360,26 @@ export type ListingCountOrderByAggregateInput = {
   daysListed?: Prisma.SortOrder
   tags?: Prisma.SortOrder
   requestToBuy?: Prisma.SortOrder
+  identifiedBrand?: Prisma.SortOrder
+  identifiedModel?: Prisma.SortOrder
+  identifiedVariant?: Prisma.SortOrder
+  identifiedCondition?: Prisma.SortOrder
+  verifiedMarketValue?: Prisma.SortOrder
+  marketDataSource?: Prisma.SortOrder
+  marketDataDate?: Prisma.SortOrder
+  comparableSalesJson?: Prisma.SortOrder
+  sellabilityScore?: Prisma.SortOrder
+  demandLevel?: Prisma.SortOrder
+  expectedDaysToSell?: Prisma.SortOrder
+  authenticityRisk?: Prisma.SortOrder
+  recommendedOffer?: Prisma.SortOrder
+  recommendedList?: Prisma.SortOrder
+  resaleStrategy?: Prisma.SortOrder
+  trueDiscountPercent?: Prisma.SortOrder
+  llmAnalyzed?: Prisma.SortOrder
+  analysisDate?: Prisma.SortOrder
+  analysisConfidence?: Prisma.SortOrder
+  analysisReasoning?: Prisma.SortOrder
 }
 
 export type ListingAvgOrderByAggregateInput = {
@@ -970,6 +1394,12 @@ export type ListingAvgOrderByAggregateInput = {
   discountPercent?: Prisma.SortOrder
   estimatedWeight?: Prisma.SortOrder
   daysListed?: Prisma.SortOrder
+  verifiedMarketValue?: Prisma.SortOrder
+  sellabilityScore?: Prisma.SortOrder
+  expectedDaysToSell?: Prisma.SortOrder
+  recommendedOffer?: Prisma.SortOrder
+  recommendedList?: Prisma.SortOrder
+  trueDiscountPercent?: Prisma.SortOrder
 }
 
 export type ListingMaxOrderByAggregateInput = {
@@ -1007,6 +1437,26 @@ export type ListingMaxOrderByAggregateInput = {
   daysListed?: Prisma.SortOrder
   tags?: Prisma.SortOrder
   requestToBuy?: Prisma.SortOrder
+  identifiedBrand?: Prisma.SortOrder
+  identifiedModel?: Prisma.SortOrder
+  identifiedVariant?: Prisma.SortOrder
+  identifiedCondition?: Prisma.SortOrder
+  verifiedMarketValue?: Prisma.SortOrder
+  marketDataSource?: Prisma.SortOrder
+  marketDataDate?: Prisma.SortOrder
+  comparableSalesJson?: Prisma.SortOrder
+  sellabilityScore?: Prisma.SortOrder
+  demandLevel?: Prisma.SortOrder
+  expectedDaysToSell?: Prisma.SortOrder
+  authenticityRisk?: Prisma.SortOrder
+  recommendedOffer?: Prisma.SortOrder
+  recommendedList?: Prisma.SortOrder
+  resaleStrategy?: Prisma.SortOrder
+  trueDiscountPercent?: Prisma.SortOrder
+  llmAnalyzed?: Prisma.SortOrder
+  analysisDate?: Prisma.SortOrder
+  analysisConfidence?: Prisma.SortOrder
+  analysisReasoning?: Prisma.SortOrder
 }
 
 export type ListingMinOrderByAggregateInput = {
@@ -1044,6 +1494,26 @@ export type ListingMinOrderByAggregateInput = {
   daysListed?: Prisma.SortOrder
   tags?: Prisma.SortOrder
   requestToBuy?: Prisma.SortOrder
+  identifiedBrand?: Prisma.SortOrder
+  identifiedModel?: Prisma.SortOrder
+  identifiedVariant?: Prisma.SortOrder
+  identifiedCondition?: Prisma.SortOrder
+  verifiedMarketValue?: Prisma.SortOrder
+  marketDataSource?: Prisma.SortOrder
+  marketDataDate?: Prisma.SortOrder
+  comparableSalesJson?: Prisma.SortOrder
+  sellabilityScore?: Prisma.SortOrder
+  demandLevel?: Prisma.SortOrder
+  expectedDaysToSell?: Prisma.SortOrder
+  authenticityRisk?: Prisma.SortOrder
+  recommendedOffer?: Prisma.SortOrder
+  recommendedList?: Prisma.SortOrder
+  resaleStrategy?: Prisma.SortOrder
+  trueDiscountPercent?: Prisma.SortOrder
+  llmAnalyzed?: Prisma.SortOrder
+  analysisDate?: Prisma.SortOrder
+  analysisConfidence?: Prisma.SortOrder
+  analysisReasoning?: Prisma.SortOrder
 }
 
 export type ListingSumOrderByAggregateInput = {
@@ -1058,6 +1528,12 @@ export type ListingSumOrderByAggregateInput = {
   discountPercent?: Prisma.SortOrder
   estimatedWeight?: Prisma.SortOrder
   daysListed?: Prisma.SortOrder
+  verifiedMarketValue?: Prisma.SortOrder
+  sellabilityScore?: Prisma.SortOrder
+  expectedDaysToSell?: Prisma.SortOrder
+  recommendedOffer?: Prisma.SortOrder
+  recommendedList?: Prisma.SortOrder
+  trueDiscountPercent?: Prisma.SortOrder
 }
 
 export type ListingScalarRelationFilter = {
@@ -1109,6 +1585,10 @@ export type NullableIntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
 export type ListingCreateNestedOneWithoutOpportunityInput = {
   create?: Prisma.XOR<Prisma.ListingCreateWithoutOpportunityInput, Prisma.ListingUncheckedCreateWithoutOpportunityInput>
   connectOrCreate?: Prisma.ListingCreateOrConnectWithoutOpportunityInput
@@ -1158,6 +1638,26 @@ export type ListingCreateWithoutOpportunityInput = {
   daysListed?: number | null
   tags?: string | null
   requestToBuy?: string | null
+  identifiedBrand?: string | null
+  identifiedModel?: string | null
+  identifiedVariant?: string | null
+  identifiedCondition?: string | null
+  verifiedMarketValue?: number | null
+  marketDataSource?: string | null
+  marketDataDate?: Date | string | null
+  comparableSalesJson?: string | null
+  sellabilityScore?: number | null
+  demandLevel?: string | null
+  expectedDaysToSell?: number | null
+  authenticityRisk?: string | null
+  recommendedOffer?: number | null
+  recommendedList?: number | null
+  resaleStrategy?: string | null
+  trueDiscountPercent?: number | null
+  llmAnalyzed?: boolean
+  analysisDate?: Date | string | null
+  analysisConfidence?: string | null
+  analysisReasoning?: string | null
 }
 
 export type ListingUncheckedCreateWithoutOpportunityInput = {
@@ -1195,6 +1695,26 @@ export type ListingUncheckedCreateWithoutOpportunityInput = {
   daysListed?: number | null
   tags?: string | null
   requestToBuy?: string | null
+  identifiedBrand?: string | null
+  identifiedModel?: string | null
+  identifiedVariant?: string | null
+  identifiedCondition?: string | null
+  verifiedMarketValue?: number | null
+  marketDataSource?: string | null
+  marketDataDate?: Date | string | null
+  comparableSalesJson?: string | null
+  sellabilityScore?: number | null
+  demandLevel?: string | null
+  expectedDaysToSell?: number | null
+  authenticityRisk?: string | null
+  recommendedOffer?: number | null
+  recommendedList?: number | null
+  resaleStrategy?: string | null
+  trueDiscountPercent?: number | null
+  llmAnalyzed?: boolean
+  analysisDate?: Date | string | null
+  analysisConfidence?: string | null
+  analysisReasoning?: string | null
 }
 
 export type ListingCreateOrConnectWithoutOpportunityInput = {
@@ -1248,6 +1768,26 @@ export type ListingUpdateWithoutOpportunityInput = {
   daysListed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requestToBuy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedBrand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedVariant?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedCondition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedMarketValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  marketDataSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketDataDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  comparableSalesJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellabilityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  demandLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expectedDaysToSell?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  authenticityRisk?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recommendedOffer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recommendedList?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  resaleStrategy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trueDiscountPercent?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmAnalyzed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  analysisDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  analysisConfidence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  analysisReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ListingUncheckedUpdateWithoutOpportunityInput = {
@@ -1285,6 +1825,26 @@ export type ListingUncheckedUpdateWithoutOpportunityInput = {
   daysListed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requestToBuy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedBrand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedVariant?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identifiedCondition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedMarketValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  marketDataSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketDataDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  comparableSalesJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellabilityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  demandLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expectedDaysToSell?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  authenticityRisk?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recommendedOffer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recommendedList?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  resaleStrategy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trueDiscountPercent?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  llmAnalyzed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  analysisDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  analysisConfidence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  analysisReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1324,6 +1884,26 @@ export type ListingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   daysListed?: boolean
   tags?: boolean
   requestToBuy?: boolean
+  identifiedBrand?: boolean
+  identifiedModel?: boolean
+  identifiedVariant?: boolean
+  identifiedCondition?: boolean
+  verifiedMarketValue?: boolean
+  marketDataSource?: boolean
+  marketDataDate?: boolean
+  comparableSalesJson?: boolean
+  sellabilityScore?: boolean
+  demandLevel?: boolean
+  expectedDaysToSell?: boolean
+  authenticityRisk?: boolean
+  recommendedOffer?: boolean
+  recommendedList?: boolean
+  resaleStrategy?: boolean
+  trueDiscountPercent?: boolean
+  llmAnalyzed?: boolean
+  analysisDate?: boolean
+  analysisConfidence?: boolean
+  analysisReasoning?: boolean
   opportunity?: boolean | Prisma.Listing$opportunityArgs<ExtArgs>
 }, ExtArgs["result"]["listing"]>
 
@@ -1362,6 +1942,26 @@ export type ListingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   daysListed?: boolean
   tags?: boolean
   requestToBuy?: boolean
+  identifiedBrand?: boolean
+  identifiedModel?: boolean
+  identifiedVariant?: boolean
+  identifiedCondition?: boolean
+  verifiedMarketValue?: boolean
+  marketDataSource?: boolean
+  marketDataDate?: boolean
+  comparableSalesJson?: boolean
+  sellabilityScore?: boolean
+  demandLevel?: boolean
+  expectedDaysToSell?: boolean
+  authenticityRisk?: boolean
+  recommendedOffer?: boolean
+  recommendedList?: boolean
+  resaleStrategy?: boolean
+  trueDiscountPercent?: boolean
+  llmAnalyzed?: boolean
+  analysisDate?: boolean
+  analysisConfidence?: boolean
+  analysisReasoning?: boolean
 }, ExtArgs["result"]["listing"]>
 
 export type ListingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1399,6 +1999,26 @@ export type ListingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   daysListed?: boolean
   tags?: boolean
   requestToBuy?: boolean
+  identifiedBrand?: boolean
+  identifiedModel?: boolean
+  identifiedVariant?: boolean
+  identifiedCondition?: boolean
+  verifiedMarketValue?: boolean
+  marketDataSource?: boolean
+  marketDataDate?: boolean
+  comparableSalesJson?: boolean
+  sellabilityScore?: boolean
+  demandLevel?: boolean
+  expectedDaysToSell?: boolean
+  authenticityRisk?: boolean
+  recommendedOffer?: boolean
+  recommendedList?: boolean
+  resaleStrategy?: boolean
+  trueDiscountPercent?: boolean
+  llmAnalyzed?: boolean
+  analysisDate?: boolean
+  analysisConfidence?: boolean
+  analysisReasoning?: boolean
 }, ExtArgs["result"]["listing"]>
 
 export type ListingSelectScalar = {
@@ -1436,9 +2056,29 @@ export type ListingSelectScalar = {
   daysListed?: boolean
   tags?: boolean
   requestToBuy?: boolean
+  identifiedBrand?: boolean
+  identifiedModel?: boolean
+  identifiedVariant?: boolean
+  identifiedCondition?: boolean
+  verifiedMarketValue?: boolean
+  marketDataSource?: boolean
+  marketDataDate?: boolean
+  comparableSalesJson?: boolean
+  sellabilityScore?: boolean
+  demandLevel?: boolean
+  expectedDaysToSell?: boolean
+  authenticityRisk?: boolean
+  recommendedOffer?: boolean
+  recommendedList?: boolean
+  resaleStrategy?: boolean
+  trueDiscountPercent?: boolean
+  llmAnalyzed?: boolean
+  analysisDate?: boolean
+  analysisConfidence?: boolean
+  analysisReasoning?: boolean
 }
 
-export type ListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "externalId" | "platform" | "url" | "title" | "description" | "askingPrice" | "condition" | "location" | "sellerName" | "sellerContact" | "imageUrls" | "category" | "postedAt" | "scrapedAt" | "estimatedValue" | "estimatedLow" | "estimatedHigh" | "profitPotential" | "profitLow" | "profitHigh" | "valueScore" | "discountPercent" | "resaleDifficulty" | "status" | "comparableUrls" | "priceReasoning" | "notes" | "shippable" | "estimatedWeight" | "negotiable" | "daysListed" | "tags" | "requestToBuy", ExtArgs["result"]["listing"]>
+export type ListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "externalId" | "platform" | "url" | "title" | "description" | "askingPrice" | "condition" | "location" | "sellerName" | "sellerContact" | "imageUrls" | "category" | "postedAt" | "scrapedAt" | "estimatedValue" | "estimatedLow" | "estimatedHigh" | "profitPotential" | "profitLow" | "profitHigh" | "valueScore" | "discountPercent" | "resaleDifficulty" | "status" | "comparableUrls" | "priceReasoning" | "notes" | "shippable" | "estimatedWeight" | "negotiable" | "daysListed" | "tags" | "requestToBuy" | "identifiedBrand" | "identifiedModel" | "identifiedVariant" | "identifiedCondition" | "verifiedMarketValue" | "marketDataSource" | "marketDataDate" | "comparableSalesJson" | "sellabilityScore" | "demandLevel" | "expectedDaysToSell" | "authenticityRisk" | "recommendedOffer" | "recommendedList" | "resaleStrategy" | "trueDiscountPercent" | "llmAnalyzed" | "analysisDate" | "analysisConfidence" | "analysisReasoning", ExtArgs["result"]["listing"]>
 export type ListingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   opportunity?: boolean | Prisma.Listing$opportunityArgs<ExtArgs>
 }
@@ -1485,6 +2125,26 @@ export type $ListingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     daysListed: number | null
     tags: string | null
     requestToBuy: string | null
+    identifiedBrand: string | null
+    identifiedModel: string | null
+    identifiedVariant: string | null
+    identifiedCondition: string | null
+    verifiedMarketValue: number | null
+    marketDataSource: string | null
+    marketDataDate: Date | null
+    comparableSalesJson: string | null
+    sellabilityScore: number | null
+    demandLevel: string | null
+    expectedDaysToSell: number | null
+    authenticityRisk: string | null
+    recommendedOffer: number | null
+    recommendedList: number | null
+    resaleStrategy: string | null
+    trueDiscountPercent: number | null
+    llmAnalyzed: boolean
+    analysisDate: Date | null
+    analysisConfidence: string | null
+    analysisReasoning: string | null
   }, ExtArgs["result"]["listing"]>
   composites: {}
 }
@@ -1943,6 +2603,26 @@ export interface ListingFieldRefs {
   readonly daysListed: Prisma.FieldRef<"Listing", 'Int'>
   readonly tags: Prisma.FieldRef<"Listing", 'String'>
   readonly requestToBuy: Prisma.FieldRef<"Listing", 'String'>
+  readonly identifiedBrand: Prisma.FieldRef<"Listing", 'String'>
+  readonly identifiedModel: Prisma.FieldRef<"Listing", 'String'>
+  readonly identifiedVariant: Prisma.FieldRef<"Listing", 'String'>
+  readonly identifiedCondition: Prisma.FieldRef<"Listing", 'String'>
+  readonly verifiedMarketValue: Prisma.FieldRef<"Listing", 'Float'>
+  readonly marketDataSource: Prisma.FieldRef<"Listing", 'String'>
+  readonly marketDataDate: Prisma.FieldRef<"Listing", 'DateTime'>
+  readonly comparableSalesJson: Prisma.FieldRef<"Listing", 'String'>
+  readonly sellabilityScore: Prisma.FieldRef<"Listing", 'Int'>
+  readonly demandLevel: Prisma.FieldRef<"Listing", 'String'>
+  readonly expectedDaysToSell: Prisma.FieldRef<"Listing", 'Int'>
+  readonly authenticityRisk: Prisma.FieldRef<"Listing", 'String'>
+  readonly recommendedOffer: Prisma.FieldRef<"Listing", 'Float'>
+  readonly recommendedList: Prisma.FieldRef<"Listing", 'Float'>
+  readonly resaleStrategy: Prisma.FieldRef<"Listing", 'String'>
+  readonly trueDiscountPercent: Prisma.FieldRef<"Listing", 'Float'>
+  readonly llmAnalyzed: Prisma.FieldRef<"Listing", 'Boolean'>
+  readonly analysisDate: Prisma.FieldRef<"Listing", 'DateTime'>
+  readonly analysisConfidence: Prisma.FieldRef<"Listing", 'String'>
+  readonly analysisReasoning: Prisma.FieldRef<"Listing", 'String'>
 }
     
 

@@ -76,6 +76,36 @@ model Listing {
   // AI-generated purchase request message
   requestToBuy    String?       // AI-generated message to send to seller
 
+  // LLM Item Identification
+  identifiedBrand     String?   // Brand identified by LLM
+  identifiedModel     String?   // Model identified by LLM
+  identifiedVariant   String?   // Variant/specs (256GB, Blue, etc.)
+  identifiedCondition String?   // Condition assessed by LLM
+
+  // Verified Market Data
+  verifiedMarketValue Float?    // True market value from eBay sold data
+  marketDataSource    String?   // "ebay_scrape", "ebay_api", etc.
+  marketDataDate      DateTime? // When market data was fetched
+  comparableSalesJson String?   // JSON array of actual sold listings
+
+  // LLM Sellability Analysis
+  sellabilityScore    Int?      // 0-100 sellability score
+  demandLevel         String?   // "low", "medium", "high", "very_high"
+  expectedDaysToSell  Int?      // Estimated days to sell
+  authenticityRisk    String?   // "low", "medium", "high"
+  recommendedOffer    Float?    // What to offer the seller
+  recommendedList     Float?    // What to list it for on resale
+  resaleStrategy      String?   // LLM-generated resale strategy
+
+  // True discount (verified vs algorithmic)
+  trueDiscountPercent Float?    // Actual discount based on verified market data
+
+  // Analysis metadata
+  llmAnalyzed         Boolean   @default(false)
+  analysisDate        DateTime?
+  analysisConfidence  String?   // "low", "medium", "high"
+  analysisReasoning   String?   // LLM explanation of assessment
+
   // Relations
   opportunity     Opportunity?
 
@@ -85,6 +115,8 @@ model Listing {
   @@index([status])
   @@index([valueScore])
   @@index([scrapedAt])
+  @@index([llmAnalyzed])
+  @@index([trueDiscountPercent])
 }
 
 // Flip opportunities we're actively pursuing
