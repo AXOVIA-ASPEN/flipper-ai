@@ -1,0 +1,175 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e5]:
+        - link [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img [ref=e7]
+        - generic [ref=e9]:
+          - img [ref=e11]
+          - generic [ref=e17]:
+            - heading "Opportunities" [level=1] [ref=e18]
+            - paragraph [ref=e19]: Track your flips from start to finish
+    - main [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e23]:
+          - generic [ref=e24]:
+            - paragraph [ref=e25]: Total Opportunities
+            - paragraph [ref=e26]: "2"
+          - img [ref=e28]
+        - generic [ref=e33]:
+          - generic [ref=e34]:
+            - paragraph [ref=e35]: Total Invested
+            - paragraph [ref=e36]: $500
+          - img [ref=e38]
+        - generic [ref=e43]:
+          - generic [ref=e44]:
+            - paragraph [ref=e45]: Total Revenue
+            - paragraph [ref=e46]: $0
+          - img [ref=e48]
+        - generic [ref=e53]:
+          - generic [ref=e54]:
+            - paragraph [ref=e55]: Total Profit
+            - paragraph [ref=e56]: $0
+          - img [ref=e58]
+      - generic [ref=e61]:
+        - generic [ref=e63]:
+          - img [ref=e64]
+          - textbox "Search opportunities..." [ref=e67]
+        - generic [ref=e68]:
+          - button "All Statuses" [ref=e69]:
+            - img [ref=e70]
+            - generic [ref=e74]: All Statuses
+          - button "Identified" [ref=e75]:
+            - img [ref=e76]
+            - generic [ref=e79]: Identified
+          - button "Contacted" [ref=e80]:
+            - img [ref=e81]
+            - generic [ref=e84]: Contacted
+          - button "Purchased" [ref=e85]:
+            - img [ref=e86]
+            - generic [ref=e90]: Purchased
+          - button "Listed" [ref=e91]:
+            - img [ref=e92]
+            - generic [ref=e96]: Listed
+          - button "Sold" [ref=e97]:
+            - img [ref=e98]
+            - generic [ref=e104]: Sold
+      - generic [ref=e105]:
+        - generic [ref=e108]:
+          - img "iPhone 13 Pro Max" [ref=e110]
+          - generic [ref=e112]:
+            - generic [ref=e113]:
+              - generic [ref=e114]:
+                - heading "iPhone 13 Pro Max" [level=3] [ref=e115]
+                - generic [ref=e116]:
+                  - generic [ref=e117]: craigslist
+                  - generic [ref=e118]: •
+                  - generic [ref=e119]: Tampa, FL
+                  - generic [ref=e120]: •
+                  - generic [ref=e121]: less than a minute ago
+              - generic [ref=e122]:
+                - img [ref=e123]
+                - generic [ref=e126]: IDENTIFIED
+            - generic [ref=e127]:
+              - generic [ref=e128]:
+                - paragraph [ref=e129]: Asking Price
+                - paragraph [ref=e130]: $600
+              - generic [ref=e131]:
+                - paragraph [ref=e132]: Est. Value
+                - paragraph [ref=e133]: $850
+              - generic [ref=e134]:
+                - paragraph [ref=e135]: Potential Profit
+                - paragraph [ref=e136]: $180
+              - generic [ref=e137]:
+                - paragraph [ref=e138]: Value Score
+                - paragraph [ref=e139]: "82"
+            - generic [ref=e140]:
+              - generic [ref=e141]:
+                - generic [ref=e142]:
+                  - generic [ref=e143]: Status
+                  - combobox [ref=e144]:
+                    - option "Identified" [selected]
+                    - option "Contacted"
+                    - option "Purchased"
+                    - option "Listed"
+                    - option "Sold"
+                - generic [ref=e145]:
+                  - generic [ref=e146]: Purchase Price
+                  - spinbutton [ref=e147]
+                - generic [ref=e148]:
+                  - generic [ref=e149]: Resale Price
+                  - spinbutton [ref=e150]
+                - generic [ref=e151]:
+                  - generic [ref=e152]: Fees
+                  - spinbutton [ref=e153]
+                - generic [ref=e154]:
+                  - generic [ref=e155]: Resale Platform
+                  - textbox "e.g., eBay, Facebook Marketplace" [ref=e156]
+                - generic [ref=e157]:
+                  - generic [ref=e158]: Notes
+                  - textbox "Add notes about this opportunity..." [ref=e159]
+              - generic [ref=e160]:
+                - button "Save Changes" [ref=e161]:
+                  - img [ref=e162]
+                  - text: Save Changes
+                - button "Cancel" [ref=e166]:
+                  - img [ref=e167]
+                  - text: Cancel
+            - link "View Listing" [ref=e171] [cursor=pointer]:
+              - /url: https://craigslist.org/item/1
+              - img [ref=e172]
+              - text: View Listing
+        - generic [ref=e178]:
+          - img [ref=e180]
+          - generic [ref=e184]:
+            - generic [ref=e185]:
+              - generic [ref=e186]:
+                - heading "MacBook Air M2" [level=3] [ref=e187]
+                - generic [ref=e188]:
+                  - generic [ref=e189]: craigslist
+                  - generic [ref=e190]: •
+                  - generic [ref=e191]: Orlando, FL
+                  - generic [ref=e192]: •
+                  - generic [ref=e193]: less than a minute ago
+              - generic [ref=e194]:
+                - img [ref=e195]
+                - generic [ref=e199]: PURCHASED
+            - generic [ref=e200]:
+              - generic [ref=e201]:
+                - paragraph [ref=e202]: Asking Price
+                - paragraph [ref=e203]: $550
+              - generic [ref=e204]:
+                - paragraph [ref=e205]: Est. Value
+                - paragraph [ref=e206]: $900
+              - generic [ref=e207]:
+                - paragraph [ref=e208]: Potential Profit
+                - paragraph [ref=e209]: $280
+              - generic [ref=e210]:
+                - paragraph [ref=e211]: Value Score
+                - paragraph [ref=e212]: "88"
+            - generic [ref=e213]:
+              - generic [ref=e215]:
+                - paragraph [ref=e216]: Purchase Price
+                - paragraph [ref=e217]: $500.00
+              - generic [ref=e218]:
+                - paragraph [ref=e219]: Notes
+                - paragraph [ref=e220]: Great condition, seller was flexible
+            - generic [ref=e221]:
+              - link "View Listing" [ref=e222] [cursor=pointer]:
+                - /url: https://craigslist.org/item/2
+                - img [ref=e223]
+                - text: View Listing
+              - button "Edit" [ref=e227]:
+                - img [ref=e228]
+                - text: Edit
+              - button "Delete" [ref=e231]:
+                - img [ref=e232]
+                - text: Delete
+  - button "Open Next.js Dev Tools" [ref=e240] [cursor=pointer]:
+    - img [ref=e241]
+  - alert [ref=e244]
+```

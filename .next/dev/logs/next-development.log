@@ -1,0 +1,79 @@
+[00:00:01.560] Server  LOG     ✓ Ready in 1283ms
+[00:00:07.106] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:07.182] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:07.197] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:07.561] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:07.738] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:09.780] Server  ERROR   Error fetching listings: DriverAdapterError: SQLITE_ERROR: no such table: main.Listing
+[00:00:09.940] Server  ERROR   Error fetching listings: DriverAdapterError: SQLITE_ERROR: no such table: main.Listing
+[00:00:10.040] Server  ERROR   Error fetching listings: DriverAdapterError: SQLITE_ERROR: no such table: main.Listing
+[00:00:10.140] Server  ERROR   Error fetching listings: DriverAdapterError: SQLITE_ERROR: no such table: main.Listing
+[00:00:10.213] Server  ERROR   Error fetching listings: DriverAdapterError: SQLITE_ERROR: no such table: main.Listing
+[00:00:10.592] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:10.839] Server  ERROR   Error fetching listings: DriverAdapterError: SQLITE_ERROR: no such table: main.Listing
+[00:00:11.192] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:11.210] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:11.525] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:11.785] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:14.267] Server  LOG     ○ Compiling /scraper ...
+[00:16:10.314] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:14.759] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:16.295] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:16.297] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:16.313] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:16.314] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:17.270] Server  ERROR   Error fetching opportunities: DriverAdapterError: SQLITE_ERROR: no such table: main.Opportunity
+[00:16:17.438] Server  ERROR   Error fetching opportunities: DriverAdapterError: SQLITE_ERROR: no such table: main.Opportunity
+[00:16:17.588] Server  ERROR   Error fetching opportunities: DriverAdapterError: SQLITE_ERROR: no such table: main.Opportunity
+[00:16:17.746] Server  ERROR   Error fetching opportunities: DriverAdapterError: SQLITE_ERROR: no such table: main.Opportunity
+[00:16:18.870] Server  ERROR   Error fetching opportunities: DriverAdapterError: SQLITE_ERROR: no such table: main.Opportunity
+[00:16:18.948] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:19.180] Server  ERROR   Error fetching opportunities: DriverAdapterError: SQLITE_ERROR: no such table: main.Opportunity
+[00:16:19.333] Server  ERROR   Error fetching opportunities: DriverAdapterError: SQLITE_ERROR: no such table: main.Opportunity
+[00:16:19.338] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:20.339] Server  ERROR   Error fetching listings: DriverAdapterError: SQLITE_ERROR: no such table: main.Listing
+[00:16:20.677] Server  ERROR   Error fetching listings: DriverAdapterError: SQLITE_ERROR: no such table: main.Listing
+[00:16:20.999] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:21.200] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:21.475] Server  ERROR   Error fetching opportunities: DriverAdapterError: SQLITE_ERROR: no such table: main.Opportunity
+[00:16:21.689] Server  ERROR   Error fetching listings: DriverAdapterError: SQLITE_ERROR: no such table: main.Listing
+[00:16:22.560] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:23.037] Server  ERROR   Error fetching opportunities: DriverAdapterError: SQLITE_ERROR: no such table: main.Opportunity
+[00:16:23.304] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:23.711] Server  ERROR   Error fetching opportunities: DriverAdapterError: SQLITE_ERROR: no such table: main.Opportunity
+[00:16:23.730] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:23.951] Server  ERROR   Error fetching opportunities: DriverAdapterError: SQLITE_ERROR: no such table: main.Opportunity
+[00:16:24.832] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:24.854] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:25.062] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:25.729] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:27.397] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:34.385] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:36.471] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:38.045] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:39.628] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:41.074] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:42.646] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:44.150] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:44.582] Server  ERROR   Error fetching scraper jobs: DriverAdapterError: SQLITE_ERROR: no such table: main.ScraperJob
+[00:16:45.055] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:45.506] Server  ERROR   Error fetching scraper jobs: DriverAdapterError: SQLITE_ERROR: no such table: main.ScraperJob
+[00:16:46.634] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:46.981] Server  ERROR   Error fetching scraper jobs: DriverAdapterError: SQLITE_ERROR: no such table: main.ScraperJob
+[00:16:47.031] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:47.311] Server  ERROR   Error fetching scraper jobs: DriverAdapterError: SQLITE_ERROR: no such table: main.ScraperJob
+[00:16:47.954] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:48.311] Server  ERROR   Error fetching scraper jobs: DriverAdapterError: SQLITE_ERROR: no such table: main.ScraperJob
+[00:16:48.554] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:48.819] Server  ERROR   Error fetching scraper jobs: DriverAdapterError: SQLITE_ERROR: no such table: main.ScraperJob
+[00:16:49.142] Server  ERROR   Error fetching listings: DriverAdapterError: SQLITE_ERROR: no such table: main.Listing
+[00:16:49.326] Server  ERROR   Error fetching listings: DriverAdapterError: SQLITE_ERROR: no such table: main.Listing
+[00:16:49.901] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:50.237] Server  ERROR   Error fetching scraper jobs: DriverAdapterError: SQLITE_ERROR: no such table: main.ScraperJob
+[00:16:51.637] Server  ERROR   Scraper error: SyntaxError: Unexpected end of JSON input
+[00:16:52.250] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:52.695] Server  ERROR   Error fetching scraper jobs: DriverAdapterError: SQLITE_ERROR: no such table: main.ScraperJob
+[00:16:53.324] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:53.756] Server  ERROR   Error fetching scraper jobs: DriverAdapterError: SQLITE_ERROR: no such table: main.ScraperJob
+[00:16:54.633] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:54.889] Server  ERROR   Error fetching scraper jobs: DriverAdapterError: SQLITE_ERROR: no such table: main.ScraperJob

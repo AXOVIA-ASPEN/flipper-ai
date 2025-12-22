@@ -54,9 +54,9 @@
 |----------|-------|--------|
 | `GET /api/listings` | 8 tests | ✅ Complete |
 | `POST /api/listings` | 19 tests | ✅ Complete |
-| `GET /api/listings/[id]` | 0 tests | ❌ Missing |
-| `PATCH /api/listings/[id]` | 0 tests | ❌ Missing |
-| `DELETE /api/listings/[id]` | 0 tests | ❌ Missing |
+| `GET /api/listings/[id]` | 4 tests | ✅ Complete |
+| `PATCH /api/listings/[id]` | 5 tests | ✅ Complete |
+| `DELETE /api/listings/[id]` | 3 tests | ✅ Complete |
 
 **Tested Behaviors (GET)**:
 - ✅ Default pagination (limit 50, offset 0)
@@ -90,9 +90,6 @@
 - ✅ Handle missing optional fields
 
 **NOT Tested**:
-- ❌ `GET /api/listings/[id]` - single listing fetch
-- ❌ `PATCH /api/listings/[id]` - update listing
-- ❌ `DELETE /api/listings/[id]` - delete listing
 - ❌ Integration tests with real database
 
 ---
@@ -105,9 +102,9 @@
 | Endpoint | Tests | Status |
 |----------|-------|--------|
 | `GET /api/opportunities` | 3 tests | ✅ Complete |
-| `POST /api/opportunities` | 3 tests | ✅ Complete |
+| `POST /api/opportunities` | 5 tests | ✅ Complete |
 | `GET /api/opportunities/[id]` | 2 tests | ✅ Complete |
-| `PATCH /api/opportunities/[id]` | 3 tests | ✅ Complete |
+| `PATCH /api/opportunities/[id]` | 5 tests | ✅ Complete |
 | `DELETE /api/opportunities/[id]` | 3 tests | ✅ Complete |
 
 **Tested Behaviors**:
@@ -121,12 +118,13 @@
 - ✅ Auto-calculate actualProfit (resalePrice - purchasePrice - fees)
 - ✅ Delete opportunity and reset listing status
 - ✅ All error handling (500)
+- ✅ Listing not found handling on POST (404)
+- ✅ Duplicate opportunity prevention (409)
+- ✅ Status transitions (IDENTIFIED → CONTACTED → PURCHASED → LISTED → SOLD)
+- ✅ Purchase/resale date handling in PATCH payloads
 
 **NOT Tested**:
-- ❌ Duplicate opportunity prevention (listing already has opportunity)
-- ❌ Listing not found handling on POST
-- ❌ Status transitions validation
-- ❌ Date field handling (purchaseDate, resaleDate)
+- (None - coverage added)
 
 ---
 
