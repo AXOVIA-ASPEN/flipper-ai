@@ -72,11 +72,11 @@ test.describe("Scraper Page", () => {
       await page.goto("/scraper");
 
       // When I set min price
-      const minPriceInput = page.getByPlaceholder("0");
+      const minPriceInput = page.getByLabel("Min Price");
       await minPriceInput.fill("50");
 
       // And I set max price
-      const maxPriceInput = page.getByPlaceholder("1000");
+      const maxPriceInput = page.getByLabel("Max Price");
       await maxPriceInput.fill("500");
 
       // Then the prices should be set

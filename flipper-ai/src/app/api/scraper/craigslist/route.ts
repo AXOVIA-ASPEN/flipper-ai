@@ -163,6 +163,8 @@ async function scrapeCraigslistWithPlaywright(
 
 // POST /api/scraper/craigslist - Run scraper
 export async function POST(request: NextRequest) {
+  let job = null;
+
   try {
     const body = await request.json();
     const { location, category, keywords, minPrice, maxPrice } = body;
@@ -174,6 +176,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Create scraper job record
+    job = await prisma.scraperJob.create({
+      data: {
+        platform: "CRAIGSLIST",
+        location,
+        category,
+        status: "RUNNING",
+        startedAt: new Date(),
+      },
+    });
+
     // Scrape listings using Playwright
     const listings = await scrapeCraigslistWithPlaywright(
       location,
@@ -184,16 +197,29 @@ export async function POST(request: NextRequest) {
     );
 
     if (listings.length === 0) {
+      // Update job as completed with no results
+      await prisma.scraperJob.update({
+        where: { id: job.id },
+        data: {
+          status: "COMPLETED",
+          listingsFound: 0,
+          opportunitiesFound: 0,
+          completedAt: new Date(),
+        },
+      });
+
       return NextResponse.json({
         success: true,
         message: "No listings found matching your criteria. Try different search parameters.",
         listings: [],
         savedCount: 0,
+        jobId: job.id,
       });
     }
 
     // Save listings to database with value estimation
     let savedCount = 0;
+    let opportunitiesFound = 0;
     const savedListings: Array<{
       title: string;
       price: string;
@@ -300,6 +326,9 @@ export async function POST(request: NextRequest) {
         });
 
         savedCount++;
+        if (estimation.valueScore >= 70) {
+          opportunitiesFound++;
+        }
         savedListings.push({
           title: item.title,
           price: `$${item.price}`,
@@ -312,19 +341,48 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Update job as completed
+    if (job) {
+      await prisma.scraperJob.update({
+        where: { id: job.id },
+        data: {
+          status: "COMPLETED",
+          listingsFound: savedCount,
+          opportunitiesFound,
+          completedAt: new Date(),
+        },
+      });
+    }
+
     return NextResponse.json({
       success: true,
       message: `Successfully scraped ${listings.length} listings`,
       listings: savedListings,
       savedCount,
+      opportunitiesFound,
+      jobId: job?.id,
     });
   } catch (error) {
     console.error("Scraper error:", error);
+
+    // Update job as failed
+    if (job) {
+      await prisma.scraperJob.update({
+        where: { id: job.id },
+        data: {
+          status: "FAILED",
+          errorMessage: error instanceof Error ? error.message : "Unknown error",
+          completedAt: new Date(),
+        },
+      });
+    }
+
     return NextResponse.json(
       {
         success: false,
         message: "Failed to scrape listings",
         error: error instanceof Error ? error.message : "Unknown error",
+        jobId: job?.id,
       },
       { status: 500 }
     );

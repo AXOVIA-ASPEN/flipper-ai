@@ -1,18 +1,25 @@
 import { NextRequest } from 'next/server';
 import { GET, POST } from '@/app/api/listings/route';
+import { GET as GET_BY_ID, PATCH, DELETE } from '@/app/api/listings/[id]/route';
 
 // Mock Prisma client
 const mockFindMany = jest.fn();
+const mockFindUnique = jest.fn();
 const mockCount = jest.fn();
 const mockUpsert = jest.fn();
+const mockUpdate = jest.fn();
+const mockDelete = jest.fn();
 
 jest.mock('@/lib/db', () => ({
   __esModule: true,
   default: {
     listing: {
       findMany: (...args: unknown[]) => mockFindMany(...args),
+      findUnique: (...args: unknown[]) => mockFindUnique(...args),
       count: (...args: unknown[]) => mockCount(...args),
       upsert: (...args: unknown[]) => mockUpsert(...args),
+      update: (...args: unknown[]) => mockUpdate(...args),
+      delete: (...args: unknown[]) => mockDelete(...args),
     },
   },
 }));
@@ -564,6 +571,195 @@ describe('Listings API', () => {
       const response = await POST(request);
 
       expect(response.status).toBe(201);
+    });
+  });
+
+  describe('GET /api/listings/[id]', () => {
+    const mockListing = {
+      id: 'listing-123',
+      externalId: 'ext-123',
+      platform: 'CRAIGSLIST',
+      url: 'https://craigslist.org/item/123',
+      title: 'Test iPhone',
+      askingPrice: 500,
+      estimatedValue: 700,
+      valueScore: 75,
+      status: 'OPPORTUNITY',
+      opportunity: null,
+    };
+
+    it('should return a single listing by ID', async () => {
+      mockFindUnique.mockResolvedValue(mockListing);
+
+      const request = createMockRequest('GET', '/api/listings/listing-123');
+      const response = await GET_BY_ID(request, { params: Promise.resolve({ id: 'listing-123' }) });
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data).toEqual(mockListing);
+      expect(mockFindUnique).toHaveBeenCalledWith({
+        where: { id: 'listing-123' },
+        include: { opportunity: true },
+      });
+    });
+
+    it('should return 404 if listing not found', async () => {
+      mockFindUnique.mockResolvedValue(null);
+
+      const request = createMockRequest('GET', '/api/listings/nonexistent');
+      const response = await GET_BY_ID(request, { params: Promise.resolve({ id: 'nonexistent' }) });
+      const data = await response.json();
+
+      expect(response.status).toBe(404);
+      expect(data.error).toBe('Listing not found');
+    });
+
+    it('should include opportunity relation in response', async () => {
+      const listingWithOpportunity = {
+        ...mockListing,
+        opportunity: {
+          id: 'opp-1',
+          status: 'IDENTIFIED',
+          purchasePrice: null,
+        },
+      };
+      mockFindUnique.mockResolvedValue(listingWithOpportunity);
+
+      const request = createMockRequest('GET', '/api/listings/listing-123');
+      const response = await GET_BY_ID(request, { params: Promise.resolve({ id: 'listing-123' }) });
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.opportunity).toBeDefined();
+      expect(data.opportunity.id).toBe('opp-1');
+    });
+
+    it('should return 500 on database error', async () => {
+      mockFindUnique.mockRejectedValue(new Error('Database error'));
+
+      const request = createMockRequest('GET', '/api/listings/listing-123');
+      const response = await GET_BY_ID(request, { params: Promise.resolve({ id: 'listing-123' }) });
+      const data = await response.json();
+
+      expect(response.status).toBe(500);
+      expect(data.error).toBe('Failed to fetch listing');
+    });
+  });
+
+  describe('PATCH /api/listings/[id]', () => {
+    const mockListing = {
+      id: 'listing-123',
+      title: 'Updated iPhone',
+      status: 'CONTACTED',
+    };
+
+    it('should update a listing', async () => {
+      mockUpdate.mockResolvedValue(mockListing);
+
+      const request = createMockRequest('PATCH', '/api/listings/listing-123', {
+        title: 'Updated iPhone',
+        status: 'CONTACTED',
+      });
+      const response = await PATCH(request, { params: Promise.resolve({ id: 'listing-123' }) });
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data).toEqual(mockListing);
+    });
+
+    it('should update listing status', async () => {
+      mockUpdate.mockResolvedValue({ ...mockListing, status: 'PURCHASED' });
+
+      const request = createMockRequest('PATCH', '/api/listings/listing-123', {
+        status: 'PURCHASED',
+      });
+      const response = await PATCH(request, { params: Promise.resolve({ id: 'listing-123' }) });
+
+      expect(mockUpdate).toHaveBeenCalledWith({
+        where: { id: 'listing-123' },
+        data: { status: 'PURCHASED' },
+      });
+    });
+
+    it('should update multiple fields at once', async () => {
+      const updateData = {
+        title: 'New Title',
+        askingPrice: 450,
+        notes: 'Price negotiated down',
+      };
+      mockUpdate.mockResolvedValue({ id: 'listing-123', ...updateData });
+
+      const request = createMockRequest('PATCH', '/api/listings/listing-123', updateData);
+      await PATCH(request, { params: Promise.resolve({ id: 'listing-123' }) });
+
+      expect(mockUpdate).toHaveBeenCalledWith({
+        where: { id: 'listing-123' },
+        data: updateData,
+      });
+    });
+
+    it('should return 500 on database error', async () => {
+      mockUpdate.mockRejectedValue(new Error('Database error'));
+
+      const request = createMockRequest('PATCH', '/api/listings/listing-123', {
+        status: 'CONTACTED',
+      });
+      const response = await PATCH(request, { params: Promise.resolve({ id: 'listing-123' }) });
+      const data = await response.json();
+
+      expect(response.status).toBe(500);
+      expect(data.error).toBe('Failed to update listing');
+    });
+
+    it('should return 500 when listing does not exist', async () => {
+      mockUpdate.mockRejectedValue(new Error('Record not found'));
+
+      const request = createMockRequest('PATCH', '/api/listings/nonexistent', {
+        status: 'CONTACTED',
+      });
+      const response = await PATCH(request, { params: Promise.resolve({ id: 'nonexistent' }) });
+      const data = await response.json();
+
+      expect(response.status).toBe(500);
+      expect(data.error).toBe('Failed to update listing');
+    });
+  });
+
+  describe('DELETE /api/listings/[id]', () => {
+    it('should delete a listing', async () => {
+      mockDelete.mockResolvedValue({ id: 'listing-123' });
+
+      const request = createMockRequest('DELETE', '/api/listings/listing-123');
+      const response = await DELETE(request, { params: Promise.resolve({ id: 'listing-123' }) });
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      expect(mockDelete).toHaveBeenCalledWith({
+        where: { id: 'listing-123' },
+      });
+    });
+
+    it('should return 500 on database error', async () => {
+      mockDelete.mockRejectedValue(new Error('Database error'));
+
+      const request = createMockRequest('DELETE', '/api/listings/listing-123');
+      const response = await DELETE(request, { params: Promise.resolve({ id: 'listing-123' }) });
+      const data = await response.json();
+
+      expect(response.status).toBe(500);
+      expect(data.error).toBe('Failed to delete listing');
+    });
+
+    it('should return 500 when listing does not exist', async () => {
+      mockDelete.mockRejectedValue(new Error('Record not found'));
+
+      const request = createMockRequest('DELETE', '/api/listings/nonexistent');
+      const response = await DELETE(request, { params: Promise.resolve({ id: 'nonexistent' }) });
+      const data = await response.json();
+
+      expect(response.status).toBe(500);
+      expect(data.error).toBe('Failed to delete listing');
     });
   });
 });

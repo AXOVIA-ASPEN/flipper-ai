@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   MapPin,
@@ -11,8 +11,14 @@ import {
   AlertCircle,
   ArrowLeft,
   Package,
+  Clock,
+  Trash2,
+  RefreshCw,
+  XCircle,
+  History,
 } from "lucide-react";
 import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
 
 interface ScrapedListing {
   title: string;
@@ -27,7 +33,23 @@ interface ScrapeResult {
   message: string;
   listings?: ScrapedListing[];
   savedCount?: number;
+  opportunitiesFound?: number;
+  jobId?: string;
   error?: string;
+}
+
+interface ScraperJob {
+  id: string;
+  platform: string;
+  location: string | null;
+  category: string | null;
+  status: string;
+  listingsFound: number;
+  opportunitiesFound: number;
+  errorMessage: string | null;
+  startedAt: string | null;
+  completedAt: string | null;
+  createdAt: string;
 }
 
 export default function ScraperPage() {
@@ -39,6 +61,62 @@ export default function ScraperPage() {
   const [maxPrice, setMaxPrice] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ScrapeResult | null>(null);
+
+  // Job history state
+  const [jobs, setJobs] = useState<ScraperJob[]>([]);
+  const [jobsLoading, setJobsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+
+  async function fetchJobs() {
+    try {
+      const response = await fetch("/api/scraper-jobs?limit=10");
+      const data = await response.json();
+      setJobs(data.jobs || []);
+    } catch (error) {
+      console.error("Failed to fetch jobs:", error);
+    } finally {
+      setJobsLoading(false);
+    }
+  }
+
+  async function deleteJob(id: string) {
+    if (!confirm("Delete this job from history?")) return;
+    try {
+      await fetch(`/api/scraper-jobs/${id}`, { method: "DELETE" });
+      fetchJobs();
+    } catch (error) {
+      console.error("Failed to delete job:", error);
+    }
+  }
+
+  function getStatusColor(status: string) {
+    switch (status) {
+      case "COMPLETED":
+        return "text-green-400";
+      case "RUNNING":
+        return "text-blue-400";
+      case "FAILED":
+        return "text-red-400";
+      default:
+        return "text-gray-400";
+    }
+  }
+
+  function getStatusIcon(status: string) {
+    switch (status) {
+      case "COMPLETED":
+        return <CheckCircle className="w-4 h-4" />;
+      case "RUNNING":
+        return <Loader2 className="w-4 h-4 animate-spin" />;
+      case "FAILED":
+        return <XCircle className="w-4 h-4" />;
+      default:
+        return <Clock className="w-4 h-4" />;
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,12 +138,15 @@ export default function ScraperPage() {
 
       const data = await response.json();
       setResult(data);
+      // Refresh job history after scrape
+      fetchJobs();
     } catch (error) {
       setResult({
         success: false,
         message: "Failed to run scraper",
         error: error instanceof Error ? error.message : "Unknown error",
       });
+      fetchJobs();
     } finally {
       setLoading(false);
     }
@@ -101,22 +182,32 @@ export default function ScraperPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+      {/* Animated background gradient orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 -left-4 w-96 h-96 bg-theme-orb-1 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute top-0 -right-4 w-96 h-96 bg-theme-orb-2 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-96 h-96 bg-theme-orb-3 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
+
       {/* Header */}
-      <header className="bg-[var(--card)] border-b border-[var(--border)] sticky top-0 z-10">
+      <header className="relative backdrop-blur-xl bg-white/10 border-b border-white/20 shadow-2xl sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-16 gap-4">
             <Link
               href="/"
-              className="p-2 hover:bg-[var(--secondary)] rounded-lg transition-colors"
+              className="p-2 hover:bg-white/20 rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-purple-500/50 group"
             >
-              <ArrowLeft className="w-5 h-5 text-[var(--muted-foreground)]" />
+              <ArrowLeft className="w-5 h-5 text-white group-hover:text-purple-200 transition-colors" />
             </Link>
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/50 animate-pulse-slow">
+              <Search className="w-6 h-6 text-white" />
+            </div>
             <div>
-              <h1 className="text-xl font-bold text-[var(--foreground)]">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-purple-200 via-pink-200 to-blue-200 bg-clip-text text-transparent">
                 Scrape Listings
               </h1>
-              <p className="text-xs text-[var(--muted-foreground)]">
+              <p className="text-xs text-blue-200/70">
                 Find deals on Craigslist
               </p>
             </div>
@@ -124,28 +215,28 @@ export default function ScraperPage() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Scraper Form */}
         <form
           onSubmit={handleSubmit}
-          className="bg-[var(--card)] rounded-xl border border-[var(--border)] p-6"
+          className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-6 shadow-xl"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Platform */}
             <div>
-              <label className="block text-sm font-medium text-[var(--foreground)] mb-2">
+              <label className="block text-sm font-medium text-blue-200/90 mb-2">
                 Platform
               </label>
               <select
                 value={platform}
                 onChange={(e) => setPlatform(e.target.value)}
-                className="w-full px-4 py-2 bg-[var(--secondary)] rounded-lg border border-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-[var(--foreground)]"
+                className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white transition-all duration-300 hover:bg-white/15"
               >
-                <option value="craigslist">Craigslist</option>
-                <option value="facebook" disabled>
+                <option value="craigslist" className="bg-slate-800 text-white">Craigslist</option>
+                <option value="facebook" disabled className="bg-slate-800 text-gray-400">
                   Facebook Marketplace (coming soon)
                 </option>
-                <option value="offerup" disabled>
+                <option value="offerup" disabled className="bg-slate-800 text-gray-400">
                   OfferUp (coming soon)
                 </option>
               </select>
@@ -153,17 +244,17 @@ export default function ScraperPage() {
 
             {/* Location */}
             <div>
-              <label className="block text-sm font-medium text-[var(--foreground)] mb-2">
+              <label className="block text-sm font-medium text-blue-200/90 mb-2">
                 <MapPin className="w-4 h-4 inline mr-1" />
                 Location
               </label>
               <select
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="w-full px-4 py-2 bg-[var(--secondary)] rounded-lg border border-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-[var(--foreground)]"
+                className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white transition-all duration-300 hover:bg-white/15"
               >
                 {locations.map((loc) => (
-                  <option key={loc.value} value={loc.value}>
+                  <option key={loc.value} value={loc.value} className="bg-slate-800 text-white">
                     {loc.label}
                   </option>
                 ))}
@@ -172,17 +263,17 @@ export default function ScraperPage() {
 
             {/* Category */}
             <div>
-              <label className="block text-sm font-medium text-[var(--foreground)] mb-2">
+              <label className="block text-sm font-medium text-blue-200/90 mb-2">
                 <Tag className="w-4 h-4 inline mr-1" />
                 Category
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-4 py-2 bg-[var(--secondary)] rounded-lg border border-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-[var(--foreground)]"
+                className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white transition-all duration-300 hover:bg-white/15"
               >
                 {categories.map((cat) => (
-                  <option key={cat.value} value={cat.value}>
+                  <option key={cat.value} value={cat.value} className="bg-slate-800 text-white">
                     {cat.label}
                   </option>
                 ))}
@@ -191,7 +282,7 @@ export default function ScraperPage() {
 
             {/* Keywords */}
             <div>
-              <label className="block text-sm font-medium text-[var(--foreground)] mb-2">
+              <label className="block text-sm font-medium text-blue-200/90 mb-2">
                 <Search className="w-4 h-4 inline mr-1" />
                 Keywords (optional)
               </label>
@@ -200,13 +291,13 @@ export default function ScraperPage() {
                 value={keywords}
                 onChange={(e) => setKeywords(e.target.value)}
                 placeholder="e.g., iPhone, Nintendo, Dyson"
-                className="w-full px-4 py-2 bg-[var(--secondary)] rounded-lg border border-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-[var(--foreground)]"
+                className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white placeholder-blue-200/50 transition-all duration-300 hover:bg-white/15"
               />
             </div>
 
             {/* Min Price */}
             <div>
-              <label className="block text-sm font-medium text-[var(--foreground)] mb-2">
+              <label className="block text-sm font-medium text-blue-200/90 mb-2">
                 <DollarSign className="w-4 h-4 inline mr-1" />
                 Min Price
               </label>
@@ -216,13 +307,13 @@ export default function ScraperPage() {
                 onChange={(e) => setMinPrice(e.target.value)}
                 placeholder="0"
                 min="0"
-                className="w-full px-4 py-2 bg-[var(--secondary)] rounded-lg border border-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-[var(--foreground)]"
+                className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white placeholder-blue-200/50 transition-all duration-300 hover:bg-white/15"
               />
             </div>
 
             {/* Max Price */}
             <div>
-              <label className="block text-sm font-medium text-[var(--foreground)] mb-2">
+              <label className="block text-sm font-medium text-blue-200/90 mb-2">
                 <DollarSign className="w-4 h-4 inline mr-1" />
                 Max Price
               </label>
@@ -232,7 +323,7 @@ export default function ScraperPage() {
                 onChange={(e) => setMaxPrice(e.target.value)}
                 placeholder="1000"
                 min="0"
-                className="w-full px-4 py-2 bg-[var(--secondary)] rounded-lg border border-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-[var(--foreground)]"
+                className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white placeholder-blue-200/50 transition-all duration-300 hover:bg-white/15"
               />
             </div>
           </div>
@@ -241,7 +332,7 @@ export default function ScraperPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[var(--primary)] text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-lg hover:from-purple-600 hover:to-pink-700 transition-all duration-300 shadow-lg shadow-purple-500/50 hover:shadow-purple-500/80 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {loading ? (
                 <>
@@ -263,72 +354,72 @@ export default function ScraperPage() {
           <div className="mt-8">
             {/* Status Message */}
             <div
-              className={`p-4 rounded-xl border ${
+              className={`p-4 rounded-xl border shadow-lg ${
                 result.success
-                  ? "bg-green-50 border-green-200 text-green-800"
-                  : "bg-red-50 border-red-200 text-red-800"
+                  ? "backdrop-blur-xl bg-gradient-to-r from-green-400/20 to-emerald-600/20 border-green-400/50 text-white shadow-green-500/30"
+                  : "backdrop-blur-xl bg-gradient-to-r from-red-400/20 to-pink-600/20 border-red-400/50 text-white shadow-red-500/30"
               }`}
             >
               <div className="flex items-center gap-2">
                 {result.success ? (
-                  <CheckCircle className="w-5 h-5" />
+                  <CheckCircle className="w-5 h-5 text-green-300" />
                 ) : (
-                  <AlertCircle className="w-5 h-5" />
+                  <AlertCircle className="w-5 h-5 text-red-300" />
                 )}
                 <span className="font-medium">{result.message}</span>
               </div>
               {result.savedCount !== undefined && (
-                <p className="mt-1 text-sm">
+                <p className="mt-1 text-sm text-blue-200/70">
                   {result.savedCount} listings saved to database
                 </p>
               )}
               {result.error && (
-                <p className="mt-1 text-sm opacity-75">{result.error}</p>
+                <p className="mt-1 text-sm text-blue-200/50">{result.error}</p>
               )}
             </div>
 
             {/* Scraped Listings Preview */}
             {result.listings && result.listings.length > 0 && (
-              <div className="mt-6 bg-[var(--card)] rounded-xl border border-[var(--border)] overflow-hidden">
-                <div className="p-4 border-b border-[var(--border)]">
-                  <h3 className="font-semibold text-[var(--foreground)]">
+              <div className="mt-6 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 overflow-hidden shadow-xl">
+                <div className="p-4 border-b border-white/10 bg-white/5">
+                  <h3 className="font-semibold bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-transparent">
                     Found {result.listings.length} Listings
                   </h3>
                 </div>
-                <div className="divide-y divide-[var(--border)]">
+                <div className="divide-y divide-white/10">
                   {result.listings.slice(0, 10).map((listing, index) => (
                     <div
                       key={index}
-                      className="p-4 flex items-center gap-4 hover:bg-[var(--secondary)] transition-colors"
+                      className="p-4 flex items-center gap-4 hover:bg-white/5 transition-all duration-300"
                     >
                       {listing.imageUrl ? (
                         <img
                           src={listing.imageUrl}
                           alt={listing.title}
-                          className="w-16 h-16 object-cover rounded-lg"
+                          className="w-16 h-16 object-cover rounded-lg border-2 border-white/20 ring-2 ring-white/10"
                         />
                       ) : (
-                        <div className="w-16 h-16 bg-[var(--secondary)] rounded-lg flex items-center justify-center">
-                          <Package className="w-6 h-6 text-[var(--muted-foreground)]" />
+                        <div className="w-16 h-16 bg-white/10 rounded-lg flex items-center justify-center border border-white/20">
+                          <Package className="w-6 h-6 text-blue-200/50" />
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-[var(--foreground)] truncate">
+                        <p className="font-medium text-white truncate">
                           {listing.title}
                         </p>
-                        <p className="text-sm text-[var(--muted-foreground)]">
+                        <p className="text-sm text-blue-200/70">
                           {listing.location}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-green-600">
+                        <p className="font-bold bg-gradient-to-r from-green-300 to-emerald-300 bg-clip-text text-transparent">
                           {listing.price}
                         </p>
                         <a
                           href={listing.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm text-[var(--primary)] hover:underline"
+                          className="text-sm text-blue-300 hover:text-blue-200 transition-colors hover:underline"
                         >
                           View
                         </a>
@@ -337,7 +428,7 @@ export default function ScraperPage() {
                   ))}
                 </div>
                 {result.listings.length > 10 && (
-                  <div className="p-4 text-center text-[var(--muted-foreground)] border-t border-[var(--border)]">
+                  <div className="p-4 text-center text-blue-200/70 border-t border-white/10 bg-white/5">
                     +{result.listings.length - 10} more listings saved
                   </div>
                 )}
@@ -349,7 +440,7 @@ export default function ScraperPage() {
               <div className="mt-6 text-center">
                 <Link
                   href="/"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--secondary)] text-[var(--foreground)] rounded-lg hover:bg-[var(--border)] transition-colors"
+                  className="inline-flex items-center gap-2 px-6 py-3 backdrop-blur-xl bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all duration-300 border border-white/20 shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-105"
                 >
                   View Dashboard
                   <ArrowLeft className="w-4 h-4 rotate-180" />
@@ -358,6 +449,96 @@ export default function ScraperPage() {
             )}
           </div>
         )}
+
+        {/* Job History Section */}
+        <div className="mt-8 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 overflow-hidden shadow-xl">
+          <div className="p-4 border-b border-white/10 bg-white/5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <History className="w-5 h-5 text-purple-300" />
+              <h3 className="font-semibold bg-gradient-to-r from-purple-200 to-pink-200 bg-clip-text text-transparent">
+                Recent Scraper Jobs
+              </h3>
+            </div>
+            <button
+              onClick={() => fetchJobs()}
+              className="p-1.5 hover:bg-white/10 rounded transition-all text-blue-300"
+              title="Refresh"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </button>
+          </div>
+
+          {jobsLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="w-6 h-6 text-blue-400 animate-spin" />
+            </div>
+          ) : jobs.length === 0 ? (
+            <p className="text-center text-blue-200/50 py-6">
+              No scraper jobs yet. Run your first scrape above.
+            </p>
+          ) : (
+            <div className="divide-y divide-white/10">
+              {jobs.map((job) => (
+                <div
+                  key={job.id}
+                  className="p-4 flex items-center gap-4 hover:bg-white/5 transition-all duration-300"
+                >
+                  <div className={`${getStatusColor(job.status)}`}>
+                    {getStatusIcon(job.status)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-medium text-white">
+                        {job.platform}
+                      </span>
+                      <span className="px-1.5 py-0.5 text-xs rounded bg-purple-500/30 text-purple-200">
+                        {job.status}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2 text-xs text-blue-200/60">
+                      {job.location && (
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3 h-3" />
+                          {job.location}
+                        </span>
+                      )}
+                      {job.category && (
+                        <span className="flex items-center gap-1">
+                          <Tag className="w-3 h-3" />
+                          {job.category}
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}
+                      </span>
+                    </div>
+                    {job.errorMessage && (
+                      <p className="text-xs text-red-300 mt-1">{job.errorMessage}</p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-white">
+                      {job.listingsFound} listings
+                    </p>
+                    {job.opportunitiesFound > 0 && (
+                      <p className="text-xs text-green-300">
+                        {job.opportunitiesFound} opportunities
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => deleteJob(job.id)}
+                    className="p-1.5 hover:bg-red-500/20 rounded transition-all text-red-400"
+                    title="Delete"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );
