@@ -1,7 +1,7 @@
 # Flipper.ai Makefile
 # ====================
 
-.PHONY: help install dev preview build start db-migrate db-studio db-reset clean
+.PHONY: help install dev preview build start db-migrate db-studio db-reset clean test test-e2e test-e2e-ui
 
 # Default target
 help:
@@ -17,6 +17,11 @@ help:
 	@echo "  make db-studio  - Open Prisma Studio (database GUI)"
 	@echo "  make db-reset   - Reset database (WARNING: deletes all data)"
 	@echo "  make clean      - Remove build artifacts"
+	@echo ""
+	@echo "Testing:"
+	@echo "  make test       - Run unit tests (Jest)"
+	@echo "  make test-e2e   - Run E2E tests (Playwright)"
+	@echo "  make test-e2e-ui - Run E2E tests with UI (Playwright)"
 
 # Install dependencies
 install:
@@ -57,3 +62,15 @@ db-reset:
 clean:
 	rm -rf .next
 	rm -rf node_modules/.cache
+
+# Unit tests (Jest)
+test:
+	pnpm test
+
+# E2E tests (Playwright)
+test-e2e:
+	pnpm test:e2e
+
+# E2E tests with UI (Playwright)
+test-e2e-ui:
+	pnpm test:e2e:ui

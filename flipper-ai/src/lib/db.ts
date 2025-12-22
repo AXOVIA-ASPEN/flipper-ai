@@ -5,9 +5,15 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
+const defaultDatabaseUrl = "file:./dev.db";
+
+function resolveDatabaseUrl() {
+  return process.env.DATABASE_URL ?? defaultDatabaseUrl;
+}
+
 function createPrismaClient() {
   const adapter = new PrismaLibSql({
-    url: "file:prisma/dev.db",
+    url: resolveDatabaseUrl(),
   });
   return new PrismaClient({ adapter });
 }

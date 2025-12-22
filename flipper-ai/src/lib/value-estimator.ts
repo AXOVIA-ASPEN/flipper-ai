@@ -68,7 +68,7 @@ const RISK_KEYWORDS = [
 ];
 
 // Keywords that indicate negotiable pricing
-const NEGOTIABLE_KEYWORDS = /obo|or best offer|negotiable|make.?offer|flexible|willing to negotiate|best offer/i;
+const NEGOTIABLE_KEYWORDS = /obo|or best offer|negotiable|make\s*(an\s*)?offer|flexible|willing to negotiate|best offer/i;
 
 // Keywords that indicate local pickup only (not shippable)
 const LOCAL_ONLY_KEYWORDS = /local pickup|pickup only|no shipping|cash only|must pick up|local only|in person/i;
@@ -340,15 +340,18 @@ export function detectCategory(title: string, description: string | null): strin
   const fullText = `${title} ${description || ""}`.toLowerCase();
 
   const categoryPatterns: [string, RegExp][] = [
-    ["electronics", /phone|laptop|computer|tablet|tv|monitor|camera|speaker|headphone|gaming|console/],
+    // Musical first - DJ equipment and instruments (before video games due to "controller")
+    ["musical", /guitar|piano|keyboard|drum|amp|amplifier|instrument|dj\b|ddj|pioneer\s*ddj/],
+    // Video games next - consoles and gaming (before electronics due to "console", "controller")
+    ["video games", /playstation|xbox|nintendo|game\b|ps5|ps4|switch|wii/],
+    // Electronics - general tech items
+    ["electronics", /phone|ipad|laptop|computer|tablet|tv|monitor|camera|speaker|headphone|gaming|console/],
     ["furniture", /couch|sofa|table|chair|desk|bed|dresser|cabinet|shelf/],
     ["appliances", /washer|dryer|refrigerator|fridge|dishwasher|microwave|oven|vacuum/],
     ["tools", /drill|saw|wrench|hammer|power tool|dewalt|milwaukee|makita/],
-    ["video games", /playstation|xbox|nintendo|game|controller|ps5|ps4|switch/],
     ["collectibles", /vintage|antique|collectible|rare|limited|comic|card|coin/],
     ["clothing", /shirt|pants|dress|shoes|jacket|coat|clothing|fashion/],
     ["sports", /bike|bicycle|golf|tennis|fitness|gym|weights|treadmill/],
-    ["musical", /guitar|piano|keyboard|drum|amp|amplifier|instrument|dj|ddj|pioneer|controller/],
     ["automotive", /car|truck|motorcycle|parts|tire|wheel|engine/],
   ];
 

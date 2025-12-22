@@ -1,0 +1,91 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - img [ref=e8]
+          - generic [ref=e11]:
+            - heading "Flipper.ai" [level=1] [ref=e12]
+            - paragraph [ref=e13]: Find profitable flips
+        - button "Refresh" [ref=e14]:
+          - img [ref=e15]
+          - text: Refresh
+    - main [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e23]:
+          - generic [ref=e24]:
+            - paragraph [ref=e25]: Total Listings
+            - paragraph [ref=e26]: "0"
+          - img [ref=e28]
+        - generic [ref=e33]:
+          - generic [ref=e34]:
+            - paragraph [ref=e35]: Opportunities
+            - paragraph [ref=e36]: "0"
+          - img [ref=e38]
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - paragraph [ref=e43]: Potential Profit
+            - paragraph [ref=e44]: $0
+          - img [ref=e46]
+        - generic [ref=e49]:
+          - generic [ref=e50]:
+            - paragraph [ref=e51]: Avg Value Score
+            - paragraph [ref=e52]: "0"
+          - img [ref=e54]
+      - generic [ref=e58]:
+        - generic [ref=e59]:
+          - img [ref=e60]
+          - textbox "Search listings..." [ref=e63]
+        - generic [ref=e64]:
+          - img [ref=e65]
+          - combobox [ref=e67]:
+            - option "All Listings" [selected]
+            - option "New"
+            - option "Opportunities"
+            - option "Contacted"
+            - option "Purchased"
+            - option "Sold"
+      - table [ref=e70]:
+        - rowgroup [ref=e71]:
+          - row "Item Platform Price Est. Value Profit Score Actions" [ref=e72]:
+            - columnheader "Item" [ref=e73]
+            - columnheader "Platform" [ref=e74]
+            - columnheader "Price" [ref=e75]
+            - columnheader "Est. Value" [ref=e76]
+            - columnheader "Profit" [ref=e77]
+            - columnheader "Score" [ref=e78]
+            - columnheader "Actions" [ref=e79]
+        - rowgroup [ref=e80]:
+          - row "No listings found. Run a scraper to find deals!" [ref=e81]:
+            - cell "No listings found. Run a scraper to find deals!" [ref=e82]:
+              - generic [ref=e83]:
+                - img [ref=e85]
+                - paragraph [ref=e89]: No listings found. Run a scraper to find deals!
+      - generic [ref=e90]:
+        - heading "Quick Actions" [level=2] [ref=e91]
+        - generic [ref=e92]:
+          - link "Scrape Craigslist Find local deals" [ref=e93] [cursor=pointer]:
+            - /url: /scraper
+            - img [ref=e95]
+            - generic [ref=e98]:
+              - paragraph [ref=e99]: Scrape Craigslist
+              - paragraph [ref=e100]: Find local deals
+          - link "View Opportunities Track your flips" [ref=e101] [cursor=pointer]:
+            - /url: /opportunities
+            - img [ref=e103]
+            - generic [ref=e105]:
+              - paragraph [ref=e106]: View Opportunities
+              - paragraph [ref=e107]: Track your flips
+          - link "Search Settings Configure scrapers" [ref=e108] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e110]
+            - generic [ref=e112]:
+              - paragraph [ref=e113]: Search Settings
+              - paragraph [ref=e114]: Configure scrapers
+  - button "Open Next.js Dev Tools" [ref=e120] [cursor=pointer]:
+    - img [ref=e121]
+  - alert [ref=e124]
+```
