@@ -4,7 +4,7 @@
 import { estimateValue, detectCategory, generatePurchaseMessage, EstimationResult } from "./value-estimator";
 
 // Platform types supported by the scanner
-export type MarketplacePlatform = "CRAIGSLIST" | "FACEBOOK_MARKETPLACE" | "EBAY" | "OFFERUP";
+export type MarketplacePlatform = "CRAIGSLIST" | "FACEBOOK_MARKETPLACE" | "EBAY" | "OFFERUP" | "MERCARI";
 
 // Raw listing data from any marketplace scraper
 export interface RawListing {

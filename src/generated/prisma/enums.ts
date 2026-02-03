@@ -13,7 +13,8 @@ export const Platform = {
   CRAIGSLIST: 'CRAIGSLIST',
   FACEBOOK_MARKETPLACE: 'FACEBOOK_MARKETPLACE',
   EBAY: 'EBAY',
-  OFFERUP: 'OFFERUP'
+  OFFERUP: 'OFFERUP',
+  MERCARI: 'MERCARI'
 } as const
 
 export type Platform = (typeof Platform)[keyof typeof Platform]
