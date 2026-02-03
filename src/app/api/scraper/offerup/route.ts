@@ -3,6 +3,7 @@ import { chromium, Browser, Page } from "playwright";
 import prisma from "@/lib/db";
 import { estimateValue, detectCategory, generatePurchaseMessage } from "@/lib/value-estimator";
 import { getAuthUserId } from "@/lib/auth-middleware";
+import { downloadAndCacheImages, normalizeLocation } from "@/lib/image-service";
 
 // Rate limiting configuration
 const RATE_LIMIT_DELAY_MS = 2000; // 2 seconds between requests
@@ -378,6 +379,20 @@ export async function POST(request: NextRequest) {
         // Determine status based on value score
         const status = estimation.valueScore >= 70 ? "OPPORTUNITY" : "NEW";
 
+        // Download and cache images
+        let cachedImageUrls: string[] = [];
+        if (item.imageUrls && item.imageUrls.length > 0) {
+          const imageResult = await downloadAndCacheImages(item.imageUrls, {
+            maxConcurrent: 2,
+            skipOnFailure: true, // Use original URL if download fails
+          });
+          cachedImageUrls = imageResult.cachedUrls;
+          console.log(`Cached ${imageResult.successCount}/${item.imageUrls.length} images for listing ${item.externalId}`);
+        }
+
+        // Normalize location data
+        const normalizedLoc = normalizeLocation(item.location);
+
         // Build listing data
         const listingData = {
           userId,
@@ -388,9 +403,9 @@ export async function POST(request: NextRequest) {
           description: item.description || null,
           askingPrice: item.price,
           condition: item.condition || null,
-          location: item.location,
+          location: normalizedLoc.normalized,
           sellerName: item.sellerName || null,
-          imageUrls: item.imageUrls ? JSON.stringify(item.imageUrls) : null,
+          imageUrls: cachedImageUrls.length > 0 ? JSON.stringify(cachedImageUrls) : null,
           category: detectedCategory,
           postedAt: item.postedAt || null,
 
@@ -439,9 +454,9 @@ export async function POST(request: NextRequest) {
         savedListings.push({
           title: item.title,
           price: `$${item.price}`,
-          location: item.location,
+          location: normalizedLoc.normalized,
           url: item.url,
-          imageUrl: item.imageUrls?.[0],
+          imageUrl: cachedImageUrls[0] || item.imageUrls?.[0],
           valueScore: estimation.valueScore,
         });
       } catch (error) {

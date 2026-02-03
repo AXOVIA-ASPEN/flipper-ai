@@ -23,3 +23,7 @@ yarn-error.log*
 
 # TypeScript
 *.tsbuildinfo
+
+# Cached images (keep directory structure but not actual images)
+public/images/listings/*
+!public/images/listings/.gitkeep
