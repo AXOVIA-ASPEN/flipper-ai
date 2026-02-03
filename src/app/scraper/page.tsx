@@ -115,6 +115,9 @@ export default function ScraperPage() {
   }
 
   function loadConfig(config: SearchConfig) {
+    // Set platform first, then location (to match platform's location format)
+    const configPlatform = config.platform.toLowerCase();
+    setPlatform(configPlatform);
     setLocation(config.location);
     setCategory(config.category || "electronics");
     setKeywords(config.keywords || "");
@@ -133,7 +136,7 @@ export default function ScraperPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: saveConfigName,
-          platform: "CRAIGSLIST",
+          platform: platform.toUpperCase(),
           location,
           category,
           keywords: keywords || null,
@@ -248,13 +251,29 @@ export default function ScraperPage() {
     }
   }
 
+  // Reset location when platform changes
+  const handlePlatformChange = (newPlatform: string) => {
+    setPlatform(newPlatform);
+    // Set default location for the new platform
+    if (newPlatform === "offerup") {
+      setLocation("sarasota-fl");
+    } else {
+      setLocation("sarasota");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setResult(null);
 
+    // Determine API endpoint based on platform
+    const apiEndpoint = platform === "offerup" 
+      ? "/api/scraper/offerup" 
+      : "/api/scraper/craigslist";
+
     try {
-      const response = await fetch("/api/scraper/craigslist", {
+      const response = await fetch(apiEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -296,7 +315,8 @@ export default function ScraperPage() {
     { value: "cell_phones", label: "Cell Phones" },
   ];
 
-  const locations = [
+  // Craigslist locations (subdomain format)
+  const craigslistLocations = [
     { value: "sarasota", label: "Sarasota, FL" },
     { value: "tampa", label: "Tampa, FL" },
     { value: "orlando", label: "Orlando, FL" },
@@ -310,6 +330,28 @@ export default function ScraperPage() {
     { value: "austin", label: "Austin, TX" },
     { value: "denver", label: "Denver, CO" },
   ];
+
+  // OfferUp locations (city-state format)
+  const offerupLocations = [
+    { value: "sarasota-fl", label: "Sarasota, FL" },
+    { value: "tampa-fl", label: "Tampa, FL" },
+    { value: "orlando-fl", label: "Orlando, FL" },
+    { value: "miami-fl", label: "Miami, FL" },
+    { value: "jacksonville-fl", label: "Jacksonville, FL" },
+    { value: "san-francisco-ca", label: "San Francisco, CA" },
+    { value: "los-angeles-ca", label: "Los Angeles, CA" },
+    { value: "new-york-ny", label: "New York, NY" },
+    { value: "chicago-il", label: "Chicago, IL" },
+    { value: "seattle-wa", label: "Seattle, WA" },
+    { value: "austin-tx", label: "Austin, TX" },
+    { value: "denver-co", label: "Denver, CO" },
+    { value: "phoenix-az", label: "Phoenix, AZ" },
+    { value: "atlanta-ga", label: "Atlanta, GA" },
+    { value: "dallas-tx", label: "Dallas, TX" },
+  ];
+
+  // Get locations based on selected platform
+  const locations = platform === "offerup" ? offerupLocations : craigslistLocations;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
@@ -338,7 +380,7 @@ export default function ScraperPage() {
                 Scrape Listings
               </h1>
               <p className="text-xs text-blue-200/70">
-                Find deals on Craigslist
+                Find deals on {platform === "offerup" ? "OfferUp" : "Craigslist"}
               </p>
             </div>
           </div>
@@ -431,15 +473,13 @@ export default function ScraperPage() {
               </label>
               <select
                 value={platform}
-                onChange={(e) => setPlatform(e.target.value)}
+                onChange={(e) => handlePlatformChange(e.target.value)}
                 className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white transition-all duration-300 hover:bg-white/15"
               >
                 <option value="craigslist" className="bg-slate-800 text-white">Craigslist</option>
+                <option value="offerup" className="bg-slate-800 text-white">OfferUp</option>
                 <option value="facebook" disabled className="bg-slate-800 text-gray-400">
                   Facebook Marketplace (coming soon)
-                </option>
-                <option value="offerup" disabled className="bg-slate-800 text-gray-400">
-                  OfferUp (coming soon)
                 </option>
               </select>
             </div>
