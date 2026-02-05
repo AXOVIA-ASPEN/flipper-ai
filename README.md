@@ -34,14 +34,37 @@ Open [http://localhost:3000](http://localhost:3000) to view the dashboard.
 
 ## Available Commands
 
-| Command | Description |
-|---------|-------------|
-| `make preview` | Install deps, run migrations, start dev server |
-| `make dev` | Start development server |
-| `make build` | Build for production |
-| `make db-migrate` | Run database migrations |
-| `make db-studio` | Open Prisma Studio (database GUI) |
-| `make db-reset` | Reset database (deletes all data) |
+| Command           | Description                                    |
+| ----------------- | ---------------------------------------------- |
+| `make preview`    | Install deps, run migrations, start dev server |
+| `make dev`        | Start development server                       |
+| `make build`      | Build for production                           |
+| `make db-migrate` | Run database migrations                        |
+| `make db-studio`  | Open Prisma Studio (database GUI)              |
+| `make db-reset`   | Reset database (deletes all data)              |
+
+## Code Quality & Linting
+
+We use ESLint, Prettier, and Husky to maintain high code quality:
+
+### Linting Commands
+
+- `npm run lint` - Run ESLint checks
+- `npm run lint:fix` - Auto-fix ESLint issues
+- `npm run format` - Format code with Prettier
+- `npm run format:check` - Check code formatting
+
+### Git Hooks
+
+- Pre-commit hook runs linting and formatting automatically
+- Prevents commits with linting or formatting errors
+
+### Configuration
+
+- `.eslintrc.js`: ESLint rules configuration
+- `.prettierrc.js`: Code formatting rules
+- `.lintstagedrc.js`: Lint-staged configuration
+- `.github/workflows/ci.yml`: GitHub Actions CI/CD pipeline
 
 ## Tech Stack
 
@@ -49,6 +72,8 @@ Open [http://localhost:3000](http://localhost:3000) to view the dashboard.
 - **Backend**: Next.js API Routes
 - **Database**: SQLite with Prisma ORM
 - **Scraping**: Stagehand with Google Gemini AI
+- **Linting**: ESLint, Prettier
+- **CI/CD**: GitHub Actions
 
 ## Project Structure
 
@@ -96,37 +121,38 @@ EBAY_BROWSE_API_BASE_URL="https://api.ebay.com/buy/browse/v1"
 
 ### Listings
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/listings` | Get all listings |
-| GET | `/api/listings?status=OPPORTUNITY` | Filter by status |
-| GET | `/api/listings?minScore=70` | Filter by value score |
-| POST | `/api/listings` | Create listing (from scraper) |
-| GET | `/api/listings/[id]` | Get single listing |
-| PATCH | `/api/listings/[id]` | Update listing |
-| DELETE | `/api/listings/[id]` | Delete listing |
+| Method | Endpoint                           | Description                   |
+| ------ | ---------------------------------- | ----------------------------- |
+| GET    | `/api/listings`                    | Get all listings              |
+| GET    | `/api/listings?status=OPPORTUNITY` | Filter by status              |
+| GET    | `/api/listings?minScore=70`        | Filter by value score         |
+| POST   | `/api/listings`                    | Create listing (from scraper) |
+| GET    | `/api/listings/[id]`               | Get single listing            |
+| PATCH  | `/api/listings/[id]`               | Update listing                |
+| DELETE | `/api/listings/[id]`               | Delete listing                |
 
 ### Opportunities
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/opportunities` | Get all opportunities |
-| POST | `/api/opportunities` | Create opportunity from listing |
+| Method | Endpoint             | Description                     |
+| ------ | -------------------- | ------------------------------- |
+| GET    | `/api/opportunities` | Get all opportunities           |
+| POST   | `/api/opportunities` | Create opportunity from listing |
 
 ### Scrapers
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/scraper/craigslist` | Returns supported Craigslist locations/categories |
-| POST | `/api/scraper/craigslist` | Launches the Playwright-based Craigslist scraper |
-| GET | `/api/scraper/ebay` | Returns supported eBay categories, condition enums, and parameter hints |
-| POST | `/api/scraper/ebay` | Pulls fixed-price listings via the eBay Browse API and stores opportunities |
+| Method | Endpoint                  | Description                                                                 |
+| ------ | ------------------------- | --------------------------------------------------------------------------- |
+| GET    | `/api/scraper/craigslist` | Returns supported Craigslist locations/categories                           |
+| POST   | `/api/scraper/craigslist` | Launches the Playwright-based Craigslist scraper                            |
+| GET    | `/api/scraper/ebay`       | Returns supported eBay categories, condition enums, and parameter hints     |
+| POST   | `/api/scraper/ebay`       | Pulls fixed-price listings via the eBay Browse API and stores opportunities |
 
 ## Database Schema
 
 See [docs/PRISMA.md](docs/PRISMA.md) for full Prisma integration details.
 
 **Key Models:**
+
 - `Listing` - Scraped items with value analysis
 - `Opportunity` - Flips being actively pursued
 - `ScraperJob` - Scraper run history
@@ -135,6 +161,7 @@ See [docs/PRISMA.md](docs/PRISMA.md) for full Prisma integration details.
 ## Value Scoring
 
 Items are scored 0-100 based on:
+
 - **Category multipliers** - Electronics, furniture, collectibles, etc.
 - **Brand detection** - Apple, Sony, Dyson, vintage items
 - **Condition analysis** - New, like new, good, fair, poor
