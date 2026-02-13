@@ -1,87 +1,95 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1770957480543" clover="3.2.0">
-  <project timestamp="1770957480543" name="All files">
-    <metrics statements="75" coveredstatements="75" conditionals="108" coveredconditionals="106" methods="15" coveredmethods="15" elements="198" coveredelements="196" complexity="0" loc="75" ncloc="75" packages="1" files="2" classes="2"/>
-    <file name="auth-middleware.ts" path="/home/ubuntu/.openclaw/workspace/projects/flipper-ai/src/lib/auth-middleware.ts">
-      <metrics statements="35" coveredstatements="35" conditionals="62" coveredconditionals="62" methods="8" coveredmethods="8"/>
-      <line num="6" count="1" type="stmt"/>
-      <line num="7" count="1" type="stmt"/>
-      <line num="18" count="1" type="stmt"/>
-      <line num="21" count="5" type="stmt"/>
-      <line num="22" count="5" type="stmt"/>
-      <line num="24" count="5" type="cond" truecount="10" falsecount="0"/>
-      <line num="25" count="3" type="stmt"/>
-      <line num="32" count="2" type="stmt"/>
-      <line num="33" count="2" type="stmt"/>
-      <line num="34" count="2" type="cond" truecount="4" falsecount="0"/>
-      <line num="36" count="2" type="stmt"/>
-      <line num="44" count="1" type="stmt"/>
-      <line num="45" count="4" type="stmt"/>
-      <line num="46" count="4" type="cond" truecount="12" falsecount="0"/>
-      <line num="53" count="1" type="stmt"/>
-      <line num="54" count="3" type="stmt"/>
-      <line num="55" count="3" type="cond" truecount="8" falsecount="0"/>
-      <line num="61" count="1" type="stmt"/>
-      <line num="62" count="4" type="stmt"/>
-      <line num="63" count="4" type="cond" truecount="8" falsecount="0"/>
-      <line num="70" count="1" type="stmt"/>
-      <line num="71" count="4" type="stmt"/>
-      <line num="73" count="4" type="cond" truecount="10" falsecount="0"/>
-      <line num="74" count="1" type="stmt"/>
-      <line num="78" count="3" type="cond" truecount="2" falsecount="0"/>
-      <line num="79" count="2" type="stmt"/>
-      <line num="80" count="2" type="stmt"/>
-      <line num="83" count="2" type="cond" truecount="2" falsecount="0"/>
-      <line num="84" count="1" type="stmt"/>
-      <line num="88" count="2" type="stmt"/>
-      <line num="95" count="1" type="stmt"/>
-      <line num="96" count="3" type="stmt"/>
-      <line num="98" count="3" type="cond" truecount="6" falsecount="0"/>
-      <line num="99" count="2" type="stmt"/>
-      <line num="107" count="1" type="stmt"/>
-    </file>
-    <file name="auth.ts" path="/home/ubuntu/.openclaw/workspace/projects/flipper-ai/src/lib/auth.ts">
-      <metrics statements="40" coveredstatements="40" conditionals="46" coveredconditionals="44" methods="7" coveredmethods="7"/>
-      <line num="6" count="2" type="stmt"/>
-      <line num="7" count="2" type="stmt"/>
-      <line num="8" count="2" type="stmt"/>
-      <line num="9" count="2" type="stmt"/>
-      <line num="10" count="2" type="stmt"/>
-      <line num="11" count="2" type="stmt"/>
-      <line num="12" count="2" type="stmt"/>
-      <line num="14" count="2" type="stmt"/>
-      <line num="42" count="23" type="cond" truecount="10" falsecount="2"/>
-      <line num="43" count="3" type="stmt"/>
-      <line num="46" count="20" type="stmt"/>
-      <line num="47" count="20" type="stmt"/>
-      <line num="49" count="20" type="stmt"/>
-      <line num="53" count="20" type="cond" truecount="4" falsecount="0"/>
-      <line num="54" count="11" type="stmt"/>
-      <line num="57" count="9" type="stmt"/>
-      <line num="59" count="9" type="cond" truecount="2" falsecount="0"/>
-      <line num="60" count="7" type="stmt"/>
-      <line num="63" count="2" type="stmt"/>
-      <line num="74" count="3" type="cond" truecount="2" falsecount="0"/>
-      <line num="75" count="2" type="stmt"/>
-      <line num="77" count="3" type="stmt"/>
-      <line num="80" count="4" type="cond" truecount="4" falsecount="0"/>
-      <line num="81" count="2" type="stmt"/>
-      <line num="83" count="4" type="stmt"/>
-      <line num="89" count="2" type="cond" truecount="2" falsecount="0"/>
-      <line num="90" count="1" type="stmt"/>
-      <line num="107" count="2" type="stmt"/>
-      <line num="108" count="11" type="stmt"/>
-      <line num="109" count="11" type="cond" truecount="10" falsecount="0"/>
-      <line num="110" count="8" type="stmt"/>
-      <line num="112" count="3" type="stmt"/>
-      <line num="119" count="2" type="stmt"/>
-      <line num="120" count="3" type="stmt"/>
-      <line num="121" count="3" type="cond" truecount="8" falsecount="0"/>
-      <line num="128" count="2" type="stmt"/>
-      <line num="129" count="4" type="stmt"/>
-      <line num="130" count="4" type="cond" truecount="2" falsecount="0"/>
-      <line num="131" count="3" type="stmt"/>
-      <line num="133" count="1" type="stmt"/>
+<coverage generated="1770957676619" clover="3.2.0">
+  <project timestamp="1770957676619" name="All files">
+    <metrics statements="86" coveredstatements="81" conditionals="73" coveredconditionals="60" methods="10" coveredmethods="10" elements="169" coveredelements="151" complexity="0" loc="86" ncloc="86" packages="1" files="1" classes="1"/>
+    <file name="claude-analyzer.ts" path="/home/ubuntu/.openclaw/workspace/projects/flipper-ai/src/lib/claude-analyzer.ts">
+      <metrics statements="86" coveredstatements="81" conditionals="73" coveredconditionals="60" methods="10" coveredmethods="10"/>
+      <line num="10" count="1" type="stmt"/>
+      <line num="11" count="1" type="stmt"/>
+      <line num="13" count="1" type="cond" truecount="1" falsecount="1"/>
+      <line num="14" count="1" type="cond" truecount="2" falsecount="0"/>
+      <line num="15" count="1" type="stmt"/>
+      <line num="46" count="22" type="stmt"/>
+      <line num="47" count="22" type="stmt"/>
+      <line num="59" count="21" type="cond" truecount="2" falsecount="0"/>
+      <line num="60" count="2" type="stmt"/>
+      <line num="63" count="1" type="stmt"/>
+      <line num="66" count="20" type="stmt"/>
+      <line num="76" count="11" type="stmt"/>
+      <line num="77" count="11" type="stmt"/>
+      <line num="79" count="11" type="stmt"/>
+      <line num="80" count="11" type="stmt"/>
+      <line num="88" count="8" type="stmt"/>
+      <line num="101" count="26" type="stmt"/>
+      <line num="142" count="23" type="stmt"/>
+      <line num="144" count="23" type="stmt"/>
+      <line num="145" count="23" type="cond" truecount="2" falsecount="0"/>
+      <line num="146" count="1" type="stmt"/>
+      <line num="149" count="22" type="stmt"/>
+      <line num="152" count="22" type="stmt"/>
+      <line num="176" count="1" type="stmt"/>
+      <line num="177" count="1" type="stmt"/>
+      <line num="185" count="26" type="cond" truecount="1" falsecount="1"/>
+      <line num="186" count="0" type="stmt"/>
+      <line num="189" count="26" type="stmt"/>
+      <line num="193" count="26" type="stmt"/>
+      <line num="194" count="26" type="stmt"/>
+      <line num="205" count="23" type="stmt"/>
+      <line num="206" count="23" type="cond" truecount="3" falsecount="1"/>
+      <line num="207" count="0" type="stmt"/>
+      <line num="210" count="23" type="stmt"/>
+      <line num="213" count="3" type="cond" truecount="5" falsecount="0"/>
+      <line num="214" count="2" type="stmt"/>
+      <line num="215" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="216" count="1" type="stmt"/>
+      <line num="218" count="1" type="cond" truecount="1" falsecount="1"/>
+      <line num="219" count="1" type="stmt"/>
+      <line num="224" count="1" type="cond" truecount="1" falsecount="1"/>
+      <line num="225" count="1" type="cond" truecount="3" falsecount="1"/>
+      <line num="226" count="0" type="stmt"/>
+      <line num="228" count="1" type="stmt"/>
+      <line num="231" count="0" type="stmt"/>
+      <line num="239" count="1" type="stmt"/>
+      <line num="243" count="14" type="stmt"/>
+      <line num="244" count="14" type="cond" truecount="2" falsecount="0"/>
+      <line num="245" count="1" type="stmt"/>
+      <line num="249" count="13" type="stmt"/>
+      <line num="253" count="13" type="cond" truecount="2" falsecount="0"/>
+      <line num="254" count="2" type="stmt"/>
+      <line num="258" count="11" type="stmt"/>
+      <line num="259" count="11" type="cond" truecount="1" falsecount="1"/>
+      <line num="260" count="11" type="stmt"/>
+      <line num="261" count="11" type="stmt"/>
+      <line num="268" count="11" type="stmt"/>
+      <line num="275" count="11" type="stmt"/>
+      <line num="276" count="11" type="stmt"/>
+      <line num="279" count="11" type="stmt"/>
+      <line num="281" count="11" type="stmt"/>
+      <line num="288" count="1" type="stmt"/>
+      <line num="294" count="15" type="stmt"/>
+      <line num="295" count="15" type="stmt"/>
+      <line num="296" count="12" type="stmt"/>
+      <line num="303" count="1" type="stmt"/>
+      <line num="312" count="3" type="stmt"/>
+      <line num="313" count="3" type="stmt"/>
+      <line num="314" count="3" type="stmt"/>
+      <line num="315" count="3" type="stmt"/>
+      <line num="317" count="3" type="stmt"/>
+      <line num="318" count="8" type="stmt"/>
+      <line num="320" count="8" type="stmt"/>
+      <line num="322" count="8" type="stmt"/>
+      <line num="323" count="8" type="cond" truecount="2" falsecount="0"/>
+      <line num="324" count="1" type="stmt"/>
+      <line num="325" count="1" type="stmt"/>
+      <line num="328" count="7" type="stmt"/>
+      <line num="329" count="6" type="stmt"/>
+      <line num="332" count="6" type="cond" truecount="2" falsecount="0"/>
+      <line num="333" count="3" type="stmt"/>
+      <line num="337" count="1" type="stmt"/>
+      <line num="338" count="1" type="stmt"/>
+      <line num="344" count="8" type="cond" truecount="1" falsecount="1"/>
+      <line num="345" count="0" type="stmt"/>
+      <line num="349" count="3" type="stmt"/>
     </file>
   </project>
 </coverage>

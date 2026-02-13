@@ -39,6 +39,8 @@ jest.mock("@/lib/db", () => ({
 import Anthropic from "@anthropic-ai/sdk";
 import {
   analyzeListingData,
+  analyzeListing,
+  batchAnalyzeListings,
   ClaudeAnalysisResult,
 } from "@/lib/claude-analyzer";
 import prisma from "@/lib/db";
@@ -348,6 +350,623 @@ describe("Claude Analyzer", () => {
 
       expect(promptMessage).toContain("$800");
       expect(promptMessage).toContain("1 images available");
+    });
+  });
+
+  describe("Caching functionality (via analyzeListing)", () => {
+    test("should return cached analysis when available", async () => {
+      const mockCachedAnalysis = {
+        id: "cache-123",
+        listingId: "listing-456",
+        analysisResult: JSON.stringify({
+          category: "electronics",
+          condition: "good",
+          keyFeatures: ["test"],
+          potentialIssues: [],
+          flippabilityScore: 75,
+          confidence: "medium",
+          reasoning: "Cached result",
+        }),
+        createdAt: new Date(),
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60), // 1 hour from now
+      };
+
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(mockCachedAnalysis);
+      (prisma.listing.findUnique as jest.Mock).mockResolvedValue({
+        id: "listing-456",
+        title: "Test Item",
+        description: "Test description",
+        askingPrice: 100,
+        imageUrls: "[]",
+      });
+
+      const result = await analyzeListing("listing-456");
+
+      expect(result.reasoning).toBe("Cached result");
+      expect(prisma.aiAnalysisCache.findFirst).toHaveBeenCalled();
+      // Should NOT call Claude API when cached
+      expect(Anthropic).not.toHaveBeenCalled();
+    });
+
+    test("should call Claude API when cache is not found", async () => {
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
+      (prisma.listing.findUnique as jest.Mock).mockResolvedValue({
+        id: "listing-789",
+        title: "Test Item",
+        description: "Description",
+        askingPrice: 100,
+        imageUrls: "[]",
+      });
+
+      const mockResponse = {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({
+              category: "fresh",
+              condition: "new",
+              keyFeatures: [],
+              potentialIssues: [],
+              flippabilityScore: 90,
+              confidence: "high",
+              reasoning: "Fresh analysis",
+            }),
+          },
+        ],
+      };
+
+      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
+      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
+      AnthropicMock.mockImplementation(() => ({
+        messages: {
+          create: mockCreate,
+        },
+      } as any));
+
+      const result = await analyzeListing("listing-789");
+
+      expect(result.reasoning).toBe("Fresh analysis");
+      expect(mockCreate).toHaveBeenCalled();
+    });
+
+    test("should cache new analysis after Claude API call", async () => {
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
+      (prisma.aiAnalysisCache.create as jest.Mock).mockResolvedValue({});
+      (prisma.listing.findUnique as jest.Mock).mockResolvedValue({
+        id: "listing-cache-test",
+        title: "Item",
+        description: "Desc",
+        askingPrice: 50,
+        imageUrls: "[]",
+      });
+
+      const mockResponse = {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({
+              category: "test",
+              condition: "good",
+              keyFeatures: [],
+              potentialIssues: [],
+              flippabilityScore: 80,
+              confidence: "high",
+              reasoning: "Test",
+            }),
+          },
+        ],
+      };
+
+      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
+      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
+      AnthropicMock.mockImplementation(() => ({
+        messages: {
+          create: mockCreate,
+        },
+      } as any));
+
+      await analyzeListing("listing-cache-test");
+
+      expect(prisma.aiAnalysisCache.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            listingId: "listing-cache-test",
+            analysisResult: expect.any(String),
+            expiresAt: expect.any(Date),
+          }),
+        })
+      );
+    });
+
+    test("should handle cache lookup errors gracefully", async () => {
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockRejectedValue(
+        new Error("Database error")
+      );
+      (prisma.listing.findUnique as jest.Mock).mockResolvedValue({
+        id: "listing-error-test",
+        title: "Item",
+        description: "Desc",
+        askingPrice: 50,
+        imageUrls: "[]",
+      });
+
+      const mockResponse = {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({
+              category: "test",
+              condition: "good",
+              keyFeatures: [],
+              potentialIssues: [],
+              flippabilityScore: 70,
+              confidence: "medium",
+              reasoning: "Fallback",
+            }),
+          },
+        ],
+      };
+
+      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
+      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
+      AnthropicMock.mockImplementation(() => ({
+        messages: {
+          create: mockCreate,
+        },
+      } as any));
+
+      const result = await analyzeListing("listing-error-test");
+
+      expect(result.reasoning).toBe("Fallback");
+      expect(mockCreate).toHaveBeenCalled();
+    });
+
+    test("should handle cache storage errors gracefully", async () => {
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
+      (prisma.aiAnalysisCache.create as jest.Mock).mockRejectedValue(
+        new Error("Cache write error")
+      );
+      (prisma.listing.findUnique as jest.Mock).mockResolvedValue({
+        id: "listing-write-error",
+        title: "Item",
+        description: "Desc",
+        askingPrice: 50,
+        imageUrls: "[]",
+      });
+
+      const mockResponse = {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({
+              category: "test",
+              condition: "good",
+              keyFeatures: [],
+              potentialIssues: [],
+              flippabilityScore: 85,
+              confidence: "high",
+              reasoning: "Success despite cache error",
+            }),
+          },
+        ],
+      };
+
+      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
+      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
+      AnthropicMock.mockImplementation(() => ({
+        messages: {
+          create: mockCreate,
+        },
+      } as any));
+
+      // Should not throw even if caching fails
+      const result = await analyzeListing("listing-write-error");
+
+      expect(result.reasoning).toBe("Success despite cache error");
+    });
+
+    test("should throw error when listing not found", async () => {
+      (prisma.listing.findUnique as jest.Mock).mockResolvedValue(null);
+
+      await expect(analyzeListing("nonexistent-listing")).rejects.toThrow(
+        "Listing not found: nonexistent-listing"
+      );
+    });
+
+    test("should handle imageUrls parsing errors", async () => {
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
+      (prisma.listing.findUnique as jest.Mock).mockResolvedValue({
+        id: "listing-bad-json",
+        title: "Item",
+        description: "Desc",
+        askingPrice: 50,
+        imageUrls: "invalid json", // Not valid JSON
+      });
+
+      const mockResponse = {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({
+              category: "test",
+              condition: "good",
+              keyFeatures: [],
+              potentialIssues: [],
+              flippabilityScore: 70,
+              confidence: "medium",
+              reasoning: "Parsed without images",
+            }),
+          },
+        ],
+      };
+
+      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
+      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
+      AnthropicMock.mockImplementation(() => ({
+        messages: {
+          create: mockCreate,
+        },
+      } as any));
+
+      const result = await analyzeListing("listing-bad-json");
+
+      expect(result.reasoning).toBe("Parsed without images");
+      // Should still complete successfully
+    });
+  });
+
+  describe("Batch analysis", () => {
+    test("should analyze multiple listings in batch", async () => {
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
+      
+      // Mock 3 different listings
+      (prisma.listing.findUnique as jest.Mock)
+        .mockResolvedValueOnce({
+          id: "list-1",
+          title: "Item 1",
+          description: "Desc 1",
+          askingPrice: 100,
+          imageUrls: "[]",
+        })
+        .mockResolvedValueOnce({
+          id: "list-2",
+          title: "Item 2",
+          description: "Desc 2",
+          askingPrice: 200,
+          imageUrls: "[]",
+        })
+        .mockResolvedValueOnce({
+          id: "list-3",
+          title: "Item 3",
+          description: "Desc 3",
+          askingPrice: 300,
+          imageUrls: "[]",
+        });
+
+      const mockResponse = {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({
+              category: "test",
+              condition: "good",
+              keyFeatures: [],
+              potentialIssues: [],
+              flippabilityScore: 75,
+              confidence: "medium",
+              reasoning: "Batch analysis",
+            }),
+          },
+        ],
+      };
+
+      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
+      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
+      AnthropicMock.mockImplementation(() => ({
+        messages: {
+          create: mockCreate,
+        },
+      } as any));
+
+      const results = await batchAnalyzeListings(["list-1", "list-2", "list-3"]);
+
+      expect(results.successful).toBe(3);
+      expect(results.failed).toBe(0);
+      expect(results.errors).toHaveLength(0);
+      expect(mockCreate).toHaveBeenCalledTimes(3);
+    });
+
+    test("should handle partial failures in batch", async () => {
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
+      
+      // First listing succeeds
+      (prisma.listing.findUnique as jest.Mock)
+        .mockResolvedValueOnce({
+          id: "list-success",
+          title: "Good Item",
+          description: "Works",
+          askingPrice: 100,
+          imageUrls: "[]",
+        })
+        // Second listing not found
+        .mockResolvedValueOnce(null)
+        // Third listing succeeds
+        .mockResolvedValueOnce({
+          id: "list-success-2",
+          title: "Another Item",
+          description: "Also works",
+          askingPrice: 150,
+          imageUrls: "[]",
+        });
+
+      const mockResponse = {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({
+              category: "test",
+              condition: "good",
+              keyFeatures: [],
+              potentialIssues: [],
+              flippabilityScore: 80,
+              confidence: "high",
+              reasoning: "Success",
+            }),
+          },
+        ],
+      };
+
+      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
+      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
+      AnthropicMock.mockImplementation(() => ({
+        messages: {
+          create: mockCreate,
+        },
+      } as any));
+
+      const results = await batchAnalyzeListings([
+        "list-success",
+        "list-not-found",
+        "list-success-2",
+      ]);
+
+      expect(results.successful).toBe(2);
+      expect(results.failed).toBe(1);
+      expect(results.errors).toHaveLength(1);
+      expect(results.errors[0].error).toContain("not found");
+      expect(results.errors[0].listingId).toBe("list-not-found");
+    });
+
+    test("should report cached results in batch", async () => {
+      // First listing cached
+      (prisma.aiAnalysisCache.findFirst as jest.Mock)
+        .mockResolvedValueOnce({
+          id: "cache-1",
+          listingId: "list-cached",
+          analysisResult: JSON.stringify({
+            category: "test",
+            condition: "good",
+            keyFeatures: [],
+            potentialIssues: [],
+            flippabilityScore: 70,
+            confidence: "medium",
+            reasoning: "Cached",
+          }),
+          createdAt: new Date(),
+          expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+        })
+        // Second not cached
+        .mockResolvedValueOnce(null);
+
+      (prisma.listing.findUnique as jest.Mock).mockResolvedValueOnce({
+        id: "list-fresh",
+        title: "Fresh Item",
+        description: "New",
+        askingPrice: 100,
+        imageUrls: "[]",
+      });
+
+      const mockResponse = {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({
+              category: "test",
+              condition: "good",
+              keyFeatures: [],
+              potentialIssues: [],
+              flippabilityScore: 80,
+              confidence: "high",
+              reasoning: "Fresh",
+            }),
+          },
+        ],
+      };
+
+      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
+      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
+      AnthropicMock.mockImplementation(() => ({
+        messages: {
+          create: mockCreate,
+        },
+      } as any));
+
+      const results = await batchAnalyzeListings(["list-cached", "list-fresh"]);
+
+      expect(results.successful).toBe(2);
+      expect(results.cached).toBe(1);
+      expect(results.failed).toBe(0);
+      // Only 1 API call (cached result doesn't call API)
+      expect(mockCreate).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("Error handling and edge cases", () => {
+    test("should handle malformed JSON in Claude response", async () => {
+      const mockResponse = {
+        content: [
+          {
+            type: "text",
+            text: "This is not valid JSON at all!",
+          },
+        ],
+      };
+
+      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
+      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
+      AnthropicMock.mockImplementation(() => ({
+        messages: {
+          create: mockCreate,
+        },
+      } as any));
+
+      await expect(analyzeListingData("Item", "Desc", 50)).rejects.toThrow();
+    });
+
+    test("should handle empty description", async () => {
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
+
+      const mockResponse = {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({
+              category: "unknown",
+              condition: "unknown",
+              keyFeatures: [],
+              potentialIssues: ["No description provided"],
+              flippabilityScore: 30,
+              confidence: "low",
+              reasoning: "Limited information",
+            }),
+          },
+        ],
+      };
+
+      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
+      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
+      AnthropicMock.mockImplementation(() => ({
+        messages: {
+          create: mockCreate,
+        },
+      } as any));
+
+      const result = await analyzeListingData("Item", null, 50);
+
+      expect(result.potentialIssues).toContain("No description provided");
+      expect(mockCreate).toHaveBeenCalled();
+    });
+
+    test("should handle zero price", async () => {
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
+
+      const mockResponse = {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({
+              category: "free-stuff",
+              condition: "unknown",
+              keyFeatures: [],
+              potentialIssues: ["Free item - possible issues"],
+              flippabilityScore: 40,
+              confidence: "low",
+              reasoning: "Free items are risky",
+            }),
+          },
+        ],
+      };
+
+      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
+      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
+      AnthropicMock.mockImplementation(() => ({
+        messages: {
+          create: mockCreate,
+        },
+      } as any));
+
+      const result = await analyzeListingData("Free Couch", "Come pick it up", 0);
+
+      expect(result.flippabilityScore).toBeLessThan(50);
+      expect(mockCreate).toHaveBeenCalled();
+    });
+
+    test("should handle very long descriptions", async () => {
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
+
+      const longDescription = "A".repeat(10000);
+
+      const mockResponse = {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({
+              category: "misc",
+              condition: "unknown",
+              keyFeatures: [],
+              potentialIssues: [],
+              flippabilityScore: 50,
+              confidence: "medium",
+              reasoning: "Long description",
+            }),
+          },
+        ],
+      };
+
+      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
+      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
+      AnthropicMock.mockImplementation(() => ({
+        messages: {
+          create: mockCreate,
+        },
+      } as any));
+
+      const result = await analyzeListingData("Item", longDescription, 100);
+
+      expect(result).toBeDefined();
+      expect(mockCreate).toHaveBeenCalled();
+    });
+
+    test("should handle multiple images", async () => {
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
+
+      const mockResponse = {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({
+              category: "electronics",
+              condition: "good",
+              keyFeatures: ["Multiple angles shown"],
+              potentialIssues: [],
+              flippabilityScore: 85,
+              confidence: "high",
+              reasoning: "Good photo documentation",
+            }),
+          },
+        ],
+      };
+
+      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
+      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
+      AnthropicMock.mockImplementation(() => ({
+        messages: {
+          create: mockCreate,
+        },
+      } as any));
+
+      const result = await analyzeListingData(
+        "Laptop",
+        "Used laptop",
+        500,
+        ["img1.jpg", "img2.jpg", "img3.jpg"]
+      );
+
+      const callArgs = mockCreate.mock.calls[0][0];
+      const promptMessage = callArgs.messages[0].content;
+
+      expect(promptMessage).toContain("3 images available");
+      expect(result.confidence).toBe("high");
     });
   });
 });
