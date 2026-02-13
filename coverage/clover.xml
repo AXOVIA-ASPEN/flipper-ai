@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1770956265590" clover="3.2.0">
-  <project timestamp="1770956265590" name="All files">
-    <metrics statements="775" coveredstatements="56" conditionals="598" coveredconditionals="82" methods="119" coveredmethods="11" elements="1492" coveredelements="149" complexity="0" loc="775" ncloc="775" packages="1" files="13" classes="13"/>
+<coverage generated="1770956389072" clover="3.2.0">
+  <project timestamp="1770956389072" name="All files">
+    <metrics statements="775" coveredstatements="2" conditionals="598" coveredconditionals="0" methods="119" coveredmethods="0" elements="1492" coveredelements="2" complexity="0" loc="775" ncloc="775" packages="1" files="13" classes="13"/>
     <file name="auth-middleware.ts" path="/home/ubuntu/.openclaw/workspace/projects/flipper-ai/src/lib/auth-middleware.ts">
-      <metrics statements="35" coveredstatements="35" conditionals="62" coveredconditionals="62" methods="8" coveredmethods="8"/>
-      <line num="6" count="1" type="stmt"/>
-      <line num="7" count="1" type="stmt"/>
-      <line num="18" count="1" type="stmt"/>
-      <line num="21" count="5" type="stmt"/>
-      <line num="22" count="5" type="stmt"/>
-      <line num="24" count="5" type="cond" truecount="10" falsecount="0"/>
-      <line num="25" count="3" type="stmt"/>
-      <line num="32" count="2" type="stmt"/>
-      <line num="33" count="2" type="stmt"/>
-      <line num="34" count="2" type="cond" truecount="4" falsecount="0"/>
-      <line num="36" count="2" type="stmt"/>
-      <line num="44" count="1" type="stmt"/>
-      <line num="45" count="4" type="stmt"/>
-      <line num="46" count="4" type="cond" truecount="12" falsecount="0"/>
-      <line num="53" count="1" type="stmt"/>
-      <line num="54" count="3" type="stmt"/>
-      <line num="55" count="3" type="cond" truecount="8" falsecount="0"/>
-      <line num="61" count="1" type="stmt"/>
-      <line num="62" count="4" type="stmt"/>
-      <line num="63" count="4" type="cond" truecount="8" falsecount="0"/>
-      <line num="70" count="1" type="stmt"/>
-      <line num="71" count="4" type="stmt"/>
-      <line num="73" count="4" type="cond" truecount="10" falsecount="0"/>
-      <line num="74" count="1" type="stmt"/>
-      <line num="78" count="3" type="cond" truecount="2" falsecount="0"/>
-      <line num="79" count="2" type="stmt"/>
-      <line num="80" count="2" type="stmt"/>
-      <line num="83" count="2" type="cond" truecount="2" falsecount="0"/>
-      <line num="84" count="1" type="stmt"/>
-      <line num="88" count="2" type="stmt"/>
-      <line num="95" count="1" type="stmt"/>
-      <line num="96" count="3" type="stmt"/>
-      <line num="98" count="3" type="cond" truecount="6" falsecount="0"/>
-      <line num="99" count="2" type="stmt"/>
-      <line num="107" count="1" type="stmt"/>
+      <metrics statements="35" coveredstatements="0" conditionals="62" coveredconditionals="0" methods="8" coveredmethods="0"/>
+      <line num="6" count="0" type="stmt"/>
+      <line num="7" count="0" type="stmt"/>
+      <line num="18" count="0" type="stmt"/>
+      <line num="21" count="0" type="stmt"/>
+      <line num="22" count="0" type="stmt"/>
+      <line num="24" count="0" type="cond" truecount="0" falsecount="10"/>
+      <line num="25" count="0" type="stmt"/>
+      <line num="32" count="0" type="stmt"/>
+      <line num="33" count="0" type="stmt"/>
+      <line num="34" count="0" type="cond" truecount="0" falsecount="4"/>
+      <line num="36" count="0" type="stmt"/>
+      <line num="44" count="0" type="stmt"/>
+      <line num="45" count="0" type="stmt"/>
+      <line num="46" count="0" type="cond" truecount="0" falsecount="12"/>
+      <line num="53" count="0" type="stmt"/>
+      <line num="54" count="0" type="stmt"/>
+      <line num="55" count="0" type="cond" truecount="0" falsecount="8"/>
+      <line num="61" count="0" type="stmt"/>
+      <line num="62" count="0" type="stmt"/>
+      <line num="63" count="0" type="cond" truecount="0" falsecount="8"/>
+      <line num="70" count="0" type="stmt"/>
+      <line num="71" count="0" type="stmt"/>
+      <line num="73" count="0" type="cond" truecount="0" falsecount="10"/>
+      <line num="74" count="0" type="stmt"/>
+      <line num="78" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="79" count="0" type="stmt"/>
+      <line num="80" count="0" type="stmt"/>
+      <line num="83" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="84" count="0" type="stmt"/>
+      <line num="88" count="0" type="stmt"/>
+      <line num="95" count="0" type="stmt"/>
+      <line num="96" count="0" type="stmt"/>
+      <line num="98" count="0" type="cond" truecount="0" falsecount="6"/>
+      <line num="99" count="0" type="stmt"/>
+      <line num="107" count="0" type="stmt"/>
     </file>
     <file name="auth.ts" path="/home/ubuntu/.openclaw/workspace/projects/flipper-ai/src/lib/auth.ts">
-      <metrics statements="40" coveredstatements="21" conditionals="46" coveredconditionals="20" methods="7" coveredmethods="3"/>
-      <line num="6" count="1" type="stmt"/>
-      <line num="7" count="1" type="stmt"/>
-      <line num="8" count="1" type="stmt"/>
-      <line num="9" count="1" type="stmt"/>
-      <line num="10" count="1" type="stmt"/>
-      <line num="11" count="1" type="stmt"/>
-      <line num="12" count="1" type="stmt"/>
-      <line num="14" count="1" type="stmt"/>
+      <metrics statements="40" coveredstatements="0" conditionals="46" coveredconditionals="0" methods="7" coveredmethods="0"/>
+      <line num="6" count="0" type="stmt"/>
+      <line num="7" count="0" type="stmt"/>
+      <line num="8" count="0" type="stmt"/>
+      <line num="9" count="0" type="stmt"/>
+      <line num="10" count="0" type="stmt"/>
+      <line num="11" count="0" type="stmt"/>
+      <line num="12" count="0" type="stmt"/>
+      <line num="14" count="0" type="stmt"/>
       <line num="42" count="0" type="cond" truecount="0" falsecount="12"/>
       <line num="43" count="0" type="stmt"/>
       <line num="46" count="0" type="stmt"/>
@@ -69,19 +69,19 @@
       <line num="83" count="0" type="stmt"/>
       <line num="89" count="0" type="cond" truecount="0" falsecount="2"/>
       <line num="90" count="0" type="stmt"/>
-      <line num="107" count="1" type="stmt"/>
-      <line num="108" count="11" type="stmt"/>
-      <line num="109" count="11" type="cond" truecount="10" falsecount="0"/>
-      <line num="110" count="8" type="stmt"/>
-      <line num="112" count="3" type="stmt"/>
-      <line num="119" count="1" type="stmt"/>
-      <line num="120" count="3" type="stmt"/>
-      <line num="121" count="3" type="cond" truecount="8" falsecount="0"/>
-      <line num="128" count="1" type="stmt"/>
-      <line num="129" count="4" type="stmt"/>
-      <line num="130" count="4" type="cond" truecount="2" falsecount="0"/>
-      <line num="131" count="3" type="stmt"/>
-      <line num="133" count="1" type="stmt"/>
+      <line num="107" count="0" type="stmt"/>
+      <line num="108" count="0" type="stmt"/>
+      <line num="109" count="0" type="cond" truecount="0" falsecount="10"/>
+      <line num="110" count="0" type="stmt"/>
+      <line num="112" count="0" type="stmt"/>
+      <line num="119" count="0" type="stmt"/>
+      <line num="120" count="0" type="stmt"/>
+      <line num="121" count="0" type="cond" truecount="0" falsecount="8"/>
+      <line num="128" count="0" type="stmt"/>
+      <line num="129" count="0" type="stmt"/>
+      <line num="130" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="131" count="0" type="stmt"/>
+      <line num="133" count="0" type="stmt"/>
     </file>
     <file name="claude-analyzer.ts" path="/home/ubuntu/.openclaw/workspace/projects/flipper-ai/src/lib/claude-analyzer.ts">
       <metrics statements="86" coveredstatements="0" conditionals="73" coveredconditionals="0" methods="10" coveredmethods="0"/>
@@ -696,9 +696,9 @@
       <line num="216" count="0" type="stmt"/>
     </file>
     <file name="theme-config.ts" path="/home/ubuntu/.openclaw/workspace/projects/flipper-ai/src/lib/theme-config.ts">
-      <metrics statements="2" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-      <line num="38" count="0" type="stmt"/>
-      <line num="161" count="0" type="stmt"/>
+      <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <line num="38" count="1" type="stmt"/>
+      <line num="161" count="1" type="stmt"/>
     </file>
     <file name="value-estimator.ts" path="/home/ubuntu/.openclaw/workspace/projects/flipper-ai/src/lib/value-estimator.ts">
       <metrics statements="113" coveredstatements="0" conditionals="70" coveredconditionals="0" methods="9" coveredmethods="0"/>
