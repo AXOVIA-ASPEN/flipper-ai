@@ -60,7 +60,8 @@ export const ModelName = {
   Account: 'Account',
   Session: 'Session',
   VerificationToken: 'VerificationToken',
-  UserSettings: 'UserSettings'
+  UserSettings: 'UserSettings',
+  FacebookToken: 'FacebookToken'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -273,6 +274,18 @@ export const UserSettingsScalarFieldEnum = {
 } as const
 
 export type UserSettingsScalarFieldEnum = (typeof UserSettingsScalarFieldEnum)[keyof typeof UserSettingsScalarFieldEnum]
+
+
+export const FacebookTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  accessToken: 'accessToken',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FacebookTokenScalarFieldEnum = (typeof FacebookTokenScalarFieldEnum)[keyof typeof FacebookTokenScalarFieldEnum]
 
 
 export const SortOrder = {

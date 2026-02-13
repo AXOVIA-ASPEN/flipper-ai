@@ -393,7 +393,8 @@ export const ModelName = {
   Account: 'Account',
   Session: 'Session',
   VerificationToken: 'VerificationToken',
-  UserSettings: 'UserSettings'
+  UserSettings: 'UserSettings',
+  FacebookToken: 'FacebookToken'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -409,7 +410,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "listing" | "opportunity" | "scraperJob" | "searchConfig" | "priceHistory" | "user" | "account" | "session" | "verificationToken" | "userSettings"
+    modelProps: "listing" | "opportunity" | "scraperJob" | "searchConfig" | "priceHistory" | "user" | "account" | "session" | "verificationToken" | "userSettings" | "facebookToken"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1153,6 +1154,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    FacebookToken: {
+      payload: Prisma.$FacebookTokenPayload<ExtArgs>
+      fields: Prisma.FacebookTokenFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FacebookTokenFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FacebookTokenPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FacebookTokenFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FacebookTokenPayload>
+        }
+        findFirst: {
+          args: Prisma.FacebookTokenFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FacebookTokenPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FacebookTokenFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FacebookTokenPayload>
+        }
+        findMany: {
+          args: Prisma.FacebookTokenFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FacebookTokenPayload>[]
+        }
+        create: {
+          args: Prisma.FacebookTokenCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FacebookTokenPayload>
+        }
+        createMany: {
+          args: Prisma.FacebookTokenCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FacebookTokenCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FacebookTokenPayload>[]
+        }
+        delete: {
+          args: Prisma.FacebookTokenDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FacebookTokenPayload>
+        }
+        update: {
+          args: Prisma.FacebookTokenUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FacebookTokenPayload>
+        }
+        deleteMany: {
+          args: Prisma.FacebookTokenDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FacebookTokenUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FacebookTokenUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FacebookTokenPayload>[]
+        }
+        upsert: {
+          args: Prisma.FacebookTokenUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FacebookTokenPayload>
+        }
+        aggregate: {
+          args: Prisma.FacebookTokenAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFacebookToken>
+        }
+        groupBy: {
+          args: Prisma.FacebookTokenGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FacebookTokenGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FacebookTokenCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FacebookTokenCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1388,6 +1463,18 @@ export const UserSettingsScalarFieldEnum = {
 export type UserSettingsScalarFieldEnum = (typeof UserSettingsScalarFieldEnum)[keyof typeof UserSettingsScalarFieldEnum]
 
 
+export const FacebookTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  accessToken: 'accessToken',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FacebookTokenScalarFieldEnum = (typeof FacebookTokenScalarFieldEnum)[keyof typeof FacebookTokenScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1549,6 +1636,7 @@ export type GlobalOmitConfig = {
   session?: Prisma.SessionOmit
   verificationToken?: Prisma.VerificationTokenOmit
   userSettings?: Prisma.UserSettingsOmit
+  facebookToken?: Prisma.FacebookTokenOmit
 }
 
 /* Types for Logging */

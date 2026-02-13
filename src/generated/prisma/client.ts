@@ -89,3 +89,8 @@ export type VerificationToken = Prisma.VerificationTokenModel
  * 
  */
 export type UserSettings = Prisma.UserSettingsModel
+/**
+ * Model FacebookToken
+ * 
+ */
+export type FacebookToken = Prisma.FacebookTokenModel
