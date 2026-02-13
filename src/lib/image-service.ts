@@ -283,18 +283,22 @@ export function normalizeLocation(locationStr: string): NormalizedLocation {
   const original = locationStr;
   const cleaned = locationStr.trim().toLowerCase();
 
-  // Pattern 1: "City, State" or "City, ST"
-  const commaPattern = /^([^,]+),\s*(\w+)$/;
+  // Pattern 1: "City, State" or "City, ST" (allow multi-word states)
+  const commaPattern = /^([^,]+),\s*(.+)$/;
   const commaMatch = cleaned.match(commaPattern);
 
   if (commaMatch) {
     const city = commaMatch[1].trim();
     const stateInput = commaMatch[2].trim();
 
-    // Check if it's already a state code
-    const stateCode = stateInput.length === 2 
-      ? stateInput.toUpperCase()
-      : STATE_CODES[stateInput] || stateInput.toUpperCase().substring(0, 2);
+    // Check if it's already a state code (2 letters)
+    let stateCode: string;
+    if (stateInput.length === 2) {
+      stateCode = stateInput.toUpperCase();
+    } else {
+      // Look up the full state name in STATE_CODES
+      stateCode = STATE_CODES[stateInput] || "XX";
+    }
     
     const stateName = STATE_CODE_TO_NAME[stateCode] || stateInput;
     const normalizedCity = city.replace(/\s+/g, "-");
