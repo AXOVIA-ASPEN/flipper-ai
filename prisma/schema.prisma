@@ -312,3 +312,15 @@ model FacebookToken {
   @@index([userId])
   @@index([expiresAt])
 }
+
+// AI Analysis Cache (for Claude/LLM responses)
+model AiAnalysisCache {
+  id              String    @id @default(cuid())
+  listingId       String
+  analysisResult  String    // JSON-encoded ClaudeAnalysisResult
+  createdAt       DateTime  @default(now())
+  expiresAt       DateTime
+
+  @@index([listingId])
+  @@index([expiresAt])
+}
