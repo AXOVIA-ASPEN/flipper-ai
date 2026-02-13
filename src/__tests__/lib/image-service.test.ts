@@ -1,11 +1,30 @@
+/**
+ * @jest-environment node
+ */
 import {
   generateImageHash,
   normalizeLocation,
   buildProxyUrl,
+  downloadAndCacheImage,
+  downloadAndCacheImages,
+  isImageCached,
+  getBestImageUrl,
   NormalizedLocation,
 } from "@/lib/image-service";
+import { writeFile, mkdir, access, unlink } from "fs/promises";
+import { join } from "path";
+
+// Mock fs/promises
+jest.mock("fs/promises");
+
+// Mock fetch
+global.fetch = jest.fn();
 
 describe("Image Service", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe("generateImageHash", () => {
     it("generates consistent hash for same URL", () => {
       const url = "https://example.com/image.jpg";
@@ -172,5 +191,380 @@ describe("Location Normalization Edge Cases", () => {
       const result = normalizeLocation(input);
       expect(result.stateCode).toBe(expectedCode);
     }
+  });
+});
+
+describe("Image Download and Caching", () => {
+  const mockImageUrl = "https://example.com/test-image.jpg";
+  const mockImageBuffer = new Uint8Array([0xFF, 0xD8, 0xFF, 0xE0]); // JPEG header
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (mkdir as jest.Mock).mockResolvedValue(undefined);
+    (writeFile as jest.Mock).mockResolvedValue(undefined);
+  });
+
+  describe("downloadAndCacheImage", () => {
+    it("successfully downloads and caches an image", async () => {
+      // Mock cache directory exists
+      (access as jest.Mock).mockResolvedValueOnce(undefined); // Cache dir exists
+      (access as jest.Mock).mockRejectedValueOnce(new Error("Not found")); // Cache miss for jpg
+      (access as jest.Mock).mockRejectedValueOnce(new Error("Not found")); // Cache miss for png
+      (access as jest.Mock).mockRejectedValueOnce(new Error("Not found")); // Cache miss for webp
+      (access as jest.Mock).mockRejectedValueOnce(new Error("Not found")); // Cache miss for gif
+      
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: {
+          get: (name: string) => name === "content-type" ? "image/jpeg" : null,
+        },
+        arrayBuffer: async () => mockImageBuffer.buffer,
+      });
+
+      const result = await downloadAndCacheImage(mockImageUrl);
+
+      expect(result.success).toBe(true);
+      expect(result.cachedImage).toBeDefined();
+      expect(result.cachedImage?.originalUrl).toBe(mockImageUrl);
+      expect(result.cachedImage?.mimeType).toBe("image/jpeg");
+      expect(writeFile).toHaveBeenCalled();
+    });
+
+    it("returns cached image if already exists", async () => {
+      (access as jest.Mock)
+        .mockResolvedValueOnce(undefined) // Cache dir exists
+        .mockResolvedValueOnce(undefined); // File exists
+
+      const result = await downloadAndCacheImage(mockImageUrl);
+
+      expect(result.success).toBe(true);
+      expect(result.cachedImage).toBeDefined();
+      expect(fetch).not.toHaveBeenCalled();
+    });
+
+    it("handles HTTP errors", async () => {
+      (access as jest.Mock)
+        .mockResolvedValueOnce(undefined) // Cache dir exists
+        .mockRejectedValue(new Error("Not found")); // No cached files
+      
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: "Not Found",
+      });
+
+      const result = await downloadAndCacheImage(mockImageUrl);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain("404");
+    });
+
+    it("handles network errors", async () => {
+      (access as jest.Mock)
+        .mockResolvedValueOnce(undefined) // Cache dir exists
+        .mockRejectedValue(new Error("Not found"));
+      (fetch as jest.Mock).mockRejectedValueOnce(new Error("Network error"));
+
+      const result = await downloadAndCacheImage(mockImageUrl);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Network error");
+    });
+
+    it("rejects unsupported image types", async () => {
+      (access as jest.Mock)
+        .mockResolvedValueOnce(undefined) // Cache dir exists
+        .mockRejectedValue(new Error("Not found"));
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        headers: {
+          get: (name: string) => name === "content-type" ? "image/bmp" : null,
+        },
+        arrayBuffer: async () => mockImageBuffer.buffer,
+      });
+
+      const result = await downloadAndCacheImage(mockImageUrl);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain("Unsupported image type");
+    });
+
+    it("rejects images that are too large", async () => {
+      const largeBuffer = new Uint8Array(6 * 1024 * 1024); // 6MB (over 5MB limit)
+      (access as jest.Mock)
+        .mockResolvedValueOnce(undefined) // Cache dir exists
+        .mockRejectedValue(new Error("Not found"));
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        headers: {
+          get: (name: string) => name === "content-type" ? "image/jpeg" : null,
+        },
+        arrayBuffer: async () => largeBuffer.buffer,
+      });
+
+      const result = await downloadAndCacheImage(mockImageUrl);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain("too large");
+    });
+
+    it("handles timeout errors", async () => {
+      (access as jest.Mock)
+        .mockResolvedValueOnce(undefined) // Cache dir exists
+        .mockRejectedValue(new Error("Not found"));
+      (fetch as jest.Mock).mockRejectedValueOnce(new Error("The operation was aborted"));
+
+      const result = await downloadAndCacheImage(mockImageUrl);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Download timeout");
+    });
+
+    it("handles different content-type formats", async () => {
+      (access as jest.Mock)
+        .mockResolvedValueOnce(undefined) // Cache dir exists
+        .mockRejectedValue(new Error("Not found"));
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        headers: {
+          get: (name: string) => name === "content-type" ? "image/webp; charset=utf-8" : null,
+        },
+        arrayBuffer: async () => mockImageBuffer.buffer,
+      });
+
+      const result = await downloadAndCacheImage(mockImageUrl);
+
+      expect(result.success).toBe(true);
+      expect(result.cachedImage?.mimeType).toBe("image/webp");
+    });
+
+    it("handles missing content-type header", async () => {
+      (access as jest.Mock)
+        .mockResolvedValueOnce(undefined) // Cache dir exists
+        .mockRejectedValue(new Error("Not found"));
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        headers: {
+          get: () => null,
+        },
+        arrayBuffer: async () => mockImageBuffer.buffer,
+      });
+
+      const result = await downloadAndCacheImage(mockImageUrl);
+
+      expect(result.success).toBe(true);
+      expect(result.cachedImage?.mimeType).toBe("image/jpeg"); // Default
+    });
+
+    it("creates cache directory if it doesn't exist", async () => {
+      (access as jest.Mock)
+        .mockRejectedValueOnce(new Error("Directory not found")) // Cache dir doesn't exist
+        .mockRejectedValue(new Error("File not found")); // Cache misses
+        
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        headers: {
+          get: (name: string) => name === "content-type" ? "image/png" : null,
+        },
+        arrayBuffer: async () => mockImageBuffer.buffer,
+      });
+
+      await downloadAndCacheImage(mockImageUrl);
+
+      expect(mkdir).toHaveBeenCalledWith(
+        expect.stringContaining("public/images/listings"),
+        { recursive: true }
+      );
+    });
+  });
+
+  describe("downloadAndCacheImages", () => {
+    it("processes multiple images successfully", async () => {
+      const urls = [
+        "https://example.com/img1.jpg",
+        "https://example.com/img2.jpg",
+        "https://example.com/img3.jpg",
+      ];
+
+      (access as jest.Mock).mockRejectedValue(new Error("Not found"));
+      (fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        headers: new Map([["content-type", "image/jpeg"]]),
+        arrayBuffer: async () => mockImageBuffer.buffer,
+      });
+
+      const result = await downloadAndCacheImages(urls);
+
+      expect(result.successCount).toBe(3);
+      expect(result.failCount).toBe(0);
+      expect(result.cachedUrls).toHaveLength(3);
+    });
+
+    it("respects maxConcurrent option", async () => {
+      const urls = Array(10).fill("https://example.com/image.jpg");
+      let concurrentCalls = 0;
+      let maxConcurrent = 0;
+
+      (access as jest.Mock).mockRejectedValue(new Error("Not found"));
+      (fetch as jest.Mock).mockImplementation(async () => {
+        concurrentCalls++;
+        maxConcurrent = Math.max(maxConcurrent, concurrentCalls);
+        await new Promise(resolve => setTimeout(resolve, 10));
+        concurrentCalls--;
+        return {
+          ok: true,
+          headers: new Map([["content-type", "image/jpeg"]]),
+          arrayBuffer: async () => mockImageBuffer.buffer,
+        };
+      });
+
+      await downloadAndCacheImages(urls, { maxConcurrent: 2 });
+
+      expect(maxConcurrent).toBeLessThanOrEqual(2);
+    });
+
+    it("handles partial failures with skipOnFailure=true", async () => {
+      const urls = [
+        "https://example.com/good.jpg",
+        "https://example.com/bad.jpg",
+        "https://example.com/good2.jpg",
+      ];
+
+      (access as jest.Mock).mockRejectedValue(new Error("Not found"));
+      (fetch as jest.Mock)
+        .mockResolvedValueOnce({
+          ok: true,
+          headers: new Map([["content-type", "image/jpeg"]]),
+          arrayBuffer: async () => mockImageBuffer.buffer,
+        })
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 404,
+          statusText: "Not Found",
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          headers: new Map([["content-type", "image/jpeg"]]),
+          arrayBuffer: async () => mockImageBuffer.buffer,
+        });
+
+      const result = await downloadAndCacheImages(urls, { skipOnFailure: true });
+
+      expect(result.successCount).toBe(2);
+      expect(result.failCount).toBe(1);
+      expect(result.cachedUrls).toHaveLength(3); // Includes fallback URL
+      expect(result.cachedUrls[1]).toBe(urls[1]); // Failed URL used as fallback
+    });
+
+    it("handles partial failures with skipOnFailure=false", async () => {
+      const urls = [
+        "https://example.com/good.jpg",
+        "https://example.com/bad.jpg",
+      ];
+
+      (access as jest.Mock).mockRejectedValue(new Error("Not found"));
+      (fetch as jest.Mock)
+        .mockResolvedValueOnce({
+          ok: true,
+          headers: new Map([["content-type", "image/jpeg"]]),
+          arrayBuffer: async () => mockImageBuffer.buffer,
+        })
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 500,
+          statusText: "Server Error",
+        });
+
+      const result = await downloadAndCacheImages(urls, { skipOnFailure: false });
+
+      expect(result.successCount).toBe(1);
+      expect(result.failCount).toBe(1);
+      expect(result.cachedUrls).toHaveLength(1); // Only successful downloads
+    });
+  });
+
+  describe("isImageCached", () => {
+    it("returns path for cached jpg image", async () => {
+      (access as jest.Mock)
+        .mockRejectedValueOnce(new Error("Not found")) // .jpg not found
+        .mockResolvedValueOnce(undefined); // .png found
+
+      const hash = "abc123def456";
+      const result = await isImageCached(hash);
+
+      expect(result).toContain(`${hash}.png`);
+    });
+
+    it("returns null if image not cached", async () => {
+      (access as jest.Mock).mockRejectedValue(new Error("Not found"));
+
+      const result = await isImageCached("nonexistent");
+
+      expect(result).toBeNull();
+    });
+
+    it("checks multiple extensions", async () => {
+      const mockAccess = access as jest.Mock;
+      mockAccess.mockRejectedValue(new Error("Not found"));
+
+      await isImageCached("test-hash");
+
+      expect(mockAccess).toHaveBeenCalledWith(
+        expect.stringContaining("test-hash.jpg")
+      );
+      expect(mockAccess).toHaveBeenCalledWith(
+        expect.stringContaining("test-hash.png")
+      );
+      expect(mockAccess).toHaveBeenCalledWith(
+        expect.stringContaining("test-hash.webp")
+      );
+      expect(mockAccess).toHaveBeenCalledWith(
+        expect.stringContaining("test-hash.gif")
+      );
+    });
+  });
+
+  describe("getBestImageUrl", () => {
+    it("returns cached URL if available", async () => {
+      (access as jest.Mock).mockResolvedValueOnce(undefined);
+
+      const url = "https://example.com/image.jpg";
+      const result = await getBestImageUrl(url);
+
+      expect(result).toContain("/images/listings/");
+      expect(result).not.toBe(url);
+    });
+
+    it("returns proxy URL if useProxy=true and not cached", async () => {
+      (access as jest.Mock).mockRejectedValue(new Error("Not found"));
+
+      const url = "https://example.com/image.jpg";
+      const result = await getBestImageUrl(url, {
+        useProxy: true,
+        baseUrl: "https://myapp.com",
+      });
+
+      expect(result).toContain("/api/images/proxy");
+      expect(result).toContain(encodeURIComponent(url));
+    });
+
+    it("returns original URL if not cached and useProxy=false", async () => {
+      (access as jest.Mock).mockRejectedValue(new Error("Not found"));
+
+      const url = "https://example.com/image.jpg";
+      const result = await getBestImageUrl(url, { useProxy: false });
+
+      expect(result).toBe(url);
+    });
+
+    it("returns original URL by default if not cached", async () => {
+      (access as jest.Mock).mockRejectedValue(new Error("Not found"));
+
+      const url = "https://example.com/image.jpg";
+      const result = await getBestImageUrl(url);
+
+      expect(result).toBe(url);
+    });
   });
 });
