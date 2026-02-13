@@ -6,7 +6,8 @@
 
 import { World, IWorldOptions, setWorldConstructor } from '@cucumber/cucumber';
 import { Page, Browser, chromium } from '@playwright/test';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../src/generated/prisma/client';
+import { PrismaLibSql } from '@prisma/adapter-libsql';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -27,7 +28,10 @@ export class CustomWorld extends World implements FlipperWorld {
 
   constructor(options: IWorldOptions) {
     super(options);
-    this.db = new PrismaClient();
+    const adapter = new PrismaLibSql({
+      url: process.env.DATABASE_URL || 'file:./test.db'
+    });
+    this.db = new PrismaClient({ adapter });
   }
 
   /**
@@ -40,8 +44,8 @@ export class CustomWorld extends World implements FlipperWorld {
       return;
     }
 
-    const scenarioName = this.scenario?.name
-      .replace(/[^a-z0-9]/gi, '-')
+    const scenarioName = (this as any).scenario?.name
+      ?.replace(/[^a-z0-9]/gi, '-')
       .toLowerCase() || 'unknown';
     
     const dir = path.join('screenshots', scenarioName);

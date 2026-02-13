@@ -16,7 +16,7 @@ module.exports = {
     ],
     
     // Enable TypeScript
-    requireModule: ['ts-node/register'],
+    requireModule: ['ts-node/register/transpile-only'],
     
     // Output formats
     format: [
@@ -49,7 +49,7 @@ module.exports = {
       'features/step_definitions/**/*.ts',
       'features/support/**/*.ts'
     ],
-    requireModule: ['ts-node/register'],
+    requireModule: ['ts-node/register/transpile-only'],
     format: [
       'json:reports/cucumber-report.json',
       'junit:reports/cucumber-report.xml',
@@ -66,7 +66,7 @@ module.exports = {
       'features/step_definitions/**/*.ts',
       'features/support/**/*.ts'
     ],
-    requireModule: ['ts-node/register'],
+    requireModule: ['ts-node/register/transpile-only'],
     format: [
       'progress-bar',
       'html:reports/cucumber-report.html',
