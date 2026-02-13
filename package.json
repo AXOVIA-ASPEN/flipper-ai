@@ -16,7 +16,12 @@
     "test:integration:watch": "jest --config jest.integration.config.js --watch",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:headed": "playwright test --headed"
+    "test:e2e:headed": "playwright test --headed",
+    "test:bdd": "cucumber-js",
+    "test:bdd:dev": "cucumber-js --profile dev",
+    "test:bdd:ci": "cucumber-js --profile ci",
+    "test:bdd:watch": "nodemon --watch features --exec 'cucumber-js --profile dev'",
+    "test:all": "npm run test && npm run test:bdd && npm run test:e2e"
   },
   "dependencies": {
     "@browserbasehq/stagehand": "^3.0.6",

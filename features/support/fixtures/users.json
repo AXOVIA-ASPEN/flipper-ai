@@ -1,0 +1,26 @@
+{
+  "free_user": {
+    "id": "test-user-free-001",
+    "email": "testuser@example.com",
+    "password": "TestPass123!",
+    "tier": "free",
+    "scansToday": 0,
+    "maxScansPerDay": 10
+  },
+  "flipper_user": {
+    "id": "test-user-flipper-001",
+    "email": "flipper@example.com",
+    "password": "FlipperPass123!",
+    "tier": "flipper",
+    "scansToday": 0,
+    "maxScansPerDay": -1
+  },
+  "pro_user": {
+    "id": "test-user-pro-001",
+    "email": "pro@example.com",
+    "password": "ProPass123!",
+    "tier": "pro",
+    "scansToday": 0,
+    "maxScansPerDay": -1
+  }
+}
