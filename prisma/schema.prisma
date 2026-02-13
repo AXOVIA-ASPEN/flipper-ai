@@ -299,3 +299,16 @@ model UserSettings {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 }
+
+// Facebook OAuth tokens for Marketplace API access
+model FacebookToken {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  accessToken     String    // Encrypted OAuth access token
+  expiresAt       DateTime  // Token expiration timestamp
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([expiresAt])
+}
