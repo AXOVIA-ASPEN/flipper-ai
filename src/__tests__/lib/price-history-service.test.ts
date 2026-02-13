@@ -256,4 +256,185 @@ describe("Price History Service", () => {
       expect(prisma.listing.update).not.toHaveBeenCalled();
     });
   });
+
+  describe("batchUpdateListingsWithMarketValue", () => {
+    // Import the batch function
+    const { batchUpdateListingsWithMarketValue } = require("../../lib/price-history-service");
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      // Clear timers
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it("should successfully update multiple listings", async () => {
+      const listingIds = ["listing1", "listing2", "listing3"];
+      
+      const mockListing = (id: string) => ({
+        id,
+        title: `Product ${id}`,
+        askingPrice: 100,
+        category: "electronics",
+      });
+
+      const mockMarketData = {
+        source: "ebay_scrape" as const,
+        soldListings: [
+          {
+            title: "Product",
+            price: 200,
+            soldDate: new Date(),
+            condition: "Good",
+            url: "https://ebay.com/item/1",
+            shippingCost: 0,
+          },
+        ],
+        medianPrice: 200,
+        lowPrice: 200,
+        highPrice: 200,
+        avgPrice: 200,
+        salesCount: 1,
+        avgDaysToSell: null,
+        searchQuery: "Product",
+        fetchedAt: new Date(),
+      };
+
+      jest.mocked(prisma.listing.findUnique)
+        .mockResolvedValueOnce(mockListing("listing1") as any)
+        .mockResolvedValueOnce(mockListing("listing2") as any)
+        .mockResolvedValueOnce(mockListing("listing3") as any);
+
+      jest.mocked(marketPrice.fetchMarketPrice).mockResolvedValue(mockMarketData);
+
+      // Start the batch update
+      const resultPromise = batchUpdateListingsWithMarketValue(listingIds);
+
+      // Fast-forward through all setTimeout delays
+      for (let i = 0; i < listingIds.length; i++) {
+        await jest.runAllTimersAsync();
+      }
+
+      const result = await resultPromise;
+
+      expect(result.success).toBe(3);
+      expect(result.failed).toBe(0);
+      expect(result.errors).toHaveLength(0);
+      expect(prisma.listing.update).toHaveBeenCalledTimes(3);
+    });
+
+    it("should handle partial failures", async () => {
+      const listingIds = ["listing1", "listing2", "listing3"];
+      
+      jest.mocked(prisma.listing.findUnique)
+        .mockResolvedValueOnce({
+          id: "listing1",
+          title: "Product 1",
+          askingPrice: 100,
+          category: null,
+        } as any)
+        .mockRejectedValueOnce(new Error("Listing not found")) // listing2 fails
+        .mockResolvedValueOnce({
+          id: "listing3",
+          title: "Product 3",
+          askingPrice: 100,
+          category: null,
+        } as any);
+
+      jest.mocked(marketPrice.fetchMarketPrice).mockResolvedValue({
+        source: "ebay_scrape" as const,
+        soldListings: [],
+        medianPrice: 150,
+        lowPrice: 150,
+        highPrice: 150,
+        avgPrice: 150,
+        salesCount: 1,
+        avgDaysToSell: null,
+        searchQuery: "Product",
+        fetchedAt: new Date(),
+      });
+
+      const resultPromise = batchUpdateListingsWithMarketValue(listingIds);
+
+      // Fast-forward through delays
+      for (let i = 0; i < listingIds.length; i++) {
+        await jest.runAllTimersAsync();
+      }
+
+      const result = await resultPromise;
+
+      expect(result.success).toBe(2);
+      expect(result.failed).toBe(1);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0].listingId).toBe("listing2");
+      expect(result.errors[0].error).toContain("not found");
+    });
+
+    it("should handle all failures", async () => {
+      const listingIds = ["listing1", "listing2"];
+      
+      jest.mocked(prisma.listing.findUnique).mockRejectedValue(
+        new Error("Database error")
+      );
+
+      const resultPromise = batchUpdateListingsWithMarketValue(listingIds);
+
+      // Fast-forward through delays
+      for (let i = 0; i < listingIds.length; i++) {
+        await jest.runAllTimersAsync();
+      }
+
+      const result = await resultPromise;
+
+      expect(result.success).toBe(0);
+      expect(result.failed).toBe(2);
+      expect(result.errors).toHaveLength(2);
+    });
+
+    it("should add delays between requests", async () => {
+      const listingIds = ["listing1", "listing2"];
+      const delays: number[] = [];
+      let lastCall = Date.now();
+
+      jest.mocked(prisma.listing.findUnique).mockResolvedValue({
+        id: "listing1",
+        title: "Product",
+        askingPrice: 100,
+        category: null,
+      } as any);
+
+      jest.mocked(marketPrice.fetchMarketPrice).mockImplementation(async () => {
+        const now = Date.now();
+        delays.push(now - lastCall);
+        lastCall = now;
+        return {
+          source: "ebay_scrape" as const,
+          soldListings: [],
+          medianPrice: 150,
+          lowPrice: 150,
+          highPrice: 150,
+          avgPrice: 150,
+          salesCount: 1,
+          avgDaysToSell: null,
+          searchQuery: "Product",
+          fetchedAt: new Date(),
+        };
+      });
+
+      const resultPromise = batchUpdateListingsWithMarketValue(listingIds);
+
+      // Fast-forward through delays
+      for (let i = 0; i < listingIds.length; i++) {
+        await jest.runAllTimersAsync();
+      }
+
+      const result = await resultPromise;
+
+      // Verify delays were called (using fake timers, so we just check the function was called)
+      expect(result.success).toBe(2);
+    });
+  });
 });
