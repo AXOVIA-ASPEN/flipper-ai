@@ -198,20 +198,45 @@ describe("Image Download and Caching", () => {
   const mockImageUrl = "https://example.com/test-image.jpg";
   const mockImageBuffer = new Uint8Array([0xFF, 0xD8, 0xFF, 0xE0]); // JPEG header
 
+  // Helper to mock access calls (used by isImageCached and ensureCacheDir)
+  const mockCacheMiss = () => {
+    const mockAccess = access as jest.Mock;
+    // isImageCached checks all 4 extensions - all fail
+    mockAccess.mockRejectedValueOnce(new Error("Not found")); // .jpg
+    mockAccess.mockRejectedValueOnce(new Error("Not found")); // .png
+    mockAccess.mockRejectedValueOnce(new Error("Not found")); // .webp
+    mockAccess.mockRejectedValueOnce(new Error("Not found")); // .gif
+    // ensureCacheDir checks if directory exists - succeeds
+    mockAccess.mockResolvedValueOnce(undefined);
+  };
+
+  const mockCacheHit = () => {
+    const mockAccess = access as jest.Mock;
+    // isImageCached checks jpg - succeeds immediately
+    mockAccess.mockResolvedValueOnce(undefined);
+  };
+
+  const mockCacheDirMissing = () => {
+    const mockAccess = access as jest.Mock;
+    // isImageCached checks all 4 extensions - all fail
+    mockAccess.mockRejectedValueOnce(new Error("Not found"));
+    mockAccess.mockRejectedValueOnce(new Error("Not found"));
+    mockAccess.mockRejectedValueOnce(new Error("Not found"));
+    mockAccess.mockRejectedValueOnce(new Error("Not found"));
+    // ensureCacheDir checks if directory exists - fails, triggers mkdir
+    mockAccess.mockRejectedValueOnce(new Error("Not found"));
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
     (mkdir as jest.Mock).mockResolvedValue(undefined);
     (writeFile as jest.Mock).mockResolvedValue(undefined);
+    (fetch as jest.Mock).mockClear();
   });
 
   describe("downloadAndCacheImage", () => {
     it("successfully downloads and caches an image", async () => {
-      // Mock cache directory exists
-      (access as jest.Mock).mockResolvedValueOnce(undefined); // Cache dir exists
-      (access as jest.Mock).mockRejectedValueOnce(new Error("Not found")); // Cache miss for jpg
-      (access as jest.Mock).mockRejectedValueOnce(new Error("Not found")); // Cache miss for png
-      (access as jest.Mock).mockRejectedValueOnce(new Error("Not found")); // Cache miss for webp
-      (access as jest.Mock).mockRejectedValueOnce(new Error("Not found")); // Cache miss for gif
+      mockCacheMiss();
       
       (fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
@@ -232,9 +257,7 @@ describe("Image Download and Caching", () => {
     });
 
     it("returns cached image if already exists", async () => {
-      (access as jest.Mock)
-        .mockResolvedValueOnce(undefined) // Cache dir exists
-        .mockResolvedValueOnce(undefined); // File exists
+      mockCacheHit();
 
       const result = await downloadAndCacheImage(mockImageUrl);
 
@@ -244,9 +267,7 @@ describe("Image Download and Caching", () => {
     });
 
     it("handles HTTP errors", async () => {
-      (access as jest.Mock)
-        .mockResolvedValueOnce(undefined) // Cache dir exists
-        .mockRejectedValue(new Error("Not found")); // No cached files
+      mockCacheMiss();
       
       (fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
@@ -261,9 +282,7 @@ describe("Image Download and Caching", () => {
     });
 
     it("handles network errors", async () => {
-      (access as jest.Mock)
-        .mockResolvedValueOnce(undefined) // Cache dir exists
-        .mockRejectedValue(new Error("Not found"));
+      mockCacheMiss();
       (fetch as jest.Mock).mockRejectedValueOnce(new Error("Network error"));
 
       const result = await downloadAndCacheImage(mockImageUrl);
@@ -273,9 +292,7 @@ describe("Image Download and Caching", () => {
     });
 
     it("rejects unsupported image types", async () => {
-      (access as jest.Mock)
-        .mockResolvedValueOnce(undefined) // Cache dir exists
-        .mockRejectedValue(new Error("Not found"));
+      mockCacheMiss();
       (fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         headers: {
@@ -292,9 +309,7 @@ describe("Image Download and Caching", () => {
 
     it("rejects images that are too large", async () => {
       const largeBuffer = new Uint8Array(6 * 1024 * 1024); // 6MB (over 5MB limit)
-      (access as jest.Mock)
-        .mockResolvedValueOnce(undefined) // Cache dir exists
-        .mockRejectedValue(new Error("Not found"));
+      mockCacheMiss();
       (fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         headers: {
@@ -310,9 +325,7 @@ describe("Image Download and Caching", () => {
     });
 
     it("handles timeout errors", async () => {
-      (access as jest.Mock)
-        .mockResolvedValueOnce(undefined) // Cache dir exists
-        .mockRejectedValue(new Error("Not found"));
+      mockCacheMiss();
       (fetch as jest.Mock).mockRejectedValueOnce(new Error("The operation was aborted"));
 
       const result = await downloadAndCacheImage(mockImageUrl);
@@ -322,9 +335,7 @@ describe("Image Download and Caching", () => {
     });
 
     it("handles different content-type formats", async () => {
-      (access as jest.Mock)
-        .mockResolvedValueOnce(undefined) // Cache dir exists
-        .mockRejectedValue(new Error("Not found"));
+      mockCacheMiss();
       (fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         headers: {
@@ -340,9 +351,7 @@ describe("Image Download and Caching", () => {
     });
 
     it("handles missing content-type header", async () => {
-      (access as jest.Mock)
-        .mockResolvedValueOnce(undefined) // Cache dir exists
-        .mockRejectedValue(new Error("Not found"));
+      mockCacheMiss();
       (fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         headers: {
@@ -358,9 +367,7 @@ describe("Image Download and Caching", () => {
     });
 
     it("creates cache directory if it doesn't exist", async () => {
-      (access as jest.Mock)
-        .mockRejectedValueOnce(new Error("Directory not found")) // Cache dir doesn't exist
-        .mockRejectedValue(new Error("File not found")); // Cache misses
+      mockCacheDirMissing();
         
       (fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
@@ -387,10 +394,21 @@ describe("Image Download and Caching", () => {
         "https://example.com/img3.jpg",
       ];
 
-      (access as jest.Mock).mockRejectedValue(new Error("Not found"));
+      // Simplify: mock implementation that always says cache dir exists, files don't
+      (access as jest.Mock).mockImplementation((path: string) => {
+        // If checking for a file (has extension), reject
+        if (path.match(/\.(jpg|png|webp|gif)$/)) {
+          return Promise.reject(new Error("Not found"));
+        }
+        // Otherwise it's the directory check, resolve
+        return Promise.resolve();
+      });
+      
       (fetch as jest.Mock).mockResolvedValue({
         ok: true,
-        headers: new Map([["content-type", "image/jpeg"]]),
+        headers: {
+          get: (name: string) => name === "content-type" ? "image/jpeg" : null,
+        },
         arrayBuffer: async () => mockImageBuffer.buffer,
       });
 
@@ -402,11 +420,17 @@ describe("Image Download and Caching", () => {
     });
 
     it("respects maxConcurrent option", async () => {
-      const urls = Array(10).fill("https://example.com/image.jpg");
+      const urls = Array(10).fill("https://example.com/image.jpg").map((url, i) => `${url}?id=${i}`);
       let concurrentCalls = 0;
       let maxConcurrent = 0;
 
-      (access as jest.Mock).mockRejectedValue(new Error("Not found"));
+      (access as jest.Mock).mockImplementation((path: string) => {
+        if (path.match(/\.(jpg|png|webp|gif)$/)) {
+          return Promise.reject(new Error("Not found"));
+        }
+        return Promise.resolve();
+      });
+      
       (fetch as jest.Mock).mockImplementation(async () => {
         concurrentCalls++;
         maxConcurrent = Math.max(maxConcurrent, concurrentCalls);
@@ -414,7 +438,9 @@ describe("Image Download and Caching", () => {
         concurrentCalls--;
         return {
           ok: true,
-          headers: new Map([["content-type", "image/jpeg"]]),
+          headers: {
+            get: (name: string) => name === "content-type" ? "image/jpeg" : null,
+          },
           arrayBuffer: async () => mockImageBuffer.buffer,
         };
       });
@@ -431,11 +457,19 @@ describe("Image Download and Caching", () => {
         "https://example.com/good2.jpg",
       ];
 
-      (access as jest.Mock).mockRejectedValue(new Error("Not found"));
+      (access as jest.Mock).mockImplementation((path: string) => {
+        if (path.match(/\.(jpg|png|webp|gif)$/)) {
+          return Promise.reject(new Error("Not found"));
+        }
+        return Promise.resolve();
+      });
+      
       (fetch as jest.Mock)
         .mockResolvedValueOnce({
           ok: true,
-          headers: new Map([["content-type", "image/jpeg"]]),
+          headers: {
+            get: (name: string) => name === "content-type" ? "image/jpeg" : null,
+          },
           arrayBuffer: async () => mockImageBuffer.buffer,
         })
         .mockResolvedValueOnce({
@@ -445,7 +479,9 @@ describe("Image Download and Caching", () => {
         })
         .mockResolvedValueOnce({
           ok: true,
-          headers: new Map([["content-type", "image/jpeg"]]),
+          headers: {
+            get: (name: string) => name === "content-type" ? "image/jpeg" : null,
+          },
           arrayBuffer: async () => mockImageBuffer.buffer,
         });
 
@@ -463,11 +499,19 @@ describe("Image Download and Caching", () => {
         "https://example.com/bad.jpg",
       ];
 
-      (access as jest.Mock).mockRejectedValue(new Error("Not found"));
+      (access as jest.Mock).mockImplementation((path: string) => {
+        if (path.match(/\.(jpg|png|webp|gif)$/)) {
+          return Promise.reject(new Error("Not found"));
+        }
+        return Promise.resolve();
+      });
+      
       (fetch as jest.Mock)
         .mockResolvedValueOnce({
           ok: true,
-          headers: new Map([["content-type", "image/jpeg"]]),
+          headers: {
+            get: (name: string) => name === "content-type" ? "image/jpeg" : null,
+          },
           arrayBuffer: async () => mockImageBuffer.buffer,
         })
         .mockResolvedValueOnce({
