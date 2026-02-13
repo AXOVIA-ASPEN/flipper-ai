@@ -5,14 +5,36 @@
 import { describe, test, expect, jest, beforeEach } from '@jest/globals';
 
 // Mock NextAuth before importing auth
-jest.mock('next-auth', () => ({
-  __esModule: true,
-  default: jest.fn((config) => ({
+const mockNextAuth = jest.fn((config) => {
+  // Store the config so tests can access it
+  mockNextAuth._config = config;
+  return {
     handlers: { GET: jest.fn(), POST: jest.fn() },
     auth: jest.fn(),
     signIn: jest.fn(),
     signOut: jest.fn(),
-  })),
+  };
+});
+
+jest.mock('next-auth', () => ({
+  __esModule: true,
+  default: mockNextAuth,
+}));
+
+// Mock NextAuth providers
+jest.mock('next-auth/providers/google', () => ({
+  __esModule: true,
+  default: jest.fn((config) => ({ ...config, type: 'oauth', id: 'google', name: 'Google' })),
+}));
+
+jest.mock('next-auth/providers/github', () => ({
+  __esModule: true,
+  default: jest.fn((config) => ({ ...config, type: 'oauth', id: 'github', name: 'GitHub' })),
+}));
+
+jest.mock('next-auth/providers/credentials', () => ({
+  __esModule: true,
+  default: jest.fn((config) => ({ ...config, type: 'credentials', id: 'credentials', name: 'credentials' })),
 }));
 
 // Mock Prisma adapter
@@ -51,7 +73,7 @@ describe('Auth utilities', () => {
     jest.clearAllMocks();
     // Get the mocked auth function from NextAuth
     const NextAuth = require('next-auth').default;
-    const authConfig = NextAuth.mock.calls[0]?.[0];
+    const authConfig = NextAuth._config;
     mockAuth = authConfig ? jest.fn() : jest.fn();
   });
 
@@ -178,7 +200,7 @@ describe('Auth utilities', () => {
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
       const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth.mock.calls[0]?.[0];
+      const authConfig = NextAuth._config;
       const credentialsProvider = authConfig.providers.find(
         (p: any) => p.name === 'credentials'
       );
@@ -202,7 +224,7 @@ describe('Auth utilities', () => {
 
     test('should reject missing email', async () => {
       const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth.mock.calls[0]?.[0];
+      const authConfig = NextAuth._config;
       const credentialsProvider = authConfig.providers.find(
         (p: any) => p.name === 'credentials'
       );
@@ -214,7 +236,7 @@ describe('Auth utilities', () => {
 
     test('should reject missing password', async () => {
       const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth.mock.calls[0]?.[0];
+      const authConfig = NextAuth._config;
       const credentialsProvider = authConfig.providers.find(
         (p: any) => p.name === 'credentials'
       );
@@ -228,7 +250,7 @@ describe('Auth utilities', () => {
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
 
       const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth.mock.calls[0]?.[0];
+      const authConfig = NextAuth._config;
       const credentialsProvider = authConfig.providers.find(
         (p: any) => p.name === 'credentials'
       );
@@ -249,7 +271,7 @@ describe('Auth utilities', () => {
       });
 
       const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth.mock.calls[0]?.[0];
+      const authConfig = NextAuth._config;
       const credentialsProvider = authConfig.providers.find(
         (p: any) => p.name === 'credentials'
       );
@@ -272,7 +294,7 @@ describe('Auth utilities', () => {
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth.mock.calls[0]?.[0];
+      const authConfig = NextAuth._config;
       const credentialsProvider = authConfig.providers.find(
         (p: any) => p.name === 'credentials'
       );
@@ -289,7 +311,7 @@ describe('Auth utilities', () => {
   describe('JWT callback', () => {
     test('should add user ID to token', async () => {
       const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth.mock.calls[0]?.[0];
+      const authConfig = NextAuth._config;
       const jwtCallback = authConfig.callbacks.jwt;
 
       const token = { sub: 'token-sub' };
@@ -301,7 +323,7 @@ describe('Auth utilities', () => {
 
     test('should preserve existing token when no user', async () => {
       const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth.mock.calls[0]?.[0];
+      const authConfig = NextAuth._config;
       const jwtCallback = authConfig.callbacks.jwt;
 
       const token = { sub: 'token-sub', id: 'existing-id' };
@@ -314,7 +336,7 @@ describe('Auth utilities', () => {
   describe('Session callback', () => {
     test('should add user ID to session', async () => {
       const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth.mock.calls[0]?.[0];
+      const authConfig = NextAuth._config;
       const sessionCallback = authConfig.callbacks.session;
 
       const session = { user: { email: 'test@example.com' } };
@@ -326,7 +348,7 @@ describe('Auth utilities', () => {
 
     test('should handle missing user in session', async () => {
       const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth.mock.calls[0]?.[0];
+      const authConfig = NextAuth._config;
       const sessionCallback = authConfig.callbacks.session;
 
       const session = {};
@@ -338,7 +360,7 @@ describe('Auth utilities', () => {
 
     test('should handle missing token ID', async () => {
       const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth.mock.calls[0]?.[0];
+      const authConfig = NextAuth._config;
       const sessionCallback = authConfig.callbacks.session;
 
       const session = { user: { email: 'test@example.com' } };
@@ -352,7 +374,7 @@ describe('Auth utilities', () => {
   describe('createUser event', () => {
     test('should create default settings for new user', async () => {
       const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth.mock.calls[0]?.[0];
+      const authConfig = NextAuth._config;
       const createUserEvent = authConfig.events.createUser;
 
       const user = { id: 'new-user-123' };
@@ -370,7 +392,7 @@ describe('Auth utilities', () => {
 
     test('should not create settings when user has no ID', async () => {
       const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth.mock.calls[0]?.[0];
+      const authConfig = NextAuth._config;
       const createUserEvent = authConfig.events.createUser;
 
       const user = { email: 'test@example.com' };
