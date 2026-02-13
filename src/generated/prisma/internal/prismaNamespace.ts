@@ -394,7 +394,8 @@ export const ModelName = {
   Session: 'Session',
   VerificationToken: 'VerificationToken',
   UserSettings: 'UserSettings',
-  FacebookToken: 'FacebookToken'
+  FacebookToken: 'FacebookToken',
+  AiAnalysisCache: 'AiAnalysisCache'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -410,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "listing" | "opportunity" | "scraperJob" | "searchConfig" | "priceHistory" | "user" | "account" | "session" | "verificationToken" | "userSettings" | "facebookToken"
+    modelProps: "listing" | "opportunity" | "scraperJob" | "searchConfig" | "priceHistory" | "user" | "account" | "session" | "verificationToken" | "userSettings" | "facebookToken" | "aiAnalysisCache"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1228,6 +1229,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AiAnalysisCache: {
+      payload: Prisma.$AiAnalysisCachePayload<ExtArgs>
+      fields: Prisma.AiAnalysisCacheFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AiAnalysisCacheFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiAnalysisCachePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AiAnalysisCacheFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiAnalysisCachePayload>
+        }
+        findFirst: {
+          args: Prisma.AiAnalysisCacheFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiAnalysisCachePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AiAnalysisCacheFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiAnalysisCachePayload>
+        }
+        findMany: {
+          args: Prisma.AiAnalysisCacheFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiAnalysisCachePayload>[]
+        }
+        create: {
+          args: Prisma.AiAnalysisCacheCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiAnalysisCachePayload>
+        }
+        createMany: {
+          args: Prisma.AiAnalysisCacheCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AiAnalysisCacheCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiAnalysisCachePayload>[]
+        }
+        delete: {
+          args: Prisma.AiAnalysisCacheDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiAnalysisCachePayload>
+        }
+        update: {
+          args: Prisma.AiAnalysisCacheUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiAnalysisCachePayload>
+        }
+        deleteMany: {
+          args: Prisma.AiAnalysisCacheDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AiAnalysisCacheUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AiAnalysisCacheUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiAnalysisCachePayload>[]
+        }
+        upsert: {
+          args: Prisma.AiAnalysisCacheUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiAnalysisCachePayload>
+        }
+        aggregate: {
+          args: Prisma.AiAnalysisCacheAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAiAnalysisCache>
+        }
+        groupBy: {
+          args: Prisma.AiAnalysisCacheGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AiAnalysisCacheGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AiAnalysisCacheCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AiAnalysisCacheCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1475,6 +1550,17 @@ export const FacebookTokenScalarFieldEnum = {
 export type FacebookTokenScalarFieldEnum = (typeof FacebookTokenScalarFieldEnum)[keyof typeof FacebookTokenScalarFieldEnum]
 
 
+export const AiAnalysisCacheScalarFieldEnum = {
+  id: 'id',
+  listingId: 'listingId',
+  analysisResult: 'analysisResult',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type AiAnalysisCacheScalarFieldEnum = (typeof AiAnalysisCacheScalarFieldEnum)[keyof typeof AiAnalysisCacheScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1637,6 +1723,7 @@ export type GlobalOmitConfig = {
   verificationToken?: Prisma.VerificationTokenOmit
   userSettings?: Prisma.UserSettingsOmit
   facebookToken?: Prisma.FacebookTokenOmit
+  aiAnalysisCache?: Prisma.AiAnalysisCacheOmit
 }
 
 /* Types for Logging */

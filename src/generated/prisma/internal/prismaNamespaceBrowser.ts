@@ -61,7 +61,8 @@ export const ModelName = {
   Session: 'Session',
   VerificationToken: 'VerificationToken',
   UserSettings: 'UserSettings',
-  FacebookToken: 'FacebookToken'
+  FacebookToken: 'FacebookToken',
+  AiAnalysisCache: 'AiAnalysisCache'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -286,6 +287,17 @@ export const FacebookTokenScalarFieldEnum = {
 } as const
 
 export type FacebookTokenScalarFieldEnum = (typeof FacebookTokenScalarFieldEnum)[keyof typeof FacebookTokenScalarFieldEnum]
+
+
+export const AiAnalysisCacheScalarFieldEnum = {
+  id: 'id',
+  listingId: 'listingId',
+  analysisResult: 'analysisResult',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type AiAnalysisCacheScalarFieldEnum = (typeof AiAnalysisCacheScalarFieldEnum)[keyof typeof AiAnalysisCacheScalarFieldEnum]
 
 
 export const SortOrder = {
