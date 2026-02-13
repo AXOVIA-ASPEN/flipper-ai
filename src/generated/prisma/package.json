@@ -1,0 +1,6 @@
+{
+  "name": "@generated/prisma",
+  "main": "./client.ts",
+  "types": "./client.ts",
+  "type": "module"
+}

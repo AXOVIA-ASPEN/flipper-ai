@@ -6,7 +6,7 @@
 
 import { World, IWorldOptions, setWorldConstructor } from '@cucumber/cucumber';
 import { Page, Browser, chromium } from '@playwright/test';
-import { PrismaClient } from '../../src/generated/prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { PrismaLibSql } from '@prisma/adapter-libsql';
 import * as fs from 'fs';
 import * as path from 'path';
