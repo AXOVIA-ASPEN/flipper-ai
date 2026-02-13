@@ -39,7 +39,6 @@ jest.mock('bcryptjs', () => ({
   hash: jest.fn(),
 }));
 
-import bcrypt from 'bcryptjs';
 import prisma from '@/lib/db';
 
 // Must import after mocks are set up
@@ -175,6 +174,7 @@ describe('Auth utilities', () => {
       };
 
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
+      const bcrypt = require('bcryptjs');
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
       const NextAuth = require('next-auth').default;
@@ -268,6 +268,7 @@ describe('Auth utilities', () => {
         email: 'test@example.com',
         password: '$2a$10$hashedpassword',
       });
+      const bcrypt = require('bcryptjs');
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       const NextAuth = require('next-auth').default;
