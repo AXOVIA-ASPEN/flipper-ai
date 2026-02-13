@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1770951949534" clover="3.2.0">
-  <project timestamp="1770951949534" name="All files">
+<coverage generated="1770952971426" clover="3.2.0">
+  <project timestamp="1770952971426" name="All files">
     <metrics statements="775" coveredstatements="265" conditionals="598" coveredconditionals="149" methods="119" coveredmethods="38" elements="1492" coveredelements="452" complexity="0" loc="775" ncloc="775" packages="1" files="13" classes="13"/>
     <file name="auth-middleware.ts" path="/home/ubuntu/.openclaw/workspace/projects/flipper-ai/src/lib/auth-middleware.ts">
       <metrics statements="35" coveredstatements="0" conditionals="62" coveredconditionals="0" methods="8" coveredmethods="0"/>
