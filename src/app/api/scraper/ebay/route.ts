@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { estimateValue, detectCategory, generatePurchaseMessage } from "@/lib/value-estimator";
 import { getAuthUserId } from "@/lib/auth-middleware";
+import { calculateVerifiedMarketValue, calculateTrueDiscount } from "@/lib/market-value-calculator";
 
 const EBAY_API_BASE_URL =
   process.env.EBAY_BROWSE_API_BASE_URL || "https://api.ebay.com/buy/browse/v1";
@@ -173,6 +174,14 @@ async function saveListingFromEbayItem(item: EbayItemSummary, userId: string | n
     category
   );
 
+  // Calculate verified market value from sold data
+  const marketValue = await calculateVerifiedMarketValue(item.title, "EBAY");
+  const verifiedMarketValue = marketValue?.verifiedMarketValue || null;
+  const marketDataSource = marketValue?.marketDataSource || null;
+  const trueDiscountPercent = marketValue
+    ? calculateTrueDiscount(marketValue.verifiedMarketValue, price)
+    : null;
+
   const sellerNote = buildSellerNote(item);
   const auctionNote = item.buyingOptions?.includes("AUCTION")
     ? "Auction also available for this item."
@@ -235,6 +244,9 @@ async function saveListingFromEbayItem(item: EbayItemSummary, userId: string | n
       tags,
       requestToBuy,
       status,
+      verifiedMarketValue,
+      marketDataSource,
+      trueDiscountPercent,
     },
     update: {
       title: item.title,
@@ -261,6 +273,9 @@ async function saveListingFromEbayItem(item: EbayItemSummary, userId: string | n
       negotiable: estimation.negotiable,
       tags,
       requestToBuy,
+      verifiedMarketValue,
+      marketDataSource,
+      trueDiscountPercent,
     },
   });
 
