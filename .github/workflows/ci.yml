@@ -13,6 +13,8 @@ jobs:
     env:
       DATABASE_URL: "file:./dev.db"
       CI: "true"
+      AUTH_SECRET: "ci-test-secret"
+      NEXTAUTH_URL: "http://localhost:3000"
 
     steps:
       - uses: actions/checkout@v4
@@ -46,11 +48,11 @@ jobs:
       - name: Run Unit Tests with Coverage
         run: pnpm test:coverage
 
+      - name: Build Project
+        run: pnpm build
+
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
 
       - name: Run BDD Acceptance Tests
         run: pnpm test:bdd
-
-      - name: Build Project
-        run: pnpm build

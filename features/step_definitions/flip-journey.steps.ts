@@ -18,8 +18,8 @@ const screenshots: string[] = [];
 
 Before(async function() {
   browser = await chromium.launch({ 
-    headless: false, // Visual verification needs headed mode
-    slowMo: 100, // Slow down for visual inspection
+    headless: true, // Headless for CI/server environments
+    slowMo: process.env.SLOW_MO ? parseInt(process.env.SLOW_MO) : 0,
   });
   page = await browser.newPage();
   
