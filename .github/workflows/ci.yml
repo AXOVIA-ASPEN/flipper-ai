@@ -11,36 +11,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
-          cache: 'npm'
+          node-version: '20.x'
+          cache: 'pnpm'
 
       - name: Install Dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
 
       - name: Run ESLint
-        run: npm run lint
+        run: pnpm lint
 
       - name: Run Prettier Check
-        run: npm run format:check
+        run: pnpm format:check
 
-      - name: Run Tests with Coverage
-        run: npm run test:coverage
+      - name: Run Unit Tests with Coverage
+        run: pnpm test:coverage
+
+      - name: Run BDD Acceptance Tests
+        run: pnpm test:bdd
 
       - name: Build Project
-        run: npm run build
-
-  # Optional deployment step (customize as needed)
-  # deploy:
-  #   needs: lint-and-test
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Deploy to Production
-  #       run: |
-  #         # Add deployment commands here
-  #         # e.g., SSH, Docker, Heroku, Vercel deployment
+        run: pnpm build

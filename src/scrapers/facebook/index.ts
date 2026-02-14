@@ -7,11 +7,14 @@ export {
   convertToRawListing,
 } from "./scraper";
 
-export {
+export type {
   FacebookScraperConfig,
   FacebookListingDetail,
   FacebookListingPreview,
   FacebookScrapeResult,
+} from "./types";
+
+export {
   FACEBOOK_CATEGORIES,
   FacebookListingPreviewSchema,
   FacebookListingDetailSchema,

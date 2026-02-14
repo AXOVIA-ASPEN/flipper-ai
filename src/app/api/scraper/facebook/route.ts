@@ -105,7 +105,7 @@ function buildSearchParams(params: ScrapeRequestBody): Record<string, string> {
 /**
  * Fetch Facebook access token for the user
  */
-async function getUserFacebookToken(userId: string | null): Promise<string | null> {
+async function getUserFacebookToken(userId: string): Promise<string | null> {
   if (!userId) return null;
 
   const tokenRecord = await prisma.facebookToken.findUnique({
@@ -168,7 +168,7 @@ function formatLocation(location?: FacebookMarketplaceListing["location"]): stri
  */
 async function saveListingFromFacebookItem(
   item: FacebookMarketplaceListing,
-  userId: string | null
+  userId: string
 ) {
   const price = parseFloat(item.price || "0");
   const description = item.description || "";
@@ -178,7 +178,7 @@ async function saveListingFromFacebookItem(
     item.name || "",
     description,
     price,
-    item.condition || undefined,
+    item.condition || null,
     category
   );
 
@@ -288,6 +288,9 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body: ScrapeRequestBody = await request.json();
 
     if (!body.keywords || body.keywords.trim().length === 0) {
@@ -300,7 +303,7 @@ export async function POST(request: NextRequest) {
     // Get access token: from request body, user's stored token, or fail
     let accessToken = body.accessToken;
     if (!accessToken) {
-      accessToken = await getUserFacebookToken(userId);
+      accessToken = await getUserFacebookToken(userId) ?? undefined;
     }
 
     if (!accessToken) {

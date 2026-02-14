@@ -13,7 +13,7 @@ import { RawListing } from "@/lib/marketplace-scanner";
 
 // Stagehand configuration
 const getStagehandConfig = () => ({
-  verbose: 1,
+  verbose: 1 as const,
   domSettleTimeoutMs: 30_000,
   modelName: "gemini-2.0-flash" as const,
   modelClientOptions: {
@@ -171,7 +171,8 @@ export async function scrapeFacebookMarketplace(
     await stagehand.init();
     console.log("Stagehand initialized successfully.");
 
-    const page = stagehand.page;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const page = (stagehand as any).page;
     if (!page) {
       throw new Error("Failed to get page instance from Stagehand");
     }

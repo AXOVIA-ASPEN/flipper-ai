@@ -44,7 +44,7 @@ export async function fetchAndStorePriceHistory(
   }));
 
   try {
-    await prisma.priceHistory.createMany({
+    await (prisma.priceHistory.createMany as any)({
       data: priceRecords,
       skipDuplicates: true,
     });
@@ -86,7 +86,7 @@ export async function getPriceHistory(
   // Get price history from database
   const priceRecords = await prisma.priceHistory.findMany({
     where: {
-      productName: { contains: productName, mode: "insensitive" },
+      productName: { contains: productName },
       ...(category && { category }),
     },
     orderBy: { soldAt: "desc" },

@@ -276,6 +276,9 @@ export async function POST(request: NextRequest) {
 
   try {
     const userId = await getAuthUserId();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await request.json();
     const { location, category, keywords, minPrice, maxPrice } = body;
 

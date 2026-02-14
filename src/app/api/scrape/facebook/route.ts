@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import { getCurrentUserId } from "@/lib/auth";
 import { scrapeAndConvert, FacebookScraperConfig } from "@/scrapers/facebook";
 import {
   processListings,
@@ -11,6 +12,10 @@ import {
 // POST /api/scrape/facebook - Trigger a Facebook Marketplace scrape
 export async function POST(request: NextRequest) {
   try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const body = await request.json();
     const {
       // Scraper config
@@ -106,9 +111,10 @@ export async function POST(request: NextRequest) {
       try {
         const listing = await prisma.listing.upsert({
           where: {
-            platform_externalId: {
+            platform_externalId_userId: {
               platform: "FACEBOOK_MARKETPLACE",
               externalId: analyzed.externalId,
+              userId,
             },
           },
           create: storageData as Parameters<typeof prisma.listing.create>[0]["data"],

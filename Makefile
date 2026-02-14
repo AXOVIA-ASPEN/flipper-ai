@@ -1,7 +1,7 @@
 # Flipper.ai Makefile
 # ====================
 
-.PHONY: help install dev preview build start db-migrate db-sync db-studio db-reset clean test test-e2e test-e2e-ui
+.PHONY: help install dev preview build start db-migrate db-sync db-studio db-reset clean test test-acceptance test-e2e test-e2e-ui test-all
 
 # Default target
 help:
@@ -21,8 +21,10 @@ help:
 	@echo ""
 	@echo "Testing:"
 	@echo "  make test       - Run unit tests (Jest)"
+	@echo "  make test-acceptance - Run BDD acceptance tests (Cucumber)"
 	@echo "  make test-e2e   - Run E2E tests (Playwright)"
 	@echo "  make test-e2e-ui - Run E2E tests with UI (Playwright)"
+	@echo "  make test-all   - Run all tests (unit + BDD + E2E)"
 
 # Install dependencies
 install:
@@ -82,3 +84,11 @@ test-e2e:
 # E2E tests with UI (Playwright)
 test-e2e-ui:
 	pnpm test:e2e:ui
+
+# BDD acceptance tests (Cucumber)
+test-acceptance:
+	pnpm test:bdd
+
+# All tests (unit + BDD + E2E)
+test-all:
+	pnpm test:all

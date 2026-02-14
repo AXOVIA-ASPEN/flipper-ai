@@ -41,7 +41,6 @@ export async function calculateVerifiedMarketValue(
     where: {
       productName: {
         contains: productName,
-        mode: "insensitive",
       },
       platform,
       soldAt: {

@@ -34,14 +34,18 @@ Open [http://localhost:3000](http://localhost:3000) to view the dashboard.
 
 ## Available Commands
 
-| Command           | Description                                    |
-| ----------------- | ---------------------------------------------- |
-| `make preview`    | Install deps, run migrations, start dev server |
-| `make dev`        | Start development server                       |
-| `make build`      | Build for production                           |
-| `make db-migrate` | Run database migrations                        |
-| `make db-studio`  | Open Prisma Studio (database GUI)              |
-| `make db-reset`   | Reset database (deletes all data)              |
+| Command                | Description                                    |
+| ---------------------- | ---------------------------------------------- |
+| `make preview`         | Install deps, run migrations, start dev server |
+| `make dev`             | Start development server                       |
+| `make build`           | Build for production                           |
+| `make test`            | Run unit tests (Jest, 660+ tests)              |
+| `make test-acceptance` | Run BDD acceptance tests (Cucumber/Gherkin)    |
+| `make test-e2e`        | Run E2E tests (Playwright)                     |
+| `make test-all`        | Run all tests (unit + BDD + E2E)               |
+| `make db-migrate`      | Run database migrations                        |
+| `make db-studio`       | Open Prisma Studio (database GUI)              |
+| `make db-reset`        | Reset database (deletes all data)              |
 
 ## Code Quality & Linting
 
@@ -66,14 +70,36 @@ We use ESLint, Prettier, and Husky to maintain high code quality:
 - `.lintstagedrc.js`: Lint-staged configuration
 - `.github/workflows/ci.yml`: GitHub Actions CI/CD pipeline
 
+## Deployment
+
+### Vercel (Recommended)
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel --prod
+```
+
+Configuration is in `vercel.json`. Set environment variables in the Vercel dashboard.
+
+### Docker (Alternative)
+
+```bash
+docker build -t flipper-ai .
+docker run -p 3000:3000 flipper-ai
+```
+
 ## Tech Stack
 
-- **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS
+- **Frontend**: Next.js 16, React, TypeScript, Tailwind CSS
 - **Backend**: Next.js API Routes
-- **Database**: SQLite with Prisma ORM
+- **Database**: SQLite (libSQL) with Prisma ORM
 - **Scraping**: Stagehand with Google Gemini AI
-- **Linting**: ESLint, Prettier
-- **CI/CD**: GitHub Actions
+- **Testing**: Jest (660+ unit tests, 95% coverage), Cucumber BDD, Playwright E2E
+- **Linting**: ESLint, Prettier, Husky pre-commit hooks
+- **CI/CD**: GitHub Actions (lint → test → build on every push)
 
 ## Project Structure
 

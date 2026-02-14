@@ -158,7 +158,7 @@ function buildSellerNote(item: EbayItemSummary) {
   return `Seller feedback: ${percent ?? "N/A"} (${score ?? "N/A"} ratings)`;
 }
 
-async function saveListingFromEbayItem(item: EbayItemSummary, userId: string | null) {
+async function saveListingFromEbayItem(item: EbayItemSummary, userId: string) {
   const price = parseFloat(item.price?.value || "0");
   const description = item.shortDescription || item.description || "";
   const category =
@@ -170,7 +170,7 @@ async function saveListingFromEbayItem(item: EbayItemSummary, userId: string | n
     item.title,
     description,
     price,
-    item.condition || undefined,
+    item.condition || null,
     category
   );
 
@@ -307,8 +307,8 @@ async function storePriceHistoryRecords(
 
   if (!data.length) return 0;
 
-  await prisma.priceHistory.createMany({
-    data: data as Parameters<typeof prisma.priceHistory.createMany>[0]["data"],
+  await (prisma.priceHistory.createMany as any)({
+    data,
     skipDuplicates: true,
   });
 
@@ -339,6 +339,9 @@ export async function POST(request: NextRequest) {
 
   try {
     const userId = await getAuthUserId();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body: ScrapeRequestBody = await request.json();
     if (!body.keywords || body.keywords.trim().length === 0) {
       return NextResponse.json(
