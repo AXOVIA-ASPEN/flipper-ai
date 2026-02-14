@@ -10,6 +10,10 @@ jobs:
   lint-and-test:
     runs-on: ubuntu-latest
 
+    env:
+      DATABASE_URL: "file:./dev.db"
+      CI: "true"
+
     steps:
       - uses: actions/checkout@v4
 
@@ -30,6 +34,9 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate
 
+      - name: Setup Database
+        run: npx prisma db push
+
       - name: Run ESLint
         run: pnpm lint
 
@@ -38,6 +45,9 @@ jobs:
 
       - name: Run Unit Tests with Coverage
         run: pnpm test:coverage
+
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium --with-deps
 
       - name: Run BDD Acceptance Tests
         run: pnpm test:bdd

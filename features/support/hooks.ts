@@ -13,7 +13,7 @@ let browser: Browser;
 BeforeAll(async function () {
   // Launch browser once for all tests
   browser = await chromium.launch({
-    headless: process.env.CI === 'true', // Headless in CI, headed locally
+    headless: true, // Always headless on server (no X display)
     slowMo: process.env.SLOW_MO ? parseInt(process.env.SLOW_MO) : 0,
   });
   console.log('🚀 Browser launched');

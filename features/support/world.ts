@@ -7,6 +7,7 @@
 import { World, IWorldOptions, setWorldConstructor } from '@cucumber/cucumber';
 import { Page, Browser, chromium } from '@playwright/test';
 import { PrismaClient } from '../../src/generated/prisma/client';
+import { PrismaLibSql } from '@prisma/adapter-libsql';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -32,7 +33,10 @@ export class CustomWorld extends World implements FlipperWorld {
 
   get db(): PrismaClient {
     if (!this._db) {
-      this._db = new PrismaClient();
+      const adapter = new PrismaLibSql({
+        url: process.env.DATABASE_URL ?? 'file:./dev.db',
+      });
+      this._db = new PrismaClient({ adapter });
     }
     return this._db;
   }

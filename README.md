@@ -1,200 +1,249 @@
-# Flipper.ai
+# 🐧 Flipper.ai
 
-AI-powered marketplace scraper to find underpriced items for flipping profit. Automatically scrapes Craigslist, Facebook Marketplace, eBay, and OfferUp to identify flip opportunities.
+[![CI/CD Pipeline](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-660%2B-brightgreen)](.)
+[![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen)](.)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](.)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Features
+AI-powered marketplace flipping tool. Automatically scans Craigslist, Facebook Marketplace, eBay, OfferUp, and Mercari to find underpriced items, analyze profit potential with AI, and manage your flipping workflow from discovery to sale.
 
-- **Multi-Platform Scraping** - Scrapes Craigslist, Facebook Marketplace, eBay, and OfferUp
-- **AI-Powered Analysis** - Uses Stagehand with Gemini AI for intelligent data extraction
-- **Value Estimation** - Automatically estimates market value and profit potential
-- **Opportunity Tracking** - Track items from discovery through sale
-- **Dashboard UI** - Clean interface to browse and manage opportunities
+## ✨ Features
 
-## Quick Start
+- **Multi-Platform Scanning** — Scrapes 5 marketplaces simultaneously
+- **AI-Powered Analysis** — Uses Stagehand + Google Gemini for intelligent pricing and demand analysis
+- **Value Scoring** — Automatic 0-100 scoring with brand detection, category multipliers, and condition analysis
+- **Seller Communication** — In-app messaging with AI-suggested negotiation templates
+- **Resale Listing Generator** — Auto-generates optimized listings with AI-enhanced descriptions
+- **Dashboard & Tracking** — Track items from discovery → purchase → listing → sale → profit
+- **Notifications** — Real-time alerts for high-value opportunities and price drops
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- **Node.js** 20+ (recommended: use [nvm](https://github.com/nvm-sh/nvm))
+- **pnpm** 9+ (`npm install -g pnpm`)
+- **Google API Key** (for Gemini AI analysis — optional but recommended)
+
+### Setup
 
 ```bash
-# Install dependencies and start preview
+# Clone the repository
+git clone https://github.com/AXOVIA-ASPEN/flipper-ai.git
+cd flipper-ai
+
+# Install dependencies and start
 make preview
 ```
 
-Or manually:
+Or step by step:
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Run database migrations
-npx prisma migrate dev
-
-# Start development server
-pnpm dev
+pnpm install              # Install dependencies
+npx prisma generate       # Generate Prisma client
+npx prisma db push        # Create/sync database
+pnpm dev                  # Start development server
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to view the dashboard.
 
-## Available Commands
+### Environment Variables
 
-| Command                | Description                                    |
-| ---------------------- | ---------------------------------------------- |
-| `make preview`         | Install deps, run migrations, start dev server |
-| `make dev`             | Start development server                       |
-| `make build`           | Build for production                           |
-| `make test`            | Run unit tests (Jest, 660+ tests)              |
-| `make test-acceptance` | Run BDD acceptance tests (Cucumber/Gherkin)    |
-| `make test-e2e`        | Run E2E tests (Playwright)                     |
-| `make test-all`        | Run all tests (unit + BDD + E2E)               |
-| `make db-migrate`      | Run database migrations                        |
-| `make db-studio`       | Open Prisma Studio (database GUI)              |
-| `make db-reset`        | Reset database (deletes all data)              |
+Create a `.env` file in the project root:
 
-## Code Quality & Linting
+```env
+# Database (SQLite — works out of the box)
+DATABASE_URL="file:./dev.db"
 
-We use ESLint, Prettier, and Husky to maintain high code quality:
+# Google Gemini API (for AI analysis)
+GOOGLE_API_KEY="your-google-api-key"
 
-### Linting Commands
+# eBay Browse API (for eBay scraping)
+EBAY_OAUTH_TOKEN="your-oauth-token"
 
-- `npm run lint` - Run ESLint checks
-- `npm run lint:fix` - Auto-fix ESLint issues
-- `npm run format` - Format code with Prettier
-- `npm run format:check` - Check code formatting
+# Optional
+EBAY_MARKETPLACE_ID="EBAY_US"
+```
 
-### Git Hooks
+## 📋 Available Commands
 
-- Pre-commit hook runs linting and formatting automatically
-- Prevents commits with linting or formatting errors
+```bash
+make help              # Show all commands
+make dev               # Start dev server
+make build             # Production build (strict TypeScript)
+make test              # Run 660+ unit tests (Jest)
+make test-acceptance   # Run BDD acceptance tests (Cucumber/Gherkin)
+make test-e2e          # Run E2E tests (Playwright)
+make test-all          # Run all test suites
+make db-migrate        # Run database migrations
+make db-studio         # Open Prisma Studio GUI
+make db-reset          # Reset database
+make clean             # Remove build artifacts
+```
 
-### Configuration
+## 🧪 Testing
 
-- `.eslintrc.js`: ESLint rules configuration
-- `.prettierrc.js`: Code formatting rules
-- `.lintstagedrc.js`: Lint-staged configuration
-- `.github/workflows/ci.yml`: GitHub Actions CI/CD pipeline
+| Suite | Tool | Count | Coverage |
+|-------|------|-------|----------|
+| Unit | Jest | 660+ | 95% |
+| BDD Acceptance | Cucumber + Gherkin | 70 scenarios / 572 steps | Core flows |
+| E2E | Playwright | Browser automation | Critical paths |
 
-## Deployment
+```bash
+# Run all tests
+make test-all
+
+# Unit tests with coverage report
+pnpm test:coverage
+
+# BDD tests (requires Playwright browsers)
+npx playwright install chromium
+make test-acceptance
+
+# Watch mode
+pnpm test -- --watch
+```
+
+### BDD Feature Coverage
+
+- `01-marketplace-scanning` — Multi-platform search and filtering
+- `02-ai-analysis` — AI pricing analysis and demand scoring
+- `03-seller-communication` — Messaging and negotiation flows
+- `04-resale-listing` — Listing generation and optimization
+- `05-dashboard-tracking` — Portfolio and profit tracking
+- `06-user-auth-billing` — Authentication and subscription management
+- `07-notifications-monitoring` — Alerts and monitoring
+- `08-complete-flip-journey` — End-to-end user journey
+
+## 🏗 Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Framework** | Next.js 16 (App Router) |
+| **Language** | TypeScript (strict mode) |
+| **UI** | React, Tailwind CSS |
+| **Database** | SQLite (libSQL) + Prisma ORM |
+| **AI** | Google Gemini via Stagehand |
+| **Testing** | Jest, Cucumber, Playwright |
+| **CI/CD** | GitHub Actions |
+| **Hosting** | Vercel |
+| **Linting** | ESLint, Prettier, Husky |
+
+## 📁 Project Structure
+
+```
+flipper-ai/
+├── src/
+│   ├── app/
+│   │   ├── api/                # API routes
+│   │   │   ├── listings/       # Listings CRUD
+│   │   │   ├── opportunities/  # Opportunities management
+│   │   │   ├── scraper/        # Platform scrapers
+│   │   │   └── search-configs/ # Saved searches
+│   │   ├── dashboard/          # Dashboard pages
+│   │   ├── login/              # Auth pages
+│   │   └── settings/           # User settings
+│   ├── components/             # React components
+│   ├── lib/
+│   │   ├── db.ts               # Database client
+│   │   ├── value-estimator.ts  # Profit scoring engine
+│   │   └── scrapers/           # Scraper implementations
+│   └── generated/prisma/       # Generated Prisma client
+├── features/                   # BDD feature files (Gherkin)
+│   ├── step_definitions/       # Step implementations
+│   └── support/                # Test hooks and world
+├── prisma/
+│   └── schema.prisma           # Database schema
+├── .github/workflows/ci.yml    # CI/CD pipeline
+├── vercel.json                 # Vercel deployment config
+├── Makefile                    # Build commands
+└── docs/                       # Documentation
+```
+
+## 🔌 API Endpoints
+
+### Listings
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/listings` | List all (supports `?status=`, `?minScore=`) |
+| `POST` | `/api/listings` | Create from scraper data |
+| `GET` | `/api/listings/[id]` | Get single listing |
+| `PATCH` | `/api/listings/[id]` | Update listing |
+| `DELETE` | `/api/listings/[id]` | Delete listing |
+| `GET` | `/api/listings/[id]/market-value` | Get AI market analysis |
+
+### Opportunities
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/opportunities` | List opportunities |
+| `POST` | `/api/opportunities` | Create from listing |
+| `GET` | `/api/opportunities/[id]` | Get opportunity detail |
+
+### Scrapers
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/scraper/craigslist` | Scrape Craigslist listings |
+| `POST` | `/api/scraper/ebay` | Search eBay Browse API |
+| `POST` | `/api/scraper/facebook` | Scrape Facebook Marketplace |
+| `POST` | `/api/scraper/offerup` | Scrape OfferUp |
+| `POST` | `/api/scraper/mercari` | Scrape Mercari |
+
+### Search & Jobs
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET/POST` | `/api/search-configs` | Manage saved searches |
+| `GET` | `/api/scraper-jobs` | View scraper run history |
+
+## 📊 Value Scoring Algorithm
+
+Items are scored 0-100 based on multiple signals:
+
+- **Category multipliers** — Electronics, furniture, collectibles, vintage
+- **Brand detection** — Premium brands (Apple, Sony, Dyson) score higher
+- **Condition analysis** — New > Like New > Good > Fair > Poor
+- **Risk factors** — "broken", "parts only", "needs repair" reduce score
+- **Demand signals** — Recent sold comparables and market velocity
+
+Items scoring **70+** are automatically flagged as opportunities.
+
+## 🚢 Deployment
 
 ### Vercel (Recommended)
 
 ```bash
-# Install Vercel CLI
 npm i -g vercel
-
-# Deploy
 vercel --prod
 ```
 
-Configuration is in `vercel.json`. Set environment variables in the Vercel dashboard.
+Set environment variables in the [Vercel Dashboard](https://vercel.com). Configuration is in `vercel.json`.
 
-### Docker (Alternative)
+### Docker
 
 ```bash
 docker build -t flipper-ai .
 docker run -p 3000:3000 flipper-ai
 ```
 
-## Tech Stack
+## 🔧 Code Quality
 
-- **Frontend**: Next.js 16, React, TypeScript, Tailwind CSS
-- **Backend**: Next.js API Routes
-- **Database**: SQLite (libSQL) with Prisma ORM
-- **Scraping**: Stagehand with Google Gemini AI
-- **Testing**: Jest (660+ unit tests, 95% coverage), Cucumber BDD, Playwright E2E
-- **Linting**: ESLint, Prettier, Husky pre-commit hooks
-- **CI/CD**: GitHub Actions (lint → test → build on every push)
+- **ESLint** — Strict TypeScript rules
+- **Prettier** — Consistent formatting
+- **Husky** — Pre-commit hooks prevent bad commits
+- **CI/CD** — GitHub Actions runs lint → test → build on every push/PR
+- **TypeScript** — Strict mode, `ignoreBuildErrors: false`
 
-## Project Structure
-
-```
-flipper-ai/
-├── src/
-│   ├── app/
-│   │   ├── api/           # API routes
-│   │   │   ├── listings/  # Listings CRUD
-│   │   │   └── opportunities/ # Opportunities CRUD
-│   │   ├── page.tsx       # Dashboard
-│   │   └── layout.tsx     # Root layout
-│   ├── lib/
-│   │   ├── db.ts          # Prisma client
-│   │   └── value-estimator.ts # Profit calculation
-│   └── generated/
-│       └── prisma/        # Generated Prisma client
-├── prisma/
-│   ├── schema.prisma      # Database schema
-│   └── migrations/        # Migration history
-├── docs/
-│   └── PRISMA.md          # Prisma integration guide
-└── Makefile               # Build commands
+```bash
+pnpm lint          # Check for issues
+pnpm lint:fix      # Auto-fix
+pnpm format        # Format with Prettier
+pnpm format:check  # Check formatting
 ```
 
-## Environment Variables
+## 📄 License
 
-Create a `.env` file:
+MIT — see [LICENSE](LICENSE) for details.
 
-```env
-# Database (SQLite)
-DATABASE_URL="file:./dev.db"
+---
 
-# For scraping (optional - uses Stagehand with Gemini)
-GOOGLE_API_KEY="your-google-api-key"
-
-# eBay Browse API (required for /api/scraper/ebay)
-EBAY_OAUTH_TOKEN="your-oauth-token"
-# Optional overrides
-EBAY_MARKETPLACE_ID="EBAY_US"
-EBAY_BROWSE_API_BASE_URL="https://api.ebay.com/buy/browse/v1"
-```
-
-## API Endpoints
-
-### Listings
-
-| Method | Endpoint                           | Description                   |
-| ------ | ---------------------------------- | ----------------------------- |
-| GET    | `/api/listings`                    | Get all listings              |
-| GET    | `/api/listings?status=OPPORTUNITY` | Filter by status              |
-| GET    | `/api/listings?minScore=70`        | Filter by value score         |
-| POST   | `/api/listings`                    | Create listing (from scraper) |
-| GET    | `/api/listings/[id]`               | Get single listing            |
-| PATCH  | `/api/listings/[id]`               | Update listing                |
-| DELETE | `/api/listings/[id]`               | Delete listing                |
-
-### Opportunities
-
-| Method | Endpoint             | Description                     |
-| ------ | -------------------- | ------------------------------- |
-| GET    | `/api/opportunities` | Get all opportunities           |
-| POST   | `/api/opportunities` | Create opportunity from listing |
-
-### Scrapers
-
-| Method | Endpoint                  | Description                                                                 |
-| ------ | ------------------------- | --------------------------------------------------------------------------- |
-| GET    | `/api/scraper/craigslist` | Returns supported Craigslist locations/categories                           |
-| POST   | `/api/scraper/craigslist` | Launches the Playwright-based Craigslist scraper                            |
-| GET    | `/api/scraper/ebay`       | Returns supported eBay categories, condition enums, and parameter hints     |
-| POST   | `/api/scraper/ebay`       | Pulls fixed-price listings via the eBay Browse API and stores opportunities |
-
-## Database Schema
-
-See [docs/PRISMA.md](docs/PRISMA.md) for full Prisma integration details.
-
-**Key Models:**
-
-- `Listing` - Scraped items with value analysis
-- `Opportunity` - Flips being actively pursued
-- `ScraperJob` - Scraper run history
-- `SearchConfig` - Saved search configurations
-
-## Value Scoring
-
-Items are scored 0-100 based on:
-
-- **Category multipliers** - Electronics, furniture, collectibles, etc.
-- **Brand detection** - Apple, Sony, Dyson, vintage items
-- **Condition analysis** - New, like new, good, fair, poor
-- **Risk factors** - "broken", "parts only", "needs repair"
-
-Scores 70+ are automatically flagged as opportunities.
-
-## License
-
-MIT
+Built with 🐧 by [Axovia AI](https://github.com/AXOVIA-ASPEN)

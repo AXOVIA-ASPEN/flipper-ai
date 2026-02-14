@@ -3516,8 +3516,11 @@
             "keyword": "And ",
             "line": 8,
             "name": "I have purchased an item to flip",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:115"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3555,8 +3558,11 @@
             "keyword": "Given ",
             "line": 11,
             "name": "I have purchased:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:125"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3565,8 +3571,11 @@
             "keyword": "And ",
             "line": 16,
             "name": "the target profit margin is 40%",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:275"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3588,8 +3597,11 @@
             "keyword": "And ",
             "line": 18,
             "name": "I select \"eBay\" as the platform",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1005"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3645,8 +3657,11 @@
             "keyword": "Then ",
             "line": 19,
             "name": "the AI should generate:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:740"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3655,8 +3670,11 @@
             "keyword": "And ",
             "line": 27,
             "name": "all photos should be included",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:615"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3665,8 +3683,11 @@
             "keyword": "And ",
             "line": 28,
             "name": "SEO keywords should be optimized",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:590"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3731,8 +3752,11 @@
             "keyword": "And ",
             "line": 8,
             "name": "I have purchased an item to flip",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:115"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3741,8 +3765,11 @@
             "keyword": "Given ",
             "line": 31,
             "name": "I have created a listing for eBay",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:95"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3751,8 +3778,11 @@
             "keyword": "When ",
             "line": 32,
             "name": "I select \"Also post to Facebook Marketplace\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1010"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3761,8 +3791,11 @@
             "keyword": "Then ",
             "line": 33,
             "name": "the listing should be adapted for Facebook format",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:770"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3800,8 +3833,11 @@
             "keyword": "And ",
             "line": 34,
             "name": "platform-specific fields should be adjusted:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:730"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3810,8 +3846,11 @@
             "keyword": "And ",
             "line": 39,
             "name": "both listings should be posted simultaneously",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:635"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3876,8 +3915,11 @@
             "keyword": "And ",
             "line": 8,
             "name": "I have purchased an item to flip",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:115"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3886,8 +3928,11 @@
             "keyword": "Given ",
             "line": 42,
             "name": "the item \"iPad Pro 11-inch\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:245"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3896,8 +3941,11 @@
             "keyword": "And ",
             "line": 43,
             "name": "recent sold listings show high demand (10+ sold in last 3 days)",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:235"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3906,8 +3954,11 @@
             "keyword": "When ",
             "line": 44,
             "name": "the AI calculates the list price",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1105"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3916,8 +3967,11 @@
             "keyword": "Then ",
             "line": 45,
             "name": "the suggested price should be at the upper end of the range",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:840"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3926,8 +3980,11 @@
             "keyword": "And ",
             "line": 46,
             "name": "I should see a confidence indicator \"High Demand - Price Aggressively\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:435"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3992,8 +4049,11 @@
             "keyword": "And ",
             "line": 8,
             "name": "I have purchased an item to flip",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:115"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4002,8 +4062,11 @@
             "keyword": "Given ",
             "line": 49,
             "name": "I upload photos of a vintage lamp",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:215"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4012,8 +4075,11 @@
             "keyword": "And ",
             "line": 50,
             "name": "the photos are slightly dim",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:260"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4022,8 +4088,11 @@
             "keyword": "When ",
             "line": 51,
             "name": "the listing generator processes the images",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1120"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4032,8 +4101,11 @@
             "keyword": "Then ",
             "line": 52,
             "name": "the photos should be automatically brightened",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:825"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4042,8 +4114,11 @@
             "keyword": "And ",
             "line": 53,
             "name": "backgrounds should be neutralized (white/gray)",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:630"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4052,8 +4127,11 @@
             "keyword": "And ",
             "line": 54,
             "name": "the main image should be cropped to focus on the item",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:775"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4118,8 +4196,11 @@
             "keyword": "And ",
             "line": 8,
             "name": "I have purchased an item to flip",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:115"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4128,8 +4209,11 @@
             "keyword": "Given ",
             "line": 57,
             "name": "I successfully sold an item \"Canon EOS Rebel T7\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:210"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4138,8 +4222,11 @@
             "keyword": "And ",
             "line": 58,
             "name": "I purchase another similar item \"Canon EOS Rebel SL3\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:195"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4148,8 +4235,11 @@
             "keyword": "When ",
             "line": 59,
             "name": "I create a new listing",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:935"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4158,8 +4248,11 @@
             "keyword": "And ",
             "line": 60,
             "name": "I select \"Clone from previous listing\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1010"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4168,8 +4261,11 @@
             "keyword": "Then ",
             "line": 61,
             "name": "the title, description, and settings should be copied",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:845"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4178,8 +4274,11 @@
             "keyword": "And ",
             "line": 62,
             "name": "the model name should be auto-updated to \"SL3\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:795"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4188,8 +4287,11 @@
             "keyword": "And ",
             "line": 63,
             "name": "I should review before posting",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:420"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4254,8 +4356,11 @@
             "keyword": "And ",
             "line": 8,
             "name": "I have purchased an item to flip",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:115"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4264,8 +4369,11 @@
             "keyword": "Given ",
             "line": 66,
             "name": "I have posted an item for $150",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:110"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4274,8 +4382,11 @@
             "keyword": "And ",
             "line": 67,
             "name": "it has been listed for 5 days",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:225"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4284,8 +4395,11 @@
             "keyword": "And ",
             "line": 68,
             "name": "I have received 3 views but no offers",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:135"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4294,8 +4408,11 @@
             "keyword": "When ",
             "line": 69,
             "name": "I view the listing analytics",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1045"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4339,8 +4456,11 @@
             "keyword": "Then ",
             "line": 70,
             "name": "I should see:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:585"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4349,8 +4469,11 @@
             "keyword": "And ",
             "line": 76,
             "name": "I should have the option to \"Reduce Price by 10%\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:370"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4426,8 +4549,11 @@
             "keyword": "And ",
             "line": 8,
             "name": "I have data across multiple stages",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:100"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4436,8 +4562,11 @@
             "keyword": "Given ",
             "line": 11,
             "name": "I have 15 identified opportunities",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:165"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4446,8 +4575,11 @@
             "keyword": "And ",
             "line": 12,
             "name": "5 have score > 80",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:280"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4456,8 +4588,11 @@
             "keyword": "And ",
             "line": 13,
             "name": "10 have score between 70-80",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:285"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4479,8 +4614,11 @@
             "keyword": "Then ",
             "line": 15,
             "name": "I should see the \"Flippables Queue\" section",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:570"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4489,8 +4627,11 @@
             "keyword": "And ",
             "line": 16,
             "name": "items should be sorted by score (highest first)",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:700"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4534,8 +4675,11 @@
             "keyword": "And ",
             "line": 17,
             "name": "I should see filter options:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:505"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4544,8 +4688,11 @@
             "keyword": "And ",
             "line": 23,
             "name": "each card should show a \"Contact Seller\" button",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:670"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4610,8 +4757,11 @@
             "keyword": "And ",
             "line": 8,
             "name": "I have data across multiple stages",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:100"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4620,8 +4770,11 @@
             "keyword": "Given ",
             "line": 26,
             "name": "I have 3 ongoing conversations with sellers",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:170"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4630,8 +4783,11 @@
             "keyword": "And ",
             "line": 27,
             "name": "1 seller hasn't replied in 48 hours",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:290"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4640,8 +4796,11 @@
             "keyword": "And ",
             "line": 28,
             "name": "1 seller just sent a message 10 minutes ago",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:295"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4650,8 +4809,11 @@
             "keyword": "When ",
             "line": 29,
             "name": "I view the \"Active Negotiations\" section",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1055"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4660,8 +4822,11 @@
             "keyword": "Then ",
             "line": 30,
             "name": "conversations should be sorted by last activity",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:660"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4670,8 +4835,11 @@
             "keyword": "And ",
             "line": 31,
             "name": "unread messages should have a notification badge",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:885"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4680,8 +4848,11 @@
             "keyword": "And ",
             "line": 32,
             "name": "stale conversations (48h+) should be highlighted in yellow",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:735"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4746,8 +4917,11 @@
             "keyword": "And ",
             "line": 8,
             "name": "I have data across multiple stages",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:100"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4806,8 +4980,11 @@
             "keyword": "Given ",
             "line": 35,
             "name": "I have purchased 4 items awaiting resale:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:120"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4829,8 +5006,11 @@
             "keyword": "Then ",
             "line": 42,
             "name": "I should see all 4 items",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:490"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4839,8 +5019,11 @@
             "keyword": "And ",
             "line": 43,
             "name": "the \"Not listed\" item should be highlighted",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:860"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4849,8 +5032,11 @@
             "keyword": "And ",
             "line": 44,
             "name": "the \"Sold!\" item should show profit calculation",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:865"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4859,8 +5045,11 @@
             "keyword": "And ",
             "line": 45,
             "name": "total inventory value should be displayed",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:880"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4925,8 +5114,11 @@
             "keyword": "And ",
             "line": 8,
             "name": "I have data across multiple stages",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:100"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -4935,8 +5127,11 @@
             "keyword": "Given ",
             "line": 48,
             "name": "I have completed 10 flips in the last month",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:80"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5005,8 +5200,11 @@
             "keyword": "Then ",
             "line": 50,
             "name": "I should see a table of completed flips:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:470"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5050,8 +5248,11 @@
             "keyword": "And ",
             "line": 58,
             "name": "I should see summary stats:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:540"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5060,8 +5261,11 @@
             "keyword": "And ",
             "line": 64,
             "name": "I should be able to export as CSV",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:315"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5126,8 +5330,11 @@
             "keyword": "And ",
             "line": 8,
             "name": "I have data across multiple stages",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:100"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5136,8 +5343,11 @@
             "keyword": "Given ",
             "line": 67,
             "name": "I have sales data for the last 3 months",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:140"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5146,8 +5356,11 @@
             "keyword": "When ",
             "line": 68,
             "name": "I view the dashboard analytics section",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1040"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5179,8 +5392,11 @@
             "keyword": "Then ",
             "line": 69,
             "name": "I should see a line chart showing:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:450"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5189,8 +5405,11 @@
             "keyword": "And ",
             "line": 73,
             "name": "hovering over data points should show weekly breakdown",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:690"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5199,8 +5418,11 @@
             "keyword": "And ",
             "line": 74,
             "name": "I should see a trend indicator (↑ improving, ↓ declining)",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:475"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5265,8 +5487,11 @@
             "keyword": "And ",
             "line": 8,
             "name": "I have data across multiple stages",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:100"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5275,8 +5500,11 @@
             "keyword": "Given ",
             "line": 77,
             "name": "I am viewing the dashboard",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:45"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5285,8 +5513,11 @@
             "keyword": "When ",
             "line": 78,
             "name": "I see a high-score opportunity",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:985"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5330,8 +5561,11 @@
             "keyword": "Then ",
             "line": 79,
             "name": "I should be able to:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:330"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5340,8 +5574,11 @@
             "keyword": "And ",
             "line": 85,
             "name": "each action should update the UI immediately",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:665"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5406,8 +5643,11 @@
             "keyword": "And ",
             "line": 8,
             "name": "I have data across multiple stages",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:100"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5416,8 +5656,11 @@
             "keyword": "Given ",
             "line": 88,
             "name": "I have the dashboard open",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:160"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5426,8 +5669,11 @@
             "keyword": "And ",
             "line": 89,
             "name": "a background scan is running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:220"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5436,8 +5682,11 @@
             "keyword": "When ",
             "line": 90,
             "name": "a new opportunity is found with score > 85",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1095"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5446,8 +5695,11 @@
             "keyword": "Then ",
             "line": 91,
             "name": "the dashboard should update automatically",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:745"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5456,8 +5708,11 @@
             "keyword": "And ",
             "line": 92,
             "name": "a toast notification should appear",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:600"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5466,8 +5721,11 @@
             "keyword": "And ",
             "line": 93,
             "name": "the new item should slide into the queue with animation",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:800"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5476,8 +5734,11 @@
             "keyword": "And ",
             "line": 94,
             "name": "the total count badge should increment",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:850"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5540,8 +5801,11 @@
             "keyword": "Given ",
             "line": 7,
             "name": "the application is running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:240"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5550,8 +5814,11 @@
             "keyword": "When ",
             "line": 10,
             "name": "I visit the landing page",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1060"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5573,8 +5840,11 @@
             "keyword": "Then ",
             "line": 12,
             "name": "I should see a registration form",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:465"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5612,8 +5882,11 @@
             "keyword": "When ",
             "line": 13,
             "name": "I enter:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:955"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5622,8 +5895,11 @@
             "keyword": "And ",
             "line": 18,
             "name": "I accept the terms of service",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:895"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5645,8 +5921,11 @@
             "keyword": "Then ",
             "line": 20,
             "name": "I should receive a verification email",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:395"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5655,8 +5934,11 @@
             "keyword": "And ",
             "line": 21,
             "name": "I should be redirected to the onboarding flow",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:360"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5708,8 +5990,11 @@
             "keyword": "Given ",
             "line": 7,
             "name": "the application is running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:240"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5718,8 +6003,11 @@
             "keyword": "Given ",
             "line": 24,
             "name": "I signed up with \"newuser@example.com\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:205"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5728,8 +6016,11 @@
             "keyword": "And ",
             "line": 25,
             "name": "I received a verification email",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:200"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5738,8 +6029,11 @@
             "keyword": "When ",
             "line": 26,
             "name": "I click the verification link",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:910"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5748,8 +6042,11 @@
             "keyword": "Then ",
             "line": 27,
             "name": "my account should be activated",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:705"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5758,8 +6055,11 @@
             "keyword": "And ",
             "line": 28,
             "name": "I should be redirected to the dashboard",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:355"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5768,8 +6068,11 @@
             "keyword": "And ",
             "line": 29,
             "name": "I should see a \"Welcome to Flipper AI!\" message",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:485"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5821,8 +6124,11 @@
             "keyword": "Given ",
             "line": 7,
             "name": "the application is running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:240"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5831,8 +6137,11 @@
             "keyword": "Given ",
             "line": 32,
             "name": "I have a verified account",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:65"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5841,8 +6150,11 @@
             "keyword": "When ",
             "line": 33,
             "name": "I visit the login page",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1065"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5851,8 +6163,11 @@
             "keyword": "And ",
             "line": 34,
             "name": "I enter my email and password",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:945"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5874,8 +6189,11 @@
             "keyword": "Then ",
             "line": 36,
             "name": "I should be logged in",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:335"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5884,8 +6202,11 @@
             "keyword": "And ",
             "line": 37,
             "name": "I should see my dashboard",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:515"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5937,8 +6258,11 @@
             "keyword": "Given ",
             "line": 7,
             "name": "the application is running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:240"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5973,8 +6297,11 @@
             "keyword": "When ",
             "line": 42,
             "name": "I try to start scan #11",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1035"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5983,8 +6310,11 @@
             "keyword": "Then ",
             "line": 43,
             "name": "I should see an upgrade prompt",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:495"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6028,8 +6358,11 @@
             "keyword": "And ",
             "line": 44,
             "name": "the prompt should show:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:830"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6038,8 +6371,11 @@
             "keyword": "And ",
             "line": 50,
             "name": "I should be able to click \"Upgrade Now\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:305"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6091,8 +6427,11 @@
             "keyword": "Given ",
             "line": 7,
             "name": "the application is running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:240"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6101,8 +6440,11 @@
             "keyword": "Given ",
             "line": 53,
             "name": "I am logged in to a free account",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:15"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6111,8 +6453,11 @@
             "keyword": "When ",
             "line": 54,
             "name": "I click \"Upgrade\" from the dashboard",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:915"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6121,8 +6466,11 @@
             "keyword": "Then ",
             "line": 55,
             "name": "I should see the pricing page",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:565"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6131,8 +6479,11 @@
             "keyword": "When ",
             "line": 56,
             "name": "I select the \"Flipper\" plan ($19/mo)",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1000"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6154,8 +6505,11 @@
             "keyword": "Then ",
             "line": 58,
             "name": "I should be redirected to Stripe Checkout",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:350"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6164,8 +6518,11 @@
             "keyword": "When ",
             "line": 59,
             "name": "I enter valid payment information",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:950"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6174,8 +6531,11 @@
             "keyword": "And ",
             "line": 60,
             "name": "I complete the purchase",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:925"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6184,8 +6544,11 @@
             "keyword": "Then ",
             "line": 61,
             "name": "my account should be upgraded to \"Flipper\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:710"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6194,8 +6557,11 @@
             "keyword": "And ",
             "line": 62,
             "name": "I should receive a confirmation email",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:385"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6204,8 +6570,11 @@
             "keyword": "And ",
             "line": 63,
             "name": "my dashboard should show \"Unlimited scans\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:715"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6257,8 +6626,11 @@
             "keyword": "Given ",
             "line": 7,
             "name": "the application is running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:240"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6267,8 +6639,11 @@
             "keyword": "Given ",
             "line": 66,
             "name": "I am subscribed to the \"Flipper\" plan",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:30"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6277,8 +6652,11 @@
             "keyword": "When ",
             "line": 67,
             "name": "I navigate to Account Settings",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:965"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6329,8 +6707,11 @@
             "keyword": "Then ",
             "line": 69,
             "name": "I should see:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:585"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6368,8 +6749,11 @@
             "keyword": "And ",
             "line": 74,
             "name": "I should have options to:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:365"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6421,8 +6805,11 @@
             "keyword": "Given ",
             "line": 7,
             "name": "the application is running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:240"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6431,8 +6818,11 @@
             "keyword": "Given ",
             "line": 81,
             "name": "I am subscribed to a paid plan",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:25"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6441,8 +6831,11 @@
             "keyword": "When ",
             "line": 82,
             "name": "I navigate to subscription management",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:970"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6464,8 +6857,11 @@
             "keyword": "Then ",
             "line": 84,
             "name": "I should see a confirmation modal",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:440"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6474,8 +6870,11 @@
             "keyword": "And ",
             "line": 85,
             "name": "the modal should warn about feature loss",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:790"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6484,8 +6883,11 @@
             "keyword": "When ",
             "line": 86,
             "name": "I confirm cancellation",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:930"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6494,8 +6896,11 @@
             "keyword": "Then ",
             "line": 87,
             "name": "my subscription should be set to cancel at period end",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:725"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6504,8 +6909,11 @@
             "keyword": "And ",
             "line": 88,
             "name": "I should retain access until the billing date",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:415"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6514,8 +6922,11 @@
             "keyword": "And ",
             "line": 89,
             "name": "I should see a message \"Your plan will downgrade to Free on [date]\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:455"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6567,8 +6978,11 @@
             "keyword": "Given ",
             "line": 7,
             "name": "the application is running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:240"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6590,8 +7004,11 @@
             "keyword": "When ",
             "line": 93,
             "name": "I try to access the \"Auto-Listing\" feature",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1030"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6600,8 +7017,11 @@
             "keyword": "Then ",
             "line": 94,
             "name": "I should see a paywall modal",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:460"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6610,8 +7030,11 @@
             "keyword": "And ",
             "line": 95,
             "name": "the modal should say \"This feature requires Flipper or Pro plan\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:785"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6620,8 +7043,11 @@
             "keyword": "And ",
             "line": 96,
             "name": "I should be able to click \"Upgrade\" to subscribe",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:300"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6673,8 +7099,11 @@
             "keyword": "Given ",
             "line": 7,
             "name": "the application is running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:240"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6683,8 +7112,11 @@
             "keyword": "Given ",
             "line": 99,
             "name": "I am subscribed to the \"Free\" plan",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:30"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6693,8 +7125,11 @@
             "keyword": "When ",
             "line": 100,
             "name": "I check my available features",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:900"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6703,8 +7138,11 @@
             "keyword": "Then ",
             "line": 101,
             "name": "I should have to \"eBay Scanning\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:375"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6756,8 +7194,11 @@
             "keyword": "Given ",
             "line": 7,
             "name": "the application is running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:240"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6766,8 +7207,11 @@
             "keyword": "Given ",
             "line": 99,
             "name": "I am subscribed to the \"Free\" plan",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:30"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6776,8 +7220,11 @@
             "keyword": "When ",
             "line": 100,
             "name": "I check my available features",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:900"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6786,8 +7233,11 @@
             "keyword": "Then ",
             "line": 101,
             "name": "I should not have to \"AI Messaging\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:380"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6839,8 +7289,11 @@
             "keyword": "Given ",
             "line": 7,
             "name": "the application is running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:240"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6849,8 +7302,11 @@
             "keyword": "Given ",
             "line": 99,
             "name": "I am subscribed to the \"Free\" plan",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:30"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6859,8 +7315,11 @@
             "keyword": "When ",
             "line": 100,
             "name": "I check my available features",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:900"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6869,8 +7328,11 @@
             "keyword": "Then ",
             "line": 101,
             "name": "I should not have to \"Auto-Listing\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:380"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6922,8 +7384,11 @@
             "keyword": "Given ",
             "line": 7,
             "name": "the application is running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:240"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6932,8 +7397,11 @@
             "keyword": "Given ",
             "line": 99,
             "name": "I am subscribed to the \"Flipper\" plan",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:30"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6942,8 +7410,11 @@
             "keyword": "When ",
             "line": 100,
             "name": "I check my available features",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:900"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6952,8 +7423,11 @@
             "keyword": "Then ",
             "line": 101,
             "name": "I should have to \"eBay Scanning\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:375"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7005,8 +7479,11 @@
             "keyword": "Given ",
             "line": 7,
             "name": "the application is running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:240"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7015,8 +7492,11 @@
             "keyword": "Given ",
             "line": 99,
             "name": "I am subscribed to the \"Flipper\" plan",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:30"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7025,8 +7505,11 @@
             "keyword": "When ",
             "line": 100,
             "name": "I check my available features",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:900"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7035,8 +7518,11 @@
             "keyword": "Then ",
             "line": 101,
             "name": "I should have to \"AI Messaging\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:375"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7088,8 +7574,11 @@
             "keyword": "Given ",
             "line": 7,
             "name": "the application is running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:240"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7098,8 +7587,11 @@
             "keyword": "Given ",
             "line": 99,
             "name": "I am subscribed to the \"Flipper\" plan",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:30"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7108,8 +7600,11 @@
             "keyword": "When ",
             "line": 100,
             "name": "I check my available features",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:900"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7118,8 +7613,11 @@
             "keyword": "Then ",
             "line": 101,
             "name": "I should not have to \"Auto-Listing\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:380"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7171,8 +7669,11 @@
             "keyword": "Given ",
             "line": 7,
             "name": "the application is running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:240"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7181,8 +7682,11 @@
             "keyword": "Given ",
             "line": 99,
             "name": "I am subscribed to the \"Pro Flipper\" plan",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:30"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7191,8 +7695,11 @@
             "keyword": "When ",
             "line": 100,
             "name": "I check my available features",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:900"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7201,8 +7708,11 @@
             "keyword": "Then ",
             "line": 101,
             "name": "I should have to \"eBay Scanning\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:375"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7254,8 +7764,11 @@
             "keyword": "Given ",
             "line": 7,
             "name": "the application is running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:240"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7264,8 +7777,11 @@
             "keyword": "Given ",
             "line": 99,
             "name": "I am subscribed to the \"Pro Flipper\" plan",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:30"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7274,8 +7790,11 @@
             "keyword": "When ",
             "line": 100,
             "name": "I check my available features",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:900"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7284,8 +7803,11 @@
             "keyword": "Then ",
             "line": 101,
             "name": "I should have to \"AI Messaging\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:375"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7337,8 +7859,11 @@
             "keyword": "Given ",
             "line": 7,
             "name": "the application is running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:240"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7347,8 +7872,11 @@
             "keyword": "Given ",
             "line": 99,
             "name": "I am subscribed to the \"Pro Flipper\" plan",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:30"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7357,8 +7885,11 @@
             "keyword": "When ",
             "line": 100,
             "name": "I check my available features",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:900"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7367,8 +7898,11 @@
             "keyword": "Then ",
             "line": 101,
             "name": "I should have to \"Auto-Listing\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:375"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7420,8 +7954,11 @@
             "keyword": "Given ",
             "line": 7,
             "name": "the application is running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:240"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7430,8 +7967,11 @@
             "keyword": "Given ",
             "line": 99,
             "name": "I am subscribed to the \"Pro Flipper\" plan",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:30"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7440,8 +7980,11 @@
             "keyword": "When ",
             "line": 100,
             "name": "I check my available features",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:900"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7450,8 +7993,11 @@
             "keyword": "Then ",
             "line": 101,
             "name": "I should have to \"Priority Support\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:375"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7540,8 +8086,11 @@
             "keyword": "Given ",
             "line": 11,
             "name": "I have the app open in a browser tab",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:155"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7550,8 +8099,11 @@
             "keyword": "And ",
             "line": 12,
             "name": "I have an active scan running",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:75"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7560,8 +8112,11 @@
             "keyword": "When ",
             "line": 13,
             "name": "a listing appears with flippability score > 85",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1080"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7570,8 +8125,11 @@
             "keyword": "Then ",
             "line": 14,
             "name": "I should see a browser notification",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:430"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7580,8 +8138,11 @@
             "keyword": "And ",
             "line": 15,
             "name": "the notification should say \"🔥 New flip opportunity! Score: [score]\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:805"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7590,8 +8151,11 @@
             "keyword": "And ",
             "line": 16,
             "name": "clicking it should open the item detail page",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:650"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7669,8 +8233,11 @@
             "keyword": "Given ",
             "line": 19,
             "name": "I have sent a message to a seller",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:145"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7679,8 +8246,11 @@
             "keyword": "And ",
             "line": 20,
             "name": "I have email notifications enabled",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:105"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7689,8 +8259,11 @@
             "keyword": "When ",
             "line": 21,
             "name": "the seller responds to my message",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1135"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7699,8 +8272,11 @@
             "keyword": "Then ",
             "line": 22,
             "name": "I should receive an email notification",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:410"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7738,8 +8314,11 @@
             "keyword": "And ",
             "line": 23,
             "name": "the email should include:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:750"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7748,8 +8327,11 @@
             "keyword": "And ",
             "line": 28,
             "name": "clicking \"Reply Now\" should open the conversation",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:655"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7827,8 +8409,11 @@
             "keyword": "Given ",
             "line": 31,
             "name": "I am on the Pro Flipper plan",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:20"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7837,8 +8422,11 @@
             "keyword": "And ",
             "line": 32,
             "name": "I have connected my Slack workspace",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:85"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7847,8 +8435,11 @@
             "keyword": "When ",
             "line": 33,
             "name": "a listing with score > 90 is found",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1085"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7857,8 +8448,11 @@
             "keyword": "Then ",
             "line": 34,
             "name": "a message should be posted to my #flips channel",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:595"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7908,8 +8502,11 @@
             "keyword": "And ",
             "line": 35,
             "name": "the message should include:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:780"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7987,8 +8584,11 @@
             "keyword": "Given ",
             "line": 44,
             "name": "I am watching a listing priced at $300",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:50"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -7997,8 +8597,11 @@
             "keyword": "And ",
             "line": 45,
             "name": "the seller has not reduced the price in 3 days",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:265"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8007,8 +8610,11 @@
             "keyword": "When ",
             "line": 46,
             "name": "the seller drops the price to $250",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1130"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8017,8 +8623,11 @@
             "keyword": "Then ",
             "line": 47,
             "name": "I should receive a notification",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:390"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8027,8 +8636,11 @@
             "keyword": "And ",
             "line": 48,
             "name": "it should say \"Price drop! [Item] now $250 (was $300)\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:695"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8037,8 +8649,11 @@
             "keyword": "And ",
             "line": 49,
             "name": "I should be prompted to \"Contact Seller Now\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:345"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8129,8 +8744,11 @@
             "keyword": "And ",
             "line": 53,
             "name": "the listing is active on Facebook Marketplace",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:250"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8139,8 +8757,11 @@
             "keyword": "When ",
             "line": 54,
             "name": "another buyer purchases the item",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1100"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8175,8 +8796,11 @@
             "keyword": "And ",
             "line": 57,
             "name": "the subject should be \"⚠️ Missed Opportunity\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:835"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8185,8 +8809,11 @@
             "keyword": "And ",
             "line": 58,
             "name": "the opportunity should be moved to \"Lost Opportunities\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:815"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8195,8 +8822,11 @@
             "keyword": "And ",
             "line": 59,
             "name": "I should see analytics on how many opportunities I've missed",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:500"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8274,8 +8904,11 @@
             "keyword": "Given ",
             "line": 62,
             "name": "I am tracking a Craigslist listing",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:35"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8284,8 +8917,11 @@
             "keyword": "And ",
             "line": 63,
             "name": "Craigslist posts expire after 30 days",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:10"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8294,8 +8930,11 @@
             "keyword": "And ",
             "line": 64,
             "name": "the listing is 28 days old",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:255"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8304,8 +8943,11 @@
             "keyword": "When ",
             "line": 65,
             "name": "the system checks listing ages",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1140"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8314,8 +8956,11 @@
             "keyword": "Then ",
             "line": 66,
             "name": "I should receive a warning \"This listing expires in 2 days\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:400"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8324,8 +8969,11 @@
             "keyword": "And ",
             "line": 67,
             "name": "I should be prompted to contact the seller urgently",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:340"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8403,8 +9051,11 @@
             "keyword": "Given ",
             "line": 70,
             "name": "I navigate to Settings > Notifications",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:190"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8466,8 +9117,11 @@
             "keyword": "Then ",
             "line": 71,
             "name": "I should be able to toggle:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:325"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8476,8 +9130,11 @@
             "keyword": "And ",
             "line": 80,
             "name": "changes should save automatically",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:645"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8555,8 +9212,11 @@
             "keyword": "Given ",
             "line": 83,
             "name": "I have \"Weekly Summary Email\" enabled",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:175"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8565,8 +9225,11 @@
             "keyword": "And ",
             "line": 84,
             "name": "it is Monday at 9 AM",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:230"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8575,8 +9238,11 @@
             "keyword": "When ",
             "line": 85,
             "name": "the system generates my weekly summary",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1145"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8626,8 +9292,11 @@
             "keyword": "Then ",
             "line": 86,
             "name": "I should receive an email containing:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:405"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8636,8 +9305,11 @@
             "keyword": "And ",
             "line": 93,
             "name": "I should see a \"View Full Report\" link",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:480"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8715,8 +9387,11 @@
             "keyword": "Given ",
             "line": 96,
             "name": "I have received 5 notifications today",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:130"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8725,8 +9400,11 @@
             "keyword": "And ",
             "line": 97,
             "name": "I haven't viewed them all",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:180"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8735,8 +9413,11 @@
             "keyword": "When ",
             "line": 98,
             "name": "I click the notification bell icon",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:905"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8745,8 +9426,11 @@
             "keyword": "Then ",
             "line": 99,
             "name": "I should see a dropdown with all notifications",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:445"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8755,8 +9439,11 @@
             "keyword": "And ",
             "line": 100,
             "name": "unread notifications should be marked with a dot",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:890"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8800,8 +9487,11 @@
             "keyword": "And ",
             "line": 101,
             "name": "I should be able to:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:330"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8879,8 +9569,11 @@
             "keyword": "Given ",
             "line": 109,
             "name": "I have set quiet hours from 10 PM to 8 AM",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:150"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8889,8 +9582,11 @@
             "keyword": "When ",
             "line": 110,
             "name": "a new opportunity is found at 11 PM",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1090"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8899,8 +9595,11 @@
             "keyword": "Then ",
             "line": 111,
             "name": "browser/push notifications should be suppressed",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:640"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8909,8 +9608,11 @@
             "keyword": "But ",
             "line": 112,
             "name": "email notifications should still be sent",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:680"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -8919,8 +9621,11 @@
             "keyword": "And ",
             "line": 113,
             "name": "I should see the opportunity in my queue when I log in",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:560"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9555,8 +10260,11 @@
             "keyword": "And ",
             "line": 75,
             "name": "I select the purchased item",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:995"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9578,8 +10286,11 @@
             "keyword": "Then ",
             "line": 77,
             "name": "I should see the listing creation form",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:550"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9629,8 +10340,11 @@
             "keyword": "When ",
             "line": 78,
             "name": "I enter listing details:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:940"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9668,8 +10382,11 @@
             "keyword": "And ",
             "line": 85,
             "name": "I select marketplaces:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:990"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9691,8 +10408,11 @@
             "keyword": "Then ",
             "line": 91,
             "name": "I should see AI-optimized listings for each platform",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:425"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9701,8 +10421,11 @@
             "keyword": "And ",
             "line": 92,
             "name": "each listing should be tailored to platform best practices",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:675"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9711,8 +10434,11 @@
             "keyword": "When ",
             "line": 95,
             "name": "I preview the eBay listing",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:980"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9747,8 +10473,11 @@
             "keyword": "When ",
             "line": 98,
             "name": "I preview the Facebook listing",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:975"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9796,8 +10525,11 @@
             "keyword": "And ",
             "line": 104,
             "name": "I wait for publishing to complete",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1070"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9835,8 +10567,11 @@
             "keyword": "Then ",
             "line": 105,
             "name": "I should see success messages for each platform:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:535"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9845,8 +10580,11 @@
             "keyword": "And ",
             "line": 110,
             "name": "the item status should change to \"Listed\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:765"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9868,8 +10606,11 @@
             "keyword": "Then ",
             "line": 114,
             "name": "I should see the listed item in \"Active Listings\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:545"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9913,8 +10654,11 @@
             "keyword": "And ",
             "line": 115,
             "name": "I should see real-time metrics:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:530"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9923,8 +10667,11 @@
             "keyword": "When ",
             "line": 123,
             "name": "a buyer sends an offer of \"$225\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1075"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9933,8 +10680,11 @@
             "keyword": "Then ",
             "line": 124,
             "name": "I should receive a notification",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:390"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9943,8 +10693,11 @@
             "keyword": "And ",
             "line": 125,
             "name": "I should see the offer in my dashboard",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:555"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9966,8 +10719,11 @@
             "keyword": "And ",
             "line": 127,
             "name": "the buyer accepts",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1115"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9976,8 +10732,11 @@
             "keyword": "Then ",
             "line": 128,
             "name": "I should see \"Sale Pending\" status",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:575"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10021,8 +10780,11 @@
             "keyword": "When ",
             "line": 131,
             "name": "I mark the item as sold:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:960"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10085,8 +10847,11 @@
             "keyword": "Then ",
             "line": 138,
             "name": "I should see profit calculation:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:525"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10095,8 +10860,11 @@
             "keyword": "And ",
             "line": 145,
             "name": "the item should move to \"Sold Items\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:760"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10134,8 +10902,11 @@
             "keyword": "And ",
             "line": 146,
             "name": "my dashboard stats should update:",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:720"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10235,8 +11006,11 @@
             "keyword": "Given ",
             "line": 154,
             "name": "I have contacted a seller 3 days ago",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:90"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10245,8 +11019,11 @@
             "keyword": "And ",
             "line": 155,
             "name": "the seller has not responded",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:270"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10255,8 +11032,11 @@
             "keyword": "When ",
             "line": 156,
             "name": "I view the opportunity",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1050"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10265,8 +11045,11 @@
             "keyword": "Then ",
             "line": 157,
             "name": "I should see \"No Response\" warning",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:580"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10275,8 +11058,11 @@
             "keyword": "And ",
             "line": 158,
             "name": "I should see option to \"Move to Archive\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:520"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10298,8 +11084,11 @@
             "keyword": "Then ",
             "line": 160,
             "name": "the opportunity should be archived",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:810"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10308,8 +11097,11 @@
             "keyword": "And ",
             "line": 161,
             "name": "I should see it in \"Archived Opportunities\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:510"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10405,8 +11197,11 @@
             "keyword": "Given ",
             "line": 165,
             "name": "I have agreed on a price with seller",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:70"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10415,8 +11210,11 @@
             "keyword": "And ",
             "line": 166,
             "name": "I marked it as \"Purchase Pending\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:185"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10425,8 +11223,11 @@
             "keyword": "When ",
             "line": 167,
             "name": "the seller cancels the deal",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1125"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10448,8 +11249,11 @@
             "keyword": "Then ",
             "line": 169,
             "name": "the opportunity should return to \"Available\"",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:820"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10458,8 +11262,11 @@
             "keyword": "And ",
             "line": 170,
             "name": "I should be able to re-negotiate or skip",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:320"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10555,8 +11362,11 @@
             "keyword": "Given ",
             "line": 174,
             "name": "I have a purchased item in inventory",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:60"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10565,8 +11375,11 @@
             "keyword": "When ",
             "line": 175,
             "name": "I start creating a listing",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1015"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10575,8 +11388,11 @@
             "keyword": "And ",
             "line": 176,
             "name": "the AI generates optimized listings",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1110"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10585,8 +11401,11 @@
             "keyword": "Then ",
             "line": 177,
             "name": "the total time should be under 10 seconds",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:855"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10595,8 +11414,11 @@
             "keyword": "And ",
             "line": 178,
             "name": "all three marketplace listings should be ready",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:625"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10692,8 +11514,11 @@
             "keyword": "Given ",
             "line": 182,
             "name": "I complete the full flip journey",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:55"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10702,8 +11527,11 @@
             "keyword": "When ",
             "line": 183,
             "name": "I take screenshots at each major step",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1025"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10712,8 +11540,11 @@
             "keyword": "Then ",
             "line": 184,
             "name": "all screenshots should match their baselines",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:620"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10722,8 +11553,11 @@
             "keyword": "And ",
             "line": 185,
             "name": "there should be no layout shifts or visual bugs",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:870"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10819,8 +11653,11 @@
             "keyword": "Given ",
             "line": 189,
             "name": "I am using keyboard navigation only",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:40"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10829,8 +11666,11 @@
             "keyword": "When ",
             "line": 190,
             "name": "I complete the entire flip journey using only Tab and Enter",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:920"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10839,8 +11679,11 @@
             "keyword": "Then ",
             "line": 191,
             "name": "I should be able to complete every step",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:310"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10849,8 +11692,11 @@
             "keyword": "And ",
             "line": 192,
             "name": "all interactive elements should be reachable",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:610"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10859,8 +11705,11 @@
             "keyword": "And ",
             "line": 193,
             "name": "focus indicators should be clearly visible",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:685"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10982,8 +11831,11 @@
             "keyword": "Then ",
             "line": 199,
             "name": "all features should work correctly",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:605"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10992,8 +11844,11 @@
             "keyword": "And ",
             "line": 200,
             "name": "the interface should be responsive",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:755"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -11015,8 +11870,11 @@
             "keyword": "When ",
             "line": 202,
             "name": "I take mobile screenshots",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:1020"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -11025,8 +11883,11 @@
             "keyword": "Then ",
             "line": 203,
             "name": "they should match mobile baselines",
+            "match": {
+              "location": "features/step_definitions/all-stubs.steps.ts:875"
+            },
             "result": {
-              "status": "undefined",
+              "status": "skipped",
               "duration": 0
             }
           },
