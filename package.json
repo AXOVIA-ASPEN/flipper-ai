@@ -26,6 +26,7 @@
     "test:all": "npm run test && npm run test:bdd && npm run test:e2e"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.74.0",
     "@auth/prisma-adapter": "^2.11.1",
     "@browserbasehq/stagehand": "^3.0.6",
     "@libsql/client": "^0.15.15",
