@@ -144,6 +144,62 @@ describe("Market Value Calculator", () => {
     });
   });
 
+  describe("batchUpdateVerifiedValues", () => {
+    test("updates multiple listings and returns summary", async () => {
+      const { batchUpdateVerifiedValues } = require("@/lib/market-value-calculator");
+
+      const listings = [
+        { id: "l1", title: "Item A", platform: "EBAY", askingPrice: 100 },
+        { id: "l2", title: "Item B", platform: "EBAY", askingPrice: 200 },
+      ];
+
+      (mockPrisma.listing.findMany as jest.Mock).mockResolvedValue(listings);
+
+      // First listing: has market data → updated
+      (mockPrisma.listing.findUnique as jest.Mock)
+        .mockResolvedValueOnce(listings[0])
+        .mockResolvedValueOnce(listings[1]);
+
+      const prices5 = [90, 100, 110, 120, 130];
+      (mockPrisma.priceHistory.findMany as jest.Mock)
+        .mockResolvedValueOnce(prices5.map((p) => ({ soldPrice: p })))
+        .mockResolvedValueOnce([]); // Second listing: no data → skipped
+
+      (mockPrisma.listing.update as jest.Mock).mockResolvedValue({
+        ...listings[0],
+        verifiedMarketValue: 110,
+      });
+
+      const result = await batchUpdateVerifiedValues("EBAY", 10);
+      expect(result.updated).toBe(1);
+      expect(result.skipped).toBe(1);
+      expect(result.errors).toBe(0);
+    });
+
+    test("counts errors when update throws", async () => {
+      const { batchUpdateVerifiedValues } = require("@/lib/market-value-calculator");
+
+      (mockPrisma.listing.findMany as jest.Mock).mockResolvedValue([
+        { id: "l1", title: "Item", platform: "EBAY", askingPrice: 100 },
+      ]);
+      (mockPrisma.listing.findUnique as jest.Mock).mockRejectedValue(new Error("DB error"));
+
+      const result = await batchUpdateVerifiedValues();
+      expect(result.errors).toBe(1);
+    });
+
+    test("processes all platforms when none specified", async () => {
+      const { batchUpdateVerifiedValues } = require("@/lib/market-value-calculator");
+
+      (mockPrisma.listing.findMany as jest.Mock).mockResolvedValue([]);
+      const result = await batchUpdateVerifiedValues();
+      expect(result).toEqual({ updated: 0, skipped: 0, errors: 0 });
+      expect(mockPrisma.listing.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: {} })
+      );
+    });
+  });
+
   describe("updateListingWithVerifiedValue", () => {
     test("updates listing with verified market value", async () => {
       const testListing = {
