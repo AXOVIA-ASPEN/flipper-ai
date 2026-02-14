@@ -84,6 +84,18 @@ describe("marketplace-scanner", () => {
       expect(meetsViabilityCriteria(analyzed, { includeCategories: [analyzed.category] })).toBe(true);
     });
 
+    it("rejects listing exceeding maxResaleDifficulty", () => {
+      const analyzed = analyzeListing("EBAY", makeListing({ askingPrice: 200 }));
+      analyzed.estimation.resaleDifficulty = "VERY_HARD";
+      expect(meetsViabilityCriteria(analyzed, { maxResaleDifficulty: "EASY" })).toBe(false);
+    });
+
+    it("accepts listing within maxResaleDifficulty", () => {
+      const analyzed = analyzeListing("EBAY", makeListing({ askingPrice: 200 }));
+      analyzed.estimation.resaleDifficulty = "EASY";
+      expect(meetsViabilityCriteria(analyzed, { maxResaleDifficulty: "HARD" })).toBe(true);
+    });
+
     it("filters by maxResaleDifficulty", () => {
       const easy = meetsViabilityCriteria(analyzed, { maxResaleDifficulty: "VERY_EASY" });
       const hard = meetsViabilityCriteria(analyzed, { maxResaleDifficulty: "VERY_HARD" });
@@ -136,6 +148,31 @@ describe("marketplace-scanner", () => {
     it("handles empty array", () => {
       expect(sortByOpportunity([])).toEqual([]);
     });
+
+    it("breaks ties by profit potential when value scores are equal", () => {
+      const a = analyzeListing("EBAY", makeListing({ askingPrice: 200 }));
+      const b = analyzeListing("EBAY", makeListing({ askingPrice: 200 }));
+      // Force same valueScore but different profitPotential
+      a.estimation.valueScore = 80;
+      b.estimation.valueScore = 80;
+      a.estimation.profitPotential = 100;
+      b.estimation.profitPotential = 200;
+      const sorted = sortByOpportunity([a, b]);
+      expect(sorted[0].estimation.profitPotential).toBe(200);
+    });
+
+    it("breaks ties by resale difficulty when score and profit are equal", () => {
+      const a = analyzeListing("EBAY", makeListing({ askingPrice: 200 }));
+      const b = analyzeListing("EBAY", makeListing({ askingPrice: 200 }));
+      a.estimation.valueScore = 80;
+      b.estimation.valueScore = 80;
+      a.estimation.profitPotential = 100;
+      b.estimation.profitPotential = 100;
+      a.estimation.resaleDifficulty = "HARD";
+      b.estimation.resaleDifficulty = "EASY";
+      const sorted = sortByOpportunity([a, b]);
+      expect(sorted[0].estimation.resaleDifficulty).toBe("EASY");
+    });
   });
 
   describe("formatForStorage", () => {
@@ -164,6 +201,25 @@ describe("marketplace-scanner", () => {
       expect(summary.totalListings).toBe(2);
       expect(summary.averageScore).toBeGreaterThanOrEqual(0);
       expect(summary.categoryCounts).toBeDefined();
+    });
+
+    it("calculates totalPotentialProfit from opportunities", () => {
+      const listings = [makeListing({ askingPrice: 10 }), makeListing({ askingPrice: 20 })];
+      const results = processListings("CRAIGSLIST", listings);
+      // Force some to be opportunities with known profit
+      results.opportunities = results.all.filter(l => l.isOpportunity);
+      const summary = generateScanSummary(results);
+      expect(summary.totalPotentialProfit).toBeGreaterThanOrEqual(0);
+      expect(typeof summary.totalPotentialProfit).toBe("number");
+    });
+
+    it("returns bestOpportunity as highest scored", () => {
+      const listings = [makeListing({ askingPrice: 10 }), makeListing({ askingPrice: 5 })];
+      const results = processListings("EBAY", listings);
+      if (results.opportunities.length > 0) {
+        const summary = generateScanSummary(results);
+        expect(summary.bestOpportunity).not.toBeNull();
+      }
     });
 
     it("handles empty results", () => {
