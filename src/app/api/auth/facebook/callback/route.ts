@@ -4,8 +4,8 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+
+import { auth } from "@/lib/auth";
 import {
   exchangeCodeForToken,
   exchangeForLongLivedToken,
@@ -15,7 +15,7 @@ import { storeToken } from "@/scrapers/facebook/token-store";
 
 export async function GET(req: NextRequest) {
   // Check if user is authenticated
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session?.user?.email) {
     return NextResponse.redirect("/auth/signin?error=unauthorized");

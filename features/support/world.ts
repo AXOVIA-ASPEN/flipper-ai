@@ -17,6 +17,7 @@ export interface FlipperWorld extends World {
   db: PrismaClient;
   screenshots: string[];
   testData: Record<string, any>;
+  [key: string]: any;
 }
 
 export class CustomWorld extends World implements FlipperWorld {

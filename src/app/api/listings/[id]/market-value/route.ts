@@ -7,10 +7,10 @@ import { updateListingWithMarketValue } from "@/lib/price-history-service";
 // POST /api/listings/[id]/market-value
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const listingId = params.id;
+    const { id: listingId } = await params;
 
     if (!listingId) {
       return NextResponse.json(
