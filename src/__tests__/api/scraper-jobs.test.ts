@@ -207,6 +207,7 @@ describe('Scraper Jobs API', () => {
           location: null,
           category: null,
           status: 'PENDING',
+          userId: null,
         },
       });
     });

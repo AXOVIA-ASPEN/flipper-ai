@@ -14,6 +14,8 @@ jest.mock("@/lib/db", () => ({
     },
     priceHistory: {
       createMany: (...args: unknown[]) => mockPriceHistoryCreateMany(...args),
+      findMany: jest.fn().mockResolvedValue([]),
+      deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
     },
     scraperJob: {
       create: (...args: unknown[]) => mockJobCreate(...args),

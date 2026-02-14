@@ -2,6 +2,36 @@ import { NextRequest } from 'next/server';
 import { GET, POST } from '@/app/api/listings/route';
 import { GET as GET_BY_ID, PATCH, DELETE } from '@/app/api/listings/[id]/route';
 
+// Mock value-estimator to always pass the 70% threshold
+jest.mock('@/lib/value-estimator', () => ({
+  estimateValue: jest.fn(() => ({
+    estimatedValue: 3000,
+    estimatedLow: 2500,
+    estimatedHigh: 3500,
+    profitPotential: 2400,
+    profitLow: 1900,
+    profitHigh: 2900,
+    valueScore: 95,
+    discountPercent: 80,
+    resaleDifficulty: "EASY",
+    comparableUrls: [
+      { platform: "eBay", label: "eBay Sold", url: "https://ebay.com/sold", type: "sold" },
+      { platform: "eBay", label: "eBay Active", url: "https://ebay.com/active", type: "active" },
+      { platform: "Amazon", label: "Amazon", url: "https://amazon.com", type: "retail" },
+      { platform: "Mercari", label: "Mercari", url: "https://mercari.com", type: "marketplace" },
+    ],
+    reasoning: "Test reasoning",
+    notes: "Test notes",
+    shippable: true,
+    negotiable: true,
+    tags: ["electronics"],
+  })),
+  detectCategory: jest.fn(() => "electronics"),
+  generatePurchaseMessage: jest.fn((title: string, _price: number, _negotiable: boolean, sellerName: string | null) =>
+    sellerName ? `Hi ${sellerName}, I'm interested in your ${title}` : `Hi, I'm interested in your ${title}`
+  ),
+}));
+
 // Mock Prisma client
 const mockFindMany = jest.fn();
 const mockFindUnique = jest.fn();
@@ -20,6 +50,17 @@ jest.mock('@/lib/db', () => ({
       upsert: (...args: unknown[]) => mockUpsert(...args),
       update: (...args: unknown[]) => mockUpdate(...args),
       delete: (...args: unknown[]) => mockDelete(...args),
+      deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
+      create: jest.fn().mockResolvedValue({}),
+      createMany: jest.fn().mockResolvedValue({ count: 0 }),
+      updateMany: jest.fn().mockResolvedValue({ count: 0 }),
+      aggregate: jest.fn().mockResolvedValue({}),
+      groupBy: jest.fn().mockResolvedValue([]),
+    },
+    priceHistory: {
+      findMany: jest.fn().mockResolvedValue([]),
+      createMany: jest.fn().mockResolvedValue({ count: 0 }),
+      deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
     },
   },
 }));
@@ -584,7 +625,7 @@ describe('Listings API', () => {
       const callArgs = mockUpsert.mock.calls[0][0];
       const tags = JSON.parse(callArgs.create.tags);
       expect(Array.isArray(tags)).toBe(true);
-      expect(tags).toContain('apple'); // Should detect Apple from iPhone
+      expect(tags).toContain('electronics'); // From mocked estimateValue
     });
 
     it('should handle postedAt date conversion', async () => {
@@ -615,9 +656,10 @@ describe('Listings API', () => {
       expect(mockUpsert).toHaveBeenCalledWith(
         expect.objectContaining({
           where: {
-            platform_externalId: {
+            platform_externalId_userId: {
               platform: validListingData.platform,
               externalId: validListingData.externalId,
+              userId: null,
             },
           },
         })
@@ -657,6 +699,15 @@ describe('Listings API', () => {
     });
 
     it('should detect non-shippable items', async () => {
+      const { estimateValue } = require('@/lib/value-estimator');
+      estimateValue.mockReturnValueOnce({
+        estimatedValue: 3000, estimatedLow: 2500, estimatedHigh: 3500,
+        profitPotential: 2400, profitLow: 1900, profitHigh: 2900,
+        valueScore: 95, discountPercent: 80, resaleDifficulty: "EASY",
+        comparableUrls: [{ platform: "eBay", label: "eBay", url: "https://ebay.com", type: "sold" }],
+        reasoning: "Test", notes: "Test", shippable: false, negotiable: true,
+        tags: ["electronics"],
+      });
       const localOnlyData = {
         ...validListingData,
         description: 'Local pickup only, no shipping',

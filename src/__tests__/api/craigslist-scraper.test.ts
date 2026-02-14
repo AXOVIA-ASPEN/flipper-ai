@@ -103,6 +103,7 @@ describe('Craigslist Scraper API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     delete process.env.GOOGLE_API_KEY;
+    delete process.env.OPENAI_API_KEY;
     mockEstimateValue.mockImplementation(() => createDefaultEstimation());
     mockDetectCategory.mockReturnValue("electronics");
     mockGeneratePurchaseMessage.mockImplementation(
@@ -117,6 +118,13 @@ describe('Craigslist Scraper API', () => {
     // Setup mock for scraperJob
     mockJobCreate.mockResolvedValue({ id: 'job-123' });
     mockJobUpdate.mockResolvedValue({ id: 'job-123' });
+
+    // Re-setup chromium.launch after clearAllMocks resets factory mocks
+    const { chromium: chromiumMock } = require('playwright');
+    chromiumMock.launch.mockResolvedValue({
+      newContext: mockNewContext,
+      close: mockClose,
+    });
 
     // Setup mock chain for browser
     mockNewContext.mockResolvedValue({
@@ -540,6 +548,13 @@ describe('Craigslist Scraper Helper Functions', () => {
     // Setup mock for scraperJob
     mockJobCreate.mockResolvedValue({ id: 'job-123' });
     mockJobUpdate.mockResolvedValue({ id: 'job-123' });
+
+    // Re-setup chromium.launch after clearAllMocks resets factory mocks
+    const { chromium: chromiumMock2 } = require('playwright');
+    chromiumMock2.launch.mockResolvedValue({
+      newContext: mockNewContext,
+      close: mockClose,
+    });
 
     // Setup mock chain for browser
     mockNewContext.mockResolvedValue({

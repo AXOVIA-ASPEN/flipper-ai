@@ -10,15 +10,19 @@ const config = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
+    '^.+\\.[tj]sx?$': ['ts-jest', {
       tsconfig: {
         module: 'commonjs',
         moduleResolution: 'node',
         esModuleInterop: true,
         allowSyntheticDefaultImports: true,
+        allowJs: true,
       },
     }],
   },
+  transformIgnorePatterns: [
+    '/node_modules/(?!(@auth/prisma-adapter|@auth/core)/)',
+  ],
   collectCoverageFrom: [
     'src/lib/**/*.ts',
     '!src/lib/db.ts', // Skip database client
