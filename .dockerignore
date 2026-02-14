@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+*.md
+tests
+e2e
+features
+screenshots
+reports
