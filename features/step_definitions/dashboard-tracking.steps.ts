@@ -176,16 +176,7 @@ Given('I have purchased {int} items awaiting resale:', async function (count: nu
   });
 });
 
-When('I navigate to {string}', async function (pageName: string) {
-  const pageMap: Record<string, string> = {
-    'My Inventory': '/inventory',
-    'Sales History': '/sales',
-    'dashboard': '/dashboard',
-  };
-  const url = pageMap[pageName] || `/${pageName.toLowerCase().replace(/\s+/g, '-')}`;
-  await page.goto(`http://localhost:3000${url}`);
-  await page.waitForLoadState('networkidle');
-});
+// 'I navigate to {string}' is defined in common-steps.ts
 
 Then('I should see all {int} items', async function (count: number) {
   const items = page.locator('[data-testid="inventory-item"]');

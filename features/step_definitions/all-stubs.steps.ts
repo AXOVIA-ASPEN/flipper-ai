@@ -42,11 +42,6 @@ Given('I am using keyboard navigation only', async function () {
   return 'pending';
 });
 
-Given('I am viewing the dashboard', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
 Given('I am watching a listing priced at ${int}', async function (int) {
   // TODO: Implement when E2E test server is configured
   return 'pending';
@@ -77,11 +72,6 @@ Given('I have an active scan running', async function () {
   return 'pending';
 });
 
-Given('I have completed {int} flips in the last month', async function (int) {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
 Given('I have connected my Slack workspace', async function () {
   // TODO: Implement when E2E test server is configured
   return 'pending';
@@ -92,27 +82,12 @@ Given('I have contacted a seller {int} days ago', async function (int) {
   return 'pending';
 });
 
-Given('I have data across multiple stages', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
 Given('I have email notifications enabled', async function () {
   // TODO: Implement when E2E test server is configured
   return 'pending';
 });
 
-Given('I have purchased {int} items awaiting resale:', async function (int, dataTable) {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
 Given('I have received {int} notifications today', async function (int) {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-Given('I have sales data for the last {int} months', async function (int) {
   // TODO: Implement when E2E test server is configured
   return 'pending';
 });
@@ -128,21 +103,6 @@ Given('I have set quiet hours from {int} PM to {int} AM', async function (int, i
 });
 
 Given('I have the app open in a browser tab', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-Given('I have the dashboard open', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-Given('I have {int} identified opportunities', async function (int) {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-Given('I have {int} ongoing conversations with sellers', async function (int) {
   // TODO: Implement when E2E test server is configured
   return 'pending';
 });
@@ -177,11 +137,6 @@ Given('I signed up with {string}', async function (string) {
   return 'pending';
 });
 
-Given('a background scan is running', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
 Given('it is Monday at {int} AM', async function (int) {
   // TODO: Implement when E2E test server is configured
   return 'pending';
@@ -212,26 +167,6 @@ Given('the seller has not responded', async function () {
   return 'pending';
 });
 
-Given('{int} have score > {int}', async function (int, int2) {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-Given('{int} have score between {int}-{int}', async function (int, int2, int3) {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-Given('{int} seller hasn\'t replied in {int} hours', async function (int, int2) {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-Given('{int} seller just sent a message {int} minutes ago', async function (int, int2) {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
 Then('I should be able to click {string} to subscribe', async function (string) {
   // TODO: Implement when E2E test server is configured
   return 'pending';
@@ -247,22 +182,12 @@ Then('I should be able to complete every step', async function () {
   return 'pending';
 });
 
-Then('I should be able to export as CSV', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
 Then('I should be able to re-negotiate or skip', async function () {
   // TODO: Implement when E2E test server is configured
   return 'pending';
 });
 
 Then('I should be able to toggle:', async function (dataTable) {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-Then('I should be able to:', async function (dataTable) {
   // TODO: Implement when E2E test server is configured
   return 'pending';
 });
@@ -367,11 +292,6 @@ Then('I should see a dropdown with all notifications', async function () {
   return 'pending';
 });
 
-Then('I should see a line chart showing:', async function (dataTable) {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
 Then('I should see a message {string}', async function (string) {
   // TODO: Implement when E2E test server is configured
   return 'pending';
@@ -387,16 +307,6 @@ Then('I should see a registration form', async function () {
   return 'pending';
 });
 
-Then('I should see a table of completed flips:', async function (dataTable) {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-Then('I should see a trend indicator \\(↑ improving, ↓ declining)', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
 Then('I should see a {string} link', async function (string) {
   // TODO: Implement when E2E test server is configured
   return 'pending';
@@ -407,22 +317,12 @@ Then('I should see a {string} message', async function (string) {
   return 'pending';
 });
 
-Then('I should see all {int} items', async function (int) {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
 Then('I should see an upgrade prompt', async function () {
   // TODO: Implement when E2E test server is configured
   return 'pending';
 });
 
 Then('I should see analytics on how many opportunities I\'ve missed', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-Then('I should see filter options:', async function (dataTable) {
   // TODO: Implement when E2E test server is configured
   return 'pending';
 });
@@ -457,11 +357,6 @@ Then('I should see success messages for each platform:', async function (dataTab
   return 'pending';
 });
 
-Then('I should see summary stats:', async function (dataTable) {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
 Then('I should see the listed item in {string}', async function (string) {
   // TODO: Implement when E2E test server is configured
   return 'pending';
@@ -487,11 +382,6 @@ Then('I should see the pricing page', async function () {
   return 'pending';
 });
 
-Then('I should see the {string} section', async function (string) {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
 Then('I should see {string} status', async function (string) {
   // TODO: Implement when E2E test server is configured
   return 'pending';
@@ -503,11 +393,6 @@ Then('I should see {string} warning', async function (string) {
 });
 
 Then('a message should be posted to my #flips channel', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-Then('a toast notification should appear', async function () {
   // TODO: Implement when E2E test server is configured
   return 'pending';
 });
@@ -552,21 +437,6 @@ Then('clicking {string} should open the conversation', async function (string) {
   return 'pending';
 });
 
-Then('conversations should be sorted by last activity', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-Then('each action should update the UI immediately', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-Then('each card should show a {string} button', async function (string) {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
 Then('each listing should be tailored to platform best practices', async function () {
   // TODO: Implement when E2E test server is configured
   return 'pending';
@@ -582,17 +452,7 @@ Then('focus indicators should be clearly visible', async function () {
   return 'pending';
 });
 
-Then('hovering over data points should show weekly breakdown', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
 Then('it should say {string}', async function (string) {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-Then('items should be sorted by score \\(highest first)', async function () {
   // TODO: Implement when E2E test server is configured
   return 'pending';
 });
@@ -622,15 +482,7 @@ Then('my subscription should be set to cancel at period end', async function () 
   return 'pending';
 });
 
-Then('stale conversations \\(48h+) should be highlighted in yellow', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-Then('the dashboard should update automatically', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
+// 'stale conversations (48h+)' handled by dashboard-tracking.steps.ts
 
 Then('the email should include:', async function (dataTable) {
   // TODO: Implement when E2E test server is configured
@@ -667,11 +519,6 @@ Then('the modal should warn about feature loss', async function () {
   return 'pending';
 });
 
-Then('the new item should slide into the queue with animation', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
 Then('the notification should say {string}', async function (string) {
   // TODO: Implement when E2E test server is configured
   return 'pending';
@@ -702,22 +549,7 @@ Then('the subject should be {string}', async function (string) {
   return 'pending';
 });
 
-Then('the total count badge should increment', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
 Then('the total time should be under {int} seconds', async function (int) {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-Then('the {string} item should be highlighted', async function (string) {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-Then('the {string} item should show profit calculation', async function (string) {
   // TODO: Implement when E2E test server is configured
   return 'pending';
 });
@@ -728,16 +560,6 @@ Then('there should be no layout shifts or visual bugs', async function () {
 });
 
 Then('they should match mobile baselines', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-Then('total inventory value should be displayed', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-Then('unread messages should have a notification badge', async function () {
   // TODO: Implement when E2E test server is configured
   return 'pending';
 });
@@ -832,11 +654,6 @@ When('I preview the eBay listing', async function () {
   return 'pending';
 });
 
-When('I see a high-score opportunity', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
 When('I select marketplaces:', async function (dataTable) {
   // TODO: Implement when E2E test server is configured
   return 'pending';
@@ -877,17 +694,7 @@ When('I try to start scan #{int}', async function (int) {
   return 'pending';
 });
 
-When('I view the dashboard analytics section', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
 When('I view the opportunity', async function () {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-When('I view the {string} section', async function (string) {
   // TODO: Implement when E2E test server is configured
   return 'pending';
 });
@@ -923,11 +730,6 @@ When('a listing with score > {int} is found', async function (int) {
 });
 
 When('a new opportunity is found at {int} PM', async function (int) {
-  // TODO: Implement when E2E test server is configured
-  return 'pending';
-});
-
-When('a new opportunity is found with score > {int}', async function (int) {
   // TODO: Implement when E2E test server is configured
   return 'pending';
 });
