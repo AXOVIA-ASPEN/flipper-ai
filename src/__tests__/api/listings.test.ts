@@ -2,6 +2,17 @@ import { NextRequest } from 'next/server';
 import { GET, POST } from '@/app/api/listings/route';
 import { GET as GET_BY_ID, PATCH, DELETE } from '@/app/api/listings/[id]/route';
 
+// Mock auth to return a test user
+jest.mock('@/lib/auth-middleware', () => ({
+  getAuthUserId: jest.fn(() => Promise.resolve('test-user-id')),
+  getUserIdOrDefault: jest.fn(() => Promise.resolve('test-user-id')),
+  isAuthenticated: jest.fn(() => Promise.resolve(true)),
+}));
+
+jest.mock('@/lib/auth', () => ({
+  auth: jest.fn(() => Promise.resolve({ user: { id: 'test-user-id', email: 'test@test.com' } })),
+}));
+
 // Mock value-estimator to always pass the 70% threshold
 jest.mock('@/lib/value-estimator', () => ({
   estimateValue: jest.fn(() => ({
@@ -659,7 +670,7 @@ describe('Listings API', () => {
             platform_externalId_userId: {
               platform: validListingData.platform,
               externalId: validListingData.externalId,
-              userId: null,
+              userId: 'test-user-id',
             },
           },
         })

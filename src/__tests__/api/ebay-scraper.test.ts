@@ -1,6 +1,17 @@
 import { NextRequest } from "next/server";
 import { GET, POST } from "@/app/api/scraper/ebay/route";
 
+// Mock auth
+jest.mock('@/lib/auth-middleware', () => ({
+  getAuthUserId: jest.fn(() => Promise.resolve('test-user-id')),
+  getUserIdOrDefault: jest.fn(() => Promise.resolve('test-user-id')),
+  isAuthenticated: jest.fn(() => Promise.resolve(true)),
+}));
+
+jest.mock('@/lib/auth', () => ({
+  auth: jest.fn(() => Promise.resolve({ user: { id: 'test-user-id', email: 'test@test.com' } })),
+}));
+
 const mockListingUpsert = jest.fn();
 const mockPriceHistoryCreateMany = jest.fn();
 const mockJobCreate = jest.fn();
