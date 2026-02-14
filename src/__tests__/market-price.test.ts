@@ -135,6 +135,132 @@ describe("market-price", () => {
       expect(result).toBeNull();
     });
 
+    it("handles parseEbayPrice with no valid number", async () => {
+      const { chromium } = require("playwright");
+      const mockPage = {
+        goto: jest.fn().mockResolvedValue(undefined),
+        waitForSelector: jest.fn().mockResolvedValue(undefined),
+        evaluate: jest.fn().mockResolvedValue([
+          { title: "Item", price: "no-price-here", shipping: "no shipping info", condition: "Used", url: "https://ebay.com/z", soldDate: "" },
+        ]),
+      };
+      const mockContext = {
+        newPage: jest.fn().mockResolvedValue(mockPage),
+        close: jest.fn().mockResolvedValue(undefined),
+      };
+      chromium.launch.mockResolvedValue({
+        newContext: jest.fn().mockResolvedValue(mockContext),
+        close: jest.fn().mockResolvedValue(undefined),
+      });
+
+      await closeBrowser();
+      const result = await fetchMarketPrice("unparseable price item");
+      // Price parses to 0, shipping parses to 0, so all validPrices filtered out → null
+      expect(result).toBeNull();
+    });
+
+    it("handles shipping with non-free non-numeric text", async () => {
+      const { chromium } = require("playwright");
+      const mockPage = {
+        goto: jest.fn().mockResolvedValue(undefined),
+        waitForSelector: jest.fn().mockResolvedValue(undefined),
+        evaluate: jest.fn().mockResolvedValue([
+          { title: "Item B", price: "$200.00", shipping: "Shipping not specified", condition: "Used", url: "https://ebay.com/b", soldDate: "" },
+        ]),
+      };
+      const mockContext = {
+        newPage: jest.fn().mockResolvedValue(mockPage),
+        close: jest.fn().mockResolvedValue(undefined),
+      };
+      chromium.launch.mockResolvedValue({
+        newContext: jest.fn().mockResolvedValue(mockContext),
+        close: jest.fn().mockResolvedValue(undefined),
+      });
+
+      await closeBrowser();
+      const result = await fetchMarketPrice("shipping text item");
+      expect(result).not.toBeNull();
+      expect(result!.soldListings[0].shippingCost).toBe(0);
+    });
+
+    it("handles waitForSelector timeout (no results selector)", async () => {
+      const { chromium } = require("playwright");
+      const mockPage = {
+        goto: jest.fn().mockResolvedValue(undefined),
+        waitForSelector: jest.fn().mockRejectedValue(new Error("Timeout")),
+        evaluate: jest.fn().mockResolvedValue([
+          { title: "Item C", price: "$300.00", shipping: "Free shipping", condition: "New", url: "https://ebay.com/c", soldDate: "" },
+        ]),
+      };
+      const mockContext = {
+        newPage: jest.fn().mockResolvedValue(mockPage),
+        close: jest.fn().mockResolvedValue(undefined),
+      };
+      chromium.launch.mockResolvedValue({
+        newContext: jest.fn().mockResolvedValue(mockContext),
+        close: jest.fn().mockResolvedValue(undefined),
+      });
+
+      await closeBrowser();
+      const result = await fetchMarketPrice("timeout selector item");
+      // waitForSelector failure is caught, evaluate still runs
+      expect(result).not.toBeNull();
+    });
+
+    it("handles even number of listings for median calculation", async () => {
+      const { chromium } = require("playwright");
+      const mockPage = {
+        goto: jest.fn().mockResolvedValue(undefined),
+        waitForSelector: jest.fn().mockResolvedValue(undefined),
+        evaluate: jest.fn().mockResolvedValue([
+          { title: "Item 1", price: "$100.00", shipping: "Free shipping", condition: "Used", url: "https://ebay.com/1", soldDate: "" },
+          { title: "Item 2", price: "$200.00", shipping: "Free shipping", condition: "Used", url: "https://ebay.com/2", soldDate: "" },
+          { title: "Item 3", price: "$300.00", shipping: "Free shipping", condition: "Used", url: "https://ebay.com/3", soldDate: "" },
+          { title: "Item 4", price: "$400.00", shipping: "Free shipping", condition: "Used", url: "https://ebay.com/4", soldDate: "" },
+        ]),
+      };
+      const mockContext = {
+        newPage: jest.fn().mockResolvedValue(mockPage),
+        close: jest.fn().mockResolvedValue(undefined),
+      };
+      chromium.launch.mockResolvedValue({
+        newContext: jest.fn().mockResolvedValue(mockContext),
+        close: jest.fn().mockResolvedValue(undefined),
+      });
+
+      await closeBrowser();
+      const result = await fetchMarketPrice("even count items");
+      expect(result).not.toBeNull();
+      expect(result!.medianPrice).toBe(250); // (200+300)/2
+      expect(result!.salesCount).toBe(4);
+    });
+
+    it("uses known categories correctly", async () => {
+      const { chromium } = require("playwright");
+      const mockPage = {
+        goto: jest.fn().mockResolvedValue(undefined),
+        waitForSelector: jest.fn().mockResolvedValue(undefined),
+        evaluate: jest.fn().mockResolvedValue([
+          { title: "Game", price: "$50.00", shipping: "Free shipping", condition: "Used", url: "https://ebay.com/g", soldDate: "" },
+        ]),
+      };
+      const mockContext = {
+        newPage: jest.fn().mockResolvedValue(mockPage),
+        close: jest.fn().mockResolvedValue(undefined),
+      };
+      chromium.launch.mockResolvedValue({
+        newContext: jest.fn().mockResolvedValue(mockContext),
+        close: jest.fn().mockResolvedValue(undefined),
+      });
+
+      await closeBrowser();
+      // Test multiple known categories
+      for (const cat of ["video games", "computers", "cell phones", "collectibles", "tools", "musical", "furniture", "appliances", "sports"]) {
+        const result = await fetchMarketPrice("test", cat);
+        expect(result).not.toBeNull();
+      }
+    });
+
     it("handles unknown category gracefully", async () => {
       const { chromium } = require("playwright");
       const mockPage = {
