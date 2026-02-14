@@ -113,6 +113,67 @@ describe("llm-analyzer", () => {
     });
   });
 
+  describe("analyzeSellability edge cases", () => {
+    it("returns null when LLM response has no JSON", async () => {
+      // Override mock to return non-JSON content
+      const OpenAI = require("openai");
+      const mockCreate = jest.fn().mockResolvedValue({
+        choices: [{ message: { content: "No JSON here, just plain text analysis." } }],
+      });
+      OpenAI.mockImplementation(() => ({
+        chat: { completions: { create: mockCreate } },
+      }));
+
+      // Reset cached openai instance by re-importing
+      jest.resetModules();
+      jest.mock("openai", () => {
+        return jest.fn().mockImplementation(() => ({
+          chat: { completions: { create: mockCreate } },
+        }));
+      });
+      const { analyzeSellability: freshAnalyze } = require("../lib/llm-analyzer");
+      process.env.OPENAI_API_KEY = "test-key";
+      const result = await freshAnalyze("iPhone", 200, mockIdentification, mockMarketData);
+      expect(result).toBeNull();
+    });
+
+    it("returns null when LLM call throws an error", async () => {
+      jest.resetModules();
+      const mockCreate = jest.fn().mockRejectedValue(new Error("API rate limit"));
+      jest.mock("openai", () => {
+        return jest.fn().mockImplementation(() => ({
+          chat: { completions: { create: mockCreate } },
+        }));
+      });
+      const { analyzeSellability: freshAnalyze } = require("../lib/llm-analyzer");
+      process.env.OPENAI_API_KEY = "test-key";
+      const result = await freshAnalyze("iPhone", 200, mockIdentification, mockMarketData);
+      expect(result).toBeNull();
+    });
+
+    it("uses fallback values when LLM returns partial JSON", async () => {
+      jest.resetModules();
+      const mockCreate = jest.fn().mockResolvedValue({
+        choices: [{ message: { content: JSON.stringify({ sellabilityScore: 150, demandLevel: "invalid", authenticityRisk: "invalid", conditionRisk: "invalid", confidence: "invalid" }) } }],
+      });
+      jest.mock("openai", () => {
+        return jest.fn().mockImplementation(() => ({
+          chat: { completions: { create: mockCreate } },
+        }));
+      });
+      const { analyzeSellability: freshAnalyze } = require("../lib/llm-analyzer");
+      process.env.OPENAI_API_KEY = "test-key";
+      const result = await freshAnalyze("iPhone", 200, mockIdentification, mockMarketData);
+      expect(result).not.toBeNull();
+      // sellabilityScore clamped to 100
+      expect(result!.sellabilityScore).toBe(100);
+      // Fallbacks for invalid values
+      expect(result!.verifiedMarketValue).toBe(mockMarketData.medianPrice);
+      expect(result!.recommendedOfferPrice).toBe(200);
+      expect(result!.recommendedListPrice).toBe(mockMarketData.medianPrice);
+    });
+  });
+
   describe("runFullAnalysis", () => {
     it("returns full analysis result", async () => {
       const result = await runFullAnalysis(
