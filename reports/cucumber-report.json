@@ -108,8 +108,11 @@
             "keyword": "And ",
             "line": 15,
             "name": "I click \"Start Scan\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -119,7 +122,7 @@
             "line": 16,
             "name": "I should see a \"Scanning eBay...\" progress indicator",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:100"
+              "location": "features/step_definitions/marketplace-steps.ts:95"
             },
             "result": {
               "status": "skipped",
@@ -132,7 +135,7 @@
             "line": 17,
             "name": "within 10 seconds, results should be displayed",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:106"
+              "location": "features/step_definitions/marketplace-steps.ts:101"
             },
             "result": {
               "status": "skipped",
@@ -186,7 +189,7 @@
             "line": 18,
             "name": "each result should show:",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:112"
+              "location": "features/step_definitions/marketplace-steps.ts:107"
             },
             "result": {
               "status": "skipped",
@@ -199,7 +202,7 @@
             "line": 25,
             "name": "results should be sorted by flippability score descending",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:136"
+              "location": "features/step_definitions/marketplace-steps.ts:131"
             },
             "result": {
               "status": "skipped",
@@ -281,7 +284,7 @@
             "line": 28,
             "name": "I have an active scan running for \"Craigslist\"",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:212"
+              "location": "features/step_definitions/marketplace-steps.ts:207"
             },
             "result": {
               "status": "skipped",
@@ -294,7 +297,7 @@
             "line": 29,
             "name": "I have notifications enabled",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:226"
+              "location": "features/step_definitions/marketplace-steps.ts:221"
             },
             "result": {
               "status": "skipped",
@@ -307,7 +310,7 @@
             "line": 30,
             "name": "a new listing appears with flippability score > 80",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:233"
+              "location": "features/step_definitions/marketplace-steps.ts:228"
             },
             "result": {
               "status": "skipped",
@@ -320,7 +323,7 @@
             "line": 31,
             "name": "I should receive a browser notification",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:252"
+              "location": "features/step_definitions/marketplace-steps.ts:247"
             },
             "result": {
               "status": "skipped",
@@ -333,7 +336,7 @@
             "line": 32,
             "name": "the notification should show the item title and score",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:260"
+              "location": "features/step_definitions/marketplace-steps.ts:255"
             },
             "result": {
               "status": "skipped",
@@ -346,7 +349,7 @@
             "line": 33,
             "name": "clicking the notification should navigate to the item detail page",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:270"
+              "location": "features/step_definitions/marketplace-steps.ts:265"
             },
             "result": {
               "status": "skipped",
@@ -428,7 +431,7 @@
             "line": 36,
             "name": "I have scan results displayed",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:324"
+              "location": "features/step_definitions/marketplace-steps.ts:319"
             },
             "result": {
               "status": "skipped",
@@ -441,7 +444,7 @@
             "line": 37,
             "name": "I set the flippability filter to \"70+ only\"",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:150"
+              "location": "features/step_definitions/marketplace-steps.ts:145"
             },
             "result": {
               "status": "skipped",
@@ -454,7 +457,7 @@
             "line": 38,
             "name": "only items with score >= 70 should be visible",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:161"
+              "location": "features/step_definitions/marketplace-steps.ts:156"
             },
             "result": {
               "status": "skipped",
@@ -467,7 +470,7 @@
             "line": 39,
             "name": "the count badge should update to show filtered count",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:172"
+              "location": "features/step_definitions/marketplace-steps.ts:167"
             },
             "result": {
               "status": "skipped",
@@ -595,8 +598,11 @@
             "keyword": "And ",
             "line": 46,
             "name": "I click \"Save Search\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -606,7 +612,7 @@
             "line": 47,
             "name": "I enter search name \"Vintage Furniture FB\"",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:185"
+              "location": "features/step_definitions/marketplace-steps.ts:180"
             },
             "result": {
               "status": "skipped",
@@ -619,7 +625,7 @@
             "line": 48,
             "name": "the search should be saved to my configurations",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:191"
+              "location": "features/step_definitions/marketplace-steps.ts:186"
             },
             "result": {
               "status": "skipped",
@@ -632,7 +638,7 @@
             "line": 49,
             "name": "I should be able to re-run it from the dashboard",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:199"
+              "location": "features/step_definitions/marketplace-steps.ts:194"
             },
             "result": {
               "status": "skipped",
@@ -714,7 +720,7 @@
             "line": 52,
             "name": "I am on the free tier",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:280"
+              "location": "features/step_definitions/marketplace-steps.ts:275"
             },
             "result": {
               "status": "skipped",
@@ -727,7 +733,7 @@
             "line": 53,
             "name": "I have used 10 scans today",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:286"
+              "location": "features/step_definitions/marketplace-steps.ts:281"
             },
             "result": {
               "status": "skipped",
@@ -740,7 +746,7 @@
             "line": 54,
             "name": "I try to start another scan",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:295"
+              "location": "features/step_definitions/marketplace-steps.ts:290"
             },
             "result": {
               "status": "skipped",
@@ -753,7 +759,7 @@
             "line": 55,
             "name": "I should see an upgrade modal",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:303"
+              "location": "features/step_definitions/marketplace-steps.ts:298"
             },
             "result": {
               "status": "skipped",
@@ -766,7 +772,7 @@
             "line": 56,
             "name": "the scan should not execute",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:310"
+              "location": "features/step_definitions/marketplace-steps.ts:305"
             },
             "result": {
               "status": "skipped",
@@ -779,7 +785,7 @@
             "line": 57,
             "name": "the modal should show pricing tiers",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:315"
+              "location": "features/step_definitions/marketplace-steps.ts:310"
             },
             "result": {
               "status": "skipped",
@@ -2452,8 +2458,11 @@
             "keyword": "When ",
             "line": 17,
             "name": "I click \"Draft Message\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -2504,7 +2513,7 @@
             "line": 18,
             "name": "the AI should generate a message containing:",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:55"
+              "location": "features/step_definitions/seller-communication.steps.ts:50"
             },
             "result": {
               "status": "skipped",
@@ -2517,7 +2526,7 @@
             "line": 25,
             "name": "the tone should be friendly and professional",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:100"
+              "location": "features/step_definitions/seller-communication.steps.ts:95"
             },
             "result": {
               "status": "skipped",
@@ -2530,7 +2539,7 @@
             "line": 26,
             "name": "it should NOT include lowball offers",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:115"
+              "location": "features/step_definitions/seller-communication.steps.ts:110"
             },
             "result": {
               "status": "skipped",
@@ -2612,7 +2621,7 @@
             "line": 29,
             "name": "an AI-drafted message is ready",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:127"
+              "location": "features/step_definitions/seller-communication.steps.ts:122"
             },
             "result": {
               "status": "skipped",
@@ -2625,7 +2634,7 @@
             "line": 30,
             "name": "I review the message",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:142"
+              "location": "features/step_definitions/seller-communication.steps.ts:137"
             },
             "result": {
               "status": "skipped",
@@ -2637,8 +2646,11 @@
             "keyword": "And ",
             "line": 31,
             "name": "I click \"Approve & Send\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -2648,7 +2660,7 @@
             "line": 32,
             "name": "the message should be sent to the seller",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:160"
+              "location": "features/step_definitions/seller-communication.steps.ts:150"
             },
             "result": {
               "status": "skipped",
@@ -2660,8 +2672,11 @@
             "keyword": "And ",
             "line": 33,
             "name": "the opportunity status should change to \"Contacted\"",
+            "match": {
+              "location": "features/step_definitions/flip-journey.steps.ts:267"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -2671,7 +2686,7 @@
             "line": 34,
             "name": "the conversation should appear in my inbox",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:181"
+              "location": "features/step_definitions/seller-communication.steps.ts:160"
             },
             "result": {
               "status": "skipped",
@@ -2753,7 +2768,7 @@
             "line": 37,
             "name": "an AI-drafted message is displayed",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:194"
+              "location": "features/step_definitions/seller-communication.steps.ts:173"
             },
             "result": {
               "status": "skipped",
@@ -2765,8 +2780,11 @@
             "keyword": "When ",
             "line": 38,
             "name": "I click \"Edit\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -2776,7 +2794,7 @@
             "line": 39,
             "name": "I modify the pickup time to \"Saturday afternoon\"",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:211"
+              "location": "features/step_definitions/seller-communication.steps.ts:185"
             },
             "result": {
               "status": "skipped",
@@ -2788,8 +2806,11 @@
             "keyword": "And ",
             "line": 40,
             "name": "I click \"Send Edited Message\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -2799,7 +2820,7 @@
             "line": 41,
             "name": "the modified message should be sent",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:232"
+              "location": "features/step_definitions/seller-communication.steps.ts:202"
             },
             "result": {
               "status": "skipped",
@@ -2812,7 +2833,7 @@
             "line": 42,
             "name": "my edits should be saved as a template preference",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:239"
+              "location": "features/step_definitions/seller-communication.steps.ts:209"
             },
             "result": {
               "status": "skipped",
@@ -2894,7 +2915,7 @@
             "line": 45,
             "name": "I have sent an initial message",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:253"
+              "location": "features/step_definitions/seller-communication.steps.ts:223"
             },
             "result": {
               "status": "skipped",
@@ -2907,7 +2928,7 @@
             "line": 46,
             "name": "the seller has replied \"Yes, it's available. Can you pick up tomorrow?\"",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:265"
+              "location": "features/step_definitions/seller-communication.steps.ts:235"
             },
             "result": {
               "status": "skipped",
@@ -2920,7 +2941,7 @@
             "line": 47,
             "name": "I navigate to the Messages page",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:295"
+              "location": "features/step_definitions/seller-communication.steps.ts:265"
             },
             "result": {
               "status": "skipped",
@@ -2933,7 +2954,7 @@
             "line": 48,
             "name": "I should see the full conversation thread",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:301"
+              "location": "features/step_definitions/seller-communication.steps.ts:271"
             },
             "result": {
               "status": "skipped",
@@ -2946,7 +2967,7 @@
             "line": 49,
             "name": "the seller's reply should be marked as unread",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:315"
+              "location": "features/step_definitions/seller-communication.steps.ts:285"
             },
             "result": {
               "status": "skipped",
@@ -2958,8 +2979,11 @@
             "keyword": "And ",
             "line": 50,
             "name": "I should see a \"Draft Reply\" button",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:87"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3038,7 +3062,7 @@
             "line": 53,
             "name": "the seller asks \"What's your best offer?\"",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:335"
+              "location": "features/step_definitions/seller-communication.steps.ts:299"
             },
             "result": {
               "status": "skipped",
@@ -3050,8 +3074,11 @@
             "keyword": "When ",
             "line": 54,
             "name": "I click \"Draft Reply\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3061,7 +3088,7 @@
             "line": 55,
             "name": "the AI should analyze my profit margins",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:360"
+              "location": "features/step_definitions/seller-communication.steps.ts:319"
             },
             "result": {
               "status": "skipped",
@@ -3074,7 +3101,7 @@
             "line": 56,
             "name": "suggest a counteroffer between list price and my max budget",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:368"
+              "location": "features/step_definitions/seller-communication.steps.ts:327"
             },
             "result": {
               "status": "skipped",
@@ -3087,7 +3114,7 @@
             "line": 57,
             "name": "include negotiation rationale in the message",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:382"
+              "location": "features/step_definitions/seller-communication.steps.ts:341"
             },
             "result": {
               "status": "skipped",
@@ -3169,7 +3196,7 @@
             "line": 60,
             "name": "the seller agrees to sell",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:395"
+              "location": "features/step_definitions/seller-communication.steps.ts:354"
             },
             "result": {
               "status": "skipped",
@@ -3182,7 +3209,7 @@
             "line": 61,
             "name": "they say \"Can you pick up this Saturday?\"",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:400"
+              "location": "features/step_definitions/seller-communication.steps.ts:359"
             },
             "result": {
               "status": "skipped",
@@ -3194,8 +3221,11 @@
             "keyword": "When ",
             "line": 62,
             "name": "I click \"Schedule Pickup\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -3205,7 +3235,7 @@
             "line": 63,
             "name": "a calendar event should be created",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:420"
+              "location": "features/step_definitions/seller-communication.steps.ts:374"
             },
             "result": {
               "status": "skipped",
@@ -3218,7 +3248,7 @@
             "line": 64,
             "name": "I should be able to set a reminder",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:428"
+              "location": "features/step_definitions/seller-communication.steps.ts:382"
             },
             "result": {
               "status": "skipped",
@@ -3260,7 +3290,7 @@
             "line": 65,
             "name": "the event should include:",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:435"
+              "location": "features/step_definitions/seller-communication.steps.ts:389"
             },
             "result": {
               "status": "skipped",
@@ -3342,7 +3372,7 @@
             "line": 72,
             "name": "I am negotiating with a seller",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:454"
+              "location": "features/step_definitions/seller-communication.steps.ts:408"
             },
             "result": {
               "status": "skipped",
@@ -3355,7 +3385,7 @@
             "line": 73,
             "name": "the listing is still active on the marketplace",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:464"
+              "location": "features/step_definitions/seller-communication.steps.ts:418"
             },
             "result": {
               "status": "skipped",
@@ -3368,7 +3398,7 @@
             "line": 74,
             "name": "the listing status changes to \"SOLD\"",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:469"
+              "location": "features/step_definitions/seller-communication.steps.ts:423"
             },
             "result": {
               "status": "skipped",
@@ -3381,7 +3411,7 @@
             "line": 75,
             "name": "I should receive an urgent notification",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:481"
+              "location": "features/step_definitions/seller-communication.steps.ts:435"
             },
             "result": {
               "status": "skipped",
@@ -3394,7 +3424,7 @@
             "line": 76,
             "name": "the opportunity should be marked as \"Missed\"",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:489"
+              "location": "features/step_definitions/seller-communication.steps.ts:443"
             },
             "result": {
               "status": "skipped",
@@ -3407,7 +3437,7 @@
             "line": 77,
             "name": "it should move to the \"Lost Opportunities\" section",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:497"
+              "location": "features/step_definitions/seller-communication.steps.ts:451"
             },
             "result": {
               "status": "skipped",
@@ -3545,8 +3575,11 @@
             "keyword": "When ",
             "line": 17,
             "name": "I click \"Create Sell Listing\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5527,8 +5560,11 @@
             "keyword": "And ",
             "line": 11,
             "name": "I click \"Get Started Free\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5596,8 +5632,11 @@
             "keyword": "And ",
             "line": 19,
             "name": "I click \"Create Account\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5822,8 +5861,11 @@
             "keyword": "And ",
             "line": 35,
             "name": "I click \"Sign In\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -5906,7 +5948,7 @@
             "line": 40,
             "name": "I am on the free tier",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:280"
+              "location": "features/step_definitions/marketplace-steps.ts:275"
             },
             "result": {
               "status": "skipped",
@@ -5919,7 +5961,7 @@
             "line": 41,
             "name": "I have used 10 scans today",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:286"
+              "location": "features/step_definitions/marketplace-steps.ts:281"
             },
             "result": {
               "status": "skipped",
@@ -6099,8 +6141,11 @@
             "keyword": "And ",
             "line": 57,
             "name": "I click \"Subscribe\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6242,8 +6287,11 @@
             "keyword": "And ",
             "line": 68,
             "name": "I click \"Manage Subscription\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6403,8 +6451,11 @@
             "keyword": "And ",
             "line": 83,
             "name": "I click \"Cancel Subscription\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -6527,7 +6578,7 @@
             "line": 92,
             "name": "I am on the free tier",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:280"
+              "location": "features/step_definitions/marketplace-steps.ts:275"
             },
             "result": {
               "status": "skipped",
@@ -7477,7 +7528,7 @@
             "line": 8,
             "name": "I have notifications enabled",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:226"
+              "location": "features/step_definitions/marketplace-steps.ts:221"
             },
             "result": {
               "status": "skipped",
@@ -7606,7 +7657,7 @@
             "line": 8,
             "name": "I have notifications enabled",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:226"
+              "location": "features/step_definitions/marketplace-steps.ts:221"
             },
             "result": {
               "status": "skipped",
@@ -7764,7 +7815,7 @@
             "line": 8,
             "name": "I have notifications enabled",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:226"
+              "location": "features/step_definitions/marketplace-steps.ts:221"
             },
             "result": {
               "status": "skipped",
@@ -7924,7 +7975,7 @@
             "line": 8,
             "name": "I have notifications enabled",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:226"
+              "location": "features/step_definitions/marketplace-steps.ts:221"
             },
             "result": {
               "status": "skipped",
@@ -8053,7 +8104,7 @@
             "line": 8,
             "name": "I have notifications enabled",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:226"
+              "location": "features/step_definitions/marketplace-steps.ts:221"
             },
             "result": {
               "status": "skipped",
@@ -8066,7 +8117,7 @@
             "line": 52,
             "name": "I am negotiating with a seller",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:454"
+              "location": "features/step_definitions/seller-communication.steps.ts:408"
             },
             "result": {
               "status": "skipped",
@@ -8099,7 +8150,7 @@
             "line": 55,
             "name": "the listing status changes to \"SOLD\"",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:469"
+              "location": "features/step_definitions/seller-communication.steps.ts:423"
             },
             "result": {
               "status": "skipped",
@@ -8112,7 +8163,7 @@
             "line": 56,
             "name": "I should receive an urgent notification",
             "match": {
-              "location": "features/step_definitions/seller-communication.steps.ts:481"
+              "location": "features/step_definitions/seller-communication.steps.ts:435"
             },
             "result": {
               "status": "skipped",
@@ -8211,7 +8262,7 @@
             "line": 8,
             "name": "I have notifications enabled",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:226"
+              "location": "features/step_definitions/marketplace-steps.ts:221"
             },
             "result": {
               "status": "skipped",
@@ -8340,7 +8391,7 @@
             "line": 8,
             "name": "I have notifications enabled",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:226"
+              "location": "features/step_definitions/marketplace-steps.ts:221"
             },
             "result": {
               "status": "skipped",
@@ -8492,7 +8543,7 @@
             "line": 8,
             "name": "I have notifications enabled",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:226"
+              "location": "features/step_definitions/marketplace-steps.ts:221"
             },
             "result": {
               "status": "skipped",
@@ -8652,7 +8703,7 @@
             "line": 8,
             "name": "I have notifications enabled",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:226"
+              "location": "features/step_definitions/marketplace-steps.ts:221"
             },
             "result": {
               "status": "skipped",
@@ -8816,7 +8867,7 @@
             "line": 8,
             "name": "I have notifications enabled",
             "match": {
-              "location": "features/step_definitions/marketplace-steps.ts:226"
+              "location": "features/step_definitions/marketplace-steps.ts:221"
             },
             "result": {
               "status": "skipped",
@@ -9176,8 +9227,11 @@
             "keyword": "When ",
             "line": 40,
             "name": "I click \"View Images\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9187,7 +9241,7 @@
             "line": 41,
             "name": "I should see a gallery of product images",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:173"
+              "location": "features/step_definitions/flip-journey.steps.ts:170"
             },
             "result": {
               "status": "skipped",
@@ -9200,7 +9254,7 @@
             "line": 42,
             "name": "I should be able to zoom into images",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:179"
+              "location": "features/step_definitions/flip-journey.steps.ts:176"
             },
             "result": {
               "status": "skipped",
@@ -9213,7 +9267,7 @@
             "line": 43,
             "name": "I should see AI-detected condition issues highlighted",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:188"
+              "location": "features/step_definitions/flip-journey.steps.ts:185"
             },
             "result": {
               "status": "skipped",
@@ -9226,7 +9280,7 @@
             "line": 44,
             "name": "I take a screenshot as \"opportunity-analysis\"",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:195"
+              "location": "features/step_definitions/flip-journey.steps.ts:192"
             },
             "result": {
               "status": "skipped",
@@ -9239,7 +9293,7 @@
             "line": 45,
             "name": "the screenshot should match the baseline",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:202"
+              "location": "features/step_definitions/flip-journey.steps.ts:199"
             },
             "result": {
               "status": "skipped",
@@ -9251,8 +9305,11 @@
             "keyword": "When ",
             "line": 48,
             "name": "I click \"Contact Seller\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9262,7 +9319,7 @@
             "line": 49,
             "name": "I should see the messaging interface",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:220"
+              "location": "features/step_definitions/flip-journey.steps.ts:217"
             },
             "result": {
               "status": "skipped",
@@ -9275,7 +9332,7 @@
             "line": 50,
             "name": "I send message \"Is this still available? Can you do $X?\"",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:225"
+              "location": "features/step_definitions/flip-journey.steps.ts:222"
             },
             "result": {
               "status": "skipped",
@@ -9288,7 +9345,7 @@
             "line": 51,
             "name": "I wait for 2 seconds",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:230"
+              "location": "features/step_definitions/flip-journey.steps.ts:227"
             },
             "result": {
               "status": "skipped",
@@ -9301,7 +9358,7 @@
             "line": 52,
             "name": "the message should be marked as sent",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:234"
+              "location": "features/step_definitions/flip-journey.steps.ts:231"
             },
             "result": {
               "status": "skipped",
@@ -9314,7 +9371,7 @@
             "line": 53,
             "name": "I should see it in my conversation history",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:239"
+              "location": "features/step_definitions/flip-journey.steps.ts:236"
             },
             "result": {
               "status": "skipped",
@@ -9327,7 +9384,7 @@
             "line": 56,
             "name": "seller responds with \"Yes, it's available at $Y\"",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:245"
+              "location": "features/step_definitions/flip-journey.steps.ts:242"
             },
             "result": {
               "status": "skipped",
@@ -9340,7 +9397,7 @@
             "line": 57,
             "name": "I counter with \"How about $Z? I can pick up today\"",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:254"
+              "location": "features/step_definitions/flip-journey.steps.ts:251"
             },
             "result": {
               "status": "skipped",
@@ -9353,7 +9410,7 @@
             "line": 58,
             "name": "seller accepts with \"Deal!\"",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:260"
+              "location": "features/step_definitions/flip-journey.steps.ts:257"
             },
             "result": {
               "status": "skipped",
@@ -9366,7 +9423,7 @@
             "line": 59,
             "name": "I should see a notification \"Seller accepted your offer\"",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:266"
+              "location": "features/step_definitions/flip-journey.steps.ts:263"
             },
             "result": {
               "status": "skipped",
@@ -9378,8 +9435,11 @@
             "keyword": "And ",
             "line": 60,
             "name": "the opportunity status should change to \"Negotiating → Purchased\"",
+            "match": {
+              "location": "features/step_definitions/flip-journey.steps.ts:267"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9388,8 +9448,11 @@
             "keyword": "When ",
             "line": 63,
             "name": "I click \"Mark as Purchased\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9428,7 +9491,7 @@
             "line": 64,
             "name": "I enter purchase details:",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:276"
+              "location": "features/step_definitions/flip-journey.steps.ts:273"
             },
             "result": {
               "status": "skipped",
@@ -9440,8 +9503,11 @@
             "keyword": "And ",
             "line": 69,
             "name": "I click \"Confirm Purchase\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9451,7 +9517,7 @@
             "line": 70,
             "name": "I should see success message \"Item marked as purchased\"",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:289"
+              "location": "features/step_definitions/flip-journey.steps.ts:284"
             },
             "result": {
               "status": "skipped",
@@ -9464,7 +9530,7 @@
             "line": 71,
             "name": "the opportunity should move to \"My Inventory\"",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:293"
+              "location": "features/step_definitions/flip-journey.steps.ts:288"
             },
             "result": {
               "status": "skipped",
@@ -9499,8 +9565,11 @@
             "keyword": "And ",
             "line": 76,
             "name": "I click \"Create Listing\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9609,8 +9678,11 @@
             "keyword": "And ",
             "line": 90,
             "name": "I click \"Generate Listing\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9650,7 +9722,7 @@
             "line": 96,
             "name": "I take a screenshot as \"ebay-listing-preview\"",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:195"
+              "location": "features/step_definitions/flip-journey.steps.ts:192"
             },
             "result": {
               "status": "skipped",
@@ -9663,7 +9735,7 @@
             "line": 97,
             "name": "the screenshot should match the baseline",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:202"
+              "location": "features/step_definitions/flip-journey.steps.ts:199"
             },
             "result": {
               "status": "skipped",
@@ -9686,7 +9758,7 @@
             "line": 99,
             "name": "I take a screenshot as \"facebook-listing-preview\"",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:195"
+              "location": "features/step_definitions/flip-journey.steps.ts:192"
             },
             "result": {
               "status": "skipped",
@@ -9699,7 +9771,7 @@
             "line": 100,
             "name": "the screenshot should match the baseline",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:202"
+              "location": "features/step_definitions/flip-journey.steps.ts:199"
             },
             "result": {
               "status": "skipped",
@@ -9711,8 +9783,11 @@
             "keyword": "When ",
             "line": 103,
             "name": "I click \"Publish to All Platforms\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -9879,7 +9954,7 @@
             "line": 126,
             "name": "I counter with \"$240\"",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:254"
+              "location": "features/step_definitions/flip-journey.steps.ts:251"
             },
             "result": {
               "status": "skipped",
@@ -9956,8 +10031,11 @@
             "keyword": "And ",
             "line": 137,
             "name": "I click \"Confirm Sale\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10207,8 +10285,11 @@
             "keyword": "When ",
             "line": 159,
             "name": "I click \"Move to Archive\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10354,8 +10435,11 @@
             "keyword": "And ",
             "line": 168,
             "name": "I click \"Deal Cancelled\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
             "result": {
-              "status": "ambiguous",
+              "status": "skipped",
               "duration": 0
             }
           },
@@ -10873,7 +10957,7 @@
             "line": 197,
             "name": "I am using a mobile device (375x667)",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:304"
+              "location": "features/step_definitions/flip-journey.steps.ts:299"
             },
             "result": {
               "status": "skipped",
@@ -10886,7 +10970,7 @@
             "line": 198,
             "name": "I complete the flip journey on mobile",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:308"
+              "location": "features/step_definitions/flip-journey.steps.ts:303"
             },
             "result": {
               "status": "skipped",
@@ -10919,7 +11003,7 @@
             "line": 201,
             "name": "touch targets should be at least 44x44px",
             "match": {
-              "location": "features/step_definitions/flip-journey.steps.ts:315"
+              "location": "features/step_definitions/flip-journey.steps.ts:310"
             },
             "result": {
               "status": "skipped",

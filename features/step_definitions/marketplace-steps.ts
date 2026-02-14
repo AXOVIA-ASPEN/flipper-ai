@@ -88,12 +88,7 @@ When('I configure:', async function (this: CustomWorld, dataTable) {
   await this.screenshot('scan-configuration-complete');
 });
 
-When('I click {string}', async function (this: CustomWorld, buttonText: string) {
-  const button = this.page.locator(`button:has-text("${buttonText}")`);
-  await button.click();
-  await this.page.waitForTimeout(500);
-  await this.screenshot(`clicked-${buttonText.replace(/\s+/g, '-').toLowerCase()}`);
-});
+// click step defined in common-steps.ts
 
 // ==================== SEARCH EXECUTION ====================
 

@@ -45,12 +45,7 @@ Given('an opportunity:', async function (this: CustomWorld, dataTable) {
 
 // ==================== MESSAGE GENERATION ====================
 
-When('I click {string}', async function (this: CustomWorld, buttonText: string) {
-  const button = this.page.locator(`button:has-text("${buttonText}")`);
-  await button.click();
-  await this.page.waitForTimeout(1000); // Wait for AI generation
-  await this.screenshot(`clicked-${buttonText.replace(/\s+/g, '-').toLowerCase()}`);
-});
+// click step defined in common-steps.ts
 
 Then('the AI should generate a message containing:', async function (this: CustomWorld, dataTable) {
   const elements = dataTable.hashes();
@@ -150,12 +145,7 @@ When('I review the message', async function (this: CustomWorld) {
   await this.screenshot('message-reviewed');
 });
 
-When('I click "Approve & Send"', async function (this: CustomWorld) {
-  const approveButton = this.page.locator('button:has-text("Approve & Send")');
-  await approveButton.click();
-  await this.page.waitForTimeout(1000);
-  await this.screenshot('message-approved-sent');
-});
+// literal click step removed (handled by common-steps.ts)
 
 Then('the message should be sent to the seller', async function (this: CustomWorld) {
   // Check for success notification
@@ -165,18 +155,7 @@ Then('the message should be sent to the seller', async function (this: CustomWor
   console.log('✅ Message sent to seller');
 });
 
-Then('the opportunity status should change to {string}', async function (this: CustomWorld, expectedStatus: string) {
-  // Wait for status update
-  await this.page.waitForTimeout(1000);
-  
-  const statusBadge = this.page.locator('[data-testid="opportunity-status"]');
-  const statusText = await statusBadge.textContent();
-  
-  expect(statusText?.toLowerCase()).toContain(expectedStatus.toLowerCase());
-  console.log(`✅ Status changed to: ${expectedStatus}`);
-  
-  await this.screenshot('status-updated');
-});
+// opportunity status step defined in flip-journey.steps.ts
 
 Then('the conversation should appear in my inbox', async function (this: CustomWorld) {
   // Navigate to inbox
@@ -201,12 +180,7 @@ Given('an AI-drafted message is displayed', async function (this: CustomWorld) {
   await expect(messageArea).toBeVisible({ timeout: 10000 });
 });
 
-When('I click "Edit"', async function (this: CustomWorld) {
-  const editButton = this.page.locator('button:has-text("Edit")');
-  await editButton.click();
-  await this.page.waitForTimeout(500);
-  await this.screenshot('edit-mode-enabled');
-});
+// literal click step removed (handled by common-steps.ts)
 
 When('I modify the pickup time to {string}', async function (this: CustomWorld, newPickupTime: string) {
   const messageInput = this.page.locator('[data-testid="message-editor"]');
@@ -223,11 +197,7 @@ When('I modify the pickup time to {string}', async function (this: CustomWorld, 
   await this.screenshot('message-edited');
 });
 
-When('I click "Send Edited Message"', async function (this: CustomWorld) {
-  const sendButton = this.page.locator('button:has-text("Send Edited Message")');
-  await sendButton.click();
-  await this.page.waitForTimeout(1000);
-});
+// literal click step removed (handled by common-steps.ts)
 
 Then('the modified message should be sent', async function (this: CustomWorld) {
   const successNotif = this.page.locator('text="Message sent successfully"');
@@ -322,13 +292,7 @@ Then('the seller\'s reply should be marked as unread', async function (this: Cus
   console.log('✅ Unread badge visible');
 });
 
-Then('I should see a {string} button', async function (this: CustomWorld, buttonText: string) {
-  const button = this.page.locator(`button:has-text("${buttonText}")`);
-  await expect(button).toBeVisible();
-  
-  console.log(`✅ "${buttonText}" button visible`);
-  await this.screenshot(`button-${buttonText.replace(/\s+/g, '-').toLowerCase()}`);
-});
+// "should see a button" step defined in common-steps.ts
 
 // ==================== AI RESPONSE SUGGESTIONS ====================
 
@@ -350,12 +314,7 @@ Given('the seller asks {string}', async function (this: CustomWorld, question: s
   await this.page.waitForTimeout(1000);
 });
 
-When('I click "Draft Reply"', async function (this: CustomWorld) {
-  const draftButton = this.page.locator('button:has-text("Draft Reply")');
-  await draftButton.click();
-  await this.page.waitForTimeout(2000); // AI needs time to analyze
-  await this.screenshot('draft-reply-clicked');
-});
+// literal click step removed (handled by common-steps.ts)
 
 Then('the AI should analyze my profit margins', async function (this: CustomWorld) {
   // Check for profit analysis indicator
@@ -410,12 +369,7 @@ Given('they say {string}', async function (this: CustomWorld, sellerMessage: str
   await this.page.waitForTimeout(500);
 });
 
-When('I click "Schedule Pickup"', async function (this: CustomWorld) {
-  const scheduleButton = this.page.locator('button:has-text("Schedule Pickup")');
-  await scheduleButton.click();
-  await this.page.waitForTimeout(1000);
-  await this.screenshot('schedule-pickup-clicked');
-});
+// literal click step removed (handled by common-steps.ts)
 
 Then('a calendar event should be created', async function (this: CustomWorld) {
   const calendarModal = this.page.locator('[data-testid="calendar-event-modal"]');

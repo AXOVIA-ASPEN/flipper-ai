@@ -1,25 +1,20 @@
 <?xml version="1.0"?>
-<testsuite name="Cucumber" time="1.41" tests="70" skipped="14" failures="56" errors="0" timestamp="2026-02-14T21:53:58.399Z">
-  <testcase classname="Multi-Marketplace Scanning" name="Scan eBay for electronics" time="0.011">
-    <failure><![CDATA[Multiple step definitions match:
-  I click {string} - features/step_definitions/common-steps.ts:112             
-  I click {string} - features/step_definitions/flip-journey.steps.ts:169       
-  I click {string} - features/step_definitions/flip-journey.steps.ts:285       
-  I click {string} - features/step_definitions/marketplace-steps.ts:91         
-  I click {string} - features/step_definitions/seller-communication.steps.ts:48]]></failure>
+<testsuite name="Cucumber" time="1.351" tests="70" skipped="22" failures="48" errors="0" timestamp="2026-02-14T21:57:11.254Z">
+  <testcase classname="Multi-Marketplace Scanning" name="Scan eBay for electronics" time="0.002">
+    <skipped/>
     <system-out><![CDATA[Given I am logged in as a free user.........................................skipped
 And the database is seeded with test data...................................skipped
 When I navigate to the scanner page.........................................skipped
 And I select "eBay" as the marketplace......................................skipped
 And I select "Electronics" as the category..................................skipped
 And I set price range to "$50-$500".........................................skipped
-And I click "Start Scan"....................................................ambiguous
+And I click "Start Scan"....................................................skipped
 Then I should see a "Scanning eBay..." progress indicator...................skipped
 And within 10 seconds, results should be displayed..........................skipped
 And each result should show:................................................skipped
 And results should be sorted by flippability score descending...............skipped]]></system-out>
   </testcase>
-  <testcase classname="Multi-Marketplace Scanning" name="Real-time alert for high-value opportunity" time="0">
+  <testcase classname="Multi-Marketplace Scanning" name="Real-time alert for high-value opportunity" time="0.001">
     <skipped/>
     <system-out><![CDATA[Given I am logged in as a free user.........................................skipped
 And the database is seeded with test data...................................skipped
@@ -30,7 +25,7 @@ Then I should receive a browser notification................................skip
 And the notification should show the item title and score...................skipped
 And clicking the notification should navigate to the item detail page.......skipped]]></system-out>
   </testcase>
-  <testcase classname="Multi-Marketplace Scanning" name="Filter scan results by flippability score" time="0">
+  <testcase classname="Multi-Marketplace Scanning" name="Filter scan results by flippability score" time="0.001">
     <skipped/>
     <system-out><![CDATA[Given I am logged in as a free user.........................................skipped
 And the database is seeded with test data...................................skipped
@@ -39,23 +34,18 @@ When I set the flippability filter to "70+ only"............................skip
 Then only items with score >= 70 should be visible..........................skipped
 And the count badge should update to show filtered count....................skipped]]></system-out>
   </testcase>
-  <testcase classname="Multi-Marketplace Scanning" name="Save custom search configuration" time="0.002">
-    <failure><![CDATA[Multiple step definitions match:
-  I click {string} - features/step_definitions/common-steps.ts:112             
-  I click {string} - features/step_definitions/flip-journey.steps.ts:169       
-  I click {string} - features/step_definitions/flip-journey.steps.ts:285       
-  I click {string} - features/step_definitions/marketplace-steps.ts:91         
-  I click {string} - features/step_definitions/seller-communication.steps.ts:48]]></failure>
+  <testcase classname="Multi-Marketplace Scanning" name="Save custom search configuration" time="0">
+    <skipped/>
     <system-out><![CDATA[Given I am logged in as a free user.........................................skipped
 And the database is seeded with test data...................................skipped
 When I navigate to the scanner page.........................................skipped
 And I configure:............................................................skipped
-And I click "Save Search"...................................................ambiguous
+And I click "Save Search"...................................................skipped
 And I enter search name "Vintage Furniture FB"..............................skipped
 Then the search should be saved to my configurations........................skipped
 And I should be able to re-run it from the dashboard........................skipped]]></system-out>
   </testcase>
-  <testcase classname="Multi-Marketplace Scanning" name="Free tier scan limit enforcement" time="0.001">
+  <testcase classname="Multi-Marketplace Scanning" name="Free tier scan limit enforcement" time="0">
     <skipped/>
     <system-out><![CDATA[Given I am logged in as a free user.........................................skipped
 And the database is seeded with test data...................................skipped
@@ -87,7 +77,7 @@ Then the flippability score should be below 60..............................skip
 And the risk factors should include "needs repair"..........................skipped
 And the difficulty rating should be "Medium" or "High"......................skipped]]></system-out>
   </testcase>
-  <testcase classname="AI Flippability Scoring" name="Boost score for high-demand brands" time="0">
+  <testcase classname="AI Flippability Scoring" name="Boost score for high-demand brands" time="0.001">
     <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And the AI scoring engine is initialized....................................skipped
@@ -119,7 +109,7 @@ Then the "shippable" flag should be false...................................skip
 And the difficulty rating should increase...................................skipped
 And a warning should show "Requires local pickup"...........................skipped]]></system-out>
   </testcase>
-  <testcase classname="AI Flippability Scoring" name="Condition-based multipliers - #1.1" time="0">
+  <testcase classname="AI Flippability Scoring" name="Condition-based multipliers - #1.1" time="0.001">
     <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And the AI scoring engine is initialized....................................skipped
@@ -129,7 +119,7 @@ When the AI calculates estimated value......................................skip
 Then the condition multiplier should be approximately 2.5...................skipped
 And the estimated resale value should be around $250........................skipped]]></system-out>
   </testcase>
-  <testcase classname="AI Flippability Scoring" name="Condition-based multipliers - #1.2" time="0.001">
+  <testcase classname="AI Flippability Scoring" name="Condition-based multipliers - #1.2" time="0">
     <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And the AI scoring engine is initialized....................................skipped
@@ -149,7 +139,7 @@ When the AI calculates estimated value......................................skip
 Then the condition multiplier should be approximately 1.5...................skipped
 And the estimated resale value should be around $150........................skipped]]></system-out>
   </testcase>
-  <testcase classname="AI Flippability Scoring" name="Condition-based multipliers - #1.4" time="0">
+  <testcase classname="AI Flippability Scoring" name="Condition-based multipliers - #1.4" time="0.001">
     <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And the AI scoring engine is initialized....................................skipped
@@ -159,7 +149,7 @@ When the AI calculates estimated value......................................skip
 Then the condition multiplier should be approximately 1.2...................skipped
 And the estimated resale value should be around $120........................skipped]]></system-out>
   </testcase>
-  <testcase classname="AI Flippability Scoring" name="Condition-based multipliers - #1.5" time="0.001">
+  <testcase classname="AI Flippability Scoring" name="Condition-based multipliers - #1.5" time="0">
     <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And the AI scoring engine is initialized....................................skipped
@@ -170,54 +160,39 @@ Then the condition multiplier should be approximately 0.8...................skip
 And the estimated resale value should be around $80.........................skipped]]></system-out>
   </testcase>
   <testcase classname="Automated Seller Communication" name="Generate initial outreach message" time="0.001">
-    <failure><![CDATA[Multiple step definitions match:
-  I click {string} - features/step_definitions/common-steps.ts:112             
-  I click {string} - features/step_definitions/flip-journey.steps.ts:169       
-  I click {string} - features/step_definitions/flip-journey.steps.ts:285       
-  I click {string} - features/step_definitions/marketplace-steps.ts:91         
-  I click {string} - features/step_definitions/seller-communication.steps.ts:48]]></failure>
+    <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have identified a flip opportunity....................................skipped
 Given an opportunity:.......................................................skipped
-When I click "Draft Message"................................................ambiguous
+When I click "Draft Message"................................................skipped
 Then the AI should generate a message containing:...........................skipped
 And the tone should be friendly and professional............................skipped
 And it should NOT include lowball offers....................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Automated Seller Communication" name="User approves and sends message" time="0.001">
-    <failure><![CDATA[Multiple step definitions match:
-  the opportunity status should change to {string} - features/step_definitions/flip-journey.steps.ts:270        
-  the opportunity status should change to {string} - features/step_definitions/seller-communication.steps.ts:168]]></failure>
+  <testcase classname="Automated Seller Communication" name="User approves and sends message" time="0">
+    <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have identified a flip opportunity....................................skipped
 Given an AI-drafted message is ready........................................skipped
 When I review the message...................................................skipped
-And I click "Approve & Send"................................................ambiguous
+And I click "Approve & Send"................................................skipped
 Then the message should be sent to the seller...............................skipped
-And the opportunity status should change to "Contacted".....................ambiguous
+And the opportunity status should change to "Contacted".....................skipped
 And the conversation should appear in my inbox..............................skipped]]></system-out>
   </testcase>
-  <testcase classname="Automated Seller Communication" name="User edits AI-drafted message" time="0.002">
-    <failure><![CDATA[Multiple step definitions match:
-  I click {string}              - features/step_definitions/common-steps.ts:112              
-  I click {string}              - features/step_definitions/flip-journey.steps.ts:169        
-  I click {string}              - features/step_definitions/flip-journey.steps.ts:285        
-  I click {string}              - features/step_definitions/marketplace-steps.ts:91          
-  I click {string}              - features/step_definitions/seller-communication.steps.ts:48 
-  I click "Send Edited Message" - features/step_definitions/seller-communication.steps.ts:226]]></failure>
+  <testcase classname="Automated Seller Communication" name="User edits AI-drafted message" time="0">
+    <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have identified a flip opportunity....................................skipped
 Given an AI-drafted message is displayed....................................skipped
-When I click "Edit".........................................................ambiguous
+When I click "Edit".........................................................skipped
 And I modify the pickup time to "Saturday afternoon"........................skipped
-And I click "Send Edited Message"...........................................ambiguous
+And I click "Send Edited Message"...........................................skipped
 Then the modified message should be sent....................................skipped
 And my edits should be saved as a template preference.......................skipped]]></system-out>
   </testcase>
-  <testcase classname="Automated Seller Communication" name="Track conversation thread" time="0.001">
-    <failure><![CDATA[Multiple step definitions match:
-  I should see a {string} button - features/step_definitions/common-steps.ts:87               
-  I should see a {string} button - features/step_definitions/seller-communication.steps.ts:325]]></failure>
+  <testcase classname="Automated Seller Communication" name="Track conversation thread" time="0">
+    <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have identified a flip opportunity....................................skipped
 Given I have sent an initial message........................................skipped
@@ -225,42 +200,30 @@ And the seller has replied "Yes, it's available. Can you pick up tomorrow?"..ski
 When I navigate to the Messages page........................................skipped
 Then I should see the full conversation thread..............................skipped
 And the seller's reply should be marked as unread...........................skipped
-And I should see a "Draft Reply" button.....................................ambiguous]]></system-out>
+And I should see a "Draft Reply" button.....................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Automated Seller Communication" name="AI suggests response to seller question" time="0.001">
-    <failure><![CDATA[Multiple step definitions match:
-  I click {string}      - features/step_definitions/common-steps.ts:112              
-  I click {string}      - features/step_definitions/flip-journey.steps.ts:169        
-  I click {string}      - features/step_definitions/flip-journey.steps.ts:285        
-  I click {string}      - features/step_definitions/marketplace-steps.ts:91          
-  I click {string}      - features/step_definitions/seller-communication.steps.ts:48 
-  I click "Draft Reply" - features/step_definitions/seller-communication.steps.ts:353]]></failure>
+  <testcase classname="Automated Seller Communication" name="AI suggests response to seller question" time="0">
+    <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have identified a flip opportunity....................................skipped
 Given the seller asks "What's your best offer?".............................skipped
-When I click "Draft Reply"..................................................ambiguous
+When I click "Draft Reply"..................................................skipped
 Then the AI should analyze my profit margins................................skipped
 And suggest a counteroffer between list price and my max budget.............skipped
 And include negotiation rationale in the message............................skipped]]></system-out>
   </testcase>
-  <testcase classname="Automated Seller Communication" name="Schedule pickup with calendar integration" time="0.001">
-    <failure><![CDATA[Multiple step definitions match:
-  I click {string}          - features/step_definitions/common-steps.ts:112              
-  I click {string}          - features/step_definitions/flip-journey.steps.ts:169        
-  I click {string}          - features/step_definitions/flip-journey.steps.ts:285        
-  I click {string}          - features/step_definitions/marketplace-steps.ts:91          
-  I click {string}          - features/step_definitions/seller-communication.steps.ts:48 
-  I click "Schedule Pickup" - features/step_definitions/seller-communication.steps.ts:413]]></failure>
+  <testcase classname="Automated Seller Communication" name="Schedule pickup with calendar integration" time="0">
+    <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have identified a flip opportunity....................................skipped
 Given the seller agrees to sell.............................................skipped
 And they say "Can you pick up this Saturday?"...............................skipped
-When I click "Schedule Pickup"..............................................ambiguous
+When I click "Schedule Pickup"..............................................skipped
 Then a calendar event should be created.....................................skipped
 And I should be able to set a reminder......................................skipped
 And the event should include:...............................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Automated Seller Communication" name="Alert if tracked item sells before purchase" time="0">
+  <testcase classname="Automated Seller Communication" name="Alert if tracked item sells before purchase" time="0.001">
     <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have identified a flip opportunity....................................skipped
@@ -271,24 +234,19 @@ Then I should receive an urgent notification................................skip
 And the opportunity should be marked as "Missed"............................skipped
 And it should move to the "Lost Opportunities" section......................skipped]]></system-out>
   </testcase>
-  <testcase classname="Resale Listing Generator" name="Auto-generate eBay listing" time="0.007">
-    <failure><![CDATA[Multiple step definitions match:
-  I click {string} - features/step_definitions/common-steps.ts:112             
-  I click {string} - features/step_definitions/flip-journey.steps.ts:169       
-  I click {string} - features/step_definitions/flip-journey.steps.ts:285       
-  I click {string} - features/step_definitions/marketplace-steps.ts:91         
-  I click {string} - features/step_definitions/seller-communication.steps.ts:48]]></failure>
+  <testcase classname="Resale Listing Generator" name="Auto-generate eBay listing" time="0.006">
+    <failure/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have purchased an item to flip........................................undefined
 Given I have purchased:.....................................................undefined
 And the target profit margin is 40%.........................................undefined
-When I click "Create Sell Listing"..........................................ambiguous
+When I click "Create Sell Listing"..........................................skipped
 And I select "eBay" as the platform.........................................undefined
 Then the AI should generate:................................................undefined
 And all photos should be included...........................................undefined
 And SEO keywords should be optimized........................................undefined]]></system-out>
   </testcase>
-  <testcase classname="Resale Listing Generator" name="Cross-platform posting" time="0.004">
+  <testcase classname="Resale Listing Generator" name="Cross-platform posting" time="0.003">
     <failure/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have purchased an item to flip........................................undefined
@@ -298,7 +256,7 @@ Then the listing should be adapted for Facebook format......................unde
 And platform-specific fields should be adjusted:............................undefined
 And both listings should be posted simultaneously...........................undefined]]></system-out>
   </testcase>
-  <testcase classname="Resale Listing Generator" name="Price optimization based on demand" time="0.002">
+  <testcase classname="Resale Listing Generator" name="Price optimization based on demand" time="0.001">
     <failure/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have purchased an item to flip........................................undefined
@@ -308,7 +266,7 @@ When the AI calculates the list price.......................................unde
 Then the suggested price should be at the upper end of the range............undefined
 And I should see a confidence indicator "High Demand - Price Aggressively"..undefined]]></system-out>
   </testcase>
-  <testcase classname="Resale Listing Generator" name="Automated photo enhancement" time="0.003">
+  <testcase classname="Resale Listing Generator" name="Automated photo enhancement" time="0.004">
     <failure/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have purchased an item to flip........................................undefined
@@ -319,7 +277,7 @@ Then the photos should be automatically brightened..........................unde
 And backgrounds should be neutralized (white/gray)..........................undefined
 And the main image should be cropped to focus on the item...................undefined]]></system-out>
   </testcase>
-  <testcase classname="Resale Listing Generator" name="Clone existing listing for similar item" time="0.001">
+  <testcase classname="Resale Listing Generator" name="Clone existing listing for similar item" time="0.002">
     <failure/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have purchased an item to flip........................................undefined
@@ -342,7 +300,7 @@ When I view the listing analytics...........................................unde
 Then I should see:..........................................................undefined
 And I should have the option to "Reduce Price by 10%".......................undefined]]></system-out>
   </testcase>
-  <testcase classname="Dashboard &amp; Opportunity Tracking" name="View flippables queue" time="0.002">
+  <testcase classname="Dashboard &amp; Opportunity Tracking" name="View flippables queue" time="0.005">
     <failure/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have data across multiple stages......................................undefined
@@ -378,7 +336,7 @@ And the "Not listed" item should be highlighted.............................unde
 And the "Sold!" item should show profit calculation.........................undefined
 And total inventory value should be displayed...............................undefined]]></system-out>
   </testcase>
-  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Sales history and profit tracking" time="0">
+  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Sales history and profit tracking" time="0.001">
     <failure/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have data across multiple stages......................................undefined
@@ -388,7 +346,7 @@ Then I should see a table of completed flips:...............................unde
 And I should see summary stats:.............................................undefined
 And I should be able to export as CSV.......................................undefined]]></system-out>
   </testcase>
-  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Visual profit/loss chart" time="0.002">
+  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Visual profit/loss chart" time="0.001">
     <failure/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have data across multiple stages......................................undefined
@@ -398,7 +356,7 @@ Then I should see a line chart showing:.....................................unde
 And hovering over data points should show weekly breakdown..................undefined
 And I should see a trend indicator (↑ improving, ↓ declining)...............undefined]]></system-out>
   </testcase>
-  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Quick actions from dashboard" time="0.001">
+  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Quick actions from dashboard" time="0">
     <failure/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have data across multiple stages......................................undefined
@@ -419,20 +377,15 @@ And a toast notification should appear......................................unde
 And the new item should slide into the queue with animation.................undefined
 And the total count badge should increment..................................undefined]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Sign up for free account" time="0.003">
-    <failure><![CDATA[Multiple step definitions match:
-  I click {string} - features/step_definitions/common-steps.ts:112             
-  I click {string} - features/step_definitions/flip-journey.steps.ts:169       
-  I click {string} - features/step_definitions/flip-journey.steps.ts:285       
-  I click {string} - features/step_definitions/marketplace-steps.ts:91         
-  I click {string} - features/step_definitions/seller-communication.steps.ts:48]]></failure>
+  <testcase classname="User Authentication &amp; Billing" name="Sign up for free account" time="0.001">
+    <failure/>
     <system-out><![CDATA[Given the application is running............................................undefined
 When I visit the landing page...............................................undefined
-And I click "Get Started Free"..............................................ambiguous
+And I click "Get Started Free"..............................................skipped
 Then I should see a registration form.......................................undefined
 When I enter:...............................................................undefined
 And I accept the terms of service...........................................undefined
-And I click "Create Account"................................................ambiguous
+And I click "Create Account"................................................skipped
 Then I should receive a verification email..................................undefined
 And I should be redirected to the onboarding flow...........................undefined]]></system-out>
   </testcase>
@@ -446,22 +399,17 @@ Then my account should be activated.........................................unde
 And I should be redirected to the dashboard.................................undefined
 And I should see a "Welcome to Flipper AI!" message.........................undefined]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Login with existing account" time="0.002">
-    <failure><![CDATA[Multiple step definitions match:
-  I click {string} - features/step_definitions/common-steps.ts:112             
-  I click {string} - features/step_definitions/flip-journey.steps.ts:169       
-  I click {string} - features/step_definitions/flip-journey.steps.ts:285       
-  I click {string} - features/step_definitions/marketplace-steps.ts:91         
-  I click {string} - features/step_definitions/seller-communication.steps.ts:48]]></failure>
+  <testcase classname="User Authentication &amp; Billing" name="Login with existing account" time="0">
+    <failure/>
     <system-out><![CDATA[Given the application is running............................................undefined
 Given I have a verified account.............................................undefined
 When I visit the login page.................................................undefined
 And I enter my email and password...........................................undefined
-And I click "Sign In".......................................................ambiguous
+And I click "Sign In".......................................................skipped
 Then I should be logged in..................................................undefined
 And I should see my dashboard...............................................undefined]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Free tier limitations" time="0">
+  <testcase classname="User Authentication &amp; Billing" name="Free tier limitations" time="0.001">
     <failure/>
     <system-out><![CDATA[Given the application is running............................................undefined
 Given I am on the free tier.................................................skipped
@@ -471,19 +419,14 @@ Then I should see an upgrade prompt.........................................unde
 And the prompt should show:.................................................undefined
 And I should be able to click "Upgrade Now".................................undefined]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Upgrade to paid tier (Flipper)" time="0.005">
-    <failure><![CDATA[Multiple step definitions match:
-  I click {string} - features/step_definitions/common-steps.ts:112             
-  I click {string} - features/step_definitions/flip-journey.steps.ts:169       
-  I click {string} - features/step_definitions/flip-journey.steps.ts:285       
-  I click {string} - features/step_definitions/marketplace-steps.ts:91         
-  I click {string} - features/step_definitions/seller-communication.steps.ts:48]]></failure>
+  <testcase classname="User Authentication &amp; Billing" name="Upgrade to paid tier (Flipper)" time="0.002">
+    <failure/>
     <system-out><![CDATA[Given the application is running............................................undefined
 Given I am logged in to a free account......................................undefined
 When I click "Upgrade" from the dashboard...................................undefined
 Then I should see the pricing page..........................................undefined
 When I select the "Flipper" plan ($19/mo)...................................undefined
-And I click "Subscribe".....................................................ambiguous
+And I click "Subscribe".....................................................skipped
 Then I should be redirected to Stripe Checkout..............................undefined
 When I enter valid payment information......................................undefined
 And I complete the purchase.................................................undefined
@@ -492,30 +435,20 @@ And I should receive a confirmation email...................................unde
 And my dashboard should show "Unlimited scans"..............................undefined]]></system-out>
   </testcase>
   <testcase classname="User Authentication &amp; Billing" name="Subscription management" time="0.001">
-    <failure><![CDATA[Multiple step definitions match:
-  I click {string} - features/step_definitions/common-steps.ts:112             
-  I click {string} - features/step_definitions/flip-journey.steps.ts:169       
-  I click {string} - features/step_definitions/flip-journey.steps.ts:285       
-  I click {string} - features/step_definitions/marketplace-steps.ts:91         
-  I click {string} - features/step_definitions/seller-communication.steps.ts:48]]></failure>
+    <failure/>
     <system-out><![CDATA[Given the application is running............................................undefined
 Given I am subscribed to the "Flipper" plan.................................undefined
 When I navigate to Account Settings.........................................undefined
-And I click "Manage Subscription"...........................................ambiguous
+And I click "Manage Subscription"...........................................skipped
 Then I should see:..........................................................undefined
 And I should have options to:...............................................undefined]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Cancel subscription" time="0.004">
-    <failure><![CDATA[Multiple step definitions match:
-  I click {string} - features/step_definitions/common-steps.ts:112             
-  I click {string} - features/step_definitions/flip-journey.steps.ts:169       
-  I click {string} - features/step_definitions/flip-journey.steps.ts:285       
-  I click {string} - features/step_definitions/marketplace-steps.ts:91         
-  I click {string} - features/step_definitions/seller-communication.steps.ts:48]]></failure>
+  <testcase classname="User Authentication &amp; Billing" name="Cancel subscription" time="0.001">
+    <failure/>
     <system-out><![CDATA[Given the application is running............................................undefined
 Given I am subscribed to a paid plan........................................undefined
 When I navigate to subscription management..................................undefined
-And I click "Cancel Subscription"...........................................ambiguous
+And I click "Cancel Subscription"...........................................skipped
 Then I should see a confirmation modal......................................undefined
 And the modal should warn about feature loss................................undefined
 When I confirm cancellation.................................................undefined
@@ -539,35 +472,35 @@ Given I am subscribed to the "Free" plan....................................unde
 When I check my available features..........................................undefined
 Then I should have to "eBay Scanning".......................................undefined]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.2" time="0">
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.2" time="0.001">
     <failure/>
     <system-out><![CDATA[Given the application is running............................................undefined
 Given I am subscribed to the "Free" plan....................................undefined
 When I check my available features..........................................undefined
 Then I should not have to "AI Messaging"....................................undefined]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.3" time="0">
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.3" time="0.001">
     <failure/>
     <system-out><![CDATA[Given the application is running............................................undefined
 Given I am subscribed to the "Free" plan....................................undefined
 When I check my available features..........................................undefined
 Then I should not have to "Auto-Listing"....................................undefined]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.4" time="0.001">
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.4" time="0">
     <failure/>
     <system-out><![CDATA[Given the application is running............................................undefined
 Given I am subscribed to the "Flipper" plan.................................undefined
 When I check my available features..........................................undefined
 Then I should have to "eBay Scanning".......................................undefined]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.5" time="0.001">
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.5" time="0">
     <failure/>
     <system-out><![CDATA[Given the application is running............................................undefined
 Given I am subscribed to the "Flipper" plan.................................undefined
 When I check my available features..........................................undefined
 Then I should have to "AI Messaging"........................................undefined]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.6" time="0">
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.6" time="0.001">
     <failure/>
     <system-out><![CDATA[Given the application is running............................................undefined
 Given I am subscribed to the "Flipper" plan.................................undefined
@@ -634,7 +567,7 @@ When a listing with score > 90 is found.....................................unde
 Then a message should be posted to my #flips channel........................undefined
 And the message should include:.............................................undefined]]></system-out>
   </testcase>
-  <testcase classname="Notifications &amp; Listing Monitoring" name="Price drop alert" time="0">
+  <testcase classname="Notifications &amp; Listing Monitoring" name="Price drop alert" time="0.001">
     <failure/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have notifications enabled............................................skipped
@@ -645,7 +578,7 @@ Then I should receive a notification........................................unde
 And it should say "Price drop! [Item] now $250 (was $300)"..................undefined
 And I should be prompted to "Contact Seller Now"............................undefined]]></system-out>
   </testcase>
-  <testcase classname="Notifications &amp; Listing Monitoring" name="SOLD alert for tracked listing" time="0.001">
+  <testcase classname="Notifications &amp; Listing Monitoring" name="SOLD alert for tracked listing" time="0.002">
     <failure/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have notifications enabled............................................skipped
@@ -708,13 +641,8 @@ Then browser/push notifications should be suppressed........................unde
 But email notifications should still be sent................................undefined
 And I should see the opportunity in my queue when I log in..................undefined]]></system-out>
   </testcase>
-  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Successful Complete Flip Journey" time="0.021">
-    <failure><![CDATA[Multiple step definitions match:
-  I click {string} - features/step_definitions/common-steps.ts:112             
-  I click {string} - features/step_definitions/flip-journey.steps.ts:169       
-  I click {string} - features/step_definitions/flip-journey.steps.ts:285       
-  I click {string} - features/step_definitions/marketplace-steps.ts:91         
-  I click {string} - features/step_definitions/seller-communication.steps.ts:48]]></failure>
+  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Successful Complete Flip Journey" time="0.004">
+    <failure/>
     <system-out><![CDATA[Given I am logged in as a verified user.....................................skipped
 And I have set up my preferred search locations.............................skipped
 And I have connected all marketplace accounts...............................skipped
@@ -727,13 +655,13 @@ When I click on the first profitable opportunity............................skip
 Then I should see the opportunity detail page...............................skipped
 And I should see AI analysis results within 5 seconds.......................skipped
 And the analysis should include:............................................skipped
-When I click "View Images"..................................................ambiguous
+When I click "View Images"..................................................skipped
 Then I should see a gallery of product images...............................skipped
 And I should be able to zoom into images....................................skipped
 And I should see AI-detected condition issues highlighted...................skipped
 When I take a screenshot as "opportunity-analysis"..........................skipped
 Then the screenshot should match the baseline...............................skipped
-When I click "Contact Seller"...............................................ambiguous
+When I click "Contact Seller"...............................................skipped
 Then I should see the messaging interface...................................skipped
 When I send message "Is this still available? Can you do $X?"...............skipped
 And I wait for 2 seconds....................................................skipped
@@ -743,19 +671,19 @@ When seller responds with "Yes, it's available at $Y".......................skip
 And I counter with "How about $Z? I can pick up today"......................skipped
 And seller accepts with "Deal!".............................................skipped
 Then I should see a notification "Seller accepted your offer"...............skipped
-And the opportunity status should change to "Negotiating → Purchased".......ambiguous
-When I click "Mark as Purchased"............................................ambiguous
+And the opportunity status should change to "Negotiating → Purchased".......skipped
+When I click "Mark as Purchased"............................................skipped
 And I enter purchase details:...............................................skipped
-And I click "Confirm Purchase"..............................................ambiguous
+And I click "Confirm Purchase"..............................................skipped
 Then I should see success message "Item marked as purchased"................skipped
 And the opportunity should move to "My Inventory"...........................skipped
 When I navigate to "My Inventory"...........................................skipped
 And I select the purchased item.............................................undefined
-And I click "Create Listing"................................................ambiguous
+And I click "Create Listing"................................................skipped
 Then I should see the listing creation form.................................undefined
 When I enter listing details:...............................................undefined
 And I select marketplaces:..................................................undefined
-And I click "Generate Listing"..............................................ambiguous
+And I click "Generate Listing"..............................................skipped
 Then I should see AI-optimized listings for each platform...................undefined
 And each listing should be tailored to platform best practices..............undefined
 When I preview the eBay listing.............................................undefined
@@ -764,7 +692,7 @@ And the screenshot should match the baseline................................skip
 When I preview the Facebook listing.........................................undefined
 Then I take a screenshot as "facebook-listing-preview"......................skipped
 And the screenshot should match the baseline................................skipped
-When I click "Publish to All Platforms".....................................ambiguous
+When I click "Publish to All Platforms".....................................skipped
 And I wait for publishing to complete.......................................undefined
 Then I should see success messages for each platform:.......................undefined
 And the item status should change to "Listed"...............................undefined
@@ -778,18 +706,13 @@ When I counter with "$240"..................................................skip
 And the buyer accepts.......................................................undefined
 Then I should see "Sale Pending" status.....................................undefined
 When I mark the item as sold:...............................................undefined
-And I click "Confirm Sale"..................................................ambiguous
+And I click "Confirm Sale"..................................................skipped
 Then I should see profit calculation:.......................................undefined
 And the item should move to "Sold Items"....................................undefined
 And my dashboard stats should update:.......................................undefined]]></system-out>
   </testcase>
   <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Handle Seller Not Responding" time="0.003">
-    <failure><![CDATA[Multiple step definitions match:
-  I click {string} - features/step_definitions/common-steps.ts:112             
-  I click {string} - features/step_definitions/flip-journey.steps.ts:169       
-  I click {string} - features/step_definitions/flip-journey.steps.ts:285       
-  I click {string} - features/step_definitions/marketplace-steps.ts:91         
-  I click {string} - features/step_definitions/seller-communication.steps.ts:48]]></failure>
+    <failure/>
     <system-out><![CDATA[Given I am logged in as a verified user.....................................skipped
 And I have set up my preferred search locations.............................skipped
 And I have connected all marketplace accounts...............................skipped
@@ -798,28 +721,23 @@ And the seller has not responded............................................unde
 When I view the opportunity.................................................undefined
 Then I should see "No Response" warning.....................................undefined
 And I should see option to "Move to Archive"................................undefined
-When I click "Move to Archive"..............................................ambiguous
+When I click "Move to Archive"..............................................skipped
 Then the opportunity should be archived.....................................undefined
 And I should see it in "Archived Opportunities".............................undefined]]></system-out>
   </testcase>
-  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Deal Falls Through After Agreement" time="0.002">
-    <failure><![CDATA[Multiple step definitions match:
-  I click {string} - features/step_definitions/common-steps.ts:112             
-  I click {string} - features/step_definitions/flip-journey.steps.ts:169       
-  I click {string} - features/step_definitions/flip-journey.steps.ts:285       
-  I click {string} - features/step_definitions/marketplace-steps.ts:91         
-  I click {string} - features/step_definitions/seller-communication.steps.ts:48]]></failure>
+  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Deal Falls Through After Agreement" time="0.001">
+    <failure/>
     <system-out><![CDATA[Given I am logged in as a verified user.....................................skipped
 And I have set up my preferred search locations.............................skipped
 And I have connected all marketplace accounts...............................skipped
 Given I have agreed on a price with seller..................................undefined
 And I marked it as "Purchase Pending".......................................undefined
 When the seller cancels the deal............................................undefined
-And I click "Deal Cancelled"................................................ambiguous
+And I click "Deal Cancelled"................................................skipped
 Then the opportunity should return to "Available"...........................undefined
 And I should be able to re-negotiate or skip................................undefined]]></system-out>
   </testcase>
-  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Fast Listing Creation Under 10 Seconds" time="0.002">
+  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Fast Listing Creation Under 10 Seconds" time="0.001">
     <failure/>
     <system-out><![CDATA[Given I am logged in as a verified user.....................................skipped
 And I have set up my preferred search locations.............................skipped
@@ -840,7 +758,7 @@ When I take screenshots at each major step..................................unde
 Then all screenshots should match their baselines...........................undefined
 And there should be no layout shifts or visual bugs.........................undefined]]></system-out>
   </testcase>
-  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Journey Accessible via Keyboard Only" time="0.002">
+  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Journey Accessible via Keyboard Only" time="0.001">
     <failure/>
     <system-out><![CDATA[Given I am logged in as a verified user.....................................skipped
 And I have set up my preferred search locations.............................skipped
@@ -851,7 +769,7 @@ Then I should be able to complete every step................................unde
 And all interactive elements should be reachable............................undefined
 And focus indicators should be clearly visible..............................undefined]]></system-out>
   </testcase>
-  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Complete Journey on Mobile Device" time="0.002">
+  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Complete Journey on Mobile Device" time="0.001">
     <failure/>
     <system-out><![CDATA[Given I am logged in as a verified user.....................................skipped
 And I have set up my preferred search locations.............................skipped

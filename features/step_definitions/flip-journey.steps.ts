@@ -165,10 +165,7 @@ Then('the analysis should include:', async function(dataTable: any) {
   }
 });
 
-// Step 3: Visual Verification
-When('I click {string}', async function(buttonText: string) {
-  await page.click(`button:has-text("${buttonText}")`);
-});
+// Step 3: Visual Verification (click step defined in common-steps.ts)
 
 Then('I should see a gallery of product images', async function() {
   await page.waitForSelector('[data-testid="image-gallery"]');
@@ -282,9 +279,7 @@ When('I enter purchase details:', async function(dataTable: any) {
   }
 });
 
-When('I click {string}', async function(buttonText: string) {
-  await page.click(`button:has-text("${buttonText}")`);
-});
+// click step defined in common-steps.ts
 
 Then('I should see success message {string}', async function(message: string) {
   await page.waitForSelector(`text=${message}`);
