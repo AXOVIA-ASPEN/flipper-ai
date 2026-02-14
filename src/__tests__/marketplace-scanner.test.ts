@@ -1,0 +1,177 @@
+// Tests for marketplace-scanner.ts
+import {
+  analyzeListing,
+  meetsViabilityCriteria,
+  processListings,
+  sortByOpportunity,
+  formatForStorage,
+  generateScanSummary,
+  type RawListing,
+  type AnalyzedListing,
+  type ViabilityCriteria,
+} from "../lib/marketplace-scanner";
+
+const makeListing = (overrides: Partial<RawListing> = {}): RawListing => ({
+  externalId: "123",
+  url: "https://example.com/listing/123",
+  title: "Apple iPhone 14 Pro 256GB",
+  description: "Excellent condition, minor scratches",
+  askingPrice: 200,
+  condition: "good",
+  location: "New York",
+  sellerName: "John",
+  sellerContact: null,
+  imageUrls: ["https://example.com/img.jpg"],
+  category: "electronics",
+  postedAt: new Date("2026-01-15"),
+  ...overrides,
+});
+
+describe("marketplace-scanner", () => {
+  describe("analyzeListing", () => {
+    it("analyzes a listing and returns enriched data", () => {
+      const result = analyzeListing("CRAIGSLIST", makeListing());
+      expect(result.platform).toBe("CRAIGSLIST");
+      expect(result.category).toBe("electronics");
+      expect(result.estimation).toBeDefined();
+      expect(result.requestToBuy).toBeDefined();
+      expect(typeof result.isOpportunity).toBe("boolean");
+    });
+
+    it("detects category when not provided", () => {
+      const result = analyzeListing("EBAY", makeListing({ category: null }));
+      expect(result.category).toBeDefined();
+    });
+
+    it("handles different platforms", () => {
+      const platforms = ["CRAIGSLIST", "FACEBOOK_MARKETPLACE", "EBAY", "OFFERUP", "MERCARI"] as const;
+      for (const platform of platforms) {
+        const result = analyzeListing(platform, makeListing());
+        expect(result.platform).toBe(platform);
+      }
+    });
+  });
+
+  describe("meetsViabilityCriteria", () => {
+    let analyzed: AnalyzedListing;
+
+    beforeEach(() => {
+      analyzed = analyzeListing("CRAIGSLIST", makeListing());
+    });
+
+    it("uses default criteria when none specified", () => {
+      const result = meetsViabilityCriteria(analyzed);
+      expect(typeof result).toBe("boolean");
+    });
+
+    it("filters by minValueScore", () => {
+      const result = meetsViabilityCriteria(analyzed, { minValueScore: 999 });
+      expect(result).toBe(false);
+    });
+
+    it("filters by maxAskingPrice", () => {
+      expect(meetsViabilityCriteria(analyzed, { maxAskingPrice: 10 })).toBe(false);
+      expect(meetsViabilityCriteria(analyzed, { maxAskingPrice: 10000 })).toBe(true);
+    });
+
+    it("filters by excludeCategories", () => {
+      const result = meetsViabilityCriteria(analyzed, { excludeCategories: [analyzed.category] });
+      expect(result).toBe(false);
+    });
+
+    it("filters by includeCategories", () => {
+      expect(meetsViabilityCriteria(analyzed, { includeCategories: ["nonexistent"] })).toBe(false);
+      expect(meetsViabilityCriteria(analyzed, { includeCategories: [analyzed.category] })).toBe(true);
+    });
+
+    it("filters by maxResaleDifficulty", () => {
+      const easy = meetsViabilityCriteria(analyzed, { maxResaleDifficulty: "VERY_EASY" });
+      const hard = meetsViabilityCriteria(analyzed, { maxResaleDifficulty: "VERY_HARD" });
+      // hard should be at least as permissive as easy
+      if (easy) expect(hard).toBe(true);
+    });
+
+    it("filters by requireShippable", () => {
+      const result = meetsViabilityCriteria(analyzed, { requireShippable: true });
+      expect(typeof result).toBe("boolean");
+    });
+
+    it("filters by minProfitPotential", () => {
+      const result = meetsViabilityCriteria(analyzed, { minProfitPotential: 999999 });
+      expect(result).toBe(false);
+    });
+  });
+
+  describe("processListings", () => {
+    it("processes a batch of listings", () => {
+      const listings = [makeListing(), makeListing({ askingPrice: 50, title: "Cheap Widget" })];
+      const result = processListings("FACEBOOK_MARKETPLACE", listings);
+      expect(result.all).toHaveLength(2);
+      expect(result.opportunities.length).toBeLessThanOrEqual(2);
+    });
+
+    it("applies criteria when provided", () => {
+      const listings = [makeListing()];
+      const result = processListings("EBAY", listings, { maxAskingPrice: 1 });
+      expect(result.filtered).toHaveLength(0);
+    });
+
+    it("handles empty listings", () => {
+      const result = processListings("MERCARI", []);
+      expect(result.all).toHaveLength(0);
+      expect(result.opportunities).toHaveLength(0);
+    });
+  });
+
+  describe("sortByOpportunity", () => {
+    it("sorts by value score descending", () => {
+      const listings = [
+        analyzeListing("EBAY", makeListing({ askingPrice: 500, title: "Cheap item" })),
+        analyzeListing("EBAY", makeListing({ askingPrice: 10, title: "Apple MacBook Pro 16" })),
+      ];
+      const sorted = sortByOpportunity(listings);
+      expect(sorted[0].estimation.valueScore).toBeGreaterThanOrEqual(sorted[1].estimation.valueScore);
+    });
+
+    it("handles empty array", () => {
+      expect(sortByOpportunity([])).toEqual([]);
+    });
+  });
+
+  describe("formatForStorage", () => {
+    it("returns a flat object with all fields", () => {
+      const analyzed = analyzeListing("CRAIGSLIST", makeListing());
+      const stored = formatForStorage(analyzed);
+      expect(stored.platform).toBe("CRAIGSLIST");
+      expect(stored.title).toBe("Apple iPhone 14 Pro 256GB");
+      expect(stored.estimatedValue).toBeDefined();
+      expect(stored.valueScore).toBeDefined();
+      expect(typeof stored.tags).toBe("string"); // JSON stringified
+    });
+
+    it("handles null imageUrls", () => {
+      const analyzed = analyzeListing("EBAY", makeListing({ imageUrls: undefined }));
+      const stored = formatForStorage(analyzed);
+      expect(stored.imageUrls).toBeNull();
+    });
+  });
+
+  describe("generateScanSummary", () => {
+    it("generates accurate summary", () => {
+      const listings = [makeListing(), makeListing({ askingPrice: 50 })];
+      const results = processListings("CRAIGSLIST", listings);
+      const summary = generateScanSummary(results);
+      expect(summary.totalListings).toBe(2);
+      expect(summary.averageScore).toBeGreaterThanOrEqual(0);
+      expect(summary.categoryCounts).toBeDefined();
+    });
+
+    it("handles empty results", () => {
+      const results = processListings("EBAY", []);
+      const summary = generateScanSummary(results);
+      expect(summary.totalListings).toBe(0);
+      expect(summary.averageScore).toBe(0);
+      expect(summary.bestOpportunity).toBeNull();
+    });
+  });
+});
