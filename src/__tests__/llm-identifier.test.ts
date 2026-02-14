@@ -117,6 +117,149 @@ describe("llm-identifier", () => {
     });
   });
 
+  describe("identifyItem field defaults", () => {
+    it("handles missing optional fields in parsed JSON", async () => {
+      const OpenAI = require("openai");
+      const mockCreate = jest.fn().mockResolvedValue({
+        choices: [{
+          message: {
+            content: JSON.stringify({
+              brand: null,
+              model: null,
+              condition: "unknown_condition",
+              worthInvestigating: false,
+            }),
+          },
+        }],
+      });
+      OpenAI.mockImplementation(() => ({
+        chat: { completions: { create: mockCreate } },
+      }));
+
+      jest.resetModules();
+      jest.mock("openai", () => OpenAI);
+      process.env.OPENAI_API_KEY = "test-key";
+      const { identifyItem: freshIdentify } = require("../lib/llm-identifier");
+
+      const result = await freshIdentify("Mystery Item", "desc", 50, "other");
+      expect(result).not.toBeNull();
+      expect(result?.brand).toBeNull();
+      expect(result?.model).toBeNull();
+      expect(result?.variant).toBeNull();
+      expect(result?.year).toBeNull();
+      expect(result?.condition).toBe("good"); // default for invalid condition
+      expect(result?.conditionNotes).toBe("");
+      expect(result?.searchQuery).toBe("Mystery Item"); // falls back to title
+      expect(result?.reasoning).toBe("");
+      expect(result?.worthInvestigating).toBe(false);
+    });
+
+    it("handles all valid condition values", async () => {
+      for (const cond of ["new", "like_new", "good", "fair", "poor"]) {
+        const OpenAI = require("openai");
+        const mockCreate = jest.fn().mockResolvedValue({
+          choices: [{
+            message: {
+              content: JSON.stringify({
+                brand: "Test",
+                condition: cond,
+                searchQuery: "test",
+                category: "test",
+              }),
+            },
+          }],
+        });
+        OpenAI.mockImplementation(() => ({
+          chat: { completions: { create: mockCreate } },
+        }));
+
+        jest.resetModules();
+        jest.mock("openai", () => OpenAI);
+        process.env.OPENAI_API_KEY = "test-key";
+        const { identifyItem: freshIdentify } = require("../lib/llm-identifier");
+
+        const result = await freshIdentify("Test", null, 100, null);
+        expect(result?.condition).toBe(cond);
+      }
+    });
+
+    it("handles condition with spaces (like new -> like_new)", async () => {
+      const OpenAI = require("openai");
+      const mockCreate = jest.fn().mockResolvedValue({
+        choices: [{
+          message: {
+            content: JSON.stringify({
+              brand: "Test",
+              condition: "like new",
+              searchQuery: "test",
+            }),
+          },
+        }],
+      });
+      OpenAI.mockImplementation(() => ({
+        chat: { completions: { create: mockCreate } },
+      }));
+
+      jest.resetModules();
+      jest.mock("openai", () => OpenAI);
+      process.env.OPENAI_API_KEY = "test-key";
+      const { identifyItem: freshIdentify } = require("../lib/llm-identifier");
+
+      const result = await freshIdentify("Test", null, 100, null);
+      expect(result?.condition).toBe("like_new");
+    });
+
+    it("handles year as string number", async () => {
+      const OpenAI = require("openai");
+      const mockCreate = jest.fn().mockResolvedValue({
+        choices: [{
+          message: {
+            content: JSON.stringify({
+              brand: "Sony",
+              year: "2023",
+              condition: "good",
+              searchQuery: "Sony TV",
+            }),
+          },
+        }],
+      });
+      OpenAI.mockImplementation(() => ({
+        chat: { completions: { create: mockCreate } },
+      }));
+
+      jest.resetModules();
+      jest.mock("openai", () => OpenAI);
+      process.env.OPENAI_API_KEY = "test-key";
+      const { identifyItem: freshIdentify } = require("../lib/llm-identifier");
+
+      const result = await freshIdentify("Sony TV", null, 300, null);
+      expect(result?.year).toBe(2023);
+    });
+
+    it("handles markdown-wrapped JSON response", async () => {
+      const OpenAI = require("openai");
+      const mockCreate = jest.fn().mockResolvedValue({
+        choices: [{
+          message: {
+            content: '```json\n{"brand":"Test","condition":"good","searchQuery":"test"}\n```',
+          },
+        }],
+      });
+      OpenAI.mockImplementation(() => ({
+        chat: { completions: { create: mockCreate } },
+      }));
+
+      jest.resetModules();
+      jest.mock("openai", () => OpenAI);
+      process.env.OPENAI_API_KEY = "test-key";
+      const { identifyItem: freshIdentify } = require("../lib/llm-identifier");
+
+      const result = await freshIdentify("Test", null, 100, null);
+      expect(result).not.toBeNull();
+      expect(result?.brand).toBe("Test");
+    });
+  });
+
   describe("identifyItemsBatch", () => {
     it("processes multiple listings", async () => {
       const listings = [
@@ -132,6 +275,18 @@ describe("llm-identifier", () => {
     it("handles empty batch", async () => {
       const results = await identifyItemsBatch([]);
       expect(results).toHaveLength(0);
+    });
+
+    it("processes batches of more than 5 items with rate limiting", async () => {
+      const listings = Array.from({ length: 7 }, (_, i) => ({
+        title: `Item ${i}`,
+        description: null,
+        askingPrice: 100 + i * 10,
+        categoryHint: null,
+      }));
+      const results = await identifyItemsBatch(listings);
+      expect(results).toHaveLength(7);
+      results.forEach((r) => expect(r).not.toBeNull());
     });
   });
 });
