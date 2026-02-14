@@ -1,5 +1,27 @@
 // Jest test setup file
 
+// Mock playwright globally to prevent browser download/launch hangs
+jest.mock('playwright', () => ({
+  chromium: {
+    launch: jest.fn().mockResolvedValue({
+      newContext: jest.fn().mockResolvedValue({
+        newPage: jest.fn().mockResolvedValue({
+          goto: jest.fn(),
+          waitForSelector: jest.fn(),
+          evaluate: jest.fn(),
+          close: jest.fn(),
+          $$eval: jest.fn().mockResolvedValue([]),
+          $eval: jest.fn(),
+          waitForTimeout: jest.fn(),
+          setDefaultTimeout: jest.fn(),
+        }),
+        close: jest.fn(),
+      }),
+      close: jest.fn(),
+    }),
+  },
+}));
+
 // Mock ESM-only modules that Jest can't transform
 jest.mock('@auth/prisma-adapter', () => ({
   PrismaAdapter: jest.fn(() => ({})),

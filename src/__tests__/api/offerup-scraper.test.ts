@@ -70,6 +70,19 @@ jest.mock('@/lib/auth-middleware', () => ({
   getAuthUserId: jest.fn(() => 'test-user-id'),
 }));
 
+jest.mock('@/lib/sleep', () => ({
+  sleep: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock('@/lib/image-service', () => ({
+  downloadAndCacheImages: jest.fn(async (urls: string[]) => ({
+    cachedUrls: urls,
+    successCount: urls.length,
+    failedCount: 0,
+  })),
+  normalizeLocation: jest.fn((loc: string) => ({ normalized: loc, city: '', state: '', zip: '' })),
+}));
+
 // Helper to create mock NextRequest
 function createMockRequest(
   method: string,

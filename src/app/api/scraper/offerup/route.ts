@@ -83,9 +83,7 @@ function extractListingId(url: string): string {
 }
 
 // Sleep helper for rate limiting
-function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+import { sleep } from "@/lib/sleep";
 
 // Retry wrapper for browser operations
 async function withRetry<T>(
