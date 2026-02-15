@@ -16,7 +16,7 @@
 | Functions  | 98.62%   | 90%    | ✅     |
 | Lines      | 99.33%   | 90%    | ✅     |
 
-- **Total Tests:** 918 (49 test suites, all passing)
+- **Total Tests:** 1,444 (68 test suites, all passing)
 - **Test Types:** Unit, Integration, Security, E2E (Playwright), BDD (Cucumber)
 
 ---
