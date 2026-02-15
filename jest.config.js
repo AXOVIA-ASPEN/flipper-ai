@@ -1,6 +1,5 @@
 /** @type {import('jest').Config} */
 const config = {
-  preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/src'],
   testMatch: [
@@ -25,7 +24,9 @@ const config = {
           esModuleInterop: true,
           allowSyntheticDefaultImports: true,
           allowJs: true,
+          jsx: 'react-jsx',
         },
+        isolatedModules: true,
       },
     ],
   },

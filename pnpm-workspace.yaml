@@ -5,5 +5,7 @@ ignoredBuiltDependencies:
   - unrs-resolver
 onlyBuiltDependencies:
   - '@prisma/engines'
+  - '@swc/core'
   - bufferutil
+  - esbuild
   - prisma
