@@ -429,7 +429,7 @@ describe('POST /api/scraper/offerup', () => {
     const mockPage = {
       goto: jest.fn().mockResolvedValue(undefined),
       waitForSelector: jest.fn().mockRejectedValue(new Error('Timeout')),
-      content: jest.fn().mockResolvedValue('<html>normal page no captcha</html>'),
+      content: jest.fn().mockResolvedValue('<html><body>OfferUp listings page</body></html>'),
       evaluate: jest.fn().mockResolvedValue([
         { title: 'Found Item', price: '$30', url: 'https://offerup.com/item/detail/777', location: 'Tampa' },
       ]),
