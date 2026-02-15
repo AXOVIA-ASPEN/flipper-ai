@@ -139,11 +139,56 @@ describe('Tier Enforcement', () => {
     });
   });
 
+  describe('checkScanLimit - additional branches', () => {
+    it('defaults to FREE for undefined tier', () => {
+      const result = checkScanLimit(undefined, 10);
+      expect(result.allowed).toBe(false);
+      expect(result.tier).toBe('FREE');
+    });
+
+    it('allows PRO user with high scan count', () => {
+      const result = checkScanLimit('PRO', 50);
+      expect(result.allowed).toBe(true);
+      expect(result.tier).toBe('PRO');
+      expect(result.limits).toBeDefined();
+    });
+
+    it('returns limits object when allowed', () => {
+      const result = checkScanLimit('FLIPPER', 0);
+      expect(result.allowed).toBe(true);
+      expect(result.limits.scansPerDay).toBeDefined();
+      expect(result.reason).toBeUndefined();
+    });
+  });
+
   describe('checkMarketplaceLimit', () => {
     it('blocks Free user adding second marketplace', () => {
       const result = checkMarketplaceLimit('FREE', 1);
       expect(result.allowed).toBe(false);
       expect(result.reason).toContain('Marketplace limit');
+    });
+
+    it('allows Free user with zero marketplaces', () => {
+      const result = checkMarketplaceLimit('FREE', 0);
+      expect(result.allowed).toBe(true);
+      expect(result.reason).toBeUndefined();
+    });
+
+    it('allows PRO user with multiple marketplaces', () => {
+      const result = checkMarketplaceLimit('PRO', 3);
+      expect(result.allowed).toBe(true);
+    });
+
+    it('defaults to FREE for null tier', () => {
+      const result = checkMarketplaceLimit(null, 1);
+      expect(result.allowed).toBe(false);
+      expect(result.tier).toBe('FREE');
+    });
+
+    it('defaults to FREE for undefined tier', () => {
+      const result = checkMarketplaceLimit(undefined, 1);
+      expect(result.allowed).toBe(false);
+      expect(result.tier).toBe('FREE');
     });
   });
 
@@ -151,6 +196,36 @@ describe('Tier Enforcement', () => {
     it('blocks Free user over config limit', () => {
       const result = checkSearchConfigLimit('FREE', 3);
       expect(result.allowed).toBe(false);
+    });
+
+    it('allows Free user under config limit', () => {
+      const result = checkSearchConfigLimit('FREE', 0);
+      expect(result.allowed).toBe(true);
+      expect(result.reason).toBeUndefined();
+    });
+
+    it('allows PRO user with many configs', () => {
+      const result = checkSearchConfigLimit('PRO', 10);
+      expect(result.allowed).toBe(true);
+    });
+
+    it('defaults to FREE for null tier', () => {
+      const result = checkSearchConfigLimit(null, 3);
+      expect(result.allowed).toBe(false);
+      expect(result.tier).toBe('FREE');
+    });
+
+    it('defaults to FREE for undefined tier', () => {
+      const result = checkSearchConfigLimit(undefined, 3);
+      expect(result.allowed).toBe(false);
+      expect(result.tier).toBe('FREE');
+    });
+
+    it('includes plan name in rejection reason', () => {
+      const result = checkSearchConfigLimit('FREE', 100);
+      expect(result.allowed).toBe(false);
+      expect(result.reason).toContain('Search config limit');
+      expect(result.reason).toContain('Upgrade');
     });
   });
 
@@ -165,6 +240,42 @@ describe('Tier Enforcement', () => {
       expect(checkFeatureAccess('PRO', 'messaging').allowed).toBe(true);
       expect(checkFeatureAccess('PRO', 'ebayCrossListing').allowed).toBe(true);
       expect(checkFeatureAccess('PRO', 'priceHistory').allowed).toBe(true);
+    });
+
+    it('blocks Free user from priceHistory with correct feature name', () => {
+      const result = checkFeatureAccess('FREE', 'priceHistory');
+      expect(result.allowed).toBe(false);
+      expect(result.reason).toContain('Price History');
+    });
+
+    it('blocks Free user from ebayCrossListing with correct feature name', () => {
+      const result = checkFeatureAccess('FREE', 'ebayCrossListing');
+      expect(result.allowed).toBe(false);
+      expect(result.reason).toContain('eBay Cross-listing');
+    });
+
+    it('allows all tiers AI analysis', () => {
+      const result = checkFeatureAccess('FREE', 'aiAnalysis');
+      expect(result.allowed).toBe(true);
+      expect(result.reason).toBeUndefined();
+    });
+
+    it('defaults to FREE for null tier', () => {
+      const result = checkFeatureAccess(null, 'messaging');
+      expect(result.allowed).toBe(false);
+      expect(result.tier).toBe('FREE');
+    });
+
+    it('defaults to FREE for undefined tier', () => {
+      const result = checkFeatureAccess(undefined, 'ebayCrossListing');
+      expect(result.allowed).toBe(false);
+      expect(result.tier).toBe('FREE');
+    });
+
+    it('includes plan name in denial reason', () => {
+      const result = checkFeatureAccess('FLIPPER', 'ebayCrossListing');
+      expect(result.allowed).toBe(false);
+      expect(result.reason).toContain('Upgrade');
     });
   });
 });
