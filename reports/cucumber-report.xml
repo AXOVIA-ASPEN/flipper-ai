@@ -1,8 +1,10 @@
 <?xml version="1.0"?>
-<testsuite name="Cucumber" time="1.573" tests="70" skipped="70" failures="0" errors="0" timestamp="2026-02-14T23:50:43.470Z">
-  <testcase classname="Multi-Marketplace Scanning" name="Scan eBay for electronics" time="0.003">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in as a free user.........................................skipped
+<testsuite name="Cucumber" time="8.411" tests="70" skipped="0" failures="70" errors="0" timestamp="2026-02-15T01:04:09.662Z">
+  <testcase classname="Multi-Marketplace Scanning" name="Scan eBay for electronics" time="0.225">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in as a free user.........................................failed
 And the database is seeded with test data...................................skipped
 When I navigate to the scanner page.........................................skipped
 And I select "eBay" as the marketplace......................................skipped
@@ -14,9 +16,11 @@ And within 10 seconds, results should be displayed..........................skip
 And each result should show:................................................skipped
 And results should be sorted by flippability score descending...............skipped]]></system-out>
   </testcase>
-  <testcase classname="Multi-Marketplace Scanning" name="Real-time alert for high-value opportunity" time="0.001">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in as a free user.........................................skipped
+  <testcase classname="Multi-Marketplace Scanning" name="Real-time alert for high-value opportunity" time="0.109">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in as a free user.........................................failed
 And the database is seeded with test data...................................skipped
 Given I have an active scan running for "Craigslist"........................skipped
 And I have notifications enabled............................................skipped
@@ -25,18 +29,22 @@ Then I should receive a browser notification................................skip
 And the notification should show the item title and score...................skipped
 And clicking the notification should navigate to the item detail page.......skipped]]></system-out>
   </testcase>
-  <testcase classname="Multi-Marketplace Scanning" name="Filter scan results by flippability score" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in as a free user.........................................skipped
+  <testcase classname="Multi-Marketplace Scanning" name="Filter scan results by flippability score" time="0.117">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in as a free user.........................................failed
 And the database is seeded with test data...................................skipped
 Given I have scan results displayed.........................................skipped
 When I set the flippability filter to "70+ only"............................skipped
 Then only items with score >= 70 should be visible..........................skipped
 And the count badge should update to show filtered count....................skipped]]></system-out>
   </testcase>
-  <testcase classname="Multi-Marketplace Scanning" name="Save custom search configuration" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in as a free user.........................................skipped
+  <testcase classname="Multi-Marketplace Scanning" name="Save custom search configuration" time="0.113">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in as a free user.........................................failed
 And the database is seeded with test data...................................skipped
 When I navigate to the scanner page.........................................skipped
 And I configure:............................................................skipped
@@ -45,9 +53,11 @@ And I enter search name "Vintage Furniture FB"..............................skip
 Then the search should be saved to my configurations........................skipped
 And I should be able to re-run it from the dashboard........................skipped]]></system-out>
   </testcase>
-  <testcase classname="Multi-Marketplace Scanning" name="Free tier scan limit enforcement" time="0.001">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in as a free user.........................................skipped
+  <testcase classname="Multi-Marketplace Scanning" name="Free tier scan limit enforcement" time="0.118">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in as a free user.........................................failed
 And the database is seeded with test data...................................skipped
 Given I am on the free tier.................................................skipped
 And I have used 10 scans today..............................................skipped
@@ -56,9 +66,11 @@ Then I should see an upgrade modal..........................................skip
 And the scan should not execute.............................................skipped
 And the modal should show pricing tiers.....................................skipped]]></system-out>
   </testcase>
-  <testcase classname="AI Flippability Scoring" name="Calculate flippability score for underpriced item" time="0.001">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="AI Flippability Scoring" name="Calculate flippability score for underpriced item" time="0.113">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And the AI scoring engine is initialized....................................skipped
 Given an eBay listing:......................................................skipped
 And the market value for "iPhone 14 Pro" is $850............................skipped
@@ -67,9 +79,11 @@ Then the flippability score should be between 85 and 95.....................skip
 And the confidence level should be "High"...................................skipped
 And the estimated profit should be calculated as:...........................skipped]]></system-out>
   </testcase>
-  <testcase classname="AI Flippability Scoring" name="Penalize risky items" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="AI Flippability Scoring" name="Penalize risky items" time="0.113">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And the AI scoring engine is initialized....................................skipped
 Given a Craigslist listing:.................................................skipped
 When the AI analyzer evaluates the listing..................................skipped
@@ -77,9 +91,11 @@ Then the flippability score should be below 60..............................skip
 And the risk factors should include "needs repair"..........................skipped
 And the difficulty rating should be "Medium" or "High"......................skipped]]></system-out>
   </testcase>
-  <testcase classname="AI Flippability Scoring" name="Boost score for high-demand brands" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="AI Flippability Scoring" name="Boost score for high-demand brands" time="0.128">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And the AI scoring engine is initialized....................................skipped
 Given a Facebook Marketplace listing:.......................................skipped
 When the AI analyzer evaluates the listing..................................skipped
@@ -87,9 +103,11 @@ Then the flippability score should be above 80..............................skip
 And the analysis should show "Brand: Dyson (high-value)"....................skipped
 And the analysis should show "Sealed/NIB (low risk)"........................skipped]]></system-out>
   </testcase>
-  <testcase classname="AI Flippability Scoring" name="Price history comparison" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="AI Flippability Scoring" name="Price history comparison" time="0.103">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And the AI scoring engine is initialized....................................skipped
 Given an item titled "Sony WH-1000XM5 Headphones"...........................skipped
 And eBay sold listings show:................................................skipped
@@ -98,9 +116,11 @@ Then I should see a price history chart.....................................skip
 And the average sold price should be displayed as "$320"....................skipped
 And the recommended list price should be "$315-$325"........................skipped]]></system-out>
   </testcase>
-  <testcase classname="AI Flippability Scoring" name="Detect non-shippable items" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="AI Flippability Scoring" name="Detect non-shippable items" time="0.114">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And the AI scoring engine is initialized....................................skipped
 Given a listing with description "Local pickup only - no shipping"..........skipped
 And the seller is 150 miles away............................................skipped
@@ -109,9 +129,11 @@ Then the "shippable" flag should be false...................................skip
 And the difficulty rating should increase...................................skipped
 And a warning should show "Requires local pickup"...........................skipped]]></system-out>
   </testcase>
-  <testcase classname="AI Flippability Scoring" name="Condition-based multipliers - #1.1" time="0.001">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="AI Flippability Scoring" name="Condition-based multipliers - #1.1" time="0.117">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And the AI scoring engine is initialized....................................skipped
 Given a listing with condition "New"........................................skipped
 And asking price of $100....................................................skipped
@@ -119,9 +141,11 @@ When the AI calculates estimated value......................................skip
 Then the condition multiplier should be approximately 2.5...................skipped
 And the estimated resale value should be around $250........................skipped]]></system-out>
   </testcase>
-  <testcase classname="AI Flippability Scoring" name="Condition-based multipliers - #1.2" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="AI Flippability Scoring" name="Condition-based multipliers - #1.2" time="0.11">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And the AI scoring engine is initialized....................................skipped
 Given a listing with condition "Like New"...................................skipped
 And asking price of $100....................................................skipped
@@ -129,9 +153,11 @@ When the AI calculates estimated value......................................skip
 Then the condition multiplier should be approximately 2.0...................skipped
 And the estimated resale value should be around $200........................skipped]]></system-out>
   </testcase>
-  <testcase classname="AI Flippability Scoring" name="Condition-based multipliers - #1.3" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="AI Flippability Scoring" name="Condition-based multipliers - #1.3" time="0.122">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And the AI scoring engine is initialized....................................skipped
 Given a listing with condition "Good".......................................skipped
 And asking price of $100....................................................skipped
@@ -139,9 +165,11 @@ When the AI calculates estimated value......................................skip
 Then the condition multiplier should be approximately 1.5...................skipped
 And the estimated resale value should be around $150........................skipped]]></system-out>
   </testcase>
-  <testcase classname="AI Flippability Scoring" name="Condition-based multipliers - #1.4" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="AI Flippability Scoring" name="Condition-based multipliers - #1.4" time="0.113">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And the AI scoring engine is initialized....................................skipped
 Given a listing with condition "Fair".......................................skipped
 And asking price of $100....................................................skipped
@@ -149,9 +177,11 @@ When the AI calculates estimated value......................................skip
 Then the condition multiplier should be approximately 1.2...................skipped
 And the estimated resale value should be around $120........................skipped]]></system-out>
   </testcase>
-  <testcase classname="AI Flippability Scoring" name="Condition-based multipliers - #1.5" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="AI Flippability Scoring" name="Condition-based multipliers - #1.5" time="0.116">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And the AI scoring engine is initialized....................................skipped
 Given a listing with condition "Poor".......................................skipped
 And asking price of $100....................................................skipped
@@ -159,9 +189,11 @@ When the AI calculates estimated value......................................skip
 Then the condition multiplier should be approximately 0.8...................skipped
 And the estimated resale value should be around $80.........................skipped]]></system-out>
   </testcase>
-  <testcase classname="Automated Seller Communication" name="Generate initial outreach message" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Automated Seller Communication" name="Generate initial outreach message" time="0.113">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have identified a flip opportunity....................................skipped
 Given an opportunity:.......................................................skipped
 When I click "Draft Message"................................................skipped
@@ -169,9 +201,11 @@ Then the AI should generate a message containing:...........................skip
 And the tone should be friendly and professional............................skipped
 And it should NOT include lowball offers....................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Automated Seller Communication" name="User approves and sends message" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Automated Seller Communication" name="User approves and sends message" time="0.115">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have identified a flip opportunity....................................skipped
 Given an AI-drafted message is ready........................................skipped
 When I review the message...................................................skipped
@@ -180,9 +214,11 @@ Then the message should be sent to the seller...............................skip
 And the opportunity status should change to "Contacted".....................skipped
 And the conversation should appear in my inbox..............................skipped]]></system-out>
   </testcase>
-  <testcase classname="Automated Seller Communication" name="User edits AI-drafted message" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Automated Seller Communication" name="User edits AI-drafted message" time="0.111">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have identified a flip opportunity....................................skipped
 Given an AI-drafted message is displayed....................................skipped
 When I click "Edit".........................................................skipped
@@ -191,9 +227,11 @@ And I click "Send Edited Message"...........................................skip
 Then the modified message should be sent....................................skipped
 And my edits should be saved as a template preference.......................skipped]]></system-out>
   </testcase>
-  <testcase classname="Automated Seller Communication" name="Track conversation thread" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Automated Seller Communication" name="Track conversation thread" time="0.102">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have identified a flip opportunity....................................skipped
 Given I have sent an initial message........................................skipped
 And the seller has replied "Yes, it's available. Can you pick up tomorrow?"..skipped
@@ -202,9 +240,11 @@ Then I should see the full conversation thread..............................skip
 And the seller's reply should be marked as unread...........................skipped
 And I should see a "Draft Reply" button.....................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Automated Seller Communication" name="AI suggests response to seller question" time="0.001">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Automated Seller Communication" name="AI suggests response to seller question" time="0.113">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have identified a flip opportunity....................................skipped
 Given the seller asks "What's your best offer?".............................skipped
 When I click "Draft Reply"..................................................skipped
@@ -212,9 +252,11 @@ Then the AI should analyze my profit margins................................skip
 And suggest a counteroffer between list price and my max budget.............skipped
 And include negotiation rationale in the message............................skipped]]></system-out>
   </testcase>
-  <testcase classname="Automated Seller Communication" name="Schedule pickup with calendar integration" time="0.001">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Automated Seller Communication" name="Schedule pickup with calendar integration" time="0.115">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have identified a flip opportunity....................................skipped
 Given the seller agrees to sell.............................................skipped
 And they say "Can you pick up this Saturday?"...............................skipped
@@ -223,9 +265,11 @@ Then a calendar event should be created.....................................skip
 And I should be able to set a reminder......................................skipped
 And the event should include:...............................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Automated Seller Communication" name="Alert if tracked item sells before purchase" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Automated Seller Communication" name="Alert if tracked item sells before purchase" time="0.115">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have identified a flip opportunity....................................skipped
 Given I am negotiating with a seller........................................skipped
 And the listing is still active on the marketplace..........................skipped
@@ -234,9 +278,11 @@ Then I should receive an urgent notification................................skip
 And the opportunity should be marked as "Missed"............................skipped
 And it should move to the "Lost Opportunities" section......................skipped]]></system-out>
   </testcase>
-  <testcase classname="Resale Listing Generator" name="Auto-generate eBay listing" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Resale Listing Generator" name="Auto-generate eBay listing" time="0.118">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have purchased an item to flip........................................skipped
 Given I have purchased:.....................................................skipped
 And the target profit margin is 40%.........................................skipped
@@ -246,9 +292,11 @@ Then the AI should generate:................................................skip
 And all photos should be included...........................................skipped
 And SEO keywords should be optimized........................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Resale Listing Generator" name="Cross-platform posting" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Resale Listing Generator" name="Cross-platform posting" time="0.114">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have purchased an item to flip........................................skipped
 Given I have created a listing for eBay.....................................skipped
 When I select "Also post to Facebook Marketplace"...........................skipped
@@ -256,9 +304,11 @@ Then the listing should be adapted for Facebook format......................skip
 And platform-specific fields should be adjusted:............................skipped
 And both listings should be posted simultaneously...........................skipped]]></system-out>
   </testcase>
-  <testcase classname="Resale Listing Generator" name="Price optimization based on demand" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Resale Listing Generator" name="Price optimization based on demand" time="0.117">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have purchased an item to flip........................................skipped
 Given the item "iPad Pro 11-inch"...........................................skipped
 And recent sold listings show high demand (10+ sold in last 3 days).........skipped
@@ -266,9 +316,11 @@ When the AI calculates the list price.......................................skip
 Then the suggested price should be at the upper end of the range............skipped
 And I should see a confidence indicator "High Demand - Price Aggressively"..skipped]]></system-out>
   </testcase>
-  <testcase classname="Resale Listing Generator" name="Automated photo enhancement" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Resale Listing Generator" name="Automated photo enhancement" time="0.116">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have purchased an item to flip........................................skipped
 Given I upload photos of a vintage lamp.....................................skipped
 And the photos are slightly dim.............................................skipped
@@ -277,9 +329,11 @@ Then the photos should be automatically brightened..........................skip
 And backgrounds should be neutralized (white/gray)..........................skipped
 And the main image should be cropped to focus on the item...................skipped]]></system-out>
   </testcase>
-  <testcase classname="Resale Listing Generator" name="Clone existing listing for similar item" time="0.001">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Resale Listing Generator" name="Clone existing listing for similar item" time="0.115">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have purchased an item to flip........................................skipped
 Given I successfully sold an item "Canon EOS Rebel T7"......................skipped
 And I purchase another similar item "Canon EOS Rebel SL3"...................skipped
@@ -289,9 +343,11 @@ Then the title, description, and settings should be copied..................skip
 And the model name should be auto-updated to "SL3"..........................skipped
 And I should review before posting..........................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Resale Listing Generator" name="Track listing performance" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Resale Listing Generator" name="Track listing performance" time="0.117">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have purchased an item to flip........................................skipped
 Given I have posted an item for $150........................................skipped
 And it has been listed for 5 days...........................................skipped
@@ -300,9 +356,11 @@ When I view the listing analytics...........................................skip
 Then I should see:..........................................................skipped
 And I should have the option to "Reduce Price by 10%".......................skipped]]></system-out>
   </testcase>
-  <testcase classname="Dashboard &amp; Opportunity Tracking" name="View flippables queue" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Dashboard &amp; Opportunity Tracking" name="View flippables queue" time="0.112">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have data across multiple stages......................................skipped
 Given I have 15 identified opportunities....................................skipped
 And 5 have score > 80.......................................................skipped
@@ -313,9 +371,11 @@ And items should be sorted by score (highest first).........................skip
 And I should see filter options:............................................skipped
 And each card should show a "Contact Seller" button.........................skipped]]></system-out>
   </testcase>
-  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Active negotiations section" time="0.001">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Active negotiations section" time="0.114">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have data across multiple stages......................................skipped
 Given I have 3 ongoing conversations with sellers...........................skipped
 And 1 seller hasn't replied in 48 hours.....................................skipped
@@ -325,9 +385,11 @@ Then conversations should be sorted by last activity........................skip
 And unread messages should have a notification badge........................skipped
 And stale conversations (48h+) should be highlighted in yellow..............skipped]]></system-out>
   </testcase>
-  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Inventory management" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Inventory management" time="0.119">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have data across multiple stages......................................skipped
 Given I have purchased 4 items awaiting resale:.............................skipped
 When I navigate to "My Inventory"...........................................skipped
@@ -336,9 +398,11 @@ And the "Not listed" item should be highlighted.............................skip
 And the "Sold!" item should show profit calculation.........................skipped
 And total inventory value should be displayed...............................skipped]]></system-out>
   </testcase>
-  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Sales history and profit tracking" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Sales history and profit tracking" time="0.115">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have data across multiple stages......................................skipped
 Given I have completed 10 flips in the last month...........................skipped
 When I navigate to "Sales History"..........................................skipped
@@ -346,9 +410,11 @@ Then I should see a table of completed flips:...............................skip
 And I should see summary stats:.............................................skipped
 And I should be able to export as CSV.......................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Visual profit/loss chart" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Visual profit/loss chart" time="0.118">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have data across multiple stages......................................skipped
 Given I have sales data for the last 3 months...............................skipped
 When I view the dashboard analytics section.................................skipped
@@ -356,18 +422,22 @@ Then I should see a line chart showing:.....................................skip
 And hovering over data points should show weekly breakdown..................skipped
 And I should see a trend indicator (↑ improving, ↓ declining)...............skipped]]></system-out>
   </testcase>
-  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Quick actions from dashboard" time="0.001">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Quick actions from dashboard" time="0.113">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have data across multiple stages......................................skipped
 Given I am viewing the dashboard............................................skipped
 When I see a high-score opportunity.........................................skipped
 Then I should be able to:...................................................skipped
 And each action should update the UI immediately............................skipped]]></system-out>
   </testcase>
-  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Real-time updates via WebSocket" time="0.001">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Real-time updates via WebSocket" time="0.114">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have data across multiple stages......................................skipped
 Given I have the dashboard open.............................................skipped
 And a background scan is running............................................skipped
@@ -377,9 +447,11 @@ And a toast notification should appear......................................skip
 And the new item should slide into the queue with animation.................skipped
 And the total count badge should increment..................................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Sign up for free account" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given the application is running............................................skipped
+  <testcase classname="User Authentication &amp; Billing" name="Sign up for free account" time="0.042">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given the application is running............................................pending
 When I visit the landing page...............................................skipped
 And I click "Get Started Free"..............................................skipped
 Then I should see a registration form.......................................skipped
@@ -389,9 +461,11 @@ And I click "Create Account"................................................skip
 Then I should receive a verification email..................................skipped
 And I should be redirected to the onboarding flow...........................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Email verification" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given the application is running............................................skipped
+  <testcase classname="User Authentication &amp; Billing" name="Email verification" time="0.039">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given the application is running............................................pending
 Given I signed up with "newuser@example.com"................................skipped
 And I received a verification email.........................................skipped
 When I click the verification link..........................................skipped
@@ -399,9 +473,11 @@ Then my account should be activated.........................................skip
 And I should be redirected to the dashboard.................................skipped
 And I should see a "Welcome to Flipper AI!" message.........................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Login with existing account" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given the application is running............................................skipped
+  <testcase classname="User Authentication &amp; Billing" name="Login with existing account" time="0.039">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given the application is running............................................pending
 Given I have a verified account.............................................skipped
 When I visit the login page.................................................skipped
 And I enter my email and password...........................................skipped
@@ -409,9 +485,11 @@ And I click "Sign In".......................................................skip
 Then I should be logged in..................................................skipped
 And I should see my dashboard...............................................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Free tier limitations" time="0.001">
-    <skipped/>
-    <system-out><![CDATA[Given the application is running............................................skipped
+  <testcase classname="User Authentication &amp; Billing" name="Free tier limitations" time="0.041">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given the application is running............................................pending
 Given I am on the free tier.................................................skipped
 And I have used 10 scans today..............................................skipped
 When I try to start scan #11................................................skipped
@@ -419,9 +497,11 @@ Then I should see an upgrade prompt.........................................skip
 And the prompt should show:.................................................skipped
 And I should be able to click "Upgrade Now".................................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Upgrade to paid tier (Flipper)" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given the application is running............................................skipped
+  <testcase classname="User Authentication &amp; Billing" name="Upgrade to paid tier (Flipper)" time="0.043">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given the application is running............................................pending
 Given I am logged in to a free account......................................skipped
 When I click "Upgrade" from the dashboard...................................skipped
 Then I should see the pricing page..........................................skipped
@@ -434,18 +514,22 @@ Then my account should be upgraded to "Flipper".............................skip
 And I should receive a confirmation email...................................skipped
 And my dashboard should show "Unlimited scans"..............................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Subscription management" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given the application is running............................................skipped
+  <testcase classname="User Authentication &amp; Billing" name="Subscription management" time="0.039">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given the application is running............................................pending
 Given I am subscribed to the "Flipper" plan.................................skipped
 When I navigate to Account Settings.........................................skipped
 And I click "Manage Subscription"...........................................skipped
 Then I should see:..........................................................skipped
 And I should have options to:...............................................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Cancel subscription" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given the application is running............................................skipped
+  <testcase classname="User Authentication &amp; Billing" name="Cancel subscription" time="0.043">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given the application is running............................................pending
 Given I am subscribed to a paid plan........................................skipped
 When I navigate to subscription management..................................skipped
 And I click "Cancel Subscription"...........................................skipped
@@ -456,81 +540,112 @@ Then my subscription should be set to cancel at period end..................skip
 And I should retain access until the billing date...........................skipped
 And I should see a message "Your plan will downgrade to Free on [date]".....skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Access control for premium features" time="0.002">
-    <skipped/>
-    <system-out><![CDATA[Given the application is running............................................skipped
+  <testcase classname="User Authentication &amp; Billing" name="Access control for premium features" time="0.04">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given the application is running............................................pending
 Given I am on the free tier.................................................skipped
 When I try to access the "Auto-Listing" feature.............................skipped
 Then I should see a paywall modal...........................................skipped
 And the modal should say "This feature requires Flipper or Pro plan"........skipped
 And I should be able to click "Upgrade" to subscribe........................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.1" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given the application is running............................................skipped
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.1" time="0.037">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given the application is running............................................pending
 Given I am subscribed to the "Free" plan....................................skipped
 When I check my available features..........................................skipped
 Then I should have to "eBay Scanning".......................................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.3" time="0.001">
-    <skipped/>
-    <system-out><![CDATA[Given the application is running............................................skipped
-Given I am subscribed to the "Free" plan....................................skipped
-When I check my available features..........................................skipped
-Then I should not have to "Auto-Listing"....................................skipped]]></system-out>
-  </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.2" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given the application is running............................................skipped
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.2" time="0.043">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given the application is running............................................pending
 Given I am subscribed to the "Free" plan....................................skipped
 When I check my available features..........................................skipped
 Then I should not have to "AI Messaging"....................................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.4" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given the application is running............................................skipped
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.3" time="0.04">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given the application is running............................................pending
+Given I am subscribed to the "Free" plan....................................skipped
+When I check my available features..........................................skipped
+Then I should not have to "Auto-Listing"....................................skipped]]></system-out>
+  </testcase>
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.4" time="0.039">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given the application is running............................................pending
 Given I am subscribed to the "Flipper" plan.................................skipped
 When I check my available features..........................................skipped
 Then I should have to "eBay Scanning".......................................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.5" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given the application is running............................................skipped
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.5" time="0.038">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given the application is running............................................pending
 Given I am subscribed to the "Flipper" plan.................................skipped
 When I check my available features..........................................skipped
 Then I should have to "AI Messaging"........................................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.6" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given the application is running............................................skipped
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.6" time="0.041">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given the application is running............................................pending
 Given I am subscribed to the "Flipper" plan.................................skipped
 When I check my available features..........................................skipped
 Then I should not have to "Auto-Listing"....................................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.7" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given the application is running............................................skipped
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.7" time="0.04">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given the application is running............................................pending
 Given I am subscribed to the "Pro Flipper" plan.............................skipped
 When I check my available features..........................................skipped
 Then I should have to "eBay Scanning".......................................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.8" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given the application is running............................................skipped
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.8" time="0.052">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given the application is running............................................pending
 Given I am subscribed to the "Pro Flipper" plan.............................skipped
 When I check my available features..........................................skipped
 Then I should have to "AI Messaging"........................................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.9" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given the application is running............................................skipped
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.9" time="0.039">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given the application is running............................................pending
 Given I am subscribed to the "Pro Flipper" plan.............................skipped
 When I check my available features..........................................skipped
 Then I should have to "Auto-Listing"........................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Notifications &amp; Listing Monitoring" name="Browser notification for new high-score opportunity" time="0.001">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.10" time="0.044">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given the application is running............................................pending
+Given I am subscribed to the "Pro Flipper" plan.............................skipped
+When I check my available features..........................................skipped
+Then I should have to "Priority Support"....................................skipped]]></system-out>
+  </testcase>
+  <testcase classname="Notifications &amp; Listing Monitoring" name="Browser notification for new high-score opportunity" time="0.114">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have notifications enabled............................................skipped
 Given I have the app open in a browser tab..................................skipped
 And I have an active scan running...........................................skipped
@@ -539,16 +654,11 @@ Then I should see a browser notification....................................skip
 And the notification should say "🔥 New flip opportunity! Score: [score]"...skipped
 And clicking it should open the item detail page............................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.10" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given the application is running............................................skipped
-Given I am subscribed to the "Pro Flipper" plan.............................skipped
-When I check my available features..........................................skipped
-Then I should have to "Priority Support"....................................skipped]]></system-out>
-  </testcase>
-  <testcase classname="Notifications &amp; Listing Monitoring" name="Email notification for seller response" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Notifications &amp; Listing Monitoring" name="Email notification for seller response" time="0.113">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have notifications enabled............................................skipped
 Given I have sent a message to a seller.....................................skipped
 And I have email notifications enabled......................................skipped
@@ -557,9 +667,11 @@ Then I should receive an email notification.................................skip
 And the email should include:...............................................skipped
 And clicking "Reply Now" should open the conversation.......................skipped]]></system-out>
   </testcase>
-  <testcase classname="Notifications &amp; Listing Monitoring" name="Slack/Discord integration (Pro tier)" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Notifications &amp; Listing Monitoring" name="Slack/Discord integration (Pro tier)" time="0.121">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have notifications enabled............................................skipped
 Given I am on the Pro Flipper plan..........................................skipped
 And I have connected my Slack workspace.....................................skipped
@@ -567,9 +679,11 @@ When a listing with score > 90 is found.....................................skip
 Then a message should be posted to my #flips channel........................skipped
 And the message should include:.............................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Notifications &amp; Listing Monitoring" name="Price drop alert" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Notifications &amp; Listing Monitoring" name="Price drop alert" time="0.11">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have notifications enabled............................................skipped
 Given I am watching a listing priced at $300................................skipped
 And the seller has not reduced the price in 3 days..........................skipped
@@ -578,9 +692,11 @@ Then I should receive a notification........................................skip
 And it should say "Price drop! [Item] now $250 (was $300)"..................skipped
 And I should be prompted to "Contact Seller Now"............................skipped]]></system-out>
   </testcase>
-  <testcase classname="Notifications &amp; Listing Monitoring" name="SOLD alert for tracked listing" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Notifications &amp; Listing Monitoring" name="SOLD alert for tracked listing" time="0.111">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have notifications enabled............................................skipped
 Given I am negotiating with a seller........................................skipped
 And the listing is active on Facebook Marketplace...........................skipped
@@ -591,9 +707,11 @@ And the subject should be "⚠️ Missed Opportunity"...........................
 And the opportunity should be moved to "Lost Opportunities".................skipped
 And I should see analytics on how many opportunities I've missed............skipped]]></system-out>
   </testcase>
-  <testcase classname="Notifications &amp; Listing Monitoring" name="Listing expiration warning" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Notifications &amp; Listing Monitoring" name="Listing expiration warning" time="0.119">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have notifications enabled............................................skipped
 Given I am tracking a Craigslist listing....................................skipped
 And Craigslist posts expire after 30 days...................................skipped
@@ -602,17 +720,21 @@ When the system checks listing ages.........................................skip
 Then I should receive a warning "This listing expires in 2 days"............skipped
 And I should be prompted to contact the seller urgently.....................skipped]]></system-out>
   </testcase>
-  <testcase classname="Notifications &amp; Listing Monitoring" name="Notification preferences management" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Notifications &amp; Listing Monitoring" name="Notification preferences management" time="0.128">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have notifications enabled............................................skipped
 Given I navigate to Settings > Notifications................................skipped
 Then I should be able to toggle:............................................skipped
 And changes should save automatically.......................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Notifications &amp; Listing Monitoring" name="Daily/Weekly summary email" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Notifications &amp; Listing Monitoring" name="Daily/Weekly summary email" time="0.099">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have notifications enabled............................................skipped
 Given I have "Weekly Summary Email" enabled.................................skipped
 And it is Monday at 9 AM....................................................skipped
@@ -620,9 +742,11 @@ When the system generates my weekly summary.................................skip
 Then I should receive an email containing:..................................skipped
 And I should see a "View Full Report" link..................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Notifications &amp; Listing Monitoring" name="In-app notification center" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Notifications &amp; Listing Monitoring" name="In-app notification center" time="0.116">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have notifications enabled............................................skipped
 Given I have received 5 notifications today.................................skipped
 And I haven't viewed them all...............................................skipped
@@ -631,9 +755,11 @@ Then I should see a dropdown with all notifications.........................skip
 And unread notifications should be marked with a dot........................skipped
 And I should be able to:....................................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Notifications &amp; Listing Monitoring" name="Quiet hours (Do Not Disturb)" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in........................................................skipped
+  <testcase classname="Notifications &amp; Listing Monitoring" name="Quiet hours (Do Not Disturb)" time="0.103">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
 And I have notifications enabled............................................skipped
 Given I have set quiet hours from 10 PM to 8 AM.............................skipped
 When a new opportunity is found at 11 PM....................................skipped
@@ -641,9 +767,11 @@ Then browser/push notifications should be suppressed........................skip
 But email notifications should still be sent................................skipped
 And I should see the opportunity in my queue when I log in..................skipped]]></system-out>
   </testcase>
-  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Successful Complete Flip Journey" time="0.001">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in as a verified user.....................................skipped
+  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Successful Complete Flip Journey" time="0.111">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in as a verified user.....................................failed
 And I have set up my preferred search locations.............................skipped
 And I have connected all marketplace accounts...............................skipped
 When I navigate to the opportunities page...................................skipped
@@ -711,9 +839,11 @@ Then I should see profit calculation:.......................................skip
 And the item should move to "Sold Items"....................................skipped
 And my dashboard stats should update:.......................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Handle Seller Not Responding" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in as a verified user.....................................skipped
+  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Handle Seller Not Responding" time="0.099">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in as a verified user.....................................failed
 And I have set up my preferred search locations.............................skipped
 And I have connected all marketplace accounts...............................skipped
 Given I have contacted a seller 3 days ago..................................skipped
@@ -725,9 +855,11 @@ When I click "Move to Archive"..............................................skip
 Then the opportunity should be archived.....................................skipped
 And I should see it in "Archived Opportunities".............................skipped]]></system-out>
   </testcase>
-  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Deal Falls Through After Agreement" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in as a verified user.....................................skipped
+  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Deal Falls Through After Agreement" time="0.114">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in as a verified user.....................................failed
 And I have set up my preferred search locations.............................skipped
 And I have connected all marketplace accounts...............................skipped
 Given I have agreed on a price with seller..................................skipped
@@ -737,9 +869,11 @@ And I click "Deal Cancelled"................................................skip
 Then the opportunity should return to "Available"...........................skipped
 And I should be able to re-negotiate or skip................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Fast Listing Creation Under 10 Seconds" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in as a verified user.....................................skipped
+  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Fast Listing Creation Under 10 Seconds" time="0.11">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in as a verified user.....................................failed
 And I have set up my preferred search locations.............................skipped
 And I have connected all marketplace accounts...............................skipped
 Given I have a purchased item in inventory..................................skipped
@@ -748,9 +882,11 @@ And the AI generates optimized listings.....................................skip
 Then the total time should be under 10 seconds..............................skipped
 And all three marketplace listings should be ready..........................skipped]]></system-out>
   </testcase>
-  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Visual Consistency Across Journey" time="0">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in as a verified user.....................................skipped
+  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Visual Consistency Across Journey" time="0.099">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in as a verified user.....................................failed
 And I have set up my preferred search locations.............................skipped
 And I have connected all marketplace accounts...............................skipped
 Given I complete the full flip journey......................................skipped
@@ -758,9 +894,11 @@ When I take screenshots at each major step..................................skip
 Then all screenshots should match their baselines...........................skipped
 And there should be no layout shifts or visual bugs.........................skipped]]></system-out>
   </testcase>
-  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Journey Accessible via Keyboard Only" time="0.001">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in as a verified user.....................................skipped
+  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Journey Accessible via Keyboard Only" time="0.115">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in as a verified user.....................................failed
 And I have set up my preferred search locations.............................skipped
 And I have connected all marketplace accounts...............................skipped
 Given I am using keyboard navigation only...................................skipped
@@ -769,9 +907,11 @@ Then I should be able to complete every step................................skip
 And all interactive elements should be reachable............................skipped
 And focus indicators should be clearly visible..............................skipped]]></system-out>
   </testcase>
-  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Complete Journey on Mobile Device" time="0.001">
-    <skipped/>
-    <system-out><![CDATA[Given I am logged in as a verified user.....................................skipped
+  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Complete Journey on Mobile Device" time="0.112">
+    <failure type="PrismaClientInitializationError" message="The Driver Adapter `@prisma/adapter-libsql`, based on `sqlite`, is not compatible with the provider `postgres` specified in the Prisma schema."><![CDATA[    at new t (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/node_modules/.pnpm/@prisma+client@7.4.0_prisma@7.4.0_@types+react@19.2.7_better-sqlite3@12.5.0_react-dom@1_696955edb3ba664be45491ec97ec38fb/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:317:17)
+    at CustomWorld.get db (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/world.ts:39:18)
+    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/support/hooks.ts:73:14)]]></failure>
+    <system-out><![CDATA[Given I am logged in as a verified user.....................................failed
 And I have set up my preferred search locations.............................skipped
 And I have connected all marketplace accounts...............................skipped
 Given I am using a mobile device (375x667)..................................skipped

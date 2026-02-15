@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1771117034620" clover="3.2.0">
-  <project timestamp="1771117034620" name="All files">
+<coverage generated="1771117777611" clover="3.2.0">
+  <project timestamp="1771117777611" name="All files">
     <metrics statements="850" coveredstatements="832" conditionals="613" coveredconditionals="564" methods="132" coveredmethods="128" elements="1595" coveredelements="1524" complexity="0" loc="850" ncloc="850" packages="1" files="16" classes="16"/>
     <file name="api-security.ts" path="/home/ubuntu/.openclaw/workspace/projects/flipper-ai/src/lib/api-security.ts">
       <metrics statements="45" coveredstatements="45" conditionals="53" coveredconditionals="50" methods="6" coveredmethods="6"/>
@@ -781,8 +781,8 @@
     </file>
     <file name="theme-config.ts" path="/home/ubuntu/.openclaw/workspace/projects/flipper-ai/src/lib/theme-config.ts">
       <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-      <line num="38" count="1" type="stmt"/>
-      <line num="161" count="1" type="stmt"/>
+      <line num="38" count="3" type="stmt"/>
+      <line num="161" count="3" type="stmt"/>
     </file>
     <file name="value-estimator.ts" path="/home/ubuntu/.openclaw/workspace/projects/flipper-ai/src/lib/value-estimator.ts">
       <metrics statements="113" coveredstatements="113" conditionals="70" coveredconditionals="70" methods="9" coveredmethods="9"/>
