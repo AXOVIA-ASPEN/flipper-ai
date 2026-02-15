@@ -1,15 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { getAuthUserId } from "@/lib/auth-middleware";
+import {
+  ScraperJobQuerySchema,
+  CreateScraperJobSchema,
+  validateQuery,
+  validateBody,
+} from "@/lib/validations";
 
 // GET /api/scraper-jobs - List all scraper jobs
 export async function GET(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status");
-    const platform = searchParams.get("platform");
-    const limit = parseInt(searchParams.get("limit") || "50");
+
+    const parsed = validateQuery(ScraperJobQuerySchema, searchParams);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid query parameters", details: parsed.error },
+        { status: 400 }
+      );
+    }
+    const { status, platform, limit } = parsed.data;
 
     const where: Record<string, unknown> = {};
 
@@ -45,24 +57,14 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     const body = await request.json();
-    const { platform, location, category } = body;
-
-    // Validate required fields
-    if (!platform) {
+    const parsed = validateBody(CreateScraperJobSchema, body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: "Platform is required" },
+        { error: "Invalid request body", details: parsed.error },
         { status: 400 }
       );
     }
-
-    // Validate platform
-    const validPlatforms = ["CRAIGSLIST", "FACEBOOK_MARKETPLACE", "EBAY", "OFFERUP"];
-    if (!validPlatforms.includes(platform)) {
-      return NextResponse.json(
-        { error: `Invalid platform. Must be one of: ${validPlatforms.join(", ")}` },
-        { status: 400 }
-      );
-    }
+    const { platform, location, category } = parsed.data;
 
     const job = await prisma.scraperJob.create({
       data: {

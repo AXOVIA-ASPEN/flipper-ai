@@ -1,13 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { getAuthUserId } from "@/lib/auth-middleware";
+import {
+  SearchConfigQuerySchema,
+  CreateSearchConfigSchema,
+  validateQuery,
+  validateBody,
+} from "@/lib/validations";
 
 // GET /api/search-configs - List all search configurations
 export async function GET(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     const { searchParams } = new URL(request.url);
-    const enabledOnly = searchParams.get("enabled") === "true";
+
+    const parsed = validateQuery(SearchConfigQuerySchema, searchParams);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid query parameters", details: parsed.error },
+        { status: 400 }
+      );
+    }
 
     const where: Record<string, unknown> = {};
 
@@ -16,7 +29,7 @@ export async function GET(request: NextRequest) {
       where.OR = [{ userId }, { userId: null }];
     }
 
-    if (enabledOnly) {
+    if (parsed.data.enabled === "true") {
       where.enabled = true;
     }
 
@@ -43,24 +56,14 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     const body = await request.json();
-    const { name, platform, location, category, keywords, minPrice, maxPrice, enabled } = body;
-
-    // Validate required fields
-    if (!name || !platform || !location) {
+    const parsed = validateBody(CreateSearchConfigSchema, body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: "Name, platform, and location are required" },
+        { error: "Invalid request body", details: parsed.error },
         { status: 400 }
       );
     }
-
-    // Validate platform
-    const validPlatforms = ["CRAIGSLIST", "FACEBOOK_MARKETPLACE", "EBAY", "OFFERUP"];
-    if (!validPlatforms.includes(platform)) {
-      return NextResponse.json(
-        { error: `Invalid platform. Must be one of: ${validPlatforms.join(", ")}` },
-        { status: 400 }
-      );
-    }
+    const { name, platform, location, category, keywords, minPrice, maxPrice, enabled } = parsed.data;
 
     const config = await prisma.searchConfig.create({
       data: {
@@ -70,9 +73,9 @@ export async function POST(request: NextRequest) {
         location,
         category: category || null,
         keywords: keywords || null,
-        minPrice: minPrice ? parseFloat(minPrice) : null,
-        maxPrice: maxPrice ? parseFloat(maxPrice) : null,
-        enabled: enabled !== false, // Default to true
+        minPrice: minPrice || null,
+        maxPrice: maxPrice || null,
+        enabled,
       },
     });
 

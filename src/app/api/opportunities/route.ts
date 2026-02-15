@@ -1,23 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { getAuthUserId } from "@/lib/auth-middleware";
+import {
+  OpportunityQuerySchema,
+  CreateOpportunitySchema,
+  validateQuery,
+  validateBody,
+} from "@/lib/validations";
 
 // GET /api/opportunities - Get all opportunities
-const VALID_STATUSES = [
-  "IDENTIFIED",
-  "CONTACTED",
-  "PURCHASED",
-  "LISTED",
-  "SOLD",
-];
-
 export async function GET(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     const { searchParams } = new URL(request.url);
-    const requestedStatus = searchParams.get("status");
-    const limit = parseInt(searchParams.get("limit") || "50");
-    const offset = parseInt(searchParams.get("offset") || "0");
+
+    const parsed = validateQuery(OpportunityQuerySchema, searchParams);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid query parameters", details: parsed.error },
+        { status: 400 }
+      );
+    }
+    const { status, limit, offset } = parsed.data;
 
     const where: Record<string, unknown> = {};
 
@@ -26,11 +30,8 @@ export async function GET(request: NextRequest) {
       where.OR = [{ userId }, { userId: null }];
     }
 
-    if (requestedStatus) {
-      const normalized = requestedStatus.toUpperCase();
-      if (VALID_STATUSES.includes(normalized)) {
-        where.status = normalized;
-      }
+    if (status) {
+      where.status = status;
     }
 
     const [opportunities, total, stats] = await Promise.all([
@@ -79,14 +80,14 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     const body = await request.json();
-    const { listingId, notes } = body;
-
-    if (!listingId) {
+    const parsed = validateBody(CreateOpportunitySchema, body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: "listingId is required" },
+        { error: "Invalid request body", details: parsed.error },
         { status: 400 }
       );
     }
+    const { listingId, notes } = parsed.data;
 
     // Check if listing exists
     const listing = await prisma.listing.findUnique({

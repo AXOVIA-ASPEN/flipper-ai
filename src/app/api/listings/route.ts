@@ -2,23 +2,27 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { estimateValue, detectCategory, generatePurchaseMessage } from "@/lib/value-estimator";
 import { getAuthUserId } from "@/lib/auth-middleware";
+import {
+  ListingQuerySchema,
+  CreateListingSchema,
+  validateQuery,
+  validateBody,
+} from "@/lib/validations";
 
 // GET /api/listings - Get all listings with optional filters
 export async function GET(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     const { searchParams } = new URL(request.url);
-    const platform = searchParams.get("platform");
-    const status = searchParams.get("status");
-    const minScore = searchParams.get("minScore");
-    const location = searchParams.get("location");
-    const category = searchParams.get("category");
-    const minPrice = searchParams.get("minPrice");
-    const maxPrice = searchParams.get("maxPrice");
-    const dateFrom = searchParams.get("dateFrom");
-    const dateTo = searchParams.get("dateTo");
-    const limit = parseInt(searchParams.get("limit") || "50");
-    const offset = parseInt(searchParams.get("offset") || "0");
+
+    const parsed = validateQuery(ListingQuerySchema, searchParams);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid query parameters", details: parsed.error },
+        { status: 400 }
+      );
+    }
+    const { platform, status, minScore, location, category, minPrice, maxPrice, dateFrom, dateTo, limit, offset } = parsed.data;
 
     const where: Record<string, unknown> = {};
 
@@ -29,13 +33,13 @@ export async function GET(request: NextRequest) {
 
     if (platform) where.platform = platform;
     if (status) where.status = status;
-    if (minScore) where.valueScore = { gte: parseFloat(minScore) };
+    if (minScore) where.valueScore = { gte: minScore };
     if (location) where.location = { contains: location };
     if (category) where.category = category;
     if (minPrice || maxPrice) {
       where.askingPrice = {
-        ...(minPrice && { gte: parseFloat(minPrice) }),
-        ...(maxPrice && { lte: parseFloat(maxPrice) }),
+        ...(minPrice && { gte: minPrice }),
+        ...(maxPrice && { lte: maxPrice }),
       };
     }
     if (dateFrom || dateTo) {
@@ -79,6 +83,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const body = await request.json();
+    const parsed = validateBody(CreateListingSchema, body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid request body", details: parsed.error },
+        { status: 400 }
+      );
+    }
     const {
       externalId,
       platform,
@@ -93,15 +104,7 @@ export async function POST(request: NextRequest) {
       imageUrls,
       category,
       postedAt,
-    } = body;
-
-    // Validate required fields
-    if (!externalId || !platform || !url || !title || askingPrice === undefined) {
-      return NextResponse.json(
-        { error: "Missing required fields: externalId, platform, url, title, askingPrice" },
-        { status: 400 }
-      );
-    }
+    } = parsed.data;
 
     // Detect category if not provided
     const detectedCategory = category || detectCategory(title, description);
