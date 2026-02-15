@@ -91,6 +91,50 @@ describe("ebay-inventory", () => {
       await expect(createDraftListing(validInput)).rejects.toThrow("Missing EBAY_OAUTH_TOKEN");
     });
 
+    it("includes optional policy IDs in offer body", async () => {
+      mockFetch.mockResolvedValueOnce({ status: 204, ok: true });
+      mockFetch.mockResolvedValueOnce({
+        status: 201,
+        ok: true,
+        json: async () => ({ offerId: "offer-policies" }),
+      });
+
+      await createDraftListing({
+        ...validInput,
+        fulfillmentPolicyId: "fulfillment-123",
+        paymentPolicyId: "payment-456",
+        returnPolicyId: "return-789",
+        merchantLocationKey: "warehouse-1",
+      });
+
+      // Second call is the offer POST
+      const offerBody = JSON.parse(mockFetch.mock.calls[1][1].body);
+      expect(offerBody.listingPolicies.fulfillmentPolicyId).toBe("fulfillment-123");
+      expect(offerBody.listingPolicies.paymentPolicyId).toBe("payment-456");
+      expect(offerBody.listingPolicies.returnPolicyId).toBe("return-789");
+      expect(offerBody.merchantLocationKey).toBe("warehouse-1");
+    });
+
+    it("includes only fulfillmentPolicyId when others are not provided", async () => {
+      mockFetch.mockResolvedValueOnce({ status: 204, ok: true });
+      mockFetch.mockResolvedValueOnce({
+        status: 201,
+        ok: true,
+        json: async () => ({ offerId: "offer-partial" }),
+      });
+
+      await createDraftListing({
+        ...validInput,
+        fulfillmentPolicyId: "fulfillment-only",
+      });
+
+      const offerBody = JSON.parse(mockFetch.mock.calls[1][1].body);
+      expect(offerBody.listingPolicies.fulfillmentPolicyId).toBe("fulfillment-only");
+      expect(offerBody.listingPolicies.paymentPolicyId).toBeUndefined();
+      expect(offerBody.listingPolicies.returnPolicyId).toBeUndefined();
+      expect(offerBody.merchantLocationKey).toBeUndefined();
+    });
+
     it("includes package weight and dimensions when provided", async () => {
       mockFetch.mockResolvedValueOnce({ status: 204, ok: true });
       mockFetch.mockResolvedValueOnce({
