@@ -650,4 +650,404 @@ describe('Craigslist Scraper Helper Functions', () => {
       expect(upsertCall.create.externalId).toBe('7654321');
     });
   });
+
+  describe('LLM Analysis Pipeline', () => {
+    beforeEach(() => {
+      // Set up standard listing response
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'iPhone 15 Pro',
+          price: '$400',
+          url: 'https://sarasota.craigslist.org/ele/d/iphone/1234567.html',
+          location: 'Sarasota',
+          imageUrl: 'https://images.craigslist.org/test.jpg',
+        },
+      ]);
+      mockUpsert.mockResolvedValue({ id: 'listing-1' });
+    });
+
+    it('should run LLM pipeline when OPENAI_API_KEY is set', async () => {
+      process.env.OPENAI_API_KEY = 'test-key';
+
+      mockQuickDiscountCheck.mockReturnValue({ passesQuickCheck: true });
+
+      mockIdentifyItem.mockResolvedValue({
+        brand: 'Apple',
+        model: 'iPhone 15 Pro',
+        variant: '256GB',
+        condition: 'good',
+        searchQuery: 'iPhone 15 Pro 256GB',
+        category: 'electronics',
+        worthInvestigating: true,
+      });
+
+      mockFetchMarketPrice.mockResolvedValue({
+        averagePrice: 800,
+        medianPrice: 750,
+        lowestPrice: 600,
+        highestPrice: 1000,
+        salesCount: 10,
+        soldListings: [
+          { title: 'iPhone 15 Pro', price: 750, url: 'https://ebay.com/1' },
+        ],
+      });
+
+      mockAnalyzeSellability.mockResolvedValue({
+        sellabilityScore: 90,
+        demandLevel: 'high',
+        expectedDaysToSell: 3,
+        authenticityRisk: 'low',
+        recommendedOfferPrice: 350,
+        recommendedListPrice: 700,
+        resaleStrategy: 'List on eBay immediately',
+        verifiedMarketValue: 750,
+        trueDiscountPercent: 60,
+        meetsThreshold: true,
+        confidence: 0.95,
+        reasoning: 'Great deal on a popular phone',
+      });
+
+      const request = createMockRequest('POST', '/api/scraper/craigslist', {
+        location: 'sarasota',
+        category: 'electronics',
+      });
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(data.success).toBe(true);
+      expect(mockIdentifyItem).toHaveBeenCalled();
+      expect(mockFetchMarketPrice).toHaveBeenCalled();
+      expect(mockAnalyzeSellability).toHaveBeenCalled();
+      expect(data.savedCount).toBe(1);
+
+      const upsertCall = mockUpsert.mock.calls[0][0];
+      expect(upsertCall.create.llmAnalyzed).toBe(true);
+      expect(upsertCall.create.verifiedMarketValue).toBe(750);
+      expect(upsertCall.create.trueDiscountPercent).toBe(60);
+      expect(upsertCall.create.identifiedBrand).toBe('Apple');
+
+      delete process.env.OPENAI_API_KEY;
+    });
+
+    it('should skip item when LLM says not worth investigating', async () => {
+      process.env.OPENAI_API_KEY = 'test-key';
+
+      mockIdentifyItem.mockResolvedValue({
+        brand: null,
+        model: null,
+        worthInvestigating: false,
+      });
+
+      // estimateValue returns low score so item is skipped
+      mockEstimateValue.mockReturnValue({
+        estimatedValue: 50,
+        estimatedLow: 30,
+        estimatedHigh: 70,
+        profitPotential: -10,
+        profitLow: -30,
+        profitHigh: 10,
+        valueScore: 30,
+        discountPercent: 10,
+        resaleDifficulty: 'hard',
+        comparableUrls: [],
+        reasoning: 'Not worth it',
+        notes: '',
+        shippable: false,
+        negotiable: false,
+        tags: [],
+      });
+
+      const request = createMockRequest('POST', '/api/scraper/craigslist', {
+        location: 'sarasota',
+        category: 'electronics',
+      });
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(data.success).toBe(true);
+      expect(mockIdentifyItem).toHaveBeenCalled();
+      expect(mockFetchMarketPrice).not.toHaveBeenCalled();
+      expect(data.savedCount).toBe(0);
+
+      delete process.env.OPENAI_API_KEY;
+    });
+
+    it('should skip when market data has zero sales', async () => {
+      process.env.OPENAI_API_KEY = 'test-key';
+
+      mockIdentifyItem.mockResolvedValue({
+        brand: 'Generic',
+        model: 'Widget',
+        searchQuery: 'generic widget',
+        category: 'other',
+        worthInvestigating: true,
+      });
+
+      mockFetchMarketPrice.mockResolvedValue({
+        averagePrice: 0,
+        medianPrice: 0,
+        lowestPrice: 0,
+        highestPrice: 0,
+        salesCount: 0,
+        soldListings: [],
+      });
+
+      mockEstimateValue.mockReturnValue({
+        estimatedValue: 50,
+        estimatedLow: 30,
+        estimatedHigh: 70,
+        profitPotential: -10,
+        profitLow: -30,
+        profitHigh: 10,
+        valueScore: 30,
+        discountPercent: 10,
+        resaleDifficulty: 'hard',
+        comparableUrls: [],
+        reasoning: 'Low value',
+        notes: '',
+        shippable: false,
+        negotiable: false,
+        tags: [],
+      });
+
+      const request = createMockRequest('POST', '/api/scraper/craigslist', {
+        location: 'sarasota',
+        category: 'electronics',
+      });
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(data.success).toBe(true);
+      expect(mockFetchMarketPrice).toHaveBeenCalled();
+      expect(mockAnalyzeSellability).not.toHaveBeenCalled();
+
+      delete process.env.OPENAI_API_KEY;
+    });
+
+    it('should skip when discount below threshold', async () => {
+      process.env.OPENAI_API_KEY = 'test-key';
+
+      mockIdentifyItem.mockResolvedValue({
+        brand: 'Apple',
+        model: 'iPhone 15',
+        searchQuery: 'iPhone 15',
+        category: 'electronics',
+        worthInvestigating: true,
+      });
+
+      mockFetchMarketPrice.mockResolvedValue({
+        averagePrice: 500,
+        medianPrice: 500,
+        lowestPrice: 400,
+        highestPrice: 600,
+        salesCount: 5,
+        soldListings: [{ title: 'iPhone 15', price: 500, url: 'https://ebay.com/1' }],
+      });
+
+      // quickDiscountCheck will return false for items not deeply discounted
+      mockQuickDiscountCheck.mockReturnValue({ passesQuickCheck: false });
+
+      mockEstimateValue.mockReturnValue({
+        estimatedValue: 450,
+        estimatedLow: 400,
+        estimatedHigh: 500,
+        profitPotential: 50,
+        profitLow: 0,
+        profitHigh: 100,
+        valueScore: 50,
+        discountPercent: 20,
+        resaleDifficulty: 'medium',
+        comparableUrls: [],
+        reasoning: 'Fair price',
+        notes: '',
+        shippable: true,
+        negotiable: true,
+        tags: [],
+      });
+
+      const request = createMockRequest('POST', '/api/scraper/craigslist', {
+        location: 'sarasota',
+        category: 'electronics',
+      });
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(data.success).toBe(true);
+      expect(mockAnalyzeSellability).not.toHaveBeenCalled();
+      expect(data.savedCount).toBe(0);
+
+      delete process.env.OPENAI_API_KEY;
+    });
+
+    it('should handle LLM analysis errors gracefully', async () => {
+      process.env.OPENAI_API_KEY = 'test-key';
+
+      mockIdentifyItem.mockRejectedValue(new Error('LLM API timeout'));
+
+      // Falls back to algorithmic, high score saves it
+      mockEstimateValue.mockReturnValue({
+        estimatedValue: 800,
+        estimatedLow: 600,
+        estimatedHigh: 1000,
+        profitPotential: 400,
+        profitLow: 200,
+        profitHigh: 600,
+        valueScore: 85,
+        discountPercent: 50,
+        resaleDifficulty: 'easy',
+        comparableUrls: [],
+        reasoning: 'Algorithmic fallback',
+        notes: '',
+        shippable: true,
+        negotiable: true,
+        tags: ['electronics'],
+      });
+
+      const request = createMockRequest('POST', '/api/scraper/craigslist', {
+        location: 'sarasota',
+        category: 'electronics',
+      });
+      const response = await POST(request);
+      const data = await response.json();
+
+      // With LLM key set but analysis failed, meetsThreshold is false,
+      // so it won't save via LLM path
+      expect(data.success).toBe(true);
+
+      delete process.env.OPENAI_API_KEY;
+    });
+
+    it('should handle listing with no imageUrls', async () => {
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'Old Radio',
+          price: '$25',
+          url: 'https://sarasota.craigslist.org/ele/d/radio/9999999.html',
+          location: 'Sarasota',
+          imageUrl: '',
+        },
+      ]);
+
+      const request = createMockRequest('POST', '/api/scraper/craigslist', {
+        location: 'sarasota',
+        category: 'electronics',
+      });
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(data.success).toBe(true);
+    });
+
+    it('should handle null identification result', async () => {
+      process.env.OPENAI_API_KEY = 'test-key';
+
+      mockIdentifyItem.mockResolvedValue(null);
+
+      mockEstimateValue.mockReturnValue({
+        estimatedValue: 50,
+        estimatedLow: 30,
+        estimatedHigh: 70,
+        profitPotential: -350,
+        profitLow: -370,
+        profitHigh: -330,
+        valueScore: 10,
+        discountPercent: 0,
+        resaleDifficulty: 'impossible',
+        comparableUrls: [],
+        reasoning: 'Unknown item',
+        notes: '',
+        shippable: false,
+        negotiable: false,
+        tags: [],
+      });
+
+      const request = createMockRequest('POST', '/api/scraper/craigslist', {
+        location: 'sarasota',
+        category: 'electronics',
+      });
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(data.success).toBe(true);
+      expect(mockFetchMarketPrice).not.toHaveBeenCalled();
+
+      delete process.env.OPENAI_API_KEY;
+    });
+
+    it('should save listing with full LLM data when threshold met', async () => {
+      process.env.OPENAI_API_KEY = 'test-key';
+
+      mockIdentifyItem.mockResolvedValue({
+        brand: 'Sony',
+        model: 'PlayStation 5',
+        variant: 'Disc Edition',
+        condition: 'like new',
+        searchQuery: 'PlayStation 5 Disc Edition',
+        category: 'video_gaming',
+        worthInvestigating: true,
+      });
+
+      mockFetchMarketPrice.mockResolvedValue({
+        averagePrice: 450,
+        medianPrice: 440,
+        lowestPrice: 380,
+        highestPrice: 520,
+        salesCount: 25,
+        soldListings: [
+          { title: 'PS5 Disc', price: 440, url: 'https://ebay.com/1' },
+          { title: 'PS5 Disc Edition', price: 450, url: 'https://ebay.com/2' },
+        ],
+      });
+
+      mockQuickDiscountCheck.mockReturnValue({ passesQuickCheck: true });
+
+      mockAnalyzeSellability.mockResolvedValue({
+        sellabilityScore: 95,
+        demandLevel: 'very high',
+        expectedDaysToSell: 1,
+        authenticityRisk: 'low',
+        recommendedOfferPrice: 180,
+        recommendedListPrice: 400,
+        resaleStrategy: 'List immediately on eBay',
+        verifiedMarketValue: 440,
+        trueDiscountPercent: 55,
+        meetsThreshold: true,
+        confidence: 0.98,
+        reasoning: 'PS5 at half price, instant flip',
+      });
+
+      // Price is $400 but let's make it cheap
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'PS5 Like New',
+          price: '$200',
+          url: 'https://sarasota.craigslist.org/vgm/d/ps5/5555555.html',
+          location: 'Sarasota',
+          imageUrl: 'https://images.craigslist.org/ps5.jpg',
+        },
+      ]);
+
+      const request = createMockRequest('POST', '/api/scraper/craigslist', {
+        location: 'sarasota',
+        category: 'video_gaming',
+      });
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(data.success).toBe(true);
+      expect(data.savedCount).toBe(1);
+      expect(data.analyzedWithLLM).toBe(1);
+
+      const upsertCall = mockUpsert.mock.calls[0][0];
+      expect(upsertCall.create.identifiedBrand).toBe('Sony');
+      expect(upsertCall.create.identifiedModel).toBe('PlayStation 5');
+      expect(upsertCall.create.sellabilityScore).toBe(95);
+      expect(upsertCall.create.demandLevel).toBe('very high');
+      expect(upsertCall.create.marketDataSource).toBe('ebay_scrape');
+      expect(upsertCall.create.comparableSalesJson).toBeTruthy();
+      expect(upsertCall.create.resaleStrategy).toBe('List immediately on eBay');
+
+      delete process.env.OPENAI_API_KEY;
+    });
+  });
 });
