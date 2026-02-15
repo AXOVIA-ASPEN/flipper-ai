@@ -833,6 +833,7 @@ export type OpportunityCreateOrConnectWithoutUserInput = {
 
 export type OpportunityCreateManyUserInputEnvelope = {
   data: Prisma.OpportunityCreateManyUserInput | Prisma.OpportunityCreateManyUserInput[]
+  skipDuplicates?: boolean
 }
 
 export type OpportunityUpsertWithWhereUniqueWithoutUserInput = {
@@ -1736,6 +1737,7 @@ export type OpportunityCreateManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * The data used to create many Opportunities.
    */
   data: Prisma.OpportunityCreateManyInput | Prisma.OpportunityCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1754,6 +1756,7 @@ export type OpportunityCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ext
    * The data used to create many Opportunities.
    */
   data: Prisma.OpportunityCreateManyInput | Prisma.OpportunityCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

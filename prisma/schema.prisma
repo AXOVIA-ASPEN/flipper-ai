@@ -7,7 +7,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 // Platform values: CRAIGSLIST, FACEBOOK_MARKETPLACE, EBAY, OFFERUP, MERCARI
@@ -92,6 +92,7 @@ model Listing {
 
   // Relations
   opportunity     Opportunity?
+  messages        Message[]
 
   // Indexes
   @@unique([platform, externalId, userId])
@@ -217,6 +218,7 @@ model User {
   opportunities   Opportunity[]
   scraperJobs     ScraperJob[]
   searchConfigs   SearchConfig[]
+  messages        Message[]
 }
 
 // NextAuth.js Account model (for OAuth providers)
@@ -292,6 +294,33 @@ model FacebookToken {
 
   @@index([userId])
   @@index([expiresAt])
+}
+
+// Seller communication messages
+model Message {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId       String?
+  listing         Listing?  @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  direction       String    // OUTBOUND or INBOUND
+  status          String    @default("DRAFT") // DRAFT, SENT, DELIVERED, READ, REPLIED, FAILED
+  subject         String?
+  body            String
+  sellerName      String?
+  sellerContact   String?
+  platform        String?   // Platform the message relates to
+  parentId        String?   // For threading - references parent message
+  sentAt          DateTime?
+  readAt          DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([listingId])
+  @@index([status])
+  @@index([direction])
+  @@index([createdAt])
 }
 
 // AI Analysis Cache (for Claude/LLM responses)

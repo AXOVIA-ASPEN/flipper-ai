@@ -95,6 +95,11 @@ export type UserSettings = Prisma.UserSettingsModel
  */
 export type FacebookToken = Prisma.FacebookTokenModel
 /**
+ * Model Message
+ * 
+ */
+export type Message = Prisma.MessageModel
+/**
  * Model AiAnalysisCache
  * 
  */

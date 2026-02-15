@@ -62,6 +62,7 @@ export const ModelName = {
   VerificationToken: 'VerificationToken',
   UserSettings: 'UserSettings',
   FacebookToken: 'FacebookToken',
+  Message: 'Message',
   AiAnalysisCache: 'AiAnalysisCache'
 } as const
 
@@ -72,6 +73,9 @@ export type ModelName = (typeof ModelName)[keyof typeof ModelName]
  */
 
 export const TransactionIsolationLevel = runtime.makeStrictEnum({
+  ReadUncommitted: 'ReadUncommitted',
+  ReadCommitted: 'ReadCommitted',
+  RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
 } as const)
 
@@ -289,6 +293,27 @@ export const FacebookTokenScalarFieldEnum = {
 export type FacebookTokenScalarFieldEnum = (typeof FacebookTokenScalarFieldEnum)[keyof typeof FacebookTokenScalarFieldEnum]
 
 
+export const MessageScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  listingId: 'listingId',
+  direction: 'direction',
+  status: 'status',
+  subject: 'subject',
+  body: 'body',
+  sellerName: 'sellerName',
+  sellerContact: 'sellerContact',
+  platform: 'platform',
+  parentId: 'parentId',
+  sentAt: 'sentAt',
+  readAt: 'readAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
+
+
 export const AiAnalysisCacheScalarFieldEnum = {
   id: 'id',
   listingId: 'listingId',
@@ -306,6 +331,14 @@ export const SortOrder = {
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+} as const
+
+export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
 export const NullsOrder = {

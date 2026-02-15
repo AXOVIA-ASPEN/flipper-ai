@@ -213,6 +213,7 @@ export type UserWhereInput = {
   opportunities?: Prisma.OpportunityListRelationFilter
   scraperJobs?: Prisma.ScraperJobListRelationFilter
   searchConfigs?: Prisma.SearchConfigListRelationFilter
+  messages?: Prisma.MessageListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -231,6 +232,7 @@ export type UserOrderByWithRelationInput = {
   opportunities?: Prisma.OpportunityOrderByRelationAggregateInput
   scraperJobs?: Prisma.ScraperJobOrderByRelationAggregateInput
   searchConfigs?: Prisma.SearchConfigOrderByRelationAggregateInput
+  messages?: Prisma.MessageOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -252,6 +254,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   opportunities?: Prisma.OpportunityListRelationFilter
   scraperJobs?: Prisma.ScraperJobListRelationFilter
   searchConfigs?: Prisma.SearchConfigListRelationFilter
+  messages?: Prisma.MessageListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -298,6 +301,7 @@ export type UserCreateInput = {
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -316,6 +320,7 @@ export type UserUncheckedCreateInput = {
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobUncheckedCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -334,6 +339,7 @@ export type UserUpdateInput = {
   opportunities?: Prisma.OpportunityUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -352,6 +358,7 @@ export type UserUncheckedUpdateInput = {
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUncheckedUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -536,6 +543,20 @@ export type UserUpdateOneRequiredWithoutSettingsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSettingsInput, Prisma.UserUpdateWithoutSettingsInput>, Prisma.UserUncheckedUpdateWithoutSettingsInput>
 }
 
+export type UserCreateNestedOneWithoutMessagesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMessagesInput, Prisma.UserUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMessagesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMessagesInput, Prisma.UserUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMessagesInput
+  upsert?: Prisma.UserUpsertWithoutMessagesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutMessagesInput, Prisma.UserUpdateWithoutMessagesInput>, Prisma.UserUncheckedUpdateWithoutMessagesInput>
+}
+
 export type UserCreateWithoutListingsInput = {
   id?: string
   email: string
@@ -551,6 +572,7 @@ export type UserCreateWithoutListingsInput = {
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutListingsInput = {
@@ -568,6 +590,7 @@ export type UserUncheckedCreateWithoutListingsInput = {
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobUncheckedCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutListingsInput = {
@@ -601,6 +624,7 @@ export type UserUpdateWithoutListingsInput = {
   opportunities?: Prisma.OpportunityUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutListingsInput = {
@@ -618,6 +642,7 @@ export type UserUncheckedUpdateWithoutListingsInput = {
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUncheckedUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutOpportunitiesInput = {
@@ -635,6 +660,7 @@ export type UserCreateWithoutOpportunitiesInput = {
   listings?: Prisma.ListingCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutOpportunitiesInput = {
@@ -652,6 +678,7 @@ export type UserUncheckedCreateWithoutOpportunitiesInput = {
   listings?: Prisma.ListingUncheckedCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobUncheckedCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutOpportunitiesInput = {
@@ -685,6 +712,7 @@ export type UserUpdateWithoutOpportunitiesInput = {
   listings?: Prisma.ListingUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOpportunitiesInput = {
@@ -702,6 +730,7 @@ export type UserUncheckedUpdateWithoutOpportunitiesInput = {
   listings?: Prisma.ListingUncheckedUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUncheckedUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutScraperJobsInput = {
@@ -719,6 +748,7 @@ export type UserCreateWithoutScraperJobsInput = {
   listings?: Prisma.ListingCreateNestedManyWithoutUserInput
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutScraperJobsInput = {
@@ -736,6 +766,7 @@ export type UserUncheckedCreateWithoutScraperJobsInput = {
   listings?: Prisma.ListingUncheckedCreateNestedManyWithoutUserInput
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutScraperJobsInput = {
@@ -769,6 +800,7 @@ export type UserUpdateWithoutScraperJobsInput = {
   listings?: Prisma.ListingUpdateManyWithoutUserNestedInput
   opportunities?: Prisma.OpportunityUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutScraperJobsInput = {
@@ -786,6 +818,7 @@ export type UserUncheckedUpdateWithoutScraperJobsInput = {
   listings?: Prisma.ListingUncheckedUpdateManyWithoutUserNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSearchConfigsInput = {
@@ -803,6 +836,7 @@ export type UserCreateWithoutSearchConfigsInput = {
   listings?: Prisma.ListingCreateNestedManyWithoutUserInput
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSearchConfigsInput = {
@@ -820,6 +854,7 @@ export type UserUncheckedCreateWithoutSearchConfigsInput = {
   listings?: Prisma.ListingUncheckedCreateNestedManyWithoutUserInput
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSearchConfigsInput = {
@@ -853,6 +888,7 @@ export type UserUpdateWithoutSearchConfigsInput = {
   listings?: Prisma.ListingUpdateManyWithoutUserNestedInput
   opportunities?: Prisma.OpportunityUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSearchConfigsInput = {
@@ -870,6 +906,7 @@ export type UserUncheckedUpdateWithoutSearchConfigsInput = {
   listings?: Prisma.ListingUncheckedUpdateManyWithoutUserNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAccountsInput = {
@@ -887,6 +924,7 @@ export type UserCreateWithoutAccountsInput = {
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -904,6 +942,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobUncheckedCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -937,6 +976,7 @@ export type UserUpdateWithoutAccountsInput = {
   opportunities?: Prisma.OpportunityUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -954,6 +994,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUncheckedUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -971,6 +1012,7 @@ export type UserCreateWithoutSessionsInput = {
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -988,6 +1030,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobUncheckedCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -1021,6 +1064,7 @@ export type UserUpdateWithoutSessionsInput = {
   opportunities?: Prisma.OpportunityUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -1038,6 +1082,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUncheckedUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSettingsInput = {
@@ -1055,6 +1100,7 @@ export type UserCreateWithoutSettingsInput = {
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSettingsInput = {
@@ -1072,6 +1118,7 @@ export type UserUncheckedCreateWithoutSettingsInput = {
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobUncheckedCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSettingsInput = {
@@ -1105,6 +1152,7 @@ export type UserUpdateWithoutSettingsInput = {
   opportunities?: Prisma.OpportunityUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettingsInput = {
@@ -1118,6 +1166,95 @@ export type UserUncheckedUpdateWithoutSettingsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  listings?: Prisma.ListingUncheckedUpdateManyWithoutUserNestedInput
+  opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutUserNestedInput
+  scraperJobs?: Prisma.ScraperJobUncheckedUpdateManyWithoutUserNestedInput
+  searchConfigs?: Prisma.SearchConfigUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutMessagesInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  name?: string | null
+  image?: string | null
+  password?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  listings?: Prisma.ListingCreateNestedManyWithoutUserInput
+  opportunities?: Prisma.OpportunityCreateNestedManyWithoutUserInput
+  scraperJobs?: Prisma.ScraperJobCreateNestedManyWithoutUserInput
+  searchConfigs?: Prisma.SearchConfigCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutMessagesInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  name?: string | null
+  image?: string | null
+  password?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  listings?: Prisma.ListingUncheckedCreateNestedManyWithoutUserInput
+  opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutUserInput
+  scraperJobs?: Prisma.ScraperJobUncheckedCreateNestedManyWithoutUserInput
+  searchConfigs?: Prisma.SearchConfigUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutMessagesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutMessagesInput, Prisma.UserUncheckedCreateWithoutMessagesInput>
+}
+
+export type UserUpsertWithoutMessagesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutMessagesInput, Prisma.UserUncheckedUpdateWithoutMessagesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutMessagesInput, Prisma.UserUncheckedCreateWithoutMessagesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutMessagesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutMessagesInput, Prisma.UserUncheckedUpdateWithoutMessagesInput>
+}
+
+export type UserUpdateWithoutMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  listings?: Prisma.ListingUpdateManyWithoutUserNestedInput
+  opportunities?: Prisma.OpportunityUpdateManyWithoutUserNestedInput
+  scraperJobs?: Prisma.ScraperJobUpdateManyWithoutUserNestedInput
+  searchConfigs?: Prisma.SearchConfigUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   listings?: Prisma.ListingUncheckedUpdateManyWithoutUserNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUncheckedUpdateManyWithoutUserNestedInput
@@ -1136,6 +1273,7 @@ export type UserCountOutputType = {
   opportunities: number
   scraperJobs: number
   searchConfigs: number
+  messages: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1145,6 +1283,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   opportunities?: boolean | UserCountOutputTypeCountOpportunitiesArgs
   scraperJobs?: boolean | UserCountOutputTypeCountScraperJobsArgs
   searchConfigs?: boolean | UserCountOutputTypeCountSearchConfigsArgs
+  messages?: boolean | UserCountOutputTypeCountMessagesArgs
 }
 
 /**
@@ -1199,6 +1338,13 @@ export type UserCountOutputTypeCountSearchConfigsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.SearchConfigWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MessageWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1216,6 +1362,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   opportunities?: boolean | Prisma.User$opportunitiesArgs<ExtArgs>
   scraperJobs?: boolean | Prisma.User$scraperJobsArgs<ExtArgs>
   searchConfigs?: boolean | Prisma.User$searchConfigsArgs<ExtArgs>
+  messages?: boolean | Prisma.User$messagesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1261,6 +1408,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   opportunities?: boolean | Prisma.User$opportunitiesArgs<ExtArgs>
   scraperJobs?: boolean | Prisma.User$scraperJobsArgs<ExtArgs>
   searchConfigs?: boolean | Prisma.User$searchConfigsArgs<ExtArgs>
+  messages?: boolean | Prisma.User$messagesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1276,6 +1424,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     opportunities: Prisma.$OpportunityPayload<ExtArgs>[]
     scraperJobs: Prisma.$ScraperJobPayload<ExtArgs>[]
     searchConfigs: Prisma.$SearchConfigPayload<ExtArgs>[]
+    messages: Prisma.$MessagePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1687,6 +1836,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   opportunities<T extends Prisma.User$opportunitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$opportunitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OpportunityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   scraperJobs<T extends Prisma.User$scraperJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$scraperJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScraperJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   searchConfigs<T extends Prisma.User$searchConfigsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$searchConfigsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SearchConfigPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  messages<T extends Prisma.User$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1953,6 +2103,7 @@ export type UserCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * The data used to create many Users.
    */
   data: Prisma.UserCreateManyInput | Prisma.UserCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1971,6 +2122,7 @@ export type UserCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * The data used to create many Users.
    */
   data: Prisma.UserCreateManyInput | Prisma.UserCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -2270,6 +2422,30 @@ export type User$searchConfigsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.SearchConfigScalarFieldEnum | Prisma.SearchConfigScalarFieldEnum[]
+}
+
+/**
+ * User.messages
+ */
+export type User$messagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Message
+   */
+  select?: Prisma.MessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Message
+   */
+  omit?: Prisma.MessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MessageInclude<ExtArgs> | null
+  where?: Prisma.MessageWhereInput
+  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[]
+  cursor?: Prisma.MessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
 }
 
 /**
