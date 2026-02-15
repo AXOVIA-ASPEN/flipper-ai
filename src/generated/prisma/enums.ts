@@ -9,27 +9,7 @@
 * 🟢 You can import this file directly.
 */
 
-export const Platform = {
-  CRAIGSLIST: 'CRAIGSLIST',
-  FACEBOOK_MARKETPLACE: 'FACEBOOK_MARKETPLACE',
-  EBAY: 'EBAY',
-  OFFERUP: 'OFFERUP',
-  MERCARI: 'MERCARI'
-} as const
-
-export type Platform = (typeof Platform)[keyof typeof Platform]
 
 
-export const ListingStatus = {
-  NEW: 'NEW',
-  ANALYZING: 'ANALYZING',
-  OPPORTUNITY: 'OPPORTUNITY',
-  CONTACTED: 'CONTACTED',
-  PURCHASED: 'PURCHASED',
-  LISTED: 'LISTED',
-  SOLD: 'SOLD',
-  PASSED: 'PASSED',
-  EXPIRED: 'EXPIRED'
-} as const
-
-export type ListingStatus = (typeof ListingStatus)[keyof typeof ListingStatus]
+// This file is empty because there are no enums in the schema.
+export {}

@@ -983,6 +983,7 @@ export type AiAnalysisCacheCreateManyArgs<ExtArgs extends runtime.Types.Extensio
    * The data used to create many AiAnalysisCaches.
    */
   data: Prisma.AiAnalysisCacheCreateManyInput | Prisma.AiAnalysisCacheCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1001,6 +1002,7 @@ export type AiAnalysisCacheCreateManyAndReturnArgs<ExtArgs extends runtime.Types
    * The data used to create many AiAnalysisCaches.
    */
   data: Prisma.AiAnalysisCacheCreateManyInput | Prisma.AiAnalysisCacheCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
