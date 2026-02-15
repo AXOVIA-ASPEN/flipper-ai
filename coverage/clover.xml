@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1771116702925" clover="3.2.0">
-  <project timestamp="1771116702925" name="All files">
+<coverage generated="1771117034620" clover="3.2.0">
+  <project timestamp="1771117034620" name="All files">
     <metrics statements="850" coveredstatements="832" conditionals="613" coveredconditionals="564" methods="132" coveredmethods="128" elements="1595" coveredelements="1524" complexity="0" loc="850" ncloc="850" packages="1" files="16" classes="16"/>
     <file name="api-security.ts" path="/home/ubuntu/.openclaw/workspace/projects/flipper-ai/src/lib/api-security.ts">
       <metrics statements="45" coveredstatements="45" conditionals="53" coveredconditionals="50" methods="6" coveredmethods="6"/>
