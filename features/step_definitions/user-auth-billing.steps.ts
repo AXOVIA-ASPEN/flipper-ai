@@ -375,21 +375,15 @@ When('I check my available features', async function (this: CustomWorld) {
 });
 
 // Handles "I should have to X"
-Then(
-  'I should have to {string}',
-  async function (this: CustomWorld, feature: string) {
-    const hasFeature = this.testData.availableFeatures?.includes(feature);
-    expect(hasFeature).toBeTruthy();
-    console.log(`✅ Has access to "${feature}"`);
-  }
-);
+Then('I should have to {string}', async function (this: CustomWorld, feature: string) {
+  const hasFeature = this.testData.availableFeatures?.includes(feature);
+  expect(hasFeature).toBeTruthy();
+  console.log(`✅ Has access to "${feature}"`);
+});
 
 // Handles "I should not have to X"
-Then(
-  'I should not have to {string}',
-  async function (this: CustomWorld, feature: string) {
-    const hasFeature = this.testData.availableFeatures?.includes(feature);
-    expect(hasFeature).toBeFalsy();
-    console.log(`✅ No access to "${feature}" (expected for tier)`);
-  }
-);
+Then('I should not have to {string}', async function (this: CustomWorld, feature: string) {
+  const hasFeature = this.testData.availableFeatures?.includes(feature);
+  expect(hasFeature).toBeFalsy();
+  console.log(`✅ No access to "${feature}" (expected for tier)`);
+});

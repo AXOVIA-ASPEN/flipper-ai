@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<testsuite name="Cucumber" time="3.026" tests="70" skipped="70" failures="0" errors="0" timestamp="2026-02-15T12:57:23.495Z">
-  <testcase classname="Multi-Marketplace Scanning" name="Scan eBay for electronics" time="0.002">
+<testsuite name="Cucumber" time="2.579" tests="70" skipped="70" failures="0" errors="0" timestamp="2026-02-15T13:35:02.475Z">
+  <testcase classname="Multi-Marketplace Scanning" name="Scan eBay for electronics" time="0.004">
     <skipped/>
     <system-out><![CDATA[Given I am logged in as a free user.........................................skipped
 And the database is seeded with test data...................................skipped
@@ -14,7 +14,7 @@ And within 10 seconds, results should be displayed..........................skip
 And each result should show:................................................skipped
 And results should be sorted by flippability score descending...............skipped]]></system-out>
   </testcase>
-  <testcase classname="Multi-Marketplace Scanning" name="Real-time alert for high-value opportunity" time="0.001">
+  <testcase classname="Multi-Marketplace Scanning" name="Real-time alert for high-value opportunity" time="0">
     <skipped/>
     <system-out><![CDATA[Given I am logged in as a free user.........................................skipped
 And the database is seeded with test data...................................skipped
@@ -34,7 +34,7 @@ When I set the flippability filter to "70+ only"............................skip
 Then only items with score >= 70 should be visible..........................skipped
 And the count badge should update to show filtered count....................skipped]]></system-out>
   </testcase>
-  <testcase classname="Multi-Marketplace Scanning" name="Save custom search configuration" time="0.001">
+  <testcase classname="Multi-Marketplace Scanning" name="Save custom search configuration" time="0">
     <skipped/>
     <system-out><![CDATA[Given I am logged in as a free user.........................................skipped
 And the database is seeded with test data...................................skipped
@@ -77,7 +77,7 @@ Then the flippability score should be below 60..............................skip
 And the risk factors should include "needs repair"..........................skipped
 And the difficulty rating should be "Medium" or "High"......................skipped]]></system-out>
   </testcase>
-  <testcase classname="AI Flippability Scoring" name="Boost score for high-demand brands" time="0">
+  <testcase classname="AI Flippability Scoring" name="Boost score for high-demand brands" time="0.007">
     <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And the AI scoring engine is initialized....................................skipped
@@ -169,7 +169,7 @@ Then the AI should generate a message containing:...........................skip
 And the tone should be friendly and professional............................skipped
 And it should NOT include lowball offers....................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Automated Seller Communication" name="User approves and sends message" time="0.001">
+  <testcase classname="Automated Seller Communication" name="User approves and sends message" time="0">
     <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have identified a flip opportunity....................................skipped
@@ -202,7 +202,7 @@ Then I should see the full conversation thread..............................skip
 And the seller's reply should be marked as unread...........................skipped
 And I should see a "Draft Reply" button.....................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Automated Seller Communication" name="AI suggests response to seller question" time="0">
+  <testcase classname="Automated Seller Communication" name="AI suggests response to seller question" time="0.001">
     <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have identified a flip opportunity....................................skipped
@@ -223,7 +223,7 @@ Then a calendar event should be created.....................................skip
 And I should be able to set a reminder......................................skipped
 And the event should include:...............................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Automated Seller Communication" name="Alert if tracked item sells before purchase" time="0">
+  <testcase classname="Automated Seller Communication" name="Alert if tracked item sells before purchase" time="0.001">
     <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have identified a flip opportunity....................................skipped
@@ -234,7 +234,7 @@ Then I should receive an urgent notification................................skip
 And the opportunity should be marked as "Missed"............................skipped
 And it should move to the "Lost Opportunities" section......................skipped]]></system-out>
   </testcase>
-  <testcase classname="Resale Listing Generator" name="Auto-generate eBay listing" time="0.001">
+  <testcase classname="Resale Listing Generator" name="Auto-generate eBay listing" time="0">
     <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have purchased an item to flip........................................skipped
@@ -246,7 +246,7 @@ Then the AI should generate:................................................skip
 And all photos should be included...........................................skipped
 And SEO keywords should be optimized........................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Resale Listing Generator" name="Cross-platform posting" time="0">
+  <testcase classname="Resale Listing Generator" name="Cross-platform posting" time="0.001">
     <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have purchased an item to flip........................................skipped
@@ -277,7 +277,7 @@ Then the photos should be automatically brightened..........................skip
 And backgrounds should be neutralized (white/gray)..........................skipped
 And the main image should be cropped to focus on the item...................skipped]]></system-out>
   </testcase>
-  <testcase classname="Resale Listing Generator" name="Clone existing listing for similar item" time="0.001">
+  <testcase classname="Resale Listing Generator" name="Clone existing listing for similar item" time="0">
     <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have purchased an item to flip........................................skipped
@@ -300,7 +300,7 @@ When I view the listing analytics...........................................skip
 Then I should see:..........................................................skipped
 And I should have the option to "Reduce Price by 10%".......................skipped]]></system-out>
   </testcase>
-  <testcase classname="Dashboard &amp; Opportunity Tracking" name="View flippables queue" time="0.001">
+  <testcase classname="Dashboard &amp; Opportunity Tracking" name="View flippables queue" time="0">
     <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have data across multiple stages......................................skipped
@@ -336,7 +336,7 @@ And the "Not listed" item should be highlighted.............................skip
 And the "Sold!" item should show profit calculation.........................skipped
 And total inventory value should be displayed...............................skipped]]></system-out>
   </testcase>
-  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Sales history and profit tracking" time="0.001">
+  <testcase classname="Dashboard &amp; Opportunity Tracking" name="Sales history and profit tracking" time="0">
     <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have data across multiple stages......................................skipped
@@ -399,7 +399,7 @@ Then my account should be activated.........................................skip
 And I should be redirected to the dashboard.................................skipped
 And I should see a "Welcome to Flipper AI!" message.........................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Login with existing account" time="0.001">
+  <testcase classname="User Authentication &amp; Billing" name="Login with existing account" time="0">
     <skipped/>
     <system-out><![CDATA[Given the application is running............................................skipped
 Given I have a verified account.............................................skipped
@@ -419,7 +419,7 @@ Then I should see an upgrade prompt.........................................skip
 And the prompt should show:.................................................skipped
 And I should be able to click "Upgrade Now".................................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Upgrade to paid tier (Flipper)" time="0.002">
+  <testcase classname="User Authentication &amp; Billing" name="Upgrade to paid tier (Flipper)" time="0">
     <skipped/>
     <system-out><![CDATA[Given the application is running............................................skipped
 Given I am logged in to a free account......................................skipped
@@ -456,7 +456,7 @@ Then my subscription should be set to cancel at period end..................skip
 And I should retain access until the billing date...........................skipped
 And I should see a message "Your plan will downgrade to Free on [date]".....skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Access control for premium features" time="0.001">
+  <testcase classname="User Authentication &amp; Billing" name="Access control for premium features" time="0">
     <skipped/>
     <system-out><![CDATA[Given the application is running............................................skipped
 Given I am on the free tier.................................................skipped
@@ -472,21 +472,21 @@ Given I am subscribed to the "Free" plan....................................skip
 When I check my available features..........................................skipped
 Then I should have to "eBay Scanning".......................................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.2" time="0">
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.2" time="0.001">
     <skipped/>
     <system-out><![CDATA[Given the application is running............................................skipped
 Given I am subscribed to the "Free" plan....................................skipped
 When I check my available features..........................................skipped
 Then I should not have to "AI Messaging"....................................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.3" time="0">
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.3" time="0.004">
     <skipped/>
     <system-out><![CDATA[Given the application is running............................................skipped
 Given I am subscribed to the "Free" plan....................................skipped
 When I check my available features..........................................skipped
 Then I should not have to "Auto-Listing"....................................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.4" time="0.001">
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.4" time="0">
     <skipped/>
     <system-out><![CDATA[Given the application is running............................................skipped
 Given I am subscribed to the "Flipper" plan.................................skipped
@@ -507,7 +507,7 @@ Given I am subscribed to the "Flipper" plan.................................skip
 When I check my available features..........................................skipped
 Then I should not have to "Auto-Listing"....................................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.7" time="0.001">
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.7" time="0">
     <skipped/>
     <system-out><![CDATA[Given the application is running............................................skipped
 Given I am subscribed to the "Pro Flipper" plan.............................skipped
@@ -521,21 +521,21 @@ Given I am subscribed to the "Pro Flipper" plan.............................skip
 When I check my available features..........................................skipped
 Then I should have to "AI Messaging"........................................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.9" time="0">
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.9" time="0.001">
     <skipped/>
     <system-out><![CDATA[Given the application is running............................................skipped
 Given I am subscribed to the "Pro Flipper" plan.............................skipped
 When I check my available features..........................................skipped
 Then I should have to "Auto-Listing"........................................skipped]]></system-out>
   </testcase>
-  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.10" time="0.001">
+  <testcase classname="User Authentication &amp; Billing" name="Feature availability by tier - #1.10" time="0">
     <skipped/>
     <system-out><![CDATA[Given the application is running............................................skipped
 Given I am subscribed to the "Pro Flipper" plan.............................skipped
 When I check my available features..........................................skipped
 Then I should have to "Priority Support"....................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Notifications &amp; Listing Monitoring" name="Browser notification for new high-score opportunity" time="0.001">
+  <testcase classname="Notifications &amp; Listing Monitoring" name="Browser notification for new high-score opportunity" time="0">
     <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have notifications enabled............................................skipped
@@ -557,7 +557,7 @@ Then I should receive an email notification.................................skip
 And the email should include:...............................................skipped
 And clicking "Reply Now" should open the conversation.......................skipped]]></system-out>
   </testcase>
-  <testcase classname="Notifications &amp; Listing Monitoring" name="Slack/Discord integration (Pro tier)" time="0.001">
+  <testcase classname="Notifications &amp; Listing Monitoring" name="Slack/Discord integration (Pro tier)" time="0">
     <skipped/>
     <system-out><![CDATA[Given I am logged in........................................................skipped
 And I have notifications enabled............................................skipped
@@ -641,7 +641,7 @@ Then browser/push notifications should be suppressed........................skip
 But email notifications should still be sent................................skipped
 And I should see the opportunity in my queue when I log in..................skipped]]></system-out>
   </testcase>
-  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Successful Complete Flip Journey" time="0.003">
+  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Successful Complete Flip Journey" time="0.004">
     <skipped/>
     <system-out><![CDATA[Given I am logged in as a verified user.....................................skipped
 And I have set up my preferred search locations.............................skipped
@@ -711,7 +711,7 @@ Then I should see profit calculation:.......................................skip
 And the item should move to "Sold Items"....................................skipped
 And my dashboard stats should update:.......................................skipped]]></system-out>
   </testcase>
-  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Handle Seller Not Responding" time="0">
+  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Handle Seller Not Responding" time="0.001">
     <skipped/>
     <system-out><![CDATA[Given I am logged in as a verified user.....................................skipped
 And I have set up my preferred search locations.............................skipped
@@ -758,7 +758,7 @@ When I take screenshots at each major step..................................skip
 Then all screenshots should match their baselines...........................skipped
 And there should be no layout shifts or visual bugs.........................skipped]]></system-out>
   </testcase>
-  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Journey Accessible via Keyboard Only" time="0">
+  <testcase classname="Complete Flip Journey - End-to-End User Flow" name="Journey Accessible via Keyboard Only" time="0.001">
     <skipped/>
     <system-out><![CDATA[Given I am logged in as a verified user.....................................skipped
 And I have set up my preferred search locations.............................skipped

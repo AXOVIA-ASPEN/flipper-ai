@@ -156,21 +156,32 @@ Given('the application is running', async function (this: CustomWorld) {
 
 When('I click {string} from the dashboard', async function (this: CustomWorld, buttonText: string) {
   await this.page.goto('/dashboard');
-  const btn = this.page.locator(`button:has-text("${buttonText}"), a:has-text("${buttonText}")`).first();
+  const btn = this.page
+    .locator(`button:has-text("${buttonText}"), a:has-text("${buttonText}")`)
+    .first();
   if (await btn.isVisible().catch(() => false)) {
     await btn.click();
   }
   console.log(`✅ Clicked "${buttonText}" from dashboard`);
 });
 
-Then('I should be able to click {string} to subscribe', async function (this: CustomWorld, buttonText: string) {
-  const btn = this.page.locator(`button:has-text("${buttonText}"), a:has-text("${buttonText}")`).first();
-  const visible = await btn.isVisible().catch(() => false);
-  console.log(`✅ "${buttonText}" to subscribe ${visible ? 'available' : 'checked'}`);
-});
+Then(
+  'I should be able to click {string} to subscribe',
+  async function (this: CustomWorld, buttonText: string) {
+    const btn = this.page
+      .locator(`button:has-text("${buttonText}"), a:has-text("${buttonText}")`)
+      .first();
+    const visible = await btn.isVisible().catch(() => false);
+    console.log(`✅ "${buttonText}" to subscribe ${visible ? 'available' : 'checked'}`);
+  }
+);
 
 Then('I should see a message {string}', async function (this: CustomWorld, message: string) {
-  const visible = await this.page.locator(`text=${message.replace('[date]', '')}`).first().isVisible().catch(() => false);
+  const visible = await this.page
+    .locator(`text=${message.replace('[date]', '')}`)
+    .first()
+    .isVisible()
+    .catch(() => false);
   console.log(`✅ Message "${message}" ${visible ? 'visible' : 'checked (may use dynamic date)'}`);
 });
 

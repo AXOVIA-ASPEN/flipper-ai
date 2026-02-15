@@ -95,7 +95,7 @@ export const analysisCache = new LRUCache<unknown>({ maxSize: 100, ttlMs: 30 * 6
  */
 export function withCache<A extends string, R>(
   cache: LRUCache<R>,
-  fn: (arg: A) => Promise<R>,
+  fn: (arg: A) => Promise<R>
 ): (arg: A) => Promise<R> {
   return async (arg: A): Promise<R> => {
     const cached = cache.get(arg) as R | undefined;
