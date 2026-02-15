@@ -107,14 +107,14 @@ export async function POST(request: NextRequest) {
     } = parsed.data;
 
     // Detect category if not provided
-    const detectedCategory = category || detectCategory(title, description);
+    const detectedCategory = category || detectCategory(title, description ?? null);
 
     // Estimate value (includes all analysis fields)
     const estimation = estimateValue(
       title,
-      description,
+      description ?? null,
       askingPrice,
-      condition,
+      condition ?? null,
       detectedCategory
     );
 
