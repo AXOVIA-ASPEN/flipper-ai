@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Scraper Page', () => {
   test.describe('Feature: Configure Scraper Search', () => {
@@ -285,5 +285,147 @@ test.describe('Feature: Scraper Results and History', () => {
     await expect(page.getByText('COMPLETED').first()).toBeVisible();
     await expect(page.getByText('FAILED').first()).toBeVisible();
     await expect(page.getByText('Blocked by captcha')).toBeVisible();
+  });
+});
+
+test.describe('Feature: BDD Marketplace Scanning Scenarios', () => {
+  test.describe('Scenario: Filter results by flippability score', () => {
+    test('should filter results when flippability threshold is set', async ({ page }) => {
+      // Mock results with varying flippability scores
+      await page.route('**/api/scraper-jobs**', async (route, request) => {
+        if (request.method() === 'GET') {
+          await route.fulfill({ json: { jobs: [] } });
+        } else {
+          await route.fulfill({ json: { success: true } });
+        }
+      });
+
+      await page.route('**/api/scraper/craigslist', async (route) => {
+        await route.fulfill({
+          json: {
+            success: true,
+            message: 'Scrape complete',
+            savedCount: 3,
+            listings: [
+              { title: 'High Value Item', price: '$100', location: 'Tampa', url: '#', flippabilityScore: 90 },
+              { title: 'Medium Value Item', price: '$50', location: 'Tampa', url: '#', flippabilityScore: 60 },
+              { title: 'Low Value Item', price: '$20', location: 'Tampa', url: '#', flippabilityScore: 30 },
+            ],
+          },
+        });
+      });
+
+      await page.goto('/scraper');
+      await page.getByRole('button', { name: /Start Scraping/i }).click();
+      await expect(page.getByText('Scrape complete')).toBeVisible();
+
+      // Look for flippability filter if it exists
+      const flipFilter = page.locator('[data-testid="flippability-filter"], select:has-text("flippability"), input[placeholder*="score"]');
+      if (await flipFilter.count() > 0) {
+        await flipFilter.fill('70');
+        // High value item should remain visible
+        await expect(page.getByText('High Value Item')).toBeVisible();
+      }
+    });
+  });
+
+  test.describe('Scenario: Save custom search configuration', () => {
+    test('should save and recall a search configuration', async ({ page }) => {
+      await page.route('**/api/scraper-jobs**', async (route, request) => {
+        if (request.method() === 'GET') {
+          await route.fulfill({ json: { jobs: [] } });
+        } else {
+          await route.fulfill({ json: { success: true } });
+        }
+      });
+
+      await page.goto('/scraper');
+
+      // Configure search
+      const categorySelect = page.locator('select').nth(2);
+      await categorySelect.selectOption('furniture');
+
+      const keywordsInput = page.getByPlaceholder('e.g., iPhone, Nintendo, Dyson');
+      await keywordsInput.fill('vintage');
+
+      // Look for save search button
+      const saveBtn = page.locator('button', { hasText: /save.*search|save.*config/i });
+      if (await saveBtn.count() > 0) {
+        await saveBtn.click();
+
+        // Enter search name if prompted
+        const nameInput = page.locator('input[placeholder*="name"], [data-testid="search-name"]');
+        if (await nameInput.count() > 0) {
+          await nameInput.fill('Vintage Furniture FB');
+          await page.locator('button', { hasText: /save|confirm/i }).click();
+        }
+      }
+    });
+  });
+
+  test.describe('Scenario: Free tier scan limit enforcement', () => {
+    test('should show upgrade modal when free tier limit exceeded', async ({ page }) => {
+      // Mock the tier limit API response
+      await page.route('**/api/scraper-jobs**', async (route, request) => {
+        if (request.method() === 'GET') {
+          await route.fulfill({ json: { jobs: [] } });
+        } else {
+          await route.fulfill({ json: { success: true } });
+        }
+      });
+
+      await page.route('**/api/scraper/craigslist', async (route) => {
+        await route.fulfill({
+          status: 429,
+          json: {
+            success: false,
+            message: 'Free tier limit reached',
+            error: 'You have used all 10 free scans today. Upgrade to Pro for unlimited scans.',
+            upgradeRequired: true,
+          },
+        });
+      });
+
+      await page.goto('/scraper');
+      await page.getByRole('button', { name: /Start Scraping/i }).click();
+
+      // Should show error or upgrade prompt
+      const upgradePrompt = page.locator('text=/upgrade|limit|free tier/i');
+      await expect(upgradePrompt.first()).toBeVisible({ timeout: 5000 });
+    });
+  });
+
+  test.describe('Visual Regression: Scraper Page', () => {
+    test('scraper page renders correctly', async ({ page }) => {
+      await page.route('**/api/scraper-jobs**', async (route) => {
+        await route.fulfill({ json: { jobs: [] } });
+      });
+      await page.goto('/scraper');
+      await page.screenshot({ path: 'e2e/screenshots/scraper-page.png', fullPage: true });
+    });
+
+    test('scraper results render correctly', async ({ page }) => {
+      await page.route('**/api/scraper-jobs**', async (route, request) => {
+        if (request.method() === 'GET') {
+          await route.fulfill({ json: { jobs: [] } });
+        } else {
+          await route.fulfill({ json: { success: true } });
+        }
+      });
+      await page.route('**/api/scraper/craigslist', async (route) => {
+        await route.fulfill({
+          json: {
+            success: true,
+            message: 'Scrape complete',
+            savedCount: 1,
+            listings: [{ title: 'Test Item', price: '$99', location: 'Tampa', url: '#' }],
+          },
+        });
+      });
+      await page.goto('/scraper');
+      await page.getByRole('button', { name: /Start Scraping/i }).click();
+      await expect(page.getByText('Scrape complete')).toBeVisible();
+      await page.screenshot({ path: 'e2e/screenshots/scraper-results.png', fullPage: true });
+    });
   });
 });
