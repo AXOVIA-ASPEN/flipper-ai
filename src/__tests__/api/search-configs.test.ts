@@ -323,6 +323,75 @@ describe('Search Configs API', () => {
       });
     });
 
+    it('should update all fields at once', async () => {
+      mockUpdate.mockResolvedValue({ id: 'config-1' });
+
+      const request = createMockRequest('PATCH', '/api/search-configs/config-1', {
+        name: 'Full Update',
+        platform: 'EBAY',
+        location: 'miami',
+        category: 'electronics',
+        keywords: 'laptop',
+        minPrice: '50.00',
+        maxPrice: '999.99',
+        enabled: true,
+        lastRun: '2024-06-01T00:00:00Z',
+      });
+      await PATCH(request, { params: Promise.resolve({ id: 'config-1' }) });
+
+      expect(mockUpdate).toHaveBeenCalledWith({
+        where: { id: 'config-1' },
+        data: {
+          name: 'Full Update',
+          platform: 'EBAY',
+          location: 'miami',
+          category: 'electronics',
+          keywords: 'laptop',
+          minPrice: 50,
+          maxPrice: 999.99,
+          enabled: true,
+          lastRun: new Date('2024-06-01T00:00:00Z'),
+        },
+      });
+    });
+
+    it('should set minPrice to null when falsy value provided', async () => {
+      mockUpdate.mockResolvedValue({ id: 'config-1' });
+
+      const request = createMockRequest('PATCH', '/api/search-configs/config-1', {
+        minPrice: 0,
+        maxPrice: 0,
+      });
+      await PATCH(request, { params: Promise.resolve({ id: 'config-1' }) });
+
+      expect(mockUpdate).toHaveBeenCalledWith({
+        where: { id: 'config-1' },
+        data: { minPrice: null, maxPrice: null },
+      });
+    });
+
+    it('should accept valid platform FACEBOOK_MARKETPLACE on update', async () => {
+      mockUpdate.mockResolvedValue({ id: 'config-1' });
+
+      const request = createMockRequest('PATCH', '/api/search-configs/config-1', {
+        platform: 'FACEBOOK_MARKETPLACE',
+      });
+      const response = await PATCH(request, { params: Promise.resolve({ id: 'config-1' }) });
+
+      expect(response.status).toBe(200);
+    });
+
+    it('should accept valid platform OFFERUP on update', async () => {
+      mockUpdate.mockResolvedValue({ id: 'config-1' });
+
+      const request = createMockRequest('PATCH', '/api/search-configs/config-1', {
+        platform: 'OFFERUP',
+      });
+      const response = await PATCH(request, { params: Promise.resolve({ id: 'config-1' }) });
+
+      expect(response.status).toBe(200);
+    });
+
     it('should return 500 on database error', async () => {
       mockUpdate.mockRejectedValue(new Error('Database error'));
 
