@@ -24,8 +24,11 @@ const config = {
   transformIgnorePatterns: [
     '/node_modules/(?!(@auth/prisma-adapter|@auth/core)/)',
   ],
+  coverageReporters: ['text', 'lcov', 'clover', 'json-summary'],
   collectCoverageFrom: [
     'src/lib/**/*.ts',
+    'src/app/api/**/*.ts',
+    'src/scrapers/**/*.ts',
     '!src/lib/db.ts', // Skip database client
     '!src/generated/**', // Skip generated files
   ],
