@@ -82,7 +82,7 @@
 - [ ] Monitoring & alerting (Sentry, Uptime Robot)
 - [ ] Performance optimization & caching review
 - [ ] Load testing
-- [ ] Developer setup guide (docs/)
+- [x] Developer setup guide (docs/DEVELOPER_SETUP.md)
 - [ ] Operations runbook (docs/)
 
 ---
