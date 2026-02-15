@@ -12,26 +12,28 @@ jest.mock('@/lib/auth', () => ({
   auth: jest.fn(() => Promise.resolve({ user: { id: 'test-user-id' } })),
 }));
 
-// Mock Prisma
-const mockPrisma = {
-  postingQueueItem: {
-    findMany: jest.fn(),
-    findFirst: jest.fn(),
-    count: jest.fn(),
-    create: jest.fn(),
-    upsert: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-  },
-  listing: {
-    findFirst: jest.fn(),
-  },
-};
-
+// Mock Prisma - use jest.fn() inline to avoid hoisting issues
 jest.mock('@/lib/db', () => ({
   __esModule: true,
-  default: mockPrisma,
+  default: {
+    postingQueueItem: {
+      findMany: jest.fn(),
+      findFirst: jest.fn(),
+      count: jest.fn(),
+      create: jest.fn(),
+      upsert: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    },
+    listing: {
+      findFirst: jest.fn(),
+    },
+  },
 }));
+
+// Import after mock setup (jest.mock is hoisted)
+import db from '@/lib/db';
+const mockPrisma = db as jest.Mocked<typeof db>;
 
 const makeRequest = (url: string, options?: RequestInit) =>
   new NextRequest(new URL(url, 'http://localhost:3000'), options);
