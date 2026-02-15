@@ -1,27 +1,32 @@
 # Changelog
 
-## [1.0.0] - 2026-02-14
+All notable changes to Flipper AI will be documented in this file.
 
-### 🎉 Initial Release
+## [1.0.0] - 2026-02-15
 
-Flipper AI is an AI-powered marketplace flipping tool that automatically finds underpriced items across multiple marketplaces and identifies profitable flip opportunities.
+### 🎉 Initial Release — Production Ready
 
-### Features
+#### Features
+- **Multi-marketplace scanning** — eBay, Craigslist, Facebook, OfferUp, Mercari
+- **AI-powered item analysis** — Claude/LLM profit estimation, condition grading
+- **Market price lookup** — eBay sold-listings scraping with median/avg/range stats
+- **Price history tracking** — Historical price trends per item
+- **Market value calculator** — Automated ROI and flip-score computation
+- **Authentication** — NextAuth with Prisma adapter, secure session management
+- **Dashboard** — Real-time opportunities, portfolio tracking
+- **Seller communication** — Negotiation templates and tracking
+- **Theme system** — Configurable dark/light themes
 
-- **Multi-Marketplace Scraping** — Craigslist, eBay, Facebook Marketplace, OfferUp, Mercari
-- **AI-Powered Analysis** — LLM-based item identification, value estimation, and pricing analysis
-- **Smart Value Scoring** — 0-100 scoring with category multipliers, brand detection, and condition analysis
-- **Opportunity Dashboard** — Browse, filter, and manage flip opportunities
-- **Seller Communication** — AI-assisted negotiation and messaging
-- **Search Configurations** — Save and manage marketplace search criteria
-- **User Authentication** — NextAuth v5 with credential-based auth
-- **Scraper Job Tracking** — Monitor scraper runs and results
+#### Testing
+- 692 unit tests (Jest) — **97.5% statement coverage**
+- BDD acceptance tests (Cucumber + Playwright)
+- 8 feature files covering full user journeys
+- Integration tests for API routes and services
 
-### Technical
-
-- **Frontend:** Next.js 16, React, TypeScript, Tailwind CSS
-- **Backend:** Next.js API Routes with Prisma ORM (SQLite/libSQL)
-- **Testing:** 660+ unit tests (95% coverage), 70 BDD scenarios (Cucumber), Playwright E2E
-- **CI/CD:** GitHub Actions (lint → test → build)
-- **Deployment:** Vercel (vercel.json), Docker (Dockerfile)
-- **Code Quality:** ESLint, Prettier, Husky pre-commit hooks
+#### Infrastructure
+- Next.js 16 with Turbopack
+- Docker production setup (multi-stage Dockerfile, docker-compose.prod.yml)
+- GitHub Actions CI/CD pipeline
+- Environment configuration & secrets management
+- Production logging & error tracking
+- ESLint + Prettier + Husky pre-commit hooks
