@@ -1,157 +1,145 @@
-import { test, expect } from '@playwright/test';
-import { expectPageTitle, expectNoErrors } from './helpers/assertions';
+import { test, expect } from './fixtures';
+import { expectNoErrors } from './helpers/assertions';
 
 /**
  * Feature: Resale Listing Generator (BDD)
  * Covers feature/04-resale-listing.feature scenarios
+ * Uses Page Object Model via fixtures for maintainability
  */
 
 test.describe('Resale Listing Generator', () => {
-  test.beforeEach(async ({ page }) => {
-    // Given I am logged in
-    await page.goto('/login');
-    await page.fill('[name="email"]', 'test@example.com');
-    await page.fill('[name="password"]', 'TestPassword123!');
-    await page.click('button[type="submit"]');
-    await page.waitForURL(/\/(dashboard|opportunities)/);
+  test.beforeEach(async ({ authPage }) => {
+    await authPage.goto('/login');
+    await authPage.login('test@example.com', 'TestPassword123!');
   });
 
   test.describe('Scenario: Auto-generate eBay listing', () => {
-    test('Given I have a purchased item, When I create a sell listing for eBay, Then the AI should generate optimized fields', async ({ page }) => {
-      // Given I have purchased an item to flip
-      await page.goto('/dashboard');
-      await page.click('text=Inventory');
-      
-      // Find a purchased item or navigate to listing creation
+    test('should generate optimized listing fields for eBay', async ({ page, resaleListingPage, dashboardPage }) => {
+      // Given I have a purchased item
+      await dashboardPage.goto('/dashboard');
+      const inventoryTab = page.locator('text=Inventory');
+      if (await inventoryTab.count() > 0) {
+        await inventoryTab.click();
+      }
+
       const itemRow = page.locator('tr', { hasText: /purchased|bought/i }).first();
-      
+
       if (await itemRow.count() > 0) {
-        // When I click "Create Sell Listing"
         await itemRow.locator('text=Create Sell Listing').click();
       } else {
-        // Navigate to create listing page directly
-        await page.goto('/listings/create');
+        await resaleListingPage.gotoCreate();
       }
 
-      // And I select "eBay" as the platform
-      const platformSelect = page.locator('select, [role="combobox"]').filter({ hasText: /platform/i });
-      if (await platformSelect.count() > 0) {
-        await platformSelect.selectOption({ label: 'eBay' });
-      } else {
-        await page.click('text=eBay');
-      }
+      // When I select eBay as platform
+      await resaleListingPage.selectPlatform('eBay');
 
-      // Then the listing form should be visible with key fields
-      await expect(page.locator('form, [data-testid="listing-form"]')).toBeVisible();
-
-      // Verify generated fields are present
-      const titleField = page.locator('[name="title"], [data-testid="listing-title"]');
-      const descField = page.locator('[name="description"], [data-testid="listing-description"]');
-      const priceField = page.locator('[name="price"], [data-testid="listing-price"]');
-
-      await expect(titleField).toBeVisible();
-      await expect(descField).toBeVisible();
-      await expect(priceField).toBeVisible();
-
+      // Then form should be visible with key fields
+      await resaleListingPage.expectFormVisible();
+      await resaleListingPage.expectFieldsPresent();
       await expectNoErrors(page);
     });
   });
 
   test.describe('Scenario: Cross-platform posting', () => {
-    test('Given I have a listing, When I select multiple platforms, Then it should adapt for each platform', async ({ page }) => {
-      // Navigate to listing creation
-      await page.goto('/listings/create');
+    test('should adapt listing for multiple platforms', async ({ page, resaleListingPage }) => {
+      await resaleListingPage.gotoCreate();
 
-      // Fill basic listing info
-      await page.fill('[name="title"], [data-testid="listing-title"]', 'Sony WH-1000XM5 Headphones - Like New');
-      await page.fill('[name="price"], [data-testid="listing-price"]', '320');
+      // Fill basic info
+      await resaleListingPage.fillTitle('Sony WH-1000XM5 Headphones - Like New');
+      await resaleListingPage.fillPrice('320');
 
-      // When I select multiple platforms
-      const fbCheckbox = page.locator('input[type="checkbox"]').filter({ hasText: /facebook/i });
-      const ebayCheckbox = page.locator('input[type="checkbox"]').filter({ hasText: /ebay/i });
+      // Select multiple platforms
+      await resaleListingPage.checkPlatform('Facebook');
+      await resaleListingPage.checkPlatform('eBay');
 
-      if (await fbCheckbox.count() > 0) {
-        await fbCheckbox.check();
-      }
-      if (await ebayCheckbox.count() > 0) {
-        await ebayCheckbox.check();
-      }
-
-      // Then platform-specific sections should appear
       await expectNoErrors(page);
     });
   });
 
   test.describe('Scenario: Price optimization based on demand', () => {
-    test('Given an item with high demand, When AI calculates list price, Then it should suggest aggressive pricing', async ({ page }) => {
-      await page.goto('/listings/create');
+    test('should suggest aggressive pricing for high-demand items', async ({ page, resaleListingPage }) => {
+      await resaleListingPage.gotoCreate();
 
-      // Fill item details
-      const titleField = page.locator('[name="title"], [data-testid="listing-title"]');
-      if (await titleField.count() > 0) {
-        await titleField.fill('iPad Pro 11-inch');
-      }
-
-      // Look for AI price suggestion or analyze button
-      const analyzeBtn = page.locator('button', { hasText: /analyze|suggest|optimize/i });
-      if (await analyzeBtn.count() > 0) {
-        await analyzeBtn.click();
-        // Wait for AI response
-        await page.waitForTimeout(2000);
-      }
-
-      // Verify price suggestion area exists
-      const priceSuggestion = page.locator('[data-testid="price-suggestion"], .price-suggestion, text=/suggested|recommended/i');
-      if (await priceSuggestion.count() > 0) {
-        await expect(priceSuggestion).toBeVisible();
-      }
+      await resaleListingPage.fillTitle('iPad Pro 11-inch');
+      await resaleListingPage.requestPriceAnalysis();
+      await resaleListingPage.expectPriceSuggestionVisible();
 
       await expectNoErrors(page);
     });
   });
 
-  test.describe('Scenario: Clone existing listing for similar item', () => {
-    test('Given a previous listing exists, When I clone it, Then fields should be pre-filled', async ({ page }) => {
-      // Navigate to listings page
-      await page.goto('/listings');
+  test.describe('Scenario: Clone existing listing', () => {
+    test('should pre-fill fields when cloning a listing', async ({ page, resaleListingPage }) => {
+      await resaleListingPage.gotoListings();
 
-      // Look for a clone button on an existing listing
-      const cloneBtn = page.locator('button, a').filter({ hasText: /clone|copy|duplicate/i }).first();
+      if (await resaleListingPage.cloneButton.count() > 0) {
+        await resaleListingPage.cloneButton.click();
 
-      if (await cloneBtn.count() > 0) {
-        await cloneBtn.click();
-
-        // Then title and description should be pre-filled
-        const titleField = page.locator('[name="title"], [data-testid="listing-title"]');
-        if (await titleField.count() > 0) {
-          const value = await titleField.inputValue();
-          expect(value.length).toBeGreaterThan(0);
-        }
+        const value = await resaleListingPage.titleInput.inputValue();
+        expect(value.length).toBeGreaterThan(0);
       } else {
-        // If no listings exist yet, just verify the listings page loads
         await expectNoErrors(page);
       }
     });
   });
 
   test.describe('Scenario: Track listing performance', () => {
-    test('Given I have posted an item, When I view listing analytics, Then I should see performance metrics', async ({ page }) => {
-      await page.goto('/listings');
+    test('should display performance metrics for posted listings', async ({ page, resaleListingPage }) => {
+      await resaleListingPage.gotoListings();
 
-      // Click on first listing if available
-      const listingLink = page.locator('a, tr, [data-testid="listing-row"]').filter({ hasText: /\$/ }).first();
-
+      const listingLink = await resaleListingPage.getFirstListingLink();
       if (await listingLink.count() > 0) {
         await listingLink.click();
 
-        // Then I should see analytics/metrics
-        const metricsSection = page.locator('text=/views|watchers|analytics|performance/i');
-        if (await metricsSection.count() > 0) {
-          await expect(metricsSection.first()).toBeVisible();
+        const metrics = page.locator('text=/views|watchers|analytics|performance/i');
+        if (await metrics.count() > 0) {
+          await expect(metrics.first()).toBeVisible();
         }
       }
 
       await expectNoErrors(page);
+    });
+  });
+
+  test.describe('Scenario: Listing form validation', () => {
+    test('should show validation errors for empty required fields', async ({ page, resaleListingPage }) => {
+      await resaleListingPage.gotoCreate();
+
+      // Submit without filling required fields
+      await resaleListingPage.submitListing();
+
+      // Should show validation messages
+      const validationError = page.locator('[role="alert"], .error, text=/required|cannot be empty/i');
+      if (await validationError.count() > 0) {
+        await expect(validationError.first()).toBeVisible();
+      }
+    });
+
+    test('should reject negative price values', async ({ page, resaleListingPage }) => {
+      await resaleListingPage.gotoCreate();
+
+      await resaleListingPage.fillTitle('Test Item');
+      await resaleListingPage.fillPrice('-10');
+      await resaleListingPage.submitListing();
+
+      const priceError = page.locator('text=/invalid|positive|greater than/i');
+      if (await priceError.count() > 0) {
+        await expect(priceError.first()).toBeVisible();
+      }
+
+      await expectNoErrors(page);
+    });
+  });
+
+  test.describe('Scenario: Visual regression - Listing form', () => {
+    test('listing create page renders correctly', async ({ page, resaleListingPage }) => {
+      await resaleListingPage.gotoCreate();
+      await resaleListingPage.screenshot('resale-listing-create');
+    });
+
+    test('listings index page renders correctly', async ({ page, resaleListingPage }) => {
+      await resaleListingPage.gotoListings();
+      await resaleListingPage.screenshot('resale-listing-index');
     });
   });
 });

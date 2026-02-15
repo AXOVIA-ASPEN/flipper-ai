@@ -5,6 +5,7 @@ import { OpportunitiesPage } from '../pages/OpportunitiesPage';
 import { AuthPage } from '../pages/AuthPage';
 import { SettingsPage } from '../pages/SettingsPage';
 import { MessagesPage } from '../pages/MessagesPage';
+import { ResaleListingPage } from '../pages/ResaleListingPage';
 import { MockAPIHelper } from './api-mocks';
 
 type Fixtures = {
@@ -14,6 +15,7 @@ type Fixtures = {
   authPage: AuthPage;
   settingsPage: SettingsPage;
   messagesPage: MessagesPage;
+  resaleListingPage: ResaleListingPage;
   mockAPI: MockAPIHelper;
 };
 
@@ -35,6 +37,9 @@ export const test = base.extend<Fixtures>({
   },
   messagesPage: async ({ page }, use) => {
     await use(new MessagesPage(page));
+  },
+  resaleListingPage: async ({ page }, use) => {
+    await use(new ResaleListingPage(page));
   },
   mockAPI: async ({ page }, use) => {
     await use(new MockAPIHelper(page));
