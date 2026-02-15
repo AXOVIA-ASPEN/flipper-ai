@@ -22,7 +22,10 @@ import {
   Tag as TagIcon,
   MessageSquare,
   User,
+  LayoutGrid,
+  List,
 } from 'lucide-react';
+import KanbanBoard from '@/components/KanbanBoard';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -225,6 +228,7 @@ export default function OpportunitiesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<Opportunity>>({});
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
 
   useEffect(() => {
     fetchOpportunities();
@@ -327,6 +331,10 @@ export default function OpportunitiesPage() {
 
   function saveEditing(id: string) {
     updateOpportunity(id, editForm);
+  }
+
+  async function handleKanbanStatusChange(id: string, newStatus: string) {
+    await updateOpportunity(id, { status: newStatus });
   }
 
   const normalizedSearch = searchTerm.toLowerCase();
@@ -484,6 +492,32 @@ export default function OpportunitiesPage() {
               </div>
             </div>
 
+            {/* View Toggle */}
+            <div className="flex gap-1 border border-white/20 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('list')}
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-sm transition-all duration-200 ${
+                  viewMode === 'list'
+                    ? 'bg-white/20 text-white shadow-sm'
+                    : 'text-white/60 hover:text-white hover:bg-white/10'
+                }`}
+                title="List view"
+              >
+                <List className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('kanban')}
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-sm transition-all duration-200 ${
+                  viewMode === 'kanban'
+                    ? 'bg-white/20 text-white shadow-sm'
+                    : 'text-white/60 hover:text-white hover:bg-white/10'
+                }`}
+                title="Kanban view"
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+            </div>
+
             {/* Status Filter */}
             <div className="flex gap-2 flex-wrap">
               {statusOptions.map((option) => {
@@ -507,13 +541,21 @@ export default function OpportunitiesPage() {
           </div>
         </div>
 
-        {/* Opportunities List */}
+        {/* Kanban View */}
+        {viewMode === 'kanban' && !loading && (
+          <KanbanBoard
+            opportunities={filteredOpportunities}
+            onStatusChange={handleKanbanStatusChange}
+          />
+        )}
+
+        {/* List View */}
         {loading ? (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-400/30 border-t-blue-400"></div>
             <p className="mt-4 text-blue-200 font-medium animate-pulse">Loading opportunities...</p>
           </div>
-        ) : filteredOpportunities.length === 0 ? (
+        ) : viewMode === 'kanban' ? null : filteredOpportunities.length === 0 ? (
           <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-12 text-center shadow-xl">
             <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-purple-500/50 animate-pulse-slow">
               <Package className="w-10 h-10 text-white" />
