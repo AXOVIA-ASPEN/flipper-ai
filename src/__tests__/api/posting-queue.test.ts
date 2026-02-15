@@ -101,6 +101,76 @@ describe('POST /api/posting-queue', () => {
     expect(res.status).toBe(400);
   });
 
+  it('returns 401 when unauthenticated', async () => {
+    const { getAuthUserId } = require('@/lib/auth-middleware');
+    getAuthUserId.mockResolvedValueOnce(null);
+
+    const res = await POST(
+      makeRequest('http://localhost:3000/api/posting-queue', {
+        method: 'POST',
+        body: JSON.stringify({ listingId: 'lst-1', targetPlatform: 'EBAY' }),
+      })
+    );
+    expect(res.status).toBe(401);
+  });
+
+  it('returns 400 for invalid single body', async () => {
+    const res = await POST(
+      makeRequest('http://localhost:3000/api/posting-queue', {
+        method: 'POST',
+        body: JSON.stringify({ targetPlatform: 'EBAY' }), // missing listingId
+      })
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 400 for invalid batch body', async () => {
+    const res = await POST(
+      makeRequest('http://localhost:3000/api/posting-queue', {
+        method: 'POST',
+        body: JSON.stringify({ platforms: ['EBAY'] }), // missing listingId
+      })
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 404 for non-existent listing in batch', async () => {
+    mockPrisma.listing.findFirst.mockResolvedValue(null);
+
+    const res = await POST(
+      makeRequest('http://localhost:3000/api/posting-queue', {
+        method: 'POST',
+        body: JSON.stringify({ listingId: 'nope', platforms: ['EBAY'] }),
+      })
+    );
+    expect(res.status).toBe(404);
+  });
+
+  it('returns 400 when batch platforms all match source', async () => {
+    const listing = { id: 'lst-1', platform: 'EBAY', userId: 'test-user-id' };
+    mockPrisma.listing.findFirst.mockResolvedValue(listing);
+
+    const res = await POST(
+      makeRequest('http://localhost:3000/api/posting-queue', {
+        method: 'POST',
+        body: JSON.stringify({ listingId: 'lst-1', platforms: ['EBAY'] }),
+      })
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 500 on internal error', async () => {
+    mockPrisma.listing.findFirst.mockRejectedValue(new Error('DB down'));
+
+    const res = await POST(
+      makeRequest('http://localhost:3000/api/posting-queue', {
+        method: 'POST',
+        body: JSON.stringify({ listingId: 'lst-1', targetPlatform: 'EBAY' }),
+      })
+    );
+    expect(res.status).toBe(500);
+  });
+
   it('returns 404 for non-existent listing', async () => {
     mockPrisma.listing.findFirst.mockResolvedValue(null);
 
@@ -127,6 +197,45 @@ describe('GET /api/posting-queue', () => {
     const data = await res.json();
     expect(data).toHaveProperty('items');
     expect(data).toHaveProperty('total');
+  });
+
+  it('returns 401 when unauthenticated', async () => {
+    const { getAuthUserId } = require('@/lib/auth-middleware');
+    getAuthUserId.mockResolvedValueOnce(null);
+
+    const res = await GET(makeRequest('http://localhost:3000/api/posting-queue'));
+    expect(res.status).toBe(401);
+  });
+
+  it('returns 400 for invalid query params', async () => {
+    const res = await GET(makeRequest('http://localhost:3000/api/posting-queue?limit=notanumber'));
+    expect(res.status).toBe(400);
+  });
+
+  it('filters by status, targetPlatform, and listingId', async () => {
+    mockPrisma.postingQueueItem.findMany.mockResolvedValue([]);
+    mockPrisma.postingQueueItem.count.mockResolvedValue(0);
+
+    const res = await GET(
+      makeRequest('http://localhost:3000/api/posting-queue?status=PENDING&targetPlatform=EBAY&listingId=lst-1')
+    );
+    expect(res.status).toBe(200);
+    expect(mockPrisma.postingQueueItem.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          status: 'PENDING',
+          targetPlatform: 'EBAY',
+          listingId: 'lst-1',
+        }),
+      })
+    );
+  });
+
+  it('returns 500 on internal error', async () => {
+    mockPrisma.postingQueueItem.findMany.mockRejectedValue(new Error('DB down'));
+
+    const res = await GET(makeRequest('http://localhost:3000/api/posting-queue'));
+    expect(res.status).toBe(500);
   });
 });
 
