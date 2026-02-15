@@ -32,6 +32,25 @@ describe('logger', () => {
     expect(console.warn).toHaveBeenCalledTimes(1);
   });
 
+  it('logs fatal to console.error', () => {
+    logger.fatal('system crash', { code: 'FATAL_001' });
+    expect(console.error).toHaveBeenCalledTimes(1);
+    const logged = JSON.parse((console.error as jest.Mock).mock.calls[0][0]);
+    expect(logged.level).toBe('fatal');
+    expect(logged.message).toBe('system crash');
+    expect(logged.code).toBe('FATAL_001');
+  });
+
+  it('logs debug to console.log', () => {
+    logger.debug('verbose detail', { step: 3 });
+    // In test env (NODE_ENV=test), currentLevel defaults to 'debug'
+    expect(console.log).toHaveBeenCalled();
+    const logged = JSON.parse((console.log as jest.Mock).mock.calls[0][0]);
+    expect(logged.level).toBe('debug');
+    expect(logged.message).toBe('verbose detail');
+    expect(logged.step).toBe(3);
+  });
+
   it('timed() measures duration', () => {
     const done = logger.timed('test-op');
     done();

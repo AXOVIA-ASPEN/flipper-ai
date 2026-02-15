@@ -31,6 +31,28 @@ describe('metrics', () => {
     expect(hist.avg).toBe(117); // Math.round(350/3)
   });
 
+  it('caps recent histogram samples at MAX_RECENT (100)', () => {
+    for (let i = 0; i < 110; i++) {
+      metrics.observe('overflow_test', i);
+    }
+    const snap = metrics.snapshot();
+    const hist = (snap.histograms as Record<string, Record<string, number>>).overflow_test;
+    expect(hist.count).toBe(110);
+    expect(hist.min).toBe(0);
+    expect(hist.max).toBe(109);
+  });
+
+  it('returns empty collections after reset', () => {
+    metrics.increment('x');
+    metrics.gauge('y', 1);
+    metrics.observe('z', 5);
+    metrics.reset();
+    const snap = metrics.snapshot();
+    expect(snap.counters).toEqual({});
+    expect(snap.gauges).toEqual({});
+    expect(snap.histograms).toEqual({});
+  });
+
   it('tracks uptime', () => {
     const snap = metrics.snapshot();
     expect(snap.uptime_seconds).toBeGreaterThanOrEqual(0);
