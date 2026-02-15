@@ -622,7 +622,6 @@ export type SearchConfigCreateOrConnectWithoutUserInput = {
 
 export type SearchConfigCreateManyUserInputEnvelope = {
   data: Prisma.SearchConfigCreateManyUserInput | Prisma.SearchConfigCreateManyUserInput[]
-  skipDuplicates?: boolean
 }
 
 export type SearchConfigUpsertWithWhereUniqueWithoutUserInput = {
@@ -1485,7 +1484,6 @@ export type SearchConfigCreateManyArgs<ExtArgs extends runtime.Types.Extensions.
    * The data used to create many SearchConfigs.
    */
   data: Prisma.SearchConfigCreateManyInput | Prisma.SearchConfigCreateManyInput[]
-  skipDuplicates?: boolean
 }
 
 /**
@@ -1504,7 +1502,6 @@ export type SearchConfigCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ex
    * The data used to create many SearchConfigs.
    */
   data: Prisma.SearchConfigCreateManyInput | Prisma.SearchConfigCreateManyInput[]
-  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
