@@ -205,6 +205,7 @@ model User {
   name            String?
   image           String?
   password        String?       // Hashed password for credentials auth
+  subscriptionTier String       @default("FREE") // FREE, FLIPPER, PRO
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 

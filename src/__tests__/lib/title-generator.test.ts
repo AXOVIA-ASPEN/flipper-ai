@@ -448,6 +448,206 @@ describe('title-generator', () => {
     });
   });
 
+  describe('generateLLMTitle - additional branch coverage', () => {
+    it('handles null choices array from LLM', async () => {
+      const OpenAI = require('openai');
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockResolvedValue({
+              choices: [],
+            }),
+          },
+        },
+      }));
+
+      const origKey = process.env.OPENAI_API_KEY;
+      process.env.OPENAI_API_KEY = 'test-key';
+
+      const result = await generateLLMTitle(sampleInput, 'ebay');
+      // Empty choices[0] means content is undefined, falls through to empty string
+      expect(result.platform).toBe('ebay');
+      expect(result.title).toBe('');
+
+      // Restore
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockResolvedValue({
+              choices: [{ message: { content: 'Apple iPhone 15 Pro Max 256GB - Excellent Condition' } }],
+            }),
+          },
+        },
+      }));
+
+      if (origKey) {
+        process.env.OPENAI_API_KEY = origKey;
+      } else {
+        delete process.env.OPENAI_API_KEY;
+      }
+    });
+
+    it('handles null message in choices', async () => {
+      const OpenAI = require('openai');
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockResolvedValue({
+              choices: [{ message: null }],
+            }),
+          },
+        },
+      }));
+
+      const origKey = process.env.OPENAI_API_KEY;
+      process.env.OPENAI_API_KEY = 'test-key';
+
+      const result = await generateLLMTitle(sampleInput, 'ebay');
+      expect(result.platform).toBe('ebay');
+      expect(result.title).toBe('');
+
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockResolvedValue({
+              choices: [{ message: { content: 'Apple iPhone 15 Pro Max 256GB - Excellent Condition' } }],
+            }),
+          },
+        },
+      }));
+
+      if (origKey) {
+        process.env.OPENAI_API_KEY = origKey;
+      } else {
+        delete process.env.OPENAI_API_KEY;
+      }
+    });
+
+    it('handles null content in message', async () => {
+      const OpenAI = require('openai');
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockResolvedValue({
+              choices: [{ message: { content: null } }],
+            }),
+          },
+        },
+      }));
+
+      const origKey = process.env.OPENAI_API_KEY;
+      process.env.OPENAI_API_KEY = 'test-key';
+
+      const result = await generateLLMTitle(sampleInput, 'ebay');
+      expect(result.platform).toBe('ebay');
+      expect(result.title).toBe('');
+
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockResolvedValue({
+              choices: [{ message: { content: 'Apple iPhone 15 Pro Max 256GB - Excellent Condition' } }],
+            }),
+          },
+        },
+      }));
+
+      if (origKey) {
+        process.env.OPENAI_API_KEY = origKey;
+      } else {
+        delete process.env.OPENAI_API_KEY;
+      }
+    });
+
+    it('strips single quotes from LLM response', async () => {
+      const OpenAI = require('openai');
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockResolvedValue({
+              choices: [{ message: { content: "'Single Quoted Title'" } }],
+            }),
+          },
+        },
+      }));
+
+      const origKey = process.env.OPENAI_API_KEY;
+      process.env.OPENAI_API_KEY = 'test-key';
+
+      const result = await generateLLMTitle(sampleInput, 'ebay');
+      expect(result.title).toBe('Single Quoted Title');
+
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockResolvedValue({
+              choices: [{ message: { content: 'Apple iPhone 15 Pro Max 256GB - Excellent Condition' } }],
+            }),
+          },
+        },
+      }));
+
+      if (origKey) {
+        process.env.OPENAI_API_KEY = origKey;
+      } else {
+        delete process.env.OPENAI_API_KEY;
+      }
+    });
+
+    it('uses default 80 limit for unknown platform with LLM', async () => {
+      const OpenAI = require('openai');
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockResolvedValue({
+              choices: [{ message: { content: 'Short Title' } }],
+            }),
+          },
+        },
+      }));
+
+      const origKey = process.env.OPENAI_API_KEY;
+      process.env.OPENAI_API_KEY = 'test-key';
+
+      const result = await generateLLMTitle(sampleInput, 'unknown_platform');
+      expect(result.title).toBe('Short Title');
+      expect(result.charCount).toBeLessThanOrEqual(80);
+
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockResolvedValue({
+              choices: [{ message: { content: 'Apple iPhone 15 Pro Max 256GB - Excellent Condition' } }],
+            }),
+          },
+        },
+      }));
+
+      if (origKey) {
+        process.env.OPENAI_API_KEY = origKey;
+      } else {
+        delete process.env.OPENAI_API_KEY;
+      }
+    });
+  });
+
+  describe('generateTitlesForAllPlatforms - edge cases', () => {
+    it('returns empty primary when no titles match ebay', () => {
+      // This tests the fallback chain: titles[0]?.title || ''
+      const input: TitleGeneratorInput = {
+        brand: null,
+        model: null,
+        variant: null,
+        condition: 'new',
+        category: null,
+      };
+      const result = generateTitlesForAllPlatforms(input);
+      // Even with null inputs, titles are generated, so primary should exist
+      expect(result.primary).toBeTruthy();
+      expect(result.titles.length).toBe(4);
+    });
+  });
+
   describe('fromIdentification', () => {
     it('converts ItemIdentification to TitleGeneratorInput', () => {
       const identification = {
