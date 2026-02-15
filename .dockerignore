@@ -2,8 +2,16 @@ node_modules
 .next
 .git
 *.md
+!README.md
 tests
 e2e
 features
 screenshots
 reports
+coverage
+.env*
+.husky
+jest.config.*
+playwright.config.*
+cucumber.js
+tsconfig.test.json
