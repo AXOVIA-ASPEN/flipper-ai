@@ -14,11 +14,13 @@ import {
 import { storeToken } from "@/scrapers/facebook/token-store";
 
 export async function GET(req: NextRequest) {
+  const baseUrl = req.nextUrl.origin;
+
   // Check if user is authenticated
   const session = await auth();
 
   if (!session?.user?.email) {
-    return NextResponse.redirect("/auth/signin?error=unauthorized");
+    return NextResponse.redirect(new URL("/auth/signin?error=unauthorized", baseUrl));
   }
 
   // Get code and state from query params
@@ -30,19 +32,19 @@ export async function GET(req: NextRequest) {
   // Handle authorization errors (user denied permission)
   if (error) {
     return NextResponse.redirect(
-      `/settings?error=facebook_auth_${error}`
+      new URL(`/settings?error=facebook_auth_${error}`, baseUrl)
     );
   }
 
   if (!code || !state) {
-    return NextResponse.redirect("/settings?error=missing_code_or_state");
+    return NextResponse.redirect(new URL("/settings?error=missing_code_or_state", baseUrl));
   }
 
   // Verify state token (CSRF protection)
   const storedState = req.cookies.get("facebook_oauth_state")?.value;
 
   if (!storedState || storedState !== state) {
-    return NextResponse.redirect("/settings?error=invalid_state");
+    return NextResponse.redirect(new URL("/settings?error=invalid_state", baseUrl));
   }
 
   // Get Facebook app credentials
@@ -52,7 +54,7 @@ export async function GET(req: NextRequest) {
     process.env.FACEBOOK_REDIRECT_URI || "http://localhost:3000/api/auth/facebook/callback";
 
   if (!appId || !appSecret) {
-    return NextResponse.redirect("/settings?error=facebook_not_configured");
+    return NextResponse.redirect(new URL("/settings?error=facebook_not_configured", baseUrl));
   }
 
   try {
@@ -73,7 +75,7 @@ export async function GET(req: NextRequest) {
     await storeToken(userId, longToken.access_token, longToken.expires_in);
 
     // Redirect to settings page with success message
-    const response = NextResponse.redirect("/settings?facebook_auth=success");
+    const response = NextResponse.redirect(new URL("/settings?facebook_auth=success", baseUrl));
 
     // Clear state cookie
     response.cookies.delete("facebook_oauth_state");
@@ -82,9 +84,9 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error("Facebook OAuth callback error:", error);
     return NextResponse.redirect(
-      `/settings?error=token_exchange_failed&message=${encodeURIComponent(
+      new URL(`/settings?error=token_exchange_failed&message=${encodeURIComponent(
         error instanceof Error ? error.message : "Unknown error"
-      )}`
+      )}`, baseUrl)
     );
   }
 }
