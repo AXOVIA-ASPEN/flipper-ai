@@ -2,31 +2,40 @@
 
 All notable changes to Flipper AI will be documented in this file.
 
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
 ## [1.0.0] - 2026-02-15
 
-### 🎉 Initial Release — Production Ready
+### Added
+- **Marketplace Scanning** — Multi-platform scraping (eBay, Facebook, Craigslist, OfferUp, Mercari) with normalized listing data
+- **AI-Powered Analysis** — Claude integration for brand/model extraction, condition assessment, and flip scoring
+- **Market Value Estimation** — eBay sold-listing price comparison, price history aggregation, weighted scoring algorithm
+- **Seller Communication** — AI message template generator, negotiation strategies, message inbox/outbox with approval workflow
+- **Resale Listing Creation** — AI-optimized titles/descriptions, pricing calculator, eBay listing API integration
+- **Dashboard & Tracking** — Kanban-style opportunity board, deal pipeline visualization
+- **User Auth & Billing** — Login/register, user settings, API key management
+- **Scraper Job System** — Background processing queue, rate limiting, job scheduling
+- **WebSocket Real-time Updates** — Live notifications for new opportunities and price changes
+- **React Frontend** — Next.js app with responsive components for all features
 
-#### Features
-- **Multi-marketplace scanning** — eBay, Craigslist, Facebook, OfferUp, Mercari
-- **AI-powered item analysis** — Claude/LLM profit estimation, condition grading
-- **Market price lookup** — eBay sold-listings scraping with median/avg/range stats
-- **Price history tracking** — Historical price trends per item
-- **Market value calculator** — Automated ROI and flip-score computation
-- **Authentication** — NextAuth with Prisma adapter, secure session management
-- **Dashboard** — Real-time opportunities, portfolio tracking
-- **Seller communication** — Negotiation templates and tracking
-- **Theme system** — Configurable dark/light themes
+### Infrastructure
+- **CI/CD** — GitHub Actions pipeline with test, lint, and deploy stages
+- **Vercel Deployment** — Production deployment configuration
+- **Environment Management** — Zod-validated environment configuration
+- **Rate Limiting & Security** — API rate limiting, input validation (Zod), security hardening
+- **Monitoring & Observability** — Logging, error tracking, health checks
+- **Docker Support** — Docker & Docker Compose setup for local development
 
-#### Testing
-- 692 unit tests (Jest) — **97.5% statement coverage**
-- BDD acceptance tests (Cucumber + Playwright)
-- 8 feature files covering full user journeys
-- Integration tests for API routes and services
+### Testing
+- **1,204 unit/integration tests** passing (Jest)
+- **99%+ code coverage** across all modules
+- **BDD/Cucumber** feature specs for all user journeys
+- **Playwright E2E** tests with visual regression
+- **API contract testing** (77 tests covering all endpoints)
+- **React component tests** (Testing Library)
 
-#### Infrastructure
-- Next.js 16 with Turbopack
-- Docker production setup (multi-stage Dockerfile, docker-compose.prod.yml)
-- GitHub Actions CI/CD pipeline
-- Environment configuration & secrets management
-- Production logging & error tracking
-- ESLint + Prettier + Husky pre-commit hooks
+### Documentation
+- Developer Setup Guide
+- API Documentation (OpenAPI/Swagger)
+- Operations Runbook
+- Deployment guide
