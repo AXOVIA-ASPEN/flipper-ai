@@ -127,10 +127,14 @@ export function rateLimit(
   return { allowed: true, remaining: ipResult.remaining, limit: config.limit, resetAt: ipResult.resetAt };
 }
 
-/** Reset stores — useful for tests */
+/** Reset stores and cleanup timer — useful for tests */
 export function resetRateLimiter() {
   ipStore.clear();
   userStore.clear();
+  if (cleanupTimer) {
+    clearInterval(cleanupTimer);
+    cleanupTimer = null;
+  }
 }
 
 export { ENDPOINT_CONFIGS, DEFAULT_CONFIG };

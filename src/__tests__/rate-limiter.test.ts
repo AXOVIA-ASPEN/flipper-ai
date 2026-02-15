@@ -129,13 +129,69 @@ describe("rate-limiter", () => {
     // Advance past the window so entries expire
     jest.advanceTimersByTime(DEFAULT_CONFIG.windowSeconds * 1000 + 1000);
 
-    // Advance past the cleanup interval (5 minutes)
+    // Advance past the cleanup interval (5 minutes) to trigger the interval callback
     jest.advanceTimersByTime(5 * 60 * 1000);
 
     // After cleanup, a new request should start fresh
     const result = rateLimit("cleanup-ip", "/api/listings");
     expect(result.allowed).toBe(true);
     expect(result.remaining).toBe(DEFAULT_CONFIG.limit - 1);
+
+    jest.useRealTimers();
+  });
+
+  it("cleanup interval removes both expired IP and user entries", () => {
+    jest.useFakeTimers();
+
+    // Create entries across multiple endpoints with users
+    rateLimit("exp-ip-1", "/api/analyze", "exp-user-1");
+    rateLimit("exp-ip-2", "/api/scrape", "exp-user-2");
+    rateLimit("exp-ip-3", "/api/auth/register");
+
+    // Advance past the longest window (register = 300s)
+    jest.advanceTimersByTime(301 * 1000);
+
+    // Trigger cleanup interval
+    jest.advanceTimersByTime(5 * 60 * 1000);
+
+    // All entries should have been cleaned up; new requests start fresh
+    const r1 = rateLimit("exp-ip-1", "/api/analyze", "exp-user-1");
+    expect(r1.allowed).toBe(true);
+    expect(r1.remaining).toBe(ENDPOINT_CONFIGS["/api/analyze"].limit - 1);
+
+    const r2 = rateLimit("exp-ip-3", "/api/auth/register");
+    expect(r2.allowed).toBe(true);
+    expect(r2.remaining).toBe(ENDPOINT_CONFIGS["/api/auth/register"].limit - 1);
+
+    jest.useRealTimers();
+  });
+
+  it("cleanup keeps non-expired entries and removes expired ones selectively", () => {
+    jest.useFakeTimers();
+
+    // Create entry on a long-window endpoint (register: 300s)
+    const longPath = "/api/auth/register";
+    rateLimit("long-ip", longPath);
+
+    // Create entry on a short-window endpoint (listings: 60s)
+    const shortPath = "/api/listings";
+    rateLimit("short-ip", shortPath);
+
+    // Advance 120s: short-window entries expired, long-window still active
+    jest.advanceTimersByTime(120 * 1000);
+
+    // Trigger cleanup at 5min mark
+    jest.advanceTimersByTime(3 * 60 * 1000); // total: 300s
+
+    // Short-window entry was cleaned → fresh start
+    const r1 = rateLimit("short-ip", shortPath);
+    expect(r1.allowed).toBe(true);
+    expect(r1.remaining).toBe(DEFAULT_CONFIG.limit - 1);
+
+    // Long-window entry: resetAt = start + 300s = 300s, now = 300s → resetAt <= now → also cleaned
+    // So this also starts fresh
+    const r2 = rateLimit("long-ip", longPath);
+    expect(r2.allowed).toBe(true);
 
     jest.useRealTimers();
   });

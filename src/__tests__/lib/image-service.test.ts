@@ -9,6 +9,7 @@ import {
   downloadAndCacheImages,
   isImageCached,
   getBestImageUrl,
+  getExtensionFromUrl,
   NormalizedLocation,
 } from "@/lib/image-service";
 import { writeFile, mkdir, access, unlink } from "fs/promises";
@@ -664,6 +665,44 @@ describe("Image Download and Caching", () => {
       const result = await getBestImageUrl(url);
 
       expect(result).toBe(url);
+    });
+  });
+
+  describe("getExtensionFromUrl", () => {
+    it("extracts jpg extension", () => {
+      expect(getExtensionFromUrl("https://example.com/photo.jpg")).toBe("jpg");
+    });
+
+    it("normalizes jpeg to jpg", () => {
+      expect(getExtensionFromUrl("https://example.com/photo.jpeg")).toBe("jpg");
+    });
+
+    it("extracts png extension", () => {
+      expect(getExtensionFromUrl("https://example.com/photo.png")).toBe("png");
+    });
+
+    it("extracts webp extension", () => {
+      expect(getExtensionFromUrl("https://example.com/photo.webp")).toBe("webp");
+    });
+
+    it("extracts gif extension", () => {
+      expect(getExtensionFromUrl("https://example.com/anim.gif")).toBe("gif");
+    });
+
+    it("defaults to jpg for unsupported extension", () => {
+      expect(getExtensionFromUrl("https://example.com/file.bmp")).toBe("jpg");
+    });
+
+    it("defaults to jpg for no extension", () => {
+      expect(getExtensionFromUrl("https://example.com/image")).toBe("jpg");
+    });
+
+    it("defaults to jpg for invalid URL", () => {
+      expect(getExtensionFromUrl("not-a-url")).toBe("jpg");
+    });
+
+    it("handles URLs with query params", () => {
+      expect(getExtensionFromUrl("https://example.com/photo.png?w=100")).toBe("png");
     });
   });
 });

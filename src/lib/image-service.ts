@@ -52,7 +52,7 @@ function getExtensionFromMimeType(mimeType: string): string {
 /**
  * Extract file extension from URL
  */
-function getExtensionFromUrl(url: string): string {
+export function getExtensionFromUrl(url: string): string {
   try {
     const pathname = new URL(url).pathname;
     const match = pathname.match(/\.(\w+)$/);
