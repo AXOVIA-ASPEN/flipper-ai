@@ -79,10 +79,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     // Only DRAFT or PENDING messages can be approved/edited/rejected
-    const modifiableStatuses = ['DRAFT', 'PENDING'];
+    const modifiableStatuses = ['DRAFT', 'PENDING', 'PENDING_APPROVAL'];
     if (!modifiableStatuses.includes(existing.status)) {
       return NextResponse.json(
-        { error: `Cannot ${action} a message with status: ${existing.status}. Must be DRAFT or PENDING.` },
+        { error: `Cannot ${action} a message with status: ${existing.status}. Must be DRAFT, PENDING, or PENDING_APPROVAL.` },
         { status: 409 }
       );
     }
@@ -113,7 +113,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
       case 'reject':
         updateData = {
-          status: 'FAILED',
+          status: 'REJECTED',
         };
         break;
     }

@@ -307,7 +307,7 @@ model Message {
   listingId       String?
   listing         Listing?  @relation(fields: [listingId], references: [id], onDelete: SetNull)
   direction       String    // OUTBOUND or INBOUND
-  status          String    @default("DRAFT") // DRAFT, SENT, DELIVERED, READ, REPLIED, FAILED
+  status          String    @default("DRAFT") // DRAFT, PENDING_APPROVAL, SENT, DELIVERED, READ, REPLIED, REJECTED, FAILED
   subject         String?
   body            String
   sellerName      String?

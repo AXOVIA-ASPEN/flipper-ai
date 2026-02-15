@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
         userId,
         listingId: listingId || null,
         direction,
-        status: msgStatus || (direction === 'OUTBOUND' ? 'DRAFT' : 'DELIVERED'),
+        status: msgStatus || (direction === 'OUTBOUND' ? 'PENDING_APPROVAL' : 'DELIVERED'),
         subject: subject || null,
         body: messageBody,
         sellerName: sellerName || null,

@@ -183,7 +183,7 @@ describe('GET /api/messages', () => {
 describe('POST /api/messages', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCreate.mockResolvedValue({ ...sampleMessage, direction: 'OUTBOUND', status: 'DRAFT' });
+    mockCreate.mockResolvedValue({ ...sampleMessage, direction: 'OUTBOUND', status: 'PENDING_APPROVAL' });
   });
 
   it('creates an outbound message', async () => {
@@ -208,7 +208,7 @@ describe('POST /api/messages', () => {
           userId: 'test-user-id',
           direction: 'OUTBOUND',
           body: 'Hello, is this available?',
-          status: 'DRAFT',
+          status: 'PENDING_APPROVAL',
         }),
       })
     );

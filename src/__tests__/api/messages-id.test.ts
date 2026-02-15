@@ -160,8 +160,8 @@ describe('/api/messages/[id]', () => {
       expect(res.status).toBe(400);
     });
 
-    it('rejects a message (sets FAILED)', async () => {
-      const updated = { ...mockMessage, status: 'FAILED' };
+    it('rejects a message (sets REJECTED)', async () => {
+      const updated = { ...mockMessage, status: 'REJECTED' };
       (mockPrisma.message.update as jest.Mock).mockResolvedValue(updated);
 
       const res = await PATCH(makeRequest('PATCH', { action: 'reject' }) as any, makeParams('msg-1'));
@@ -170,7 +170,7 @@ describe('/api/messages/[id]', () => {
       expect(json.action).toBe('reject');
       expect(mockPrisma.message.update).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({ status: 'FAILED' }),
+          data: expect.objectContaining({ status: 'REJECTED' }),
         })
       );
     });
