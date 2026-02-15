@@ -3,38 +3,51 @@ import { GET, PATCH } from '@/app/api/user/settings/route';
 
 // Mock auth middleware
 jest.mock('@/lib/auth-middleware', () => ({
-  getUserIdOrDefault: jest.fn(() => Promise.resolve('test-user-id')),
+  getUserIdOrDefault: jest.fn().mockResolvedValue('test-user-id'),
 }));
 
 // Mock crypto
 jest.mock('@/lib/crypto', () => ({
   encrypt: jest.fn((val: string) => `encrypted:${val}`),
   decrypt: jest.fn((val: string) => val.replace('encrypted:', '')),
-  maskApiKey: jest.fn((val: string) => `sk-****${val.slice(-4)}`),
+  maskApiKey: jest.fn((val: string) => `${val.slice(0, 3)}...${val.slice(-4)}`),
 }));
 
-// Mock prisma
-const mockUserFindUnique = jest.fn();
-const mockSettingsCreate = jest.fn();
-const mockSettingsUpdate = jest.fn();
+// Mock Prisma
+const mockFindUnique = jest.fn();
+const mockCreateSettings = jest.fn();
+const mockUpdateSettings = jest.fn();
 
 jest.mock('@/lib/db', () => ({
   __esModule: true,
   default: {
     user: {
-      findUnique: (...args: unknown[]) => mockUserFindUnique(...args),
+      findUnique: (...args: unknown[]) => mockFindUnique(...args),
     },
     userSettings: {
-      create: (...args: unknown[]) => mockSettingsCreate(...args),
-      update: (...args: unknown[]) => mockSettingsUpdate(...args),
+      create: (...args: unknown[]) => mockCreateSettings(...args),
+      update: (...args: unknown[]) => mockUpdateSettings(...args),
     },
   },
 }));
 
-const baseUser = {
+function createMockRequest(
+  method: string,
+  body?: Record<string, unknown>
+): NextRequest {
+  return new NextRequest(new URL('http://localhost:3000/api/user/settings'), {
+    method,
+    ...(body && {
+      body: JSON.stringify(body),
+      headers: { 'Content-Type': 'application/json' },
+    }),
+  });
+}
+
+const mockUser = {
   id: 'test-user-id',
-  email: 'test@test.com',
-  name: 'Test',
+  email: 'test@example.com',
+  name: 'Test User',
   image: null,
   settings: {
     id: 'settings-1',
@@ -49,152 +62,219 @@ const baseUser = {
 };
 
 describe('GET /api/user/settings', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-  it('returns user settings', async () => {
-    mockUserFindUnique.mockResolvedValue(baseUser);
+  it('should return user settings', async () => {
+    mockFindUnique.mockResolvedValue(mockUser);
 
-    const res = await GET();
-    const data = await res.json();
+    const response = await GET();
+    const data = await response.json();
 
-    expect(res.status).toBe(200);
     expect(data.success).toBe(true);
     expect(data.data.llmModel).toBe('gpt-4o-mini');
+    expect(data.data.discountThreshold).toBe(50);
+    expect(data.data.autoAnalyze).toBe(true);
     expect(data.data.hasOpenaiApiKey).toBe(false);
+    expect(data.data.openaiApiKey).toBeNull();
+    expect(data.data.user.email).toBe('test@example.com');
   });
 
-  it('returns settings with masked API key', async () => {
-    mockUserFindUnique.mockResolvedValue({
-      ...baseUser,
-      settings: { ...baseUser.settings, openaiApiKey: 'encrypted:sk-abc123' },
-    });
+  it('should return masked API key when set', async () => {
+    const userWithKey = {
+      ...mockUser,
+      settings: { ...mockUser.settings, openaiApiKey: 'encrypted:sk-test1234abcd' },
+    };
+    mockFindUnique.mockResolvedValue(userWithKey);
 
-    const res = await GET();
-    const data = await res.json();
+    const response = await GET();
+    const data = await response.json();
 
+    expect(data.success).toBe(true);
     expect(data.data.hasOpenaiApiKey).toBe(true);
-    expect(data.data.openaiApiKey).toContain('****');
+    expect(data.data.openaiApiKey).not.toContain('sk-test1234abcd');
   });
 
-  it('creates settings if missing', async () => {
-    mockUserFindUnique.mockResolvedValue({ ...baseUser, settings: null });
-    mockSettingsCreate.mockResolvedValue(baseUser.settings);
+  it('should create settings if they do not exist', async () => {
+    const userNoSettings = { ...mockUser, settings: null };
+    mockFindUnique.mockResolvedValue(userNoSettings);
+    const newSettings = { ...mockUser.settings };
+    mockCreateSettings.mockResolvedValue(newSettings);
 
-    const res = await GET();
-    expect(res.status).toBe(200);
-    expect(mockSettingsCreate).toHaveBeenCalled();
+    const response = await GET();
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(mockCreateSettings).toHaveBeenCalled();
   });
 
-  it('returns 500 when user not found', async () => {
-    mockUserFindUnique.mockResolvedValue(null);
+  it('should return 500 when user not found', async () => {
+    mockFindUnique.mockResolvedValue(null);
 
-    const res = await GET();
-    expect(res.status).toBe(500);
+    const response = await GET();
+    const data = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
+  });
+
+  it('should return 500 on database error', async () => {
+    mockFindUnique.mockRejectedValue(new Error('DB error'));
+
+    const response = await GET();
+    const data = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
   });
 });
 
 describe('PATCH /api/user/settings', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUserFindUnique.mockResolvedValue(baseUser);
+    mockFindUnique.mockResolvedValue(mockUser);
   });
 
-  it('updates llmModel', async () => {
-    mockSettingsUpdate.mockResolvedValue({ ...baseUser.settings, llmModel: 'gpt-4o' });
+  it('should update llmModel', async () => {
+    const updated = { ...mockUser.settings, llmModel: 'gpt-4o' };
+    mockUpdateSettings.mockResolvedValue(updated);
 
-    const req = new NextRequest('http://localhost/api/user/settings', {
-      method: 'PATCH',
-      body: JSON.stringify({ llmModel: 'gpt-4o' }),
-    });
-    const res = await PATCH(req);
-    const data = await res.json();
+    const req = createMockRequest('PATCH', { llmModel: 'gpt-4o' });
+    const response = await PATCH(req);
+    const data = await response.json();
 
-    expect(res.status).toBe(200);
+    expect(data.success).toBe(true);
     expect(data.data.llmModel).toBe('gpt-4o');
   });
 
-  it('rejects invalid model', async () => {
-    const req = new NextRequest('http://localhost/api/user/settings', {
-      method: 'PATCH',
-      body: JSON.stringify({ llmModel: 'invalid-model' }),
-    });
-    const res = await PATCH(req);
-    expect(res.status).toBe(400);
+  it('should reject invalid llmModel', async () => {
+    const req = createMockRequest('PATCH', { llmModel: 'invalid-model' });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(data.success).toBe(false);
+    expect(data.error).toContain('Invalid LLM model');
   });
 
-  it('rejects invalid discount threshold', async () => {
-    const req = new NextRequest('http://localhost/api/user/settings', {
-      method: 'PATCH',
-      body: JSON.stringify({ discountThreshold: 150 }),
-    });
-    const res = await PATCH(req);
-    expect(res.status).toBe(400);
+  it('should update discountThreshold', async () => {
+    const updated = { ...mockUser.settings, discountThreshold: 75 };
+    mockUpdateSettings.mockResolvedValue(updated);
+
+    const req = createMockRequest('PATCH', { discountThreshold: 75 });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(data.data.discountThreshold).toBe(75);
   });
 
-  it('rejects NaN discount threshold', async () => {
-    const req = new NextRequest('http://localhost/api/user/settings', {
-      method: 'PATCH',
-      body: JSON.stringify({ discountThreshold: 'abc' }),
-    });
-    const res = await PATCH(req);
-    expect(res.status).toBe(400);
+  it('should reject invalid discountThreshold (>100)', async () => {
+    const req = createMockRequest('PATCH', { discountThreshold: 150 });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(data.error).toContain('between 0 and 100');
   });
 
-  it('encrypts and stores API key', async () => {
-    mockSettingsUpdate.mockResolvedValue({
-      ...baseUser.settings,
-      openaiApiKey: 'encrypted:sk-newkey123',
-    });
+  it('should reject negative discountThreshold', async () => {
+    const req = createMockRequest('PATCH', { discountThreshold: -5 });
+    const response = await PATCH(req);
+    const data = await response.json();
 
-    const req = new NextRequest('http://localhost/api/user/settings', {
-      method: 'PATCH',
-      body: JSON.stringify({ openaiApiKey: 'sk-newkey123' }),
-    });
-    const res = await PATCH(req);
-    expect(res.status).toBe(200);
+    expect(response.status).toBe(400);
   });
 
-  it('clears API key when null', async () => {
-    mockSettingsUpdate.mockResolvedValue({ ...baseUser.settings, openaiApiKey: null });
+  it('should update autoAnalyze', async () => {
+    const updated = { ...mockUser.settings, autoAnalyze: false };
+    mockUpdateSettings.mockResolvedValue(updated);
 
-    const req = new NextRequest('http://localhost/api/user/settings', {
-      method: 'PATCH',
-      body: JSON.stringify({ openaiApiKey: null }),
-    });
-    const res = await PATCH(req);
-    expect(res.status).toBe(200);
+    const req = createMockRequest('PATCH', { autoAnalyze: false });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(data.data.autoAnalyze).toBe(false);
   });
 
-  it('clears API key when empty string', async () => {
-    mockSettingsUpdate.mockResolvedValue({ ...baseUser.settings, openaiApiKey: null });
+  it('should encrypt and store openaiApiKey', async () => {
+    const updated = { ...mockUser.settings, openaiApiKey: 'encrypted:sk-newkey123' };
+    mockUpdateSettings.mockResolvedValue(updated);
 
-    const req = new NextRequest('http://localhost/api/user/settings', {
-      method: 'PATCH',
-      body: JSON.stringify({ openaiApiKey: '' }),
-    });
-    const res = await PATCH(req);
-    expect(res.status).toBe(200);
+    const req = createMockRequest('PATCH', { openaiApiKey: 'sk-newkey123' });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(data.data.hasOpenaiApiKey).toBe(true);
+    expect(mockUpdateSettings).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          openaiApiKey: 'encrypted:sk-newkey123',
+        }),
+      })
+    );
   });
 
-  it('updates autoAnalyze', async () => {
-    mockSettingsUpdate.mockResolvedValue({ ...baseUser.settings, autoAnalyze: false });
+  it('should clear openaiApiKey when set to null', async () => {
+    const updated = { ...mockUser.settings, openaiApiKey: null };
+    mockUpdateSettings.mockResolvedValue(updated);
 
-    const req = new NextRequest('http://localhost/api/user/settings', {
-      method: 'PATCH',
-      body: JSON.stringify({ autoAnalyze: false }),
-    });
-    const res = await PATCH(req);
-    expect(res.status).toBe(200);
+    const req = createMockRequest('PATCH', { openaiApiKey: null });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(data.data.hasOpenaiApiKey).toBe(false);
+    expect(mockUpdateSettings).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ openaiApiKey: null }),
+      })
+    );
   });
 
-  it('returns 500 on error', async () => {
-    mockUserFindUnique.mockRejectedValue(new Error('DB error'));
+  it('should clear openaiApiKey when set to empty string', async () => {
+    const updated = { ...mockUser.settings, openaiApiKey: null };
+    mockUpdateSettings.mockResolvedValue(updated);
 
-    const req = new NextRequest('http://localhost/api/user/settings', {
-      method: 'PATCH',
-      body: JSON.stringify({ llmModel: 'gpt-4o' }),
+    const req = createMockRequest('PATCH', { openaiApiKey: '' });
+    const response = await PATCH(req);
+
+    expect(mockUpdateSettings).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ openaiApiKey: null }),
+      })
+    );
+  });
+
+  it('should handle multiple field updates at once', async () => {
+    const updated = { ...mockUser.settings, llmModel: 'gpt-4-turbo', discountThreshold: 30, autoAnalyze: false };
+    mockUpdateSettings.mockResolvedValue(updated);
+
+    const req = createMockRequest('PATCH', {
+      llmModel: 'gpt-4-turbo',
+      discountThreshold: 30,
+      autoAnalyze: false,
     });
-    const res = await PATCH(req);
-    expect(res.status).toBe(500);
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(data.data.llmModel).toBe('gpt-4-turbo');
+    expect(data.data.discountThreshold).toBe(30);
+    expect(data.data.autoAnalyze).toBe(false);
+  });
+
+  it('should return 500 on database error', async () => {
+    mockUpdateSettings.mockRejectedValue(new Error('DB error'));
+
+    const req = createMockRequest('PATCH', { llmModel: 'gpt-4o' });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
   });
 });

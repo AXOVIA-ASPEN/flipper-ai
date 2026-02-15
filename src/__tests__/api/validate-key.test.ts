@@ -2,83 +2,111 @@ import { NextRequest } from 'next/server';
 import { POST } from '@/app/api/user/settings/validate-key/route';
 
 // Mock OpenAI
-const mockModelsList = jest.fn();
+const mockList = jest.fn();
 jest.mock('openai', () => {
   return jest.fn().mockImplementation(() => ({
-    models: { list: () => mockModelsList() },
+    models: { list: mockList },
   }));
 });
 
-function createRequest(body: object) {
-  return new NextRequest('http://localhost/api/user/settings/validate-key', {
+function createMockRequest(body?: Record<string, unknown>): NextRequest {
+  return new NextRequest(new URL('http://localhost:3000/api/user/settings/validate-key'), {
     method: 'POST',
-    body: JSON.stringify(body),
-    headers: { 'Content-Type': 'application/json' },
+    ...(body && {
+      body: JSON.stringify(body),
+      headers: { 'Content-Type': 'application/json' },
+    }),
   });
 }
 
 describe('POST /api/user/settings/validate-key', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-  it('returns valid for working key', async () => {
-    mockModelsList.mockResolvedValue({ data: [] });
+  it('should return 400 when apiKey is missing', async () => {
+    const req = createMockRequest({});
+    const response = await POST(req);
+    const data = await response.json();
 
-    const res = await POST(createRequest({ apiKey: 'sk-test123' }));
-    const data = await res.json();
+    expect(response.status).toBe(400);
+    expect(data.valid).toBe(false);
+  });
 
+  it('should return 400 when apiKey is not a string', async () => {
+    const req = createMockRequest({ apiKey: 123 });
+    const response = await POST(req);
+    const data = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(data.valid).toBe(false);
+  });
+
+  it('should reject keys not starting with sk-', async () => {
+    const req = createMockRequest({ apiKey: 'invalid-key' });
+    const response = await POST(req);
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(data.valid).toBe(false);
+    expect(data.error).toContain("start with 'sk-'");
+  });
+
+  it('should validate a valid API key', async () => {
+    mockList.mockResolvedValue({ data: [] });
+
+    const req = createMockRequest({ apiKey: 'sk-valid123' });
+    const response = await POST(req);
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
     expect(data.valid).toBe(true);
   });
 
-  it('returns 400 when no key provided', async () => {
-    const res = await POST(createRequest({}));
-    expect(res.status).toBe(400);
-  });
+  it('should return invalid for 401 (bad key)', async () => {
+    mockList.mockRejectedValue({ status: 401, message: 'Unauthorized' });
 
-  it('returns 400 when key is not a string', async () => {
-    const res = await POST(createRequest({ apiKey: 123 }));
-    expect(res.status).toBe(400);
-  });
+    const req = createMockRequest({ apiKey: 'sk-bad123' });
+    const response = await POST(req);
+    const data = await response.json();
 
-  it('rejects keys not starting with sk-', async () => {
-    const res = await POST(createRequest({ apiKey: 'pk-invalid' }));
-    const data = await res.json();
-
-    expect(data.valid).toBe(false);
-    expect(data.error).toContain('sk-');
-  });
-
-  it('returns invalid for 401 error', async () => {
-    mockModelsList.mockRejectedValue({ status: 401, message: 'Unauthorized' });
-
-    const res = await POST(createRequest({ apiKey: 'sk-invalid' }));
-    const data = await res.json();
-
+    expect(data.success).toBe(true);
     expect(data.valid).toBe(false);
   });
 
-  it('returns valid for 429 (rate limited but key works)', async () => {
-    mockModelsList.mockRejectedValue({ status: 429, message: 'Rate limited' });
+  it('should return valid for 429 (rate limited but key works)', async () => {
+    mockList.mockRejectedValue({ status: 429, message: 'Rate limited' });
 
-    const res = await POST(createRequest({ apiKey: 'sk-ratelimited' }));
-    const data = await res.json();
+    const req = createMockRequest({ apiKey: 'sk-ratelimited' });
+    const response = await POST(req);
+    const data = await response.json();
 
+    expect(data.success).toBe(true);
     expect(data.valid).toBe(true);
   });
 
-  it('returns invalid for other OpenAI errors', async () => {
-    mockModelsList.mockRejectedValue({ status: 500, message: 'Server error' });
+  it('should return invalid for other OpenAI errors', async () => {
+    mockList.mockRejectedValue({ status: 500, message: 'Server error' });
 
-    const res = await POST(createRequest({ apiKey: 'sk-broken' }));
-    const data = await res.json();
+    const req = createMockRequest({ apiKey: 'sk-other' });
+    const response = await POST(req);
+    const data = await response.json();
 
+    expect(data.success).toBe(true);
     expect(data.valid).toBe(false);
   });
 
-  it('returns 500 on unexpected error', async () => {
-    const res = await POST(new NextRequest('http://localhost/api/user/settings/validate-key', {
+  it('should return 500 on unexpected error', async () => {
+    // Simulate JSON parse failure by sending invalid request
+    const req = new NextRequest(new URL('http://localhost:3000/api/user/settings/validate-key'), {
       method: 'POST',
       body: 'not json',
-    }));
-    expect(res.status).toBe(500);
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const response = await POST(req);
+    const data = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(data.valid).toBe(false);
   });
 });
