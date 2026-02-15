@@ -453,6 +453,275 @@ describe('OfferUp Scraper API', () => {
     });
   });
 
+    it('returns 401 when user is not authenticated', async () => {
+      const { getAuthUserId } = require('@/lib/auth-middleware');
+      (getAuthUserId as jest.Mock).mockResolvedValueOnce(null);
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'tampa-fl' }
+      );
+
+      const response = await POST(request);
+      expect(response.status).toBe(401);
+      const data = await response.json();
+      expect(data.error).toBe('Unauthorized');
+    });
+
+    it('rejects invalid location format', async () => {
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: '!!!invalid!!!' }
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.success).toBe(false);
+      expect(data.message).toContain('Invalid location format');
+    });
+
+    it('accepts custom location matching city-state pattern', async () => {
+      mockEvaluate.mockResolvedValue([]);
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'portland-or' }
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+    });
+
+    it('marks listings with low value score as NEW (not OPPORTUNITY)', async () => {
+      mockEstimateValue.mockReturnValue({
+        ...createDefaultEstimation(),
+        valueScore: 50,
+      });
+
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'Old TV',
+          price: '$50',
+          url: 'https://offerup.com/item/detail/333333333',
+          location: 'Tampa, FL',
+        },
+      ]);
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'tampa-fl' }
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(data.opportunitiesFound).toBe(0);
+      expect(mockUpsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          create: expect.objectContaining({ status: 'NEW' }),
+        })
+      );
+    });
+
+    it('handles listings without images', async () => {
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'No Image Item',
+          price: '$75',
+          url: 'https://offerup.com/item/detail/444444444',
+          location: 'Tampa, FL',
+          imageUrl: '',
+        },
+      ]);
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'tampa-fl' }
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(data.savedCount).toBe(1);
+    });
+
+    it('continues processing when individual listing fails', async () => {
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'Good Item',
+          price: '$100',
+          url: 'https://offerup.com/item/detail/555555555',
+          location: 'Tampa, FL',
+        },
+        {
+          title: 'Another Good Item',
+          price: '$200',
+          url: 'https://offerup.com/item/detail/666666666',
+          location: 'Tampa, FL',
+        },
+      ]);
+
+      // First upsert fails, second succeeds
+      mockUpsert
+        .mockRejectedValueOnce(new Error('DB error'))
+        .mockResolvedValueOnce({ id: 'listing-2' });
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'tampa-fl' }
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(data.success).toBe(true);
+      expect(data.savedCount).toBe(1); // Only the second one saved
+    });
+
+    it('handles Access Denied page as rate limited', async () => {
+      mockNewPage.mockResolvedValue({
+        goto: mockGoto,
+        waitForSelector: mockWaitForSelector,
+        evaluate: mockEvaluate,
+        content: jest.fn().mockResolvedValue('<html>Access Denied</html>'),
+      });
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'tampa-fl' }
+      );
+
+      const response = await POST(request);
+      expect(response.status).toBe(429);
+    });
+
+    it('handles "blocked" page as rate limited', async () => {
+      mockNewPage.mockResolvedValue({
+        goto: mockGoto,
+        waitForSelector: mockWaitForSelector,
+        evaluate: mockEvaluate,
+        content: jest.fn().mockResolvedValue('<html>You have been blocked</html>'),
+      });
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'tampa-fl' }
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(429);
+      expect(data.message).toContain('blocked');
+    });
+
+    it('extracts listing ID from alternative URL format', async () => {
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'Alt URL Item',
+          price: '$150',
+          url: 'https://offerup.com/listing/9876543/',
+          location: 'Tampa, FL',
+        },
+      ]);
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'tampa-fl' }
+      );
+
+      await POST(request);
+
+      expect(mockUpsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            platform_externalId_userId: expect.objectContaining({
+              externalId: '9876543',
+            }),
+          }),
+        })
+      );
+    });
+
+    it('falls back to full URL when no ID pattern matches', async () => {
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'Weird URL Item',
+          price: '$150',
+          url: 'https://offerup.com/item/detail/abc-no-digits',
+          location: 'Tampa, FL',
+        },
+      ]);
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'tampa-fl' }
+      );
+
+      await POST(request);
+
+      // extractListingId falls back to the full URL
+      expect(mockUpsert).toHaveBeenCalled();
+    });
+
+    it('handles waitForSelector timeout gracefully', async () => {
+      mockWaitForSelector.mockRejectedValue(new Error('Timeout'));
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'Slow Load Item',
+          price: '$100',
+          url: 'https://offerup.com/item/detail/777777777',
+          location: 'Tampa, FL',
+        },
+      ]);
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'tampa-fl' }
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      // Should still process results even if selector wait times out
+      expect(data.success).toBe(true);
+      expect(data.savedCount).toBe(1);
+    });
+
+    it('uses default category "all" when none provided', async () => {
+      mockEvaluate.mockResolvedValue([]);
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'tampa-fl' }
+      );
+
+      await POST(request);
+
+      expect(mockJobCreate).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          category: 'all',
+        }),
+      });
+    });
+
   describe('Price parsing', () => {
     it('parses standard dollar format', async () => {
       mockEvaluate.mockResolvedValue([
