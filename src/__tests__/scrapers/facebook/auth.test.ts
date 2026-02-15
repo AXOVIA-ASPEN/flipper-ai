@@ -102,6 +102,21 @@ describe('Facebook Authentication', () => {
       expect(result).toEqual(mockResponse);
       expect(result.expires_in).toBe(5184000);
     });
+
+    it('should throw error on failed long-lived token exchange', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        statusText: 'Bad Request',
+        json: async () => ({
+          error: { message: 'Invalid OAuth access token' },
+        }),
+      });
+
+      await expect(
+        exchangeForLongLivedToken(mockConfig, 'bad-token')
+      ).rejects.toThrow('Invalid OAuth access token');
+    });
   });
 
   describe('verifyAccessToken', () => {
@@ -125,6 +140,37 @@ describe('Facebook Authentication', () => {
       expect(result.isValid).toBe(true);
       expect(result.userId).toBe('test-user-id');
       expect(result.appId).toBe('test-app-id');
+    });
+
+    it('should return invalid for expired/invalid token', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: {
+            is_valid: false,
+            app_id: '',
+            user_id: '',
+            expires_at: 0,
+          },
+        }),
+      });
+
+      const result = await verifyAccessToken('expired-token');
+
+      expect(result.isValid).toBe(false);
+    });
+
+    it('should handle fetch failure during verification', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+        json: async () => ({
+          error: { message: 'Service unavailable' },
+        }),
+      });
+
+      await expect(verifyAccessToken('test-token')).rejects.toThrow();
     });
   });
 
@@ -184,6 +230,32 @@ describe('Facebook Authentication', () => {
 
       await expect(revokeAccessToken('test-token')).resolves.not.toThrow();
     });
+
+    it('should throw error when revocation fails', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        statusText: 'Bad Request',
+      });
+
+      await expect(revokeAccessToken('bad-token')).rejects.toThrow(
+        'Token revocation failed: Bad Request'
+      );
+    });
+
+    it('should call DELETE on the correct Facebook endpoint', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true }),
+      });
+
+      await revokeAccessToken('my-token');
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://graph.facebook.com/v18.0/me/permissions?access_token=my-token',
+        { method: 'DELETE' }
+      );
+    });
   });
 
   describe('calculateExpirationTimestamp', () => {
@@ -212,6 +284,18 @@ describe('Facebook Authentication', () => {
     it('should return false if token has plenty of time left', () => {
       const futureTime = Math.floor(Date.now() / 1000) + 604800; // 1 week from now
       expect(isTokenExpiring(futureTime, 86400)).toBe(false); // 1 day buffer
+    });
+
+    it('should use default 24-hour buffer when not specified', () => {
+      // Token expires in 12 hours — within default 24h buffer
+      const expiringTime = Math.floor(Date.now() / 1000) + 43200;
+      expect(isTokenExpiring(expiringTime)).toBe(true);
+    });
+
+    it('should return true when token expires exactly at buffer boundary', () => {
+      const now = Math.floor(Date.now() / 1000);
+      // Token expires exactly at buffer time — (expiresAt - now) == bufferSeconds → returns true (<=)
+      expect(isTokenExpiring(now + 100, 100)).toBe(true);
     });
   });
 });
