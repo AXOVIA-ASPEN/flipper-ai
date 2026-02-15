@@ -396,7 +396,8 @@ export const ModelName = {
   UserSettings: 'UserSettings',
   FacebookToken: 'FacebookToken',
   Message: 'Message',
-  AiAnalysisCache: 'AiAnalysisCache'
+  AiAnalysisCache: 'AiAnalysisCache',
+  PostingQueueItem: 'PostingQueueItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -412,7 +413,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "listing" | "opportunity" | "scraperJob" | "searchConfig" | "priceHistory" | "user" | "account" | "session" | "verificationToken" | "userSettings" | "facebookToken" | "message" | "aiAnalysisCache"
+    modelProps: "listing" | "opportunity" | "scraperJob" | "searchConfig" | "priceHistory" | "user" | "account" | "session" | "verificationToken" | "userSettings" | "facebookToken" | "message" | "aiAnalysisCache" | "postingQueueItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1378,6 +1379,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PostingQueueItem: {
+      payload: Prisma.$PostingQueueItemPayload<ExtArgs>
+      fields: Prisma.PostingQueueItemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PostingQueueItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PostingQueueItemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PostingQueueItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PostingQueueItemPayload>
+        }
+        findFirst: {
+          args: Prisma.PostingQueueItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PostingQueueItemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PostingQueueItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PostingQueueItemPayload>
+        }
+        findMany: {
+          args: Prisma.PostingQueueItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PostingQueueItemPayload>[]
+        }
+        create: {
+          args: Prisma.PostingQueueItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PostingQueueItemPayload>
+        }
+        createMany: {
+          args: Prisma.PostingQueueItemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PostingQueueItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PostingQueueItemPayload>[]
+        }
+        delete: {
+          args: Prisma.PostingQueueItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PostingQueueItemPayload>
+        }
+        update: {
+          args: Prisma.PostingQueueItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PostingQueueItemPayload>
+        }
+        deleteMany: {
+          args: Prisma.PostingQueueItemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PostingQueueItemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PostingQueueItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PostingQueueItemPayload>[]
+        }
+        upsert: {
+          args: Prisma.PostingQueueItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PostingQueueItemPayload>
+        }
+        aggregate: {
+          args: Prisma.PostingQueueItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePostingQueueItem>
+        }
+        groupBy: {
+          args: Prisma.PostingQueueItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PostingQueueItemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PostingQueueItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PostingQueueItemCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1658,6 +1733,29 @@ export const AiAnalysisCacheScalarFieldEnum = {
 export type AiAnalysisCacheScalarFieldEnum = (typeof AiAnalysisCacheScalarFieldEnum)[keyof typeof AiAnalysisCacheScalarFieldEnum]
 
 
+export const PostingQueueItemScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  listingId: 'listingId',
+  targetPlatform: 'targetPlatform',
+  status: 'status',
+  askingPrice: 'askingPrice',
+  title: 'title',
+  description: 'description',
+  externalPostId: 'externalPostId',
+  externalPostUrl: 'externalPostUrl',
+  errorMessage: 'errorMessage',
+  retryCount: 'retryCount',
+  maxRetries: 'maxRetries',
+  scheduledAt: 'scheduledAt',
+  postedAt: 'postedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PostingQueueItemScalarFieldEnum = (typeof PostingQueueItemScalarFieldEnum)[keyof typeof PostingQueueItemScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1822,6 +1920,7 @@ export type GlobalOmitConfig = {
   facebookToken?: Prisma.FacebookTokenOmit
   message?: Prisma.MessageOmit
   aiAnalysisCache?: Prisma.AiAnalysisCacheOmit
+  postingQueueItem?: Prisma.PostingQueueItemOmit
 }
 
 /* Types for Logging */

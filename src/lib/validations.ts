@@ -118,6 +118,49 @@ export type ValidationResult<T> =
   | { success: true; data: T }
   | { success: false; error: string; details: z.ZodError };
 
+// ---------------------------------------------------------------------------
+// Posting Queue
+// ---------------------------------------------------------------------------
+
+export const PostingStatusEnum = z.enum([
+  'PENDING',
+  'IN_PROGRESS',
+  'POSTED',
+  'FAILED',
+  'CANCELLED',
+]);
+
+export const PostingQueueQuerySchema = PaginationSchema.extend({
+  status: PostingStatusEnum.optional(),
+  targetPlatform: PlatformEnum.optional(),
+  listingId: z.string().optional(),
+});
+
+export const CreatePostingQueueItemSchema = z.object({
+  listingId: z.string().min(1),
+  targetPlatform: PlatformEnum,
+  askingPrice: z.number().positive().optional(),
+  title: z.string().max(200).optional(),
+  description: z.string().max(5000).optional(),
+  scheduledAt: z.string().datetime().optional(),
+});
+
+export const CreatePostingQueueBatchSchema = z.object({
+  listingId: z.string().min(1),
+  platforms: z.array(PlatformEnum).min(1).max(5),
+  askingPrice: z.number().positive().optional(),
+  title: z.string().max(200).optional(),
+  description: z.string().max(5000).optional(),
+});
+
+export const UpdatePostingQueueItemSchema = z.object({
+  status: PostingStatusEnum.optional(),
+  askingPrice: z.number().positive().optional(),
+  title: z.string().max(200).optional(),
+  description: z.string().max(5000).optional(),
+  scheduledAt: z.string().datetime().nullable().optional(),
+});
+
 export function validateBody<T>(schema: z.ZodSchema<T>, data: unknown): ValidationResult<T> {
   const result = schema.safeParse(data);
   if (result.success) {

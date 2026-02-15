@@ -63,7 +63,8 @@ export const ModelName = {
   UserSettings: 'UserSettings',
   FacebookToken: 'FacebookToken',
   Message: 'Message',
-  AiAnalysisCache: 'AiAnalysisCache'
+  AiAnalysisCache: 'AiAnalysisCache',
+  PostingQueueItem: 'PostingQueueItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -321,6 +322,29 @@ export const AiAnalysisCacheScalarFieldEnum = {
 } as const
 
 export type AiAnalysisCacheScalarFieldEnum = (typeof AiAnalysisCacheScalarFieldEnum)[keyof typeof AiAnalysisCacheScalarFieldEnum]
+
+
+export const PostingQueueItemScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  listingId: 'listingId',
+  targetPlatform: 'targetPlatform',
+  status: 'status',
+  askingPrice: 'askingPrice',
+  title: 'title',
+  description: 'description',
+  externalPostId: 'externalPostId',
+  externalPostUrl: 'externalPostUrl',
+  errorMessage: 'errorMessage',
+  retryCount: 'retryCount',
+  maxRetries: 'maxRetries',
+  scheduledAt: 'scheduledAt',
+  postedAt: 'postedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PostingQueueItemScalarFieldEnum = (typeof PostingQueueItemScalarFieldEnum)[keyof typeof PostingQueueItemScalarFieldEnum]
 
 
 export const SortOrder = {

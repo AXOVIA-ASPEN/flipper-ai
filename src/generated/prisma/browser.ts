@@ -82,3 +82,8 @@ export type Message = Prisma.MessageModel
  * 
  */
 export type AiAnalysisCache = Prisma.AiAnalysisCacheModel
+/**
+ * Model PostingQueueItem
+ * 
+ */
+export type PostingQueueItem = Prisma.PostingQueueItemModel

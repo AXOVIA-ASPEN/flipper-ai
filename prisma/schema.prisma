@@ -93,6 +93,7 @@ model Listing {
   // Relations
   opportunity     Opportunity?
   messages        Message[]
+  postingQueue    PostingQueueItem[]
 
   // Indexes
   @@unique([platform, externalId, userId])
@@ -220,6 +221,7 @@ model User {
   scraperJobs     ScraperJob[]
   searchConfigs   SearchConfig[]
   messages        Message[]
+  postingQueue    PostingQueueItem[]
 }
 
 // NextAuth.js Account model (for OAuth providers)
@@ -334,4 +336,34 @@ model AiAnalysisCache {
 
   @@index([listingId])
   @@index([expiresAt])
+}
+
+// Multi-platform posting queue for cross-posting listings
+// PostingStatus values: PENDING, IN_PROGRESS, POSTED, FAILED, CANCELLED
+model PostingQueueItem {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId       String    // Source listing to cross-post
+  listing         Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  targetPlatform  String    // Platform to post to: EBAY, FACEBOOK_MARKETPLACE, OFFERUP, MERCARI, CRAIGSLIST
+  status          String    @default("PENDING") // PENDING, IN_PROGRESS, POSTED, FAILED, CANCELLED
+  askingPrice     Float?    // Override price for this platform (null = use listing price)
+  title           String?   // Override title for this platform
+  description     String?   // Override description for this platform
+  externalPostId  String?   // ID of the created post on the target platform
+  externalPostUrl String?   // URL of the created post
+  errorMessage    String?   // Last error message if failed
+  retryCount      Int       @default(0)
+  maxRetries      Int       @default(3)
+  scheduledAt     DateTime? // When to post (null = ASAP)
+  postedAt        DateTime? // When actually posted
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([listingId, targetPlatform, userId])
+  @@index([userId])
+  @@index([status])
+  @@index([targetPlatform])
+  @@index([scheduledAt])
 }
