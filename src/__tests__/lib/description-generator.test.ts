@@ -226,7 +226,7 @@ describe('description-generator', () => {
       process.env.OPENAI_API_KEY = 'test-key';
       (OpenAI as unknown as jest.Mock).mockImplementation(() => ({
         chat: { completions: { create: jest.fn().mockResolvedValue({
-          choices: [{ message: { content: 'Great item, no wear mentioned, no shipping info.' } }],
+          choices: [{ message: { content: 'Great item available now. Grab it before it is gone!' } }],
         }) } },
       }));
 
