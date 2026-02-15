@@ -1,0 +1,70 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e5]:
+      - img [ref=e7]
+      - generic [ref=e10]:
+        - paragraph [ref=e11]: Avg. Profit
+        - paragraph [ref=e12]: $127/flip
+    - generic [ref=e15]:
+      - img [ref=e17]
+      - generic [ref=e20]:
+        - paragraph [ref=e21]: Success Rate
+        - paragraph [ref=e22]: 94%
+    - generic [ref=e25]:
+      - img [ref=e27]
+      - generic [ref=e32]:
+        - paragraph [ref=e33]: AI Powered
+        - paragraph [ref=e34]: 100%
+    - generic [ref=e35]:
+      - generic [ref=e36]:
+        - generic [ref=e37]:
+          - link "Flipper.ai" [ref=e38] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e39]:
+              - img [ref=e41]
+              - generic [ref=e44]: Flipper.ai
+          - heading "Welcome back" [level=1] [ref=e45]
+          - paragraph [ref=e46]: Sign in to find your next profitable flip
+        - generic [ref=e47]:
+          - button "Continue with Google" [ref=e48]:
+            - img [ref=e49]
+            - generic [ref=e54]: Continue with Google
+          - button "Continue with GitHub" [ref=e55]:
+            - img [ref=e56]
+            - generic [ref=e58]: Continue with GitHub
+        - generic [ref=e64]: or continue with email
+        - generic [ref=e65]:
+          - generic [ref=e66]:
+            - generic [ref=e67]: Email address
+            - generic [ref=e68]:
+              - generic:
+                - img
+              - textbox "you@example.com" [ref=e69]
+          - generic [ref=e70]:
+            - generic [ref=e71]: Password
+            - generic [ref=e72]:
+              - generic:
+                - img
+              - textbox "Enter your password" [ref=e73]
+              - button [ref=e74]:
+                - img [ref=e75]
+          - button "Sign in" [ref=e78]:
+            - generic [ref=e79]: Sign in
+            - img [ref=e80]
+        - paragraph [ref=e83]:
+          - text: Don't have an account?
+          - link "Create one free" [ref=e84] [cursor=pointer]:
+            - /url: /register
+      - paragraph [ref=e85]: Powered by AI to maximize your flipping profits
+  - button "Open Next.js Dev Tools" [ref=e91] [cursor=pointer]:
+    - generic [ref=e94]:
+      - text: Compiling
+      - generic [ref=e95]:
+        - generic [ref=e96]: .
+        - generic [ref=e97]: .
+        - generic [ref=e98]: .
+  - alert [ref=e99]
+```
