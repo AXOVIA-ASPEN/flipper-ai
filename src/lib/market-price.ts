@@ -116,6 +116,7 @@ export async function fetchMarketPrice(
       });
 
     // Extract sold listings
+    // istanbul ignore next -- runs in browser context, not instrumentable by Jest
     const listings = await page.evaluate(() => {
       const items: Array<{
         title: string;
