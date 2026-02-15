@@ -1,5 +1,79 @@
 # Flipper AI — Deployment Guide
 
+## Deployment Options
+
+| Method | Best For | Cost |
+|--------|----------|------|
+| **Vercel** (recommended) | Production, auto-scaling, preview deploys | Free tier available |
+| **Docker** | Self-hosted, full control | Your infra costs |
+
+---
+
+## Quick Start (Vercel) — Recommended
+
+### 1. Prerequisites
+- [Vercel account](https://vercel.com)
+- GitHub repo connected to Vercel
+- PostgreSQL database (Neon, Supabase, or PlanetScale recommended)
+
+### 2. Initial Setup
+```bash
+# Install Vercel CLI
+pnpm add -g vercel
+
+# Link project
+vercel link
+
+# Note your org and project IDs from .vercel/project.json
+```
+
+### 3. Environment Variables
+Set these in Vercel Dashboard → Settings → Environment Variables:
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | ✅ | PostgreSQL connection string |
+| `AUTH_SECRET` | ✅ | `openssl rand -base64 32` |
+| `ENCRYPTION_SECRET` | ✅ | `openssl rand -base64 32` |
+| `NEXTAUTH_URL` | ✅ | Your production URL |
+| `ANTHROPIC_API_KEY` | ✅ | For AI analysis features |
+| `EBAY_APP_ID` | ⬚ | eBay marketplace integration |
+| `EBAY_CERT_ID` | ⬚ | eBay marketplace integration |
+
+### 4. GitHub Actions Secrets
+Add to repo Settings → Secrets → Actions:
+- `VERCEL_TOKEN` — From [Vercel Tokens](https://vercel.com/account/tokens)
+- `VERCEL_ORG_ID` — From `.vercel/project.json`
+- `VERCEL_PROJECT_ID` — From `.vercel/project.json`
+
+### 5. Deploy
+```bash
+# Preview deploy
+vercel
+
+# Production deploy
+vercel --prod
+```
+
+### 6. Custom Domain
+```bash
+vercel domains add flipper-ai.com
+```
+Then update DNS records as shown in Vercel dashboard.
+
+### Automatic Deployments
+- **Push to `main`** → Production deploy
+- **Pull Request** → Preview deploy with unique URL (commented on PR)
+
+### Vercel Configuration
+See `vercel.json` for:
+- Security headers (HSTS, CSP, X-Frame-Options)
+- API route caching policies
+- Serverless function timeouts (30s max)
+- Health check rewrite (`/health` → `/api/health`)
+
+---
+
 ## Quick Start (Docker)
 
 ```bash
