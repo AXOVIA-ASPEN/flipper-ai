@@ -4,6 +4,7 @@ import { ScraperPage } from '../pages/ScraperPage';
 import { OpportunitiesPage } from '../pages/OpportunitiesPage';
 import { AuthPage } from '../pages/AuthPage';
 import { SettingsPage } from '../pages/SettingsPage';
+import { MessagesPage } from '../pages/MessagesPage';
 import { MockAPIHelper } from './api-mocks';
 
 type Fixtures = {
@@ -12,6 +13,7 @@ type Fixtures = {
   opportunitiesPage: OpportunitiesPage;
   authPage: AuthPage;
   settingsPage: SettingsPage;
+  messagesPage: MessagesPage;
   mockAPI: MockAPIHelper;
 };
 
@@ -30,6 +32,9 @@ export const test = base.extend<Fixtures>({
   },
   settingsPage: async ({ page }, use) => {
     await use(new SettingsPage(page));
+  },
+  messagesPage: async ({ page }, use) => {
+    await use(new MessagesPage(page));
   },
   mockAPI: async ({ page }, use) => {
     await use(new MockAPIHelper(page));
