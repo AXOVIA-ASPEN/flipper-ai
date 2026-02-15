@@ -40,7 +40,7 @@ export async function PATCH(
     const body = await request.json();
 
     // Calculate actualProfit if purchasePrice, resalePrice, and fees are provided
-    let updateData = { ...body };
+    const updateData = { ...body };
     if (
       body.purchasePrice !== undefined &&
       body.resalePrice !== undefined

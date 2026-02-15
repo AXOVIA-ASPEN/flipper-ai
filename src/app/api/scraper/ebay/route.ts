@@ -306,7 +306,7 @@ async function storePriceHistoryRecords(
     .filter(Boolean);
 
   if (!data.length) return 0;
-
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (prisma.priceHistory.createMany as any)({
     data,
     skipDuplicates: true,

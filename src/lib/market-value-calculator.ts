@@ -62,7 +62,7 @@ export async function calculateVerifiedMarketValue(
   }
 
   // Extract prices
-  let prices = soldListings.map((listing) => listing.soldPrice);
+  const prices = soldListings.map((listing) => listing.soldPrice);
   const originalCount = prices.length;
 
   // Remove outliers using IQR method

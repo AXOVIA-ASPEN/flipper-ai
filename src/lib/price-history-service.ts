@@ -44,6 +44,7 @@ export async function fetchAndStorePriceHistory(
   }));
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (prisma.priceHistory.createMany as any)({
       data: priceRecords,
       skipDuplicates: true,

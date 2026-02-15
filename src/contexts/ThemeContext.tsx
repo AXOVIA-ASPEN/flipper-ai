@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { Theme, themes, defaultTheme } from "@/lib/theme-config";
 
 interface ThemeContextType {
@@ -12,15 +12,15 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(defaultTheme);
-
-  // Load theme from localStorage on mount
-  useEffect(() => {
-    const savedThemeId = localStorage.getItem("flipper-theme");
-    if (savedThemeId && themes[savedThemeId]) {
-      setThemeState(themes[savedThemeId]);
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window !== "undefined") {
+      const savedThemeId = localStorage.getItem("flipper-theme");
+      if (savedThemeId && themes[savedThemeId]) {
+        return themes[savedThemeId];
+      }
     }
-  }, []);
+    return defaultTheme;
+  });
 
   const setTheme = (themeId: string) => {
     if (themes[themeId]) {

@@ -95,7 +95,7 @@ const DIFFICULTY_LABELS: Record<number, "VERY_EASY" | "EASY" | "MODERATE" | "HAR
 // Generate search query for a product
 function generateSearchQuery(title: string): string {
   const fillerWords = /\b(the|a|an|and|or|for|with|in|on|at|to|of|is|it|this|that|will|can|be|has|have|was|are|were|just|very|really|new|used|great|good|nice|excellent|condition)\b/gi;
-  let query = title.replace(fillerWords, " ").replace(/\s+/g, " ").trim();
+  const query = title.replace(fillerWords, " ").replace(/\s+/g, " ").trim();
   const words = query.split(" ").filter((w) => w.length > 2).slice(0, 6);
   return words.join(" ");
 }
