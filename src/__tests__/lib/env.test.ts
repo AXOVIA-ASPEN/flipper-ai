@@ -117,6 +117,39 @@ describe('Environment Configuration', () => {
     });
   });
 
+  describe('validation error handling', () => {
+    it('should throw in non-test env when required vars missing', () => {
+      process.env.NODE_ENV = 'production';
+      delete process.env.DATABASE_URL;
+      delete process.env.AUTH_SECRET;
+      delete process.env.ENCRYPTION_SECRET;
+
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+      expect(() => {
+        require('@/lib/env');
+      }).toThrow('Invalid environment configuration');
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Invalid environment variables')
+      );
+      consoleSpy.mockRestore();
+    });
+
+    it('should recover in test env when validation fails with bad values', () => {
+      process.env.NODE_ENV = 'test';
+      process.env.ENCRYPTION_SECRET = 'short'; // Too short, < 16 chars
+
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+      const { env } = require('@/lib/env');
+
+      // Should recover with defaults
+      expect(env.ENCRYPTION_SECRET).toBe('test-encryption-secret-min16');
+      consoleSpy.mockRestore();
+    });
+  });
+
   describe('environment helpers', () => {
     it('isProduction returns false in test', () => {
       const { isProduction } = require('@/lib/env');

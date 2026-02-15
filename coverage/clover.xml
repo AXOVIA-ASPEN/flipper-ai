@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1771119186438" clover="3.2.0">
-  <project timestamp="1771119186438" name="All files">
-    <metrics statements="850" coveredstatements="833" conditionals="613" coveredconditionals="566" methods="132" coveredmethods="128" elements="1595" coveredelements="1527" complexity="0" loc="850" ncloc="850" packages="1" files="16" classes="16"/>
+<coverage generated="1771119444775" clover="3.2.0">
+  <project timestamp="1771119444775" name="All files">
+    <metrics statements="879" coveredstatements="862" conditionals="644" coveredconditionals="596" methods="141" coveredmethods="137" elements="1664" coveredelements="1595" complexity="0" loc="879" ncloc="879" packages="1" files="17" classes="17"/>
     <file name="api-security.ts" path="/home/ubuntu/.openclaw/workspace/projects/flipper-ai/src/lib/api-security.ts">
       <metrics statements="45" coveredstatements="45" conditionals="53" coveredconditionals="50" methods="6" coveredmethods="6"/>
       <line num="5" count="1" type="stmt"/>
@@ -269,6 +269,38 @@
       <line num="107" count="5" type="stmt"/>
       <line num="109" count="5" type="stmt"/>
       <line num="111" count="0" type="stmt"/>
+    </file>
+    <file name="env.ts" path="/home/ubuntu/.openclaw/workspace/projects/flipper-ai/src/lib/env.ts">
+      <metrics statements="29" coveredstatements="29" conditionals="31" coveredconditionals="30" methods="9" coveredmethods="9"/>
+      <line num="12" count="18" type="stmt"/>
+      <line num="14" count="18" type="stmt"/>
+      <line num="43" count="19" type="cond" truecount="2" falsecount="0"/>
+      <line num="44" count="19" type="cond" truecount="2" falsecount="0"/>
+      <line num="45" count="19" type="cond" truecount="2" falsecount="0"/>
+      <line num="62" count="18" type="stmt"/>
+      <line num="64" count="18" type="stmt"/>
+      <line num="74" count="18" type="stmt"/>
+      <line num="76" count="18" type="cond" truecount="2" falsecount="0"/>
+      <line num="77" count="2" type="stmt"/>
+      <line num="78" count="2" type="stmt"/>
+      <line num="79" count="4" type="cond" truecount="3" falsecount="1"/>
+      <line num="82" count="2" type="stmt"/>
+      <line num="84" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="85" count="1" type="stmt"/>
+      <line num="89" count="1" type="stmt"/>
+      <line num="97" count="16" type="stmt"/>
+      <line num="101" count="18" type="stmt"/>
+      <line num="104" count="18" type="stmt"/>
+      <line num="105" count="6" type="cond" truecount="3" falsecount="0"/>
+      <line num="107" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="109" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="111" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="116" count="18" type="stmt"/>
+      <line num="117" count="1" type="stmt"/>
+      <line num="121" count="18" type="stmt"/>
+      <line num="122" count="1" type="stmt"/>
+      <line num="126" count="18" type="stmt"/>
+      <line num="127" count="1" type="stmt"/>
     </file>
     <file name="image-service.ts" path="/home/ubuntu/.openclaw/workspace/projects/flipper-ai/src/lib/image-service.ts">
       <metrics statements="122" coveredstatements="114" conditionals="55" coveredconditionals="44" methods="20" coveredmethods="18"/>
