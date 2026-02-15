@@ -67,7 +67,7 @@ export function validateApiKey(request: NextRequest): boolean {
   const apiKey = request.headers.get("x-api-key");
   if (!apiKey) return false;
 
-  const validKeys = (process.env.FLIPPER_API_KEYS ?? "").split(",").filter(Boolean);
+  const validKeys = (process.env.FLIPPER_API_KEYS ?? "").split(",").map(k => k.trim()).filter(Boolean);
   return validKeys.includes(apiKey);
 }
 
