@@ -118,13 +118,7 @@ Given(
   }
 );
 
-Given('I have notifications enabled', async function (this: CustomWorld) {
-  // Grant notification permission in test context
-  await this.page.evaluate(() => {
-    (window as any).__notificationPermission = 'granted';
-  });
-  console.log('✅ Notifications enabled');
-});
+// NOTE: 'I have notifications enabled' is defined in notifications-monitoring.steps.ts
 
 When(
   'a new listing appears with flippability score > {int}',

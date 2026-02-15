@@ -19,20 +19,7 @@ When('I visit the landing page', async function (this: CustomWorld) {
   console.log('✅ Visited landing page');
 });
 
-When('I click {string}', async function (this: CustomWorld, buttonText: string) {
-  // Try button first, then link, then any clickable with that text
-  const button = this.page.getByRole('button', { name: new RegExp(buttonText, 'i') });
-  const link = this.page.getByRole('link', { name: new RegExp(buttonText, 'i') });
-
-  if (await button.isVisible().catch(() => false)) {
-    await button.click();
-  } else if (await link.isVisible().catch(() => false)) {
-    await link.click();
-  } else {
-    await this.page.locator(`text=${buttonText}`).first().click();
-  }
-  console.log(`✅ Clicked "${buttonText}"`);
-});
+// NOTE: 'I click {string}' is defined in common-steps.ts — do not duplicate here
 
 Then('I should see a registration form', async function (this: CustomWorld) {
   await this.page.waitForURL(/register|signup/i, { timeout: 5000 }).catch(() => {});
@@ -165,16 +152,7 @@ Then('I should see my dashboard', async function (this: CustomWorld) {
 
 // ==================== TIER LIMITATIONS ====================
 
-Given('I am on the free tier', async function (this: CustomWorld) {
-  this.testData.tier = 'free';
-  this.testData.scansUsed = 0;
-  console.log('✅ On free tier');
-});
-
-Given('I have used {int} scans today', async function (this: CustomWorld, scans: number) {
-  this.testData.scansUsed = scans;
-  console.log(`✅ Used ${scans} scans today`);
-});
+// NOTE: 'I am on the free tier' and 'I have used {int} scans today' are defined in marketplace-scanning.steps.ts — do not duplicate here
 
 When('I try to start scan #{int}', async function (this: CustomWorld, scanNumber: number) {
   // Mock the scan API to return a tier limit error
@@ -311,16 +289,7 @@ When('I navigate to Account Settings', async function (this: CustomWorld) {
   console.log('✅ Navigated to Account Settings');
 });
 
-Then('I should see:', async function (this: CustomWorld, dataTable: any) {
-  const rows = dataTable.hashes();
-  for (const row of rows) {
-    const field = Object.keys(row)[0];
-    const value = row[field];
-    console.log(`  📋 ${field}: ${value}`);
-  }
-  await this.screenshot('subscription-details');
-  console.log('✅ Subscription details verified');
-});
+// NOTE: 'I should see:' is defined in resale-listing.steps.ts
 
 Then('I should have options to:', async function (this: CustomWorld, dataTable: any) {
   const rows = dataTable.hashes();
@@ -405,29 +374,22 @@ When('I check my available features', async function (this: CustomWorld) {
   );
 });
 
-Then('I should have to {string}', async function (this: CustomWorld, feature: string) {
-  const hasFeature = this.testData.availableFeatures?.includes(feature);
-  expect(hasFeature).toBeTruthy();
-  console.log(`✅ Has access to "${feature}"`);
-});
-
-Then('I should not have to {string}', async function (this: CustomWorld, feature: string) {
-  const hasFeature = this.testData.availableFeatures?.includes(feature);
-  expect(hasFeature).toBeFalsy();
-  console.log(`✅ No access to "${feature}" (expected)`);
-});
-
-// Handle the Scenario Outline phrasing
+// Handles "I should have to X"
 Then(
-  'I should {word} to {string}',
-  async function (this: CustomWorld, access: string, feature: string) {
+  'I should have to {string}',
+  async function (this: CustomWorld, feature: string) {
     const hasFeature = this.testData.availableFeatures?.includes(feature);
-    if (access === 'have') {
-      expect(hasFeature).toBeTruthy();
-      console.log(`✅ Has access to "${feature}"`);
-    } else {
-      expect(hasFeature).toBeFalsy();
-      console.log(`✅ No access to "${feature}" (expected for tier)`);
-    }
+    expect(hasFeature).toBeTruthy();
+    console.log(`✅ Has access to "${feature}"`);
+  }
+);
+
+// Handles "I should not have to X"
+Then(
+  'I should not have to {string}',
+  async function (this: CustomWorld, feature: string) {
+    const hasFeature = this.testData.availableFeatures?.includes(feature);
+    expect(hasFeature).toBeFalsy();
+    console.log(`✅ No access to "${feature}" (expected for tier)`);
   }
 );

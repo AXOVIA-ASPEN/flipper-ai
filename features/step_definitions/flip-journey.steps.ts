@@ -449,10 +449,7 @@ When('a buyer sends an offer of {string}', async function (this: CustomWorld, am
   await this.screenshot('buyer-offer-received');
 });
 
-Then('I should receive a notification', async function (this: CustomWorld) {
-  await this.page.waitForSelector('[data-testid="notification"]', { timeout: 5000 });
-  await this.screenshot('notification-received');
-});
+// NOTE: 'I should receive a notification' is defined in notifications-monitoring.steps.ts
 
 Then('I should see the offer in my dashboard', async function (this: CustomWorld) {
   const offer = this.page.locator('[data-testid="offer-card"]');

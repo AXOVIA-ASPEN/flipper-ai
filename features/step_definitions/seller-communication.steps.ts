@@ -409,43 +409,12 @@ Then('the event should include:', async function (this: CustomWorld, dataTable) 
 });
 
 // ==================== LISTING MONITORING ====================
-
-Given('I am negotiating with a seller', async function (this: CustomWorld) {
-  this.negotiationActive = true;
-  this.currentOpportunity = {
-    ...this.currentOpportunity,
-    status: 'negotiating',
-  };
-
-  console.log('✅ Negotiation active');
-});
+// NOTE: 'I am negotiating with a seller', 'the listing status changes to {string}',
+// and 'I should receive an urgent notification' are defined in notifications-monitoring.steps.ts
 
 Given('the listing is still active on the marketplace', async function (this: CustomWorld) {
   this.listingActive = true;
   console.log('✅ Listing active');
-});
-
-When(
-  'the listing status changes to {string}',
-  async function (this: CustomWorld, newStatus: string) {
-    // Simulate status change event
-    await this.page.evaluate((status) => {
-      const event = new CustomEvent('listingStatusChange', {
-        detail: { status },
-      });
-      window.dispatchEvent(event);
-    }, newStatus);
-
-    await this.page.waitForTimeout(1000);
-  }
-);
-
-Then('I should receive an urgent notification', async function (this: CustomWorld) {
-  const notification = this.page.locator('[data-testid="urgent-notification"]');
-  await expect(notification).toBeVisible({ timeout: 5000 });
-
-  console.log('✅ Urgent notification received');
-  await this.screenshot('urgent-notification');
 });
 
 Then(

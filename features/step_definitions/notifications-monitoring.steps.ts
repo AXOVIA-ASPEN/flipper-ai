@@ -321,13 +321,7 @@ Then('unread notifications should be marked with a dot', async function (this: C
   console.log('✅ Unread indicators present');
 });
 
-Then('I should be able to:', async function (this: CustomWorld, dataTable: any) {
-  const rows = dataTable.hashes();
-  for (const row of rows) {
-    console.log(`  🔘 ${row['Action']}: ${row['Outcome']}`);
-  }
-  console.log('✅ Notification actions verified');
-});
+// NOTE: 'I should be able to:' is defined in dashboard-tracking.steps.ts
 
 // ==================== QUIET HOURS ====================
 
