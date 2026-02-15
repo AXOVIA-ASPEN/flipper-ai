@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
         { status: 400 }
       );
     }
-    const { status, limit, offset } = parsed.data;
+    const { status, limit, offset, platform, minScore, maxScore, minProfit, maxProfit } = parsed.data;
 
     const where: Record<string, unknown> = {};
 
@@ -32,6 +32,32 @@ export async function GET(request: NextRequest) {
 
     if (status) {
       where.status = status;
+    }
+
+    // Filter by platform (via related listing)
+    const listingWhere: Record<string, unknown> = {};
+    if (platform) {
+      listingWhere.platform = platform;
+    }
+
+    // Filter by valueScore on the related listing
+    if (minScore !== undefined || maxScore !== undefined) {
+      const scoreFilter: Record<string, number> = {};
+      if (minScore !== undefined) scoreFilter.gte = minScore;
+      if (maxScore !== undefined) scoreFilter.lte = maxScore;
+      listingWhere.valueScore = scoreFilter;
+    }
+
+    // Filter by profitPotential on the related listing
+    if (minProfit !== undefined || maxProfit !== undefined) {
+      const profitFilter: Record<string, number> = {};
+      if (minProfit !== undefined) profitFilter.gte = minProfit;
+      if (maxProfit !== undefined) profitFilter.lte = maxProfit;
+      listingWhere.profitPotential = profitFilter;
+    }
+
+    if (Object.keys(listingWhere).length > 0) {
+      where.listing = listingWhere;
     }
 
     const [opportunities, total, stats] = await Promise.all([

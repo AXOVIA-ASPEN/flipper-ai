@@ -36,6 +36,11 @@ export const OpportunityStatusEnum = z.enum([
 
 export const OpportunityQuerySchema = PaginationSchema.extend({
   status: OpportunityStatusEnum.optional(),
+  platform: PlatformEnum.optional(),
+  minScore: z.coerce.number().min(0).max(100).optional(),
+  maxScore: z.coerce.number().min(0).max(100).optional(),
+  minProfit: z.coerce.number().optional(),
+  maxProfit: z.coerce.number().optional(),
 });
 
 export const CreateOpportunitySchema = z.object({

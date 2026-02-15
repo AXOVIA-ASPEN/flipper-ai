@@ -137,6 +137,102 @@ describe('Opportunities API', () => {
       expect(response.status).toBe(500);
       expect(data.error).toBe('Failed to fetch opportunities');
     });
+
+    it('should filter by platform via listing relation', async () => {
+      mockFindMany.mockResolvedValue([]);
+      mockCount.mockResolvedValue(0);
+      mockAggregate.mockResolvedValue({
+        _sum: { actualProfit: 0, purchasePrice: 0, resalePrice: 0 },
+        _count: 0,
+      });
+
+      const request = createMockRequest('GET', '/api/opportunities?platform=EBAY');
+      const response = await GET(request);
+
+      expect(response.status).toBe(200);
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            listing: expect.objectContaining({ platform: 'EBAY' }),
+          }),
+        })
+      );
+    });
+
+    it('should filter by minScore and maxScore', async () => {
+      mockFindMany.mockResolvedValue([]);
+      mockCount.mockResolvedValue(0);
+      mockAggregate.mockResolvedValue({
+        _sum: { actualProfit: 0, purchasePrice: 0, resalePrice: 0 },
+        _count: 0,
+      });
+
+      const request = createMockRequest('GET', '/api/opportunities?minScore=50&maxScore=90');
+      const response = await GET(request);
+
+      expect(response.status).toBe(200);
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            listing: expect.objectContaining({
+              valueScore: { gte: 50, lte: 90 },
+            }),
+          }),
+        })
+      );
+    });
+
+    it('should filter by minProfit and maxProfit', async () => {
+      mockFindMany.mockResolvedValue([]);
+      mockCount.mockResolvedValue(0);
+      mockAggregate.mockResolvedValue({
+        _sum: { actualProfit: 0, purchasePrice: 0, resalePrice: 0 },
+        _count: 0,
+      });
+
+      const request = createMockRequest('GET', '/api/opportunities?minProfit=100&maxProfit=500');
+      const response = await GET(request);
+
+      expect(response.status).toBe(200);
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            listing: expect.objectContaining({
+              profitPotential: { gte: 100, lte: 500 },
+            }),
+          }),
+        })
+      );
+    });
+
+    it('should combine multiple filters', async () => {
+      mockFindMany.mockResolvedValue([]);
+      mockCount.mockResolvedValue(0);
+      mockAggregate.mockResolvedValue({
+        _sum: { actualProfit: 0, purchasePrice: 0, resalePrice: 0 },
+        _count: 0,
+      });
+
+      const request = createMockRequest(
+        'GET',
+        '/api/opportunities?status=IDENTIFIED&platform=CRAIGSLIST&minScore=70&minProfit=50'
+      );
+      const response = await GET(request);
+
+      expect(response.status).toBe(200);
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            status: 'IDENTIFIED',
+            listing: expect.objectContaining({
+              platform: 'CRAIGSLIST',
+              valueScore: { gte: 70 },
+              profitPotential: { gte: 50 },
+            }),
+          }),
+        })
+      );
+    });
   });
 
   describe('POST /api/opportunities', () => {
