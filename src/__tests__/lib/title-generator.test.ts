@@ -140,6 +140,100 @@ describe("title-generator", () => {
     });
   });
 
+  describe("generateAlgorithmicTitle - branch coverage", () => {
+    it("uses unknown platform default limit of 80", () => {
+      const result = generateAlgorithmicTitle(sampleInput, "unknown_platform");
+      expect(result.charCount).toBeLessThanOrEqual(80);
+    });
+
+    it("condenses title with short 'LN' for like_new when over limit", () => {
+      // Mercari has 40 char limit, long input will trigger condensation
+      const longInput: TitleGeneratorInput = {
+        brand: "Samsung",
+        model: "Galaxy S24 Ultra",
+        variant: "512GB Titanium Black",
+        condition: "like_new",
+        category: "Electronics",
+      };
+      const result = generateAlgorithmicTitle(longInput, "mercari");
+      expect(result.charCount).toBeLessThanOrEqual(40);
+    });
+
+    it("condenses title with 'NEW' for new condition when over limit", () => {
+      const longInput: TitleGeneratorInput = {
+        brand: "Samsung",
+        model: "Galaxy S24 Ultra",
+        variant: "512GB Titanium Black",
+        condition: "new",
+        category: "Electronics",
+      };
+      const result = generateAlgorithmicTitle(longInput, "mercari");
+      expect(result.charCount).toBeLessThanOrEqual(40);
+    });
+
+    it("condenses with no short label for good condition", () => {
+      const longInput: TitleGeneratorInput = {
+        brand: "Samsung",
+        model: "Galaxy S24 Ultra",
+        variant: "512GB Titanium Black",
+        condition: "good",
+        category: "Electronics",
+      };
+      const result = generateAlgorithmicTitle(longInput, "mercari");
+      expect(result.charCount).toBeLessThanOrEqual(40);
+    });
+
+    it("shows For Parts/Repair for poor condition", () => {
+      const input: TitleGeneratorInput = {
+        brand: "Sony",
+        model: "PS5",
+        variant: null,
+        condition: "poor",
+        category: null,
+      };
+      const result = generateAlgorithmicTitle(input, "facebook");
+      expect(result.title).toContain("For Parts/Repair");
+    });
+
+    it("shows Fair for fair condition", () => {
+      const input: TitleGeneratorInput = {
+        brand: "Sony",
+        model: "PS5",
+        variant: null,
+        condition: "fair",
+        category: null,
+      };
+      const result = generateAlgorithmicTitle(input, "ebay");
+      expect(result.title).toContain("Fair");
+    });
+
+    it("uses raw condition string for unknown condition", () => {
+      const input: TitleGeneratorInput = {
+        brand: "Test",
+        model: "Item",
+        variant: null,
+        condition: "refurbished",
+        category: null,
+      };
+      const result = generateAlgorithmicTitle(input);
+      expect(result.title).toContain("refurbished");
+    });
+
+    it("truncates with ellipsis when condensed title still exceeds limit", () => {
+      // Very long brand+model that even without condition exceeds mercari 40
+      const longInput: TitleGeneratorInput = {
+        brand: "Extraordinary Brand Name Here",
+        model: "Super Long Model Name XYZ Pro Max Ultra",
+        variant: "Limited Edition 2024",
+        condition: "good",
+        category: null,
+      };
+      const result = generateAlgorithmicTitle(longInput, "mercari");
+      expect(result.charCount).toBeLessThanOrEqual(40);
+      expect(result.title).toMatch(/\.\.\.$/);
+    });
+  });
+
   describe("generateLLMTitle", () => {
     it("falls back to algorithmic when no API key", async () => {
       const origKey = process.env.OPENAI_API_KEY;
@@ -148,6 +242,215 @@ describe("title-generator", () => {
       const result = await generateLLMTitle(sampleInput, "ebay");
       expect(result.title).toContain("Apple");
       expect(result.platform).toBe("ebay");
+
+      if (origKey) process.env.OPENAI_API_KEY = origKey;
+    });
+
+    it("uses LLM when API key is set", async () => {
+      const origKey = process.env.OPENAI_API_KEY;
+      process.env.OPENAI_API_KEY = "test-key";
+
+      const result = await generateLLMTitle(sampleInput, "ebay");
+      expect(result.title).toBe(
+        "Apple iPhone 15 Pro Max 256GB - Excellent Condition"
+      );
+      expect(result.platform).toBe("ebay");
+      expect(result.keywords.length).toBeGreaterThan(0);
+
+      if (origKey) {
+        process.env.OPENAI_API_KEY = origKey;
+      } else {
+        delete process.env.OPENAI_API_KEY;
+      }
+    });
+
+    it("strips quotes from LLM response", async () => {
+      const OpenAI = require("openai");
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockResolvedValue({
+              choices: [
+                { message: { content: '"Quoted Title Here"' } },
+              ],
+            }),
+          },
+        },
+      }));
+
+      const origKey = process.env.OPENAI_API_KEY;
+      process.env.OPENAI_API_KEY = "test-key";
+
+      const result = await generateLLMTitle(sampleInput, "ebay");
+      expect(result.title).toBe("Quoted Title Here");
+
+      // Restore mock
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockResolvedValue({
+              choices: [
+                {
+                  message: {
+                    content:
+                      "Apple iPhone 15 Pro Max 256GB - Excellent Condition",
+                  },
+                },
+              ],
+            }),
+          },
+        },
+      }));
+
+      if (origKey) {
+        process.env.OPENAI_API_KEY = origKey;
+      } else {
+        delete process.env.OPENAI_API_KEY;
+      }
+    });
+
+    it("truncates LLM title that exceeds platform limit", async () => {
+      const OpenAI = require("openai");
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockResolvedValue({
+              choices: [
+                {
+                  message: {
+                    content:
+                      "This is an extremely long title that definitely exceeds the forty character limit for Mercari listings and should be truncated",
+                  },
+                },
+              ],
+            }),
+          },
+        },
+      }));
+
+      const origKey = process.env.OPENAI_API_KEY;
+      process.env.OPENAI_API_KEY = "test-key";
+
+      const result = await generateLLMTitle(sampleInput, "mercari");
+      expect(result.charCount).toBeLessThanOrEqual(40);
+      expect(result.title).toMatch(/\.\.\.$/);
+
+      // Restore mock
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockResolvedValue({
+              choices: [
+                {
+                  message: {
+                    content:
+                      "Apple iPhone 15 Pro Max 256GB - Excellent Condition",
+                  },
+                },
+              ],
+            }),
+          },
+        },
+      }));
+
+      if (origKey) {
+        process.env.OPENAI_API_KEY = origKey;
+      } else {
+        delete process.env.OPENAI_API_KEY;
+      }
+    });
+
+    it("falls back to algorithmic on LLM error", async () => {
+      const OpenAI = require("openai");
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockRejectedValue(new Error("API Error")),
+          },
+        },
+      }));
+
+      const origKey = process.env.OPENAI_API_KEY;
+      process.env.OPENAI_API_KEY = "test-key";
+
+      const result = await generateLLMTitle(sampleInput, "ebay");
+      expect(result.title).toContain("Apple");
+      expect(result.platform).toBe("ebay");
+
+      // Restore mock
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockResolvedValue({
+              choices: [
+                {
+                  message: {
+                    content:
+                      "Apple iPhone 15 Pro Max 256GB - Excellent Condition",
+                  },
+                },
+              ],
+            }),
+          },
+        },
+      }));
+
+      if (origKey) {
+        process.env.OPENAI_API_KEY = origKey;
+      } else {
+        delete process.env.OPENAI_API_KEY;
+      }
+    });
+
+    it("handles empty LLM response", async () => {
+      const OpenAI = require("openai");
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockResolvedValue({
+              choices: [{ message: { content: "" } }],
+            }),
+          },
+        },
+      }));
+
+      const origKey = process.env.OPENAI_API_KEY;
+      process.env.OPENAI_API_KEY = "test-key";
+
+      const result = await generateLLMTitle(sampleInput, "ebay");
+      expect(result.platform).toBe("ebay");
+
+      // Restore mock
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockResolvedValue({
+              choices: [
+                {
+                  message: {
+                    content:
+                      "Apple iPhone 15 Pro Max 256GB - Excellent Condition",
+                  },
+                },
+              ],
+            }),
+          },
+        },
+      }));
+
+      if (origKey) {
+        process.env.OPENAI_API_KEY = origKey;
+      } else {
+        delete process.env.OPENAI_API_KEY;
+      }
+    });
+
+    it("uses default platform limit for unknown platform", async () => {
+      const origKey = process.env.OPENAI_API_KEY;
+      delete process.env.OPENAI_API_KEY;
+
+      const result = await generateLLMTitle(sampleInput, "amazon");
+      expect(result.charCount).toBeLessThanOrEqual(80);
 
       if (origKey) process.env.OPENAI_API_KEY = origKey;
     });
