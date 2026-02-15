@@ -1,0 +1,10 @@
+node_modules
+.next
+dist
+build
+coverage
+src/generated
+e2e/test-results
+e2e/screenshots
+test-results
+playwright-report
