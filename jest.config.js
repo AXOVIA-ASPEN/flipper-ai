@@ -8,6 +8,7 @@ const config = {
   testPathIgnorePatterns: ['/node_modules/', '\\.integration\\.test\\.ts$'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '\\.(css|less|scss|sass)$': '<rootDir>/src/__tests__/__mocks__/styleMock.js',
   },
   transform: {
     '^.+\\.[tj]sx?$': ['ts-jest', {
