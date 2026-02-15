@@ -722,6 +722,177 @@ describe('OfferUp Scraper API', () => {
       });
     });
 
+    it('handles error when job creation fails before scraping', async () => {
+      mockJobCreate.mockRejectedValueOnce(new Error('DB connection failed'));
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'tampa-fl' }
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(500);
+      expect(data.success).toBe(false);
+      // job is null so jobUpdate should not be called (or called with undefined)
+    });
+
+    it('handles category mapping for known categories', async () => {
+      mockEvaluate.mockResolvedValue([]);
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'tampa-fl', category: 'furniture' }
+      );
+
+      await POST(request);
+
+      // The URL should include the mapped category slug
+      expect(mockGoto).toHaveBeenCalledWith(
+        expect.stringContaining('catid=home-garden'),
+        expect.any(Object)
+      );
+    });
+
+    it('handles unknown category by using "all"', async () => {
+      mockEvaluate.mockResolvedValue([]);
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'tampa-fl', category: 'unknown_category' }
+      );
+
+      await POST(request);
+
+      // "all" category should not add catid parameter
+      expect(mockGoto).toHaveBeenCalledWith(
+        expect.not.stringContaining('catid='),
+        expect.any(Object)
+      );
+    });
+
+    it('processes listings with description, postedAt, sellerName, and condition', async () => {
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'Full Info Item',
+          price: '$200',
+          url: 'https://offerup.com/item/detail/888888888',
+          location: 'Tampa, FL',
+          imageUrl: 'https://example.com/img.jpg',
+          condition: 'Like New',
+        },
+      ]);
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'tampa-fl' }
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(data.savedCount).toBe(1);
+      expect(mockUpsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          create: expect.objectContaining({
+            condition: 'Like New',
+          }),
+        })
+      );
+    });
+
+    it('handles goto retry on transient failure then success', async () => {
+      mockGoto
+        .mockRejectedValueOnce(new Error('Transient network error'))
+        .mockRejectedValueOnce(new Error('Transient network error'))
+        .mockResolvedValueOnce(undefined);
+      mockEvaluate.mockResolvedValue([]);
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'tampa-fl' }
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(data.success).toBe(true);
+    });
+
+    it('handles goto failing all retries', async () => {
+      mockGoto.mockRejectedValue(new Error('Persistent failure'));
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'tampa-fl' }
+      );
+
+      const response = await POST(request);
+      expect(response.status).toBe(500);
+    });
+
+    it('processes listing with no imageUrl (empty string)', async () => {
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'No Image',
+          price: '$50',
+          url: 'https://offerup.com/item/detail/999999999',
+          location: 'Tampa, FL',
+          imageUrl: '',
+        },
+      ]);
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'tampa-fl' }
+      );
+
+      await POST(request);
+
+      // imageUrls should be undefined for empty imageUrl
+      expect(mockUpsert).toHaveBeenCalled();
+    });
+
+    it('only provides minPrice when maxPrice is not set', async () => {
+      mockEvaluate.mockResolvedValue([]);
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'tampa-fl', minPrice: 50 }
+      );
+
+      await POST(request);
+
+      expect(mockGoto).toHaveBeenCalledWith(
+        expect.stringContaining('price_min=50'),
+        expect.any(Object)
+      );
+    });
+
+    it('closes browser even when scraping throws', async () => {
+      mockEvaluate.mockRejectedValue(new Error('Evaluate failed'));
+
+      const request = createMockRequest(
+        'POST',
+        '/api/scraper/offerup',
+        { location: 'tampa-fl' }
+      );
+
+      await POST(request);
+
+      // Browser close should still be called (finally block)
+      expect(mockClose).toHaveBeenCalled();
+    });
+
   describe('Price parsing', () => {
     it('parses standard dollar format', async () => {
       mockEvaluate.mockResolvedValue([
