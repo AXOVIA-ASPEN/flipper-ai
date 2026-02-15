@@ -10,7 +10,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import prisma from '@/lib/db';
 
-const CLAUDE_API_KEY = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
+const getClaudeApiKey = () => process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
 const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-5-20250929';
 const CACHE_DURATION_HOURS = 24;
 
@@ -170,12 +170,13 @@ function parseClaudeResponse(text: string): ClaudeAnalysisResult {
  * Call Claude API for listing analysis
  */
 async function callClaudeAPI(prompt: string): Promise<string> {
-  if (!CLAUDE_API_KEY) {
+  const apiKey = getClaudeApiKey();
+  if (!apiKey) {
     throw new Error('ANTHROPIC_API_KEY or CLAUDE_API_KEY not configured');
   }
 
   const client = new Anthropic({
-    apiKey: CLAUDE_API_KEY,
+    apiKey,
   });
 
   try {
