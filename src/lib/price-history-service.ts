@@ -1,13 +1,13 @@
 // Price History Service - Integrates eBay market price scraper with database
 // Fetches sold listings and stores them for analysis
 
-import { prisma } from "./db";
+import { prisma } from './db';
 import {
   fetchMarketPrice,
   fetchMarketPricesBatch,
   type MarketPrice,
   type SoldListing,
-} from "./market-price";
+} from './market-price';
 
 export interface PriceHistoryQuery {
   productName: string;
@@ -37,7 +37,7 @@ export async function fetchAndStorePriceHistory(
   const priceRecords = marketData.soldListings.map((listing: SoldListing) => ({
     productName,
     category: category || null,
-    platform: "EBAY",
+    platform: 'EBAY',
     soldPrice: listing.price + listing.shippingCost, // Total price
     condition: listing.condition,
     soldAt: listing.soldDate || new Date(), // Use fetch date if sold date unknown
@@ -50,11 +50,9 @@ export async function fetchAndStorePriceHistory(
       skipDuplicates: true,
     });
 
-    console.log(
-      `✅ Stored ${priceRecords.length} price history records for: ${productName}`
-    );
+    console.log(`✅ Stored ${priceRecords.length} price history records for: ${productName}`);
   } catch (error) {
-    console.error("Error storing price history:", error);
+    console.error('Error storing price history:', error);
   }
 
   return marketData;
@@ -63,9 +61,7 @@ export async function fetchAndStorePriceHistory(
 /**
  * Get price history from database for a product
  */
-export async function getPriceHistory(
-  query: PriceHistoryQuery
-): Promise<{
+export async function getPriceHistory(query: PriceHistoryQuery): Promise<{
   productName: string;
   category?: string;
   soldListings: Array<{
@@ -90,7 +86,7 @@ export async function getPriceHistory(
       productName: { contains: productName },
       ...(category && { category }),
     },
-    orderBy: { soldAt: "desc" },
+    orderBy: { soldAt: 'desc' },
     take: limit,
   });
 
@@ -140,9 +136,7 @@ export async function getPriceHistory(
 /**
  * Update listing with verified market value from price history
  */
-export async function updateListingWithMarketValue(
-  listingId: string
-): Promise<void> {
+export async function updateListingWithMarketValue(listingId: string): Promise<void> {
   const listing = await prisma.listing.findUnique({
     where: { id: listingId },
   });
@@ -152,10 +146,7 @@ export async function updateListingWithMarketValue(
   }
 
   // Fetch and store price history
-  const marketData = await fetchAndStorePriceHistory(
-    listing.title,
-    listing.category || undefined
-  );
+  const marketData = await fetchAndStorePriceHistory(listing.title, listing.category || undefined);
 
   if (!marketData) {
     console.log(`No market data available for listing: ${listingId}`);
@@ -167,13 +158,11 @@ export async function updateListingWithMarketValue(
     where: { id: listingId },
     data: {
       verifiedMarketValue: marketData.medianPrice,
-      marketDataSource: "ebay_scrape",
+      marketDataSource: 'ebay_scrape',
       marketDataDate: new Date(),
       comparableSalesJson: JSON.stringify(marketData.soldListings),
       trueDiscountPercent:
-        ((marketData.medianPrice - listing.askingPrice) /
-          marketData.medianPrice) *
-        100,
+        ((marketData.medianPrice - listing.askingPrice) / marketData.medianPrice) * 100,
     },
   });
 
@@ -185,9 +174,7 @@ export async function updateListingWithMarketValue(
 /**
  * Batch update multiple listings with market values
  */
-export async function batchUpdateListingsWithMarketValue(
-  listingIds: string[]
-): Promise<{
+export async function batchUpdateListingsWithMarketValue(listingIds: string[]): Promise<{
   success: number;
   failed: number;
   errors: Array<{ listingId: string; error: string }>;
@@ -209,7 +196,7 @@ export async function batchUpdateListingsWithMarketValue(
       results.failed++;
       results.errors.push({
         listingId,
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }

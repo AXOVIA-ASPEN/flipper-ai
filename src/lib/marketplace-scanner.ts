@@ -1,10 +1,20 @@
 // Central marketplace scanner service
 // Provides common logic for scanning any marketplace and determining item viability
 
-import { estimateValue, detectCategory, generatePurchaseMessage, EstimationResult } from "./value-estimator";
+import {
+  estimateValue,
+  detectCategory,
+  generatePurchaseMessage,
+  EstimationResult,
+} from './value-estimator';
 
 // Platform types supported by the scanner
-export type MarketplacePlatform = "CRAIGSLIST" | "FACEBOOK_MARKETPLACE" | "EBAY" | "OFFERUP" | "MERCARI";
+export type MarketplacePlatform =
+  | 'CRAIGSLIST'
+  | 'FACEBOOK_MARKETPLACE'
+  | 'EBAY'
+  | 'OFFERUP'
+  | 'MERCARI';
 
 // Raw listing data from any marketplace scraper
 export interface RawListing {
@@ -33,13 +43,13 @@ export interface AnalyzedListing extends RawListing {
 
 // Viability criteria for filtering opportunities
 export interface ViabilityCriteria {
-  minValueScore?: number;        // Minimum value score (0-100), default 70
-  minProfitPotential?: number;   // Minimum profit in dollars
-  maxAskingPrice?: number;       // Maximum price to consider
-  requireShippable?: boolean;    // Only include shippable items
-  excludeCategories?: string[];  // Categories to exclude
-  includeCategories?: string[];  // Only include these categories (if specified)
-  maxResaleDifficulty?: "VERY_EASY" | "EASY" | "MODERATE" | "HARD" | "VERY_HARD";
+  minValueScore?: number; // Minimum value score (0-100), default 70
+  minProfitPotential?: number; // Minimum profit in dollars
+  maxAskingPrice?: number; // Maximum price to consider
+  requireShippable?: boolean; // Only include shippable items
+  excludeCategories?: string[]; // Categories to exclude
+  includeCategories?: string[]; // Only include these categories (if specified)
+  maxResaleDifficulty?: 'VERY_EASY' | 'EASY' | 'MODERATE' | 'HARD' | 'VERY_HARD';
 }
 
 // Default viability criteria
@@ -50,11 +60,11 @@ const DEFAULT_CRITERIA: ViabilityCriteria = {
 
 // Difficulty ordering for comparison
 const DIFFICULTY_ORDER = {
-  "VERY_EASY": 1,
-  "EASY": 2,
-  "MODERATE": 3,
-  "HARD": 4,
-  "VERY_HARD": 5,
+  VERY_EASY: 1,
+  EASY: 2,
+  MODERATE: 3,
+  HARD: 4,
+  VERY_HARD: 5,
 };
 
 /**
@@ -66,7 +76,8 @@ export function analyzeListing(
   listing: RawListing
 ): AnalyzedListing {
   // Detect category if not provided
-  const detectedCategory = listing.category || detectCategory(listing.title, listing.description || null);
+  const detectedCategory =
+    listing.category || detectCategory(listing.title, listing.description || null);
 
   // Get full value estimation
   const estimation = estimateValue(
@@ -113,7 +124,10 @@ export function meetsViabilityCriteria(
   }
 
   // Check minimum profit potential
-  if (criteria.minProfitPotential !== undefined && estimation.profitPotential < criteria.minProfitPotential) {
+  if (
+    criteria.minProfitPotential !== undefined &&
+    estimation.profitPotential < criteria.minProfitPotential
+  ) {
     return false;
   }
 
@@ -162,14 +176,14 @@ export function processListings(
   filtered: AnalyzedListing[];
 } {
   // Analyze all listings
-  const analyzed = listings.map(listing => analyzeListing(platform, listing));
+  const analyzed = listings.map((listing) => analyzeListing(platform, listing));
 
   // Separate opportunities (score >= 70)
-  const opportunities = analyzed.filter(l => l.isOpportunity);
+  const opportunities = analyzed.filter((l) => l.isOpportunity);
 
   // Apply additional filtering if criteria provided
   const filtered = criteria
-    ? analyzed.filter(l => meetsViabilityCriteria(l, criteria))
+    ? analyzed.filter((l) => meetsViabilityCriteria(l, criteria))
     : opportunities;
 
   return {
@@ -242,7 +256,7 @@ export function formatForStorage(listing: AnalyzedListing): Record<string, unkno
     requestToBuy: listing.requestToBuy,
 
     // Status
-    status: listing.isOpportunity ? "OPPORTUNITY" : "NEW",
+    status: listing.isOpportunity ? 'OPPORTUNITY' : 'NEW',
   };
 }
 
@@ -264,9 +278,10 @@ export function generateScanSummary(results: {
 } {
   const { all, opportunities, filtered } = results;
 
-  const averageScore = all.length > 0
-    ? Math.round(all.reduce((sum, l) => sum + l.estimation.valueScore, 0) / all.length)
-    : 0;
+  const averageScore =
+    all.length > 0
+      ? Math.round(all.reduce((sum, l) => sum + l.estimation.valueScore, 0) / all.length)
+      : 0;
 
   const totalPotentialProfit = opportunities.reduce(
     (sum, l) => sum + Math.max(0, l.estimation.profitPotential),

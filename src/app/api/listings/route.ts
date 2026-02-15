@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
-import { estimateValue, detectCategory, generatePurchaseMessage } from "@/lib/value-estimator";
-import { getAuthUserId } from "@/lib/auth-middleware";
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/db';
+import { estimateValue, detectCategory, generatePurchaseMessage } from '@/lib/value-estimator';
+import { getAuthUserId } from '@/lib/auth-middleware';
 import {
   ListingQuerySchema,
   CreateListingSchema,
   validateQuery,
   validateBody,
-} from "@/lib/validations";
+} from '@/lib/validations';
 
 // GET /api/listings - Get all listings with optional filters
 export async function GET(request: NextRequest) {
@@ -18,11 +18,23 @@ export async function GET(request: NextRequest) {
     const parsed = validateQuery(ListingQuerySchema, searchParams);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "Invalid query parameters", details: parsed.error },
+        { error: 'Invalid query parameters', details: parsed.error },
         { status: 400 }
       );
     }
-    const { platform, status, minScore, location, category, minPrice, maxPrice, dateFrom, dateTo, limit, offset } = parsed.data;
+    const {
+      platform,
+      status,
+      minScore,
+      location,
+      category,
+      minPrice,
+      maxPrice,
+      dateFrom,
+      dateTo,
+      limit,
+      offset,
+    } = parsed.data;
 
     const where: Record<string, unknown> = {};
 
@@ -52,7 +64,7 @@ export async function GET(request: NextRequest) {
     const [listings, total] = await Promise.all([
       prisma.listing.findMany({
         where,
-        orderBy: { scrapedAt: "desc" },
+        orderBy: { scrapedAt: 'desc' },
         take: limit,
         skip: offset,
         include: { opportunity: true },
@@ -67,11 +79,8 @@ export async function GET(request: NextRequest) {
       offset,
     });
   } catch (error) {
-    console.error("Error fetching listings:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch listings" },
-      { status: 500 }
-    );
+    console.error('Error fetching listings:', error);
+    return NextResponse.json({ error: 'Failed to fetch listings' }, { status: 500 });
   }
 }
 
@@ -86,7 +95,7 @@ export async function POST(request: NextRequest) {
     const parsed = validateBody(CreateListingSchema, body);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "Invalid request body", details: parsed.error },
+        { error: 'Invalid request body', details: parsed.error },
         { status: 400 }
       );
     }
@@ -132,7 +141,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           skipped: true,
-          reason: "Listing discount below 70% threshold",
+          reason: 'Listing discount below 70% threshold',
           discountPercent: estimation.discountPercent,
         },
         { status: 200 }
@@ -193,7 +202,7 @@ export async function POST(request: NextRequest) {
         requestToBuy,
 
         // Status
-        status: estimation.valueScore >= 70 ? "OPPORTUNITY" : "NEW",
+        status: estimation.valueScore >= 70 ? 'OPPORTUNITY' : 'NEW',
       },
       update: {
         // Basic info updates
@@ -232,10 +241,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(listing, { status: 201 });
   } catch (error) {
-    console.error("Error creating listing:", error);
-    return NextResponse.json(
-      { error: "Failed to create listing" },
-      { status: 500 }
-    );
+    console.error('Error creating listing:', error);
+    return NextResponse.json({ error: 'Failed to create listing' }, { status: 500 });
   }
 }

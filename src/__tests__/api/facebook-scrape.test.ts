@@ -80,7 +80,10 @@ describe('Facebook Scrape API', () => {
       profitPotential: 300,
       status: 'OPPORTUNITY',
     });
-    mockFormatForStorage.mockReturnValue({ title: 'iPhone 14 Pro', platform: 'FACEBOOK_MARKETPLACE' });
+    mockFormatForStorage.mockReturnValue({
+      title: 'iPhone 14 Pro',
+      platform: 'FACEBOOK_MARKETPLACE',
+    });
   });
 
   describe('POST /api/scrape/facebook', () => {
@@ -161,8 +164,12 @@ describe('Facebook Scrape API', () => {
       mockScrapeAndConvert.mockResolvedValue({ success: true, listings: [] });
       mockProcessListings.mockReturnValue({ all: [], opportunities: [], filtered: [] });
       mockGenerateScanSummary.mockReturnValue({
-        totalListings: 0, totalOpportunities: 0, filteredCount: 0,
-        averageScore: 0, totalPotentialProfit: 0, categoryCounts: {},
+        totalListings: 0,
+        totalOpportunities: 0,
+        filteredCount: 0,
+        averageScore: 0,
+        totalPotentialProfit: 0,
+        categoryCounts: {},
         bestOpportunity: null,
       });
 
@@ -172,7 +179,7 @@ describe('Facebook Scrape API', () => {
       expect(mockProcessListings).toHaveBeenCalledWith(
         'FACEBOOK_MARKETPLACE',
         [],
-        expect.objectContaining({ minValueScore: 70 }),
+        expect.objectContaining({ minValueScore: 70 })
       );
     });
 
@@ -180,8 +187,12 @@ describe('Facebook Scrape API', () => {
       mockScrapeAndConvert.mockResolvedValue({ success: true, listings: [] });
       mockProcessListings.mockReturnValue({ all: [], opportunities: [], filtered: [] });
       mockGenerateScanSummary.mockReturnValue({
-        totalListings: 0, totalOpportunities: 0, filteredCount: 0,
-        averageScore: 0, totalPotentialProfit: 0, categoryCounts: {},
+        totalListings: 0,
+        totalOpportunities: 0,
+        filteredCount: 0,
+        averageScore: 0,
+        totalPotentialProfit: 0,
+        categoryCounts: {},
         bestOpportunity: null,
       });
 
@@ -206,7 +217,7 @@ describe('Facebook Scrape API', () => {
           excludeCategories: ['clothing'],
           includeCategories: ['electronics'],
           maxResaleDifficulty: 'MEDIUM',
-        }),
+        })
       );
     });
 
@@ -222,8 +233,12 @@ describe('Facebook Scrape API', () => {
       });
       mockListingUpsert.mockRejectedValue(new Error('DB constraint error'));
       mockGenerateScanSummary.mockReturnValue({
-        totalListings: 1, totalOpportunities: 0, filteredCount: 0,
-        averageScore: 85, totalPotentialProfit: 0, categoryCounts: {},
+        totalListings: 1,
+        totalOpportunities: 0,
+        filteredCount: 0,
+        averageScore: 85,
+        totalPotentialProfit: 0,
+        categoryCounts: {},
         bestOpportunity: null,
       });
 
@@ -241,8 +256,12 @@ describe('Facebook Scrape API', () => {
       mockScrapeAndConvert.mockResolvedValue({ success: true, listings: [] });
       mockProcessListings.mockReturnValue({ all: [], opportunities: [], filtered: [] });
       mockGenerateScanSummary.mockReturnValue({
-        totalListings: 0, totalOpportunities: 0, filteredCount: 0,
-        averageScore: 0, totalPotentialProfit: 0, categoryCounts: {},
+        totalListings: 0,
+        totalOpportunities: 0,
+        filteredCount: 0,
+        averageScore: 0,
+        totalPotentialProfit: 0,
+        categoryCounts: {},
         bestOpportunity: null,
       });
 
@@ -280,8 +299,12 @@ describe('Facebook Scrape API', () => {
       mockScrapeAndConvert.mockResolvedValue({ success: true, listings: [] });
       mockProcessListings.mockReturnValue({ all: [], opportunities: [], filtered: [] });
       mockGenerateScanSummary.mockReturnValue({
-        totalListings: 0, totalOpportunities: 0, filteredCount: 0,
-        averageScore: 0, totalPotentialProfit: 0, categoryCounts: {},
+        totalListings: 0,
+        totalOpportunities: 0,
+        filteredCount: 0,
+        averageScore: 0,
+        totalPotentialProfit: 0,
+        categoryCounts: {},
         bestOpportunity: null,
       });
 
@@ -297,7 +320,7 @@ describe('Facebook Scrape API', () => {
           maxListings: 20,
           includeDetails: true,
           sortBy: 'date',
-        }),
+        })
       );
     });
   });
@@ -346,9 +369,7 @@ describe('Facebook Scrape API', () => {
       const req = createRequest('GET', '/api/scrape/facebook?limit=5');
       await GET(req);
 
-      expect(mockJobFindMany).toHaveBeenCalledWith(
-        expect.objectContaining({ take: 5 }),
-      );
+      expect(mockJobFindMany).toHaveBeenCalledWith(expect.objectContaining({ take: 5 }));
     });
 
     it('handles GET errors', async () => {

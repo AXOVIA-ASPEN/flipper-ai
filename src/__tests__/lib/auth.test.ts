@@ -34,7 +34,12 @@ jest.mock('next-auth/providers/github', () => ({
 
 jest.mock('next-auth/providers/credentials', () => ({
   __esModule: true,
-  default: jest.fn((config) => ({ ...config, type: 'credentials', id: 'credentials', name: 'credentials' })),
+  default: jest.fn((config) => ({
+    ...config,
+    type: 'credentials',
+    id: 'credentials',
+    name: 'credentials',
+  })),
 }));
 
 // Mock Prisma adapter
@@ -201,9 +206,7 @@ describe('Auth utilities', () => {
 
       const NextAuth = require('next-auth').default;
       const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find(
-        (p: any) => p.name === 'credentials'
-      );
+      const credentialsProvider = authConfig.providers.find((p: any) => p.name === 'credentials');
 
       if (!credentialsProvider) {
         throw new Error('Credentials provider not found');
@@ -225,25 +228,21 @@ describe('Auth utilities', () => {
     test('should reject missing email', async () => {
       const NextAuth = require('next-auth').default;
       const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find(
-        (p: any) => p.name === 'credentials'
-      );
+      const credentialsProvider = authConfig.providers.find((p: any) => p.name === 'credentials');
 
-      await expect(
-        credentialsProvider.authorize({ password: 'password123' })
-      ).rejects.toThrow('Email and password are required');
+      await expect(credentialsProvider.authorize({ password: 'password123' })).rejects.toThrow(
+        'Email and password are required'
+      );
     });
 
     test('should reject missing password', async () => {
       const NextAuth = require('next-auth').default;
       const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find(
-        (p: any) => p.name === 'credentials'
-      );
+      const credentialsProvider = authConfig.providers.find((p: any) => p.name === 'credentials');
 
-      await expect(
-        credentialsProvider.authorize({ email: 'test@example.com' })
-      ).rejects.toThrow('Email and password are required');
+      await expect(credentialsProvider.authorize({ email: 'test@example.com' })).rejects.toThrow(
+        'Email and password are required'
+      );
     });
 
     test('should reject invalid email', async () => {
@@ -251,9 +250,7 @@ describe('Auth utilities', () => {
 
       const NextAuth = require('next-auth').default;
       const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find(
-        (p: any) => p.name === 'credentials'
-      );
+      const credentialsProvider = authConfig.providers.find((p: any) => p.name === 'credentials');
 
       await expect(
         credentialsProvider.authorize({
@@ -272,9 +269,7 @@ describe('Auth utilities', () => {
 
       const NextAuth = require('next-auth').default;
       const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find(
-        (p: any) => p.name === 'credentials'
-      );
+      const credentialsProvider = authConfig.providers.find((p: any) => p.name === 'credentials');
 
       await expect(
         credentialsProvider.authorize({
@@ -295,9 +290,7 @@ describe('Auth utilities', () => {
 
       const NextAuth = require('next-auth').default;
       const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find(
-        (p: any) => p.name === 'credentials'
-      );
+      const credentialsProvider = authConfig.providers.find((p: any) => p.name === 'credentials');
 
       await expect(
         credentialsProvider.authorize({

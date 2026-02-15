@@ -17,7 +17,12 @@ jest.mock('next-auth/providers/github', () => ({
 
 jest.mock('next-auth/providers/credentials', () => ({
   __esModule: true,
-  default: jest.fn((config) => ({ ...config, type: 'credentials', id: 'credentials', name: 'credentials' })),
+  default: jest.fn((config) => ({
+    ...config,
+    type: 'credentials',
+    id: 'credentials',
+    name: 'credentials',
+  })),
 }));
 
 // Mock NextAuth before importing auth
@@ -72,9 +77,7 @@ describe('Security: Authentication Attack Vectors', () => {
     test('should safely handle SQL injection in email field', async () => {
       const NextAuth = require('next-auth').default;
       const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find(
-        (p: any) => p.id === 'credentials'
-      );
+      const credentialsProvider = authConfig.providers.find((p: any) => p.id === 'credentials');
 
       const maliciousEmail = "admin'--";
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
@@ -94,9 +97,7 @@ describe('Security: Authentication Attack Vectors', () => {
     test('should safely handle SQL injection in password field', async () => {
       const NextAuth = require('next-auth').default;
       const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find(
-        (p: any) => p.id === 'credentials'
-      );
+      const credentialsProvider = authConfig.providers.find((p: any) => p.id === 'credentials');
 
       const maliciousPassword = "' OR '1'='1";
       const mockUser = {
@@ -121,41 +122,36 @@ describe('Security: Authentication Attack Vectors', () => {
     test('should reject rapid successive login attempts', async () => {
       const NextAuth = require('next-auth').default;
       const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find(
-        (p: any) => p.id === 'credentials'
-      );
+      const credentialsProvider = authConfig.providers.find((p: any) => p.id === 'credentials');
 
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
 
       // Simulate 5 rapid failed login attempts
-      const attempts = Array(5).fill(null).map(() =>
-        credentialsProvider.authorize({
-          email: 'test@example.com',
-          password: 'wrongpass',
-        }).catch(() => 'failed')
-      );
+      const attempts = Array(5)
+        .fill(null)
+        .map(() =>
+          credentialsProvider
+            .authorize({
+              email: 'test@example.com',
+              password: 'wrongpass',
+            })
+            .catch(() => 'failed')
+        );
 
       const results = await Promise.all(attempts);
-      expect(results.every(r => r === 'failed')).toBe(true);
+      expect(results.every((r) => r === 'failed')).toBe(true);
     });
   });
 
   describe('Password Security', () => {
     test('should reject weak passwords (if validation exists)', async () => {
       // This test assumes password validation would be added
-      const weakPasswords = [
-        '123',
-        'password',
-        'abc',
-        '11111111',
-      ];
+      const weakPasswords = ['123', 'password', 'abc', '11111111'];
 
       // For now, just verify bcrypt is called for comparison
       const NextAuth = require('next-auth').default;
       const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find(
-        (p: any) => p.id === 'credentials'
-      );
+      const credentialsProvider = authConfig.providers.find((p: any) => p.id === 'credentials');
 
       const mockUser = {
         id: 'user-123',
@@ -179,9 +175,7 @@ describe('Security: Authentication Attack Vectors', () => {
     test('should use bcrypt for password hashing', async () => {
       const NextAuth = require('next-auth').default;
       const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find(
-        (p: any) => p.id === 'credentials'
-      );
+      const credentialsProvider = authConfig.providers.find((p: any) => p.id === 'credentials');
 
       const mockUser = {
         id: 'user-123',
@@ -197,10 +191,7 @@ describe('Security: Authentication Attack Vectors', () => {
         password: 'correct-password',
       });
 
-      expect(bcrypt.compare).toHaveBeenCalledWith(
-        'correct-password',
-        '$2a$10$hashedpassword'
-      );
+      expect(bcrypt.compare).toHaveBeenCalledWith('correct-password', '$2a$10$hashedpassword');
     });
   });
 
@@ -241,9 +232,7 @@ describe('Security: Authentication Attack Vectors', () => {
     test('should enable account linking for Google', () => {
       const NextAuth = require('next-auth').default;
       const authConfig = NextAuth._config;
-      const googleProvider = authConfig.providers.find(
-        (p: any) => p.id === 'google'
-      );
+      const googleProvider = authConfig.providers.find((p: any) => p.id === 'google');
 
       expect(googleProvider.allowDangerousEmailAccountLinking).toBe(true);
     });
@@ -251,9 +240,7 @@ describe('Security: Authentication Attack Vectors', () => {
     test('should enable account linking for GitHub', () => {
       const NextAuth = require('next-auth').default;
       const authConfig = NextAuth._config;
-      const githubProvider = authConfig.providers.find(
-        (p: any) => p.id === 'github'
-      );
+      const githubProvider = authConfig.providers.find((p: any) => p.id === 'github');
 
       expect(githubProvider.allowDangerousEmailAccountLinking).toBe(true);
     });
@@ -263,9 +250,7 @@ describe('Security: Authentication Attack Vectors', () => {
     test('should reject null/undefined email', async () => {
       const NextAuth = require('next-auth').default;
       const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find(
-        (p: any) => p.id === 'credentials'
-      );
+      const credentialsProvider = authConfig.providers.find((p: any) => p.id === 'credentials');
 
       await expect(
         credentialsProvider.authorize({
@@ -278,9 +263,7 @@ describe('Security: Authentication Attack Vectors', () => {
     test('should reject XSS attempts in email', async () => {
       const NextAuth = require('next-auth').default;
       const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find(
-        (p: any) => p.id === 'credentials'
-      );
+      const credentialsProvider = authConfig.providers.find((p: any) => p.id === 'credentials');
 
       const xssEmail = '<script>alert("XSS")</script>@example.com';
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
@@ -296,9 +279,7 @@ describe('Security: Authentication Attack Vectors', () => {
     test('should reject extremely long inputs', async () => {
       const NextAuth = require('next-auth').default;
       const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find(
-        (p: any) => p.id === 'credentials'
-      );
+      const credentialsProvider = authConfig.providers.find((p: any) => p.id === 'credentials');
 
       const longEmail = 'a'.repeat(10000) + '@example.com';
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
@@ -316,9 +297,7 @@ describe('Security: Authentication Attack Vectors', () => {
     test('should not leak user existence information', async () => {
       const NextAuth = require('next-auth').default;
       const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find(
-        (p: any) => p.id === 'credentials'
-      );
+      const credentialsProvider = authConfig.providers.find((p: any) => p.id === 'credentials');
 
       // Case 1: User doesn't exist
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);

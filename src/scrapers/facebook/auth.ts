@@ -3,7 +3,7 @@
  * Handles OAuth flow and token management for accessing Facebook Marketplace
  */
 
-import { z } from "zod";
+import { z } from 'zod';
 
 export interface FacebookAuthConfig {
   appId: string;
@@ -44,15 +44,12 @@ const FacebookLongLivedTokenSchema = z.object({
  * @param state Optional state parameter for CSRF protection
  * @returns Authorization URL to redirect user to
  */
-export function getAuthorizationUrl(
-  config: FacebookAuthConfig,
-  state?: string
-): string {
+export function getAuthorizationUrl(config: FacebookAuthConfig, state?: string): string {
   const params = new URLSearchParams({
     client_id: config.appId,
     redirect_uri: config.redirectUri,
-    scope: "public_profile,email", // Note: Marketplace API requires special approval
-    response_type: "code",
+    scope: 'public_profile,email', // Note: Marketplace API requires special approval
+    response_type: 'code',
     ...(state && { state }),
   });
 
@@ -102,7 +99,7 @@ export async function exchangeForLongLivedToken(
   shortLivedToken: string
 ): Promise<FacebookLongLivedTokenResponse> {
   const params = new URLSearchParams({
-    grant_type: "fb_exchange_token",
+    grant_type: 'fb_exchange_token',
     client_id: config.appId,
     client_secret: config.appSecret,
     fb_exchange_token: shortLivedToken,
@@ -128,9 +125,7 @@ export async function exchangeForLongLivedToken(
  * @param accessToken Access token to verify
  * @returns User ID and app ID if valid
  */
-export async function verifyAccessToken(
-  accessToken: string
-): Promise<{
+export async function verifyAccessToken(accessToken: string): Promise<{
   appId: string;
   userId: string;
   isValid: boolean;
@@ -171,7 +166,7 @@ export async function refreshAccessToken(
   const verification = await verifyAccessToken(currentToken);
 
   if (!verification.isValid) {
-    throw new Error("Token is invalid. User needs to re-authenticate.");
+    throw new Error('Token is invalid. User needs to re-authenticate.');
   }
 
   // Exchange for a new long-lived token
@@ -186,7 +181,7 @@ export async function revokeAccessToken(accessToken: string): Promise<void> {
   const url = `https://graph.facebook.com/v18.0/me/permissions?access_token=${accessToken}`;
 
   const response = await fetch(url, {
-    method: "DELETE",
+    method: 'DELETE',
   });
 
   if (!response.ok) {

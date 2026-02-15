@@ -58,8 +58,16 @@ const mockMessages = [
 ];
 
 const mockAiTemplates = [
-  { id: 'tpl-1', name: 'Initial Inquiry', content: 'Hi! Is this item still available? I\'m very interested.' },
-  { id: 'tpl-2', name: 'Price Negotiation', content: 'Would you consider a lower price? I can pick up today.' },
+  {
+    id: 'tpl-1',
+    name: 'Initial Inquiry',
+    content: "Hi! Is this item still available? I'm very interested.",
+  },
+  {
+    id: 'tpl-2',
+    name: 'Price Negotiation',
+    content: 'Would you consider a lower price? I can pick up today.',
+  },
   { id: 'tpl-3', name: 'Schedule Pickup', content: 'Great! When and where can I pick this up?' },
 ];
 
@@ -182,7 +190,9 @@ test.describe('Seller Communication Flow', () => {
   test.describe('AI-Generated Message Templates', () => {
     test('shows AI template button', async ({ page }) => {
       await page.goto('/messages/conv-1');
-      await expect(page.getByRole('button', { name: /ai template|generate message/i })).toBeVisible();
+      await expect(
+        page.getByRole('button', { name: /ai template|generate message/i })
+      ).toBeVisible();
     });
 
     test('displays template options when clicked', async ({ page }) => {

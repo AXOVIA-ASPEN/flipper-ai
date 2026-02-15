@@ -3,8 +3,8 @@
  * Provides utilities for protecting API routes
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
 
 export type AuthenticatedRequest = NextRequest & {
   userId: string;
@@ -22,10 +22,7 @@ export function withAuth<T>(
     const session = await auth();
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     // Attach user info to request
@@ -75,17 +72,17 @@ export async function getUserIdOrDefault(): Promise<string> {
   }
 
   // In development, allow fallback to default user
-  if (process.env.NODE_ENV === "development") {
-    const prisma = (await import("@/lib/db")).default;
+  if (process.env.NODE_ENV === 'development') {
+    const prisma = (await import('@/lib/db')).default;
     const defaultUser = await prisma.user.findFirst({
-      where: { email: "default@flipper.ai" },
+      where: { email: 'default@flipper.ai' },
     });
     if (defaultUser) {
       return defaultUser.id;
     }
   }
 
-  throw new Error("Unauthorized");
+  throw new Error('Unauthorized');
 }
 
 /**
@@ -98,7 +95,7 @@ export async function requirePageAuth() {
   if (!session?.user) {
     return {
       redirect: {
-        destination: "/login",
+        destination: '/login',
         permanent: false,
       },
     };

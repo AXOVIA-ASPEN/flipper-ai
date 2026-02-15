@@ -31,10 +31,7 @@ jest.mock('@/lib/db', () => ({
   },
 }));
 
-function createMockRequest(
-  method: string,
-  body?: Record<string, unknown>
-): NextRequest {
+function createMockRequest(method: string, body?: Record<string, unknown>): NextRequest {
   return new NextRequest(new URL('http://localhost:3000/api/user/settings'), {
     method,
     ...(body && {
@@ -250,7 +247,12 @@ describe('PATCH /api/user/settings', () => {
   });
 
   it('should handle multiple field updates at once', async () => {
-    const updated = { ...mockUser.settings, llmModel: 'gpt-4-turbo', discountThreshold: 30, autoAnalyze: false };
+    const updated = {
+      ...mockUser.settings,
+      llmModel: 'gpt-4-turbo',
+      discountThreshold: 30,
+      autoAnalyze: false,
+    };
     mockUpdateSettings.mockResolvedValue(updated);
 
     const req = createMockRequest('PATCH', {

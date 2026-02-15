@@ -3,8 +3,8 @@
  * Secure storage and retrieval of Facebook OAuth tokens
  */
 
-import { prisma } from "@/lib/db";
-import { encrypt, decrypt } from "@/lib/crypto";
+import { prisma } from '@/lib/db';
+import { encrypt, decrypt } from '@/lib/crypto';
 
 export interface StoredFacebookToken {
   userId: string;
@@ -48,9 +48,7 @@ export async function storeToken(
  * @param userId User ID
  * @returns Stored token data or null if not found
  */
-export async function getToken(
-  userId: string
-): Promise<StoredFacebookToken | null> {
+export async function getToken(userId: string): Promise<StoredFacebookToken | null> {
   const tokenRecord = await prisma.facebookToken.findUnique({
     where: { userId },
   });
@@ -91,11 +89,13 @@ export async function hasValidToken(userId: string): Promise<boolean> {
  * @param userId User ID
  */
 export async function deleteToken(userId: string): Promise<void> {
-  await prisma.facebookToken.delete({
-    where: { userId },
-  }).catch(() => {
-    // Ignore error if token doesn't exist
-  });
+  await prisma.facebookToken
+    .delete({
+      where: { userId },
+    })
+    .catch(() => {
+      // Ignore error if token doesn't exist
+    });
 }
 
 /**

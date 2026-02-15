@@ -55,12 +55,11 @@ export class CustomWorld extends World implements FlipperWorld {
       return;
     }
 
-    const scenarioName = (this as any).scenario?.name
-      ?.replace(/[^a-z0-9]/gi, '-')
-      .toLowerCase() || 'unknown';
-    
+    const scenarioName =
+      (this as any).scenario?.name?.replace(/[^a-z0-9]/gi, '-').toLowerCase() || 'unknown';
+
     const dir = path.join('screenshots', scenarioName);
-    
+
     // Create directory if it doesn't exist
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
@@ -69,9 +68,9 @@ export class CustomWorld extends World implements FlipperWorld {
     const filename = `${name}.png`;
     const filepath = path.join(dir, filename);
 
-    await this.page.screenshot({ 
-      path: filepath, 
-      fullPage: true 
+    await this.page.screenshot({
+      path: filepath,
+      fullPage: true,
     });
 
     this.screenshots.push(filepath);

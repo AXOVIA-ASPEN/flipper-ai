@@ -24,22 +24,25 @@ jest.mock('@/lib/value-estimator', () => ({
     profitHigh: 2900,
     valueScore: 95,
     discountPercent: 80,
-    resaleDifficulty: "EASY",
+    resaleDifficulty: 'EASY',
     comparableUrls: [
-      { platform: "eBay", label: "eBay Sold", url: "https://ebay.com/sold", type: "sold" },
-      { platform: "eBay", label: "eBay Active", url: "https://ebay.com/active", type: "active" },
-      { platform: "Amazon", label: "Amazon", url: "https://amazon.com", type: "retail" },
-      { platform: "Mercari", label: "Mercari", url: "https://mercari.com", type: "marketplace" },
+      { platform: 'eBay', label: 'eBay Sold', url: 'https://ebay.com/sold', type: 'sold' },
+      { platform: 'eBay', label: 'eBay Active', url: 'https://ebay.com/active', type: 'active' },
+      { platform: 'Amazon', label: 'Amazon', url: 'https://amazon.com', type: 'retail' },
+      { platform: 'Mercari', label: 'Mercari', url: 'https://mercari.com', type: 'marketplace' },
     ],
-    reasoning: "Test reasoning",
-    notes: "Test notes",
+    reasoning: 'Test reasoning',
+    notes: 'Test notes',
     shippable: true,
     negotiable: true,
-    tags: ["electronics"],
+    tags: ['electronics'],
   })),
-  detectCategory: jest.fn(() => "electronics"),
-  generatePurchaseMessage: jest.fn((title: string, _price: number, _negotiable: boolean, sellerName: string | null) =>
-    sellerName ? `Hi ${sellerName}, I'm interested in your ${title}` : `Hi, I'm interested in your ${title}`
+  detectCategory: jest.fn(() => 'electronics'),
+  generatePurchaseMessage: jest.fn(
+    (title: string, _price: number, _negotiable: boolean, sellerName: string | null) =>
+      sellerName
+        ? `Hi ${sellerName}, I'm interested in your ${title}`
+        : `Hi, I'm interested in your ${title}`
   ),
 }));
 
@@ -712,12 +715,23 @@ describe('Listings API', () => {
     it('should detect non-shippable items', async () => {
       const { estimateValue } = require('@/lib/value-estimator');
       estimateValue.mockReturnValueOnce({
-        estimatedValue: 3000, estimatedLow: 2500, estimatedHigh: 3500,
-        profitPotential: 2400, profitLow: 1900, profitHigh: 2900,
-        valueScore: 95, discountPercent: 80, resaleDifficulty: "EASY",
-        comparableUrls: [{ platform: "eBay", label: "eBay", url: "https://ebay.com", type: "sold" }],
-        reasoning: "Test", notes: "Test", shippable: false, negotiable: true,
-        tags: ["electronics"],
+        estimatedValue: 3000,
+        estimatedLow: 2500,
+        estimatedHigh: 3500,
+        profitPotential: 2400,
+        profitLow: 1900,
+        profitHigh: 2900,
+        valueScore: 95,
+        discountPercent: 80,
+        resaleDifficulty: 'EASY',
+        comparableUrls: [
+          { platform: 'eBay', label: 'eBay', url: 'https://ebay.com', type: 'sold' },
+        ],
+        reasoning: 'Test',
+        notes: 'Test',
+        shippable: false,
+        negotiable: true,
+        tags: ['electronics'],
       });
       const localOnlyData = {
         ...validListingData,

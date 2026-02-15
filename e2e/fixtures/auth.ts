@@ -34,9 +34,9 @@ export async function mockAuthSession(page: Page) {
 /**
  * Create an authenticated browser context with a stored session cookie.
  */
-export async function createAuthenticatedContext(
-  browser: { newContext: () => Promise<BrowserContext> },
-): Promise<BrowserContext> {
+export async function createAuthenticatedContext(browser: {
+  newContext: () => Promise<BrowserContext>;
+}): Promise<BrowserContext> {
   const context = await browser.newContext();
   // Add session cookie for NextAuth
   await context.addCookies([

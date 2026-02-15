@@ -14,11 +14,11 @@ Prisma is a modern, type-safe ORM (Object-Relational Mapping) for Node.js and Ty
 
 Prisma's core tools are **100% free and open-source**:
 
-| Component | Cost | Description |
-|-----------|------|-------------|
-| Prisma Client | Free | Query builder/ORM |
+| Component      | Cost | Description         |
+| -------------- | ---- | ------------------- |
+| Prisma Client  | Free | Query builder/ORM   |
 | Prisma Migrate | Free | Database migrations |
-| Prisma Studio | Free | Visual database GUI |
+| Prisma Studio  | Free | Visual database GUI |
 
 Prisma has paid cloud services (Accelerate, Pulse) but we don't use them. Everything in Flipper.ai uses only the free, self-hosted components.
 
@@ -53,7 +53,9 @@ DATABASE_URL="file:./dev.db"
 Our schema in `prisma/schema.prisma` defines these models:
 
 ### Listing
+
 Scraped marketplace listings with flip analysis:
+
 ```prisma
 model Listing {
   id              String    @id @default(cuid())
@@ -69,7 +71,9 @@ model Listing {
 ```
 
 ### Opportunity
+
 Flip opportunities being actively pursued:
+
 ```prisma
 model Opportunity {
   id              String    @id @default(cuid())
@@ -84,7 +88,9 @@ model Opportunity {
 ```
 
 ### ScraperJob
+
 Tracks scraper runs:
+
 ```prisma
 model ScraperJob {
   id              String    @id @default(cuid())
@@ -96,7 +102,9 @@ model ScraperJob {
 ```
 
 ### SearchConfig
+
 Saved search configurations for automated scraping:
+
 ```prisma
 model SearchConfig {
   id              String    @id @default(cuid())
@@ -112,12 +120,14 @@ model SearchConfig {
 ## Common Commands
 
 ### Install Dependencies & Generate Client
+
 ```bash
 pnpm install
 npx prisma generate
 ```
 
 ### Run Migrations
+
 ```bash
 # Development - creates migration and applies it
 npx prisma migrate dev
@@ -127,18 +137,21 @@ npx prisma migrate deploy
 ```
 
 ### Open Prisma Studio (Database GUI)
+
 ```bash
 npx prisma studio
 # Opens at http://localhost:5555
 ```
 
 ### Reset Database
+
 ```bash
 npx prisma migrate reset
 # WARNING: Deletes all data!
 ```
 
 ### Using the Makefile
+
 ```bash
 make db-migrate   # Run migrations
 make db-studio    # Open Prisma Studio
@@ -148,59 +161,69 @@ make db-reset     # Reset database
 ## Using Prisma in Code
 
 ### Import the Client
+
 ```typescript
-import prisma from "@/lib/db";
+import prisma from '@/lib/db';
 ```
 
 ### Query Examples
 
 **Find all listings:**
+
 ```typescript
 const listings = await prisma.listing.findMany({
-  orderBy: { scrapedAt: "desc" },
+  orderBy: { scrapedAt: 'desc' },
   take: 50,
 });
 ```
 
 **Find opportunities with high scores:**
+
 ```typescript
 const opportunities = await prisma.listing.findMany({
   where: {
     valueScore: { gte: 70 },
-    status: "NEW",
+    status: 'NEW',
   },
 });
 ```
 
 **Create a listing:**
+
 ```typescript
 const listing = await prisma.listing.create({
   data: {
-    externalId: "12345",
-    platform: "CRAIGSLIST",
-    title: "iPhone 13 Pro",
+    externalId: '12345',
+    platform: 'CRAIGSLIST',
+    title: 'iPhone 13 Pro',
     askingPrice: 500,
-    url: "https://...",
+    url: 'https://...',
   },
 });
 ```
 
 **Update listing status:**
+
 ```typescript
 await prisma.listing.update({
   where: { id: listingId },
-  data: { status: "OPPORTUNITY" },
+  data: { status: 'OPPORTUNITY' },
 });
 ```
 
 **Upsert (create or update):**
+
 ```typescript
 await prisma.listing.upsert({
   where: {
-    platform_externalId: { platform: "CRAIGSLIST", externalId: "12345" },
+    platform_externalId: { platform: 'CRAIGSLIST', externalId: '12345' },
   },
-  create: { /* new listing data */ },
-  update: { /* updated fields */ },
+  create: {
+    /* new listing data */
+  },
+  update: {
+    /* updated fields */
+  },
 });
 ```
 
@@ -209,6 +232,7 @@ await prisma.listing.upsert({
 When you modify `schema.prisma`:
 
 1. **Create a migration:**
+
    ```bash
    npx prisma migrate dev --name describe_your_change
    ```
@@ -223,25 +247,32 @@ The migration will be saved in `prisma/migrations/` for version control.
 ## Troubleshooting
 
 ### "Table does not exist"
+
 Run migrations:
+
 ```bash
 npx prisma migrate dev
 ```
 
 ### "Prisma Client not generated"
+
 Generate the client:
+
 ```bash
 npx prisma generate
 ```
 
 ### "Cannot find module '@/generated/prisma'"
+
 Make sure you've run:
+
 ```bash
 pnpm install
 npx prisma generate
 ```
 
 ### Database locked errors
+
 Close Prisma Studio and any other connections, then retry.
 
 ## Resources

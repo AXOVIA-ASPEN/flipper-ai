@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
-import { getAuthUserId } from "@/lib/auth-middleware";
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/db';
+import { getAuthUserId } from '@/lib/auth-middleware';
 import {
   OpportunityQuerySchema,
   CreateOpportunitySchema,
   validateQuery,
   validateBody,
-} from "@/lib/validations";
+} from '@/lib/validations';
 
 // GET /api/opportunities - Get all opportunities
 export async function GET(request: NextRequest) {
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const parsed = validateQuery(OpportunityQuerySchema, searchParams);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "Invalid query parameters", details: parsed.error },
+        { error: 'Invalid query parameters', details: parsed.error },
         { status: 400 }
       );
     }
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     const [opportunities, total, stats] = await Promise.all([
       prisma.opportunity.findMany({
         where,
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: 'desc' },
         take: limit,
         skip: offset,
         include: { listing: true },
@@ -67,11 +67,8 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error fetching opportunities:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch opportunities" },
-      { status: 500 }
-    );
+    console.error('Error fetching opportunities:', error);
+    return NextResponse.json({ error: 'Failed to fetch opportunities' }, { status: 500 });
   }
 }
 
@@ -83,7 +80,7 @@ export async function POST(request: NextRequest) {
     const parsed = validateBody(CreateOpportunitySchema, body);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "Invalid request body", details: parsed.error },
+        { error: 'Invalid request body', details: parsed.error },
         { status: 400 }
       );
     }
@@ -95,10 +92,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!listing) {
-      return NextResponse.json(
-        { error: "Listing not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
     }
 
     // Check if opportunity already exists
@@ -108,7 +102,7 @@ export async function POST(request: NextRequest) {
 
     if (existing) {
       return NextResponse.json(
-        { error: "Opportunity already exists for this listing" },
+        { error: 'Opportunity already exists for this listing' },
         { status: 409 }
       );
     }
@@ -120,22 +114,19 @@ export async function POST(request: NextRequest) {
           userId,
           listingId,
           notes,
-          status: "IDENTIFIED",
+          status: 'IDENTIFIED',
         },
         include: { listing: true },
       }),
       prisma.listing.update({
         where: { id: listingId },
-        data: { status: "OPPORTUNITY" },
+        data: { status: 'OPPORTUNITY' },
       }),
     ]);
 
     return NextResponse.json(opportunity, { status: 201 });
   } catch (error) {
-    console.error("Error creating opportunity:", error);
-    return NextResponse.json(
-      { error: "Failed to create opportunity" },
-      { status: 500 }
-    );
+    console.error('Error creating opportunity:', error);
+    return NextResponse.json({ error: 'Failed to create opportunity' }, { status: 500 });
   }
 }

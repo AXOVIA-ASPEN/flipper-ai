@@ -50,13 +50,13 @@ const createDefaultEstimation = () => ({
   profitHigh: 450,
   valueScore: 85,
   discountPercent: 40,
-  resaleDifficulty: "EASY",
-  comparableUrls: [{ platform: "eBay", label: "eBay", url: "https://ebay.com", type: "sold" }],
-  reasoning: "Test reasoning",
-  notes: "Test notes",
+  resaleDifficulty: 'EASY',
+  comparableUrls: [{ platform: 'eBay', label: 'eBay', url: 'https://ebay.com', type: 'sold' }],
+  reasoning: 'Test reasoning',
+  notes: 'Test notes',
   shippable: true,
   negotiable: true,
-  tags: ["electronics", "craigslist"],
+  tags: ['electronics', 'craigslist'],
 });
 
 // Mock Playwright
@@ -116,7 +116,7 @@ describe('Craigslist Scraper API', () => {
     delete process.env.GOOGLE_API_KEY;
     delete process.env.OPENAI_API_KEY;
     mockEstimateValue.mockImplementation(() => createDefaultEstimation());
-    mockDetectCategory.mockReturnValue("electronics");
+    mockDetectCategory.mockReturnValue('electronics');
     mockGeneratePurchaseMessage.mockImplementation(
       (title: string) => `Auto purchase message for ${title}`
     );
@@ -687,9 +687,7 @@ describe('Craigslist Scraper Helper Functions', () => {
         lowestPrice: 600,
         highestPrice: 1000,
         salesCount: 10,
-        soldListings: [
-          { title: 'iPhone 15 Pro', price: 750, url: 'https://ebay.com/1' },
-        ],
+        soldListings: [{ title: 'iPhone 15 Pro', price: 750, url: 'https://ebay.com/1' }],
       });
 
       mockAnalyzeSellability.mockResolvedValue({

@@ -67,13 +67,19 @@ export class DashboardPage extends BasePage {
   }
 
   async openImageModal(index = 0) {
-    const thumbnail = this.page.locator('button').filter({ has: this.page.locator('img') }).nth(index);
+    const thumbnail = this.page
+      .locator('button')
+      .filter({ has: this.page.locator('img') })
+      .nth(index);
     await thumbnail.click();
     await expect(this.page.locator('.fixed.inset-0')).toBeVisible();
   }
 
   async closeImageModal() {
-    const closeButton = this.page.locator('.fixed.inset-0 button').filter({ has: this.page.locator('svg') }).first();
+    const closeButton = this.page
+      .locator('.fixed.inset-0 button')
+      .filter({ has: this.page.locator('svg') })
+      .first();
     await closeButton.click();
     await expect(this.page.locator('.fixed.inset-0')).not.toBeVisible();
   }
@@ -95,7 +101,9 @@ export class DashboardPage extends BasePage {
 
   // Assertions
   async expectEmptyState() {
-    await expect(this.page.getByText('No listings found. Run a scraper to find deals!')).toBeVisible();
+    await expect(
+      this.page.getByText('No listings found. Run a scraper to find deals!')
+    ).toBeVisible();
   }
 
   async expectLoadingState() {

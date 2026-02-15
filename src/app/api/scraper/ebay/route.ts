@@ -1,31 +1,31 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
-import { estimateValue, detectCategory, generatePurchaseMessage } from "@/lib/value-estimator";
-import { getAuthUserId } from "@/lib/auth-middleware";
-import { calculateVerifiedMarketValue, calculateTrueDiscount } from "@/lib/market-value-calculator";
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/db';
+import { estimateValue, detectCategory, generatePurchaseMessage } from '@/lib/value-estimator';
+import { getAuthUserId } from '@/lib/auth-middleware';
+import { calculateVerifiedMarketValue, calculateTrueDiscount } from '@/lib/market-value-calculator';
 
 const EBAY_API_BASE_URL =
-  process.env.EBAY_BROWSE_API_BASE_URL || "https://api.ebay.com/buy/browse/v1";
-const EBAY_MARKETPLACE_ID = process.env.EBAY_MARKETPLACE_ID || "EBAY_US";
+  process.env.EBAY_BROWSE_API_BASE_URL || 'https://api.ebay.com/buy/browse/v1';
+const EBAY_MARKETPLACE_ID = process.env.EBAY_MARKETPLACE_ID || 'EBAY_US';
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
 
 const SUPPORTED_CATEGORIES = [
-  { id: "293", label: "Electronics" },
-  { id: "11450", label: "Clothing, Shoes & Accessories" },
-  { id: "12576", label: "Collectibles" },
-  { id: "6000", label: "Musical Instruments & Gear" },
-  { id: "888", label: "Video Games & Consoles" },
-  { id: "281", label: "Antiques" },
+  { id: '293', label: 'Electronics' },
+  { id: '11450', label: 'Clothing, Shoes & Accessories' },
+  { id: '12576', label: 'Collectibles' },
+  { id: '6000', label: 'Musical Instruments & Gear' },
+  { id: '888', label: 'Video Games & Consoles' },
+  { id: '281', label: 'Antiques' },
 ];
 
 const SUPPORTED_CONDITIONS = [
-  { id: "NEW", label: "New" },
-  { id: "OPEN_BOX", label: "Open Box" },
-  { id: "CERTIFIED_REFURBISHED", label: "Certified Refurbished" },
-  { id: "EXCELLENT_REFURBISHED", label: "Excellent Refurbished" },
-  { id: "VERY_GOOD_REFURBISHED", label: "Very Good Refurbished" },
-  { id: "USED", label: "Used" },
+  { id: 'NEW', label: 'New' },
+  { id: 'OPEN_BOX', label: 'Open Box' },
+  { id: 'CERTIFIED_REFURBISHED', label: 'Certified Refurbished' },
+  { id: 'EXCELLENT_REFURBISHED', label: 'Excellent Refurbished' },
+  { id: 'VERY_GOOD_REFURBISHED', label: 'Very Good Refurbished' },
+  { id: 'USED', label: 'Used' },
 ];
 
 interface EbayItemSummary {
@@ -69,19 +69,19 @@ interface ScrapeRequestBody {
 }
 
 function buildFilterString(params: ScrapeRequestBody, soldOnly = false) {
-  const filters: string[] = ["buyingOptions:{FIXED_PRICE}"];
+  const filters: string[] = ['buyingOptions:{FIXED_PRICE}'];
   if (soldOnly) {
-    filters.push("soldItemsOnly:true");
+    filters.push('soldItemsOnly:true');
   }
   if (params.minPrice !== undefined || params.maxPrice !== undefined) {
     const min = params.minPrice ?? 0;
-    const max = params.maxPrice ?? "*";
+    const max = params.maxPrice ?? '*';
     filters.push(`price:[${min}..${max}]`);
   }
   if (params.condition) {
     filters.push(`conditions:{${params.condition}}`);
   }
-  return filters.join(",");
+  return filters.join(',');
 }
 
 async function callEbayApi(
@@ -90,7 +90,7 @@ async function callEbayApi(
 ): Promise<EbaySearchResponse> {
   const token = process.env.EBAY_OAUTH_TOKEN;
   if (!token) {
-    throw new Error("Missing EBAY_OAUTH_TOKEN environment variable");
+    throw new Error('Missing EBAY_OAUTH_TOKEN environment variable');
   }
 
   const url = new URL(`${EBAY_API_BASE_URL}${path}`);
@@ -103,8 +103,8 @@ async function callEbayApi(
   const response = await fetch(url.toString(), {
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      "X-EBAY-C-MARKETPLACE-ID": EBAY_MARKETPLACE_ID,
+      'Content-Type': 'application/json',
+      'X-EBAY-C-MARKETPLACE-ID': EBAY_MARKETPLACE_ID,
     },
   });
 
@@ -117,24 +117,24 @@ async function callEbayApi(
 }
 
 async function fetchEbayListings(params: ScrapeRequestBody) {
-  const response = await callEbayApi("/item_summary/search", {
-    q: params.keywords || "",
-    sort: "-price",
+  const response = await callEbayApi('/item_summary/search', {
+    q: params.keywords || '',
+    sort: '-price',
     limit: String(Math.min(params.limit ?? DEFAULT_LIMIT, MAX_LIMIT)),
-    fieldgroups: "EXTENDED",
-    category_ids: params.categoryId || "",
+    fieldgroups: 'EXTENDED',
+    category_ids: params.categoryId || '',
     filter: buildFilterString(params),
   });
   return response.itemSummaries ?? [];
 }
 
 async function fetchSoldListings(params: ScrapeRequestBody) {
-  const response = await callEbayApi("/item_summary/search", {
-    q: params.keywords || "",
-    sort: "-price",
-    limit: "10",
-    fieldgroups: "EXTENDED",
-    category_ids: params.categoryId || "",
+  const response = await callEbayApi('/item_summary/search', {
+    q: params.keywords || '',
+    sort: '-price',
+    limit: '10',
+    fieldgroups: 'EXTENDED',
+    category_ids: params.categoryId || '',
     filter: buildFilterString(params, true),
   });
   return response.itemSummaries ?? [];
@@ -147,7 +147,7 @@ function formatLocation(item: EbayItemSummary) {
     item.itemLocation.stateOrProvince,
     item.itemLocation.country,
   ].filter(Boolean);
-  return parts.join(", ") || null;
+  return parts.join(', ') || null;
 }
 
 function buildSellerNote(item: EbayItemSummary) {
@@ -155,16 +155,14 @@ function buildSellerNote(item: EbayItemSummary) {
   const score = item.seller.feedbackScore ?? null;
   const percent = item.seller.feedbackPercentage ?? null;
   if (!score && !percent) return null;
-  return `Seller feedback: ${percent ?? "N/A"} (${score ?? "N/A"} ratings)`;
+  return `Seller feedback: ${percent ?? 'N/A'} (${score ?? 'N/A'} ratings)`;
 }
 
 async function saveListingFromEbayItem(item: EbayItemSummary, userId: string) {
-  const price = parseFloat(item.price?.value || "0");
-  const description = item.shortDescription || item.description || "";
+  const price = parseFloat(item.price?.value || '0');
+  const description = item.shortDescription || item.description || '';
   const category =
-    item.categories?.[0]?.categoryName ||
-    detectCategory(item.title, description) ||
-    "electronics";
+    item.categories?.[0]?.categoryName || detectCategory(item.title, description) || 'electronics';
 
   const estimation = estimateValue(
     item.title,
@@ -175,7 +173,7 @@ async function saveListingFromEbayItem(item: EbayItemSummary, userId: string) {
   );
 
   // Calculate verified market value from sold data
-  const marketValue = await calculateVerifiedMarketValue(item.title, "EBAY");
+  const marketValue = await calculateVerifiedMarketValue(item.title, 'EBAY');
   const verifiedMarketValue = marketValue?.verifiedMarketValue || null;
   const marketDataSource = marketValue?.marketDataSource || null;
   const trueDiscountPercent = marketValue
@@ -183,12 +181,12 @@ async function saveListingFromEbayItem(item: EbayItemSummary, userId: string) {
     : null;
 
   const sellerNote = buildSellerNote(item);
-  const auctionNote = item.buyingOptions?.includes("AUCTION")
-    ? "Auction also available for this item."
+  const auctionNote = item.buyingOptions?.includes('AUCTION')
+    ? 'Auction also available for this item.'
     : null;
   const combinedNotes = [estimation.notes, sellerNote, auctionNote]
     .filter(Boolean)
-    .join("\n")
+    .join('\n')
     .trim();
 
   const sellerName = item.seller?.username || null;
@@ -206,16 +204,16 @@ async function saveListingFromEbayItem(item: EbayItemSummary, userId: string) {
 
   const serializedImages = imageUrls.length ? JSON.stringify(imageUrls) : null;
   const tags = JSON.stringify(estimation.tags);
-  const status = estimation.valueScore >= 70 ? "OPPORTUNITY" : "NEW";
+  const status = estimation.valueScore >= 70 ? 'OPPORTUNITY' : 'NEW';
 
   const savedListing = await prisma.listing.upsert({
     where: {
-      platform_externalId_userId: { platform: "EBAY", externalId: item.itemId, userId },
+      platform_externalId_userId: { platform: 'EBAY', externalId: item.itemId, userId },
     },
     create: {
       userId,
       externalId: item.itemId,
-      platform: "EBAY",
+      platform: 'EBAY',
       url: item.itemWebUrl,
       title: item.title,
       description,
@@ -282,20 +280,17 @@ async function saveListingFromEbayItem(item: EbayItemSummary, userId: string) {
   return savedListing;
 }
 
-async function storePriceHistoryRecords(
-  soldItems: EbayItemSummary[],
-  keywords: string
-) {
+async function storePriceHistoryRecords(soldItems: EbayItemSummary[], keywords: string) {
   if (!soldItems.length) return 0;
 
   const data = soldItems
     .map((item) => {
-      const price = parseFloat(item.price?.value || "0");
+      const price = parseFloat(item.price?.value || '0');
       if (!price) return null;
       return {
         productName: item.title || keywords,
         category: item.categories?.[0]?.categoryName || null,
-        platform: "EBAY",
+        platform: 'EBAY',
         soldPrice: price,
         condition: item.condition || null,
         soldAt: item.itemEndDate
@@ -306,7 +301,7 @@ async function storePriceHistoryRecords(
     .filter(Boolean);
 
   if (!data.length) return 0;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (prisma.priceHistory.createMany as any)({
     data,
     skipDuplicates: true,
@@ -316,38 +311,32 @@ async function storePriceHistoryRecords(
 }
 
 export async function GET() {
-  const status = process.env.EBAY_OAUTH_TOKEN ? "ready" : "missing_token";
+  const status = process.env.EBAY_OAUTH_TOKEN ? 'ready' : 'missing_token';
   return NextResponse.json({
-    platform: "ebay",
+    platform: 'ebay',
     status,
     marketplaceId: EBAY_MARKETPLACE_ID,
     supportedCategories: SUPPORTED_CATEGORIES,
     supportedConditions: SUPPORTED_CONDITIONS,
     notes:
-      "Requires eBay Browse API OAuth token (set EBAY_OAUTH_TOKEN). Only Fixed Price listings are ingested by default.",
+      'Requires eBay Browse API OAuth token (set EBAY_OAUTH_TOKEN). Only Fixed Price listings are ingested by default.',
   });
 }
 
 export async function POST(request: NextRequest) {
   const token = process.env.EBAY_OAUTH_TOKEN;
   if (!token) {
-    return NextResponse.json(
-      { error: "EBAY_OAUTH_TOKEN is not configured" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'EBAY_OAUTH_TOKEN is not configured' }, { status: 500 });
   }
 
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const body: ScrapeRequestBody = await request.json();
     if (!body.keywords || body.keywords.trim().length === 0) {
-      return NextResponse.json(
-        { error: "keywords is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'keywords is required' }, { status: 400 });
     }
 
     const sanitizedLimit = Math.min(body.limit ?? DEFAULT_LIMIT, MAX_LIMIT);
@@ -360,10 +349,10 @@ export async function POST(request: NextRequest) {
     const scraperJob = await prisma.scraperJob.create({
       data: {
         userId,
-        platform: "EBAY",
-        location: "remote",
+        platform: 'EBAY',
+        location: 'remote',
         category: body.categoryId || null,
-        status: "RUNNING",
+        status: 'RUNNING',
         startedAt: new Date(),
       },
     });
@@ -389,18 +378,17 @@ export async function POST(request: NextRequest) {
       await prisma.scraperJob.update({
         where: { id: scraperJob.id },
         data: {
-          status: "COMPLETED",
+          status: 'COMPLETED',
           listingsFound: savedListings.length,
-          opportunitiesFound: savedListings.filter(
-            (listing) => listing.status === "OPPORTUNITY"
-          ).length,
+          opportunitiesFound: savedListings.filter((listing) => listing.status === 'OPPORTUNITY')
+            .length,
           completedAt: new Date(),
         },
       });
 
       return NextResponse.json({
         success: true,
-        platform: "EBAY",
+        platform: 'EBAY',
         listingsSaved: savedListings.length,
         priceHistorySaved,
         listings: savedListings,
@@ -409,19 +397,15 @@ export async function POST(request: NextRequest) {
       await prisma.scraperJob.update({
         where: { id: scraperJob.id },
         data: {
-          status: "FAILED",
-          errorMessage:
-            error instanceof Error ? error.message : "Unknown eBay error",
+          status: 'FAILED',
+          errorMessage: error instanceof Error ? error.message : 'Unknown eBay error',
           completedAt: new Date(),
         },
       });
       throw error;
     }
   } catch (error) {
-    console.error("Error running eBay scraper:", error);
-    return NextResponse.json(
-      { error: "Failed to scrape eBay listings" },
-      { status: 500 }
-    );
+    console.error('Error running eBay scraper:', error);
+    return NextResponse.json({ error: 'Failed to scrape eBay listings' }, { status: 500 });
   }
 }

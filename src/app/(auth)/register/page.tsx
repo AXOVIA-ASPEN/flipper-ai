@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useState } from 'react';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   Mail,
   Lock,
@@ -18,15 +18,15 @@ import {
   Target,
   ArrowRight,
   Zap,
-} from "lucide-react";
+} from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -48,34 +48,34 @@ export default function RegisterPage() {
 
     // Validate password match
     if (password !== confirmPassword) {
-      setErrorMessage("Passwords do not match");
+      setErrorMessage('Passwords do not match');
       setIsLoading(false);
       return;
     }
 
     // Validate password strength
     if (!passwordChecks.length) {
-      setErrorMessage("Password must be at least 8 characters");
+      setErrorMessage('Password must be at least 8 characters');
       setIsLoading(false);
       return;
     }
 
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, name }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        setErrorMessage(data.error || "Failed to create account");
+        setErrorMessage(data.error || 'Failed to create account');
         return;
       }
 
       // Auto sign in after registration
-      const signInResult = await signIn("credentials", {
+      const signInResult = await signIn('credentials', {
         email,
         password,
         redirect: false,
@@ -83,22 +83,22 @@ export default function RegisterPage() {
 
       if (signInResult?.error) {
         // Account created but sign-in failed, redirect to login
-        router.push("/login?registered=true");
+        router.push('/login?registered=true');
       } else {
-        router.push("/settings");
+        router.push('/settings');
         router.refresh();
       }
     } catch {
-      setErrorMessage("Something went wrong. Please try again.");
+      setErrorMessage('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
   }
 
-  async function handleOAuthSignIn(provider: "google" | "github") {
+  async function handleOAuthSignIn(provider: 'google' | 'github') {
     setIsLoading(true);
     setErrorMessage(null);
-    await signIn(provider, { callbackUrl: "/settings" });
+    await signIn(provider, { callbackUrl: '/settings' });
   }
 
   return (
@@ -120,9 +120,7 @@ export default function RegisterPage() {
             </div>
             <div>
               <p className="text-sm font-semibold text-white">AI-Powered Analysis</p>
-              <p className="text-xs text-blue-200/60">
-                Instant profit estimates on every listing
-              </p>
+              <p className="text-xs text-blue-200/60">Instant profit estimates on every listing</p>
             </div>
           </div>
         </div>
@@ -134,9 +132,7 @@ export default function RegisterPage() {
             </div>
             <div>
               <p className="text-sm font-semibold text-white">Market Intelligence</p>
-              <p className="text-xs text-blue-200/60">
-                Real eBay sold data for accurate pricing
-              </p>
+              <p className="text-xs text-blue-200/60">Real eBay sold data for accurate pricing</p>
             </div>
           </div>
         </div>
@@ -151,9 +147,7 @@ export default function RegisterPage() {
             </div>
             <div>
               <p className="text-sm font-semibold text-white">Multi-Platform</p>
-              <p className="text-xs text-blue-200/60">
-                Craigslist, eBay, Facebook & OfferUp
-              </p>
+              <p className="text-xs text-blue-200/60">Craigslist, eBay, Facebook & OfferUp</p>
             </div>
           </div>
         </div>
@@ -165,9 +159,7 @@ export default function RegisterPage() {
             </div>
             <div>
               <p className="text-sm font-semibold text-white">Automated Alerts</p>
-              <p className="text-xs text-blue-200/60">
-                Never miss a high-value opportunity
-              </p>
+              <p className="text-xs text-blue-200/60">Never miss a high-value opportunity</p>
             </div>
           </div>
         </div>
@@ -189,9 +181,7 @@ export default function RegisterPage() {
               </div>
             </Link>
             <h1 className="text-2xl font-bold text-white mb-2">Create your account</h1>
-            <p className="text-blue-200/70">
-              Start finding profitable flips in minutes
-            </p>
+            <p className="text-blue-200/70">Start finding profitable flips in minutes</p>
           </div>
 
           {/* Error message */}
@@ -205,7 +195,7 @@ export default function RegisterPage() {
           {/* OAuth buttons */}
           <div className="px-8 space-y-3">
             <button
-              onClick={() => handleOAuthSignIn("google")}
+              onClick={() => handleOAuthSignIn('google')}
               disabled={isLoading}
               className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
             >
@@ -233,7 +223,7 @@ export default function RegisterPage() {
             </button>
 
             <button
-              onClick={() => handleOAuthSignIn("github")}
+              onClick={() => handleOAuthSignIn('github')}
               disabled={isLoading}
               className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
             >
@@ -253,9 +243,7 @@ export default function RegisterPage() {
                 <div className="w-full border-t border-white/20" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-transparent text-blue-200/50">
-                  or create with email
-                </span>
+                <span className="px-4 bg-transparent text-blue-200/50">or create with email</span>
               </div>
             </div>
           </div>
@@ -263,9 +251,7 @@ export default function RegisterPage() {
           {/* Registration form */}
           <form onSubmit={handleSubmit} className="px-8 pb-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-blue-200/90 mb-2">
-                Full name
-              </label>
+              <label className="block text-sm font-medium text-blue-200/90 mb-2">Full name</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <User className="h-5 w-5 text-blue-300/50" />
@@ -300,15 +286,13 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-blue-200/90 mb-2">
-                Password
-              </label>
+              <label className="block text-sm font-medium text-blue-200/90 mb-2">Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-blue-300/50" />
                 </div>
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -320,11 +304,7 @@ export default function RegisterPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-300/50 hover:text-blue-200 transition-colors"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
 
@@ -338,11 +318,11 @@ export default function RegisterPage() {
                         className={`h-1 flex-1 rounded-full transition-colors ${
                           passwordStrength >= level
                             ? passwordStrength <= 2
-                              ? "bg-red-400"
+                              ? 'bg-red-400'
                               : passwordStrength === 3
-                              ? "bg-yellow-400"
-                              : "bg-green-400"
-                            : "bg-white/20"
+                                ? 'bg-yellow-400'
+                                : 'bg-green-400'
+                            : 'bg-white/20'
                         }`}
                       />
                     ))}
@@ -350,7 +330,7 @@ export default function RegisterPage() {
                   <div className="grid grid-cols-2 gap-1 text-xs">
                     <div
                       className={`flex items-center gap-1 ${
-                        passwordChecks.length ? "text-green-300" : "text-blue-200/40"
+                        passwordChecks.length ? 'text-green-300' : 'text-blue-200/40'
                       }`}
                     >
                       <CheckCircle className="w-3 h-3" />
@@ -358,7 +338,7 @@ export default function RegisterPage() {
                     </div>
                     <div
                       className={`flex items-center gap-1 ${
-                        passwordChecks.uppercase ? "text-green-300" : "text-blue-200/40"
+                        passwordChecks.uppercase ? 'text-green-300' : 'text-blue-200/40'
                       }`}
                     >
                       <CheckCircle className="w-3 h-3" />
@@ -366,7 +346,7 @@ export default function RegisterPage() {
                     </div>
                     <div
                       className={`flex items-center gap-1 ${
-                        passwordChecks.lowercase ? "text-green-300" : "text-blue-200/40"
+                        passwordChecks.lowercase ? 'text-green-300' : 'text-blue-200/40'
                       }`}
                     >
                       <CheckCircle className="w-3 h-3" />
@@ -374,7 +354,7 @@ export default function RegisterPage() {
                     </div>
                     <div
                       className={`flex items-center gap-1 ${
-                        passwordChecks.number ? "text-green-300" : "text-blue-200/40"
+                        passwordChecks.number ? 'text-green-300' : 'text-blue-200/40'
                       }`}
                     >
                       <CheckCircle className="w-3 h-3" />
@@ -394,15 +374,15 @@ export default function RegisterPage() {
                   <Lock className="h-5 w-5 text-blue-300/50" />
                 </div>
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   placeholder="Confirm your password"
                   className={`w-full pl-10 pr-4 py-3 bg-white/10 rounded-xl border focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white placeholder-blue-200/30 transition-all duration-300 ${
                     confirmPassword && password !== confirmPassword
-                      ? "border-red-400/50"
-                      : "border-white/20 focus:border-purple-400/50"
+                      ? 'border-red-400/50'
+                      : 'border-white/20 focus:border-purple-400/50'
                   }`}
                 />
               </div>
@@ -413,7 +393,7 @@ export default function RegisterPage() {
 
             <button
               type="submit"
-              disabled={isLoading || (password !== confirmPassword)}
+              disabled={isLoading || password !== confirmPassword}
               className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-600 hover:to-pink-700 transition-all duration-300 shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed group mt-6"
             >
               {isLoading ? (
@@ -430,7 +410,7 @@ export default function RegisterPage() {
           {/* Footer */}
           <div className="px-8 pb-8 text-center">
             <p className="text-blue-200/60 text-sm">
-              Already have an account?{" "}
+              Already have an account?{' '}
               <Link
                 href="/login"
                 className="text-purple-300 hover:text-purple-200 font-medium transition-colors"

@@ -24,7 +24,7 @@ export class AuthPage extends BasePage {
     await this.page.getByLabel(/Email/i).fill(email);
     const passwordFields = this.page.getByLabel(/Password/i);
     await passwordFields.first().fill(password);
-    if (confirmPassword && await passwordFields.count() > 1) {
+    if (confirmPassword && (await passwordFields.count()) > 1) {
       await passwordFields.nth(1).fill(confirmPassword);
     }
     await this.page.getByRole('button', { name: /Sign [Uu]p|Register/i }).click();

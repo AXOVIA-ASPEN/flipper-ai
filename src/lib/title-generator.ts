@@ -2,8 +2,8 @@
 // Generates SEO-optimized resale listing titles from item data
 // Supports multiple marketplace formats with character limits
 
-import OpenAI from "openai";
-import type { ItemIdentification } from "./llm-identifier";
+import OpenAI from 'openai';
+import type { ItemIdentification } from './llm-identifier';
 
 export interface TitleGeneratorInput {
   brand: string | null;
@@ -16,7 +16,7 @@ export interface TitleGeneratorInput {
 
 export interface GeneratedTitle {
   title: string;
-  platform: "ebay" | "mercari" | "facebook" | "offerup" | "generic";
+  platform: 'ebay' | 'mercari' | 'facebook' | 'offerup' | 'generic';
   charCount: number;
   keywords: string[];
 }
@@ -37,11 +37,11 @@ const PLATFORM_LIMITS: Record<string, number> = {
 
 // Condition display mapping for titles
 const CONDITION_LABELS: Record<string, string> = {
-  new: "NEW",
-  like_new: "Like New",
-  good: "Good Condition",
-  fair: "Fair",
-  poor: "For Parts/Repair",
+  new: 'NEW',
+  like_new: 'Like New',
+  good: 'Good Condition',
+  fair: 'Fair',
+  poor: 'For Parts/Repair',
 };
 
 /**
@@ -50,7 +50,7 @@ const CONDITION_LABELS: Record<string, string> = {
  */
 export function generateAlgorithmicTitle(
   input: TitleGeneratorInput,
-  platform: string = "generic"
+  platform: string = 'generic'
 ): GeneratedTitle {
   const limit = PLATFORM_LIMITS[platform] || 80;
   const parts: string[] = [];
@@ -86,29 +86,25 @@ export function generateAlgorithmicTitle(
   }
 
   // Build title respecting character limit
-  let title = parts.join(" ");
+  let title = parts.join(' ');
 
   // If over limit, try removing condition details
   if (title.length > limit) {
     const shortCondition =
-      input.condition === "new"
-        ? "NEW"
-        : input.condition === "like_new"
-          ? "LN"
-          : "";
+      input.condition === 'new' ? 'NEW' : input.condition === 'like_new' ? 'LN' : '';
     const condensed = parts.slice(0, -1);
     if (shortCondition) condensed.push(shortCondition);
-    title = condensed.join(" ");
+    title = condensed.join(' ');
   }
 
   // Final truncation if still over
   if (title.length > limit) {
-    title = title.substring(0, limit - 3).trimEnd() + "...";
+    title = title.substring(0, limit - 3).trimEnd() + '...';
   }
 
   return {
     title: title.trim(),
-    platform: platform as GeneratedTitle["platform"],
+    platform: platform as GeneratedTitle['platform'],
     charCount: Math.min(title.trim().length, limit),
     keywords,
   };
@@ -117,19 +113,12 @@ export function generateAlgorithmicTitle(
 /**
  * Generate titles for all supported platforms from item data.
  */
-export function generateTitlesForAllPlatforms(
-  input: TitleGeneratorInput
-): TitleGeneratorResult {
-  const platforms = ["ebay", "mercari", "facebook", "offerup"] as const;
-  const titles: GeneratedTitle[] = platforms.map((p) =>
-    generateAlgorithmicTitle(input, p)
-  );
+export function generateTitlesForAllPlatforms(input: TitleGeneratorInput): TitleGeneratorResult {
+  const platforms = ['ebay', 'mercari', 'facebook', 'offerup'] as const;
+  const titles: GeneratedTitle[] = platforms.map((p) => generateAlgorithmicTitle(input, p));
 
   // Primary title is the eBay one (most common resale platform)
-  const primary =
-    titles.find((t) => t.platform === "ebay")?.title ||
-    titles[0]?.title ||
-    "";
+  const primary = titles.find((t) => t.platform === 'ebay')?.title || titles[0]?.title || '';
 
   return { titles, primary };
 }
@@ -140,7 +129,7 @@ export function generateTitlesForAllPlatforms(
  */
 export async function generateLLMTitle(
   input: TitleGeneratorInput,
-  platform: string = "ebay"
+  platform: string = 'ebay'
 ): Promise<GeneratedTitle> {
   const limit = PLATFORM_LIMITS[platform] || 80;
 
@@ -154,11 +143,11 @@ export async function generateLLMTitle(
     const prompt = `Generate a single SEO-optimized resale listing title for ${platform}.
 
 Item Details:
-- Brand: ${input.brand || "Unknown"}
-- Model: ${input.model || "Unknown"}
-- Variant: ${input.variant || "N/A"}
+- Brand: ${input.brand || 'Unknown'}
+- Model: ${input.model || 'Unknown'}
+- Variant: ${input.variant || 'N/A'}
 - Condition: ${input.condition}
-- Category: ${input.category || "General"}
+- Category: ${input.category || 'General'}
 
 Rules:
 - MUST be ${limit} characters or fewer
@@ -171,27 +160,27 @@ Rules:
 Respond with ONLY the title text, nothing else.`;
 
     const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: 'gpt-4o-mini',
       messages: [
         {
-          role: "system",
+          role: 'system',
           content:
-            "You are an expert eBay/marketplace seller who writes high-converting listing titles.",
+            'You are an expert eBay/marketplace seller who writes high-converting listing titles.',
         },
-        { role: "user", content: prompt },
+        { role: 'user', content: prompt },
       ],
       temperature: 0.4,
       max_tokens: 100,
     });
 
-    let title = (response.choices[0]?.message?.content || "").trim();
+    let title = (response.choices[0]?.message?.content || '').trim();
 
     // Strip quotes if the LLM wrapped it
-    title = title.replace(/^["']|["']$/g, "");
+    title = title.replace(/^["']|["']$/g, '');
 
     // Enforce character limit
     if (title.length > limit) {
-      title = title.substring(0, limit - 3).trimEnd() + "...";
+      title = title.substring(0, limit - 3).trimEnd() + '...';
     }
 
     // Extract keywords from the generated title
@@ -202,12 +191,12 @@ Respond with ONLY the title text, nothing else.`;
 
     return {
       title,
-      platform: platform as GeneratedTitle["platform"],
+      platform: platform as GeneratedTitle['platform'],
       charCount: title.length,
       keywords,
     };
   } catch (error) {
-    console.error("LLM title generation failed, using algorithmic:", error);
+    console.error('LLM title generation failed, using algorithmic:', error);
     return generateAlgorithmicTitle(input, platform);
   }
 }
@@ -215,9 +204,7 @@ Respond with ONLY the title text, nothing else.`;
 /**
  * Convert an ItemIdentification (from llm-identifier) to TitleGeneratorInput.
  */
-export function fromIdentification(
-  identification: ItemIdentification
-): TitleGeneratorInput {
+export function fromIdentification(identification: ItemIdentification): TitleGeneratorInput {
   return {
     brand: identification.brand,
     model: identification.model,

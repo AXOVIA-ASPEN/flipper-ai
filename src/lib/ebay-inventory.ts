@@ -10,23 +10,22 @@
  */
 
 const EBAY_INVENTORY_API_BASE =
-  process.env.EBAY_INVENTORY_API_BASE_URL ||
-  "https://api.ebay.com/sell/inventory/v1";
-const EBAY_MARKETPLACE_ID = process.env.EBAY_MARKETPLACE_ID || "EBAY_US";
+  process.env.EBAY_INVENTORY_API_BASE_URL || 'https://api.ebay.com/sell/inventory/v1';
+const EBAY_MARKETPLACE_ID = process.env.EBAY_MARKETPLACE_ID || 'EBAY_US';
 
 // eBay condition enum values for Inventory API
 export const EBAY_CONDITIONS = {
-  NEW: "NEW",
-  LIKE_NEW: "LIKE_NEW",
-  NEW_OTHER: "NEW_OTHER",
-  NEW_WITH_DEFECTS: "NEW_WITH_DEFECTS",
-  MANUFACTURER_REFURBISHED: "MANUFACTURER_REFURBISHED",
-  SELLER_REFURBISHED: "SELLER_REFURBISHED",
-  USED_EXCELLENT: "USED_EXCELLENT",
-  USED_VERY_GOOD: "USED_VERY_GOOD",
-  USED_GOOD: "USED_GOOD",
-  USED_ACCEPTABLE: "USED_ACCEPTABLE",
-  FOR_PARTS_OR_NOT_WORKING: "FOR_PARTS_OR_NOT_WORKING",
+  NEW: 'NEW',
+  LIKE_NEW: 'LIKE_NEW',
+  NEW_OTHER: 'NEW_OTHER',
+  NEW_WITH_DEFECTS: 'NEW_WITH_DEFECTS',
+  MANUFACTURER_REFURBISHED: 'MANUFACTURER_REFURBISHED',
+  SELLER_REFURBISHED: 'SELLER_REFURBISHED',
+  USED_EXCELLENT: 'USED_EXCELLENT',
+  USED_VERY_GOOD: 'USED_VERY_GOOD',
+  USED_GOOD: 'USED_GOOD',
+  USED_ACCEPTABLE: 'USED_ACCEPTABLE',
+  FOR_PARTS_OR_NOT_WORKING: 'FOR_PARTS_OR_NOT_WORKING',
 } as const;
 
 export type EbayCondition = (typeof EBAY_CONDITIONS)[keyof typeof EBAY_CONDITIONS];
@@ -88,22 +87,19 @@ export interface CreateListingResult {
   sku: string;
   offerId?: string;
   listingId?: string;
-  status: "DRAFT" | "PUBLISHED" | "FAILED";
+  status: 'DRAFT' | 'PUBLISHED' | 'FAILED';
   errors?: string[];
 }
 
 function getToken(): string {
   const token = process.env.EBAY_OAUTH_TOKEN;
   if (!token) {
-    throw new Error("Missing EBAY_OAUTH_TOKEN environment variable");
+    throw new Error('Missing EBAY_OAUTH_TOKEN environment variable');
   }
   return token;
 }
 
-async function ebayFetch(
-  path: string,
-  options: RequestInit = {}
-): Promise<Response> {
+async function ebayFetch(path: string, options: RequestInit = {}): Promise<Response> {
   const token = getToken();
   const url = `${EBAY_INVENTORY_API_BASE}${path}`;
 
@@ -111,9 +107,9 @@ async function ebayFetch(
     ...options,
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      "Accept-Language": "en-US",
-      "X-EBAY-C-MARKETPLACE-ID": EBAY_MARKETPLACE_ID,
+      'Content-Type': 'application/json',
+      'Accept-Language': 'en-US',
+      'X-EBAY-C-MARKETPLACE-ID': EBAY_MARKETPLACE_ID,
       ...((options.headers as Record<string, string>) || {}),
     },
   });
@@ -146,7 +142,7 @@ async function createOrReplaceInventoryItem(
       ...(input.packageWeightLbs && {
         weight: {
           value: input.packageWeightLbs,
-          unit: "POUND",
+          unit: 'POUND',
         },
       }),
       ...(input.packageDimensions && {
@@ -154,14 +150,14 @@ async function createOrReplaceInventoryItem(
           length: input.packageDimensions.length,
           width: input.packageDimensions.width,
           height: input.packageDimensions.height,
-          unit: "INCH",
+          unit: 'INCH',
         },
       }),
     };
   }
 
   const response = await ebayFetch(`/inventory_item/${encodeURIComponent(input.sku)}`, {
-    method: "PUT",
+    method: 'PUT',
     body: JSON.stringify(body),
   });
 
@@ -173,9 +169,7 @@ async function createOrReplaceInventoryItem(
   const errorBody: EbayApiError = await response.json();
   return {
     success: false,
-    errors: errorBody.errors?.map((e) => e.longMessage || e.message) || [
-      `HTTP ${response.status}`,
-    ],
+    errors: errorBody.errors?.map((e) => e.longMessage || e.message) || [`HTTP ${response.status}`],
   };
 }
 
@@ -188,14 +182,14 @@ async function createOffer(
   const body: Record<string, unknown> = {
     sku: input.sku,
     marketplaceId: EBAY_MARKETPLACE_ID,
-    format: "FIXED_PRICE",
+    format: 'FIXED_PRICE',
     listingDescription: input.description,
     availableQuantity: input.quantity ?? 1,
     categoryId: input.categoryId,
     pricingSummary: {
       price: {
         value: input.price.toFixed(2),
-        currency: input.currency || "USD",
+        currency: input.currency || 'USD',
       },
     },
   };
@@ -203,19 +197,19 @@ async function createOffer(
   // Add optional policy IDs
   if (input.fulfillmentPolicyId) {
     (body as Record<string, unknown>).listingPolicies = {
-      ...((body as Record<string, unknown>).listingPolicies as object || {}),
+      ...(((body as Record<string, unknown>).listingPolicies as object) || {}),
       fulfillmentPolicyId: input.fulfillmentPolicyId,
     };
   }
   if (input.paymentPolicyId) {
     (body as Record<string, unknown>).listingPolicies = {
-      ...((body as Record<string, unknown>).listingPolicies as object || {}),
+      ...(((body as Record<string, unknown>).listingPolicies as object) || {}),
       paymentPolicyId: input.paymentPolicyId,
     };
   }
   if (input.returnPolicyId) {
     (body as Record<string, unknown>).listingPolicies = {
-      ...((body as Record<string, unknown>).listingPolicies as object || {}),
+      ...(((body as Record<string, unknown>).listingPolicies as object) || {}),
       returnPolicyId: input.returnPolicyId,
     };
   }
@@ -223,8 +217,8 @@ async function createOffer(
     body.merchantLocationKey = input.merchantLocationKey;
   }
 
-  const response = await ebayFetch("/offer", {
-    method: "POST",
+  const response = await ebayFetch('/offer', {
+    method: 'POST',
     body: JSON.stringify(body),
   });
 
@@ -236,9 +230,7 @@ async function createOffer(
   const errorBody: EbayApiError = await response.json();
   return {
     success: false,
-    errors: errorBody.errors?.map((e) => e.longMessage || e.message) || [
-      `HTTP ${response.status}`,
-    ],
+    errors: errorBody.errors?.map((e) => e.longMessage || e.message) || [`HTTP ${response.status}`],
   };
 }
 
@@ -249,7 +241,7 @@ export async function publishOffer(
   offerId: string
 ): Promise<{ success: boolean; listingId?: string; errors?: string[] }> {
   const response = await ebayFetch(`/offer/${encodeURIComponent(offerId)}/publish`, {
-    method: "POST",
+    method: 'POST',
   });
 
   if (response.status === 200) {
@@ -260,9 +252,7 @@ export async function publishOffer(
   const errorBody: EbayApiError = await response.json();
   return {
     success: false,
-    errors: errorBody.errors?.map((e) => e.longMessage || e.message) || [
-      `HTTP ${response.status}`,
-    ],
+    errors: errorBody.errors?.map((e) => e.longMessage || e.message) || [`HTTP ${response.status}`],
   };
 }
 
@@ -278,7 +268,7 @@ export async function createDraftListing(
     return {
       success: false,
       sku: input.sku,
-      status: "FAILED",
+      status: 'FAILED',
       errors: itemResult.errors,
     };
   }
@@ -289,7 +279,7 @@ export async function createDraftListing(
     return {
       success: false,
       sku: input.sku,
-      status: "FAILED",
+      status: 'FAILED',
       errors: offerResult.errors,
     };
   }
@@ -298,16 +288,14 @@ export async function createDraftListing(
     success: true,
     sku: input.sku,
     offerId: offerResult.offerId,
-    status: "DRAFT",
+    status: 'DRAFT',
   };
 }
 
 /**
  * Get an existing inventory item by SKU
  */
-export async function getInventoryItem(
-  sku: string
-): Promise<Record<string, unknown> | null> {
+export async function getInventoryItem(sku: string): Promise<Record<string, unknown> | null> {
   const response = await ebayFetch(`/inventory_item/${encodeURIComponent(sku)}`);
   if (response.status === 200) {
     return response.json();
@@ -322,7 +310,7 @@ export async function deleteInventoryItem(
   sku: string
 ): Promise<{ success: boolean; errors?: string[] }> {
   const response = await ebayFetch(`/inventory_item/${encodeURIComponent(sku)}`, {
-    method: "DELETE",
+    method: 'DELETE',
   });
   if (response.status === 204) {
     return { success: true };
@@ -330,8 +318,6 @@ export async function deleteInventoryItem(
   const errorBody: EbayApiError = await response.json();
   return {
     success: false,
-    errors: errorBody.errors?.map((e) => e.longMessage || e.message) || [
-      `HTTP ${response.status}`,
-    ],
+    errors: errorBody.errors?.map((e) => e.longMessage || e.message) || [`HTTP ${response.status}`],
   };
 }

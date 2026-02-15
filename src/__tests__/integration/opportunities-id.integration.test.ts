@@ -217,7 +217,9 @@ describe('Opportunities [id] API Integration Tests', () => {
         method: 'DELETE',
       });
 
-      const response = await DELETE(request, { params: Promise.resolve({ id: 'non-existent-id' }) });
+      const response = await DELETE(request, {
+        params: Promise.resolve({ id: 'non-existent-id' }),
+      });
       const data = await response.json();
 
       expect(response.status).toBe(404);

@@ -74,7 +74,7 @@ describe('Crypto utilities', () => {
       const encrypted = encrypt(plaintext);
       // Tamper with the auth tag portion (after salt+iv, before ciphertext)
       const buffer = Buffer.from(encrypted, 'base64');
-      buffer[40] = buffer[40] ^ 0xFF; // Flip bits in auth tag
+      buffer[40] = buffer[40] ^ 0xff; // Flip bits in auth tag
       const tampered = buffer.toString('base64');
       expect(() => decrypt(tampered)).toThrow();
     });
@@ -89,7 +89,9 @@ describe('Crypto utilities', () => {
     test('should throw error in production without ENCRYPTION_SECRET', () => {
       delete process.env.ENCRYPTION_SECRET;
       process.env.NODE_ENV = 'production';
-      expect(() => encrypt('test')).toThrow('ENCRYPTION_SECRET environment variable is required in production');
+      expect(() => encrypt('test')).toThrow(
+        'ENCRYPTION_SECRET environment variable is required in production'
+      );
     });
 
     test('should use development fallback when ENCRYPTION_SECRET is missing in dev', () => {
@@ -112,7 +114,7 @@ describe('Crypto utilities', () => {
     test('should fail to decrypt with wrong secret', () => {
       process.env.ENCRYPTION_SECRET = 'secret-1';
       const encrypted = encrypt('test');
-      
+
       process.env.ENCRYPTION_SECRET = 'secret-2';
       expect(() => decrypt(encrypted)).toThrow();
     });

@@ -45,7 +45,7 @@ This document describes the current decision-making process for determining whet
 Each category has a resale markup range:
 
 | Category     | Low Multiplier | High Multiplier | Difficulty |
-|--------------|----------------|-----------------|------------|
+| ------------ | -------------- | --------------- | ---------- |
 | electronics  | 1.2x           | 1.6x            | 2 (Easy)   |
 | furniture    | 1.3x           | 1.8x            | 4 (Hard)   |
 | appliances   | 1.1x           | 1.4x            | 4 (Hard)   |
@@ -61,7 +61,7 @@ Each category has a resale markup range:
 ### Step 2: Condition Multiplier
 
 | Condition | Multiplier |
-|-----------|------------|
+| --------- | ---------- |
 | new       | 1.0        |
 | like new  | 0.92       |
 | excellent | 0.85       |
@@ -75,20 +75,20 @@ Each category has a resale markup range:
 
 Keywords that INCREASE estimated value:
 
-| Pattern                        | Boost | Tag              |
-|--------------------------------|-------|------------------|
-| apple, iphone, ipad, macbook   | 1.2x  | apple            |
-| samsung, galaxy                | 1.15x | samsung          |
-| sony, playstation, ps5, ps4    | 1.2x  | sony             |
-| nintendo, switch               | 1.25x | nintendo         |
-| xbox, microsoft                | 1.15x | xbox             |
-| dyson                          | 1.3x  | dyson            |
-| kitchenaid, vitamix            | 1.25x | premium-kitchen  |
-| herman miller, steelcase       | 1.4x  | premium-furniture|
-| pioneer, ddj                   | 1.2x  | dj-equipment     |
-| vintage, antique, retro        | 1.4x  | vintage          |
-| sealed, new in box, nib, bnib  | 1.3x  | sealed           |
-| rare, limited edition          | 1.4x  | rare             |
+| Pattern                       | Boost | Tag               |
+| ----------------------------- | ----- | ----------------- |
+| apple, iphone, ipad, macbook  | 1.2x  | apple             |
+| samsung, galaxy               | 1.15x | samsung           |
+| sony, playstation, ps5, ps4   | 1.2x  | sony              |
+| nintendo, switch              | 1.25x | nintendo          |
+| xbox, microsoft               | 1.15x | xbox              |
+| dyson                         | 1.3x  | dyson             |
+| kitchenaid, vitamix           | 1.25x | premium-kitchen   |
+| herman miller, steelcase      | 1.4x  | premium-furniture |
+| pioneer, ddj                  | 1.2x  | dj-equipment      |
+| vintage, antique, retro       | 1.4x  | vintage           |
+| sealed, new in box, nib, bnib | 1.3x  | sealed            |
+| rare, limited edition         | 1.4x  | rare              |
 
 **Boosts are multiplicative**: An "Apple iPhone sealed" would get 1.2 × 1.3 = 1.56x boost.
 
@@ -96,13 +96,13 @@ Keywords that INCREASE estimated value:
 
 Keywords that DECREASE estimated value:
 
-| Pattern                          | Penalty | Tag           |
-|----------------------------------|---------|---------------|
-| broken, damaged, parts only      | 0.3x    | for-parts     |
-| needs repair, not working        | 0.4x    | needs-repair  |
-| scratched, dented, worn          | 0.85x   | cosmetic-wear |
-| missing, incomplete              | 0.6x    | incomplete    |
-| old, used heavily                | 0.75x   | heavy-use     |
+| Pattern                     | Penalty | Tag           |
+| --------------------------- | ------- | ------------- |
+| broken, damaged, parts only | 0.3x    | for-parts     |
+| needs repair, not working   | 0.4x    | needs-repair  |
+| scratched, dented, worn     | 0.85x   | cosmetic-wear |
+| missing, incomplete         | 0.6x    | incomplete    |
+| old, used heavily           | 0.75x   | heavy-use     |
 
 ### Step 5: Calculate Estimated Market Value
 
@@ -120,6 +120,7 @@ discountPercent = ((estimatedValue - askingPrice) / estimatedValue) × 100
 ```
 
 **Example**:
+
 - Asking: $100
 - Estimated Value: $150
 - Discount: ((150 - 100) / 150) × 100 = **33%** undervalued
@@ -172,6 +173,7 @@ The current `estimateValue()` function **does NOT verify actual market prices**.
 **This is circular logic**: `estimatedValue = askingPrice × multiplier`
 
 A $100 item in "electronics" gets estimated at $120-$160, regardless of what that item actually sells for. The system has no way to know if:
+
 - A "Sony TV" is a $50 Trinitron from 2003 or a $2000 OLED from 2024
 - An "iPhone" is a cracked iPhone 6 or a mint iPhone 15 Pro
 - "Vintage" means valuable antique or worthless old junk
@@ -229,6 +231,7 @@ But it **never fetches these URLs** to get actual prices. They're just provided 
 ### 1. ALL Listings Are Saved
 
 Currently, every scraped listing (except price=0) is saved to the database regardless of flip potential. This causes:
+
 - Database bloat with low-value listings
 - Noise in the dashboard
 - Wasted storage on items with no flip potential
@@ -245,11 +248,11 @@ The `discountPercent` is calculated from a **guessed** estimated value, not from
 
 The valueScore formula produces counterintuitive results:
 
-| Asking | Est. Value | Profit | Profit Margin | Raw Score | Adjusted |
-|--------|------------|--------|---------------|-----------|----------|
+| Asking | Est. Value | Profit | Profit Margin | Raw Score | Adjusted    |
+| ------ | ---------- | ------ | ------------- | --------- | ----------- |
 | $100   | $120       | $4.40  | 4.4%          | 54        | 30 (capped) |
-| $100   | $150       | $30.50 | 30.5%         | 80        | 80       |
-| $100   | $200       | $74.00 | 74%           | 100       | 100      |
+| $100   | $150       | $30.50 | 30.5%         | 80        | 80          |
+| $100   | $200       | $74.00 | 74%           | 100       | 100         |
 | $100   | $100       | -$13   | -13%          | 37        | 10 (capped) |
 
 ---
@@ -288,7 +291,7 @@ askingPrice <= estimatedValue × 0.5
 ```
 
 | Asking | Est. Value | Discount % | Saved? |
-|--------|------------|------------|--------|
+| ------ | ---------- | ---------- | ------ |
 | $50    | $100       | 50%        | ✅ Yes |
 | $40    | $100       | 60%        | ✅ Yes |
 | $60    | $100       | 40%        | ❌ No  |
@@ -397,11 +400,11 @@ for (const item of listings) {
 interface ItemIdentification {
   brand: string | null;
   model: string | null;
-  variant: string | null;      // "256GB", "Blue", etc.
+  variant: string | null; // "256GB", "Blue", etc.
   year: number | null;
-  condition: "new" | "like_new" | "good" | "fair" | "poor";
+  condition: 'new' | 'like_new' | 'good' | 'fair' | 'poor';
   conditionNotes: string;
-  searchQuery: string;         // Optimized query for eBay search
+  searchQuery: string; // Optimized query for eBay search
   worthInvestigating: boolean; // Quick filter
   reasoning: string;
 }
@@ -410,20 +413,20 @@ async function identifyItem(
   title: string,
   description: string | null,
   imageUrls: string[] | null
-): Promise<ItemIdentification>
+): Promise<ItemIdentification>;
 ```
 
 #### 2. Market Price Fetcher (`src/lib/market-price.ts`)
 
 ```typescript
 interface MarketPrice {
-  source: "ebay_api" | "ebay_scrape";
+  source: 'ebay_api' | 'ebay_scrape';
   soldListings: SoldListing[];
   medianPrice: number;
   lowPrice: number;
   highPrice: number;
   avgDaysToSell: number;
-  salesVolume: number;         // Listings sold in last 30 days
+  salesVolume: number; // Listings sold in last 30 days
   lastUpdated: Date;
 }
 
@@ -438,7 +441,7 @@ interface SoldListing {
 async function fetchMarketPrice(
   searchQuery: string,
   category?: string
-): Promise<MarketPrice | null>
+): Promise<MarketPrice | null>;
 ```
 
 #### 3. LLM Sellability Analyzer (`src/lib/llm-analyzer.ts`)
@@ -450,13 +453,13 @@ interface SellabilityAnalysis {
   trueDiscountPercent: number;
 
   // Sellability
-  sellabilityScore: number;    // 0-100
-  demandLevel: "low" | "medium" | "high" | "very_high";
+  sellabilityScore: number; // 0-100
+  demandLevel: 'low' | 'medium' | 'high' | 'very_high';
   expectedDaysToSell: number;
 
   // Risk assessment
-  authenticityRisk: "low" | "medium" | "high";
-  conditionRisk: "low" | "medium" | "high";
+  authenticityRisk: 'low' | 'medium' | 'high';
+  conditionRisk: 'low' | 'medium' | 'high';
 
   // Recommendations
   recommendedOfferPrice: number;
@@ -465,7 +468,7 @@ interface SellabilityAnalysis {
 
   // Evidence
   comparableSales: SoldListing[];
-  confidence: "low" | "medium" | "high";
+  confidence: 'low' | 'medium' | 'high';
   reasoning: string;
 }
 
@@ -473,36 +476,39 @@ async function analyzeSellability(
   listing: ScrapedListing,
   identification: ItemIdentification,
   marketData: MarketPrice
-): Promise<SellabilityAnalysis>
+): Promise<SellabilityAnalysis>;
 ```
 
 ### eBay Market Data Options
 
 #### Option A: eBay Browse API (Recommended)
+
 - Official API access
 - Requires eBay developer account
 - Rate limited but reliable
 - Can search completed/sold listings
 
 #### Option B: eBay Scraping
+
 - Use Playwright to scrape sold listings page
 - More fragile (HTML changes)
 - No rate limits from eBay
 - Can be blocked
 
 #### Option C: Third-Party APIs
+
 - Services like Terapeak, Keepa (Amazon)
 - PriceCharting for video games
 - Usually paid services
 
 ### Cost Analysis
 
-| Component | Cost per Listing | Notes |
-|-----------|------------------|-------|
-| LLM Identification | ~$0.001 | Gemini Flash, ~500 tokens |
-| eBay Price Fetch | ~$0.00 | API free tier or scraping |
-| LLM Analysis | ~$0.002 | Gemini Flash, ~1000 tokens |
-| **Total** | **~$0.003** | $0.15 per 50 listings |
+| Component          | Cost per Listing | Notes                      |
+| ------------------ | ---------------- | -------------------------- |
+| LLM Identification | ~$0.001          | Gemini Flash, ~500 tokens  |
+| eBay Price Fetch   | ~$0.00           | API free tier or scraping  |
+| LLM Analysis       | ~$0.002          | Gemini Flash, ~1000 tokens |
+| **Total**          | **~$0.003**      | $0.15 per 50 listings      |
 
 With 50% filter, only ~10 items analyzed deeply = **$0.03 per scrape**.
 
@@ -541,12 +547,12 @@ model Listing {
 
 ## Summary
 
-| Aspect | Current | With LLM + Market Verification |
-|--------|---------|--------------------------------|
-| Market value source | Guessed (askingPrice × multiplier) | Verified (eBay sold data) |
-| Accuracy | Low (~30%?) | High (~85%+) |
-| Filter threshold | None (all saved) | 50% true undervalue |
-| Sellability assessment | None | LLM-powered |
-| Listings saved | ~50 per scrape | ~3-10 verified opportunities |
-| Database quality | Noise | Signal only |
-| Cost per scrape | $0 | ~$0.03 |
+| Aspect                 | Current                            | With LLM + Market Verification |
+| ---------------------- | ---------------------------------- | ------------------------------ |
+| Market value source    | Guessed (askingPrice × multiplier) | Verified (eBay sold data)      |
+| Accuracy               | Low (~30%?)                        | High (~85%+)                   |
+| Filter threshold       | None (all saved)                   | 50% true undervalue            |
+| Sellability assessment | None                               | LLM-powered                    |
+| Listings saved         | ~50 per scrape                     | ~3-10 verified opportunities   |
+| Database quality       | Noise                              | Signal only                    |
+| Cost per scrape        | $0                                 | ~$0.03                         |

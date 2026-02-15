@@ -35,6 +35,7 @@ npm install
 ```
 
 This installs:
+
 - `@cucumber/cucumber` - BDD test runner
 - `@playwright/test` - Browser automation
 - `chai` - Assertions
@@ -91,13 +92,13 @@ import { Given, When, Then } from '@cucumber/cucumber';
 import { expect } from '@playwright/test';
 import { CustomWorld } from '../support/world';
 
-When('I select {string} as the marketplace', async function (
-  this: CustomWorld,
-  marketplace: string
-) {
-  await this.page.selectOption('select[name="marketplace"]', marketplace);
-  await this.screenshot(`selected-${marketplace}`);
-});
+When(
+  'I select {string} as the marketplace',
+  async function (this: CustomWorld, marketplace: string) {
+    await this.page.selectOption('select[name="marketplace"]', marketplace);
+    await this.screenshot(`selected-${marketplace}`);
+  }
+);
 ```
 
 ## 📸 Screenshots
@@ -124,7 +125,7 @@ const listing = this.loadFixture('listings').underpriced_iphone;
 
 // Seed database
 await this.seedDatabase({
-  listings: Object.values(this.loadFixture('listings'))
+  listings: Object.values(this.loadFixture('listings')),
 });
 ```
 
@@ -187,15 +188,15 @@ After running tests, reports are generated:
 
 ## ✅ Current Status
 
-| Feature | Scenarios | Steps Implemented | Status |
-|---------|-----------|-------------------|--------|
-| Marketplace Scanning | 5 | 🟡 Partial | In Progress |
-| AI Analysis | 7 | ❌ None | TODO |
-| Seller Communication | 7 | ❌ None | TODO |
-| Resale Listing | 6 | ❌ None | TODO |
-| Dashboard & Tracking | 8 | ❌ None | TODO |
-| User Auth & Billing | 9 | ❌ None | TODO |
-| Notifications | 10 | ❌ None | TODO |
+| Feature              | Scenarios | Steps Implemented | Status      |
+| -------------------- | --------- | ----------------- | ----------- |
+| Marketplace Scanning | 5         | 🟡 Partial        | In Progress |
+| AI Analysis          | 7         | ❌ None           | TODO        |
+| Seller Communication | 7         | ❌ None           | TODO        |
+| Resale Listing       | 6         | ❌ None           | TODO        |
+| Dashboard & Tracking | 8         | ❌ None           | TODO        |
+| User Auth & Billing  | 9         | ❌ None           | TODO        |
+| Notifications        | 10        | ❌ None           | TODO        |
 
 **Total:** 52 scenarios, ~200+ steps to implement
 

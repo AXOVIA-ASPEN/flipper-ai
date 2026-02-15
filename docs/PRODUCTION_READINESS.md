@@ -1,4 +1,5 @@
 # 🐧 Flipper AI - Production Readiness Checklist
+
 **Author:** Stephen Boyett  
 **Company:** Axovia AI  
 **Last Updated:** February 15, 2026  
@@ -9,7 +10,7 @@
 ## 📊 Test Coverage (Current)
 
 | Metric     | Coverage | Target | Status |
-|------------|----------|--------|--------|
+| ---------- | -------- | ------ | ------ |
 | Statements | 99.26%   | 90%    | ✅     |
 | Branches   | 93.82%   | 85%    | ✅     |
 | Functions  | 98.62%   | 90%    | ✅     |
@@ -23,6 +24,7 @@
 ## ✅ Completed Items
 
 ### Testing
+
 - [x] Unit tests: 918 tests, 99.26% coverage
 - [x] Integration tests: API endpoints, database operations
 - [x] Security tests: Auth, rate limiting, input validation
@@ -31,6 +33,7 @@
 - [x] Coverage threshold: 90% enforced in CI
 
 ### CI/CD
+
 - [x] GitHub Actions pipeline (lint → test → build → BDD → Docker)
 - [x] Automated coverage checks
 - [x] Docker image build on main branch
@@ -38,6 +41,7 @@
 - [x] Dependency auditing
 
 ### Infrastructure
+
 - [x] Docker + Docker Compose (production config)
 - [x] Vercel deployment config (vercel.json)
 - [x] Security headers (X-Content-Type-Options, X-Frame-Options, Referrer-Policy)
@@ -46,12 +50,14 @@
 - [x] PostgreSQL database (Prisma ORM)
 
 ### Documentation
+
 - [x] PRD (docs/PRD.md)
 - [x] Deployment guide (docs/DEPLOYMENT.md)
 - [x] API documentation (OpenAPI/Swagger)
 - [x] BDD test plan (docs/BDD_TEST_PLAN.md)
 
 ### Code Quality
+
 - [x] ESLint + Prettier enforced
 - [x] TypeScript strict mode
 - [x] Husky pre-commit hooks
@@ -64,6 +70,7 @@
 ## ⏳ Remaining for Production Launch
 
 ### Required
+
 - [ ] **Deploy to Vercel/Railway** — connect repo, set env vars, verify
 - [ ] **Domain setup** — custom domain + SSL
 - [ ] **PostgreSQL hosting** — Supabase/Neon/Railway for prod DB
@@ -71,6 +78,7 @@
 - [ ] **OAuth providers** — Google/GitHub client IDs for prod
 
 ### Nice to Have
+
 - [ ] Monitoring & alerting (Sentry, Uptime Robot)
 - [ ] Performance optimization & caching review
 - [ ] Load testing

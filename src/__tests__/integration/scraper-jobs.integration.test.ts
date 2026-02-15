@@ -187,7 +187,9 @@ describe('Scraper Jobs API Integration Tests', () => {
 
     it('should return 404 for non-existent job', async () => {
       const request = new NextRequest('http://localhost:3000/api/scraper-jobs/non-existent-id');
-      const response = await GET_BY_ID(request, { params: Promise.resolve({ id: 'non-existent-id' }) });
+      const response = await GET_BY_ID(request, {
+        params: Promise.resolve({ id: 'non-existent-id' }),
+      });
       const data = await response.json();
 
       expect(response.status).toBe(404);

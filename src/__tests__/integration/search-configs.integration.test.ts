@@ -171,7 +171,9 @@ describe('Search Configs API Integration Tests', () => {
 
     it('should return 404 for non-existent config', async () => {
       const request = new NextRequest('http://localhost:3000/api/search-configs/non-existent-id');
-      const response = await GET_BY_ID(request, { params: Promise.resolve({ id: 'non-existent-id' }) });
+      const response = await GET_BY_ID(request, {
+        params: Promise.resolve({ id: 'non-existent-id' }),
+      });
       const data = await response.json();
 
       expect(response.status).toBe(404);
@@ -299,7 +301,9 @@ describe('Search Configs API Integration Tests', () => {
         method: 'DELETE',
       });
 
-      const response = await DELETE(request, { params: Promise.resolve({ id: 'non-existent-id' }) });
+      const response = await DELETE(request, {
+        params: Promise.resolve({ id: 'non-existent-id' }),
+      });
 
       expect(response.status).toBe(500); // Prisma throws on delete of non-existent
     });

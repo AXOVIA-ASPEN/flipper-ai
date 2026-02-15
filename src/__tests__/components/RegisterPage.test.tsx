@@ -22,7 +22,11 @@ jest.mock('next-auth/react', () => ({
 // Mock next/link
 jest.mock('next/link', () => {
   return function MockLink({ children, href, ...props }: any) {
-    return <a href={href} {...props}>{children}</a>;
+    return (
+      <a href={href} {...props}>
+        {children}
+      </a>
+    );
   };
 });
 
@@ -66,7 +70,7 @@ describe('RegisterPage', () => {
     await user.type(screen.getByPlaceholderText('you@example.com'), 'test@example.com');
     await user.type(screen.getByPlaceholderText('Create a password'), 'Password123');
     await user.type(screen.getByPlaceholderText('Confirm your password'), 'Different456');
-    
+
     await user.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
@@ -82,7 +86,7 @@ describe('RegisterPage', () => {
     await user.type(screen.getByPlaceholderText('you@example.com'), 'test@example.com');
     await user.type(screen.getByPlaceholderText('Create a password'), 'short');
     await user.type(screen.getByPlaceholderText('Confirm your password'), 'short');
-    
+
     await user.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
@@ -104,20 +108,26 @@ describe('RegisterPage', () => {
     await user.type(screen.getByPlaceholderText('you@example.com'), 'test@example.com');
     await user.type(screen.getByPlaceholderText('Create a password'), 'Password123');
     await user.type(screen.getByPlaceholderText('Confirm your password'), 'Password123');
-    
+
     await user.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith('/api/auth/register', expect.objectContaining({
-        method: 'POST',
-      }));
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/auth/register',
+        expect.objectContaining({
+          method: 'POST',
+        })
+      );
     });
 
     await waitFor(() => {
-      expect(mockSignIn).toHaveBeenCalledWith('credentials', expect.objectContaining({
-        email: 'test@example.com',
-        password: 'Password123',
-      }));
+      expect(mockSignIn).toHaveBeenCalledWith(
+        'credentials',
+        expect.objectContaining({
+          email: 'test@example.com',
+          password: 'Password123',
+        })
+      );
     });
   });
 
@@ -134,7 +144,7 @@ describe('RegisterPage', () => {
     await user.type(screen.getByPlaceholderText('you@example.com'), 'existing@example.com');
     await user.type(screen.getByPlaceholderText('Create a password'), 'Password123');
     await user.type(screen.getByPlaceholderText('Confirm your password'), 'Password123');
-    
+
     await user.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
@@ -152,7 +162,7 @@ describe('RegisterPage', () => {
     await user.type(screen.getByPlaceholderText('you@example.com'), 'test@example.com');
     await user.type(screen.getByPlaceholderText('Create a password'), 'Password123');
     await user.type(screen.getByPlaceholderText('Confirm your password'), 'Password123');
-    
+
     await user.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
@@ -174,7 +184,7 @@ describe('RegisterPage', () => {
     await user.type(screen.getByPlaceholderText('you@example.com'), 'test@example.com');
     await user.type(screen.getByPlaceholderText('Create a password'), 'Password123');
     await user.type(screen.getByPlaceholderText('Confirm your password'), 'Password123');
-    
+
     await user.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
@@ -191,10 +201,10 @@ describe('RegisterPage', () => {
   it('shows password strength indicators as user types', async () => {
     const user = userEvent.setup();
     render(<RegisterPage />);
-    
+
     const passwordField = screen.getByPlaceholderText('Create a password');
     await user.type(passwordField, 'Abcd1234');
-    
+
     // Password meets all criteria - the component should show visual indicators
     // Just verify no errors occurred during typing
     expect(passwordField).toHaveValue('Abcd1234');

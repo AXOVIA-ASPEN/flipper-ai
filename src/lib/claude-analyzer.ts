@@ -2,16 +2,16 @@
  * Claude AI Analyzer
  * Author: Stephen Boyett
  * Company: Axovia AI
- * 
+ *
  * Integrates Claude API for intelligent listing analysis.
  * Provides structured analysis of item category, condition, brand, and flippability.
  */
 
-import Anthropic from "@anthropic-ai/sdk";
-import prisma from "@/lib/db";
+import Anthropic from '@anthropic-ai/sdk';
+import prisma from '@/lib/db';
 
 const CLAUDE_API_KEY = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
-const CLAUDE_MODEL = process.env.CLAUDE_MODEL || "claude-sonnet-4-5-20250929";
+const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-5-20250929';
 const CACHE_DURATION_HOURS = 24;
 
 export interface ClaudeAnalysisResult {
@@ -23,7 +23,7 @@ export interface ClaudeAnalysisResult {
   keyFeatures: string[];
   potentialIssues: string[];
   flippabilityScore: number; // 0-100
-  confidence: "low" | "medium" | "high";
+  confidence: 'low' | 'medium' | 'high';
   reasoning: string;
   marketTrends?: string;
   targetBuyer?: string;
@@ -40,9 +40,7 @@ interface CachedAnalysis {
 /**
  * Check if we have a cached analysis for this listing
  */
-async function getCachedAnalysis(
-  listingId: string
-): Promise<ClaudeAnalysisResult | null> {
+async function getCachedAnalysis(listingId: string): Promise<ClaudeAnalysisResult | null> {
   try {
     const cached = await prisma.aiAnalysisCache.findFirst({
       where: {
@@ -52,7 +50,7 @@ async function getCachedAnalysis(
         },
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
 
@@ -60,7 +58,7 @@ async function getCachedAnalysis(
       return JSON.parse(cached.analysisResult);
     }
   } catch (error) {
-    console.error("Error fetching cached analysis:", error);
+    console.error('Error fetching cached analysis:', error);
   }
 
   return null;
@@ -69,10 +67,7 @@ async function getCachedAnalysis(
 /**
  * Store analysis result in cache
  */
-async function cacheAnalysis(
-  listingId: string,
-  result: ClaudeAnalysisResult
-): Promise<void> {
+async function cacheAnalysis(listingId: string, result: ClaudeAnalysisResult): Promise<void> {
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + CACHE_DURATION_HOURS);
 
@@ -85,7 +80,7 @@ async function cacheAnalysis(
       },
     });
   } catch (error) {
-    console.error("Error caching analysis:", error);
+    console.error('Error caching analysis:', error);
   }
 }
 
@@ -102,11 +97,11 @@ function buildAnalysisPrompt(
 
 **Title:** ${title}
 
-**Description:** ${description || "No description provided"}
+**Description:** ${description || 'No description provided'}
 
 **Asking Price:** $${askingPrice}
 
-${imageUrls && imageUrls.length > 0 ? `**Images:** ${imageUrls.length} images available` : "**Images:** None"}
+${imageUrls && imageUrls.length > 0 ? `**Images:** ${imageUrls.length} images available` : '**Images:** None'}
 
 Please provide a JSON response with the following structure:
 {
@@ -143,37 +138,30 @@ function parseClaudeResponse(text: string): ClaudeAnalysisResult {
     // Extract JSON from response (Claude sometimes wraps it in markdown)
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      throw new Error("No JSON found in response");
+      throw new Error('No JSON found in response');
     }
 
     const parsed = JSON.parse(jsonMatch[0]);
 
     // Validate and normalize
     return {
-      category: parsed.category || "other",
+      category: parsed.category || 'other',
       subcategory: parsed.subcategory || undefined,
       brand: parsed.brand || undefined,
-      condition: parsed.condition || "good",
+      condition: parsed.condition || 'good',
       estimatedAge: parsed.estimatedAge || undefined,
-      keyFeatures: Array.isArray(parsed.keyFeatures)
-        ? parsed.keyFeatures
-        : [],
-      potentialIssues: Array.isArray(parsed.potentialIssues)
-        ? parsed.potentialIssues
-        : [],
-      flippabilityScore: Math.max(
-        0,
-        Math.min(100, parsed.flippabilityScore || 50)
-      ),
-      confidence: ["low", "medium", "high"].includes(parsed.confidence)
+      keyFeatures: Array.isArray(parsed.keyFeatures) ? parsed.keyFeatures : [],
+      potentialIssues: Array.isArray(parsed.potentialIssues) ? parsed.potentialIssues : [],
+      flippabilityScore: Math.max(0, Math.min(100, parsed.flippabilityScore || 50)),
+      confidence: ['low', 'medium', 'high'].includes(parsed.confidence)
         ? parsed.confidence
-        : "medium",
-      reasoning: parsed.reasoning || "No reasoning provided",
+        : 'medium',
+      reasoning: parsed.reasoning || 'No reasoning provided',
       marketTrends: parsed.marketTrends || undefined,
       targetBuyer: parsed.targetBuyer || undefined,
     };
   } catch (error) {
-    console.error("Error parsing Claude response:", error);
+    console.error('Error parsing Claude response:', error);
     throw new Error(`Failed to parse Claude response: ${error}`);
   }
 }
@@ -183,7 +171,7 @@ function parseClaudeResponse(text: string): ClaudeAnalysisResult {
  */
 async function callClaudeAPI(prompt: string): Promise<string> {
   if (!CLAUDE_API_KEY) {
-    throw new Error("ANTHROPIC_API_KEY or CLAUDE_API_KEY not configured");
+    throw new Error('ANTHROPIC_API_KEY or CLAUDE_API_KEY not configured');
   }
 
   const client = new Anthropic({
@@ -196,24 +184,24 @@ async function callClaudeAPI(prompt: string): Promise<string> {
       max_tokens: 1500,
       messages: [
         {
-          role: "user",
+          role: 'user',
           content: prompt,
         },
       ],
     });
 
-    const textContent = message.content.find((block) => block.type === "text");
-    if (!textContent || textContent.type !== "text") {
-      throw new Error("No text response from Claude");
+    const textContent = message.content.find((block) => block.type === 'text');
+    if (!textContent || textContent.type !== 'text') {
+      throw new Error('No text response from Claude');
     }
 
     return textContent.text;
   } catch (error: unknown) {
     // Handle rate limiting
-    if (error && typeof error === "object" && "status" in error) {
+    if (error && typeof error === 'object' && 'status' in error) {
       const apiError = error as { status?: number; message?: string };
       if (apiError.status === 429) {
-        throw new Error("Claude API rate limit exceeded. Please try again later.");
+        throw new Error('Claude API rate limit exceeded. Please try again later.');
       }
       if (apiError.message) {
         throw new Error(`Claude API error: ${apiError.message}`);
@@ -222,13 +210,13 @@ async function callClaudeAPI(prompt: string): Promise<string> {
 
     // Handle other errors
     if (error instanceof Error) {
-      if (error.message.includes("rate limit") || error.message.includes("429")) {
-        throw new Error("Claude API rate limit exceeded. Please try again later.");
+      if (error.message.includes('rate limit') || error.message.includes('429')) {
+        throw new Error('Claude API rate limit exceeded. Please try again later.');
       }
       throw error;
     }
 
-    throw new Error("Unknown error calling Claude API");
+    throw new Error('Unknown error calling Claude API');
   }
 }
 
@@ -236,9 +224,7 @@ async function callClaudeAPI(prompt: string): Promise<string> {
  * Analyze a listing using Claude AI
  * Checks cache first, falls back to API call if needed
  */
-export async function analyzeListing(
-  listingId: string
-): Promise<ClaudeAnalysisResult> {
+export async function analyzeListing(listingId: string): Promise<ClaudeAnalysisResult> {
   // Check cache first
   const cached = await getCachedAnalysis(listingId);
   if (cached) {
@@ -337,7 +323,7 @@ export async function batchAnalyzeListings(
       failed++;
       errors.push({
         listingId,
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
 

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { createContext, useContext, useState } from "react";
-import { Theme, themes, defaultTheme } from "@/lib/theme-config";
+import React, { createContext, useContext, useState } from 'react';
+import { Theme, themes, defaultTheme } from '@/lib/theme-config';
 
 interface ThemeContextType {
   theme: Theme;
@@ -13,8 +13,8 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window !== "undefined") {
-      const savedThemeId = localStorage.getItem("flipper-theme");
+    if (typeof window !== 'undefined') {
+      const savedThemeId = localStorage.getItem('flipper-theme');
       if (savedThemeId && themes[savedThemeId]) {
         return themes[savedThemeId];
       }
@@ -25,7 +25,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const setTheme = (themeId: string) => {
     if (themes[themeId]) {
       setThemeState(themes[themeId]);
-      localStorage.setItem("flipper-theme", themeId);
+      localStorage.setItem('flipper-theme', themeId);
     }
   };
 
@@ -41,8 +41,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 export function useTheme() {
   const context = useContext(ThemeContext);
   if (context === undefined) {
-    throw new Error("useTheme must be used within a ThemeProvider");
+    throw new Error('useTheme must be used within a ThemeProvider');
   }
   return context;
 }
-

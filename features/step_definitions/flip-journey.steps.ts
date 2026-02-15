@@ -67,12 +67,15 @@ When('I navigate to the opportunities page', async function (this: CustomWorld) 
   await this.screenshot('opportunities-page');
 });
 
-When('I search for {string} in {string}', async function (this: CustomWorld, query: string, location: string) {
-  await this.page.fill('input[name="search"]', query);
-  await this.page.fill('input[name="location"]', location);
-  await this.page.click('button[data-testid="search-button"]');
-  await this.screenshot('search-submitted');
-});
+When(
+  'I search for {string} in {string}',
+  async function (this: CustomWorld, query: string, location: string) {
+    await this.page.fill('input[name="search"]', query);
+    await this.page.fill('input[name="location"]', location);
+    await this.page.click('button[data-testid="search-button"]');
+    await this.screenshot('search-submitted');
+  }
+);
 
 When('I wait for results to load', async function (this: CustomWorld) {
   await this.page.waitForSelector('[data-testid="opportunity-card"]', { timeout: 10000 });
@@ -132,13 +135,16 @@ Then('I should see the opportunity detail page', async function (this: CustomWor
   await this.screenshot('opportunity-detail');
 });
 
-Then('I should see AI analysis results within {int} seconds', async function (this: CustomWorld, seconds: number) {
-  const start = Date.now();
-  await this.page.waitForSelector('[data-testid="ai-analysis"]', { timeout: seconds * 1000 });
-  const elapsed = (Date.now() - start) / 1000;
-  console.log(`⏱ AI analysis loaded in ${elapsed.toFixed(2)}s (limit: ${seconds}s)`);
-  await this.screenshot('ai-analysis-loaded');
-});
+Then(
+  'I should see AI analysis results within {int} seconds',
+  async function (this: CustomWorld, seconds: number) {
+    const start = Date.now();
+    await this.page.waitForSelector('[data-testid="ai-analysis"]', { timeout: seconds * 1000 });
+    const elapsed = (Date.now() - start) / 1000;
+    console.log(`⏱ AI analysis loaded in ${elapsed.toFixed(2)}s (limit: ${seconds}s)`);
+    await this.screenshot('ai-analysis-loaded');
+  }
+);
 
 Then('the analysis should include:', async function (this: CustomWorld, dataTable: any) {
   const sections = dataTable.hashes();
@@ -249,14 +255,19 @@ When('seller accepts with {string}', async function (this: CustomWorld, message:
 });
 
 Then('I should see a notification {string}', async function (this: CustomWorld, text: string) {
-  await this.page.waitForSelector(`[data-testid="notification"]:has-text("${text}")`, { timeout: 5000 });
+  await this.page.waitForSelector(`[data-testid="notification"]:has-text("${text}")`, {
+    timeout: 5000,
+  });
   await this.screenshot('notification-visible');
 });
 
-Then('the opportunity status should change to {string}', async function (this: CustomWorld, status: string) {
-  const el = this.page.locator('[data-testid="opportunity-status"]');
-  await expect(el).toHaveText(status, { timeout: 5000 });
-});
+Then(
+  'the opportunity status should change to {string}',
+  async function (this: CustomWorld, status: string) {
+    const el = this.page.locator('[data-testid="opportunity-status"]');
+    await expect(el).toHaveText(status, { timeout: 5000 });
+  }
+);
 
 // ==================== STEP 6: MARK AS PURCHASED ====================
 
@@ -265,7 +276,7 @@ When('I enter purchase details:', async function (this: CustomWorld, dataTable: 
   for (const detail of details) {
     const fieldName = detail.Field.toLowerCase().replace(/ /g, '-');
     const input = this.page.locator(`input[name="${fieldName}"], select[name="${fieldName}"]`);
-    if (await input.count() > 0) {
+    if ((await input.count()) > 0) {
       const tag = await input.first().evaluate((el: Element) => el.tagName.toLowerCase());
       if (tag === 'select') {
         await this.page.selectOption(`select[name="${fieldName}"]`, detail.Value);
@@ -282,13 +293,16 @@ Then('I should see success message {string}', async function (this: CustomWorld,
   await this.screenshot('success-message');
 });
 
-Then('the opportunity should move to {string}', async function (this: CustomWorld, section: string) {
-  const slug = section.toLowerCase().replace(/ /g, '-');
-  await this.page.goto(`/${slug}`);
-  await this.page.waitForSelector('[data-testid="inventory-item"]', { timeout: 5000 });
-  await expect(this.page.locator('[data-testid="inventory-item"]').first()).toBeVisible();
-  await this.screenshot(`moved-to-${slug}`);
-});
+Then(
+  'the opportunity should move to {string}',
+  async function (this: CustomWorld, section: string) {
+    const slug = section.toLowerCase().replace(/ /g, '-');
+    await this.page.goto(`/${slug}`);
+    await this.page.waitForSelector('[data-testid="inventory-item"]', { timeout: 5000 });
+    await expect(this.page.locator('[data-testid="inventory-item"]').first()).toBeVisible();
+    await this.screenshot(`moved-to-${slug}`);
+  }
+);
 
 // ==================== STEP 7: CREATE RESALE LISTING ====================
 
@@ -302,8 +316,10 @@ When('I enter listing details:', async function (this: CustomWorld, dataTable: a
   const details = dataTable.hashes();
   for (const detail of details) {
     const fieldName = detail.Field.toLowerCase().replace(/ /g, '-');
-    const input = this.page.locator(`input[name="${fieldName}"], textarea[name="${fieldName}"], select[name="${fieldName}"]`);
-    if (await input.count() > 0) {
+    const input = this.page.locator(
+      `input[name="${fieldName}"], textarea[name="${fieldName}"], select[name="${fieldName}"]`
+    );
+    if ((await input.count()) > 0) {
       const tag = await input.first().evaluate((el: Element) => el.tagName.toLowerCase());
       if (tag === 'select') {
         await this.page.selectOption(`select[name="${fieldName}"]`, detail.Value);
@@ -319,7 +335,9 @@ When('I select marketplaces:', async function (this: CustomWorld, dataTable: any
   const rows = dataTable.hashes();
   for (const row of rows) {
     if (row.Selected === 'Yes') {
-      const checkbox = this.page.locator(`[data-testid="marketplace-${row.Marketplace.toLowerCase()}"] input[type="checkbox"]`);
+      const checkbox = this.page.locator(
+        `[data-testid="marketplace-${row.Marketplace.toLowerCase()}"] input[type="checkbox"]`
+      );
       if (!(await checkbox.isChecked())) {
         await checkbox.check();
       }
@@ -340,15 +358,18 @@ Then('I should see AI-optimized listings for each platform', async function (thi
   await this.screenshot('ai-optimized-listings');
 });
 
-Then('each listing should be tailored to platform best practices', async function (this: CustomWorld) {
-  const listings = await this.page.locator('[data-testid="platform-listing"]').all();
-  for (const listing of listings) {
-    const platform = await listing.getAttribute('data-platform');
-    const content = await listing.textContent();
-    expect(content?.trim()).toBeTruthy();
-    console.log(`✅ ${platform} listing has content (${content?.length} chars)`);
+Then(
+  'each listing should be tailored to platform best practices',
+  async function (this: CustomWorld) {
+    const listings = await this.page.locator('[data-testid="platform-listing"]').all();
+    for (const listing of listings) {
+      const platform = await listing.getAttribute('data-platform');
+      const content = await listing.textContent();
+      expect(content?.trim()).toBeTruthy();
+      console.log(`✅ ${platform} listing has content (${content?.length} chars)`);
+    }
   }
-});
+);
 
 // ==================== STEP 8: PREVIEW LISTINGS ====================
 
@@ -371,29 +392,40 @@ When('I wait for publishing to complete', async function (this: CustomWorld) {
   await this.screenshot('publishing-complete');
 });
 
-Then('I should see success messages for each platform:', async function (this: CustomWorld, dataTable: any) {
-  const platforms = dataTable.hashes();
-  for (const row of platforms) {
-    const msg = this.page.locator(`[data-testid="publish-status-${row.Platform.toLowerCase()}"]`);
-    await expect(msg).toContainText(row.Status, { timeout: 5000 });
+Then(
+  'I should see success messages for each platform:',
+  async function (this: CustomWorld, dataTable: any) {
+    const platforms = dataTable.hashes();
+    for (const row of platforms) {
+      const msg = this.page.locator(`[data-testid="publish-status-${row.Platform.toLowerCase()}"]`);
+      await expect(msg).toContainText(row.Status, { timeout: 5000 });
+    }
+    await this.screenshot('publish-success-messages');
   }
-  await this.screenshot('publish-success-messages');
-});
+);
 
-Then('the item status should change to {string}', async function (this: CustomWorld, status: string) {
-  const el = this.page.locator('[data-testid="item-status"]');
-  await expect(el).toContainText(status, { timeout: 5000 });
-});
+Then(
+  'the item status should change to {string}',
+  async function (this: CustomWorld, status: string) {
+    const el = this.page.locator('[data-testid="item-status"]');
+    await expect(el).toContainText(status, { timeout: 5000 });
+  }
+);
 
 // ==================== STEP 10: TRACK PERFORMANCE ====================
 
-Then('I should see the listed item in {string}', async function (this: CustomWorld, section: string) {
-  const el = this.page.locator(`[data-testid="section-${section.toLowerCase().replace(/ /g, '-')}"]`);
-  await expect(el).toBeVisible({ timeout: 5000 });
-  const items = await el.locator('[data-testid="list-item"]').count();
-  expect(items).toBeGreaterThan(0);
-  await this.screenshot(`item-in-${section.toLowerCase().replace(/ /g, '-')}`);
-});
+Then(
+  'I should see the listed item in {string}',
+  async function (this: CustomWorld, section: string) {
+    const el = this.page.locator(
+      `[data-testid="section-${section.toLowerCase().replace(/ /g, '-')}"]`
+    );
+    await expect(el).toBeVisible({ timeout: 5000 });
+    const items = await el.locator('[data-testid="list-item"]').count();
+    expect(items).toBeGreaterThan(0);
+    await this.screenshot(`item-in-${section.toLowerCase().replace(/ /g, '-')}`);
+  }
+);
 
 Then('I should see real-time metrics:', async function (this: CustomWorld, dataTable: any) {
   const metrics = dataTable.hashes();
@@ -450,11 +482,16 @@ When('I mark the item as sold:', async function (this: CustomWorld, dataTable: a
   const details = dataTable.hashes();
   for (const detail of details) {
     const fieldName = detail.Field.toLowerCase().replace(/ /g, '-');
-    const input = this.page.locator(`[data-testid="sold-form"] input[name="${fieldName}"], [data-testid="sold-form"] select[name="${fieldName}"]`);
-    if (await input.count() > 0) {
+    const input = this.page.locator(
+      `[data-testid="sold-form"] input[name="${fieldName}"], [data-testid="sold-form"] select[name="${fieldName}"]`
+    );
+    if ((await input.count()) > 0) {
       const tag = await input.first().evaluate((el: Element) => el.tagName.toLowerCase());
       if (tag === 'select') {
-        await this.page.selectOption(`[data-testid="sold-form"] select[name="${fieldName}"]`, detail.Value);
+        await this.page.selectOption(
+          `[data-testid="sold-form"] select[name="${fieldName}"]`,
+          detail.Value
+        );
       } else {
         await input.first().fill(detail.Value);
       }
@@ -466,7 +503,9 @@ When('I mark the item as sold:', async function (this: CustomWorld, dataTable: a
 Then('I should see profit calculation:', async function (this: CustomWorld, dataTable: any) {
   const rows = dataTable.hashes();
   for (const row of rows) {
-    const el = this.page.locator(`[data-testid="profit-${row.Metric.toLowerCase().replace(/ /g, '-')}"]`);
+    const el = this.page.locator(
+      `[data-testid="profit-${row.Metric.toLowerCase().replace(/ /g, '-')}"]`
+    );
     await expect(el).toBeVisible({ timeout: 5000 });
     await expect(el).toContainText(row.Value);
   }
@@ -482,7 +521,9 @@ Then('the item should move to {string}', async function (this: CustomWorld, sect
 Then('my dashboard stats should update:', async function (this: CustomWorld, dataTable: any) {
   const stats = dataTable.hashes();
   for (const stat of stats) {
-    const el = this.page.locator(`[data-testid="stat-${stat.Stat.toLowerCase().replace(/ /g, '-')}"]`);
+    const el = this.page.locator(
+      `[data-testid="stat-${stat.Stat.toLowerCase().replace(/ /g, '-')}"]`
+    );
     await expect(el).toBeVisible({ timeout: 5000 });
   }
   await this.screenshot('dashboard-stats-updated');
@@ -500,7 +541,9 @@ Given('I have contacted a seller {int} days ago', async function (this: CustomWo
 
 Given('the seller has not responded', async function (this: CustomWorld) {
   // Verify no seller response in the conversation
-  const sellerMessages = await this.page.locator('[data-testid="message"][data-from="seller"]').count();
+  const sellerMessages = await this.page
+    .locator('[data-testid="message"][data-from="seller"]')
+    .count();
   // In test fixtures, ensure no seller response exists
   this.testData.sellerResponded = false;
   await this.screenshot('no-seller-response');
@@ -513,7 +556,9 @@ When('I view the opportunity', async function (this: CustomWorld) {
 });
 
 Then('I should see {string} warning', async function (this: CustomWorld, warning: string) {
-  await this.page.waitForSelector(`[data-testid="warning"]:has-text("${warning}")`, { timeout: 5000 });
+  await this.page.waitForSelector(`[data-testid="warning"]:has-text("${warning}")`, {
+    timeout: 5000,
+  });
   await this.screenshot('warning-visible');
 });
 
@@ -530,7 +575,10 @@ Then('the opportunity should be archived', async function (this: CustomWorld) {
 Then('I should see it in {string}', async function (this: CustomWorld, section: string) {
   const slug = section.toLowerCase().replace(/ /g, '-');
   await this.page.goto(`/${slug}`);
-  await this.page.waitForSelector('[data-testid="opportunity-card"], [data-testid="inventory-item"]', { timeout: 5000 });
+  await this.page.waitForSelector(
+    '[data-testid="opportunity-card"], [data-testid="inventory-item"]',
+    { timeout: 5000 }
+  );
   await this.screenshot(`visible-in-${slug}`);
 });
 
@@ -559,7 +607,9 @@ Then('the opportunity should return to {string}', async function (this: CustomWo
 });
 
 Then('I should be able to re-negotiate or skip', async function (this: CustomWorld) {
-  await expect(this.page.locator('button:has-text("Re-negotiate"), button:has-text("Skip")')).toBeVisible();
+  await expect(
+    this.page.locator('button:has-text("Re-negotiate"), button:has-text("Skip")')
+  ).toBeVisible();
   await this.screenshot('renegotiate-or-skip');
 });
 
@@ -584,11 +634,14 @@ When('the AI generates optimized listings', async function (this: CustomWorld) {
   await this.screenshot('ai-listings-generated');
 });
 
-Then('the total time should be under {int} seconds', async function (this: CustomWorld, maxSeconds: number) {
-  const elapsed = (Date.now() - (this.testData.listingStartTime || Date.now())) / 1000;
-  console.log(`⏱ Listing creation took ${elapsed.toFixed(2)}s (limit: ${maxSeconds}s)`);
-  expect(elapsed).toBeLessThan(maxSeconds);
-});
+Then(
+  'the total time should be under {int} seconds',
+  async function (this: CustomWorld, maxSeconds: number) {
+    const elapsed = (Date.now() - (this.testData.listingStartTime || Date.now())) / 1000;
+    console.log(`⏱ Listing creation took ${elapsed.toFixed(2)}s (limit: ${maxSeconds}s)`);
+    expect(elapsed).toBeLessThan(maxSeconds);
+  }
+);
 
 Then('all three marketplace listings should be ready', async function (this: CustomWorld) {
   const count = await this.page.locator('[data-testid="platform-listing"]').count();
@@ -649,20 +702,25 @@ Given('I am using keyboard navigation only', async function (this: CustomWorld) 
   await this.screenshot('keyboard-only-mode');
 });
 
-When('I complete the entire flip journey using only Tab and Enter', async function (this: CustomWorld) {
-  // Tab through key interactive elements and verify focus
-  for (let i = 0; i < 20; i++) {
-    await this.page.keyboard.press('Tab');
-    const focused = await this.page.evaluate(() => {
-      const el = document.activeElement;
-      return el ? { tag: el.tagName, role: el.getAttribute('role'), text: el.textContent?.slice(0, 50) } : null;
-    });
-    if (focused) {
-      console.log(`⌨️ Focus ${i}: <${focused.tag}> ${focused.text || ''}`);
+When(
+  'I complete the entire flip journey using only Tab and Enter',
+  async function (this: CustomWorld) {
+    // Tab through key interactive elements and verify focus
+    for (let i = 0; i < 20; i++) {
+      await this.page.keyboard.press('Tab');
+      const focused = await this.page.evaluate(() => {
+        const el = document.activeElement;
+        return el
+          ? { tag: el.tagName, role: el.getAttribute('role'), text: el.textContent?.slice(0, 50) }
+          : null;
+      });
+      if (focused) {
+        console.log(`⌨️ Focus ${i}: <${focused.tag}> ${focused.text || ''}`);
+      }
     }
+    await this.screenshot('keyboard-navigation-complete');
   }
-  await this.screenshot('keyboard-navigation-complete');
-});
+);
 
 Then('I should be able to complete every step', async function (this: CustomWorld) {
   // Verified by the keyboard navigation completing without errors
@@ -671,7 +729,9 @@ Then('I should be able to complete every step', async function (this: CustomWorl
 
 Then('all interactive elements should be reachable', async function (this: CustomWorld) {
   const unreachable = await this.page.evaluate(() => {
-    const interactive = document.querySelectorAll('button, a, input, select, textarea, [role="button"]');
+    const interactive = document.querySelectorAll(
+      'button, a, input, select, textarea, [role="button"]'
+    );
     const unreachableElements: string[] = [];
     interactive.forEach((el) => {
       const tabIndex = (el as HTMLElement).tabIndex;
@@ -704,10 +764,13 @@ Then('focus indicators should be clearly visible', async function (this: CustomW
 
 // ==================== MOBILE ====================
 
-Given('I am using a mobile device \\({int}x{int}\\)', async function (this: CustomWorld, width: number, height: number) {
-  await this.page.setViewportSize({ width, height });
-  await this.screenshot('mobile-viewport-set');
-});
+Given(
+  'I am using a mobile device \\({int}x{int}\\)',
+  async function (this: CustomWorld, width: number, height: number) {
+    await this.page.setViewportSize({ width, height });
+    await this.screenshot('mobile-viewport-set');
+  }
+);
 
 When('I complete the flip journey on mobile', async function (this: CustomWorld) {
   // Navigate through key pages at mobile viewport
@@ -735,27 +798,35 @@ Then('the interface should be responsive', async function (this: CustomWorld) {
   await this.screenshot('responsive-check');
 });
 
-Then('touch targets should be at least {int}x{int}px', async function (this: CustomWorld, minW: number, minH: number) {
-  const smallTargets = await this.page.evaluate(({ minW, minH }: { minW: number; minH: number }) => {
-    const interactive = document.querySelectorAll('button, a, input, [role="button"]');
-    const tooSmall: string[] = [];
-    interactive.forEach((el) => {
-      const rect = el.getBoundingClientRect();
-      if (rect.width > 0 && rect.height > 0) {
-        if (rect.width < minW || rect.height < minH) {
-          tooSmall.push(`${el.tagName}(${rect.width.toFixed(0)}x${rect.height.toFixed(0)}): ${el.textContent?.slice(0, 20)}`);
-        }
-      }
-    });
-    return tooSmall;
-  }, { minW, minH });
+Then(
+  'touch targets should be at least {int}x{int}px',
+  async function (this: CustomWorld, minW: number, minH: number) {
+    const smallTargets = await this.page.evaluate(
+      ({ minW, minH }: { minW: number; minH: number }) => {
+        const interactive = document.querySelectorAll('button, a, input, [role="button"]');
+        const tooSmall: string[] = [];
+        interactive.forEach((el) => {
+          const rect = el.getBoundingClientRect();
+          if (rect.width > 0 && rect.height > 0) {
+            if (rect.width < minW || rect.height < minH) {
+              tooSmall.push(
+                `${el.tagName}(${rect.width.toFixed(0)}x${rect.height.toFixed(0)}): ${el.textContent?.slice(0, 20)}`
+              );
+            }
+          }
+        });
+        return tooSmall;
+      },
+      { minW, minH }
+    );
 
-  if (smallTargets.length > 0) {
-    console.warn(`⚠️ Small touch targets: ${smallTargets.join(', ')}`);
+    if (smallTargets.length > 0) {
+      console.warn(`⚠️ Small touch targets: ${smallTargets.join(', ')}`);
+    }
+    // Allow a few exceptions (icon buttons etc.)
+    expect(smallTargets.length).toBeLessThan(3);
   }
-  // Allow a few exceptions (icon buttons etc.)
-  expect(smallTargets.length).toBeLessThan(3);
-});
+);
 
 When('I take mobile screenshots', async function (this: CustomWorld) {
   await this.screenshot('mobile-final');

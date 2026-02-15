@@ -24,11 +24,11 @@ const DEFAULT_CONFIG: RateLimitConfig = {
 
 /** Per-endpoint overrides (path prefix match) */
 const ENDPOINT_CONFIGS: Record<string, RateLimitConfig> = {
-  "/api/auth/register": { limit: 5, windowSeconds: 300 },
-  "/api/auth": { limit: 20, windowSeconds: 60 },
-  "/api/analyze": { limit: 10, windowSeconds: 60 },
-  "/api/scrape": { limit: 5, windowSeconds: 60 },
-  "/api/scraper": { limit: 5, windowSeconds: 60 },
+  '/api/auth/register': { limit: 5, windowSeconds: 300 },
+  '/api/auth': { limit: 20, windowSeconds: 60 },
+  '/api/analyze': { limit: 10, windowSeconds: 60 },
+  '/api/scrape': { limit: 5, windowSeconds: 60 },
+  '/api/scraper': { limit: 5, windowSeconds: 60 },
 };
 
 // In-memory stores (reset on server restart — fine for single-instance)
@@ -40,13 +40,16 @@ let cleanupTimer: ReturnType<typeof setInterval> | null = null;
 
 function ensureCleanup() {
   if (cleanupTimer) return;
-  cleanupTimer = setInterval(() => {
-    const now = Date.now();
-    for (const [k, v] of ipStore) if (v.resetAt <= now) ipStore.delete(k);
-    for (const [k, v] of userStore) if (v.resetAt <= now) userStore.delete(k);
-  }, 5 * 60 * 1000);
+  cleanupTimer = setInterval(
+    () => {
+      const now = Date.now();
+      for (const [k, v] of ipStore) if (v.resetAt <= now) ipStore.delete(k);
+      for (const [k, v] of userStore) if (v.resetAt <= now) userStore.delete(k);
+    },
+    5 * 60 * 1000
+  );
   // Don't prevent process exit
-  if (typeof cleanupTimer === "object" && "unref" in cleanupTimer) {
+  if (typeof cleanupTimer === 'object' && 'unref' in cleanupTimer) {
     cleanupTimer.unref();
   }
 }
@@ -100,11 +103,7 @@ export interface RateLimitResult {
  * @param pathname  Request pathname (e.g. /api/listings)
  * @param userId  Optional authenticated user ID (stricter per-user limits applied separately)
  */
-export function rateLimit(
-  ip: string,
-  pathname: string,
-  userId?: string | null
-): RateLimitResult {
+export function rateLimit(ip: string, pathname: string, userId?: string | null): RateLimitResult {
   const config = getConfig(pathname);
   const ipKey = `${ip}:${pathname}`;
   const ipResult = check(ipStore, ipKey, config);
@@ -121,10 +120,20 @@ export function rateLimit(
     if (!userResult.allowed) {
       return { allowed: false, remaining: 0, limit: userConfig.limit, resetAt: userResult.resetAt };
     }
-    return { allowed: true, remaining: Math.min(ipResult.remaining, userResult.remaining), limit: config.limit, resetAt: ipResult.resetAt };
+    return {
+      allowed: true,
+      remaining: Math.min(ipResult.remaining, userResult.remaining),
+      limit: config.limit,
+      resetAt: ipResult.resetAt,
+    };
   }
 
-  return { allowed: true, remaining: ipResult.remaining, limit: config.limit, resetAt: ipResult.resetAt };
+  return {
+    allowed: true,
+    remaining: ipResult.remaining,
+    limit: config.limit,
+    resetAt: ipResult.resetAt,
+  };
 }
 
 /** Reset stores and cleanup timer — useful for tests */

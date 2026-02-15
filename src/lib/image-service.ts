@@ -3,24 +3,24 @@
  * Handles downloading, caching, and proxying of listing images
  */
 
-import { createHash } from "crypto";
-import { writeFile, mkdir, access } from "fs/promises";
-import { join } from "path";
+import { createHash } from 'crypto';
+import { writeFile, mkdir, access } from 'fs/promises';
+import { join } from 'path';
 
 // Configuration
-const IMAGE_CACHE_DIR = join(process.cwd(), "public", "images", "listings");
+const IMAGE_CACHE_DIR = join(process.cwd(), 'public', 'images', 'listings');
 const MAX_IMAGE_SIZE_MB = 5;
 const DOWNLOAD_TIMEOUT_MS = 10000;
-const SUPPORTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const SUPPORTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
 export interface CachedImage {
-  localPath: string;      // Path relative to public directory
-  originalUrl: string;    // Original source URL
-  hash: string;           // Content hash for deduplication
-  size: number;           // File size in bytes
-  mimeType: string;       // MIME type
-  width?: number;         // Optional: detected width
-  height?: number;        // Optional: detected height
+  localPath: string; // Path relative to public directory
+  originalUrl: string; // Original source URL
+  hash: string; // Content hash for deduplication
+  size: number; // File size in bytes
+  mimeType: string; // MIME type
+  width?: number; // Optional: detected width
+  height?: number; // Optional: detected height
 }
 
 export interface ImageDownloadResult {
@@ -33,7 +33,7 @@ export interface ImageDownloadResult {
  * Generate a unique hash for an image URL
  */
 export function generateImageHash(url: string): string {
-  return createHash("sha256").update(url).digest("hex").substring(0, 16);
+  return createHash('sha256').update(url).digest('hex').substring(0, 16);
 }
 
 /**
@@ -41,12 +41,12 @@ export function generateImageHash(url: string): string {
  */
 function getExtensionFromMimeType(mimeType: string): string {
   const map: Record<string, string> = {
-    "image/jpeg": "jpg",
-    "image/png": "png",
-    "image/webp": "webp",
-    "image/gif": "gif",
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp',
+    'image/gif': 'gif',
   };
-  return map[mimeType] || "jpg";
+  return map[mimeType] || 'jpg';
 }
 
 /**
@@ -58,14 +58,14 @@ export function getExtensionFromUrl(url: string): string {
     const match = pathname.match(/\.(\w+)$/);
     if (match) {
       const ext = match[1].toLowerCase();
-      if (["jpg", "jpeg", "png", "webp", "gif"].includes(ext)) {
-        return ext === "jpeg" ? "jpg" : ext;
+      if (['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext)) {
+        return ext === 'jpeg' ? 'jpg' : ext;
       }
     }
   } catch {
     // Invalid URL
   }
-  return "jpg"; // Default
+  return 'jpg'; // Default
 }
 
 /**
@@ -83,7 +83,7 @@ async function ensureCacheDir(): Promise<void> {
  * Check if an image is already cached
  */
 export async function isImageCached(urlHash: string): Promise<string | null> {
-  const extensions = ["jpg", "png", "webp", "gif"];
+  const extensions = ['jpg', 'png', 'webp', 'gif'];
   for (const ext of extensions) {
     const filePath = join(IMAGE_CACHE_DIR, `${urlHash}.${ext}`);
     try {
@@ -99,9 +99,7 @@ export async function isImageCached(urlHash: string): Promise<string | null> {
 /**
  * Download and cache a single image
  */
-export async function downloadAndCacheImage(
-  imageUrl: string
-): Promise<ImageDownloadResult> {
+export async function downloadAndCacheImage(imageUrl: string): Promise<ImageDownloadResult> {
   try {
     // Generate hash for deduplication
     const urlHash = generateImageHash(imageUrl);
@@ -116,7 +114,7 @@ export async function downloadAndCacheImage(
           originalUrl: imageUrl,
           hash: urlHash,
           size: 0, // Would need to stat the file
-          mimeType: "image/jpeg",
+          mimeType: 'image/jpeg',
         },
       };
     }
@@ -131,9 +129,9 @@ export async function downloadAndCacheImage(
     const response = await fetch(imageUrl, {
       signal: controller.signal,
       headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-        Accept: "image/webp,image/apng,image/*,*/*;q=0.8",
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+        Accept: 'image/webp,image/apng,image/*,*/*;q=0.8',
       },
     });
 
@@ -147,8 +145,8 @@ export async function downloadAndCacheImage(
     }
 
     // Get content type
-    const contentType = response.headers.get("content-type") || "image/jpeg";
-    const mimeType = contentType.split(";")[0].trim();
+    const contentType = response.headers.get('content-type') || 'image/jpeg';
+    const mimeType = contentType.split(';')[0].trim();
 
     // Validate image type
     if (!SUPPORTED_TYPES.includes(mimeType)) {
@@ -190,9 +188,9 @@ export async function downloadAndCacheImage(
       },
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    if (message.includes("abort")) {
-      return { success: false, error: "Download timeout" };
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    if (message.includes('abort')) {
+      return { success: false, error: 'Download timeout' };
     }
     return { success: false, error: message };
   }
@@ -221,9 +219,7 @@ export async function downloadAndCacheImages(
   // Process in batches for rate limiting
   for (let i = 0; i < imageUrls.length; i += maxConcurrent) {
     const batch = imageUrls.slice(i, i + maxConcurrent);
-    const batchResults = await Promise.all(
-      batch.map((url) => downloadAndCacheImage(url))
-    );
+    const batchResults = await Promise.all(batch.map((url) => downloadAndCacheImage(url)));
 
     for (let j = 0; j < batchResults.length; j++) {
       const result = batchResults[j];
@@ -254,22 +250,62 @@ export interface NormalizedLocation {
   city: string;
   state: string;
   stateCode: string;
-  normalized: string;  // "city-statecode" format
+  normalized: string; // "city-statecode" format
   original: string;
 }
 
 const STATE_CODES: Record<string, string> = {
-  alabama: "AL", alaska: "AK", arizona: "AZ", arkansas: "AR", california: "CA",
-  colorado: "CO", connecticut: "CT", delaware: "DE", florida: "FL", georgia: "GA",
-  hawaii: "HI", idaho: "ID", illinois: "IL", indiana: "IN", iowa: "IA",
-  kansas: "KS", kentucky: "KY", louisiana: "LA", maine: "ME", maryland: "MD",
-  massachusetts: "MA", michigan: "MI", minnesota: "MN", mississippi: "MS", missouri: "MO",
-  montana: "MT", nebraska: "NE", nevada: "NV", "new hampshire": "NH", "new jersey": "NJ",
-  "new mexico": "NM", "new york": "NY", "north carolina": "NC", "north dakota": "ND",
-  ohio: "OH", oklahoma: "OK", oregon: "OR", pennsylvania: "PA", "rhode island": "RI",
-  "south carolina": "SC", "south dakota": "SD", tennessee: "TN", texas: "TX", utah: "UT",
-  vermont: "VT", virginia: "VA", washington: "WA", "west virginia": "WV",
-  wisconsin: "WI", wyoming: "WY", "district of columbia": "DC",
+  alabama: 'AL',
+  alaska: 'AK',
+  arizona: 'AZ',
+  arkansas: 'AR',
+  california: 'CA',
+  colorado: 'CO',
+  connecticut: 'CT',
+  delaware: 'DE',
+  florida: 'FL',
+  georgia: 'GA',
+  hawaii: 'HI',
+  idaho: 'ID',
+  illinois: 'IL',
+  indiana: 'IN',
+  iowa: 'IA',
+  kansas: 'KS',
+  kentucky: 'KY',
+  louisiana: 'LA',
+  maine: 'ME',
+  maryland: 'MD',
+  massachusetts: 'MA',
+  michigan: 'MI',
+  minnesota: 'MN',
+  mississippi: 'MS',
+  missouri: 'MO',
+  montana: 'MT',
+  nebraska: 'NE',
+  nevada: 'NV',
+  'new hampshire': 'NH',
+  'new jersey': 'NJ',
+  'new mexico': 'NM',
+  'new york': 'NY',
+  'north carolina': 'NC',
+  'north dakota': 'ND',
+  ohio: 'OH',
+  oklahoma: 'OK',
+  oregon: 'OR',
+  pennsylvania: 'PA',
+  'rhode island': 'RI',
+  'south carolina': 'SC',
+  'south dakota': 'SD',
+  tennessee: 'TN',
+  texas: 'TX',
+  utah: 'UT',
+  vermont: 'VT',
+  virginia: 'VA',
+  washington: 'WA',
+  'west virginia': 'WV',
+  wisconsin: 'WI',
+  wyoming: 'WY',
+  'district of columbia': 'DC',
 };
 
 const STATE_CODE_TO_NAME: Record<string, string> = Object.fromEntries(
@@ -297,15 +333,21 @@ export function normalizeLocation(locationStr: string): NormalizedLocation {
       stateCode = stateInput.toUpperCase();
     } else {
       // Look up the full state name in STATE_CODES
-      stateCode = STATE_CODES[stateInput] || "XX";
+      stateCode = STATE_CODES[stateInput] || 'XX';
     }
-    
+
     const stateName = STATE_CODE_TO_NAME[stateCode] || stateInput;
-    const normalizedCity = city.replace(/\s+/g, "-");
+    const normalizedCity = city.replace(/\s+/g, '-');
 
     return {
-      city: city.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" "),
-      state: stateName.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" "),
+      city: city
+        .split(' ')
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' '),
+      state: stateName
+        .split(' ')
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' '),
       stateCode,
       normalized: `${normalizedCity}-${stateCode.toLowerCase()}`,
       original,
@@ -317,13 +359,19 @@ export function normalizeLocation(locationStr: string): NormalizedLocation {
   const dashMatch = cleaned.match(dashPattern);
 
   if (dashMatch) {
-    const city = dashMatch[1].replace(/-/g, " ");
+    const city = dashMatch[1].replace(/-/g, ' ');
     const stateCode = dashMatch[2].toUpperCase();
     const stateName = STATE_CODE_TO_NAME[stateCode] || stateCode;
 
     return {
-      city: city.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" "),
-      state: stateName.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" "),
+      city: city
+        .split(' ')
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' '),
+      state: stateName
+        .split(' ')
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' '),
       stateCode,
       normalized: cleaned,
       original,
@@ -332,12 +380,15 @@ export function normalizeLocation(locationStr: string): NormalizedLocation {
 
   // Pattern 3: Just city name - try to detect state from context
   // Default to keeping as-is with unknown state
-  const normalizedCity = cleaned.replace(/\s+/g, "-");
+  const normalizedCity = cleaned.replace(/\s+/g, '-');
 
   return {
-    city: locationStr.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" "),
-    state: "Unknown",
-    stateCode: "XX",
+    city: locationStr
+      .split(' ')
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' '),
+    state: 'Unknown',
+    stateCode: 'XX',
     normalized: normalizedCity,
     original,
   };
@@ -347,7 +398,7 @@ export function normalizeLocation(locationStr: string): NormalizedLocation {
  * Build a proxy URL for an external image
  * This allows serving external images through our domain for reliability
  */
-export function buildProxyUrl(imageUrl: string, baseUrl: string = ""): string {
+export function buildProxyUrl(imageUrl: string, baseUrl: string = ''): string {
   const encoded = encodeURIComponent(imageUrl);
   return `${baseUrl}/api/images/proxy?url=${encoded}`;
 }

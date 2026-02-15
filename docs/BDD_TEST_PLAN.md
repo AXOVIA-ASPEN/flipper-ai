@@ -3,7 +3,7 @@
 **Author:** ASPEN  
 **Company:** Axovia AI  
 **Created:** February 13, 2026  
-**Status:** Ready for Implementation  
+**Status:** Ready for Implementation
 
 ---
 
@@ -12,6 +12,7 @@
 This document outlines the Behavior-Driven Development (BDD) testing strategy for Flipper AI using **Cucumber/Gherkin** feature files and **Playwright** for visual verification.
 
 ### Goals
+
 1. **100% User Flow Coverage** — Every PRD feature has BDD scenarios
 2. **Visual Verification** — Playwright screenshots for all UI interactions
 3. **Production Readiness** — Comprehensive acceptance criteria before launch
@@ -22,15 +23,15 @@ This document outlines the Behavior-Driven Development (BDD) testing strategy fo
 
 All feature files are located in `/features/` and follow Gherkin syntax:
 
-| File | Feature | Scenarios | Priority |
-|------|---------|-----------|----------|
-| `01-marketplace-scanning.feature` | Multi-Marketplace Scanning | 5 | 🔴 Critical |
-| `02-ai-analysis.feature` | AI Flippability Scoring | 7 | 🔴 Critical |
-| `03-seller-communication.feature` | Automated Seller Communication | 7 | 🟡 High |
-| `04-resale-listing.feature` | Resale Listing Generator | 6 | 🟡 High |
-| `05-dashboard-tracking.feature` | Dashboard & Opportunity Tracking | 8 | 🟡 High |
-| `06-user-auth-billing.feature` | User Authentication & Billing | 9 | 🟡 High |
-| `07-notifications-monitoring.feature` | Notifications & Listing Monitoring | 10 | 🟢 Medium |
+| File                                  | Feature                            | Scenarios | Priority    |
+| ------------------------------------- | ---------------------------------- | --------- | ----------- |
+| `01-marketplace-scanning.feature`     | Multi-Marketplace Scanning         | 5         | 🔴 Critical |
+| `02-ai-analysis.feature`              | AI Flippability Scoring            | 7         | 🔴 Critical |
+| `03-seller-communication.feature`     | Automated Seller Communication     | 7         | 🟡 High     |
+| `04-resale-listing.feature`           | Resale Listing Generator           | 6         | 🟡 High     |
+| `05-dashboard-tracking.feature`       | Dashboard & Opportunity Tracking   | 8         | 🟡 High     |
+| `06-user-auth-billing.feature`        | User Authentication & Billing      | 9         | 🟡 High     |
+| `07-notifications-monitoring.feature` | Notifications & Listing Monitoring | 10        | 🟢 Medium   |
 
 **Total Scenarios:** 52
 
@@ -39,16 +40,19 @@ All feature files are located in `/features/` and follow Gherkin syntax:
 ## 🛠️ Tech Stack
 
 ### BDD Framework
+
 - **Cucumber.js** — Gherkin parser and step runner
 - **@cucumber/cucumber** — Official Node.js implementation
 - **chai** — Assertion library
 
 ### E2E Testing
+
 - **Playwright** — Browser automation
 - **@playwright/test** — Test runner with visual regression
 - **playwright-expect** — Built-in assertions
 
 ### CI/CD
+
 - **GitHub Actions** — Automated test runs on PRs
 - **Playwright Test Report** — HTML test results
 - **Screenshot Artifacts** — Visual diff storage
@@ -118,11 +122,11 @@ module.exports = {
     format: [
       'progress-bar',
       'html:reports/cucumber-report.html',
-      'json:reports/cucumber-report.json'
+      'json:reports/cucumber-report.json',
     ],
     formatOptions: { snippetInterface: 'async-await' },
-    publishQuiet: true
-  }
+    publishQuiet: true,
+  },
 };
 ```
 
@@ -170,7 +174,7 @@ Given('I am logged in as a free user', async function () {
   await this.page.fill('[name="password"]', 'TestPass123!');
   await this.page.click('button[type="submit"]');
   await this.page.waitForURL('/dashboard');
-  
+
   // Take screenshot for visual verification
   await this.screenshot('logged-in-dashboard');
 });
@@ -267,23 +271,23 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
-      
+
       - name: Run BDD tests
         run: npm run test:bdd
-      
+
       - name: Upload test report
         if: always()
         uses: actions/upload-artifact@v3
         with:
           name: cucumber-report
           path: reports/
-      
+
       - name: Upload screenshots
         if: failure()
         uses: actions/upload-artifact@v3
@@ -296,36 +300,40 @@ jobs:
 
 ## 📊 Coverage Goals
 
-| Category | Target | Status |
-|----------|--------|--------|
-| Feature Coverage | 100% | ⏳ 52 scenarios defined |
-| Step Definitions | 100% | ⏳ To implement |
-| Visual Screenshots | 100% | ⏳ To capture |
-| E2E Flows | 100% | ⏳ To automate |
+| Category           | Target | Status                  |
+| ------------------ | ------ | ----------------------- |
+| Feature Coverage   | 100%   | ⏳ 52 scenarios defined |
+| Step Definitions   | 100%   | ⏳ To implement         |
+| Visual Screenshots | 100%   | ⏳ To capture           |
+| E2E Flows          | 100%   | ⏳ To automate          |
 
 ---
 
 ## 🎯 Next Steps
 
 ### Phase 1: Step Definitions (Week 1)
+
 - [ ] Implement `common-steps.ts` (login, navigation)
 - [ ] Implement `scanning-steps.ts`
 - [ ] Implement `analysis-steps.ts`
 - [ ] Set up screenshot utilities
 
 ### Phase 2: Core Flows (Week 2)
+
 - [ ] Implement `communication-steps.ts`
 - [ ] Implement `dashboard-steps.ts`
 - [ ] Create test fixtures (users, listings)
 - [ ] Wire up database seeding
 
 ### Phase 3: Advanced Features (Week 3)
+
 - [ ] Implement `listing-steps.ts`
 - [ ] Implement `auth-steps.ts`
 - [ ] Implement `notification-steps.ts`
 - [ ] Set up CI/CD pipeline
 
 ### Phase 4: Visual Regression (Week 4)
+
 - [ ] Capture baseline screenshots for all scenarios
 - [ ] Set up Playwright visual comparison
 - [ ] Document screenshot library
@@ -342,4 +350,4 @@ jobs:
 
 ---
 
-*Created by ASPEN — Driving Flipper AI to production readiness*
+_Created by ASPEN — Driving Flipper AI to production readiness_

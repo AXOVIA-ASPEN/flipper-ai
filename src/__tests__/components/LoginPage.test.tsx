@@ -24,7 +24,11 @@ jest.mock('next-auth/react', () => ({
 // Mock next/link
 jest.mock('next/link', () => {
   return function MockLink({ children, href, ...props }: any) {
-    return <a href={href} {...props}>{children}</a>;
+    return (
+      <a href={href} {...props}>
+        {children}
+      </a>
+    );
   };
 });
 
@@ -72,9 +76,9 @@ describe('LoginPage', () => {
   it('handles credentials login submission', async () => {
     const user = userEvent.setup();
     mockSignIn.mockResolvedValue({ error: null });
-    
+
     render(<LoginPage />);
-    
+
     await user.type(screen.getByPlaceholderText('you@example.com'), 'test@example.com');
     await user.type(screen.getByPlaceholderText('Enter your password'), 'password123');
     await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -91,9 +95,9 @@ describe('LoginPage', () => {
   it('shows error on failed credentials login', async () => {
     const user = userEvent.setup();
     mockSignIn.mockResolvedValue({ error: 'CredentialsSignin' });
-    
+
     render(<LoginPage />);
-    
+
     await user.type(screen.getByPlaceholderText('you@example.com'), 'test@example.com');
     await user.type(screen.getByPlaceholderText('Enter your password'), 'wrong');
     await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -110,9 +114,9 @@ describe('LoginPage', () => {
       return null;
     });
     mockSignIn.mockResolvedValue({ error: null });
-    
+
     render(<LoginPage />);
-    
+
     await user.type(screen.getByPlaceholderText('you@example.com'), 'test@example.com');
     await user.type(screen.getByPlaceholderText('Enter your password'), 'password123');
     await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -125,9 +129,9 @@ describe('LoginPage', () => {
   it('handles sign in error gracefully', async () => {
     const user = userEvent.setup();
     mockSignIn.mockRejectedValue(new Error('Network error'));
-    
+
     render(<LoginPage />);
-    
+
     await user.type(screen.getByPlaceholderText('you@example.com'), 'test@example.com');
     await user.type(screen.getByPlaceholderText('Enter your password'), 'password123');
     await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -140,14 +144,14 @@ describe('LoginPage', () => {
   it('toggles password visibility', async () => {
     const user = userEvent.setup();
     render(<LoginPage />);
-    
+
     const passwordInput = screen.getByPlaceholderText('Enter your password');
     expect(passwordInput).toHaveAttribute('type', 'password');
-    
+
     // The toggle button is inside the password field's parent
     const passwordContainer = passwordInput.closest('div.relative') || passwordInput.parentElement;
     const toggleButton = passwordContainer?.querySelector('button');
-    
+
     if (toggleButton) {
       await user.click(toggleButton);
       expect(passwordInput).toHaveAttribute('type', 'text');

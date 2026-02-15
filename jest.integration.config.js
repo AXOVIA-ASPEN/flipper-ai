@@ -17,9 +17,7 @@ const config = {
   globalSetup: undefined,
   globalTeardown: undefined,
   // Transform the generated Prisma client (which uses ESM)
-  transformIgnorePatterns: [
-    '/node_modules/(?!(@prisma/adapter-libsql|@libsql)/)',
-  ],
+  transformIgnorePatterns: ['/node_modules/(?!(@prisma/adapter-libsql|@libsql)/)'],
   // Use experimental ESM support for import.meta
   extensionsToTreatAsEsm: [],
 };

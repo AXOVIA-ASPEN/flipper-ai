@@ -1,4 +1,4 @@
-version: "3.8"
+version: '3.8'
 
 services:
   app:
@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       - DATABASE_URL=postgresql://flipper:${POSTGRES_PASSWORD:-flipper_secret}@db:5432/flipper_ai
       - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
@@ -25,7 +25,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U flipper -d flipper_ai"]
+      test: ['CMD-SHELL', 'pg_isready -U flipper -d flipper_ai']
       interval: 10s
       timeout: 5s
       retries: 5

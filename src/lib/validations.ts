@@ -3,7 +3,7 @@
  * Centralizes all request validation for type safety and consistent error handling.
  */
 
-import { z } from "zod/v4";
+import { z } from 'zod/v4';
 
 // ---------------------------------------------------------------------------
 // Shared / Reusable
@@ -15,19 +15,19 @@ export const PaginationSchema = z.object({
 });
 
 export const PlatformEnum = z.enum([
-  "CRAIGSLIST",
-  "FACEBOOK_MARKETPLACE",
-  "EBAY",
-  "OFFERUP",
-  "MERCARI",
+  'CRAIGSLIST',
+  'FACEBOOK_MARKETPLACE',
+  'EBAY',
+  'OFFERUP',
+  'MERCARI',
 ]);
 
 export const OpportunityStatusEnum = z.enum([
-  "IDENTIFIED",
-  "CONTACTED",
-  "PURCHASED",
-  "LISTED",
-  "SOLD",
+  'IDENTIFIED',
+  'CONTACTED',
+  'PURCHASED',
+  'LISTED',
+  'SOLD',
 ]);
 
 // ---------------------------------------------------------------------------
@@ -39,7 +39,7 @@ export const OpportunityQuerySchema = PaginationSchema.extend({
 });
 
 export const CreateOpportunitySchema = z.object({
-  listingId: z.string().min(1, "listingId is required"),
+  listingId: z.string().min(1, 'listingId is required'),
   notes: z.string().max(5000).optional(),
 });
 
@@ -60,12 +60,12 @@ export const ListingQuerySchema = PaginationSchema.extend({
 });
 
 export const CreateListingSchema = z.object({
-  externalId: z.string().min(1, "externalId is required"),
+  externalId: z.string().min(1, 'externalId is required'),
   platform: PlatformEnum,
-  url: z.string().url("Valid URL is required"),
-  title: z.string().min(1, "Title is required").max(500),
+  url: z.string().url('Valid URL is required'),
+  title: z.string().min(1, 'Title is required').max(500),
   description: z.string().max(10000).optional(),
-  askingPrice: z.number().min(0, "askingPrice must be >= 0"),
+  askingPrice: z.number().min(0, 'askingPrice must be >= 0'),
   condition: z.string().max(100).optional(),
   location: z.string().max(500).optional(),
   sellerName: z.string().max(200).optional(),
@@ -96,13 +96,13 @@ export const CreateScraperJobSchema = z.object({
 // ---------------------------------------------------------------------------
 
 export const SearchConfigQuerySchema = z.object({
-  enabled: z.enum(["true", "false"]).optional(),
+  enabled: z.enum(['true', 'false']).optional(),
 });
 
 export const CreateSearchConfigSchema = z.object({
-  name: z.string().min(1, "Name is required").max(200),
+  name: z.string().min(1, 'Name is required').max(200),
   platform: PlatformEnum,
-  location: z.string().min(1, "Location is required").max(500),
+  location: z.string().min(1, 'Location is required').max(500),
   category: z.string().max(200).optional(),
   keywords: z.string().max(1000).optional(),
   minPrice: z.coerce.number().min(0).optional(),
@@ -118,17 +118,12 @@ export type ValidationResult<T> =
   | { success: true; data: T }
   | { success: false; error: string; details: z.ZodError };
 
-export function validateBody<T>(
-  schema: z.ZodSchema<T>,
-  data: unknown
-): ValidationResult<T> {
+export function validateBody<T>(schema: z.ZodSchema<T>, data: unknown): ValidationResult<T> {
   const result = schema.safeParse(data);
   if (result.success) {
     return { success: true, data: result.data };
   }
-  const messages = result.error.issues
-    .map((i) => `${i.path.join(".")}: ${i.message}`)
-    .join("; ");
+  const messages = result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ');
   return { success: false, error: messages, details: result.error };
 }
 

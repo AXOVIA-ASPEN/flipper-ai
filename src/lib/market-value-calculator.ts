@@ -2,19 +2,19 @@
  * Market Value Calculator
  * Author: Stephen Boyett
  * Company: Axovia AI
- * 
+ *
  * Calculates verified market value from sold listing data.
  * Implements outlier handling and statistical analysis.
  */
 
-import prisma from "@/lib/db";
+import prisma from '@/lib/db';
 
 export interface MarketValueResult {
   verifiedMarketValue: number;
   marketDataSource: string;
   trueDiscountPercent: number;
   dataPoints: number;
-  confidence: "low" | "medium" | "high";
+  confidence: 'low' | 'medium' | 'high';
   soldPriceRange: { min: number; max: number; median: number; average: number };
   outliers: { removed: number; method: string };
 }
@@ -22,7 +22,7 @@ export interface MarketValueResult {
 /**
  * Calculate verified market value from sold price history.
  * Uses interquartile range (IQR) method to detect and remove outliers.
- * 
+ *
  * @param productName - Product title or keywords to search for
  * @param platform - Marketplace platform (default: EBAY)
  * @param maxAge - Maximum age of sold listings in days (default: 90)
@@ -30,7 +30,7 @@ export interface MarketValueResult {
  */
 export async function calculateVerifiedMarketValue(
   productName: string,
-  platform: string = "EBAY",
+  platform: string = 'EBAY',
   maxAge: number = 90
 ): Promise<MarketValueResult | null> {
   // Fetch recent sold listings
@@ -51,7 +51,7 @@ export async function calculateVerifiedMarketValue(
       },
     },
     orderBy: {
-      soldAt: "desc",
+      soldAt: 'desc',
     },
     take: 100, // Limit to most recent 100 sales
   });
@@ -89,14 +89,14 @@ export async function calculateVerifiedMarketValue(
   const verifiedMarketValue = Math.round(median);
 
   // Determine confidence based on data points and price variance
-  let confidence: "low" | "medium" | "high" = "medium";
+  let confidence: 'low' | 'medium' | 'high' = 'medium';
   const priceRange = max - min;
   const variance = priceRange / average;
 
   if (filteredPrices.length >= 10 && variance < 0.3) {
-    confidence = "high";
+    confidence = 'high';
   } else if (filteredPrices.length < 5 || variance > 0.5) {
-    confidence = "low";
+    confidence = 'low';
   }
 
   const result: MarketValueResult = {
@@ -113,7 +113,7 @@ export async function calculateVerifiedMarketValue(
     },
     outliers: {
       removed: outliersRemoved,
-      method: "IQR (1.5x)",
+      method: 'IQR (1.5x)',
     },
   };
 
@@ -122,15 +122,12 @@ export async function calculateVerifiedMarketValue(
 
 /**
  * Calculate true discount percentage given verified market value and asking price.
- * 
+ *
  * @param verifiedMarketValue - Verified market value from sold data
  * @param askingPrice - Current listing's asking price
  * @returns Discount percentage (positive means below market, negative means above)
  */
-export function calculateTrueDiscount(
-  verifiedMarketValue: number,
-  askingPrice: number
-): number {
+export function calculateTrueDiscount(verifiedMarketValue: number, askingPrice: number): number {
   if (verifiedMarketValue === 0) return 0;
   return Math.round(((verifiedMarketValue - askingPrice) / verifiedMarketValue) * 100);
 }
@@ -138,7 +135,7 @@ export function calculateTrueDiscount(
 /**
  * Update a listing with verified market value data.
  * Fetches sold listings, calculates market value, and updates the database.
- * 
+ *
  * @param listingId - Listing ID to update
  * @returns Updated listing or null if insufficient data
  */
@@ -154,10 +151,7 @@ export async function updateListingWithVerifiedValue(
   }
 
   // Calculate verified market value
-  const marketValue = await calculateVerifiedMarketValue(
-    listing.title,
-    listing.platform
-  );
+  const marketValue = await calculateVerifiedMarketValue(listing.title, listing.platform);
 
   if (!marketValue) {
     // Insufficient data - keep algorithmic estimates
@@ -186,7 +180,7 @@ export async function updateListingWithVerifiedValue(
 /**
  * Batch update all listings with verified market values.
  * Useful for backfilling existing listings or periodic refresh.
- * 
+ *
  * @param platform - Platform to update (default: all platforms)
  * @param batchSize - Number of listings to process per batch (default: 50)
  * @returns Summary of updates

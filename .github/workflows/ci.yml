@@ -14,10 +14,10 @@ jobs:
   lint-and-typecheck:
     runs-on: ubuntu-latest
     env:
-      DATABASE_URL: "file:./dev.db"
-      CI: "true"
-      AUTH_SECRET: "ci-test-secret"
-      NEXTAUTH_URL: "http://localhost:3000"
+      DATABASE_URL: 'file:./dev.db'
+      CI: 'true'
+      AUTH_SECRET: 'ci-test-secret'
+      NEXTAUTH_URL: 'http://localhost:3000'
 
     steps:
       - uses: actions/checkout@v4
@@ -49,10 +49,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: lint-and-typecheck
     env:
-      DATABASE_URL: "file:./dev.db"
-      CI: "true"
-      AUTH_SECRET: "ci-test-secret"
-      NEXTAUTH_URL: "http://localhost:3000"
+      DATABASE_URL: 'file:./dev.db'
+      CI: 'true'
+      AUTH_SECRET: 'ci-test-secret'
+      NEXTAUTH_URL: 'http://localhost:3000'
 
     steps:
       - uses: actions/checkout@v4
@@ -98,10 +98,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     env:
-      DATABASE_URL: "file:./dev.db"
-      CI: "true"
-      AUTH_SECRET: "ci-test-secret"
-      NEXTAUTH_URL: "http://localhost:3000"
+      DATABASE_URL: 'file:./dev.db'
+      CI: 'true'
+      AUTH_SECRET: 'ci-test-secret'
+      NEXTAUTH_URL: 'http://localhost:3000'
 
     steps:
       - uses: actions/checkout@v4
@@ -133,10 +133,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     env:
-      DATABASE_URL: "file:./dev.db"
-      CI: "true"
-      AUTH_SECRET: "ci-test-secret"
-      NEXTAUTH_URL: "http://localhost:3000"
+      DATABASE_URL: 'file:./dev.db'
+      CI: 'true'
+      AUTH_SECRET: 'ci-test-secret'
+      NEXTAUTH_URL: 'http://localhost:3000'
 
     steps:
       - uses: actions/checkout@v4

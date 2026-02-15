@@ -110,7 +110,10 @@ describe('Opportunities API', () => {
 
       mockFindMany.mockResolvedValue(mockOpportunities);
       mockCount.mockResolvedValue(1);
-      mockAggregate.mockResolvedValue({ _sum: { actualProfit: 0, purchasePrice: 0, resalePrice: 0 }, _count: 1 });
+      mockAggregate.mockResolvedValue({
+        _sum: { actualProfit: 0, purchasePrice: 0, resalePrice: 0 },
+        _count: 1,
+      });
 
       const request = createMockRequest('GET', '/api/opportunities?status=PURCHASED');
       const response = await GET(request);

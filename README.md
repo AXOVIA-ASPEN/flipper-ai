@@ -84,11 +84,11 @@ make clean             # Remove build artifacts
 
 ## 🧪 Testing
 
-| Suite | Tool | Count | Coverage |
-|-------|------|-------|----------|
-| Unit | Jest | 660+ | 95% |
-| BDD Acceptance | Cucumber + Gherkin | 70 scenarios / 572 steps | Core flows |
-| E2E | Playwright | Browser automation | Critical paths |
+| Suite          | Tool               | Count                    | Coverage       |
+| -------------- | ------------------ | ------------------------ | -------------- |
+| Unit           | Jest               | 660+                     | 95%            |
+| BDD Acceptance | Cucumber + Gherkin | 70 scenarios / 572 steps | Core flows     |
+| E2E            | Playwright         | Browser automation       | Critical paths |
 
 ```bash
 # Run all tests
@@ -118,17 +118,17 @@ pnpm test -- --watch
 
 ## 🏗 Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| **Framework** | Next.js 16 (App Router) |
-| **Language** | TypeScript (strict mode) |
-| **UI** | React, Tailwind CSS |
-| **Database** | SQLite (libSQL) + Prisma ORM |
-| **AI** | Google Gemini via Stagehand |
-| **Testing** | Jest, Cucumber, Playwright |
-| **CI/CD** | GitHub Actions |
-| **Hosting** | Vercel |
-| **Linting** | ESLint, Prettier, Husky |
+| Layer         | Technology                   |
+| ------------- | ---------------------------- |
+| **Framework** | Next.js 16 (App Router)      |
+| **Language**  | TypeScript (strict mode)     |
+| **UI**        | React, Tailwind CSS          |
+| **Database**  | SQLite (libSQL) + Prisma ORM |
+| **AI**        | Google Gemini via Stagehand  |
+| **Testing**   | Jest, Cucumber, Playwright   |
+| **CI/CD**     | GitHub Actions               |
+| **Hosting**   | Vercel                       |
+| **Linting**   | ESLint, Prettier, Husky      |
 
 ## 📁 Project Structure
 
@@ -164,36 +164,40 @@ flipper-ai/
 ## 🔌 API Endpoints
 
 ### Listings
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/listings` | List all (supports `?status=`, `?minScore=`) |
-| `POST` | `/api/listings` | Create from scraper data |
-| `GET` | `/api/listings/[id]` | Get single listing |
-| `PATCH` | `/api/listings/[id]` | Update listing |
-| `DELETE` | `/api/listings/[id]` | Delete listing |
-| `GET` | `/api/listings/[id]/market-value` | Get AI market analysis |
+
+| Method   | Endpoint                          | Description                                  |
+| -------- | --------------------------------- | -------------------------------------------- |
+| `GET`    | `/api/listings`                   | List all (supports `?status=`, `?minScore=`) |
+| `POST`   | `/api/listings`                   | Create from scraper data                     |
+| `GET`    | `/api/listings/[id]`              | Get single listing                           |
+| `PATCH`  | `/api/listings/[id]`              | Update listing                               |
+| `DELETE` | `/api/listings/[id]`              | Delete listing                               |
+| `GET`    | `/api/listings/[id]/market-value` | Get AI market analysis                       |
 
 ### Opportunities
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/opportunities` | List opportunities |
-| `POST` | `/api/opportunities` | Create from listing |
-| `GET` | `/api/opportunities/[id]` | Get opportunity detail |
+
+| Method | Endpoint                  | Description            |
+| ------ | ------------------------- | ---------------------- |
+| `GET`  | `/api/opportunities`      | List opportunities     |
+| `POST` | `/api/opportunities`      | Create from listing    |
+| `GET`  | `/api/opportunities/[id]` | Get opportunity detail |
 
 ### Scrapers
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/scraper/craigslist` | Scrape Craigslist listings |
-| `POST` | `/api/scraper/ebay` | Search eBay Browse API |
-| `POST` | `/api/scraper/facebook` | Scrape Facebook Marketplace |
-| `POST` | `/api/scraper/offerup` | Scrape OfferUp |
-| `POST` | `/api/scraper/mercari` | Scrape Mercari |
+
+| Method | Endpoint                  | Description                 |
+| ------ | ------------------------- | --------------------------- |
+| `POST` | `/api/scraper/craigslist` | Scrape Craigslist listings  |
+| `POST` | `/api/scraper/ebay`       | Search eBay Browse API      |
+| `POST` | `/api/scraper/facebook`   | Scrape Facebook Marketplace |
+| `POST` | `/api/scraper/offerup`    | Scrape OfferUp              |
+| `POST` | `/api/scraper/mercari`    | Scrape Mercari              |
 
 ### Search & Jobs
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET/POST` | `/api/search-configs` | Manage saved searches |
-| `GET` | `/api/scraper-jobs` | View scraper run history |
+
+| Method     | Endpoint              | Description              |
+| ---------- | --------------------- | ------------------------ |
+| `GET/POST` | `/api/search-configs` | Manage saved searches    |
+| `GET`      | `/api/scraper-jobs`   | View scraper run history |
 
 ## 📊 Value Scoring Algorithm
 

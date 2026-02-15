@@ -37,6 +37,7 @@ pnpm lint                   # Run ESLint
 ## Architecture
 
 ### Tech Stack
+
 - **Frontend**: Next.js 16, React 19, TypeScript, Tailwind CSS 4
 - **Backend**: Next.js API Routes
 - **Database**: SQLite with Prisma ORM (client generated to `src/generated/prisma/`)
@@ -44,6 +45,7 @@ pnpm lint                   # Run ESLint
 - **Testing**: Jest (unit), Playwright (E2E)
 
 ### Key Directories
+
 ```
 src/app/                        # Next.js App Router
 ├── api/                        # API routes (REST endpoints)
@@ -67,12 +69,14 @@ prisma/schema.prisma            # Database schema
 ```
 
 ### Data Flow
+
 1. **Scraping**: `/api/scraper/craigslist` uses Playwright to extract listings from search results
 2. **Analysis**: `value-estimator.ts` scores items 0-100 based on category, brand, condition, and risk factors
 3. **Storage**: Prisma stores listings in SQLite with status tracking
 4. **Opportunities**: Listings with score 70+ become opportunities for tracking through purchase/resale
 
 ### Database Models
+
 - `Listing`: Scraped items with value analysis, comparable URLs, AI-generated purchase messages
 - `Opportunity`: Active flips linked to listings, tracks purchase/resale/profit
 - `ScraperJob`: Run history and status
@@ -80,14 +84,18 @@ prisma/schema.prisma            # Database schema
 - `PriceHistory`: Market value reference data
 
 ### Value Scoring System
+
 Items scored 0-100 in `value-estimator.ts` using:
+
 - Category multipliers (electronics, furniture, collectibles)
 - Brand detection (Apple, Sony, Dyson, vintage items)
 - Condition analysis (new, like new, good, fair, poor)
 - Risk factors (broken, parts only, needs repair)
 
 ### API Route Pattern
+
 All API routes follow Next.js App Router conventions:
+
 - `route.ts` exports HTTP method handlers (GET, POST, PATCH, DELETE)
 - Dynamic routes use `[id]` folder pattern
 - Returns `NextResponse.json()` with consistent `{ success, data/message }` shape
@@ -95,6 +103,7 @@ All API routes follow Next.js App Router conventions:
 ## Scraper Implementation
 
 The Craigslist scraper (`src/app/api/scraper/craigslist/route.ts`) uses Playwright:
+
 - Launches headless Chromium with custom user agent
 - Navigates to Craigslist search URL with filters
 - Extracts listings via `page.evaluate()` with multiple selector fallbacks

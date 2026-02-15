@@ -1,11 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/db';
 
 // GET /api/scraper-jobs/[id] - Get a single scraper job
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const job = await prisma.scraperJob.findUnique({
@@ -13,27 +10,18 @@ export async function GET(
     });
 
     if (!job) {
-      return NextResponse.json(
-        { error: "Scraper job not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Scraper job not found' }, { status: 404 });
     }
 
     return NextResponse.json(job);
   } catch (error) {
-    console.error("Error fetching scraper job:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch scraper job" },
-      { status: 500 }
-    );
+    console.error('Error fetching scraper job:', error);
+    return NextResponse.json({ error: 'Failed to fetch scraper job' }, { status: 500 });
   }
 }
 
 // PATCH /api/scraper-jobs/[id] - Update a scraper job
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const body = await request.json();
@@ -43,10 +31,10 @@ export async function PATCH(
 
     // Validate status if provided
     if (body.status !== undefined) {
-      const validStatuses = ["PENDING", "RUNNING", "COMPLETED", "FAILED"];
+      const validStatuses = ['PENDING', 'RUNNING', 'COMPLETED', 'FAILED'];
       if (!validStatuses.includes(body.status)) {
         return NextResponse.json(
-          { error: `Invalid status. Must be one of: ${validStatuses.join(", ")}` },
+          { error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` },
           { status: 400 }
         );
       }
@@ -76,11 +64,8 @@ export async function PATCH(
 
     return NextResponse.json(job);
   } catch (error) {
-    console.error("Error updating scraper job:", error);
-    return NextResponse.json(
-      { error: "Failed to update scraper job" },
-      { status: 500 }
-    );
+    console.error('Error updating scraper job:', error);
+    return NextResponse.json({ error: 'Failed to update scraper job' }, { status: 500 });
   }
 }
 
@@ -97,10 +82,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error deleting scraper job:", error);
-    return NextResponse.json(
-      { error: "Failed to delete scraper job" },
-      { status: 500 }
-    );
+    console.error('Error deleting scraper job:', error);
+    return NextResponse.json({ error: 'Failed to delete scraper job' }, { status: 500 });
   }
 }

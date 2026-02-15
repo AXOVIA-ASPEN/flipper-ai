@@ -17,12 +17,15 @@ setDefaultTimeout(30 * 1000);
 
 // ==================== NAVIGATION & SCANNING ====================
 
-When('I select {string} as the marketplace', async function (this: CustomWorld, marketplace: string) {
-  const selector = this.page.locator('[data-testid="marketplace-select"]');
-  await selector.click();
-  await this.page.locator(`[data-value="${marketplace.toLowerCase()}"]`).click();
-  console.log(`✅ Selected marketplace: ${marketplace}`);
-});
+When(
+  'I select {string} as the marketplace',
+  async function (this: CustomWorld, marketplace: string) {
+    const selector = this.page.locator('[data-testid="marketplace-select"]');
+    await selector.click();
+    await this.page.locator(`[data-value="${marketplace.toLowerCase()}"]`).click();
+    console.log(`✅ Selected marketplace: ${marketplace}`);
+  }
+);
 
 When('I select {string} as the category', async function (this: CustomWorld, category: string) {
   const selector = this.page.locator('[data-testid="category-select"]');
@@ -45,21 +48,27 @@ When('I set price range to {string}', async function (this: CustomWorld, priceRa
 
 // ==================== SCAN RESULTS ====================
 
-Then('I should see a {string} progress indicator', async function (this: CustomWorld, indicatorText: string) {
-  const indicator = this.page.locator('[data-testid="scan-progress"]');
-  await expect(indicator).toBeVisible({ timeout: 5000 });
-  const text = await indicator.textContent();
-  expect(text).toContain(indicatorText);
-  await this.screenshot('scan-progress-indicator');
-  console.log(`✅ Progress indicator visible: ${indicatorText}`);
-});
+Then(
+  'I should see a {string} progress indicator',
+  async function (this: CustomWorld, indicatorText: string) {
+    const indicator = this.page.locator('[data-testid="scan-progress"]');
+    await expect(indicator).toBeVisible({ timeout: 5000 });
+    const text = await indicator.textContent();
+    expect(text).toContain(indicatorText);
+    await this.screenshot('scan-progress-indicator');
+    console.log(`✅ Progress indicator visible: ${indicatorText}`);
+  }
+);
 
-Then('within {int} seconds, results should be displayed', async function (this: CustomWorld, seconds: number) {
-  const resultsList = this.page.locator('[data-testid="scan-results"]');
-  await expect(resultsList).toBeVisible({ timeout: seconds * 1000 });
-  await this.screenshot('scan-results-displayed');
-  console.log(`✅ Results displayed within ${seconds}s`);
-});
+Then(
+  'within {int} seconds, results should be displayed',
+  async function (this: CustomWorld, seconds: number) {
+    const resultsList = this.page.locator('[data-testid="scan-results"]');
+    await expect(resultsList).toBeVisible({ timeout: seconds * 1000 });
+    await this.screenshot('scan-results-displayed');
+    console.log(`✅ Results displayed within ${seconds}s`);
+  }
+);
 
 Then('each result should show:', async function (this: CustomWorld, dataTable) {
   const expectedFields = dataTable.hashes();
@@ -77,33 +86,37 @@ Then('each result should show:', async function (this: CustomWorld, dataTable) {
   await this.screenshot('result-fields-verified');
 });
 
-Then('results should be sorted by flippability score descending', async function (this: CustomWorld) {
-  const scores = await this.page
-    .locator('[data-testid="result-flippability"]')
-    .allTextContents();
+Then(
+  'results should be sorted by flippability score descending',
+  async function (this: CustomWorld) {
+    const scores = await this.page.locator('[data-testid="result-flippability"]').allTextContents();
 
-  const numericScores = scores.map((s) => parseFloat(s.replace(/[^0-9.]/g, '')));
+    const numericScores = scores.map((s) => parseFloat(s.replace(/[^0-9.]/g, '')));
 
-  for (let i = 1; i < numericScores.length; i++) {
-    expect(numericScores[i]).toBeLessThanOrEqual(numericScores[i - 1]);
+    for (let i = 1; i < numericScores.length; i++) {
+      expect(numericScores[i]).toBeLessThanOrEqual(numericScores[i - 1]);
+    }
+    console.log(`✅ Results sorted by score descending: ${numericScores.join(', ')}`);
   }
-  console.log(`✅ Results sorted by score descending: ${numericScores.join(', ')}`);
-});
+);
 
 // ==================== REAL-TIME ALERTS ====================
 
-Given('I have an active scan running for {string}', async function (this: CustomWorld, marketplace: string) {
-  // Mock an active scan WebSocket/polling
-  this.testData.activeScan = { marketplace, status: 'running' };
+Given(
+  'I have an active scan running for {string}',
+  async function (this: CustomWorld, marketplace: string) {
+    // Mock an active scan WebSocket/polling
+    this.testData.activeScan = { marketplace, status: 'running' };
 
-  await this.page.route('**/api/scans/active**', async (route) => {
-    await route.fulfill({
-      status: 200,
-      body: JSON.stringify({ scans: [this.testData.activeScan] }),
+    await this.page.route('**/api/scans/active**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        body: JSON.stringify({ scans: [this.testData.activeScan] }),
+      });
     });
-  });
-  console.log(`✅ Active scan running for ${marketplace}`);
-});
+    console.log(`✅ Active scan running for ${marketplace}`);
+  }
+);
 
 Given('I have notifications enabled', async function (this: CustomWorld) {
   // Grant notification permission in test context
@@ -126,9 +139,7 @@ When(
     };
 
     await this.page.evaluate((listing) => {
-      window.dispatchEvent(
-        new CustomEvent('new-opportunity', { detail: listing })
-      );
+      window.dispatchEvent(new CustomEvent('new-opportunity', { detail: listing }));
     }, this.testData.alertListing);
     console.log(`✅ New listing with score ${minScore + 5} appeared`);
   }
@@ -144,17 +155,12 @@ Then('I should receive a browser notification', async function (this: CustomWorl
   console.log('✅ Browser notification triggered');
 });
 
-Then(
-  'the notification should show the item title and score',
-  async function (this: CustomWorld) {
-    const listing = this.testData.alertListing;
-    expect(listing.title).toBeTruthy();
-    expect(listing.flippabilityScore).toBeGreaterThan(0);
-    console.log(
-      `✅ Notification content: ${listing.title} (${listing.flippabilityScore})`
-    );
-  }
-);
+Then('the notification should show the item title and score', async function (this: CustomWorld) {
+  const listing = this.testData.alertListing;
+  expect(listing.title).toBeTruthy();
+  expect(listing.flippabilityScore).toBeGreaterThan(0);
+  console.log(`✅ Notification content: ${listing.title} (${listing.flippabilityScore})`);
+});
 
 Then(
   'clicking the notification should navigate to the item detail page',
@@ -196,13 +202,9 @@ Given('I have scan results displayed', async function (this: CustomWorld) {
 When(
   'I set the flippability filter to {string}',
   async function (this: CustomWorld, filterValue: string) {
-    const filterSelect = this.page.locator(
-      '[data-testid="flippability-filter"]'
-    );
+    const filterSelect = this.page.locator('[data-testid="flippability-filter"]');
     await filterSelect.click();
-    await this.page
-      .locator(`[data-value="${filterValue.replace(/[^a-z0-9+]/gi, '')}"]`)
-      .click();
+    await this.page.locator(`[data-value="${filterValue.replace(/[^a-z0-9+]/gi, '')}"]`).click();
 
     // Wait for filter to apply
     await this.page.waitForTimeout(500);
@@ -214,32 +216,23 @@ When(
 Then(
   'only items with score >= {int} should be visible',
   async function (this: CustomWorld, minScore: number) {
-    const scores = await this.page
-      .locator('[data-testid="result-flippability"]')
-      .allTextContents();
+    const scores = await this.page.locator('[data-testid="result-flippability"]').allTextContents();
 
-    const numericScores = scores.map((s) =>
-      parseFloat(s.replace(/[^0-9.]/g, ''))
-    );
+    const numericScores = scores.map((s) => parseFloat(s.replace(/[^0-9.]/g, '')));
     for (const score of numericScores) {
       expect(score).toBeGreaterThanOrEqual(minScore);
     }
-    console.log(
-      `✅ All visible scores >= ${minScore}: ${numericScores.join(', ')}`
-    );
+    console.log(`✅ All visible scores >= ${minScore}: ${numericScores.join(', ')}`);
   }
 );
 
-Then(
-  'the count badge should update to show filtered count',
-  async function (this: CustomWorld) {
-    const badge = this.page.locator('[data-testid="results-count"]');
-    await expect(badge).toBeVisible();
-    const count = await badge.textContent();
-    console.log(`✅ Count badge updated: ${count}`);
-    await this.screenshot('count-badge-updated');
-  }
-);
+Then('the count badge should update to show filtered count', async function (this: CustomWorld) {
+  const badge = this.page.locator('[data-testid="results-count"]');
+  await expect(badge).toBeVisible();
+  const count = await badge.textContent();
+  console.log(`✅ Count badge updated: ${count}`);
+  await this.screenshot('count-badge-updated');
+});
 
 // ==================== SAVE SEARCH ====================
 
@@ -249,17 +242,13 @@ When('I configure:', async function (this: CustomWorld, dataTable) {
   if (config.Marketplace) {
     const selector = this.page.locator('[data-testid="marketplace-select"]');
     await selector.click();
-    await this.page
-      .locator(`[data-value="${config.Marketplace.toLowerCase()}"]`)
-      .click();
+    await this.page.locator(`[data-value="${config.Marketplace.toLowerCase()}"]`).click();
   }
 
   if (config.Category) {
     const selector = this.page.locator('[data-testid="category-select"]');
     await selector.click();
-    await this.page
-      .locator(`[data-value="${config.Category.toLowerCase()}"]`)
-      .click();
+    await this.page.locator(`[data-value="${config.Category.toLowerCase()}"]`).click();
   }
 
   if (config['Price Range']) {
@@ -278,41 +267,32 @@ When('I configure:', async function (this: CustomWorld, dataTable) {
   console.log('✅ Search configured:', JSON.stringify(config));
 });
 
-When(
-  'I enter search name {string}',
-  async function (this: CustomWorld, name: string) {
-    // Modal or inline input for naming the search
-    const nameInput = this.page.locator('[data-testid="search-name-input"]');
-    await expect(nameInput).toBeVisible({ timeout: 5000 });
-    await nameInput.fill(name);
-    await this.page.getByRole('button', { name: 'Save' }).click();
-    console.log(`✅ Search name entered: ${name}`);
-  }
-);
+When('I enter search name {string}', async function (this: CustomWorld, name: string) {
+  // Modal or inline input for naming the search
+  const nameInput = this.page.locator('[data-testid="search-name-input"]');
+  await expect(nameInput).toBeVisible({ timeout: 5000 });
+  await nameInput.fill(name);
+  await this.page.getByRole('button', { name: 'Save' }).click();
+  console.log(`✅ Search name entered: ${name}`);
+});
 
-Then(
-  'the search should be saved to my configurations',
-  async function (this: CustomWorld) {
-    // Verify save confirmation
-    const toast = this.page.locator('[data-testid="toast-success"]');
-    await expect(toast).toBeVisible({ timeout: 5000 });
-    console.log('✅ Search saved to configurations');
-    await this.screenshot('search-saved-confirmation');
-  }
-);
+Then('the search should be saved to my configurations', async function (this: CustomWorld) {
+  // Verify save confirmation
+  const toast = this.page.locator('[data-testid="toast-success"]');
+  await expect(toast).toBeVisible({ timeout: 5000 });
+  console.log('✅ Search saved to configurations');
+  await this.screenshot('search-saved-confirmation');
+});
 
-Then(
-  'I should be able to re-run it from the dashboard',
-  async function (this: CustomWorld) {
-    await this.page.goto('/dashboard');
-    await this.page.waitForLoadState('networkidle');
+Then('I should be able to re-run it from the dashboard', async function (this: CustomWorld) {
+  await this.page.goto('/dashboard');
+  await this.page.waitForLoadState('networkidle');
 
-    const savedSearch = this.page.locator('[data-testid="saved-search"]');
-    await expect(savedSearch.first()).toBeVisible();
-    console.log('✅ Saved search visible on dashboard');
-    await this.screenshot('saved-search-on-dashboard');
-  }
-);
+  const savedSearch = this.page.locator('[data-testid="saved-search"]');
+  await expect(savedSearch.first()).toBeVisible();
+  console.log('✅ Saved search visible on dashboard');
+  await this.screenshot('saved-search-on-dashboard');
+});
 
 // ==================== FREE TIER LIMITS ====================
 
@@ -323,74 +303,57 @@ Given('I am on the free tier', async function (this: CustomWorld) {
   console.log('✅ User is on free tier');
 });
 
-Given(
-  'I have used {int} scans today',
-  async function (this: CustomWorld, scanCount: number) {
-    // Mock the scan usage API
-    await this.page.route('**/api/usage**', async (route) => {
-      await route.fulfill({
-        status: 200,
-        body: JSON.stringify({
-          scansToday: scanCount,
-          scanLimit: 10,
-          tier: 'free',
-        }),
-      });
+Given('I have used {int} scans today', async function (this: CustomWorld, scanCount: number) {
+  // Mock the scan usage API
+  await this.page.route('**/api/usage**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      body: JSON.stringify({
+        scansToday: scanCount,
+        scanLimit: 10,
+        tier: 'free',
+      }),
     });
-    console.log(`✅ Scan usage set: ${scanCount}/10`);
+  });
+  console.log(`✅ Scan usage set: ${scanCount}/10`);
+});
+
+When('I try to start another scan', async function (this: CustomWorld) {
+  await this.page.goto('/scanner');
+  await this.page.waitForLoadState('networkidle');
+
+  // Try to click Start Scan
+  const startButton = this.page.getByRole('button', { name: 'Start Scan' });
+  if (await startButton.isVisible()) {
+    await startButton.click();
   }
-);
+  await this.screenshot('scan-limit-reached');
+  console.log('✅ Attempted to start scan at limit');
+});
 
-When(
-  'I try to start another scan',
-  async function (this: CustomWorld) {
-    await this.page.goto('/scanner');
-    await this.page.waitForLoadState('networkidle');
+Then('I should see an upgrade modal', async function (this: CustomWorld) {
+  const modal = this.page.locator('[data-testid="upgrade-modal"]');
+  await expect(modal).toBeVisible({ timeout: 5000 });
+  await this.screenshot('upgrade-modal-visible');
+  console.log('✅ Upgrade modal displayed');
+});
 
-    // Try to click Start Scan
-    const startButton = this.page.getByRole('button', { name: 'Start Scan' });
-    if (await startButton.isVisible()) {
-      await startButton.click();
-    }
-    await this.screenshot('scan-limit-reached');
-    console.log('✅ Attempted to start scan at limit');
-  }
-);
+Then('the scan should not execute', async function (this: CustomWorld) {
+  // Verify no scan progress indicator
+  const progress = this.page.locator('[data-testid="scan-progress"]');
+  await expect(progress).not.toBeVisible();
+  console.log('✅ Scan did not execute');
+});
 
-Then(
-  'I should see an upgrade modal',
-  async function (this: CustomWorld) {
-    const modal = this.page.locator('[data-testid="upgrade-modal"]');
-    await expect(modal).toBeVisible({ timeout: 5000 });
-    await this.screenshot('upgrade-modal-visible');
-    console.log('✅ Upgrade modal displayed');
-  }
-);
+Then('the modal should show pricing tiers', async function (this: CustomWorld) {
+  const pricingSection = this.page.locator('[data-testid="pricing-tiers"]');
+  await expect(pricingSection).toBeVisible();
 
-Then(
-  'the scan should not execute',
-  async function (this: CustomWorld) {
-    // Verify no scan progress indicator
-    const progress = this.page.locator('[data-testid="scan-progress"]');
-    await expect(progress).not.toBeVisible();
-    console.log('✅ Scan did not execute');
-  }
-);
+  // Verify at least 2 tiers are shown
+  const tierCards = this.page.locator('[data-testid="tier-card"]');
+  const count = await tierCards.count();
+  expect(count).toBeGreaterThanOrEqual(2);
 
-Then(
-  'the modal should show pricing tiers',
-  async function (this: CustomWorld) {
-    const pricingSection = this.page.locator(
-      '[data-testid="pricing-tiers"]'
-    );
-    await expect(pricingSection).toBeVisible();
-
-    // Verify at least 2 tiers are shown
-    const tierCards = this.page.locator('[data-testid="tier-card"]');
-    const count = await tierCards.count();
-    expect(count).toBeGreaterThanOrEqual(2);
-
-    await this.screenshot('pricing-tiers-displayed');
-    console.log(`✅ ${count} pricing tiers displayed`);
-  }
-);
+  await this.screenshot('pricing-tiers-displayed');
+  console.log(`✅ ${count} pricing tiers displayed`);
+});

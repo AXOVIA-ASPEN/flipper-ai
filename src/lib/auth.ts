@@ -3,23 +3,23 @@
  * Supports OAuth (Google, GitHub) and email/password credentials
  */
 
-import NextAuth from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import Google from "next-auth/providers/google";
-import GitHub from "next-auth/providers/github";
-import Credentials from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
-import prisma from "@/lib/db";
+import NextAuth from 'next-auth';
+import { PrismaAdapter } from '@auth/prisma-adapter';
+import Google from 'next-auth/providers/google';
+import GitHub from 'next-auth/providers/github';
+import Credentials from 'next-auth/providers/credentials';
+import bcrypt from 'bcryptjs';
+import prisma from '@/lib/db';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
   },
   pages: {
-    signIn: "/login",
-    newUser: "/settings",
-    error: "/login",
+    signIn: '/login',
+    newUser: '/settings',
+    error: '/login',
   },
   providers: [
     Google({
@@ -33,14 +33,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       allowDangerousEmailAccountLinking: true,
     }),
     Credentials({
-      name: "credentials",
+      name: 'credentials',
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Email and password are required");
+          throw new Error('Email and password are required');
         }
 
         const email = credentials.email as string;
@@ -51,13 +51,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         });
 
         if (!user || !user.password) {
-          throw new Error("Invalid email or password");
+          throw new Error('Invalid email or password');
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-          throw new Error("Invalid email or password");
+          throw new Error('Invalid email or password');
         }
 
         return {
@@ -90,7 +90,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         await prisma.userSettings.create({
           data: {
             userId: user.id,
-            llmModel: "gpt-4o-mini",
+            llmModel: 'gpt-4o-mini',
             discountThreshold: 50,
             autoAnalyze: true,
           },
@@ -128,13 +128,13 @@ export async function getCurrentUserId(): Promise<string | null> {
 export async function requireAuth() {
   const user = await getCurrentUser();
   if (!user) {
-    throw new Error("Unauthorized");
+    throw new Error('Unauthorized');
   }
   return user;
 }
 
 // Extend the NextAuth types
-declare module "next-auth" {
+declare module 'next-auth' {
   interface Session {
     user: {
       id: string;
@@ -145,7 +145,7 @@ declare module "next-auth" {
   }
 }
 
-declare module "next-auth" {
+declare module 'next-auth' {
   interface JWT {
     id?: string;
   }

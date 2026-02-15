@@ -3,7 +3,7 @@
 **Author:** Stephen Boyett  
 **Company:** Axovia AI  
 **Version:** 2.0  
-**Date:** February 3, 2026  
+**Date:** February 3, 2026
 
 ---
 
@@ -11,13 +11,14 @@
 
 **Flipper AI** is an AI-powered marketplace arbitrage tool that helps users find, analyze, and flip items for profit across multiple online marketplaces. The tool automates the entire flipping workflow — from discovery to purchase communication to resale listing.
 
-**Tagline:** *Find. Flip. Profit.* 🐧
+**Tagline:** _Find. Flip. Profit._ 🐧
 
 ---
 
 ## 🔍 Problem Statement
 
 Flipping items for profit is time-consuming and requires:
+
 - Manually searching multiple marketplaces
 - Estimating resale value based on experience
 - Tracking listings and price changes
@@ -43,11 +44,13 @@ Flipper AI automates the entire flipping workflow:
 ## 👤 Target Users
 
 ### Primary: Side Hustlers & Part-Time Flippers
+
 - Looking for extra income
 - Limited time for manual searching
 - Want data-driven decisions
 
 ### Secondary: Professional Resellers
+
 - High-volume operations
 - Need efficiency tools
 - Value automation
@@ -57,41 +60,47 @@ Flipper AI automates the entire flipping workflow:
 ## 🏗️ Key Features
 
 ### 1. Multi-Marketplace Scanner
+
 - **Supported Platforms:** eBay, Craigslist, Facebook Marketplace, OfferUp, Mercari
 - **Real-time Alerts:** Instant notifications for high-flippability items
 - **Custom Filters:** Category, price range, location, keywords
 
 ### 2. AI Flippability Score Engine
+
 Analyzes each listing using:
 
-| Factor | Weight | Data Source |
-|--------|--------|-------------|
-| Price vs. Market Value | 30% | eBay sold listings, price guides |
-| Sales Probability | 25% | Historical sales data, demand trends |
-| Profit Margin | 20% | Buy price vs. expected sell price |
-| Time to Sell | 15% | Average days on market |
-| Condition Assessment | 10% | Listing description analysis |
+| Factor                 | Weight | Data Source                          |
+| ---------------------- | ------ | ------------------------------------ |
+| Price vs. Market Value | 30%    | eBay sold listings, price guides     |
+| Sales Probability      | 25%    | Historical sales data, demand trends |
+| Profit Margin          | 20%    | Buy price vs. expected sell price    |
+| Time to Sell           | 15%    | Average days on market               |
+| Condition Assessment   | 10%    | Listing description analysis         |
 
 **Output:** Flippability Score (0-100) + Confidence Level
 
 ### 3. Automated Seller Communication
+
 - **Message Drafting:** AI generates personalized outreach messages
 - **Conversation Management:** Full chat history in UI
 - **Pickup Scheduling:** Integrates user availability for local pickups
 - **Approval Flow:** User approves messages before sending
 
 ### 4. Resale Listing Generator
+
 - **Auto-create Listings:** Generates title, description, photos
 - **Price Optimization:** Sets price based on market analysis
 - **Cross-platform Posting:** List on multiple marketplaces
 
 ### 5. Dashboard & Tracking
+
 - **Flippables Queue:** Items identified but not yet contacted
 - **Active Negotiations:** Ongoing conversations
 - **Inventory:** Purchased items awaiting resale
 - **Sales History:** Completed flips with P&L
 
 ### 6. Listing Monitoring
+
 - **SOLD Detection:** Alerts if a tracked item sells
 - **Price Changes:** Notifies of price drops
 - **Listing Expiry:** Warns before listings expire
@@ -131,30 +140,33 @@ Analyzes each listing using:
 
 ## 💰 Pricing
 
-| Tier | Price | Features |
-|------|-------|----------|
-| **Free** | $0/mo | 10 scans/day, 1 marketplace, manual messaging |
-| **Flipper** | $19/mo | Unlimited scans, 3 marketplaces, AI messaging |
+| Tier            | Price  | Features                                         |
+| --------------- | ------ | ------------------------------------------------ |
+| **Free**        | $0/mo  | 10 scans/day, 1 marketplace, manual messaging    |
+| **Flipper**     | $19/mo | Unlimited scans, 3 marketplaces, AI messaging    |
 | **Pro Flipper** | $49/mo | All marketplaces, auto-listing, priority support |
-| **Enterprise** | Custom | API access, team features, custom integrations |
+| **Enterprise**  | Custom | API access, team features, custom integrations   |
 
 ---
 
 ## 🛠️ Technical Architecture
 
 ### Frontend
+
 - **Framework:** Next.js 14+ (App Router)
 - **Styling:** Tailwind CSS
 - **State:** React Query + Zustand
 - **Real-time:** WebSockets for live updates
 
 ### Backend
+
 - **API:** FastAPI (Python)
 - **Database:** PostgreSQL + Redis (caching)
 - **Queue:** Celery for background jobs
 - **AI/ML:** Claude API for analysis, custom scoring models
 
 ### Integrations
+
 - eBay API
 - Facebook Graph API (Marketplace)
 - Craigslist scraping (robots.txt compliant)
@@ -162,6 +174,7 @@ Analyzes each listing using:
 - Mercari API
 
 ### Infrastructure
+
 - **Hosting:** Firebase/Cloud Run
 - **CDN:** Cloudflare
 - **Monitoring:** Prometheus + Grafana
@@ -170,37 +183,41 @@ Analyzes each listing using:
 
 ## 📊 Success Metrics
 
-| Metric | Target (3 months) |
-|--------|-------------------|
-| MAU | 1,000 |
-| Paid Subscribers | 100 |
-| MRR | $2,500 |
-| Avg Flippability Accuracy | 80% |
-| User Profit (avg) | $500/mo |
+| Metric                    | Target (3 months) |
+| ------------------------- | ----------------- |
+| MAU                       | 1,000             |
+| Paid Subscribers          | 100               |
+| MRR                       | $2,500            |
+| Avg Flippability Accuracy | 80%               |
+| User Profit (avg)         | $500/mo           |
 
 ---
 
 ## 🗓️ MVP Scope (4 Weeks)
 
 ### Week 1: Core Scanner
+
 - [ ] eBay listing scraper
 - [ ] Basic flippability scoring
 - [ ] Database schema
 - [ ] API endpoints
 
 ### Week 2: AI Analysis
+
 - [ ] Price comparison engine
 - [ ] Sales probability model
 - [ ] Flippability score calculator
 - [ ] Dashboard UI
 
 ### Week 3: Communication
+
 - [ ] Message drafting AI
 - [ ] Conversation UI
 - [ ] Approval workflow
 - [ ] Notification system
 
 ### Week 4: Polish & Launch
+
 - [ ] Resale listing generator
 - [ ] Payment integration (Stripe)
 - [ ] Onboarding flow
@@ -219,12 +236,12 @@ Analyzes each listing using:
 
 ## ⚠️ Risks & Mitigations
 
-| Risk | Mitigation |
-|------|------------|
-| Marketplace TOS violations | Comply with APIs, rate limiting, no scraping where prohibited |
-| Low flippability accuracy | Continuous model training, user feedback loop |
-| Seller communication failures | Human-in-the-loop approval, fallback to manual |
-| Competition | Focus on UX and multi-marketplace advantage |
+| Risk                          | Mitigation                                                    |
+| ----------------------------- | ------------------------------------------------------------- |
+| Marketplace TOS violations    | Comply with APIs, rate limiting, no scraping where prohibited |
+| Low flippability accuracy     | Continuous model training, user feedback loop                 |
+| Seller communication failures | Human-in-the-loop approval, fallback to manual                |
+| Competition                   | Focus on UX and multi-marketplace advantage                   |
 
 ---
 
@@ -238,4 +255,4 @@ Analyzes each listing using:
 
 ---
 
-*Document created by ASPEN | February 3, 2026*
+_Document created by ASPEN | February 3, 2026_

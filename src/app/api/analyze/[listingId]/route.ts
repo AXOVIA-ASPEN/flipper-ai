@@ -2,13 +2,13 @@
  * API Route: POST /api/analyze/[listingId]
  * Author: Stephen Boyett
  * Company: Axovia AI
- * 
+ *
  * Analyze a listing using Claude AI.
  * Returns structured analysis with caching.
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import { analyzeListing } from "@/lib/claude-analyzer";
+import { NextRequest, NextResponse } from 'next/server';
+import { analyzeListing } from '@/lib/claude-analyzer';
 
 export async function POST(
   request: NextRequest,
@@ -18,10 +18,7 @@ export async function POST(
     const { listingId } = await params;
 
     if (!listingId) {
-      return NextResponse.json(
-        { error: "Listing ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Listing ID is required' }, { status: 400 });
     }
 
     const analysis = await analyzeListing(listingId);
@@ -32,41 +29,29 @@ export async function POST(
       analysis,
     });
   } catch (error) {
-    console.error("Error analyzing listing:", error);
+    console.error('Error analyzing listing:', error);
 
     if (error instanceof Error) {
       // Check for specific errors
-      if (error.message.includes("not found")) {
-        return NextResponse.json(
-          { error: "Listing not found" },
-          { status: 404 }
-        );
+      if (error.message.includes('not found')) {
+        return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
       }
 
-      if (error.message.includes("rate limit")) {
+      if (error.message.includes('rate limit')) {
         return NextResponse.json(
-          { error: "Rate limit exceeded. Please try again later." },
+          { error: 'Rate limit exceeded. Please try again later.' },
           { status: 429 }
         );
       }
 
-      if (error.message.includes("API_KEY")) {
-        return NextResponse.json(
-          { error: "Claude API not configured" },
-          { status: 500 }
-        );
+      if (error.message.includes('API_KEY')) {
+        return NextResponse.json({ error: 'Claude API not configured' }, { status: 500 });
       }
 
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json(
-      { error: "Failed to analyze listing" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to analyze listing' }, { status: 500 });
   }
 }
 
@@ -81,14 +66,11 @@ export async function GET(
     const { listingId } = await params;
 
     if (!listingId) {
-      return NextResponse.json(
-        { error: "Listing ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Listing ID is required' }, { status: 400 });
     }
 
     // Try to get from cache (without triggering new analysis)
-    const { default: prisma } = await import("@/lib/db");
+    const { default: prisma } = await import('@/lib/db');
 
     const cached = await prisma.aiAnalysisCache.findFirst({
       where: {
@@ -98,7 +80,7 @@ export async function GET(
         },
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
 
@@ -120,10 +102,7 @@ export async function GET(
       listingId,
     });
   } catch (error) {
-    console.error("Error checking analysis cache:", error);
-    return NextResponse.json(
-      { error: "Failed to check cache" },
-      { status: 500 }
-    );
+    console.error('Error checking analysis cache:', error);
+    return NextResponse.json({ error: 'Failed to check cache' }, { status: 500 });
   }
 }

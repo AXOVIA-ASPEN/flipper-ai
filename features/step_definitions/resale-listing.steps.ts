@@ -47,7 +47,9 @@ Given('the target profit margin is {int}%', async function (this: CustomWorld, m
 
 When('I select {string} as the platform', async function (this: CustomWorld, platform: string) {
   // Select platform from dropdown or radio group
-  const selector = this.page.getByLabel('Platform').or(this.page.locator('select[name="platform"]'));
+  const selector = this.page
+    .getByLabel('Platform')
+    .or(this.page.locator('select[name="platform"]'));
   await selector.selectOption({ label: platform });
   this.testData.selectedPlatform = platform;
   console.log(`✅ Selected platform: ${platform}`);
@@ -57,7 +59,9 @@ Then('the AI should generate:', async function (this: CustomWorld, dataTable) {
   const expectedFields = dataTable.rowsHash();
 
   // Wait for AI generation to complete
-  await this.page.waitForSelector('[data-testid="listing-preview"], .listing-preview', { timeout: 15000 });
+  await this.page.waitForSelector('[data-testid="listing-preview"], .listing-preview', {
+    timeout: 15000,
+  });
 
   for (const [field, expected] of Object.entries(expectedFields)) {
     const fieldSelector = `[data-testid="listing-${field.toLowerCase().replace(/\s+/g, '-')}"]`;
@@ -111,7 +115,9 @@ Then('platform-specific fields should be adjusted:', async function (this: Custo
   const mappings = dataTable.hashes();
   for (const row of mappings) {
     const fbField = row['Facebook Field'];
-    const fbElement = this.page.locator(`[data-testid="fb-field-${fbField.toLowerCase().replace(/[^a-z0-9]/g, '-')}"]`);
+    const fbElement = this.page.locator(
+      `[data-testid="fb-field-${fbField.toLowerCase().replace(/[^a-z0-9]/g, '-')}"]`
+    );
     const isVisible = await fbElement.isVisible().catch(() => false);
     // Some fields like "(Not applicable)" should NOT be present
     if (fbField === '(Not applicable)') {
@@ -158,20 +164,26 @@ When('the AI calculates the list price', async function (this: CustomWorld) {
   console.log(`✅ AI calculated price: $${this.testData.suggestedPrice}`);
 });
 
-Then('the suggested price should be at the upper end of the range', async function (this: CustomWorld) {
-  const pricePosition = this.page.locator('[data-testid="price-range-position"]');
-  const position = await pricePosition.getAttribute('data-position');
-  expect(['upper', 'high', 'aggressive']).toContain(position);
-  console.log('✅ Price is at the upper end of range');
-});
+Then(
+  'the suggested price should be at the upper end of the range',
+  async function (this: CustomWorld) {
+    const pricePosition = this.page.locator('[data-testid="price-range-position"]');
+    const position = await pricePosition.getAttribute('data-position');
+    expect(['upper', 'high', 'aggressive']).toContain(position);
+    console.log('✅ Price is at the upper end of range');
+  }
+);
 
-Then('I should see a confidence indicator {string}', async function (this: CustomWorld, indicator: string) {
-  const badge = this.page.locator('[data-testid="demand-indicator"]');
-  await expect(badge).toBeVisible();
-  const text = await badge.textContent();
-  expect(text).toContain(indicator);
-  console.log(`✅ Confidence indicator shown: "${indicator}"`);
-});
+Then(
+  'I should see a confidence indicator {string}',
+  async function (this: CustomWorld, indicator: string) {
+    const badge = this.page.locator('[data-testid="demand-indicator"]');
+    await expect(badge).toBeVisible();
+    const text = await badge.textContent();
+    expect(text).toContain(indicator);
+    console.log(`✅ Confidence indicator shown: "${indicator}"`);
+  }
+);
 
 // ==================== SCENARIO: Automated photo enhancement ====================
 
@@ -235,10 +247,13 @@ Given('I successfully sold an item {string}', async function (this: CustomWorld,
   console.log(`✅ Previously sold: ${itemName}`);
 });
 
-Given('I purchase another similar item {string}', async function (this: CustomWorld, itemName: string) {
-  this.testData.newItem = { name: itemName };
-  console.log(`✅ New similar item: ${itemName}`);
-});
+Given(
+  'I purchase another similar item {string}',
+  async function (this: CustomWorld, itemName: string) {
+    this.testData.newItem = { name: itemName };
+    console.log(`✅ New similar item: ${itemName}`);
+  }
+);
 
 When('I create a new listing', async function (this: CustomWorld) {
   await this.page.goto('http://localhost:3000/listings/new');
@@ -255,12 +270,15 @@ Then('the title, description, and settings should be copied', async function (th
   console.log('✅ Title, description, and settings copied from previous listing');
 });
 
-Then('the model name should be auto-updated to {string}', async function (this: CustomWorld, newModel: string) {
-  const titleInput = this.page.locator('input[name="title"], [data-testid="listing-title"]');
-  const titleValue = await titleInput.inputValue().catch(() => titleInput.textContent());
-  expect(titleValue).toContain(newModel);
-  console.log(`✅ Model name auto-updated to "${newModel}"`);
-});
+Then(
+  'the model name should be auto-updated to {string}',
+  async function (this: CustomWorld, newModel: string) {
+    const titleInput = this.page.locator('input[name="title"], [data-testid="listing-title"]');
+    const titleValue = await titleInput.inputValue().catch(() => titleInput.textContent());
+    expect(titleValue).toContain(newModel);
+    console.log(`✅ Model name auto-updated to "${newModel}"`);
+  }
+);
 
 Then('I should review before posting', async function (this: CustomWorld) {
   const reviewSection = this.page.locator('[data-testid="review-before-post"], .review-section');
@@ -280,13 +298,18 @@ Given('it has been listed for {int} days', async function (this: CustomWorld, da
   console.log(`✅ Listed for ${days} days`);
 });
 
-Given('I have received {int} views but no offers', async function (this: CustomWorld, views: number) {
-  this.testData.postedItem = { ...this.testData.postedItem, views, offers: 0 };
-  console.log(`✅ ${views} views, 0 offers`);
-});
+Given(
+  'I have received {int} views but no offers',
+  async function (this: CustomWorld, views: number) {
+    this.testData.postedItem = { ...this.testData.postedItem, views, offers: 0 };
+    console.log(`✅ ${views} views, 0 offers`);
+  }
+);
 
 When('I view the listing analytics', async function (this: CustomWorld) {
-  await this.page.goto(`http://localhost:3000/listings/${this.testData.postedItem?.id ?? 'posted-001'}/analytics`);
+  await this.page.goto(
+    `http://localhost:3000/listings/${this.testData.postedItem?.id ?? 'posted-001'}/analytics`
+  );
   await this.page.waitForSelector('[data-testid="listing-analytics"]', { timeout: 10000 });
   console.log('✅ Viewing listing analytics');
 });
@@ -304,8 +327,11 @@ Then('I should see:', async function (this: CustomWorld, dataTable) {
   }
 });
 
-Then('I should have the option to {string}', async function (this: CustomWorld, optionText: string) {
-  const button = this.page.getByRole('button', { name: optionText });
-  await expect(button).toBeVisible();
-  console.log(`✅ Option available: "${optionText}"`);
-});
+Then(
+  'I should have the option to {string}',
+  async function (this: CustomWorld, optionText: string) {
+    const button = this.page.getByRole('button', { name: optionText });
+    await expect(button).toBeVisible();
+    console.log(`✅ Option available: "${optionText}"`);
+  }
+);

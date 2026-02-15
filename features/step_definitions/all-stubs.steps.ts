@@ -87,7 +87,7 @@ Given('I have {string} enabled', async function (string) {
   return 'pending';
 });
 
-Given('I haven\'t viewed them all', async function () {
+Given("I haven't viewed them all", async function () {
   // TODO: Implement when E2E test server is configured
   return 'pending';
 });
@@ -267,7 +267,7 @@ Then('I should see an upgrade prompt', async function () {
   return 'pending';
 });
 
-Then('I should see analytics on how many opportunities I\'ve missed', async function () {
+Then("I should see analytics on how many opportunities I've missed", async function () {
   // TODO: Implement when E2E test server is configured
   return 'pending';
 });
@@ -513,4 +513,3 @@ When('the system generates my weekly summary', async function () {
   // TODO: Implement when E2E test server is configured
   return 'pending';
 });
-

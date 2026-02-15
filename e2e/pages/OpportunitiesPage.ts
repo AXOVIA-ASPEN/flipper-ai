@@ -15,7 +15,9 @@ export class OpportunitiesPage extends BasePage {
   }
 
   // Filters
-  async filterByStatus(status: 'All Statuses' | 'Identified' | 'Contacted' | 'Purchased' | 'Listed' | 'Sold') {
+  async filterByStatus(
+    status: 'All Statuses' | 'Identified' | 'Contacted' | 'Purchased' | 'Listed' | 'Sold'
+  ) {
     await this.page.getByRole('button', { name: new RegExp(status, 'i') }).click();
   }
 
@@ -49,7 +51,8 @@ export class OpportunitiesPage extends BasePage {
     if (data.purchasePrice) await this.page.getByLabel(/Purchase Price/i).fill(data.purchasePrice);
     if (data.resalePrice) await this.page.getByLabel(/Resale Price/i).fill(data.resalePrice);
     if (data.fees) await this.page.getByLabel(/Fees/i).fill(data.fees);
-    if (data.resalePlatform) await this.page.getByLabel(/Resale Platform/i).fill(data.resalePlatform);
+    if (data.resalePlatform)
+      await this.page.getByLabel(/Resale Platform/i).fill(data.resalePlatform);
     if (data.notes) await this.page.getByLabel(/Notes/i).fill(data.notes);
   }
 
@@ -63,7 +66,10 @@ export class OpportunitiesPage extends BasePage {
 
   // Delete
   async clickDelete(index = 0) {
-    await this.page.getByRole('button', { name: /Delete/i }).nth(index).click();
+    await this.page
+      .getByRole('button', { name: /Delete/i })
+      .nth(index)
+      .click();
   }
 
   async confirmDeleteDialog(accept: boolean) {

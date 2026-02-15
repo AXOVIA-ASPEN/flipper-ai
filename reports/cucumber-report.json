@@ -139,40 +139,22 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Field",
-                      "Present"
-                    ]
+                    "cells": ["Field", "Present"]
                   },
                   {
-                    "cells": [
-                      "Title",
-                      "Yes"
-                    ]
+                    "cells": ["Title", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Price",
-                      "Yes"
-                    ]
+                    "cells": ["Price", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Marketplace",
-                      "Yes"
-                    ]
+                    "cells": ["Marketplace", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Thumbnail",
-                      "Yes"
-                    ]
+                    "cells": ["Thumbnail", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Flippability",
-                      "Yes"
-                    ]
+                    "cells": ["Flippability", "Yes"]
                   }
                 ]
               }
@@ -508,20 +490,10 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Marketplace",
-                      "Category",
-                      "Price Range",
-                      "Keywords"
-                    ]
+                    "cells": ["Marketplace", "Category", "Price Range", "Keywords"]
                   },
                   {
-                    "cells": [
-                      "Facebook",
-                      "Furniture",
-                      "$0-$200",
-                      "vintage"
-                    ]
+                    "cells": ["Facebook", "Furniture", "$0-$200", "vintage"]
                   }
                 ]
               }
@@ -789,34 +761,19 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Title",
-                      "iPhone 14 Pro - Like New"
-                    ]
+                    "cells": ["Title", "iPhone 14 Pro - Like New"]
                   },
                   {
-                    "cells": [
-                      "Price",
-                      "$400"
-                    ]
+                    "cells": ["Price", "$400"]
                   },
                   {
-                    "cells": [
-                      "Condition",
-                      "Excellent"
-                    ]
+                    "cells": ["Condition", "Excellent"]
                   },
                   {
-                    "cells": [
-                      "Seller Location",
-                      "Local (10 miles)"
-                    ]
+                    "cells": ["Seller Location", "Local (10 miles)"]
                   },
                   {
-                    "cells": [
-                      "Category",
-                      "Electronics"
-                    ]
+                    "cells": ["Category", "Electronics"]
                   }
                 ]
               }
@@ -889,28 +846,16 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Buy Price",
-                      "$400"
-                    ]
+                    "cells": ["Buy Price", "$400"]
                   },
                   {
-                    "cells": [
-                      "Market Value",
-                      "$850"
-                    ]
+                    "cells": ["Market Value", "$850"]
                   },
                   {
-                    "cells": [
-                      "Fees (15%)",
-                      "$127"
-                    ]
+                    "cells": ["Fees (15%)", "$127"]
                   },
                   {
-                    "cells": [
-                      "Net Profit",
-                      "$323"
-                    ]
+                    "cells": ["Net Profit", "$323"]
                   }
                 ]
               }
@@ -984,22 +929,13 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Title",
-                      "MacBook Pro - needs battery replacement"
-                    ]
+                    "cells": ["Title", "MacBook Pro - needs battery replacement"]
                   },
                   {
-                    "cells": [
-                      "Price",
-                      "$200"
-                    ]
+                    "cells": ["Price", "$200"]
                   },
                   {
-                    "cells": [
-                      "Description",
-                      "Battery doesn't hold charge, otherwise works"
-                    ]
+                    "cells": ["Description", "Battery doesn't hold charge, otherwise works"]
                   }
                 ]
               }
@@ -1125,22 +1061,13 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Title",
-                      "Dyson V15 Vacuum - Sealed NIB"
-                    ]
+                    "cells": ["Title", "Dyson V15 Vacuum - Sealed NIB"]
                   },
                   {
-                    "cells": [
-                      "Price",
-                      "$350"
-                    ]
+                    "cells": ["Price", "$350"]
                   },
                   {
-                    "cells": [
-                      "Condition",
-                      "New in box"
-                    ]
+                    "cells": ["Condition", "New in box"]
                   }
                 ]
               }
@@ -1279,32 +1206,16 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Price",
-                      "Date",
-                      "Condition"
-                    ]
+                    "cells": ["Price", "Date", "Condition"]
                   },
                   {
-                    "cells": [
-                      "$320",
-                      "2 days ago",
-                      "Like New"
-                    ]
+                    "cells": ["$320", "2 days ago", "Like New"]
                   },
                   {
-                    "cells": [
-                      "$310",
-                      "5 days ago",
-                      "Like New"
-                    ]
+                    "cells": ["$310", "5 days ago", "Like New"]
                   },
                   {
-                    "cells": [
-                      "$330",
-                      "1 week ago",
-                      "Like New"
-                    ]
+                    "cells": ["$330", "1 week ago", "Like New"]
                   }
                 ]
               }
@@ -2162,34 +2073,19 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Title",
-                      "Vintage Nintendo 64 Console"
-                    ]
+                    "cells": ["Title", "Vintage Nintendo 64 Console"]
                   },
                   {
-                    "cells": [
-                      "Price",
-                      "$75"
-                    ]
+                    "cells": ["Price", "$75"]
                   },
                   {
-                    "cells": [
-                      "Seller",
-                      "John (Craigslist)"
-                    ]
+                    "cells": ["Seller", "John (Craigslist)"]
                   },
                   {
-                    "cells": [
-                      "Location",
-                      "5 miles away"
-                    ]
+                    "cells": ["Location", "5 miles away"]
                   },
                   {
-                    "cells": [
-                      "Asking Offer",
-                      "Yes (OBO)"
-                    ]
+                    "cells": ["Asking Offer", "Yes (OBO)"]
                   }
                 ]
               }
@@ -2223,40 +2119,22 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Element",
-                      "Required"
-                    ]
+                    "cells": ["Element", "Required"]
                   },
                   {
-                    "cells": [
-                      "Polite greeting",
-                      "Yes"
-                    ]
+                    "cells": ["Polite greeting", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Item reference",
-                      "Yes"
-                    ]
+                    "cells": ["Item reference", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Interest statement",
-                      "Yes"
-                    ]
+                    "cells": ["Interest statement", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Pickup availability",
-                      "Yes"
-                    ]
+                    "cells": ["Pickup availability", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Contact info request",
-                      "Yes"
-                    ]
+                    "cells": ["Contact info request", "Yes"]
                   }
                 ]
               }
@@ -2932,28 +2810,16 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Field",
-                      "Content"
-                    ]
+                    "cells": ["Field", "Content"]
                   },
                   {
-                    "cells": [
-                      "Title",
-                      "Pickup: [Item Name]"
-                    ]
+                    "cells": ["Title", "Pickup: [Item Name]"]
                   },
                   {
-                    "cells": [
-                      "Location",
-                      "[Seller Address]"
-                    ]
+                    "cells": ["Location", "[Seller Address]"]
                   },
                   {
-                    "cells": [
-                      "Notes",
-                      "Seller: [Contact Info]"
-                    ]
+                    "cells": ["Notes", "Seller: [Contact Info]"]
                   }
                 ]
               }
@@ -3169,28 +3035,16 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Item",
-                      "Sony WH-1000XM5 Headphones"
-                    ]
+                    "cells": ["Item", "Sony WH-1000XM5 Headphones"]
                   },
                   {
-                    "cells": [
-                      "Buy Price",
-                      "$200"
-                    ]
+                    "cells": ["Buy Price", "$200"]
                   },
                   {
-                    "cells": [
-                      "Condition",
-                      "Like New"
-                    ]
+                    "cells": ["Condition", "Like New"]
                   },
                   {
-                    "cells": [
-                      "Photos",
-                      "5 images"
-                    ]
+                    "cells": ["Photos", "5 images"]
                   }
                 ]
               }
@@ -3250,46 +3104,25 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Field",
-                      "Generated"
-                    ]
+                    "cells": ["Field", "Generated"]
                   },
                   {
-                    "cells": [
-                      "Title",
-                      "Sony WH-1000XM5 Wireless Headphones - Like New"
-                    ]
+                    "cells": ["Title", "Sony WH-1000XM5 Wireless Headphones - Like New"]
                   },
                   {
-                    "cells": [
-                      "Category",
-                      "Electronics > Headphones"
-                    ]
+                    "cells": ["Category", "Electronics > Headphones"]
                   },
                   {
-                    "cells": [
-                      "Description",
-                      "Full product description with features"
-                    ]
+                    "cells": ["Description", "Full product description with features"]
                   },
                   {
-                    "cells": [
-                      "Price",
-                      "$315-$325 (based on market analysis)"
-                    ]
+                    "cells": ["Price", "$315-$325 (based on market analysis)"]
                   },
                   {
-                    "cells": [
-                      "Shipping",
-                      "Free shipping calculated"
-                    ]
+                    "cells": ["Shipping", "Free shipping calculated"]
                   },
                   {
-                    "cells": [
-                      "Return Policy",
-                      "30-day returns accepted"
-                    ]
+                    "cells": ["Return Policy", "30-day returns accepted"]
                   }
                 ]
               }
@@ -3428,28 +3261,16 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "eBay Field",
-                      "Facebook Field"
-                    ]
+                    "cells": ["eBay Field", "Facebook Field"]
                   },
                   {
-                    "cells": [
-                      "Shipping",
-                      "Local pickup/ship"
-                    ]
+                    "cells": ["Shipping", "Local pickup/ship"]
                   },
                   {
-                    "cells": [
-                      "Handling time",
-                      "Meet-up location"
-                    ]
+                    "cells": ["Handling time", "Meet-up location"]
                   },
                   {
-                    "cells": [
-                      "Return policy",
-                      "(Not applicable)"
-                    ]
+                    "cells": ["Return policy", "(Not applicable)"]
                   }
                 ]
               }
@@ -3981,34 +3802,19 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Metric",
-                      "Value"
-                    ]
+                    "cells": ["Metric", "Value"]
                   },
                   {
-                    "cells": [
-                      "Views",
-                      "3"
-                    ]
+                    "cells": ["Views", "3"]
                   },
                   {
-                    "cells": [
-                      "Watchers",
-                      "0"
-                    ]
+                    "cells": ["Watchers", "0"]
                   },
                   {
-                    "cells": [
-                      "Avg time to sell",
-                      "7 days (category)"
-                    ]
+                    "cells": ["Avg time to sell", "7 days (category)"]
                   },
                   {
-                    "cells": [
-                      "Recommendation",
-                      "Consider lowering"
-                    ]
+                    "cells": ["Recommendation", "Consider lowering"]
                   }
                 ]
               }
@@ -4184,34 +3990,19 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Filter",
-                      "Options"
-                    ]
+                    "cells": ["Filter", "Options"]
                   },
                   {
-                    "cells": [
-                      "Score Range",
-                      "90+, 80-89, 70-79, <70"
-                    ]
+                    "cells": ["Score Range", "90+, 80-89, 70-79, <70"]
                   },
                   {
-                    "cells": [
-                      "Marketplace",
-                      "All, eBay, FB, Craigslist"
-                    ]
+                    "cells": ["Marketplace", "All, eBay, FB, Craigslist"]
                   },
                   {
-                    "cells": [
-                      "Category",
-                      "All, Electronics, etc."
-                    ]
+                    "cells": ["Category", "All, Electronics, etc."]
                   },
                   {
-                    "cells": [
-                      "Shippable",
-                      "Yes, No, All"
-                    ]
+                    "cells": ["Shippable", "Yes, No, All"]
                   }
                 ]
               }
@@ -4442,49 +4233,19 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Item",
-                      "Purchase Date",
-                      "Cost",
-                      "Listed",
-                      "Status"
-                    ]
+                    "cells": ["Item", "Purchase Date", "Cost", "Listed", "Status"]
                   },
                   {
-                    "cells": [
-                      "Nintendo Switch",
-                      "2 days ago",
-                      "$180",
-                      "Yes",
-                      "Active"
-                    ]
+                    "cells": ["Nintendo Switch", "2 days ago", "$180", "Yes", "Active"]
                   },
                   {
-                    "cells": [
-                      "Dyson Vacuum",
-                      "5 days ago",
-                      "$220",
-                      "Yes",
-                      "3 watchers"
-                    ]
+                    "cells": ["Dyson Vacuum", "5 days ago", "$220", "Yes", "3 watchers"]
                   },
                   {
-                    "cells": [
-                      "Canon Camera",
-                      "1 week ago",
-                      "$300",
-                      "No",
-                      "Not listed"
-                    ]
+                    "cells": ["Canon Camera", "1 week ago", "$300", "No", "Not listed"]
                   },
                   {
-                    "cells": [
-                      "Vintage Radio",
-                      "2 weeks ago",
-                      "$50",
-                      "Yes",
-                      "Sold!"
-                    ]
+                    "cells": ["Vintage Radio", "2 weeks ago", "$50", "Yes", "Sold!"]
                   }
                 ]
               }
@@ -4649,46 +4410,25 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Column",
-                      "Present"
-                    ]
+                    "cells": ["Column", "Present"]
                   },
                   {
-                    "cells": [
-                      "Item Name",
-                      "Yes"
-                    ]
+                    "cells": ["Item Name", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Buy Price",
-                      "Yes"
-                    ]
+                    "cells": ["Buy Price", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Sell Price",
-                      "Yes"
-                    ]
+                    "cells": ["Sell Price", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Net Profit",
-                      "Yes"
-                    ]
+                    "cells": ["Net Profit", "Yes"]
                   },
                   {
-                    "cells": [
-                      "ROI %",
-                      "Yes"
-                    ]
+                    "cells": ["ROI %", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Days to Sell",
-                      "Yes"
-                    ]
+                    "cells": ["Days to Sell", "Yes"]
                   }
                 ]
               }
@@ -4709,34 +4449,19 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Metric",
-                      "Calculated"
-                    ]
+                    "cells": ["Metric", "Calculated"]
                   },
                   {
-                    "cells": [
-                      "Total Profit",
-                      "Sum"
-                    ]
+                    "cells": ["Total Profit", "Sum"]
                   },
                   {
-                    "cells": [
-                      "Avg ROI",
-                      "Average"
-                    ]
+                    "cells": ["Avg ROI", "Average"]
                   },
                   {
-                    "cells": [
-                      "Avg Days to Sell",
-                      "Average"
-                    ]
+                    "cells": ["Avg Days to Sell", "Average"]
                   },
                   {
-                    "cells": [
-                      "Success Rate",
-                      "Sold/Total"
-                    ]
+                    "cells": ["Success Rate", "Sold/Total"]
                   }
                 ]
               }
@@ -4849,22 +4574,13 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Axis",
-                      "Data"
-                    ]
+                    "cells": ["Axis", "Data"]
                   },
                   {
-                    "cells": [
-                      "X-axis",
-                      "Weeks (last 12 weeks)"
-                    ]
+                    "cells": ["X-axis", "Weeks (last 12 weeks)"]
                   },
                   {
-                    "cells": [
-                      "Y-axis",
-                      "Cumulative profit ($)"
-                    ]
+                    "cells": ["Y-axis", "Cumulative profit ($)"]
                   }
                 ]
               }
@@ -4990,34 +4706,19 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Action",
-                      "Outcome"
-                    ]
+                    "cells": ["Action", "Outcome"]
                   },
                   {
-                    "cells": [
-                      "Quick Contact",
-                      "Opens message draft modal"
-                    ]
+                    "cells": ["Quick Contact", "Opens message draft modal"]
                   },
                   {
-                    "cells": [
-                      "Save for Later",
-                      "Moves to \"Saved\" section"
-                    ]
+                    "cells": ["Save for Later", "Moves to \"Saved\" section"]
                   },
                   {
-                    "cells": [
-                      "Mark as Purchased",
-                      "Moves to Inventory"
-                    ]
+                    "cells": ["Mark as Purchased", "Moves to Inventory"]
                   },
                   {
-                    "cells": [
-                      "Dismiss",
-                      "Removes from queue"
-                    ]
+                    "cells": ["Dismiss", "Removes from queue"]
                   }
                 ]
               }
@@ -5285,28 +4986,16 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Field",
-                      "Value"
-                    ]
+                    "cells": ["Field", "Value"]
                   },
                   {
-                    "cells": [
-                      "Email",
-                      "newuser@example.com"
-                    ]
+                    "cells": ["Email", "newuser@example.com"]
                   },
                   {
-                    "cells": [
-                      "Password",
-                      "SecurePass123!"
-                    ]
+                    "cells": ["Password", "SecurePass123!"]
                   },
                   {
-                    "cells": [
-                      "Confirm Pass",
-                      "SecurePass123!"
-                    ]
+                    "cells": ["Confirm Pass", "SecurePass123!"]
                   }
                 ]
               }
@@ -5707,34 +5396,19 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Info",
-                      "Value"
-                    ]
+                    "cells": ["Info", "Value"]
                   },
                   {
-                    "cells": [
-                      "Current Plan",
-                      "Free"
-                    ]
+                    "cells": ["Current Plan", "Free"]
                   },
                   {
-                    "cells": [
-                      "Scans Used Today",
-                      "10/10"
-                    ]
+                    "cells": ["Scans Used Today", "10/10"]
                   },
                   {
-                    "cells": [
-                      "Recommended Plan",
-                      "Flipper ($19/mo)"
-                    ]
+                    "cells": ["Recommended Plan", "Flipper ($19/mo)"]
                   },
                   {
-                    "cells": [
-                      "Benefit",
-                      "Unlimited scans"
-                    ]
+                    "cells": ["Benefit", "Unlimited scans"]
                   }
                 ]
               }
@@ -6030,28 +5704,16 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Field",
-                      "Value"
-                    ]
+                    "cells": ["Field", "Value"]
                   },
                   {
-                    "cells": [
-                      "Current Plan",
-                      "Flipper ($19/mo)"
-                    ]
+                    "cells": ["Current Plan", "Flipper ($19/mo)"]
                   },
                   {
-                    "cells": [
-                      "Next Billing Date",
-                      "[30 days from signup]"
-                    ]
+                    "cells": ["Next Billing Date", "[30 days from signup]"]
                   },
                   {
-                    "cells": [
-                      "Payment Method",
-                      "•••• 4242 (Visa)"
-                    ]
+                    "cells": ["Payment Method", "•••• 4242 (Visa)"]
                   }
                 ]
               }
@@ -6072,28 +5734,16 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Action",
-                      "Available"
-                    ]
+                    "cells": ["Action", "Available"]
                   },
                   {
-                    "cells": [
-                      "Upgrade to Pro",
-                      "Yes"
-                    ]
+                    "cells": ["Upgrade to Pro", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Update Payment Method",
-                      "Yes"
-                    ]
+                    "cells": ["Update Payment Method", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Cancel Subscription",
-                      "Yes"
-                    ]
+                    "cells": ["Cancel Subscription", "Yes"]
                   }
                 ]
               }
@@ -7413,28 +7063,16 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Element",
-                      "Present"
-                    ]
+                    "cells": ["Element", "Present"]
                   },
                   {
-                    "cells": [
-                      "Item Name",
-                      "Yes"
-                    ]
+                    "cells": ["Item Name", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Seller Message",
-                      "Yes"
-                    ]
+                    "cells": ["Seller Message", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Reply Link",
-                      "Yes"
-                    ]
+                    "cells": ["Reply Link", "Yes"]
                   }
                 ]
               }
@@ -7573,40 +7211,22 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Field",
-                      "Format"
-                    ]
+                    "cells": ["Field", "Format"]
                   },
                   {
-                    "cells": [
-                      "Item Title",
-                      "Bold text"
-                    ]
+                    "cells": ["Item Title", "Bold text"]
                   },
                   {
-                    "cells": [
-                      "Marketplace",
-                      "Badge/emoji"
-                    ]
+                    "cells": ["Marketplace", "Badge/emoji"]
                   },
                   {
-                    "cells": [
-                      "Price",
-                      "$XXX"
-                    ]
+                    "cells": ["Price", "$XXX"]
                   },
                   {
-                    "cells": [
-                      "Flippability Score",
-                      "XX/100 with emoji (🔥/⚡)"
-                    ]
+                    "cells": ["Flippability Score", "XX/100 with emoji (🔥/⚡)"]
                   },
                   {
-                    "cells": [
-                      "Link",
-                      "\"View Opportunity\" button"
-                    ]
+                    "cells": ["Link", "\"View Opportunity\" button"]
                   }
                 ]
               }
@@ -8112,52 +7732,28 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Notification Type",
-                      "Default"
-                    ]
+                    "cells": ["Notification Type", "Default"]
                   },
                   {
-                    "cells": [
-                      "New Opportunities (90+)",
-                      "On"
-                    ]
+                    "cells": ["New Opportunities (90+)", "On"]
                   },
                   {
-                    "cells": [
-                      "New Opportunities (80-89)",
-                      "On"
-                    ]
+                    "cells": ["New Opportunities (80-89)", "On"]
                   },
                   {
-                    "cells": [
-                      "New Opportunities (70-79)",
-                      "Off"
-                    ]
+                    "cells": ["New Opportunities (70-79)", "Off"]
                   },
                   {
-                    "cells": [
-                      "Seller Responses",
-                      "On"
-                    ]
+                    "cells": ["Seller Responses", "On"]
                   },
                   {
-                    "cells": [
-                      "Price Drops",
-                      "On"
-                    ]
+                    "cells": ["Price Drops", "On"]
                   },
                   {
-                    "cells": [
-                      "Sold Alerts",
-                      "On"
-                    ]
+                    "cells": ["Sold Alerts", "On"]
                   },
                   {
-                    "cells": [
-                      "Weekly Summary Email",
-                      "On"
-                    ]
+                    "cells": ["Weekly Summary Email", "On"]
                   }
                 ]
               }
@@ -8283,40 +7879,22 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Section",
-                      "Data"
-                    ]
+                    "cells": ["Section", "Data"]
                   },
                   {
-                    "cells": [
-                      "Opportunities Found",
-                      "Count and avg flippability"
-                    ]
+                    "cells": ["Opportunities Found", "Count and avg flippability"]
                   },
                   {
-                    "cells": [
-                      "Items Contacted",
-                      "Count"
-                    ]
+                    "cells": ["Items Contacted", "Count"]
                   },
                   {
-                    "cells": [
-                      "Purchases Made",
-                      "Count and total spent"
-                    ]
+                    "cells": ["Purchases Made", "Count and total spent"]
                   },
                   {
-                    "cells": [
-                      "Items Sold",
-                      "Count and total profit"
-                    ]
+                    "cells": ["Items Sold", "Count and total profit"]
                   },
                   {
-                    "cells": [
-                      "Top Opportunity Missed",
-                      "Item with highest score"
-                    ]
+                    "cells": ["Top Opportunity Missed", "Item with highest score"]
                   }
                 ]
               }
@@ -8468,34 +8046,19 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Action",
-                      "Outcome"
-                    ]
+                    "cells": ["Action", "Outcome"]
                   },
                   {
-                    "cells": [
-                      "Click notification",
-                      "Navigate to related page"
-                    ]
+                    "cells": ["Click notification", "Navigate to related page"]
                   },
                   {
-                    "cells": [
-                      "Mark as read",
-                      "Remove unread indicator"
-                    ]
+                    "cells": ["Mark as read", "Remove unread indicator"]
                   },
                   {
-                    "cells": [
-                      "Mark all as read",
-                      "Clear all unread indicators"
-                    ]
+                    "cells": ["Mark all as read", "Clear all unread indicators"]
                   },
                   {
-                    "cells": [
-                      "Delete notification",
-                      "Remove from list"
-                    ]
+                    "cells": ["Delete notification", "Remove from list"]
                   }
                 ]
               }
@@ -8763,46 +8326,25 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Field",
-                      "Type"
-                    ]
+                    "cells": ["Field", "Type"]
                   },
                   {
-                    "cells": [
-                      "title",
-                      "string"
-                    ]
+                    "cells": ["title", "string"]
                   },
                   {
-                    "cells": [
-                      "price",
-                      "number"
-                    ]
+                    "cells": ["price", "number"]
                   },
                   {
-                    "cells": [
-                      "marketplace",
-                      "string"
-                    ]
+                    "cells": ["marketplace", "string"]
                   },
                   {
-                    "cells": [
-                      "estimated_profit",
-                      "number"
-                    ]
+                    "cells": ["estimated_profit", "number"]
                   },
                   {
-                    "cells": [
-                      "profit_margin",
-                      "percentage"
-                    ]
+                    "cells": ["profit_margin", "percentage"]
                   },
                   {
-                    "cells": [
-                      "images",
-                      "array"
-                    ]
+                    "cells": ["images", "array"]
                   }
                 ]
               }
@@ -8862,40 +8404,22 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Section",
-                      "Content"
-                    ]
+                    "cells": ["Section", "Content"]
                   },
                   {
-                    "cells": [
-                      "Market Value",
-                      "Comparable sales data"
-                    ]
+                    "cells": ["Market Value", "Comparable sales data"]
                   },
                   {
-                    "cells": [
-                      "Condition Assessment",
-                      "AI-powered analysis"
-                    ]
+                    "cells": ["Condition Assessment", "AI-powered analysis"]
                   },
                   {
-                    "cells": [
-                      "Profit Estimate",
-                      "Expected profit range"
-                    ]
+                    "cells": ["Profit Estimate", "Expected profit range"]
                   },
                   {
-                    "cells": [
-                      "Risk Score",
-                      "High/Medium/Low"
-                    ]
+                    "cells": ["Risk Score", "High/Medium/Low"]
                   },
                   {
-                    "cells": [
-                      "Selling Strategy",
-                      "Recommended platforms"
-                    ]
+                    "cells": ["Selling Strategy", "Recommended platforms"]
                   }
                 ]
               }
@@ -9150,28 +8674,16 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Field",
-                      "Value"
-                    ]
+                    "cells": ["Field", "Value"]
                   },
                   {
-                    "cells": [
-                      "Purchase Price",
-                      "150"
-                    ]
+                    "cells": ["Purchase Price", "150"]
                   },
                   {
-                    "cells": [
-                      "Condition",
-                      "Very Good"
-                    ]
+                    "cells": ["Condition", "Very Good"]
                   },
                   {
-                    "cells": [
-                      "Pickup Date",
-                      "Today"
-                    ]
+                    "cells": ["Pickup Date", "Today"]
                   }
                 ]
               }
@@ -9283,40 +8795,22 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Field",
-                      "Value"
-                    ]
+                    "cells": ["Field", "Value"]
                   },
                   {
-                    "cells": [
-                      "Title",
-                      "Vintage Canon AE-1 Camera - Excellent"
-                    ]
+                    "cells": ["Title", "Vintage Canon AE-1 Camera - Excellent"]
                   },
                   {
-                    "cells": [
-                      "Description",
-                      "Professionally cleaned and tested"
-                    ]
+                    "cells": ["Description", "Professionally cleaned and tested"]
                   },
                   {
-                    "cells": [
-                      "Price",
-                      "250"
-                    ]
+                    "cells": ["Price", "250"]
                   },
                   {
-                    "cells": [
-                      "Category",
-                      "Cameras & Photography"
-                    ]
+                    "cells": ["Category", "Cameras & Photography"]
                   },
                   {
-                    "cells": [
-                      "Condition",
-                      "Used - Very Good"
-                    ]
+                    "cells": ["Condition", "Used - Very Good"]
                   }
                 ]
               }
@@ -9337,28 +8831,16 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Marketplace",
-                      "Selected"
-                    ]
+                    "cells": ["Marketplace", "Selected"]
                   },
                   {
-                    "cells": [
-                      "eBay",
-                      "Yes"
-                    ]
+                    "cells": ["eBay", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Facebook",
-                      "Yes"
-                    ]
+                    "cells": ["Facebook", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Mercari",
-                      "Yes"
-                    ]
+                    "cells": ["Mercari", "Yes"]
                   }
                 ]
               }
@@ -9522,28 +9004,16 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Platform",
-                      "Status"
-                    ]
+                    "cells": ["Platform", "Status"]
                   },
                   {
-                    "cells": [
-                      "eBay",
-                      "Published"
-                    ]
+                    "cells": ["eBay", "Published"]
                   },
                   {
-                    "cells": [
-                      "Facebook",
-                      "Published"
-                    ]
+                    "cells": ["Facebook", "Published"]
                   },
                   {
-                    "cells": [
-                      "Mercari",
-                      "Published"
-                    ]
+                    "cells": ["Mercari", "Published"]
                   }
                 ]
               }
@@ -9603,34 +9073,19 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Metric",
-                      "Visible"
-                    ]
+                    "cells": ["Metric", "Visible"]
                   },
                   {
-                    "cells": [
-                      "Views",
-                      "Yes"
-                    ]
+                    "cells": ["Views", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Watchers",
-                      "Yes"
-                    ]
+                    "cells": ["Watchers", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Messages",
-                      "Yes"
-                    ]
+                    "cells": ["Messages", "Yes"]
                   },
                   {
-                    "cells": [
-                      "Time Listed",
-                      "Yes"
-                    ]
+                    "cells": ["Time Listed", "Yes"]
                   }
                 ]
               }
@@ -9729,34 +9184,19 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Field",
-                      "Value"
-                    ]
+                    "cells": ["Field", "Value"]
                   },
                   {
-                    "cells": [
-                      "Sale Price",
-                      "240"
-                    ]
+                    "cells": ["Sale Price", "240"]
                   },
                   {
-                    "cells": [
-                      "Platform",
-                      "eBay"
-                    ]
+                    "cells": ["Platform", "eBay"]
                   },
                   {
-                    "cells": [
-                      "Buyer",
-                      "john123"
-                    ]
+                    "cells": ["Buyer", "john123"]
                   },
                   {
-                    "cells": [
-                      "Sale Date",
-                      "Today"
-                    ]
+                    "cells": ["Sale Date", "Today"]
                   }
                 ]
               }
@@ -9790,40 +9230,22 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Metric",
-                      "Value"
-                    ]
+                    "cells": ["Metric", "Value"]
                   },
                   {
-                    "cells": [
-                      "Purchase Price",
-                      "$150"
-                    ]
+                    "cells": ["Purchase Price", "$150"]
                   },
                   {
-                    "cells": [
-                      "Sale Price",
-                      "$240"
-                    ]
+                    "cells": ["Sale Price", "$240"]
                   },
                   {
-                    "cells": [
-                      "Fees",
-                      "$24"
-                    ]
+                    "cells": ["Fees", "$24"]
                   },
                   {
-                    "cells": [
-                      "Net Profit",
-                      "$66"
-                    ]
+                    "cells": ["Net Profit", "$66"]
                   },
                   {
-                    "cells": [
-                      "ROI",
-                      "44%"
-                    ]
+                    "cells": ["ROI", "44%"]
                   }
                 ]
               }
@@ -9857,28 +9279,16 @@
               {
                 "rows": [
                   {
-                    "cells": [
-                      "Stat",
-                      "Change"
-                    ]
+                    "cells": ["Stat", "Change"]
                   },
                   {
-                    "cells": [
-                      "Total Profit",
-                      "+$66"
-                    ]
+                    "cells": ["Total Profit", "+$66"]
                   },
                   {
-                    "cells": [
-                      "Items Sold",
-                      "+1"
-                    ]
+                    "cells": ["Items Sold", "+1"]
                   },
                   {
-                    "cells": [
-                      "Success Rate",
-                      "Update"
-                    ]
+                    "cells": ["Success Rate", "Update"]
                   }
                 ]
               }

@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { Suspense, useEffect, useRef, useState, useCallback } from "react";
+import { Suspense, useEffect, useRef, useState, useCallback } from 'react';
 import {
   TrendingUp,
   DollarSign,
@@ -23,39 +23,39 @@ import {
   MapPin,
   Tag,
   Calendar,
-} from "lucide-react";
-import { useFilterParams, FilterState } from "@/hooks/useFilterParams";
+} from 'lucide-react';
+import { useFilterParams, FilterState } from '@/hooks/useFilterParams';
 
 // Location and category options (reused from settings page)
 const locations = [
-  { value: "", label: "All Locations" },
-  { value: "sarasota", label: "Sarasota, FL" },
-  { value: "tampa", label: "Tampa, FL" },
-  { value: "orlando", label: "Orlando, FL" },
-  { value: "miami", label: "Miami, FL" },
-  { value: "jacksonville", label: "Jacksonville, FL" },
-  { value: "sfbay", label: "San Francisco Bay Area" },
-  { value: "losangeles", label: "Los Angeles, CA" },
-  { value: "newyork", label: "New York, NY" },
-  { value: "chicago", label: "Chicago, IL" },
-  { value: "seattle", label: "Seattle, WA" },
-  { value: "austin", label: "Austin, TX" },
-  { value: "denver", label: "Denver, CO" },
+  { value: '', label: 'All Locations' },
+  { value: 'sarasota', label: 'Sarasota, FL' },
+  { value: 'tampa', label: 'Tampa, FL' },
+  { value: 'orlando', label: 'Orlando, FL' },
+  { value: 'miami', label: 'Miami, FL' },
+  { value: 'jacksonville', label: 'Jacksonville, FL' },
+  { value: 'sfbay', label: 'San Francisco Bay Area' },
+  { value: 'losangeles', label: 'Los Angeles, CA' },
+  { value: 'newyork', label: 'New York, NY' },
+  { value: 'chicago', label: 'Chicago, IL' },
+  { value: 'seattle', label: 'Seattle, WA' },
+  { value: 'austin', label: 'Austin, TX' },
+  { value: 'denver', label: 'Denver, CO' },
 ];
 
 const categories = [
-  { value: "", label: "All Categories" },
-  { value: "electronics", label: "Electronics" },
-  { value: "furniture", label: "Furniture" },
-  { value: "appliances", label: "Appliances" },
-  { value: "sporting", label: "Sporting Goods" },
-  { value: "tools", label: "Tools" },
-  { value: "jewelry", label: "Jewelry" },
-  { value: "antiques", label: "Antiques" },
-  { value: "video_gaming", label: "Video Gaming" },
-  { value: "music_instr", label: "Musical Instruments" },
-  { value: "computers", label: "Computers" },
-  { value: "cell_phones", label: "Cell Phones" },
+  { value: '', label: 'All Categories' },
+  { value: 'electronics', label: 'Electronics' },
+  { value: 'furniture', label: 'Furniture' },
+  { value: 'appliances', label: 'Appliances' },
+  { value: 'sporting', label: 'Sporting Goods' },
+  { value: 'tools', label: 'Tools' },
+  { value: 'jewelry', label: 'Jewelry' },
+  { value: 'antiques', label: 'Antiques' },
+  { value: 'video_gaming', label: 'Video Gaming' },
+  { value: 'music_instr', label: 'Musical Instruments' },
+  { value: 'computers', label: 'Computers' },
+  { value: 'cell_phones', label: 'Cell Phones' },
 ];
 
 interface Listing {
@@ -111,13 +111,13 @@ function DashboardContent() {
   });
   const [loading, setLoading] = useState(true);
   const { filters, setFilter, clearFilters, activeFilterCount } = useFilterParams();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [imageModal, setImageModal] = useState<ImageModalState>({
     isOpen: false,
     images: [],
     currentIndex: 0,
-    title: "",
+    title: '',
   });
   const [selectedListingIds, setSelectedListingIds] = useState<Set<string>>(new Set());
   const selectAllRef = useRef<HTMLInputElement>(null);
@@ -163,13 +163,13 @@ function DashboardContent() {
       const params = new URLSearchParams();
 
       // Build query params from all filters
-      if (filters.status && filters.status !== "all") params.set("status", filters.status);
-      if (filters.location) params.set("location", filters.location);
-      if (filters.category) params.set("category", filters.category);
-      if (filters.minPrice) params.set("minPrice", filters.minPrice);
-      if (filters.maxPrice) params.set("maxPrice", filters.maxPrice);
-      if (filters.dateFrom) params.set("dateFrom", filters.dateFrom);
-      if (filters.dateTo) params.set("dateTo", filters.dateTo);
+      if (filters.status && filters.status !== 'all') params.set('status', filters.status);
+      if (filters.location) params.set('location', filters.location);
+      if (filters.category) params.set('category', filters.category);
+      if (filters.minPrice) params.set('minPrice', filters.minPrice);
+      if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
+      if (filters.dateFrom) params.set('dateFrom', filters.dateFrom);
+      if (filters.dateTo) params.set('dateTo', filters.dateTo);
 
       const response = await fetch(`/api/listings?${params}`);
       const data = await response.json();
@@ -179,7 +179,7 @@ function DashboardContent() {
       // Calculate stats
       const allListings = data.listings || [];
       const opps = allListings.filter(
-        (l: Listing) => l.status === "OPPORTUNITY" || (l.valueScore && l.valueScore >= 70)
+        (l: Listing) => l.status === 'OPPORTUNITY' || (l.valueScore && l.valueScore >= 70)
       );
       const totalProfit = allListings.reduce(
         (sum: number, l: Listing) => sum + (l.profitPotential || 0),
@@ -198,7 +198,7 @@ function DashboardContent() {
         avgValueScore: Math.round(avgScore),
       });
     } catch (error) {
-      console.error("Failed to fetch listings:", error);
+      console.error('Failed to fetch listings:', error);
     } finally {
       setLoading(false);
     }
@@ -223,26 +223,26 @@ function DashboardContent() {
 
   async function markAsOpportunity(listingId: string) {
     try {
-      await fetch("/api/opportunities", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      await fetch('/api/opportunities', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ listingId }),
       });
       fetchListings();
     } catch (error) {
-      console.error("Failed to create opportunity:", error);
+      console.error('Failed to create opportunity:', error);
     }
   }
 
   // Bulk operations
   async function bulkAddToOpportunities() {
     if (selectedListingIds.size === 0) return;
-    setBulkActionLoading("opportunities");
+    setBulkActionLoading('opportunities');
     try {
       const promises = Array.from(selectedListingIds).map((listingId) =>
-        fetch("/api/opportunities", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        fetch('/api/opportunities', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ listingId }),
         })
       );
@@ -250,7 +250,7 @@ function DashboardContent() {
       setSelectedListingIds(new Set());
       fetchListings();
     } catch (error) {
-      console.error("Failed to bulk add opportunities:", error);
+      console.error('Failed to bulk add opportunities:', error);
     } finally {
       setBulkActionLoading(null);
     }
@@ -258,13 +258,13 @@ function DashboardContent() {
 
   async function bulkUpdateStatus(newStatus: string) {
     if (selectedListingIds.size === 0) return;
-    setBulkActionLoading("status");
+    setBulkActionLoading('status');
     setShowStatusDropdown(false);
     try {
       const promises = Array.from(selectedListingIds).map((listingId) =>
         fetch(`/api/listings/${listingId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: newStatus }),
         })
       );
@@ -272,7 +272,7 @@ function DashboardContent() {
       setSelectedListingIds(new Set());
       fetchListings();
     } catch (error) {
-      console.error("Failed to bulk update status:", error);
+      console.error('Failed to bulk update status:', error);
     } finally {
       setBulkActionLoading(null);
     }
@@ -280,19 +280,19 @@ function DashboardContent() {
 
   async function bulkDelete() {
     if (selectedListingIds.size === 0) return;
-    setBulkActionLoading("delete");
+    setBulkActionLoading('delete');
     setShowDeleteModal(false);
     try {
       const promises = Array.from(selectedListingIds).map((listingId) =>
         fetch(`/api/listings/${listingId}`, {
-          method: "DELETE",
+          method: 'DELETE',
         })
       );
       await Promise.all(promises);
       setSelectedListingIds(new Set());
       fetchListings();
     } catch (error) {
-      console.error("Failed to bulk delete:", error);
+      console.error('Failed to bulk delete:', error);
     } finally {
       setBulkActionLoading(null);
     }
@@ -311,8 +311,7 @@ function DashboardContent() {
     filteredListings.every((listing) => selectedListingIds.has(listing.id));
 
   const someVisibleSelected =
-    filteredListings.some((listing) => selectedListingIds.has(listing.id)) &&
-    !allVisibleSelected;
+    filteredListings.some((listing) => selectedListingIds.has(listing.id)) && !allVisibleSelected;
 
   useEffect(() => {
     if (selectAllRef.current) {
@@ -349,39 +348,43 @@ function DashboardContent() {
   };
 
   const getScoreColor = (score: number | null) => {
-    if (!score) return "bg-gradient-to-r from-gray-400 to-gray-600 text-white border-gray-400 shadow-gray-500/50";
-    if (score >= 80) return "bg-gradient-to-r from-green-400 to-emerald-600 text-white border-green-400 shadow-green-500/50 animate-pulse-slow";
-    if (score >= 60) return "bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-yellow-400 shadow-yellow-500/50";
-    if (score >= 40) return "bg-gradient-to-r from-orange-400 to-pink-500 text-white border-orange-400 shadow-orange-500/50";
-    return "bg-gradient-to-r from-red-400 to-red-600 text-white border-red-400 shadow-red-500/50";
+    if (!score)
+      return 'bg-gradient-to-r from-gray-400 to-gray-600 text-white border-gray-400 shadow-gray-500/50';
+    if (score >= 80)
+      return 'bg-gradient-to-r from-green-400 to-emerald-600 text-white border-green-400 shadow-green-500/50 animate-pulse-slow';
+    if (score >= 60)
+      return 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-yellow-400 shadow-yellow-500/50';
+    if (score >= 40)
+      return 'bg-gradient-to-r from-orange-400 to-pink-500 text-white border-orange-400 shadow-orange-500/50';
+    return 'bg-gradient-to-r from-red-400 to-red-600 text-white border-red-400 shadow-red-500/50';
   };
 
   const getPlatformColor = (platform: string) => {
     switch (platform.toUpperCase()) {
-      case "CRAIGSLIST":
-        return "bg-gradient-to-r from-purple-400 to-purple-600 text-white border-purple-400 shadow-purple-500/50";
-      case "FACEBOOK_MARKETPLACE":
-        return "bg-gradient-to-r from-blue-400 to-blue-600 text-white border-blue-400 shadow-blue-500/50";
-      case "EBAY":
-        return "bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-yellow-400 shadow-yellow-500/50";
-      case "OFFERUP":
-        return "bg-gradient-to-r from-green-400 to-emerald-600 text-white border-green-400 shadow-green-500/50";
+      case 'CRAIGSLIST':
+        return 'bg-gradient-to-r from-purple-400 to-purple-600 text-white border-purple-400 shadow-purple-500/50';
+      case 'FACEBOOK_MARKETPLACE':
+        return 'bg-gradient-to-r from-blue-400 to-blue-600 text-white border-blue-400 shadow-blue-500/50';
+      case 'EBAY':
+        return 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-yellow-400 shadow-yellow-500/50';
+      case 'OFFERUP':
+        return 'bg-gradient-to-r from-green-400 to-emerald-600 text-white border-green-400 shadow-green-500/50';
       default:
-        return "bg-gradient-to-r from-gray-400 to-gray-600 text-white border-gray-400 shadow-gray-500/50";
+        return 'bg-gradient-to-r from-gray-400 to-gray-600 text-white border-gray-400 shadow-gray-500/50';
     }
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
   };
 
   const formatPercent = (value: number | null) => {
-    if (value === null || Number.isNaN(value)) return "-";
+    if (value === null || Number.isNaN(value)) return '-';
     return `${value}%`;
   };
 
@@ -403,17 +406,17 @@ function DashboardContent() {
                 <TrendingUp className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">Flipper.ai</h1>
-                <p className="text-xs text-blue-200/70">
-                  Find profitable flips
-                </p>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
+                  Flipper.ai
+                </h1>
+                <p className="text-xs text-blue-200/70">Find profitable flips</p>
               </div>
             </div>
             <button
               onClick={fetchListings}
               className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg shadow-blue-500/50 hover:shadow-blue-500/80 hover:scale-105"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </button>
           </div>
@@ -427,9 +430,7 @@ function DashboardContent() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-blue-200/70">Total Listings</p>
-                <p className="text-2xl font-bold text-white">
-                  {stats.totalListings}
-                </p>
+                <p className="text-2xl font-bold text-white">{stats.totalListings}</p>
               </div>
               <div className="w-12 h-12 bg-theme-accent-blue rounded-xl flex items-center justify-center shadow-theme-accent-blue group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110">
                 <Package className="w-6 h-6 text-white" />
@@ -441,7 +442,9 @@ function DashboardContent() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-green-200/70">Opportunities</p>
-                <p className="text-2xl font-bold bg-gradient-to-r from-green-300 to-emerald-300 bg-clip-text text-transparent">{stats.opportunities}</p>
+                <p className="text-2xl font-bold bg-gradient-to-r from-green-300 to-emerald-300 bg-clip-text text-transparent">
+                  {stats.opportunities}
+                </p>
               </div>
               <div className="w-12 h-12 bg-theme-accent-green rounded-xl flex items-center justify-center shadow-theme-accent-green group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110">
                 <Star className="w-6 h-6 text-white" />
@@ -467,9 +470,7 @@ function DashboardContent() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-orange-200/70">Avg Value Score</p>
-                <p className="text-2xl font-bold text-white">
-                  {stats.avgValueScore}
-                </p>
+                <p className="text-2xl font-bold text-white">{stats.avgValueScore}</p>
               </div>
               <div className="w-12 h-12 bg-theme-accent-orange rounded-xl flex items-center justify-center shadow-theme-accent-orange group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110">
                 <TrendingUp className="w-6 h-6 text-white" />
@@ -495,15 +496,27 @@ function DashboardContent() {
               <Filter className="w-5 h-5 text-blue-200/70" />
               <select
                 value={filters.status}
-                onChange={(e) => setFilter("status", e.target.value)}
+                onChange={(e) => setFilter('status', e.target.value)}
                 className="px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50 text-white transition-all duration-300 hover:bg-white/15"
               >
-                <option value="all" className="bg-slate-800 text-white">All Listings</option>
-                <option value="NEW" className="bg-slate-800 text-white">New</option>
-                <option value="OPPORTUNITY" className="bg-slate-800 text-white">Opportunities</option>
-                <option value="CONTACTED" className="bg-slate-800 text-white">Contacted</option>
-                <option value="PURCHASED" className="bg-slate-800 text-white">Purchased</option>
-                <option value="SOLD" className="bg-slate-800 text-white">Sold</option>
+                <option value="all" className="bg-slate-800 text-white">
+                  All Listings
+                </option>
+                <option value="NEW" className="bg-slate-800 text-white">
+                  New
+                </option>
+                <option value="OPPORTUNITY" className="bg-slate-800 text-white">
+                  Opportunities
+                </option>
+                <option value="CONTACTED" className="bg-slate-800 text-white">
+                  Contacted
+                </option>
+                <option value="PURCHASED" className="bg-slate-800 text-white">
+                  Purchased
+                </option>
+                <option value="SOLD" className="bg-slate-800 text-white">
+                  Sold
+                </option>
               </select>
             </div>
             {/* Advanced Filters Toggle */}
@@ -511,8 +524,8 @@ function DashboardContent() {
               onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 hover:bg-white/15 ${
                 activeFilterCount > 0
-                  ? "bg-purple-500/20 border-purple-400/50 text-purple-200"
-                  : "bg-white/10 border-white/20 text-blue-200/70"
+                  ? 'bg-purple-500/20 border-purple-400/50 text-purple-200'
+                  : 'bg-white/10 border-white/20 text-blue-200/70'
               }`}
             >
               <Filter className="w-4 h-4" />
@@ -522,12 +535,16 @@ function DashboardContent() {
                   {activeFilterCount}
                 </span>
               )}
-              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${showAdvancedFilters ? "rotate-180" : ""}`} />
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-300 ${showAdvancedFilters ? 'rotate-180' : ''}`}
+              />
             </button>
           </div>
 
           {/* Advanced Filters Panel */}
-          <div className={`overflow-hidden transition-all duration-300 ${showAdvancedFilters ? "max-h-96 mt-4 opacity-100" : "max-h-0 opacity-0"}`}>
+          <div
+            className={`overflow-hidden transition-all duration-300 ${showAdvancedFilters ? 'max-h-96 mt-4 opacity-100' : 'max-h-0 opacity-0'}`}
+          >
             <div className="pt-4 border-t border-white/10">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Location Filter */}
@@ -538,7 +555,7 @@ function DashboardContent() {
                   </label>
                   <select
                     value={filters.location}
-                    onChange={(e) => setFilter("location", e.target.value)}
+                    onChange={(e) => setFilter('location', e.target.value)}
                     className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white transition-all duration-300 hover:bg-white/15"
                   >
                     {locations.map((loc) => (
@@ -557,7 +574,7 @@ function DashboardContent() {
                   </label>
                   <select
                     value={filters.category}
-                    onChange={(e) => setFilter("category", e.target.value)}
+                    onChange={(e) => setFilter('category', e.target.value)}
                     className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white transition-all duration-300 hover:bg-white/15"
                   >
                     {categories.map((cat) => (
@@ -579,14 +596,14 @@ function DashboardContent() {
                       type="number"
                       placeholder="Min $"
                       value={filters.minPrice}
-                      onChange={(e) => setFilter("minPrice", e.target.value)}
+                      onChange={(e) => setFilter('minPrice', e.target.value)}
                       className="flex-1 px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white placeholder-blue-200/50"
                     />
                     <input
                       type="number"
                       placeholder="Max $"
                       value={filters.maxPrice}
-                      onChange={(e) => setFilter("maxPrice", e.target.value)}
+                      onChange={(e) => setFilter('maxPrice', e.target.value)}
                       className="flex-1 px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white placeholder-blue-200/50"
                     />
                   </div>
@@ -602,13 +619,13 @@ function DashboardContent() {
                     <input
                       type="date"
                       value={filters.dateFrom}
-                      onChange={(e) => setFilter("dateFrom", e.target.value)}
+                      onChange={(e) => setFilter('dateFrom', e.target.value)}
                       className="flex-1 px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white"
                     />
                     <input
                       type="date"
                       value={filters.dateTo}
-                      onChange={(e) => setFilter("dateTo", e.target.value)}
+                      onChange={(e) => setFilter('dateTo', e.target.value)}
                       className="flex-1 px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white"
                     />
                   </div>
@@ -701,7 +718,7 @@ function DashboardContent() {
                       <tr
                         key={listing.id}
                         className={`transition-all duration-300 ${
-                          isSelected ? "bg-white/10" : "hover:bg-white/5"
+                          isSelected ? 'bg-white/10' : 'hover:bg-white/5'
                         }`}
                       >
                         <td className="px-4 py-4">
@@ -715,127 +732,123 @@ function DashboardContent() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                          {/* Product Thumbnail */}
-                          {(() => {
-                            const images = parseImageUrls(listing.imageUrls);
-                            return images.length > 0 ? (
-                              <button
-                                onClick={() => openImageModal(listing)}
-                                className="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 border-white/20 hover:border-blue-400/50 transition-all duration-300 group ring-2 ring-white/10 hover:ring-blue-400/30"
-                              >
-                                <img
-                                  src={images[0]}
-                                  alt={listing.title}
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    e.currentTarget.style.display = 'none';
-                                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                                  }}
-                                />
-                                <div className="hidden absolute inset-0 flex items-center justify-center bg-white/10">
+                            {/* Product Thumbnail */}
+                            {(() => {
+                              const images = parseImageUrls(listing.imageUrls);
+                              return images.length > 0 ? (
+                                <button
+                                  onClick={() => openImageModal(listing)}
+                                  className="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 border-white/20 hover:border-blue-400/50 transition-all duration-300 group ring-2 ring-white/10 hover:ring-blue-400/30"
+                                >
+                                  <img
+                                    src={images[0]}
+                                    alt={listing.title}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = 'none';
+                                      e.currentTarget.nextElementSibling?.classList.remove(
+                                        'hidden'
+                                      );
+                                    }}
+                                  />
+                                  <div className="hidden absolute inset-0 flex items-center justify-center bg-white/10">
+                                    <ImageIcon className="w-6 h-6 text-blue-200/50" />
+                                  </div>
+                                  {images.length > 1 && (
+                                    <div className="absolute bottom-1 right-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
+                                      +{images.length - 1}
+                                    </div>
+                                  )}
+                                  <div className="absolute inset-0 bg-gradient-to-t from-blue-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                </button>
+                              ) : (
+                                <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-white/10 flex items-center justify-center border border-white/20">
                                   <ImageIcon className="w-6 h-6 text-blue-200/50" />
                                 </div>
-                                {images.length > 1 && (
-                                  <div className="absolute bottom-1 right-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
-                                    +{images.length - 1}
-                                  </div>
-                                )}
-                                <div className="absolute inset-0 bg-gradient-to-t from-blue-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                              </button>
-                            ) : (
-                              <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-white/10 flex items-center justify-center border border-white/20">
-                                <ImageIcon className="w-6 h-6 text-blue-200/50" />
-                              </div>
-                            );
-                          })()}
-                          <div className="max-w-xs">
-                            <p className="font-medium text-white truncate">
-                              {listing.title}
-                            </p>
-                            {listing.location && (
-                              <p className="text-sm text-blue-200/70">
-                                {listing.location}
-                              </p>
-                            )}
+                              );
+                            })()}
+                            <div className="max-w-xs">
+                              <p className="font-medium text-white truncate">{listing.title}</p>
+                              {listing.location && (
+                                <p className="text-sm text-blue-200/70">{listing.location}</p>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`px-3 py-1 rounded-lg text-xs font-medium shadow-lg ${getPlatformColor(
-                            listing.platform
-                          )}`}
-                        >
-                          {listing.platform.replace("_", " ")}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 font-medium text-white">
-                        {formatCurrency(listing.askingPrice)}
-                      </td>
-                      <td className="px-6 py-4 text-blue-200/70">
-                        {listing.estimatedValue
-                          ? formatCurrency(listing.estimatedValue)
-                          : "-"}
-                      </td>
-                      <td className="px-6 py-4">
-                        {listing.profitPotential !== null && (
+                        </td>
+                        <td className="px-6 py-4">
                           <span
-                            className={`font-bold ${
-                              listing.profitPotential > 0
-                                ? "bg-gradient-to-r from-green-300 to-emerald-300 bg-clip-text text-transparent"
-                                : "bg-gradient-to-r from-red-300 to-pink-300 bg-clip-text text-transparent"
+                            className={`px-3 py-1 rounded-lg text-xs font-medium shadow-lg ${getPlatformColor(
+                              listing.platform
+                            )}`}
+                          >
+                            {listing.platform.replace('_', ' ')}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 font-medium text-white">
+                          {formatCurrency(listing.askingPrice)}
+                        </td>
+                        <td className="px-6 py-4 text-blue-200/70">
+                          {listing.estimatedValue ? formatCurrency(listing.estimatedValue) : '-'}
+                        </td>
+                        <td className="px-6 py-4">
+                          {listing.profitPotential !== null && (
+                            <span
+                              className={`font-bold ${
+                                listing.profitPotential > 0
+                                  ? 'bg-gradient-to-r from-green-300 to-emerald-300 bg-clip-text text-transparent'
+                                  : 'bg-gradient-to-r from-red-300 to-pink-300 bg-clip-text text-transparent'
+                              }`}
+                            >
+                              {listing.profitPotential > 0 ? '+' : ''}
+                              {formatCurrency(listing.profitPotential)}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span
+                            className={`px-3 py-1 rounded-lg text-xs font-medium shadow-lg ${getScoreColor(
+                              listing.valueScore
+                            )}`}
+                          >
+                            {listing.valueScore ?? '-'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span
+                            className={`px-3 py-1 rounded-lg text-xs font-medium shadow-lg ${
+                              listing.discountPercent && listing.discountPercent >= 90
+                                ? 'bg-gradient-to-r from-green-400 to-green-600 text-white border border-green-400/50'
+                                : listing.discountPercent && listing.discountPercent >= 70
+                                  ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white border border-yellow-400/50'
+                                  : 'bg-gradient-to-r from-gray-400 to-gray-600 text-white border border-gray-400/50'
                             }`}
                           >
-                            {listing.profitPotential > 0 ? "+" : ""}
-                            {formatCurrency(listing.profitPotential)}
+                            {formatPercent(listing.discountPercent)}
                           </span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`px-3 py-1 rounded-lg text-xs font-medium shadow-lg ${getScoreColor(
-                            listing.valueScore
-                          )}`}
-                        >
-                          {listing.valueScore ?? "-"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`px-3 py-1 rounded-lg text-xs font-medium shadow-lg ${
-                            listing.discountPercent && listing.discountPercent >= 90
-                              ? "bg-gradient-to-r from-green-400 to-green-600 text-white border border-green-400/50"
-                              : listing.discountPercent && listing.discountPercent >= 70
-                              ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-white border border-yellow-400/50"
-                              : "bg-gradient-to-r from-gray-400 to-gray-600 text-white border border-gray-400/50"
-                          }`}
-                        >
-                          {formatPercent(listing.discountPercent)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <a
-                            href={listing.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2 hover:bg-white/10 rounded-lg transition-all duration-300 hover:scale-110 group"
-                            title="View listing"
-                          >
-                            <ExternalLink className="w-4 h-4 text-blue-200/70 group-hover:text-blue-300" />
-                          </a>
-                          {!listing.opportunity && (
-                            <button
-                              onClick={() => markAsOpportunity(listing.id)}
-                              className="p-2 bg-gradient-to-r from-green-400/20 to-emerald-600/20 hover:from-green-400/40 hover:to-emerald-600/40 rounded-lg transition-all duration-300 hover:scale-110 shadow-lg shadow-green-500/30 hover:shadow-green-500/50"
-                              title="Mark as opportunity"
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <a
+                              href={listing.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-2 hover:bg-white/10 rounded-lg transition-all duration-300 hover:scale-110 group"
+                              title="View listing"
                             >
-                              <Plus className="w-4 h-4 text-green-300" />
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
+                              <ExternalLink className="w-4 h-4 text-blue-200/70 group-hover:text-blue-300" />
+                            </a>
+                            {!listing.opportunity && (
+                              <button
+                                onClick={() => markAsOpportunity(listing.id)}
+                                className="p-2 bg-gradient-to-r from-green-400/20 to-emerald-600/20 hover:from-green-400/40 hover:to-emerald-600/40 rounded-lg transition-all duration-300 hover:scale-110 shadow-lg shadow-green-500/30 hover:shadow-green-500/50"
+                                title="Mark as opportunity"
+                              >
+                                <Plus className="w-4 h-4 text-green-300" />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
                     );
                   })
                 )}
@@ -956,8 +969,8 @@ function DashboardContent() {
                     onClick={() => setImageModal((prev) => ({ ...prev, currentIndex: index }))}
                     className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
                       index === imageModal.currentIndex
-                        ? "border-blue-400 shadow-lg shadow-blue-500/50 scale-110"
-                        : "border-white/20 hover:border-blue-400/50 hover:scale-105"
+                        ? 'border-blue-400 shadow-lg shadow-blue-500/50 scale-110'
+                        : 'border-white/20 hover:border-blue-400/50 hover:scale-105'
                     }`}
                   >
                     <img
@@ -977,8 +990,8 @@ function DashboardContent() {
       <div
         className={`fixed bottom-0 left-0 right-0 z-40 transform transition-all duration-500 ease-out ${
           selectedListingIds.size > 0
-            ? "translate-y-0 opacity-100"
-            : "translate-y-full opacity-0 pointer-events-none"
+            ? 'translate-y-0 opacity-100'
+            : 'translate-y-full opacity-0 pointer-events-none'
         }`}
       >
         <div className="max-w-4xl mx-auto px-4 pb-6">
@@ -991,7 +1004,8 @@ function DashboardContent() {
                 </div>
                 <div>
                   <p className="text-white font-medium">
-                    {selectedListingIds.size} item{selectedListingIds.size !== 1 ? "s" : ""} selected
+                    {selectedListingIds.size} item{selectedListingIds.size !== 1 ? 's' : ''}{' '}
+                    selected
                   </p>
                   <button
                     onClick={clearSelection}
@@ -1010,7 +1024,7 @@ function DashboardContent() {
                   disabled={bulkActionLoading !== null}
                   className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-medium"
                 >
-                  {bulkActionLoading === "opportunities" ? (
+                  {bulkActionLoading === 'opportunities' ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <Star className="w-4 h-4" />
@@ -1026,7 +1040,7 @@ function DashboardContent() {
                     disabled={bulkActionLoading !== null}
                     className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-medium"
                   >
-                    {bulkActionLoading === "status" ? (
+                    {bulkActionLoading === 'status' ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
                       <Filter className="w-4 h-4" />
@@ -1043,7 +1057,7 @@ function DashboardContent() {
                         onClick={() => setShowStatusDropdown(false)}
                       />
                       <div className="absolute bottom-full left-0 mb-2 z-20 min-w-[180px] backdrop-blur-xl bg-slate-800/95 rounded-xl border border-white/20 shadow-2xl overflow-hidden">
-                        {["NEW", "OPPORTUNITY", "CONTACTED", "PURCHASED", "SOLD"].map((status) => (
+                        {['NEW', 'OPPORTUNITY', 'CONTACTED', 'PURCHASED', 'SOLD'].map((status) => (
                           <button
                             key={status}
                             onClick={() => bulkUpdateStatus(status)}
@@ -1051,15 +1065,15 @@ function DashboardContent() {
                           >
                             <div
                               className={`w-2 h-2 rounded-full ${
-                                status === "NEW"
-                                  ? "bg-gray-400"
-                                  : status === "OPPORTUNITY"
-                                  ? "bg-green-400"
-                                  : status === "CONTACTED"
-                                  ? "bg-blue-400"
-                                  : status === "PURCHASED"
-                                  ? "bg-purple-400"
-                                  : "bg-emerald-400"
+                                status === 'NEW'
+                                  ? 'bg-gray-400'
+                                  : status === 'OPPORTUNITY'
+                                    ? 'bg-green-400'
+                                    : status === 'CONTACTED'
+                                      ? 'bg-blue-400'
+                                      : status === 'PURCHASED'
+                                        ? 'bg-purple-400'
+                                        : 'bg-emerald-400'
                               }`}
                             />
                             {status.charAt(0) + status.slice(1).toLowerCase()}
@@ -1076,7 +1090,7 @@ function DashboardContent() {
                   disabled={bulkActionLoading !== null}
                   className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl hover:from-red-600 hover:to-pink-700 transition-all duration-300 shadow-lg shadow-red-500/30 hover:shadow-red-500/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-medium"
                 >
-                  {bulkActionLoading === "delete" ? (
+                  {bulkActionLoading === 'delete' ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <Trash2 className="w-4 h-4" />
@@ -1110,9 +1124,9 @@ function DashboardContent() {
             <div className="text-center mb-6">
               <h3 className="text-xl font-bold text-white mb-2">Delete Listings?</h3>
               <p className="text-blue-200/70">
-                You&apos;re about to delete{" "}
-                <span className="text-white font-semibold">{selectedListingIds.size}</span>{" "}
-                listing{selectedListingIds.size !== 1 ? "s" : ""}. This action cannot be undone.
+                You&apos;re about to delete{' '}
+                <span className="text-white font-semibold">{selectedListingIds.size}</span> listing
+                {selectedListingIds.size !== 1 ? 's' : ''}. This action cannot be undone.
               </p>
             </div>
 
@@ -1128,7 +1142,7 @@ function DashboardContent() {
                 onClick={bulkDelete}
                 className="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl hover:from-red-600 hover:to-pink-700 transition-all duration-300 shadow-lg shadow-red-500/30 hover:shadow-red-500/50 font-medium"
               >
-                Delete {selectedListingIds.size} item{selectedListingIds.size !== 1 ? "s" : ""}
+                Delete {selectedListingIds.size} item{selectedListingIds.size !== 1 ? 's' : ''}
               </button>
             </div>
           </div>
@@ -1141,11 +1155,13 @@ function DashboardContent() {
 // Wrap with Suspense for useSearchParams
 export default function Dashboard() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-blue-400/30 border-t-blue-400 rounded-full animate-spin"></div>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+          <div className="w-12 h-12 border-4 border-blue-400/30 border-t-blue-400 rounded-full animate-spin"></div>
+        </div>
+      }
+    >
       <DashboardContent />
     </Suspense>
   );

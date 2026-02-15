@@ -34,7 +34,12 @@ export class MockAPIHelper {
     });
   }
 
-  async mockScraperAPI(result?: { success: boolean; message: string; savedCount?: number; listings?: unknown[] }) {
+  async mockScraperAPI(result?: {
+    success: boolean;
+    message: string;
+    savedCount?: number;
+    listings?: unknown[];
+  }) {
     const scraperResult = result ?? {
       success: true,
       message: 'Scrape complete',

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useSession, signOut } from "next-auth/react";
+import { useState, useEffect } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 import {
   ArrowLeft,
   Settings as SettingsIcon,
@@ -33,10 +33,10 @@ import {
   Sparkles,
   ExternalLink,
   Zap,
-} from "lucide-react";
-import Link from "next/link";
-import { useTheme } from "@/contexts/ThemeContext";
-import { formatDistanceToNow } from "date-fns";
+} from 'lucide-react';
+import Link from 'next/link';
+import { useTheme } from '@/contexts/ThemeContext';
+import { formatDistanceToNow } from 'date-fns';
 
 interface SearchConfig {
   id: string;
@@ -64,13 +64,13 @@ interface SearchFormData {
 }
 
 const defaultSearchFormData: SearchFormData = {
-  name: "",
-  platform: "CRAIGSLIST",
-  location: "sarasota",
-  category: "electronics",
-  keywords: "",
-  minPrice: "",
-  maxPrice: "",
+  name: '',
+  platform: 'CRAIGSLIST',
+  location: 'sarasota',
+  category: 'electronics',
+  keywords: '',
+  minPrice: '',
+  maxPrice: '',
   enabled: true,
 };
 
@@ -98,12 +98,12 @@ export default function SettingsPage() {
   // User settings state
   const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
   const [settingsLoading, setSettingsLoading] = useState(true);
-  const [apiKey, setApiKey] = useState("");
+  const [apiKey, setApiKey] = useState('');
   const [showApiKey, setShowApiKey] = useState(false);
   const [savingApiKey, setSavingApiKey] = useState(false);
   const [testingApiKey, setTestingApiKey] = useState(false);
-  const [apiKeyStatus, setApiKeyStatus] = useState<"valid" | "invalid" | "not_set" | null>(null);
-  const [llmModel, setLlmModel] = useState("gpt-4o-mini");
+  const [apiKeyStatus, setApiKeyStatus] = useState<'valid' | 'invalid' | 'not_set' | null>(null);
+  const [llmModel, setLlmModel] = useState('gpt-4o-mini');
   const [discountThreshold, setDiscountThreshold] = useState(50);
   const [autoAnalyze, setAutoAnalyze] = useState(true);
 
@@ -115,21 +115,24 @@ export default function SettingsPage() {
   const [searchFormData, setSearchFormData] = useState<SearchFormData>(defaultSearchFormData);
   const [savingConfig, setSavingConfig] = useState(false);
   const [runningConfigId, setRunningConfigId] = useState<string | null>(null);
-  const [configMessage, setConfigMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [configMessage, setConfigMessage] = useState<{
+    type: 'success' | 'error';
+    text: string;
+  } | null>(null);
 
   const searchLocations = [
-    { value: "sarasota", label: "Sarasota, FL" },
-    { value: "tampa", label: "Tampa, FL" },
-    { value: "orlando", label: "Orlando, FL" },
-    { value: "miami", label: "Miami, FL" },
-    { value: "jacksonville", label: "Jacksonville, FL" },
-    { value: "sfbay", label: "San Francisco Bay Area" },
-    { value: "losangeles", label: "Los Angeles, CA" },
-    { value: "newyork", label: "New York, NY" },
-    { value: "chicago", label: "Chicago, IL" },
-    { value: "seattle", label: "Seattle, WA" },
-    { value: "austin", label: "Austin, TX" },
-    { value: "denver", label: "Denver, CO" },
+    { value: 'sarasota', label: 'Sarasota, FL' },
+    { value: 'tampa', label: 'Tampa, FL' },
+    { value: 'orlando', label: 'Orlando, FL' },
+    { value: 'miami', label: 'Miami, FL' },
+    { value: 'jacksonville', label: 'Jacksonville, FL' },
+    { value: 'sfbay', label: 'San Francisco Bay Area' },
+    { value: 'losangeles', label: 'Los Angeles, CA' },
+    { value: 'newyork', label: 'New York, NY' },
+    { value: 'chicago', label: 'Chicago, IL' },
+    { value: 'seattle', label: 'Seattle, WA' },
+    { value: 'austin', label: 'Austin, TX' },
+    { value: 'denver', label: 'Denver, CO' },
   ];
 
   // Fetch user settings on mount
@@ -140,17 +143,17 @@ export default function SettingsPage() {
 
   async function fetchUserSettings() {
     try {
-      const response = await fetch("/api/user/settings");
+      const response = await fetch('/api/user/settings');
       const data = await response.json();
       if (data.success && data.data) {
         setUserSettings(data.data);
         setLlmModel(data.data.llmModel);
         setDiscountThreshold(data.data.discountThreshold);
         setAutoAnalyze(data.data.autoAnalyze);
-        setApiKeyStatus(data.data.hasOpenaiApiKey ? "valid" : "not_set");
+        setApiKeyStatus(data.data.hasOpenaiApiKey ? 'valid' : 'not_set');
       }
     } catch (error) {
-      console.error("Failed to fetch user settings:", error);
+      console.error('Failed to fetch user settings:', error);
     } finally {
       setSettingsLoading(false);
     }
@@ -159,23 +162,23 @@ export default function SettingsPage() {
   async function handleSaveApiKey() {
     setSavingApiKey(true);
     try {
-      const response = await fetch("/api/user/settings", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/user/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ openaiApiKey: apiKey || null }),
       });
       const data = await response.json();
       if (data.success) {
         setUserSettings(data.data);
-        setApiKey("");
-        setApiKeyStatus(data.data.hasOpenaiApiKey ? "valid" : "not_set");
-        showConfigMessage("success", "API key saved securely");
+        setApiKey('');
+        setApiKeyStatus(data.data.hasOpenaiApiKey ? 'valid' : 'not_set');
+        showConfigMessage('success', 'API key saved securely');
       } else {
-        showConfigMessage("error", data.error || "Failed to save API key");
+        showConfigMessage('error', data.error || 'Failed to save API key');
       }
     } catch (error) {
-      console.error("Failed to save API key:", error);
-      showConfigMessage("error", "Failed to save API key");
+      console.error('Failed to save API key:', error);
+      showConfigMessage('error', 'Failed to save API key');
     } finally {
       setSavingApiKey(false);
     }
@@ -184,23 +187,23 @@ export default function SettingsPage() {
   async function handleTestApiKey() {
     setTestingApiKey(true);
     try {
-      const response = await fetch("/api/user/settings/validate-key", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/user/settings/validate-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ apiKey: apiKey || undefined }),
       });
       const data = await response.json();
       if (data.success && data.valid) {
-        setApiKeyStatus("valid");
-        showConfigMessage("success", "API key is valid!");
+        setApiKeyStatus('valid');
+        showConfigMessage('success', 'API key is valid!');
       } else {
-        setApiKeyStatus("invalid");
-        showConfigMessage("error", data.error || "API key is invalid");
+        setApiKeyStatus('invalid');
+        showConfigMessage('error', data.error || 'API key is invalid');
       }
     } catch (error) {
-      console.error("Failed to test API key:", error);
-      setApiKeyStatus("invalid");
-      showConfigMessage("error", "Failed to test API key");
+      console.error('Failed to test API key:', error);
+      setApiKeyStatus('invalid');
+      showConfigMessage('error', 'Failed to test API key');
     } finally {
       setTestingApiKey(false);
     }
@@ -208,41 +211,41 @@ export default function SettingsPage() {
 
   async function handleSaveLlmSettings() {
     try {
-      const response = await fetch("/api/user/settings", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/user/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ llmModel, discountThreshold, autoAnalyze }),
       });
       const data = await response.json();
       if (data.success) {
         setUserSettings(data.data);
-        showConfigMessage("success", "LLM settings saved");
+        showConfigMessage('success', 'LLM settings saved');
       } else {
-        showConfigMessage("error", data.error || "Failed to save settings");
+        showConfigMessage('error', data.error || 'Failed to save settings');
       }
     } catch (error) {
-      console.error("Failed to save LLM settings:", error);
-      showConfigMessage("error", "Failed to save settings");
+      console.error('Failed to save LLM settings:', error);
+      showConfigMessage('error', 'Failed to save settings');
     }
   }
 
   async function handleSignOut() {
-    await signOut({ callbackUrl: "/login" });
+    await signOut({ callbackUrl: '/login' });
   }
 
   async function fetchConfigs() {
     try {
-      const response = await fetch("/api/search-configs");
+      const response = await fetch('/api/search-configs');
       const data = await response.json();
       setConfigs(data.configs || []);
     } catch (error) {
-      console.error("Failed to fetch configs:", error);
+      console.error('Failed to fetch configs:', error);
     } finally {
       setConfigsLoading(false);
     }
   }
 
-  function showConfigMessage(type: "success" | "error", text: string) {
+  function showConfigMessage(type: 'success' | 'error', text: string) {
     setConfigMessage({ type, text });
     setTimeout(() => setConfigMessage(null), 5000);
   }
@@ -251,9 +254,9 @@ export default function SettingsPage() {
     e.preventDefault();
     setSavingConfig(true);
     try {
-      const response = await fetch("/api/search-configs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/search-configs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: searchFormData.name,
           platform: searchFormData.platform,
@@ -266,17 +269,17 @@ export default function SettingsPage() {
         }),
       });
       if (response.ok) {
-        showConfigMessage("success", "Search configuration created");
+        showConfigMessage('success', 'Search configuration created');
         setShowCreateForm(false);
         setSearchFormData(defaultSearchFormData);
         fetchConfigs();
       } else {
         const data = await response.json();
-        showConfigMessage("error", data.error || "Failed to create");
+        showConfigMessage('error', data.error || 'Failed to create');
       }
     } catch (error) {
-      console.error("Failed to create config:", error);
-      showConfigMessage("error", "Failed to create configuration");
+      console.error('Failed to create config:', error);
+      showConfigMessage('error', 'Failed to create configuration');
     } finally {
       setSavingConfig(false);
     }
@@ -286,8 +289,8 @@ export default function SettingsPage() {
     setSavingConfig(true);
     try {
       const response = await fetch(`/api/search-configs/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: searchFormData.name,
           platform: searchFormData.platform,
@@ -300,53 +303,53 @@ export default function SettingsPage() {
         }),
       });
       if (response.ok) {
-        showConfigMessage("success", "Configuration updated");
+        showConfigMessage('success', 'Configuration updated');
         setEditingConfigId(null);
         setSearchFormData(defaultSearchFormData);
         fetchConfigs();
       } else {
-        showConfigMessage("error", "Failed to update configuration");
+        showConfigMessage('error', 'Failed to update configuration');
       }
     } catch (error) {
-      console.error("Failed to update config:", error);
-      showConfigMessage("error", "Failed to update configuration");
+      console.error('Failed to update config:', error);
+      showConfigMessage('error', 'Failed to update configuration');
     } finally {
       setSavingConfig(false);
     }
   }
 
   async function handleDeleteConfig(id: string) {
-    if (!confirm("Delete this search configuration?")) return;
+    if (!confirm('Delete this search configuration?')) return;
     try {
-      const response = await fetch(`/api/search-configs/${id}`, { method: "DELETE" });
+      const response = await fetch(`/api/search-configs/${id}`, { method: 'DELETE' });
       if (response.ok) {
-        showConfigMessage("success", "Configuration deleted");
+        showConfigMessage('success', 'Configuration deleted');
         fetchConfigs();
       }
     } catch (error) {
-      console.error("Failed to delete config:", error);
+      console.error('Failed to delete config:', error);
     }
   }
 
   async function handleToggleConfig(config: SearchConfig) {
     try {
       await fetch(`/api/search-configs/${config.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled: !config.enabled }),
       });
       fetchConfigs();
     } catch (error) {
-      console.error("Failed to toggle config:", error);
+      console.error('Failed to toggle config:', error);
     }
   }
 
   async function handleRunConfig(config: SearchConfig) {
     setRunningConfigId(config.id);
     try {
-      const response = await fetch("/api/scraper/craigslist", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/scraper/craigslist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           location: config.location,
           category: config.category,
@@ -357,19 +360,19 @@ export default function SettingsPage() {
       });
       const data = await response.json();
       if (data.success) {
-        showConfigMessage("success", `Found ${data.savedCount || 0} listings`);
+        showConfigMessage('success', `Found ${data.savedCount || 0} listings`);
         await fetch(`/api/search-configs/${config.id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ lastRun: new Date().toISOString() }),
         });
         fetchConfigs();
       } else {
-        showConfigMessage("error", data.message || "Scraping failed");
+        showConfigMessage('error', data.message || 'Scraping failed');
       }
     } catch (error) {
-      console.error("Failed to run scraper:", error);
-      showConfigMessage("error", "Failed to run scraper");
+      console.error('Failed to run scraper:', error);
+      showConfigMessage('error', 'Failed to run scraper');
     } finally {
       setRunningConfigId(null);
     }
@@ -381,10 +384,10 @@ export default function SettingsPage() {
       name: config.name,
       platform: config.platform,
       location: config.location,
-      category: config.category || "",
-      keywords: config.keywords || "",
-      minPrice: config.minPrice?.toString() || "",
-      maxPrice: config.maxPrice?.toString() || "",
+      category: config.category || '',
+      keywords: config.keywords || '',
+      minPrice: config.minPrice?.toString() || '',
+      maxPrice: config.maxPrice?.toString() || '',
       enabled: config.enabled,
     });
   }
@@ -397,28 +400,28 @@ export default function SettingsPage() {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(false);
   const [notifyOnHighScore, setNotifyOnHighScore] = useState(true);
-  const [minScoreThreshold, setMinScoreThreshold] = useState("70");
+  const [minScoreThreshold, setMinScoreThreshold] = useState('70');
 
   // Profit settings
-  const [minProfitMargin, setMinProfitMargin] = useState("20");
-  const [maxInvestment, setMaxInvestment] = useState("500");
+  const [minProfitMargin, setMinProfitMargin] = useState('20');
+  const [maxInvestment, setMaxInvestment] = useState('500');
   const [preferredCategories, setPreferredCategories] = useState<string[]>([
-    "electronics",
-    "furniture",
+    'electronics',
+    'furniture',
   ]);
 
   const categories = [
-    { value: "electronics", label: "Electronics" },
-    { value: "furniture", label: "Furniture" },
-    { value: "appliances", label: "Appliances" },
-    { value: "sporting", label: "Sporting Goods" },
-    { value: "tools", label: "Tools" },
-    { value: "jewelry", label: "Jewelry" },
-    { value: "antiques", label: "Antiques" },
-    { value: "video_gaming", label: "Video Gaming" },
-    { value: "music_instr", label: "Musical Instruments" },
-    { value: "computers", label: "Computers" },
-    { value: "cell_phones", label: "Cell Phones" },
+    { value: 'electronics', label: 'Electronics' },
+    { value: 'furniture', label: 'Furniture' },
+    { value: 'appliances', label: 'Appliances' },
+    { value: 'sporting', label: 'Sporting Goods' },
+    { value: 'tools', label: 'Tools' },
+    { value: 'jewelry', label: 'Jewelry' },
+    { value: 'antiques', label: 'Antiques' },
+    { value: 'video_gaming', label: 'Video Gaming' },
+    { value: 'music_instr', label: 'Musical Instruments' },
+    { value: 'computers', label: 'Computers' },
+    { value: 'cell_phones', label: 'Cell Phones' },
   ];
 
   const handleSave = () => {
@@ -429,9 +432,7 @@ export default function SettingsPage() {
 
   const toggleCategory = (category: string) => {
     setPreferredCategories((prev) =>
-      prev.includes(category)
-        ? prev.filter((c) => c !== category)
-        : [...prev, category]
+      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
     );
   };
 
@@ -461,9 +462,7 @@ export default function SettingsPage() {
               <h1 className="text-xl font-bold bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
                 Settings
               </h1>
-              <p className="text-xs text-blue-200/70">
-                Configure your preferences
-              </p>
+              <p className="text-xs text-blue-200/70">Configure your preferences</p>
             </div>
           </div>
         </div>
@@ -474,12 +473,12 @@ export default function SettingsPage() {
         {configMessage && (
           <div
             className={`fixed top-20 right-4 z-50 p-4 rounded-xl border shadow-lg flex items-center gap-2 ${
-              configMessage.type === "success"
-                ? "backdrop-blur-xl bg-gradient-to-r from-green-400/20 to-emerald-600/20 border-green-400/50 text-white"
-                : "backdrop-blur-xl bg-gradient-to-r from-red-400/20 to-pink-600/20 border-red-400/50 text-white"
+              configMessage.type === 'success'
+                ? 'backdrop-blur-xl bg-gradient-to-r from-green-400/20 to-emerald-600/20 border-green-400/50 text-white'
+                : 'backdrop-blur-xl bg-gradient-to-r from-red-400/20 to-pink-600/20 border-red-400/50 text-white'
             }`}
           >
-            {configMessage.type === "success" ? (
+            {configMessage.type === 'success' ? (
               <CheckCircle className="w-5 h-5 text-green-300" />
             ) : (
               <AlertCircle className="w-5 h-5 text-red-300" />
@@ -510,7 +509,7 @@ export default function SettingsPage() {
                 {session.user.image ? (
                   <img
                     src={session.user.image}
-                    alt={session.user.name || "User"}
+                    alt={session.user.name || 'User'}
                     className="w-14 h-14 rounded-full border-2 border-purple-400/50"
                   />
                 ) : (
@@ -520,7 +519,7 @@ export default function SettingsPage() {
                 )}
                 <div className="flex-1">
                   <p className="text-lg font-semibold text-white">
-                    {session.user.name || "Anonymous User"}
+                    {session.user.name || 'Anonymous User'}
                   </p>
                   <p className="text-sm text-blue-200/60">{session.user.email}</p>
                 </div>
@@ -565,23 +564,21 @@ export default function SettingsPage() {
             {/* OpenAI API Key */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-blue-200/90">
-                  OpenAI API Key
-                </label>
+                <label className="text-sm font-medium text-blue-200/90">OpenAI API Key</label>
                 <div className="flex items-center gap-2">
-                  {apiKeyStatus === "valid" && (
+                  {apiKeyStatus === 'valid' && (
                     <span className="flex items-center gap-1 text-xs text-green-300">
                       <CheckCircle className="w-3 h-3" />
                       Connected
                     </span>
                   )}
-                  {apiKeyStatus === "invalid" && (
+                  {apiKeyStatus === 'invalid' && (
                     <span className="flex items-center gap-1 text-xs text-red-300">
                       <AlertCircle className="w-3 h-3" />
                       Invalid
                     </span>
                   )}
-                  {apiKeyStatus === "not_set" && (
+                  {apiKeyStatus === 'not_set' && (
                     <span className="flex items-center gap-1 text-xs text-yellow-300">
                       <AlertCircle className="w-3 h-3" />
                       Not set
@@ -591,10 +588,14 @@ export default function SettingsPage() {
               </div>
               <div className="relative">
                 <input
-                  type={showApiKey ? "text" : "password"}
+                  type={showApiKey ? 'text' : 'password'}
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
-                  placeholder={userSettings?.hasOpenaiApiKey ? userSettings.openaiApiKey || "••••••••••••" : "sk-..."}
+                  placeholder={
+                    userSettings?.hasOpenaiApiKey
+                      ? userSettings.openaiApiKey || '••••••••••••'
+                      : 'sk-...'
+                  }
                   className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50 text-white placeholder-blue-200/30 transition-all duration-300 pr-24"
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 gap-1">
@@ -613,7 +614,11 @@ export default function SettingsPage() {
                   disabled={savingApiKey}
                   className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white text-sm rounded-lg hover:from-amber-600 hover:to-orange-700 transition-all disabled:opacity-50"
                 >
-                  {savingApiKey ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
+                  {savingApiKey ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <Save className="w-3 h-3" />
+                  )}
                   Save
                 </button>
                 <button
@@ -621,7 +626,11 @@ export default function SettingsPage() {
                   disabled={testingApiKey || (!apiKey && !userSettings?.hasOpenaiApiKey)}
                   className="flex items-center gap-1 px-3 py-1.5 bg-white/10 text-blue-300 text-sm rounded-lg hover:bg-white/20 transition-all disabled:opacity-50"
                 >
-                  {testingApiKey ? <Loader2 className="w-3 h-3 animate-spin" /> : <Zap className="w-3 h-3" />}
+                  {testingApiKey ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <Zap className="w-3 h-3" />
+                  )}
                   Test
                 </button>
                 <a
@@ -635,7 +644,8 @@ export default function SettingsPage() {
                 </a>
               </div>
               <p className="mt-2 text-xs text-blue-200/40">
-                Your API key is encrypted and stored securely. It's never exposed in logs or transmitted to our servers.
+                Your API key is encrypted and stored securely. It's never exposed in logs or
+                transmitted to our servers.
               </p>
             </div>
           </div>
@@ -655,17 +665,21 @@ export default function SettingsPage() {
           <div className="space-y-4">
             {/* Model Selection */}
             <div>
-              <label className="block text-sm font-medium text-blue-200/90 mb-2">
-                LLM Model
-              </label>
+              <label className="block text-sm font-medium text-blue-200/90 mb-2">LLM Model</label>
               <select
                 value={llmModel}
                 onChange={(e) => setLlmModel(e.target.value)}
                 className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white"
               >
-                <option value="gpt-4o-mini" className="bg-slate-800">GPT-4o Mini (Recommended)</option>
-                <option value="gpt-4o" className="bg-slate-800">GPT-4o (More accurate)</option>
-                <option value="gpt-4-turbo" className="bg-slate-800">GPT-4 Turbo (Highest quality)</option>
+                <option value="gpt-4o-mini" className="bg-slate-800">
+                  GPT-4o Mini (Recommended)
+                </option>
+                <option value="gpt-4o" className="bg-slate-800">
+                  GPT-4o (More accurate)
+                </option>
+                <option value="gpt-4-turbo" className="bg-slate-800">
+                  GPT-4 Turbo (Highest quality)
+                </option>
               </select>
               <p className="mt-1 text-xs text-blue-200/40">
                 GPT-4o Mini offers the best balance of speed and accuracy for listing analysis.
@@ -695,13 +709,11 @@ export default function SettingsPage() {
             <label className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-all duration-300 cursor-pointer">
               <div>
                 <span className="text-white">Auto-analyze new listings</span>
-                <p className="text-xs text-blue-200/40">Automatically run AI analysis on scraped listings</p>
+                <p className="text-xs text-blue-200/40">
+                  Automatically run AI analysis on scraped listings
+                </p>
               </div>
-              <button
-                type="button"
-                onClick={() => setAutoAnalyze(!autoAnalyze)}
-                className="p-1"
-              >
+              <button type="button" onClick={() => setAutoAnalyze(!autoAnalyze)} className="p-1">
                 {autoAnalyze ? (
                   <ToggleRight className="w-8 h-8 text-green-400" />
                 ) : (
@@ -747,7 +759,10 @@ export default function SettingsPage() {
 
           {/* Create Form */}
           {showCreateForm && (
-            <form onSubmit={handleCreateConfig} className="mb-6 p-4 rounded-lg bg-white/5 border border-white/10">
+            <form
+              onSubmit={handleCreateConfig}
+              className="mb-6 p-4 rounded-lg bg-white/5 border border-white/10"
+            >
               <h3 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
                 <Plus className="w-4 h-4 text-green-400" />
                 Create New Search
@@ -765,26 +780,36 @@ export default function SettingsPage() {
                 </div>
                 <select
                   value={searchFormData.location}
-                  onChange={(e) => setSearchFormData({ ...searchFormData, location: e.target.value })}
+                  onChange={(e) =>
+                    setSearchFormData({ ...searchFormData, location: e.target.value })
+                  }
                   className="px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white"
                 >
                   {searchLocations.map((loc) => (
-                    <option key={loc.value} value={loc.value} className="bg-slate-800">{loc.label}</option>
+                    <option key={loc.value} value={loc.value} className="bg-slate-800">
+                      {loc.label}
+                    </option>
                   ))}
                 </select>
                 <select
                   value={searchFormData.category}
-                  onChange={(e) => setSearchFormData({ ...searchFormData, category: e.target.value })}
+                  onChange={(e) =>
+                    setSearchFormData({ ...searchFormData, category: e.target.value })
+                  }
                   className="px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white"
                 >
                   {categories.map((cat) => (
-                    <option key={cat.value} value={cat.value} className="bg-slate-800">{cat.label}</option>
+                    <option key={cat.value} value={cat.value} className="bg-slate-800">
+                      {cat.label}
+                    </option>
                   ))}
                 </select>
                 <input
                   type="text"
                   value={searchFormData.keywords}
-                  onChange={(e) => setSearchFormData({ ...searchFormData, keywords: e.target.value })}
+                  onChange={(e) =>
+                    setSearchFormData({ ...searchFormData, keywords: e.target.value })
+                  }
                   placeholder="Keywords (optional)"
                   className="px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white placeholder-blue-200/50"
                 />
@@ -792,14 +817,18 @@ export default function SettingsPage() {
                   <input
                     type="number"
                     value={searchFormData.minPrice}
-                    onChange={(e) => setSearchFormData({ ...searchFormData, minPrice: e.target.value })}
+                    onChange={(e) =>
+                      setSearchFormData({ ...searchFormData, minPrice: e.target.value })
+                    }
                     placeholder="Min $"
                     className="flex-1 px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white placeholder-blue-200/50"
                   />
                   <input
                     type="number"
                     value={searchFormData.maxPrice}
-                    onChange={(e) => setSearchFormData({ ...searchFormData, maxPrice: e.target.value })}
+                    onChange={(e) =>
+                      setSearchFormData({ ...searchFormData, maxPrice: e.target.value })
+                    }
                     placeholder="Max $"
                     className="flex-1 px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white placeholder-blue-200/50"
                   />
@@ -811,7 +840,11 @@ export default function SettingsPage() {
                   disabled={savingConfig}
                   className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all disabled:opacity-50"
                 >
-                  {savingConfig ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                  {savingConfig ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4" />
+                  )}
                   Create
                 </button>
                 <button
@@ -842,8 +875,8 @@ export default function SettingsPage() {
                   key={config.id}
                   className={`p-4 rounded-lg border transition-all ${
                     config.enabled
-                      ? "bg-white/5 border-white/20 hover:bg-white/10"
-                      : "bg-white/2 border-white/10 opacity-60"
+                      ? 'bg-white/5 border-white/20 hover:bg-white/10'
+                      : 'bg-white/2 border-white/10 opacity-60'
                   }`}
                 >
                   {editingConfigId === config.id ? (
@@ -854,32 +887,44 @@ export default function SettingsPage() {
                           <input
                             type="text"
                             value={searchFormData.name}
-                            onChange={(e) => setSearchFormData({ ...searchFormData, name: e.target.value })}
+                            onChange={(e) =>
+                              setSearchFormData({ ...searchFormData, name: e.target.value })
+                            }
                             className="w-full px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white"
                           />
                         </div>
                         <select
                           value={searchFormData.location}
-                          onChange={(e) => setSearchFormData({ ...searchFormData, location: e.target.value })}
+                          onChange={(e) =>
+                            setSearchFormData({ ...searchFormData, location: e.target.value })
+                          }
                           className="px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 text-white"
                         >
                           {searchLocations.map((loc) => (
-                            <option key={loc.value} value={loc.value} className="bg-slate-800">{loc.label}</option>
+                            <option key={loc.value} value={loc.value} className="bg-slate-800">
+                              {loc.label}
+                            </option>
                           ))}
                         </select>
                         <select
                           value={searchFormData.category}
-                          onChange={(e) => setSearchFormData({ ...searchFormData, category: e.target.value })}
+                          onChange={(e) =>
+                            setSearchFormData({ ...searchFormData, category: e.target.value })
+                          }
                           className="px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 text-white"
                         >
                           {categories.map((cat) => (
-                            <option key={cat.value} value={cat.value} className="bg-slate-800">{cat.label}</option>
+                            <option key={cat.value} value={cat.value} className="bg-slate-800">
+                              {cat.label}
+                            </option>
                           ))}
                         </select>
                         <input
                           type="text"
                           value={searchFormData.keywords}
-                          onChange={(e) => setSearchFormData({ ...searchFormData, keywords: e.target.value })}
+                          onChange={(e) =>
+                            setSearchFormData({ ...searchFormData, keywords: e.target.value })
+                          }
                           placeholder="Keywords"
                           className="px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 text-white placeholder-blue-200/50"
                         />
@@ -887,14 +932,18 @@ export default function SettingsPage() {
                           <input
                             type="number"
                             value={searchFormData.minPrice}
-                            onChange={(e) => setSearchFormData({ ...searchFormData, minPrice: e.target.value })}
+                            onChange={(e) =>
+                              setSearchFormData({ ...searchFormData, minPrice: e.target.value })
+                            }
                             placeholder="Min $"
                             className="flex-1 px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 text-white placeholder-blue-200/50"
                           />
                           <input
                             type="number"
                             value={searchFormData.maxPrice}
-                            onChange={(e) => setSearchFormData({ ...searchFormData, maxPrice: e.target.value })}
+                            onChange={(e) =>
+                              setSearchFormData({ ...searchFormData, maxPrice: e.target.value })
+                            }
                             placeholder="Max $"
                             className="flex-1 px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 text-white placeholder-blue-200/50"
                           />
@@ -906,7 +955,11 @@ export default function SettingsPage() {
                           disabled={savingConfig}
                           className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm rounded-lg disabled:opacity-50"
                         >
-                          {savingConfig ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                          {savingConfig ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Save className="w-4 h-4" />
+                          )}
                           Save
                         </button>
                         <button
@@ -960,7 +1013,7 @@ export default function SettingsPage() {
                         <button
                           onClick={() => handleToggleConfig(config)}
                           className="p-1.5 hover:bg-white/10 rounded transition-all"
-                          title={config.enabled ? "Disable" : "Enable"}
+                          title={config.enabled ? 'Disable' : 'Enable'}
                         >
                           {config.enabled ? (
                             <ToggleRight className="w-5 h-5 text-green-400" />
@@ -1131,8 +1184,8 @@ export default function SettingsPage() {
                 onClick={() => toggleCategory(category.value)}
                 className={`p-3 rounded-lg border transition-all duration-300 ${
                   preferredCategories.includes(category.value)
-                    ? "bg-gradient-to-r from-purple-500/30 to-pink-500/30 border-purple-400/50 shadow-lg shadow-purple-500/30 scale-105"
-                    : "bg-white/5 border-white/20 hover:bg-white/10 hover:border-white/30"
+                    ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30 border-purple-400/50 shadow-lg shadow-purple-500/30 scale-105'
+                    : 'bg-white/5 border-white/20 hover:bg-white/10 hover:border-white/30'
                 }`}
               >
                 <span className="text-sm text-white">{category.label}</span>
@@ -1152,9 +1205,7 @@ export default function SettingsPage() {
             </h2>
           </div>
 
-          <p className="text-sm text-blue-200/70 mb-4">
-            Choose your preferred color scheme
-          </p>
+          <p className="text-sm text-blue-200/70 mb-4">Choose your preferred color scheme</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {availableThemes.map((t) => (
@@ -1163,23 +1214,25 @@ export default function SettingsPage() {
                 onClick={() => setTheme(t.id)}
                 className={`group p-4 rounded-xl border-2 transition-all duration-300 ${
                   theme.id === t.id
-                    ? "border-white/50 bg-white/15 shadow-lg shadow-white/20 scale-105"
-                    : "border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/30 hover:scale-102"
+                    ? 'border-white/50 bg-white/15 shadow-lg shadow-white/20 scale-105'
+                    : 'border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/30 hover:scale-102'
                 }`}
               >
                 {/* Theme preview gradient */}
                 <div className="flex gap-2 mb-3">
-                  <div className={`h-8 w-full rounded-lg bg-gradient-to-r from-${t.colors.primaryFrom} to-${t.colors.primaryTo} shadow-md`}></div>
-                  <div className={`h-8 w-full rounded-lg bg-gradient-to-r from-${t.colors.secondaryFrom} to-${t.colors.secondaryTo} shadow-md`}></div>
+                  <div
+                    className={`h-8 w-full rounded-lg bg-gradient-to-r from-${t.colors.primaryFrom} to-${t.colors.primaryTo} shadow-md`}
+                  ></div>
+                  <div
+                    className={`h-8 w-full rounded-lg bg-gradient-to-r from-${t.colors.secondaryFrom} to-${t.colors.secondaryTo} shadow-md`}
+                  ></div>
                 </div>
 
                 {/* Theme name and description */}
                 <div className="text-left">
                   <h3 className="font-semibold text-white mb-1 flex items-center gap-2">
                     {t.name}
-                    {theme.id === t.id && (
-                      <CheckCircle className="w-4 h-4 text-green-300" />
-                    )}
+                    {theme.id === t.id && <CheckCircle className="w-4 h-4 text-green-300" />}
                   </h3>
                   <p className="text-xs text-blue-200/60">{t.description}</p>
                 </div>
@@ -1208,4 +1261,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-

@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
-import { chromium } from "playwright";
-import prisma from "@/lib/db";
-import { estimateValue, detectCategory, generatePurchaseMessage } from "@/lib/value-estimator";
-import { identifyItem } from "@/lib/llm-identifier";
-import { fetchMarketPrice, closeBrowser as closeMarketBrowser } from "@/lib/market-price";
-import { analyzeSellability, quickDiscountCheck } from "@/lib/llm-analyzer";
-import { getAuthUserId } from "@/lib/auth-middleware";
+import { NextRequest, NextResponse } from 'next/server';
+import { chromium } from 'playwright';
+import prisma from '@/lib/db';
+import { estimateValue, detectCategory, generatePurchaseMessage } from '@/lib/value-estimator';
+import { identifyItem } from '@/lib/llm-identifier';
+import { fetchMarketPrice, closeBrowser as closeMarketBrowser } from '@/lib/market-price';
+import { analyzeSellability, quickDiscountCheck } from '@/lib/llm-analyzer';
+import { getAuthUserId } from '@/lib/auth-middleware';
 
 // Minimum discount threshold for saving a listing (50% = must be half market value)
 const MIN_DISCOUNT_THRESHOLD = 50;
@@ -25,7 +25,7 @@ interface CraigslistItem {
 function parsePrice(priceStr: string): number {
   const match = priceStr.match(/\$?([\d,]+)/);
   if (match) {
-    return parseFloat(match[1].replace(/,/g, ""));
+    return parseFloat(match[1].replace(/,/g, ''));
   }
   return 0;
 }
@@ -38,17 +38,17 @@ function extractListingId(url: string): string {
 
 // Category mapping to Craigslist paths
 const categoryPaths: Record<string, string> = {
-  electronics: "ela",
-  furniture: "fua",
-  appliances: "ppa",
-  sporting: "sga",
-  tools: "tla",
-  jewelry: "jwa",
-  antiques: "ata",
-  video_gaming: "vga",
-  music_instr: "msa",
-  computers: "sya",
-  cell_phones: "moa",
+  electronics: 'ela',
+  furniture: 'fua',
+  appliances: 'ppa',
+  sporting: 'sga',
+  tools: 'tla',
+  jewelry: 'jwa',
+  antiques: 'ata',
+  video_gaming: 'vga',
+  music_instr: 'msa',
+  computers: 'sya',
+  cell_phones: 'moa',
 };
 
 // Scrape Craigslist using Playwright (real browser)
@@ -61,29 +61,35 @@ async function scrapeCraigslistWithPlaywright(
 ): Promise<CraigslistItem[]> {
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
-    userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    userAgent:
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   });
   const page = await context.newPage();
 
   try {
     // Build search URL
     const baseUrl = `https://${location}.craigslist.org`;
-    const categoryPath = categoryPaths[category] || "sss";
+    const categoryPath = categoryPaths[category] || 'sss';
     const searchParams = new URLSearchParams();
 
-    if (query) searchParams.set("query", query);
-    if (minPrice) searchParams.set("min_price", minPrice.toString());
-    if (maxPrice) searchParams.set("max_price", maxPrice.toString());
+    if (query) searchParams.set('query', query);
+    if (minPrice) searchParams.set('min_price', minPrice.toString());
+    if (maxPrice) searchParams.set('max_price', maxPrice.toString());
 
     const searchUrl = `${baseUrl}/search/${categoryPath}?${searchParams.toString()}`;
     console.log(`Navigating to: ${searchUrl}`);
 
-    await page.goto(searchUrl, { waitUntil: "domcontentloaded", timeout: 30000 });
+    await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
     // Wait for listings to load
-    await page.waitForSelector(".cl-search-result, .result-row, .gallery-card, li.cl-static-search-result", { timeout: 10000 }).catch(() => {
-      console.log("No standard listing selector found, trying alternate approach");
-    });
+    await page
+      .waitForSelector(
+        '.cl-search-result, .result-row, .gallery-card, li.cl-static-search-result',
+        { timeout: 10000 }
+      )
+      .catch(() => {
+        console.log('No standard listing selector found, trying alternate approach');
+      });
 
     // Extract listings using page.evaluate
     const listings = await page.evaluate(() => {
@@ -97,10 +103,10 @@ async function scrapeCraigslistWithPlaywright(
 
       // Try multiple selector patterns (Craigslist UI changes)
       const selectors = [
-        ".cl-search-result",
-        ".result-row",
-        ".gallery-card",
-        "li.cl-static-search-result"
+        '.cl-search-result',
+        '.result-row',
+        '.gallery-card',
+        'li.cl-static-search-result',
       ];
 
       let listingElements: Element[] = [];
@@ -117,29 +123,35 @@ async function scrapeCraigslistWithPlaywright(
         listingElements = Array.from(document.querySelectorAll('[data-pid]'));
       }
 
-      for (const el of listingElements.slice(0, 50)) { // Limit to 50 listings
+      for (const el of listingElements.slice(0, 50)) {
+        // Limit to 50 listings
         try {
           // Extract title
-          const titleEl = el.querySelector(".posting-title, .result-title, .titlestring, a.posting-title, .label") as HTMLElement;
-          const title = titleEl?.innerText?.trim() || el.querySelector("a")?.innerText?.trim() || "";
+          const titleEl = el.querySelector(
+            '.posting-title, .result-title, .titlestring, a.posting-title, .label'
+          ) as HTMLElement;
+          const title =
+            titleEl?.innerText?.trim() || el.querySelector('a')?.innerText?.trim() || '';
 
           // Extract URL
           const linkEl = el.querySelector("a[href*='/']") as HTMLAnchorElement;
-          const url = linkEl?.href || "";
+          const url = linkEl?.href || '';
 
           // Extract price
-          const priceEl = el.querySelector(".priceinfo, .result-price, .price") as HTMLElement;
-          const price = priceEl?.innerText?.trim() || "$0";
+          const priceEl = el.querySelector('.priceinfo, .result-price, .price') as HTMLElement;
+          const price = priceEl?.innerText?.trim() || '$0';
 
           // Extract location
-          const locationEl = el.querySelector(".meta, .result-hood, .location, .supertitle") as HTMLElement;
-          const location = locationEl?.innerText?.replace(/[()]/g, "").trim() || "";
+          const locationEl = el.querySelector(
+            '.meta, .result-hood, .location, .supertitle'
+          ) as HTMLElement;
+          const location = locationEl?.innerText?.replace(/[()]/g, '').trim() || '';
 
           // Extract image
-          const imgEl = el.querySelector("img") as HTMLImageElement;
-          const imageUrl = imgEl?.src || "";
+          const imgEl = el.querySelector('img') as HTMLImageElement;
+          const imageUrl = imgEl?.src || '';
 
-          if (title && url && !title.includes("sponsored")) {
+          if (title && url && !title.includes('sponsored')) {
             items.push({ title, price, url, location, imageUrl });
           }
         } catch (e) {
@@ -175,14 +187,14 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const body = await request.json();
     const { location, category, keywords, minPrice, maxPrice } = body;
 
     if (!location || !category) {
       return NextResponse.json(
-        { success: false, message: "Location and category are required" },
+        { success: false, message: 'Location and category are required' },
         { status: 400 }
       );
     }
@@ -191,10 +203,10 @@ export async function POST(request: NextRequest) {
     job = await prisma.scraperJob.create({
       data: {
         userId,
-        platform: "CRAIGSLIST",
+        platform: 'CRAIGSLIST',
         location,
         category,
-        status: "RUNNING",
+        status: 'RUNNING',
         startedAt: new Date(),
       },
     });
@@ -213,7 +225,7 @@ export async function POST(request: NextRequest) {
       await prisma.scraperJob.update({
         where: { id: job.id },
         data: {
-          status: "COMPLETED",
+          status: 'COMPLETED',
           listingsFound: 0,
           opportunitiesFound: 0,
           completedAt: new Date(),
@@ -222,7 +234,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: "No listings found matching your criteria. Try different search parameters.",
+        message: 'No listings found matching your criteria. Try different search parameters.',
         listings: [],
         savedCount: 0,
         jobId: job.id,
@@ -245,7 +257,7 @@ export async function POST(request: NextRequest) {
     }> = [];
 
     const hasLLM = !!process.env.OPENAI_API_KEY;
-    console.log(`LLM analysis ${hasLLM ? "enabled" : "disabled (no OPENAI_API_KEY)"}`);
+    console.log(`LLM analysis ${hasLLM ? 'enabled' : 'disabled (no OPENAI_API_KEY)'}`);
 
     for (const item of listings) {
       try {
@@ -324,7 +336,9 @@ export async function POST(request: NextRequest) {
         // With LLM: only save if verified 50%+ undervalued
         // Without LLM: fall back to algorithmic estimation (save if valueScore >= 70)
         const shouldSave = hasLLM
-          ? meetsThreshold && trueDiscountPercent !== null && trueDiscountPercent >= MIN_DISCOUNT_THRESHOLD
+          ? meetsThreshold &&
+            trueDiscountPercent !== null &&
+            trueDiscountPercent >= MIN_DISCOUNT_THRESHOLD
           : estimation.valueScore >= 70;
 
         if (!shouldSave) {
@@ -344,7 +358,7 @@ export async function POST(request: NextRequest) {
         const listingData = {
           userId,
           externalId: item.externalId,
-          platform: "CRAIGSLIST",
+          platform: 'CRAIGSLIST',
           url: item.url,
           title: item.title,
           description: item.description,
@@ -384,7 +398,7 @@ export async function POST(request: NextRequest) {
 
           // Verified Market Data
           verifiedMarketValue: verifiedMarketValue,
-          marketDataSource: marketData ? "ebay_scrape" : null,
+          marketDataSource: marketData ? 'ebay_scrape' : null,
           marketDataDate: marketData ? new Date() : null,
           comparableSalesJson: marketData
             ? JSON.stringify(marketData.soldListings.slice(0, 5))
@@ -409,14 +423,14 @@ export async function POST(request: NextRequest) {
           analysisReasoning: sellabilityAnalysis?.reasoning || null,
 
           // Status - all saved listings are opportunities now
-          status: "OPPORTUNITY",
+          status: 'OPPORTUNITY',
         };
 
         // Upsert to database
         await prisma.listing.upsert({
           where: {
             platform_externalId_userId: {
-              platform: "CRAIGSLIST",
+              platform: 'CRAIGSLIST',
               externalId: item.externalId,
               userId,
             },
@@ -448,7 +462,7 @@ export async function POST(request: NextRequest) {
       await prisma.scraperJob.update({
         where: { id: job.id },
         data: {
-          status: "COMPLETED",
+          status: 'COMPLETED',
           listingsFound: listings.length,
           opportunitiesFound,
           completedAt: new Date(),
@@ -456,7 +470,9 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const analysisMode = hasLLM ? "LLM-verified (50%+ undervalued only)" : "algorithmic (score >= 70)";
+    const analysisMode = hasLLM
+      ? 'LLM-verified (50%+ undervalued only)'
+      : 'algorithmic (score >= 70)';
     const message = hasLLM
       ? `Analyzed ${listings.length} listings, found ${opportunitiesFound} opportunities (${skippedCount} didn't meet 50% threshold)`
       : `Scraped ${listings.length} listings, found ${opportunitiesFound} opportunities`;
@@ -474,15 +490,15 @@ export async function POST(request: NextRequest) {
       jobId: job?.id,
     });
   } catch (error) {
-    console.error("Scraper error:", error);
+    console.error('Scraper error:', error);
 
     // Update job as failed
     if (job) {
       await prisma.scraperJob.update({
         where: { id: job.id },
         data: {
-          status: "FAILED",
-          errorMessage: error instanceof Error ? error.message : "Unknown error",
+          status: 'FAILED',
+          errorMessage: error instanceof Error ? error.message : 'Unknown error',
           completedAt: new Date(),
         },
       });
@@ -491,8 +507,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        message: "Failed to scrape listings",
-        error: error instanceof Error ? error.message : "Unknown error",
+        message: 'Failed to scrape listings',
+        error: error instanceof Error ? error.message : 'Unknown error',
         jobId: job?.id,
       },
       { status: 500 }
@@ -503,22 +519,22 @@ export async function POST(request: NextRequest) {
 // GET /api/scraper/craigslist - Get scraper status/info
 export async function GET() {
   return NextResponse.json({
-    platform: "craigslist",
-    status: "ready",
+    platform: 'craigslist',
+    status: 'ready',
     supportedCategories: Object.keys(categoryPaths),
     supportedLocations: [
-      "sarasota",
-      "tampa",
-      "orlando",
-      "miami",
-      "jacksonville",
-      "sfbay",
-      "losangeles",
-      "newyork",
-      "chicago",
-      "seattle",
-      "austin",
-      "denver",
+      'sarasota',
+      'tampa',
+      'orlando',
+      'miami',
+      'jacksonville',
+      'sfbay',
+      'losangeles',
+      'newyork',
+      'chicago',
+      'seattle',
+      'austin',
+      'denver',
     ],
   });
 }

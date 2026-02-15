@@ -57,20 +57,24 @@ Given('{int} have score > {int}', async function (count: number, minScore: numbe
   this.testData.highScoreMin = minScore;
 });
 
-Given('{int} have score between {int}-{int}', async function (count: number, low: number, high: number) {
-  this.testData.midScoreCount = count;
-  this.testData.midScoreRange = [low, high];
-});
+Given(
+  '{int} have score between {int}-{int}',
+  async function (count: number, low: number, high: number) {
+    this.testData.midScoreCount = count;
+    this.testData.midScoreRange = [low, high];
+  }
+);
 
 Then('I should see the {string} section', async function (sectionName: string) {
-  const section = page.locator(`[data-testid="section-${sectionName.toLowerCase().replace(/\s+/g, '-')}"], h2:has-text("${sectionName}"), [aria-label="${sectionName}"]`);
+  const section = page.locator(
+    `[data-testid="section-${sectionName.toLowerCase().replace(/\s+/g, '-')}"], h2:has-text("${sectionName}"), [aria-label="${sectionName}"]`
+  );
   await expect(section.first()).toBeVisible({ timeout: 10000 });
 });
 
 Then('items should be sorted by score \\(highest first)', async function () {
-  const scores = await page.$$eval(
-    '[data-testid="opportunity-score"]',
-    (els) => els.map((el) => parseInt(el.textContent || '0', 10))
+  const scores = await page.$$eval('[data-testid="opportunity-score"]', (els) =>
+    els.map((el) => parseInt(el.textContent || '0', 10))
   );
   for (let i = 1; i < scores.length; i++) {
     expect(scores[i]).toBeLessThanOrEqual(scores[i - 1]);
@@ -81,14 +85,18 @@ Then('I should see filter options:', async function (dataTable: any) {
   const filters = dataTable.hashes();
   for (const row of filters) {
     const filterLabel = row['Filter'];
-    const filter = page.locator(`[data-testid="filter-${filterLabel.toLowerCase().replace(/\s+/g, '-')}"]`);
+    const filter = page.locator(
+      `[data-testid="filter-${filterLabel.toLowerCase().replace(/\s+/g, '-')}"]`
+    );
     await expect(filter.first()).toBeVisible();
 
     // Verify options are available
     const options = row['Options'].split(', ');
     await filter.first().click();
     for (const option of options) {
-      const optionEl = page.locator(`[role="option"]:has-text("${option.trim()}"), li:has-text("${option.trim()}")`);
+      const optionEl = page.locator(
+        `[role="option"]:has-text("${option.trim()}"), li:has-text("${option.trim()}")`
+      );
       await expect(optionEl.first()).toBeVisible();
     }
     // Close dropdown
@@ -116,25 +124,29 @@ Given('I have {int} ongoing conversations with sellers', async function (count: 
   this.testData.conversationCount = count;
 });
 
-Given('{int} seller hasn\'t replied in {int} hours', async function (count: number, hours: number) {
+Given("{int} seller hasn't replied in {int} hours", async function (count: number, hours: number) {
   this.testData.staleConversations = count;
   this.testData.staleHours = hours;
 });
 
-Given('{int} seller just sent a message {int} minutes ago', async function (count: number, minutes: number) {
-  this.testData.recentConversations = count;
-});
+Given(
+  '{int} seller just sent a message {int} minutes ago',
+  async function (count: number, minutes: number) {
+    this.testData.recentConversations = count;
+  }
+);
 
 When('I view the {string} section', async function (sectionName: string) {
-  const section = page.locator(`[data-testid="section-${sectionName.toLowerCase().replace(/\s+/g, '-')}"], h2:has-text("${sectionName}")`);
+  const section = page.locator(
+    `[data-testid="section-${sectionName.toLowerCase().replace(/\s+/g, '-')}"], h2:has-text("${sectionName}")`
+  );
   await section.first().scrollIntoViewIfNeeded();
   await expect(section.first()).toBeVisible();
 });
 
 Then('conversations should be sorted by last activity', async function () {
-  const timestamps = await page.$$eval(
-    '[data-testid="conversation-timestamp"]',
-    (els) => els.map((el) => new Date(el.getAttribute('data-timestamp') || '').getTime())
+  const timestamps = await page.$$eval('[data-testid="conversation-timestamp"]', (els) =>
+    els.map((el) => new Date(el.getAttribute('data-timestamp') || '').getTime())
   );
   for (let i = 1; i < timestamps.length; i++) {
     expect(timestamps[i]).toBeLessThanOrEqual(timestamps[i - 1]);
@@ -147,34 +159,42 @@ Then('unread messages should have a notification badge', async function () {
   expect(count).toBeGreaterThan(0);
 });
 
-Then('stale conversations \\({int}h+) should be highlighted in yellow', async function (hours: number) {
-  const staleItems = page.locator('[data-testid="conversation-stale"]');
-  const count = await staleItems.count();
-  expect(count).toBeGreaterThan(0);
+Then(
+  'stale conversations \\({int}h+) should be highlighted in yellow',
+  async function (hours: number) {
+    const staleItems = page.locator('[data-testid="conversation-stale"]');
+    const count = await staleItems.count();
+    expect(count).toBeGreaterThan(0);
 
-  // Verify yellow/warning styling
-  const bgColor = await staleItems.first().evaluate((el) => {
-    return window.getComputedStyle(el).backgroundColor;
-  });
-  // Accept yellow-ish colors or warning class
-  const hasWarningClass = await staleItems.first().evaluate((el) => {
-    return el.classList.contains('bg-yellow-50') ||
-      el.classList.contains('bg-warning') ||
-      el.classList.contains('border-yellow-400');
-  });
-  expect(hasWarningClass || bgColor.includes('255')).toBeTruthy();
-});
+    // Verify yellow/warning styling
+    const bgColor = await staleItems.first().evaluate((el) => {
+      return window.getComputedStyle(el).backgroundColor;
+    });
+    // Accept yellow-ish colors or warning class
+    const hasWarningClass = await staleItems.first().evaluate((el) => {
+      return (
+        el.classList.contains('bg-yellow-50') ||
+        el.classList.contains('bg-warning') ||
+        el.classList.contains('border-yellow-400')
+      );
+    });
+    expect(hasWarningClass || bgColor.includes('255')).toBeTruthy();
+  }
+);
 
 // ==================== SCENARIO: Inventory management ====================
 
-Given('I have purchased {int} items awaiting resale:', async function (count: number, dataTable: any) {
-  this.testData = this.testData || {};
-  this.testData.inventoryItems = dataTable.hashes();
+Given(
+  'I have purchased {int} items awaiting resale:',
+  async function (count: number, dataTable: any) {
+    this.testData = this.testData || {};
+    this.testData.inventoryItems = dataTable.hashes();
 
-  await page.request.post('http://localhost:3000/api/test/seed-inventory', {
-    data: { items: this.testData.inventoryItems },
-  });
-});
+    await page.request.post('http://localhost:3000/api/test/seed-inventory', {
+      data: { items: this.testData.inventoryItems },
+    });
+  }
+);
 
 // 'I navigate to {string}' is defined in common-steps.ts
 
@@ -235,7 +255,9 @@ Then('I should see a table of completed flips:', async function (dataTable: any)
 Then('I should see summary stats:', async function (dataTable: any) {
   const stats = dataTable.hashes();
   for (const stat of stats) {
-    const metricEl = page.locator(`[data-testid="stat-${stat['Metric'].toLowerCase().replace(/\s+/g, '-')}"]`);
+    const metricEl = page.locator(
+      `[data-testid="stat-${stat['Metric'].toLowerCase().replace(/\s+/g, '-')}"]`
+    );
     await expect(metricEl.first()).toBeVisible();
     const text = await metricEl.first().textContent();
     expect(text).toBeTruthy();
@@ -243,7 +265,9 @@ Then('I should see summary stats:', async function (dataTable: any) {
 });
 
 Then('I should be able to export as CSV', async function () {
-  const exportBtn = page.locator('button:has-text("Export"), button:has-text("CSV"), [data-testid="export-csv"]');
+  const exportBtn = page.locator(
+    'button:has-text("Export"), button:has-text("CSV"), [data-testid="export-csv"]'
+  );
   await expect(exportBtn.first()).toBeVisible();
   await expect(exportBtn.first()).toBeEnabled();
 });
@@ -258,7 +282,9 @@ Given('I have sales data for the last {int} months', async function (months: num
 When('I view the dashboard analytics section', async function () {
   await page.goto('http://localhost:3000/dashboard');
   await page.waitForLoadState('networkidle');
-  const analytics = page.locator('[data-testid="analytics-section"], [data-testid="charts-section"]');
+  const analytics = page.locator(
+    '[data-testid="analytics-section"], [data-testid="charts-section"]'
+  );
   await analytics.first().scrollIntoViewIfNeeded();
 });
 
@@ -287,7 +313,9 @@ Then('hovering over data points should show weekly breakdown', async function ()
     await page.waitForTimeout(500);
 
     // Check tooltip appears
-    const tooltip = page.locator('[data-testid="chart-tooltip"], .chartjs-tooltip, [role="tooltip"]');
+    const tooltip = page.locator(
+      '[data-testid="chart-tooltip"], .chartjs-tooltip, [role="tooltip"]'
+    );
     await expect(tooltip.first()).toBeVisible({ timeout: 3000 });
   }
 });
@@ -317,7 +345,9 @@ Then('I should be able to:', async function (dataTable: any) {
 
   for (const action of actions) {
     const actionName = action['Action'];
-    const btn = card.locator(`button:has-text("${actionName}"), [data-testid="action-${actionName.toLowerCase().replace(/\s+/g, '-')}"]`);
+    const btn = card.locator(
+      `button:has-text("${actionName}"), [data-testid="action-${actionName.toLowerCase().replace(/\s+/g, '-')}"]`
+    );
     await expect(btn.first()).toBeVisible();
   }
 });
@@ -325,12 +355,16 @@ Then('I should be able to:', async function (dataTable: any) {
 Then('each action should update the UI immediately', async function () {
   // Test one quick action - "Save for Later"
   const card = page.locator('[data-testid="opportunity-card"]').first();
-  const saveBtn = card.locator('button:has-text("Save for Later"), [data-testid="action-save-for-later"]');
+  const saveBtn = card.locator(
+    'button:has-text("Save for Later"), [data-testid="action-save-for-later"]'
+  );
 
   if (await saveBtn.first().isVisible()) {
     await saveBtn.first().click();
     // Verify UI updated without page reload
-    const savedIndicator = page.locator('[data-testid="save-confirmation"], .toast, [role="status"]');
+    const savedIndicator = page.locator(
+      '[data-testid="save-confirmation"], .toast, [role="status"]'
+    );
     await expect(savedIndicator.first()).toBeVisible({ timeout: 3000 });
   }
 });

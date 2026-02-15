@@ -21,37 +21,39 @@ export function resetCounters(): void {
 /**
  * Generate a mock listing with sensible defaults
  */
-export function createMockListing(overrides: Partial<{
-  externalId: string;
-  platform: string;
-  url: string;
-  title: string;
-  description: string;
-  askingPrice: number;
-  condition: string;
-  location: string;
-  sellerName: string;
-  sellerContact: string;
-  imageUrls: string;
-  category: string;
-  status: string;
-  valueScore: number;
-  estimatedValue: number;
-  estimatedLow: number;
-  estimatedHigh: number;
-  profitPotential: number;
-  profitLow: number;
-  profitHigh: number;
-  discountPercent: number;
-  resaleDifficulty: string;
-  comparableUrls: string;
-  priceReasoning: string;
-  notes: string;
-  shippable: boolean;
-  negotiable: boolean;
-  tags: string;
-  requestToBuy: string;
-}> = {}) {
+export function createMockListing(
+  overrides: Partial<{
+    externalId: string;
+    platform: string;
+    url: string;
+    title: string;
+    description: string;
+    askingPrice: number;
+    condition: string;
+    location: string;
+    sellerName: string;
+    sellerContact: string;
+    imageUrls: string;
+    category: string;
+    status: string;
+    valueScore: number;
+    estimatedValue: number;
+    estimatedLow: number;
+    estimatedHigh: number;
+    profitPotential: number;
+    profitLow: number;
+    profitHigh: number;
+    discountPercent: number;
+    resaleDifficulty: string;
+    comparableUrls: string;
+    priceReasoning: string;
+    notes: string;
+    shippable: boolean;
+    negotiable: boolean;
+    tags: string;
+    requestToBuy: string;
+  }> = {}
+) {
   listingCounter++;
   return {
     externalId: `ext-${listingCounter}`,
@@ -90,21 +92,23 @@ export function createMockListing(overrides: Partial<{
 /**
  * Generate mock listing data for POST request body
  */
-export function createMockListingRequest(overrides: Partial<{
-  externalId: string;
-  platform: string;
-  url: string;
-  title: string;
-  description: string;
-  askingPrice: number;
-  condition: string;
-  location: string;
-  sellerName: string;
-  sellerContact: string;
-  imageUrls: string[];
-  category: string;
-  postedAt: string;
-}> = {}) {
+export function createMockListingRequest(
+  overrides: Partial<{
+    externalId: string;
+    platform: string;
+    url: string;
+    title: string;
+    description: string;
+    askingPrice: number;
+    condition: string;
+    location: string;
+    sellerName: string;
+    sellerContact: string;
+    imageUrls: string[];
+    category: string;
+    postedAt: string;
+  }> = {}
+) {
   listingCounter++;
   return {
     externalId: `ext-${listingCounter}`,
@@ -159,17 +163,19 @@ export function createMockOpportunity(
 /**
  * Generate a mock scraper job with sensible defaults
  */
-export function createMockScraperJob(overrides: Partial<{
-  platform: string;
-  location: string;
-  category: string;
-  status: string;
-  listingsFound: number;
-  opportunitiesFound: number;
-  errorMessage: string;
-  startedAt: Date;
-  completedAt: Date;
-}> = {}) {
+export function createMockScraperJob(
+  overrides: Partial<{
+    platform: string;
+    location: string;
+    category: string;
+    status: string;
+    listingsFound: number;
+    opportunitiesFound: number;
+    errorMessage: string;
+    startedAt: Date;
+    completedAt: Date;
+  }> = {}
+) {
   jobCounter++;
   return {
     platform: 'CRAIGSLIST',
@@ -188,17 +194,19 @@ export function createMockScraperJob(overrides: Partial<{
 /**
  * Generate a mock search config with sensible defaults
  */
-export function createMockSearchConfig(overrides: Partial<{
-  name: string;
-  platform: string;
-  location: string;
-  category: string;
-  keywords: string;
-  minPrice: number;
-  maxPrice: number;
-  enabled: boolean;
-  lastRun: Date;
-}> = {}) {
+export function createMockSearchConfig(
+  overrides: Partial<{
+    name: string;
+    platform: string;
+    location: string;
+    category: string;
+    keywords: string;
+    minPrice: number;
+    maxPrice: number;
+    enabled: boolean;
+    lastRun: Date;
+  }> = {}
+) {
   configCounter++;
   return {
     name: `Search Config ${configCounter}`,

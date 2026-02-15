@@ -41,11 +41,13 @@ describe('POST /api/auth/register', () => {
       createdAt: new Date(),
     });
 
-    const res = await POST(createRequest({
-      email: 'Test@Example.com',
-      password: 'password123',
-      name: 'Test User',
-    }));
+    const res = await POST(
+      createRequest({
+        email: 'Test@Example.com',
+        password: 'password123',
+        name: 'Test User',
+      })
+    );
     const data = await res.json();
 
     expect(res.status).toBe(200);

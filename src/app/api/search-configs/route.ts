@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
-import { getAuthUserId } from "@/lib/auth-middleware";
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/db';
+import { getAuthUserId } from '@/lib/auth-middleware';
 import {
   SearchConfigQuerySchema,
   CreateSearchConfigSchema,
   validateQuery,
   validateBody,
-} from "@/lib/validations";
+} from '@/lib/validations';
 
 // GET /api/search-configs - List all search configurations
 export async function GET(request: NextRequest) {
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const parsed = validateQuery(SearchConfigQuerySchema, searchParams);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "Invalid query parameters", details: parsed.error },
+        { error: 'Invalid query parameters', details: parsed.error },
         { status: 400 }
       );
     }
@@ -29,13 +29,13 @@ export async function GET(request: NextRequest) {
       where.OR = [{ userId }, { userId: null }];
     }
 
-    if (parsed.data.enabled === "true") {
+    if (parsed.data.enabled === 'true') {
       where.enabled = true;
     }
 
     const configs = await prisma.searchConfig.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
     });
 
     return NextResponse.json({
@@ -43,11 +43,8 @@ export async function GET(request: NextRequest) {
       total: configs.length,
     });
   } catch (error) {
-    console.error("Error fetching search configs:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch search configurations" },
-      { status: 500 }
-    );
+    console.error('Error fetching search configs:', error);
+    return NextResponse.json({ error: 'Failed to fetch search configurations' }, { status: 500 });
   }
 }
 
@@ -59,11 +56,12 @@ export async function POST(request: NextRequest) {
     const parsed = validateBody(CreateSearchConfigSchema, body);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "Invalid request body", details: parsed.error },
+        { error: 'Invalid request body', details: parsed.error },
         { status: 400 }
       );
     }
-    const { name, platform, location, category, keywords, minPrice, maxPrice, enabled } = parsed.data;
+    const { name, platform, location, category, keywords, minPrice, maxPrice, enabled } =
+      parsed.data;
 
     const config = await prisma.searchConfig.create({
       data: {
@@ -81,10 +79,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(config, { status: 201 });
   } catch (error) {
-    console.error("Error creating search config:", error);
-    return NextResponse.json(
-      { error: "Failed to create search configuration" },
-      { status: 500 }
-    );
+    console.error('Error creating search config:', error);
+    return NextResponse.json({ error: 'Failed to create search configuration' }, { status: 500 });
   }
 }

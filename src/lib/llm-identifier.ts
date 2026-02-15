@@ -1,18 +1,18 @@
 // LLM-powered item identification for marketplace listings
 // Uses OpenAI ChatGPT to extract structured product information from listing titles/descriptions
 
-import OpenAI from "openai";
+import OpenAI from 'openai';
 
 export interface ItemIdentification {
   brand: string | null;
   model: string | null;
-  variant: string | null;        // "256GB", "Blue", "Pro Max", etc.
+  variant: string | null; // "256GB", "Blue", "Pro Max", etc.
   year: number | null;
-  condition: "new" | "like_new" | "good" | "fair" | "poor";
+  condition: 'new' | 'like_new' | 'good' | 'fair' | 'poor';
   conditionNotes: string;
-  searchQuery: string;           // Optimized query for eBay search
-  category: string;              // Refined category
-  worthInvestigating: boolean;   // Quick filter - is this worth deeper analysis?
+  searchQuery: string; // Optimized query for eBay search
+  category: string; // Refined category
+  worthInvestigating: boolean; // Quick filter - is this worth deeper analysis?
   reasoning: string;
 }
 
@@ -21,7 +21,7 @@ const IDENTIFICATION_PROMPT = `You are an expert at identifying products from ma
 LISTING:
 Title: {title}
 Description: {description}
-Asking Price: ${"{price}"}
+Asking Price: ${'{price}'}
 Category Hint: {category}
 
 TASK:
@@ -56,7 +56,7 @@ function getOpenAI(): OpenAI {
   if (!openai) {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
-      throw new Error("OPENAI_API_KEY environment variable is not set");
+      throw new Error('OPENAI_API_KEY environment variable is not set');
     }
     openai = new OpenAI({ apiKey });
   }
@@ -71,28 +71,28 @@ export async function identifyItem(
 ): Promise<ItemIdentification | null> {
   // Skip if no API key configured
   if (!process.env.OPENAI_API_KEY) {
-    console.log("OPENAI_API_KEY not set, skipping LLM identification");
+    console.log('OPENAI_API_KEY not set, skipping LLM identification');
     return null;
   }
 
   try {
     const client = getOpenAI();
 
-    const prompt = IDENTIFICATION_PROMPT
-      .replace("{title}", title)
-      .replace("{description}", description || "No description provided")
-      .replace("{price}", askingPrice.toString())
-      .replace("{category}", categoryHint || "Unknown");
+    const prompt = IDENTIFICATION_PROMPT.replace('{title}', title)
+      .replace('{description}', description || 'No description provided')
+      .replace('{price}', askingPrice.toString())
+      .replace('{category}', categoryHint || 'Unknown');
 
     const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: 'gpt-4o-mini',
       messages: [
         {
-          role: "system",
-          content: "You are a product identification expert. Always respond with valid JSON only, no markdown formatting.",
+          role: 'system',
+          content:
+            'You are a product identification expert. Always respond with valid JSON only, no markdown formatting.',
         },
         {
-          role: "user",
+          role: 'user',
           content: prompt,
         },
       ],
@@ -100,12 +100,12 @@ export async function identifyItem(
       max_tokens: 500,
     });
 
-    const responseText = response.choices[0]?.message?.content || "";
+    const responseText = response.choices[0]?.message?.content || '';
 
     // Extract JSON from response (handle potential markdown wrapping)
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error("Failed to extract JSON from LLM response:", responseText);
+      console.error('Failed to extract JSON from LLM response:', responseText);
       return null;
     }
 
@@ -117,26 +117,24 @@ export async function identifyItem(
       variant: parsed.variant || null,
       year: parsed.year ? parseInt(parsed.year) : null,
       condition: validateCondition(parsed.condition),
-      conditionNotes: parsed.conditionNotes || "",
+      conditionNotes: parsed.conditionNotes || '',
       searchQuery: parsed.searchQuery || title,
-      category: parsed.category || categoryHint || "other",
+      category: parsed.category || categoryHint || 'other',
       worthInvestigating: parsed.worthInvestigating === true,
-      reasoning: parsed.reasoning || "",
+      reasoning: parsed.reasoning || '',
     };
   } catch (error) {
-    console.error("LLM identification error:", error);
+    console.error('LLM identification error:', error);
     return null;
   }
 }
 
-function validateCondition(
-  condition: string
-): "new" | "like_new" | "good" | "fair" | "poor" {
-  const valid = ["new", "like_new", "good", "fair", "poor"];
-  const normalized = condition?.toLowerCase().replace(/\s+/g, "_");
+function validateCondition(condition: string): 'new' | 'like_new' | 'good' | 'fair' | 'poor' {
+  const valid = ['new', 'like_new', 'good', 'fair', 'poor'];
+  const normalized = condition?.toLowerCase().replace(/\s+/g, '_');
   return valid.includes(normalized)
-    ? (normalized as "new" | "like_new" | "good" | "fair" | "poor")
-    : "good";
+    ? (normalized as 'new' | 'like_new' | 'good' | 'fair' | 'poor')
+    : 'good';
 }
 
 // Batch identification for multiple listings (more efficient)
@@ -156,12 +154,7 @@ export async function identifyItemsBatch(
     const batch = listings.slice(i, i + batchSize);
     const batchResults = await Promise.all(
       batch.map((listing) =>
-        identifyItem(
-          listing.title,
-          listing.description,
-          listing.askingPrice,
-          listing.categoryHint
-        )
+        identifyItem(listing.title, listing.description, listing.askingPrice, listing.categoryHint)
       )
     );
     results.push(...batchResults);

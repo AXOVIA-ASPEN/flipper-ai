@@ -246,7 +246,12 @@ describe('Search Configs API', () => {
 
     it('should filter by userId when authenticated', async () => {
       mockGetAuthUserId.mockResolvedValueOnce('user-123');
-      mockCreate.mockResolvedValue({ id: 'config-1', name: 'Test', platform: 'CRAIGSLIST', location: 'tampa' });
+      mockCreate.mockResolvedValue({
+        id: 'config-1',
+        name: 'Test',
+        platform: 'CRAIGSLIST',
+        location: 'tampa',
+      });
 
       const request = createMockRequest('POST', '/api/search-configs', {
         name: 'Test',
@@ -360,7 +365,7 @@ describe('Search Configs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toContain("Invalid platform");
+      expect(data.error).toContain('Invalid platform');
     });
 
     it('should update lastRun timestamp', async () => {

@@ -16,7 +16,9 @@ describe('POST /api/listings/[id]/market-value', () => {
   it('updates market value successfully', async () => {
     mockUpdateListingWithMarketValue.mockResolvedValue(undefined);
 
-    const req = new NextRequest('http://localhost/api/listings/listing-1/market-value', { method: 'POST' });
+    const req = new NextRequest('http://localhost/api/listings/listing-1/market-value', {
+      method: 'POST',
+    });
     const res = await POST(req, createParams('listing-1'));
     const data = await res.json();
 
@@ -27,7 +29,9 @@ describe('POST /api/listings/[id]/market-value', () => {
   it('returns 404 when listing not found', async () => {
     mockUpdateListingWithMarketValue.mockRejectedValue(new Error('Listing not found'));
 
-    const req = new NextRequest('http://localhost/api/listings/bad-id/market-value', { method: 'POST' });
+    const req = new NextRequest('http://localhost/api/listings/bad-id/market-value', {
+      method: 'POST',
+    });
     const res = await POST(req, createParams('bad-id'));
     expect(res.status).toBe(404);
   });
@@ -35,7 +39,9 @@ describe('POST /api/listings/[id]/market-value', () => {
   it('returns 500 on generic error', async () => {
     mockUpdateListingWithMarketValue.mockRejectedValue(new Error('DB error'));
 
-    const req = new NextRequest('http://localhost/api/listings/listing-1/market-value', { method: 'POST' });
+    const req = new NextRequest('http://localhost/api/listings/listing-1/market-value', {
+      method: 'POST',
+    });
     const res = await POST(req, createParams('listing-1'));
     expect(res.status).toBe(500);
   });

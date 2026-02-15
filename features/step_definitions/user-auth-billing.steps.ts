@@ -57,7 +57,9 @@ When('I enter:', async function (this: CustomWorld, dataTable: any) {
 });
 
 When('I accept the terms of service', async function (this: CustomWorld) {
-  const checkbox = this.page.locator('[data-testid="tos-checkbox"], input[name*="terms"], input[type="checkbox"]').first();
+  const checkbox = this.page
+    .locator('[data-testid="tos-checkbox"], input[name*="terms"], input[type="checkbox"]')
+    .first();
   if (await checkbox.isVisible().catch(() => false)) {
     await checkbox.check();
   }
@@ -110,8 +112,13 @@ Then('I should be redirected to the dashboard', async function (this: CustomWorl
 
 Then('I should see a {string} message', async function (this: CustomWorld, message: string) {
   // Check for the message text on the page
-  const visible = await this.page.locator(`text=${message}`).isVisible().catch(() => false);
-  console.log(`✅ Message "${message}" ${visible ? 'visible' : 'checked (may not be present in test env)'}`);
+  const visible = await this.page
+    .locator(`text=${message}`)
+    .isVisible()
+    .catch(() => false);
+  console.log(
+    `✅ Message "${message}" ${visible ? 'visible' : 'checked (may not be present in test env)'}`
+  );
 });
 
 // ==================== LOGIN ====================
@@ -185,7 +192,9 @@ When('I try to start scan #{int}', async function (this: CustomWorld, scanNumber
     });
   });
   // Trigger a scan attempt
-  const scanButton = this.page.locator('[data-testid="start-scan"], button:has-text("Scan"), button:has-text("Start")').first();
+  const scanButton = this.page
+    .locator('[data-testid="start-scan"], button:has-text("Scan"), button:has-text("Start")')
+    .first();
   if (await scanButton.isVisible().catch(() => false)) {
     await scanButton.click();
   }
@@ -194,7 +203,11 @@ When('I try to start scan #{int}', async function (this: CustomWorld, scanNumber
 
 Then('I should see an upgrade prompt', async function (this: CustomWorld) {
   // Look for upgrade modal/prompt
-  await this.page.waitForSelector('[data-testid="upgrade-prompt"], [role="dialog"], .upgrade-modal', { timeout: 5000 }).catch(() => {});
+  await this.page
+    .waitForSelector('[data-testid="upgrade-prompt"], [role="dialog"], .upgrade-modal', {
+      timeout: 5000,
+    })
+    .catch(() => {});
   await this.screenshot('upgrade-prompt');
   console.log('✅ Upgrade prompt displayed');
 });
@@ -208,7 +221,9 @@ Then('the prompt should show:', async function (this: CustomWorld, dataTable: an
 });
 
 Then('I should be able to click {string}', async function (this: CustomWorld, buttonText: string) {
-  const button = this.page.locator(`button:has-text("${buttonText}"), a:has-text("${buttonText}")`).first();
+  const button = this.page
+    .locator(`button:has-text("${buttonText}"), a:has-text("${buttonText}")`)
+    .first();
   const visible = await button.isVisible().catch(() => false);
   console.log(`✅ "${buttonText}" button ${visible ? 'available' : 'checked'}`);
 });
@@ -233,11 +248,14 @@ Then('I should see the pricing page', async function (this: CustomWorld) {
   console.log('✅ Pricing page visible');
 });
 
-When('I select the {string} plan \\(${int}\\/mo\\)', async function (this: CustomWorld, plan: string, price: number) {
-  this.testData.selectedPlan = plan;
-  this.testData.selectedPrice = price;
-  console.log(`✅ Selected ${plan} plan ($${price}/mo)`);
-});
+When(
+  'I select the {string} plan \\(${int}\\/mo\\)',
+  async function (this: CustomWorld, plan: string, price: number) {
+    this.testData.selectedPlan = plan;
+    this.testData.selectedPrice = price;
+    console.log(`✅ Selected ${plan} plan ($${price}/mo)`);
+  }
+);
 
 Then('I should be redirected to Stripe Checkout', async function (this: CustomWorld) {
   // Mock Stripe checkout redirect
@@ -326,7 +344,9 @@ When('I navigate to subscription management', async function (this: CustomWorld)
 });
 
 Then('I should see a confirmation modal', async function (this: CustomWorld) {
-  await this.page.waitForSelector('[role="dialog"], .modal, [data-testid="cancel-modal"]', { timeout: 5000 }).catch(() => {});
+  await this.page
+    .waitForSelector('[role="dialog"], .modal, [data-testid="cancel-modal"]', { timeout: 5000 })
+    .catch(() => {});
   await this.screenshot('cancel-confirmation-modal');
   console.log('✅ Confirmation modal visible');
 });
@@ -380,7 +400,9 @@ When('I check my available features', async function (this: CustomWorld) {
     'pro flipper': ['eBay Scanning', 'AI Messaging', 'Auto-Listing', 'Priority Support'],
   };
   this.testData.availableFeatures = features[tier] || [];
-  console.log(`✅ Checked features for ${tier} tier: ${this.testData.availableFeatures.join(', ')}`);
+  console.log(
+    `✅ Checked features for ${tier} tier: ${this.testData.availableFeatures.join(', ')}`
+  );
 });
 
 Then('I should have to {string}', async function (this: CustomWorld, feature: string) {
@@ -396,13 +418,16 @@ Then('I should not have to {string}', async function (this: CustomWorld, feature
 });
 
 // Handle the Scenario Outline phrasing
-Then('I should {word} to {string}', async function (this: CustomWorld, access: string, feature: string) {
-  const hasFeature = this.testData.availableFeatures?.includes(feature);
-  if (access === 'have') {
-    expect(hasFeature).toBeTruthy();
-    console.log(`✅ Has access to "${feature}"`);
-  } else {
-    expect(hasFeature).toBeFalsy();
-    console.log(`✅ No access to "${feature}" (expected for tier)`);
+Then(
+  'I should {word} to {string}',
+  async function (this: CustomWorld, access: string, feature: string) {
+    const hasFeature = this.testData.availableFeatures?.includes(feature);
+    if (access === 'have') {
+      expect(hasFeature).toBeTruthy();
+      console.log(`✅ Has access to "${feature}"`);
+    } else {
+      expect(hasFeature).toBeFalsy();
+      console.log(`✅ No access to "${feature}" (expected for tier)`);
+    }
   }
-});
+);

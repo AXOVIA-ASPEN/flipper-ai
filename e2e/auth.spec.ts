@@ -3,7 +3,9 @@ import { TEST_USER, mockAuthSession } from './fixtures/auth';
 
 test.describe('Authentication', () => {
   test.describe('Feature: User Login', () => {
-    test('Scenario: Given a user on the login page, When they see the form, Then all login elements are visible', async ({ page }) => {
+    test('Scenario: Given a user on the login page, When they see the form, Then all login elements are visible', async ({
+      page,
+    }) => {
       await page.goto('/login');
 
       // Brand header
@@ -23,7 +25,9 @@ test.describe('Authentication', () => {
       await expect(page.getByRole('link', { name: /Create one free/i })).toBeVisible();
     });
 
-    test('Scenario: Given a user on the login page, When they submit empty form, Then validation prevents submission', async ({ page }) => {
+    test('Scenario: Given a user on the login page, When they submit empty form, Then validation prevents submission', async ({
+      page,
+    }) => {
       await page.goto('/login');
 
       // HTML5 required validation should prevent submission
@@ -34,7 +38,9 @@ test.describe('Authentication', () => {
       await expect(passwordInput).toHaveAttribute('required', '');
     });
 
-    test('Scenario: Given a user on the login page, When they enter invalid credentials, Then an error message appears', async ({ page }) => {
+    test('Scenario: Given a user on the login page, When they enter invalid credentials, Then an error message appears', async ({
+      page,
+    }) => {
       // Mock the signIn endpoint to return an error
       await page.route('**/api/auth/callback/credentials', async (route) => {
         await route.fulfill({
@@ -65,7 +71,9 @@ test.describe('Authentication', () => {
       await expect(page.getByText(/Invalid email or password/i)).toBeVisible({ timeout: 5000 });
     });
 
-    test('Scenario: Given a user on the login page, When they toggle password visibility, Then the password field type changes', async ({ page }) => {
+    test('Scenario: Given a user on the login page, When they toggle password visibility, Then the password field type changes', async ({
+      page,
+    }) => {
       await page.goto('/login');
 
       const passwordInput = page.getByPlaceholder(/Enter your password/i);
@@ -81,7 +89,9 @@ test.describe('Authentication', () => {
       await expect(passwordInput).toHaveAttribute('type', 'text');
     });
 
-    test('Scenario: Given a user on the login page, When they click "Create one free", Then they navigate to registration', async ({ page }) => {
+    test('Scenario: Given a user on the login page, When they click "Create one free", Then they navigate to registration', async ({
+      page,
+    }) => {
       await page.goto('/login');
       const registerLink = page.getByRole('link', { name: /Create one free/i });
       await expect(registerLink).toHaveAttribute('href', '/register');
@@ -89,7 +99,9 @@ test.describe('Authentication', () => {
   });
 
   test.describe('Feature: User Registration', () => {
-    test('Scenario: Given a visitor, When they navigate to register, Then the registration page loads', async ({ page }) => {
+    test('Scenario: Given a visitor, When they navigate to register, Then the registration page loads', async ({
+      page,
+    }) => {
       await page.goto('/register');
 
       // Page should load without errors
@@ -98,7 +110,9 @@ test.describe('Authentication', () => {
   });
 
   test.describe('Feature: Protected Routes', () => {
-    test('Scenario: Given an unauthenticated user, When they visit a protected page, Then they are redirected to login', async ({ page }) => {
+    test('Scenario: Given an unauthenticated user, When they visit a protected page, Then they are redirected to login', async ({
+      page,
+    }) => {
       // Don't mock auth — leave unauthenticated
       await page.route('**/api/auth/session', async (route) => {
         await route.fulfill({ json: {} });
@@ -111,12 +125,17 @@ test.describe('Authentication', () => {
       await page.waitForTimeout(2000);
       const url = page.url();
       const isRedirected = url.includes('signin') || url.includes('login');
-      const hasAuthPrompt = await page.getByText(/sign in/i).isVisible().catch(() => false);
+      const hasAuthPrompt = await page
+        .getByText(/sign in/i)
+        .isVisible()
+        .catch(() => false);
 
       expect(isRedirected || hasAuthPrompt).toBeTruthy();
     });
 
-    test('Scenario: Given an authenticated user, When they visit a protected page, Then content loads normally', async ({ page }) => {
+    test('Scenario: Given an authenticated user, When they visit a protected page, Then content loads normally', async ({
+      page,
+    }) => {
       await mockAuthSession(page);
       await page.goto('/opportunities');
 

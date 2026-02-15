@@ -40,7 +40,9 @@ describe('GET /api/images/proxy', () => {
   it('redirects to cached image when available', async () => {
     mockIsImageCached.mockResolvedValue('/cached/image.jpg');
 
-    const req = new NextRequest('http://localhost/api/images/proxy?url=https://example.com/img.jpg');
+    const req = new NextRequest(
+      'http://localhost/api/images/proxy?url=https://example.com/img.jpg'
+    );
     const res = await GET(req);
 
     expect(res.status).toBe(302);
@@ -53,7 +55,9 @@ describe('GET /api/images/proxy', () => {
       cachedImage: { localPath: '/cached/new.jpg' },
     });
 
-    const req = new NextRequest('http://localhost/api/images/proxy?url=https://example.com/img.jpg');
+    const req = new NextRequest(
+      'http://localhost/api/images/proxy?url=https://example.com/img.jpg'
+    );
     const res = await GET(req);
 
     expect(res.status).toBe(302);
@@ -64,11 +68,16 @@ describe('GET /api/images/proxy', () => {
     mockDownloadAndCacheImage.mockResolvedValue({ success: false });
     mockFetch.mockResolvedValue({
       ok: true,
-      headers: new Map([['content-type', 'image/jpeg'], ['content-length', '1024']]),
+      headers: new Map([
+        ['content-type', 'image/jpeg'],
+        ['content-length', '1024'],
+      ]),
       arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
     });
 
-    const req = new NextRequest('http://localhost/api/images/proxy?url=https://example.com/img.jpg');
+    const req = new NextRequest(
+      'http://localhost/api/images/proxy?url=https://example.com/img.jpg'
+    );
     const res = await GET(req);
 
     expect(res.status).toBe(200);
@@ -84,7 +93,9 @@ describe('GET /api/images/proxy', () => {
       headers: new Map(),
     });
 
-    const req = new NextRequest('http://localhost/api/images/proxy?url=https://example.com/missing.jpg');
+    const req = new NextRequest(
+      'http://localhost/api/images/proxy?url=https://example.com/missing.jpg'
+    );
     const res = await GET(req);
 
     expect(res.status).toBe(404);
@@ -99,7 +110,9 @@ describe('GET /api/images/proxy', () => {
       arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
     });
 
-    const req = new NextRequest('http://localhost/api/images/proxy?url=https://example.com/page.html');
+    const req = new NextRequest(
+      'http://localhost/api/images/proxy?url=https://example.com/page.html'
+    );
     const res = await GET(req);
 
     expect(res.status).toBe(400);
@@ -111,11 +124,16 @@ describe('GET /api/images/proxy', () => {
     const bigSize = String(10 * 1024 * 1024); // 10MB
     mockFetch.mockResolvedValue({
       ok: true,
-      headers: new Map([['content-type', 'image/jpeg'], ['content-length', bigSize]]),
+      headers: new Map([
+        ['content-type', 'image/jpeg'],
+        ['content-length', bigSize],
+      ]),
       arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
     });
 
-    const req = new NextRequest('http://localhost/api/images/proxy?url=https://example.com/big.jpg');
+    const req = new NextRequest(
+      'http://localhost/api/images/proxy?url=https://example.com/big.jpg'
+    );
     const res = await GET(req);
 
     expect(res.status).toBe(413);
@@ -129,7 +147,9 @@ describe('GET /api/images/proxy', () => {
       arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
     });
 
-    const req = new NextRequest('http://localhost/api/images/proxy?url=https://example.com/img.png&cache=false');
+    const req = new NextRequest(
+      'http://localhost/api/images/proxy?url=https://example.com/img.png&cache=false'
+    );
     const res = await GET(req);
 
     expect(res.status).toBe(200);
@@ -139,7 +159,9 @@ describe('GET /api/images/proxy', () => {
   it('returns 500 on unexpected error', async () => {
     mockIsImageCached.mockRejectedValue(new Error('Unexpected'));
 
-    const req = new NextRequest('http://localhost/api/images/proxy?url=https://example.com/img.jpg');
+    const req = new NextRequest(
+      'http://localhost/api/images/proxy?url=https://example.com/img.jpg'
+    );
     const res = await GET(req);
 
     expect(res.status).toBe(500);

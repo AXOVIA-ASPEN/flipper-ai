@@ -1,22 +1,16 @@
 // API Route: /api/listings/[id]/market-value
 // Update a listing with verified market value from eBay sold data
 
-import { NextRequest, NextResponse } from "next/server";
-import { updateListingWithMarketValue } from "@/lib/price-history-service";
+import { NextRequest, NextResponse } from 'next/server';
+import { updateListingWithMarketValue } from '@/lib/price-history-service';
 
 // POST /api/listings/[id]/market-value
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: listingId } = await params;
 
     if (!listingId) {
-      return NextResponse.json(
-        { error: "Listing ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Listing ID is required' }, { status: 400 });
     }
 
     await updateListingWithMarketValue(listingId);
@@ -26,15 +20,12 @@ export async function POST(
       message: `Updated listing ${listingId} with verified market value`,
     });
   } catch (error) {
-    console.error("Error updating listing market value:", error);
-    
-    if (error instanceof Error && error.message.includes("not found")) {
+    console.error('Error updating listing market value:', error);
+
+    if (error instanceof Error && error.message.includes('not found')) {
       return NextResponse.json({ error: error.message }, { status: 404 });
     }
 
-    return NextResponse.json(
-      { error: "Failed to update listing market value" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to update listing market value' }, { status: 500 });
   }
 }

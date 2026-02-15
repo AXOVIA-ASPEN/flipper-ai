@@ -1,7 +1,7 @@
 /**
  * Database seeding helpers for E2E tests.
  * Uses Prisma client directly to seed/cleanup test data.
- * 
+ *
  * Usage: Import in global-setup.ts or call from test fixtures.
  */
 
@@ -31,7 +31,7 @@ export async function seedTestListings(count = 5) {
             url: `https://craigslist.org/e2e/${i}`,
             category: 'electronics',
           },
-        }),
+        })
       );
     }
     return await Promise.all(listings);
@@ -52,7 +52,7 @@ export async function seedTestOpportunities(count = 3) {
           purchasePrice: i % 3 === 2 ? listing.askingPrice : null,
           notes: `E2E test opportunity ${i}`,
         },
-      }),
+      })
     );
     return await Promise.all(opportunities);
   } finally {

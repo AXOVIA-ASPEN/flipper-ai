@@ -1,9 +1,9 @@
 // LLM-powered sellability analysis
 // Given item identification and market data, assess flip potential using OpenAI ChatGPT
 
-import OpenAI from "openai";
-import type { ItemIdentification } from "./llm-identifier";
-import type { MarketPrice, SoldListing } from "./market-price";
+import OpenAI from 'openai';
+import type { ItemIdentification } from './llm-identifier';
+import type { MarketPrice, SoldListing } from './market-price';
 
 export interface SellabilityAnalysis {
   // Verified values
@@ -12,12 +12,12 @@ export interface SellabilityAnalysis {
 
   // Sellability assessment
   sellabilityScore: number; // 0-100
-  demandLevel: "low" | "medium" | "high" | "very_high";
+  demandLevel: 'low' | 'medium' | 'high' | 'very_high';
   expectedDaysToSell: number;
 
   // Risk assessment
-  authenticityRisk: "low" | "medium" | "high";
-  conditionRisk: "low" | "medium" | "high";
+  authenticityRisk: 'low' | 'medium' | 'high';
+  conditionRisk: 'low' | 'medium' | 'high';
 
   // Recommendations
   recommendedOfferPrice: number;
@@ -27,7 +27,7 @@ export interface SellabilityAnalysis {
 
   // Evidence
   comparableSales: SoldListing[];
-  confidence: "low" | "medium" | "high";
+  confidence: 'low' | 'medium' | 'high';
   reasoning: string;
 
   // Filter result
@@ -38,13 +38,13 @@ const ANALYSIS_PROMPT = `You are an expert reseller analyzing a marketplace list
 
 LISTING DETAILS:
 - Title: {title}
-- Asking Price: ${"{askingPrice}"}
+- Asking Price: ${'{askingPrice}'}
 - Identified as: {brand} {model} {variant}
 - Condition: {condition} ({conditionNotes})
 
 MARKET DATA (from eBay sold listings):
-- Median Sold Price: ${"{medianPrice}"}
-- Price Range: ${"{lowPrice}"} - ${"{highPrice}"}
+- Median Sold Price: ${'{medianPrice}'}
+- Price Range: ${'{lowPrice}'} - ${'{highPrice}'}
 - Recent Sales Count: {salesCount}
 - Sample Sold Listings:
 {soldListingsText}
@@ -84,7 +84,7 @@ function getOpenAI(): OpenAI {
   if (!openai) {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
-      throw new Error("OPENAI_API_KEY environment variable is not set");
+      throw new Error('OPENAI_API_KEY environment variable is not set');
     }
     openai = new OpenAI({ apiKey });
   }
@@ -98,7 +98,7 @@ export async function analyzeSellability(
   marketData: MarketPrice
 ): Promise<SellabilityAnalysis | null> {
   if (!process.env.OPENAI_API_KEY) {
-    console.log("OPENAI_API_KEY not set, skipping LLM analysis");
+    console.log('OPENAI_API_KEY not set, skipping LLM analysis');
     return null;
   }
 
@@ -108,35 +108,32 @@ export async function analyzeSellability(
     // Format sold listings for the prompt
     const soldListingsText = marketData.soldListings
       .slice(0, 5)
-      .map(
-        (l) =>
-          `  - "${l.title}" sold for $${l.price} (${l.condition})`
-      )
-      .join("\n");
+      .map((l) => `  - "${l.title}" sold for $${l.price} (${l.condition})`)
+      .join('\n');
 
-    const prompt = ANALYSIS_PROMPT
-      .replace("{title}", title)
-      .replace("{askingPrice}", askingPrice.toString())
-      .replace("{brand}", identification.brand || "Unknown")
-      .replace("{model}", identification.model || "Unknown")
-      .replace("{variant}", identification.variant || "")
-      .replace("{condition}", identification.condition)
-      .replace("{conditionNotes}", identification.conditionNotes)
-      .replace("{medianPrice}", marketData.medianPrice.toString())
-      .replace("{lowPrice}", marketData.lowPrice.toString())
-      .replace("{highPrice}", marketData.highPrice.toString())
-      .replace("{salesCount}", marketData.salesCount.toString())
-      .replace("{soldListingsText}", soldListingsText);
+    const prompt = ANALYSIS_PROMPT.replace('{title}', title)
+      .replace('{askingPrice}', askingPrice.toString())
+      .replace('{brand}', identification.brand || 'Unknown')
+      .replace('{model}', identification.model || 'Unknown')
+      .replace('{variant}', identification.variant || '')
+      .replace('{condition}', identification.condition)
+      .replace('{conditionNotes}', identification.conditionNotes)
+      .replace('{medianPrice}', marketData.medianPrice.toString())
+      .replace('{lowPrice}', marketData.lowPrice.toString())
+      .replace('{highPrice}', marketData.highPrice.toString())
+      .replace('{salesCount}', marketData.salesCount.toString())
+      .replace('{soldListingsText}', soldListingsText);
 
     const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: 'gpt-4o-mini',
       messages: [
         {
-          role: "system",
-          content: "You are a resale market expert. Always respond with valid JSON only, no markdown formatting.",
+          role: 'system',
+          content:
+            'You are a resale market expert. Always respond with valid JSON only, no markdown formatting.',
         },
         {
-          role: "user",
+          role: 'user',
           content: prompt,
         },
       ],
@@ -144,12 +141,12 @@ export async function analyzeSellability(
       max_tokens: 800,
     });
 
-    const responseText = response.choices[0]?.message?.content || "";
+    const responseText = response.choices[0]?.message?.content || '';
 
     // Extract JSON from response
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error("Failed to extract JSON from LLM analysis:", responseText);
+      console.error('Failed to extract JSON from LLM analysis:', responseText);
       return null;
     }
 
@@ -165,34 +162,32 @@ export async function analyzeSellability(
       conditionRisk: validateRisk(parsed.conditionRisk),
       recommendedOfferPrice: parsed.recommendedOfferPrice || askingPrice,
       recommendedListPrice: parsed.recommendedListPrice || marketData.medianPrice,
-      resaleStrategy: parsed.resaleStrategy || "List on eBay with detailed photos",
-      resalePlatform: parsed.resalePlatform || "ebay",
+      resaleStrategy: parsed.resaleStrategy || 'List on eBay with detailed photos',
+      resalePlatform: parsed.resalePlatform || 'ebay',
       comparableSales: marketData.soldListings.slice(0, 5),
       confidence: validateConfidence(parsed.confidence),
-      reasoning: parsed.reasoning || "",
+      reasoning: parsed.reasoning || '',
       meetsThreshold: parsed.meetsThreshold === true,
     };
   } catch (error) {
-    console.error("LLM analysis error:", error);
+    console.error('LLM analysis error:', error);
     return null;
   }
 }
 
-function validateDemandLevel(
-  level: string
-): "low" | "medium" | "high" | "very_high" {
-  const valid = ["low", "medium", "high", "very_high"];
-  return valid.includes(level) ? (level as "low" | "medium" | "high" | "very_high") : "medium";
+function validateDemandLevel(level: string): 'low' | 'medium' | 'high' | 'very_high' {
+  const valid = ['low', 'medium', 'high', 'very_high'];
+  return valid.includes(level) ? (level as 'low' | 'medium' | 'high' | 'very_high') : 'medium';
 }
 
-function validateRisk(risk: string): "low" | "medium" | "high" {
-  const valid = ["low", "medium", "high"];
-  return valid.includes(risk) ? (risk as "low" | "medium" | "high") : "medium";
+function validateRisk(risk: string): 'low' | 'medium' | 'high' {
+  const valid = ['low', 'medium', 'high'];
+  return valid.includes(risk) ? (risk as 'low' | 'medium' | 'high') : 'medium';
 }
 
-function validateConfidence(conf: string): "low" | "medium" | "high" {
-  const valid = ["low", "medium", "high"];
-  return valid.includes(conf) ? (conf as "low" | "medium" | "high") : "medium";
+function validateConfidence(conf: string): 'low' | 'medium' | 'high' {
+  const valid = ['low', 'medium', 'high'];
+  return valid.includes(conf) ? (conf as 'low' | 'medium' | 'high') : 'medium';
 }
 
 // Quick algorithmic check before expensive LLM analysis
@@ -227,12 +222,7 @@ export async function runFullAnalysis(
   marketData: MarketPrice
 ): Promise<FullAnalysisResult | null> {
   // Run sellability analysis
-  const analysis = await analyzeSellability(
-    title,
-    askingPrice,
-    identification,
-    marketData
-  );
+  const analysis = await analyzeSellability(title, askingPrice, identification, marketData);
 
   if (!analysis) {
     return null;

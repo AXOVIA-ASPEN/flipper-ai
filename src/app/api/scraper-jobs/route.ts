@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
-import { getAuthUserId } from "@/lib/auth-middleware";
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/db';
+import { getAuthUserId } from '@/lib/auth-middleware';
 import {
   ScraperJobQuerySchema,
   CreateScraperJobSchema,
   validateQuery,
   validateBody,
-} from "@/lib/validations";
+} from '@/lib/validations';
 
 // GET /api/scraper-jobs - List all scraper jobs
 export async function GET(request: NextRequest) {
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const parsed = validateQuery(ScraperJobQuerySchema, searchParams);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "Invalid query parameters", details: parsed.error },
+        { error: 'Invalid query parameters', details: parsed.error },
         { status: 400 }
       );
     }
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
 
     const jobs = await prisma.scraperJob.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
       take: limit,
     });
 
@@ -44,11 +44,8 @@ export async function GET(request: NextRequest) {
       total: jobs.length,
     });
   } catch (error) {
-    console.error("Error fetching scraper jobs:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch scraper jobs" },
-      { status: 500 }
-    );
+    console.error('Error fetching scraper jobs:', error);
+    return NextResponse.json({ error: 'Failed to fetch scraper jobs' }, { status: 500 });
   }
 }
 
@@ -60,7 +57,7 @@ export async function POST(request: NextRequest) {
     const parsed = validateBody(CreateScraperJobSchema, body);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "Invalid request body", details: parsed.error },
+        { error: 'Invalid request body', details: parsed.error },
         { status: 400 }
       );
     }
@@ -72,16 +69,13 @@ export async function POST(request: NextRequest) {
         platform,
         location: location || null,
         category: category || null,
-        status: "PENDING",
+        status: 'PENDING',
       },
     });
 
     return NextResponse.json(job, { status: 201 });
   } catch (error) {
-    console.error("Error creating scraper job:", error);
-    return NextResponse.json(
-      { error: "Failed to create scraper job" },
-      { status: 500 }
-    );
+    console.error('Error creating scraper job:', error);
+    return NextResponse.json({ error: 'Failed to create scraper job' }, { status: 500 });
   }
 }

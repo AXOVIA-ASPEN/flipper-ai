@@ -1,9 +1,9 @@
 /**
  * Environment Configuration
- * 
+ *
  * Centralized, validated environment variables using Zod.
  * Import `env` from this module instead of accessing process.env directly.
- * 
+ *
  * Usage:
  *   import { env } from '@/lib/env';
  *   const dbUrl = env.DATABASE_URL;
@@ -40,9 +40,18 @@ const envSchema = z.object({
   FLIPPER_API_KEYS: z.string().optional(),
 
   // Feature Flags
-  ENABLE_OAUTH_GOOGLE: z.string().default('false').transform(v => v === 'true' || v === '1'),
-  ENABLE_OAUTH_GITHUB: z.string().default('false').transform(v => v === 'true' || v === '1'),
-  ENABLE_OAUTH_FACEBOOK: z.string().default('false').transform(v => v === 'true' || v === '1'),
+  ENABLE_OAUTH_GOOGLE: z
+    .string()
+    .default('false')
+    .transform((v) => v === 'true' || v === '1'),
+  ENABLE_OAUTH_GITHUB: z
+    .string()
+    .default('false')
+    .transform((v) => v === 'true' || v === '1'),
+  ENABLE_OAUTH_FACEBOOK: z
+    .string()
+    .default('false')
+    .transform((v) => v === 'true' || v === '1'),
 
   // Rate Limiting
   RATE_LIMIT_MAX: z.coerce.number().positive().default(100),
@@ -64,11 +73,13 @@ function parseEnv(): Env {
   const input = {
     ...process.env,
     // Provide test defaults so unit tests don't need full .env
-    ...(isTest ? {
-      DATABASE_URL: process.env.DATABASE_URL || 'file:./test.db',
-      AUTH_SECRET: process.env.AUTH_SECRET || 'test-auth-secret-minimum-16-chars',
-      ENCRYPTION_SECRET: process.env.ENCRYPTION_SECRET || 'test-encryption-secret-min16',
-    } : {}),
+    ...(isTest
+      ? {
+          DATABASE_URL: process.env.DATABASE_URL || 'file:./test.db',
+          AUTH_SECRET: process.env.AUTH_SECRET || 'test-auth-secret-minimum-16-chars',
+          ENCRYPTION_SECRET: process.env.ENCRYPTION_SECRET || 'test-encryption-secret-min16',
+        }
+      : {}),
   };
 
   const result = envSchema.safeParse(input);
@@ -78,13 +89,13 @@ function parseEnv(): Env {
     const message = Object.entries(formatted)
       .map(([key, errors]) => `  ${key}: ${errors?.join(', ')}`)
       .join('\n');
-    
+
     console.error('❌ Invalid environment variables:\n' + message);
-    
+
     if (!isTest) {
       throw new Error('Invalid environment configuration. Check .env file.');
     }
-    
+
     // In test, return partial parse with defaults
     return envSchema.parse({
       ...input,

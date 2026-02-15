@@ -26,7 +26,13 @@ db.pragma('foreign_keys = ON');
 function createTestClient() {
   return {
     listing: {
-      findMany: async (args?: { where?: Record<string, unknown>; orderBy?: Record<string, string>; take?: number; skip?: number; include?: Record<string, boolean> }) => {
+      findMany: async (args?: {
+        where?: Record<string, unknown>;
+        orderBy?: Record<string, string>;
+        take?: number;
+        skip?: number;
+        include?: Record<string, boolean>;
+      }) => {
         let sql = 'SELECT * FROM Listing';
         const params: unknown[] = [];
         const conditions: string[] = [];
@@ -65,7 +71,8 @@ function createTestClient() {
         // Include opportunity relation if requested
         if (args?.include?.opportunity) {
           return rows.map((row: Record<string, unknown>) => {
-            const opportunity = db.prepare('SELECT * FROM Opportunity WHERE listingId = ?').get(row.id) || null;
+            const opportunity =
+              db.prepare('SELECT * FROM Opportunity WHERE listingId = ?').get(row.id) || null;
             return { ...row, opportunity };
           });
         }
@@ -73,19 +80,27 @@ function createTestClient() {
         return rows;
       },
 
-      findUnique: async (args: { where: { id?: string; platform_externalId?: { platform: string; externalId: string } }; include?: Record<string, boolean> }) => {
+      findUnique: async (args: {
+        where: { id?: string; platform_externalId?: { platform: string; externalId: string } };
+        include?: Record<string, boolean>;
+      }) => {
         let row;
         if (args.where.id) {
           row = db.prepare('SELECT * FROM Listing WHERE id = ?').get(args.where.id);
         } else if (args.where.platform_externalId) {
-          row = db.prepare('SELECT * FROM Listing WHERE platform = ? AND externalId = ?').get(
-            args.where.platform_externalId.platform,
-            args.where.platform_externalId.externalId
-          );
+          row = db
+            .prepare('SELECT * FROM Listing WHERE platform = ? AND externalId = ?')
+            .get(
+              args.where.platform_externalId.platform,
+              args.where.platform_externalId.externalId
+            );
         }
 
         if (row && args.include?.opportunity) {
-          const opportunity = db.prepare('SELECT * FROM Opportunity WHERE listingId = ?').get((row as Record<string, unknown>).id) || null;
+          const opportunity =
+            db
+              .prepare('SELECT * FROM Opportunity WHERE listingId = ?')
+              .get((row as Record<string, unknown>).id) || null;
           return { ...row, opportunity };
         }
 
@@ -130,15 +145,20 @@ function createTestClient() {
         return db.prepare('SELECT * FROM Listing WHERE id = ?').get(id);
       },
 
-      upsert: async (args: { where: { platform_externalId: { platform: string; externalId: string } }; create: Record<string, unknown>; update: Record<string, unknown> }) => {
-        const existing = db.prepare('SELECT * FROM Listing WHERE platform = ? AND externalId = ?').get(
-          args.where.platform_externalId.platform,
-          args.where.platform_externalId.externalId
-        );
+      upsert: async (args: {
+        where: { platform_externalId: { platform: string; externalId: string } };
+        create: Record<string, unknown>;
+        update: Record<string, unknown>;
+      }) => {
+        const existing = db
+          .prepare('SELECT * FROM Listing WHERE platform = ? AND externalId = ?')
+          .get(args.where.platform_externalId.platform, args.where.platform_externalId.externalId);
 
         if (existing) {
           const id = (existing as Record<string, unknown>).id;
-          const updates = Object.entries(args.update).map(([key]) => `${key} = ?`).join(', ');
+          const updates = Object.entries(args.update)
+            .map(([key]) => `${key} = ?`)
+            .join(', ');
           const sql = `UPDATE Listing SET ${updates} WHERE id = ?`;
           db.prepare(sql).run(...Object.values(args.update), id);
           return db.prepare('SELECT * FROM Listing WHERE id = ?').get(id);
@@ -157,7 +177,9 @@ function createTestClient() {
       },
 
       update: async (args: { where: { id: string }; data: Record<string, unknown> }) => {
-        const updates = Object.entries(args.data).map(([key]) => `${key} = ?`).join(', ');
+        const updates = Object.entries(args.data)
+          .map(([key]) => `${key} = ?`)
+          .join(', ');
         const sql = `UPDATE Listing SET ${updates} WHERE id = ?`;
         db.prepare(sql).run(...Object.values(args.data), args.where.id);
         return db.prepare('SELECT * FROM Listing WHERE id = ?').get(args.where.id);
@@ -175,7 +197,13 @@ function createTestClient() {
     },
 
     opportunity: {
-      findMany: async (args?: { where?: Record<string, unknown>; orderBy?: Record<string, string>; take?: number; skip?: number; include?: Record<string, boolean> }) => {
+      findMany: async (args?: {
+        where?: Record<string, unknown>;
+        orderBy?: Record<string, string>;
+        take?: number;
+        skip?: number;
+        include?: Record<string, boolean>;
+      }) => {
         let sql = 'SELECT * FROM Opportunity';
         const params: unknown[] = [];
         const conditions: string[] = [];
@@ -208,7 +236,8 @@ function createTestClient() {
 
         if (args?.include?.listing) {
           return rows.map((row: Record<string, unknown>) => {
-            const listing = db.prepare('SELECT * FROM Listing WHERE id = ?').get(row.listingId) || null;
+            const listing =
+              db.prepare('SELECT * FROM Listing WHERE id = ?').get(row.listingId) || null;
             return { ...row, listing };
           });
         }
@@ -216,16 +245,25 @@ function createTestClient() {
         return rows;
       },
 
-      findUnique: async (args: { where: { id?: string; listingId?: string }; include?: Record<string, boolean>; select?: Record<string, boolean> }) => {
+      findUnique: async (args: {
+        where: { id?: string; listingId?: string };
+        include?: Record<string, boolean>;
+        select?: Record<string, boolean>;
+      }) => {
         let row;
         if (args.where.id) {
           row = db.prepare('SELECT * FROM Opportunity WHERE id = ?').get(args.where.id);
         } else if (args.where.listingId) {
-          row = db.prepare('SELECT * FROM Opportunity WHERE listingId = ?').get(args.where.listingId);
+          row = db
+            .prepare('SELECT * FROM Opportunity WHERE listingId = ?')
+            .get(args.where.listingId);
         }
 
         if (row && args.include?.listing) {
-          const listing = db.prepare('SELECT * FROM Listing WHERE id = ?').get((row as Record<string, unknown>).listingId) || null;
+          const listing =
+            db
+              .prepare('SELECT * FROM Listing WHERE id = ?')
+              .get((row as Record<string, unknown>).listingId) || null;
           return { ...row, listing };
         }
 
@@ -233,19 +271,30 @@ function createTestClient() {
       },
 
       count: async () => {
-        const result = db.prepare('SELECT COUNT(*) as count FROM Opportunity').get() as { count: number };
+        const result = db.prepare('SELECT COUNT(*) as count FROM Opportunity').get() as {
+          count: number;
+        };
         return result.count;
       },
 
       aggregate: async () => {
-        const result = db.prepare(`
+        const result = db
+          .prepare(
+            `
           SELECT
             COUNT(*) as count,
             COALESCE(SUM(actualProfit), 0) as sumActualProfit,
             COALESCE(SUM(purchasePrice), 0) as sumPurchasePrice,
             COALESCE(SUM(resalePrice), 0) as sumResalePrice
           FROM Opportunity
-        `).get() as { count: number; sumActualProfit: number; sumPurchasePrice: number; sumResalePrice: number };
+        `
+          )
+          .get() as {
+          count: number;
+          sumActualProfit: number;
+          sumPurchasePrice: number;
+          sumResalePrice: number;
+        };
 
         return {
           _count: result.count,
@@ -257,7 +306,10 @@ function createTestClient() {
         };
       },
 
-      create: async (args: { data: Record<string, unknown>; include?: Record<string, boolean> }) => {
+      create: async (args: {
+        data: Record<string, unknown>;
+        include?: Record<string, boolean>;
+      }) => {
         const id = `cltest${Date.now()}${Math.random().toString(36).slice(2)}`;
         const now = new Date().toISOString();
         const data = { id, createdAt: now, updatedAt: now, ...args.data };
@@ -271,24 +323,36 @@ function createTestClient() {
         const row = db.prepare('SELECT * FROM Opportunity WHERE id = ?').get(id);
 
         if (args.include?.listing) {
-          const listing = db.prepare('SELECT * FROM Listing WHERE id = ?').get((row as Record<string, unknown>).listingId) || null;
+          const listing =
+            db
+              .prepare('SELECT * FROM Listing WHERE id = ?')
+              .get((row as Record<string, unknown>).listingId) || null;
           return { ...row, listing };
         }
 
         return row;
       },
 
-      update: async (args: { where: { id: string }; data: Record<string, unknown>; include?: Record<string, boolean> }) => {
+      update: async (args: {
+        where: { id: string };
+        data: Record<string, unknown>;
+        include?: Record<string, boolean>;
+      }) => {
         const now = new Date().toISOString();
         const data = { ...args.data, updatedAt: now };
-        const updates = Object.entries(data).map(([key]) => `${key} = ?`).join(', ');
+        const updates = Object.entries(data)
+          .map(([key]) => `${key} = ?`)
+          .join(', ');
         const sql = `UPDATE Opportunity SET ${updates} WHERE id = ?`;
         db.prepare(sql).run(...Object.values(data), args.where.id);
 
         const row = db.prepare('SELECT * FROM Opportunity WHERE id = ?').get(args.where.id);
 
         if (args.include?.listing) {
-          const listing = db.prepare('SELECT * FROM Listing WHERE id = ?').get((row as Record<string, unknown>).listingId) || null;
+          const listing =
+            db
+              .prepare('SELECT * FROM Listing WHERE id = ?')
+              .get((row as Record<string, unknown>).listingId) || null;
           return { ...row, listing };
         }
 
@@ -307,7 +371,11 @@ function createTestClient() {
     },
 
     scraperJob: {
-      findMany: async (args?: { where?: Record<string, unknown>; orderBy?: Record<string, string>; take?: number }) => {
+      findMany: async (args?: {
+        where?: Record<string, unknown>;
+        orderBy?: Record<string, string>;
+        take?: number;
+      }) => {
         let sql = 'SELECT * FROM ScraperJob';
         const params: unknown[] = [];
         const conditions: string[] = [];
@@ -353,7 +421,9 @@ function createTestClient() {
       },
 
       update: async (args: { where: { id: string }; data: Record<string, unknown> }) => {
-        const updates = Object.entries(args.data).map(([key]) => `${key} = ?`).join(', ');
+        const updates = Object.entries(args.data)
+          .map(([key]) => `${key} = ?`)
+          .join(', ');
         const sql = `UPDATE ScraperJob SET ${updates} WHERE id = ?`;
         db.prepare(sql).run(...Object.values(args.data), args.where.id);
         return db.prepare('SELECT * FROM ScraperJob WHERE id = ?').get(args.where.id);
@@ -371,7 +441,10 @@ function createTestClient() {
     },
 
     searchConfig: {
-      findMany: async (args?: { where?: { enabled?: boolean }; orderBy?: Record<string, string> }) => {
+      findMany: async (args?: {
+        where?: { enabled?: boolean };
+        orderBy?: Record<string, string>;
+      }) => {
         let sql = 'SELECT * FROM SearchConfig';
         const params: unknown[] = [];
 
@@ -406,7 +479,10 @@ function createTestClient() {
         const sql = `INSERT INTO SearchConfig (${keys.join(', ')}) VALUES (${placeholders})`;
 
         db.prepare(sql).run(...Object.values(data));
-        const row = db.prepare('SELECT * FROM SearchConfig WHERE id = ?').get(id) as Record<string, unknown>;
+        const row = db.prepare('SELECT * FROM SearchConfig WHERE id = ?').get(id) as Record<
+          string,
+          unknown
+        >;
         // Convert enabled back to boolean
         return { ...row, enabled: Boolean(row.enabled) };
       },
@@ -418,10 +494,14 @@ function createTestClient() {
         if (typeof data.enabled === 'boolean') {
           data.enabled = data.enabled ? 1 : 0;
         }
-        const updates = Object.entries(data).map(([key]) => `${key} = ?`).join(', ');
+        const updates = Object.entries(data)
+          .map(([key]) => `${key} = ?`)
+          .join(', ');
         const sql = `UPDATE SearchConfig SET ${updates} WHERE id = ?`;
         db.prepare(sql).run(...Object.values(data), args.where.id);
-        const row = db.prepare('SELECT * FROM SearchConfig WHERE id = ?').get(args.where.id) as Record<string, unknown>;
+        const row = db
+          .prepare('SELECT * FROM SearchConfig WHERE id = ?')
+          .get(args.where.id) as Record<string, unknown>;
         // Convert enabled back to boolean
         return { ...row, enabled: Boolean(row.enabled) };
       },

@@ -193,7 +193,9 @@ describe('Listings [id] API Integration Tests', () => {
         method: 'DELETE',
       });
 
-      const response = await DELETE(request, { params: Promise.resolve({ id: 'non-existent-id' }) });
+      const response = await DELETE(request, {
+        params: Promise.resolve({ id: 'non-existent-id' }),
+      });
 
       expect(response.status).toBe(500); // Prisma throws on delete of non-existent
     });

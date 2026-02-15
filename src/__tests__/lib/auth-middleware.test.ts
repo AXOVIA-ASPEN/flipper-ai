@@ -51,9 +51,7 @@ describe('Auth Middleware', () => {
       };
       mockAuth.mockResolvedValue(mockSession);
 
-      const mockHandler = jest.fn().mockResolvedValue(
-        NextResponse.json({ success: true })
-      );
+      const mockHandler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
 
       const wrappedHandler = withAuth(mockHandler);
       const req = new NextRequest('http://localhost:3000/api/test');
@@ -122,9 +120,7 @@ describe('Auth Middleware', () => {
         expires: new Date(Date.now() + 86400000).toISOString(),
       });
 
-      const mockHandler = jest.fn().mockResolvedValue(
-        NextResponse.json({ success: true })
-      );
+      const mockHandler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
 
       const wrappedHandler = withAuth(mockHandler);
       const req = new NextRequest('http://localhost:3000/api/test');

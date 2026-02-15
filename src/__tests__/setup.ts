@@ -84,7 +84,7 @@ const mockPrisma = {
   verificationToken: mockModel(),
   $connect: jest.fn(),
   $disconnect: jest.fn(),
-  $transaction: jest.fn((fn: any) => typeof fn === 'function' ? fn(mockPrisma) : Promise.all(fn)),
+  $transaction: jest.fn((fn: any) => (typeof fn === 'function' ? fn(mockPrisma) : Promise.all(fn))),
   $queryRaw: jest.fn().mockResolvedValue([]),
   $executeRaw: jest.fn().mockResolvedValue(0),
 };

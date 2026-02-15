@@ -3,21 +3,21 @@
  * Author: Stephen Boyett
  * Company: Axovia AI
  * Created: 2026-02-03
- * 
+ *
  * Provides API endpoints for scraping Mercari listings.
  * Mercari doesn't have a public API, so this uses their internal
  * search API with proper headers to mimic browser requests.
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
-import { estimateValue, detectCategory, generatePurchaseMessage } from "@/lib/value-estimator";
-import { getAuthUserId } from "@/lib/auth-middleware";
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/db';
+import { estimateValue, detectCategory, generatePurchaseMessage } from '@/lib/value-estimator';
+import { getAuthUserId } from '@/lib/auth-middleware';
 
 // Mercari API configuration
-const MERCARI_API_BASE_URL = "https://www.mercari.com/v1/api";
-const MERCARI_SEARCH_URL = "https://www.mercari.com/search/";
-const API_VERSION = "2.0";
+const MERCARI_API_BASE_URL = 'https://www.mercari.com/v1/api';
+const MERCARI_SEARCH_URL = 'https://www.mercari.com/search/';
+const API_VERSION = '2.0';
 
 // Default pagination
 const DEFAULT_LIMIT = 20;
@@ -25,36 +25,36 @@ const MAX_LIMIT = 50;
 
 // Supported categories on Mercari
 const SUPPORTED_CATEGORIES = [
-  { id: "1", label: "Women" },
-  { id: "2", label: "Men" },
-  { id: "3", label: "Electronics" },
-  { id: "4", label: "Home" },
-  { id: "5", label: "Beauty" },
-  { id: "6", label: "Sports & Outdoors" },
-  { id: "7", label: "Toys & Collectibles" },
-  { id: "8", label: "Handmade" },
-  { id: "9", label: "Pet Supplies" },
-  { id: "10", label: "Office" },
+  { id: '1', label: 'Women' },
+  { id: '2', label: 'Men' },
+  { id: '3', label: 'Electronics' },
+  { id: '4', label: 'Home' },
+  { id: '5', label: 'Beauty' },
+  { id: '6', label: 'Sports & Outdoors' },
+  { id: '7', label: 'Toys & Collectibles' },
+  { id: '8', label: 'Handmade' },
+  { id: '9', label: 'Pet Supplies' },
+  { id: '10', label: 'Office' },
 ];
 
 // Supported conditions
 const SUPPORTED_CONDITIONS = [
-  { id: "1", label: "New with tags" },
-  { id: "2", label: "New without tags" },
-  { id: "3", label: "Very good" },
-  { id: "4", label: "Good" },
-  { id: "5", label: "Fair" },
-  { id: "6", label: "Poor" },
+  { id: '1', label: 'New with tags' },
+  { id: '2', label: 'New without tags' },
+  { id: '3', label: 'Very good' },
+  { id: '4', label: 'Good' },
+  { id: '5', label: 'Fair' },
+  { id: '6', label: 'Poor' },
 ];
 
 // Mercari condition ID to display name mapping
 const CONDITION_MAP: Record<string, string> = {
-  "1": "New with tags",
-  "2": "New without tags", 
-  "3": "Very good",
-  "4": "Good",
-  "5": "Fair",
-  "6": "Poor",
+  '1': 'New with tags',
+  '2': 'New without tags',
+  '3': 'Very good',
+  '4': 'Good',
+  '5': 'Fair',
+  '6': 'Poor',
 };
 
 // Mercari search response types
@@ -100,7 +100,7 @@ interface ScrapeRequestBody {
   minPrice?: number;
   maxPrice?: number;
   limit?: number;
-  sortBy?: "created_time" | "price_asc" | "price_desc" | "num_likes";
+  sortBy?: 'created_time' | 'price_asc' | 'price_desc' | 'num_likes';
 }
 
 /**
@@ -108,19 +108,20 @@ interface ScrapeRequestBody {
  */
 function buildMercariHeaders(): Record<string, string> {
   return {
-    "Accept": "application/json, text/plain, */*",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Cache-Control": "no-cache",
-    "Content-Type": "application/json",
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-    "Referer": "https://www.mercari.com/",
-    "Origin": "https://www.mercari.com",
-    "X-Platform": "web",
-    "X-Requested-With": "XMLHttpRequest",
-    "Pragma": "no-cache",
-    "Sec-Fetch-Dest": "empty",
-    "Sec-Fetch-Mode": "cors",
-    "Sec-Fetch-Site": "same-origin",
+    Accept: 'application/json, text/plain, */*',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Cache-Control': 'no-cache',
+    'Content-Type': 'application/json',
+    'User-Agent':
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+    Referer: 'https://www.mercari.com/',
+    Origin: 'https://www.mercari.com',
+    'X-Platform': 'web',
+    'X-Requested-With': 'XMLHttpRequest',
+    Pragma: 'no-cache',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-origin',
   };
 }
 
@@ -129,41 +130,45 @@ function buildMercariHeaders(): Record<string, string> {
  */
 async function callMercariApi(
   endpoint: string,
-  method: "GET" | "POST" = "GET",
+  method: 'GET' | 'POST' = 'GET',
   body?: Record<string, unknown>
 ): Promise<MercariSearchResponse> {
   const url = `${MERCARI_API_BASE_URL}${endpoint}`;
-  
+
   const options: RequestInit = {
     method,
     headers: buildMercariHeaders(),
-    cache: "no-store",
+    cache: 'no-store',
   };
 
-  if (body && method === "POST") {
+  if (body && method === 'POST') {
     options.body = JSON.stringify(body);
   }
 
   try {
     const response = await fetch(url, options);
-    
+
     if (!response.ok) {
       // Mercari may return HTML for rate limiting or blocks
-      const contentType = response.headers.get("content-type");
-      if (contentType?.includes("text/html")) {
-        throw new Error(`Mercari returned HTML (possible rate limit or block). Status: ${response.status}`);
+      const contentType = response.headers.get('content-type');
+      if (contentType?.includes('text/html')) {
+        throw new Error(
+          `Mercari returned HTML (possible rate limit or block). Status: ${response.status}`
+        );
       }
-      
+
       const errorText = await response.text();
       throw new Error(`Mercari API error (${response.status}): ${errorText.slice(0, 500)}`);
     }
 
     return await response.json();
   } catch (error) {
-    if (error instanceof Error && error.message.includes("Mercari")) {
+    if (error instanceof Error && error.message.includes('Mercari')) {
       throw error;
     }
-    throw new Error(`Failed to fetch from Mercari: ${error instanceof Error ? error.message : "Unknown error"}`);
+    throw new Error(
+      `Failed to fetch from Mercari: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }
 
@@ -173,56 +178,56 @@ async function callMercariApi(
  */
 async function scrapeMercariSearch(params: ScrapeRequestBody): Promise<MercariItem[]> {
   const searchParams = new URLSearchParams();
-  
+
   if (params.keywords) {
-    searchParams.set("keyword", params.keywords);
+    searchParams.set('keyword', params.keywords);
   }
   if (params.categoryId) {
-    searchParams.set("categoryIds", params.categoryId);
+    searchParams.set('categoryIds', params.categoryId);
   }
   if (params.condition) {
-    searchParams.set("itemConditionId", params.condition);
+    searchParams.set('itemConditionId', params.condition);
   }
   if (params.minPrice !== undefined) {
-    searchParams.set("minPrice", String(params.minPrice));
+    searchParams.set('minPrice', String(params.minPrice));
   }
   if (params.maxPrice !== undefined) {
-    searchParams.set("maxPrice", String(params.maxPrice));
+    searchParams.set('maxPrice', String(params.maxPrice));
   }
-  
+
   // Sort options: created_time (newest), price_asc, price_desc, num_likes
-  const sortBy = params.sortBy || "created_time";
-  searchParams.set("sortBy", sortBy);
-  
+  const sortBy = params.sortBy || 'created_time';
+  searchParams.set('sortBy', sortBy);
+
   // Only show items for sale
-  searchParams.set("itemStatuses", "on_sale");
+  searchParams.set('itemStatuses', 'on_sale');
 
   const url = `${MERCARI_SEARCH_URL}?${searchParams.toString()}`;
 
   try {
     // Try the internal search API endpoint
-    const apiResponse = await callMercariApi("/search", "POST", {
-      keyword: params.keywords || "",
+    const apiResponse = await callMercariApi('/search', 'POST', {
+      keyword: params.keywords || '',
       categoryId: params.categoryId ? [params.categoryId] : [],
       itemConditionId: params.condition ? [params.condition] : [],
       priceMin: params.minPrice,
       priceMax: params.maxPrice,
       sort: sortBy,
-      status: ["on_sale"],
+      status: ['on_sale'],
       length: Math.min(params.limit || DEFAULT_LIMIT, MAX_LIMIT),
     });
 
     return apiResponse.data || apiResponse.items || [];
   } catch (apiError) {
     // Don't retry if rate limited - propagate the error
-    const errorMsg = apiError instanceof Error ? apiError.message : "";
-    if (errorMsg.includes("rate limit") || errorMsg.includes("429") || errorMsg.includes("block")) {
+    const errorMsg = apiError instanceof Error ? apiError.message : '';
+    if (errorMsg.includes('rate limit') || errorMsg.includes('429') || errorMsg.includes('block')) {
       throw apiError;
     }
-    
+
     // If API fails for other reasons, try web scraping as fallback
-    console.warn("Mercari API failed, attempting web scrape fallback");
-    
+    console.warn('Mercari API failed, attempting web scrape fallback');
+
     const response = await fetch(url, {
       headers: buildMercariHeaders(),
     });
@@ -233,7 +238,7 @@ async function scrapeMercariSearch(params: ScrapeRequestBody): Promise<MercariIt
 
     // For web scraping, we'd need to parse HTML - return empty for now
     // In production, you'd use Playwright or similar for JS-rendered content
-    console.warn("Mercari web scrape fallback not implemented - requires browser automation");
+    console.warn('Mercari web scrape fallback not implemented - requires browser automation');
     return [];
   }
 }
@@ -253,17 +258,17 @@ async function fetchMercariListings(params: ScrapeRequestBody): Promise<MercariI
  */
 async function fetchSoldListings(params: ScrapeRequestBody): Promise<MercariItem[]> {
   try {
-    const apiResponse = await callMercariApi("/search", "POST", {
-      keyword: params.keywords || "",
+    const apiResponse = await callMercariApi('/search', 'POST', {
+      keyword: params.keywords || '',
       categoryId: params.categoryId ? [params.categoryId] : [],
-      status: ["sold_out"], // Only sold items
-      sort: "created_time",
+      status: ['sold_out'], // Only sold items
+      sort: 'created_time',
       length: 10,
     });
 
     return apiResponse.data || apiResponse.items || [];
   } catch {
-    console.warn("Failed to fetch sold Mercari listings for price history");
+    console.warn('Failed to fetch sold Mercari listings for price history');
     return [];
   }
 }
@@ -289,13 +294,13 @@ function formatLocation(item: MercariItem): string | null {
  */
 function collectImageUrls(item: MercariItem): string[] {
   const urls: string[] = [];
-  
+
   if (item.photos?.length) {
     urls.push(...item.photos);
   } else if (item.thumbnails?.length) {
     urls.push(...item.thumbnails);
   }
-  
+
   return urls.filter(Boolean);
 }
 
@@ -304,12 +309,12 @@ function collectImageUrls(item: MercariItem): string[] {
  */
 function buildSellerNote(item: MercariItem): string | null {
   if (!item.seller?.ratings) return null;
-  
+
   const { good = 0, normal = 0, bad = 0 } = item.seller.ratings;
   const total = good + normal + bad;
-  
-  if (total === 0) return "New seller (no ratings)";
-  
+
+  if (total === 0) return 'New seller (no ratings)';
+
   const positivePercent = Math.round((good / total) * 100);
   return `Seller: ${item.seller.name} - ${positivePercent}% positive (${total} ratings)`;
 }
@@ -317,40 +322,30 @@ function buildSellerNote(item: MercariItem): string | null {
 /**
  * Saves a Mercari listing to the database
  */
-async function saveListingFromMercariItem(
-  item: MercariItem,
-  userId: string
-) {
+async function saveListingFromMercariItem(item: MercariItem, userId: string) {
   const itemUrl = `https://www.mercari.com/us/item/${item.id}/`;
-  const description = item.description || "";
+  const description = item.description || '';
   const condition = normalizeCondition(item);
-  
+
   // Detect category
-  const category = item.rootCategory?.name ||
-    detectCategory(item.name, description) ||
-    "other";
+  const category = item.rootCategory?.name || detectCategory(item.name, description) || 'other';
 
   // Get value estimation
-  const estimation = estimateValue(
-    item.name,
-    description,
-    item.price,
-    condition || null,
-    category
-  );
+  const estimation = estimateValue(item.name, description, item.price, condition || null, category);
 
   // Build notes
   const sellerNote = buildSellerNote(item);
-  const shippingNote = item.shippingPayer?.name === "Seller" 
-    ? "Free shipping" 
-    : item.shippingPayer?.name 
-      ? `Buyer pays shipping (${item.shippingMethod?.name || "standard"})`
-      : null;
+  const shippingNote =
+    item.shippingPayer?.name === 'Seller'
+      ? 'Free shipping'
+      : item.shippingPayer?.name
+        ? `Buyer pays shipping (${item.shippingMethod?.name || 'standard'})`
+        : null;
   const brandNote = item.itemBrand?.name ? `Brand: ${item.itemBrand.name}` : null;
-  
+
   const combinedNotes = [estimation.notes, sellerNote, shippingNote, brandNote]
     .filter(Boolean)
-    .join("\n")
+    .join('\n')
     .trim();
 
   // Generate purchase message
@@ -365,21 +360,21 @@ async function saveListingFromMercariItem(
   // Collect images
   const imageUrls = collectImageUrls(item);
   const serializedImages = imageUrls.length ? JSON.stringify(imageUrls) : null;
-  
+
   const tags = JSON.stringify(estimation.tags);
-  const status = estimation.valueScore >= 70 ? "OPPORTUNITY" : "NEW";
+  const status = estimation.valueScore >= 70 ? 'OPPORTUNITY' : 'NEW';
 
   // Determine posted date
-  const postedAt = item.created 
-    ? new Date(item.created * 1000) 
-    : item.updated 
+  const postedAt = item.created
+    ? new Date(item.created * 1000)
+    : item.updated
       ? new Date(item.updated * 1000)
       : null;
 
   const savedListing = await prisma.listing.upsert({
     where: {
       platform_externalId_userId: {
-        platform: "MERCARI",
+        platform: 'MERCARI',
         externalId: item.id,
         userId,
       },
@@ -387,7 +382,7 @@ async function saveListingFromMercariItem(
     create: {
       userId,
       externalId: item.id,
-      platform: "MERCARI",
+      platform: 'MERCARI',
       url: itemUrl,
       title: item.name,
       description,
@@ -463,7 +458,7 @@ async function storePriceHistoryRecords(
       return {
         productName: item.name || keywords,
         category: item.rootCategory?.name || null,
-        platform: "MERCARI",
+        platform: 'MERCARI',
         soldPrice: item.price,
         condition: normalizeCondition(item),
         soldAt: item.updated
@@ -492,13 +487,14 @@ async function storePriceHistoryRecords(
  */
 export async function GET() {
   return NextResponse.json({
-    platform: "mercari",
-    status: "ready",
+    platform: 'mercari',
+    status: 'ready',
     apiVersion: API_VERSION,
     supportedCategories: SUPPORTED_CATEGORIES,
     supportedConditions: SUPPORTED_CONDITIONS,
-    notes: "Mercari scraper uses internal API. May be rate-limited for large volume requests. Supports keyword search, category filtering, condition filtering, and price range filtering.",
-    sortOptions: ["created_time", "price_asc", "price_desc", "num_likes"],
+    notes:
+      'Mercari scraper uses internal API. May be rate-limited for large volume requests. Supports keyword search, category filtering, condition filtering, and price range filtering.',
+    sortOptions: ['created_time', 'price_asc', 'price_desc', 'num_likes'],
   });
 }
 
@@ -510,15 +506,12 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const body: ScrapeRequestBody = await request.json();
 
     if (!body.keywords || body.keywords.trim().length === 0) {
-      return NextResponse.json(
-        { error: "keywords is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'keywords is required' }, { status: 400 });
     }
 
     const sanitizedLimit = Math.min(body.limit ?? DEFAULT_LIMIT, MAX_LIMIT);
@@ -532,10 +525,10 @@ export async function POST(request: NextRequest) {
     const scraperJob = await prisma.scraperJob.create({
       data: {
         userId,
-        platform: "MERCARI",
-        location: "remote",
+        platform: 'MERCARI',
+        location: 'remote',
         category: body.categoryId || null,
-        status: "RUNNING",
+        status: 'RUNNING',
         startedAt: new Date(),
       },
     });
@@ -569,18 +562,17 @@ export async function POST(request: NextRequest) {
       await prisma.scraperJob.update({
         where: { id: scraperJob.id },
         data: {
-          status: "COMPLETED",
+          status: 'COMPLETED',
           listingsFound: savedListings.length,
-          opportunitiesFound: savedListings.filter(
-            (listing) => listing.status === "OPPORTUNITY"
-          ).length,
+          opportunitiesFound: savedListings.filter((listing) => listing.status === 'OPPORTUNITY')
+            .length,
           completedAt: new Date(),
         },
       });
 
       return NextResponse.json({
         success: true,
-        platform: "MERCARI",
+        platform: 'MERCARI',
         listingsSaved: savedListings.length,
         priceHistorySaved,
         listings: savedListings,
@@ -590,26 +582,25 @@ export async function POST(request: NextRequest) {
       await prisma.scraperJob.update({
         where: { id: scraperJob.id },
         data: {
-          status: "FAILED",
-          errorMessage:
-            error instanceof Error ? error.message : "Unknown Mercari error",
+          status: 'FAILED',
+          errorMessage: error instanceof Error ? error.message : 'Unknown Mercari error',
           completedAt: new Date(),
         },
       });
       throw error;
     }
   } catch (error) {
-    console.error("Error running Mercari scraper:", error);
-    
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    const isRateLimited = errorMessage.includes("rate limit") || errorMessage.includes("block");
-    
+    console.error('Error running Mercari scraper:', error);
+
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const isRateLimited = errorMessage.includes('rate limit') || errorMessage.includes('block');
+
     return NextResponse.json(
       {
-        error: "Failed to scrape Mercari listings",
+        error: 'Failed to scrape Mercari listings',
         details: errorMessage,
         suggestion: isRateLimited
-          ? "Mercari may be rate limiting requests. Try again in a few minutes or reduce request frequency."
+          ? 'Mercari may be rate limiting requests. Try again in a few minutes or reduce request frequency.'
           : undefined,
       },
       { status: isRateLimited ? 429 : 500 }

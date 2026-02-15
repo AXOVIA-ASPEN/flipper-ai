@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from '@/contexts/ThemeContext';
 
 /**
  * Component that injects dynamic CSS variables based on the current theme
@@ -13,84 +13,84 @@ export function ThemeStyles() {
   // Map Tailwind color names to actual hex values
   const colorMap: Record<string, string> = {
     // Purple shades
-    "purple-400": "#c084fc",
-    "purple-500": "#a855f7",
-    "purple-600": "#9333ea",
-    "purple-700": "#7e22ce",
-    
+    'purple-400': '#c084fc',
+    'purple-500': '#a855f7',
+    'purple-600': '#9333ea',
+    'purple-700': '#7e22ce',
+
     // Pink shades
-    "pink-400": "#f472b6",
-    "pink-500": "#ec4899",
-    "pink-600": "#db2777",
-    "pink-700": "#be185d",
-    
+    'pink-400': '#f472b6',
+    'pink-500': '#ec4899',
+    'pink-600': '#db2777',
+    'pink-700': '#be185d',
+
     // Blue shades
-    "blue-400": "#60a5fa",
-    "blue-500": "#3b82f6",
-    "blue-600": "#2563eb",
-    "blue-700": "#1d4ed8",
-    
+    'blue-400': '#60a5fa',
+    'blue-500': '#3b82f6',
+    'blue-600': '#2563eb',
+    'blue-700': '#1d4ed8',
+
     // Cyan shades
-    "cyan-400": "#22d3ee",
-    "cyan-500": "#06b6d4",
-    "cyan-600": "#0891b2",
-    
+    'cyan-400': '#22d3ee',
+    'cyan-500': '#06b6d4',
+    'cyan-600': '#0891b2',
+
     // Teal shades
-    "teal-400": "#2dd4bf",
-    "teal-500": "#14b8a6",
-    "teal-600": "#0d9488",
-    
+    'teal-400': '#2dd4bf',
+    'teal-500': '#14b8a6',
+    'teal-600': '#0d9488',
+
     // Green shades
-    "green-400": "#4ade80",
-    "green-500": "#22c55e",
-    "green-600": "#16a34a",
-    
+    'green-400': '#4ade80',
+    'green-500': '#22c55e',
+    'green-600': '#16a34a',
+
     // Emerald shades
-    "emerald-400": "#34d399",
-    "emerald-600": "#059669",
-    
+    'emerald-400': '#34d399',
+    'emerald-600': '#059669',
+
     // Lime shades
-    "lime-400": "#a3e635",
-    "lime-500": "#84cc16",
-    
+    'lime-400': '#a3e635',
+    'lime-500': '#84cc16',
+
     // Yellow shades
-    "yellow-400": "#facc15",
-    "yellow-500": "#eab308",
-    
+    'yellow-400': '#facc15',
+    'yellow-500': '#eab308',
+
     // Orange shades
-    "orange-400": "#fb923c",
-    "orange-500": "#f97316",
-    "orange-600": "#ea580c",
-    
+    'orange-400': '#fb923c',
+    'orange-500': '#f97316',
+    'orange-600': '#ea580c',
+
     // Red shades
-    "red-500": "#ef4444",
-    "red-600": "#dc2626",
-    
+    'red-500': '#ef4444',
+    'red-600': '#dc2626',
+
     // Indigo shades
-    "indigo-400": "#818cf8",
-    "indigo-500": "#6366f1",
-    "indigo-600": "#4f46e5",
-    "indigo-700": "#4338ca",
-    
+    'indigo-400': '#818cf8',
+    'indigo-500': '#6366f1',
+    'indigo-600': '#4f46e5',
+    'indigo-700': '#4338ca',
+
     // Violet shades
-    "violet-400": "#a78bfa",
-    "violet-500": "#8b5cf6",
-    
+    'violet-400': '#a78bfa',
+    'violet-500': '#8b5cf6',
+
     // Fuchsia shades
-    "fuchsia-400": "#e879f9",
-    "fuchsia-500": "#d946ef",
-    "fuchsia-600": "#c026d3",
-    
+    'fuchsia-400': '#e879f9',
+    'fuchsia-500': '#d946ef',
+    'fuchsia-600': '#c026d3',
+
     // Rose shades
-    "rose-500": "#f43f5e",
-    "rose-600": "#e11d48",
-    
+    'rose-500': '#f43f5e',
+    'rose-600': '#e11d48',
+
     // Sky shades
-    "sky-400": "#38bdf8",
+    'sky-400': '#38bdf8',
   };
 
   const getColor = (colorName: string): string => {
-    return colorMap[colorName] || "#a855f7"; // fallback to purple-500
+    return colorMap[colorName] || '#a855f7'; // fallback to purple-500
   };
 
   return (
@@ -115,4 +115,3 @@ export function ThemeStyles() {
     `}</style>
   );
 }
-

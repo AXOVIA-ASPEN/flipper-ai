@@ -31,14 +31,19 @@ Given('I have an active scan running', async function (this: CustomWorld) {
   console.log('✅ Active scan running');
 });
 
-When('a listing appears with flippability score > {int}', async function (this: CustomWorld, score: number) {
-  this.testData.newListingScore = score + 5; // e.g., 90
-  // Mock notification event via page evaluate
-  await this.page.evaluate((s) => {
-    window.dispatchEvent(new CustomEvent('flipper:new-opportunity', { detail: { score: s } }));
-  }, this.testData.newListingScore).catch(() => {});
-  console.log(`✅ High-score listing appeared (score: ${this.testData.newListingScore})`);
-});
+When(
+  'a listing appears with flippability score > {int}',
+  async function (this: CustomWorld, score: number) {
+    this.testData.newListingScore = score + 5; // e.g., 90
+    // Mock notification event via page evaluate
+    await this.page
+      .evaluate((s) => {
+        window.dispatchEvent(new CustomEvent('flipper:new-opportunity', { detail: { score: s } }));
+      }, this.testData.newListingScore)
+      .catch(() => {});
+    console.log(`✅ High-score listing appeared (score: ${this.testData.newListingScore})`);
+  }
+);
 
 Then('I should see a browser notification', async function (this: CustomWorld) {
   await this.screenshot('browser-notification');
@@ -82,9 +87,12 @@ Then('the email should include:', async function (this: CustomWorld, dataTable: 
   console.log('✅ Email contents verified');
 });
 
-Then('clicking {string} should open the conversation', async function (this: CustomWorld, linkText: string) {
-  console.log(`✅ "${linkText}" link opens conversation`);
-});
+Then(
+  'clicking {string} should open the conversation',
+  async function (this: CustomWorld, linkText: string) {
+    console.log(`✅ "${linkText}" link opens conversation`);
+  }
+);
 
 // ==================== SLACK/DISCORD INTEGRATION ====================
 
@@ -117,15 +125,21 @@ Then('the message should include:', async function (this: CustomWorld, dataTable
 
 // ==================== PRICE DROP ALERTS ====================
 
-Given('I am watching a listing priced at ${int}', async function (this: CustomWorld, price: number) {
-  this.testData.watchedPrice = price;
-  console.log(`✅ Watching listing at $${price}`);
-});
+Given(
+  'I am watching a listing priced at ${int}',
+  async function (this: CustomWorld, price: number) {
+    this.testData.watchedPrice = price;
+    console.log(`✅ Watching listing at $${price}`);
+  }
+);
 
-Given('the seller has not reduced the price in {int} days', async function (this: CustomWorld, days: number) {
-  this.testData.daysSinceLastDrop = days;
-  console.log(`✅ No price change in ${days} days`);
-});
+Given(
+  'the seller has not reduced the price in {int} days',
+  async function (this: CustomWorld, days: number) {
+    this.testData.daysSinceLastDrop = days;
+    console.log(`✅ No price change in ${days} days`);
+  }
+);
 
 When('the seller drops the price to ${int}', async function (this: CustomWorld, newPrice: number) {
   this.testData.newPrice = newPrice;
@@ -175,14 +189,20 @@ Then('the subject should be {string}', async function (this: CustomWorld, subjec
   console.log(`✅ Subject: "${subject}"`);
 });
 
-Then('the opportunity should be moved to {string}', async function (this: CustomWorld, list: string) {
-  console.log(`✅ Opportunity moved to "${list}"`);
-});
+Then(
+  'the opportunity should be moved to {string}',
+  async function (this: CustomWorld, list: string) {
+    console.log(`✅ Opportunity moved to "${list}"`);
+  }
+);
 
-Then('I should see analytics on how many opportunities I\'ve missed', async function (this: CustomWorld) {
-  await this.screenshot('missed-opportunities-analytics');
-  console.log('✅ Missed opportunities analytics displayed');
-});
+Then(
+  "I should see analytics on how many opportunities I've missed",
+  async function (this: CustomWorld) {
+    await this.screenshot('missed-opportunities-analytics');
+    console.log('✅ Missed opportunities analytics displayed');
+  }
+);
 
 // ==================== LISTING EXPIRATION ====================
 
@@ -266,18 +286,25 @@ Then('I should see a {string} link', async function (this: CustomWorld, linkText
 
 // ==================== IN-APP NOTIFICATION CENTER ====================
 
-Given('I have received {int} notifications today', async function (this: CustomWorld, count: number) {
-  this.testData.notificationCount = count;
-  console.log(`✅ ${count} notifications received today`);
-});
+Given(
+  'I have received {int} notifications today',
+  async function (this: CustomWorld, count: number) {
+    this.testData.notificationCount = count;
+    console.log(`✅ ${count} notifications received today`);
+  }
+);
 
-Given('I haven\'t viewed them all', async function (this: CustomWorld) {
+Given("I haven't viewed them all", async function (this: CustomWorld) {
   this.testData.unreadNotifications = true;
   console.log('✅ Unread notifications present');
 });
 
 When('I click the notification bell icon', async function (this: CustomWorld) {
-  const bell = this.page.locator('[data-testid="notification-bell"], .notification-bell, button[aria-label*="notification"]').first();
+  const bell = this.page
+    .locator(
+      '[data-testid="notification-bell"], .notification-bell, button[aria-label*="notification"]'
+    )
+    .first();
   if (await bell.isVisible().catch(() => false)) {
     await bell.click();
   }
@@ -304,10 +331,13 @@ Then('I should be able to:', async function (this: CustomWorld, dataTable: any) 
 
 // ==================== QUIET HOURS ====================
 
-Given('I have set quiet hours from {int} PM to {int} AM', async function (this: CustomWorld, start: number, end: number) {
-  this.testData.quietHours = { start: start + 12, end };
-  console.log(`✅ Quiet hours: ${start} PM - ${end} AM`);
-});
+Given(
+  'I have set quiet hours from {int} PM to {int} AM',
+  async function (this: CustomWorld, start: number, end: number) {
+    this.testData.quietHours = { start: start + 12, end };
+    console.log(`✅ Quiet hours: ${start} PM - ${end} AM`);
+  }
+);
 
 When('a new opportunity is found at {int} PM', async function (this: CustomWorld, hour: number) {
   this.testData.opportunityFoundAt = hour + 12;

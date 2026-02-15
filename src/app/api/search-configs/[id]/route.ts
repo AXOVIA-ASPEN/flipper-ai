@@ -1,11 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/db';
 
 // GET /api/search-configs/[id] - Get a single search configuration
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const config = await prisma.searchConfig.findUnique({
@@ -13,27 +10,18 @@ export async function GET(
     });
 
     if (!config) {
-      return NextResponse.json(
-        { error: "Search configuration not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Search configuration not found' }, { status: 404 });
     }
 
     return NextResponse.json(config);
   } catch (error) {
-    console.error("Error fetching search config:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch search configuration" },
-      { status: 500 }
-    );
+    console.error('Error fetching search config:', error);
+    return NextResponse.json({ error: 'Failed to fetch search configuration' }, { status: 500 });
   }
 }
 
 // PATCH /api/search-configs/[id] - Update a search configuration
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const body = await request.json();
@@ -43,10 +31,10 @@ export async function PATCH(
 
     if (body.name !== undefined) updateData.name = body.name;
     if (body.platform !== undefined) {
-      const validPlatforms = ["CRAIGSLIST", "FACEBOOK_MARKETPLACE", "EBAY", "OFFERUP"];
+      const validPlatforms = ['CRAIGSLIST', 'FACEBOOK_MARKETPLACE', 'EBAY', 'OFFERUP'];
       if (!validPlatforms.includes(body.platform)) {
         return NextResponse.json(
-          { error: `Invalid platform. Must be one of: ${validPlatforms.join(", ")}` },
+          { error: `Invalid platform. Must be one of: ${validPlatforms.join(', ')}` },
           { status: 400 }
         );
       }
@@ -55,8 +43,10 @@ export async function PATCH(
     if (body.location !== undefined) updateData.location = body.location;
     if (body.category !== undefined) updateData.category = body.category;
     if (body.keywords !== undefined) updateData.keywords = body.keywords;
-    if (body.minPrice !== undefined) updateData.minPrice = body.minPrice ? parseFloat(body.minPrice) : null;
-    if (body.maxPrice !== undefined) updateData.maxPrice = body.maxPrice ? parseFloat(body.maxPrice) : null;
+    if (body.minPrice !== undefined)
+      updateData.minPrice = body.minPrice ? parseFloat(body.minPrice) : null;
+    if (body.maxPrice !== undefined)
+      updateData.maxPrice = body.maxPrice ? parseFloat(body.maxPrice) : null;
     if (body.enabled !== undefined) updateData.enabled = body.enabled;
     if (body.lastRun !== undefined) updateData.lastRun = new Date(body.lastRun);
 
@@ -67,11 +57,8 @@ export async function PATCH(
 
     return NextResponse.json(config);
   } catch (error) {
-    console.error("Error updating search config:", error);
-    return NextResponse.json(
-      { error: "Failed to update search configuration" },
-      { status: 500 }
-    );
+    console.error('Error updating search config:', error);
+    return NextResponse.json({ error: 'Failed to update search configuration' }, { status: 500 });
   }
 }
 
@@ -88,10 +75,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error deleting search config:", error);
-    return NextResponse.json(
-      { error: "Failed to delete search configuration" },
-      { status: 500 }
-    );
+    console.error('Error deleting search config:', error);
+    return NextResponse.json({ error: 'Failed to delete search configuration' }, { status: 500 });
   }
 }

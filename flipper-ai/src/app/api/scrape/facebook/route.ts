@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
-import { scrapeAndConvert, FacebookScraperConfig } from "@/scrapers/facebook";
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/db';
+import { scrapeAndConvert, FacebookScraperConfig } from '@/scrapers/facebook';
 import {
   processListings,
   formatForStorage,
   generateScanSummary,
   ViabilityCriteria,
-} from "@/lib/marketplace-scanner";
+} from '@/lib/marketplace-scanner';
 
 // POST /api/scrape/facebook - Trigger a Facebook Marketplace scrape
 export async function POST(request: NextRequest) {
@@ -57,10 +57,10 @@ export async function POST(request: NextRequest) {
     // Create a scraper job record
     const job = await prisma.scraperJob.create({
       data: {
-        platform: "FACEBOOK_MARKETPLACE",
+        platform: 'FACEBOOK_MARKETPLACE',
         location: location || null,
         category: category || null,
-        status: "RUNNING",
+        status: 'RUNNING',
         startedAt: new Date(),
       },
     });
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       await prisma.scraperJob.update({
         where: { id: job.id },
         data: {
-          status: "FAILED",
+          status: 'FAILED',
           errorMessage: scrapeResult.error,
           completedAt: new Date(),
         },
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
 
     // Process listings through central viability logic
     const processedResults = processListings(
-      "FACEBOOK_MARKETPLACE",
+      'FACEBOOK_MARKETPLACE',
       scrapeResult.listings,
       viabilityCriteria
     );
@@ -107,15 +107,15 @@ export async function POST(request: NextRequest) {
         const listing = await prisma.listing.upsert({
           where: {
             platform_externalId: {
-              platform: "FACEBOOK_MARKETPLACE",
+              platform: 'FACEBOOK_MARKETPLACE',
               externalId: analyzed.externalId,
             },
           },
-          create: storageData as Parameters<typeof prisma.listing.create>[0]["data"],
+          create: storageData as Parameters<typeof prisma.listing.create>[0]['data'],
           update: {
             ...storageData,
             scrapedAt: new Date(),
-          } as Parameters<typeof prisma.listing.update>[0]["data"],
+          } as Parameters<typeof prisma.listing.update>[0]['data'],
         });
         savedListings.push(listing);
       } catch (err) {
@@ -130,14 +130,16 @@ export async function POST(request: NextRequest) {
     await prisma.scraperJob.update({
       where: { id: job.id },
       data: {
-        status: "COMPLETED",
+        status: 'COMPLETED',
         listingsFound: processedResults.all.length,
         opportunitiesFound: processedResults.opportunities.length,
         completedAt: new Date(),
       },
     });
 
-    console.log(`Scrape job ${job.id} completed: ${processedResults.all.length} listings, ${processedResults.opportunities.length} opportunities`);
+    console.log(
+      `Scrape job ${job.id} completed: ${processedResults.all.length} listings, ${processedResults.opportunities.length} opportunities`
+    );
 
     return NextResponse.json({
       success: true,
@@ -168,11 +170,11 @@ export async function POST(request: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error("Error in Facebook scraper endpoint:", error);
+    console.error('Error in Facebook scraper endpoint:', error);
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to run scraper",
+        error: error instanceof Error ? error.message : 'Failed to run scraper',
       },
       { status: 500 }
     );
@@ -183,8 +185,8 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const jobId = searchParams.get("jobId");
-    const limit = parseInt(searchParams.get("limit") || "10");
+    const jobId = searchParams.get('jobId');
+    const limit = parseInt(searchParams.get('limit') || '10');
 
     if (jobId) {
       // Get specific job
@@ -193,10 +195,7 @@ export async function GET(request: NextRequest) {
       });
 
       if (!job) {
-        return NextResponse.json(
-          { error: "Job not found" },
-          { status: 404 }
-        );
+        return NextResponse.json({ error: 'Job not found' }, { status: 404 });
       }
 
       return NextResponse.json(job);
@@ -204,17 +203,14 @@ export async function GET(request: NextRequest) {
 
     // Get recent jobs
     const jobs = await prisma.scraperJob.findMany({
-      where: { platform: "FACEBOOK_MARKETPLACE" },
-      orderBy: { createdAt: "desc" },
+      where: { platform: 'FACEBOOK_MARKETPLACE' },
+      orderBy: { createdAt: 'desc' },
       take: limit,
     });
 
     return NextResponse.json({ jobs });
   } catch (error) {
-    console.error("Error fetching scraper jobs:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch scraper jobs" },
-      { status: 500 }
-    );
+    console.error('Error fetching scraper jobs:', error);
+    return NextResponse.json({ error: 'Failed to fetch scraper jobs' }, { status: 500 });
   }
 }

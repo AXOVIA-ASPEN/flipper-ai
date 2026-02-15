@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
+import { NextRequest, NextResponse } from 'next/server';
+import OpenAI from 'openai';
 
 // POST /api/user/settings/validate-key - Test if an OpenAI API key is valid
 export async function POST(request: NextRequest) {
@@ -7,15 +7,15 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { apiKey } = body;
 
-    if (!apiKey || typeof apiKey !== "string") {
+    if (!apiKey || typeof apiKey !== 'string') {
       return NextResponse.json(
-        { success: false, error: "API key is required", valid: false },
+        { success: false, error: 'API key is required', valid: false },
         { status: 400 }
       );
     }
 
     // Validate the format (OpenAI keys start with sk-)
-    if (!apiKey.startsWith("sk-")) {
+    if (!apiKey.startsWith('sk-')) {
       return NextResponse.json({
         success: true,
         valid: false,
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         valid: true,
-        message: "API key is valid",
+        message: 'API key is valid',
       });
     } catch (openaiError: unknown) {
       const error = openaiError as { status?: number; message?: string };
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           valid: false,
-          error: "Invalid API key. Please check your key and try again.",
+          error: 'Invalid API key. Please check your key and try again.',
         });
       }
 
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           valid: true,
-          message: "API key is valid (rate limited)",
+          message: 'API key is valid (rate limited)',
         });
       }
 
@@ -59,13 +59,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         valid: false,
-        error: error.message || "Could not validate API key",
+        error: error.message || 'Could not validate API key',
       });
     }
   } catch (error) {
-    console.error("Error validating API key:", error);
+    console.error('Error validating API key:', error);
     return NextResponse.json(
-      { success: false, error: "Failed to validate API key", valid: false },
+      { success: false, error: 'Failed to validate API key', valid: false },
       { status: 500 }
     );
   }

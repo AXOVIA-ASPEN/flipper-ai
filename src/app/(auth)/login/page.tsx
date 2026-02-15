@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState, Suspense } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { useState, Suspense } from 'react';
+import { signIn } from 'next-auth/react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import {
   Mail,
   Lock,
@@ -15,11 +15,17 @@ import {
   TrendingUp,
   DollarSign,
   ArrowRight,
-} from "lucide-react";
+} from 'lucide-react';
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-purple-400" /></div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
+        </div>
+      }
+    >
       <LoginPageInner />
     </Suspense>
   );
@@ -28,15 +34,15 @@ export default function LoginPage() {
 function LoginPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
-  const error = searchParams.get("error");
+  const callbackUrl = searchParams.get('callbackUrl') || '/';
+  const error = searchParams.get('error');
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(
-    error === "CredentialsSignin" ? "Invalid email or password" : null
+    error === 'CredentialsSignin' ? 'Invalid email or password' : null
   );
 
   async function handleCredentialsSubmit(e: React.FormEvent) {
@@ -45,26 +51,26 @@ function LoginPageInner() {
     setErrorMessage(null);
 
     try {
-      const result = await signIn("credentials", {
+      const result = await signIn('credentials', {
         email,
         password,
         redirect: false,
       });
 
       if (result?.error) {
-        setErrorMessage("Invalid email or password");
+        setErrorMessage('Invalid email or password');
       } else {
         router.push(callbackUrl);
         router.refresh();
       }
     } catch {
-      setErrorMessage("Something went wrong. Please try again.");
+      setErrorMessage('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
   }
 
-  async function handleOAuthSignIn(provider: "google" | "github") {
+  async function handleOAuthSignIn(provider: 'google' | 'github') {
     setIsLoading(true);
     setErrorMessage(null);
     await signIn(provider, { callbackUrl });
@@ -139,9 +145,7 @@ function LoginPageInner() {
               </div>
             </Link>
             <h1 className="text-2xl font-bold text-white mb-2">Welcome back</h1>
-            <p className="text-blue-200/70">
-              Sign in to find your next profitable flip
-            </p>
+            <p className="text-blue-200/70">Sign in to find your next profitable flip</p>
           </div>
 
           {/* Error message */}
@@ -155,7 +159,7 @@ function LoginPageInner() {
           {/* OAuth buttons */}
           <div className="px-8 space-y-3">
             <button
-              onClick={() => handleOAuthSignIn("google")}
+              onClick={() => handleOAuthSignIn('google')}
               disabled={isLoading}
               className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
             >
@@ -183,7 +187,7 @@ function LoginPageInner() {
             </button>
 
             <button
-              onClick={() => handleOAuthSignIn("github")}
+              onClick={() => handleOAuthSignIn('github')}
               disabled={isLoading}
               className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
             >
@@ -203,9 +207,7 @@ function LoginPageInner() {
                 <div className="w-full border-t border-white/20" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-transparent text-blue-200/50">
-                  or continue with email
-                </span>
+                <span className="px-4 bg-transparent text-blue-200/50">or continue with email</span>
               </div>
             </div>
           </div>
@@ -232,15 +234,13 @@ function LoginPageInner() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-blue-200/90 mb-2">
-                Password
-              </label>
+              <label className="block text-sm font-medium text-blue-200/90 mb-2">Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-blue-300/50" />
                 </div>
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -252,11 +252,7 @@ function LoginPageInner() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-300/50 hover:text-blue-200 transition-colors"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
@@ -280,7 +276,7 @@ function LoginPageInner() {
           {/* Footer */}
           <div className="px-8 pb-8 text-center">
             <p className="text-blue-200/60 text-sm">
-              Don't have an account?{" "}
+              Don't have an account?{' '}
               <Link
                 href="/register"
                 className="text-purple-300 hover:text-purple-200 font-medium transition-colors"

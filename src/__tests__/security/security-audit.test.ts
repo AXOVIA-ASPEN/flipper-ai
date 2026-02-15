@@ -1,6 +1,6 @@
 /**
  * Security Audit & Hardening Tests
- * 
+ *
  * Validates security posture across:
  * - Security headers (CSP, HSTS, X-Frame-Options, etc.)
  * - CORS configuration
@@ -10,7 +10,7 @@
  * - Environment variable validation
  * - Rate limiting edge cases
  * - Next.js configuration security
- * 
+ *
  * @jest-environment node
  */
 
@@ -291,7 +291,9 @@ describe('Input Validation (validateRequestBody)', () => {
 
   function makeBadJsonReq() {
     return {
-      json: async () => { throw new Error('bad json'); },
+      json: async () => {
+        throw new Error('bad json');
+      },
     } as any;
   }
 
@@ -317,7 +319,10 @@ describe('Input Validation (validateRequestBody)', () => {
 
   test('strips extra fields with strict schema', async () => {
     const schema = z.object({ name: z.string() }).strict();
-    const result = await validateRequestBody(makeJsonReq({ name: 'Test', evil: '<script>' }), schema);
+    const result = await validateRequestBody(
+      makeJsonReq({ name: 'Test', evil: '<script>' }),
+      schema
+    );
     expect(result.error).toBeDefined();
   });
 });
@@ -441,10 +446,14 @@ describe('Client IP Extraction', () => {
   });
 
   test('prefers x-forwarded-for over x-real-ip', () => {
-    expect(getClientIp(makeReq({
-      'x-forwarded-for': '1.1.1.1',
-      'x-real-ip': '2.2.2.2',
-    }))).toBe('1.1.1.1');
+    expect(
+      getClientIp(
+        makeReq({
+          'x-forwarded-for': '1.1.1.1',
+          'x-real-ip': '2.2.2.2',
+        })
+      )
+    ).toBe('1.1.1.1');
   });
 });
 

@@ -23,7 +23,7 @@ describe('Scraper API Integration Tests', () => {
   describe('eBay Scraper', () => {
     it('should scrape eBay listings successfully', async () => {
       const { POST } = await import('../../../src/app/api/scraper/ebay/route');
-      
+
       const request = new NextRequest('http://localhost:3000/api/scraper/ebay', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -41,7 +41,7 @@ describe('Scraper API Integration Tests', () => {
       expect(data.listings).toBeDefined();
       expect(Array.isArray(data.listings)).toBe(true);
       expect(data.listings.length).toBeGreaterThan(0);
-      
+
       // Verify listing structure
       const listing = data.listings[0];
       expect(listing).toHaveProperty('id');
@@ -53,7 +53,7 @@ describe('Scraper API Integration Tests', () => {
 
     it('should handle empty search results', async () => {
       const { POST } = await import('../../../src/app/api/scraper/ebay/route');
-      
+
       const request = new NextRequest('http://localhost:3000/api/scraper/ebay', {
         method: 'POST',
         body: JSON.stringify({
@@ -72,20 +72,20 @@ describe('Scraper API Integration Tests', () => {
 
     it('should validate required parameters', async () => {
       const { POST } = await import('../../../src/app/api/scraper/ebay/route');
-      
+
       const request = new NextRequest('http://localhost:3000/api/scraper/ebay', {
         method: 'POST',
         body: JSON.stringify({}),
       });
 
       const response = await POST(request);
-      
+
       expect(response.status).toBe(400);
     });
 
     it('should cache scraped results', async () => {
       const { POST } = await import('../../../src/app/api/scraper/ebay/route');
-      
+
       const requestData = {
         query: 'iPad Pro',
         location: 'Tampa, FL',
@@ -96,7 +96,7 @@ describe('Scraper API Integration Tests', () => {
         method: 'POST',
         body: JSON.stringify(requestData),
       });
-      
+
       const start1 = Date.now();
       const response1 = await POST(request1);
       const time1 = Date.now() - start1;
@@ -106,7 +106,7 @@ describe('Scraper API Integration Tests', () => {
         method: 'POST',
         body: JSON.stringify(requestData),
       });
-      
+
       const start2 = Date.now();
       const response2 = await POST(request2);
       const time2 = Date.now() - start2;
@@ -119,7 +119,7 @@ describe('Scraper API Integration Tests', () => {
   describe('Facebook Marketplace Scraper', () => {
     it('should scrape Facebook listings successfully', async () => {
       const { POST } = await import('../../../src/app/api/scraper/facebook/route');
-      
+
       const request = new NextRequest('http://localhost:3000/api/scraper/facebook', {
         method: 'POST',
         body: JSON.stringify({
@@ -139,7 +139,7 @@ describe('Scraper API Integration Tests', () => {
 
     it('should handle authentication errors', async () => {
       const { POST } = await import('../../../src/app/api/scraper/facebook/route');
-      
+
       // Clear auth cookies
       const request = new NextRequest('http://localhost:3000/api/scraper/facebook', {
         method: 'POST',
@@ -147,7 +147,7 @@ describe('Scraper API Integration Tests', () => {
       });
 
       const response = await POST(request);
-      
+
       // Should fail without auth or handle gracefully
       expect([200, 401, 403]).toContain(response.status);
     });
@@ -156,7 +156,7 @@ describe('Scraper API Integration Tests', () => {
   describe('OfferUp Scraper', () => {
     it('should scrape OfferUp listings successfully', async () => {
       const { POST } = await import('../../../src/app/api/scraper/offerup/route');
-      
+
       const request = new NextRequest('http://localhost:3000/api/scraper/offerup', {
         method: 'POST',
         body: JSON.stringify({
@@ -175,7 +175,7 @@ describe('Scraper API Integration Tests', () => {
 
     it('should cache images locally', async () => {
       const { POST } = await import('../../../src/app/api/scraper/offerup/route');
-      
+
       const request = new NextRequest('http://localhost:3000/api/scraper/offerup', {
         method: 'POST',
         body: JSON.stringify({
@@ -188,11 +188,11 @@ describe('Scraper API Integration Tests', () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      
+
       if (data.listings.length > 0) {
         const listing = data.listings[0];
         expect(listing.images).toBeDefined();
-        
+
         // Check if images are cached locally
         if (listing.images.length > 0) {
           expect(listing.images[0]).toMatch(/^\/api\/images\/proxy/);
@@ -204,7 +204,7 @@ describe('Scraper API Integration Tests', () => {
   describe('Craigslist Scraper', () => {
     it('should scrape Craigslist listings successfully', async () => {
       const { POST } = await import('../../../src/app/api/scraper/craigslist/route');
-      
+
       const request = new NextRequest('http://localhost:3000/api/scraper/craigslist', {
         method: 'POST',
         body: JSON.stringify({
@@ -223,7 +223,7 @@ describe('Scraper API Integration Tests', () => {
 
     it('should parse price correctly', async () => {
       const { POST } = await import('../../../src/app/api/scraper/craigslist/route');
-      
+
       const request = new NextRequest('http://localhost:3000/api/scraper/craigslist', {
         method: 'POST',
         body: JSON.stringify({
@@ -236,7 +236,7 @@ describe('Scraper API Integration Tests', () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      
+
       if (data.listings.length > 0) {
         const listing = data.listings[0];
         expect(listing.price).toBeDefined();
@@ -249,7 +249,7 @@ describe('Scraper API Integration Tests', () => {
   describe('Mercari Scraper', () => {
     it('should scrape Mercari listings successfully', async () => {
       const { POST } = await import('../../../src/app/api/scraper/mercari/route');
-      
+
       const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
         method: 'POST',
         body: JSON.stringify({
@@ -278,18 +278,24 @@ describe('Scraper API Integration Tests', () => {
       };
 
       const [ebayRes, fbRes, offerupRes] = await Promise.all([
-        ebayPost(new NextRequest('http://localhost:3000/api/scraper/ebay', {
-          method: 'POST',
-          body: JSON.stringify(searchParams),
-        })),
-        facebookPost(new NextRequest('http://localhost:3000/api/scraper/facebook', {
-          method: 'POST',
-          body: JSON.stringify(searchParams),
-        })),
-        offerupPost(new NextRequest('http://localhost:3000/api/scraper/offerup', {
-          method: 'POST',
-          body: JSON.stringify(searchParams),
-        })),
+        ebayPost(
+          new NextRequest('http://localhost:3000/api/scraper/ebay', {
+            method: 'POST',
+            body: JSON.stringify(searchParams),
+          })
+        ),
+        facebookPost(
+          new NextRequest('http://localhost:3000/api/scraper/facebook', {
+            method: 'POST',
+            body: JSON.stringify(searchParams),
+          })
+        ),
+        offerupPost(
+          new NextRequest('http://localhost:3000/api/scraper/offerup', {
+            method: 'POST',
+            body: JSON.stringify(searchParams),
+          })
+        ),
       ]);
 
       const ebayData = await ebayRes.json();
@@ -297,16 +303,12 @@ describe('Scraper API Integration Tests', () => {
       const offerupData = await offerupRes.json();
 
       // Combine all results
-      const allListings = [
-        ...ebayData.listings,
-        ...fbData.listings,
-        ...offerupData.listings,
-      ];
+      const allListings = [...ebayData.listings, ...fbData.listings, ...offerupData.listings];
 
       expect(allListings.length).toBeGreaterThan(0);
-      
+
       // Verify each listing has marketplace identifier
-      allListings.forEach(listing => {
+      allListings.forEach((listing) => {
         expect(listing.marketplace).toBeDefined();
         expect(['ebay', 'facebook', 'offerup']).toContain(listing.marketplace);
       });

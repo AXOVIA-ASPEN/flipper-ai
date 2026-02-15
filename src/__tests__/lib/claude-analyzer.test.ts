@@ -2,14 +2,14 @@
  * Claude Analyzer Unit Tests
  * Author: Stephen Boyett
  * Company: Axovia AI
- * 
+ *
  * Tests for Claude AI integration (mocked API calls)
  */
 
-import { describe, test, expect, jest, beforeEach } from "@jest/globals";
+import { describe, test, expect, jest, beforeEach } from '@jest/globals';
 
 // Mock Anthropic SDK
-jest.mock("@anthropic-ai/sdk", () => {
+jest.mock('@anthropic-ai/sdk', () => {
   return {
     __esModule: true,
     default: jest.fn().mockImplementation(() => ({
@@ -23,7 +23,7 @@ jest.mock("@anthropic-ai/sdk", () => {
 });
 
 // Mock Prisma
-jest.mock("@/lib/db", () => ({
+jest.mock('@/lib/db', () => ({
   __esModule: true,
   default: {
     listing: {
@@ -36,41 +36,41 @@ jest.mock("@/lib/db", () => ({
   },
 }));
 
-import Anthropic from "@anthropic-ai/sdk";
+import Anthropic from '@anthropic-ai/sdk';
 import {
   analyzeListingData,
   analyzeListing,
   batchAnalyzeListings,
   ClaudeAnalysisResult,
-} from "@/lib/claude-analyzer";
-import prisma from "@/lib/db";
+} from '@/lib/claude-analyzer';
+import prisma from '@/lib/db';
 
-describe("Claude Analyzer", () => {
+describe('Claude Analyzer', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.resetModules();
-    process.env.ANTHROPIC_API_KEY = "test-key";
+    process.env.ANTHROPIC_API_KEY = 'test-key';
   });
 
-  describe("analyzeListingData", () => {
-    test("should parse valid JSON response from Claude", async () => {
+  describe('analyzeListingData', () => {
+    test('should parse valid JSON response from Claude', async () => {
       const mockResponse = {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: JSON.stringify({
-              category: "electronics",
-              subcategory: "smartphones",
-              brand: "Apple",
-              condition: "excellent",
-              estimatedAge: "1-2 years",
-              keyFeatures: ["128GB storage", "Face ID", "A15 chip"],
-              potentialIssues: ["Battery health unknown"],
+              category: 'electronics',
+              subcategory: 'smartphones',
+              brand: 'Apple',
+              condition: 'excellent',
+              estimatedAge: '1-2 years',
+              keyFeatures: ['128GB storage', 'Face ID', 'A15 chip'],
+              potentialIssues: ['Battery health unknown'],
               flippabilityScore: 85,
-              confidence: "high",
-              reasoning: "Strong brand value and demand",
-              marketTrends: "High demand for used iPhones",
-              targetBuyer: "Budget-conscious tech users",
+              confidence: 'high',
+              reasoning: 'Strong brand value and demand',
+              marketTrends: 'High demand for used iPhones',
+              targetBuyer: 'Budget-conscious tech users',
             }),
           },
         ],
@@ -79,38 +79,41 @@ describe("Claude Analyzer", () => {
       // Mock the Anthropic client's create method directly
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
 
       const result = await analyzeListingData(
-        "iPhone 12 128GB",
-        "Excellent condition, no scratches",
+        'iPhone 12 128GB',
+        'Excellent condition, no scratches',
         400
       );
 
-      expect(result.category).toBe("electronics");
-      expect(result.brand).toBe("Apple");
+      expect(result.category).toBe('electronics');
+      expect(result.brand).toBe('Apple');
       expect(result.flippabilityScore).toBe(85);
-      expect(result.confidence).toBe("high");
+      expect(result.confidence).toBe('high');
       expect(result.keyFeatures).toHaveLength(3);
     });
 
-    test("should handle Claude response with markdown wrapper", async () => {
+    test('should handle Claude response with markdown wrapper', async () => {
       const mockResponse = {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: `Here's the analysis:\n\n\`\`\`json\n${JSON.stringify({
-              category: "tools",
-              condition: "good",
-              keyFeatures: ["Cordless", "20V battery"],
+              category: 'tools',
+              condition: 'good',
+              keyFeatures: ['Cordless', '20V battery'],
               potentialIssues: [],
               flippabilityScore: 70,
-              confidence: "medium",
-              reasoning: "Tools have good resale value",
+              confidence: 'medium',
+              reasoning: 'Tools have good resale value',
             })}\n\`\`\``,
           },
         ],
@@ -118,31 +121,34 @@ describe("Claude Analyzer", () => {
 
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
 
-      const result = await analyzeListingData("DeWalt Drill", "Used but works", 50);
+      const result = await analyzeListingData('DeWalt Drill', 'Used but works', 50);
 
-      expect(result.category).toBe("tools");
+      expect(result.category).toBe('tools');
       expect(result.flippabilityScore).toBe(70);
     });
 
-    test("should normalize flippability score to 0-100 range", async () => {
+    test('should normalize flippability score to 0-100 range', async () => {
       const mockResponse = {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: JSON.stringify({
-              category: "furniture",
-              condition: "fair",
+              category: 'furniture',
+              condition: 'fair',
               keyFeatures: [],
               potentialIssues: [],
               flippabilityScore: 150, // Invalid (too high)
-              confidence: "low",
-              reasoning: "Test",
+              confidence: 'low',
+              reasoning: 'Test',
             }),
           },
         ],
@@ -150,31 +156,34 @@ describe("Claude Analyzer", () => {
 
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
 
-      const result = await analyzeListingData("Old Couch", null, 20);
+      const result = await analyzeListingData('Old Couch', null, 20);
 
       expect(result.flippabilityScore).toBeLessThanOrEqual(100);
       expect(result.flippabilityScore).toBeGreaterThanOrEqual(0);
     });
 
-    test("should handle missing optional fields gracefully", async () => {
+    test('should handle missing optional fields gracefully', async () => {
       const mockResponse = {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: JSON.stringify({
-              category: "sports",
-              condition: "good",
-              keyFeatures: ["Carbon frame"],
+              category: 'sports',
+              condition: 'good',
+              keyFeatures: ['Carbon frame'],
               potentialIssues: [],
               flippabilityScore: 60,
-              confidence: "medium",
-              reasoning: "Bikes sell well locally",
+              confidence: 'medium',
+              reasoning: 'Bikes sell well locally',
               // Missing: subcategory, brand, estimatedAge, marketTrends, targetBuyer
             }),
           },
@@ -183,86 +192,94 @@ describe("Claude Analyzer", () => {
 
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
 
-      const result = await analyzeListingData("Road Bike", "Good shape", 200);
+      const result = await analyzeListingData('Road Bike', 'Good shape', 200);
 
-      expect(result.category).toBe("sports");
+      expect(result.category).toBe('sports');
       expect(result.subcategory).toBeUndefined();
       expect(result.brand).toBeUndefined();
       expect(result.estimatedAge).toBeUndefined();
     });
 
-    test("should throw error when Claude API key is missing", async () => {
+    test('should throw error when Claude API key is missing', async () => {
       // Note: This test can't work properly because CLAUDE_API_KEY is evaluated at module load time
       // In a real scenario, the API would fail with auth error which is caught in callClaudeAPI
       // For now, we'll test that the mock framework works with auth failures
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockImplementation(() => {
-        const error: any = new Error("Invalid API key");
+        const error: any = new Error('Invalid API key');
         error.status = 401;
         throw error;
       });
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
-
-      await expect(
-        analyzeListingData("Test Item", null, 100)
-      ).rejects.toThrow();
-    });
-
-    test("should throw error on rate limit", async () => {
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockRejectedValue(
-        Object.assign(new Error("Rate limit exceeded"), { status: 429 })
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
       );
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
 
-      await expect(
-        analyzeListingData("Test Item", null, 100)
-      ).rejects.toThrow("rate limit");
+      await expect(analyzeListingData('Test Item', null, 100)).rejects.toThrow();
     });
 
-    test("should throw error on API error", async () => {
+    test('should throw error on rate limit', async () => {
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockRejectedValue(
-        Object.assign(new Error("Something went wrong"), { message: "Something went wrong" })
+      const mockCreate = jest
+        .fn()
+        .mockRejectedValue(Object.assign(new Error('Rate limit exceeded'), { status: 429 }));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
       );
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
 
-      await expect(
-        analyzeListingData("Test Item", null, 100)
-      ).rejects.toThrow();
+      await expect(analyzeListingData('Test Item', null, 100)).rejects.toThrow('rate limit');
     });
 
-    test("should validate confidence level", async () => {
+    test('should throw error on API error', async () => {
+      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
+      const mockCreate = jest
+        .fn()
+        .mockRejectedValue(
+          Object.assign(new Error('Something went wrong'), { message: 'Something went wrong' })
+        );
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
+
+      await expect(analyzeListingData('Test Item', null, 100)).rejects.toThrow();
+    });
+
+    test('should validate confidence level', async () => {
       const mockResponse = {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: JSON.stringify({
-              category: "other",
-              condition: "unknown",
+              category: 'other',
+              condition: 'unknown',
               keyFeatures: [],
               potentialIssues: [],
               flippabilityScore: 50,
-              confidence: "invalid", // Invalid confidence
-              reasoning: "Test",
+              confidence: 'invalid', // Invalid confidence
+              reasoning: 'Test',
             }),
           },
         ],
@@ -270,31 +287,34 @@ describe("Claude Analyzer", () => {
 
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
 
-      const result = await analyzeListingData("Mystery Item", null, 50);
+      const result = await analyzeListingData('Mystery Item', null, 50);
 
-      expect(["low", "medium", "high"]).toContain(result.confidence);
-      expect(result.confidence).toBe("medium"); // Default fallback
+      expect(['low', 'medium', 'high']).toContain(result.confidence);
+      expect(result.confidence).toBe('medium'); // Default fallback
     });
 
-    test("should handle empty arrays for features/issues", async () => {
+    test('should handle empty arrays for features/issues', async () => {
       const mockResponse = {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: JSON.stringify({
-              category: "clothing",
-              condition: "good",
+              category: 'clothing',
+              condition: 'good',
               keyFeatures: null, // Invalid (should be array)
               potentialIssues: undefined, // Invalid
               flippabilityScore: 40,
-              confidence: "low",
-              reasoning: "Clothing has low resale value",
+              confidence: 'low',
+              reasoning: 'Clothing has low resale value',
             }),
           },
         ],
@@ -302,13 +322,16 @@ describe("Claude Analyzer", () => {
 
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
 
-      const result = await analyzeListingData("T-Shirt", "Gently used", 5);
+      const result = await analyzeListingData('T-Shirt', 'Gently used', 5);
 
       expect(Array.isArray(result.keyFeatures)).toBe(true);
       expect(Array.isArray(result.potentialIssues)).toBe(true);
@@ -316,56 +339,57 @@ describe("Claude Analyzer", () => {
       expect(result.potentialIssues).toHaveLength(0);
     });
 
-    test("should include price context in analysis", async () => {
+    test('should include price context in analysis', async () => {
       const mockCreate = jest.fn().mockResolvedValue({
         content: [
           {
-            type: "text",
+            type: 'text',
             text: JSON.stringify({
-              category: "electronics",
-              condition: "new",
+              category: 'electronics',
+              condition: 'new',
               keyFeatures: [],
               potentialIssues: [],
               flippabilityScore: 90,
-              confidence: "high",
-              reasoning: "Great deal",
+              confidence: 'high',
+              reasoning: 'Great deal',
             }),
           },
         ],
       });
 
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
 
-      await analyzeListingData("iPhone 15 Pro", "Brand new sealed", 800, [
-        "image1.jpg",
-      ]);
+      await analyzeListingData('iPhone 15 Pro', 'Brand new sealed', 800, ['image1.jpg']);
 
       const callArgs = mockCreate.mock.calls[0][0];
       const promptMessage = callArgs.messages[0].content;
 
-      expect(promptMessage).toContain("$800");
-      expect(promptMessage).toContain("1 images available");
+      expect(promptMessage).toContain('$800');
+      expect(promptMessage).toContain('1 images available');
     });
   });
 
-  describe("Caching functionality (via analyzeListing)", () => {
-    test("should return cached analysis when available", async () => {
+  describe('Caching functionality (via analyzeListing)', () => {
+    test('should return cached analysis when available', async () => {
       const mockCachedAnalysis = {
-        id: "cache-123",
-        listingId: "listing-456",
+        id: 'cache-123',
+        listingId: 'listing-456',
         analysisResult: JSON.stringify({
-          category: "electronics",
-          condition: "good",
-          keyFeatures: ["test"],
+          category: 'electronics',
+          condition: 'good',
+          keyFeatures: ['test'],
           potentialIssues: [],
           flippabilityScore: 75,
-          confidence: "medium",
-          reasoning: "Cached result",
+          confidence: 'medium',
+          reasoning: 'Cached result',
         }),
         createdAt: new Date(),
         expiresAt: new Date(Date.now() + 1000 * 60 * 60), // 1 hour from now
@@ -373,43 +397,43 @@ describe("Claude Analyzer", () => {
 
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(mockCachedAnalysis);
       (prisma.listing.findUnique as jest.Mock).mockResolvedValue({
-        id: "listing-456",
-        title: "Test Item",
-        description: "Test description",
+        id: 'listing-456',
+        title: 'Test Item',
+        description: 'Test description',
         askingPrice: 100,
-        imageUrls: "[]",
+        imageUrls: '[]',
       });
 
-      const result = await analyzeListing("listing-456");
+      const result = await analyzeListing('listing-456');
 
-      expect(result.reasoning).toBe("Cached result");
+      expect(result.reasoning).toBe('Cached result');
       expect(prisma.aiAnalysisCache.findFirst).toHaveBeenCalled();
       // Should NOT call Claude API when cached
       expect(Anthropic).not.toHaveBeenCalled();
     });
 
-    test("should call Claude API when cache is not found", async () => {
+    test('should call Claude API when cache is not found', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
       (prisma.listing.findUnique as jest.Mock).mockResolvedValue({
-        id: "listing-789",
-        title: "Test Item",
-        description: "Description",
+        id: 'listing-789',
+        title: 'Test Item',
+        description: 'Description',
         askingPrice: 100,
-        imageUrls: "[]",
+        imageUrls: '[]',
       });
 
       const mockResponse = {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: JSON.stringify({
-              category: "fresh",
-              condition: "new",
+              category: 'fresh',
+              condition: 'new',
               keyFeatures: [],
               potentialIssues: [],
               flippabilityScore: 90,
-              confidence: "high",
-              reasoning: "Fresh analysis",
+              confidence: 'high',
+              reasoning: 'Fresh analysis',
             }),
           },
         ],
@@ -417,41 +441,44 @@ describe("Claude Analyzer", () => {
 
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
 
-      const result = await analyzeListing("listing-789");
+      const result = await analyzeListing('listing-789');
 
-      expect(result.reasoning).toBe("Fresh analysis");
+      expect(result.reasoning).toBe('Fresh analysis');
       expect(mockCreate).toHaveBeenCalled();
     });
 
-    test("should cache new analysis after Claude API call", async () => {
+    test('should cache new analysis after Claude API call', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
       (prisma.aiAnalysisCache.create as jest.Mock).mockResolvedValue({});
       (prisma.listing.findUnique as jest.Mock).mockResolvedValue({
-        id: "listing-cache-test",
-        title: "Item",
-        description: "Desc",
+        id: 'listing-cache-test',
+        title: 'Item',
+        description: 'Desc',
         askingPrice: 50,
-        imageUrls: "[]",
+        imageUrls: '[]',
       });
 
       const mockResponse = {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: JSON.stringify({
-              category: "test",
-              condition: "good",
+              category: 'test',
+              condition: 'good',
               keyFeatures: [],
               potentialIssues: [],
               flippabilityScore: 80,
-              confidence: "high",
-              reasoning: "Test",
+              confidence: 'high',
+              reasoning: 'Test',
             }),
           },
         ],
@@ -459,18 +486,21 @@ describe("Claude Analyzer", () => {
 
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
 
-      await analyzeListing("listing-cache-test");
+      await analyzeListing('listing-cache-test');
 
       expect(prisma.aiAnalysisCache.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            listingId: "listing-cache-test",
+            listingId: 'listing-cache-test',
             analysisResult: expect.any(String),
             expiresAt: expect.any(Date),
           }),
@@ -478,30 +508,30 @@ describe("Claude Analyzer", () => {
       );
     });
 
-    test("should handle cache lookup errors gracefully", async () => {
+    test('should handle cache lookup errors gracefully', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockRejectedValue(
-        new Error("Database error")
+        new Error('Database error')
       );
       (prisma.listing.findUnique as jest.Mock).mockResolvedValue({
-        id: "listing-error-test",
-        title: "Item",
-        description: "Desc",
+        id: 'listing-error-test',
+        title: 'Item',
+        description: 'Desc',
         askingPrice: 50,
-        imageUrls: "[]",
+        imageUrls: '[]',
       });
 
       const mockResponse = {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: JSON.stringify({
-              category: "test",
-              condition: "good",
+              category: 'test',
+              condition: 'good',
               keyFeatures: [],
               potentialIssues: [],
               flippabilityScore: 70,
-              confidence: "medium",
-              reasoning: "Fallback",
+              confidence: 'medium',
+              reasoning: 'Fallback',
             }),
           },
         ],
@@ -509,43 +539,46 @@ describe("Claude Analyzer", () => {
 
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
 
-      const result = await analyzeListing("listing-error-test");
+      const result = await analyzeListing('listing-error-test');
 
-      expect(result.reasoning).toBe("Fallback");
+      expect(result.reasoning).toBe('Fallback');
       expect(mockCreate).toHaveBeenCalled();
     });
 
-    test("should handle cache storage errors gracefully", async () => {
+    test('should handle cache storage errors gracefully', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
       (prisma.aiAnalysisCache.create as jest.Mock).mockRejectedValue(
-        new Error("Cache write error")
+        new Error('Cache write error')
       );
       (prisma.listing.findUnique as jest.Mock).mockResolvedValue({
-        id: "listing-write-error",
-        title: "Item",
-        description: "Desc",
+        id: 'listing-write-error',
+        title: 'Item',
+        description: 'Desc',
         askingPrice: 50,
-        imageUrls: "[]",
+        imageUrls: '[]',
       });
 
       const mockResponse = {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: JSON.stringify({
-              category: "test",
-              condition: "good",
+              category: 'test',
+              condition: 'good',
               keyFeatures: [],
               potentialIssues: [],
               flippabilityScore: 85,
-              confidence: "high",
-              reasoning: "Success despite cache error",
+              confidence: 'high',
+              reasoning: 'Success despite cache error',
             }),
           },
         ],
@@ -553,48 +586,51 @@ describe("Claude Analyzer", () => {
 
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
 
       // Should not throw even if caching fails
-      const result = await analyzeListing("listing-write-error");
+      const result = await analyzeListing('listing-write-error');
 
-      expect(result.reasoning).toBe("Success despite cache error");
+      expect(result.reasoning).toBe('Success despite cache error');
     });
 
-    test("should throw error when listing not found", async () => {
+    test('should throw error when listing not found', async () => {
       (prisma.listing.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await expect(analyzeListing("nonexistent-listing")).rejects.toThrow(
-        "Listing not found: nonexistent-listing"
+      await expect(analyzeListing('nonexistent-listing')).rejects.toThrow(
+        'Listing not found: nonexistent-listing'
       );
     });
 
-    test("should handle imageUrls parsing errors", async () => {
+    test('should handle imageUrls parsing errors', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
       (prisma.listing.findUnique as jest.Mock).mockResolvedValue({
-        id: "listing-bad-json",
-        title: "Item",
-        description: "Desc",
+        id: 'listing-bad-json',
+        title: 'Item',
+        description: 'Desc',
         askingPrice: 50,
-        imageUrls: "invalid json", // Not valid JSON
+        imageUrls: 'invalid json', // Not valid JSON
       });
 
       const mockResponse = {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: JSON.stringify({
-              category: "test",
-              condition: "good",
+              category: 'test',
+              condition: 'good',
               keyFeatures: [],
               potentialIssues: [],
               flippabilityScore: 70,
-              confidence: "medium",
-              reasoning: "Parsed without images",
+              confidence: 'medium',
+              reasoning: 'Parsed without images',
             }),
           },
         ],
@@ -602,59 +638,62 @@ describe("Claude Analyzer", () => {
 
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
 
-      const result = await analyzeListing("listing-bad-json");
+      const result = await analyzeListing('listing-bad-json');
 
-      expect(result.reasoning).toBe("Parsed without images");
+      expect(result.reasoning).toBe('Parsed without images');
       // Should still complete successfully
     });
   });
 
-  describe("Batch analysis", () => {
-    test("should analyze multiple listings in batch", async () => {
+  describe('Batch analysis', () => {
+    test('should analyze multiple listings in batch', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
-      
+
       // Mock 3 different listings
       (prisma.listing.findUnique as jest.Mock)
         .mockResolvedValueOnce({
-          id: "list-1",
-          title: "Item 1",
-          description: "Desc 1",
+          id: 'list-1',
+          title: 'Item 1',
+          description: 'Desc 1',
           askingPrice: 100,
-          imageUrls: "[]",
+          imageUrls: '[]',
         })
         .mockResolvedValueOnce({
-          id: "list-2",
-          title: "Item 2",
-          description: "Desc 2",
+          id: 'list-2',
+          title: 'Item 2',
+          description: 'Desc 2',
           askingPrice: 200,
-          imageUrls: "[]",
+          imageUrls: '[]',
         })
         .mockResolvedValueOnce({
-          id: "list-3",
-          title: "Item 3",
-          description: "Desc 3",
+          id: 'list-3',
+          title: 'Item 3',
+          description: 'Desc 3',
           askingPrice: 300,
-          imageUrls: "[]",
+          imageUrls: '[]',
         });
 
       const mockResponse = {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: JSON.stringify({
-              category: "test",
-              condition: "good",
+              category: 'test',
+              condition: 'good',
               keyFeatures: [],
               potentialIssues: [],
               flippabilityScore: 75,
-              confidence: "medium",
-              reasoning: "Batch analysis",
+              confidence: 'medium',
+              reasoning: 'Batch analysis',
             }),
           },
         ],
@@ -662,13 +701,16 @@ describe("Claude Analyzer", () => {
 
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
 
-      const results = await batchAnalyzeListings(["list-1", "list-2", "list-3"]);
+      const results = await batchAnalyzeListings(['list-1', 'list-2', 'list-3']);
 
       expect(results.successful).toBe(3);
       expect(results.failed).toBe(0);
@@ -676,41 +718,41 @@ describe("Claude Analyzer", () => {
       expect(mockCreate).toHaveBeenCalledTimes(3);
     });
 
-    test("should handle partial failures in batch", async () => {
+    test('should handle partial failures in batch', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
-      
+
       // First listing succeeds
       (prisma.listing.findUnique as jest.Mock)
         .mockResolvedValueOnce({
-          id: "list-success",
-          title: "Good Item",
-          description: "Works",
+          id: 'list-success',
+          title: 'Good Item',
+          description: 'Works',
           askingPrice: 100,
-          imageUrls: "[]",
+          imageUrls: '[]',
         })
         // Second listing not found
         .mockResolvedValueOnce(null)
         // Third listing succeeds
         .mockResolvedValueOnce({
-          id: "list-success-2",
-          title: "Another Item",
-          description: "Also works",
+          id: 'list-success-2',
+          title: 'Another Item',
+          description: 'Also works',
           askingPrice: 150,
-          imageUrls: "[]",
+          imageUrls: '[]',
         });
 
       const mockResponse = {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: JSON.stringify({
-              category: "test",
-              condition: "good",
+              category: 'test',
+              condition: 'good',
               keyFeatures: [],
               potentialIssues: [],
               flippabilityScore: 80,
-              confidence: "high",
-              reasoning: "Success",
+              confidence: 'high',
+              reasoning: 'Success',
             }),
           },
         ],
@@ -718,39 +760,42 @@ describe("Claude Analyzer", () => {
 
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
 
       const results = await batchAnalyzeListings([
-        "list-success",
-        "list-not-found",
-        "list-success-2",
+        'list-success',
+        'list-not-found',
+        'list-success-2',
       ]);
 
       expect(results.successful).toBe(2);
       expect(results.failed).toBe(1);
       expect(results.errors).toHaveLength(1);
-      expect(results.errors[0].error).toContain("not found");
-      expect(results.errors[0].listingId).toBe("list-not-found");
+      expect(results.errors[0].error).toContain('not found');
+      expect(results.errors[0].listingId).toBe('list-not-found');
     });
 
-    test("should report cached results in batch", async () => {
+    test('should report cached results in batch', async () => {
       // First listing cached
       (prisma.aiAnalysisCache.findFirst as jest.Mock)
         .mockResolvedValueOnce({
-          id: "cache-1",
-          listingId: "list-cached",
+          id: 'cache-1',
+          listingId: 'list-cached',
           analysisResult: JSON.stringify({
-            category: "test",
-            condition: "good",
+            category: 'test',
+            condition: 'good',
             keyFeatures: [],
             potentialIssues: [],
             flippabilityScore: 70,
-            confidence: "medium",
-            reasoning: "Cached",
+            confidence: 'medium',
+            reasoning: 'Cached',
           }),
           createdAt: new Date(),
           expiresAt: new Date(Date.now() + 1000 * 60 * 60),
@@ -759,25 +804,25 @@ describe("Claude Analyzer", () => {
         .mockResolvedValueOnce(null);
 
       (prisma.listing.findUnique as jest.Mock).mockResolvedValueOnce({
-        id: "list-fresh",
-        title: "Fresh Item",
-        description: "New",
+        id: 'list-fresh',
+        title: 'Fresh Item',
+        description: 'New',
         askingPrice: 100,
-        imageUrls: "[]",
+        imageUrls: '[]',
       });
 
       const mockResponse = {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: JSON.stringify({
-              category: "test",
-              condition: "good",
+              category: 'test',
+              condition: 'good',
               keyFeatures: [],
               potentialIssues: [],
               flippabilityScore: 80,
-              confidence: "high",
-              reasoning: "Fresh",
+              confidence: 'high',
+              reasoning: 'Fresh',
             }),
           },
         ],
@@ -785,13 +830,16 @@ describe("Claude Analyzer", () => {
 
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
 
-      const results = await batchAnalyzeListings(["list-cached", "list-fresh"]);
+      const results = await batchAnalyzeListings(['list-cached', 'list-fresh']);
 
       expect(results.successful).toBe(2);
       expect(results.cached).toBe(1);
@@ -801,43 +849,46 @@ describe("Claude Analyzer", () => {
     });
   });
 
-  describe("Error handling and edge cases", () => {
-    test("should handle malformed JSON in Claude response", async () => {
+  describe('Error handling and edge cases', () => {
+    test('should handle malformed JSON in Claude response', async () => {
       const mockResponse = {
         content: [
           {
-            type: "text",
-            text: "This is not valid JSON at all!",
+            type: 'text',
+            text: 'This is not valid JSON at all!',
           },
         ],
       };
 
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
 
-      await expect(analyzeListingData("Item", "Desc", 50)).rejects.toThrow();
+      await expect(analyzeListingData('Item', 'Desc', 50)).rejects.toThrow();
     });
 
-    test("should handle empty description", async () => {
+    test('should handle empty description', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
 
       const mockResponse = {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: JSON.stringify({
-              category: "unknown",
-              condition: "unknown",
+              category: 'unknown',
+              condition: 'unknown',
               keyFeatures: [],
-              potentialIssues: ["No description provided"],
+              potentialIssues: ['No description provided'],
               flippabilityScore: 30,
-              confidence: "low",
-              reasoning: "Limited information",
+              confidence: 'low',
+              reasoning: 'Limited information',
             }),
           },
         ],
@@ -845,33 +896,36 @@ describe("Claude Analyzer", () => {
 
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
 
-      const result = await analyzeListingData("Item", null, 50);
+      const result = await analyzeListingData('Item', null, 50);
 
-      expect(result.potentialIssues).toContain("No description provided");
+      expect(result.potentialIssues).toContain('No description provided');
       expect(mockCreate).toHaveBeenCalled();
     });
 
-    test("should handle zero price", async () => {
+    test('should handle zero price', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
 
       const mockResponse = {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: JSON.stringify({
-              category: "free-stuff",
-              condition: "unknown",
+              category: 'free-stuff',
+              condition: 'unknown',
               keyFeatures: [],
-              potentialIssues: ["Free item - possible issues"],
+              potentialIssues: ['Free item - possible issues'],
               flippabilityScore: 40,
-              confidence: "low",
-              reasoning: "Free items are risky",
+              confidence: 'low',
+              reasoning: 'Free items are risky',
             }),
           },
         ],
@@ -879,35 +933,38 @@ describe("Claude Analyzer", () => {
 
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
 
-      const result = await analyzeListingData("Free Couch", "Come pick it up", 0);
+      const result = await analyzeListingData('Free Couch', 'Come pick it up', 0);
 
       expect(result.flippabilityScore).toBeLessThan(50);
       expect(mockCreate).toHaveBeenCalled();
     });
 
-    test("should handle very long descriptions", async () => {
+    test('should handle very long descriptions', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
 
-      const longDescription = "A".repeat(10000);
+      const longDescription = 'A'.repeat(10000);
 
       const mockResponse = {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: JSON.stringify({
-              category: "misc",
-              condition: "unknown",
+              category: 'misc',
+              condition: 'unknown',
               keyFeatures: [],
               potentialIssues: [],
               flippabilityScore: 50,
-              confidence: "medium",
-              reasoning: "Long description",
+              confidence: 'medium',
+              reasoning: 'Long description',
             }),
           },
         ],
@@ -915,33 +972,36 @@ describe("Claude Analyzer", () => {
 
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
 
-      const result = await analyzeListingData("Item", longDescription, 100);
+      const result = await analyzeListingData('Item', longDescription, 100);
 
       expect(result).toBeDefined();
       expect(mockCreate).toHaveBeenCalled();
     });
 
-    test("should handle multiple images", async () => {
+    test('should handle multiple images', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
 
       const mockResponse = {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: JSON.stringify({
-              category: "electronics",
-              condition: "good",
-              keyFeatures: ["Multiple angles shown"],
+              category: 'electronics',
+              condition: 'good',
+              keyFeatures: ['Multiple angles shown'],
               potentialIssues: [],
               flippabilityScore: 85,
-              confidence: "high",
-              reasoning: "Good photo documentation",
+              confidence: 'high',
+              reasoning: 'Good photo documentation',
             }),
           },
         ],
@@ -949,174 +1009,181 @@ describe("Claude Analyzer", () => {
 
       const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
       const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(() => ({
-        messages: {
-          create: mockCreate,
-        },
-      } as any));
-
-      const result = await analyzeListingData(
-        "Laptop",
-        "Used laptop",
-        500,
-        ["img1.jpg", "img2.jpg", "img3.jpg"]
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
       );
+
+      const result = await analyzeListingData('Laptop', 'Used laptop', 500, [
+        'img1.jpg',
+        'img2.jpg',
+        'img3.jpg',
+      ]);
 
       const callArgs = mockCreate.mock.calls[0][0];
       const promptMessage = callArgs.messages[0].content;
 
-      expect(promptMessage).toContain("3 images available");
-      expect(result.confidence).toBe("high");
+      expect(promptMessage).toContain('3 images available');
+      expect(result.confidence).toBe('high');
     });
   });
 
-  describe("callClaudeAPI error handling - uncovered branches", () => {
-    test("should handle API error with status and message (non-429)", async () => {
-      const mockCreate = jest.fn().mockRejectedValue(
-        Object.assign(new Error("Bad request"), { status: 400, message: "Invalid model" })
+  describe('callClaudeAPI error handling - uncovered branches', () => {
+    test('should handle API error with status and message (non-429)', async () => {
+      const mockCreate = jest
+        .fn()
+        .mockRejectedValue(
+          Object.assign(new Error('Bad request'), { status: 400, message: 'Invalid model' })
+        );
+      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }));
+
+      await expect(analyzeListingData('Test Item', 'desc', 100)).rejects.toThrow(
+        'Claude API error: Invalid model'
       );
+    });
+
+    test('should handle non-Error thrown object (unknown error)', async () => {
+      const mockCreate = jest.fn().mockRejectedValue('string error');
       (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
         messages: { create: mockCreate },
       }));
 
-      await expect(
-        analyzeListingData("Test Item", "desc", 100)
-      ).rejects.toThrow("Claude API error: Invalid model");
-    });
-
-    test("should handle non-Error thrown object (unknown error)", async () => {
-      const mockCreate = jest.fn().mockRejectedValue("string error");
-      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
-        messages: { create: mockCreate },
-      }));
-
-      await expect(
-        analyzeListingData("Test Item", "desc", 100)
-      ).rejects.toThrow("Unknown error calling Claude API");
-    });
-
-    test("should handle error with rate limit in message but not status", async () => {
-      const mockCreate = jest.fn().mockRejectedValue(
-        new Error("rate limit reached for this model")
+      await expect(analyzeListingData('Test Item', 'desc', 100)).rejects.toThrow(
+        'Unknown error calling Claude API'
       );
+    });
+
+    test('should handle error with rate limit in message but not status', async () => {
+      const mockCreate = jest
+        .fn()
+        .mockRejectedValue(new Error('rate limit reached for this model'));
       (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
         messages: { create: mockCreate },
       }));
 
-      await expect(
-        analyzeListingData("Test Item", "desc", 100)
-      ).rejects.toThrow("Claude API rate limit exceeded");
-    });
-
-    test("should handle error with 429 in message string", async () => {
-      const mockCreate = jest.fn().mockRejectedValue(
-        new Error("Error 429: too many requests")
+      await expect(analyzeListingData('Test Item', 'desc', 100)).rejects.toThrow(
+        'Claude API rate limit exceeded'
       );
+    });
+
+    test('should handle error with 429 in message string', async () => {
+      const mockCreate = jest.fn().mockRejectedValue(new Error('Error 429: too many requests'));
       (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
         messages: { create: mockCreate },
       }));
 
-      await expect(
-        analyzeListingData("Test Item", "desc", 100)
-      ).rejects.toThrow("Claude API rate limit exceeded");
+      await expect(analyzeListingData('Test Item', 'desc', 100)).rejects.toThrow(
+        'Claude API rate limit exceeded'
+      );
     });
 
-    test("should handle no text content in Claude response", async () => {
+    test('should handle no text content in Claude response', async () => {
       const mockCreate = jest.fn().mockResolvedValue({
-        content: [{ type: "tool_use", id: "123", name: "test", input: {} }],
+        content: [{ type: 'tool_use', id: '123', name: 'test', input: {} }],
       });
       (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
         messages: { create: mockCreate },
       }));
 
-      await expect(
-        analyzeListingData("Test Item", "desc", 100)
-      ).rejects.toThrow("No text response from Claude");
+      await expect(analyzeListingData('Test Item', 'desc', 100)).rejects.toThrow(
+        'No text response from Claude'
+      );
     });
   });
 
-  describe("parseClaudeResponse edge cases - uncovered branches", () => {
+  describe('parseClaudeResponse edge cases - uncovered branches', () => {
     const mockValidResponse = (overrides: Record<string, unknown> = {}) => {
       const base = {
-        category: "electronics",
-        condition: "good",
+        category: 'electronics',
+        condition: 'good',
         flippabilityScore: 75,
-        confidence: "high",
-        reasoning: "Test reasoning",
+        confidence: 'high',
+        reasoning: 'Test reasoning',
         ...overrides,
       };
       return JSON.stringify(base);
     };
 
-    test("should default missing fields in parsed response", async () => {
+    test('should default missing fields in parsed response', async () => {
       const mockCreate = jest.fn().mockResolvedValue({
-        content: [{ type: "text", text: mockValidResponse({
-          category: null,
-          condition: null,
-          keyFeatures: "not-an-array",
-          potentialIssues: null,
-          flippabilityScore: null,
-          confidence: "invalid-value",
-          reasoning: null,
-        }) }],
+        content: [
+          {
+            type: 'text',
+            text: mockValidResponse({
+              category: null,
+              condition: null,
+              keyFeatures: 'not-an-array',
+              potentialIssues: null,
+              flippabilityScore: null,
+              confidence: 'invalid-value',
+              reasoning: null,
+            }),
+          },
+        ],
       });
       (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
         messages: { create: mockCreate },
       }));
 
-      const result = await analyzeListingData("Test", "desc", 50);
-      expect(result.category).toBe("other");
-      expect(result.condition).toBe("good");
+      const result = await analyzeListingData('Test', 'desc', 50);
+      expect(result.category).toBe('other');
+      expect(result.condition).toBe('good');
       expect(result.keyFeatures).toEqual([]);
       expect(result.potentialIssues).toEqual([]);
       expect(result.flippabilityScore).toBe(50);
-      expect(result.confidence).toBe("medium");
-      expect(result.reasoning).toBe("No reasoning provided");
+      expect(result.confidence).toBe('medium');
+      expect(result.reasoning).toBe('No reasoning provided');
     });
 
-    test("should clamp flippabilityScore to 0-100 range", async () => {
+    test('should clamp flippabilityScore to 0-100 range', async () => {
       const mockCreate = jest.fn().mockResolvedValue({
-        content: [{ type: "text", text: mockValidResponse({ flippabilityScore: 150 }) }],
+        content: [{ type: 'text', text: mockValidResponse({ flippabilityScore: 150 }) }],
       });
       (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
         messages: { create: mockCreate },
       }));
 
-      const result = await analyzeListingData("Test", "desc", 50);
+      const result = await analyzeListingData('Test', 'desc', 50);
       expect(result.flippabilityScore).toBe(100);
     });
 
-    test("should clamp negative flippabilityScore to 0", async () => {
+    test('should clamp negative flippabilityScore to 0', async () => {
       const mockCreate = jest.fn().mockResolvedValue({
-        content: [{ type: "text", text: mockValidResponse({ flippabilityScore: -10 }) }],
+        content: [{ type: 'text', text: mockValidResponse({ flippabilityScore: -10 }) }],
       });
       (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
         messages: { create: mockCreate },
       }));
 
-      const result = await analyzeListingData("Test", "desc", 50);
+      const result = await analyzeListingData('Test', 'desc', 50);
       expect(result.flippabilityScore).toBe(0);
     });
 
-    test("should throw when response has no JSON", async () => {
+    test('should throw when response has no JSON', async () => {
       const mockCreate = jest.fn().mockResolvedValue({
-        content: [{ type: "text", text: "This is just plain text with no JSON at all" }],
+        content: [{ type: 'text', text: 'This is just plain text with no JSON at all' }],
       });
       (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
         messages: { create: mockCreate },
       }));
 
-      await expect(
-        analyzeListingData("Test", "desc", 50)
-      ).rejects.toThrow("Failed to parse Claude response");
+      await expect(analyzeListingData('Test', 'desc', 50)).rejects.toThrow(
+        'Failed to parse Claude response'
+      );
     });
   });
 
-  describe("batchAnalyzeListings - uncovered branches", () => {
-    test("should call onProgress callback", async () => {
+  describe('batchAnalyzeListings - uncovered branches', () => {
+    test('should call onProgress callback', async () => {
       const mockFindFirst = prisma.aiAnalysisCache.findFirst as jest.Mock;
       mockFindFirst.mockResolvedValue({
-        result: JSON.stringify({ category: "electronics", confidence: "high", reasoning: "test" }),
+        result: JSON.stringify({ category: 'electronics', confidence: 'high', reasoning: 'test' }),
       });
 
       const progressCalls: Array<[number, number]> = [];
@@ -1124,50 +1191,53 @@ describe("Claude Analyzer", () => {
         progressCalls.push([completed, total]);
       };
 
-      await batchAnalyzeListings(["id-1", "id-2"], onProgress);
+      await batchAnalyzeListings(['id-1', 'id-2'], onProgress);
 
-      expect(progressCalls).toEqual([[1, 2], [2, 2]]);
+      expect(progressCalls).toEqual([
+        [1, 2],
+        [2, 2],
+      ]);
     });
 
-    test("should handle errors in batch and track them", async () => {
+    test('should handle errors in batch and track them', async () => {
       const mockFindFirst = prisma.aiAnalysisCache.findFirst as jest.Mock;
       mockFindFirst.mockResolvedValueOnce(null); // not cached
-      
+
       const mockFindUnique = prisma.listing.findUnique as jest.Mock;
       mockFindUnique.mockResolvedValueOnce(null); // listing not found
 
-      const result = await batchAnalyzeListings(["missing-id"]);
+      const result = await batchAnalyzeListings(['missing-id']);
 
       expect(result.failed).toBe(1);
       expect(result.errors).toHaveLength(1);
-      expect(result.errors[0].listingId).toBe("missing-id");
-      expect(result.errors[0].error).toContain("not found");
+      expect(result.errors[0].listingId).toBe('missing-id');
+      expect(result.errors[0].error).toContain('not found');
     });
 
-    test("should handle non-Error throws in batch", async () => {
+    test('should handle non-Error throws in batch', async () => {
       const mockFindFirst = prisma.aiAnalysisCache.findFirst as jest.Mock;
       // First call: not cached. Then analyzeListing will call findFirst again for cache check.
       mockFindFirst.mockResolvedValue(null);
-      
+
       const mockFindUnique = prisma.listing.findUnique as jest.Mock;
       mockFindUnique.mockResolvedValueOnce({
-        id: "bad-id",
-        title: "Test",
-        description: "desc",
+        id: 'bad-id',
+        title: 'Test',
+        description: 'desc',
         askingPrice: 50,
-        imageUrls: "[]",
+        imageUrls: '[]',
       });
 
       // Make the API call throw a non-Error
-      const mockCreate = jest.fn().mockRejectedValue("string error");
+      const mockCreate = jest.fn().mockRejectedValue('string error');
       (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
         messages: { create: mockCreate },
       }));
 
-      const result = await batchAnalyzeListings(["bad-id"]);
+      const result = await batchAnalyzeListings(['bad-id']);
 
       expect(result.failed).toBe(1);
-      expect(result.errors[0].error).toBe("Unknown error calling Claude API");
+      expect(result.errors[0].error).toBe('Unknown error calling Claude API');
     });
   });
 });

@@ -2,26 +2,26 @@
  * @jest-environment jsdom
  */
 
-import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 // Mock useFilterParams
 const mockSetFilter = jest.fn();
 const mockClearFilters = jest.fn();
-jest.mock("@/hooks/useFilterParams", () => ({
+jest.mock('@/hooks/useFilterParams', () => ({
   useFilterParams: () => ({
     filters: {
-      search: "",
-      platform: "",
-      status: "",
-      minPrice: "",
-      maxPrice: "",
-      sort: "newest",
-      location: "",
-      category: "",
-      dateFrom: "",
-      dateTo: "",
+      search: '',
+      platform: '',
+      status: '',
+      minPrice: '',
+      maxPrice: '',
+      sort: 'newest',
+      location: '',
+      category: '',
+      dateFrom: '',
+      dateTo: '',
     },
     setFilter: mockSetFilter,
     clearFilters: mockClearFilters,
@@ -30,7 +30,7 @@ jest.mock("@/hooks/useFilterParams", () => ({
 }));
 
 // Mock lucide-react icons
-jest.mock("lucide-react", () => {
+jest.mock('lucide-react', () => {
   const handler = {
     get: (_: any, name: string) => {
       const Component = (props: any) => <span data-testid={`icon-${name}`} {...props} />;
@@ -48,36 +48,36 @@ global.confirm = jest.fn(() => true);
 
 const mockListings = [
   {
-    id: "1",
-    platform: "EBAY",
-    title: "iPhone 15 Pro",
+    id: '1',
+    platform: 'EBAY',
+    title: 'iPhone 15 Pro',
     askingPrice: 500,
     estimatedValue: 800,
     profitPotential: 250,
     valueScore: 85,
     discountPercent: 37.5,
-    status: "NEW",
-    location: "Tampa, FL",
-    url: "https://ebay.com/item/1",
+    status: 'NEW',
+    location: 'Tampa, FL',
+    url: 'https://ebay.com/item/1',
     scrapedAt: new Date().toISOString(),
     imageUrls: '["https://example.com/img.jpg"]',
     opportunity: null,
   },
   {
-    id: "2",
-    platform: "CRAIGSLIST",
-    title: "Vintage Guitar",
+    id: '2',
+    platform: 'CRAIGSLIST',
+    title: 'Vintage Guitar',
     askingPrice: 200,
     estimatedValue: 600,
     profitPotential: 350,
     valueScore: 92,
     discountPercent: 66.7,
-    status: "OPPORTUNITY",
-    location: "Orlando, FL",
-    url: "https://craigslist.org/item/2",
+    status: 'OPPORTUNITY',
+    location: 'Orlando, FL',
+    url: 'https://craigslist.org/item/2',
     scrapedAt: new Date().toISOString(),
     imageUrls: null,
-    opportunity: { id: "opp-1" },
+    opportunity: { id: 'opp-1' },
   },
 ];
 
@@ -92,50 +92,54 @@ function setupFetchMock() {
   });
 }
 
-import Dashboard from "@/app/page";
+import Dashboard from '@/app/page';
 
-describe("Dashboard", () => {
+describe('Dashboard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     setupFetchMock();
   });
 
-  it("renders loading state initially", () => {
+  it('renders loading state initially', () => {
     mockFetch.mockReturnValue(new Promise(() => {}));
     render(<Dashboard />);
-    expect(screen.getByText("Loading listings...")).toBeInTheDocument();
+    expect(screen.getByText('Loading listings...')).toBeInTheDocument();
   });
 
-  it("fetches and displays listings", async () => {
+  it('fetches and displays listings', async () => {
     render(<Dashboard />);
     await waitFor(() => {
-      expect(screen.getByText("iPhone 15 Pro")).toBeInTheDocument();
+      expect(screen.getByText('iPhone 15 Pro')).toBeInTheDocument();
     });
-    expect(screen.getByText("Vintage Guitar")).toBeInTheDocument();
+    expect(screen.getByText('Vintage Guitar')).toBeInTheDocument();
   });
 
-  it("displays total listings stat", async () => {
+  it('displays total listings stat', async () => {
     render(<Dashboard />);
     await waitFor(() => {
       // stats.totalListings = data.total = 42
-      expect(screen.getByText("Total Listings")).toBeInTheDocument();
+      expect(screen.getByText('Total Listings')).toBeInTheDocument();
     });
   });
 
-  it("handles fetch error gracefully (logs to console)", async () => {
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation();
-    mockFetch.mockRejectedValue(new Error("Network error"));
+  it('handles fetch error gracefully (logs to console)', async () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+    mockFetch.mockRejectedValue(new Error('Network error'));
     render(<Dashboard />);
     await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalledWith("Failed to fetch listings:", expect.any(Error));
+      expect(consoleSpy).toHaveBeenCalledWith('Failed to fetch listings:', expect.any(Error));
     });
     consoleSpy.mockRestore();
   });
 
-  it("handles empty listings", async () => {
+  it('handles empty listings', async () => {
     mockFetch.mockResolvedValue({
       ok: true,
-      json: async () => ({ listings: [], total: 0, pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } }),
+      json: async () => ({
+        listings: [],
+        total: 0,
+        pagination: { page: 1, limit: 20, total: 0, totalPages: 0 },
+      }),
     });
     render(<Dashboard />);
     await waitFor(() => {
@@ -143,36 +147,36 @@ describe("Dashboard", () => {
     });
   });
 
-  it("calls fetch with correct URL on mount", async () => {
+  it('calls fetch with correct URL on mount', async () => {
     render(<Dashboard />);
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/api/listings"));
+      expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/api/listings'));
     });
   });
 
-  it("renders platform badges", async () => {
+  it('renders platform badges', async () => {
     render(<Dashboard />);
     await waitFor(() => {
-      expect(screen.getByText("EBAY")).toBeInTheDocument();
-      expect(screen.getByText("CRAIGSLIST")).toBeInTheDocument();
+      expect(screen.getByText('EBAY')).toBeInTheDocument();
+      expect(screen.getByText('CRAIGSLIST')).toBeInTheDocument();
     });
   });
 
-  it("renders listing prices", async () => {
+  it('renders listing prices', async () => {
     render(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText(/\$500/)).toBeInTheDocument();
     });
   });
 
-  it("shows opportunities stat label", async () => {
+  it('shows opportunities stat label', async () => {
     render(<Dashboard />);
     await waitFor(() => {
-      expect(screen.getAllByText("Opportunities").length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Opportunities').length).toBeGreaterThan(0);
     });
   });
 
-  it("handles create opportunity from listing", async () => {
+  it('handles create opportunity from listing', async () => {
     mockFetch
       .mockResolvedValueOnce({
         ok: true,
@@ -182,7 +186,7 @@ describe("Dashboard", () => {
           pagination: { page: 1, limit: 20, total: 2, totalPages: 1 },
         }),
       })
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ id: "new-opp" }) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 'new-opp' }) })
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -194,18 +198,18 @@ describe("Dashboard", () => {
 
     render(<Dashboard />);
     await waitFor(() => {
-      expect(screen.getByText("iPhone 15 Pro")).toBeInTheDocument();
+      expect(screen.getByText('iPhone 15 Pro')).toBeInTheDocument();
     });
 
-    const starIcons = screen.getAllByTestId("icon-Star");
+    const starIcons = screen.getAllByTestId('icon-Star');
     if (starIcons.length > 0) {
-      const btn = starIcons[0].closest("button");
+      const btn = starIcons[0].closest('button');
       if (btn) {
         await userEvent.click(btn);
         await waitFor(() => {
           expect(mockFetch).toHaveBeenCalledWith(
-            "/api/opportunities",
-            expect.objectContaining({ method: "POST" })
+            '/api/opportunities',
+            expect.objectContaining({ method: 'POST' })
           );
         });
       }

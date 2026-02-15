@@ -138,16 +138,12 @@ describe('GET /api/messages', () => {
 
   it('caps limit at 100', async () => {
     await GET(createRequest('/api/messages?limit=999'));
-    expect(mockFindMany).toHaveBeenCalledWith(
-      expect.objectContaining({ take: 100 })
-    );
+    expect(mockFindMany).toHaveBeenCalledWith(expect.objectContaining({ take: 100 }));
   });
 
   it('supports pagination offset', async () => {
     await GET(createRequest('/api/messages?offset=20&limit=10'));
-    expect(mockFindMany).toHaveBeenCalledWith(
-      expect.objectContaining({ skip: 20, take: 10 })
-    );
+    expect(mockFindMany).toHaveBeenCalledWith(expect.objectContaining({ skip: 20, take: 10 }));
   });
 
   it('returns hasMore=true when more results exist', async () => {

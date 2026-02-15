@@ -3,7 +3,7 @@
  * Unit tests for Facebook OAuth flow
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   getAuthorizationUrl,
   exchangeCodeForToken,
@@ -13,43 +13,43 @@ import {
   revokeAccessToken,
   calculateExpirationTimestamp,
   isTokenExpiring,
-} from "@/scrapers/facebook/auth";
+} from '@/scrapers/facebook/auth';
 
-describe("Facebook Authentication", () => {
+describe('Facebook Authentication', () => {
   const mockConfig = {
-    appId: "test-app-id",
-    appSecret: "test-app-secret",
-    redirectUri: "http://localhost:3000/callback",
+    appId: 'test-app-id',
+    appSecret: 'test-app-secret',
+    redirectUri: 'http://localhost:3000/callback',
   };
 
-  describe("getAuthorizationUrl", () => {
-    it("should generate valid authorization URL", () => {
+  describe('getAuthorizationUrl', () => {
+    it('should generate valid authorization URL', () => {
       const url = getAuthorizationUrl(mockConfig);
 
-      expect(url).toContain("https://www.facebook.com/v18.0/dialog/oauth");
+      expect(url).toContain('https://www.facebook.com/v18.0/dialog/oauth');
       expect(url).toContain(`client_id=${mockConfig.appId}`);
       expect(url).toContain(`redirect_uri=${encodeURIComponent(mockConfig.redirectUri)}`);
-      expect(url).toContain("scope=public_profile%2Cemail");
-      expect(url).toContain("response_type=code");
+      expect(url).toContain('scope=public_profile%2Cemail');
+      expect(url).toContain('response_type=code');
     });
 
-    it("should include state parameter when provided", () => {
-      const state = "random-state-token";
+    it('should include state parameter when provided', () => {
+      const state = 'random-state-token';
       const url = getAuthorizationUrl(mockConfig, state);
 
       expect(url).toContain(`state=${state}`);
     });
   });
 
-  describe("exchangeCodeForToken", () => {
+  describe('exchangeCodeForToken', () => {
     beforeEach(() => {
       global.fetch = vi.fn();
     });
 
-    it("should exchange code for access token", async () => {
+    it('should exchange code for access token', async () => {
       const mockResponse = {
-        access_token: "short-lived-token",
-        token_type: "bearer",
+        access_token: 'short-lived-token',
+        token_type: 'bearer',
         expires_in: 3600,
       };
 
@@ -58,39 +58,39 @@ describe("Facebook Authentication", () => {
         json: async () => mockResponse,
       });
 
-      const result = await exchangeCodeForToken(mockConfig, "test-code");
+      const result = await exchangeCodeForToken(mockConfig, 'test-code');
 
       expect(result).toEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining("https://graph.facebook.com/v18.0/oauth/access_token")
+        expect.stringContaining('https://graph.facebook.com/v18.0/oauth/access_token')
       );
     });
 
-    it("should throw error on failed exchange", async () => {
+    it('should throw error on failed exchange', async () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: false,
         status: 400,
-        statusText: "Bad Request",
+        statusText: 'Bad Request',
         json: async () => ({
-          error: { message: "Invalid authorization code" },
+          error: { message: 'Invalid authorization code' },
         }),
       });
 
-      await expect(
-        exchangeCodeForToken(mockConfig, "invalid-code")
-      ).rejects.toThrow("Invalid authorization code");
+      await expect(exchangeCodeForToken(mockConfig, 'invalid-code')).rejects.toThrow(
+        'Invalid authorization code'
+      );
     });
   });
 
-  describe("exchangeForLongLivedToken", () => {
+  describe('exchangeForLongLivedToken', () => {
     beforeEach(() => {
       global.fetch = vi.fn();
     });
 
-    it("should exchange short-lived token for long-lived token", async () => {
+    it('should exchange short-lived token for long-lived token', async () => {
       const mockResponse = {
-        access_token: "long-lived-token",
-        token_type: "bearer",
+        access_token: 'long-lived-token',
+        token_type: 'bearer',
         expires_in: 5184000, // 60 days
       };
 
@@ -99,26 +99,23 @@ describe("Facebook Authentication", () => {
         json: async () => mockResponse,
       });
 
-      const result = await exchangeForLongLivedToken(
-        mockConfig,
-        "short-lived-token"
-      );
+      const result = await exchangeForLongLivedToken(mockConfig, 'short-lived-token');
 
       expect(result).toEqual(mockResponse);
       expect(result.expires_in).toBe(5184000);
     });
   });
 
-  describe("verifyAccessToken", () => {
+  describe('verifyAccessToken', () => {
     beforeEach(() => {
       global.fetch = vi.fn();
     });
 
-    it("should verify valid token", async () => {
+    it('should verify valid token', async () => {
       const mockResponse = {
         data: {
-          app_id: "test-app-id",
-          user_id: "test-user-id",
+          app_id: 'test-app-id',
+          user_id: 'test-user-id',
           is_valid: true,
           expires_at: Math.floor(Date.now() / 1000) + 3600,
         },
@@ -129,27 +126,27 @@ describe("Facebook Authentication", () => {
         json: async () => mockResponse,
       });
 
-      const result = await verifyAccessToken("test-token");
+      const result = await verifyAccessToken('test-token');
 
       expect(result.isValid).toBe(true);
-      expect(result.userId).toBe("test-user-id");
-      expect(result.appId).toBe("test-app-id");
+      expect(result.userId).toBe('test-user-id');
+      expect(result.appId).toBe('test-app-id');
     });
   });
 
-  describe("refreshAccessToken", () => {
+  describe('refreshAccessToken', () => {
     beforeEach(() => {
       global.fetch = vi.fn();
     });
 
-    it("should refresh valid token", async () => {
+    it('should refresh valid token', async () => {
       // Mock verify call
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           data: {
-            app_id: "test-app-id",
-            user_id: "test-user-id",
+            app_id: 'test-app-id',
+            user_id: 'test-user-id',
             is_valid: true,
             expires_at: Math.floor(Date.now() / 1000) + 3600,
           },
@@ -160,19 +157,19 @@ describe("Facebook Authentication", () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          access_token: "refreshed-token",
-          token_type: "bearer",
+          access_token: 'refreshed-token',
+          token_type: 'bearer',
           expires_in: 5184000,
         }),
       });
 
-      const result = await refreshAccessToken(mockConfig, "old-token");
+      const result = await refreshAccessToken(mockConfig, 'old-token');
 
-      expect(result.access_token).toBe("refreshed-token");
+      expect(result.access_token).toBe('refreshed-token');
       expect(result.expires_in).toBe(5184000);
     });
 
-    it("should throw error if token is invalid", async () => {
+    it('should throw error if token is invalid', async () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -182,29 +179,29 @@ describe("Facebook Authentication", () => {
         }),
       });
 
-      await expect(
-        refreshAccessToken(mockConfig, "invalid-token")
-      ).rejects.toThrow("Token is invalid");
+      await expect(refreshAccessToken(mockConfig, 'invalid-token')).rejects.toThrow(
+        'Token is invalid'
+      );
     });
   });
 
-  describe("revokeAccessToken", () => {
+  describe('revokeAccessToken', () => {
     beforeEach(() => {
       global.fetch = vi.fn();
     });
 
-    it("should revoke access token", async () => {
+    it('should revoke access token', async () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true }),
       });
 
-      await expect(revokeAccessToken("test-token")).resolves.not.toThrow();
+      await expect(revokeAccessToken('test-token')).resolves.not.toThrow();
     });
   });
 
-  describe("calculateExpirationTimestamp", () => {
-    it("should calculate correct expiration timestamp", () => {
+  describe('calculateExpirationTimestamp', () => {
+    it('should calculate correct expiration timestamp', () => {
       const expiresIn = 3600; // 1 hour
       const before = Math.floor(Date.now() / 1000);
       const timestamp = calculateExpirationTimestamp(expiresIn);
@@ -215,18 +212,18 @@ describe("Facebook Authentication", () => {
     });
   });
 
-  describe("isTokenExpiring", () => {
-    it("should return true if token is expired", () => {
+  describe('isTokenExpiring', () => {
+    it('should return true if token is expired', () => {
       const expiredTime = Math.floor(Date.now() / 1000) - 3600; // 1 hour ago
       expect(isTokenExpiring(expiredTime)).toBe(true);
     });
 
-    it("should return true if token expires within buffer", () => {
+    it('should return true if token expires within buffer', () => {
       const expiringTime = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
       expect(isTokenExpiring(expiringTime, 7200)).toBe(true); // 2 hour buffer
     });
 
-    it("should return false if token has plenty of time left", () => {
+    it('should return false if token has plenty of time left', () => {
       const futureTime = Math.floor(Date.now() / 1000) + 604800; // 1 week from now
       expect(isTokenExpiring(futureTime, 86400)).toBe(false); // 1 day buffer
     });

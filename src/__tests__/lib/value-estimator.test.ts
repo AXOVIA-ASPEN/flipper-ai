@@ -10,13 +10,7 @@ describe('Value Estimator', () => {
   describe('estimateValue', () => {
     describe('basic estimation', () => {
       it('should return all required fields in the result', () => {
-        const result = estimateValue(
-          'Test Item',
-          'A simple test item',
-          100,
-          'good',
-          'electronics'
-        );
+        const result = estimateValue('Test Item', 'A simple test item', 100, 'good', 'electronics');
 
         expect(result).toHaveProperty('estimatedValue');
         expect(result).toHaveProperty('estimatedLow');
@@ -124,7 +118,13 @@ describe('Value Estimator', () => {
       });
 
       it('should boost value for Samsung products', () => {
-        const result = estimateValue('Samsung Galaxy S21', 'Great Samsung phone', 400, 'good', 'electronics');
+        const result = estimateValue(
+          'Samsung Galaxy S21',
+          'Great Samsung phone',
+          400,
+          'good',
+          'electronics'
+        );
         expect(result.tags).toContain('samsung');
       });
 
@@ -135,7 +135,13 @@ describe('Value Estimator', () => {
       });
 
       it('should boost value for Sony/PlayStation products', () => {
-        const result = estimateValue('PS5 Digital Edition', 'PlayStation 5', 400, 'like new', 'video games');
+        const result = estimateValue(
+          'PS5 Digital Edition',
+          'PlayStation 5',
+          400,
+          'like new',
+          'video games'
+        );
         expect(result.tags).toContain('sony');
       });
 
@@ -145,7 +151,13 @@ describe('Value Estimator', () => {
       });
 
       it('should boost value for vintage/collectible items', () => {
-        const result = estimateValue('Vintage 1950s Radio', 'Antique collectible', 100, 'fair', 'collectibles');
+        const result = estimateValue(
+          'Vintage 1950s Radio',
+          'Antique collectible',
+          100,
+          'fair',
+          'collectibles'
+        );
         expect(result.tags).toContain('vintage');
       });
 
@@ -155,25 +167,55 @@ describe('Value Estimator', () => {
       });
 
       it('should boost value for rare/limited edition items', () => {
-        const result = estimateValue('Limited Edition Console', 'Rare collector item', 500, 'excellent', 'video games');
+        const result = estimateValue(
+          'Limited Edition Console',
+          'Rare collector item',
+          500,
+          'excellent',
+          'video games'
+        );
         expect(result.tags).toContain('rare');
       });
 
       it('should boost value for Pioneer DJ equipment', () => {
-        const result = estimateValue('Pioneer DDJ-SB3', 'DJ controller', 200, 'like new', 'musical');
+        const result = estimateValue(
+          'Pioneer DDJ-SB3',
+          'DJ controller',
+          200,
+          'like new',
+          'musical'
+        );
         expect(result.tags).toContain('dj-equipment');
       });
 
       it('should set high confidence when value keywords match and no risks', () => {
-        const result = estimateValue('Apple MacBook Pro', 'Like new condition', 800, 'excellent', 'electronics');
+        const result = estimateValue(
+          'Apple MacBook Pro',
+          'Like new condition',
+          800,
+          'excellent',
+          'electronics'
+        );
         expect(result.confidence).toBe('high');
       });
     });
 
     describe('risk keywords', () => {
       it('should penalize broken/parts only items', () => {
-        const brokenResult = estimateValue('iPhone for parts only', 'Broken screen', 100, 'poor', 'electronics');
-        const workingResult = estimateValue('iPhone working great', null, 100, 'good', 'electronics');
+        const brokenResult = estimateValue(
+          'iPhone for parts only',
+          'Broken screen',
+          100,
+          'poor',
+          'electronics'
+        );
+        const workingResult = estimateValue(
+          'iPhone working great',
+          null,
+          100,
+          'good',
+          'electronics'
+        );
 
         expect(brokenResult.estimatedValue).toBeLessThan(workingResult.estimatedValue);
         expect(brokenResult.tags).toContain('for-parts');
@@ -181,23 +223,47 @@ describe('Value Estimator', () => {
       });
 
       it('should penalize items needing repair', () => {
-        const result = estimateValue('TV needs repair', 'Not working properly', 200, 'fair', 'electronics');
+        const result = estimateValue(
+          'TV needs repair',
+          'Not working properly',
+          200,
+          'fair',
+          'electronics'
+        );
         expect(result.tags).toContain('needs-repair');
         expect(result.notes).toContain('Caution');
       });
 
       it('should penalize scratched/dented items', () => {
-        const result = estimateValue('Laptop scratched', 'Some dents on case', 500, 'fair', 'electronics');
+        const result = estimateValue(
+          'Laptop scratched',
+          'Some dents on case',
+          500,
+          'fair',
+          'electronics'
+        );
         expect(result.tags).toContain('cosmetic-wear');
       });
 
       it('should penalize incomplete items', () => {
-        const result = estimateValue('Game console', 'Missing controller', 150, 'good', 'video games');
+        const result = estimateValue(
+          'Game console',
+          'Missing controller',
+          150,
+          'good',
+          'video games'
+        );
         expect(result.tags).toContain('incomplete');
       });
 
       it('should increase difficulty for items with risk factors', () => {
-        const riskyResult = estimateValue('Broken laptop for parts', null, 100, 'poor', 'electronics');
+        const riskyResult = estimateValue(
+          'Broken laptop for parts',
+          null,
+          100,
+          'poor',
+          'electronics'
+        );
         const goodResult = estimateValue('Working laptop', null, 100, 'good', 'electronics');
 
         // Risk items should have higher difficulty (harder to resell)
@@ -240,7 +306,13 @@ describe('Value Estimator', () => {
 
     describe('shippable detection', () => {
       it('should detect local pickup only items', () => {
-        const result = estimateValue('Large furniture', 'Local pickup only', 500, 'good', 'furniture');
+        const result = estimateValue(
+          'Large furniture',
+          'Local pickup only',
+          500,
+          'good',
+          'furniture'
+        );
         expect(result.shippable).toBe(false);
         expect(result.tags).toContain('local-only');
       });
@@ -251,12 +323,24 @@ describe('Value Estimator', () => {
       });
 
       it('should detect must pick up items', () => {
-        const result = estimateValue('Couch', 'Must pick up from my location', 300, 'good', 'furniture');
+        const result = estimateValue(
+          'Couch',
+          'Must pick up from my location',
+          300,
+          'good',
+          'furniture'
+        );
         expect(result.shippable).toBe(false);
       });
 
       it('should mark as shippable when no local-only indicators', () => {
-        const result = estimateValue('Small electronics', 'Will ship anywhere', 50, 'good', 'electronics');
+        const result = estimateValue(
+          'Small electronics',
+          'Will ship anywhere',
+          50,
+          'good',
+          'electronics'
+        );
         expect(result.shippable).toBe(true);
         expect(result.tags).not.toContain('local-only');
       });
@@ -289,7 +373,13 @@ describe('Value Estimator', () => {
 
       it('should show negative profit for overpriced items', () => {
         // An item with severe penalties should show negative profit
-        const result = estimateValue('Broken item', 'For parts only, not working', 1000, 'poor', 'electronics');
+        const result = estimateValue(
+          'Broken item',
+          'For parts only, not working',
+          1000,
+          'poor',
+          'electronics'
+        );
         expect(result.profitPotential).toBeLessThan(0);
       });
     });
@@ -302,8 +392,20 @@ describe('Value Estimator', () => {
       });
 
       it('should give higher score for items with good profit margin', () => {
-        const goodDeal = estimateValue('Apple iPhone sealed', 'New in box', 200, 'new', 'electronics');
-        const badDeal = estimateValue('Broken junk', 'For parts, not working', 500, 'poor', 'electronics');
+        const goodDeal = estimateValue(
+          'Apple iPhone sealed',
+          'New in box',
+          200,
+          'new',
+          'electronics'
+        );
+        const badDeal = estimateValue(
+          'Broken junk',
+          'For parts, not working',
+          500,
+          'poor',
+          'electronics'
+        );
 
         expect(goodDeal.valueScore).toBeGreaterThan(badDeal.valueScore);
       });
@@ -333,7 +435,13 @@ describe('Value Estimator', () => {
       });
 
       it('should show positive discount when item is priced below market', () => {
-        const result = estimateValue('Apple MacBook Pro', 'Like new', 500, 'excellent', 'electronics');
+        const result = estimateValue(
+          'Apple MacBook Pro',
+          'Like new',
+          500,
+          'excellent',
+          'electronics'
+        );
         expect(result.discountPercent).toBeGreaterThan(0);
       });
     });
@@ -416,9 +524,7 @@ describe('Value Estimator', () => {
 
       it('should encode search query in URLs', () => {
         const result = estimateValue('Apple iPhone 12 Pro Max', null, 500, 'good', 'electronics');
-        const ebaySold = result.comparableUrls.find(
-          (url: ComparableUrl) => url.type === 'sold'
-        );
+        const ebaySold = result.comparableUrls.find((url: ComparableUrl) => url.type === 'sold');
         // URL should be encoded
         expect(ebaySold?.url).toContain('%20');
       });
@@ -447,7 +553,13 @@ describe('Value Estimator', () => {
       });
 
       it('should generate notes about flip potential', () => {
-        const result = estimateValue('Apple iPhone sealed', 'New in box', 200, 'new', 'electronics');
+        const result = estimateValue(
+          'Apple iPhone sealed',
+          'New in box',
+          200,
+          'new',
+          'electronics'
+        );
         expect(result.notes.length).toBeGreaterThan(0);
       });
 
@@ -800,7 +912,8 @@ describe('Value Estimator', () => {
 
     describe('title truncation', () => {
       it('should truncate long titles', () => {
-        const longTitle = 'This is a very long title that exceeds the maximum allowed character limit for display purposes';
+        const longTitle =
+          'This is a very long title that exceeds the maximum allowed character limit for display purposes';
         const message = generatePurchaseMessage(longTitle, 100, false, null);
 
         expect(message).toContain('...');

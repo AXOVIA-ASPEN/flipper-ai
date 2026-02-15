@@ -52,7 +52,9 @@ export class ScraperPage extends BasePage {
   }
 
   async waitForResults() {
-    await expect(this.page.getByText(/Scrape complete|Found \d+ Listings/i)).toBeVisible({ timeout: 10000 });
+    await expect(this.page.getByText(/Scrape complete|Found \d+ Listings/i)).toBeVisible({
+      timeout: 10000,
+    });
   }
 
   async getResultCount() {

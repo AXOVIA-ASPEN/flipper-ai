@@ -17,7 +17,9 @@ describe('sleep', () => {
 
   it('does not resolve before the delay', async () => {
     let resolved = false;
-    sleep(500).then(() => { resolved = true; });
+    sleep(500).then(() => {
+      resolved = true;
+    });
     jest.advanceTimersByTime(499);
     await Promise.resolve(); // flush microtasks
     expect(resolved).toBe(false);

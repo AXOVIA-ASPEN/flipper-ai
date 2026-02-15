@@ -31,9 +31,7 @@ Before(async function (this: CustomWorld, { pickle }) {
   // Create a new browser context for each scenario (isolation)
   const context = await browser.newContext({
     viewport: { width: 1920, height: 1080 },
-    recordVideo: process.env.RECORD_VIDEO
-      ? { dir: 'videos/' }
-      : undefined,
+    recordVideo: process.env.RECORD_VIDEO ? { dir: 'videos/' } : undefined,
   });
 
   // Create a new page
@@ -77,13 +75,13 @@ After(async function (this: CustomWorld, { result, pickle }) {
 Before({ tags: '@auth' }, async function (this: CustomWorld) {
   // Auto-login for scenarios tagged with @auth
   console.log('🔐 Auto-login enabled for @auth scenario');
-  
+
   await this.page.goto('/login');
   await this.page.fill('[name="email"]', 'testuser@example.com');
   await this.page.fill('[name="password"]', 'TestPass123!');
   await this.page.click('button[type="submit"]');
   await this.page.waitForURL('/dashboard');
-  
+
   await this.screenshot('auto-login');
 });
 

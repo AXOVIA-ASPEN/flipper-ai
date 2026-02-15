@@ -3,9 +3,9 @@
  * POST /api/auth/register - Create a new user account with email/password
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import prisma from "@/lib/db";
+import { NextRequest, NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
+import prisma from '@/lib/db';
 
 interface RegisterBody {
   email: string;
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     // Validate required fields
     if (!email || !password) {
       return NextResponse.json(
-        { success: false, error: "Email and password are required" },
+        { success: false, error: 'Email and password are required' },
         { status: 400 }
       );
     }
@@ -29,16 +29,13 @@ export async function POST(request: NextRequest) {
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { success: false, error: "Invalid email format" },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'Invalid email format' }, { status: 400 });
     }
 
     // Validate password strength
     if (password.length < 8) {
       return NextResponse.json(
-        { success: false, error: "Password must be at least 8 characters" },
+        { success: false, error: 'Password must be at least 8 characters' },
         { status: 400 }
       );
     }
@@ -50,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       return NextResponse.json(
-        { success: false, error: "An account with this email already exists" },
+        { success: false, error: 'An account with this email already exists' },
         { status: 409 }
       );
     }
@@ -66,7 +63,7 @@ export async function POST(request: NextRequest) {
         name: name || null,
         settings: {
           create: {
-            llmModel: "gpt-4o-mini",
+            llmModel: 'gpt-4o-mini',
             discountThreshold: 50,
             autoAnalyze: true,
           },
@@ -83,7 +80,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Account created successfully",
+      message: 'Account created successfully',
       data: {
         user: {
           id: user.id,
@@ -93,9 +90,9 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Registration error:", error);
+    console.error('Registration error:', error);
     return NextResponse.json(
-      { success: false, error: "Failed to create account" },
+      { success: false, error: 'Failed to create account' },
       { status: 500 }
     );
   }
