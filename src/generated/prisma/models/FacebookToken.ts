@@ -1011,7 +1011,6 @@ export type FacebookTokenCreateManyArgs<ExtArgs extends runtime.Types.Extensions
    * The data used to create many FacebookTokens.
    */
   data: Prisma.FacebookTokenCreateManyInput | Prisma.FacebookTokenCreateManyInput[]
-  skipDuplicates?: boolean
 }
 
 /**
@@ -1030,7 +1029,6 @@ export type FacebookTokenCreateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    * The data used to create many FacebookTokens.
    */
   data: Prisma.FacebookTokenCreateManyInput | Prisma.FacebookTokenCreateManyInput[]
-  skipDuplicates?: boolean
 }
 
 /**

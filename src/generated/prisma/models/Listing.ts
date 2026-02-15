@@ -2051,7 +2051,6 @@ export type ListingCreateOrConnectWithoutUserInput = {
 
 export type ListingCreateManyUserInputEnvelope = {
   data: Prisma.ListingCreateManyUserInput | Prisma.ListingCreateManyUserInput[]
-  skipDuplicates?: boolean
 }
 
 export type ListingUpsertWithWhereUniqueWithoutUserInput = {
@@ -3382,7 +3381,6 @@ export type ListingCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * The data used to create many Listings.
    */
   data: Prisma.ListingCreateManyInput | Prisma.ListingCreateManyInput[]
-  skipDuplicates?: boolean
 }
 
 /**
@@ -3401,7 +3399,6 @@ export type ListingCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    * The data used to create many Listings.
    */
   data: Prisma.ListingCreateManyInput | Prisma.ListingCreateManyInput[]
-  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
