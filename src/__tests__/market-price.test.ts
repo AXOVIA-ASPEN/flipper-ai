@@ -42,7 +42,7 @@ jest.mock('playwright', () => ({
   },
 }));
 
-import { fetchMarketPrice, fetchMarketPricesBatch, closeBrowser } from '../lib/market-price';
+import { fetchMarketPrice, fetchMarketPricesBatch, closeBrowser, parseEbayPrice, median, buildEbaySoldUrl } from '../lib/market-price';
 
 describe('market-price', () => {
   afterAll(async () => {
@@ -384,6 +384,155 @@ describe('market-price', () => {
       const result = await fetchMarketPrice('test item', 'unknown_category');
       expect(result).not.toBeNull();
       expect(result!.soldListings[0].shippingCost).toBe(5.5);
+    });
+  });
+
+  describe('parseEbayPrice (direct)', () => {
+    it('parses standard dollar amount', () => {
+      expect(parseEbayPrice('$100.00')).toBe(100);
+    });
+
+    it('parses price with commas', () => {
+      expect(parseEbayPrice('$1,234.56')).toBe(1234.56);
+    });
+
+    it('parses price without dollar sign', () => {
+      expect(parseEbayPrice('250.99')).toBe(250.99);
+    });
+
+    it('parses price with extra text', () => {
+      expect(parseEbayPrice('US $99.99 (approx)')).toBe(99.99);
+    });
+
+    it('returns 0 for empty string', () => {
+      expect(parseEbayPrice('')).toBe(0);
+    });
+
+    it('returns 0 for non-numeric string', () => {
+      expect(parseEbayPrice('no price')).toBe(0);
+    });
+
+    it('parses whole number without decimals', () => {
+      expect(parseEbayPrice('$50')).toBe(50);
+    });
+
+    it('parses price with currency symbols', () => {
+      expect(parseEbayPrice('€150.00')).toBe(150);
+    });
+
+    it('parses large prices with multiple commas', () => {
+      expect(parseEbayPrice('$10,000,000.00')).toBe(10000000);
+    });
+  });
+
+  describe('median (direct)', () => {
+    it('returns 0 for empty array', () => {
+      expect(median([])).toBe(0);
+    });
+
+    it('returns the single element for length 1', () => {
+      expect(median([42])).toBe(42);
+    });
+
+    it('returns middle element for odd-length array', () => {
+      expect(median([1, 3, 5])).toBe(3);
+    });
+
+    it('returns average of two middle elements for even-length array', () => {
+      expect(median([1, 2, 3, 4])).toBe(2.5);
+    });
+
+    it('handles unsorted input', () => {
+      expect(median([5, 1, 3])).toBe(3);
+    });
+
+    it('does not mutate original array', () => {
+      const arr = [3, 1, 2];
+      median(arr);
+      expect(arr).toEqual([3, 1, 2]);
+    });
+
+    it('handles duplicate values', () => {
+      expect(median([5, 5, 5, 5])).toBe(5);
+    });
+
+    it('handles two elements', () => {
+      expect(median([10, 20])).toBe(15);
+    });
+  });
+
+  describe('buildEbaySoldUrl (direct)', () => {
+    it('builds URL with search query', () => {
+      const url = buildEbaySoldUrl('iPhone 14');
+      expect(url).toContain('_nkw=iPhone+14');
+      expect(url).toContain('LH_Complete=1');
+      expect(url).toContain('LH_Sold=1');
+      expect(url).toContain('_sop=13');
+    });
+
+    it('includes category ID for known category', () => {
+      const url = buildEbaySoldUrl('laptop', 'electronics');
+      expect(url).toContain('_sacat=293');
+    });
+
+    it('includes category for video games', () => {
+      const url = buildEbaySoldUrl('ps5', 'video games');
+      expect(url).toContain('_sacat=1249');
+    });
+
+    it('includes category for computers', () => {
+      const url = buildEbaySoldUrl('macbook', 'computers');
+      expect(url).toContain('_sacat=58058');
+    });
+
+    it('includes category for cell phones', () => {
+      const url = buildEbaySoldUrl('pixel', 'cell phones');
+      expect(url).toContain('_sacat=15032');
+    });
+
+    it('includes category for collectibles', () => {
+      const url = buildEbaySoldUrl('coins', 'collectibles');
+      expect(url).toContain('_sacat=1');
+    });
+
+    it('includes category for tools', () => {
+      const url = buildEbaySoldUrl('drill', 'tools');
+      expect(url).toContain('_sacat=631');
+    });
+
+    it('includes category for musical', () => {
+      const url = buildEbaySoldUrl('guitar', 'musical');
+      expect(url).toContain('_sacat=619');
+    });
+
+    it('includes category for furniture', () => {
+      const url = buildEbaySoldUrl('desk', 'furniture');
+      expect(url).toContain('_sacat=3197');
+    });
+
+    it('includes category for appliances', () => {
+      const url = buildEbaySoldUrl('microwave', 'appliances');
+      expect(url).toContain('_sacat=20710');
+    });
+
+    it('includes category for sports', () => {
+      const url = buildEbaySoldUrl('bike', 'sports');
+      expect(url).toContain('_sacat=888');
+    });
+
+    it('does not add _sacat for unknown category', () => {
+      const url = buildEbaySoldUrl('thing', 'unknown');
+      expect(url).not.toContain('_sacat');
+    });
+
+    it('does not add _sacat when no category provided', () => {
+      const url = buildEbaySoldUrl('thing');
+      expect(url).not.toContain('_sacat');
+    });
+
+    it('handles case-insensitive category matching', () => {
+      const url = buildEbaySoldUrl('tv', 'Electronics');
+      expect(url).toContain('_sacat=293');
     });
   });
 });
