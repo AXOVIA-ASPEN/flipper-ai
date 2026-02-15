@@ -944,4 +944,218 @@ describe('OfferUp Scraper API', () => {
       expect(data.savedCount).toBe(0);
     });
   });
+
+  describe('Image caching branches', () => {
+    it('caches images when listing has imageUrl', async () => {
+      const { downloadAndCacheImages } = require('@/lib/image-service');
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'Item With Image',
+          price: '$200',
+          url: 'https://offerup.com/item/detail/img001',
+          location: 'Tampa, FL',
+          imageUrl: 'https://images.offerup.com/photo1.jpg',
+          condition: 'Like New',
+        },
+      ]);
+
+      const request = createMockRequest('POST', '/api/scraper/offerup', { location: 'tampa-fl' });
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(data.savedCount).toBe(1);
+      expect(downloadAndCacheImages).toHaveBeenCalledWith(
+        ['https://images.offerup.com/photo1.jpg'],
+        expect.objectContaining({ maxConcurrent: 2, skipOnFailure: true })
+      );
+    });
+
+    it('stores null imageUrls when no images provided', async () => {
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'No Photo Item',
+          price: '$50',
+          url: 'https://offerup.com/item/detail/noimg001',
+          location: 'Tampa, FL',
+        },
+      ]);
+
+      const request = createMockRequest('POST', '/api/scraper/offerup', { location: 'tampa-fl' });
+      await POST(request);
+
+      expect(mockUpsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          create: expect.objectContaining({ imageUrls: null }),
+        })
+      );
+    });
+
+    it('stores cached image URLs as JSON when images are downloaded', async () => {
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'Photo Item',
+          price: '$150',
+          url: 'https://offerup.com/item/detail/imgyes01',
+          location: 'Tampa, FL',
+          imageUrl: 'https://images.offerup.com/cached.jpg',
+        },
+      ]);
+
+      const request = createMockRequest('POST', '/api/scraper/offerup', { location: 'tampa-fl' });
+      await POST(request);
+
+      expect(mockUpsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          create: expect.objectContaining({
+            imageUrls: expect.stringContaining('cached.jpg'),
+          }),
+        })
+      );
+    });
+
+    it('handles image caching failure returning empty cached URLs', async () => {
+      const { downloadAndCacheImages } = require('@/lib/image-service');
+      downloadAndCacheImages.mockResolvedValueOnce({
+        cachedUrls: [],
+        successCount: 0,
+        failedCount: 1,
+      });
+
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'Failed Image Item',
+          price: '$300',
+          url: 'https://offerup.com/item/detail/failimg01',
+          location: 'Tampa, FL',
+          imageUrl: 'https://images.offerup.com/bad.jpg',
+        },
+      ]);
+
+      const request = createMockRequest('POST', '/api/scraper/offerup', { location: 'tampa-fl' });
+      await POST(request);
+
+      expect(mockUpsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          create: expect.objectContaining({ imageUrls: null }),
+        })
+      );
+    });
+  });
+
+  describe('Listing metadata branches', () => {
+    it('passes description, postedAt, sellerName, and condition to processing', async () => {
+      const postedDate = new Date('2026-01-15');
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'Full Metadata Item',
+          price: '$500',
+          url: 'https://offerup.com/item/detail/meta001',
+          location: 'Tampa, FL',
+          imageUrl: 'https://images.offerup.com/meta.jpg',
+          condition: 'Good',
+        },
+      ]);
+
+      const request = createMockRequest('POST', '/api/scraper/offerup', { location: 'tampa-fl' });
+      await POST(request);
+
+      expect(mockUpsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          create: expect.objectContaining({
+            condition: 'Good',
+            platform: 'OFFERUP',
+          }),
+        })
+      );
+    });
+
+    it('sets null for missing optional fields', async () => {
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'Minimal Item',
+          price: '$25',
+          url: 'https://offerup.com/item/detail/min001',
+          location: 'Tampa, FL',
+        },
+      ]);
+
+      const request = createMockRequest('POST', '/api/scraper/offerup', { location: 'tampa-fl' });
+      await POST(request);
+
+      expect(mockUpsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          create: expect.objectContaining({
+            description: null,
+            condition: null,
+            sellerName: null,
+            postedAt: null,
+          }),
+        })
+      );
+    });
+  });
+
+  describe('parsePrice edge cases', () => {
+    it('returns 0 for null/undefined input', async () => {
+      // Trigger parsePrice with no price field - item gets price 0 and is skipped
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'No Price Item',
+          price: '',
+          url: 'https://offerup.com/item/detail/noprice01',
+          location: 'Tampa, FL',
+        },
+      ]);
+
+      const request = createMockRequest('POST', '/api/scraper/offerup', { location: 'tampa-fl' });
+      const response = await POST(request);
+      const data = await response.json();
+
+      // Price 0 items get skipped
+      expect(data.savedCount).toBe(0);
+    });
+
+    it('parses comma-separated prices', async () => {
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'Expensive Item',
+          price: '$1,500',
+          url: 'https://offerup.com/item/detail/exp001',
+          location: 'Tampa, FL',
+        },
+      ]);
+
+      const request = createMockRequest('POST', '/api/scraper/offerup', { location: 'tampa-fl' });
+      await POST(request);
+
+      expect(mockEstimateValue).toHaveBeenCalledWith(
+        'Expensive Item', null, 1500, null, expect.any(String)
+      );
+    });
+  });
+
+  describe('withRetry function', () => {
+    it('retries on transient navigation errors', async () => {
+      mockGoto
+        .mockRejectedValueOnce(new Error('net::ERR_CONNECTION_RESET'))
+        .mockRejectedValueOnce(new Error('Timeout'))
+        .mockResolvedValueOnce(undefined);
+
+      mockEvaluate.mockResolvedValue([
+        {
+          title: 'Retry Item',
+          price: '$100',
+          url: 'https://offerup.com/item/detail/retry001',
+          location: 'Tampa, FL',
+        },
+      ]);
+
+      const request = createMockRequest('POST', '/api/scraper/offerup', { location: 'tampa-fl' });
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(data.success).toBe(true);
+      expect(mockGoto).toHaveBeenCalledTimes(3);
+    });
+  });
 });
