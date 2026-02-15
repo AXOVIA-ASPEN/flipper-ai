@@ -219,4 +219,92 @@ describe('Opportunities API Integration Tests', () => {
       expect(data.error).toBe('Opportunity already exists for this listing');
     });
   });
+
+  describe('GET /api/opportunities - Filters', () => {
+    beforeEach(async () => {
+      // Create listings with different platforms, scores, and profits
+      const listing1 = await testPrisma.listing.create({
+        data: createMockListing({ platform: 'CRAIGSLIST', valueScore: 85, profitPotential: 200 }),
+      });
+      const listing2 = await testPrisma.listing.create({
+        data: createMockListing({ platform: 'EBAY', valueScore: 45, profitPotential: 50 }),
+      });
+      const listing3 = await testPrisma.listing.create({
+        data: createMockListing({ platform: 'FACEBOOK', valueScore: 70, profitPotential: 120 }),
+      });
+
+      await testPrisma.opportunity.createMany({
+        data: [
+          { listingId: listing1.id, status: 'IDENTIFIED' },
+          { listingId: listing2.id, status: 'CONTACTED' },
+          { listingId: listing3.id, status: 'IDENTIFIED' },
+        ],
+      });
+    });
+
+    it('should filter by platform', async () => {
+      const request = new NextRequest('http://localhost:3000/api/opportunities?platform=CRAIGSLIST');
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.opportunities.length).toBe(1);
+      expect(data.opportunities[0].listing.platform).toBe('CRAIGSLIST');
+    });
+
+    it('should filter by minScore', async () => {
+      const request = new NextRequest('http://localhost:3000/api/opportunities?minScore=60');
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.opportunities.length).toBe(2);
+      data.opportunities.forEach((opp: { listing: { valueScore: number } }) => {
+        expect(opp.listing.valueScore).toBeGreaterThanOrEqual(60);
+      });
+    });
+
+    it('should filter by maxScore', async () => {
+      const request = new NextRequest('http://localhost:3000/api/opportunities?maxScore=50');
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.opportunities.length).toBe(1);
+      expect(data.opportunities[0].listing.valueScore).toBeLessThanOrEqual(50);
+    });
+
+    it('should filter by minProfit and maxProfit', async () => {
+      const request = new NextRequest('http://localhost:3000/api/opportunities?minProfit=100&maxProfit=250');
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.opportunities.length).toBe(2);
+      data.opportunities.forEach((opp: { listing: { profitPotential: number } }) => {
+        expect(opp.listing.profitPotential).toBeGreaterThanOrEqual(100);
+        expect(opp.listing.profitPotential).toBeLessThanOrEqual(250);
+      });
+    });
+
+    it('should combine platform and score filters', async () => {
+      const request = new NextRequest('http://localhost:3000/api/opportunities?platform=CRAIGSLIST&minScore=80');
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.opportunities.length).toBe(1);
+      expect(data.opportunities[0].listing.platform).toBe('CRAIGSLIST');
+      expect(data.opportunities[0].listing.valueScore).toBeGreaterThanOrEqual(80);
+    });
+
+    it('should return empty when no opportunities match filters', async () => {
+      const request = new NextRequest('http://localhost:3000/api/opportunities?platform=MERCARI');
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.opportunities.length).toBe(0);
+    });
+  });
 });

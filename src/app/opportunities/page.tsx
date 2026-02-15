@@ -224,6 +224,12 @@ export default function OpportunitiesPage() {
   });
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [platformFilter, setPlatformFilter] = useState<string>('all');
+  const [minScore, setMinScore] = useState<string>('');
+  const [maxScore, setMaxScore] = useState<string>('');
+  const [minProfit, setMinProfit] = useState<string>('');
+  const [maxProfit, setMaxProfit] = useState<string>('');
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<Opportunity>>({});
@@ -232,7 +238,7 @@ export default function OpportunitiesPage() {
 
   useEffect(() => {
     fetchOpportunities();
-  }, [statusFilter]);
+  }, [statusFilter, platformFilter, minScore, maxScore, minProfit, maxProfit]);
 
   useEffect(() => {
     if (!copiedMessageId) return;
@@ -243,8 +249,15 @@ export default function OpportunitiesPage() {
   async function fetchOpportunities() {
     setLoading(true);
     try {
-      const url =
-        statusFilter === 'all' ? '/api/opportunities' : `/api/opportunities?status=${statusFilter}`;
+      const params = new URLSearchParams();
+      if (statusFilter !== 'all') params.set('status', statusFilter);
+      if (platformFilter !== 'all') params.set('platform', platformFilter);
+      if (minScore) params.set('minScore', minScore);
+      if (maxScore) params.set('maxScore', maxScore);
+      if (minProfit) params.set('minProfit', minProfit);
+      if (maxProfit) params.set('maxProfit', maxProfit);
+      const qs = params.toString();
+      const url = qs ? `/api/opportunities?${qs}` : '/api/opportunities';
       const response = await fetch(url);
       const data = await response.json();
 
@@ -341,7 +354,8 @@ export default function OpportunitiesPage() {
   const filteredOpportunities = opportunities.filter((opp) => {
     const matchesSearch = opp.listing.title.toLowerCase().includes(normalizedSearch);
     const matchesStatus = statusFilter === 'all' || opp.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesPlatform = platformFilter === 'all' || opp.listing.platform === platformFilter;
+    return matchesSearch && matchesStatus && matchesPlatform;
   });
 
   const statusOptions = [
@@ -538,7 +552,102 @@ export default function OpportunitiesPage() {
                 );
               })}
             </div>
+
+            {/* Advanced Filters Toggle */}
+            <button
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 bg-white/10 text-white hover:bg-white/20 transition-all duration-300 text-sm"
+            >
+              <TagIcon className="w-4 h-4" />
+              {showAdvancedFilters ? 'Hide Filters' : 'More Filters'}
+            </button>
           </div>
+
+          {/* Advanced Filters Panel */}
+          {showAdvancedFilters && (
+            <div className="mt-4 pt-4 border-t border-white/10 grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Platform Filter */}
+              <div>
+                <label className="block text-xs text-blue-200/70 mb-1 font-medium">Platform</label>
+                <select
+                  value={platformFilter}
+                  onChange={(e) => setPlatformFilter(e.target.value)}
+                  className="w-full px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm appearance-none cursor-pointer"
+                >
+                  <option value="all" className="bg-slate-800">All Platforms</option>
+                  <option value="CRAIGSLIST" className="bg-slate-800">Craigslist</option>
+                  <option value="FACEBOOK" className="bg-slate-800">Facebook</option>
+                  <option value="EBAY" className="bg-slate-800">eBay</option>
+                  <option value="OFFERUP" className="bg-slate-800">OfferUp</option>
+                  <option value="MERCARI" className="bg-slate-800">Mercari</option>
+                </select>
+              </div>
+
+              {/* Score Range */}
+              <div>
+                <label className="block text-xs text-blue-200/70 mb-1 font-medium">Value Score Range</label>
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    min="0"
+                    max="100"
+                    value={minScore}
+                    onChange={(e) => setMinScore(e.target.value)}
+                    className="w-full px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm placeholder-blue-200/40"
+                  />
+                  <span className="text-white/40">–</span>
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    min="0"
+                    max="100"
+                    value={maxScore}
+                    onChange={(e) => setMaxScore(e.target.value)}
+                    className="w-full px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm placeholder-blue-200/40"
+                  />
+                </div>
+              </div>
+
+              {/* Profit Range */}
+              <div>
+                <label className="block text-xs text-blue-200/70 mb-1 font-medium">Profit Range ($)</label>
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    value={minProfit}
+                    onChange={(e) => setMinProfit(e.target.value)}
+                    className="w-full px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm placeholder-blue-200/40"
+                  />
+                  <span className="text-white/40">–</span>
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={maxProfit}
+                    onChange={(e) => setMaxProfit(e.target.value)}
+                    className="w-full px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm placeholder-blue-200/40"
+                  />
+                </div>
+              </div>
+
+              {/* Clear Filters */}
+              <div className="md:col-span-3 flex justify-end">
+                <button
+                  onClick={() => {
+                    setPlatformFilter('all');
+                    setMinScore('');
+                    setMaxScore('');
+                    setMinProfit('');
+                    setMaxProfit('');
+                  }}
+                  className="text-xs text-blue-300/70 hover:text-white transition-colors"
+                >
+                  Clear all filters
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Kanban View */}
