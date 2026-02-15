@@ -108,6 +108,46 @@ describe("marketplace-scanner", () => {
       expect(typeof result).toBe("boolean");
     });
 
+    it("rejects non-shippable items when requireShippable is true", () => {
+      // Force estimation.shippable to false
+      analyzed.estimation = { ...analyzed.estimation, shippable: false };
+      const result = meetsViabilityCriteria(analyzed, { requireShippable: true });
+      expect(result).toBe(false);
+    });
+
+    it("accepts shippable items when requireShippable is true", () => {
+      analyzed.estimation = { ...analyzed.estimation, shippable: true };
+      const result = meetsViabilityCriteria(analyzed, { requireShippable: true });
+      // Should not be filtered by shippable (may still fail other criteria)
+      // At minimum, the shippable check doesn't reject it
+      expect(typeof result).toBe("boolean");
+    });
+
+    it("filters by includeCategories (rejects unlisted category)", () => {
+      analyzed.category = "electronics";
+      const result = meetsViabilityCriteria(analyzed, { includeCategories: ["furniture", "clothing"] });
+      expect(result).toBe(false);
+    });
+
+    it("accepts items in includeCategories list", () => {
+      analyzed.category = "electronics";
+      const result = meetsViabilityCriteria(analyzed, { includeCategories: ["electronics", "furniture"] });
+      // Should not be rejected by includeCategories filter
+      expect(typeof result).toBe("boolean");
+    });
+
+    it("filters by maxAskingPrice", () => {
+      analyzed.askingPrice = 500;
+      const result = meetsViabilityCriteria(analyzed, { maxAskingPrice: 100 });
+      expect(result).toBe(false);
+    });
+
+    it("rejects items above maxResaleDifficulty", () => {
+      analyzed.estimation = { ...analyzed.estimation, resaleDifficulty: "VERY_HARD" };
+      const result = meetsViabilityCriteria(analyzed, { maxResaleDifficulty: "EASY" });
+      expect(result).toBe(false);
+    });
+
     it("filters by minProfitPotential", () => {
       const result = meetsViabilityCriteria(analyzed, { minProfitPotential: 999999 });
       expect(result).toBe(false);

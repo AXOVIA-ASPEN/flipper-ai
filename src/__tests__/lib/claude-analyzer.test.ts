@@ -969,4 +969,205 @@ describe("Claude Analyzer", () => {
       expect(result.confidence).toBe("high");
     });
   });
+
+  describe("callClaudeAPI error handling - uncovered branches", () => {
+    test("should handle API error with status and message (non-429)", async () => {
+      const mockCreate = jest.fn().mockRejectedValue(
+        Object.assign(new Error("Bad request"), { status: 400, message: "Invalid model" })
+      );
+      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }));
+
+      await expect(
+        analyzeListingData("Test Item", "desc", 100)
+      ).rejects.toThrow("Claude API error: Invalid model");
+    });
+
+    test("should handle non-Error thrown object (unknown error)", async () => {
+      const mockCreate = jest.fn().mockRejectedValue("string error");
+      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }));
+
+      await expect(
+        analyzeListingData("Test Item", "desc", 100)
+      ).rejects.toThrow("Unknown error calling Claude API");
+    });
+
+    test("should handle error with rate limit in message but not status", async () => {
+      const mockCreate = jest.fn().mockRejectedValue(
+        new Error("rate limit reached for this model")
+      );
+      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }));
+
+      await expect(
+        analyzeListingData("Test Item", "desc", 100)
+      ).rejects.toThrow("Claude API rate limit exceeded");
+    });
+
+    test("should handle error with 429 in message string", async () => {
+      const mockCreate = jest.fn().mockRejectedValue(
+        new Error("Error 429: too many requests")
+      );
+      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }));
+
+      await expect(
+        analyzeListingData("Test Item", "desc", 100)
+      ).rejects.toThrow("Claude API rate limit exceeded");
+    });
+
+    test("should handle no text content in Claude response", async () => {
+      const mockCreate = jest.fn().mockResolvedValue({
+        content: [{ type: "tool_use", id: "123", name: "test", input: {} }],
+      });
+      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }));
+
+      await expect(
+        analyzeListingData("Test Item", "desc", 100)
+      ).rejects.toThrow("No text response from Claude");
+    });
+  });
+
+  describe("parseClaudeResponse edge cases - uncovered branches", () => {
+    const mockValidResponse = (overrides: Record<string, unknown> = {}) => {
+      const base = {
+        category: "electronics",
+        condition: "good",
+        flippabilityScore: 75,
+        confidence: "high",
+        reasoning: "Test reasoning",
+        ...overrides,
+      };
+      return JSON.stringify(base);
+    };
+
+    test("should default missing fields in parsed response", async () => {
+      const mockCreate = jest.fn().mockResolvedValue({
+        content: [{ type: "text", text: mockValidResponse({
+          category: null,
+          condition: null,
+          keyFeatures: "not-an-array",
+          potentialIssues: null,
+          flippabilityScore: null,
+          confidence: "invalid-value",
+          reasoning: null,
+        }) }],
+      });
+      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }));
+
+      const result = await analyzeListingData("Test", "desc", 50);
+      expect(result.category).toBe("other");
+      expect(result.condition).toBe("good");
+      expect(result.keyFeatures).toEqual([]);
+      expect(result.potentialIssues).toEqual([]);
+      expect(result.flippabilityScore).toBe(50);
+      expect(result.confidence).toBe("medium");
+      expect(result.reasoning).toBe("No reasoning provided");
+    });
+
+    test("should clamp flippabilityScore to 0-100 range", async () => {
+      const mockCreate = jest.fn().mockResolvedValue({
+        content: [{ type: "text", text: mockValidResponse({ flippabilityScore: 150 }) }],
+      });
+      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }));
+
+      const result = await analyzeListingData("Test", "desc", 50);
+      expect(result.flippabilityScore).toBe(100);
+    });
+
+    test("should clamp negative flippabilityScore to 0", async () => {
+      const mockCreate = jest.fn().mockResolvedValue({
+        content: [{ type: "text", text: mockValidResponse({ flippabilityScore: -10 }) }],
+      });
+      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }));
+
+      const result = await analyzeListingData("Test", "desc", 50);
+      expect(result.flippabilityScore).toBe(0);
+    });
+
+    test("should throw when response has no JSON", async () => {
+      const mockCreate = jest.fn().mockResolvedValue({
+        content: [{ type: "text", text: "This is just plain text with no JSON at all" }],
+      });
+      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }));
+
+      await expect(
+        analyzeListingData("Test", "desc", 50)
+      ).rejects.toThrow("Failed to parse Claude response");
+    });
+  });
+
+  describe("batchAnalyzeListings - uncovered branches", () => {
+    test("should call onProgress callback", async () => {
+      const mockFindFirst = prisma.aiAnalysisCache.findFirst as jest.Mock;
+      mockFindFirst.mockResolvedValue({
+        result: JSON.stringify({ category: "electronics", confidence: "high", reasoning: "test" }),
+      });
+
+      const progressCalls: Array<[number, number]> = [];
+      const onProgress = (completed: number, total: number) => {
+        progressCalls.push([completed, total]);
+      };
+
+      await batchAnalyzeListings(["id-1", "id-2"], onProgress);
+
+      expect(progressCalls).toEqual([[1, 2], [2, 2]]);
+    });
+
+    test("should handle errors in batch and track them", async () => {
+      const mockFindFirst = prisma.aiAnalysisCache.findFirst as jest.Mock;
+      mockFindFirst.mockResolvedValueOnce(null); // not cached
+      
+      const mockFindUnique = prisma.listing.findUnique as jest.Mock;
+      mockFindUnique.mockResolvedValueOnce(null); // listing not found
+
+      const result = await batchAnalyzeListings(["missing-id"]);
+
+      expect(result.failed).toBe(1);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0].listingId).toBe("missing-id");
+      expect(result.errors[0].error).toContain("not found");
+    });
+
+    test("should handle non-Error throws in batch", async () => {
+      const mockFindFirst = prisma.aiAnalysisCache.findFirst as jest.Mock;
+      // First call: not cached. Then analyzeListing will call findFirst again for cache check.
+      mockFindFirst.mockResolvedValue(null);
+      
+      const mockFindUnique = prisma.listing.findUnique as jest.Mock;
+      mockFindUnique.mockResolvedValueOnce({
+        id: "bad-id",
+        title: "Test",
+        description: "desc",
+        askingPrice: 50,
+        imageUrls: "[]",
+      });
+
+      // Make the API call throw a non-Error
+      const mockCreate = jest.fn().mockRejectedValue("string error");
+      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }));
+
+      const result = await batchAnalyzeListings(["bad-id"]);
+
+      expect(result.failed).toBe(1);
+      expect(result.errors[0].error).toBe("Unknown error calling Claude API");
+    });
+  });
 });
