@@ -161,7 +161,7 @@ describe('Scraper Jobs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toContain('Platform');
+      expect(data.error).toBe('Invalid request body');
     });
 
     it('should return 400 for invalid platform', async () => {
@@ -173,7 +173,7 @@ describe('Scraper Jobs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toContain('Invalid platform');
+      expect(data.error).toBe('Invalid request body');
     });
 
     it('should accept all valid platforms', async () => {

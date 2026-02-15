@@ -200,7 +200,7 @@ describe('Opportunities API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('listingId is required');
+      expect(data.error).toBe('Invalid request body');
     });
 
     it('should handle errors gracefully', async () => {

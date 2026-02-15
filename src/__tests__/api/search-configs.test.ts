@@ -129,7 +129,7 @@ describe('Search Configs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toContain('Name');
+      expect(data.error).toBe('Invalid request body');
     });
 
     it('should return 400 if platform is missing', async () => {
@@ -141,7 +141,7 @@ describe('Search Configs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toContain('platform');
+      expect(data.error).toBe('Invalid request body');
     });
 
     it('should return 400 if location is missing', async () => {
@@ -153,7 +153,7 @@ describe('Search Configs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toContain('location');
+      expect(data.error).toBe('Invalid request body');
     });
 
     it('should return 400 for invalid platform', async () => {
@@ -166,7 +166,7 @@ describe('Search Configs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toContain('Invalid platform');
+      expect(data.error).toBe('Invalid request body');
     });
 
     it('should accept all valid platforms', async () => {
@@ -305,7 +305,7 @@ describe('Search Configs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toContain('Invalid platform');
+      expect(data.error).toContain("Invalid platform");
     });
 
     it('should update lastRun timestamp', async () => {

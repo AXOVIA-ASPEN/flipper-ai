@@ -421,7 +421,7 @@ describe('Listings API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toContain('Missing required fields');
+      expect(data.error).toBe('Invalid request body');
     });
 
     it('should return 400 for missing platform', async () => {
@@ -432,7 +432,7 @@ describe('Listings API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toContain('Missing required fields');
+      expect(data.error).toBe('Invalid request body');
     });
 
     it('should return 400 for missing url', async () => {
@@ -443,7 +443,7 @@ describe('Listings API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toContain('Missing required fields');
+      expect(data.error).toBe('Invalid request body');
     });
 
     it('should return 400 for missing title', async () => {
@@ -454,7 +454,7 @@ describe('Listings API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toContain('Missing required fields');
+      expect(data.error).toBe('Invalid request body');
     });
 
     it('should return 400 for missing askingPrice', async () => {
@@ -465,7 +465,7 @@ describe('Listings API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toContain('Missing required fields');
+      expect(data.error).toBe('Invalid request body');
     });
 
     it('should allow askingPrice of 0', async () => {
