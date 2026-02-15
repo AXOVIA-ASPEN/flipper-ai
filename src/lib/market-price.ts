@@ -26,7 +26,7 @@ export interface MarketPrice {
 }
 
 // Parse price string from eBay
-function parseEbayPrice(priceStr: string): number {
+export function parseEbayPrice(priceStr: string): number {
   const match = priceStr.replace(/[^0-9.,]/g, "").match(/[\d,]+\.?\d*/);
   if (match) {
     return parseFloat(match[0].replace(/,/g, ""));
@@ -35,7 +35,7 @@ function parseEbayPrice(priceStr: string): number {
 }
 
 // Calculate median from array of numbers
-function median(numbers: number[]): number {
+export function median(numbers: number[]): number {
   if (numbers.length === 0) return 0;
   const sorted = [...numbers].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
@@ -45,7 +45,7 @@ function median(numbers: number[]): number {
 }
 
 // Build eBay sold listings search URL
-function buildEbaySoldUrl(searchQuery: string, category?: string): string {
+export function buildEbaySoldUrl(searchQuery: string, category?: string): string {
   const params = new URLSearchParams({
     _nkw: searchQuery,
     LH_Complete: "1",  // Completed listings
