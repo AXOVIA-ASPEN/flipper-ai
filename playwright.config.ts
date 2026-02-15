@@ -8,6 +8,13 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: [['html'], ['list']],
   outputDir: 'e2e/test-results',
+  snapshotPathTemplate: '{testDir}/{testFileDir}/{testFileName}-snapshots/{arg}{ext}',
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.02,
+      animations: 'disabled',
+    },
+  },
   use: {
     baseURL: 'http://localhost:3001',
     trace: 'on-first-retry',
