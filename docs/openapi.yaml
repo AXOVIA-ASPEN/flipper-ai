@@ -1,0 +1,936 @@
+openapi: 3.1.0
+info:
+  title: Flipper AI API
+  version: 0.1.0
+  description: |
+    Multi-marketplace flipping tool API. Find undervalued items, analyze flip potential
+    with AI, manage opportunities, communicate with sellers, and list items for resale.
+  contact:
+    name: Axovia AI
+    email: axoviaai@gmail.com
+  license:
+    name: Proprietary
+
+servers:
+  - url: http://localhost:3000/api
+    description: Local development
+  - url: https://flipper-ai.vercel.app/api
+    description: Production
+
+tags:
+  - name: Health
+    description: Health & readiness probes
+  - name: Listings
+    description: Marketplace listings (scraped items)
+  - name: Opportunities
+    description: Flip opportunities tracked from listings
+  - name: Analyze
+    description: AI-powered listing analysis (Claude)
+  - name: Messages
+    description: Seller communication
+  - name: Search Configs
+    description: Saved marketplace search configurations
+  - name: Scraper Jobs
+    description: Marketplace scraping job management
+  - name: Posting Queue
+    description: Cross-platform resale listing queue
+  - name: Price History
+    description: Market price research & history
+  - name: User Settings
+    description: User preferences & API keys
+  - name: Scrapers
+    description: Direct marketplace scraper endpoints
+  - name: Auth
+    description: Authentication (NextAuth + Facebook OAuth)
+
+components:
+  securitySchemes:
+    session:
+      type: apiKey
+      in: cookie
+      name: next-auth.session-token
+      description: NextAuth session cookie
+
+  schemas:
+    Platform:
+      type: string
+      enum: [CRAIGSLIST, FACEBOOK_MARKETPLACE, EBAY, OFFERUP, MERCARI]
+
+    OpportunityStatus:
+      type: string
+      enum: [IDENTIFIED, CONTACTED, PURCHASED, LISTED, SOLD]
+
+    PostingStatus:
+      type: string
+      enum: [PENDING, IN_PROGRESS, POSTED, FAILED, CANCELLED]
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+
+    Listing:
+      type: object
+      properties:
+        id: { type: string }
+        externalId: { type: string }
+        platform: { $ref: '#/components/schemas/Platform' }
+        url: { type: string, format: uri }
+        title: { type: string }
+        description: { type: string, nullable: true }
+        askingPrice: { type: number }
+        estimatedValue: { type: number, nullable: true }
+        valueScore: { type: number, nullable: true }
+        condition: { type: string, nullable: true }
+        location: { type: string, nullable: true }
+        sellerName: { type: string, nullable: true }
+        sellerContact: { type: string, nullable: true }
+        imageUrls: { type: array, items: { type: string } }
+        category: { type: string, nullable: true }
+        status: { type: string }
+        scrapedAt: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    Opportunity:
+      type: object
+      properties:
+        id: { type: string }
+        listingId: { type: string }
+        status: { $ref: '#/components/schemas/OpportunityStatus' }
+        purchasePrice: { type: number, nullable: true }
+        resalePrice: { type: number, nullable: true }
+        actualProfit: { type: number, nullable: true }
+        notes: { type: string, nullable: true }
+        listing: { $ref: '#/components/schemas/Listing' }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    Message:
+      type: object
+      properties:
+        id: { type: string }
+        listingId: { type: string }
+        direction: { type: string, enum: [INBOUND, OUTBOUND] }
+        status: { type: string }
+        subject: { type: string, nullable: true }
+        body: { type: string }
+        sellerName: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    SearchConfig:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        platform: { $ref: '#/components/schemas/Platform' }
+        location: { type: string }
+        category: { type: string, nullable: true }
+        keywords: { type: string, nullable: true }
+        minPrice: { type: number, nullable: true }
+        maxPrice: { type: number, nullable: true }
+        enabled: { type: boolean }
+        createdAt: { type: string, format: date-time }
+
+    ScraperJob:
+      type: object
+      properties:
+        id: { type: string }
+        platform: { $ref: '#/components/schemas/Platform' }
+        location: { type: string, nullable: true }
+        category: { type: string, nullable: true }
+        status: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    PostingQueueItem:
+      type: object
+      properties:
+        id: { type: string }
+        listingId: { type: string }
+        targetPlatform: { $ref: '#/components/schemas/Platform' }
+        status: { $ref: '#/components/schemas/PostingStatus' }
+        askingPrice: { type: number, nullable: true }
+        title: { type: string, nullable: true }
+        description: { type: string, nullable: true }
+        scheduledAt: { type: string, format: date-time, nullable: true }
+        listing:
+          type: object
+          properties:
+            id: { type: string }
+            title: { type: string }
+            platform: { $ref: '#/components/schemas/Platform' }
+            askingPrice: { type: number }
+            imageUrls: { type: array, items: { type: string } }
+        createdAt: { type: string, format: date-time }
+
+    HealthResponse:
+      type: object
+      properties:
+        status: { type: string, example: ok }
+        timestamp: { type: string, format: date-time }
+        uptime: { type: number }
+        version: { type: string }
+        environment: { type: string }
+
+  parameters:
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+    Offset:
+      name: offset
+      in: query
+      schema: { type: integer, minimum: 0, default: 0 }
+
+security:
+  - session: []
+
+paths:
+  # ── Health ──────────────────────────────────────────────────────────────
+  /health:
+    get:
+      tags: [Health]
+      summary: Liveness check
+      security: []
+      responses:
+        '200':
+          description: Service is alive
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/HealthResponse' }
+
+  /health/ready:
+    get:
+      tags: [Health]
+      summary: Readiness check (DB connectivity)
+      security: []
+      responses:
+        '200': { description: Ready }
+        '503': { description: Not ready }
+
+  /health/metrics:
+    get:
+      tags: [Health]
+      summary: Application metrics
+      security: []
+      responses:
+        '200':
+          description: Metrics snapshot
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  # ── Listings ────────────────────────────────────────────────────────────
+  /listings:
+    get:
+      tags: [Listings]
+      summary: List all listings with filters
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        - { name: platform, in: query, schema: { $ref: '#/components/schemas/Platform' } }
+        - { name: status, in: query, schema: { type: string } }
+        - { name: minScore, in: query, schema: { type: number, minimum: 0, maximum: 100 } }
+        - { name: location, in: query, schema: { type: string } }
+        - { name: category, in: query, schema: { type: string } }
+        - { name: minPrice, in: query, schema: { type: number, minimum: 0 } }
+        - { name: maxPrice, in: query, schema: { type: number, minimum: 0 } }
+        - { name: dateFrom, in: query, schema: { type: string, format: date-time } }
+        - { name: dateTo, in: query, schema: { type: string, format: date-time } }
+      responses:
+        '200':
+          description: Paginated listing results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  listings: { type: array, items: { $ref: '#/components/schemas/Listing' } }
+                  total: { type: integer }
+                  limit: { type: integer }
+                  offset: { type: integer }
+    post:
+      tags: [Listings]
+      summary: Create a listing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [externalId, platform, url, title, askingPrice]
+              properties:
+                externalId: { type: string }
+                platform: { $ref: '#/components/schemas/Platform' }
+                url: { type: string, format: uri }
+                title: { type: string, maxLength: 500 }
+                description: { type: string, maxLength: 10000 }
+                askingPrice: { type: number, minimum: 0 }
+                condition: { type: string, maxLength: 100 }
+                location: { type: string, maxLength: 500 }
+                sellerName: { type: string, maxLength: 200 }
+                sellerContact: { type: string, maxLength: 500 }
+                imageUrls: { type: array, items: { type: string, format: uri }, maxItems: 20 }
+                category: { type: string, maxLength: 200 }
+                postedAt: { type: string, format: date-time }
+      responses:
+        '201': { description: Created }
+        '400': { description: Validation error, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+
+  /listings/{id}:
+    get:
+      tags: [Listings]
+      summary: Get a listing by ID
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Listing details
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Listing' }
+        '404': { description: Not found }
+    patch:
+      tags: [Listings]
+      summary: Update a listing
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { type: string }
+                askingPrice: { type: number }
+                notes: { type: string }
+      responses:
+        '200': { description: Updated }
+    delete:
+      tags: [Listings]
+      summary: Delete a listing
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Deleted }
+
+  /listings/{id}/description:
+    post:
+      tags: [Listings]
+      summary: Generate AI description for a listing
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Generated description
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  description: { type: string }
+
+  /listings/{id}/market-value:
+    get:
+      tags: [Listings]
+      summary: Get market value estimate for a listing
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Market value data
+
+  /listings/ebay:
+    get:
+      tags: [Listings]
+      summary: Search eBay listings
+      parameters:
+        - { name: query, in: query, required: true, schema: { type: string } }
+      responses:
+        '200': { description: eBay search results }
+
+  # ── Opportunities ───────────────────────────────────────────────────────
+  /opportunities:
+    get:
+      tags: [Opportunities]
+      summary: List opportunities with stats
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        - { name: status, in: query, schema: { $ref: '#/components/schemas/OpportunityStatus' } }
+      responses:
+        '200':
+          description: Paginated opportunities with aggregate stats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  opportunities: { type: array, items: { $ref: '#/components/schemas/Opportunity' } }
+                  total: { type: integer }
+                  limit: { type: integer }
+                  offset: { type: integer }
+                  stats:
+                    type: object
+                    properties:
+                      totalOpportunities: { type: integer }
+                      totalProfit: { type: number }
+                      totalInvested: { type: number }
+                      totalRevenue: { type: number }
+    post:
+      tags: [Opportunities]
+      summary: Create an opportunity from a listing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [listingId]
+              properties:
+                listingId: { type: string }
+                notes: { type: string, maxLength: 5000 }
+      responses:
+        '201': { description: Created }
+        '400': { description: Validation error }
+        '409': { description: Opportunity already exists for this listing }
+
+  /opportunities/{id}:
+    get:
+      tags: [Opportunities]
+      summary: Get an opportunity by ID
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Opportunity' }
+        '404': { description: Not found }
+    patch:
+      tags: [Opportunities]
+      summary: Update opportunity (status, prices, notes)
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { $ref: '#/components/schemas/OpportunityStatus' }
+                purchasePrice: { type: number }
+                resalePrice: { type: number }
+                actualProfit: { type: number }
+                notes: { type: string }
+      responses:
+        '200': { description: Updated }
+    delete:
+      tags: [Opportunities]
+      summary: Delete an opportunity
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Deleted }
+
+  # ── Analyze ─────────────────────────────────────────────────────────────
+  /analyze/{listingId}:
+    get:
+      tags: [Analyze]
+      summary: Check if cached analysis exists
+      parameters:
+        - { name: listingId, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Cached analysis found }
+        '404': { description: No cached analysis }
+    post:
+      tags: [Analyze]
+      summary: Analyze a listing with Claude AI
+      description: Returns structured analysis including flip potential, market value, risks, and recommendations.
+      parameters:
+        - { name: listingId, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Analysis result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  listingId: { type: string }
+                  analysis: { type: object }
+        '404': { description: Listing not found }
+        '429': { description: Rate limit exceeded }
+
+  # ── Messages ────────────────────────────────────────────────────────────
+  /messages:
+    get:
+      tags: [Messages]
+      summary: List messages
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        - { name: direction, in: query, schema: { type: string, enum: [INBOUND, OUTBOUND] } }
+        - { name: status, in: query, schema: { type: string } }
+        - { name: listingId, in: query, schema: { type: string } }
+        - { name: search, in: query, schema: { type: string } }
+        - { name: sortBy, in: query, schema: { type: string, enum: [createdAt, status, direction, sellerName], default: createdAt } }
+        - { name: sortOrder, in: query, schema: { type: string, enum: [asc, desc], default: desc } }
+      responses:
+        '200':
+          description: Paginated messages
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data: { type: array, items: { $ref: '#/components/schemas/Message' } }
+                  pagination:
+                    type: object
+                    properties:
+                      total: { type: integer }
+                      limit: { type: integer }
+                      offset: { type: integer }
+                      hasMore: { type: boolean }
+    post:
+      tags: [Messages]
+      summary: Create a message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [listingId, body]
+              properties:
+                listingId: { type: string }
+                body: { type: string }
+                subject: { type: string }
+      responses:
+        '201': { description: Created }
+
+  /messages/{id}:
+    patch:
+      tags: [Messages]
+      summary: Approve/update a message
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                approved: { type: boolean }
+                body: { type: string }
+      responses:
+        '200': { description: Updated }
+
+  # ── Search Configs ──────────────────────────────────────────────────────
+  /search-configs:
+    get:
+      tags: [Search Configs]
+      summary: List search configurations
+      parameters:
+        - { name: enabled, in: query, schema: { type: string, enum: ['true', 'false'] } }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  configs: { type: array, items: { $ref: '#/components/schemas/SearchConfig' } }
+                  total: { type: integer }
+    post:
+      tags: [Search Configs]
+      summary: Create a search configuration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, platform, location]
+              properties:
+                name: { type: string, maxLength: 200 }
+                platform: { $ref: '#/components/schemas/Platform' }
+                location: { type: string, maxLength: 500 }
+                category: { type: string, maxLength: 200 }
+                keywords: { type: string, maxLength: 1000 }
+                minPrice: { type: number, minimum: 0 }
+                maxPrice: { type: number, minimum: 0 }
+                enabled: { type: boolean, default: true }
+      responses:
+        '201': { description: Created }
+
+  /search-configs/{id}:
+    put:
+      tags: [Search Configs]
+      summary: Update a search configuration
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Updated }
+    delete:
+      tags: [Search Configs]
+      summary: Delete a search configuration
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Deleted }
+
+  # ── Scraper Jobs ────────────────────────────────────────────────────────
+  /scraper-jobs:
+    get:
+      tags: [Scraper Jobs]
+      summary: List scraper jobs
+      parameters:
+        - { name: status, in: query, schema: { type: string } }
+        - { name: platform, in: query, schema: { $ref: '#/components/schemas/Platform' } }
+        - { name: limit, in: query, schema: { type: integer, default: 50 } }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobs: { type: array, items: { $ref: '#/components/schemas/ScraperJob' } }
+                  total: { type: integer }
+    post:
+      tags: [Scraper Jobs]
+      summary: Create a scraper job
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [platform]
+              properties:
+                platform: { $ref: '#/components/schemas/Platform' }
+                location: { type: string, maxLength: 500 }
+                category: { type: string, maxLength: 200 }
+      responses:
+        '201': { description: Created }
+
+  /scraper-jobs/{id}:
+    delete:
+      tags: [Scraper Jobs]
+      summary: Delete a scraper job
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Deleted }
+
+  # ── Posting Queue ───────────────────────────────────────────────────────
+  /posting-queue:
+    get:
+      tags: [Posting Queue]
+      summary: List posting queue items
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        - { name: status, in: query, schema: { $ref: '#/components/schemas/PostingStatus' } }
+        - { name: targetPlatform, in: query, schema: { $ref: '#/components/schemas/Platform' } }
+        - { name: listingId, in: query, schema: { type: string } }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/PostingQueueItem' } }
+                  total: { type: integer }
+                  limit: { type: integer }
+                  offset: { type: integer }
+    post:
+      tags: [Posting Queue]
+      summary: Queue listing for resale (single or batch)
+      description: |
+        Supports two modes:
+        - **Single**: `{ listingId, targetPlatform, ... }`
+        - **Batch**: `{ listingId, platforms: [...], ... }` to post to multiple marketplaces at once
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  required: [listingId, targetPlatform]
+                  properties:
+                    listingId: { type: string }
+                    targetPlatform: { $ref: '#/components/schemas/Platform' }
+                    askingPrice: { type: number }
+                    title: { type: string, maxLength: 200 }
+                    description: { type: string, maxLength: 5000 }
+                    scheduledAt: { type: string, format: date-time }
+                - type: object
+                  required: [listingId, platforms]
+                  properties:
+                    listingId: { type: string }
+                    platforms: { type: array, items: { $ref: '#/components/schemas/Platform' }, minItems: 1, maxItems: 5 }
+                    askingPrice: { type: number }
+                    title: { type: string, maxLength: 200 }
+                    description: { type: string, maxLength: 5000 }
+      responses:
+        '201': { description: Queued }
+
+  /posting-queue/{id}:
+    patch:
+      tags: [Posting Queue]
+      summary: Update a queued posting
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { $ref: '#/components/schemas/PostingStatus' }
+                askingPrice: { type: number }
+                title: { type: string }
+                description: { type: string }
+                scheduledAt: { type: string, format: date-time, nullable: true }
+      responses:
+        '200': { description: Updated }
+    delete:
+      tags: [Posting Queue]
+      summary: Cancel/delete a queued posting
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Deleted }
+
+  /posting-queue/{id}/retry:
+    post:
+      tags: [Posting Queue]
+      summary: Retry a failed posting
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Retried }
+
+  /posting-queue/stats:
+    get:
+      tags: [Posting Queue]
+      summary: Get posting queue statistics
+      responses:
+        '200':
+          description: Queue stats by status
+
+  # ── Price History ───────────────────────────────────────────────────────
+  /price-history:
+    get:
+      tags: [Price History]
+      summary: Get price history for a product
+      parameters:
+        - { name: productName, in: query, required: true, schema: { type: string } }
+        - { name: category, in: query, schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, default: 50 } }
+      responses:
+        '200': { description: Price history records }
+    post:
+      tags: [Price History]
+      summary: Fetch and store new price history from market data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productName]
+              properties:
+                productName: { type: string }
+                category: { type: string }
+      responses:
+        '200':
+          description: Market data fetched and stored
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  marketData: { type: object }
+                  storedRecords: { type: integer }
+        '404': { description: No market data found }
+
+  # ── User Settings ───────────────────────────────────────────────────────
+  /user/settings:
+    get:
+      tags: [User Settings]
+      summary: Get user settings
+      responses:
+        '200':
+          description: User settings (API keys masked)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data:
+                    type: object
+                    properties:
+                      id: { type: string }
+                      userId: { type: string }
+                      hasOpenaiApiKey: { type: boolean }
+                      llmModel: { type: string }
+                      discountThreshold: { type: number }
+                      autoAnalyze: { type: boolean }
+    patch:
+      tags: [User Settings]
+      summary: Update user settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                openaiApiKey: { type: string }
+                llmModel: { type: string }
+                discountThreshold: { type: number }
+                autoAnalyze: { type: boolean }
+      responses:
+        '200': { description: Updated }
+
+  /user/settings/validate-key:
+    post:
+      tags: [User Settings]
+      summary: Validate an OpenAI API key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [apiKey]
+              properties:
+                apiKey: { type: string }
+      responses:
+        '200':
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid: { type: boolean }
+                  error: { type: string }
+
+  # ── Scrapers (Direct) ──────────────────────────────────────────────────
+  /scraper/craigslist:
+    post:
+      tags: [Scrapers]
+      summary: Scrape Craigslist listings
+      responses:
+        '200': { description: Scraped listings }
+
+  /scraper/ebay:
+    post:
+      tags: [Scrapers]
+      summary: Scrape eBay listings
+      responses:
+        '200': { description: Scraped listings }
+
+  /scraper/facebook:
+    post:
+      tags: [Scrapers]
+      summary: Scrape Facebook Marketplace listings
+      responses:
+        '200': { description: Scraped listings }
+
+  /scraper/mercari:
+    post:
+      tags: [Scrapers]
+      summary: Scrape Mercari listings
+      responses:
+        '200': { description: Scraped listings }
+
+  /scraper/offerup:
+    post:
+      tags: [Scrapers]
+      summary: Scrape OfferUp listings
+      responses:
+        '200': { description: Scraped listings }
+
+  /scrape/facebook:
+    post:
+      tags: [Scrapers]
+      summary: Legacy Facebook scrape endpoint
+      responses:
+        '200': { description: Scraped listings }
+
+  # ── Auth ────────────────────────────────────────────────────────────────
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, name]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                name: { type: string }
+      responses:
+        '201': { description: User created }
+        '409': { description: Email already exists }
+
+  /auth/facebook/authorize:
+    get:
+      tags: [Auth]
+      summary: Start Facebook OAuth flow
+      responses:
+        '302': { description: Redirect to Facebook }
+
+  /auth/facebook/callback:
+    get:
+      tags: [Auth]
+      summary: Facebook OAuth callback
+      responses:
+        '302': { description: Redirect with token }
+
+  /auth/facebook/status:
+    get:
+      tags: [Auth]
+      summary: Check Facebook connection status
+      responses:
+        '200':
+          description: Connection status
+
+  /auth/facebook/disconnect:
+    post:
+      tags: [Auth]
+      summary: Disconnect Facebook account
+      responses:
+        '200': { description: Disconnected }
+
+  # ── Images ──────────────────────────────────────────────────────────────
+  /images/proxy:
+    get:
+      tags: [Listings]
+      summary: Proxy external listing images (CORS bypass)
+      parameters:
+        - { name: url, in: query, required: true, schema: { type: string, format: uri } }
+      responses:
+        '200':
+          description: Proxied image
+          content:
+            image/*: {}
