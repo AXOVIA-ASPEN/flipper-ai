@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1771135435257" clover="3.2.0">
-  <project timestamp="1771135435257" name="All files">
+<coverage generated="1771136533727" clover="3.2.0">
+  <project timestamp="1771136533728" name="All files">
     <metrics statements="907" coveredstatements="901" conditionals="648" coveredconditionals="608" methods="146" coveredmethods="144" elements="1701" coveredelements="1653" complexity="0" loc="907" ncloc="907" packages="1" files="18" classes="18"/>
     <file name="api-security.ts" path="/home/ubuntu/.openclaw/workspace/projects/flipper-ai/src/lib/api-security.ts">
       <metrics statements="45" coveredstatements="45" conditionals="53" coveredconditionals="50" methods="7" coveredmethods="7"/>
@@ -822,30 +822,30 @@
     </file>
     <file name="validations.ts" path="/home/ubuntu/.openclaw/workspace/projects/flipper-ai/src/lib/validations.ts">
       <metrics statements="24" coveredstatements="24" conditionals="2" coveredconditionals="2" methods="4" coveredmethods="4"/>
-      <line num="6" count="5" type="stmt"/>
-      <line num="12" count="5" type="stmt"/>
-      <line num="17" count="5" type="stmt"/>
-      <line num="25" count="5" type="stmt"/>
-      <line num="37" count="5" type="stmt"/>
-      <line num="41" count="5" type="stmt"/>
-      <line num="50" count="5" type="stmt"/>
-      <line num="62" count="5" type="stmt"/>
-      <line num="82" count="5" type="stmt"/>
-      <line num="88" count="5" type="stmt"/>
-      <line num="98" count="5" type="stmt"/>
-      <line num="102" count="5" type="stmt"/>
-      <line num="121" count="5" type="stmt"/>
-      <line num="125" count="81" type="stmt"/>
-      <line num="126" count="81" type="cond" truecount="2" falsecount="0"/>
-      <line num="127" count="68" type="stmt"/>
-      <line num="129" count="13" type="stmt"/>
-      <line num="130" count="13" type="stmt"/>
-      <line num="132" count="13" type="stmt"/>
-      <line num="135" count="5" type="stmt"/>
-      <line num="139" count="30" type="stmt"/>
-      <line num="140" count="30" type="stmt"/>
-      <line num="141" count="31" type="stmt"/>
-      <line num="143" count="30" type="stmt"/>
+      <line num="6" count="6" type="stmt"/>
+      <line num="12" count="6" type="stmt"/>
+      <line num="17" count="6" type="stmt"/>
+      <line num="25" count="6" type="stmt"/>
+      <line num="37" count="6" type="stmt"/>
+      <line num="41" count="6" type="stmt"/>
+      <line num="50" count="6" type="stmt"/>
+      <line num="62" count="6" type="stmt"/>
+      <line num="82" count="6" type="stmt"/>
+      <line num="88" count="6" type="stmt"/>
+      <line num="98" count="6" type="stmt"/>
+      <line num="102" count="6" type="stmt"/>
+      <line num="121" count="6" type="stmt"/>
+      <line num="125" count="85" type="stmt"/>
+      <line num="126" count="85" type="cond" truecount="2" falsecount="0"/>
+      <line num="127" count="70" type="stmt"/>
+      <line num="129" count="15" type="stmt"/>
+      <line num="130" count="19" type="stmt"/>
+      <line num="132" count="15" type="stmt"/>
+      <line num="135" count="6" type="stmt"/>
+      <line num="139" count="32" type="stmt"/>
+      <line num="140" count="32" type="stmt"/>
+      <line num="141" count="34" type="stmt"/>
+      <line num="143" count="32" type="stmt"/>
     </file>
     <file name="value-estimator.ts" path="/home/ubuntu/.openclaw/workspace/projects/flipper-ai/src/lib/value-estimator.ts">
       <metrics statements="113" coveredstatements="113" conditionals="70" coveredconditionals="70" methods="9" coveredmethods="9"/>

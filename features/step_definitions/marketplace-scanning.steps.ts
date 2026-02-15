@@ -7,75 +7,15 @@
  */
 
 import { Given, When, Then, setDefaultTimeout } from '@cucumber/cucumber';
+// Note: Given is used below for scan/notification/filter/tier steps
 import { expect } from '@playwright/test';
 import { CustomWorld } from '../support/world';
 
 setDefaultTimeout(30 * 1000);
 
-// ==================== BACKGROUND / AUTH ====================
-
-Given('I am logged in as a free user', async function (this: CustomWorld) {
-  // Navigate to login page and authenticate as test free-tier user
-  await this.page.goto('/login');
-
-  // Mock auth for test environment
-  await this.page.evaluate(() => {
-    localStorage.setItem('auth_token', 'test-free-user-token');
-    localStorage.setItem('user_tier', 'free');
-    localStorage.setItem('user_id', 'test-free-user');
-  });
-
-  await this.page.goto('/');
-  await this.page.waitForLoadState('networkidle');
-  console.log('✅ Logged in as free user');
-});
-
-Given('the database is seeded with test data', async function (this: CustomWorld) {
-  // Seed via API or direct DB
-  try {
-    const testData = this.loadFixture('scan-test-data');
-    await this.seedDatabase(testData);
-  } catch {
-    // If no fixture, mock API responses instead
-    await this.page.route('**/api/listings**', async (route) => {
-      await route.fulfill({
-        status: 200,
-        body: JSON.stringify({
-          listings: [
-            {
-              id: '1',
-              title: 'Sony WH-1000XM5 Headphones',
-              price: 180,
-              marketplace: 'eBay',
-              thumbnail: 'https://example.com/thumb.jpg',
-              flippabilityScore: 85,
-              category: 'Electronics',
-            },
-            {
-              id: '2',
-              title: 'Nintendo Switch Bundle',
-              price: 200,
-              marketplace: 'eBay',
-              thumbnail: 'https://example.com/thumb2.jpg',
-              flippabilityScore: 72,
-              category: 'Electronics',
-            },
-          ],
-        }),
-      });
-    });
-  }
-  console.log('✅ Test data seeded');
-});
+// Background/auth and navigation steps are in common-steps.ts
 
 // ==================== NAVIGATION & SCANNING ====================
-
-When('I navigate to the scanner page', async function (this: CustomWorld) {
-  await this.page.goto('/scanner');
-  await this.page.waitForLoadState('networkidle');
-  await this.screenshot('scanner-page-loaded');
-  console.log('✅ Navigated to scanner page');
-});
 
 When('I select {string} as the marketplace', async function (this: CustomWorld, marketplace: string) {
   const selector = this.page.locator('[data-testid="marketplace-select"]');
@@ -101,10 +41,7 @@ When('I set price range to {string}', async function (this: CustomWorld, priceRa
   console.log(`✅ Price range set: ${priceRange}`);
 });
 
-When('I click {string}', async function (this: CustomWorld, buttonText: string) {
-  await this.page.getByRole('button', { name: buttonText }).click();
-  console.log(`✅ Clicked: ${buttonText}`);
-});
+// 'I click {string}' step is in common-steps.ts
 
 // ==================== SCAN RESULTS ====================
 
