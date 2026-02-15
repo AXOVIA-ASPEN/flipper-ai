@@ -366,6 +366,61 @@ describe("Image Download and Caching", () => {
       expect(result.cachedImage?.mimeType).toBe("image/jpeg"); // Default
     });
 
+    it("uses URL extension when MIME type has no mapping", async () => {
+      mockCacheMiss();
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        headers: {
+          get: (name: string) => name === "content-type" ? "image/png" : null,
+        },
+        arrayBuffer: async () => mockImageBuffer.buffer,
+      });
+
+      const result = await downloadAndCacheImage("https://example.com/photo.png");
+
+      expect(result.success).toBe(true);
+      expect(result.cachedImage?.localPath).toContain(".png");
+    });
+
+    it("handles URLs with .webp extension", async () => {
+      mockCacheMiss();
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        headers: {
+          get: (name: string) => name === "content-type" ? "image/webp" : null,
+        },
+        arrayBuffer: async () => mockImageBuffer.buffer,
+      });
+
+      const result = await downloadAndCacheImage("https://example.com/photo.webp");
+      expect(result.success).toBe(true);
+      expect(result.cachedImage?.localPath).toContain(".webp");
+    });
+
+    it("handles URLs with .gif extension", async () => {
+      mockCacheMiss();
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        headers: {
+          get: (name: string) => name === "content-type" ? "image/gif" : null,
+        },
+        arrayBuffer: async () => mockImageBuffer.buffer,
+      });
+
+      const result = await downloadAndCacheImage("https://example.com/anim.gif");
+      expect(result.success).toBe(true);
+      expect(result.cachedImage?.localPath).toContain(".gif");
+    });
+
+    it("handles non-Error thrown exceptions", async () => {
+      mockCacheMiss();
+      (fetch as jest.Mock).mockRejectedValueOnce("string error");
+
+      const result = await downloadAndCacheImage(mockImageUrl);
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Unknown error");
+    });
+
     it("creates cache directory if it doesn't exist", async () => {
       mockCacheDirMissing();
         
