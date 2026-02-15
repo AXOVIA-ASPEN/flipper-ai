@@ -27,3 +27,4 @@ yarn-error.log*
 # Cached images (keep directory structure but not actual images)
 public/images/listings/*
 !public/images/listings/.gitkeepe2e/test-results/
+coverage/
