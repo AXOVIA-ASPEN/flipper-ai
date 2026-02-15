@@ -9,6 +9,12 @@ const mockCreate = jest.fn();
 const mockUpdate = jest.fn();
 const mockDelete = jest.fn();
 
+const mockGetAuthUserId = jest.fn().mockResolvedValue(null);
+jest.mock('@/lib/auth-middleware', () => ({
+  __esModule: true,
+  getAuthUserId: (...args: unknown[]) => mockGetAuthUserId(...args),
+}));
+
 jest.mock('@/lib/db', () => ({
   __esModule: true,
   default: {
@@ -95,6 +101,23 @@ describe('Search Configs API', () => {
 
       expect(response.status).toBe(500);
       expect(data.error).toBe('Failed to fetch search configurations');
+    });
+
+    it('should filter by userId when authenticated', async () => {
+      mockGetAuthUserId.mockResolvedValueOnce('user-456');
+      mockFindMany.mockResolvedValue([{ id: 'config-1', name: 'Test' }]);
+
+      const request = createMockRequest('GET', '/api/search-configs');
+      const response = await GET(request);
+
+      expect(response.status).toBe(200);
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            OR: [{ userId: 'user-456' }, { userId: null }],
+          }),
+        })
+      );
     });
   });
 
@@ -219,6 +242,38 @@ describe('Search Configs API', () => {
           maxPrice: 500.75,
         }),
       });
+    });
+
+    it('should filter by userId when authenticated', async () => {
+      mockGetAuthUserId.mockResolvedValueOnce('user-123');
+      mockCreate.mockResolvedValue({ id: 'config-1', name: 'Test', platform: 'CRAIGSLIST', location: 'tampa' });
+
+      const request = createMockRequest('POST', '/api/search-configs', {
+        name: 'Test',
+        platform: 'CRAIGSLIST',
+        location: 'tampa',
+      });
+      const response = await POST(request);
+
+      expect(response.status).toBe(201);
+      expect(mockCreate).toHaveBeenCalledWith({
+        data: expect.objectContaining({ userId: 'user-123' }),
+      });
+    });
+
+    it('should return 500 when prisma create throws', async () => {
+      mockCreate.mockRejectedValue(new Error('Database connection failed'));
+
+      const request = createMockRequest('POST', '/api/search-configs', {
+        name: 'Test',
+        platform: 'CRAIGSLIST',
+        location: 'tampa',
+      });
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(500);
+      expect(data.error).toBe('Failed to create search configuration');
     });
   });
 
