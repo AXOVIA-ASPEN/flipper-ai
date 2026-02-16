@@ -631,6 +631,58 @@ describe('title-generator', () => {
     });
   });
 
+    it('uses fallback values in prompt when input fields are null', async () => {
+      const OpenAI = require('openai');
+      let capturedPrompt = '';
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockImplementation(async (opts: { messages: Array<{ content: string }> }) => {
+              capturedPrompt = opts.messages[1].content;
+              return {
+                choices: [{ message: { content: 'Generic Item - Good Condition' } }],
+              };
+            }),
+          },
+        },
+      }));
+
+      const origKey = process.env.OPENAI_API_KEY;
+      process.env.OPENAI_API_KEY = 'test-key';
+
+      const nullInput: TitleGeneratorInput = {
+        brand: null,
+        model: null,
+        variant: null,
+        condition: 'good',
+        category: null,
+      };
+
+      const result = await generateLLMTitle(nullInput, 'ebay');
+      expect(result.title).toBe('Generic Item - Good Condition');
+      expect(capturedPrompt).toContain('Brand: Unknown');
+      expect(capturedPrompt).toContain('Model: Unknown');
+      expect(capturedPrompt).toContain('Variant: N/A');
+      expect(capturedPrompt).toContain('Category: General');
+
+      OpenAI.mockImplementation(() => ({
+        chat: {
+          completions: {
+            create: jest.fn().mockResolvedValue({
+              choices: [{ message: { content: 'Apple iPhone 15 Pro Max 256GB - Excellent Condition' } }],
+            }),
+          },
+        },
+      }));
+
+      if (origKey) {
+        process.env.OPENAI_API_KEY = origKey;
+      } else {
+        delete process.env.OPENAI_API_KEY;
+      }
+    });
+  });
+
   describe('generateTitlesForAllPlatforms - edge cases', () => {
     it('returns empty primary when no titles match ebay', () => {
       // This tests the fallback chain: titles[0]?.title || ''
