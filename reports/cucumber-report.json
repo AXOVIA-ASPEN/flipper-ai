@@ -1,0 +1,1016 @@
+[
+  {
+    "description": "  As a flipper\n  I want AI to draft messages to sellers\n  So I can quickly negotiate purchases",
+    "elements": [
+      {
+        "description": "",
+        "id": "automated-seller-communication;generate-initial-outreach-message",
+        "keyword": "Scenario",
+        "line": 10,
+        "name": "Generate initial outreach message",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 134749201
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 7,
+            "name": "I am logged in",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:27"
+            },
+            "result": {
+              "status": "failed",
+              "duration": 24763366,
+              "error_message": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n  - navigating to \"/login\", waiting until \"load\"\n\n    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/step_definitions/common-steps.ts:31:19)"
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 8,
+            "name": "I have identified a flip opportunity",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:17"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [
+              {
+                "rows": [
+                  {
+                    "cells": [
+                      "Title",
+                      "Vintage Nintendo 64 Console"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Price",
+                      "$75"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Seller",
+                      "John (Craigslist)"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Location",
+                      "5 miles away"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Asking Offer",
+                      "Yes (OBO)"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "keyword": "Given ",
+            "line": 11,
+            "name": "an opportunity:",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:30"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 17,
+            "name": "I click \"Draft Message\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [
+              {
+                "rows": [
+                  {
+                    "cells": [
+                      "Element",
+                      "Required"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Polite greeting",
+                      "Yes"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Item reference",
+                      "Yes"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Interest statement",
+                      "Yes"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Pickup availability",
+                      "Yes"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Contact info request",
+                      "Yes"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "keyword": "Then ",
+            "line": 18,
+            "name": "the AI should generate a message containing:",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:50"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 25,
+            "name": "the tone should be friendly and professional",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:95"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 26,
+            "name": "it should NOT include lowball offers",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:110"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 148819813
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "automated-seller-communication;user-approves-and-sends-message",
+        "keyword": "Scenario",
+        "line": 28,
+        "name": "User approves and sends message",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 137927494
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 7,
+            "name": "I am logged in",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:27"
+            },
+            "result": {
+              "status": "failed",
+              "duration": 19219490,
+              "error_message": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n  - navigating to \"/login\", waiting until \"load\"\n\n    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/step_definitions/common-steps.ts:31:19)"
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 8,
+            "name": "I have identified a flip opportunity",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:17"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 29,
+            "name": "an AI-drafted message is ready",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:122"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 30,
+            "name": "I review the message",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:137"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 31,
+            "name": "I click \"Approve & Send\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 32,
+            "name": "the message should be sent to the seller",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:150"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 33,
+            "name": "the opportunity status should change to \"Contacted\"",
+            "match": {
+              "location": "features/step_definitions/flip-journey.steps.ts:264"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 34,
+            "name": "the conversation should appear in my inbox",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:160"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 316041198
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "automated-seller-communication;user-edits-ai-drafted-message",
+        "keyword": "Scenario",
+        "line": 36,
+        "name": "User edits AI-drafted message",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 87593498
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 7,
+            "name": "I am logged in",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:27"
+            },
+            "result": {
+              "status": "failed",
+              "duration": 6803061,
+              "error_message": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n  - navigating to \"/login\", waiting until \"load\"\n\n    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/step_definitions/common-steps.ts:31:19)"
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 8,
+            "name": "I have identified a flip opportunity",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:17"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 37,
+            "name": "an AI-drafted message is displayed",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:173"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 38,
+            "name": "I click \"Edit\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 39,
+            "name": "I modify the pickup time to \"Saturday afternoon\"",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:185"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 40,
+            "name": "I click \"Send Edited Message\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 41,
+            "name": "the modified message should be sent",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:205"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 42,
+            "name": "my edits should be saved as a template preference",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:212"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 161967650
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "automated-seller-communication;track-conversation-thread",
+        "keyword": "Scenario",
+        "line": 44,
+        "name": "Track conversation thread",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 68964211
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 7,
+            "name": "I am logged in",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:27"
+            },
+            "result": {
+              "status": "failed",
+              "duration": 8963855,
+              "error_message": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n  - navigating to \"/login\", waiting until \"load\"\n\n    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/step_definitions/common-steps.ts:31:19)"
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 8,
+            "name": "I have identified a flip opportunity",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:17"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 45,
+            "name": "I have sent an initial message",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:226"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 46,
+            "name": "the seller has replied \"Yes, it's available. Can you pick up tomorrow?\"",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:238"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 47,
+            "name": "I navigate to the Messages page",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:267"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 48,
+            "name": "I should see the full conversation thread",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:273"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 49,
+            "name": "the seller's reply should be marked as unread",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:287"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 50,
+            "name": "I should see a \"Draft Reply\" button",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:87"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 141903522
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "automated-seller-communication;ai-suggests-response-to-seller-question",
+        "keyword": "Scenario",
+        "line": 52,
+        "name": "AI suggests response to seller question",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 87876494
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 7,
+            "name": "I am logged in",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:27"
+            },
+            "result": {
+              "status": "failed",
+              "duration": 4953199,
+              "error_message": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n  - navigating to \"/login\", waiting until \"load\"\n\n    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/step_definitions/common-steps.ts:31:19)"
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 8,
+            "name": "I have identified a flip opportunity",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:17"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 53,
+            "name": "the seller asks \"What's your best offer?\"",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:301"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 54,
+            "name": "I click \"Draft Reply\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 55,
+            "name": "the AI should analyze my profit margins",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:321"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 56,
+            "name": "suggest a counteroffer between list price and my max budget",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:329"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 57,
+            "name": "include negotiation rationale in the message",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:346"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 146530501
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "automated-seller-communication;schedule-pickup-with-calendar-integration",
+        "keyword": "Scenario",
+        "line": 59,
+        "name": "Schedule pickup with calendar integration",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 54915065
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 7,
+            "name": "I am logged in",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:27"
+            },
+            "result": {
+              "status": "failed",
+              "duration": 6688110,
+              "error_message": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n  - navigating to \"/login\", waiting until \"load\"\n\n    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/step_definitions/common-steps.ts:31:19)"
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 8,
+            "name": "I have identified a flip opportunity",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:17"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 60,
+            "name": "the seller agrees to sell",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:359"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 61,
+            "name": "they say \"Can you pick up this Saturday?\"",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:364"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 62,
+            "name": "I click \"Schedule Pickup\"",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:112"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 63,
+            "name": "a calendar event should be created",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:379"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 64,
+            "name": "I should be able to set a reminder",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:387"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [
+              {
+                "rows": [
+                  {
+                    "cells": [
+                      "Field",
+                      "Content"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Title",
+                      "Pickup: [Item Name]"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Location",
+                      "[Seller Address]"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Notes",
+                      "Seller: [Contact Info]"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "keyword": "And ",
+            "line": 65,
+            "name": "the event should include:",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:394"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 143392444
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "automated-seller-communication;alert-if-tracked-item-sells-before-purchase",
+        "keyword": "Scenario",
+        "line": 71,
+        "name": "Alert if tracked item sells before purchase",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 85162912
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 7,
+            "name": "I am logged in",
+            "match": {
+              "location": "features/step_definitions/common-steps.ts:27"
+            },
+            "result": {
+              "status": "failed",
+              "duration": 6189728,
+              "error_message": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n  - navigating to \"/login\", waiting until \"load\"\n\n    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/step_definitions/common-steps.ts:31:19)"
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 8,
+            "name": "I have identified a flip opportunity",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:17"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 72,
+            "name": "I am negotiating with a seller",
+            "match": {
+              "location": "features/step_definitions/notifications-monitoring.steps.ts:163"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 73,
+            "name": "the listing is still active on the marketplace",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:415"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 74,
+            "name": "the listing status changes to \"SOLD\"",
+            "match": {
+              "location": "features/step_definitions/notifications-monitoring.steps.ts:179"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 75,
+            "name": "I should receive an urgent notification",
+            "match": {
+              "location": "features/step_definitions/notifications-monitoring.steps.ts:184"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 76,
+            "name": "the opportunity should be marked as \"Missed\"",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:420"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 77,
+            "name": "it should move to the \"Lost Opportunities\" section",
+            "match": {
+              "location": "features/step_definitions/seller-communication.steps.ts:431"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 138042599
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      }
+    ],
+    "id": "automated-seller-communication",
+    "line": 1,
+    "keyword": "Feature",
+    "name": "Automated Seller Communication",
+    "tags": [],
+    "uri": "features/03-seller-communication.feature"
+  }
+]

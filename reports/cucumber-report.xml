@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<testsuite name="Cucumber" time="4.848" tests="7" skipped="0" failures="7" errors="0" timestamp="2026-02-16T13:33:58.810Z">
+  <testcase classname="Automated Seller Communication" name="Generate initial outreach message" time="0.321">
+    <failure type="Error" message="page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL&#xA;Call log:&#xA;  - navigating to &quot;/login&quot;, waiting until &quot;load&quot;&#xA;"><![CDATA[    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/step_definitions/common-steps.ts:31:19)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
+And I have identified a flip opportunity....................................skipped
+Given an opportunity:.......................................................skipped
+When I click "Draft Message"................................................skipped
+Then the AI should generate a message containing:...........................skipped
+And the tone should be friendly and professional............................skipped
+And it should NOT include lowball offers....................................skipped]]></system-out>
+  </testcase>
+  <testcase classname="Automated Seller Communication" name="User approves and sends message" time="0.485">
+    <failure type="Error" message="page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL&#xA;Call log:&#xA;  - navigating to &quot;/login&quot;, waiting until &quot;load&quot;&#xA;"><![CDATA[    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/step_definitions/common-steps.ts:31:19)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
+And I have identified a flip opportunity....................................skipped
+Given an AI-drafted message is ready........................................skipped
+When I review the message...................................................skipped
+And I click "Approve & Send"................................................skipped
+Then the message should be sent to the seller...............................skipped
+And the opportunity status should change to "Contacted".....................skipped
+And the conversation should appear in my inbox..............................skipped]]></system-out>
+  </testcase>
+  <testcase classname="Automated Seller Communication" name="User edits AI-drafted message" time="0.262">
+    <failure type="Error" message="page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL&#xA;Call log:&#xA;  - navigating to &quot;/login&quot;, waiting until &quot;load&quot;&#xA;"><![CDATA[    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/step_definitions/common-steps.ts:31:19)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
+And I have identified a flip opportunity....................................skipped
+Given an AI-drafted message is displayed....................................skipped
+When I click "Edit".........................................................skipped
+And I modify the pickup time to "Saturday afternoon"........................skipped
+And I click "Send Edited Message"...........................................skipped
+Then the modified message should be sent....................................skipped
+And my edits should be saved as a template preference.......................skipped]]></system-out>
+  </testcase>
+  <testcase classname="Automated Seller Communication" name="Track conversation thread" time="0.226">
+    <failure type="Error" message="page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL&#xA;Call log:&#xA;  - navigating to &quot;/login&quot;, waiting until &quot;load&quot;&#xA;"><![CDATA[    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/step_definitions/common-steps.ts:31:19)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
+And I have identified a flip opportunity....................................skipped
+Given I have sent an initial message........................................skipped
+And the seller has replied "Yes, it's available. Can you pick up tomorrow?"..skipped
+When I navigate to the Messages page........................................skipped
+Then I should see the full conversation thread..............................skipped
+And the seller's reply should be marked as unread...........................skipped
+And I should see a "Draft Reply" button.....................................skipped]]></system-out>
+  </testcase>
+  <testcase classname="Automated Seller Communication" name="AI suggests response to seller question" time="0.242">
+    <failure type="Error" message="page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL&#xA;Call log:&#xA;  - navigating to &quot;/login&quot;, waiting until &quot;load&quot;&#xA;"><![CDATA[    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/step_definitions/common-steps.ts:31:19)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
+And I have identified a flip opportunity....................................skipped
+Given the seller asks "What's your best offer?".............................skipped
+When I click "Draft Reply"..................................................skipped
+Then the AI should analyze my profit margins................................skipped
+And suggest a counteroffer between list price and my max budget.............skipped
+And include negotiation rationale in the message............................skipped]]></system-out>
+  </testcase>
+  <testcase classname="Automated Seller Communication" name="Schedule pickup with calendar integration" time="0.212">
+    <failure type="Error" message="page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL&#xA;Call log:&#xA;  - navigating to &quot;/login&quot;, waiting until &quot;load&quot;&#xA;"><![CDATA[    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/step_definitions/common-steps.ts:31:19)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
+And I have identified a flip opportunity....................................skipped
+Given the seller agrees to sell.............................................skipped
+And they say "Can you pick up this Saturday?"...............................skipped
+When I click "Schedule Pickup"..............................................skipped
+Then a calendar event should be created.....................................skipped
+And I should be able to set a reminder......................................skipped
+And the event should include:...............................................skipped]]></system-out>
+  </testcase>
+  <testcase classname="Automated Seller Communication" name="Alert if tracked item sells before purchase" time="0.233">
+    <failure type="Error" message="page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL&#xA;Call log:&#xA;  - navigating to &quot;/login&quot;, waiting until &quot;load&quot;&#xA;"><![CDATA[    at CustomWorld.<anonymous> (/home/ubuntu/.openclaw/workspace/projects/flipper-ai/features/step_definitions/common-steps.ts:31:19)]]></failure>
+    <system-out><![CDATA[Given I am logged in........................................................failed
+And I have identified a flip opportunity....................................skipped
+Given I am negotiating with a seller........................................skipped
+And the listing is still active on the marketplace..........................skipped
+When the listing status changes to "SOLD"...................................skipped
+Then I should receive an urgent notification................................skipped
+And the opportunity should be marked as "Missed"............................skipped
+And it should move to the "Lost Opportunities" section......................skipped]]></system-out>
+  </testcase>
+</testsuite>
