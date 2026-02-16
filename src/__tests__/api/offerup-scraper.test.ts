@@ -62,6 +62,134 @@ function makeRequest(body: Record<string, unknown> = {}): NextRequest {
   });
 }
 
+// Test internal helper functions via their effects on the route
+// extractListingId is tested through listing upsert calls
+// withRetry is tested through goto retry behavior
+
+describe('extractListingId edge cases', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (mockPrisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-extract' });
+    (mockPrisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+    (mockPrisma.listing.upsert as jest.Mock).mockResolvedValue({});
+    mockGetAuthUserId.mockResolvedValue('user-123');
+    mockDetectCategory.mockReturnValue('electronics');
+    mockEstimateValue.mockReturnValue({
+      estimatedValue: 500, estimatedLow: 400, estimatedHigh: 600,
+      profitPotential: 200, profitLow: 100, profitHigh: 300,
+      valueScore: 75, discountPercent: 40, resaleDifficulty: 'medium',
+      comparableUrls: [], reasoning: 'Good deal', notes: '',
+      shippable: true, negotiable: true, tags: ['electronics'],
+    } as any);
+    mockGeneratePurchaseMessage.mockReturnValue('Hi, is this still available?');
+    mockDownloadAndCacheImages.mockResolvedValue({ cachedUrls: [], successCount: 0 } as any);
+    mockNormalizeLocation.mockReturnValue({ normalized: 'Tampa, FL' } as any);
+  });
+
+  it('handles URL with alt format (trailing number, no /item/detail/)', async () => {
+    const { chromium } = require('playwright');
+    const mockPage = {
+      goto: jest.fn().mockResolvedValue(undefined),
+      waitForSelector: jest.fn().mockResolvedValue(undefined),
+      content: jest.fn().mockResolvedValue('<html></html>'),
+      evaluate: jest.fn().mockResolvedValue([
+        { title: 'Alt URL Item', price: '$100', url: 'https://offerup.com/listing/12345/', location: 'Tampa' },
+      ]),
+    };
+    const mockContext = {
+      newPage: jest.fn().mockResolvedValue(mockPage),
+      route: jest.fn().mockResolvedValue(undefined),
+    };
+    chromium.launch.mockResolvedValue({
+      newContext: jest.fn().mockResolvedValue(mockContext),
+      close: jest.fn().mockResolvedValue(undefined),
+    });
+
+    const res = await POST(makeRequest({ location: 'tampa-fl' }));
+    const json = await res.json();
+    expect(json.success).toBe(true);
+    expect(json.savedCount).toBe(1);
+    // extractListingId falls through to altMatch → '12345'
+    expect(mockPrisma.listing.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          platform_externalId_userId: expect.objectContaining({
+            externalId: '12345',
+          }),
+        }),
+      })
+    );
+  });
+
+  it('handles URL with no numeric ID (falls back to full URL)', async () => {
+    const { chromium } = require('playwright');
+    const mockPage = {
+      goto: jest.fn().mockResolvedValue(undefined),
+      waitForSelector: jest.fn().mockResolvedValue(undefined),
+      content: jest.fn().mockResolvedValue('<html></html>'),
+      evaluate: jest.fn().mockResolvedValue([
+        { title: 'Weird URL', price: '$50', url: 'https://offerup.com/some-listing-slug', location: 'Tampa' },
+      ]),
+    };
+    const mockContext = {
+      newPage: jest.fn().mockResolvedValue(mockPage),
+      route: jest.fn().mockResolvedValue(undefined),
+    };
+    chromium.launch.mockResolvedValue({
+      newContext: jest.fn().mockResolvedValue(mockContext),
+      close: jest.fn().mockResolvedValue(undefined),
+    });
+
+    const res = await POST(makeRequest({ location: 'tampa-fl' }));
+    const json = await res.json();
+    expect(json.success).toBe(true);
+    // Falls back to full URL as externalId
+    expect(mockPrisma.listing.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          platform_externalId_userId: expect.objectContaining({
+            externalId: 'https://offerup.com/some-listing-slug',
+          }),
+        }),
+      })
+    );
+  });
+});
+
+describe('withRetry behavior', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (mockPrisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-retry' });
+    (mockPrisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+    mockGetAuthUserId.mockResolvedValue('user-123');
+  });
+
+  it('retries page.goto on first failure then succeeds', async () => {
+    const { chromium } = require('playwright');
+    const mockPage = {
+      goto: jest.fn()
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockResolvedValueOnce(undefined),
+      waitForSelector: jest.fn().mockResolvedValue(undefined),
+      content: jest.fn().mockResolvedValue('<html></html>'),
+      evaluate: jest.fn().mockResolvedValue([]),
+    };
+    const mockContext = {
+      newPage: jest.fn().mockResolvedValue(mockPage),
+      route: jest.fn().mockResolvedValue(undefined),
+    };
+    chromium.launch.mockResolvedValue({
+      newContext: jest.fn().mockResolvedValue(mockContext),
+      close: jest.fn().mockResolvedValue(undefined),
+    });
+
+    const res = await POST(makeRequest({ location: 'tampa-fl' }));
+    const json = await res.json();
+    expect(json.success).toBe(true);
+    expect(mockPage.goto).toHaveBeenCalledTimes(2);
+  });
+});
+
 describe('GET /api/scraper/offerup', () => {
   it('returns platform info and supported categories', async () => {
     const res = await GET();
