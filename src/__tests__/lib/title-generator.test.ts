@@ -629,7 +629,6 @@ describe('title-generator', () => {
         delete process.env.OPENAI_API_KEY;
       }
     });
-  });
 
     it('uses fallback values in prompt when input fields are null', async () => {
       const OpenAI = require('openai');
