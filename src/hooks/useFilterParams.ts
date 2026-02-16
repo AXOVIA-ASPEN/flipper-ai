@@ -11,6 +11,11 @@ export interface FilterState {
   maxPrice: string;
   dateFrom: string;
   dateTo: string;
+  platform: string;
+  minScore: string;
+  maxScore: string;
+  minProfit: string;
+  maxProfit: string;
 }
 
 const DEFAULT_FILTERS: FilterState = {
@@ -21,6 +26,11 @@ const DEFAULT_FILTERS: FilterState = {
   maxPrice: '',
   dateFrom: '',
   dateTo: '',
+  platform: 'all',
+  minScore: '',
+  maxScore: '',
+  minProfit: '',
+  maxProfit: '',
 };
 
 export interface UseFilterParamsReturn {
@@ -46,6 +56,11 @@ export function useFilterParams(): UseFilterParamsReturn {
       maxPrice: searchParams.get('maxPrice') || DEFAULT_FILTERS.maxPrice,
       dateFrom: searchParams.get('dateFrom') || DEFAULT_FILTERS.dateFrom,
       dateTo: searchParams.get('dateTo') || DEFAULT_FILTERS.dateTo,
+      platform: searchParams.get('platform') || DEFAULT_FILTERS.platform,
+      minScore: searchParams.get('minScore') || DEFAULT_FILTERS.minScore,
+      maxScore: searchParams.get('maxScore') || DEFAULT_FILTERS.maxScore,
+      minProfit: searchParams.get('minProfit') || DEFAULT_FILTERS.minProfit,
+      maxProfit: searchParams.get('maxProfit') || DEFAULT_FILTERS.maxProfit,
     }),
     [searchParams]
   );
@@ -60,6 +75,11 @@ export function useFilterParams(): UseFilterParamsReturn {
     if (filters.maxPrice) count++;
     if (filters.dateFrom) count++;
     if (filters.dateTo) count++;
+    if (filters.platform && filters.platform !== 'all') count++;
+    if (filters.minScore) count++;
+    if (filters.maxScore) count++;
+    if (filters.minProfit) count++;
+    if (filters.maxProfit) count++;
     return count;
   }, [filters]);
 
@@ -78,6 +98,13 @@ export function useFilterParams(): UseFilterParamsReturn {
       if (newFilters.maxPrice) params.set('maxPrice', newFilters.maxPrice);
       if (newFilters.dateFrom) params.set('dateFrom', newFilters.dateFrom);
       if (newFilters.dateTo) params.set('dateTo', newFilters.dateTo);
+      if (newFilters.platform && newFilters.platform !== 'all') {
+        params.set('platform', newFilters.platform);
+      }
+      if (newFilters.minScore) params.set('minScore', newFilters.minScore);
+      if (newFilters.maxScore) params.set('maxScore', newFilters.maxScore);
+      if (newFilters.minProfit) params.set('minProfit', newFilters.minProfit);
+      if (newFilters.maxProfit) params.set('maxProfit', newFilters.maxProfit);
 
       const queryString = params.toString();
       const newURL = queryString ? `${pathname}?${queryString}` : pathname;

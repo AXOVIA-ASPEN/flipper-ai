@@ -39,6 +39,11 @@ describe('useFilterParams', () => {
       maxPrice: '',
       dateFrom: '',
       dateTo: '',
+      platform: 'all',
+      minScore: '',
+      maxScore: '',
+      minProfit: '',
+      maxProfit: '',
     });
     expect(result.current.activeFilterCount).toBe(0);
   });

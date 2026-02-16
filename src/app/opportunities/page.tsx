@@ -576,7 +576,7 @@ export default function OpportunitiesPage() {
                 >
                   <option value="all" className="bg-slate-800">All Platforms</option>
                   <option value="CRAIGSLIST" className="bg-slate-800">Craigslist</option>
-                  <option value="FACEBOOK" className="bg-slate-800">Facebook</option>
+                  <option value="FACEBOOK_MARKETPLACE" className="bg-slate-800">Facebook</option>
                   <option value="EBAY" className="bg-slate-800">eBay</option>
                   <option value="OFFERUP" className="bg-slate-800">OfferUp</option>
                   <option value="MERCARI" className="bg-slate-800">Mercari</option>
