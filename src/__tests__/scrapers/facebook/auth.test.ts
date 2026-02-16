@@ -45,6 +45,11 @@ describe('Facebook Authentication', () => {
 
       expect(url).toContain(`state=${state}`);
     });
+
+    it('should not include state parameter when empty string', () => {
+      const url = getAuthorizationUrl(mockConfig, '');
+      expect(url).not.toContain('state=');
+    });
   });
 
   describe('exchangeCodeForToken', () => {
@@ -82,6 +87,34 @@ describe('Facebook Authentication', () => {
         'Invalid authorization code'
       );
     });
+
+    it('should fall back to statusText when error.message is missing', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        statusText: 'Bad Request',
+        json: async () => ({
+          error: {},
+        }),
+      });
+
+      await expect(exchangeCodeForToken(mockConfig, 'invalid-code')).rejects.toThrow(
+        'Bad Request'
+      );
+    });
+
+    it('should fall back to statusText when error object is missing', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        statusText: 'Bad Request',
+        json: async () => ({}),
+      });
+
+      await expect(exchangeCodeForToken(mockConfig, 'invalid-code')).rejects.toThrow(
+        'Bad Request'
+      );
+    });
   });
 
   describe('exchangeForLongLivedToken', () => {
@@ -116,6 +149,19 @@ describe('Facebook Authentication', () => {
       await expect(
         exchangeForLongLivedToken(mockConfig, 'bad-token')
       ).rejects.toThrow('Invalid OAuth access token');
+    });
+
+    it('should fall back to statusText when error.message is missing', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        statusText: 'Bad Request',
+        json: async () => ({ error: {} }),
+      });
+
+      await expect(
+        exchangeForLongLivedToken(mockConfig, 'bad-token')
+      ).rejects.toThrow('Bad Request');
     });
   });
 
