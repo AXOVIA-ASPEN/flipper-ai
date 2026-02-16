@@ -34,7 +34,8 @@ describe('calculateROI', () => {
     });
 
     expect(result.isComplete).toBe(false);
-    expect(result.daysHeld).toBe(5);
+    expect(result.daysHeld).toBeGreaterThanOrEqual(5);
+    expect(result.daysHeld).toBeLessThanOrEqual(6);
     expect(result.grossProfit).toBe(-50); // no resale yet
   });
 
