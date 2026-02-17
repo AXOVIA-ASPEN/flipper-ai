@@ -1,0 +1,19 @@
+User-agent: *
+# Allow public pages
+Allow: /
+Allow: /login
+Allow: /register
+
+# Disallow API routes and private pages
+Disallow: /api/
+Disallow: /settings
+Disallow: /opportunities
+Disallow: /messages
+Disallow: /scraper
+Disallow: /analytics
+Disallow: /onboarding
+
+# Disallow Next.js internals
+Disallow: /_next/
+
+Sitemap: https://flipper-ai.axovia.ai/sitemap.xml

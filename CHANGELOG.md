@@ -4,6 +4,22 @@ All notable changes to Flipper AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.0.1] - 2026-02-17
+
+### Security
+
+- **Content Security Policy (CSP)** — Added `Content-Security-Policy` header to `vercel.json` and `src/lib/api-security.ts` for all deployments
+- **CORS Configuration** — Added `Access-Control-*` headers to `/api/*` routes in `vercel.json`
+- **Middleware Security** — Enhanced `src/middleware.ts` to apply all security headers on every response (covers Docker/Railway deployments as well as Vercel)
+- **Robots.txt** — Added `public/robots.txt` to prevent search engine indexing of API/auth routes
+- **Security.txt** — Added `public/.well-known/security.txt` for responsible vulnerability disclosure
+
+### Chore
+
+- Fixed `.gitignore` to exclude Playwright/Jest artifacts (`playwright-report/`, `test-results/`, `coverage/`)
+- Bumped version to `1.0.0` in `package.json` (was `0.1.0`)
+- Updated `PRODUCTION_READINESS.md` with accurate test count (2,177 tests) and coverage metrics
+
 ## [1.0.0] - 2026-02-15
 
 ### Added

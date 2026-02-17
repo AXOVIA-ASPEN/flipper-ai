@@ -1,0 +1,5 @@
+Contact: mailto:security@axoviaai.com
+Expires: 2027-02-17T00:00:00.000Z
+Preferred-Languages: en
+Policy: https://flipper-ai.axovia.ai/security-policy
+Canonical: https://flipper-ai.axovia.ai/.well-known/security.txt
