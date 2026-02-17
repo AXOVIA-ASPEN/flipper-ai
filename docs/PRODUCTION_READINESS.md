@@ -16,10 +16,10 @@
 - [x] Prettier formatting applied
 
 ### Test Coverage
-- [x] **113 test suites** — all passing
-- [x] **2,332 tests** — all green
+- [x] **116 test suites** — all passing
+- [x] **2,378 tests** — all green
 - [x] **Statements:** 99.66% (3859/3872) ← exceeds 99% threshold
-- [x] **Branches:** 99.30% (2894/2914) ← exceeds 96% threshold ⬆️
+- [x] **Branches:** 99.31% ← exceeds 96% threshold ⬆️
 - [x] **Functions:** 99.79% (493/494) ← exceeds 98% threshold
 - [x] **Lines:** 99.70% (3698/3709) ← exceeds 99% threshold
 - [x] Jest coverage thresholds enforced (branches ≥ 96%, others ≥ 99%)
@@ -55,6 +55,7 @@
 - [x] `docs/COVERAGE_GAPS.md` — coverage analysis
 - [x] **OpenAPI 3.0 spec** — `GET /api/docs` returns full machine-readable spec
 - [x] **Swagger UI** — interactive API explorer at `/docs` (try-it-out, auth persistence)
+- [x] **Real-time SSE** — `GET /api/events` push notifications + `useSseEvents` React hook
 
 ---
 

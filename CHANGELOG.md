@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added (Feb 17, 2026 — Cron Worker Run #2)
+- **OpenAPI 3.0 Specification** — full machine-readable API spec for all 40+ routes:
+  - `src/lib/openapi-spec.ts`: 50+ paths, 19 tag groups, all schemas/parameters/responses
+  - `GET /api/docs`: serves the spec as JSON with CORS + cache headers
+  - `/docs`: interactive Swagger UI (v5, try-it-out, auth persistence, deep linking)
+  - **26 new tests** validating spec integrity: $refs resolve, operationIds unique, tags consistent
+- **Real-time Notifications (SSE)** — Server-Sent Events infrastructure:
+  - `src/lib/sse-emitter.ts`: `SseEmitter` class — in-process pub/sub broadcaster
+    - `subscribe()`, `emit()`, `ping()`, `disconnectAll()`, `formatMessage()`
+    - Auto-prunes dead connections on write errors
+    - 7 event types: `listing.found`, `job.complete`, `job.failed`, `opportunity.*`, `alert.high-value`, `ping`
+  - `GET /api/events`: authenticated SSE endpoint with heartbeat (30s) + abort cleanup
+  - `src/hooks/useSseEvents.ts`: React hook for consuming SSE in the browser
+    - Auto-reconnect with exponential backoff (configurable delay/max)
+    - Event filtering by type, `maxEvents` cap, `clearEvents()`
+  - **46 new tests** for emitter + route + hook (15 hook, 22 emitter, 11 route)
+  - `features/09-real-time-notifications.feature`: 11 BDD scenarios
+- **README** updated with interactive docs link
+- **PRODUCTION_READINESS.md** updated: 116 suites, 2378 tests, OpenAPI docs noted
+- **Test count:** 2332 → 2378 (+46 tests)
+- **Coverage:** 99.66% stmts / 99.31% branches / 99.8% fns / 99.7% lines ✅
+
 ### Added (Feb 17, 2026 — Late Evening Run)
 - **Branch Coverage 98.86% → 99.24%** — Major coverage push across 6 files, +4 new tests:
   - `ebay-listing.test.ts`: 3 new tests covering `conditionDescription || undefined`, `packageWeightLbs ? parseFloat : undefined`, `quantity ? parseInt : 1` → eBay route **100% branches**
