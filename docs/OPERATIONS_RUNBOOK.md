@@ -178,6 +178,6 @@ docker compose -f docker-compose.prod.yml build --no-cache
 - [x] Input validation (Zod)
 - [x] CSRF protection (NextAuth)
 - [x] SQL injection prevention (Prisma parameterized queries)
-- [ ] Content Security Policy (CSP) header
-- [ ] CORS configuration for API
+- [x] Content Security Policy (CSP) header (added to vercel.json)
+- [x] CORS configuration for API (Access-Control headers in vercel.json)
 - [ ] WAF (if self-hosted)

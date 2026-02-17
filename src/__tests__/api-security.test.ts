@@ -25,6 +25,8 @@ describe('api-security', () => {
         'camera=(), microphone=(), geolocation=()'
       );
       expect(response.headers.get('Strict-Transport-Security')).toContain('max-age=');
+      expect(response.headers.get('Content-Security-Policy')).toContain("default-src 'self'");
+      expect(response.headers.get('Content-Security-Policy')).toContain("frame-ancestors 'none'");
     });
   });
 
