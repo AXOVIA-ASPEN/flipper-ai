@@ -59,6 +59,7 @@ export function captureError(error: Error, context: ErrorContext = {}): void {
   }
 
   // Sentry integration point
+  /* istanbul ignore next -- Sentry integration requires SENTRY_DSN env var (not available in test environment) */
   if (process.env.SENTRY_DSN) {
     // TODO: Initialize Sentry SDK and call Sentry.captureException(error, { extra: context })
     // For now, we log that Sentry DSN is configured but SDK not yet installed

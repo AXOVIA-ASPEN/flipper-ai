@@ -95,4 +95,29 @@ describe('logger - module-level branch coverage', () => {
     process.env.NODE_ENV = origNodeEnv;
     jest.resetModules();
   });
+
+  it('shouldLog returns false for low-priority messages when LOG_LEVEL=error (covers early return branch)', () => {
+    // Covers: if (!shouldLog(level)) return; → TRUE branch (debug message below error threshold)
+    jest.resetModules();
+    const origLogLevel = process.env.LOG_LEVEL;
+    process.env.LOG_LEVEL = 'error'; // Only error/fatal should log
+
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+    const { logger: freshLogger } = require('@/lib/logger');
+
+    // debug level (0) < error level (3) → shouldLog returns false → early return
+    freshLogger.debug('this should be silenced');
+    freshLogger.info('this too should be silenced');
+
+    // console.log should NOT have been called (messages below threshold)
+    expect(consoleSpy).not.toHaveBeenCalled();
+    consoleSpy.mockRestore();
+
+    if (origLogLevel === undefined) {
+      delete process.env.LOG_LEVEL;
+    } else {
+      process.env.LOG_LEVEL = origLogLevel;
+    }
+    jest.resetModules();
+  });
 });

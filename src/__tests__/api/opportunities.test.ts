@@ -529,6 +529,7 @@ describe('Opportunities API - branch coverage', () => {
     jest.clearAllMocks();
     mockFindMany.mockResolvedValue([]);
     mockCount.mockResolvedValue(0);
+    mockAggregate.mockResolvedValue({ _sum: { actualProfit: 0, purchasePrice: 0, resalePrice: 0 }, _count: 0 });
   });
 
   it('returns 400 for invalid query params', async () => {
@@ -544,5 +545,66 @@ describe('Opportunities API - branch coverage', () => {
     const request = createMockRequest('GET', '/api/opportunities?status=PURCHASED');
     const response = await GET(request);
     expect(response.status).toBe(200);
+  });
+
+  it('GET with userId auth covers userId truthy branch', async () => {
+    // Covers: if (userId) { where.OR = [...] } branch [0]
+    // Mock @/lib/auth to return a session with a user
+    jest.mock('@/lib/auth', () => ({
+      auth: jest.fn().mockResolvedValue({ user: { id: 'test-user-id' } }),
+    }));
+    // Reimport to get the mocked version
+    const authMiddleware = require('@/lib/auth-middleware');
+    const origGetAuth = authMiddleware.getAuthUserId;
+    authMiddleware.getAuthUserId = jest.fn().mockResolvedValue('test-user-id');
+
+    const request = createMockRequest('GET', '/api/opportunities');
+    const response = await GET(request);
+    expect(response.status).toBe(200);
+
+    authMiddleware.getAuthUserId = origGetAuth;
+  });
+
+  it('GET with minScore and maxScore covers score filter branches', async () => {
+    // Covers: if (minScore !== undefined || maxScore !== undefined) → true
+    //         if (minScore !== undefined) → both branches
+    //         if (maxScore !== undefined) → both branches
+    const request = createMockRequest('GET', '/api/opportunities?minScore=50&maxScore=100');
+    const response = await GET(request);
+    expect(response.status).toBe(200);
+  });
+
+  it('GET with minProfit and maxProfit covers profit filter branches', async () => {
+    // Covers: if (minProfit !== undefined || maxProfit !== undefined) → true
+    const request = createMockRequest('GET', '/api/opportunities?minProfit=10&maxProfit=500');
+    const response = await GET(request);
+    expect(response.status).toBe(200);
+  });
+
+  it('PATCH without fees calculates actualProfit with fees defaulting to 0', async () => {
+    // Covers: const fees = body.fees || 0 → 0 branch (line 33 in [id]/route.ts)
+    const mockUpdatedOpportunity = {
+      id: 'opp-nofees',
+      purchasePrice: 100,
+      resalePrice: 150,
+      actualProfit: 50, // 150 - 100 - 0 = 50
+    };
+    mockUpdate.mockResolvedValue(mockUpdatedOpportunity);
+
+    const request = createMockRequest('PATCH', '/api/opportunities/opp-nofees', {
+      purchasePrice: 100,
+      resalePrice: 150,
+      // No fees provided → defaults to 0
+    });
+    const response = await PATCH(request, { params: Promise.resolve({ id: 'opp-nofees' }) });
+    expect(response.status).toBe(200);
+    // fees defaults to 0, actualProfit = 150 - 100 - 0 = 50
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          actualProfit: 50,
+        }),
+      })
+    );
   });
 });

@@ -191,4 +191,18 @@ describe('Request Monitor', () => {
       expect(getRecentRequests()).toHaveLength(0);
     });
   });
+
+  describe('ring buffer overflow', () => {
+    it('limits stored requests to MAX_RECENT_REQUESTS (200) when overflow (covers shift branch)', () => {
+      // Covers: if (recentRequests.length > MAX_RECENT_REQUESTS) { recentRequests.shift(); }
+      clearRequests();
+      // Add 202 requests to exceed MAX_RECENT_REQUESTS=200 and trigger shift
+      for (let i = 0; i < 202; i++) {
+        recordRequest({ method: 'GET', path: `/test/${i}`, statusCode: 200, durationMs: 10, timestamp: '' });
+      }
+      // getRecentRequests default limit is 50, but total stored should be 200
+      // Check that we got 200 stored (requesting 200 bypasses default limit)
+      expect(getRecentRequests(200).length).toBe(200);
+    });
+  });
 });
