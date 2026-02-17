@@ -110,9 +110,79 @@ jobs:
           path: coverage/
           retention-days: 7
 
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: lint-and-typecheck
+    env:
+      DATABASE_URL: 'file:./dev.db'
+      CI: 'true'
+      AUTH_SECRET: 'ci-test-secret'
+      NEXTAUTH_URL: 'http://localhost:3000'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Setup Production Database
+        run: npx prisma db push
+
+      - name: Setup Test Database Schema
+        run: |
+          python3 - <<'EOF'
+          import sqlite3
+          # Copy schema from dev.db to test.db (integration tests use test.db)
+          dev_conn = sqlite3.connect('dev.db')
+          schema = dev_conn.execute("SELECT sql FROM sqlite_master WHERE type='table' AND sql IS NOT NULL ORDER BY name").fetchall()
+          indexes = dev_conn.execute("SELECT sql FROM sqlite_master WHERE type='index' AND sql IS NOT NULL").fetchall()
+          dev_conn.close()
+          test_conn = sqlite3.connect('test.db')
+          for (sql,) in schema:
+              try:
+                  test_conn.execute(sql)
+              except sqlite3.OperationalError:
+                  pass  # Table may already exist
+          for (sql,) in indexes:
+              try:
+                  test_conn.execute(sql)
+              except sqlite3.OperationalError:
+                  pass
+          test_conn.commit()
+          tables = test_conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
+          print(f"test.db ready with {len(tables)} tables")
+          test_conn.close()
+          EOF
+
+      - name: Rebuild Native Modules
+        run: |
+          # Rebuild better-sqlite3 for the current Node.js version
+          cd node_modules/.pnpm/better-sqlite3@12.5.0/node_modules/better-sqlite3 && npm rebuild
+
+      - name: Run Integration Tests
+        run: npx jest --config jest.integration.config.js --forceExit
+
+      - name: Print Integration Test Summary
+        if: always()
+        run: echo "✅ Integration tests complete — see job output for details"
+
   build:
     runs-on: ubuntu-latest
-    needs: test
+    needs: [test, integration-test]
     env:
       DATABASE_URL: 'file:./dev.db'
       CI: 'true'
