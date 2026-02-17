@@ -122,4 +122,28 @@ describe('POST /api/checkout', () => {
       expect.objectContaining({ customer: 'cus_existing' })
     );
   });
+
+  it('returns 500 with error message when checkout throws Error instance', async () => {
+    mockAuth.mockResolvedValue({ user: { email: 'test@test.com' } });
+    mockCustomersList.mockResolvedValue({ data: [] });
+    mockCustomersCreate.mockResolvedValue({ id: 'cus_1' });
+    mockCheckoutCreate.mockRejectedValue(new Error('Stripe unavailable'));
+
+    const res = await POST(makeRequest({ tier: 'FLIPPER' }));
+    expect(res.status).toBe(500);
+    const data = await res.json();
+    expect(data.error).toBe('Stripe unavailable');
+  });
+
+  it('returns 500 with generic message when checkout throws non-Error', async () => {
+    mockAuth.mockResolvedValue({ user: { email: 'test@test.com' } });
+    mockCustomersList.mockResolvedValue({ data: [] });
+    mockCustomersCreate.mockResolvedValue({ id: 'cus_1' });
+    mockCheckoutCreate.mockRejectedValue('string error'); // Non-Error throw
+
+    const res = await POST(makeRequest({ tier: 'FLIPPER' }));
+    expect(res.status).toBe(500);
+    const data = await res.json();
+    expect(data.error).toBe('Failed to create checkout session');
+  });
 });

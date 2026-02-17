@@ -385,3 +385,110 @@ describe('URL generation', () => {
     expect(email.html).not.toContain('app//');
   });
 });
+
+// ── ResendProvider branch coverage ────────────────────────────────────────────
+describe('ResendProvider', () => {
+  it('sends successfully via Resend client', async () => {
+    const mockSend = jest.fn().mockResolvedValue({ data: { id: 'res-123' }, error: null });
+    jest.mock('resend', () => ({
+      Resend: jest.fn().mockImplementation(() => ({
+        emails: { send: mockSend },
+      })),
+    }), { virtual: true });
+
+    // Use ResendProvider directly with a mock
+    const { ResendProvider } = await import('@/lib/email-service');
+    const mockResendSend = jest.fn().mockResolvedValue({ data: { id: 'msg-001' }, error: null });
+    const provider = new ResendProvider('fake-api-key', 'test@test.com');
+    // Monkey-patch the internal client's send method
+    (provider as any).client = { emails: { send: mockResendSend } };
+
+    const result = await provider.send({
+      to: 'user@example.com',
+      subject: 'Test',
+      html: '<p>Hello</p>',
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.messageId).toBe('msg-001');
+  });
+
+  it('returns error when Resend returns error', async () => {
+    const { ResendProvider } = await import('@/lib/email-service');
+    const provider = new ResendProvider('fake-api-key', 'test@test.com');
+    (provider as any).client = {
+      emails: {
+        send: jest.fn().mockResolvedValue({
+          data: null,
+          error: { message: 'Domain not verified' },
+        }),
+      },
+    };
+
+    const result = await provider.send({
+      to: 'user@example.com',
+      subject: 'Test',
+      html: '<p>Hello</p>',
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('Domain not verified');
+  });
+
+  it('handles exception thrown during send', async () => {
+    const { ResendProvider } = await import('@/lib/email-service');
+    const provider = new ResendProvider('fake-api-key', 'test@test.com');
+    (provider as any).client = {
+      emails: {
+        send: jest.fn().mockRejectedValue(new Error('Network error')),
+      },
+    };
+
+    const result = await provider.send({
+      to: 'user@example.com',
+      subject: 'Test',
+      html: '<p>Hello</p>',
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('Network error');
+  });
+
+  it('handles non-Error exception thrown during send', async () => {
+    const { ResendProvider } = await import('@/lib/email-service');
+    const provider = new ResendProvider('fake-api-key', 'test@test.com');
+    (provider as any).client = {
+      emails: {
+        send: jest.fn().mockRejectedValue('string error'),
+      },
+    };
+
+    const result = await provider.send({
+      to: ['user1@example.com', 'user2@example.com'],
+      subject: 'Test',
+      html: '<p>Hello</p>',
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('string error');
+  });
+
+  it('returns messageId=undefined when data.id is null', async () => {
+    const { ResendProvider } = await import('@/lib/email-service');
+    const provider = new ResendProvider('fake-api-key', 'test@test.com');
+    (provider as any).client = {
+      emails: {
+        send: jest.fn().mockResolvedValue({ data: { id: undefined }, error: null }),
+      },
+    };
+
+    const result = await provider.send({
+      to: 'user@example.com',
+      subject: 'Test',
+      html: '<p>Hello</p>',
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.messageId).toBeUndefined();
+  });
+});

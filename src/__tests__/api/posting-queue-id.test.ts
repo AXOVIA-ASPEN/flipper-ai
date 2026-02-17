@@ -151,3 +151,46 @@ describe('DELETE /api/posting-queue/[id]', () => {
     expect(res.status).toBe(500);
   });
 });
+
+// ── Additional branch coverage ────────────────────────────────────────────────
+describe('PATCH /api/posting-queue/[id] - branch coverage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('returns 400 when body is invalid', async () => {
+    (getAuthUserId as jest.Mock).mockResolvedValue('user-1');
+    const req = new NextRequest('http://localhost/api/posting-queue/1', {
+      method: 'PATCH',
+      body: JSON.stringify({ status: 'INVALID_STATUS_VALUE' }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const res = await PATCH(req, makeContext('1'));
+    expect(res.status).toBe(400);
+  });
+
+  it('updates with optional fields provided', async () => {
+    (getAuthUserId as jest.Mock).mockResolvedValue('user-1');
+    mockFindFirst.mockResolvedValue({ id: '1', userId: 'user-1', status: 'PENDING' });
+    mockUpdate.mockResolvedValue({
+      id: '1',
+      status: 'PENDING',
+      askingPrice: 150,
+      title: 'New Title',
+      description: 'New Desc',
+    });
+
+    const req = new NextRequest('http://localhost/api/posting-queue/1', {
+      method: 'PATCH',
+      body: JSON.stringify({
+        status: 'PENDING',
+        askingPrice: 150,
+        title: 'New Title',
+        description: 'New Desc',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const res = await PATCH(req, makeContext('1'));
+    expect(res.status).toBe(200);
+  });
+});

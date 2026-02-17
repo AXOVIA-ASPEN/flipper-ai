@@ -58,3 +58,26 @@ describe('metrics', () => {
     expect(snap.uptime_seconds).toBeGreaterThanOrEqual(0);
   });
 });
+
+// ── Additional branch coverage ─────────────────────────────────────────────
+describe('MetricsCollector - branch coverage', () => {
+  it('returns avg when count > 0 via snapshot()', () => {
+    metrics.reset();
+    metrics.observe('test_hist', 100);
+    const snap = metrics.snapshot();
+    const hist = (snap.histograms as Record<string, Record<string, number>>).test_hist;
+    expect(hist.avg).toBe(100);
+  });
+
+  it('snapshot with no histogram data returns empty histograms object', () => {
+    metrics.reset();
+    const snap = metrics.snapshot();
+    expect(Object.keys(snap.histograms as Record<string, unknown>)).toHaveLength(0);
+  });
+
+  it('singleton is defined and consistent across requires', () => {
+    const { metrics: m2 } = require('@/lib/metrics');
+    expect(m2).toBeDefined();
+    expect(m2).toBe(metrics);
+  });
+});

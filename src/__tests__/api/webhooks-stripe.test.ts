@@ -246,4 +246,96 @@ describe('POST /api/webhooks/stripe', () => {
     const json = await res.json();
     expect(json.error).toBe('Webhook handler failed');
   });
+
+  // ── Branch coverage ────────────────────────────────────────────────────────
+  it('handles non-Error signature verification failure (String(err) branch)', async () => {
+    constructEvent.mockImplementation(() => {
+      // eslint-disable-next-line @typescript-eslint/no-throw-literal
+      throw 'string-based-error'; // Not an Error instance
+    });
+    const res = await POST(makeReq('{}', 'sig_bad'));
+    expect(res.status).toBe(400);
+    const json = await res.json();
+    expect(json.error).toBe('Invalid signature');
+  });
+
+  it('handles subscription.updated with no items (empty priceId)', async () => {
+    constructEvent.mockReturnValue({
+      type: 'customer.subscription.updated',
+      data: {
+        object: {
+          customer: 'cus_no_items',
+          items: { data: [] }, // Empty items
+          metadata: {},
+        },
+      },
+    });
+    retrieveCustomer.mockResolvedValue({ email: 'user@test.com' });
+
+    const res = await POST(makeReq('{}', 'sig_ok'));
+    expect(res.status).toBe(200);
+  });
+
+  it('falls back to FREE tier when priceId not in PRICE_TO_TIER and no metadata.tier', async () => {
+    constructEvent.mockReturnValue({
+      type: 'customer.subscription.updated',
+      data: {
+        object: {
+          customer: 'cus_unknown',
+          items: { data: [{ price: { id: 'price_unknown_xyz' } }] },
+          metadata: {}, // No tier in metadata
+        },
+      },
+    });
+    retrieveCustomer.mockResolvedValue({ email: 'user@test.com' });
+
+    const res = await POST(makeReq('{}', 'sig_ok'));
+    expect(res.status).toBe(200);
+  });
+
+  it('handles checkout event with null metadata (optional chain branches)', async () => {
+    constructEvent.mockReturnValue({
+      type: 'checkout.session.completed',
+      data: {
+        object: {
+          metadata: null, // null → metadata?.tier → undefined branch
+          customer_details: null, // null → customer_details?.email → undefined branch
+        },
+      },
+    });
+    const res = await POST(makeReq('{}', 'sig_ok'));
+    expect(res.status).toBe(200); // skips update (no email or userId)
+  });
+
+  it('handles subscription.updated with null items (?.price.id branch)', async () => {
+    constructEvent.mockReturnValue({
+      type: 'customer.subscription.updated',
+      data: {
+        object: {
+          customer: 'cus_null_items',
+          items: { data: [null] }, // data[0] is null → ?.price.id
+          metadata: { tier: 'PRO' },
+        },
+      },
+    });
+    retrieveCustomer.mockResolvedValue({ email: 'user@test.com' });
+    const res = await POST(makeReq('{}', 'sig_ok'));
+    expect(res.status).toBe(200);
+  });
+
+  it('subscription.updated with null metadata (?.tier null branch)', async () => {
+    constructEvent.mockReturnValue({
+      type: 'customer.subscription.updated',
+      data: {
+        object: {
+          customer: 'cus_null_meta',
+          items: { data: [{ price: { id: 'price_unknown' } }] },
+          metadata: null, // null metadata → metadata?.tier → undefined
+        },
+      },
+    });
+    retrieveCustomer.mockResolvedValue({ email: 'user@test.com' });
+    const res = await POST(makeReq('{}', 'sig_ok'));
+    expect(res.status).toBe(200);
+  });
 });

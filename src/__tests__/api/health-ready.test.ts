@@ -52,4 +52,15 @@ describe('GET /api/health/ready', () => {
     expect(data.status).toBe('not_ready');
     expect(data.checks.database.status).toBe('error');
   });
+
+  it('handles non-Error exceptions (string error)', async () => {
+    // Cover the String(error) branch in error instanceof Error ? ... : String(error)
+    (prisma.$queryRawUnsafe as jest.Mock).mockRejectedValue('string error');
+
+    const res = await GET();
+    const data = await res.json();
+
+    expect(res.status).toBe(503);
+    expect(data.status).toBe('not_ready');
+  });
 });

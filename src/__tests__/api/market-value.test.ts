@@ -10,6 +10,16 @@ function createParams(id: string) {
   return { params: Promise.resolve({ id }) };
 }
 
+describe('POST /api/listings/[id]/market-value - branch coverage', () => {
+  it('returns 400 when id is empty', async () => {
+    const req = new NextRequest('http://localhost/api/listings//market-value', { method: 'POST' });
+    const res = await POST(req, createParams(''));
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toContain('Listing ID');
+  });
+});
+
 describe('POST /api/listings/[id]/market-value', () => {
   beforeEach(() => jest.clearAllMocks());
 

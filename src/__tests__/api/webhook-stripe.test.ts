@@ -105,3 +105,43 @@ describe('POST /api/webhooks/stripe', () => {
     expect(res.status).toBe(200);
   });
 });
+
+// ── Additional branch coverage ─────────────────────────────────────────────────
+describe('POST /api/webhooks/stripe - error handling', () => {
+  it('returns 500 when event handler throws (subscription.updated customers.retrieve error)', async () => {
+    mockConstructEvent.mockReturnValue({
+      type: 'customer.subscription.updated',
+      data: {
+        object: {
+          customer: 'cus_throw',
+          metadata: {},
+          items: { data: [{ price: { id: 'price_pro_monthly' } }] },
+        },
+      },
+    });
+    // Make the customers.retrieve call throw
+    mockCustomersRetrieve.mockRejectedValue(new Error('Stripe API error'));
+
+    const res = await POST(makeRequest('{}'));
+    expect(res.status).toBe(500);
+    const body = await res.json();
+    expect(body.error).toBe('Webhook handler failed');
+  });
+
+  it('returns 500 when subscription.deleted customers.retrieve throws', async () => {
+    mockConstructEvent.mockReturnValue({
+      type: 'customer.subscription.deleted',
+      data: {
+        object: {
+          customer: 'cus_del',
+          metadata: {},
+          items: { data: [{ price: { id: 'price_pro_monthly' } }] },
+        },
+      },
+    });
+    mockCustomersRetrieve.mockRejectedValue(new Error('Network error'));
+
+    const res = await POST(makeRequest('{}'));
+    expect(res.status).toBe(500);
+  });
+});

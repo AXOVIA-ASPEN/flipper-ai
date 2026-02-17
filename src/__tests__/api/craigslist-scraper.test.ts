@@ -1049,3 +1049,78 @@ describe('Craigslist Scraper Helper Functions', () => {
     });
   });
 });
+
+// ── Additional branch coverage ───────────────────────────────────────────────
+import { getAuthUserId } from '@/lib/auth-middleware';
+
+describe('Craigslist Scraper - additional branch coverage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (getAuthUserId as jest.Mock).mockResolvedValue('user-test');
+    mockJobCreate.mockResolvedValue({ id: 'job-branch' });
+    mockJobUpdate.mockResolvedValue({});
+    mockUpsert.mockResolvedValue({ id: 'listing-branch' });
+    mockDetectCategory.mockReturnValue('electronics');
+    mockEstimateValue.mockImplementation(() => createDefaultEstimation());
+    mockGeneratePurchaseMessage.mockReturnValue('Hi, still available?');
+
+    // Default playwright mocks
+    mockNewPage.mockReturnValue({
+      goto: mockGoto.mockResolvedValue(undefined),
+      waitForSelector: mockWaitForSelector.mockResolvedValue(undefined),
+      evaluate: mockEvaluate.mockResolvedValue([]),
+      close: jest.fn(),
+    });
+    mockNewContext.mockResolvedValue({
+      newPage: mockNewPage,
+    });
+  });
+
+  it('returns 401 when not authenticated', async () => {
+    (getAuthUserId as jest.Mock).mockResolvedValue(null);
+
+    const request = createMockRequest('POST', '/api/scraper/craigslist', {
+      location: 'tampa',
+      category: 'electronics',
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(401);
+  });
+
+  it('handles parse price with no match (returns 0)', async () => {
+    // Items with non-numeric price get price=0 and are skipped
+    mockEvaluate.mockResolvedValue([
+      {
+        title: 'Free Couch',
+        price: 'Free',
+        url: 'https://tampa.craigslist.org/fua/d/free-couch/1234567.html',
+        location: 'Tampa',
+        imageUrl: '',
+      },
+    ]);
+
+    const request = createMockRequest('POST', '/api/scraper/craigslist', {
+      location: 'tampa',
+      category: 'furniture',
+    });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(data.success).toBe(true);
+    // Free item with no price should be skipped
+    expect(data.savedCount).toBe(0);
+  });
+
+  it('handles waitForSelector timeout (catch callback)', async () => {
+    // waitForSelector throws → covered by .catch()
+    mockWaitForSelector.mockRejectedValue(new Error('Timeout'));
+    mockEvaluate.mockResolvedValue([]);
+
+    const request = createMockRequest('POST', '/api/scraper/craigslist', {
+      location: 'tampa',
+      category: 'electronics',
+    });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(data.success).toBe(true); // Should succeed with empty results
+  });
+});

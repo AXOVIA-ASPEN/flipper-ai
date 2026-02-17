@@ -133,3 +133,24 @@ describe('Shared cache instances', () => {
     expect(analysisCache).toBeInstanceOf(LRUCache);
   });
 });
+
+// ── Additional branch coverage ────────────────────────────────────────────────
+describe('LRUCache - branch coverage', () => {
+  it('uses default maxSize and ttlMs when no options provided', () => {
+    const { LRUCache } = require('@/lib/cache');
+    const cache = new LRUCache();
+    cache.set('key', 'value');
+    expect(cache.get('key')).toBe('value');
+  });
+
+  it('evicts oldest entry when at capacity and oldest is defined', () => {
+    const { LRUCache } = require('@/lib/cache');
+    const cache = new LRUCache({ maxSize: 2, ttlMs: 60000 });
+    cache.set('a', 1);
+    cache.set('b', 2);
+    cache.set('c', 3); // Should evict 'a'
+    expect(cache.get('a')).toBeUndefined();
+    expect(cache.get('b')).toBe(2);
+    expect(cache.get('c')).toBe(3);
+  });
+});

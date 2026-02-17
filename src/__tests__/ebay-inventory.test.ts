@@ -331,3 +331,66 @@ describe('ebay-inventory - additional branch coverage', () => {
     });
   });
 });
+
+// ── More branch coverage: remaining uncovered branches ──────────────────────
+
+describe('ebay-inventory - deeper branch coverage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    process.env.EBAY_OAUTH_TOKEN = 'test-token';
+  });
+
+  describe('createInventoryItem - optional fields', () => {
+    it('omits package weight when not provided (quantity default=1)', async () => {
+      // Inventory create 204, offer create 201
+      mockFetch.mockResolvedValueOnce({ status: 204, ok: true });
+      mockFetch.mockResolvedValueOnce({
+        status: 201, ok: true,
+        json: async () => ({ offerId: 'offer-abc' }),
+      });
+
+      // No packageWeightLbs or packageDimensions (omit those)
+      const result = await createDraftListing({
+        sku: 'SKU-NO-WEIGHT',
+        title: 'Simple Item',
+        description: 'No weight',
+        categoryId: '9355',
+        condition: EBAY_CONDITIONS.USED_GOOD,
+        price: 50,
+        imageUrls: [],
+        // quantity not provided → defaults to 1
+      });
+      expect(result.success).toBe(true);
+      const invBody = JSON.parse(mockFetch.mock.calls[0][1].body);
+      expect(invBody.availability.shipToLocationAvailability.quantity).toBe(1);
+      expect(invBody.packageWeightAndSize).toBeUndefined();
+    });
+
+    it('handles errorBody.errors as null in createOffer failure (line 255)', async () => {
+      mockFetch.mockResolvedValueOnce({ status: 204, ok: true }); // inventory ok
+      mockFetch.mockResolvedValueOnce({
+        status: 403,
+        ok: false,
+        json: async () => ({ errors: undefined }), // no errors array
+      });
+
+      const result = await createDraftListing(validInput);
+      expect(result.success).toBe(false);
+      expect(result.errors?.[0]).toBe('HTTP 403');
+    });
+  });
+
+  describe('deleteInventoryItem - success path (204)', () => {
+    it('returns errors=["HTTP 404"] when no errors array on delete', async () => {
+      mockFetch.mockResolvedValueOnce({
+        status: 404,
+        ok: false,
+        json: async () => ({ errors: undefined }),
+      });
+
+      const result = await deleteInventoryItem('MISSING-2');
+      expect(result.success).toBe(false);
+      expect(result.errors?.[0]).toBe('HTTP 404');
+    });
+  });
+});

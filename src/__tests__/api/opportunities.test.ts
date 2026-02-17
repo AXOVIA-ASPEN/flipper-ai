@@ -522,3 +522,27 @@ describe('Opportunities API', () => {
     });
   });
 });
+
+// ── Additional branch coverage ────────────────────────────────────────────────
+describe('Opportunities API - branch coverage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockFindMany.mockResolvedValue([]);
+    mockCount.mockResolvedValue(0);
+  });
+
+  it('returns 400 for invalid query params', async () => {
+    const request = createMockRequest('GET', '/api/opportunities?minScore=not-a-number');
+    const response = await GET(request);
+    expect(response.status).toBe(400);
+  });
+
+  it('GET with valid status enum param returns 200', async () => {
+    mockFindMany.mockResolvedValue([]);
+    mockCount.mockResolvedValue(0);
+    // Use a valid status enum value
+    const request = createMockRequest('GET', '/api/opportunities?status=PURCHASED');
+    const response = await GET(request);
+    expect(response.status).toBe(200);
+  });
+});

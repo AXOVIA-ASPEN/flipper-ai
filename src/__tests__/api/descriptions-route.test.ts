@@ -155,3 +155,18 @@ describe('POST /api/descriptions', () => {
     );
   });
 });
+
+// ── Additional branch coverage ────────────────────────────────────────────────
+describe('POST /api/descriptions - branch coverage', () => {
+  it('uses includeSpecs=false branch when explicitly set to false', async () => {
+    mockDescGen.generateAlgorithmicDescription.mockReturnValue({
+      description: 'Test description',
+      platform: 'ebay',
+      wordCount: 20,
+      hasConditionDetails: true,
+      hasShippingNote: true,
+    });
+    const result = await POST(makeRequest({ condition: 'Good', askingPrice: 50, includeSpecs: false }));
+    expect(result.status).toBe(200);
+  });
+});

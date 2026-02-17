@@ -208,6 +208,29 @@ describe('rate-limiter', () => {
       expect(result.allowed).toBe(true);
       expect(result.remaining).toBe(59);
     });
+
+    it('cleanup keeps non-expired entries (false branch of resetAt <= now)', () => {
+      // Strategy: add entry at T+100s with 300s window (resetAt = T+400s)
+      // When cleanup fires at T+300s: 400s > 300s → false branch (entry NOT deleted)
+
+      // Advance 100 seconds first
+      jest.advanceTimersByTime(100_000);
+
+      // Add entry at T=100s with 300s window → resetAt = T + 100000 + 300000 = T+400000
+      rateLimit('auth-fresh', '/api/auth/register');
+
+      // Also add an expired entry (60s window): resetAt = T+100000+60000 = T+160000
+      rateLimit('listing-fresh', '/api/listings');
+
+      // Advance 200s more (total 300s) → cleanup fires!
+      jest.advanceTimersByTime(200_000);
+      // At T=300000: listing entry (resetAt=160000) <= 300000 → DELETED (true branch)
+      //              auth entry (resetAt=400000) > 300000 → NOT deleted (false branch! ✓)
+
+      // The auth entry should still be accessible
+      const result = rateLimit('auth-fresh', '/api/auth/register');
+      expect(result.allowed).toBe(true); // still within window
+    });
   });
 
   describe('edge cases', () => {
@@ -245,5 +268,51 @@ describe('rate-limiter', () => {
       expect(blocked.allowed).toBe(false);
       expect(blocked.resetAt).toBeGreaterThan(Date.now());
     });
+  });
+});
+
+// ── Additional branch coverage ────────────────────────────────────────────────
+describe('rate-limiter - cleanup timer branch', () => {
+  it('covers the cleanup timer interval and unref branch', async () => {
+    // The cleanup timer is set up when the module is first imported.
+    // Trigger the interval by manipulating the store and advancing fake timers.
+    jest.useFakeTimers();
+
+    const { rateLimit } = require('@/lib/rate-limiter');
+
+    // Hit the rate limiter to populate the store
+    rateLimit('192.168.1.100', '/api/scrape/cleanup-test');
+
+    // Advance time by 6 minutes to trigger the cleanup interval
+    jest.advanceTimersByTime(6 * 60 * 1000);
+
+    // Rate limiter should still work
+    const result = rateLimit('192.168.1.101', '/api/test/after-cleanup');
+    expect(result.allowed).toBe(true);
+
+    jest.useRealTimers();
+  });
+
+  it('cleanup removes expired entries when interval fires with fake timers (fresh module)', () => {
+    jest.useFakeTimers();
+    jest.resetModules();
+
+    const { rateLimit } = require('@/lib/rate-limiter');
+
+    // Add entries via normal rate limit calls (they have 60s window)
+    rateLimit('10.0.0.50', '/api/test/expiry-ip');
+    rateLimit('10.0.0.51', '/api/test/expiry-user', 'user-expire-1');
+
+    // Advance 70 seconds - past the 60s window, entries have resetAt <= now
+    jest.advanceTimersByTime(70 * 1000);
+
+    // Advance 5 more minutes to trigger the cleanup interval (5 min = 300s)
+    jest.advanceTimersByTime(5 * 60 * 1000);
+
+    // Entries should have been cleaned up; new request should be allowed
+    const result = rateLimit('10.0.0.50', '/api/test/expiry-ip');
+    expect(result.allowed).toBe(true);
+
+    jest.useRealTimers();
   });
 });

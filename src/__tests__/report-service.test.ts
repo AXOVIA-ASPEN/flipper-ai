@@ -375,3 +375,61 @@ describe('reportToCSV - additional branch coverage', () => {
     expect(typeof csv).toBe('string');
   });
 });
+
+describe('buildReport/reportToCSV - deeper branch coverage', () => {
+  const dateRange = { start: new Date('2026-01-01'), end: new Date('2026-01-31') };
+
+  it('covers categoryMap.get() returning existing value (same category, 2 items)', () => {
+    const items = [
+      {
+        id: 'item-a',
+        title: 'Widget A',
+        platform: 'EBAY',
+        category: 'Electronics',
+        status: 'SOLD',
+        purchasePrice: 50,
+        resalePrice: 100,
+        fees: 5,
+        purchaseDate: new Date('2026-01-05'),
+        resaleDate: new Date('2026-01-10'),
+      },
+      {
+        id: 'item-b',
+        title: 'Widget B',
+        platform: 'EBAY',
+        category: 'Electronics', // same category → reuses existing map entry
+        status: 'SOLD',
+        purchasePrice: 30,
+        resalePrice: 70,
+        fees: 3,
+        purchaseDate: new Date('2026-01-07'),
+        resaleDate: new Date('2026-01-12'),
+      },
+    ];
+    const report = buildReport('user1', 'monthly', dateRange, items);
+    const elCat = report.summary.categoryBreakdown?.find((c: { name: string }) => c.name === 'Electronics');
+    expect(report.summary.bestCategory).toBe('Electronics');
+  });
+
+  it('covers CSV null value branch (null row value → empty string)', () => {
+    const items = [
+      {
+        id: 'item-1',
+        title: 'Null-fee Item',
+        platform: 'EBAY',
+        category: 'Electronics',
+        status: 'SOLD',
+        purchasePrice: 50,
+        resalePrice: 100,
+        fees: null as null | number, // null fees → should produce '' in CSV
+        purchaseDate: new Date('2026-01-05'),
+        resaleDate: new Date('2026-01-10'),
+      },
+    ];
+    const report = buildReport('user1', 'monthly', dateRange, items);
+    const csv = reportToCSV(report);
+    // The null fees value should produce an empty cell in CSV
+    expect(typeof csv).toBe('string');
+    expect(csv).toContain('item-1');
+  });
+});

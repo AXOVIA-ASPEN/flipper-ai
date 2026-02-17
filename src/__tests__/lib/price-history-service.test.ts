@@ -102,6 +102,48 @@ describe('Price History Service', () => {
       expect(result).toBeNull();
       expect(prisma.priceHistory.createMany).not.toHaveBeenCalled();
     });
+
+    it('handles createMany error gracefully (catch branch)', async () => {
+      // Trigger createMany to fail - should still return market data
+      jest.mocked(marketPrice.fetchMarketPrice).mockResolvedValue({
+        source: 'ebay_scrape' as const,
+        soldListings: [
+          { title: 'iPhone', price: 500, shippingCost: 0, condition: 'Used', url: 'http://x.com', soldDate: new Date() }
+        ],
+        medianPrice: 500,
+        lowPrice: 450,
+        highPrice: 550,
+        avgPrice: 500,
+        salesCount: 1,
+        avgDaysToSell: 5,
+        searchQuery: 'iPhone',
+        fetchedAt: new Date(),
+      });
+      jest.mocked(prisma.priceHistory.createMany).mockRejectedValue(new Error('DB constraint'));
+
+      // Should not throw, returns market data despite save error
+      const result = await fetchAndStorePriceHistory('iPhone');
+      expect(result).toBeDefined();
+    });
+
+    it('uses new Date() as soldAt fallback when soldDate is null', async () => {
+      jest.mocked(marketPrice.fetchMarketPrice).mockResolvedValue({
+        source: 'ebay_scrape' as const,
+        soldListings: [
+          { title: 'Item', price: 100, shippingCost: 0, condition: 'Used',
+            url: 'http://x.com', soldDate: null }, // null soldDate → uses new Date()
+        ],
+        medianPrice: 100, lowPrice: 80, highPrice: 120, avgPrice: 100,
+        salesCount: 1, avgDaysToSell: null, searchQuery: 'Item', fetchedAt: new Date(),
+      });
+      jest.mocked(prisma.priceHistory.createMany).mockResolvedValue({ count: 1 });
+      const result = await fetchAndStorePriceHistory('Item');
+      expect(result).toBeDefined();
+      // Verify the soldAt fallback (new Date()) was used
+      const createManyCall = jest.mocked(prisma.priceHistory.createMany).mock.calls[0];
+      const record = (createManyCall[0] as { data: Array<{ soldAt: Date }> }).data[0];
+      expect(record.soldAt).toBeInstanceOf(Date);
+    });
   });
 
   describe('getPriceHistory', () => {
@@ -163,6 +205,19 @@ describe('Price History Service', () => {
       expect(result.soldListings).toHaveLength(0);
       expect(result.stats.count).toBe(0);
       expect(result.stats.avgPrice).toBe(0);
+    });
+
+    it('uses average of two middle values for even count (false branch of % 2 !== 0)', async () => {
+      // 4 records → even count → median = average of 2 middle values
+      jest.mocked(prisma.priceHistory.findMany).mockResolvedValue([
+        { id: '1', productName: 'X', category: null, platform: 'EBAY', soldPrice: 100, condition: null, soldAt: new Date(), createdAt: new Date() },
+        { id: '2', productName: 'X', category: null, platform: 'EBAY', soldPrice: 200, condition: null, soldAt: new Date(), createdAt: new Date() },
+        { id: '3', productName: 'X', category: null, platform: 'EBAY', soldPrice: 300, condition: null, soldAt: new Date(), createdAt: new Date() },
+        { id: '4', productName: 'X', category: null, platform: 'EBAY', soldPrice: 400, condition: null, soldAt: new Date(), createdAt: new Date() },
+      ]);
+      const result = await getPriceHistory({ productName: 'X' });
+      // Sorted: [100, 200, 300, 400], mid=2, median = (200+300)/2 = 250
+      expect(result.stats.medianPrice).toBe(250);
     });
   });
 
@@ -424,6 +479,30 @@ describe('Price History Service', () => {
 
       // Verify delays were called (using fake timers, so we just check the function was called)
       expect(result.success).toBe(2);
+    });
+
+    it('handles non-Error exceptions in batch update (String error branch)', async () => {
+      jest.useFakeTimers();
+      const listingIds = ['listing-non-error'];
+
+      jest.mocked(prisma.listing.findUnique).mockResolvedValue({
+        id: 'listing-non-error',
+        title: 'Test Item',
+        description: null,
+        category: null,
+      } as any);
+
+      // Throw a non-Error string
+      jest.mocked(marketPrice.fetchMarketPrice).mockRejectedValue('string error');
+
+      const resultPromise = batchUpdateListingsWithMarketValue(listingIds);
+      await jest.runAllTimersAsync();
+      const result = await resultPromise;
+
+      expect(result.failed).toBe(1);
+      expect(result.errors[0].error).toBe('Unknown error');
+
+      jest.useRealTimers();
     });
   });
 });

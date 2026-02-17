@@ -193,6 +193,33 @@ describe('POST /api/listings/[id]/description', () => {
     expect(json.data.title).toContain('Apple');
   });
 
+  it('uses fallback values when AI response is missing optional fields', async () => {
+    process.env.OPENAI_API_KEY = 'test-key';
+    mockGetAuthUserId.mockResolvedValue('user-123');
+    (mockPrisma.listing.findFirst as jest.Mock).mockResolvedValue(mockListing);
+
+    const OpenAI = require('openai').default;
+    OpenAI.mockImplementation(() => ({
+      chat: { completions: { create: jest.fn().mockResolvedValue({
+        choices: [{
+          message: {
+            // Minimal response: no title, highlights, suggestedPrice, keywords
+            content: JSON.stringify({ description: 'Good phone' }),
+          },
+        }],
+      })},
+    }}));
+
+    const res = await POST(makeRequest({ platform: 'ebay' }), routeParams);
+    const json = await res.json();
+    expect(json.success).toBe(true);
+    expect(json.source).toBe('ai');
+    expect(json.data.title).toBe(mockListing.title); // Falls back to listing.title
+    expect(json.data.highlights).toEqual([]); // Falls back to []
+    expect(json.data.keywords).toEqual([]); // Falls back to []
+    expect(json.data.suggestedPrice).toBe(mockListing.estimatedValue); // Falls back to estimatedValue
+  });
+
   it('returns 502 when AI returns empty content', async () => {
     process.env.OPENAI_API_KEY = 'test-key';
     mockGetAuthUserId.mockResolvedValue('user-123');

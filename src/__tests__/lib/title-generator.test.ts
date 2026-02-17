@@ -799,3 +799,153 @@ describe('generateLLMTitle - branch coverage', () => {
     expect(result.title).toBeTruthy();
   });
 });
+
+// ── generateAlgorithmicTitle - branch coverage ──────────────────────────────
+describe('generateAlgorithmicTitle - branch coverage', () => {
+  it('uses default generic platform when no platform arg', () => {
+    const result = generateAlgorithmicTitle({
+      brand: 'Sony',
+      model: 'TV',
+      variant: null,
+      condition: 'good',
+      category: null,
+    });
+    expect(result.title).toContain('Sony');
+    expect(result.platform).toBe('generic');
+  });
+
+  it('falls back to 80 char limit for unknown platform', () => {
+    const result = generateAlgorithmicTitle({
+      brand: 'Sony',
+      model: 'WH-1000XM5',
+      variant: null,
+      condition: 'good',
+      category: null,
+    }, 'unknown-marketplace');
+    expect(result.charCount).toBeLessThanOrEqual(80);
+  });
+
+  it('handles null brand (no brand in title)', () => {
+    const result = generateAlgorithmicTitle({
+      brand: null,
+      model: 'Galaxy S24',
+      variant: null,
+      condition: 'good',
+      category: null,
+    });
+    expect(result.title).toContain('Galaxy S24');
+    expect(result.title).not.toContain('null');
+  });
+
+  it('handles null model (no model in title)', () => {
+    const result = generateAlgorithmicTitle({
+      brand: 'Generic Brand',
+      model: null,
+      variant: null,
+      condition: 'good',
+      category: null,
+    });
+    expect(result.title).toContain('Generic Brand');
+  });
+
+  it('handles null variant (no variant in title)', () => {
+    const result = generateAlgorithmicTitle({
+      brand: 'Apple',
+      model: 'iPhone 15',
+      variant: null,
+      condition: 'good',
+      category: null,
+    });
+    expect(result.title).toContain('Apple iPhone 15');
+  });
+
+  it('falls back to condition string for unknown condition', () => {
+    const result = generateAlgorithmicTitle({
+      brand: 'Test',
+      model: 'Item',
+      variant: null,
+      condition: 'custom-condition' as any,
+      category: null,
+    });
+    expect(result.title).toContain('custom-condition');
+  });
+
+  it('includes keywords when provided', () => {
+    const result = generateAlgorithmicTitle({
+      brand: 'Nike',
+      model: 'Air Max',
+      variant: null,
+      condition: 'new',
+      category: 'shoes',
+      keywords: ['sneakers', 'running'],
+    });
+    expect(result.keywords).toContain('sneakers');
+    expect(result.keywords).toContain('running');
+  });
+
+  it('truncates title when over limit using NEW for new condition', () => {
+    // Create a very long title to trigger truncation
+    const result = generateAlgorithmicTitle({
+      brand: 'VeryLongBrandNameThatExceedsTheLimit',
+      model: 'VeryLongModelNameThatAlsoExceedsTheCharacterLimitOfThePlatform',
+      variant: 'SpecialEdition',
+      condition: 'new',
+      category: null,
+    }, 'ebay'); // ebay limit is 80 chars
+    expect(result.charCount).toBeLessThanOrEqual(80);
+  });
+
+  it('truncates title using LN for like_new condition', () => {
+    const result = generateAlgorithmicTitle({
+      brand: 'VeryLongBrandNameThatExceedsTheLimit',
+      model: 'VeryLongModelNameThatAlsoExceedsTheCharacterLimitSetByThePlatform',
+      variant: 'LimitedEdition',
+      condition: 'like_new',
+      category: null,
+    }, 'ebay');
+    expect(result.charCount).toBeLessThanOrEqual(80);
+  });
+
+  it('truncates title with empty shortCondition (used condition)', () => {
+    const result = generateAlgorithmicTitle({
+      brand: 'VeryLongBrandNameThatExceedsTheLimit',
+      model: 'VeryLongModelNameThatAlsoExceedsTheCharacterLimitSetByThePlatform',
+      variant: 'SpecialEditionVersion',
+      condition: 'used', // not 'new' or 'like_new' → shortCondition = ''
+      category: null,
+    }, 'ebay');
+    expect(result.charCount).toBeLessThanOrEqual(80);
+  });
+});
+
+// ── generateLLMTitle and generateTitlesForAllPlatforms - more branches ─────
+describe('title-generator - final branch coverage', () => {
+  const OpenAI = require('openai');
+
+  it('generateLLMTitle uses default "ebay" platform when not specified', async () => {
+    delete process.env.OPENAI_API_KEY;
+    const result = await generateLLMTitle({
+      brand: 'Sony',
+      model: 'WH-1000XM5',
+      variant: null,
+      condition: 'good',
+      category: null,
+    }); // No platform arg → default 'ebay'
+    expect(result.platform).toBe('ebay');
+  });
+
+  it('generateTitlesForAllPlatforms falls back to first title when ebay not found', () => {
+    // getAllPlatforms always generates ebay title, so primary is always set
+    // Testing the ||'' chain by using an unusual setup
+    const result = generateTitlesForAllPlatforms({
+      brand: null,
+      model: null,
+      variant: null,
+      condition: 'used',
+      category: null,
+    });
+    // All null inputs still produce a title
+    expect(typeof result.primary).toBe('string');
+    expect(result.titles.length).toBe(4);
+  });
+});

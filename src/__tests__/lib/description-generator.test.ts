@@ -402,3 +402,45 @@ describe('generateLLMDescription - branch coverage', () => {
     expect(result.hasShippingNote).toBe(true);
   });
 });
+
+describe('description-generator - default parameter branches', () => {
+  const baseInput = {
+    brand: 'Sony',
+    model: 'WH-1000XM5',
+    variant: 'Black',
+    condition: 'good' as const,
+    category: 'electronics',
+    askingPrice: 200,
+  };
+
+  it('uses "generic" platform when called without platform arg', () => {
+    // Tests default parameter branch for generateAlgorithmicDescription
+    const result = generateAlgorithmicDescription(baseInput);
+    expect(result.description).toBeTruthy();
+    expect(result.platform).toBe('generic');
+  });
+
+  it('generateLLMDescription uses "ebay" default when no platform arg', async () => {
+    delete process.env.OPENAI_API_KEY;
+    // Will fall back to algorithmic since no key
+    const result = await generateLLMDescription(baseInput);
+    expect(result.platform).toBe('ebay');
+  });
+
+  it('generateLLMDescription handles choices[0] being undefined', async () => {
+    const OpenAI = require('openai');
+    process.env.OPENAI_API_KEY = 'test-key';
+    (OpenAI as jest.Mock).mockImplementation(() => ({
+      chat: {
+        completions: {
+          create: jest.fn().mockResolvedValue({
+            choices: [], // empty choices array
+          }),
+        },
+      },
+    }));
+
+    const result = await generateLLMDescription(baseInput, 'ebay');
+    expect(result.description).toBe('');
+  });
+});

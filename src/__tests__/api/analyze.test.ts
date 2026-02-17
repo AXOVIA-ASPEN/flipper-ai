@@ -22,6 +22,24 @@ function createParams(listingId: string) {
   return { params: Promise.resolve({ listingId }) };
 }
 
+describe('POST /api/analyze/[listingId] - branch coverage', () => {
+  it('returns 400 when listingId is empty', async () => {
+    const req = new NextRequest('http://localhost/api/analyze/');
+    const res = await POST(req, createParams(''));
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toContain('Listing ID');
+  });
+
+  it('GET returns 400 when listingId is empty', async () => {
+    const req = new NextRequest('http://localhost/api/analyze/');
+    const res = await GET(req, createParams(''));
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toContain('Listing ID');
+  });
+});
+
 describe('POST /api/analyze/[listingId]', () => {
   beforeEach(() => jest.clearAllMocks());
 

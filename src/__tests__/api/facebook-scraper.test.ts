@@ -357,4 +357,326 @@ describe('Facebook Marketplace Scraper API', () => {
       );
     });
   });
+
+  // ── Additional branch coverage ────────────────────────────────────────────
+  describe('POST /api/scraper/facebook - branch coverage', () => {
+    it('returns 401 when user is not authenticated', async () => {
+      (getAuthUserId as jest.Mock).mockResolvedValue(null);
+      const request = new NextRequest('http://localhost/api/scraper/facebook', {
+        method: 'POST',
+        body: JSON.stringify({ keywords: 'test', accessToken: 'token' }),
+      });
+      const res = await POST(request);
+      expect(res.status).toBe(401);
+      const json = await res.json();
+      expect(json.error).toBe('Unauthorized');
+    });
+
+    it('includes categoryId in search params when provided', async () => {
+      (getAuthUserId as jest.Mock).mockResolvedValue('user-123');
+      (prisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-1' });
+      (prisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({ data: [] }),
+      });
+
+      const request = new NextRequest('http://localhost/api/scraper/facebook', {
+        method: 'POST',
+        body: JSON.stringify({ keywords: 'test', accessToken: 'token', categoryId: 'electronics' }),
+      });
+      const res = await POST(request);
+      expect(res.status).toBe(200);
+      const fetchUrl = (global.fetch as jest.Mock).mock.calls[0][0];
+      expect(fetchUrl).toContain('electronics');
+    });
+
+    it('includes location in search params when provided', async () => {
+      (getAuthUserId as jest.Mock).mockResolvedValue('user-123');
+      (prisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-2' });
+      (prisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({ data: [] }),
+      });
+
+      const request = new NextRequest('http://localhost/api/scraper/facebook', {
+        method: 'POST',
+        body: JSON.stringify({ keywords: 'test', accessToken: 'token', location: 'Tampa, FL' }),
+      });
+      const res = await POST(request);
+      expect(res.status).toBe(200);
+    });
+
+    it('returns null for expired Facebook token', async () => {
+      (getAuthUserId as jest.Mock).mockResolvedValue('user-123');
+      (prisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-3' });
+      (prisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+      // Mock an expired token
+      (prisma.facebookToken.findUnique as jest.Mock).mockResolvedValue({
+        accessToken: 'old-token',
+        expiresAt: new Date(Date.now() - 86400000), // expired 24h ago
+      });
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 401,
+      });
+
+      // No access token in body, expired stored token -> should fail
+      const request = new NextRequest('http://localhost/api/scraper/facebook', {
+        method: 'POST',
+        body: JSON.stringify({ keywords: 'test' }),
+      });
+      const res = await POST(request);
+      // Expired token means no valid token - API fails with 401 or error
+      expect([400, 401, 500]).toContain(res.status);
+    });
+
+    it('handles fetch response where data.data is undefined (fallback to [])', async () => {
+      (getAuthUserId as jest.Mock).mockResolvedValue('user-123');
+      (prisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-4' });
+      (prisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+      // data.data is missing → ?? [] fallback
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({ pagination: {} }), // no "data" key
+      });
+      const request = new NextRequest('http://localhost/api/scraper/facebook', {
+        method: 'POST',
+        body: JSON.stringify({ keywords: 'iPhone', accessToken: 'token' }),
+      });
+      const res = await POST(request);
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.listingsSaved).toBe(0);
+    });
+
+    it('handles listing with no images, no marketplace_listing_url, no seller, and low value score', async () => {
+      (getAuthUserId as jest.Mock).mockResolvedValue('user-123');
+      (prisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-5' });
+      (prisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+      const { estimateValue } = require('@/lib/value-estimator');
+      (estimateValue as jest.Mock).mockReturnValueOnce({
+        estimatedValue: 50,
+        estimatedLow: 30,
+        estimatedHigh: 70,
+        profitPotential: 10,
+        profitLow: 5,
+        profitHigh: 15,
+        valueScore: 45, // < 70 → status = 'NEW'
+        discountPercent: 10,
+        resaleDifficulty: 'HARD',
+        reasoning: 'Low value',
+        notes: '',
+        shippable: false,
+        negotiable: false,
+        comparableUrls: [],
+        tags: ['misc'],
+      });
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          data: [
+            {
+              id: 'fb-no-extras',
+              name: 'Old Chair',
+              // no description, no condition, no location, no images, no marketplace_listing_url, no seller, no category
+            },
+          ],
+        }),
+      });
+      (prisma.listing.upsert as jest.Mock).mockResolvedValue({ id: 'listing-new' });
+      const request = new NextRequest('http://localhost/api/scraper/facebook', {
+        method: 'POST',
+        body: JSON.stringify({ keywords: 'chair', accessToken: 'token' }),
+      });
+      const res = await POST(request);
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.listingsSaved).toBe(1);
+    });
+
+    it('handles listing with empty location parts (all undefined city/state/zip)', async () => {
+      (getAuthUserId as jest.Mock).mockResolvedValue('user-123');
+      (prisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-6' });
+      (prisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          data: [
+            {
+              id: 'fb-empty-loc',
+              name: 'Test Item',
+              price: '100',
+              location: {}, // city/state/zip all undefined → parts.length === 0 → formatLocation returns null
+              marketplace_listing_url: 'https://facebook.com/marketplace/item/fb-empty-loc',
+            },
+          ],
+        }),
+      });
+      (prisma.listing.upsert as jest.Mock).mockResolvedValue({ id: 'listing-loc' });
+      const request = new NextRequest('http://localhost/api/scraper/facebook', {
+        method: 'POST',
+        body: JSON.stringify({ keywords: 'item', accessToken: 'token' }),
+      });
+      const res = await POST(request);
+      expect(res.status).toBe(200);
+    });
+
+    it('passes limit and minPrice/maxPrice through buildSearchParams', async () => {
+      (getAuthUserId as jest.Mock).mockResolvedValue('user-123');
+      (prisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-7' });
+      (prisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({ data: [] }),
+      });
+      const request = new NextRequest('http://localhost/api/scraper/facebook', {
+        method: 'POST',
+        body: JSON.stringify({
+          keywords: 'laptop',
+          accessToken: 'token',
+          limit: 5,
+          minPrice: 50,
+          maxPrice: 500,
+        }),
+      });
+      const res = await POST(request);
+      expect(res.status).toBe(200);
+      const fetchUrl = (global.fetch as jest.Mock).mock.calls[0][0];
+      expect(fetchUrl).toContain('min_price');
+      expect(fetchUrl).toContain('max_price');
+    });
+
+    it('skips listings with missing id or name (continue branch)', async () => {
+      (getAuthUserId as jest.Mock).mockResolvedValue('user-123');
+      (prisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-8' });
+      (prisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          data: [
+            { id: '', name: 'Has Name But No ID' },   // !item.id → skip
+            { id: 'valid-id', name: '' },              // !item.name → skip
+            { id: 'valid-id-2', name: 'Valid Item', price: '100',
+              marketplace_listing_url: 'https://fb.com/item/valid-id-2' }, // saved
+          ],
+        }),
+      });
+      (prisma.listing.upsert as jest.Mock).mockResolvedValue({ id: 'listing-valid', status: 'NEW' });
+      const request = new NextRequest('http://localhost/api/scraper/facebook', {
+        method: 'POST',
+        body: JSON.stringify({ keywords: 'test', accessToken: 'token' }),
+      });
+      const res = await POST(request);
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      // Only 1 listing was valid, 2 were skipped
+      expect(json.listingsSaved).toBe(1);
+    });
+
+    it('handles item with category set (skips detectCategory call)', async () => {
+      (getAuthUserId as jest.Mock).mockResolvedValue('user-123');
+      (prisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-9' });
+      (prisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          data: [
+            {
+              id: 'fb-cat-item',
+              name: 'MacBook Pro',
+              category: 'computers', // item.category truthy → skip detectCategory
+              price: '800',
+              images: [{ url: 'https://example.com/mac.jpg' }],
+              seller: { id: 'sel-2', name: 'Alice' },
+              marketplace_listing_url: 'https://fb.com/item/fb-cat-item',
+            },
+          ],
+        }),
+      });
+      (prisma.listing.upsert as jest.Mock).mockResolvedValue({ id: 'listing-cat', status: 'OPPORTUNITY' });
+      const request = new NextRequest('http://localhost/api/scraper/facebook', {
+        method: 'POST',
+        body: JSON.stringify({ keywords: 'laptop', accessToken: 'token' }),
+      });
+      const res = await POST(request);
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.listingsSaved).toBe(1);
+    });
+
+    it('handles inner catch when saveListingFromFacebookItem throws (updates job as FAILED)', async () => {
+      (getAuthUserId as jest.Mock).mockResolvedValue('user-123');
+      (prisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-10' });
+      (prisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          data: [{ id: 'fb-err', name: 'Error Item', price: '100' }],
+        }),
+      });
+      (prisma.listing.upsert as jest.Mock).mockRejectedValue(new Error('DB error'));
+      const request = new NextRequest('http://localhost/api/scraper/facebook', {
+        method: 'POST',
+        body: JSON.stringify({ keywords: 'test', accessToken: 'token' }),
+      });
+      const res = await POST(request);
+      expect(res.status).toBe(500);
+      const json = await res.json();
+      expect(json.details).toBe('DB error');
+    });
+
+    it('covers non-Error throw branch (error.message fallback to Unknown string)', async () => {
+      (getAuthUserId as jest.Mock).mockResolvedValue('user-123');
+      (prisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-11' });
+      (prisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          data: [{ id: 'fb-non-err', name: 'Non Error Item', price: '50' }],
+        }),
+      });
+      // Throw a non-Error object to hit the false branch of `error instanceof Error`
+      (prisma.listing.upsert as jest.Mock).mockImplementation(() => { throw 'string-error'; });
+      const request = new NextRequest('http://localhost/api/scraper/facebook', {
+        method: 'POST',
+        body: JSON.stringify({ keywords: 'test', accessToken: 'token' }),
+      });
+      const res = await POST(request);
+      expect(res.status).toBe(500);
+      const json = await res.json();
+      expect(json.details).toBe('Unknown error');
+    });
+
+    it('falls back to "electronics" category when detectCategory returns null', async () => {
+      const { detectCategory } = require('@/lib/value-estimator');
+      (detectCategory as jest.Mock).mockReturnValueOnce(null); // forces || 'electronics' fallback
+      (getAuthUserId as jest.Mock).mockResolvedValue('user-123');
+      (prisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-12' });
+      (prisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          data: [{ id: 'fb-nocat', name: 'Mystery Item', price: '200' }],
+        }),
+      });
+      (prisma.listing.upsert as jest.Mock).mockResolvedValue({ id: 'listing-fallback', status: 'NEW' });
+      const request = new NextRequest('http://localhost/api/scraper/facebook', {
+        method: 'POST',
+        body: JSON.stringify({ keywords: 'mystery', accessToken: 'token' }),
+      });
+      const res = await POST(request);
+      expect(res.status).toBe(200);
+      // Verify estimateValue was called with 'electronics' as fallback category
+      const { estimateValue } = require('@/lib/value-estimator');
+      expect(estimateValue).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(String),
+        expect.any(Number),
+        null,
+        'electronics',
+      );
+    });
+  });
 });
