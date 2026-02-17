@@ -91,6 +91,13 @@ describe('Report Service', () => {
       const diff = (end.getTime() - start.getTime()) / 86400000;
       expect(diff).toBeGreaterThanOrEqual(27);
     });
+
+    it('should fallback to monthly when custom has startDate but no endDate', () => {
+      // Covers `startDate && endDate` → startDate truthy, endDate undefined → false → fallback
+      const { start, end } = getDateRange('custom', new Date('2026-01-01'), undefined);
+      const diff = (end.getTime() - start.getTime()) / 86400000;
+      expect(diff).toBeGreaterThanOrEqual(27);
+    });
   });
 
   describe('generateReportId', () => {
@@ -431,5 +438,66 @@ describe('buildReport/reportToCSV - deeper branch coverage', () => {
     // The null fees value should produce an empty cell in CSV
     expect(typeof csv).toBe('string');
     expect(csv).toContain('item-1');
+  });
+
+  it('covers bestCategory ?? N/A fallback when no sold items', () => {
+    // bestCategory is null when there are no sold items → triggers ?? 'N/A' branch
+    const report = buildReport('user1', 'monthly', dateRange, []);
+    const csv = reportToCSV(report);
+    expect(csv).toContain('Best Category,N/A');
+  });
+
+  it('covers bestCategory set (truthy) in CSV', () => {
+    // bestCategory is set → does NOT use 'N/A' branch
+    const items = [
+      {
+        id: 'item-1',
+        title: 'Widget',
+        platform: 'EBAY',
+        category: 'Electronics',
+        status: 'SOLD',
+        purchasePrice: 50,
+        resalePrice: 100,
+        fees: 5,
+        purchaseDate: new Date('2026-01-05'),
+        resaleDate: new Date('2026-01-10'),
+      },
+    ];
+    const report = buildReport('user1', 'monthly', dateRange, items);
+    const csv = reportToCSV(report);
+    expect(csv).toContain('Best Category,Electronics');
+  });
+
+  it('covers category not beating best (data.profit <= bestCatProfit branch - false)', () => {
+    // Two categories: Electronics has higher profit → Furniture does NOT become best
+    // This covers the `if (data.profit > bestCatProfit)` → false branch
+    const items = [
+      {
+        id: 'item-elec',
+        title: 'Laptop',
+        platform: 'EBAY',
+        category: 'Electronics',
+        status: 'SOLD',
+        purchasePrice: 100,
+        resalePrice: 300,
+        fees: 0,
+        purchaseDate: new Date('2026-01-05'),
+        resaleDate: new Date('2026-01-10'),
+      },
+      {
+        id: 'item-furn',
+        title: 'Chair',
+        platform: 'EBAY',
+        category: 'Furniture',
+        status: 'SOLD',
+        purchasePrice: 50,
+        resalePrice: 80,  // profit 30 < electronics 200
+        fees: 0,
+        purchaseDate: new Date('2026-01-06'),
+        resaleDate: new Date('2026-01-11'),
+      },
+    ];
+    const report = buildReport('user1', 'monthly', dateRange, items);
+    expect(report.summary.bestCategory).toBe('Electronics');
   });
 });
