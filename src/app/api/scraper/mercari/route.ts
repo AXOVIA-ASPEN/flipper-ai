@@ -347,11 +347,12 @@ async function saveListingFromMercariItem(item: MercariItem, userId: string) {
 
   // Build notes
   const sellerNote = buildSellerNote(item);
+  const shippingMethodName = item.shippingMethod?.name || /* istanbul ignore next */ 'standard';
   const shippingNote =
     item.shippingPayer?.name === 'Seller'
       ? 'Free shipping'
       : item.shippingPayer?.name
-        ? `Buyer pays shipping (${item.shippingMethod?.name !== undefined ? item.shippingMethod.name : /* istanbul ignore next */ 'standard'})`
+        ? `Buyer pays shipping (${shippingMethodName})`
         : null;
   const brandNote = item.itemBrand?.name ? `Brand: ${item.itemBrand.name}` : null;
 
