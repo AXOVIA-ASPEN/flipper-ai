@@ -74,7 +74,11 @@ export class OpportunitiesPage extends BasePage {
 
   async confirmDeleteDialog(accept: boolean) {
     this.page.once('dialog', async (dialog) => {
-      accept ? await dialog.accept() : await dialog.dismiss();
+      if (accept) {
+        await dialog.accept();
+      } else {
+        await dialog.dismiss();
+      }
     });
   }
 

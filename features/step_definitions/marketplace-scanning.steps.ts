@@ -141,7 +141,7 @@ When(
 
 Then('I should receive a browser notification', async function (this: CustomWorld) {
   // Check that notification was triggered
-  const notificationSent = await this.page.evaluate(() => {
+  const _notificationSent = await this.page.evaluate(() => {
     return (window as any).__lastNotification != null;
   });
 

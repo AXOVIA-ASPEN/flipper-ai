@@ -211,7 +211,7 @@ Then('the modified message should be sent', async function (this: CustomWorld) {
 
 Then('my edits should be saved as a template preference', async function (this: CustomWorld) {
   // Check for preference saved notification
-  const prefSaved = this.page.locator('text="Preferences updated"');
+  const _prefSaved = this.page.locator('text="Preferences updated"');
 
   // May not always show, so we just check the setting exists
   await this.page.goto('/settings');
@@ -320,7 +320,7 @@ Given('the seller asks {string}', async function (this: CustomWorld, question: s
 
 Then('the AI should analyze my profit margins', async function (this: CustomWorld) {
   // Check for profit analysis indicator
-  const analysisIndicator = this.page.locator('[data-testid="profit-analysis"]');
+  const _analysisIndicator = this.page.locator('[data-testid="profit-analysis"]');
 
   // May be internal, just verify reply was generated with context
   console.log('✅ AI analyzed profit margins (internal)');

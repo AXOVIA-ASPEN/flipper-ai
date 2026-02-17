@@ -30,6 +30,15 @@ const eslintConfig = defineConfig([
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-require-imports': 'off',
       'react-hooks/rules-of-hooks': 'off',
+      // Allow _-prefixed vars as intentionally unused in test files
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          varsIgnorePattern: '^_',
+          argsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
     },
   },
   // Relax rules for JSX files

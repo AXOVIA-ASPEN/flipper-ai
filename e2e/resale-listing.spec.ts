@@ -41,7 +41,7 @@ test.describe('Resale Listing Generator', () => {
   });
 
   test.describe('Scenario: Cross-platform posting', () => {
-    test('should adapt listing for multiple platforms', async ({ page, resaleListingPage }) => {
+    test('should adapt listing for multiple platforms', async ({ page: _page, resaleListingPage }) => {
       await resaleListingPage.gotoCreate();
 
       // Fill basic info
@@ -69,7 +69,7 @@ test.describe('Resale Listing Generator', () => {
   });
 
   test.describe('Scenario: Clone existing listing', () => {
-    test('should pre-fill fields when cloning a listing', async ({ page, resaleListingPage }) => {
+    test('should pre-fill fields when cloning a listing', async ({ page: _page, resaleListingPage }) => {
       await resaleListingPage.gotoListings();
 
       if (await resaleListingPage.cloneButton.count() > 0) {

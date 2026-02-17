@@ -538,7 +538,7 @@ Given('I have contacted a seller {int} days ago', async function (this: CustomWo
 
 Given('the seller has not responded', async function (this: CustomWorld) {
   // Verify no seller response in the conversation
-  const sellerMessages = await this.page
+  const _sellerMessages = await this.page
     .locator('[data-testid="message"][data-from="seller"]')
     .count();
   // In test fixtures, ensure no seller response exists

@@ -264,7 +264,7 @@ test.describe('Facebook OAuth Integration', () => {
         const connectBtn = page.getByRole('button', { name: /connect.*facebook/i });
         const linkBtn = page.getByRole('link', { name: /connect.*facebook/i });
 
-        const hasConnect = (await connectBtn.count()) > 0 || (await linkBtn.count()) > 0;
+        const _hasConnect = (await connectBtn.count()) > 0 || (await linkBtn.count()) > 0;
         // The settings page should show Facebook integration status
         expect(await fbSection.isVisible()).toBeTruthy();
       }

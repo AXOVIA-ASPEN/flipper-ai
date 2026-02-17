@@ -94,7 +94,7 @@ test.describe('Image Modal & Carousel', () => {
       await expect(page.getByText('Vintage Fender Guitar')).toBeVisible();
 
       // Find and click the image thumbnail for the first listing
-      const imageButton = page.locator('button').filter({ has: page.locator('img[alt*="Vintage Fender Guitar"]') }).first();
+      const _imageButton = page.locator('button').filter({ has: page.locator('img[alt*="Vintage Fender Guitar"]') }).first();
 
       // If image is rendered as an img tag directly, try clicking it
       const imgElement = page.locator('img[alt*="Vintage Fender Guitar"]').first();

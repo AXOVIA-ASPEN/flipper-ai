@@ -19,7 +19,7 @@ test.describe('Feature: Error Handling & Edge Cases', () => {
       // App should show an error state, not crash
       await expect(page.locator('body')).toBeVisible();
       // Check for error indicator or empty state
-      const hasError = await page.locator('[data-testid="error"], [role="alert"], .error').count();
+      const _hasError = await page.locator('[data-testid="error"], [role="alert"], .error').count();
       const hasContent = await page.locator('body').textContent();
       expect(hasContent).toBeTruthy();
     });
@@ -56,7 +56,7 @@ test.describe('Feature: Error Handling & Edge Cases', () => {
 
   test.describe('Scenario: Invalid routes show 404 page', () => {
     test('shows 404 for non-existent routes', async ({ page }) => {
-      const response = await page.goto('/this-page-does-not-exist-xyz');
+      const _response = await page.goto('/this-page-does-not-exist-xyz');
       // Should either show a 404 page or redirect
       await expect(page.locator('body')).toBeVisible();
       const text = await page.locator('body').textContent();

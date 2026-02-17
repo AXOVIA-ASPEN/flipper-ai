@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { TEST_USER, mockAuthSession } from './fixtures/auth';
+// import { TEST_USER, mockAuthSession } from './fixtures/auth'; // unused
 
 test.describe('Authentication', () => {
   test.describe('Feature: User Login', () => {
@@ -80,7 +80,7 @@ test.describe('Authentication', () => {
       await expect(passwordInput).toHaveAttribute('type', 'password');
 
       // Click the eye toggle button (it's adjacent to the password input)
-      const toggleButton = page.locator('input[type="password"] + button, button:has(svg)').last();
+      const _toggleButton = page.locator('input[type="password"] + button, button:has(svg)').last();
       // More reliable: find button inside the password field's parent
       const passwordContainer = passwordInput.locator('..');
       const eyeButton = passwordContainer.locator('button');

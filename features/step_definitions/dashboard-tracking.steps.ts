@@ -296,7 +296,7 @@ Then('I should see a line chart showing:', async function (dataTable: any) {
   const hasContent = await chart.first().evaluate((el) => {
     if (el.tagName === 'CANVAS') {
       const canvas = el as HTMLCanvasElement;
-      const ctx = canvas.getContext('2d');
+      const _ctx = canvas.getContext('2d');
       return canvas.width > 0 && canvas.height > 0;
     }
     return el.children.length > 0;
@@ -378,7 +378,7 @@ Given('I have the dashboard open', async function () {
 
 Given('a background scan is running', async function () {
   // Verify scan status indicator
-  const scanIndicator = page.locator('[data-testid="scan-status"], [data-testid="scan-running"]');
+  const _scanIndicator = page.locator('[data-testid="scan-status"], [data-testid="scan-running"]');
   // Start a scan if not running
   const startScanBtn = page.locator('button:has-text("Start Scan"), [data-testid="start-scan"]');
   if (await startScanBtn.isVisible({ timeout: 2000 }).catch(() => false)) {

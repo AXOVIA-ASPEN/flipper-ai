@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { mockAuthSession, TEST_USER } from './fixtures/auth';
+import { mockAuthSession } from './fixtures/auth';
 
 // BDD: Feature — Form Validation
 // As a user, I want forms to validate my input before submission

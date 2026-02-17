@@ -69,7 +69,7 @@ test.describe('Feature: Network Resilience & Graceful Degradation', () => {
       await page.goto('/');
 
       // Should show some loading indicator (spinner, skeleton, or loading text)
-      const hasLoadingIndicator = await page
+      const _hasLoadingIndicator = await page
         .locator(
           '[class*="loading"], [class*="spinner"], [class*="skeleton"], [role="progressbar"], [aria-busy="true"], text=/loading/i'
         )

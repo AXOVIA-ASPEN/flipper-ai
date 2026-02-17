@@ -178,7 +178,7 @@ test.describe('Feature: Messages Pagination, Sort & Filter', () => {
 
         // 10 outbound messages - no pagination needed (under limit)
         // Should not show pagination controls
-        const paginationInfo = page.getByText(/of 10/);
+        const _paginationInfo = page.getByText(/of 10/);
         // 10 < 20 limit, so no pagination visible
         await expect(page.getByRole('button', { name: /Next/ })).not.toBeVisible();
       }

@@ -18,7 +18,7 @@ test.describe('API Key Validation Flow', () => {
       });
     });
 
-    await page.route('**/api/user/settings', async (route, request) => {
+    await page.route('**/api/user/settings', async (route, _request) => {
       if (request.method() === 'GET') {
         await route.fulfill({
           json: {
@@ -54,7 +54,7 @@ test.describe('API Key Validation Flow', () => {
       await page.goto('/settings');
 
       // Find and fill the API key input
-      const apiKeyInput = page.locator('input[type="password"], input[type="text"]').filter({ hasText: /./}).first()
+      const _apiKeyInput = page.locator('input[type="password"], input[type="text"]').filter({ hasText: /./}).first()
         || page.getByPlaceholder(/sk-|api.*key|enter.*key/i);
 
       // Look for any text input in the API Keys section
@@ -189,7 +189,7 @@ test.describe('API Key Validation Flow', () => {
     test('Scenario: Given I enter a valid key, When I save settings, Then the key is persisted', async ({ page }) => {
       let savedKey: string | null = null;
 
-      await page.route('**/api/user/settings', async (route, request) => {
+      await page.route('**/api/user/settings', async (route, _request) => {
         if (request.method() === 'PUT' || request.method() === 'PATCH' || request.method() === 'POST') {
           const body = await request.postDataJSON();
           savedKey = body.openaiApiKey || null;

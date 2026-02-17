@@ -300,7 +300,7 @@ test.describe('Feature: New User Onboarding Journey', () => {
       await page.waitForLoadState('networkidle');
 
       // Should see some indication of empty state
-      const emptyIndicators = page.getByText(/no opportunities|no results|get started|empty|nothing/i);
+      const _emptyIndicators = page.getByText(/no opportunities|no results|get started|empty|nothing/i);
       const pageContent = await page.textContent('body');
       // Page should at minimum load without error
       expect(pageContent).toBeTruthy();

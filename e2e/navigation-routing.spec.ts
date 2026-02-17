@@ -120,7 +120,7 @@ test.describe('Navigation & Routing', () => {
       // Given I navigate through multiple pages
       await page.goto('/dashboard');
       await page.waitForLoadState('networkidle');
-      const firstUrl = page.url();
+      const _firstUrl = page.url();
 
       await page.goto('/opportunities');
       await page.waitForLoadState('networkidle');
