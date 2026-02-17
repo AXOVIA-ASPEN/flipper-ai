@@ -193,7 +193,7 @@ test.describe('Feature: Data Refresh & State Synchronization', () => {
       const errorIndicator = page.getByText(/error|failed|try again|no listings|something went wrong/i).first();
       const emptyState = page.getByText(/no results|no data|empty/i).first();
 
-      const hasErrorHandling =
+      const _hasErrorHandling =
         (await errorIndicator.isVisible().catch(() => false)) ||
         (await emptyState.isVisible().catch(() => false));
 

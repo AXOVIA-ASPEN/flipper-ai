@@ -122,9 +122,9 @@ test.describe('Billing & Subscription', () => {
       await mockBillingAPIs(page, 'FREE');
 
       // Track navigation to Stripe checkout
-      let checkoutRequested = false;
+      let _checkoutRequested = false;
       await page.route('**/api/stripe/checkout', async (route) => {
-        checkoutRequested = true;
+        _checkoutRequested = true;
         await route.fulfill({
           json: { url: 'https://checkout.stripe.com/test_session' },
         });
@@ -192,10 +192,10 @@ test.describe('Billing & Subscription', () => {
       await mockSessionWithTier(page, 'FLIPPER');
       await mockBillingAPIs(page, 'FLIPPER');
 
-      let cancelRequested = false;
+      let _cancelRequested = false;
       await page.route('**/api/subscription', async (route) => {
         if (route.request().method() === 'DELETE') {
-          cancelRequested = true;
+          _cancelRequested = true;
           await route.fulfill({ json: { success: true, tier: 'FREE' } });
         } else {
           await route.fulfill({

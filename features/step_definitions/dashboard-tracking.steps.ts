@@ -81,7 +81,7 @@ Then('items should be sorted by score \\(highest first)', async function () {
   }
 });
 
-Then('I should see filter options:', async function (dataTable: any) {
+Then('I should see filter options:', async function (_dataTable: any) {
   const filters = dataTable.hashes();
   for (const row of filters) {
     const filterLabel = row['Filter'];
@@ -131,7 +131,7 @@ Given("{int} seller hasn't replied in {int} hours", async function (count: numbe
 
 Given(
   '{int} seller just sent a message {int} minutes ago',
-  async function (count: number, minutes: number) {
+  async function (count: number, _minutes: number) {
     this.testData.recentConversations = count;
   }
 );
@@ -161,7 +161,7 @@ Then('unread messages should have a notification badge', async function () {
 
 Then(
   'stale conversations \\({int}h+) should be highlighted in yellow',
-  async function (hours: number) {
+  async function (_hours: number) {
     const staleItems = page.locator('[data-testid="conversation-stale"]');
     const count = await staleItems.count();
     expect(count).toBeGreaterThan(0);
@@ -239,7 +239,7 @@ Given('I have completed {int} flips in the last month', async function (count: n
   });
 });
 
-Then('I should see a table of completed flips:', async function (dataTable: any) {
+Then('I should see a table of completed flips:', async function (_dataTable: any) {
   const columns = dataTable.hashes();
   const table = page.locator('[data-testid="sales-table"], table');
   await expect(table.first()).toBeVisible();
@@ -288,7 +288,7 @@ When('I view the dashboard analytics section', async function () {
   await analytics.first().scrollIntoViewIfNeeded();
 });
 
-Then('I should see a line chart showing:', async function (dataTable: any) {
+Then('I should see a line chart showing:', async function (_dataTable: any) {
   const chart = page.locator('[data-testid="profit-chart"], canvas');
   await expect(chart.first()).toBeVisible();
 

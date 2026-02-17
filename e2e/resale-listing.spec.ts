@@ -57,7 +57,7 @@ test.describe('Resale Listing Generator', () => {
   });
 
   test.describe('Scenario: Price optimization based on demand', () => {
-    test('should suggest aggressive pricing for high-demand items', async ({ page, resaleListingPage }) => {
+    test('should suggest aggressive pricing for high-demand items', async ({ page: _page, resaleListingPage }) => {
       await resaleListingPage.gotoCreate();
 
       await resaleListingPage.fillTitle('iPad Pro 11-inch');
@@ -84,7 +84,7 @@ test.describe('Resale Listing Generator', () => {
   });
 
   test.describe('Scenario: Track listing performance', () => {
-    test('should display performance metrics for posted listings', async ({ page, resaleListingPage }) => {
+    test('should display performance metrics for posted listings', async ({ page: _page, resaleListingPage }) => {
       await resaleListingPage.gotoListings();
 
       const listingLink = await resaleListingPage.getFirstListingLink();
@@ -132,12 +132,12 @@ test.describe('Resale Listing Generator', () => {
   });
 
   test.describe('Scenario: Visual regression - Listing form', () => {
-    test('listing create page renders correctly', async ({ page, resaleListingPage }) => {
+    test('listing create page renders correctly', async ({ page: _page, resaleListingPage }) => {
       await resaleListingPage.gotoCreate();
       await resaleListingPage.screenshot('resale-listing-create');
     });
 
-    test('listings index page renders correctly', async ({ page, resaleListingPage }) => {
+    test('listings index page renders correctly', async ({ page: _page, resaleListingPage }) => {
       await resaleListingPage.gotoListings();
       await resaleListingPage.screenshot('resale-listing-index');
     });

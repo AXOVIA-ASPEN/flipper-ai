@@ -8,7 +8,7 @@ import { test, expect } from '@playwright/test';
  */
 
 test.describe('Scraper Jobs CRUD', () => {
-  let createdJobId: string;
+  let _createdJobId: string;
 
   test.describe('Given the scraper jobs API is available', () => {
     test('When I create a new scraper job, Then it returns 201 with job data', async ({
@@ -32,7 +32,7 @@ test.describe('Scraper Jobs CRUD', () => {
       expect(job).toHaveProperty('status', 'PENDING');
       expect(job).toHaveProperty('createdAt');
 
-      createdJobId = job.id;
+      _createdJobId = job.id;
     });
 
     test('When I create a job with only platform, Then optional fields are null', async ({

@@ -70,7 +70,7 @@ test.describe('Feature: Inventory ROI Tracking', () => {
 
   test.describe('Scenario: Fetch ROI data via API', () => {
     test('Given I am authenticated, When I request /api/inventory/roi, Then I receive item-level and portfolio ROI data', async ({
-      request,
+      request: _request,
       page,
     }) => {
       // Given - mock the API

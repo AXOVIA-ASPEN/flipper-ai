@@ -108,7 +108,7 @@ test.describe('API Key Validation Flow', () => {
       expect([400, 404, 500]).toContain(response.status());
     });
 
-    test('Scenario: Given an invalid format key, When I call validate-key, Then valid is false', async ({ request, page }) => {
+    test('Scenario: Given an invalid format key, When I call validate-key, Then valid is false', async ({ request: _request, page }) => {
       await page.route('**/api/user/settings/validate-key', async (route) => {
         await route.fulfill({
           json: {

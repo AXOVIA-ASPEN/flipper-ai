@@ -138,15 +138,15 @@ test.describe('Feature: Notifications & Listing Monitoring', () => {
     test('Given I have an unread notification, When I click on it, Then it should be marked as read', async ({
       page,
     }) => {
-      let markReadCalled = false;
+      let _markReadCalled = false;
 
       await page.route('**/api/notifications/notif-1/read', async (route) => {
-        markReadCalled = true;
+        _markReadCalled = true;
         await route.fulfill({ json: { success: true } });
       });
 
       await page.route('**/api/notifications/*/read', async (route) => {
-        markReadCalled = true;
+        _markReadCalled = true;
         await route.fulfill({ json: { success: true } });
       });
 
@@ -169,10 +169,10 @@ test.describe('Feature: Notifications & Listing Monitoring', () => {
     test('Given I have unread notifications, When I click "Mark all as read", Then all should be marked read', async ({
       page,
     }) => {
-      let markAllCalled = false;
+      let _markAllCalled = false;
 
       await page.route('**/api/notifications/read-all', async (route) => {
-        markAllCalled = true;
+        _markAllCalled = true;
         await route.fulfill({ json: { success: true } });
       });
 

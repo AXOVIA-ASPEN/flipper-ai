@@ -118,12 +118,12 @@ test.describe('Search Config CRUD', () => {
     test('Scenario: Given user clicks Create New, When they fill the form and submit, Then a new config is created', async ({
       page,
     }) => {
-      let createCalled = false;
+      let _createCalled = false;
       await page.route('**/api/search-configs**', async (route, request) => {
         if (request.method() === 'POST' && !request.url().includes('/search-configs/')) {
           const body = await request.postDataJSON();
           expect(body.name).toBeTruthy();
-          createCalled = true;
+          _createCalled = true;
           await route.fulfill({
             status: 201,
             json: {
@@ -192,11 +192,11 @@ test.describe('Search Config CRUD', () => {
     test('Scenario: Given user clicks Edit on a config, When they modify and save, Then the config is updated', async ({
       page,
     }) => {
-      let patchCalled = false;
+      let _patchCalled = false;
       await page.route('**/api/search-configs**', async (route, request) => {
         const url = request.url();
         if (request.method() === 'PATCH' && url.includes('/search-configs/')) {
-          patchCalled = true;
+          _patchCalled = true;
           const body = await request.postDataJSON();
           await route.fulfill({
             json: { ...mockConfigs[0], ...body },
@@ -325,7 +325,7 @@ test.describe('Search Config CRUD', () => {
     test('Scenario: Given an enabled config, When user clicks Run, Then a scrape is triggered', async ({
       page,
     }) => {
-      let scrapeCalled = false;
+      let _scrapeCalled = false;
 
       await page.route('**/api/search-configs**', async (route, request) => {
         if (request.method() === 'GET') {
@@ -343,7 +343,7 @@ test.describe('Search Config CRUD', () => {
       });
 
       await page.route('**/api/scraper/**', async (route) => {
-        scrapeCalled = true;
+        _scrapeCalled = true;
         await route.fulfill({
           json: {
             success: true,

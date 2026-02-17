@@ -63,7 +63,7 @@ Then('the AI should generate:', async function (this: CustomWorld, dataTable) {
     timeout: 15000,
   });
 
-  for (const [field, expected] of Object.entries(expectedFields)) {
+  for (const [field, _expected] of Object.entries(expectedFields)) {
     const fieldSelector = `[data-testid="listing-${field.toLowerCase().replace(/\s+/g, '-')}"]`;
     const element = this.page.locator(fieldSelector);
     const text = await element.textContent();
