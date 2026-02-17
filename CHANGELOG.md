@@ -7,6 +7,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- **README Project Status Table** — Added comprehensive project status checklist to README with production-readiness milestones
+- **Register Route 100% Coverage** — Fixed emailService mock; added test for non-blocking welcome email failure path (50% → 100% fn coverage)
+- **OfferUp Route 100% Coverage** — Added test that invokes `context.route()` abort callbacks for resource blocking (75% → 100% fn coverage)
+- **Listings Track Route 100% Coverage** — Added test invoking the placeholder URL fetcher callback (83% → 100% fn coverage)
+
+### Changed
+- Test count increased from 2291 → 2294 (+3 tests, 111 suites)
+- Statement coverage improved from 99.46% → 99.61%
+- Function coverage improved from 98.79% → 99.79%
+- README badges and test tables updated with accurate live figures
+
+---
+
+## [Unreleased - Previous]
+
+### Added
 - **Branch Coverage Boost** — Global branch coverage improved from 94.56% → 95.79% (exceeds 90% threshold)
 - **Extended Mercari Scraper Tests** — 10 new branch coverage tests covering all optional field combinations
 - **LLM Analyzer Tests** — 3 new tests covering null brand/model/variant paths and zero-valued API responses
