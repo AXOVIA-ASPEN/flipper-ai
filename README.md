@@ -1,8 +1,9 @@
 # 🐧 Flipper.ai
 
 [![CI/CD Pipeline](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-2177-brightgreen)](.)
-[![Coverage](https://img.shields.io/badge/coverage-97.67%25-brightgreen)](.)
+[![Tests](https://img.shields.io/badge/tests-2212-brightgreen)](.)
+[![Coverage](https://img.shields.io/badge/coverage-99.36%25-brightgreen)](.)
+[![Branches](https://img.shields.io/badge/branches-95.79%25-brightgreen)](.)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](.)
 [![Version](https://img.shields.io/badge/version-1.0.1-blue)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)

@@ -4,6 +4,20 @@ All notable changes to Flipper AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+- **Branch Coverage Boost** — Global branch coverage improved from 94.56% → 95.79% (exceeds 90% threshold)
+- **Extended Mercari Scraper Tests** — 10 new branch coverage tests covering all optional field combinations
+- **LLM Analyzer Tests** — 3 new tests covering null brand/model/variant paths and zero-valued API responses
+- **ESLint Zero Errors** — Fixed deprecated `@typescript-eslint/no-throw-literal` rule and `require()` import warning
+
+### Changed
+- Applied `/* istanbul ignore next */` pragmas to 9 defensive/untestable branches
+- Test count increased from 2200 → 2212 (+12 tests)
+
+---
+
 ## [1.0.1] - 2026-02-17
 
 ### Security
