@@ -153,4 +153,16 @@ describe('LRUCache - branch coverage', () => {
     expect(cache.get('b')).toBe(2);
     expect(cache.get('c')).toBe(3);
   });
+
+  it('skips delete when oldest is undefined (maxSize=0, empty cache eviction guard)', () => {
+    // With maxSize=0: size(0) >= maxSize(0) is true on first set(),
+    // but cache is empty so .keys().next().value = undefined → if(oldest !== undefined) is false
+    const { LRUCache } = require('@/lib/cache');
+    const cache = new LRUCache({ maxSize: 0, ttlMs: 60000 });
+    // First set triggers the eviction guard with undefined oldest (no-op)
+    cache.set('x', 42);
+    // The entry may or may not be in the cache due to maxSize=0 eviction on next call
+    // Just verify no crash occurs
+    expect(() => cache.set('y', 99)).not.toThrow();
+  });
 });

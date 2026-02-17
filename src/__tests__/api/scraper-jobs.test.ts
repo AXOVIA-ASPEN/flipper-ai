@@ -421,3 +421,23 @@ describe('Scraper Jobs API', () => {
     });
   });
 });
+
+// ── Additional branch coverage ────────────────────────────────────────────────
+describe('PATCH /api/scraper-jobs/[id] - null date branches', () => {
+  it('sets startedAt and completedAt to null when provided as empty/null values', async () => {
+    // Covers: body.startedAt ? new Date(body.startedAt) : null (null branch)
+    //         body.completedAt ? new Date(body.completedAt) : null (null branch)
+    mockUpdate.mockResolvedValue({ id: 'job-null-dates' });
+
+    const request = createMockRequest('PATCH', '/api/scraper-jobs/job-null-dates', {
+      startedAt: null,     // falsy → sets null (covers line 54 null branch)
+      completedAt: null,   // falsy → sets null (covers line 57 null branch)
+    });
+    await PATCH(request, { params: Promise.resolve({ id: 'job-null-dates' }) });
+
+    expect(mockUpdate).toHaveBeenCalledWith({
+      where: { id: 'job-null-dates' },
+      data: { startedAt: null, completedAt: null },
+    });
+  });
+});

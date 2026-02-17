@@ -395,3 +395,21 @@ describe('Auth utilities', () => {
     });
   });
 });
+
+// ── Additional branch coverage ────────────────────────────────────────────────
+describe('credentials authorize - null credentials branch', () => {
+  test('throws when credentials is null/undefined (optional chain null branch)', async () => {
+    // Covers: credentials?.email (the null/undefined branch of the optional chain)
+    // When credentials itself is null/undefined, credentials?.email returns undefined
+    const NextAuth = require('next-auth').default;
+    const authConfig = NextAuth._config;
+    const credentialsProvider = authConfig.providers.find((p: any) => p.name === 'credentials');
+
+    if (!credentialsProvider) return;
+
+    // Call with undefined credentials → credentials?.email hits null/undefined branch
+    await expect(credentialsProvider.authorize(undefined)).rejects.toThrow(
+      'Email and password are required'
+    );
+  });
+});

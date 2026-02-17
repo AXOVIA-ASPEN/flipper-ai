@@ -337,3 +337,29 @@ describe('listing-tracker', () => {
     });
   });
 });
+
+// ── Additional branch coverage ────────────────────────────────────────────────
+describe('listing-tracker - additional branch coverage', () => {
+  it('uses empty platform patterns when platform is unknown', async () => {
+    // Covers: platformPatterns[platform] || [] (the || [] fallback for unknown platforms)
+    // extractCurrentPrice uses platformPatterns[platform] || [] for unknown platforms
+    // Call with an unknown platform - will fall back to [] for platform-specific patterns
+    // The function should still use generic pricePatterns
+    const price = extractCurrentPrice('<div>Price: $99.99</div>', 'UNKNOWN_PLATFORM');
+    expect(price).toBe(99.99); // Generic pattern still matches
+  });
+
+  it('handles non-Error throw in tracking cycle error handler', async () => {
+    // Covers: error instanceof Error ? error.message : String(error) (String branch, line 243)
+    (mockPrisma.listing.findMany as jest.Mock).mockResolvedValue([
+      { id: 'listing-1', title: 'Test Item', platform: 'EBAY', url: 'https://ebay.com/1', askingPrice: 100, status: 'NEW', userId: null },
+    ]);
+
+    // Throw a non-Error object to trigger String(error) branch
+    const fetchPage = jest.fn().mockRejectedValue('non-error string thrown');
+    const result = await runTrackingCycle(fetchPage);
+
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].error).toBe('non-error string thrown'); // String('non-error string thrown')
+  });
+});

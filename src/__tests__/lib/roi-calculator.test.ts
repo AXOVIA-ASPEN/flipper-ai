@@ -167,3 +167,18 @@ describe('calculatePortfolioROI', () => {
     expect(result.activeCount).toBe(1);
   });
 });
+
+// ── Additional branch coverage ────────────────────────────────────────────────
+describe('calculatePortfolioROI - edge cases', () => {
+  it('returns overallROI=0 when totalInvested is 0 (empty portfolio)', () => {
+    // Covers: overallROI = totalInvested > 0 ? ... : 0  (the false/zero branch)
+    // Pass items that reduce to totalInvested=0 by having totalRevenue=totalFees=0
+    // but purchasePrice must be positive → use 0 results by mocking 
+    // Alternative: pass empty array - results is empty, totalInvested=0
+    const result = calculatePortfolioROI([]);
+    expect(result.totalInvested).toBe(0);
+    expect(result.overallROI).toBe(0);
+    expect(result.completedCount).toBe(0);
+    expect(result.activeCount).toBe(0);
+  });
+});

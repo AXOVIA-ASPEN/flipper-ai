@@ -290,3 +290,20 @@ describe('Market Value Calculator', () => {
     });
   });
 });
+
+// ── Additional branch coverage ────────────────────────────────────────────────
+describe('calculateVerifiedMarketValue - default platform parameter', () => {
+  it('uses default platform (EBAY) when platform is not provided', async () => {
+    // Covers the default parameter branch: platform: string = 'EBAY'
+    (mockPrisma.priceHistory.findMany as jest.Mock).mockResolvedValue([
+      { soldPrice: 200, soldAt: new Date(), platform: 'EBAY', condition: 'Good' },
+      { soldPrice: 220, soldAt: new Date(), platform: 'EBAY', condition: 'Good' },
+      { soldPrice: 180, soldAt: new Date(), platform: 'EBAY', condition: 'Good' },
+    ]);
+
+    // Call WITHOUT the platform argument → uses default 'EBAY'
+    const result = await calculateVerifiedMarketValue('Test Product');
+    expect(result).not.toBeNull();
+    expect(result!.marketDataSource).toBe('ebay_sold');
+  });
+});
