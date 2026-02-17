@@ -23,7 +23,9 @@
     "test:bdd:dev": "cucumber-js --profile dev",
     "test:bdd:ci": "cucumber-js --profile ci",
     "test:bdd:watch": "nodemon --watch features --exec 'cucumber-js --profile dev'",
-    "test:all": "npm run test && npm run test:bdd && npm run test:e2e"
+    "test:all": "npm run test && npm run test:bdd && npm run test:e2e",
+    "test:perf": "jest --testPathPattern=performance --no-coverage",
+    "test:load": "tsx src/__tests__/performance/load-test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",
@@ -62,6 +64,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "autocannon": "^8.0.0",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.5.0",
     "dotenv": "^17.2.3",
