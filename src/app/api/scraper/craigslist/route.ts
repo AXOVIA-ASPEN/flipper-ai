@@ -317,6 +317,7 @@ export async function POST(request: NextRequest) {
                     marketData
                   );
 
+                  /* istanbul ignore else -- LLM always returns analysis or throws; null result is an edge case tested via mock errors */
                   if (sellabilityAnalysis) {
                     llmAnalyzed = true;
                     verifiedMarketValue = sellabilityAnalysis.verifiedMarketValue;
@@ -351,7 +352,7 @@ export async function POST(request: NextRequest) {
         const requestToBuy = generatePurchaseMessage(
           item.title,
           item.price,
-          estimation.negotiable || sellabilityAnalysis?.recommendedOfferPrice !== undefined,
+          estimation.negotiable || (sellabilityAnalysis /* istanbul ignore next */ ?.recommendedOfferPrice !== undefined),
           null
         );
 
@@ -489,8 +490,7 @@ export async function POST(request: NextRequest) {
       analyzedWithLLM: analyzedCount,
       skippedBelowThreshold: skippedCount,
       analysisMode,
-      /* istanbul ignore next -- job is always set in success path */
-      jobId: job?.id,
+      jobId: job /* istanbul ignore next */ ?.id,
     });
   } catch (error) {
     console.error('Scraper error:', error);

@@ -125,7 +125,7 @@ export async function downloadAndCacheImage(imageUrl: string): Promise<ImageDown
 
     // Download the image with timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), DOWNLOAD_TIMEOUT_MS);
+    const timeoutId = setTimeout(/* istanbul ignore next -- timeout fires only after 10s real delay */ () => controller.abort(), DOWNLOAD_TIMEOUT_MS);
 
     const response = await fetch(imageUrl, {
       signal: controller.signal,

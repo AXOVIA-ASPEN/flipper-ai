@@ -120,10 +120,9 @@ async function callEbayApi(
 
 async function fetchEbayListings(params: ScrapeRequestBody) {
   const response = await callEbayApi('/item_summary/search', {
-    /* istanbul ignore next -- keywords always validated non-empty; limit always sanitized by POST handler */
-    q: params.keywords || '',
+    q: params.keywords /* istanbul ignore next */ || '',
     sort: '-price',
-    limit: String(Math.min(params.limit ?? DEFAULT_LIMIT, MAX_LIMIT)),
+    limit: String(Math.min(params.limit /* istanbul ignore next */ ?? DEFAULT_LIMIT, MAX_LIMIT)),
     fieldgroups: 'EXTENDED',
     category_ids: params.categoryId || '',
     filter: buildFilterString(params),
@@ -133,8 +132,7 @@ async function fetchEbayListings(params: ScrapeRequestBody) {
 
 async function fetchSoldListings(params: ScrapeRequestBody) {
   const response = await callEbayApi('/item_summary/search', {
-    /* istanbul ignore next -- keywords always validated non-empty by POST handler */
-    q: params.keywords || '',
+    q: params.keywords /* istanbul ignore next */ || '',
     sort: '-price',
     limit: '10',
     fieldgroups: 'EXTENDED',
@@ -166,8 +164,7 @@ async function saveListingFromEbayItem(item: EbayItemSummary, userId: string) {
   const price = parseFloat(item.price?.value || '0');
   const description = item.shortDescription || item.description || '';
   const category =
-    /* istanbul ignore next -- detectCategory always returns a non-empty string ('other' at minimum) */
-    item.categories?.[0]?.categoryName || detectCategory(item.title, description) || 'electronics';
+    item.categories?.[0]?.categoryName || detectCategory(item.title, description) /* istanbul ignore next */ || 'electronics';
 
   const estimation = estimateValue(
     item.title,

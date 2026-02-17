@@ -349,6 +349,18 @@ describe('PATCH /api/user/settings', () => {
     expect(data.error).toContain('Invalid notification frequency');
   });
 
+  it('should update notifySoldItems preference', async () => {
+    const updated = { ...mockUser.settings, notifySoldItems: false };
+    mockUpdateSettings.mockResolvedValue(updated);
+
+    const req = createMockRequest('PATCH', { notifySoldItems: false });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(data.data.notifySoldItems).toBe(false);
+  });
+
   it('should return notification preferences in GET response', async () => {
     mockFindUnique.mockResolvedValue(mockUser);
 
