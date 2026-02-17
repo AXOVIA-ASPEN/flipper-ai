@@ -12,7 +12,7 @@ import {
   revokeAccessToken,
   calculateExpirationTimestamp,
   isTokenExpiring,
-} from '../../../../flipper-ai/src/scrapers/facebook/auth';
+} from '@/scrapers/facebook/auth';
 
 // Mock fetch globally
 global.fetch = jest.fn();
@@ -48,6 +48,11 @@ describe('Facebook Authentication', () => {
 
     it('should not include state parameter when empty string', () => {
       const url = getAuthorizationUrl(mockConfig, '');
+      expect(url).not.toContain('state=');
+    });
+
+    it('should not include state parameter when undefined', () => {
+      const url = getAuthorizationUrl(mockConfig, undefined);
       expect(url).not.toContain('state=');
     });
   });
@@ -115,6 +120,23 @@ describe('Facebook Authentication', () => {
         'Bad Request'
       );
     });
+
+    it('should include correct query parameters in fetch URL', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          access_token: 'token',
+          token_type: 'bearer',
+        }),
+      });
+
+      await exchangeCodeForToken(mockConfig, 'my-code');
+
+      const calledUrl = (global.fetch as jest.Mock).mock.calls[0][0] as string;
+      expect(calledUrl).toContain(`client_id=${mockConfig.appId}`);
+      expect(calledUrl).toContain(`client_secret=${mockConfig.appSecret}`);
+      expect(calledUrl).toContain(`code=my-code`);
+    });
   });
 
   describe('exchangeForLongLivedToken', () => {
@@ -162,6 +184,36 @@ describe('Facebook Authentication', () => {
       await expect(
         exchangeForLongLivedToken(mockConfig, 'bad-token')
       ).rejects.toThrow('Bad Request');
+    });
+
+    it('should fall back to statusText when error object is missing entirely', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+        json: async () => ({}),
+      });
+
+      await expect(
+        exchangeForLongLivedToken(mockConfig, 'bad-token')
+      ).rejects.toThrow('Internal Server Error');
+    });
+
+    it('should include fb_exchange_token grant_type in request', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          access_token: 'long-token',
+          token_type: 'bearer',
+          expires_in: 5184000,
+        }),
+      });
+
+      await exchangeForLongLivedToken(mockConfig, 'short-token');
+
+      const calledUrl = (global.fetch as jest.Mock).mock.calls[0][0] as string;
+      expect(calledUrl).toContain('grant_type=fb_exchange_token');
+      expect(calledUrl).toContain('fb_exchange_token=short-token');
     });
   });
 
@@ -216,7 +268,29 @@ describe('Facebook Authentication', () => {
         }),
       });
 
-      await expect(verifyAccessToken('test-token')).rejects.toThrow();
+      await expect(verifyAccessToken('test-token')).rejects.toThrow(
+        'Token verification failed: Internal Server Error'
+      );
+    });
+
+    it('should construct correct debug_token URL', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: {
+            app_id: 'app1',
+            user_id: 'user1',
+            is_valid: true,
+            expires_at: 9999999999,
+          },
+        }),
+      });
+
+      await verifyAccessToken('abc123');
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://graph.facebook.com/debug_token?input_token=abc123&access_token=abc123'
+      );
     });
   });
 
@@ -263,6 +337,18 @@ describe('Facebook Authentication', () => {
 
       await expect(refreshAccessToken(mockConfig, 'invalid-token')).rejects.toThrow(
         'Token is invalid'
+      );
+    });
+
+    it('should propagate error if verification fetch fails', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: 'Server Error',
+      });
+
+      await expect(refreshAccessToken(mockConfig, 'some-token')).rejects.toThrow(
+        'Token verification failed: Server Error'
       );
     });
   });

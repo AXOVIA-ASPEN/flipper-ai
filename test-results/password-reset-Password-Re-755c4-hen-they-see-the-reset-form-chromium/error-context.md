@@ -1,0 +1,132 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - button "Collapse sidebar" [ref=e6] [cursor=pointer]:
+        - img [ref=e8]
+      - generic [ref=e9]:
+        - img "OpenClaw" [ref=e11]
+        - generic [ref=e12]:
+          - generic [ref=e13]: OPENCLAW
+          - generic [ref=e14]: Gateway Dashboard
+    - generic [ref=e15]:
+      - generic [ref=e16]:
+        - generic [ref=e18]: Health
+        - generic [ref=e19]: Offline
+      - group "Theme" [ref=e21]:
+        - button "System theme" [pressed] [ref=e23] [cursor=pointer]:
+          - img [ref=e24]
+        - button "Light theme" [ref=e26] [cursor=pointer]:
+          - img [ref=e27]
+        - button "Dark theme" [ref=e33] [cursor=pointer]:
+          - img [ref=e34]
+  - complementary [ref=e36]:
+    - generic [ref=e37]:
+      - button "Chat −" [expanded] [ref=e38] [cursor=pointer]:
+        - generic [ref=e39]: Chat
+        - generic [ref=e40]: −
+      - link "Chat" [ref=e42] [cursor=pointer]:
+        - /url: /login/chat
+        - img [ref=e44]
+        - generic [ref=e46]: Chat
+    - generic [ref=e47]:
+      - button "Control −" [expanded] [ref=e48] [cursor=pointer]:
+        - generic [ref=e49]: Control
+        - generic [ref=e50]: −
+      - generic [ref=e51]:
+        - link "Overview" [ref=e52] [cursor=pointer]:
+          - /url: /login/overview
+          - img [ref=e54]
+          - generic [ref=e55]: Overview
+        - link "Channels" [ref=e56] [cursor=pointer]:
+          - /url: /login/channels
+          - img [ref=e58]
+          - generic [ref=e61]: Channels
+        - link "Instances" [ref=e62] [cursor=pointer]:
+          - /url: /login/instances
+          - img [ref=e64]
+          - generic [ref=e67]: Instances
+        - link "Sessions" [ref=e68] [cursor=pointer]:
+          - /url: /login/sessions
+          - img [ref=e70]
+          - generic [ref=e73]: Sessions
+        - link "Usage" [ref=e74] [cursor=pointer]:
+          - /url: /login/usage
+          - img [ref=e76]
+          - generic [ref=e77]: Usage
+        - link "Cron Jobs" [ref=e78] [cursor=pointer]:
+          - /url: /login/cron
+          - img [ref=e80]
+          - generic [ref=e85]: Cron Jobs
+    - generic [ref=e86]:
+      - button "Agent −" [expanded] [ref=e87] [cursor=pointer]:
+        - generic [ref=e88]: Agent
+        - generic [ref=e89]: −
+      - generic [ref=e90]:
+        - link "Agents" [ref=e91] [cursor=pointer]:
+          - /url: /login/agents
+          - img [ref=e93]
+          - generic [ref=e95]: Agents
+        - link "Skills" [ref=e96] [cursor=pointer]:
+          - /url: /login/skills
+          - img [ref=e98]
+          - generic [ref=e100]: Skills
+        - link "Nodes" [ref=e101] [cursor=pointer]:
+          - /url: /login/nodes
+          - img [ref=e103]
+          - generic [ref=e105]: Nodes
+    - generic [ref=e106]:
+      - button "Settings −" [expanded] [ref=e107] [cursor=pointer]:
+        - generic [ref=e108]: Settings
+        - generic [ref=e109]: −
+      - generic [ref=e110]:
+        - link "Config" [ref=e111] [cursor=pointer]:
+          - /url: /login/config
+          - img [ref=e113]
+          - generic [ref=e116]: Config
+        - link "Debug" [ref=e117] [cursor=pointer]:
+          - /url: /login/debug
+          - img [ref=e119]
+          - generic [ref=e128]: Debug
+        - link "Logs" [ref=e129] [cursor=pointer]:
+          - /url: /login/logs
+          - img [ref=e131]
+          - generic [ref=e134]: Logs
+    - generic [ref=e135]:
+      - generic [ref=e137]: Resources
+      - link "Docs" [ref=e139] [cursor=pointer]:
+        - /url: https://docs.openclaw.ai
+        - img [ref=e141]
+        - generic [ref=e143]: Docs
+  - main [ref=e144]:
+    - generic [ref=e145]:
+      - generic [ref=e146]:
+        - generic [ref=e147]: Chat
+        - generic [ref=e148]: Direct gateway chat session for quick interventions.
+      - generic [ref=e149]:
+        - generic [ref=e150]: "disconnected (1008): unauthorized: gateway token missing (open the dashboard URL and paste the token in Control UI settings)"
+        - generic [ref=e151]:
+          - combobox [disabled] [ref=e153] [cursor=pointer]:
+            - option "main" [selected]
+          - button "Refresh chat data" [disabled] [ref=e154]:
+            - img [ref=e155]
+          - generic [ref=e158]: "|"
+          - button "Toggle assistant thinking/working output" [pressed] [ref=e159] [cursor=pointer]:
+            - img [ref=e160]
+          - button "Toggle focus mode (hide sidebar + page header)" [ref=e170] [cursor=pointer]:
+            - img [ref=e171]
+    - generic [ref=e177]:
+      - generic [ref=e178]: Disconnected from gateway.
+      - generic [ref=e179]: "disconnected (1008): unauthorized: gateway token missing (open the dashboard URL and paste the token in Control UI settings)"
+      - log [ref=e182]
+      - generic [ref=e184]:
+        - textbox [disabled] [ref=e186]:
+          - /placeholder: Connect to the gateway to start chatting…
+        - generic [ref=e187]:
+          - button "New session" [disabled] [ref=e188]
+          - button "Send ↵" [disabled] [ref=e189]:
+            - text: Send
+            - generic [ref=e190]: ↵
+```
