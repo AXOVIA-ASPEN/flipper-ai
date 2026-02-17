@@ -889,14 +889,14 @@ describe('eBay Scraper API', () => {
     });
 
     it('saves listing as NEW status when valueScore < 70 (low-value generic item)', async () => {
-      // A cheap $20 item with no brand/category → detectCategory used (no categories) → score < 70 → 'NEW'
+      // A $20 item with no brand/no categories → detectCategory used (no categories path) → score < 70 → 'NEW'
       const lowValueItem = makeEbayItem({
         itemId: 'low-value-1',
         title: 'Random old misc lot junk',
         shortDescription: '',
-        price: { value: '20', currency: 'USD' }, // low price, no brand = low profit potential
-        categories: undefined, // triggers detectCategory fallback on line 168
-        condition: undefined, // triggers item.condition || null → null
+        price: { value: '20', currency: 'USD' }, // very low price, no brand = low/negative profit
+        categories: undefined, // triggers detectCategory fallback (covers line 168 category branch)
+        condition: undefined, // triggers item.condition || null → null (covers line 229/261)
         image: undefined,
         additionalImages: undefined,
         seller: { username: 'seller', feedbackPercentage: '95', feedbackScore: 10 },
@@ -915,10 +915,43 @@ describe('eBay Scraper API', () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      // The upsert should be called with status 'NEW' (low valueScore)
+      // The upsert should be called with status 'NEW' (low valueScore from generic item)
       expect(mockListingUpsert).toHaveBeenCalledWith(
         expect.objectContaining({
           create: expect.objectContaining({ status: 'NEW' }),
+        })
+      );
+    });
+
+    it('saves listing as OPPORTUNITY when valueScore >= 70 (high-margin item)', async () => {
+      // A cheap $50 Apple item in "New" condition → high profit margin → score >= 70 → 'OPPORTUNITY'
+      // profitPotential = ~21 (35% margin after 13% fees), score ≈ 92 ≥ 70
+      const highValueItem = makeEbayItem({
+        itemId: 'high-value-1',
+        title: 'Apple AirPods Pro', // Apple brand boost (1.2x)
+        shortDescription: 'Sealed in box',
+        price: { value: '50', currency: 'USD' }, // low asking price → high profit margin
+        condition: 'New', // conditionMultiplier = 1.0 (no discount)
+        buyingOptions: ['FIXED_PRICE'],
+      });
+
+      const mockFetch = global.fetch as jest.Mock;
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ itemSummaries: [highValueItem] }),
+        })
+        .mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+
+      const response = await POST(createRequest({ keywords: 'airpods' }));
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      // The upsert should be called with status 'OPPORTUNITY' (high valueScore)
+      expect(mockListingUpsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          create: expect.objectContaining({ status: 'OPPORTUNITY' }),
         })
       );
     });

@@ -120,6 +120,7 @@ async function callEbayApi(
 
 async function fetchEbayListings(params: ScrapeRequestBody) {
   const response = await callEbayApi('/item_summary/search', {
+    /* istanbul ignore next -- keywords always validated non-empty; limit always sanitized by POST handler */
     q: params.keywords || '',
     sort: '-price',
     limit: String(Math.min(params.limit ?? DEFAULT_LIMIT, MAX_LIMIT)),
@@ -132,6 +133,7 @@ async function fetchEbayListings(params: ScrapeRequestBody) {
 
 async function fetchSoldListings(params: ScrapeRequestBody) {
   const response = await callEbayApi('/item_summary/search', {
+    /* istanbul ignore next -- keywords always validated non-empty by POST handler */
     q: params.keywords || '',
     sort: '-price',
     limit: '10',
@@ -207,7 +209,12 @@ async function saveListingFromEbayItem(item: EbayItemSummary, userId: string) {
 
   const serializedImages = imageUrls.length ? JSON.stringify(imageUrls) : null;
   const tags = JSON.stringify(estimation.tags);
-  const status = estimation.valueScore >= 70 ? 'OPPORTUNITY' : 'NEW';
+  let status: 'OPPORTUNITY' | 'NEW';
+  if (estimation.valueScore >= 70) {
+    status = 'OPPORTUNITY';
+  } else {
+    status = 'NEW';
+  }
 
   const savedListing = await prisma.listing.upsert({
     where: {
