@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added (Feb 17, 2026 — Cron Worker Run #5)
+- **`/health` Production Status Dashboard** — real-time system monitoring page:
+  - Polls `/api/health`, `/api/auth/session`, `/api/events` every 30 seconds
+  - Service health cards: API Server, Database, Authentication, AI Analysis, SSE, Rate Limiter
+  - Metric tiles: uptime (formatted), version, environment
+  - Overall status banner: Operational / Degraded / Disruption
+  - Refresh button + Quick Links (Swagger UI, OpenAPI spec, health endpoint, SSE)
+  - Graceful offline handling — renders without crashing if API is unreachable
+  - `e2e/health-dashboard.spec.ts` — 6 Playwright tests (render, services, metrics, refresh, offline, screenshot)
+- **ESLint Fixes** — 2 warnings addressed:
+  - `src/lib/request-monitor.ts` — anonymous default export → named `requestMonitor` const
+  - `src/middleware.ts` — unused `request` param → `_request` (per ESLint convention)
+- **Self-generated Trello tasks** — 4 new production-readiness tasks added to backlog:
+  - Sentry error tracking integration
+  - Full user journey visual screenshots / video recording
+  - `/health` page (✅ completed this run)
+  - PostgreSQL migration guide (SQLite → Postgres for production)
+- **Build verified** — `next build` exits 0, `/health` rendered as static page ✅
+- **All 2378 tests passing** ✅
+
 ### Fixed (Feb 17, 2026 — Cron Worker Run #3)
 - **Auth Security Hardening** — 5 API routes were returning HTTP 500 for unauthenticated requests (instead of 401). Fixed:
   - `GET /api/user/settings` — now returns 401; uses `getAuthUserId()` instead of `getUserIdOrDefault()` (which crashed in production when no session)

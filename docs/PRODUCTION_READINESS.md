@@ -4,7 +4,7 @@
 **Company:** Axovia AI  
 **Date:** February 17, 2026  
 **Status:** 🟡 READY TO DEPLOY (pending Vercel credentials)
-**Last Updated:** February 17, 2026 (Run #4 — Playwright CI webServer fix)
+**Last Updated:** February 17, 2026 (Run #5 — /health dashboard + ESLint fixes)
 
 ---
 
@@ -46,6 +46,7 @@
 - [x] **API smoke tests** — 22/22 passing against `http://localhost:3001` (PM2 staging, all 3 browsers)
 - [x] Playwright config supports `BASE_URL` env var for flexible staging/prod targeting
 - [x] **webServer auto-launch** — `playwright.config.ts` auto-starts `next start` in CI (Feb 17 Run #4)
+- [x] **Health dashboard E2E** — 6 tests: service list, metric cards, refresh, offline mode, screenshot (Feb 17 Run #5)
 
 ### CI/CD
 - [x] GitHub Actions CI pipeline (`.github/workflows/ci.yml`)
@@ -63,6 +64,7 @@
 - [x] **OpenAPI 3.0 spec** — `GET /api/docs` returns full machine-readable spec
 - [x] **Swagger UI** — interactive API explorer at `/docs` (try-it-out, auth persistence)
 - [x] **Real-time SSE** — `GET /api/events` push notifications + `useSseEvents` React hook
+- [x] **`/health` status dashboard** — real-time system monitoring page (Feb 17 Run #5)
 
 ---
 
