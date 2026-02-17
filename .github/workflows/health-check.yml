@@ -1,0 +1,57 @@
+name: 🏥 Health Check
+
+on:
+  schedule:
+    # Every 15 minutes (GitHub Actions minimum practical interval)
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'Health check URL (defaults to staging)'
+        required: false
+        default: ''
+
+jobs:
+  health-check:
+    name: Check /api/health
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Determine URL
+        id: url
+        run: |
+          URL="${{ github.event.inputs.url }}"
+          if [ -z "$URL" ]; then
+            URL="${{ secrets.PRODUCTION_URL }}"
+          fi
+          if [ -z "$URL" ]; then
+            echo "No PRODUCTION_URL secret set — skipping external health check"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "url=$URL" >> $GITHUB_OUTPUT
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check /api/health endpoint
+        if: steps.url.outputs.skip != 'true'
+        run: |
+          echo "Checking ${{ steps.url.outputs.url }}/api/health"
+          RESPONSE=$(curl -sf --max-time 15 "${{ steps.url.outputs.url }}/api/health")
+          EXIT=$?
+          if [ $EXIT -ne 0 ]; then
+            echo "❌ Health check FAILED — curl exit code: $EXIT"
+            exit 1
+          fi
+          echo "Response: $RESPONSE"
+          STATUS=$(echo "$RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('status','unknown'))")
+          if [ "$STATUS" != "ok" ]; then
+            echo "❌ Service status is '$STATUS' (expected 'ok')"
+            exit 1
+          fi
+          echo "✅ Health check passed — status: $STATUS"
+
+      - name: Report skip
+        if: steps.url.outputs.skip == 'true'
+        run: |
+          echo "ℹ️ Health check skipped — set PRODUCTION_URL secret to enable"
+          echo "   Go to: Settings → Secrets → PRODUCTION_URL = https://your-app.vercel.app"

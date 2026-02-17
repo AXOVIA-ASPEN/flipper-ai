@@ -4,7 +4,7 @@
 **Company:** Axovia AI  
 **Date:** February 17, 2026  
 **Status:** 🟡 READY TO DEPLOY (pending Vercel credentials)
-**Last Updated:** February 17, 2026 (Run #6 — User journey screenshots + PG migration docs + UX empty states)
+**Last Updated:** February 17, 2026 (Run #7 — Uptime monitoring docs + GitHub Actions health check + health-monitor.sh)
 
 ---
 
@@ -69,6 +69,16 @@
 - [x] **`docs/USER_FLOWS.md`** — complete flow documentation with E2E test coverage map (Feb 17 Run #6)
 - [x] **`docs/DATABASE_MIGRATION.md`** — SQLite→PostgreSQL migration guide with Docker, pooling, data scripts (Feb 17 Run #6)
 - [x] **UX empty states** — kanban columns, messages page, dashboard now have meaningful empty states + CTAs (Feb 17 Run #6)
+- [x] **Monitoring documentation** — `docs/MONITORING.md` covers UptimeRobot, BetterStack, GitHub Actions health check (Feb 17 Run #7)
+- [x] **GitHub Actions health check** — `.github/workflows/health-check.yml` polls `/api/health` every 15 min; activate via `PRODUCTION_URL` secret (Feb 17 Run #7)
+- [x] **`scripts/health-monitor.sh`** — cron-ready shell script for PM2/staging self-monitoring (Feb 17 Run #7)
+
+### ⏳ Uptime Monitoring (External Service — Needs Stephen)
+- [ ] Sign up for [UptimeRobot](https://uptimerobot.com) or [BetterStack](https://betterstack.com)
+- [ ] Add monitor: `https://YOUR_PROD_URL/api/health` (keyword: `"status":"ok"`)
+- [ ] Add `PRODUCTION_URL` GitHub secret to activate `health-check.yml` workflow
+- [ ] Copy monitor badge ID → update README uptime badges
+- See: `docs/MONITORING.md` for complete step-by-step
 
 ---
 

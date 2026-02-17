@@ -1,11 +1,12 @@
 # 🐧 Flipper.ai
 
 [![CI/CD Pipeline](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml)
+[![Health Check](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/health-check.yml/badge.svg)](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/health-check.yml)
 [![Tests](https://img.shields.io/badge/tests-2378-brightgreen)](.)
 [![Test Suites](https://img.shields.io/badge/test%20suites-116-brightgreen)](.)
-[![Coverage](https://img.shields.io/badge/coverage-99.66%25-brightgreen)](.)
-[![Branches](https://img.shields.io/badge/branches-99.31%25-brightgreen)](.)
-[![Functions](https://img.shields.io/badge/functions-99.79%25-brightgreen)](.)
+[![Coverage](https://img.shields.io/badge/coverage-99.46%25-brightgreen)](.)
+[![Branches](https://img.shields.io/badge/branches-99.07%25-brightgreen)](.)
+[![Functions](https://img.shields.io/badge/functions-99.80%25-brightgreen)](.)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](.)
 [![Version](https://img.shields.io/badge/version-1.0.1-blue)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -264,6 +265,35 @@ pnpm format        # Format with Prettier
 pnpm format:check  # Check formatting
 ```
 
+## 🏥 Monitoring & Uptime
+
+Flipper AI exposes a health endpoint for external monitoring:
+
+```
+GET /api/health
+→ { "status": "ok", "environment": "production", "timestamp": "...", "version": "1.0.1" }
+```
+
+### Setting Up Uptime Monitoring
+
+See **[docs/MONITORING.md](docs/MONITORING.md)** for full setup guide. Quick options:
+
+| Provider | Free Tier | Check Interval | Setup |
+|----------|-----------|----------------|-------|
+| [UptimeRobot](https://uptimerobot.com) | ✅ 50 monitors | 5 min | Easiest |
+| [BetterStack](https://betterstack.com) | ✅ 10 monitors | 30 sec | Best quality |
+| GitHub Actions | ✅ Unlimited | 15 min | Zero signup |
+
+**GitHub Actions health check** is already configured at `.github/workflows/health-check.yml`. Add `PRODUCTION_URL` to repo secrets to activate it.
+
+**Local staging monitor:**
+```bash
+./scripts/health-monitor.sh          # Check staging (localhost:3001)
+HEALTH_URL=https://prod.app/api/health ./scripts/health-monitor.sh
+```
+
+---
+
 ## 📊 Project Status
 
 **Current State: Production Ready (Pending Deployment Credentials)**
@@ -271,16 +301,19 @@ pnpm format:check  # Check formatting
 | Milestone                      | Status |
 | ------------------------------ | ------ |
 | Core feature implementation    | ✅ Complete |
-| Unit tests (Jest)              | ✅ 2297 tests, 111 suites + 77 integration tests (6 suites) |
-| Statement coverage             | ✅ 99.64% |
-| Branch coverage                | ✅ 98.22% |
-| Function coverage              | ✅ 99.79% |
+| Unit tests (Jest)              | ✅ 2378 tests, 116 suites |
+| Statement coverage             | ✅ 99.46% |
+| Branch coverage                | ✅ 99.07% |
+| Function coverage              | ✅ 99.80% |
 | BDD acceptance tests           | ✅ 70 scenarios / 572 steps |
-| E2E Playwright tests           | ✅ Critical paths covered |
+| E2E Playwright tests           | ✅ Critical paths + user journeys |
 | GitHub Actions CI/CD           | ✅ lint → typecheck → test → build |
+| GitHub Actions health check    | ✅ Configured (needs PRODUCTION_URL secret) |
+| Uptime monitoring (external)   | ⏳ Awaiting provider signup (see docs/MONITORING.md) |
 | TypeScript strict mode         | ✅ Zero `any` types |
 | ESLint / Prettier              | ✅ Clean |
 | API documentation              | ✅ Full endpoint coverage |
+| Sentry error tracking          | ✅ Configured |
 | Production deployment (Vercel) | ⏳ Awaiting Vercel credentials |
 | PostgreSQL migration           | ⏳ Awaiting production DB setup |
 

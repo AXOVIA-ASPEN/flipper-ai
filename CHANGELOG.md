@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added (Feb 17, 2026 — Cron Worker Run #7)
+- **Uptime Monitoring Infrastructure** — comprehensive setup for external health checks:
+  - `docs/MONITORING.md` — full guide covering UptimeRobot, BetterStack, and GitHub Actions options
+  - `.github/workflows/health-check.yml` — scheduled health check (every 15 min) via GitHub Actions; activates when `PRODUCTION_URL` secret is set
+  - `scripts/health-monitor.sh` — cron-ready shell script for PM2/staging self-monitoring with optional Slack webhook alerts
+- **README update** — added "Monitoring & Uptime" section with health endpoint docs, provider comparison table, usage examples; updated coverage badge numbers to current (99.46% stmt, 99.07% branch)
+- **PRODUCTION_READINESS.md update** — documented all monitoring deliverables + actionable ⏳ checklist for Stephen (sign up for external service)
+
 ### Added (Feb 17, 2026 — Cron Worker Run #5)
 - **`/health` Production Status Dashboard** — real-time system monitoring page:
   - Polls `/api/health`, `/api/auth/session`, `/api/events` every 30 seconds
