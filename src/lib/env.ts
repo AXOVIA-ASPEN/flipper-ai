@@ -39,6 +39,11 @@ const envSchema = z.object({
   GOOGLE_API_KEY: z.string().optional(),
   FLIPPER_API_KEYS: z.string().optional(),
 
+  // Email (Resend)
+  RESEND_API_KEY: z.string().optional(),
+  EMAIL_FROM: z.string().optional(),
+  APP_URL: z.string().url().optional(),
+
   // Feature Flags
   ENABLE_OAUTH_GOOGLE: z
     .string()

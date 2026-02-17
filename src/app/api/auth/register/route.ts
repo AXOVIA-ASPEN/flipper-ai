@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/db';
+import { emailService } from '@/lib/email-service';
 
 interface RegisterBody {
   email: string;
@@ -76,6 +77,11 @@ export async function POST(request: NextRequest) {
         image: true,
         createdAt: true,
       },
+    });
+
+    // Send welcome email (non-blocking — don't fail registration if email fails)
+    emailService.sendWelcome({ name: user.name ?? undefined, email: user.email }).catch((err) => {
+      console.error('Failed to send welcome email:', err);
     });
 
     return NextResponse.json({
