@@ -53,6 +53,13 @@ const mockUser = {
     llmModel: 'gpt-4o-mini',
     discountThreshold: 50,
     autoAnalyze: true,
+    emailNotifications: true,
+    notifyNewDeals: true,
+    notifyPriceDrops: true,
+    notifySoldItems: true,
+    notifyExpiring: true,
+    notifyWeeklyDigest: true,
+    notifyFrequency: 'instant',
     createdAt: new Date(),
     updatedAt: new Date(),
   },
@@ -278,5 +285,82 @@ describe('PATCH /api/user/settings', () => {
 
     expect(response.status).toBe(500);
     expect(data.success).toBe(false);
+  });
+
+  // Email notification preference tests
+  it('should update emailNotifications toggle', async () => {
+    const updated = { ...mockUser.settings, emailNotifications: false };
+    mockUpdateSettings.mockResolvedValue(updated);
+
+    const req = createMockRequest('PATCH', { emailNotifications: false });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(data.data.emailNotifications).toBe(false);
+  });
+
+  it('should update individual notification preferences', async () => {
+    const updated = {
+      ...mockUser.settings,
+      notifyNewDeals: false,
+      notifyPriceDrops: false,
+      notifySoldItems: true,
+      notifyExpiring: false,
+      notifyWeeklyDigest: false,
+    };
+    mockUpdateSettings.mockResolvedValue(updated);
+
+    const req = createMockRequest('PATCH', {
+      notifyNewDeals: false,
+      notifyPriceDrops: false,
+      notifyExpiring: false,
+      notifyWeeklyDigest: false,
+    });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(data.data.notifyNewDeals).toBe(false);
+    expect(data.data.notifyPriceDrops).toBe(false);
+    expect(data.data.notifySoldItems).toBe(true);
+    expect(data.data.notifyExpiring).toBe(false);
+    expect(data.data.notifyWeeklyDigest).toBe(false);
+  });
+
+  it('should update notifyFrequency to daily', async () => {
+    const updated = { ...mockUser.settings, notifyFrequency: 'daily' };
+    mockUpdateSettings.mockResolvedValue(updated);
+
+    const req = createMockRequest('PATCH', { notifyFrequency: 'daily' });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(data.data.notifyFrequency).toBe('daily');
+  });
+
+  it('should reject invalid notifyFrequency', async () => {
+    const req = createMockRequest('PATCH', { notifyFrequency: 'hourly' });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(data.error).toContain('Invalid notification frequency');
+  });
+
+  it('should return notification preferences in GET response', async () => {
+    mockFindUnique.mockResolvedValue(mockUser);
+
+    const response = await GET();
+    const data = await response.json();
+
+    expect(data.data.emailNotifications).toBe(true);
+    expect(data.data.notifyNewDeals).toBe(true);
+    expect(data.data.notifyPriceDrops).toBe(true);
+    expect(data.data.notifySoldItems).toBe(true);
+    expect(data.data.notifyExpiring).toBe(true);
+    expect(data.data.notifyWeeklyDigest).toBe(true);
+    expect(data.data.notifyFrequency).toBe('instant');
   });
 });

@@ -1682,6 +1682,13 @@ export const UserSettingsScalarFieldEnum = {
   llmModel: 'llmModel',
   discountThreshold: 'discountThreshold',
   autoAnalyze: 'autoAnalyze',
+  emailNotifications: 'emailNotifications',
+  notifyNewDeals: 'notifyNewDeals',
+  notifyPriceDrops: 'notifyPriceDrops',
+  notifySoldItems: 'notifySoldItems',
+  notifyExpiring: 'notifyExpiring',
+  notifyWeeklyDigest: 'notifyWeeklyDigest',
+  notifyFrequency: 'notifyFrequency',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

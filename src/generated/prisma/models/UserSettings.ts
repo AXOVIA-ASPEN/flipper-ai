@@ -41,6 +41,13 @@ export type UserSettingsMinAggregateOutputType = {
   llmModel: string | null
   discountThreshold: number | null
   autoAnalyze: boolean | null
+  emailNotifications: boolean | null
+  notifyNewDeals: boolean | null
+  notifyPriceDrops: boolean | null
+  notifySoldItems: boolean | null
+  notifyExpiring: boolean | null
+  notifyWeeklyDigest: boolean | null
+  notifyFrequency: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -52,6 +59,13 @@ export type UserSettingsMaxAggregateOutputType = {
   llmModel: string | null
   discountThreshold: number | null
   autoAnalyze: boolean | null
+  emailNotifications: boolean | null
+  notifyNewDeals: boolean | null
+  notifyPriceDrops: boolean | null
+  notifySoldItems: boolean | null
+  notifyExpiring: boolean | null
+  notifyWeeklyDigest: boolean | null
+  notifyFrequency: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -63,6 +77,13 @@ export type UserSettingsCountAggregateOutputType = {
   llmModel: number
   discountThreshold: number
   autoAnalyze: number
+  emailNotifications: number
+  notifyNewDeals: number
+  notifyPriceDrops: number
+  notifySoldItems: number
+  notifyExpiring: number
+  notifyWeeklyDigest: number
+  notifyFrequency: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -84,6 +105,13 @@ export type UserSettingsMinAggregateInputType = {
   llmModel?: true
   discountThreshold?: true
   autoAnalyze?: true
+  emailNotifications?: true
+  notifyNewDeals?: true
+  notifyPriceDrops?: true
+  notifySoldItems?: true
+  notifyExpiring?: true
+  notifyWeeklyDigest?: true
+  notifyFrequency?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -95,6 +123,13 @@ export type UserSettingsMaxAggregateInputType = {
   llmModel?: true
   discountThreshold?: true
   autoAnalyze?: true
+  emailNotifications?: true
+  notifyNewDeals?: true
+  notifyPriceDrops?: true
+  notifySoldItems?: true
+  notifyExpiring?: true
+  notifyWeeklyDigest?: true
+  notifyFrequency?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -106,6 +141,13 @@ export type UserSettingsCountAggregateInputType = {
   llmModel?: true
   discountThreshold?: true
   autoAnalyze?: true
+  emailNotifications?: true
+  notifyNewDeals?: true
+  notifyPriceDrops?: true
+  notifySoldItems?: true
+  notifyExpiring?: true
+  notifyWeeklyDigest?: true
+  notifyFrequency?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -204,6 +246,13 @@ export type UserSettingsGroupByOutputType = {
   llmModel: string
   discountThreshold: number
   autoAnalyze: boolean
+  emailNotifications: boolean
+  notifyNewDeals: boolean
+  notifyPriceDrops: boolean
+  notifySoldItems: boolean
+  notifyExpiring: boolean
+  notifyWeeklyDigest: boolean
+  notifyFrequency: string
   createdAt: Date
   updatedAt: Date
   _count: UserSettingsCountAggregateOutputType | null
@@ -238,6 +287,13 @@ export type UserSettingsWhereInput = {
   llmModel?: Prisma.StringFilter<"UserSettings"> | string
   discountThreshold?: Prisma.IntFilter<"UserSettings"> | number
   autoAnalyze?: Prisma.BoolFilter<"UserSettings"> | boolean
+  emailNotifications?: Prisma.BoolFilter<"UserSettings"> | boolean
+  notifyNewDeals?: Prisma.BoolFilter<"UserSettings"> | boolean
+  notifyPriceDrops?: Prisma.BoolFilter<"UserSettings"> | boolean
+  notifySoldItems?: Prisma.BoolFilter<"UserSettings"> | boolean
+  notifyExpiring?: Prisma.BoolFilter<"UserSettings"> | boolean
+  notifyWeeklyDigest?: Prisma.BoolFilter<"UserSettings"> | boolean
+  notifyFrequency?: Prisma.StringFilter<"UserSettings"> | string
   createdAt?: Prisma.DateTimeFilter<"UserSettings"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserSettings"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -250,6 +306,13 @@ export type UserSettingsOrderByWithRelationInput = {
   llmModel?: Prisma.SortOrder
   discountThreshold?: Prisma.SortOrder
   autoAnalyze?: Prisma.SortOrder
+  emailNotifications?: Prisma.SortOrder
+  notifyNewDeals?: Prisma.SortOrder
+  notifyPriceDrops?: Prisma.SortOrder
+  notifySoldItems?: Prisma.SortOrder
+  notifyExpiring?: Prisma.SortOrder
+  notifyWeeklyDigest?: Prisma.SortOrder
+  notifyFrequency?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -265,6 +328,13 @@ export type UserSettingsWhereUniqueInput = Prisma.AtLeast<{
   llmModel?: Prisma.StringFilter<"UserSettings"> | string
   discountThreshold?: Prisma.IntFilter<"UserSettings"> | number
   autoAnalyze?: Prisma.BoolFilter<"UserSettings"> | boolean
+  emailNotifications?: Prisma.BoolFilter<"UserSettings"> | boolean
+  notifyNewDeals?: Prisma.BoolFilter<"UserSettings"> | boolean
+  notifyPriceDrops?: Prisma.BoolFilter<"UserSettings"> | boolean
+  notifySoldItems?: Prisma.BoolFilter<"UserSettings"> | boolean
+  notifyExpiring?: Prisma.BoolFilter<"UserSettings"> | boolean
+  notifyWeeklyDigest?: Prisma.BoolFilter<"UserSettings"> | boolean
+  notifyFrequency?: Prisma.StringFilter<"UserSettings"> | string
   createdAt?: Prisma.DateTimeFilter<"UserSettings"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserSettings"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -277,6 +347,13 @@ export type UserSettingsOrderByWithAggregationInput = {
   llmModel?: Prisma.SortOrder
   discountThreshold?: Prisma.SortOrder
   autoAnalyze?: Prisma.SortOrder
+  emailNotifications?: Prisma.SortOrder
+  notifyNewDeals?: Prisma.SortOrder
+  notifyPriceDrops?: Prisma.SortOrder
+  notifySoldItems?: Prisma.SortOrder
+  notifyExpiring?: Prisma.SortOrder
+  notifyWeeklyDigest?: Prisma.SortOrder
+  notifyFrequency?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserSettingsCountOrderByAggregateInput
@@ -296,6 +373,13 @@ export type UserSettingsScalarWhereWithAggregatesInput = {
   llmModel?: Prisma.StringWithAggregatesFilter<"UserSettings"> | string
   discountThreshold?: Prisma.IntWithAggregatesFilter<"UserSettings"> | number
   autoAnalyze?: Prisma.BoolWithAggregatesFilter<"UserSettings"> | boolean
+  emailNotifications?: Prisma.BoolWithAggregatesFilter<"UserSettings"> | boolean
+  notifyNewDeals?: Prisma.BoolWithAggregatesFilter<"UserSettings"> | boolean
+  notifyPriceDrops?: Prisma.BoolWithAggregatesFilter<"UserSettings"> | boolean
+  notifySoldItems?: Prisma.BoolWithAggregatesFilter<"UserSettings"> | boolean
+  notifyExpiring?: Prisma.BoolWithAggregatesFilter<"UserSettings"> | boolean
+  notifyWeeklyDigest?: Prisma.BoolWithAggregatesFilter<"UserSettings"> | boolean
+  notifyFrequency?: Prisma.StringWithAggregatesFilter<"UserSettings"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"UserSettings"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"UserSettings"> | Date | string
 }
@@ -306,6 +390,13 @@ export type UserSettingsCreateInput = {
   llmModel?: string
   discountThreshold?: number
   autoAnalyze?: boolean
+  emailNotifications?: boolean
+  notifyNewDeals?: boolean
+  notifyPriceDrops?: boolean
+  notifySoldItems?: boolean
+  notifyExpiring?: boolean
+  notifyWeeklyDigest?: boolean
+  notifyFrequency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutSettingsInput
@@ -318,6 +409,13 @@ export type UserSettingsUncheckedCreateInput = {
   llmModel?: string
   discountThreshold?: number
   autoAnalyze?: boolean
+  emailNotifications?: boolean
+  notifyNewDeals?: boolean
+  notifyPriceDrops?: boolean
+  notifySoldItems?: boolean
+  notifyExpiring?: boolean
+  notifyWeeklyDigest?: boolean
+  notifyFrequency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -328,6 +426,13 @@ export type UserSettingsUpdateInput = {
   llmModel?: Prisma.StringFieldUpdateOperationsInput | string
   discountThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   autoAnalyze?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyNewDeals?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyPriceDrops?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifySoldItems?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyExpiring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyWeeklyDigest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyFrequency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutSettingsNestedInput
@@ -340,6 +445,13 @@ export type UserSettingsUncheckedUpdateInput = {
   llmModel?: Prisma.StringFieldUpdateOperationsInput | string
   discountThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   autoAnalyze?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyNewDeals?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyPriceDrops?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifySoldItems?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyExpiring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyWeeklyDigest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyFrequency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -351,6 +463,13 @@ export type UserSettingsCreateManyInput = {
   llmModel?: string
   discountThreshold?: number
   autoAnalyze?: boolean
+  emailNotifications?: boolean
+  notifyNewDeals?: boolean
+  notifyPriceDrops?: boolean
+  notifySoldItems?: boolean
+  notifyExpiring?: boolean
+  notifyWeeklyDigest?: boolean
+  notifyFrequency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -361,6 +480,13 @@ export type UserSettingsUpdateManyMutationInput = {
   llmModel?: Prisma.StringFieldUpdateOperationsInput | string
   discountThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   autoAnalyze?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyNewDeals?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyPriceDrops?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifySoldItems?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyExpiring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyWeeklyDigest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyFrequency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -372,6 +498,13 @@ export type UserSettingsUncheckedUpdateManyInput = {
   llmModel?: Prisma.StringFieldUpdateOperationsInput | string
   discountThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   autoAnalyze?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyNewDeals?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyPriceDrops?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifySoldItems?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyExpiring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyWeeklyDigest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyFrequency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -388,6 +521,13 @@ export type UserSettingsCountOrderByAggregateInput = {
   llmModel?: Prisma.SortOrder
   discountThreshold?: Prisma.SortOrder
   autoAnalyze?: Prisma.SortOrder
+  emailNotifications?: Prisma.SortOrder
+  notifyNewDeals?: Prisma.SortOrder
+  notifyPriceDrops?: Prisma.SortOrder
+  notifySoldItems?: Prisma.SortOrder
+  notifyExpiring?: Prisma.SortOrder
+  notifyWeeklyDigest?: Prisma.SortOrder
+  notifyFrequency?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -403,6 +543,13 @@ export type UserSettingsMaxOrderByAggregateInput = {
   llmModel?: Prisma.SortOrder
   discountThreshold?: Prisma.SortOrder
   autoAnalyze?: Prisma.SortOrder
+  emailNotifications?: Prisma.SortOrder
+  notifyNewDeals?: Prisma.SortOrder
+  notifyPriceDrops?: Prisma.SortOrder
+  notifySoldItems?: Prisma.SortOrder
+  notifyExpiring?: Prisma.SortOrder
+  notifyWeeklyDigest?: Prisma.SortOrder
+  notifyFrequency?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -414,6 +561,13 @@ export type UserSettingsMinOrderByAggregateInput = {
   llmModel?: Prisma.SortOrder
   discountThreshold?: Prisma.SortOrder
   autoAnalyze?: Prisma.SortOrder
+  emailNotifications?: Prisma.SortOrder
+  notifyNewDeals?: Prisma.SortOrder
+  notifyPriceDrops?: Prisma.SortOrder
+  notifySoldItems?: Prisma.SortOrder
+  notifyExpiring?: Prisma.SortOrder
+  notifyWeeklyDigest?: Prisma.SortOrder
+  notifyFrequency?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -460,6 +614,13 @@ export type UserSettingsCreateWithoutUserInput = {
   llmModel?: string
   discountThreshold?: number
   autoAnalyze?: boolean
+  emailNotifications?: boolean
+  notifyNewDeals?: boolean
+  notifyPriceDrops?: boolean
+  notifySoldItems?: boolean
+  notifyExpiring?: boolean
+  notifyWeeklyDigest?: boolean
+  notifyFrequency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -470,6 +631,13 @@ export type UserSettingsUncheckedCreateWithoutUserInput = {
   llmModel?: string
   discountThreshold?: number
   autoAnalyze?: boolean
+  emailNotifications?: boolean
+  notifyNewDeals?: boolean
+  notifyPriceDrops?: boolean
+  notifySoldItems?: boolean
+  notifyExpiring?: boolean
+  notifyWeeklyDigest?: boolean
+  notifyFrequency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -496,6 +664,13 @@ export type UserSettingsUpdateWithoutUserInput = {
   llmModel?: Prisma.StringFieldUpdateOperationsInput | string
   discountThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   autoAnalyze?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyNewDeals?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyPriceDrops?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifySoldItems?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyExpiring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyWeeklyDigest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyFrequency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -506,6 +681,13 @@ export type UserSettingsUncheckedUpdateWithoutUserInput = {
   llmModel?: Prisma.StringFieldUpdateOperationsInput | string
   discountThreshold?: Prisma.IntFieldUpdateOperationsInput | number
   autoAnalyze?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyNewDeals?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyPriceDrops?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifySoldItems?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyExpiring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyWeeklyDigest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notifyFrequency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -519,6 +701,13 @@ export type UserSettingsSelect<ExtArgs extends runtime.Types.Extensions.Internal
   llmModel?: boolean
   discountThreshold?: boolean
   autoAnalyze?: boolean
+  emailNotifications?: boolean
+  notifyNewDeals?: boolean
+  notifyPriceDrops?: boolean
+  notifySoldItems?: boolean
+  notifyExpiring?: boolean
+  notifyWeeklyDigest?: boolean
+  notifyFrequency?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -531,6 +720,13 @@ export type UserSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   llmModel?: boolean
   discountThreshold?: boolean
   autoAnalyze?: boolean
+  emailNotifications?: boolean
+  notifyNewDeals?: boolean
+  notifyPriceDrops?: boolean
+  notifySoldItems?: boolean
+  notifyExpiring?: boolean
+  notifyWeeklyDigest?: boolean
+  notifyFrequency?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -543,6 +739,13 @@ export type UserSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   llmModel?: boolean
   discountThreshold?: boolean
   autoAnalyze?: boolean
+  emailNotifications?: boolean
+  notifyNewDeals?: boolean
+  notifyPriceDrops?: boolean
+  notifySoldItems?: boolean
+  notifyExpiring?: boolean
+  notifyWeeklyDigest?: boolean
+  notifyFrequency?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -555,11 +758,18 @@ export type UserSettingsSelectScalar = {
   llmModel?: boolean
   discountThreshold?: boolean
   autoAnalyze?: boolean
+  emailNotifications?: boolean
+  notifyNewDeals?: boolean
+  notifyPriceDrops?: boolean
+  notifySoldItems?: boolean
+  notifyExpiring?: boolean
+  notifyWeeklyDigest?: boolean
+  notifyFrequency?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "openaiApiKey" | "llmModel" | "discountThreshold" | "autoAnalyze" | "createdAt" | "updatedAt", ExtArgs["result"]["userSettings"]>
+export type UserSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "openaiApiKey" | "llmModel" | "discountThreshold" | "autoAnalyze" | "emailNotifications" | "notifyNewDeals" | "notifyPriceDrops" | "notifySoldItems" | "notifyExpiring" | "notifyWeeklyDigest" | "notifyFrequency" | "createdAt" | "updatedAt", ExtArgs["result"]["userSettings"]>
 export type UserSettingsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -582,6 +792,13 @@ export type $UserSettingsPayload<ExtArgs extends runtime.Types.Extensions.Intern
     llmModel: string
     discountThreshold: number
     autoAnalyze: boolean
+    emailNotifications: boolean
+    notifyNewDeals: boolean
+    notifyPriceDrops: boolean
+    notifySoldItems: boolean
+    notifyExpiring: boolean
+    notifyWeeklyDigest: boolean
+    notifyFrequency: string
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["userSettings"]>
@@ -1014,6 +1231,13 @@ export interface UserSettingsFieldRefs {
   readonly llmModel: Prisma.FieldRef<"UserSettings", 'String'>
   readonly discountThreshold: Prisma.FieldRef<"UserSettings", 'Int'>
   readonly autoAnalyze: Prisma.FieldRef<"UserSettings", 'Boolean'>
+  readonly emailNotifications: Prisma.FieldRef<"UserSettings", 'Boolean'>
+  readonly notifyNewDeals: Prisma.FieldRef<"UserSettings", 'Boolean'>
+  readonly notifyPriceDrops: Prisma.FieldRef<"UserSettings", 'Boolean'>
+  readonly notifySoldItems: Prisma.FieldRef<"UserSettings", 'Boolean'>
+  readonly notifyExpiring: Prisma.FieldRef<"UserSettings", 'Boolean'>
+  readonly notifyWeeklyDigest: Prisma.FieldRef<"UserSettings", 'Boolean'>
+  readonly notifyFrequency: Prisma.FieldRef<"UserSettings", 'String'>
   readonly createdAt: Prisma.FieldRef<"UserSettings", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"UserSettings", 'DateTime'>
 }

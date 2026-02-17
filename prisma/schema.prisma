@@ -282,6 +282,15 @@ model UserSettings {
   discountThreshold   Int       @default(50)  // Minimum discount % to flag as opportunity
   autoAnalyze         Boolean   @default(true) // Auto-analyze new listings with LLM
 
+  // Email Notification Preferences
+  emailNotifications  Boolean   @default(true)  // Master toggle for all email notifications
+  notifyNewDeals      Boolean   @default(true)  // New deals matching saved searches
+  notifyPriceDrops    Boolean   @default(true)  // Price drops on tracked listings
+  notifySoldItems     Boolean   @default(true)  // When tracked items sell
+  notifyExpiring      Boolean   @default(true)  // Listings about to expire
+  notifyWeeklyDigest  Boolean   @default(true)  // Weekly summary email
+  notifyFrequency     String    @default("instant") // instant | daily | weekly
+
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 }

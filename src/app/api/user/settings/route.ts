@@ -52,6 +52,13 @@ export async function GET() {
         llmModel: settings.llmModel,
         discountThreshold: settings.discountThreshold,
         autoAnalyze: settings.autoAnalyze,
+        emailNotifications: settings.emailNotifications,
+        notifyNewDeals: settings.notifyNewDeals,
+        notifyPriceDrops: settings.notifyPriceDrops,
+        notifySoldItems: settings.notifySoldItems,
+        notifyExpiring: settings.notifyExpiring,
+        notifyWeeklyDigest: settings.notifyWeeklyDigest,
+        notifyFrequency: settings.notifyFrequency,
         createdAt: settings.createdAt,
         updatedAt: settings.updatedAt,
         user: {
@@ -77,7 +84,11 @@ export async function PATCH(request: NextRequest) {
     const user = await getCurrentUserWithSettings();
     const body = await request.json();
 
-    const { openaiApiKey, llmModel, discountThreshold, autoAnalyze } = body;
+    const {
+      openaiApiKey, llmModel, discountThreshold, autoAnalyze,
+      emailNotifications, notifyNewDeals, notifyPriceDrops,
+      notifySoldItems, notifyExpiring, notifyWeeklyDigest, notifyFrequency,
+    } = body;
 
     // Validate llmModel if provided
     const validModels = ['gpt-4o-mini', 'gpt-4o', 'gpt-4-turbo'];
@@ -99,12 +110,28 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
+    // Validate notifyFrequency if provided
+    const validFrequencies = ['instant', 'daily', 'weekly'];
+    if (notifyFrequency !== undefined && !validFrequencies.includes(notifyFrequency)) {
+      return NextResponse.json(
+        { success: false, error: `Invalid notification frequency. Must be one of: ${validFrequencies.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
     // Build update data
     const updateData: {
       openaiApiKey?: string | null;
       llmModel?: string;
       discountThreshold?: number;
       autoAnalyze?: boolean;
+      emailNotifications?: boolean;
+      notifyNewDeals?: boolean;
+      notifyPriceDrops?: boolean;
+      notifySoldItems?: boolean;
+      notifyExpiring?: boolean;
+      notifyWeeklyDigest?: boolean;
+      notifyFrequency?: string;
     } = {};
 
     // Handle API key update
@@ -130,6 +157,29 @@ export async function PATCH(request: NextRequest) {
       updateData.autoAnalyze = Boolean(autoAnalyze);
     }
 
+    // Email notification preferences
+    if (emailNotifications !== undefined) {
+      updateData.emailNotifications = Boolean(emailNotifications);
+    }
+    if (notifyNewDeals !== undefined) {
+      updateData.notifyNewDeals = Boolean(notifyNewDeals);
+    }
+    if (notifyPriceDrops !== undefined) {
+      updateData.notifyPriceDrops = Boolean(notifyPriceDrops);
+    }
+    if (notifySoldItems !== undefined) {
+      updateData.notifySoldItems = Boolean(notifySoldItems);
+    }
+    if (notifyExpiring !== undefined) {
+      updateData.notifyExpiring = Boolean(notifyExpiring);
+    }
+    if (notifyWeeklyDigest !== undefined) {
+      updateData.notifyWeeklyDigest = Boolean(notifyWeeklyDigest);
+    }
+    if (notifyFrequency !== undefined) {
+      updateData.notifyFrequency = notifyFrequency;
+    }
+
     // Update settings
     const settings = await prisma.userSettings.update({
       where: { userId: user.id },
@@ -147,6 +197,13 @@ export async function PATCH(request: NextRequest) {
         llmModel: settings.llmModel,
         discountThreshold: settings.discountThreshold,
         autoAnalyze: settings.autoAnalyze,
+        emailNotifications: settings.emailNotifications,
+        notifyNewDeals: settings.notifyNewDeals,
+        notifyPriceDrops: settings.notifyPriceDrops,
+        notifySoldItems: settings.notifySoldItems,
+        notifyExpiring: settings.notifyExpiring,
+        notifyWeeklyDigest: settings.notifyWeeklyDigest,
+        notifyFrequency: settings.notifyFrequency,
         createdAt: settings.createdAt,
         updatedAt: settings.updatedAt,
       },
