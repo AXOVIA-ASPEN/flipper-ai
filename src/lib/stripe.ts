@@ -6,12 +6,17 @@
 
 import Stripe from 'stripe';
 
-if (!process.env.STRIPE_SECRET_KEY) {
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+
+if (!stripeSecretKey && process.env.NODE_ENV === 'production') {
   console.warn('⚠️ STRIPE_SECRET_KEY not set — Stripe features disabled');
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-01-27.acacia',
+// Use a placeholder key in dev/build if not set — prevents crash at module load
+const apiKey = stripeSecretKey || 'sk_test_placeholder_key_for_build';
+
+export const stripe = new Stripe(apiKey, {
+  apiVersion: '2026-01-28.clover',
   typescript: true,
 });
 

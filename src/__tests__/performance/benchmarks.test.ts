@@ -16,12 +16,12 @@ jest.mock('next/server', () => ({
   NextRequest: jest.fn(),
 }));
 
-jest.mock('next-auth', () => ({
-  getServerSession: jest.fn().mockResolvedValue({ user: { id: 'test-user' } }),
+jest.mock('@/lib/auth', () => ({
+  auth: jest.fn().mockResolvedValue({ user: { id: 'test-user' } }),
 }));
 
-jest.mock('next-auth/next', () => ({
-  getServerSession: jest.fn().mockResolvedValue({ user: { id: 'test-user' } }),
+jest.mock('next-auth', () => ({
+  default: jest.fn(),
 }));
 
 jest.mock('@/lib/metrics', () => ({

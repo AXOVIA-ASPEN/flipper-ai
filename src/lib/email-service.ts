@@ -75,18 +75,18 @@ class ResendProvider implements EmailProvider {
         subject: params.subject,
         html: params.html,
         text: params.text,
-        reply_to: params.replyTo,
+        replyTo: params.replyTo,
       });
 
       if (error) {
-        logger.error({ err: error }, 'Resend email send error');
+        logger.error('Resend email send error', { err: error });
         return { success: false, error: error.message };
       }
 
       return { success: true, messageId: data?.id };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      logger.error({ err }, 'Resend provider exception');
+      logger.error('Resend provider exception', { err });
       return { success: false, error: message };
     }
   }
@@ -96,8 +96,8 @@ class ResendProvider implements EmailProvider {
 class NullProvider implements EmailProvider {
   async send(params: SendEmailParams): Promise<SendEmailResult> {
     logger.info(
-      { to: params.to, subject: params.subject },
-      '[EmailService][NullProvider] Email would have been sent (no RESEND_API_KEY)'
+      '[EmailService][NullProvider] Email would have been sent (no RESEND_API_KEY)',
+      { to: params.to, subject: params.subject }
     );
     console.log('\n📧 [EmailService] Email not sent — no provider configured.');
     console.log(`   To:      ${Array.isArray(params.to) ? params.to.join(', ') : params.to}`);
@@ -266,7 +266,7 @@ function createEmailService(): EmailService {
 
   if (resendApiKey && process.env.NODE_ENV !== 'test') {
     provider = new ResendProvider(resendApiKey, fromAddress);
-    logger.info({ fromAddress }, '[EmailService] Resend provider initialized');
+    logger.info('[EmailService] Resend provider initialized', { fromAddress });
   } else {
     provider = new NullProvider();
     if (process.env.NODE_ENV !== 'test') {

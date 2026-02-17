@@ -55,14 +55,14 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    logger.info({ userId: user.id }, 'User unsubscribed from email notifications');
+    logger.info('User unsubscribed from email notifications', { userId: user.id });
 
     return new NextResponse(unsubscribeHtml(true), {
       status: 200,
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
     });
   } catch (err) {
-    logger.error({ err }, 'Unsubscribe error');
+    logger.error('Unsubscribe error', { err });
     return new NextResponse(unsubscribeHtml(false), {
       status: 500,
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, emailNotifications: resubscribe });
   } catch (err) {
-    logger.error({ err }, 'Resubscribe error');
+    logger.error('Resubscribe error', { err });
     return NextResponse.json({ success: false, error: 'Failed to update preferences' }, { status: 500 });
   }
 }

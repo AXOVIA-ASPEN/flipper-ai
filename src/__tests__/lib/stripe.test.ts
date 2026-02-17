@@ -16,12 +16,14 @@ describe('lib/stripe', () => {
     process.env = originalEnv;
   });
 
-  it('should warn when STRIPE_SECRET_KEY is not set and throw on empty key', () => {
+  it('should warn when STRIPE_SECRET_KEY is not set in production and use placeholder key', () => {
     delete process.env.STRIPE_SECRET_KEY;
+    process.env.NODE_ENV = 'production';
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
 
-    // Stripe SDK throws when given empty string as key in newer versions
-    expect(() => require('@/lib/stripe')).toThrow();
+    // With placeholder key the module loads without throwing
+    const mod = require('@/lib/stripe');
+    expect(mod.stripe).toBeDefined();
 
     expect(warnSpy).toHaveBeenCalledWith(
       expect.stringContaining('STRIPE_SECRET_KEY not set')
