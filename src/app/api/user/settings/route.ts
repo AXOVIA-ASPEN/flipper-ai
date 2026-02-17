@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { encrypt, decrypt, maskApiKey } from '@/lib/crypto';
-import { getUserIdOrDefault } from '@/lib/auth-middleware';
+import { getAuthUserId } from '@/lib/auth-middleware';
 
 /**
  * Get or create the current user with settings
- * Uses authenticated user or falls back to default in development
+ * Requires authentication — returns null if no session
  */
 async function getCurrentUserWithSettings() {
-  const userId = await getUserIdOrDefault();
+  const userId = await getAuthUserId();
+  if (!userId) return null;
 
   let user = await prisma.user.findUnique({
     where: { id: userId },
@@ -39,6 +40,9 @@ async function getCurrentUserWithSettings() {
 export async function GET() {
   try {
     const user = await getCurrentUserWithSettings();
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
     const settings = user.settings!;
 
     // Return settings with masked API key
@@ -82,6 +86,9 @@ export async function GET() {
 export async function PATCH(request: NextRequest) {
   try {
     const user = await getCurrentUserWithSettings();
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
     const body = await request.json();
 
     const {

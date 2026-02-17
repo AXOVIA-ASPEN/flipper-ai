@@ -3,7 +3,7 @@ import { GET, PATCH } from '@/app/api/user/settings/route';
 
 // Mock auth middleware
 jest.mock('@/lib/auth-middleware', () => ({
-  getUserIdOrDefault: jest.fn().mockResolvedValue('test-user-id'),
+  getAuthUserId: jest.fn().mockResolvedValue('test-user-id'),
 }));
 
 // Mock crypto

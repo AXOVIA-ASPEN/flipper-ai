@@ -122,6 +122,11 @@ describe('Search Configs API', () => {
   });
 
   describe('POST /api/search-configs', () => {
+    beforeEach(() => {
+      // POST endpoints require authentication
+      mockGetAuthUserId.mockResolvedValue('test-user-id');
+    });
+
     it('should create a new search config', async () => {
       const newConfig = {
         name: 'Electronics Search',

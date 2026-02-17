@@ -57,8 +57,9 @@ test.describe('API Smoke Tests', () => {
         request,
       }) => {
         const response = await request.get(endpoint.path);
-        // Either protected (401/403) or returns data — both are valid app behavior
-        expect([200, 401, 403]).toContain(response.status());
+        // Either protected (401/403), returns data (200), or validation error (400 for missing required params)
+        // 500 is NOT acceptable — server should not crash on unauthenticated requests
+        expect([200, 400, 401, 403]).toContain(response.status());
       });
     }
   });

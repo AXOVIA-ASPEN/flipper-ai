@@ -11,6 +11,7 @@ import {
   reportToCSV,
   type ReportOptions,
 } from '@/lib/report-service';
+import { getAuthUserId } from '@/lib/auth-middleware';
 
 // Mock data fetcher (replace with real DB query in production)
 async function fetchItems(userId: string, start: Date, end: Date) {
@@ -32,8 +33,14 @@ async function fetchItems(userId: string, start: Date, end: Date) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Session-based auth check first
+    const sessionUserId = await getAuthUserId();
+    if (!sessionUserId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
-    const { userId, period = 'weekly', startDate, endDate, format = 'json' } = body as ReportOptions & { format?: string };
+    const { userId = sessionUserId, period = 'weekly', startDate, endDate, format = 'json' } = body as ReportOptions & { format?: string };
 
     if (!userId) {
       return NextResponse.json({ error: 'userId is required' }, { status: 400 });

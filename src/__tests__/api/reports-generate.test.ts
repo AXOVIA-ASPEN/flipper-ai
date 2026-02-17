@@ -5,6 +5,11 @@
 import { NextRequest } from 'next/server';
 
 // Mock report-service
+// Mock auth middleware — reports routes require session auth
+jest.mock('@/lib/auth-middleware', () => ({
+  getAuthUserId: jest.fn().mockResolvedValue('user-1'),
+}));
+
 jest.mock('@/lib/report-service', () => ({
   getDateRange: jest.fn().mockReturnValue({
     start: new Date('2026-02-01'),
@@ -54,15 +59,17 @@ describe('POST /api/reports/generate', () => {
     expect(data.summary.totalProfit).toBe(300);
   });
 
-  it('returns 400 when userId missing', async () => {
+  it('returns 200 when userId omitted from body (uses session userId)', async () => {
+    // userId is now optional in body — route uses session userId as default
     const req = makeRequest('/api/reports/generate', {
       method: 'POST',
       body: JSON.stringify({ period: 'weekly' }),
     });
     const res = await POST(req);
-    expect(res.status).toBe(400);
+    // With auth mocked (user-1), omitting userId in body is fine
+    expect(res.status).toBe(200);
     const data = await res.json();
-    expect(data.error).toContain('userId');
+    expect(data.userId).toBe('user-1');
   });
 
   it('returns 400 for invalid period', async () => {

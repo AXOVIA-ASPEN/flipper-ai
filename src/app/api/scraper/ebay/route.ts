@@ -334,6 +334,16 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  // Auth check first — before any configuration checks
+  try {
+    const userId = await getAuthUserId();
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+  } catch {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const token = process.env.EBAY_OAUTH_TOKEN;
   if (!token) {
     return NextResponse.json({ error: 'EBAY_OAUTH_TOKEN is not configured' }, { status: 500 });
