@@ -224,3 +224,110 @@ describe('ebay-inventory', () => {
     });
   });
 });
+
+// ── Additional branch coverage ───────────────────────────────────────────────
+
+describe('ebay-inventory - additional branch coverage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    process.env.EBAY_OAUTH_TOKEN = 'test-token';
+  });
+
+  describe('createDraftListing - policy ID branches', () => {
+    it('includes paymentPolicyId and returnPolicyId in offer body', async () => {
+      // Inventory item create → success (204)
+      mockFetch.mockResolvedValueOnce({ status: 204, ok: true });
+      // Offer create → success (201)
+      mockFetch.mockResolvedValueOnce({
+        status: 201,
+        ok: true,
+        json: async () => ({ offerId: 'offer-789' }),
+      });
+
+      const result = await createDraftListing({
+        ...validInput,
+        paymentPolicyId: 'pay-123',
+        returnPolicyId: 'ret-456',
+        merchantLocationKey: 'loc-789',
+      });
+
+      expect(result.success).toBe(true);
+      const offerBody = JSON.parse(mockFetch.mock.calls[1][1].body);
+      expect(offerBody.listingPolicies.paymentPolicyId).toBe('pay-123');
+      expect(offerBody.listingPolicies.returnPolicyId).toBe('ret-456');
+      expect(offerBody.merchantLocationKey).toBe('loc-789');
+    });
+
+    it('handles errorBody with no errors array on offer create failure', async () => {
+      mockFetch.mockResolvedValueOnce({ status: 204, ok: true }); // inventory ok
+      mockFetch.mockResolvedValueOnce({
+        status: 500,
+        ok: false,
+        json: async () => ({ errors: null }), // null errors array
+      });
+
+      const result = await createDraftListing(validInput);
+      expect(result.success).toBe(false);
+      expect(result.errors).toContain('HTTP 500');
+    });
+  });
+
+  describe('publishOffer - branch coverage', () => {
+    it('handles errorBody with longMessage in errors array', async () => {
+      mockFetch.mockResolvedValueOnce({
+        status: 400,
+        ok: false,
+        json: async () => ({
+          errors: [{ longMessage: 'Offer is not in publishable state', message: 'Not publishable' }],
+        }),
+      });
+
+      const result = await publishOffer('offer-bad');
+      expect(result.success).toBe(false);
+      expect(result.errors?.[0]).toBe('Offer is not in publishable state');
+    });
+
+    it('uses message fallback when longMessage is missing', async () => {
+      mockFetch.mockResolvedValueOnce({
+        status: 400,
+        ok: false,
+        json: async () => ({
+          errors: [{ longMessage: undefined, message: 'Short message only' }],
+        }),
+      });
+
+      const result = await publishOffer('offer-bad');
+      expect(result.errors?.[0]).toBe('Short message only');
+    });
+  });
+
+  describe('getInventoryItem - additional coverage', () => {
+    it('returns item on 200 response', async () => {
+      const item = { sku: 'TEST', title: 'Item', price: 99 };
+      mockFetch.mockResolvedValueOnce({
+        status: 200,
+        ok: true,
+        json: async () => item,
+      });
+
+      const result = await getInventoryItem('TEST');
+      expect(result).toEqual(item);
+    });
+  });
+
+  describe('deleteInventoryItem - additional coverage', () => {
+    it('handles error body with no longMessage', async () => {
+      mockFetch.mockResolvedValueOnce({
+        status: 404,
+        ok: false,
+        json: async () => ({
+          errors: [{ longMessage: null, message: 'Not found', errorId: 1, domain: 'API', category: 'REQUEST' }],
+        }),
+      });
+
+      const result = await deleteInventoryItem('MISSING');
+      expect(result.success).toBe(false);
+      expect(result.errors?.[0]).toBe('Not found');
+    });
+  });
+});

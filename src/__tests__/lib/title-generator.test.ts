@@ -723,3 +723,79 @@ describe('title-generator', () => {
     });
   });
 });
+
+// ── Additional branch coverage for generateLLMTitle ────────────────────────
+
+describe('generateLLMTitle - branch coverage', () => {
+  const OpenAI = require('openai');
+  const origKey = process.env.OPENAI_API_KEY;
+
+  afterEach(() => {
+    if (origKey !== undefined) {
+      process.env.OPENAI_API_KEY = origKey;
+    } else {
+      delete process.env.OPENAI_API_KEY;
+    }
+  });
+
+  const baseInput: TitleGeneratorInput = {
+    brand: 'Sony',
+    model: 'WH-1000XM5',
+    variant: 'Black',
+    condition: 'good',
+    category: 'Electronics',
+  };
+
+  it('falls back to algorithmic when OPENAI_API_KEY is not set', async () => {
+    delete process.env.OPENAI_API_KEY;
+    const result = await generateLLMTitle(baseInput, 'ebay');
+    expect(result.title).toContain('Sony');
+    expect(result.platform).toBe('ebay');
+  });
+
+  it('truncates title exceeding platform character limit', async () => {
+    process.env.OPENAI_API_KEY = 'test-key';
+    const longTitle = 'A'.repeat(200);
+    OpenAI.mockImplementation(() => ({
+      chat: { completions: { create: jest.fn().mockResolvedValue({
+        choices: [{ message: { content: longTitle } }],
+      }) } },
+    }));
+    const result = await generateLLMTitle(baseInput, 'ebay');
+    // ebay limit is 80 chars
+    expect(result.title.length).toBeLessThanOrEqual(80);
+    expect(result.title).toMatch(/\.\.\.$/);
+  });
+
+  it('strips surrounding quotes from LLM response', async () => {
+    process.env.OPENAI_API_KEY = 'test-key';
+    OpenAI.mockImplementation(() => ({
+      chat: { completions: { create: jest.fn().mockResolvedValue({
+        choices: [{ message: { content: '"Sony WH-1000XM5 Black"' } }],
+      }) } },
+    }));
+    const result = await generateLLMTitle(baseInput, 'ebay');
+    expect(result.title).not.toMatch(/^"/);
+    expect(result.title).not.toMatch(/"$/);
+  });
+
+  it('falls back to algorithmic on LLM API error', async () => {
+    process.env.OPENAI_API_KEY = 'test-key';
+    OpenAI.mockImplementation(() => ({
+      chat: { completions: { create: jest.fn().mockRejectedValue(new Error('Rate limit')) } },
+    }));
+    const result = await generateLLMTitle(baseInput, 'ebay');
+    expect(result.title).toContain('Sony');
+  });
+
+  it('uses generic platform limit for unknown platform', async () => {
+    process.env.OPENAI_API_KEY = 'test-key';
+    OpenAI.mockImplementation(() => ({
+      chat: { completions: { create: jest.fn().mockResolvedValue({
+        choices: [{ message: { content: 'Sony WH-1000XM5' } }],
+      }) } },
+    }));
+    const result = await generateLLMTitle(baseInput, 'unknown-platform');
+    expect(result.title).toBeTruthy();
+  });
+});

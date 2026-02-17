@@ -256,3 +256,122 @@ describe('Report Service', () => {
     });
   });
 });
+
+// ── Additional branch coverage ───────────────────────────────────────────────
+
+describe('buildReport - additional branch coverage', () => {
+  const dateRange = {
+    start: new Date('2026-01-01'),
+    end: new Date('2026-01-31'),
+  };
+
+  it('handles items where resaleDate is null (daysToSell filter)', () => {
+    const items = [
+      {
+        id: 'item-1',
+        title: 'Widget',
+        platform: 'EBAY',
+        category: 'Electronics',
+        status: 'SOLD',
+        purchasePrice: 50,
+        resalePrice: 100,
+        fees: 5,
+        purchaseDate: new Date('2026-01-05'),
+        resaleDate: null, // sold but no resaleDate
+      },
+    ];
+    const report = buildReport('user1', 'monthly', dateRange, items);
+    // avgDaysToSell should be 0 since no resaleDate
+    expect(report.summary.avgDaysToSell).toBe(0);
+  });
+
+  it('handles items with null fees in sold items', () => {
+    const items = [
+      {
+        id: 'item-1',
+        title: 'Widget',
+        platform: 'EBAY',
+        category: 'Electronics',
+        status: 'SOLD',
+        purchasePrice: 50,
+        resalePrice: 100,
+        fees: null,
+        purchaseDate: new Date('2026-01-05'),
+        resaleDate: new Date('2026-01-10'),
+      },
+    ];
+    const report = buildReport('user1', 'monthly', dateRange, items);
+    expect(report.summary.totalProfit).toBe(50); // 100 - 50 - 0
+  });
+
+  it('calculates ROI=0 when totalCost is 0', () => {
+    const items = [
+      {
+        id: 'item-1',
+        title: 'Widget',
+        platform: 'EBAY',
+        category: 'Electronics',
+        status: 'SOLD',
+        purchasePrice: 0,
+        resalePrice: 100,
+        fees: 0,
+        purchaseDate: new Date('2026-01-05'),
+        resaleDate: new Date('2026-01-10'),
+      },
+    ];
+    const report = buildReport('user1', 'monthly', dateRange, items);
+    expect(report.summary.avgROI).toBe(0);
+  });
+
+  it('handles null category in category breakdown', () => {
+    const items = [
+      {
+        id: 'item-1',
+        title: 'Unknown Item',
+        platform: 'EBAY',
+        category: null,
+        status: 'SOLD',
+        purchasePrice: 10,
+        resalePrice: 20,
+        fees: 0,
+        purchaseDate: new Date('2026-01-05'),
+        resaleDate: new Date('2026-01-10'),
+      },
+    ];
+    const report = buildReport('user1', 'monthly', dateRange, items);
+    expect(report.summary.bestCategory).toBe('Uncategorized');
+  });
+
+  it('handles empty items resulting in avgROI=0 and winRate=0', () => {
+    const report = buildReport('user1', 'monthly', dateRange, []);
+    expect(report.summary.avgROI).toBe(0);
+    expect(report.summary.winRate).toBe(0);
+    expect(report.summary.avgDaysToSell).toBe(0);
+  });
+});
+
+describe('reportToCSV - additional branch coverage', () => {
+  const dateRange = { start: new Date('2026-01-01'), end: new Date('2026-01-31') };
+
+  it('handles null/undefined values in CSV rows (empty string)', () => {
+    const items = [
+      {
+        id: 'item-1',
+        title: 'Widget',
+        platform: 'EBAY',
+        category: null, // null should produce empty string in CSV
+        status: 'SOLD',
+        purchasePrice: 50,
+        resalePrice: null,
+        fees: null,
+        purchaseDate: new Date('2026-01-05'),
+        resaleDate: null,
+      },
+    ];
+    const report = buildReport('user1', 'monthly', dateRange, items);
+    const csv = reportToCSV(report);
+    expect(csv).toBeTruthy();
+    // The CSV generation should not throw on null values
+    expect(typeof csv).toBe('string');
+  });
+});

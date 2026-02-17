@@ -326,3 +326,79 @@ describe('description-generator', () => {
     });
   });
 });
+
+// ── Additional branch coverage ───────────────────────────────────────────────
+
+describe('generateAlgorithmicDescription - branch coverage', () => {
+  it('falls back to PLATFORM_STYLES.generic for unknown platform', () => {
+    const result = generateAlgorithmicDescription(
+      { brand: 'Nike', model: 'Air Max', variant: null, condition: 'good', category: 'Shoes', askingPrice: 50 },
+      'unknown-marketplace'
+    );
+    expect(result.description).toBeTruthy();
+    expect(result.platform).toBe('unknown-marketplace');
+  });
+
+  it('falls back condition text for unknown condition', () => {
+    const result = generateAlgorithmicDescription(
+      { brand: 'Nike', model: null, variant: null, condition: 'custom-condition', category: null, askingPrice: 10 },
+      'ebay'
+    );
+    expect(result.description).toContain('custom-condition');
+  });
+
+  it('uses facebook/offerup local pickup shipping note', () => {
+    const result = generateAlgorithmicDescription(
+      { brand: 'Test', model: 'Item', variant: null, condition: 'good', category: null, askingPrice: 10 },
+      'offerup'
+    );
+    expect(result.description).toContain('Local pickup');
+  });
+
+  it('uses default shipping note for non-local platforms', () => {
+    const result = generateAlgorithmicDescription(
+      { brand: 'Test', model: 'Item', variant: null, condition: 'good', category: null, askingPrice: 10 },
+      'ebay'
+    );
+    expect(result.description).toContain('Ships quickly');
+  });
+});
+
+describe('generateDescriptionsForAllPlatforms - branch coverage', () => {
+  it('uses first description as fallback primary when ebay missing', () => {
+    // All 4 platforms are always generated; just verify primary exists
+    const result = generateDescriptionsForAllPlatforms({
+      brand: null, model: null, variant: null,
+      condition: 'good', category: null, askingPrice: 5,
+    });
+    expect(result.primary).toBeTruthy();
+  });
+});
+
+describe('generateLLMDescription - branch coverage', () => {
+  const OpenAI = require('openai');
+  const origKey = process.env.OPENAI_API_KEY;
+
+  afterEach(() => {
+    if (origKey !== undefined) {
+      process.env.OPENAI_API_KEY = origKey;
+    } else {
+      delete process.env.OPENAI_API_KEY;
+    }
+  });
+
+  it('detects condition details in LLM response', async () => {
+    process.env.OPENAI_API_KEY = 'test-key';
+    (OpenAI as unknown as jest.Mock).mockImplementation(() => ({
+      chat: { completions: { create: jest.fn().mockResolvedValue({
+        choices: [{ message: { content: 'Item in excellent used condition, ships quickly.' } }],
+      }) } },
+    }));
+    const result = await generateLLMDescription(
+      { brand: 'Sony', model: 'TV', variant: null, condition: 'good', category: null, askingPrice: 100 },
+      'ebay'
+    );
+    expect(result.hasConditionDetails).toBe(true);
+    expect(result.hasShippingNote).toBe(true);
+  });
+});

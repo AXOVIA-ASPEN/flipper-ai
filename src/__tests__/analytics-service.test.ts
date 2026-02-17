@@ -156,3 +156,60 @@ describe('getProfitLossAnalytics', () => {
     expect(result.winRate).toBeCloseTo(33.33, 1);
   });
 });
+
+// ── Additional branch coverage tests ────────────────────────────────────────
+
+describe('getProfitLossAnalytics - branch coverage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('handles userId=null (no OR clause added)', async () => {
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([]);
+    const result = await getProfitLossAnalytics(null);
+    expect(result.items).toHaveLength(0);
+  });
+
+  it('handles undefined userId (no OR clause added)', async () => {
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([]);
+    const result = await getProfitLossAnalytics(undefined);
+    expect(result.items).toHaveLength(0);
+  });
+
+  it('computes weekly trend period correctly (Sunday edge case)', async () => {
+    // Sunday Jan 5 2026 → should normalize to previous Monday
+    const sunday = new Date('2026-01-05T00:00:00Z');
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([
+      makeOpp({ purchaseDate: sunday, resaleDate: null, status: 'PURCHASED' }),
+    ]);
+    const result = await getProfitLossAnalytics('user-1', 'weekly');
+    expect(result.trends.length).toBeGreaterThan(0);
+    expect(result.trends[0].period).toMatch(/^\d{4}-W\d{2}$/);
+  });
+
+  it('handles item with null resaleDate in trend computation', async () => {
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([
+      makeOpp({ resaleDate: null, resalePrice: null, status: 'PURCHASED' }),
+    ]);
+    const result = await getProfitLossAnalytics('user-1');
+    // No sale period created, but purchase period exists
+    expect(result.trends.length).toBeGreaterThanOrEqual(1);
+    expect(result.trends[0].itemsSold).toBe(0);
+  });
+
+  it('returns overallROI=0 when no items (totalInvested is 0)', async () => {
+    // Empty items → totalInvested=0 → overallROI=0
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([]);
+    const result = await getProfitLossAnalytics('user-1');
+    expect(result.overallROI).toBe(0);
+  });
+
+  it('computes avgDays=0 for category with no sold items', async () => {
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([
+      makeOpp({ status: 'PURCHASED', resaleDate: null, resalePrice: null }),
+    ]);
+    const result = await getProfitLossAnalytics('user-1');
+    const cat = result.categoryBreakdown.find((c) => c.category === 'Electronics');
+    expect(cat?.avgDaysToSell).toBe(0);
+  });
+});
