@@ -211,6 +211,45 @@ describe('monitoring', () => {
       // Could be degraded or unhealthy depending on accumulated errors from other tests
       expect(['degraded', 'unhealthy']).toContain(health.status);
     });
+
+    it('should report degraded when memory usage exceeds 80% of threshold', () => {
+      // Set a very low memory threshold so real memory usage triggers degraded
+      // Real RSS is typically a few hundred MB, totalmem is several GB
+      // Setting threshold to something that makes memPct >= threshold * 0.8 but < threshold
+      const os = require('os');
+      const mem = process.memoryUsage();
+      const totalMem = os.totalmem();
+      const currentPct = mem.rss / totalMem;
+
+      // Set threshold so current usage is between 80% and 100% of it
+      // threshold * 0.8 <= currentPct < threshold
+      // threshold >= currentPct and threshold <= currentPct / 0.8
+      const threshold = currentPct * 1.1; // current is ~91% of threshold
+
+      configureMonitoring({
+        errorRateThreshold: 99999, // don't trigger error-based status
+        memoryUsageThreshold: threshold,
+      });
+
+      const health = getSystemHealth();
+      expect(health.status).toBe('degraded');
+    });
+
+    it('should report unhealthy when memory usage exceeds threshold', () => {
+      const os = require('os');
+      const mem = process.memoryUsage();
+      const totalMem = os.totalmem();
+      const currentPct = mem.rss / totalMem;
+
+      // Set threshold below current usage
+      configureMonitoring({
+        errorRateThreshold: 99999,
+        memoryUsageThreshold: currentPct * 0.5, // well below current
+      });
+
+      const health = getSystemHealth();
+      expect(health.status).toBe('unhealthy');
+    });
   });
 
   // ─── onAlert ──────────────────────────────────────────────
