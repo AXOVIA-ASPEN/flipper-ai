@@ -217,12 +217,23 @@ Items scoring **70+** are automatically flagged as opportunities.
 
 ### Vercel (Recommended)
 
+**Automated CI/CD (GitHub Actions):**
+
+The CI pipeline automatically deploys to Vercel on every push to `main` (after tests pass).
+
+**Required GitHub Secrets** (Settings → Secrets → Actions):
+- `VERCEL_TOKEN` — from https://vercel.com/account/tokens
+- `VERCEL_ORG_ID` — from `.vercel/project.json` after first `vercel link`
+- `VERCEL_PROJECT_ID` — from `.vercel/project.json` after first `vercel link`
+
+**Manual deploy:**
 ```bash
 npm i -g vercel
-vercel --prod
+vercel link        # Links to Vercel project (generates .vercel/project.json)
+vercel --prod      # Deploy to production
 ```
 
-Set environment variables in the [Vercel Dashboard](https://vercel.com). Configuration is in `vercel.json`.
+Set environment variables in the [Vercel Dashboard](https://vercel.com/dashboard). Configuration is in `vercel.json` (security headers, API function timeouts, health endpoint rewrite).
 
 ### Docker
 
@@ -236,7 +247,7 @@ docker run -p 3000:3000 flipper-ai
 - **ESLint** — Strict TypeScript rules
 - **Prettier** — Consistent formatting
 - **Husky** — Pre-commit hooks prevent bad commits
-- **CI/CD** — GitHub Actions runs lint → test → build on every push/PR
+- **CI/CD** — GitHub Actions: lint → typecheck → test (coverage gated) → build → E2E → deploy to Vercel
 - **TypeScript** — Strict mode, `ignoreBuildErrors: false`
 
 ```bash
