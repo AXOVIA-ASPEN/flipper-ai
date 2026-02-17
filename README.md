@@ -1,11 +1,11 @@
 # 🐧 Flipper.ai
 
 [![CI/CD Pipeline](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-2291-brightgreen)](.)
+[![Tests](https://img.shields.io/badge/tests-2294-brightgreen)](.)
 [![Test Suites](https://img.shields.io/badge/test%20suites-111-brightgreen)](.)
-[![Coverage](https://img.shields.io/badge/coverage-99.46%25-brightgreen)](.)
+[![Coverage](https://img.shields.io/badge/coverage-99.61%25-brightgreen)](.)
 [![Branches](https://img.shields.io/badge/branches-98.09%25-brightgreen)](.)
-[![Functions](https://img.shields.io/badge/functions-98.79%25-brightgreen)](.)
+[![Functions](https://img.shields.io/badge/functions-99.79%25-brightgreen)](.)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](.)
 [![Version](https://img.shields.io/badge/version-1.0.1-blue)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -76,7 +76,7 @@ EBAY_MARKETPLACE_ID="EBAY_US"
 make help              # Show all commands
 make dev               # Start dev server
 make build             # Production build (strict TypeScript)
-make test              # Run 2291 unit tests (Jest)
+make test              # Run 2294 unit tests (Jest)
 make test-acceptance   # Run BDD acceptance tests (Cucumber/Gherkin)
 make test-e2e          # Run E2E tests (Playwright)
 make test-all          # Run all test suites
@@ -90,7 +90,7 @@ make clean             # Remove build artifacts
 
 | Suite          | Tool               | Count                    | Coverage       |
 | -------------- | ------------------ | ------------------------ | -------------- |
-| Unit           | Jest               | 2291 (111 suites)        | 99.46% stmts / 98.09% branches / 98.79% funcs |
+| Unit           | Jest               | 2294 (111 suites)        | 99.61% stmts / 98.09% branches / 99.79% funcs |
 | BDD Acceptance | Cucumber + Gherkin | 70 scenarios / 572 steps | Core flows     |
 | E2E            | Playwright         | Browser automation       | Critical paths |
 
@@ -266,10 +266,10 @@ pnpm format:check  # Check formatting
 | Milestone                      | Status |
 | ------------------------------ | ------ |
 | Core feature implementation    | ✅ Complete |
-| Unit tests (Jest)              | ✅ 2291 tests, 111 suites |
-| Statement coverage             | ✅ 99.46% |
+| Unit tests (Jest)              | ✅ 2294 tests, 111 suites |
+| Statement coverage             | ✅ 99.61% |
 | Branch coverage                | ✅ 98.09% |
-| Function coverage              | ✅ 98.79% |
+| Function coverage              | ✅ 99.79% |
 | BDD acceptance tests           | ✅ 70 scenarios / 572 steps |
 | E2E Playwright tests           | ✅ Critical paths covered |
 | GitHub Actions CI/CD           | ✅ lint → typecheck → test → build |
@@ -288,4 +288,4 @@ MIT — see [LICENSE](LICENSE) for details.
 ---
 
 Built with 🐧 by [Axovia AI](https://github.com/AXOVIA-ASPEN)  
-*Last updated: February 17, 2026 — 2291 tests passing, 99.46% coverage*
+*Last updated: February 17, 2026 — 2294 tests passing, 99.61% coverage*
