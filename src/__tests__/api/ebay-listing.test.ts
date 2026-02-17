@@ -200,3 +200,51 @@ describe('GET /api/listings/ebay', () => {
     expect(json.status).toBe('missing_token');
   });
 });
+
+// ── Branch coverage: optional fields in POST ─────────────────────────────────
+describe('POST /api/listings/ebay - optional fields branch coverage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    process.env.EBAY_OAUTH_TOKEN = 'test-token';
+    mockGetAuthUserId.mockResolvedValue('user-123');
+    mockCreateDraft.mockResolvedValue({
+      success: true,
+      sku: 'FLIP-OPT',
+      offerId: 'offer-opt',
+      status: 'DRAFT',
+    });
+  });
+
+  afterEach(() => {
+    delete process.env.EBAY_OAUTH_TOKEN;
+  });
+
+  it('uses optional fields when provided (covers || truthy branches)', async () => {
+    // All optional fields set → covers the `field || undefined` truthy branches
+    const bodyWithOptionals = {
+      ...validBody,
+      conditionDescription: 'Minor scuff on corner',
+      currency: 'CAD',
+      aspects: { Brand: ['Apple'], Storage: ['256GB'] },
+      packageDimensions: { length: 6, width: 3, height: 0.5, unit: 'INCH' },
+      fulfillmentPolicyId: 'fulfill-policy-123',
+      paymentPolicyId: 'pay-policy-456',
+      returnPolicyId: 'return-policy-789',
+      merchantLocationKey: 'WAREHOUSE_A',
+    };
+
+    const res = await POST(makeRequest(bodyWithOptionals));
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(json.status).toBe('DRAFT');
+    // Verify optional fields were passed to createDraftListing
+    const createCall = mockCreateDraft.mock.calls[0][0];
+    expect(createCall.conditionDescription).toBe('Minor scuff on corner');
+    expect(createCall.currency).toBe('CAD');
+    expect(createCall.fulfillmentPolicyId).toBe('fulfill-policy-123');
+    expect(createCall.paymentPolicyId).toBe('pay-policy-456');
+    expect(createCall.returnPolicyId).toBe('return-policy-789');
+    expect(createCall.merchantLocationKey).toBe('WAREHOUSE_A');
+  });
+});
