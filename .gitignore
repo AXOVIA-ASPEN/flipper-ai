@@ -1,5 +1,4 @@
 node_modules
-playwrite-report
 
 # Next.js
 .next/
@@ -26,5 +25,11 @@ yarn-error.log*
 
 # Cached images (keep directory structure but not actual images)
 public/images/listings/*
-!public/images/listings/.gitkeepe2e/test-results/
+!public/images/listings/.gitkeep
+
+# Test artifacts (Playwright / Jest)
+playwright-report/
+test-results/
+e2e/test-results/
 coverage/
+screenshots/*.png
