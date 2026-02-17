@@ -201,9 +201,20 @@ export default function MessagesPage() {
           ))}
         </div>
       ) : messages.length === 0 ? (
-        <div className="text-center py-12 text-gray-400">
-          <p className="text-lg">No messages yet</p>
-          <p className="text-sm mt-1">Messages from seller conversations will appear here</p>
+        <div className="text-center py-16">
+          <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-4xl">💬</span>
+          </div>
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">No messages yet</h3>
+          <p className="text-gray-400 mb-6 max-w-sm mx-auto">
+            When you contact sellers about listings, your conversation threads will appear here.
+          </p>
+          <a
+            href="/opportunities"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+          >
+            Browse Opportunities
+          </a>
         </div>
       ) : (
         <div className="space-y-2">

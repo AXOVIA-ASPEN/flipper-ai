@@ -136,6 +136,15 @@ export default function KanbanBoard({ opportunities, onStatusChange }: KanbanBoa
                       snapshot.isDraggingOver ? 'bg-white/10' : ''
                     }`}
                   >
+                    {/* Empty column placeholder */}
+                    {items.length === 0 && !snapshot.isDraggingOver && (
+                      <div className="flex flex-col items-center justify-center py-8 px-3 text-center opacity-40">
+                        <div className="w-10 h-10 rounded-full border-2 border-dashed border-white/30 flex items-center justify-center mb-2">
+                          <span className="text-lg">📭</span>
+                        </div>
+                        <p className="text-xs text-blue-200/60">Drag cards here</p>
+                      </div>
+                    )}
                     {items.map((opp, index) => {
                       const image = getFirstImage(opp.listing.imageUrls);
                       return (

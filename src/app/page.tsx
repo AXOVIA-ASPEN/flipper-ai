@@ -721,9 +721,16 @@ function DashboardContent() {
                         <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/50 animate-pulse-slow">
                           <Package className="w-8 h-8 text-white" />
                         </div>
+                        <h3 className="text-lg font-semibold text-white">No listings found</h3>
                         <p className="text-blue-200/70">
-                          No listings found. Run a scraper to find deals!
+                          Run a marketplace scan to discover flip opportunities.
                         </p>
+                        <a
+                          href="/scraper"
+                          className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 text-sm font-medium shadow-lg shadow-blue-500/40"
+                        >
+                          🔍 Run a Scan
+                        </a>
                       </div>
                     </td>
                   </tr>
