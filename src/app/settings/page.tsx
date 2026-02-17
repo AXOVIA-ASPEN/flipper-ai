@@ -82,6 +82,13 @@ interface UserSettings {
   llmModel: string;
   discountThreshold: number;
   autoAnalyze: boolean;
+  emailNotifications: boolean;
+  notifyNewDeals: boolean;
+  notifyPriceDrops: boolean;
+  notifySoldItems: boolean;
+  notifyExpiring: boolean;
+  notifyWeeklyDigest: boolean;
+  notifyFrequency: string;
   user: {
     id: string;
     email: string;
@@ -151,6 +158,14 @@ export default function SettingsPage() {
         setDiscountThreshold(data.data.discountThreshold);
         setAutoAnalyze(data.data.autoAnalyze);
         setApiKeyStatus(data.data.hasOpenaiApiKey ? 'valid' : 'not_set');
+        // Notification preferences
+        setEmailNotifications(data.data.emailNotifications ?? true);
+        setNotifyNewDeals(data.data.notifyNewDeals ?? true);
+        setNotifyPriceDrops(data.data.notifyPriceDrops ?? true);
+        setNotifySoldItems(data.data.notifySoldItems ?? false);
+        setNotifyExpiring(data.data.notifyExpiring ?? true);
+        setNotifyWeeklyDigest(data.data.notifyWeeklyDigest ?? false);
+        setNotifyFrequency(data.data.notifyFrequency ?? 'instant');
       }
     } catch (error) {
       console.error('Failed to fetch user settings:', error);
@@ -226,6 +241,37 @@ export default function SettingsPage() {
     } catch (error) {
       console.error('Failed to save LLM settings:', error);
       showConfigMessage('error', 'Failed to save settings');
+    }
+  }
+
+  async function handleSaveNotifications() {
+    setSavingNotifications(true);
+    try {
+      const response = await fetch('/api/user/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          emailNotifications,
+          notifyNewDeals,
+          notifyPriceDrops,
+          notifySoldItems,
+          notifyExpiring,
+          notifyWeeklyDigest,
+          notifyFrequency,
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setUserSettings(data.data);
+        showConfigMessage('success', 'Notification preferences saved');
+      } else {
+        showConfigMessage('error', data.error || 'Failed to save notification preferences');
+      }
+    } catch (error) {
+      console.error('Failed to save notification preferences:', error);
+      showConfigMessage('error', 'Failed to save notification preferences');
+    } finally {
+      setSavingNotifications(false);
     }
   }
 
@@ -396,11 +442,15 @@ export default function SettingsPage() {
     return searchLocations.find((l) => l.value === value)?.label || value;
   }
 
-  // Notification settings
+  // Notification settings (wired to API)
   const [emailNotifications, setEmailNotifications] = useState(true);
-  const [pushNotifications, setPushNotifications] = useState(false);
-  const [notifyOnHighScore, setNotifyOnHighScore] = useState(true);
-  const [minScoreThreshold, setMinScoreThreshold] = useState('70');
+  const [notifyNewDeals, setNotifyNewDeals] = useState(true);
+  const [notifyPriceDrops, setNotifyPriceDrops] = useState(true);
+  const [notifySoldItems, setNotifySoldItems] = useState(false);
+  const [notifyExpiring, setNotifyExpiring] = useState(true);
+  const [notifyWeeklyDigest, setNotifyWeeklyDigest] = useState(false);
+  const [notifyFrequency, setNotifyFrequency] = useState('instant');
+  const [savingNotifications, setSavingNotifications] = useState(false);
 
   // Profit settings
   const [minProfitMargin, setMinProfitMargin] = useState('20');
@@ -1067,51 +1117,120 @@ export default function SettingsPage() {
 
           <div className="space-y-4">
             <label className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-all duration-300 cursor-pointer">
-              <span className="text-white">Email Notifications</span>
-              <input
-                type="checkbox"
-                checked={emailNotifications}
-                onChange={(e) => setEmailNotifications(e.target.checked)}
-                className="w-5 h-5 rounded accent-purple-500"
-              />
+              <div>
+                <span className="text-white">Email Notifications</span>
+                <p className="text-xs text-blue-200/40">Receive notifications via email</p>
+              </div>
+              <button type="button" onClick={() => setEmailNotifications(!emailNotifications)} className="p-1">
+                {emailNotifications ? (
+                  <ToggleRight className="w-8 h-8 text-green-400" />
+                ) : (
+                  <ToggleLeft className="w-8 h-8 text-gray-400" />
+                )}
+              </button>
             </label>
 
             <label className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-all duration-300 cursor-pointer">
-              <span className="text-white">Push Notifications</span>
-              <input
-                type="checkbox"
-                checked={pushNotifications}
-                onChange={(e) => setPushNotifications(e.target.checked)}
-                className="w-5 h-5 rounded accent-purple-500"
-              />
+              <div>
+                <span className="text-white">New Deals</span>
+                <p className="text-xs text-blue-200/40">Get notified when new high-value deals are found</p>
+              </div>
+              <button type="button" onClick={() => setNotifyNewDeals(!notifyNewDeals)} className="p-1">
+                {notifyNewDeals ? (
+                  <ToggleRight className="w-8 h-8 text-green-400" />
+                ) : (
+                  <ToggleLeft className="w-8 h-8 text-gray-400" />
+                )}
+              </button>
             </label>
 
             <label className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-all duration-300 cursor-pointer">
-              <span className="text-white">Notify on High-Score Listings</span>
-              <input
-                type="checkbox"
-                checked={notifyOnHighScore}
-                onChange={(e) => setNotifyOnHighScore(e.target.checked)}
-                className="w-5 h-5 rounded accent-purple-500"
-              />
+              <div>
+                <span className="text-white">Price Drops</span>
+                <p className="text-xs text-blue-200/40">Alert when tracked items drop in price</p>
+              </div>
+              <button type="button" onClick={() => setNotifyPriceDrops(!notifyPriceDrops)} className="p-1">
+                {notifyPriceDrops ? (
+                  <ToggleRight className="w-8 h-8 text-green-400" />
+                ) : (
+                  <ToggleLeft className="w-8 h-8 text-gray-400" />
+                )}
+              </button>
+            </label>
+
+            <label className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-all duration-300 cursor-pointer">
+              <div>
+                <span className="text-white">Sold Items</span>
+                <p className="text-xs text-blue-200/40">Notify when your tracked items are sold</p>
+              </div>
+              <button type="button" onClick={() => setNotifySoldItems(!notifySoldItems)} className="p-1">
+                {notifySoldItems ? (
+                  <ToggleRight className="w-8 h-8 text-green-400" />
+                ) : (
+                  <ToggleLeft className="w-8 h-8 text-gray-400" />
+                )}
+              </button>
+            </label>
+
+            <label className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-all duration-300 cursor-pointer">
+              <div>
+                <span className="text-white">Expiring Listings</span>
+                <p className="text-xs text-blue-200/40">Alert when saved listings are about to expire</p>
+              </div>
+              <button type="button" onClick={() => setNotifyExpiring(!notifyExpiring)} className="p-1">
+                {notifyExpiring ? (
+                  <ToggleRight className="w-8 h-8 text-green-400" />
+                ) : (
+                  <ToggleLeft className="w-8 h-8 text-gray-400" />
+                )}
+              </button>
+            </label>
+
+            <label className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-all duration-300 cursor-pointer">
+              <div>
+                <span className="text-white">Weekly Digest</span>
+                <p className="text-xs text-blue-200/40">Receive a weekly summary of deals and activity</p>
+              </div>
+              <button type="button" onClick={() => setNotifyWeeklyDigest(!notifyWeeklyDigest)} className="p-1">
+                {notifyWeeklyDigest ? (
+                  <ToggleRight className="w-8 h-8 text-green-400" />
+                ) : (
+                  <ToggleLeft className="w-8 h-8 text-gray-400" />
+                )}
+              </button>
             </label>
 
             <div>
               <label className="block text-sm font-medium text-blue-200/90 mb-2">
-                Minimum Score Threshold
+                Notification Frequency
               </label>
-              <input
-                type="number"
-                value={minScoreThreshold}
-                onChange={(e) => setMinScoreThreshold(e.target.value)}
-                min="0"
-                max="100"
-                className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white transition-all duration-300 hover:bg-white/15"
-              />
+              <select
+                value={notifyFrequency}
+                onChange={(e) => setNotifyFrequency(e.target.value)}
+                className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-orange-400/50 text-white"
+              >
+                <option value="instant" className="bg-slate-800">Instant</option>
+                <option value="daily" className="bg-slate-800">Daily Summary</option>
+                <option value="weekly" className="bg-slate-800">Weekly Summary</option>
+              </select>
               <p className="mt-1 text-xs text-blue-200/50">
-                Get notified when listings score above this value (0-100)
+                How often you want to receive notification emails
               </p>
             </div>
+
+            {/* Save Button */}
+            <button
+              onClick={handleSaveNotifications}
+              disabled={savingNotifications}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-600 text-white rounded-lg hover:from-yellow-600 hover:to-orange-700 transition-all shadow-lg disabled:opacity-50"
+            >
+              {savingNotifications ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
+              Save Notification Preferences
+            </button>
           </div>
         </div>
 
