@@ -4,7 +4,7 @@
 **Company:** Axovia AI  
 **Date:** February 17, 2026  
 **Status:** 🟡 READY TO DEPLOY (pending Vercel credentials)
-**Last Updated:** February 17, 2026 (Run #3 — Security Hardening)
+**Last Updated:** February 17, 2026 (Run #4 — Playwright CI webServer fix)
 
 ---
 
@@ -43,14 +43,16 @@
 - [x] **Auth hardening** — 5 routes fixed (500→401 for unauthenticated): user/settings, scraper/ebay, search-configs, reports/generate (Feb 17 Run #3)
 
 ### E2E Staging Tests
-- [x] **API smoke tests** — 22/22 passing against `http://localhost:3001` (PM2 staging)
+- [x] **API smoke tests** — 22/22 passing against `http://localhost:3001` (PM2 staging, all 3 browsers)
 - [x] Playwright config supports `BASE_URL` env var for flexible staging/prod targeting
+- [x] **webServer auto-launch** — `playwright.config.ts` auto-starts `next start` in CI (Feb 17 Run #4)
 
 ### CI/CD
 - [x] GitHub Actions CI pipeline (`.github/workflows/ci.yml`)
 - [x] Automated tests on every PR
 - [x] Coverage reports uploaded to Codecov
 - [x] Vercel deployment workflow (awaiting secrets)
+- [x] **E2E pipeline fixed** — Playwright webServer config; no manual server startup needed in CI
 
 ### Documentation
 - [x] `README.md` with badges and quickstart
