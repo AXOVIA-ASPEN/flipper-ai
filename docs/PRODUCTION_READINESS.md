@@ -4,7 +4,7 @@
 **Company:** Axovia AI  
 **Date:** February 17, 2026  
 **Status:** 🟡 READY TO DEPLOY (pending Vercel credentials)
-**Last Updated:** February 17, 2026 (Run #5 — /health dashboard + ESLint fixes)
+**Last Updated:** February 17, 2026 (Run #6 — User journey screenshots + PG migration docs + UX empty states)
 
 ---
 
@@ -65,6 +65,10 @@
 - [x] **Swagger UI** — interactive API explorer at `/docs` (try-it-out, auth persistence)
 - [x] **Real-time SSE** — `GET /api/events` push notifications + `useSseEvents` React hook
 - [x] **`/health` status dashboard** — real-time system monitoring page (Feb 17 Run #5)
+- [x] **User journey visual screenshots** — 19 screenshots in `playwright-report/user-journey/` (Feb 17 Run #6)
+- [x] **`docs/USER_FLOWS.md`** — complete flow documentation with E2E test coverage map (Feb 17 Run #6)
+- [x] **`docs/DATABASE_MIGRATION.md`** — SQLite→PostgreSQL migration guide with Docker, pooling, data scripts (Feb 17 Run #6)
+- [x] **UX empty states** — kanban columns, messages page, dashboard now have meaningful empty states + CTAs (Feb 17 Run #6)
 
 ---
 
