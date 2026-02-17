@@ -167,6 +167,9 @@ flipper-ai/
 
 ## 🔌 API Endpoints
 
+> **Interactive Docs:** Visit `/docs` for the full Swagger UI (OpenAPI 3.0).
+> The machine-readable spec is available at `GET /api/docs`.
+
 ### Listings
 
 | Method   | Endpoint                          | Description                                  |
