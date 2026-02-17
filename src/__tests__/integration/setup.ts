@@ -253,6 +253,10 @@ function createTestClient() {
       },
 
       delete: async (args: { where: { id: string } }) => {
+        const existing = db.prepare('SELECT id FROM Listing WHERE id = ?').get(args.where.id);
+        if (!existing) {
+          throw Object.assign(new Error('Record to delete does not exist.'), { code: 'P2025' });
+        }
         db.prepare('DELETE FROM Listing WHERE id = ?').run(args.where.id);
         return { id: args.where.id };
       },
@@ -280,16 +284,39 @@ function createTestClient() {
         skip?: number;
         include?: Record<string, boolean>;
       }) => {
-        let sql = 'SELECT * FROM Opportunity';
         const params: unknown[] = [];
         const conditions: string[] = [];
+        let hasListingJoin = false;
 
         if (args?.where) {
-          for (const [key, value] of Object.entries(args.where)) {
-            conditions.push(`${key} = ?`);
-            params.push(value);
+          // Extract listing nested filter
+          const { listing: listingWhere, ...topWhere } = args.where;
+
+          // Top-level conditions (OR, status, userId, etc.)
+          if (Object.keys(topWhere).length > 0) {
+            const { clause, params: whereParams } = buildWhereClause(topWhere);
+            if (clause) {
+              conditions.push(clause.replace(/(\w+) (=|>=|<=|LIKE|IS NULL)/g, 'o.$1 $2'));
+              params.push(...whereParams);
+            }
+          }
+
+          // Nested listing filter - requires JOIN
+          if (listingWhere && typeof listingWhere === 'object') {
+            hasListingJoin = true;
+            const { clause: listingClause, params: listingParams } = buildWhereClause(
+              listingWhere as Record<string, unknown>
+            );
+            if (listingClause) {
+              conditions.push(listingClause.replace(/(\w+) (=|>=|<=|LIKE|IS NULL)/g, 'l.$1 $2'));
+              params.push(...listingParams);
+            }
           }
         }
+
+        let sql = hasListingJoin
+          ? 'SELECT o.* FROM Opportunity o LEFT JOIN Listing l ON o.listingId = l.id'
+          : 'SELECT o.* FROM Opportunity o';
 
         if (conditions.length > 0) {
           sql += ' WHERE ' + conditions.join(' AND ');
@@ -297,7 +324,7 @@ function createTestClient() {
 
         if (args?.orderBy) {
           const [key, order] = Object.entries(args.orderBy)[0];
-          sql += ` ORDER BY ${key} ${order.toUpperCase()}`;
+          sql += ` ORDER BY o.${key} ${order.toUpperCase()}`;
         }
 
         if (args?.take) {
@@ -346,41 +373,84 @@ function createTestClient() {
         return row || null;
       },
 
-      count: async () => {
-        const result = db.prepare('SELECT COUNT(*) as count FROM Opportunity').get() as {
-          count: number;
-        };
+      count: async (args?: { where?: Record<string, unknown> }) => {
+        const params: unknown[] = [];
+        const conditions: string[] = [];
+        let hasListingJoin = false;
+
+        if (args?.where) {
+          const { listing: listingWhere, ...topWhere } = args.where;
+          if (Object.keys(topWhere).length > 0) {
+            const { clause, params: whereParams } = buildWhereClause(topWhere);
+            if (clause) {
+              conditions.push(clause.replace(/(\w+) (=|>=|<=|LIKE|IS NULL)/g, 'o.$1 $2'));
+              params.push(...whereParams);
+            }
+          }
+          if (listingWhere && typeof listingWhere === 'object') {
+            hasListingJoin = true;
+            const { clause: listingClause, params: listingParams } = buildWhereClause(
+              listingWhere as Record<string, unknown>
+            );
+            if (listingClause) {
+              conditions.push(listingClause.replace(/(\w+) (=|>=|<=|LIKE|IS NULL)/g, 'l.$1 $2'));
+              params.push(...listingParams);
+            }
+          }
+        }
+
+        let sql = hasListingJoin
+          ? 'SELECT COUNT(*) as count FROM Opportunity o LEFT JOIN Listing l ON o.listingId = l.id'
+          : 'SELECT COUNT(*) as count FROM Opportunity o';
+
+        if (conditions.length > 0) sql += ' WHERE ' + conditions.join(' AND ');
+
+        const result = db.prepare(sql).get(...params) as { count: number };
         return result.count;
       },
 
-      aggregate: async () => {
-        const result = db
-          .prepare(
-            `
-          SELECT
-            COUNT(*) as count,
-            COALESCE(SUM(actualProfit), 0) as sumActualProfit,
-            COALESCE(SUM(purchasePrice), 0) as sumPurchasePrice,
-            COALESCE(SUM(resalePrice), 0) as sumResalePrice
-          FROM Opportunity
-        `
-          )
-          .get() as {
-          count: number;
-          sumActualProfit: number;
-          sumPurchasePrice: number;
-          sumResalePrice: number;
-        };
+      aggregate: async (args?: { where?: Record<string, unknown>; _sum?: Record<string, boolean>; _count?: boolean }) => {
+        const params: unknown[] = [];
+        const conditions: string[] = [];
+        let hasListingJoin = false;
 
+        if (args?.where) {
+          const { listing: listingWhere, ...topWhere } = args.where;
+          if (Object.keys(topWhere).length > 0) {
+            const { clause, params: whereParams } = buildWhereClause(topWhere);
+            if (clause) {
+              conditions.push(clause.replace(/(\w+) (=|>=|<=|LIKE|IS NULL)/g, 'o.$1 $2'));
+              params.push(...whereParams);
+            }
+          }
+          if (listingWhere && typeof listingWhere === 'object') {
+            hasListingJoin = true;
+            const { clause: listingClause, params: listingParams } = buildWhereClause(
+              listingWhere as Record<string, unknown>
+            );
+            if (listingClause) {
+              conditions.push(listingClause.replace(/(\w+) (=|>=|<=|LIKE|IS NULL)/g, 'l.$1 $2'));
+              params.push(...listingParams);
+            }
+          }
+        }
+
+        let aggregateSql = hasListingJoin
+          ? `SELECT COUNT(*) as count, COALESCE(SUM(o.actualProfit), 0) as sumActualProfit, COALESCE(SUM(o.purchasePrice), 0) as sumPurchasePrice, COALESCE(SUM(o.resalePrice), 0) as sumResalePrice FROM Opportunity o LEFT JOIN Listing l ON o.listingId = l.id`
+          : `SELECT COUNT(*) as count, COALESCE(SUM(actualProfit), 0) as sumActualProfit, COALESCE(SUM(purchasePrice), 0) as sumPurchasePrice, COALESCE(SUM(resalePrice), 0) as sumResalePrice FROM Opportunity o`;
+
+        if (conditions.length > 0) aggregateSql += ' WHERE ' + conditions.join(' AND ');
+
+        const result = db.prepare(aggregateSql).get(...params) as {
+          count: number; sumActualProfit: number; sumPurchasePrice: number; sumResalePrice: number;
+        };
         return {
           _count: result.count,
-          _sum: {
-            actualProfit: result.sumActualProfit,
-            purchasePrice: result.sumPurchasePrice,
-            resalePrice: result.sumResalePrice,
-          },
+          _sum: { actualProfit: result.sumActualProfit, purchasePrice: result.sumPurchasePrice, resalePrice: result.sumResalePrice },
         };
       },
+
+      // Legacy aggregate removed — replaced by the parametric version above
 
       create: async (args: {
         data: Record<string, unknown>;
@@ -444,6 +514,27 @@ function createTestClient() {
         db.prepare('DELETE FROM Opportunity').run();
         return { count: 0 };
       },
+
+      createMany: async (args: { data: Record<string, unknown>[] }) => {
+        let count = 0;
+        for (const item of args.data) {
+          const id = `cltest${Date.now()}${Math.random().toString(36).slice(2)}`;
+          const now = new Date().toISOString();
+          const raw = { id, createdAt: now, updatedAt: now, ...item };
+          const data: Record<string, unknown> = {};
+          for (const [k, v] of Object.entries(raw)) {
+            if (Array.isArray(v)) data[k] = JSON.stringify(v);
+            else if (v instanceof Date) data[k] = v.toISOString();
+            else if (typeof v === 'boolean') data[k] = v ? 1 : 0;
+            else data[k] = v;
+          }
+          const keys = Object.keys(data);
+          const placeholders = keys.map(() => '?').join(', ');
+          db.prepare(`INSERT INTO Opportunity (${keys.join(', ')}) VALUES (${placeholders})`).run(...Object.values(data));
+          count++;
+        }
+        return { count };
+      },
     },
 
     scraperJob: {
@@ -454,17 +545,13 @@ function createTestClient() {
       }) => {
         let sql = 'SELECT * FROM ScraperJob';
         const params: unknown[] = [];
-        const conditions: string[] = [];
 
         if (args?.where) {
-          for (const [key, value] of Object.entries(args.where)) {
-            conditions.push(`${key} = ?`);
-            params.push(value);
+          const { clause, params: whereParams } = buildWhereClause(args.where);
+          if (clause) {
+            sql += ' WHERE ' + clause;
+            params.push(...whereParams);
           }
-        }
-
-        if (conditions.length > 0) {
-          sql += ' WHERE ' + conditions.join(' AND ');
         }
 
         if (args?.orderBy) {
@@ -497,11 +584,16 @@ function createTestClient() {
       },
 
       update: async (args: { where: { id: string }; data: Record<string, unknown> }) => {
-        const updates = Object.entries(args.data)
-          .map(([key]) => `${key} = ?`)
-          .join(', ');
+        const serialized: Record<string, unknown> = {};
+        for (const [k, v] of Object.entries(args.data)) {
+          if (Array.isArray(v)) serialized[k] = JSON.stringify(v);
+          else if (v instanceof Date) serialized[k] = v.toISOString();
+          else if (typeof v === 'boolean') serialized[k] = v ? 1 : 0;
+          else serialized[k] = v;
+        }
+        const updates = Object.entries(serialized).map(([key]) => `${key} = ?`).join(', ');
         const sql = `UPDATE ScraperJob SET ${updates} WHERE id = ?`;
-        db.prepare(sql).run(...Object.values(args.data), args.where.id);
+        db.prepare(sql).run(...Object.values(serialized), args.where.id);
         return db.prepare('SELECT * FROM ScraperJob WHERE id = ?').get(args.where.id);
       },
 
@@ -534,11 +626,15 @@ function createTestClient() {
           sql += ` ORDER BY ${key} ${order.toUpperCase()}`;
         }
 
-        return db.prepare(sql).all(...params);
+        const rows = db.prepare(sql).all(...params) as Record<string, unknown>[];
+        // Convert SQLite integer boolean back to JS boolean
+        return rows.map(row => ({ ...row, enabled: Boolean(row.enabled) }));
       },
 
       findUnique: async (args: { where: { id: string } }) => {
-        return db.prepare('SELECT * FROM SearchConfig WHERE id = ?').get(args.where.id) || null;
+        const row = db.prepare('SELECT * FROM SearchConfig WHERE id = ?').get(args.where.id) as Record<string, unknown> | undefined;
+        if (!row) return null;
+        return { ...row, enabled: Boolean(row.enabled) };
       },
 
       create: async (args: { data: Record<string, unknown> }) => {
@@ -565,14 +661,15 @@ function createTestClient() {
 
       update: async (args: { where: { id: string }; data: Record<string, unknown> }) => {
         const now = new Date().toISOString();
-        const data = { ...args.data, updatedAt: now };
-        // Convert boolean to integer for SQLite
-        if (typeof data.enabled === 'boolean') {
-          data.enabled = data.enabled ? 1 : 0;
+        const raw = { ...args.data, updatedAt: now };
+        const data: Record<string, unknown> = {};
+        for (const [k, v] of Object.entries(raw)) {
+          if (Array.isArray(v)) data[k] = JSON.stringify(v);
+          else if (v instanceof Date) data[k] = v.toISOString();
+          else if (typeof v === 'boolean') data[k] = v ? 1 : 0;
+          else data[k] = v;
         }
-        const updates = Object.entries(data)
-          .map(([key]) => `${key} = ?`)
-          .join(', ');
+        const updates = Object.entries(data).map(([key]) => `${key} = ?`).join(', ');
         const sql = `UPDATE SearchConfig SET ${updates} WHERE id = ?`;
         db.prepare(sql).run(...Object.values(data), args.where.id);
         const row = db
@@ -583,6 +680,10 @@ function createTestClient() {
       },
 
       delete: async (args: { where: { id: string } }) => {
+        const existing = db.prepare('SELECT id FROM SearchConfig WHERE id = ?').get(args.where.id);
+        if (!existing) {
+          throw Object.assign(new Error('Record to delete does not exist.'), { code: 'P2025' });
+        }
         db.prepare('DELETE FROM SearchConfig WHERE id = ?').run(args.where.id);
         return { id: args.where.id };
       },
@@ -614,6 +715,20 @@ function createTestClient() {
 export const testPrisma = createTestClient();
 
 /**
+ * Ensure the test user exists (required for FK constraints on userId).
+ * Called after every reset so tests don't fail with SQLITE_CONSTRAINT_FOREIGNKEY.
+ */
+function ensureTestUser(): void {
+  const existing = db.prepare('SELECT id FROM User WHERE id = ?').get('test-user-id');
+  if (!existing) {
+    db.prepare(
+      `INSERT INTO User (id, email, name, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?)`
+    ).run('test-user-id', 'test@example.com', 'Test User', new Date().toISOString(), new Date().toISOString());
+  }
+}
+
+/**
  * Reset the database by deleting all records from all tables.
  * Tables are deleted in order to respect foreign key constraints.
  */
@@ -623,6 +738,8 @@ export async function resetDatabase(): Promise<void> {
   await testPrisma.scraperJob.deleteMany();
   await testPrisma.searchConfig.deleteMany();
   await testPrisma.priceHistory.deleteMany();
+  // Re-create the test user after clearing all data
+  ensureTestUser();
 }
 
 // Global test timeout for integration tests

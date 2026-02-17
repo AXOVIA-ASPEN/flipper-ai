@@ -185,7 +185,7 @@ describe('Listings API Integration Tests', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toContain('Missing required fields');
+      expect(data.error).toContain('Invalid request body');
     });
 
     it('should upsert existing listing (same platform + externalId)', async () => {
