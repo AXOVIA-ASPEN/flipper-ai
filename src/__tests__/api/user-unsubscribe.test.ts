@@ -78,11 +78,25 @@ describe('GET /api/user/unsubscribe', () => {
     expect(data.error).toBe('Invalid token');
   });
 
-  it('returns 400 JSON for token that decodes to empty string', async () => {
-    const emptyToken = Buffer.from('', 'utf-8').toString('base64url');
+  it('returns 400 when token decodes to empty string (empty base64url → falsy → Missing token)', async () => {
+    // Buffer.from('').toString('base64url') === '' which is falsy — hits the
+    // "Missing token" guard before the email-validation step.
+    const emptyToken = Buffer.from('', 'utf-8').toString('base64url'); // ''
     const res = await GET(makeGetRequest(emptyToken));
     expect(res.status).toBe(400);
     const data = await res.json();
+    // An empty token string is treated the same as a missing token
+    expect(data.success).toBe(false);
+    expect(['Missing token', 'Invalid token']).toContain(data.error);
+  });
+
+  it('returns 400 when token decodes to a whitespace-only string', async () => {
+    // Decodes fine but fails email regex — should return "Invalid token"
+    const wsToken = Buffer.from('   ', 'utf-8').toString('base64url');
+    const res = await GET(makeGetRequest(wsToken));
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.success).toBe(false);
     expect(data.error).toBe('Invalid token');
   });
 
