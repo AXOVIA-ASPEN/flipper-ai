@@ -443,4 +443,64 @@ describe('description-generator - default parameter branches', () => {
     const result = await generateLLMDescription(baseInput, 'ebay');
     expect(result.description).toBe('');
   });
+
+  it('generateLLMDescription includes originalPrice in prompt (truthy branch)', async () => {
+    const OpenAI = require('openai');
+    process.env.OPENAI_API_KEY = 'test-key';
+    const mockCreate = jest.fn().mockResolvedValue({
+      choices: [{ message: { content: 'Great headphones retailing for $350.' } }],
+    });
+    (OpenAI as jest.Mock).mockImplementation(() => ({
+      chat: { completions: { create: mockCreate } },
+    }));
+    const result = await generateLLMDescription({ ...baseInput, originalPrice: 350 }, 'ebay');
+    const prompt = mockCreate.mock.calls[0][0].messages[1].content;
+    expect(prompt).toContain('Retail: $350');
+    expect(result.description).toContain('headphones');
+  });
+
+  it('generateLLMDescription uses PLATFORM_STYLES.generic for unknown platform', async () => {
+    const OpenAI = require('openai');
+    process.env.OPENAI_API_KEY = 'test-key';
+    const mockCreate = jest.fn().mockResolvedValue({
+      choices: [{ message: { content: 'Item available for sale with quick shipping.' } }],
+    });
+    (OpenAI as jest.Mock).mockImplementation(() => ({
+      chat: { completions: { create: mockCreate } },
+    }));
+    // 'custom-platform' is not in PLATFORM_STYLES → falls back to generic
+    const result = await generateLLMDescription(baseInput, 'custom-platform');
+    expect(result.description).toBeTruthy();
+  });
+
+  it('generateLLMDescription: optional fields undefined → empty template lines', async () => {
+    const OpenAI = require('openai');
+    process.env.OPENAI_API_KEY = 'test-key';
+    const mockCreate = jest.fn().mockResolvedValue({
+      choices: [{ message: { content: 'Generic item for sale.' } }],
+    });
+    (OpenAI as jest.Mock).mockImplementation(() => ({
+      chat: { completions: { create: mockCreate } },
+    }));
+    // All optional fields undefined — covers falsy branches for defects/features/accessories/notes
+    const minimalInput: import('@/lib/description-generator').DescriptionGeneratorInput = {
+      brand: null,
+      model: null,
+      variant: null,
+      condition: 'fair',
+      category: null,
+      askingPrice: 10,
+      defects: undefined,
+      features: undefined,
+      includesAccessories: undefined,
+      sellerNotes: undefined,
+      originalPrice: undefined,
+    };
+    const result = await generateLLMDescription(minimalInput, 'ebay');
+    expect(result.description).toBe('Generic item for sale.');
+    const prompt = mockCreate.mock.calls[0][0].messages[1].content;
+    expect(prompt).toContain('Item'); // brand/model/variant all null → 'Item'
+    expect(prompt).toContain('General'); // category null → 'General'
+    expect(prompt).not.toContain('Retail:'); // no originalPrice
+  });
 });

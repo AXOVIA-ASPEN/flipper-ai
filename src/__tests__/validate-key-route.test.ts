@@ -91,4 +91,21 @@ describe('POST /api/user/settings/validate-key', () => {
     const data = await res.json();
     expect(data.success).toBe(false);
   });
+
+  it('should use fallback message when OpenAI error has no message', async () => {
+    // Covers the `error.message || 'Could not validate API key'` fallback branch
+    mockModelsList.mockRejectedValueOnce({ status: 503 }); // No message property
+    const res = await POST(makeRequest({ apiKey: 'sk-no-message-error' }));
+    const data = await res.json();
+    expect(data.valid).toBe(false);
+    expect(data.error).toBe('Could not validate API key');
+  });
+
+  it('should return 400 when apiKey is null', async () => {
+    // Covers the `!apiKey` branch (distinct from typeof check)
+    const res = await POST(makeRequest({ apiKey: null }));
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.valid).toBe(false);
+  });
 });
