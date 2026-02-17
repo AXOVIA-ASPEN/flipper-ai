@@ -80,11 +80,27 @@ jobs:
       - name: Run Unit Tests with Coverage
         run: pnpm test:coverage
 
-      - name: Check Coverage Threshold
+      - name: Print Coverage Summary
         run: |
-          COVERAGE=$(cat coverage/coverage-summary.json | python3 -c "import json,sys;d=json.load(sys.stdin);print(d['total']['statements']['pct'])")
-          echo "Coverage: ${COVERAGE}%"
-          python3 -c "import sys; sys.exit(0 if float('${COVERAGE}') >= 90 else 1)" || (echo '❌ Coverage below 90% threshold!' && exit 1)
+          python3 - <<'EOF'
+          import json, sys
+          with open('coverage/coverage-summary.json') as f:
+              d = json.load(f)['total']
+          print("=" * 50)
+          print("📊 Coverage Summary")
+          print("=" * 50)
+          for metric in ['statements', 'branches', 'functions', 'lines']:
+              pct = d[metric]['pct']
+              covered = d[metric]['covered']
+              total = d[metric]['total']
+              thresholds = {'statements': 99, 'branches': 96, 'functions': 98, 'lines': 99}
+              ok = "✅" if pct >= thresholds[metric] else "❌"
+              print(f"{ok} {metric.capitalize():<12}: {pct:.2f}% ({covered}/{total})")
+          print("=" * 50)
+          print("Thresholds enforced by jest.config.js (CI fails if coverage regresses).")
+          EOF
+        # NOTE: Jest enforces coverageThreshold in jest.config.js — the build step above
+        # (pnpm test:coverage) already exits non-zero if any threshold is breached.
 
       - name: Upload Coverage Report
         if: always()

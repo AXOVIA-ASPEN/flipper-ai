@@ -41,10 +41,12 @@ const config = {
   ],
   coverageThreshold: {
     global: {
-      branches: 90,
-      functions: 95,
-      lines: 95,
-      statements: 95,
+      // Thresholds reflect actual achieved coverage — CI will fail if these regress.
+      // Current: statements 99.38%, branches 96.82%, functions 98.59%, lines 99.46%
+      branches: 96,
+      functions: 98,
+      lines: 99,
+      statements: 99,
     },
   },
   setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup.ts'],
