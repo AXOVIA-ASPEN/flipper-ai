@@ -1114,4 +1114,331 @@ describe('Mercari Scraper - extended branch coverage', () => {
     const response = await POST(request);
     expect(response.status).toBe(200);
   });
+
+  it('handles item with seller shipping (Free shipping branch) and uncategorizable name', async () => {
+    // Covers: shippingPayer.name === 'Seller' → 'Free shipping' (line 348 cond-expr [0])
+    // Also covers: detectCategory() returns 'other' → 'other' fallback (line 337 binary-expr [2])
+    const item = {
+      id: 'seller-ship-1',
+      name: 'xyzqwerty12345 miscellaneous', // won't match any detectCategory pattern → 'other'
+      price: 30,
+      status: 'on_sale',
+      shippingPayer: { id: '1', name: 'Seller' }, // → 'Free shipping'
+      created: 1700000000,
+    };
+    const activeResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [item] }),
+    };
+    const soldResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
+    };
+    mockFetch
+      .mockResolvedValueOnce(activeResponse)
+      .mockResolvedValueOnce(soldResponse);
+
+    const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'seller ships misc' }),
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+  });
+
+  it('handles non-Error thrown in inner scraper job error handler (lines 592 + 601)', async () => {
+    // Covers both non-Error branches:
+    //   line 592: error instanceof Error ? error.message : 'Unknown Mercari error'
+    //   line 601: error instanceof Error ? error.message : 'Unknown error'
+    // Strategy: make scraperJob.update (COMPLETED) throw a non-Error string
+    // so inner catch fires (592), then outer catch fires (601)
+    const mockDb = require('@/lib/db').default;
+    // scraperJob.update first call (COMPLETED update) → throws a non-Error string
+    mockDb.scraperJob.update.mockRejectedValueOnce('non-Error string thrown');
+    // scraperJob.update second call (FAILED update) → resolves normally
+    mockDb.scraperJob.update.mockResolvedValueOnce({});
+
+    const mockItem = {
+      id: 'non-error-1',
+      name: 'Non Error Test Item',
+      price: 40,
+      status: 'on_sale',
+      created: 1700000000,
+    };
+    const activeResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [mockItem] }),
+    };
+    const soldResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
+    };
+    mockFetch
+      .mockResolvedValueOnce(activeResponse)
+      .mockResolvedValueOnce(soldResponse);
+
+    const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'non error test' }),
+    });
+    const response = await POST(request);
+    // Inner catch rethrows non-Error, outer catch returns 500
+    expect(response.status).toBe(500);
+    const data = await response.json();
+    expect(data.error).toBe('Failed to scrape Mercari listings');
+  });
+
+  it('handles seller ratings with no good/normal/bad fields (default-arg branches)', async () => {
+    // Covers: { good = 0, normal = 0, bad = 0 } default-arg when ratings object exists but fields missing
+    const item = {
+      id: 'seller-defaults-1',
+      name: 'Seller Defaults Item',
+      price: 55,
+      status: 'on_sale',
+      seller: {
+        name: 'DefaultRatingSeller',
+        ratings: {}, // ratings object exists but no good/normal/bad keys → default-arg branches fire
+      },
+    };
+    const activeResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [item] }),
+    };
+    const soldResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
+    };
+    mockFetch
+      .mockResolvedValueOnce(activeResponse)
+      .mockResolvedValueOnce(soldResponse);
+
+    const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'seller defaults' }),
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    // total=0, so should get 'New seller (no ratings)'
+  });
+
+  it('handles high-value item to trigger OPPORTUNITY status', async () => {
+    // Covers: estimation.valueScore >= 70 ? 'OPPORTUNITY' : 'NEW' → OPPORTUNITY branch
+    // Nintendo Switch (boost 1.25) + video games category (1.4-2.0x) + low price → valueScore ~89
+    const item = {
+      id: 'high-value-1',
+      name: 'Nintendo Switch OLED Console Bundle',
+      price: 50, // Very low price → profitMargin ~38% → valueScore ~89 → OPPORTUNITY
+      status: 'on_sale',
+      created: 1700000000,
+    };
+    const activeResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [item] }),
+    };
+    const soldResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
+    };
+    mockFetch
+      .mockResolvedValueOnce(activeResponse)
+      .mockResolvedValueOnce(soldResponse);
+
+    const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'iPhone 15 Pro Max' }),
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+  });
+
+  it('handles item with created=null but updated set (postedAt uses updated)', async () => {
+    // Covers: item.created falsy AND item.updated truthy → postedAt = new Date(item.updated * 1000)
+    const item = {
+      id: 'updated-only-1',
+      name: 'Updated Only Item',
+      price: 90,
+      status: 'on_sale',
+      created: null, // no created
+      updated: 1700000000, // has updated → should use this for postedAt
+    };
+    const activeResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [item] }),
+    };
+    const soldResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
+    };
+    mockFetch
+      .mockResolvedValueOnce(activeResponse)
+      .mockResolvedValueOnce(soldResponse);
+
+    const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'updated only' }),
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+  });
+
+  it('handles sold items where updated is null but created is set (price history soldAt branch)', async () => {
+    // Covers: soldAt: item.updated ? ... : item.created ? new Date(item.created * 1000) : new Date()
+    const activeItem = {
+      id: 'active-soldcheck-1',
+      name: 'Active Item',
+      price: 50,
+      status: 'on_sale',
+      created: 1700000000,
+    };
+    const soldItem = {
+      id: 'sold-nocreated-1',
+      name: 'Sold Item No Updated',
+      price: 75,
+      updated: null, // no updated
+      created: 1699000000, // has created → soldAt uses created
+    };
+    const activeResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [activeItem] }),
+    };
+    const soldResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [soldItem] }),
+    };
+    mockFetch
+      .mockResolvedValueOnce(activeResponse)
+      .mockResolvedValueOnce(soldResponse);
+
+    const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'sold date test' }),
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+  });
+
+  it('handles sold items with no price (data.length=0 in price history, returns 0)', async () => {
+    // Covers: if (!data.length) return 0; in savePriceHistory
+    const activeItem = {
+      id: 'active-noprice-1',
+      name: 'Active Item',
+      price: 50,
+      status: 'on_sale',
+      created: 1700000000,
+    };
+    const soldItemNoPrice = {
+      id: 'sold-noprice-1',
+      name: 'Sold Item No Price',
+      price: null, // no price → filtered out → data.length=0 → returns 0
+    };
+    const activeResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [activeItem] }),
+    };
+    const soldResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [soldItemNoPrice] }),
+    };
+    mockFetch
+      .mockResolvedValueOnce(activeResponse)
+      .mockResolvedValueOnce(soldResponse);
+
+    const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'no price sold' }),
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    const data = await response.json();
+    expect(data.priceHistorySaved).toBe(0);
+  });
+
+  it('handles sold items where name is missing (falls back to keywords in price history)', async () => {
+    // Covers: item.name || keywords → keywords branch in sold price history mapper
+    const activeItem = {
+      id: 'active-noname-1',
+      name: 'Active Item',
+      price: 50,
+      status: 'on_sale',
+      created: 1700000000,
+    };
+    const soldItemNoName = {
+      id: 'sold-noname-1',
+      name: null, // no name → should fallback to keywords
+      price: 60,
+      updated: 1699000000,
+    };
+    const activeResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [activeItem] }),
+    };
+    const soldResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [soldItemNoName] }),
+    };
+    mockFetch
+      .mockResolvedValueOnce(activeResponse)
+      .mockResolvedValueOnce(soldResponse);
+
+    const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'noname keywords test' }),
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+  });
+
+  it('handles sold items with neither updated nor created (soldAt defaults to new Date())', async () => {
+    // Covers: soldAt: item.updated ? ... : item.created ? ... : new Date() → last branch
+    const activeItem = {
+      id: 'active-nots-1',
+      name: 'Active Item',
+      price: 50,
+      status: 'on_sale',
+      created: 1700000000,
+    };
+    const soldItemNoDates = {
+      id: 'sold-nodates-1',
+      name: 'Sold No Dates',
+      price: 80,
+      updated: null,
+      created: null, // both null → new Date() fallback
+    };
+    const activeResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [activeItem] }),
+    };
+    const soldResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [soldItemNoDates] }),
+    };
+    mockFetch
+      .mockResolvedValueOnce(activeResponse)
+      .mockResolvedValueOnce(soldResponse);
+
+    const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'no dates sold' }),
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+  });
 });

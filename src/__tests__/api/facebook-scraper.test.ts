@@ -678,5 +678,53 @@ describe('Facebook Marketplace Scraper API', () => {
         'electronics',
       );
     });
+
+    it('handles item with no name, no images, no seller, no listing url (fallback branches)', async () => {
+      // Covers: item.name || '' (line 176 [1]), item.images?.map() || [] (line 190 [1])
+      //         item.seller?.name || null (line 209 [1]), marketplace_listing_url fallback (line 238 [1])
+      (getAuthUserId as jest.Mock).mockResolvedValue('user-456');
+      (prisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-fallback' });
+      (prisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          data: [
+            {
+              id: 'fb-minimal-1',
+              // no name, no images, no seller, no marketplace_listing_url
+              price: '45',
+              category: 'tools',
+            },
+          ],
+        }),
+      });
+      (prisma.listing.upsert as jest.Mock).mockResolvedValue({ id: 'listing-minimal', status: 'NEW' });
+
+      const request = new NextRequest('http://localhost/api/scraper/facebook', {
+        method: 'POST',
+        body: JSON.stringify({ keywords: 'minimal', accessToken: 'token' }),
+      });
+      const res = await POST(request);
+      expect(res.status).toBe(200);
+    });
+
+    it('handles POST without limit param (uses DEFAULT_LIMIT via ?? operator)', async () => {
+      // Covers: params.limit ?? DEFAULT_LIMIT → DEFAULT_LIMIT branch (line 74 [1])
+      (getAuthUserId as jest.Mock).mockResolvedValue('user-789');
+      (prisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-nolimit' });
+      (prisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({ data: [] }),
+      });
+
+      const request = new NextRequest('http://localhost/api/scraper/facebook', {
+        method: 'POST',
+        // No limit param → DEFAULT_LIMIT applied
+        body: JSON.stringify({ keywords: 'nolimit test', accessToken: 'token' }),
+      });
+      const res = await POST(request);
+      expect(res.status).toBe(200);
+    });
   });
 });
