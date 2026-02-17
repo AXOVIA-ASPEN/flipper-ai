@@ -32,11 +32,14 @@ const eslintConfig = defineConfig([
       'react-hooks/rules-of-hooks': 'off',
     },
   },
-  // Relax no-unescaped-entities for JSX (common false positives)
+  // Relax rules for JSX files
   {
     files: ['**/*.tsx'],
     rules: {
       'react/no-unescaped-entities': 'warn',
+      // Downgrade set-state-in-effect to warning — calling setLoading(true)
+      // at the top of a data-fetch effect is a well-established pattern.
+      'react-hooks/set-state-in-effect': 'warn',
     },
   },
 ]);

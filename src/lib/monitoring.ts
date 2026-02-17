@@ -4,6 +4,7 @@
  * and unified monitoring interface.
  */
 
+import os from 'os';
 import { logger } from './logger';
 import { metrics } from './metrics';
 
@@ -151,7 +152,7 @@ export function getSystemHealth(): {
   db: ReturnType<typeof getDbPerformanceSummary>;
 } {
   const mem = process.memoryUsage();
-  const totalMem = require('os').totalmem();
+  const totalMem = os.totalmem();
   const usedMem = mem.rss;
   const memPct = usedMem / totalMem;
 

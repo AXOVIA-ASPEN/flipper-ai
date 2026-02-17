@@ -36,10 +36,10 @@ export async function POST() {
     });
 
     return NextResponse.json({ url: portalSession.url });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Portal error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to create portal session' },
+      { error: error instanceof Error ? error.message : 'Failed to create portal session' },
       { status: 500 }
     );
   }
