@@ -142,6 +142,8 @@ export function generateDescriptionsForAllPlatforms(
     generateAlgorithmicDescription(input, p)
   );
 
+  // 'ebay' is always in platforms; find() always returns an entry with a non-empty description.
+  /* istanbul ignore next -- defensive fallbacks for find() miss or empty description; unreachable in practice */
   const primary = descriptions.find((d) => d.platform === 'ebay')?.description || descriptions[0]?.description || '';
   return { descriptions, primary };
 }

@@ -107,6 +107,21 @@ describe('Image Service', () => {
       expect(result.normalized).toBe('some-random-place');
     });
 
+    it('handles "City, UnrecognizedState" (STATE_CODES fallback to XX)', () => {
+      // stateInput is > 2 chars but not in STATE_CODES → stateCode = 'XX'
+      const result = normalizeLocation('Portland, Atlantica');
+      expect(result.stateCode).toBe('XX');
+      // STATE_CODE_TO_NAME['XX'] is undefined → stateName falls back to stateInput
+      expect(result.state).toBe('Atlantica');
+    });
+
+    it('handles "city-xx" dash format with unknown state code', () => {
+      // STATE_CODE_TO_NAME['XX'] is undefined → stateName falls back to stateCode 'XX'
+      const result = normalizeLocation('Springfield-xx');
+      expect(result.stateCode).toBe('XX');
+      expect(result.state).toBe('XX');
+    });
+
     it('normalizes all 50 state names', () => {
       const testCases: Array<[string, string, string]> = [
         ['Austin, Texas', 'TX', 'austin-tx'],

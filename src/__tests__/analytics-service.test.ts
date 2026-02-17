@@ -232,4 +232,30 @@ describe('getProfitLossAnalytics - branch coverage', () => {
     // Just verify categoryBreakdown has entries (avgROI >0 since there's purchase price)
     expect(result.categoryBreakdown.length).toBeGreaterThan(0);
   });
+
+  it('uses resalePrice ?? 0 when item has resaleDate but null resalePrice (line 175)', async () => {
+    // Item is SOLD with a resaleDate but resalePrice: null → triggers ?? 0 branch in trend
+    const soldWithNullPrice = makeOpp({
+      status: 'SOLD',
+      purchaseDate: new Date('2026-01-01'),
+      resaleDate: new Date('2026-01-15'),
+      resalePrice: null,
+    });
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([soldWithNullPrice]);
+    const result = await getProfitLossAnalytics('user-1');
+    // Trend should exist; revenue should be 0 (fell back to 0)
+    const saleTrend = result.trends.find((t) => t.itemsSold > 0);
+    expect(saleTrend).toBeDefined();
+    expect(saleTrend?.revenue).toBe(0);
+  });
+
+  it('computes avgROI correctly for sold item in category', async () => {
+    // Normal item, verifies the avgROI > 0 path in categoryBreakdown
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([
+      makeOpp({ purchasePrice: 50, resalePrice: 100, resaleDate: new Date('2026-01-20') }),
+    ]);
+    const result = await getProfitLossAnalytics('user-1');
+    const cat = result.categoryBreakdown.find((c) => c.category === 'Electronics');
+    expect(cat?.avgROI).toBeGreaterThan(0);
+  });
 });

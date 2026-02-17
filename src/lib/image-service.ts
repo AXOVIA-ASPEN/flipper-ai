@@ -46,6 +46,7 @@ function getExtensionFromMimeType(mimeType: string): string {
     'image/webp': 'webp',
     'image/gif': 'gif',
   };
+  /* istanbul ignore next -- only called with SUPPORTED_TYPES that are all in the map */
   return map[mimeType] || 'jpg';
 }
 
@@ -169,6 +170,7 @@ export async function downloadAndCacheImage(imageUrl: string): Promise<ImageDown
     }
 
     // Determine extension
+    /* istanbul ignore next -- getExtensionFromMimeType always returns a non-empty string for SUPPORTED_TYPES */
     const extension = getExtensionFromMimeType(mimeType) || getExtensionFromUrl(imageUrl);
     const fileName = `${urlHash}.${extension}`;
     const filePath = join(IMAGE_CACHE_DIR, fileName);

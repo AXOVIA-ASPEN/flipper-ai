@@ -61,7 +61,7 @@ export interface ProfitLossSummary {
   categoryBreakdown: CategoryBreakdown[];
 }
 
-function toTrendPeriod(date: Date, granularity: 'weekly' | 'monthly' = 'monthly'): string {
+function toTrendPeriod(date: Date, granularity: 'weekly' | 'monthly'): string {
   if (granularity === 'weekly') {
     const d = new Date(date);
     const day = d.getDay();
@@ -132,6 +132,7 @@ export async function getProfitLossAnalytics(
   const totalFees = items.reduce((s, i) => s + (i.fees ?? 0), 0);
   const totalGrossProfit = totalRevenue - totalInvested;
   const totalNetProfit = items.reduce((s, i) => s + i.netProfit, 0);
+  // overallROI: safe division guarded by totalInvested check (empty portfolio → 0)
   const overallROI = totalInvested > 0 ? (totalNetProfit / totalInvested) * 100 : 0;
   const avgDaysHeld = items.length > 0
     ? items.reduce((s, i) => s + i.daysHeld, 0) / items.length
@@ -191,6 +192,7 @@ export async function getProfitLossAnalytics(
     const invested = catItems.reduce((s, i) => s + i.purchasePrice, 0);
     const revenue = catItems.reduce((s, i) => s + (i.resalePrice ?? 0), 0);
     const profit = catItems.reduce((s, i) => s + i.netProfit, 0);
+    /* istanbul ignore next -- purchasePrice is always positive (validated by calculateROI), so invested > 0 always */
     const avgROI = invested > 0 ? (profit / invested) * 100 : 0;
     const soldItems = catItems.filter((i) => i.status === 'SOLD');
     const avgDays = soldItems.length > 0

@@ -394,3 +394,87 @@ describe('ebay-inventory - deeper branch coverage', () => {
     });
   });
 });
+
+describe('ebay-inventory - targeted branch coverage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    process.env.EBAY_OAUTH_TOKEN = 'test-token';
+  });
+
+  afterEach(() => {
+    delete process.env.EBAY_OAUTH_TOKEN;
+  });
+
+  it('uses explicit quantity (not default=1) in createInventoryItem (line 135 branch)', async () => {
+    // quantity explicitly provided → ?? 1 takes left branch (existing quantity)
+    mockFetch.mockResolvedValueOnce({ status: 204, ok: true });
+    mockFetch.mockResolvedValueOnce({
+      status: 201, ok: true,
+      json: async () => ({ offerId: 'offer-qty' }),
+    });
+    const result = await createDraftListing({ ...validInput, quantity: 3 });
+    expect(result.success).toBe(true);
+    // Check quantity was sent in the inventory PUT body
+    const inventoryCallBody = JSON.parse(mockFetch.mock.calls[0][1].body);
+    expect(inventoryCallBody.availability.shipToLocationAvailability.quantity).toBe(3);
+  });
+
+  it('uses explicit quantity in createOffer (line 187 cond-expr branch)', async () => {
+    mockFetch.mockResolvedValueOnce({ status: 204, ok: true });
+    mockFetch.mockResolvedValueOnce({
+      status: 201, ok: true,
+      json: async () => ({ offerId: 'offer-qty2' }),
+    });
+    const result = await createDraftListing({ ...validInput, quantity: 5 });
+    expect(result.success).toBe(true);
+    const offerCallBody = JSON.parse(mockFetch.mock.calls[1][1].body);
+    expect(offerCallBody.availableQuantity).toBe(5);
+  });
+
+  it('uses explicit currency (not USD fallback) in createOffer (line 212 branch)', async () => {
+    mockFetch.mockResolvedValueOnce({ status: 204, ok: true });
+    mockFetch.mockResolvedValueOnce({
+      status: 201, ok: true,
+      json: async () => ({ offerId: 'offer-curr' }),
+    });
+    const result = await createDraftListing({ ...validInput, currency: 'CAD' });
+    expect(result.success).toBe(true);
+    const offerCallBody = JSON.parse(mockFetch.mock.calls[1][1].body);
+    expect(offerCallBody.pricingSummary.price.currency).toBe('CAD');
+  });
+
+  it('uses longMessage in createInventoryItem error (line 172 cond-expr)', async () => {
+    mockFetch.mockResolvedValueOnce({
+      status: 400, ok: false,
+      json: async () => ({
+        errors: [{ longMessage: 'Detailed error message', message: 'Short msg' }],
+      }),
+    });
+    const result = await createDraftListing(validInput);
+    expect(result.success).toBe(false);
+    expect(result.errors).toContain('Detailed error message');
+  });
+
+  it('falls back to HTTP status when errors array is null in createInventoryItem (line 172 binary-expr)', async () => {
+    mockFetch.mockResolvedValueOnce({
+      status: 500, ok: false,
+      json: async () => ({ errors: null }),
+    });
+    const result = await createDraftListing(validInput);
+    expect(result.success).toBe(false);
+    expect(result.errors?.[0]).toBe('HTTP 500');
+  });
+
+  it('uses longMessage in createOffer error (line 255 cond-expr)', async () => {
+    mockFetch.mockResolvedValueOnce({ status: 204, ok: true }); // inventory ok
+    mockFetch.mockResolvedValueOnce({
+      status: 400, ok: false,
+      json: async () => ({
+        errors: [{ longMessage: 'Offer detailed error', message: 'Short' }],
+      }),
+    });
+    const result = await createDraftListing(validInput);
+    expect(result.success).toBe(false);
+    expect(result.errors).toContain('Offer detailed error');
+  });
+});
