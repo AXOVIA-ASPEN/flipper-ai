@@ -1,9 +1,10 @@
 # 🐧 Flipper.ai
 
 [![CI/CD Pipeline](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-1444-brightgreen)](.)
-[![Coverage](https://img.shields.io/badge/coverage-99.26%25-brightgreen)](.)
+[![Tests](https://img.shields.io/badge/tests-2177-brightgreen)](.)
+[![Coverage](https://img.shields.io/badge/coverage-97.67%25-brightgreen)](.)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](.)
+[![Version](https://img.shields.io/badge/version-1.0.1-blue)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 AI-powered marketplace flipping tool. Automatically scans Craigslist, Facebook Marketplace, eBay, OfferUp, and Mercari to find underpriced items, analyze profit potential with AI, and manage your flipping workflow from discovery to sale.
