@@ -107,4 +107,5 @@ export function clearRequests(): void {
   recentRequests.length = 0;
 }
 
-export default { recordRequest, getRecentRequests, getRequestStats, clearRequests };
+const requestMonitor = { recordRequest, getRecentRequests, getRequestStats, clearRequests };
+export default requestMonitor;
