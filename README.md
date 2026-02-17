@@ -1,14 +1,16 @@
 # 🐧 Flipper.ai
 
 [![CI/CD Pipeline](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-2300-brightgreen)](.)
-[![Test Suites](https://img.shields.io/badge/test%20suites-111-brightgreen)](.)
+[![Tests](https://img.shields.io/badge/tests-2378-brightgreen)](.)
+[![Test Suites](https://img.shields.io/badge/test%20suites-116-brightgreen)](.)
 [![Coverage](https://img.shields.io/badge/coverage-99.66%25-brightgreen)](.)
-[![Branches](https://img.shields.io/badge/branches-99.24%25-brightgreen)](.)
+[![Branches](https://img.shields.io/badge/branches-99.31%25-brightgreen)](.)
 [![Functions](https://img.shields.io/badge/functions-99.79%25-brightgreen)](.)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](.)
 [![Version](https://img.shields.io/badge/version-1.0.1-blue)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https://github.com/AXOVIA-ASPEN/flipper-ai)
 
 AI-powered marketplace flipping tool. Automatically scans Craigslist, Facebook Marketplace, eBay, OfferUp, and Mercari to find underpriced items, analyze profit potential with AI, and manage your flipping workflow from discovery to sale.
 

@@ -5,7 +5,51 @@
 | Method                   | Best For                                  | Cost                |
 | ------------------------ | ----------------------------------------- | ------------------- |
 | **Vercel** (recommended) | Production, auto-scaling, preview deploys | Free tier available |
+| **Railway** (easiest)    | One-click deploy, PostgreSQL included     | Free tier available |
 | **Docker**               | Self-hosted, full control                 | Your infra costs    |
+
+---
+
+## Quick Start (Railway) — Easiest Option
+
+Railway auto-detects Next.js, provides PostgreSQL, and deploys in minutes.
+
+### 1. One-Click Deploy
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https://github.com/AXOVIA-ASPEN/flipper-ai)
+
+Or manually:
+
+1. Go to [railway.app](https://railway.app) → New Project → Deploy from GitHub
+2. Connect `AXOVIA-ASPEN/flipper-ai` repository
+3. Railway auto-detects Next.js from `railway.json`
+
+### 2. Add PostgreSQL Database
+
+In Railway dashboard → New → Database → Add PostgreSQL
+Railway automatically sets `DATABASE_URL` in your environment.
+
+### 3. Set Environment Variables
+
+In Railway dashboard → Your service → Variables:
+
+| Variable            | Value                          | How to Generate             |
+| ------------------- | ------------------------------ | --------------------------- |
+| `AUTH_SECRET`       | Random string                  | `openssl rand -base64 32`   |
+| `ENCRYPTION_SECRET` | Random string (≥16 chars)      | `openssl rand -base64 32`   |
+| `NEXTAUTH_URL`      | Your Railway URL               | From Railway dashboard      |
+| `ANTHROPIC_API_KEY` | Your Anthropic key             | From Anthropic console      |
+
+### 4. Deploy
+
+Railway deploys automatically when you push to `main`. First deploy runs:
+```bash
+npx prisma migrate deploy && pnpm start
+```
+
+### 5. Custom Domain (Optional)
+
+In Railway → Settings → Custom Domain → Add domain `flipper-ai.axovia.ai`
 
 ---
 

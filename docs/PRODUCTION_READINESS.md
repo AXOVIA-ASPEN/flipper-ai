@@ -59,13 +59,34 @@
 
 ---
 
+## ✅ Staging Deployment (LIVE)
+
+**Running on AWS server via PM2:**
+- **URL:** http://localhost:3001 (internal; SSH tunnel for access)
+- **Health:** `{"status":"ok","environment":"production"}` ✅
+- **Swagger UI:** http://localhost:3001/docs ✅
+- **OpenAPI spec:** http://localhost:3001/api/docs (46 paths) ✅
+- **Process manager:** PM2 with systemd startup
+- **Database:** SQLite (dev.db) — switch to PostgreSQL for production
+- **Started:** February 17, 2026
+
+SSH tunnel access: `ssh -L 3001:localhost:3001 ubuntu@<server-ip>` → visit http://localhost:3001
+
+---
+
 ## 🔴 Blocked Items (Need Stephen)
 
-### Vercel Deployment
+### Option A: Vercel Deployment (Recommended)
 - [ ] **VERCEL_TOKEN** — generate at https://vercel.com/account/tokens
 - [ ] **VERCEL_ORG_ID** — from Vercel dashboard
 - [ ] **VERCEL_PROJECT_ID** — after linking repo to Vercel project
 - [ ] Add these as GitHub Secrets in AXOVIA-ASPEN/flipper-ai
+
+### Option B: Railway Deployment (Easiest)
+- [ ] Go to https://railway.app → New Project → Deploy from GitHub
+- [ ] Connect `AXOVIA-ASPEN/flipper-ai` (config in `railway.json`)
+- [ ] Add PostgreSQL database service
+- [ ] Set: `AUTH_SECRET`, `ENCRYPTION_SECRET`, `NEXTAUTH_URL`, `ANTHROPIC_API_KEY`
 
 ### Production Database
 - [ ] Choose DB provider: Vercel Postgres, Supabase, or Neon
