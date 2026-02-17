@@ -755,3 +755,61 @@ describe('POST /api/scraper/offerup', () => {
     expect(json.error).toContain('plain string error');
   });
 });
+
+describe('context.route resource blocking callbacks', () => {
+  // Ensure the inline route-blocking callbacks (route.abort()) are exercised
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (mockPrisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-route-cb' });
+    (mockPrisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+    (mockPrisma.listing.upsert as jest.Mock).mockResolvedValue({});
+    mockGetAuthUserId.mockResolvedValue('user-123');
+    mockDetectCategory.mockReturnValue('electronics');
+    mockEstimateValue.mockReturnValue({
+      estimatedValue: 300, estimatedLow: 200, estimatedHigh: 400,
+      profitPotential: 100, profitLow: 50, profitHigh: 150,
+      valueScore: 72, discountPercent: 35, resaleDifficulty: 'medium',
+      comparableUrls: [], reasoning: 'OK deal', notes: '',
+      shippable: true, negotiable: true, tags: ['electronics'],
+    } as any);
+    mockGeneratePurchaseMessage.mockReturnValue('Is this available?');
+    mockDownloadAndCacheImages.mockResolvedValue({ cachedUrls: [], successCount: 0 } as any);
+    mockNormalizeLocation.mockReturnValue({ normalized: 'Tampa, FL' } as any);
+  });
+
+  it('invokes context.route abort callbacks for resource blocking', async () => {
+    const { chromium } = require('playwright');
+    const mockAbort = jest.fn().mockResolvedValue(undefined);
+
+    // Make context.route actually call the handler with a mock route object
+    const mockRoute = jest.fn().mockImplementation(
+      async (_pattern: string, handler: (r: { abort: jest.Mock }) => unknown) => {
+        await handler({ abort: mockAbort });
+      }
+    );
+
+    const mockPage = {
+      goto: jest.fn().mockResolvedValue(undefined),
+      waitForSelector: jest.fn().mockResolvedValue(undefined),
+      content: jest.fn().mockResolvedValue('<html></html>'),
+      evaluate: jest.fn().mockResolvedValue([]),
+    };
+    const mockContext = {
+      newPage: jest.fn().mockResolvedValue(mockPage),
+      route: mockRoute,
+    };
+    chromium.launch.mockResolvedValue({
+      newContext: jest.fn().mockResolvedValue(mockContext),
+      close: jest.fn().mockResolvedValue(undefined),
+    });
+
+    const res = await POST(makeRequest({ location: 'tampa-fl' }));
+    const json = await res.json();
+
+    expect(json.success).toBe(true);
+    // context.route is called 3 times (images, analytics, tracking)
+    expect(mockRoute).toHaveBeenCalledTimes(3);
+    // abort() is invoked once per route registration handler call
+    expect(mockAbort).toHaveBeenCalledTimes(3);
+  });
+});

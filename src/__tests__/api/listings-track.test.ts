@@ -136,4 +136,28 @@ describe('POST /api/listings/track', () => {
     expect(res.status).toBe(500);
     expect(data.error).toBe('Failed to run tracking cycle');
   });
+
+  it('passes a fetcher callback that logs and returns null (placeholder)', async () => {
+    // Make runTrackingCycle actually invoke the fetcher callback to cover lines 48-49
+    const cycleResult = { checked: 1, updated: 0, sold: 0, errors: 0 };
+    mockRunCycle.mockImplementation(async (fetcher: (url: string) => Promise<null>) => {
+      // Invoke the placeholder fetcher callback with a URL
+      const result = await fetcher('https://ebay.com/item/123');
+      expect(result).toBeNull();
+      return cycleResult as any;
+    });
+
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+    const req = makeRequest({});
+    const res = await POST(req);
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data).toEqual(cycleResult);
+    // Verify the placeholder fetcher logged the URL
+    expect(consoleSpy).toHaveBeenCalledWith('Would fetch: https://ebay.com/item/123');
+
+    consoleSpy.mockRestore();
+  });
 });

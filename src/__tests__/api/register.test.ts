@@ -20,6 +20,14 @@ jest.mock('@/lib/db', () => ({
   },
 }));
 
+// Mock email service
+const mockSendWelcome = jest.fn();
+jest.mock('@/lib/email-service', () => ({
+  emailService: {
+    sendWelcome: (...args: unknown[]) => mockSendWelcome(...args),
+  },
+}));
+
 function createRequest(body: object) {
   return new NextRequest('http://localhost/api/auth/register', {
     method: 'POST',
@@ -29,7 +37,11 @@ function createRequest(body: object) {
 }
 
 describe('POST /api/auth/register', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    // Default: sendWelcome succeeds
+    mockSendWelcome.mockResolvedValue(undefined);
+  });
 
   it('creates a new user successfully', async () => {
     mockFindUnique.mockResolvedValue(null);
@@ -53,6 +65,10 @@ describe('POST /api/auth/register', () => {
     expect(res.status).toBe(200);
     expect(data.success).toBe(true);
     expect(data.data.user.email).toBe('test@example.com');
+    expect(mockSendWelcome).toHaveBeenCalledWith({
+      name: 'Test User',
+      email: 'test@example.com',
+    });
   });
 
   it('returns 400 when email missing', async () => {
@@ -98,6 +114,39 @@ describe('POST /api/auth/register', () => {
 
     const res = await POST(createRequest({ email: 'test@example.com', password: 'password123' }));
     expect(res.status).toBe(200);
+  });
+
+  it('still succeeds even if welcome email fails (non-blocking)', async () => {
+    mockFindUnique.mockResolvedValue(null);
+    mockCreate.mockResolvedValue({
+      id: 'user-3',
+      email: 'test@example.com',
+      name: 'Test User',
+      image: null,
+      createdAt: new Date(),
+    });
+    // Make sendWelcome reject to exercise the .catch() error handler
+    mockSendWelcome.mockRejectedValue(new Error('SMTP connection failed'));
+
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    const res = await POST(
+      createRequest({ email: 'test@example.com', password: 'password123', name: 'Test User' })
+    );
+    const data = await res.json();
+
+    // Registration should still succeed — email failure is non-blocking
+    expect(res.status).toBe(200);
+    expect(data.success).toBe(true);
+
+    // Give the non-blocking .catch() a tick to execute
+    await new Promise((r) => setImmediate(r));
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Failed to send welcome email:',
+      expect.any(Error)
+    );
+
+    consoleSpy.mockRestore();
   });
 
   it('returns 500 on unexpected error', async () => {
