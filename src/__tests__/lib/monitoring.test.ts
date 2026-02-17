@@ -324,3 +324,35 @@ describe('recordError - timestamp pruning (while loop body)', () => {
     // No assertion needed - just verifying no crash and loop body executed
   });
 });
+
+describe('triggerAlert - alert handler catch block', () => {
+  it('swallows errors thrown by alert handlers without crashing monitoring', () => {
+    jest.resetModules();
+    const { recordError, configureMonitoring, onAlert } = require('@/lib/monitoring');
+
+    // Set low threshold so alert fires
+    configureMonitoring({ errorRateThreshold: 1 });
+
+    // Register a handler that throws
+    onAlert(() => {
+      throw new Error('handler failure');
+    });
+
+    // This should not throw even though the handler does
+    expect(() => {
+      for (let i = 0; i < 5; i++) recordError('test error to trigger alert');
+    }).not.toThrow();
+  });
+});
+
+describe('getDbPerformanceSummary - zero total queries (avg = 0 branch)', () => {
+  it('returns avgDurationMs=0 when module state is fresh (total=0)', () => {
+    // Reset module to clear all mutable state (recentQueries array)
+    jest.resetModules();
+    const { getDbPerformanceSummary } = require('@/lib/monitoring');
+    const summary = getDbPerformanceSummary();
+    // Fresh module has no recorded queries → total=0 → avg=0 branch
+    expect(summary.totalQueries).toBe(0);
+    expect(summary.avgDurationMs).toBe(0);
+  });
+});

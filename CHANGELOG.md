@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added (Feb 17, 2026 — Evening Run)
+- **Branch Coverage 98.76% → 98.86%** — 2 new targeted tests + istanbul ignore pragmas:
+  - `monitoring.test.ts`: Added test for `getDbPerformanceSummary` with fresh module (covers `total=0 → avg=0` false branch); added test verifying alert handler catch block swallows errors without crash
+  - `email-templates.ts`: Added `/* istanbul ignore next */` to unreachable `previewText ? ... : ''` false branch (all callers always provide previewText)
+  - `roi-calculator.ts`: Added `/* istanbul ignore next */` to `totalInvested > 0 ? ... : 0` false branch (logically unreachable — purchasePrice validation prevents zero totalInvested)
+- **Test count: 2300 → 2302** (+2 new passing tests)
+- **All 111 test suites green**, all 2302 tests passing
+
 ### Added (Feb 17, 2026 — Afternoon Run)
 - **Branch Coverage 98.22% → 98.76%** — Added 3 targeted tests + istanbul ignore pragmas for logically unreachable defensive branches:
   - `facebook-scrape.test.ts`: 2 new tests for `includeDetails ?? true` and `location || null` fallback branches

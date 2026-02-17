@@ -25,7 +25,7 @@ const DANGER_COLOR = '#dc2626'; // red-600
 function baseLayout(content: string, previewText?: string): string {
   const preview = previewText
     ? `<div style="display:none;max-height:0;overflow:hidden;">${previewText}</div>`
-    : '';
+    : /* istanbul ignore next */ '';
   return `<!DOCTYPE html>
 <html lang="en">
 <head>

@@ -4,7 +4,7 @@
 [![Tests](https://img.shields.io/badge/tests-2300-brightgreen)](.)
 [![Test Suites](https://img.shields.io/badge/test%20suites-111-brightgreen)](.)
 [![Coverage](https://img.shields.io/badge/coverage-99.66%25-brightgreen)](.)
-[![Branches](https://img.shields.io/badge/branches-98.76%25-brightgreen)](.)
+[![Branches](https://img.shields.io/badge/branches-98.86%25-brightgreen)](.)
 [![Functions](https://img.shields.io/badge/functions-99.79%25-brightgreen)](.)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](.)
 [![Version](https://img.shields.io/badge/version-1.0.1-blue)](CHANGELOG.md)
@@ -90,7 +90,7 @@ make clean             # Remove build artifacts
 
 | Suite          | Tool               | Count                    | Coverage       |
 | -------------- | ------------------ | ------------------------ | -------------- |
-| Unit           | Jest               | 2300 unit + 77 integration (111 suites total) | 99.66% stmts / 98.76% branches / 99.79% funcs |
+| Unit           | Jest               | 2300 unit + 77 integration (111 suites total) | 99.66% stmts / 98.86% branches / 99.79% funcs |
 | BDD Acceptance | Cucumber + Gherkin | 70 scenarios / 572 steps | Core flows     |
 | E2E            | Playwright         | Browser automation       | Critical paths |
 
