@@ -887,5 +887,68 @@ describe('eBay Scraper API', () => {
         })
       );
     });
+
+    it('saves listing as NEW status when valueScore < 70 (low-value generic item)', async () => {
+      // A cheap $20 item with no brand/category → detectCategory used (no categories) → score < 70 → 'NEW'
+      const lowValueItem = makeEbayItem({
+        itemId: 'low-value-1',
+        title: 'Random old misc lot junk',
+        shortDescription: '',
+        price: { value: '20', currency: 'USD' }, // low price, no brand = low profit potential
+        categories: undefined, // triggers detectCategory fallback on line 168
+        condition: undefined, // triggers item.condition || null → null
+        image: undefined,
+        additionalImages: undefined,
+        seller: { username: 'seller', feedbackPercentage: '95', feedbackScore: 10 },
+      });
+
+      const mockFetch = global.fetch as jest.Mock;
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ itemSummaries: [lowValueItem] }),
+        })
+        .mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+
+      const response = await POST(createRequest({ keywords: 'random lot' }));
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      // The upsert should be called with status 'NEW' (low valueScore)
+      expect(mockListingUpsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          create: expect.objectContaining({ status: 'NEW' }),
+        })
+      );
+    });
+
+    it('saves sold items with no condition as null', async () => {
+      // Sold item without condition field → item.condition || null → null (covers line 298)
+      const soldItemNoCondition = makeSoldItem({ condition: undefined });
+
+      const mockFetch = global.fetch as jest.Mock;
+      mockFetch
+        .mockResolvedValueOnce({ ok: true, json: async () => ({}) }) // active listings
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ itemSummaries: [soldItemNoCondition] }),
+        });
+
+      mockPriceHistoryCreateMany.mockResolvedValue({ count: 1 });
+
+      const response = await POST(createRequest({ keywords: 'test' }));
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      // Price history should be saved with condition: null
+      expect(mockPriceHistoryCreateMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.arrayContaining([
+            expect.objectContaining({ condition: null }),
+          ]),
+        })
+      );
+    });
   });
 });

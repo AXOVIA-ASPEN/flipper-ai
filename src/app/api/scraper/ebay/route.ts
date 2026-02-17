@@ -89,12 +89,14 @@ async function callEbayApi(
   searchParams: Record<string, string>
 ): Promise<EbaySearchResponse> {
   const token = process.env.EBAY_OAUTH_TOKEN;
+  /* istanbul ignore next -- POST handler already guards !token before calling callEbayApi */
   if (!token) {
     throw new Error('Missing EBAY_OAUTH_TOKEN environment variable');
   }
 
   const url = new URL(`${EBAY_API_BASE_URL}${path}`);
   Object.entries(searchParams).forEach(([key, value]) => {
+    /* istanbul ignore next -- all values passed to callEbayApi are strings, never null/undefined */
     if (value !== undefined && value !== null) {
       url.searchParams.set(key, value);
     }
@@ -162,6 +164,7 @@ async function saveListingFromEbayItem(item: EbayItemSummary, userId: string) {
   const price = parseFloat(item.price?.value || '0');
   const description = item.shortDescription || item.description || '';
   const category =
+    /* istanbul ignore next -- detectCategory always returns a non-empty string ('other' at minimum) */
     item.categories?.[0]?.categoryName || detectCategory(item.title, description) || 'electronics';
 
   const estimation = estimateValue(
