@@ -926,4 +926,192 @@ describe('Mercari Scraper - extended branch coverage', () => {
     const response = await POST(request);
     expect(response.status).toBe(200);
   });
+
+  it('returns 429 with rate-limit suggestion when Mercari API returns HTML (rate limit)', async () => {
+    // Covers: isRateLimited=true path → 429 + suggestion field in outer error handler
+    // Mercari returns HTML (rate limit block) → error includes 'rate limit' → 429
+    const htmlResponse = {
+      ok: false,
+      status: 503,
+      headers: { get: (h: string) => h === 'content-type' ? 'text/html; charset=utf-8' : null },
+      text: () => Promise.resolve('<html>Service Unavailable</html>'),
+    };
+    // Both fetch calls (active + sold) fail with HTML block
+    mockFetch
+      .mockResolvedValue(htmlResponse);
+
+    const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'rate limit test' }),
+    });
+    const response = await POST(request);
+    const data = await response.json();
+    // Should detect rate limit and return 429 with suggestion
+    expect(response.status).toBe(429);
+    expect(data.suggestion).toBeDefined();
+    expect(data.suggestion).toContain('rate limiting');
+  });
+
+  it('falls through to web scrape fallback when Mercari API fails for non-rate-limit reason (fallback ok)', async () => {
+    // Covers: catch(apiError) where error doesn't include 'rate limit'/'429'/'block'
+    //         then tries web scrape as fallback (ok response → returns [])
+    // Use URL-based discrimination: /v1/api → error, /search/ → ok
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('/v1/api/')) {
+        // API call fails (non-rate-limit)
+        return Promise.resolve({
+          ok: false,
+          status: 500,
+          headers: { get: () => 'application/json' },
+          text: () => Promise.resolve('Internal Server Error'),
+        });
+      } else {
+        // Web scrape URL (/search/?...) succeeds → returns []
+        return Promise.resolve({
+          ok: true,
+          headers: { get: () => 'text/html' },
+          text: () => Promise.resolve('<html>results</html>'),
+        });
+      }
+    });
+
+    const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'fallback test' }),
+    });
+    const response = await POST(request);
+    // Web scrape returns [] so 0 listings saved; scraper job completes
+    expect(response.status).toBe(200);
+    const data = await response.json();
+    expect(data.listingsSaved).toBe(0);
+  });
+
+  it('falls through to web scrape fallback and throws when fallback also fails (!ok)', async () => {
+    // Covers: if (!response.ok) throw new Error(`Mercari web scrape failed (${response.status})`)
+    // Use URL-based discrimination: all fetches fail
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('/v1/api/')) {
+        // API call fails (non-rate-limit generic error)
+        return Promise.resolve({
+          ok: false,
+          status: 500,
+          headers: { get: () => 'application/json' },
+          text: () => Promise.resolve('Internal Server Error'),
+        });
+      } else {
+        // Web scrape also fails → throws "Mercari web scrape failed"
+        return Promise.resolve({
+          ok: false,
+          status: 403,
+          headers: { get: () => 'text/html' },
+          text: () => Promise.resolve('Forbidden'),
+        });
+      }
+    });
+
+    const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'web scrape fail test' }),
+    });
+    const response = await POST(request);
+    // Web scrape failure propagates → 500
+    expect(response.status).toBe(500);
+    const data = await response.json();
+    expect(data.error).toBeDefined();
+  });
+
+  it('handles item with no shippingPayer (shippingNote = null branch)', async () => {
+    // Covers: shippingPayer is undefined → null shippingNote
+    const item = {
+      id: 'ship-null-1',
+      name: 'No Shipping Info Item',
+      price: 80,
+      status: 'on_sale',
+      // No shippingPayer, no shippingMethod
+    };
+    const activeResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [item] }),
+    };
+    const soldResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
+    };
+    mockFetch
+      .mockResolvedValueOnce(activeResponse)
+      .mockResolvedValueOnce(soldResponse);
+
+    const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'no shipping' }),
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+  });
+
+  it('handles item with buyer-pays shipping but no method name (standard fallback)', async () => {
+    // Covers: item.shippingPayer.name !== 'Seller' AND shippingMethod.name falsy → 'standard'
+    const item = {
+      id: 'ship-buyer-1',
+      name: 'Buyer Pays No Method',
+      price: 60,
+      status: 'on_sale',
+      shippingPayer: { id: '2', name: 'Buyer' },
+      // shippingMethod present but name is empty string
+      shippingMethod: { id: '1', name: '' },
+    };
+    const activeResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [item] }),
+    };
+    const soldResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
+    };
+    mockFetch
+      .mockResolvedValueOnce(activeResponse)
+      .mockResolvedValueOnce(soldResponse);
+
+    const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'buyer pays standard' }),
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+  });
+
+  it('handles item where postedAt is null (no created or updated timestamp)', async () => {
+    // Covers: item.created falsy AND item.updated falsy → postedAt = null
+    const item = {
+      id: 'no-dates-1',
+      name: 'No Dates Item',
+      price: 45,
+      status: 'on_sale',
+      // No created or updated fields
+    };
+    const activeResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [item] }),
+    };
+    const soldResponse = {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
+    };
+    mockFetch
+      .mockResolvedValueOnce(activeResponse)
+      .mockResolvedValueOnce(soldResponse);
+
+    const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'no dates test' }),
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+  });
 });
