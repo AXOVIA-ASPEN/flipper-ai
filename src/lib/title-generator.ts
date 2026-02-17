@@ -118,6 +118,7 @@ export function generateTitlesForAllPlatforms(input: TitleGeneratorInput): Title
   const titles: GeneratedTitle[] = platforms.map((p) => generateAlgorithmicTitle(input, p));
 
   // Primary title is the eBay one (most common resale platform)
+  /* istanbul ignore next -- ebay is always in platforms array; fallback is defensive only */
   const primary = titles.find((t) => t.platform === 'ebay')?.title || titles[0]?.title || '';
 
   return { titles, primary };

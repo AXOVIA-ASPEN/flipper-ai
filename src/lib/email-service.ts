@@ -264,11 +264,13 @@ function createEmailService(): EmailService {
 
   let provider: EmailProvider;
 
+  /* istanbul ignore next -- production branches excluded from test env (NODE_ENV=test) */
   if (resendApiKey && process.env.NODE_ENV !== 'test') {
     provider = new ResendProvider(resendApiKey, fromAddress);
     logger.info('[EmailService] Resend provider initialized', { fromAddress });
   } else {
     provider = new NullProvider();
+    /* istanbul ignore next -- production warning excluded from test env */
     if (process.env.NODE_ENV !== 'test') {
       logger.warn('[EmailService] No RESEND_API_KEY — using null provider (emails logged only)');
     }

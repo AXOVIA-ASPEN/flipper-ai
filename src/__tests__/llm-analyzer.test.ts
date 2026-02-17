@@ -312,4 +312,97 @@ describe('llm-analyzer - branch coverage', () => {
       process.env.OPENAI_API_KEY = origKey;
     }
   });
+
+  it('covers null content response (|| "" branch)', async () => {
+    // response.choices[0]?.message?.content || '' — fires when content is null
+    jest.resetModules();
+    const mockCreate = jest.fn().mockResolvedValue({
+      choices: [{ message: { content: null } }],
+    });
+    jest.mock('openai', () => jest.fn().mockImplementation(() => ({
+      chat: { completions: { create: mockCreate } },
+    })));
+    const { analyzeSellability: freshAnalyze } = require('../lib/llm-analyzer');
+    process.env.OPENAI_API_KEY = 'test-key';
+    const fullMarket = {
+      medianPrice: 450, lowPrice: 380, highPrice: 520, salesCount: 5,
+      soldListings: [{ title: 'PS5', price: 450, soldDate: null, condition: 'Good' }],
+      source: 'ebay_scrape' as const,
+    };
+    // null content → responseText = '' → jsonMatch = null → return null
+    const result = await freshAnalyze('Item', 100, mockId, fullMarket);
+    expect(result).toBeNull();
+  });
+
+  it('covers null brand/model/variant branches via fresh module with key set', async () => {
+    // Use resetModules to get a fresh singleton, then call with null brand/model/variant
+    // and 0-valued parsed fields to cover all || fallback branches
+    jest.resetModules();
+    const mockCreate = jest.fn().mockResolvedValue({
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              verifiedMarketValue: 0,
+              trueDiscountPercent: 0,
+              sellabilityScore: 0,
+              demandLevel: 'low',
+              expectedDaysToSell: 0,
+              authenticityRisk: 'low',
+              conditionRisk: 'low',
+              recommendedOfferPrice: 0,
+              recommendedListPrice: 0,
+              resaleStrategy: '',
+              resalePlatform: '',
+              confidence: 'low',
+              reasoning: '',
+              meetsThreshold: false,
+            }),
+          },
+        },
+      ],
+    });
+    jest.mock('openai', () => jest.fn().mockImplementation(() => ({
+      chat: { completions: { create: mockCreate } },
+    })));
+    const { analyzeSellability: freshAnalyze } = require('../lib/llm-analyzer');
+    process.env.OPENAI_API_KEY = 'test-key';
+
+    const idWithNulls = {
+      brand: null as unknown as string,
+      model: null as unknown as string,
+      variant: null,
+      year: null,
+      condition: 'good',
+      conditionNotes: null as unknown as string,
+      searchQuery: 'item',
+      category: 'misc',
+      worthInvestigating: true,
+      reasoning: '',
+    };
+    // Full market data object with required fields
+    const fullMarket = {
+      medianPrice: 450,
+      lowPrice: 380,
+      highPrice: 520,
+      salesCount: 5,
+      soldListings: [
+        { title: 'PS5 Console', price: 450, soldDate: null, condition: 'Good' },
+      ],
+      source: 'ebay_scrape' as const,
+    };
+    const result = await freshAnalyze('Item', 100, idWithNulls, fullMarket);
+    // With 0-valued fields, || fallbacks should fire
+    expect(result).not.toBeNull();
+    // verifiedMarketValue: 0 || medianPrice (450)
+    expect(result!.verifiedMarketValue).toBe(450);
+    // recommendedOfferPrice: 0 || askingPrice (100)
+    expect(result!.recommendedOfferPrice).toBe(100);
+    // resaleStrategy: '' || fallback
+    expect(result!.resaleStrategy).toBe('List on eBay with detailed photos');
+    // resalePlatform: '' || fallback
+    expect(result!.resalePlatform).toBe('ebay');
+    // meetsThreshold: false (not true)
+    expect(result!.meetsThreshold).toBe(false);
+  });
 });

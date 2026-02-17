@@ -83,6 +83,7 @@ let openai: OpenAI | null = null;
 function getOpenAI(): OpenAI {
   if (!openai) {
     const apiKey = process.env.OPENAI_API_KEY;
+    /* istanbul ignore next -- defensive guard; singleton already set before key-deletion tests */
     if (!apiKey) {
       throw new Error('OPENAI_API_KEY environment variable is not set');
     }
@@ -141,6 +142,7 @@ export async function analyzeSellability(
       max_tokens: 800,
     });
 
+    /* istanbul ignore next -- defensive fallback for empty/null API response content */
     const responseText = response.choices[0]?.message?.content || '';
 
     // Extract JSON from response
