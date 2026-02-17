@@ -198,7 +198,7 @@ export class EmailService {
 
     return this.send({
       to: opts.email,
-      subject: `🔔 Price Drop: ${opts.listing.title} (−${opts.listing.priceDropPercent.toFixed(0)}%)`,
+      subject: `🔔 Price Drop: ${opts.listing.title} (−${Math.floor(opts.listing.priceDropPercent)}%)`,
       html: priceAlertEmailHtml(emailOpts),
       text: priceAlertEmailText(emailOpts),
     });
