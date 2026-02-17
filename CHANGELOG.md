@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added (Feb 17, 2026 — Cron Worker Run #9)
+- **BDD Feature 09 Step Definitions** — complete BDD Cucumber step definitions for `09-real-time-notifications.feature`:
+  - 11 SSE scenarios: connect/ping, high-value alerts, opportunity notifications, job completion, cross-page badge persistence, dismiss/clear, auto-reconnect, auth rejection (401), multi-tab, heartbeat keepalive
+  - Hybrid test strategy: direct API validation + window EventSource injection + UI state assertions
+  - Verified SSE `/api/events` returns `text/event-stream` content-type and 401 for unauthenticated requests
+- **Security upgrade** — Next.js `16.1.0` → `16.1.6` (patches GHSA-9g9p-9gw9-jx7f, GHSA-h25m-26qc-wcjf, GHSA-5f7q-jpqc-wp7h DoS vulnerabilities)
+- **`docs/SECURITY_AUDIT.md`** — comprehensive security audit report: 16 → 12 vulns (6 → 2 high), lists remaining dev-only vulns with remediation guidance
+- **`docs/PRODUCTION_READINESS.md`** — updated status to Run #9
+
 ### Added (Feb 17, 2026 — Cron Worker Run #8)
 - **`scripts/validate-deployment.sh`** — comprehensive pre-deploy validation script:
   - Checks required env vars (NEXTAUTH_SECRET, DATABASE_URL, AI keys)
