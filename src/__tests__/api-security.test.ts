@@ -195,6 +195,37 @@ describe('api-security', () => {
       });
       expect(validateCsrf(req)).toBe(false);
     });
+
+    it('rejects POST with x-csrf-token set but no csrf-token cookie (csrfCookie null branch)', () => {
+      // Covers `csrfToken && csrfCookie` → csrfToken truthy but csrfCookie null → false
+      process.env.FLIPPER_API_KEYS = '';
+      const req = new NextRequest('http://localhost/api/test', {
+        method: 'POST',
+        headers: {
+          'x-csrf-token': 'tok123',
+          // No csrf-token cookie set
+        },
+      });
+      expect(validateCsrf(req)).toBe(false);
+    });
+
+    it('rejects POST when origin is set but host header is absent (origin && host → false)', () => {
+      // Covers `if (origin && host)` → origin truthy, host null → false branch
+      process.env.FLIPPER_API_KEYS = '';
+      const req = new NextRequest('http://localhost/api/test', {
+        method: 'POST',
+        headers: { origin: 'http://localhost:3000' },
+        // No host header
+      });
+      expect(validateCsrf(req)).toBe(false);
+    });
+
+    it('getCorsHeaders returns no CORS allow-origin when origin is null', () => {
+      // Covers `if (origin && ...)` → false (origin is null)
+      const headers = getCorsHeaders(null);
+      expect(headers['Access-Control-Allow-Origin']).toBeUndefined();
+      expect(headers['Access-Control-Allow-Methods']).toBeDefined();
+    });
   });
 
   describe('validateRequestBody', () => {
