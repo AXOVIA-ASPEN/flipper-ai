@@ -11,13 +11,17 @@ const config = {
   testTimeout: 30000,
   // Run tests sequentially to avoid database conflicts
   maxWorkers: 1,
-  // Use integration-specific setup
-  setupFilesAfterEnv: ['<rootDir>/src/__tests__/integration/setup.ts'],
+  // Use both the base setup (for ESM mocks) and integration-specific setup
+  setupFilesAfterEnv: [
+    '<rootDir>/src/__tests__/setup.ts',
+    '<rootDir>/src/__tests__/integration/setup.ts',
+  ],
   // Set test database URL
   globalSetup: undefined,
   globalTeardown: undefined,
-  // Transform the generated Prisma client (which uses ESM)
-  transformIgnorePatterns: ['/node_modules/(?!(@prisma/adapter-libsql|@libsql)/)'],
+  // Transform ESM-only packages including next-auth, @auth/core, and Prisma
+  transformIgnorePatterns: [
+    '/node_modules/(?!(@auth/prisma-adapter|@auth/core|next-auth|@prisma/adapter-libsql|@libsql)/)'],
   // Use experimental ESM support for import.meta
   extensionsToTreatAsEsm: [],
 };

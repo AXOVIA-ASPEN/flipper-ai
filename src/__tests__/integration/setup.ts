@@ -23,6 +23,62 @@ db.pragma('foreign_keys = ON');
  * Create a Prisma-like client interface for testing
  * This wraps better-sqlite3 to provide the same API as Prisma
  */
+/**
+ * Build a SQLite WHERE clause from a Prisma-style where object.
+ * Supports: equality, { gte }, { lte }, { contains }, { OR: [...] }, null checks
+ */
+function buildWhereClause(
+  where: Record<string, unknown>
+): { clause: string; params: unknown[] } {
+  const conditions: string[] = [];
+  const params: unknown[] = [];
+
+  for (const [key, value] of Object.entries(where)) {
+    if (key === 'OR' && Array.isArray(value)) {
+      // Handle Prisma OR: [{ field: val }, { field: null }]
+      const orParts: string[] = [];
+      for (const orCond of value as Record<string, unknown>[]) {
+        const { clause: innerClause, params: innerParams } = buildWhereClause(orCond);
+        if (innerClause) {
+          orParts.push(`(${innerClause})`);
+          params.push(...innerParams);
+        }
+      }
+      if (orParts.length > 0) {
+        conditions.push(`(${orParts.join(' OR ')})`);
+      }
+    } else if (value === null) {
+      conditions.push(`${key} IS NULL`);
+    } else if (typeof value === 'object' && value !== null) {
+      const obj = value as Record<string, unknown>;
+      if ('gte' in obj && 'lte' in obj) {
+        conditions.push(`${key} >= ? AND ${key} <= ?`);
+        params.push(obj.gte, obj.lte);
+      } else if ('gte' in obj) {
+        conditions.push(`${key} >= ?`);
+        params.push(obj.gte);
+      } else if ('lte' in obj) {
+        conditions.push(`${key} <= ?`);
+        params.push(obj.lte);
+      } else if ('contains' in obj) {
+        conditions.push(`${key} LIKE ?`);
+        params.push(`%${obj.contains}%`);
+      } else {
+        // Skip complex operators not supported
+        console.warn(`buildWhereClause: unsupported operator for key "${key}":`, obj);
+      }
+    } else {
+      conditions.push(`${key} = ?`);
+      params.push(value);
+    }
+  }
+
+  return {
+    clause: conditions.join(' AND '),
+    params,
+  };
+}
+
 function createTestClient() {
   return {
     listing: {
@@ -35,22 +91,13 @@ function createTestClient() {
       }) => {
         let sql = 'SELECT * FROM Listing';
         const params: unknown[] = [];
-        const conditions: string[] = [];
 
         if (args?.where) {
-          for (const [key, value] of Object.entries(args.where)) {
-            if (typeof value === 'object' && value !== null && 'gte' in value) {
-              conditions.push(`${key} >= ?`);
-              params.push((value as { gte: number }).gte);
-            } else {
-              conditions.push(`${key} = ?`);
-              params.push(value);
-            }
+          const { clause, params: whereParams } = buildWhereClause(args.where);
+          if (clause) {
+            sql += ' WHERE ' + clause;
+            params.push(...whereParams);
           }
-        }
-
-        if (conditions.length > 0) {
-          sql += ' WHERE ' + conditions.join(' AND ');
         }
 
         if (args?.orderBy) {
@@ -110,22 +157,13 @@ function createTestClient() {
       count: async (args?: { where?: Record<string, unknown> }) => {
         let sql = 'SELECT COUNT(*) as count FROM Listing';
         const params: unknown[] = [];
-        const conditions: string[] = [];
 
         if (args?.where) {
-          for (const [key, value] of Object.entries(args.where)) {
-            if (typeof value === 'object' && value !== null && 'gte' in value) {
-              conditions.push(`${key} >= ?`);
-              params.push((value as { gte: number }).gte);
-            } else {
-              conditions.push(`${key} = ?`);
-              params.push(value);
-            }
+          const { clause, params: whereParams } = buildWhereClause(args.where);
+          if (clause) {
+            sql += ' WHERE ' + clause;
+            params.push(...whereParams);
           }
-        }
-
-        if (conditions.length > 0) {
-          sql += ' WHERE ' + conditions.join(' AND ');
         }
 
         const result = db.prepare(sql).get(...params) as { count: number };
@@ -135,7 +173,15 @@ function createTestClient() {
       create: async (args: { data: Record<string, unknown> }) => {
         const id = args.data.id || `cltest${Date.now()}${Math.random().toString(36).slice(2)}`;
         const now = new Date().toISOString();
-        const data = { id, scrapedAt: now, ...args.data };
+        const raw = { id, scrapedAt: now, ...args.data };
+        // Serialize non-primitive values for SQLite
+        const data: Record<string, unknown> = {};
+        for (const [k, v] of Object.entries(raw)) {
+          if (Array.isArray(v)) data[k] = JSON.stringify(v);
+          else if (v instanceof Date) data[k] = v.toISOString();
+          else if (typeof v === 'boolean') data[k] = v ? 1 : 0;
+          else data[k] = v;
+        }
 
         const keys = Object.keys(data);
         const placeholders = keys.map(() => '?').join(', ');
@@ -146,32 +192,53 @@ function createTestClient() {
       },
 
       upsert: async (args: {
-        where: { platform_externalId: { platform: string; externalId: string } };
+        where: {
+          platform_externalId?: { platform: string; externalId: string };
+          platform_externalId_userId?: { platform: string; externalId: string; userId?: string };
+        };
         create: Record<string, unknown>;
         update: Record<string, unknown>;
       }) => {
-        const existing = db
-          .prepare('SELECT * FROM Listing WHERE platform = ? AND externalId = ?')
-          .get(args.where.platform_externalId.platform, args.where.platform_externalId.externalId);
+        // Support both platform_externalId and platform_externalId_userId compound keys
+        const key = args.where.platform_externalId_userId ?? args.where.platform_externalId;
+        const existing = key
+          ? (args.where.platform_externalId_userId && key.userId != null
+            ? db.prepare('SELECT * FROM Listing WHERE platform = ? AND externalId = ? AND userId = ?')
+                .get(key.platform, key.externalId, key.userId)
+            : db.prepare('SELECT * FROM Listing WHERE platform = ? AND externalId = ?')
+                .get(key.platform, key.externalId))
+          : null;
+
+        const serializeValues = (obj: Record<string, unknown>) => {
+          const result: Record<string, unknown> = {};
+          for (const [k, v] of Object.entries(obj)) {
+            if (Array.isArray(v)) result[k] = JSON.stringify(v);
+            else if (v instanceof Date) result[k] = v.toISOString();
+            else if (typeof v === 'boolean') result[k] = v ? 1 : 0;
+            else result[k] = v;
+          }
+          return result;
+        };
 
         if (existing) {
           const id = (existing as Record<string, unknown>).id;
-          const updates = Object.entries(args.update)
+          const serialized = serializeValues(args.update);
+          const updates = Object.entries(serialized)
             .map(([key]) => `${key} = ?`)
             .join(', ');
           const sql = `UPDATE Listing SET ${updates} WHERE id = ?`;
-          db.prepare(sql).run(...Object.values(args.update), id);
+          db.prepare(sql).run(...Object.values(serialized), id);
           return db.prepare('SELECT * FROM Listing WHERE id = ?').get(id);
         } else {
           const id = `cltest${Date.now()}${Math.random().toString(36).slice(2)}`;
           const now = new Date().toISOString();
-          const data = { id, scrapedAt: now, ...args.create };
+          const serialized = serializeValues({ id, scrapedAt: now, ...args.create });
 
-          const keys = Object.keys(data);
+          const keys = Object.keys(serialized);
           const placeholders = keys.map(() => '?').join(', ');
           const sql = `INSERT INTO Listing (${keys.join(', ')}) VALUES (${placeholders})`;
 
-          db.prepare(sql).run(...Object.values(data));
+          db.prepare(sql).run(...Object.values(serialized));
           return db.prepare('SELECT * FROM Listing WHERE id = ?').get(id);
         }
       },
@@ -190,8 +257,17 @@ function createTestClient() {
         return { id: args.where.id };
       },
 
-      deleteMany: async () => {
-        db.prepare('DELETE FROM Listing').run();
+      deleteMany: async (args?: { where?: Record<string, unknown> }) => {
+        let sql = 'DELETE FROM Listing';
+        const params: unknown[] = [];
+        if (args?.where) {
+          const { clause, params: whereParams } = buildWhereClause(args.where);
+          if (clause) {
+            sql += ' WHERE ' + clause;
+            params.push(...whereParams);
+          }
+        }
+        db.prepare(sql).run(...params);
         return { count: 0 };
       },
     },
@@ -557,4 +633,46 @@ jest.mock('@/lib/db', () => ({
   __esModule: true,
   default: testPrisma,
   prisma: testPrisma,
+}));
+
+// Mock @/lib/auth to return an authenticated test session
+// This ensures API routes that use withAuth() work in integration tests
+jest.mock('@/lib/auth', () => ({
+  __esModule: true,
+  auth: jest.fn().mockResolvedValue({
+    user: {
+      id: 'test-user-id',
+      email: 'test@example.com',
+      name: 'Test User',
+    },
+    expires: new Date(Date.now() + 86400000).toISOString(),
+  }),
+  handlers: { GET: jest.fn(), POST: jest.fn() },
+  signIn: jest.fn(),
+  signOut: jest.fn(),
+}));
+
+// Mock value-estimator to bypass the 70% discount threshold in integration tests
+// This allows us to test the database/API layer without business logic filtering
+jest.mock('@/lib/value-estimator', () => ({
+  estimateValue: jest.fn().mockReturnValue({
+    estimatedValue: 500,
+    estimatedLow: 400,
+    estimatedHigh: 600,
+    profitPotential: 380,
+    profitLow: 280,
+    profitHigh: 480,
+    valueScore: 85,
+    discountPercent: 80,
+    resaleDifficulty: 'EASY',
+    confidence: 'high',
+    reasoning: 'Mock estimation for integration tests',
+    notes: 'Integration test mock - high discount item',
+    comparableUrls: [],
+    shippable: true,
+    negotiable: false,
+    tags: ['test'],
+  }),
+  detectCategory: jest.fn().mockReturnValue('electronics'),
+  generatePurchaseMessage: jest.fn().mockReturnValue('Mock purchase message for integration tests'),
 }));
