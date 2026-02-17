@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense, useEffect, useRef, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   TrendingUp,
   DollarSign,
@@ -102,6 +103,7 @@ interface ImageModalState {
 }
 
 function DashboardContent() {
+  const router = useRouter();
   const [listings, setListings] = useState<Listing[]>([]);
   const [stats, setStats] = useState<Stats>({
     totalListings: 0,
@@ -203,6 +205,20 @@ function DashboardContent() {
       setLoading(false);
     }
   }, [filters]);
+
+  // Redirect new users to onboarding if not complete
+  useEffect(() => {
+    fetch('/api/user/onboarding')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && !data.data.onboardingComplete) {
+          router.replace('/onboarding');
+        }
+      })
+      .catch(() => {
+        // If onboarding check fails, don't block the dashboard
+      });
+  }, [router]);
 
   useEffect(() => {
     fetchListings();

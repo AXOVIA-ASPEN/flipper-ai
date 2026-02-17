@@ -6,6 +6,14 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+// Mock next/navigation
+const mockRouterReplace = jest.fn();
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ replace: mockRouterReplace, push: jest.fn() }),
+  useSearchParams: () => ({ get: jest.fn(() => null), toString: () => '' }),
+  usePathname: () => '/',
+}));
+
 // Mock useFilterParams
 const mockSetFilter = jest.fn();
 const mockClearFilters = jest.fn();
@@ -82,13 +90,24 @@ const mockListings = [
 ];
 
 function setupFetchMock() {
-  mockFetch.mockResolvedValue({
-    ok: true,
-    json: async () => ({
-      listings: mockListings,
-      total: 42,
-      pagination: { page: 1, limit: 20, total: 42, totalPages: 3 },
-    }),
+  mockFetch.mockImplementation((url: string) => {
+    if (typeof url === 'string' && url.includes('/api/user/onboarding')) {
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({
+          success: true,
+          data: { onboardingComplete: true, onboardingStep: 6, totalSteps: 6 },
+        }),
+      });
+    }
+    return Promise.resolve({
+      ok: true,
+      json: async () => ({
+        listings: mockListings,
+        total: 42,
+        pagination: { page: 1, limit: 20, total: 42, totalPages: 3 },
+      }),
+    });
   });
 }
 
@@ -101,7 +120,18 @@ describe('Dashboard', () => {
   });
 
   it('renders loading state initially', () => {
-    mockFetch.mockReturnValue(new Promise(() => {}));
+    mockFetch.mockImplementation((url: string) => {
+      if (typeof url === 'string' && url.includes('/api/user/onboarding')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            success: true,
+            data: { onboardingComplete: true, onboardingStep: 6, totalSteps: 6 },
+          }),
+        });
+      }
+      return new Promise(() => {});
+    });
     render(<Dashboard />);
     expect(screen.getByText('Loading listings...')).toBeInTheDocument();
   });
