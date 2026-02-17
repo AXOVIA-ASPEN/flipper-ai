@@ -7,6 +7,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- **Integration Test Suite — 77/77 PASSING** — Fixed entire integration test infrastructure and got all 77 tests green:
+  - Rebuilt `better-sqlite3` native bindings for Node.js v22 (ABI 127)
+  - Applied `dev.db` schema to `test.db` via Python migration script
+  - Added `next-auth` to `transformIgnorePatterns` in `jest.integration.config.js`
+  - Refactored `testPrisma` client with `buildWhereClause()` helper supporting `OR`, `gte`, `lte`, `contains`, `IS NULL`, and nested relation JOINs
+  - Added auth mock (`@/lib/auth`) and value-estimator mock for integration layer isolation
+  - Added test user FK seed, `createMany`, proper P2025 errors, boolean serialization
+- **CI Integration Test Gate** — Added `integration-test` job to GitHub Actions CI pipeline; `build` now requires both `test` (unit) and `integration-test` to pass
+- **Integration Test Documentation** — Added `docs/INTEGRATION-TEST-RESULTS.md` with full results, suite breakdown, and infrastructure notes
 - **README Project Status Table** — Added comprehensive project status checklist to README with production-readiness milestones
 - **Register Route 100% Coverage** — Fixed emailService mock; added test for non-blocking welcome email failure path (50% → 100% fn coverage)
 - **OfferUp Route 100% Coverage** — Added test that invokes `context.route()` abort callbacks for resource blocking (75% → 100% fn coverage)

@@ -1,7 +1,7 @@
 # 🐧 Flipper.ai
 
 [![CI/CD Pipeline](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-2297-brightgreen)](.)
+[![Tests](https://img.shields.io/badge/tests-2374-brightgreen)](.)
 [![Test Suites](https://img.shields.io/badge/test%20suites-111-brightgreen)](.)
 [![Coverage](https://img.shields.io/badge/coverage-99.64%25-brightgreen)](.)
 [![Branches](https://img.shields.io/badge/branches-98.22%25-brightgreen)](.)
@@ -76,7 +76,7 @@ EBAY_MARKETPLACE_ID="EBAY_US"
 make help              # Show all commands
 make dev               # Start dev server
 make build             # Production build (strict TypeScript)
-make test              # Run 2297 unit tests (Jest)
+make test              # Run 2297 unit tests + 77 integration tests
 make test-acceptance   # Run BDD acceptance tests (Cucumber/Gherkin)
 make test-e2e          # Run E2E tests (Playwright)
 make test-all          # Run all test suites
@@ -90,7 +90,7 @@ make clean             # Remove build artifacts
 
 | Suite          | Tool               | Count                    | Coverage       |
 | -------------- | ------------------ | ------------------------ | -------------- |
-| Unit           | Jest               | 2297 (111 suites)        | 99.64% stmts / 98.22% branches / 99.79% funcs |
+| Unit           | Jest               | 2297 unit + 77 integration (6 suites)        | 99.64% stmts / 98.22% branches / 99.79% funcs |
 | BDD Acceptance | Cucumber + Gherkin | 70 scenarios / 572 steps | Core flows     |
 | E2E            | Playwright         | Browser automation       | Critical paths |
 
@@ -266,7 +266,7 @@ pnpm format:check  # Check formatting
 | Milestone                      | Status |
 | ------------------------------ | ------ |
 | Core feature implementation    | ✅ Complete |
-| Unit tests (Jest)              | ✅ 2297 tests, 111 suites |
+| Unit tests (Jest)              | ✅ 2297 tests, 111 suites + 77 integration tests (6 suites) |
 | Statement coverage             | ✅ 99.64% |
 | Branch coverage                | ✅ 98.22% |
 | Function coverage              | ✅ 99.79% |
@@ -288,4 +288,4 @@ MIT — see [LICENSE](LICENSE) for details.
 ---
 
 Built with 🐧 by [Axovia AI](https://github.com/AXOVIA-ASPEN)  
-*Last updated: February 17, 2026 — 2297 tests passing, 99.64% coverage*
+*Last updated: February 17, 2026 — 2374 total tests (2297 unit + 77 integration), 99.64% coverage*
