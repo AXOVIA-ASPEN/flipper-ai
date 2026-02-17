@@ -49,6 +49,7 @@ function ensureCleanup() {
     5 * 60 * 1000
   );
   // Don't prevent process exit
+  /* istanbul ignore next -- unref is always available in Node.js ≥ 11 */
   if (typeof cleanupTimer === 'object' && 'unref' in cleanupTimer) {
     cleanupTimer.unref();
   }

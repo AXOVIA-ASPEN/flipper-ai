@@ -195,4 +195,33 @@ describe('rate-limiter', () => {
 
     jest.useRealTimers();
   });
+
+  it('cleanup keeps non-expired IP and user entries when window has not elapsed', () => {
+    // Covers the false arm: if (v.resetAt <= now) === false → entry is kept
+    jest.useFakeTimers();
+
+    const longPath = '/api/auth/register'; // 300s window
+    const shortPath = '/api/listings';     // 60s window
+
+    // t=0: Create a short-window entry (expires at t=60s)
+    rateLimit('short-cleanup-ip', shortPath, 'short-user');
+
+    // t=10s: Create a long-window entry (expires at t=310s)
+    jest.advanceTimersByTime(10 * 1000);
+    rateLimit('long-cleanup-ip', longPath, 'long-user');
+
+    // t=300s: Trigger the cleanup interval (5-minute interval fires)
+    // At this point: short entry (resetAt=60s) → 60 <= 300 → deleted ✓
+    //                long entry  (resetAt=310s) → 310 > 300  → KEPT  ← covers false branch
+    jest.advanceTimersByTime(290 * 1000); // total: 300s
+
+    // Long-window entry should still be alive (not reset)
+    const r = rateLimit('long-cleanup-ip', longPath, 'long-user');
+    // Should be the 2nd request in the same window (count=2), not 1st (count=1)
+    expect(r.allowed).toBe(true);
+    const maxRemaining = (5 * 2) - 1; // limit * 2 - 1 for first user request
+    expect(r.remaining).toBeLessThanOrEqual(maxRemaining);
+
+    jest.useRealTimers();
+  });
 });

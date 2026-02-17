@@ -668,4 +668,90 @@ describe('POST /api/scraper/offerup', () => {
     expect(json.opportunitiesFound).toBe(0);
     expect(json.savedCount).toBe(1);
   });
+
+  it('uses fallback location when item.location is empty', async () => {
+    // B52: item.location || location — item.location falsy triggers fallback
+    mockGetAuthUserId.mockResolvedValue('user-123');
+    const { chromium } = require('playwright');
+    const mockPage = {
+      goto: jest.fn().mockResolvedValue(undefined),
+      waitForSelector: jest.fn().mockResolvedValue(undefined),
+      content: jest.fn().mockResolvedValue('<html></html>'),
+      evaluate: jest.fn().mockResolvedValue([
+        { title: 'No Location Item', price: '$100', url: 'https://offerup.com/item/detail/800', location: '' },
+      ]),
+    };
+    const mockContext = {
+      newPage: jest.fn().mockResolvedValue(mockPage),
+      route: jest.fn().mockResolvedValue(undefined),
+    };
+    chromium.launch.mockResolvedValue({
+      newContext: jest.fn().mockResolvedValue(mockContext),
+      close: jest.fn().mockResolvedValue(undefined),
+    });
+    mockDownloadAndCacheImages.mockResolvedValue({ cachedUrls: [], successCount: 0 } as any);
+
+    const res = await POST(makeRequest({ location: 'tampa-fl' }));
+    const json = await res.json();
+    expect(json.success).toBe(true);
+    expect(json.savedCount).toBe(1);
+  });
+
+  it('falls back to original imageUrl when caching returns empty array', async () => {
+    // B78: cachedImageUrls[0] || item.imageUrls?.[0] — cachedUrls empty triggers fallback
+    mockGetAuthUserId.mockResolvedValue('user-123');
+    const { chromium } = require('playwright');
+    const mockPage = {
+      goto: jest.fn().mockResolvedValue(undefined),
+      waitForSelector: jest.fn().mockResolvedValue(undefined),
+      content: jest.fn().mockResolvedValue('<html></html>'),
+      evaluate: jest.fn().mockResolvedValue([
+        { title: 'Image Item', price: '$150', url: 'https://offerup.com/item/detail/900', location: 'Tampa', imageUrl: 'https://img.example.com/original.jpg' },
+      ]),
+    };
+    const mockContext = {
+      newPage: jest.fn().mockResolvedValue(mockPage),
+      route: jest.fn().mockResolvedValue(undefined),
+    };
+    chromium.launch.mockResolvedValue({
+      newContext: jest.fn().mockResolvedValue(mockContext),
+      close: jest.fn().mockResolvedValue(undefined),
+    });
+    // caching fails → cachedUrls = [], so item.imageUrls?.[0] is used
+    mockDownloadAndCacheImages.mockResolvedValue({ cachedUrls: [], successCount: 0 } as any);
+
+    const res = await POST(makeRequest({ location: 'tampa-fl' }));
+    const json = await res.json();
+    expect(json.success).toBe(true);
+    expect(json.savedCount).toBe(1);
+    // The pushed listing should include the original URL as imageUrl
+    expect(json.listings[0].imageUrl).toBe('https://img.example.com/original.jpg');
+  });
+
+  it('handles non-Error thrown by page.goto in withRetry (string error)', async () => {
+    // B6: error instanceof Error ? error : new Error(String(error)) — non-Error path
+    mockGetAuthUserId.mockResolvedValue('user-123');
+    const { chromium } = require('playwright');
+    const mockPage = {
+      goto: jest.fn().mockRejectedValue('plain string error'), // non-Error thrown
+      waitForSelector: jest.fn(),
+      content: jest.fn(),
+      evaluate: jest.fn(),
+    };
+    const mockContext = {
+      newPage: jest.fn().mockResolvedValue(mockPage),
+      route: jest.fn().mockResolvedValue(undefined),
+    };
+    chromium.launch.mockResolvedValue({
+      newContext: jest.fn().mockResolvedValue(mockContext),
+      close: jest.fn().mockResolvedValue(undefined),
+    });
+
+    const res = await POST(makeRequest({ location: 'tampa-fl' }));
+    expect(res.status).toBe(500);
+    const json = await res.json();
+    expect(json.success).toBe(false);
+    // Error message is stringified from non-Error value
+    expect(json.error).toContain('plain string error');
+  });
 });

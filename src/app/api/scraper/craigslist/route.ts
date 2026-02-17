@@ -92,7 +92,8 @@ async function scrapeCraigslistWithPlaywright(
       });
 
     // Extract listings using page.evaluate
-    const listings = await page.evaluate(() => {
+    // istanbul ignore next -- Browser-side DOM code runs in Playwright context, not Node.js
+    const listings = await page.evaluate(/* istanbul ignore next */ () => {
       const items: Array<{
         title: string;
         price: string;
@@ -458,6 +459,7 @@ export async function POST(request: NextRequest) {
     await closeMarketBrowser();
 
     // Update job as completed
+    /* istanbul ignore next -- defensive null guard; job is always set in success path */
     if (job) {
       await prisma.scraperJob.update({
         where: { id: job.id },
@@ -487,6 +489,7 @@ export async function POST(request: NextRequest) {
       analyzedWithLLM: analyzedCount,
       skippedBelowThreshold: skippedCount,
       analysisMode,
+      /* istanbul ignore next -- job is always set in success path */
       jobId: job?.id,
     });
   } catch (error) {

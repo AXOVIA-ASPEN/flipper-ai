@@ -1064,7 +1064,7 @@ describe('Craigslist Scraper - additional branch coverage', () => {
     mockEstimateValue.mockImplementation(() => createDefaultEstimation());
     mockGeneratePurchaseMessage.mockReturnValue('Hi, still available?');
 
-    // Default playwright mocks
+    // Default playwright mocks (reset each time to prevent test bleed)
     mockNewPage.mockReturnValue({
       goto: mockGoto.mockResolvedValue(undefined),
       waitForSelector: mockWaitForSelector.mockResolvedValue(undefined),
@@ -1073,6 +1073,12 @@ describe('Craigslist Scraper - additional branch coverage', () => {
     });
     mockNewContext.mockResolvedValue({
       newPage: mockNewPage,
+    });
+    // Reset chromium.launch to default (avoids bleed from tests that override it)
+    const { chromium } = require('playwright');
+    (chromium.launch as jest.Mock).mockReturnValue({
+      newContext: mockNewContext,
+      close: mockClose,
     });
   });
 
@@ -1122,5 +1128,157 @@ describe('Craigslist Scraper - additional branch coverage', () => {
     const response = await POST(request);
     const data = await response.json();
     expect(data.success).toBe(true); // Should succeed with empty results
+  });
+
+  it('uses fallback "sss" category path for unknown category', async () => {
+    // B2: categoryPaths[category] || 'sss' — unknown category triggers fallback
+    mockEvaluate.mockResolvedValue([]);
+
+    const request = createMockRequest('POST', '/api/scraper/craigslist', {
+      location: 'tampa',
+      category: 'unknowncategory',
+    });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(data.success).toBe(true);
+    // URL should contain 'sss' as fallback path
+    expect(mockGoto).toHaveBeenCalledWith(
+      expect.stringContaining('/sss'),
+      expect.any(Object)
+    );
+  });
+
+  it('uses fallback location when item.location is empty string', async () => {
+    // B6: item.location || location — empty location triggers fallback to search location
+    mockEvaluate.mockResolvedValue([
+      {
+        title: 'No Location Item',
+        price: '$200',
+        url: 'https://tampa.craigslist.org/ela/d/no-location/9876543.html',
+        location: '',  // empty → fallback to search location
+        imageUrl: '',
+      },
+    ]);
+    mockEstimateValue.mockImplementation(() => ({
+      ...createDefaultEstimation(),
+      valueScore: 80,
+      discountPercent: 60,
+    }));
+
+    const request = createMockRequest('POST', '/api/scraper/craigslist', {
+      location: 'tampa',
+      category: 'electronics',
+    });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(data.success).toBe(true);
+    expect(data.savedCount).toBe(1);
+  });
+
+  it('uses true (negotiable=true) short-circuit for generatePurchaseMessage', async () => {
+    // B28: estimation.negotiable || sellabilityAnalysis?.recommendedOfferPrice !== undefined
+    // arm 0: estimation.negotiable is true → short-circuit (skip RHS)
+    mockEvaluate.mockResolvedValue([
+      {
+        title: 'Negotiable Item',
+        price: '$300',
+        url: 'https://tampa.craigslist.org/ela/d/negotiable/1111111.html',
+        location: 'Tampa',
+        imageUrl: '',
+      },
+    ]);
+    mockEstimateValue.mockImplementation(() => ({
+      ...createDefaultEstimation(),
+      valueScore: 80,
+      discountPercent: 60,
+      negotiable: true,  // ← triggers arm 0 short-circuit
+    }));
+
+    const request = createMockRequest('POST', '/api/scraper/craigslist', {
+      location: 'tampa',
+      category: 'electronics',
+    });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(data.success).toBe(true);
+  });
+
+  it('handles non-Error thrown before job creation (string error)', async () => {
+    // B88, B90, B91: error path with job=null and non-Error exception
+    mockJobCreate.mockRejectedValue('plain string error');
+
+    const request = createMockRequest('POST', '/api/scraper/craigslist', {
+      location: 'tampa',
+      category: 'electronics',
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(500);
+    const data = await response.json();
+    expect(data.success).toBe(false);
+    // Non-Error → 'Unknown error' message
+    expect(data.error).toBe('Unknown error');
+    // jobId is undefined because job was never created
+    expect(data.jobId).toBeUndefined();
+  });
+
+  it('handles non-Error thrown after job creation (string error)', async () => {
+    // B89: error instanceof Error in job update error message — non-Error path
+    mockJobCreate.mockResolvedValue({ id: 'job-non-error' });
+    mockJobUpdate.mockResolvedValue({});
+    // Force a non-Error after job creation by making playwright launch throw a string
+    const { chromium } = require('playwright');
+    chromium.launch.mockRejectedValue('playwright string error');
+
+    const request = createMockRequest('POST', '/api/scraper/craigslist', {
+      location: 'tampa',
+      category: 'electronics',
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(500);
+    const data = await response.json();
+    expect(data.success).toBe(false);
+    // Job was created, then error occurred → job updated as FAILED
+    expect(mockJobUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ status: 'FAILED' }),
+      })
+    );
+  });
+
+  it('falls back to raw URL as externalId when URL has no numeric ID', async () => {
+    // B1: extractListingId — URL with no /digits.html match returns full URL
+    mockEvaluate.mockResolvedValue([
+      {
+        title: 'Weird URL Item',
+        price: '$50',
+        url: 'https://tampa.craigslist.org/fua/d/some-item',
+        location: 'Tampa',
+        imageUrl: '',
+      },
+    ]);
+    // Use high valueScore so listing passes the shouldSave threshold
+    mockEstimateValue.mockImplementation(() => ({
+      ...createDefaultEstimation(),
+      valueScore: 80,
+      discountPercent: 60,
+    }));
+
+    const request = createMockRequest('POST', '/api/scraper/craigslist', {
+      location: 'tampa',
+      category: 'furniture',
+    });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(data.success).toBe(true);
+    // externalId falls back to the full URL string
+    expect(mockUpsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          platform_externalId_userId: expect.objectContaining({
+            externalId: 'https://tampa.craigslist.org/fua/d/some-item',
+          }),
+        }),
+      })
+    );
   });
 });

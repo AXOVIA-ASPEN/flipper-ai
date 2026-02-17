@@ -191,7 +191,8 @@ async function scrapeOfferUpWithPlaywright(
     }
 
     // Extract listings
-    const listings = await page.evaluate(() => {
+    // istanbul ignore next -- Browser-side DOM code runs in Playwright context, not Node.js
+    const listings = await page.evaluate(/* istanbul ignore next */ () => {
       const items: Array<{
         title: string;
         price: string;
