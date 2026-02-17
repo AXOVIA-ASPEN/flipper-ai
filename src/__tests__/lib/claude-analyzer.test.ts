@@ -609,6 +609,29 @@ describe('Claude Analyzer', () => {
       );
     });
 
+    test('should handle listing with null imageUrls (falsy branch)', async () => {
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
+      (prisma.listing.findUnique as jest.Mock).mockResolvedValue({
+        id: 'listing-no-images',
+        title: 'Item Without Images',
+        description: 'Desc',
+        askingPrice: 50,
+        imageUrls: null, // null → if (listing.imageUrls) is false
+      });
+
+      const mockResponse = {
+        content: [{ type: 'text', text: JSON.stringify({
+          category: 'test', condition: 'good', keyFeatures: [], potentialIssues: [],
+          flippabilityScore: 70, confidence: 'medium', reasoning: 'No images',
+        }) }],
+      };
+      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
+      AnthropicMock.mockImplementation(() => ({ messages: { create: jest.fn().mockResolvedValue(mockResponse) } }) as any);
+
+      const result = await analyzeListing('listing-no-images');
+      expect(result.reasoning).toBe('No images');
+    });
+
     test('should handle imageUrls parsing errors', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
       (prisma.listing.findUnique as jest.Mock).mockResolvedValue({
@@ -1032,7 +1055,49 @@ describe('Claude Analyzer', () => {
     });
   });
 
+  describe('getClaudeApiKey - branch coverage', () => {
+    test('falls back to CLAUDE_API_KEY when ANTHROPIC_API_KEY is not set', async () => {
+      delete process.env.ANTHROPIC_API_KEY;
+      process.env.CLAUDE_API_KEY = 'claude-fallback-key';
+      // analyzeListingData should use CLAUDE_API_KEY (not throw)
+      const mockCreate = jest.fn().mockResolvedValue({
+        content: [{ type: 'text', text: JSON.stringify({
+          category: 'Electronics', condition: 'good', brand: 'Apple', model: 'Test',
+          estimatedValue: 100, estimatedLow: 80, estimatedHigh: 120,
+          profitPotential: 50, isFairDeal: true, isGoodDeal: false, isExcellentDeal: false,
+          confidence: 0.8, reasoning: 'test', tags: [], keywords: [],
+        }) }],
+      });
+      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }));
+      const result = await analyzeListingData('Test', 'desc', 100);
+      expect(result).toBeDefined();
+      delete process.env.CLAUDE_API_KEY;
+    });
+
+    test('throws when neither ANTHROPIC_API_KEY nor CLAUDE_API_KEY is set', async () => {
+      delete process.env.ANTHROPIC_API_KEY;
+      delete process.env.CLAUDE_API_KEY;
+      await expect(analyzeListingData('Test', 'desc', 100)).rejects.toThrow(
+        'ANTHROPIC_API_KEY or CLAUDE_API_KEY not configured'
+      );
+    });
+  });
+
   describe('callClaudeAPI error handling - uncovered branches', () => {
+    test('handles API error object with status but no message property', async () => {
+      const errorObj = Object.assign(new Error(), { status: 400 });
+      // Remove message property so apiError.message is falsy
+      delete (errorObj as Record<string, unknown>).message;
+      const mockCreate = jest.fn().mockRejectedValue(errorObj);
+      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
+        messages: { create: mockCreate },
+      }));
+      // Should fall through to "Handle other errors" block and rethrow as-is
+      await expect(analyzeListingData('Test Item', 'desc', 100)).rejects.toThrow();
+    });
+
     test('should handle API error with status and message (non-429)', async () => {
       const mockCreate = jest
         .fn()

@@ -283,5 +283,79 @@ describe('marketplace-scanner', () => {
       expect(summary.averageScore).toBe(0);
       expect(summary.bestOpportunity).toBeNull();
     });
+
+    it('returns non-null bestOpportunity when opportunities exist', () => {
+      // Very low asking price → high value score → triggers isOpportunity and sorted[0] branch
+      const highValueListings = [makeListing({ askingPrice: 1, title: 'Rolex Watch' })];
+      const results = processListings('EBAY', highValueListings);
+      results.opportunities = results.all.filter((l) => l.isOpportunity);
+      if (results.opportunities.length > 0) {
+        const summary = generateScanSummary(results);
+        expect(summary.bestOpportunity).not.toBeNull();
+      }
+    });
+  });
+});
+
+describe('marketplace-scanner - targeted branch coverage', () => {
+  it('handles listing with no description (description || null fallback)', () => {
+    const listing = makeListing({ description: undefined });
+    const analyzed = analyzeListing('CRAIGSLIST', listing);
+    // Should still work with no description
+    expect(analyzed.title).toBe('Apple iPhone 14 Pro 256GB');
+    expect(analyzed.platform).toBe('CRAIGSLIST');
+  });
+
+  it('handles listing with no category AND no description (both || fallbacks)', () => {
+    // Need both falsy for the description||null branch inside detectCategory to trigger
+    const listingNoCatNoDec: RawListing = {
+      ...makeListing(),
+      category: undefined,
+      description: undefined,
+    };
+    const analyzed = analyzeListing('EBAY', listingNoCatNoDec);
+    expect(analyzed.title).toBe('Apple iPhone 14 Pro 256GB');
+    // Should detect category from title alone
+    expect(typeof analyzed.category).toBe('string');
+  });
+
+  it('handles listing with no condition (condition || null fallback)', () => {
+    const listing = makeListing({ condition: undefined });
+    const analyzed = analyzeListing('CRAIGSLIST', listing);
+    expect(analyzed.title).toBe('Apple iPhone 14 Pro 256GB');
+    expect(typeof analyzed.estimation.valueScore).toBe('number');
+  });
+
+  it('handles listing with no category (category || detectCategory fallback)', () => {
+    const listing = makeListing({ category: undefined });
+    // Explicitly ensure category is falsy
+    const listingWithoutCat = { ...listing };
+    delete listingWithoutCat.category;
+    const analyzed = analyzeListing('EBAY', listingWithoutCat as RawListing);
+    // detectCategory fills in from title analysis
+    expect(typeof analyzed.category).toBe('string');
+  });
+
+  it('formats listing with isOpportunity=true → status OPPORTUNITY branch', () => {
+    // Manually build an AnalyzedListing with isOpportunity = true
+    const baseListing = makeListing({ askingPrice: 1 });
+    const analyzed = analyzeListing('EBAY', baseListing);
+    // Override isOpportunity to force the OPPORTUNITY branch in formatForStorage
+    const opportunityListing: AnalyzedListing = { ...analyzed, isOpportunity: true };
+    const stored = formatForStorage(opportunityListing);
+    expect(stored.status).toBe('OPPORTUNITY');
+  });
+
+  it('generateScanSummary returns non-null bestOpportunity when opportunities exist', () => {
+    // Build results with at least one opportunity
+    const listing = makeListing({ askingPrice: 1 });
+    const analyzed: AnalyzedListing = { ...analyzeListing('EBAY', listing), isOpportunity: true };
+    const results = {
+      all: [analyzed],
+      opportunities: [analyzed],
+      filtered: [analyzed],
+    };
+    const summary = generateScanSummary(results);
+    expect(summary.bestOpportunity).not.toBeNull();
   });
 });

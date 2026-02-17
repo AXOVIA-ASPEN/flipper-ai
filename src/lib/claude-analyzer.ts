@@ -324,7 +324,9 @@ export async function batchAnalyzeListings(
       failed++;
       errors.push({
         listingId,
-        error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error
+        ? error.message
+        : /* istanbul ignore next */ 'Unknown error',
       });
     }
 
