@@ -32,16 +32,15 @@ interface MetricsData {
       min: number;
       max: number;
       avg: number;
-      p95: number;
     }
   >;
   gauges: Record<string, number>;
-  uptime: number;
+  uptime_seconds: number;
+  recent_errors: Array<{ message: string; route?: string; timestamp: string }>;
   memory: {
-    heapUsed: number;
-    heapTotal: number;
-    rss: number;
-    external: number;
+    heapUsedMB: number;
+    heapTotalMB: number;
+    rssMB: number;
   };
 }
 
@@ -61,11 +60,6 @@ function formatUptime(seconds: number): string {
   if (days > 0) return `${days}d ${hours}h ${mins}m`;
   if (hours > 0) return `${hours}h ${mins}m`;
   return `${mins}m ${Math.floor(seconds % 60)}s`;
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function StatusIcon({ status }: { status: ServiceStatus }) {
@@ -150,6 +144,17 @@ export default function HealthPage() {
 
   const fetchHealth = useCallback(async () => {
     setRefreshing(true);
+
+    // Fetch metrics (non-blocking — may fail in prod if unauthenticated)
+    fetch('/api/health/metrics')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: MetricsData | null) => {
+        if (data) setMetrics(data);
+      })
+      .catch(() => {
+        // metrics are optional — silent failure is fine
+      });
+
     const start = Date.now();
     try {
       const res = await fetch('/api/health');
@@ -359,19 +364,54 @@ export default function HealthPage() {
 
         {/* Metrics Panel (if available) */}
         {metrics && (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <MetricCard
               title="Heap Used"
-              value={formatBytes(metrics.memory?.heapUsed ?? 0)}
+              value={`${metrics.memory?.heapUsedMB ?? 0} MB`}
               icon={Cpu}
-              subtitle={`of ${formatBytes(metrics.memory?.heapTotal ?? 0)} total`}
+              subtitle={`of ${metrics.memory?.heapTotalMB ?? 0} MB total`}
             />
             <MetricCard
               title="RSS Memory"
-              value={formatBytes(metrics.memory?.rss ?? 0)}
+              value={`${metrics.memory?.rssMB ?? 0} MB`}
               icon={Database}
               subtitle="resident set size"
             />
+            <MetricCard
+              title="Server Uptime"
+              value={formatUptime(metrics.uptime_seconds ?? 0)}
+              icon={Clock}
+              subtitle="metrics collector"
+            />
+          </div>
+        )}
+
+        {/* Recent Errors (if any) */}
+        {metrics && metrics.recent_errors && metrics.recent_errors.length > 0 && (
+          <div className="bg-white rounded-xl border border-red-200">
+            <div className="p-4 border-b border-red-100 flex items-center gap-2">
+              <XCircle className="h-4 w-4 text-red-500" />
+              <h2 className="font-semibold text-gray-800">
+                Recent Errors ({metrics.recent_errors.length})
+              </h2>
+            </div>
+            <div className="px-4 py-2 divide-y divide-gray-100">
+              {metrics.recent_errors.slice(-5).map((err, i) => (
+                <div key={i} className="py-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-red-700 font-mono truncate max-w-xs">
+                      {err.message}
+                    </span>
+                    {err.route && (
+                      <span className="text-xs text-gray-400 font-mono">{err.route}</span>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-400 mt-0.5">
+                    {new Date(err.timestamp).toLocaleTimeString()}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

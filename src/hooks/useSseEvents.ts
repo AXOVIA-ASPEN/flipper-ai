@@ -102,6 +102,7 @@ export function useSseEvents<T = unknown>(
       if (!noReconnect) {
         const delay = Math.min(currentDelay.current * 2, maxReconnectDelayMs);
         currentDelay.current = delay;
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
         reconnectTimer.current = setTimeout(connect, delay);
       }
     };

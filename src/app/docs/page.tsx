@@ -60,6 +60,7 @@ export default function DocsPage() {
           <span className="badge">OpenAPI 3.0</span>
         </div>
         <div id="swagger-ui" />
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js" />
         <script
           dangerouslySetInnerHTML={{
