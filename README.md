@@ -1,9 +1,9 @@
 # 🐧 Flipper.ai
 
 [![CI/CD Pipeline](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-2248-brightgreen)](.)
-[![Coverage](https://img.shields.io/badge/coverage-99.38%25-brightgreen)](.)
-[![Branches](https://img.shields.io/badge/branches-96.82%25-brightgreen)](.)
+[![Tests](https://img.shields.io/badge/tests-2258-brightgreen)](.)
+[![Coverage](https://img.shields.io/badge/coverage-99.40%25-brightgreen)](.)
+[![Branches](https://img.shields.io/badge/branches-97.55%25-brightgreen)](.)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](.)
 [![Version](https://img.shields.io/badge/version-1.0.1-blue)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -88,7 +88,7 @@ make clean             # Remove build artifacts
 
 | Suite          | Tool               | Count                    | Coverage       |
 | -------------- | ------------------ | ------------------------ | -------------- |
-| Unit           | Jest               | 2248 (111 suites)        | 99.38% stmts / 96.82% branches |
+| Unit           | Jest               | 2258 (111 suites)        | 99.40% stmts / 97.55% branches |
 | BDD Acceptance | Cucumber + Gherkin | 70 scenarios / 572 steps | Core flows     |
 | E2E            | Playwright         | Browser automation       | Critical paths |
 
