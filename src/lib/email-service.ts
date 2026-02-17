@@ -62,6 +62,7 @@ class ResendProvider implements EmailProvider {
 
   constructor(apiKey: string, fromAddress: string) {
     // Lazy import so the module doesn't crash in envs without the key
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { Resend } = require('resend') as typeof import('resend');
     this.client = new Resend(apiKey);
     this.fromAddress = fromAddress;
