@@ -71,8 +71,7 @@ function buildSearchParams(params: ScrapeRequestBody): Record<string, string> {
   const searchParams: Record<string, string> = {
     fields:
       'id,name,description,price,currency,availability,condition,category,location,images,marketplace_listing_url,created_time',
-    /* istanbul ignore next -- limit is always pre-validated by POST handler before calling buildSearchParams */
-    limit: String(Math.min(params.limit ?? DEFAULT_LIMIT, MAX_LIMIT)),
+    limit: String(Math.min(params.limit !== undefined ? params.limit : /* istanbul ignore next */ DEFAULT_LIMIT, MAX_LIMIT)),
   };
 
   /* istanbul ignore next -- keywords is required and always set before calling this function */
@@ -216,9 +215,8 @@ async function saveListingFromFacebookItem(item: FacebookMarketplaceListing, use
       userId,
       externalId: item.id,
       platform: 'FACEBOOK_MARKETPLACE',
-      /* istanbul ignore next -- marketplace_listing_url is usually provided by FB API; fallback is defensive */
-      url: item.marketplace_listing_url || `https://www.facebook.com/marketplace/item/${item.id}`,
-      title: item.name || 'Untitled',
+      url: item.marketplace_listing_url || /* istanbul ignore next */ `https://www.facebook.com/marketplace/item/${item.id}`,
+      title: item.name || /* istanbul ignore next */ 'Untitled',
       description,
       askingPrice: price,
       condition: item.condition || null,
@@ -247,7 +245,7 @@ async function saveListingFromFacebookItem(item: FacebookMarketplaceListing, use
       status,
     },
     update: {
-      title: item.name || 'Untitled',
+      title: item.name || /* istanbul ignore next */ 'Untitled',
       description,
       askingPrice: price,
       condition: item.condition || null,

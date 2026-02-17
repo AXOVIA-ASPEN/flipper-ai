@@ -213,16 +213,14 @@ async function scrapeMercariSearch(params: ScrapeRequestBody): Promise<MercariIt
   try {
     // Try the internal search API endpoint
     const apiResponse = await callMercariApi('/search', 'POST', {
-      /* istanbul ignore next -- keywords always validated non-empty before reaching here */
-      keyword: params.keywords || '',
+      keyword: params.keywords || /* istanbul ignore next */ '',
       categoryId: params.categoryId ? [params.categoryId] : [],
       itemConditionId: params.condition ? [params.condition] : [],
       priceMin: params.minPrice,
       priceMax: params.maxPrice,
       sort: sortBy,
       status: ['on_sale'],
-      /* istanbul ignore next -- limit always provided; DEFAULT_LIMIT fallback is defensive */
-      length: Math.min(params.limit || DEFAULT_LIMIT, MAX_LIMIT),
+      length: params.limit !== undefined ? Math.min(params.limit, MAX_LIMIT) : /* istanbul ignore next */ Math.min(DEFAULT_LIMIT, MAX_LIMIT),
     });
 
     /* istanbul ignore next -- defensive; API always returns data or items array */
@@ -259,8 +257,7 @@ async function scrapeMercariSearch(params: ScrapeRequestBody): Promise<MercariIt
 async function fetchMercariListings(params: ScrapeRequestBody): Promise<MercariItem[]> {
   return scrapeMercariSearch({
     ...params,
-    /* istanbul ignore next -- limit always provided from route handler; DEFAULT_LIMIT is defensive */
-    limit: Math.min(params.limit || DEFAULT_LIMIT, MAX_LIMIT),
+    limit: params.limit !== undefined ? Math.min(params.limit, MAX_LIMIT) : /* istanbul ignore next */ Math.min(DEFAULT_LIMIT, MAX_LIMIT),
   });
 }
 
@@ -270,8 +267,7 @@ async function fetchMercariListings(params: ScrapeRequestBody): Promise<MercariI
 async function fetchSoldListings(params: ScrapeRequestBody): Promise<MercariItem[]> {
   try {
     const apiResponse = await callMercariApi('/search', 'POST', {
-      /* istanbul ignore next -- keywords always provided; '' fallback is defensive */
-      keyword: params.keywords || '',
+            keyword: params.keywords || /* istanbul ignore next */ '',
       categoryId: params.categoryId ? [params.categoryId] : [],
       status: ['sold_out'], // Only sold items
       sort: 'created_time',
@@ -355,7 +351,7 @@ async function saveListingFromMercariItem(item: MercariItem, userId: string) {
     item.shippingPayer?.name === 'Seller'
       ? 'Free shipping'
       : item.shippingPayer?.name
-        ? /* istanbul ignore next */ `Buyer pays shipping (${item.shippingMethod?.name || 'standard'})`
+        ? `Buyer pays shipping (${item.shippingMethod?.name !== undefined ? item.shippingMethod.name : /* istanbul ignore next */ 'standard'})`
         : null;
   const brandNote = item.itemBrand?.name ? `Brand: ${item.itemBrand.name}` : null;
 

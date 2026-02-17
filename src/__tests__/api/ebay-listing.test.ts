@@ -248,3 +248,57 @@ describe('POST /api/listings/ebay - optional fields branch coverage', () => {
     expect(createCall.merchantLocationKey).toBe('WAREHOUSE_A');
   });
 });
+
+describe('POST /api/listings/ebay - remaining branch coverage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    process.env.EBAY_OAUTH_TOKEN = 'test-token';
+    mockGetAuthUserId.mockResolvedValue('user-123');
+    mockCreateDraft.mockResolvedValue({
+      success: true,
+      sku: 'FLIP-BR',
+      offerId: 'offer-br',
+      status: 'DRAFT',
+    });
+  });
+
+  afterEach(() => {
+    delete process.env.EBAY_OAUTH_TOKEN;
+  });
+
+  it('covers conditionDescription falsy branch (omit field → undefined)', async () => {
+    // When conditionDescription is omitted, `body.conditionDescription || undefined` → undefined
+    const bodyNoCondDesc = {
+      ...validBody,
+      // conditionDescription intentionally omitted
+    };
+    const res = await POST(makeRequest(bodyNoCondDesc));
+    const createCall = mockCreateDraft.mock.calls[0]?.[0];
+    expect(res.status).toBe(200);
+    expect(createCall?.conditionDescription).toBeUndefined();
+  });
+
+  it('covers packageWeightLbs truthy branch (provide field → parseFloat)', async () => {
+    // When packageWeightLbs IS provided, `body.packageWeightLbs ? parseFloat(...) : undefined` → number
+    const bodyWithWeight = {
+      ...validBody,
+      packageWeightLbs: '2.5',
+    };
+    const res = await POST(makeRequest(bodyWithWeight));
+    const createCall = mockCreateDraft.mock.calls[0]?.[0];
+    expect(res.status).toBe(200);
+    expect(createCall?.packageWeightLbs).toBe(2.5);
+  });
+
+  it('covers quantity truthy branch (provide quantity → parseInt)', async () => {
+    // When quantity IS provided, `body.quantity ? parseInt(...) : 1` → parsed number
+    const bodyWithQty = {
+      ...validBody,
+      quantity: '3',
+    };
+    const res = await POST(makeRequest(bodyWithQty));
+    const createCall = mockCreateDraft.mock.calls[0]?.[0];
+    expect(res.status).toBe(200);
+    expect(createCall?.quantity).toBe(3);
+  });
+});

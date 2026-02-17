@@ -439,5 +439,18 @@ describe('Facebook Scrape API', () => {
         })
       );
     });
+
+    it('uses explicit includeDetails=false when provided (covers ?? truthy branch)', async () => {
+      // When includeDetails IS provided (false), `includeDetails ?? true` uses left side (branch 0)
+      const req = createRequest('POST', '/api/scrape/facebook', {
+        keywords: 'test item',
+        includeDetails: false,
+      });
+      await POST(req);
+
+      expect(mockScrapeAndConvert).toHaveBeenCalledWith(
+        expect.objectContaining({ includeDetails: false })
+      );
+    });
   });
 });
