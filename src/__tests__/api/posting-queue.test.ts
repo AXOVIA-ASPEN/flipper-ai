@@ -359,3 +359,40 @@ describe('POST /api/posting-queue/:id/retry', () => {
     expect(res.status).toBe(400);
   });
 });
+
+// ── Branch coverage: scheduledAt non-null path (??  operator) ────────────────
+describe('POST /api/posting-queue - scheduledAt branch coverage', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('creates a single queue item with scheduledAt set (covers ?? non-null branch)', async () => {
+    const listing = { id: 'lst-sched', platform: 'CRAIGSLIST', userId: 'test-user-id' };
+    const scheduledAt = '2026-03-01T10:00:00.000Z';
+
+    mockPrisma.listing.findFirst.mockResolvedValue(listing);
+    mockPrisma.postingQueueItem.upsert.mockResolvedValue({
+      id: 'pq-sched',
+      listingId: 'lst-sched',
+      targetPlatform: 'EBAY',
+      status: 'PENDING',
+      scheduledAt: new Date(scheduledAt),
+    });
+
+    const res = await POST(
+      makeRequest('http://localhost:3000/api/posting-queue', {
+        method: 'POST',
+        body: JSON.stringify({
+          listingId: 'lst-sched',
+          targetPlatform: 'EBAY',
+          scheduledAt,
+        }),
+      })
+    );
+
+    expect(res.status).toBe(201);
+    // Verify upsert was called with the scheduledAt value (not undefined)
+    // The route passes scheduledAt as a string (from Zod validation) — covers the ?? non-null branch
+    const upsertCall = (mockPrisma.postingQueueItem.upsert as jest.Mock).mock.calls[0][0];
+    expect(upsertCall.create.scheduledAt).toBe(scheduledAt);
+    expect(upsertCall.update.scheduledAt).toBe(scheduledAt);
+  });
+});

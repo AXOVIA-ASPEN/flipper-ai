@@ -225,6 +225,49 @@ describe('Facebook Auth - Callback', () => {
     );
     expect(mockStoreToken).toHaveBeenCalledWith('test@example.com', 'long-token', 5184000);
   });
+
+  it('uses FACEBOOK_REDIRECT_URI env var when set (covers || truthy branch)', async () => {
+    // Covers: `process.env.FACEBOOK_REDIRECT_URI || 'http://localhost:3000/...'` → left side truthy
+    process.env.FACEBOOK_REDIRECT_URI = 'https://myapp.example.com/api/auth/facebook/callback';
+    mockAuth.mockResolvedValue({ user: { email: 'test@example.com', id: 'user-1' } });
+    mockExchangeCodeForToken.mockResolvedValue({ access_token: 'short-token' });
+    mockExchangeForLongLivedToken.mockResolvedValue({
+      access_token: 'long-token',
+      expires_in: 5184000,
+    });
+    mockStoreToken.mockResolvedValue(undefined);
+
+    const res = await GET(
+      makeRequest('/api/auth/facebook/callback?code=auth-code2&state=mystate2', 'GET', {
+        facebook_oauth_state: 'mystate2',
+      })
+    );
+    expect(res.status).toBe(307);
+    const location = res.headers.get('location') || '';
+    expect(location).toContain('facebook_auth=success');
+    // Verify exchangeCodeForToken was called with the custom redirect URI
+    expect(mockExchangeCodeForToken).toHaveBeenCalledWith(
+      expect.objectContaining({ redirectUri: 'https://myapp.example.com/api/auth/facebook/callback' }),
+      'auth-code2'
+    );
+    delete process.env.FACEBOOK_REDIRECT_URI;
+  });
+
+  it('redirects with Unknown error when non-Error is thrown in callback', async () => {
+    // Covers: `error instanceof Error ? error.message : 'Unknown error'` → false branch
+    mockAuth.mockResolvedValue({ user: { email: 'test@example.com', id: 'user-1' } });
+    mockExchangeCodeForToken.mockRejectedValue('string-error'); // not an Error instance
+
+    const res = await GET(
+      makeRequest('/api/auth/facebook/callback?code=bad-code2&state=mystate3', 'GET', {
+        facebook_oauth_state: 'mystate3',
+      })
+    );
+    expect(res.status).toBe(307);
+    const location = res.headers.get('location') || '';
+    expect(location).toContain('token_exchange_failed');
+    expect(location).toContain('Unknown%20error');
+  });
 });
 
 describe('Facebook Auth - Disconnect', () => {

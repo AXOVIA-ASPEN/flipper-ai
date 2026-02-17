@@ -581,6 +581,35 @@ describe('Opportunities API - branch coverage', () => {
     expect(response.status).toBe(200);
   });
 
+  it('GET with only maxScore covers left-false||right-true branch + minScore undefined inner branch', async () => {
+    // Left side: minScore === undefined (false), right side: maxScore !== undefined (true)
+    // → covers ||  branch 2, and inner `if (minScore !== undefined)` → false branch
+    const request = createMockRequest('GET', '/api/opportunities?maxScore=90');
+    const response = await GET(request);
+    expect(response.status).toBe(200);
+  });
+
+  it('GET with only minScore covers maxScore undefined inner branch', async () => {
+    // Inner `if (maxScore !== undefined)` → false branch (only minScore set)
+    const request = createMockRequest('GET', '/api/opportunities?minScore=30');
+    const response = await GET(request);
+    expect(response.status).toBe(200);
+  });
+
+  it('GET with only maxProfit covers minProfit undefined inner branch', async () => {
+    // Inner `if (minProfit !== undefined)` → false (only maxProfit is set)
+    const request = createMockRequest('GET', '/api/opportunities?maxProfit=1000');
+    const response = await GET(request);
+    expect(response.status).toBe(200);
+  });
+
+  it('GET with only minProfit covers maxProfit undefined inner branch', async () => {
+    // Inner `if (maxProfit !== undefined)` → false (only minProfit is set)
+    const request = createMockRequest('GET', '/api/opportunities?minProfit=5');
+    const response = await GET(request);
+    expect(response.status).toBe(200);
+  });
+
   it('PATCH without fees calculates actualProfit with fees defaulting to 0', async () => {
     // Covers: const fees = body.fees || 0 → 0 branch (line 33 in [id]/route.ts)
     const mockUpdatedOpportunity = {
