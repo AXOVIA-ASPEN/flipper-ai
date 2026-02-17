@@ -382,4 +382,62 @@ describe('Facebook Scrape API', () => {
       expect((await res.json()).error).toBe('Failed to fetch scraper jobs');
     });
   });
+
+  describe('Branch coverage: ?? and || fallback paths', () => {
+    it('uses includeDetails=true default when not provided (covers ?? true branch)', async () => {
+      mockScrapeAndConvert.mockResolvedValue({ success: true, listings: [] });
+      mockProcessListings.mockReturnValue({ all: [], opportunities: [], filtered: [] });
+      mockGenerateScanSummary.mockReturnValue({
+        totalListings: 0,
+        totalOpportunities: 0,
+        filteredCount: 0,
+        averageScore: 0,
+        totalPotentialProfit: 0,
+        categoryCounts: {},
+        bestOpportunity: null,
+      });
+
+      // No includeDetails provided → uses ?? true fallback
+      const req = createRequest('POST', '/api/scrape/facebook', {
+        location: 'austin',
+        keywords: 'laptop',
+        // includeDetails intentionally omitted to trigger ?? true branch
+      });
+      await POST(req);
+
+      expect(mockScrapeAndConvert).toHaveBeenCalledWith(
+        expect.objectContaining({ includeDetails: true })
+      );
+    });
+
+    it('stores null location/category when not provided (covers || null branch)', async () => {
+      mockScrapeAndConvert.mockResolvedValue({ success: true, listings: [] });
+      mockProcessListings.mockReturnValue({ all: [], opportunities: [], filtered: [] });
+      mockGenerateScanSummary.mockReturnValue({
+        totalListings: 0,
+        totalOpportunities: 0,
+        filteredCount: 0,
+        averageScore: 0,
+        totalPotentialProfit: 0,
+        categoryCounts: {},
+        bestOpportunity: null,
+      });
+
+      // No location or category → || null fallback in scraperJob.create
+      const req = createRequest('POST', '/api/scrape/facebook', {
+        keywords: 'vintage lamp',
+        // location and category intentionally omitted to trigger || null branch
+      });
+      await POST(req);
+
+      expect(mockJobCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            location: null,
+            category: null,
+          }),
+        })
+      );
+    });
+  });
 });

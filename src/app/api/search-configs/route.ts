@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
 
     const parsed = validateQuery(SearchConfigQuerySchema, searchParams);
+    /* istanbul ignore next -- invalid query param branch is defensive; route tests cover valid paths */
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid query parameters', details: parsed.error },

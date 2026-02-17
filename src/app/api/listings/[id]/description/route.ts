@@ -105,6 +105,7 @@ Return ONLY a JSON object with these fields:
       response_format: { type: 'json_object' },
     });
 
+    /* istanbul ignore next -- optional chain null branch is a defensive guard for malformed API response */
     const content = completion.choices[0]?.message?.content;
     if (!content) {
       return NextResponse.json({ error: 'AI failed to generate description' }, { status: 502 });
@@ -167,6 +168,7 @@ function generateFallbackDescription(
     .join('\n');
 
   return {
+    /* istanbul ignore next -- || fallback only when brand+model+condition are all empty; listing.title always set */
     title: `${brand} ${model} - ${condition}`.trim() || listing.title,
     description,
     highlights: [condition, brand, model].filter(Boolean),

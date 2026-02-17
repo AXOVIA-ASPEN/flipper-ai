@@ -211,6 +211,37 @@ describe('Report Service', () => {
       expect(catSection).toBeDefined();
       expect(catSection!.data.length).toBe(3); // Electronics, Shoes, Home
     });
+
+    it('should produce zero revenue and fees for empty sold list (null resalePrice items are filtered)', () => {
+      // Items with SOLD status but null resalePrice are excluded by the sold filter
+      // (filter: status === SOLD && resalePrice != null). This verifies that
+      // an item with null resalePrice does not contribute to revenue calculations.
+      const items = [
+        {
+          id: '5',
+          title: 'Broken Laptop',
+          platform: 'CRAIGSLIST',
+          category: 'Electronics',
+          status: 'SOLD',
+          purchasePrice: 50,
+          resalePrice: null, // excluded from sold[] by the filter
+          fees: null,
+          purchaseDate: new Date('2026-02-01'),
+          resaleDate: null,
+        },
+      ];
+      const dateRange = { start: new Date('2026-01-01'), end: new Date('2026-03-01') };
+      const report = buildReport('user1', 'weekly', dateRange, items);
+      // No items in sold[] → all revenue metrics are 0
+      expect(report.summary.totalRevenue).toBe(0);
+      expect(report.summary.totalFees).toBe(0);
+      expect(report.summary.winRate).toBe(0);
+      expect(report.summary.itemsSold).toBe(0);
+      // Sold Items section should be empty
+      const soldSection = report.sections.find((s) => s.title === 'Sold Items');
+      expect(soldSection).toBeDefined();
+      expect(soldSection!.data).toHaveLength(0);
+    });
   });
 
   describe('reportToCSV', () => {
