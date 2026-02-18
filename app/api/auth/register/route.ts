@@ -56,19 +56,12 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Create user with default settings
+    // Create user
     const user = await prisma.user.create({
       data: {
         email: email.toLowerCase(),
         password: hashedPassword,
         name: name || null,
-        settings: {
-          create: {
-            llmModel: 'gpt-4o-mini',
-            discountThreshold: 50,
-            autoAnalyze: true,
-          },
-        },
       },
       select: {
         id: true,
@@ -76,6 +69,16 @@ export async function POST(request: NextRequest) {
         name: true,
         image: true,
         createdAt: true,
+      },
+    });
+
+    // Create default settings separately
+    await prisma.userSettings.create({
+      data: {
+        userId: user.id,
+        llmModel: 'gpt-4o-mini',
+        discountThreshold: 50,
+        autoAnalyze: true,
       },
     });
 
@@ -97,8 +100,17 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Registration error:', error);
+    
+    // More detailed error message for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Failed to create account';
+    
     return NextResponse.json(
-      { success: false, error: 'Failed to create account' },
+      { 
+        success: false, 
+        error: 'Failed to create account',
+        // Include detailed error in development
+        ...(process.env.NODE_ENV === 'development' && { details: errorMessage })
+      },
       { status: 500 }
     );
   }
