@@ -51,6 +51,7 @@ export async function POST(request: NextRequest) {
       url: string;
       externalId: string;
       location?: string;
+      imageUrl?: string;
       images?: string[];
       description?: string;
     }>;
