@@ -16,6 +16,10 @@ ENVIRONMENT="${1:-staging}"  # staging or production
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+# Create deployment log directory early
+mkdir -p "${PROJECT_ROOT}/deployments"
+
 DEPLOYMENT_LOG="${PROJECT_ROOT}/deployments/deploy_${ENVIRONMENT}_${TIMESTAMP}.log"
 SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
 EMAIL_NOTIFICATION="${EMAIL_NOTIFICATION:-}"
