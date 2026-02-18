@@ -1,4 +1,5 @@
 import ThemeSettings from '@/components/ThemeSettings';
+import NotificationSettings from '@/components/NotificationSettings';
 
 export default function SettingsPage() {
   return (
@@ -7,9 +8,9 @@ export default function SettingsPage() {
       
       <div className="space-y-8">
         <ThemeSettings />
+        <NotificationSettings />
         
         {/* Add more settings sections here in the future */}
-        {/* <NotificationSettings /> */}
         {/* <AccountSettings /> */}
       </div>
     </div>
