@@ -1,40 +1,37 @@
 @import 'tailwindcss';
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --primary: #2563eb;
+  /* Theme system colors (updated by ThemeContext) */
+  --color-primary: #3b82f6;
+  --color-secondary: #8b5cf6;
+  --color-accent: #f59e0b;
+  --color-background: #ffffff;
+  --color-surface: #f9fafb;
+  --color-text: #111827;
+  --color-text-secondary: #6b7280;
+  --color-border: #e5e7eb;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+
+  /* Legacy variables (for backwards compatibility) */
+  --background: var(--color-background);
+  --foreground: var(--color-text);
+  --primary: var(--color-primary);
   --primary-foreground: #ffffff;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #475569;
-  --accent: #10b981;
+  --secondary: var(--color-surface);
+  --secondary-foreground: var(--color-text-secondary);
+  --accent: var(--color-accent);
   --accent-foreground: #ffffff;
-  --destructive: #ef4444;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --border: #e2e8f0;
-  --card: #ffffff;
-  --card-foreground: #0f172a;
+  --destructive: var(--color-error);
+  --muted: var(--color-surface);
+  --muted-foreground: var(--color-text-secondary);
+  --border: var(--color-border);
+  --card: var(--color-surface);
+  --card-foreground: var(--color-text);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f172a;
-    --foreground: #f8fafc;
-    --primary: #3b82f6;
-    --primary-foreground: #ffffff;
-    --secondary: #1e293b;
-    --secondary-foreground: #94a3b8;
-    --accent: #10b981;
-    --accent-foreground: #ffffff;
-    --destructive: #ef4444;
-    --muted: #1e293b;
-    --muted-foreground: #64748b;
-    --border: #334155;
-    --card: #1e293b;
-    --card-foreground: #f8fafc;
-  }
-}
+/* Dark mode now handled by ThemeContext - users can select "Dark" preset */
 
 @theme inline {
   --color-background: var(--background);

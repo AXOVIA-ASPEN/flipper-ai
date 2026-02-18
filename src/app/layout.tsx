@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { ThemeStyles } from '@/components/ThemeStyles';
 import { SessionProvider } from '@/components/providers/SessionProvider';
 import { WebVitals } from '@/components/WebVitals';
+import Navigation from '@/components/Navigation';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -35,6 +36,7 @@ export default function RootLayout({
           <ThemeProvider>
             <ThemeStyles />
             <WebVitals />
+            <Navigation />
             {children}
           </ThemeProvider>
         </SessionProvider>
