@@ -1,213 +1,98 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useTheme, PRESET_THEMES, Theme } from '@/contexts/ThemeContext';
+import React from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function ThemeSettings() {
-  const { theme, applyPreset, customizeColor, resetToDefault, exportTheme, importTheme } = useTheme();
-  const [activeTab, setActiveTab] = useState<'presets' | 'custom'>('presets');
-  const [importText, setImportText] = useState('');
-  const [importError, setImportError] = useState('');
-
-  const handleImport = () => {
-    try {
-      importTheme(importText);
-      setImportText('');
-      setImportError('');
-    } catch (e) {
-      setImportError('Invalid theme JSON');
-    }
-  };
-
-  const handleExport = () => {
-    const json = exportTheme();
-    navigator.clipboard.writeText(json);
-    alert('Theme JSON copied to clipboard!');
-  };
+  const { theme, setTheme, availableThemes } = useTheme();
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-2xl font-bold mb-6">Theme Settings</h2>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-4xl font-bold text-white mb-2">Theme Settings</h1>
+        <p className="text-blue-200/70 mb-8">Choose a color theme for your dashboard</p>
 
-      {/* Tabs */}
-      <div className="flex gap-4 mb-6 border-b">
-        <button
-          onClick={() => setActiveTab('presets')}
-          className={`pb-2 px-4 font-medium transition-colors ${
-            activeTab === 'presets'
-              ? 'border-b-2 border-blue-500 text-blue-600'
-              : 'text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          Preset Themes
-        </button>
-        <button
-          onClick={() => setActiveTab('custom')}
-          className={`pb-2 px-4 font-medium transition-colors ${
-            activeTab === 'custom'
-              ? 'border-b-2 border-blue-500 text-blue-600'
-              : 'text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          Custom Colors
-        </button>
-      </div>
-
-      {/* Preset Themes */}
-      {activeTab === 'presets' && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {Object.entries(PRESET_THEMES).map(([key, preset]) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {availableThemes.map((themeOption) => {
+            const isActive = theme.id === themeOption.id;
+            
+            return (
               <button
-                key={key}
-                onClick={() => applyPreset(key as keyof typeof PRESET_THEMES)}
-                className={`p-4 rounded-lg border-2 transition-all hover:scale-105 ${
-                  theme.name === preset.name
-                    ? 'border-blue-500 shadow-lg'
-                    : 'border-gray-200 hover:border-gray-300'
+                key={themeOption.id}
+                onClick={() => setTheme(themeOption.id)}
+                className={`relative group p-6 rounded-xl transition-all duration-300 ${
+                  isActive
+                    ? 'bg-white/20 ring-2 ring-white shadow-2xl scale-105'
+                    : 'bg-white/5 hover:bg-white/10 hover:scale-102'
                 }`}
+                data-testid={`theme-option-${themeOption.id}`}
               >
-                <div className="flex items-center gap-2 mb-2">
+                {/* Active indicator */}
+                {isActive && (
+                  <div className="absolute top-4 right-4 w-3 h-3 bg-green-400 rounded-full animate-pulse" />
+                )}
+
+                {/* Theme preview circles */}
+                <div className="flex gap-2 mb-4">
+                  {themeOption.colors.orbColors.map((color, i) => (
+                    <div
+                      key={i}
+                      className={`w-10 h-10 rounded-full bg-gradient-to-br from-${color} to-${themeOption.colors.orbColors[(i + 1) % 3]} shadow-lg`}
+                      data-testid={`theme-${themeOption.id}-orb-${i}`}
+                    />
+                  ))}
+                </div>
+
+                {/* Theme name and description */}
+                <h3 className="text-xl font-bold text-white mb-2">
+                  {themeOption.name}
+                </h3>
+                <p className="text-sm text-blue-200/70 mb-4">
+                  {themeOption.description}
+                </p>
+
+                {/* Gradient preview bars */}
+                <div className="space-y-2">
                   <div
-                    className="w-6 h-6 rounded-full"
-                    style={{ backgroundColor: preset.primary }}
+                    className={`h-2 rounded-full bg-gradient-to-r from-${themeOption.colors.primaryFrom} to-${themeOption.colors.primaryTo}`}
                   />
                   <div
-                    className="w-6 h-6 rounded-full"
-                    style={{ backgroundColor: preset.secondary }}
-                  />
-                  <div
-                    className="w-6 h-6 rounded-full"
-                    style={{ backgroundColor: preset.accent }}
+                    className={`h-2 rounded-full bg-gradient-to-r from-${themeOption.colors.secondaryFrom} to-${themeOption.colors.secondaryTo}`}
                   />
                 </div>
-                <p className="font-medium text-left">{preset.name}</p>
-              </button>
-            ))}
-          </div>
 
-          <button
-            onClick={resetToDefault}
-            className="mt-4 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
-          >
-            Reset to Default
-          </button>
+                {/* Active label */}
+                {isActive && (
+                  <div className="mt-4 text-xs font-semibold text-green-400 uppercase tracking-wide">
+                    Active Theme
+                  </div>
+                )}
+              </button>
+            );
+          })}
         </div>
-      )}
 
-      {/* Custom Colors */}
-      {activeTab === 'custom' && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {(Object.keys(theme) as Array<keyof Theme>)
-              .filter((key) => key !== 'name')
-              .map((key) => (
-                <div key={key} className="flex items-center gap-3">
-                  <label className="w-32 text-sm font-medium capitalize">
-                    {key.replace(/([A-Z])/g, ' $1').trim()}:
-                  </label>
-                  <input
-                    type="color"
-                    value={theme[key]}
-                    onChange={(e) => customizeColor(key, e.target.value)}
-                    className="w-16 h-10 rounded cursor-pointer"
-                  />
-                  <input
-                    type="text"
-                    value={theme[key]}
-                    onChange={(e) => customizeColor(key, e.target.value)}
-                    className="flex-1 px-3 py-2 border rounded font-mono text-sm"
-                    placeholder="#000000"
-                  />
-                </div>
-              ))}
-          </div>
-
-          {/* Import/Export */}
-          <div className="border-t pt-6 mt-6">
-            <h3 className="font-semibold mb-3">Import/Export Theme</h3>
-            <div className="flex gap-2 mb-3">
-              <button
-                onClick={handleExport}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-              >
-                Export Theme
-              </button>
+        {/* Current theme info */}
+        <div className="mt-12 p-6 bg-white/10 rounded-xl backdrop-blur-sm">
+          <h2 className="text-2xl font-bold text-white mb-4">Current Theme: {theme.name}</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <p className="text-sm text-blue-200/70 mb-2">Primary Gradient</p>
+              <div className={`h-12 rounded-lg bg-gradient-to-r from-${theme.colors.primaryFrom} to-${theme.colors.primaryTo}`} />
             </div>
-            <div className="space-y-2">
-              <textarea
-                value={importText}
-                onChange={(e) => {
-                  setImportText(e.target.value);
-                  setImportError('');
-                }}
-                placeholder="Paste theme JSON here to import..."
-                className="w-full px-3 py-2 border rounded font-mono text-sm h-32"
-              />
-              {importError && (
-                <p className="text-red-500 text-sm">{importError}</p>
-              )}
-              <button
-                onClick={handleImport}
-                disabled={!importText}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Import Theme
-              </button>
+            <div>
+              <p className="text-sm text-blue-200/70 mb-2">Secondary Gradient</p>
+              <div className={`h-12 rounded-lg bg-gradient-to-r from-${theme.colors.secondaryFrom} to-${theme.colors.secondaryTo}`} />
+            </div>
+            <div>
+              <p className="text-sm text-blue-200/70 mb-2">Accent Blue</p>
+              <div className={`h-12 rounded-lg bg-gradient-to-r from-${theme.colors.accentBlue.from} to-${theme.colors.accentBlue.to}`} />
+            </div>
+            <div>
+              <p className="text-sm text-blue-200/70 mb-2">Accent Green</p>
+              <div className={`h-12 rounded-lg bg-gradient-to-r from-${theme.colors.accentGreen.from} to-${theme.colors.accentGreen.to}`} />
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Preview */}
-      <div className="mt-8 p-6 rounded-lg border-2" style={{ 
-        backgroundColor: theme.surface,
-        borderColor: theme.border,
-        color: theme.text 
-      }}>
-        <h3 className="text-lg font-bold mb-2">Theme Preview</h3>
-        <p className="mb-4" style={{ color: theme.textSecondary }}>
-          This is how your theme looks in action.
-        </p>
-        <div className="flex gap-2">
-          <button
-            className="px-4 py-2 rounded font-medium"
-            style={{ backgroundColor: theme.primary, color: '#fff' }}
-          >
-            Primary Button
-          </button>
-          <button
-            className="px-4 py-2 rounded font-medium"
-            style={{ backgroundColor: theme.secondary, color: '#fff' }}
-          >
-            Secondary Button
-          </button>
-          <button
-            className="px-4 py-2 rounded font-medium"
-            style={{ backgroundColor: theme.accent, color: '#fff' }}
-          >
-            Accent Button
-          </button>
-        </div>
-        <div className="mt-4 flex gap-2">
-          <span
-            className="px-3 py-1 rounded text-sm font-medium"
-            style={{ backgroundColor: theme.success, color: '#fff' }}
-          >
-            Success
-          </span>
-          <span
-            className="px-3 py-1 rounded text-sm font-medium"
-            style={{ backgroundColor: theme.warning, color: '#fff' }}
-          >
-            Warning
-          </span>
-          <span
-            className="px-3 py-1 rounded text-sm font-medium"
-            style={{ backgroundColor: theme.error, color: '#fff' }}
-          >
-            Error
-          </span>
         </div>
       </div>
     </div>
