@@ -8,14 +8,18 @@ jest.mock('bcryptjs', () => ({
 
 // Mock prisma
 const mockFindUnique = jest.fn();
-const mockCreate = jest.fn();
+const mockUserCreate = jest.fn();
+const mockUserSettingsCreate = jest.fn();
 
 jest.mock('@/lib/db', () => ({
   __esModule: true,
   default: {
     user: {
       findUnique: (...args: unknown[]) => mockFindUnique(...args),
-      create: (...args: unknown[]) => mockCreate(...args),
+      create: (...args: unknown[]) => mockUserCreate(...args),
+    },
+    userSettings: {
+      create: (...args: unknown[]) => mockUserSettingsCreate(...args),
     },
   },
 }));
@@ -41,11 +45,19 @@ describe('POST /api/auth/register', () => {
     jest.clearAllMocks();
     // Default: sendWelcome succeeds
     mockSendWelcome.mockResolvedValue(undefined);
+    // Default: userSettings.create succeeds
+    mockUserSettingsCreate.mockResolvedValue({
+      id: 'settings-1',
+      userId: 'user-1',
+      llmModel: 'gpt-4o-mini',
+      discountThreshold: 50,
+      autoAnalyze: true,
+    });
   });
 
   it('creates a new user successfully', async () => {
     mockFindUnique.mockResolvedValue(null);
-    mockCreate.mockResolvedValue({
+    mockUserCreate.mockResolvedValue({
       id: 'user-1',
       email: 'test@example.com',
       name: 'Test User',
@@ -104,7 +116,7 @@ describe('POST /api/auth/register', () => {
 
   it('creates user without name', async () => {
     mockFindUnique.mockResolvedValue(null);
-    mockCreate.mockResolvedValue({
+    mockUserCreate.mockResolvedValue({
       id: 'user-2',
       email: 'test@example.com',
       name: null,
@@ -118,7 +130,7 @@ describe('POST /api/auth/register', () => {
 
   it('still succeeds even if welcome email fails (non-blocking)', async () => {
     mockFindUnique.mockResolvedValue(null);
-    mockCreate.mockResolvedValue({
+    mockUserCreate.mockResolvedValue({
       id: 'user-3',
       email: 'test@example.com',
       name: 'Test User',
@@ -154,5 +166,24 @@ describe('POST /api/auth/register', () => {
 
     const res = await POST(createRequest({ email: 'test@example.com', password: 'password123' }));
     expect(res.status).toBe(500);
+  });
+
+  it('returns 500 when UserSettings creation fails', async () => {
+    mockFindUnique.mockResolvedValue(null);
+    mockUserCreate.mockResolvedValue({
+      id: 'user-4',
+      email: 'test@example.com',
+      name: 'Test User',
+      image: null,
+      createdAt: new Date(),
+    });
+    // UserSettings creation fails (e.g., table doesn't exist)
+    mockUserSettingsCreate.mockRejectedValue(new Error('relation "UserSettings" does not exist'));
+
+    const res = await POST(createRequest({ email: 'test@example.com', password: 'password123' }));
+    expect(res.status).toBe(500);
+    const data = await res.json();
+    expect(data.success).toBe(false);
+    expect(data.error).toContain('Failed to create account');
   });
 });

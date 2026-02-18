@@ -73,14 +73,23 @@ export async function POST(request: NextRequest) {
     });
 
     // Create default settings separately
-    await prisma.userSettings.create({
-      data: {
-        userId: user.id,
-        llmModel: 'gpt-4o-mini',
-        discountThreshold: 50,
-        autoAnalyze: true,
-      },
-    });
+    try {
+      await prisma.userSettings.create({
+        data: {
+          userId: user.id,
+          llmModel: 'gpt-4o-mini',
+          discountThreshold: 50,
+          autoAnalyze: true,
+        },
+      });
+    } catch (settingsError) {
+      console.error('Failed to create UserSettings:', settingsError);
+      // If UserSettings creation fails, roll back by deleting the user
+      await prisma.user.delete({ where: { id: user.id } }).catch((deleteErr) => {
+        console.error('Failed to rollback user creation:', deleteErr);
+      });
+      throw new Error('Failed to initialize user settings - database migration may be required');
+    }
 
     // Send welcome email (non-blocking — don't fail registration if email fails)
     emailService.sendWelcome({ name: user.name ?? undefined, email: user.email }).catch((err) => {

@@ -1,0 +1,10 @@
+[0;34m[2026-02-18 20:00:19][0m =========================================
+[0;34m[2026-02-18 20:00:19][0m 🐧 Flipper AI Production Deployment
+[0;34m[2026-02-18 20:00:19][0m =========================================
+[0;34m[2026-02-18 20:00:19][0m Environment: staging
+[0;34m[2026-02-18 20:00:19][0m Timestamp: 20260218_200019
+[0;34m[2026-02-18 20:00:19][0m =========================================
+[0;34m[2026-02-18 20:00:19][0m Starting pre-flight checks for staging deployment...
+[0;34m[2026-02-18 20:00:19][0m Checking Node.js version...
+[0;32m✅ Node.js version OK: v22.22.0[0m
+[0;31m❌ ERROR: Environment file not found: /home/ubuntu/.openclaw/workspace/projects/flipper-ai/.env.staging[0m
