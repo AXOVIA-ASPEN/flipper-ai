@@ -26,6 +26,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { useFilterParams, FilterState } from '@/hooks/useFilterParams';
+import { useSseEvents } from '@/hooks/useSseEvents';
 
 // Location and category options (reused from settings page)
 const locations = [
@@ -128,6 +129,10 @@ function DashboardContent() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [bulkActionLoading, setBulkActionLoading] = useState<string | null>(null);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+
+  // Real-time SSE notifications
+  const [notifications, setNotifications] = useState<Array<{ id: string; message: string; timestamp: number }>>([]);
+  const { events, isConnected } = useSseEvents({ eventTypes: ['listing.found'] });
 
   const openImageModal = (listing: Listing) => {
     const images = parseImageUrls(listing.imageUrls);
@@ -236,6 +241,39 @@ function DashboardContent() {
       return next;
     });
   }, [listings]);
+
+  // Handle incoming SSE events
+  useEffect(() => {
+    if (events.length === 0) return;
+
+    const latestEvent = events[0];
+    if (latestEvent.type === 'listing.found') {
+      const data = latestEvent.data as {
+        title: string;
+        platform: string;
+        valueScore: number;
+        isOpportunity: boolean;
+      };
+
+      // Add notification
+      const notification = {
+        id: `notif-${Date.now()}`,
+        message: `New listing found: ${data.title} (Score: ${data.valueScore})`,
+        timestamp: Date.now(),
+      };
+      setNotifications((prev) => [notification, ...prev.slice(0, 4)]);
+
+      // Auto-dismiss after 5 seconds
+      setTimeout(() => {
+        setNotifications((prev) => prev.filter((n) => n.id !== notification.id));
+      }, 5000);
+
+      // If it's a high-value opportunity, refresh listings
+      if (data.isOpportunity && data.valueScore >= 85) {
+        fetchListings();
+      }
+    }
+  }, [events, fetchListings]);
 
   async function markAsOpportunity(listingId: string) {
     try {
@@ -428,16 +466,40 @@ function DashboardContent() {
                 <p className="text-xs text-blue-200/70">Find profitable flips</p>
               </div>
             </div>
-            <button
-              onClick={fetchListings}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg shadow-blue-500/50 hover:shadow-blue-500/80 hover:scale-105"
-            >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
-            </button>
+            <div className="flex items-center gap-4">
+              {/* SSE Connection indicator */}
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`} />
+                <span className="text-xs text-blue-200/70">
+                  {isConnected ? 'Live' : 'Offline'}
+                </span>
+              </div>
+              <button
+                onClick={fetchListings}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg shadow-blue-500/50 hover:shadow-blue-500/80 hover:scale-105"
+              >
+                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </button>
+            </div>
           </div>
         </div>
       </header>
+
+      {/* Real-time notification toasts */}
+      <div className="fixed top-20 right-4 z-50 space-y-2 max-w-sm">
+        {notifications.map((notif) => (
+          <div
+            key={notif.id}
+            className="backdrop-blur-xl bg-gradient-to-r from-green-500/90 to-emerald-600/90 text-white p-4 rounded-lg shadow-2xl border border-green-400/50 animate-slide-in-right"
+          >
+            <div className="flex items-start gap-3">
+              <Star className="w-5 h-5 text-yellow-300 flex-shrink-0 mt-0.5" />
+              <p className="text-sm font-medium">{notif.message}</p>
+            </div>
+          </div>
+        ))}
+      </div>
 
       <main className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
