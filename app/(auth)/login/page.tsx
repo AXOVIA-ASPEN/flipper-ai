@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useRef, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 import {
   Mail,
   Lock,
@@ -15,6 +16,7 @@ import {
   TrendingUp,
   DollarSign,
   ArrowRight,
+  ShieldCheck,
 } from 'lucide-react';
 
 export default function LoginPage() {
@@ -44,21 +46,76 @@ function LoginPageInner() {
   const [errorMessage, setErrorMessage] = useState<string | null>(
     error === 'CredentialsSignin' ? 'Invalid email or password' : null
   );
+  const [showCaptcha, setShowCaptcha] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HCaptcha>(null);
+
+  const hcaptchaSiteKey = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || '';
+
+  // Check if CAPTCHA is required when email changes
+  useEffect(() => {
+    const checkCaptchaRequired = async () => {
+      if (!email || email.length < 3) {
+        setShowCaptcha(false);
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/auth/captcha-required', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.toLowerCase() }),
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setShowCaptcha(data.requiresCaptcha);
+        }
+      } catch (error) {
+        console.error('Failed to check CAPTCHA requirement:', error);
+      }
+    };
+
+    const debounce = setTimeout(checkCaptchaRequired, 500);
+    return () => clearTimeout(debounce);
+  }, [email]);
 
   async function handleCredentialsSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage(null);
 
+    // Check if CAPTCHA is required but not completed
+    if (showCaptcha && !captchaToken) {
+      setErrorMessage('Please complete the CAPTCHA verification');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const result = await signIn('credentials', {
         email,
         password,
+        captchaToken: captchaToken || '',
         redirect: false,
       });
 
       if (result?.error) {
-        setErrorMessage('Invalid email or password');
+        if (result.error === 'CAPTCHA verification required' || 
+            result.error === 'CAPTCHA verification failed') {
+          setErrorMessage(result.error);
+          setShowCaptcha(true);
+          // Reset CAPTCHA
+          setCaptchaToken(null);
+          if (captchaRef.current) {
+            captchaRef.current.resetCaptcha();
+          }
+        } else {
+          setErrorMessage('Invalid email or password');
+          // Trigger re-check for CAPTCHA requirement
+          setShowCaptcha(false);
+          setCaptchaToken(null);
+        }
       } else {
         router.push(callbackUrl);
         router.refresh();
@@ -256,6 +313,29 @@ function LoginPageInner() {
                 </button>
               </div>
             </div>
+
+            {/* CAPTCHA Widget */}
+            {showCaptcha && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-yellow-300/90">
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Security verification required</span>
+                </div>
+                <div className="flex justify-center bg-white/5 rounded-xl p-4 border border-white/10">
+                  <HCaptcha
+                    ref={captchaRef}
+                    sitekey={hcaptchaSiteKey}
+                    onVerify={(token) => setCaptchaToken(token)}
+                    onExpire={() => setCaptchaToken(null)}
+                    onError={() => {
+                      setCaptchaToken(null);
+                      setErrorMessage('CAPTCHA error. Please try again.');
+                    }}
+                    theme="dark"
+                  />
+                </div>
+              </div>
+            )}
 
             <button
               type="submit"

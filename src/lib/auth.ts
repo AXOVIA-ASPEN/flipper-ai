@@ -10,6 +10,12 @@ import GitHub from 'next-auth/providers/github';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/db';
+import {
+  recordFailedAttempt,
+  requiresCaptcha,
+  clearFailedAttempts,
+  verifyHCaptcha,
+} from '@/lib/captcha-tracker';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -37,6 +43,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
+        captchaToken: { label: 'CAPTCHA Token', type: 'text' },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -45,20 +52,44 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const email = credentials.email as string;
         const password = credentials.password as string;
+        const captchaToken = credentials.captchaToken as string | undefined;
+        const emailLower = email.toLowerCase();
+
+        // Check if CAPTCHA is required
+        const needsCaptcha = requiresCaptcha(emailLower);
+
+        if (needsCaptcha) {
+          // Verify CAPTCHA token
+          if (!captchaToken) {
+            throw new Error('CAPTCHA verification required');
+          }
+
+          const captchaValid = await verifyHCaptcha(captchaToken);
+          if (!captchaValid) {
+            throw new Error('CAPTCHA verification failed');
+          }
+        }
 
         const user = await prisma.user.findUnique({
-          where: { email },
+          where: { email: emailLower },
         });
 
         if (!user || !user.password) {
+          // Record failed attempt
+          recordFailedAttempt(emailLower);
           throw new Error('Invalid email or password');
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
+          // Record failed attempt
+          recordFailedAttempt(emailLower);
           throw new Error('Invalid email or password');
         }
+
+        // Clear failed attempts on successful login
+        clearFailedAttempts(emailLower);
 
         return {
           id: user.id,
