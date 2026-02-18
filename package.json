@@ -35,8 +35,6 @@
     "@auth/prisma-adapter": "^2.11.1",
     "@browserbasehq/stagehand": "^3.0.6",
     "@hello-pangea/dnd": "^18.0.1",
-    "@libsql/client": "^0.15.15",
-    "@prisma/adapter-libsql": "^7.2.0",
     "@prisma/client": "^7.4.0",
     "@sentry/nextjs": "^10.39.0",
     "@testing-library/dom": "^10.4.1",
