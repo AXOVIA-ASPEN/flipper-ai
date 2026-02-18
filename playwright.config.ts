@@ -12,7 +12,7 @@ import { defineConfig, devices } from '@playwright/test';
  * `next start` via webServer config below.
  */
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
 
 export default defineConfig({
   testDir: './e2e',
