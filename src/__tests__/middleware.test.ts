@@ -33,7 +33,7 @@ describe('Next.js Middleware', () => {
     jest.resetModules();
     // Re-import after resetting modules so the mock header map is fresh
     jest.isolateModules(() => {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
+       
       ({ middleware } = require('../middleware'));
     });
   });

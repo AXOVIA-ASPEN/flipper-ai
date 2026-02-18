@@ -250,7 +250,7 @@ describe('POST /api/webhooks/stripe', () => {
   // ── Branch coverage ────────────────────────────────────────────────────────
   it('handles non-Error signature verification failure (String(err) branch)', async () => {
     constructEvent.mockImplementation(() => {
-      // eslint-disable-next-line @typescript-eslint/only-throw-error
+       
       throw 'string-based-error'; // Not an Error instance
     });
     const res = await POST(makeReq('{}', 'sig_bad'));
