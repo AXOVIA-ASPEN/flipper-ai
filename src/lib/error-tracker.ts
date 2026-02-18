@@ -58,14 +58,29 @@ export function captureError(error: Error, context: ErrorContext = {}): void {
     recentErrors.shift();
   }
 
-  // Sentry integration point
+  // Sentry integration
   /* istanbul ignore next -- Sentry integration requires SENTRY_DSN env var (not available in test environment) */
-  if (process.env.SENTRY_DSN) {
-    // TODO: Initialize Sentry SDK and call Sentry.captureException(error, { extra: context })
-    // For now, we log that Sentry DSN is configured but SDK not yet installed
-    logger.debug('Sentry DSN configured - would forward error to Sentry', {
-      fingerprint: captured.fingerprint,
-    });
+  if (process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN) {
+    try {
+      // Dynamic import to avoid issues in test environment
+      const Sentry = require('@sentry/nextjs');
+      Sentry.captureException(error, {
+        extra: context,
+        fingerprint: [captured.fingerprint],
+        tags: {
+          route: context.route,
+          action: context.action,
+        },
+      });
+      logger.debug('Error forwarded to Sentry', {
+        fingerprint: captured.fingerprint,
+      });
+    } catch (sentryError) {
+      // Fail gracefully if Sentry is not available
+      logger.warn('Failed to forward error to Sentry', {
+        error: sentryError instanceof Error ? sentryError.message : 'Unknown error',
+      });
+    }
   }
 }
 
