@@ -1,0 +1,42 @@
+{
+  "name": "flipper-ai-functions",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cloud Functions for Flipper AI scrapers",
+  "main": "lib/index.js",
+  "scripts": {
+    "prebuild": "prisma generate",
+    "build": "tsc",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "deploy:docker": "npm run deploy:craigslist && npm run deploy:offerup",
+    "deploy:craigslist": "gcloud functions deploy scrapeCraigslist --gen2 --runtime=nodejs20 --region=us-east1 --source=. --entry-point=scrapeCraigslist --trigger-http --allow-unauthenticated --memory=2GB --timeout=300s --docker-registry=artifact-registry",
+    "deploy:offerup": "gcloud functions deploy scrapeOfferup --gen2 --runtime=nodejs20 --region=us-east1 --source=. --entry-point=scrapeOfferup --trigger-http --allow-unauthenticated --memory=2GB --timeout=300s --docker-registry=artifact-registry",
+    "logs": "firebase functions:log",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy"
+  },
+  "engines": {
+    "node": "20"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.74.0",
+    "@libsql/client": "^0.15.15",
+    "@prisma/adapter-libsql": "^7.2.0",
+    "@prisma/client": "^7.4.0",
+    "firebase-admin": "^13.0.0",
+    "firebase-functions": "^6.0.0",
+    "openai": "^4.73.0",
+    "playwright": "^1.57.0",
+    "playwright-chromium": "^1.57.0",
+    "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "firebase-functions-test": "^3.3.0",
+    "prisma": "^7.4.0",
+    "typescript": "^5.0.0"
+  }
+}

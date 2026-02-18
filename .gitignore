@@ -34,3 +34,4 @@ e2e/test-results/
 coverage/
 screenshots/*.png
 coverage-*/
+.env.firebase
