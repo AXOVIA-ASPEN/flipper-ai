@@ -47,6 +47,20 @@ function makeRequest(url: string, init?: RequestInit): NextRequest {
 describe('POST /api/reports/generate', () => {
   beforeEach(() => jest.clearAllMocks());
 
+  it('returns 401 when user is not authenticated', async () => {
+    const { getAuthUserId } = require('@/lib/auth-middleware');
+    (getAuthUserId as jest.Mock).mockResolvedValueOnce(null);
+    
+    const req = makeRequest('/api/reports/generate', {
+      method: 'POST',
+      body: JSON.stringify({ period: 'weekly' }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(401);
+    const data = await res.json();
+    expect(data.error).toBe('Unauthorized');
+  });
+
   it('returns JSON report for valid request', async () => {
     const req = makeRequest('/api/reports/generate', {
       method: 'POST',
