@@ -45,7 +45,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Process and save listings with value estimation
-    const listings = result.listings || [];
+    const listings = (result.listings || []) as Array<{
+      title: string;
+      price: string;
+      url: string;
+      location?: string;
+      images?: string[];
+      description?: string;
+    }>;
     let savedCount = 0;
 
     for (const item of listings) {

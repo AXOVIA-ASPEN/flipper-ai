@@ -17,7 +17,6 @@ import {
   TrendingUp,
   Star,
   ExternalLink,
-  Package,
 } from 'lucide-react';
 
 interface Listing {

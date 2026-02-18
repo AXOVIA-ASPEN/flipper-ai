@@ -25,23 +25,21 @@ describe('ThemeStyles', () => {
         <ThemeStyles />
       </ThemeProvider>
     );
-    // ThemeStyles injects a <style> tag with CSS variables
-    const styleTag = container.querySelector('style');
-    expect(styleTag).toBeInTheDocument();
+    // ThemeStyles returns null, it applies CSS variables via useEffect
+    expect(container.firstChild).toBeNull();
   });
 
-  it('injects CSS custom properties', () => {
-    const { container } = render(
+  it('applies CSS custom properties to document root', () => {
+    render(
       <ThemeProvider>
         <ThemeStyles />
       </ThemeProvider>
     );
-    const styleTag = container.querySelector('style');
-    if (styleTag) {
-      const cssText = styleTag.textContent || '';
-      // Should contain CSS custom property definitions
-      expect(cssText).toContain('--');
-    }
+    const root = document.documentElement;
+    // Should have applied CSS custom properties
+    expect(root.style.getPropertyValue('--color-primary')).toBeTruthy();
+    expect(root.style.getPropertyValue('--color-background')).toBeTruthy();
+    expect(root.style.getPropertyValue('--color-text')).toBeTruthy();
   });
 
   it('throws when used outside ThemeProvider', () => {
