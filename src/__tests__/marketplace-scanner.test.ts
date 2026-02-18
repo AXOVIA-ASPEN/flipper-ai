@@ -65,6 +65,51 @@ describe('marketplace-scanner', () => {
         expect(result.platform).toBe(platform);
       }
     });
+
+    it('emits SSE events when emitEvents option is true', () => {
+      const mockEmit = sseEmitter.emit as jest.Mock;
+      mockEmit.mockClear();
+
+      const listing = makeListing();
+      const result = analyzeListing('CRAIGSLIST', listing, {
+        emitEvents: true,
+        userId: 'user-123',
+      });
+
+      expect(mockEmit).toHaveBeenCalledTimes(1);
+      expect(mockEmit).toHaveBeenCalledWith({
+        type: 'listing.found',
+        data: expect.objectContaining({
+          id: listing.externalId,
+          platform: 'CRAIGSLIST',
+          title: listing.title,
+          askingPrice: listing.askingPrice,
+          userId: 'user-123',
+          category: result.category,
+          isOpportunity: result.isOpportunity,
+        }),
+      });
+    });
+
+    it('does not emit SSE events when emitEvents option is false', () => {
+      const mockEmit = sseEmitter.emit as jest.Mock;
+      mockEmit.mockClear();
+
+      analyzeListing('CRAIGSLIST', makeListing(), {
+        emitEvents: false,
+      });
+
+      expect(mockEmit).not.toHaveBeenCalled();
+    });
+
+    it('does not emit SSE events when options are not provided', () => {
+      const mockEmit = sseEmitter.emit as jest.Mock;
+      mockEmit.mockClear();
+
+      analyzeListing('CRAIGSLIST', makeListing());
+
+      expect(mockEmit).not.toHaveBeenCalled();
+    });
   });
 
   describe('meetsViabilityCriteria', () => {
