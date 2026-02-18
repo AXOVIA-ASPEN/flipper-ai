@@ -35,31 +35,20 @@ jobs:
     - name: 🔨 Build Next.js app
       run: npm run build
       env:
-        # Dummy env vars for build (tests will use test env)
-        DATABASE_URL: postgresql://test:test@localhost:5432/flipper_test
-        NEXTAUTH_SECRET: test-secret-for-ci-build-only
+        # Build-time env vars
+        DATABASE_URL: file:./dev.db
+        AUTH_SECRET: test-secret-for-ci-build-only
         NEXTAUTH_URL: http://localhost:3000
-
-    - name: 🚀 Start Next.js server (background)
-      run: |
-        npm run start &
-        sleep 5
-      env:
-        NODE_ENV: production
-        PORT: 3000
-        DATABASE_URL: postgresql://test:test@localhost:5432/flipper_test
-        NEXTAUTH_SECRET: test-secret-for-ci-build-only
-        NEXTAUTH_URL: http://localhost:3000
-
-    - name: ⏳ Wait for server to be ready
-      run: |
-        timeout 30 bash -c 'until curl -s http://localhost:3000 > /dev/null; do sleep 1; done'
 
     - name: 🎭 Run Playwright acceptance tests
       continue-on-error: true  # 🚨 NON-BLOCKING - Remove this line to block releases
       run: npm run test:acceptance
       env:
-        PLAYWRIGHT_TEST_BASE_URL: http://localhost:3000
+        # Runtime env vars (webServer in playwright.config.ts will start server)
+        DATABASE_URL: file:./dev.db
+        AUTH_SECRET: test-secret-for-ci-build-only
+        NEXTAUTH_URL: http://localhost:3000
+        BASE_URL: http://localhost:3000
 
     - name: 📊 Upload test results
       uses: actions/upload-artifact@v4
@@ -121,23 +110,19 @@ jobs:
     - name: 🔨 Build Next.js app
       run: npm run build
       env:
-        DATABASE_URL: postgresql://test:test@localhost:5432/flipper_test
-        NEXTAUTH_SECRET: test-secret-for-ci-build-only
+        DATABASE_URL: file:./dev.db
+        AUTH_SECRET: test-secret-for-ci-build-only
         NEXTAUTH_URL: http://localhost:3000
-
-    - name: 🚀 Start Next.js server
-      run: |
-        npm run start &
-        sleep 5
-      env:
-        NODE_ENV: production
-        PORT: 3000
 
     - name: 🎭 Run ALL E2E tests (chromium + firefox + webkit)
       continue-on-error: true
       run: npm run test:e2e
       env:
-        PLAYWRIGHT_TEST_BASE_URL: http://localhost:3000
+        # webServer in playwright.config.ts auto-starts server
+        DATABASE_URL: file:./dev.db
+        AUTH_SECRET: test-secret-for-ci-build-only
+        NEXTAUTH_URL: http://localhost:3000
+        BASE_URL: http://localhost:3000
 
     - name: 📊 Upload comprehensive test results
       uses: actions/upload-artifact@v4
