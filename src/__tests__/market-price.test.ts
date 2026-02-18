@@ -87,6 +87,28 @@ describe('market-price', () => {
     it('closes without error', async () => {
       await expect(closeBrowser()).resolves.not.toThrow();
     });
+
+    it('resets browser instance so next call creates new browser', async () => {
+      const { chromium } = require('playwright');
+      chromium.launch.mockClear();
+
+      // First call should launch a browser
+      await fetchMarketPrice('test 1');
+      const firstCallCount = chromium.launch.mock.calls.length;
+      expect(firstCallCount).toBeGreaterThan(0);
+
+      // Second call should reuse the browser (no new launch)
+      await fetchMarketPrice('test 2');
+      expect(chromium.launch.mock.calls.length).toBe(firstCallCount);
+
+      // Close browser
+      await closeBrowser();
+
+      // Next call should launch a new browser
+      chromium.launch.mockClear();
+      await fetchMarketPrice('test 3');
+      expect(chromium.launch).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('edge cases', () => {
