@@ -983,5 +983,40 @@ describe('eBay Scraper API', () => {
         })
       );
     });
+
+    it('calls processListings with emitEvents:true for SSE support', async () => {
+      const mockFetch = global.fetch as jest.Mock;
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ itemSummaries: [makeEbayItem()] }),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ itemSummaries: [] }),
+        });
+
+      // Spy on processListings from marketplace-scanner
+      const marketplaceScannerModule = await import('@/lib/marketplace-scanner');
+      const processListingsSpy = jest.spyOn(marketplaceScannerModule, 'processListings');
+
+      const response = await POST(createRequest({ keywords: 'test SSE' }));
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(processListingsSpy).toHaveBeenCalledWith(
+        'EBAY',
+        expect.any(Array),
+        expect.objectContaining({
+          maxAskingPrice: undefined,
+        }),
+        expect.objectContaining({
+          emitEvents: true,
+          userId: 'test-user-id',
+        })
+      );
+
+      processListingsSpy.mockRestore();
+    });
   });
 });

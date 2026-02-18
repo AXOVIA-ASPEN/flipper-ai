@@ -11,6 +11,7 @@ const config = {
   // Exclude integration tests from default run (use pnpm test:integration)
   testPathIgnorePatterns: ['/node_modules/', '\\.integration\\.test\\.ts$'],
   moduleNameMapper: {
+    '^@/app/(.*)$': '<rootDir>/app/$1',
     '^@/(.*)$': '<rootDir>/src/$1',
     '\\.(css|less|scss|sass)$': '<rootDir>/src/__tests__/__mocks__/styleMock.js',
   },
@@ -34,7 +35,7 @@ const config = {
   coverageReporters: ['text', 'lcov', 'clover', 'json-summary'],
   collectCoverageFrom: [
     'src/lib/**/*.ts',
-    'src/app/api/**/*.ts',
+    'app/api/**/*.ts',
     'src/scrapers/**/*.ts',
     '!src/lib/db.ts', // Skip database client
     '!src/generated/**', // Skip generated files
