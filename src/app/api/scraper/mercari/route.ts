@@ -13,6 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { estimateValue, detectCategory, generatePurchaseMessage } from '@/lib/value-estimator';
 import { getAuthUserId } from '@/lib/auth-middleware';
+import { sseEmitter } from '@/lib/sse-emitter';
 
 // Mercari API configuration
 const MERCARI_API_BASE_URL = 'https://www.mercari.com/v1/api';
@@ -450,6 +451,21 @@ async function saveListingFromMercariItem(item: MercariItem, userId: string) {
       negotiable: estimation.negotiable,
       tags,
       requestToBuy,
+    },
+  });
+
+  // Emit SSE event for real-time notification
+  await sseEmitter.emit({
+    type: 'listing.found',
+    data: {
+      id: savedListing.id,
+      platform: 'MERCARI',
+      title: item.name,
+      price: item.price,
+      discount: estimation.discountPercent,
+      url: itemUrl,
+      imageUrl: item.photos?.[0],
+      location: formatLocation(item),
     },
   });
 

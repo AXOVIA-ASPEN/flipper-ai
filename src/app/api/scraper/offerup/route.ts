@@ -4,6 +4,7 @@ import prisma from '@/lib/db';
 import { estimateValue, detectCategory, generatePurchaseMessage } from '@/lib/value-estimator';
 import { getAuthUserId } from '@/lib/auth-middleware';
 import { downloadAndCacheImages, normalizeLocation } from '@/lib/image-service';
+import { sseEmitter } from '@/lib/sse-emitter';
 
 // Rate limiting configuration
 const RATE_LIMIT_DELAY_MS = 2000; // 2 seconds between requests
@@ -462,7 +463,7 @@ export async function POST(request: NextRequest) {
         };
 
         // Upsert to database
-        await prisma.listing.upsert({
+        const savedListing = await prisma.listing.upsert({
           where: {
             platform_externalId_userId: {
               platform: 'OFFERUP',
@@ -472,6 +473,21 @@ export async function POST(request: NextRequest) {
           },
           create: listingData,
           update: listingData,
+        });
+
+        // Emit SSE event for real-time notification
+        await sseEmitter.emit({
+          type: 'listing.found',
+          data: {
+            id: savedListing.id,
+            platform: 'OFFERUP',
+            title: item.title,
+            price: item.price,
+            discount: estimation.discountPercent,
+            url: item.url,
+            imageUrl: cachedImageUrls[0] || item.imageUrls?.[0],
+            location: normalizedLoc.normalized,
+          },
         });
 
         savedCount++;

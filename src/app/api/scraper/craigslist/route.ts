@@ -6,6 +6,7 @@ import { identifyItem } from '@/lib/llm-identifier';
 import { fetchMarketPrice, closeBrowser as closeMarketBrowser } from '@/lib/market-price';
 import { analyzeSellability, quickDiscountCheck } from '@/lib/llm-analyzer';
 import { getAuthUserId } from '@/lib/auth-middleware';
+import { sseEmitter } from '@/lib/sse-emitter';
 
 // Minimum discount threshold for saving a listing (50% = must be half market value)
 const MIN_DISCOUNT_THRESHOLD = 50;
@@ -429,7 +430,7 @@ export async function POST(request: NextRequest) {
         };
 
         // Upsert to database
-        await prisma.listing.upsert({
+        const savedListing = await prisma.listing.upsert({
           where: {
             platform_externalId_userId: {
               platform: 'CRAIGSLIST',
@@ -439,6 +440,21 @@ export async function POST(request: NextRequest) {
           },
           create: listingData,
           update: listingData,
+        });
+
+        // Emit SSE event for real-time notification
+        await sseEmitter.emit({
+          type: 'listing.found',
+          data: {
+            id: savedListing.id,
+            platform: 'CRAIGSLIST',
+            title: item.title,
+            price: item.price,
+            discount: trueDiscountPercent || estimation.discountPercent,
+            url: item.url,
+            imageUrl: item.imageUrls?.[0],
+            location: item.location,
+          },
         });
 
         savedCount++;
