@@ -28,7 +28,8 @@
     "test:load": "tsx src/__tests__/performance/load-test.ts",
     "test:acceptance": "playwright test e2e/acceptance/",
     "test:acceptance:ui": "playwright test e2e/acceptance/ --ui",
-    "test:acceptance:headed": "playwright test e2e/acceptance/ --headed"
+    "test:acceptance:headed": "playwright test e2e/acceptance/ --headed",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",
