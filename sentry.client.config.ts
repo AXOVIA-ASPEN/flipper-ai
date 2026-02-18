@@ -21,9 +21,6 @@ Sentry.init({
   // Environment
   environment: process.env.NODE_ENV || 'development',
 
-  // Automatically capture unhandled promise rejections
-  autoSessionTracking: true,
-
   // Filter out sensitive data
   beforeSend(event) {
     // Remove user IP addresses
