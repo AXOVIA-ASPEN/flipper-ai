@@ -316,8 +316,8 @@ export type OpportunityWhereInput = {
   notes?: Prisma.StringNullableFilter<"Opportunity"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Opportunity"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Opportunity"> | Date | string
-  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   listing?: Prisma.XOR<Prisma.ListingScalarRelationFilter, Prisma.ListingWhereInput>
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
 export type OpportunityOrderByWithRelationInput = {
@@ -337,8 +337,8 @@ export type OpportunityOrderByWithRelationInput = {
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  user?: Prisma.UserOrderByWithRelationInput
   listing?: Prisma.ListingOrderByWithRelationInput
+  user?: Prisma.UserOrderByWithRelationInput
 }
 
 export type OpportunityWhereUniqueInput = Prisma.AtLeast<{
@@ -361,8 +361,8 @@ export type OpportunityWhereUniqueInput = Prisma.AtLeast<{
   notes?: Prisma.StringNullableFilter<"Opportunity"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Opportunity"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Opportunity"> | Date | string
-  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   listing?: Prisma.XOR<Prisma.ListingScalarRelationFilter, Prisma.ListingWhereInput>
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id" | "listingId">
 
 export type OpportunityOrderByWithAggregationInput = {
@@ -426,8 +426,8 @@ export type OpportunityCreateInput = {
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  user?: Prisma.UserCreateNestedOneWithoutOpportunitiesInput
   listing: Prisma.ListingCreateNestedOneWithoutOpportunityInput
+  user?: Prisma.UserCreateNestedOneWithoutOpportunitiesInput
 }
 
 export type OpportunityUncheckedCreateInput = {
@@ -464,8 +464,8 @@ export type OpportunityUpdateInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneWithoutOpportunitiesNestedInput
   listing?: Prisma.ListingUpdateOneRequiredWithoutOpportunityNestedInput
+  user?: Prisma.UserUpdateOneWithoutOpportunitiesNestedInput
 }
 
 export type OpportunityUncheckedUpdateInput = {
@@ -833,6 +833,7 @@ export type OpportunityCreateOrConnectWithoutUserInput = {
 
 export type OpportunityCreateManyUserInputEnvelope = {
   data: Prisma.OpportunityCreateManyUserInput | Prisma.OpportunityCreateManyUserInput[]
+  skipDuplicates?: boolean
 }
 
 export type OpportunityUpsertWithWhereUniqueWithoutUserInput = {
@@ -964,8 +965,8 @@ export type OpportunitySelect<ExtArgs extends runtime.Types.Extensions.InternalA
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  user?: boolean | Prisma.Opportunity$userArgs<ExtArgs>
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.Opportunity$userArgs<ExtArgs>
 }, ExtArgs["result"]["opportunity"]>
 
 export type OpportunitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -985,8 +986,8 @@ export type OpportunitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  user?: boolean | Prisma.Opportunity$userArgs<ExtArgs>
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.Opportunity$userArgs<ExtArgs>
 }, ExtArgs["result"]["opportunity"]>
 
 export type OpportunitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1006,8 +1007,8 @@ export type OpportunitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  user?: boolean | Prisma.Opportunity$userArgs<ExtArgs>
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.Opportunity$userArgs<ExtArgs>
 }, ExtArgs["result"]["opportunity"]>
 
 export type OpportunitySelectScalar = {
@@ -1031,23 +1032,23 @@ export type OpportunitySelectScalar = {
 
 export type OpportunityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "listingId" | "purchasePrice" | "purchaseDate" | "purchaseNotes" | "resalePrice" | "resalePlatform" | "resaleUrl" | "resaleDate" | "actualProfit" | "fees" | "status" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["opportunity"]>
 export type OpportunityInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.Opportunity$userArgs<ExtArgs>
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.Opportunity$userArgs<ExtArgs>
 }
 export type OpportunityIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.Opportunity$userArgs<ExtArgs>
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.Opportunity$userArgs<ExtArgs>
 }
 export type OpportunityIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.Opportunity$userArgs<ExtArgs>
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.Opportunity$userArgs<ExtArgs>
 }
 
 export type $OpportunityPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Opportunity"
   objects: {
-    user: Prisma.$UserPayload<ExtArgs> | null
     listing: Prisma.$ListingPayload<ExtArgs>
+    user: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1460,8 +1461,8 @@ readonly fields: OpportunityFieldRefs;
  */
 export interface Prisma__OpportunityClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  user<T extends Prisma.Opportunity$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Opportunity$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   listing<T extends Prisma.ListingDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ListingDefaultArgs<ExtArgs>>): Prisma.Prisma__ListingClient<runtime.Types.Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.Opportunity$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Opportunity$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1736,6 +1737,7 @@ export type OpportunityCreateManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * The data used to create many Opportunities.
    */
   data: Prisma.OpportunityCreateManyInput | Prisma.OpportunityCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1754,6 +1756,7 @@ export type OpportunityCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ext
    * The data used to create many Opportunities.
    */
   data: Prisma.OpportunityCreateManyInput | Prisma.OpportunityCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

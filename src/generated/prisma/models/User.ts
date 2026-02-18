@@ -265,14 +265,14 @@ export type UserWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   accounts?: Prisma.AccountListRelationFilter
-  sessions?: Prisma.SessionListRelationFilter
-  settings?: Prisma.XOR<Prisma.UserSettingsNullableScalarRelationFilter, Prisma.UserSettingsWhereInput> | null
   listings?: Prisma.ListingListRelationFilter
+  messages?: Prisma.MessageListRelationFilter
   opportunities?: Prisma.OpportunityListRelationFilter
+  postingQueue?: Prisma.PostingQueueItemListRelationFilter
   scraperJobs?: Prisma.ScraperJobListRelationFilter
   searchConfigs?: Prisma.SearchConfigListRelationFilter
-  messages?: Prisma.MessageListRelationFilter
-  postingQueue?: Prisma.PostingQueueItemListRelationFilter
+  sessions?: Prisma.SessionListRelationFilter
+  settings?: Prisma.XOR<Prisma.UserSettingsNullableScalarRelationFilter, Prisma.UserSettingsWhereInput> | null
 }
 
 export type UserOrderByWithRelationInput = {
@@ -288,14 +288,14 @@ export type UserOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   accounts?: Prisma.AccountOrderByRelationAggregateInput
-  sessions?: Prisma.SessionOrderByRelationAggregateInput
-  settings?: Prisma.UserSettingsOrderByWithRelationInput
   listings?: Prisma.ListingOrderByRelationAggregateInput
+  messages?: Prisma.MessageOrderByRelationAggregateInput
   opportunities?: Prisma.OpportunityOrderByRelationAggregateInput
+  postingQueue?: Prisma.PostingQueueItemOrderByRelationAggregateInput
   scraperJobs?: Prisma.ScraperJobOrderByRelationAggregateInput
   searchConfigs?: Prisma.SearchConfigOrderByRelationAggregateInput
-  messages?: Prisma.MessageOrderByRelationAggregateInput
-  postingQueue?: Prisma.PostingQueueItemOrderByRelationAggregateInput
+  sessions?: Prisma.SessionOrderByRelationAggregateInput
+  settings?: Prisma.UserSettingsOrderByWithRelationInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -314,14 +314,14 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   accounts?: Prisma.AccountListRelationFilter
-  sessions?: Prisma.SessionListRelationFilter
-  settings?: Prisma.XOR<Prisma.UserSettingsNullableScalarRelationFilter, Prisma.UserSettingsWhereInput> | null
   listings?: Prisma.ListingListRelationFilter
+  messages?: Prisma.MessageListRelationFilter
   opportunities?: Prisma.OpportunityListRelationFilter
+  postingQueue?: Prisma.PostingQueueItemListRelationFilter
   scraperJobs?: Prisma.ScraperJobListRelationFilter
   searchConfigs?: Prisma.SearchConfigListRelationFilter
-  messages?: Prisma.MessageListRelationFilter
-  postingQueue?: Prisma.PostingQueueItemListRelationFilter
+  sessions?: Prisma.SessionListRelationFilter
+  settings?: Prisma.XOR<Prisma.UserSettingsNullableScalarRelationFilter, Prisma.UserSettingsWhereInput> | null
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -373,14 +373,14 @@ export type UserCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   listings?: Prisma.ListingCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutUserInput
+  postingQueue?: Prisma.PostingQueueItemCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
-  postingQueue?: Prisma.PostingQueueItemCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -396,14 +396,14 @@ export type UserUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   listings?: Prisma.ListingUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutUserInput
+  postingQueue?: Prisma.PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobUncheckedCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigUncheckedCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
-  postingQueue?: Prisma.PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -419,14 +419,14 @@ export type UserUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   listings?: Prisma.ListingUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
   opportunities?: Prisma.OpportunityUpdateManyWithoutUserNestedInput
+  postingQueue?: Prisma.PostingQueueItemUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
-  postingQueue?: Prisma.PostingQueueItemUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -442,14 +442,14 @@ export type UserUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   listings?: Prisma.ListingUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutUserNestedInput
+  postingQueue?: Prisma.PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUncheckedUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUncheckedUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
-  postingQueue?: Prisma.PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -701,13 +701,13 @@ export type UserCreateWithoutListingsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutUserInput
+  postingQueue?: Prisma.PostingQueueItemCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
-  postingQueue?: Prisma.PostingQueueItemCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutListingsInput = {
@@ -723,13 +723,13 @@ export type UserUncheckedCreateWithoutListingsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutUserInput
+  postingQueue?: Prisma.PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobUncheckedCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigUncheckedCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
-  postingQueue?: Prisma.PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutListingsInput = {
@@ -761,13 +761,13 @@ export type UserUpdateWithoutListingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
   opportunities?: Prisma.OpportunityUpdateManyWithoutUserNestedInput
+  postingQueue?: Prisma.PostingQueueItemUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
-  postingQueue?: Prisma.PostingQueueItemUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutListingsInput = {
@@ -783,13 +783,13 @@ export type UserUncheckedUpdateWithoutListingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutUserNestedInput
+  postingQueue?: Prisma.PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUncheckedUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUncheckedUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
-  postingQueue?: Prisma.PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutOpportunitiesInput = {
@@ -805,13 +805,13 @@ export type UserCreateWithoutOpportunitiesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   listings?: Prisma.ListingCreateNestedManyWithoutUserInput
-  scraperJobs?: Prisma.ScraperJobCreateNestedManyWithoutUserInput
-  searchConfigs?: Prisma.SearchConfigCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageCreateNestedManyWithoutUserInput
   postingQueue?: Prisma.PostingQueueItemCreateNestedManyWithoutUserInput
+  scraperJobs?: Prisma.ScraperJobCreateNestedManyWithoutUserInput
+  searchConfigs?: Prisma.SearchConfigCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutOpportunitiesInput = {
@@ -827,13 +827,13 @@ export type UserUncheckedCreateWithoutOpportunitiesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   listings?: Prisma.ListingUncheckedCreateNestedManyWithoutUserInput
-  scraperJobs?: Prisma.ScraperJobUncheckedCreateNestedManyWithoutUserInput
-  searchConfigs?: Prisma.SearchConfigUncheckedCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
   postingQueue?: Prisma.PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
+  scraperJobs?: Prisma.ScraperJobUncheckedCreateNestedManyWithoutUserInput
+  searchConfigs?: Prisma.SearchConfigUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutOpportunitiesInput = {
@@ -865,13 +865,13 @@ export type UserUpdateWithoutOpportunitiesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   listings?: Prisma.ListingUpdateManyWithoutUserNestedInput
-  scraperJobs?: Prisma.ScraperJobUpdateManyWithoutUserNestedInput
-  searchConfigs?: Prisma.SearchConfigUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
   postingQueue?: Prisma.PostingQueueItemUpdateManyWithoutUserNestedInput
+  scraperJobs?: Prisma.ScraperJobUpdateManyWithoutUserNestedInput
+  searchConfigs?: Prisma.SearchConfigUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOpportunitiesInput = {
@@ -887,13 +887,13 @@ export type UserUncheckedUpdateWithoutOpportunitiesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   listings?: Prisma.ListingUncheckedUpdateManyWithoutUserNestedInput
-  scraperJobs?: Prisma.ScraperJobUncheckedUpdateManyWithoutUserNestedInput
-  searchConfigs?: Prisma.SearchConfigUncheckedUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
   postingQueue?: Prisma.PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
+  scraperJobs?: Prisma.ScraperJobUncheckedUpdateManyWithoutUserNestedInput
+  searchConfigs?: Prisma.SearchConfigUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutScraperJobsInput = {
@@ -909,13 +909,13 @@ export type UserCreateWithoutScraperJobsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  listings?: Prisma.ListingCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
+  opportunities?: Prisma.OpportunityCreateNestedManyWithoutUserInput
+  postingQueue?: Prisma.PostingQueueItemCreateNestedManyWithoutUserInput
+  searchConfigs?: Prisma.SearchConfigCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
-  listings?: Prisma.ListingCreateNestedManyWithoutUserInput
-  opportunities?: Prisma.OpportunityCreateNestedManyWithoutUserInput
-  searchConfigs?: Prisma.SearchConfigCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
-  postingQueue?: Prisma.PostingQueueItemCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutScraperJobsInput = {
@@ -931,13 +931,13 @@ export type UserUncheckedCreateWithoutScraperJobsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  listings?: Prisma.ListingUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
+  opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutUserInput
+  postingQueue?: Prisma.PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
+  searchConfigs?: Prisma.SearchConfigUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
-  listings?: Prisma.ListingUncheckedCreateNestedManyWithoutUserInput
-  opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutUserInput
-  searchConfigs?: Prisma.SearchConfigUncheckedCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
-  postingQueue?: Prisma.PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutScraperJobsInput = {
@@ -969,13 +969,13 @@ export type UserUpdateWithoutScraperJobsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  listings?: Prisma.ListingUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
+  opportunities?: Prisma.OpportunityUpdateManyWithoutUserNestedInput
+  postingQueue?: Prisma.PostingQueueItemUpdateManyWithoutUserNestedInput
+  searchConfigs?: Prisma.SearchConfigUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
-  listings?: Prisma.ListingUpdateManyWithoutUserNestedInput
-  opportunities?: Prisma.OpportunityUpdateManyWithoutUserNestedInput
-  searchConfigs?: Prisma.SearchConfigUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
-  postingQueue?: Prisma.PostingQueueItemUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutScraperJobsInput = {
@@ -991,13 +991,13 @@ export type UserUncheckedUpdateWithoutScraperJobsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  listings?: Prisma.ListingUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
+  opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutUserNestedInput
+  postingQueue?: Prisma.PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
+  searchConfigs?: Prisma.SearchConfigUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
-  listings?: Prisma.ListingUncheckedUpdateManyWithoutUserNestedInput
-  opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutUserNestedInput
-  searchConfigs?: Prisma.SearchConfigUncheckedUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
-  postingQueue?: Prisma.PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSearchConfigsInput = {
@@ -1013,13 +1013,13 @@ export type UserCreateWithoutSearchConfigsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  listings?: Prisma.ListingCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
+  opportunities?: Prisma.OpportunityCreateNestedManyWithoutUserInput
+  postingQueue?: Prisma.PostingQueueItemCreateNestedManyWithoutUserInput
+  scraperJobs?: Prisma.ScraperJobCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
-  listings?: Prisma.ListingCreateNestedManyWithoutUserInput
-  opportunities?: Prisma.OpportunityCreateNestedManyWithoutUserInput
-  scraperJobs?: Prisma.ScraperJobCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
-  postingQueue?: Prisma.PostingQueueItemCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSearchConfigsInput = {
@@ -1035,13 +1035,13 @@ export type UserUncheckedCreateWithoutSearchConfigsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  listings?: Prisma.ListingUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
+  opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutUserInput
+  postingQueue?: Prisma.PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
+  scraperJobs?: Prisma.ScraperJobUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
-  listings?: Prisma.ListingUncheckedCreateNestedManyWithoutUserInput
-  opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutUserInput
-  scraperJobs?: Prisma.ScraperJobUncheckedCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
-  postingQueue?: Prisma.PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSearchConfigsInput = {
@@ -1073,13 +1073,13 @@ export type UserUpdateWithoutSearchConfigsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  listings?: Prisma.ListingUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
+  opportunities?: Prisma.OpportunityUpdateManyWithoutUserNestedInput
+  postingQueue?: Prisma.PostingQueueItemUpdateManyWithoutUserNestedInput
+  scraperJobs?: Prisma.ScraperJobUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
-  listings?: Prisma.ListingUpdateManyWithoutUserNestedInput
-  opportunities?: Prisma.OpportunityUpdateManyWithoutUserNestedInput
-  scraperJobs?: Prisma.ScraperJobUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
-  postingQueue?: Prisma.PostingQueueItemUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSearchConfigsInput = {
@@ -1095,13 +1095,13 @@ export type UserUncheckedUpdateWithoutSearchConfigsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  listings?: Prisma.ListingUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
+  opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutUserNestedInput
+  postingQueue?: Prisma.PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
+  scraperJobs?: Prisma.ScraperJobUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
-  listings?: Prisma.ListingUncheckedUpdateManyWithoutUserNestedInput
-  opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutUserNestedInput
-  scraperJobs?: Prisma.ScraperJobUncheckedUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
-  postingQueue?: Prisma.PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAccountsInput = {
@@ -1116,14 +1116,14 @@ export type UserCreateWithoutAccountsInput = {
   onboardingStep?: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   listings?: Prisma.ListingCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutUserInput
+  postingQueue?: Prisma.PostingQueueItemCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
-  postingQueue?: Prisma.PostingQueueItemCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -1138,14 +1138,14 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   onboardingStep?: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   listings?: Prisma.ListingUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutUserInput
+  postingQueue?: Prisma.PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobUncheckedCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigUncheckedCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
-  postingQueue?: Prisma.PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -1176,14 +1176,14 @@ export type UserUpdateWithoutAccountsInput = {
   onboardingStep?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   listings?: Prisma.ListingUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
   opportunities?: Prisma.OpportunityUpdateManyWithoutUserNestedInput
+  postingQueue?: Prisma.PostingQueueItemUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
-  postingQueue?: Prisma.PostingQueueItemUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -1198,14 +1198,14 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   onboardingStep?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   listings?: Prisma.ListingUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutUserNestedInput
+  postingQueue?: Prisma.PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUncheckedUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUncheckedUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
-  postingQueue?: Prisma.PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -1221,13 +1221,13 @@ export type UserCreateWithoutSessionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   listings?: Prisma.ListingCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutUserInput
+  postingQueue?: Prisma.PostingQueueItemCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
-  postingQueue?: Prisma.PostingQueueItemCreateNestedManyWithoutUserInput
+  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -1243,13 +1243,13 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   listings?: Prisma.ListingUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutUserInput
+  postingQueue?: Prisma.PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobUncheckedCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigUncheckedCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
-  postingQueue?: Prisma.PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
+  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -1281,13 +1281,13 @@ export type UserUpdateWithoutSessionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   listings?: Prisma.ListingUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
   opportunities?: Prisma.OpportunityUpdateManyWithoutUserNestedInput
+  postingQueue?: Prisma.PostingQueueItemUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
-  postingQueue?: Prisma.PostingQueueItemUpdateManyWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -1303,13 +1303,13 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   listings?: Prisma.ListingUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutUserNestedInput
+  postingQueue?: Prisma.PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUncheckedUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUncheckedUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
-  postingQueue?: Prisma.PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSettingsInput = {
@@ -1325,13 +1325,13 @@ export type UserCreateWithoutSettingsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   listings?: Prisma.ListingCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutUserInput
+  postingQueue?: Prisma.PostingQueueItemCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
-  postingQueue?: Prisma.PostingQueueItemCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSettingsInput = {
@@ -1347,13 +1347,13 @@ export type UserUncheckedCreateWithoutSettingsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   listings?: Prisma.ListingUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutUserInput
+  postingQueue?: Prisma.PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobUncheckedCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigUncheckedCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
-  postingQueue?: Prisma.PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSettingsInput = {
@@ -1385,13 +1385,13 @@ export type UserUpdateWithoutSettingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   listings?: Prisma.ListingUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
   opportunities?: Prisma.OpportunityUpdateManyWithoutUserNestedInput
+  postingQueue?: Prisma.PostingQueueItemUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
-  postingQueue?: Prisma.PostingQueueItemUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettingsInput = {
@@ -1407,13 +1407,13 @@ export type UserUncheckedUpdateWithoutSettingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   listings?: Prisma.ListingUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutUserNestedInput
+  postingQueue?: Prisma.PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUncheckedUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUncheckedUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
-  postingQueue?: Prisma.PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMessagesInput = {
@@ -1429,13 +1429,13 @@ export type UserCreateWithoutMessagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   listings?: Prisma.ListingCreateNestedManyWithoutUserInput
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutUserInput
+  postingQueue?: Prisma.PostingQueueItemCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigCreateNestedManyWithoutUserInput
-  postingQueue?: Prisma.PostingQueueItemCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMessagesInput = {
@@ -1451,13 +1451,13 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   listings?: Prisma.ListingUncheckedCreateNestedManyWithoutUserInput
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutUserInput
+  postingQueue?: Prisma.PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobUncheckedCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigUncheckedCreateNestedManyWithoutUserInput
-  postingQueue?: Prisma.PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMessagesInput = {
@@ -1489,13 +1489,13 @@ export type UserUpdateWithoutMessagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   listings?: Prisma.ListingUpdateManyWithoutUserNestedInput
   opportunities?: Prisma.OpportunityUpdateManyWithoutUserNestedInput
+  postingQueue?: Prisma.PostingQueueItemUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUpdateManyWithoutUserNestedInput
-  postingQueue?: Prisma.PostingQueueItemUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessagesInput = {
@@ -1511,13 +1511,13 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   listings?: Prisma.ListingUncheckedUpdateManyWithoutUserNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutUserNestedInput
+  postingQueue?: Prisma.PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUncheckedUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUncheckedUpdateManyWithoutUserNestedInput
-  postingQueue?: Prisma.PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPostingQueueInput = {
@@ -1533,13 +1533,13 @@ export type UserCreateWithoutPostingQueueInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   listings?: Prisma.ListingCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
   opportunities?: Prisma.OpportunityCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPostingQueueInput = {
@@ -1555,13 +1555,13 @@ export type UserUncheckedCreateWithoutPostingQueueInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   listings?: Prisma.ListingUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
   opportunities?: Prisma.OpportunityUncheckedCreateNestedManyWithoutUserInput
   scraperJobs?: Prisma.ScraperJobUncheckedCreateNestedManyWithoutUserInput
   searchConfigs?: Prisma.SearchConfigUncheckedCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPostingQueueInput = {
@@ -1593,13 +1593,13 @@ export type UserUpdateWithoutPostingQueueInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   listings?: Prisma.ListingUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
   opportunities?: Prisma.OpportunityUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPostingQueueInput = {
@@ -1615,13 +1615,13 @@ export type UserUncheckedUpdateWithoutPostingQueueInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   listings?: Prisma.ListingUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
   opportunities?: Prisma.OpportunityUncheckedUpdateManyWithoutUserNestedInput
   scraperJobs?: Prisma.ScraperJobUncheckedUpdateManyWithoutUserNestedInput
   searchConfigs?: Prisma.SearchConfigUncheckedUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
 
@@ -1631,24 +1631,24 @@ export type UserUncheckedUpdateWithoutPostingQueueInput = {
 
 export type UserCountOutputType = {
   accounts: number
-  sessions: number
   listings: number
+  messages: number
   opportunities: number
+  postingQueue: number
   scraperJobs: number
   searchConfigs: number
-  messages: number
-  postingQueue: number
+  sessions: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accounts?: boolean | UserCountOutputTypeCountAccountsArgs
-  sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   listings?: boolean | UserCountOutputTypeCountListingsArgs
+  messages?: boolean | UserCountOutputTypeCountMessagesArgs
   opportunities?: boolean | UserCountOutputTypeCountOpportunitiesArgs
+  postingQueue?: boolean | UserCountOutputTypeCountPostingQueueArgs
   scraperJobs?: boolean | UserCountOutputTypeCountScraperJobsArgs
   searchConfigs?: boolean | UserCountOutputTypeCountSearchConfigsArgs
-  messages?: boolean | UserCountOutputTypeCountMessagesArgs
-  postingQueue?: boolean | UserCountOutputTypeCountPostingQueueArgs
+  sessions?: boolean | UserCountOutputTypeCountSessionsArgs
 }
 
 /**
@@ -1671,13 +1671,6 @@ export type UserCountOutputTypeCountAccountsArgs<ExtArgs extends runtime.Types.E
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.SessionWhereInput
-}
-
-/**
- * UserCountOutputType without action
- */
 export type UserCountOutputTypeCountListingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ListingWhereInput
 }
@@ -1685,8 +1678,22 @@ export type UserCountOutputTypeCountListingsArgs<ExtArgs extends runtime.Types.E
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MessageWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountOpportunitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.OpportunityWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPostingQueueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PostingQueueItemWhereInput
 }
 
 /**
@@ -1706,15 +1713,8 @@ export type UserCountOutputTypeCountSearchConfigsArgs<ExtArgs extends runtime.Ty
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.MessageWhereInput
-}
-
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountPostingQueueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.PostingQueueItemWhereInput
+export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SessionWhereInput
 }
 
 
@@ -1731,14 +1731,14 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdAt?: boolean
   updatedAt?: boolean
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
-  sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
-  settings?: boolean | Prisma.User$settingsArgs<ExtArgs>
   listings?: boolean | Prisma.User$listingsArgs<ExtArgs>
+  messages?: boolean | Prisma.User$messagesArgs<ExtArgs>
   opportunities?: boolean | Prisma.User$opportunitiesArgs<ExtArgs>
+  postingQueue?: boolean | Prisma.User$postingQueueArgs<ExtArgs>
   scraperJobs?: boolean | Prisma.User$scraperJobsArgs<ExtArgs>
   searchConfigs?: boolean | Prisma.User$searchConfigsArgs<ExtArgs>
-  messages?: boolean | Prisma.User$messagesArgs<ExtArgs>
-  postingQueue?: boolean | Prisma.User$postingQueueArgs<ExtArgs>
+  sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
+  settings?: boolean | Prisma.User$settingsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1787,14 +1787,14 @@ export type UserSelectScalar = {
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "emailVerified" | "name" | "image" | "password" | "subscriptionTier" | "onboardingComplete" | "onboardingStep" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
-  sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
-  settings?: boolean | Prisma.User$settingsArgs<ExtArgs>
   listings?: boolean | Prisma.User$listingsArgs<ExtArgs>
+  messages?: boolean | Prisma.User$messagesArgs<ExtArgs>
   opportunities?: boolean | Prisma.User$opportunitiesArgs<ExtArgs>
+  postingQueue?: boolean | Prisma.User$postingQueueArgs<ExtArgs>
   scraperJobs?: boolean | Prisma.User$scraperJobsArgs<ExtArgs>
   searchConfigs?: boolean | Prisma.User$searchConfigsArgs<ExtArgs>
-  messages?: boolean | Prisma.User$messagesArgs<ExtArgs>
-  postingQueue?: boolean | Prisma.User$postingQueueArgs<ExtArgs>
+  sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
+  settings?: boolean | Prisma.User$settingsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1804,14 +1804,14 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "User"
   objects: {
     accounts: Prisma.$AccountPayload<ExtArgs>[]
-    sessions: Prisma.$SessionPayload<ExtArgs>[]
-    settings: Prisma.$UserSettingsPayload<ExtArgs> | null
     listings: Prisma.$ListingPayload<ExtArgs>[]
+    messages: Prisma.$MessagePayload<ExtArgs>[]
     opportunities: Prisma.$OpportunityPayload<ExtArgs>[]
+    postingQueue: Prisma.$PostingQueueItemPayload<ExtArgs>[]
     scraperJobs: Prisma.$ScraperJobPayload<ExtArgs>[]
     searchConfigs: Prisma.$SearchConfigPayload<ExtArgs>[]
-    messages: Prisma.$MessagePayload<ExtArgs>[]
-    postingQueue: Prisma.$PostingQueueItemPayload<ExtArgs>[]
+    sessions: Prisma.$SessionPayload<ExtArgs>[]
+    settings: Prisma.$UserSettingsPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2220,14 +2220,14 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   accounts<T extends Prisma.User$accountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  settings<T extends Prisma.User$settingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$settingsArgs<ExtArgs>>): Prisma.Prisma__UserSettingsClient<runtime.Types.Result.GetResult<Prisma.$UserSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   listings<T extends Prisma.User$listingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$listingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  messages<T extends Prisma.User$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   opportunities<T extends Prisma.User$opportunitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$opportunitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OpportunityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  postingQueue<T extends Prisma.User$postingQueueArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$postingQueueArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PostingQueueItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   scraperJobs<T extends Prisma.User$scraperJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$scraperJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScraperJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   searchConfigs<T extends Prisma.User$searchConfigsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$searchConfigsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SearchConfigPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  messages<T extends Prisma.User$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  postingQueue<T extends Prisma.User$postingQueueArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$postingQueueArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PostingQueueItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  settings<T extends Prisma.User$settingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$settingsArgs<ExtArgs>>): Prisma.Prisma__UserSettingsClient<runtime.Types.Result.GetResult<Prisma.$UserSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2497,6 +2497,7 @@ export type UserCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * The data used to create many Users.
    */
   data: Prisma.UserCreateManyInput | Prisma.UserCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -2515,6 +2516,7 @@ export type UserCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * The data used to create many Users.
    */
   data: Prisma.UserCreateManyInput | Prisma.UserCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -2678,49 +2680,6 @@ export type User$accountsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 }
 
 /**
- * User.sessions
- */
-export type User$sessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Session
-   */
-  select?: Prisma.SessionSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Session
-   */
-  omit?: Prisma.SessionOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.SessionInclude<ExtArgs> | null
-  where?: Prisma.SessionWhereInput
-  orderBy?: Prisma.SessionOrderByWithRelationInput | Prisma.SessionOrderByWithRelationInput[]
-  cursor?: Prisma.SessionWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.SessionScalarFieldEnum | Prisma.SessionScalarFieldEnum[]
-}
-
-/**
- * User.settings
- */
-export type User$settingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the UserSettings
-   */
-  select?: Prisma.UserSettingsSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the UserSettings
-   */
-  omit?: Prisma.UserSettingsOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserSettingsInclude<ExtArgs> | null
-  where?: Prisma.UserSettingsWhereInput
-}
-
-/**
  * User.listings
  */
 export type User$listingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2745,6 +2704,30 @@ export type User$listingsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 }
 
 /**
+ * User.messages
+ */
+export type User$messagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Message
+   */
+  select?: Prisma.MessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Message
+   */
+  omit?: Prisma.MessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MessageInclude<ExtArgs> | null
+  where?: Prisma.MessageWhereInput
+  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[]
+  cursor?: Prisma.MessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
+}
+
+/**
  * User.opportunities
  */
 export type User$opportunitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2766,6 +2749,30 @@ export type User$opportunitiesArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.OpportunityScalarFieldEnum | Prisma.OpportunityScalarFieldEnum[]
+}
+
+/**
+ * User.postingQueue
+ */
+export type User$postingQueueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PostingQueueItem
+   */
+  select?: Prisma.PostingQueueItemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PostingQueueItem
+   */
+  omit?: Prisma.PostingQueueItemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PostingQueueItemInclude<ExtArgs> | null
+  where?: Prisma.PostingQueueItemWhereInput
+  orderBy?: Prisma.PostingQueueItemOrderByWithRelationInput | Prisma.PostingQueueItemOrderByWithRelationInput[]
+  cursor?: Prisma.PostingQueueItemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PostingQueueItemScalarFieldEnum | Prisma.PostingQueueItemScalarFieldEnum[]
 }
 
 /**
@@ -2817,51 +2824,46 @@ export type User$searchConfigsArgs<ExtArgs extends runtime.Types.Extensions.Inte
 }
 
 /**
- * User.messages
+ * User.sessions
  */
-export type User$messagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$sessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Message
+   * Select specific fields to fetch from the Session
    */
-  select?: Prisma.MessageSelect<ExtArgs> | null
+  select?: Prisma.SessionSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Message
+   * Omit specific fields from the Session
    */
-  omit?: Prisma.MessageOmit<ExtArgs> | null
+  omit?: Prisma.SessionOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.MessageInclude<ExtArgs> | null
-  where?: Prisma.MessageWhereInput
-  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[]
-  cursor?: Prisma.MessageWhereUniqueInput
+  include?: Prisma.SessionInclude<ExtArgs> | null
+  where?: Prisma.SessionWhereInput
+  orderBy?: Prisma.SessionOrderByWithRelationInput | Prisma.SessionOrderByWithRelationInput[]
+  cursor?: Prisma.SessionWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
+  distinct?: Prisma.SessionScalarFieldEnum | Prisma.SessionScalarFieldEnum[]
 }
 
 /**
- * User.postingQueue
+ * User.settings
  */
-export type User$postingQueueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$settingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the PostingQueueItem
+   * Select specific fields to fetch from the UserSettings
    */
-  select?: Prisma.PostingQueueItemSelect<ExtArgs> | null
+  select?: Prisma.UserSettingsSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the PostingQueueItem
+   * Omit specific fields from the UserSettings
    */
-  omit?: Prisma.PostingQueueItemOmit<ExtArgs> | null
+  omit?: Prisma.UserSettingsOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.PostingQueueItemInclude<ExtArgs> | null
-  where?: Prisma.PostingQueueItemWhereInput
-  orderBy?: Prisma.PostingQueueItemOrderByWithRelationInput | Prisma.PostingQueueItemOrderByWithRelationInput[]
-  cursor?: Prisma.PostingQueueItemWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.PostingQueueItemScalarFieldEnum | Prisma.PostingQueueItemScalarFieldEnum[]
+  include?: Prisma.UserSettingsInclude<ExtArgs> | null
+  where?: Prisma.UserSettingsWhereInput
 }
 
 /**

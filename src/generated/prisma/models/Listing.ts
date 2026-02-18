@@ -681,8 +681,8 @@ export type ListingWhereInput = {
   analysisConfidence?: Prisma.StringNullableFilter<"Listing"> | string | null
   analysisReasoning?: Prisma.StringNullableFilter<"Listing"> | string | null
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
-  opportunity?: Prisma.XOR<Prisma.OpportunityNullableScalarRelationFilter, Prisma.OpportunityWhereInput> | null
   messages?: Prisma.MessageListRelationFilter
+  opportunity?: Prisma.XOR<Prisma.OpportunityNullableScalarRelationFilter, Prisma.OpportunityWhereInput> | null
   postingQueue?: Prisma.PostingQueueItemListRelationFilter
 }
 
@@ -743,8 +743,8 @@ export type ListingOrderByWithRelationInput = {
   analysisConfidence?: Prisma.SortOrderInput | Prisma.SortOrder
   analysisReasoning?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
-  opportunity?: Prisma.OpportunityOrderByWithRelationInput
   messages?: Prisma.MessageOrderByRelationAggregateInput
+  opportunity?: Prisma.OpportunityOrderByWithRelationInput
   postingQueue?: Prisma.PostingQueueItemOrderByRelationAggregateInput
 }
 
@@ -809,8 +809,8 @@ export type ListingWhereUniqueInput = Prisma.AtLeast<{
   analysisConfidence?: Prisma.StringNullableFilter<"Listing"> | string | null
   analysisReasoning?: Prisma.StringNullableFilter<"Listing"> | string | null
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
-  opportunity?: Prisma.XOR<Prisma.OpportunityNullableScalarRelationFilter, Prisma.OpportunityWhereInput> | null
   messages?: Prisma.MessageListRelationFilter
+  opportunity?: Prisma.XOR<Prisma.OpportunityNullableScalarRelationFilter, Prisma.OpportunityWhereInput> | null
   postingQueue?: Prisma.PostingQueueItemListRelationFilter
 }, "id" | "platform_externalId_userId">
 
@@ -994,8 +994,8 @@ export type ListingCreateInput = {
   analysisConfidence?: string | null
   analysisReasoning?: string | null
   user?: Prisma.UserCreateNestedOneWithoutListingsInput
-  opportunity?: Prisma.OpportunityCreateNestedOneWithoutListingInput
   messages?: Prisma.MessageCreateNestedManyWithoutListingInput
+  opportunity?: Prisma.OpportunityCreateNestedOneWithoutListingInput
   postingQueue?: Prisma.PostingQueueItemCreateNestedManyWithoutListingInput
 }
 
@@ -1055,8 +1055,8 @@ export type ListingUncheckedCreateInput = {
   analysisDate?: Date | string | null
   analysisConfidence?: string | null
   analysisReasoning?: string | null
-  opportunity?: Prisma.OpportunityUncheckedCreateNestedOneWithoutListingInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutListingInput
+  opportunity?: Prisma.OpportunityUncheckedCreateNestedOneWithoutListingInput
   postingQueue?: Prisma.PostingQueueItemUncheckedCreateNestedManyWithoutListingInput
 }
 
@@ -1116,8 +1116,8 @@ export type ListingUpdateInput = {
   analysisConfidence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   analysisReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneWithoutListingsNestedInput
-  opportunity?: Prisma.OpportunityUpdateOneWithoutListingNestedInput
   messages?: Prisma.MessageUpdateManyWithoutListingNestedInput
+  opportunity?: Prisma.OpportunityUpdateOneWithoutListingNestedInput
   postingQueue?: Prisma.PostingQueueItemUpdateManyWithoutListingNestedInput
 }
 
@@ -1177,8 +1177,8 @@ export type ListingUncheckedUpdateInput = {
   analysisDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   analysisConfidence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   analysisReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  opportunity?: Prisma.OpportunityUncheckedUpdateOneWithoutListingNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutListingNestedInput
+  opportunity?: Prisma.OpportunityUncheckedUpdateOneWithoutListingNestedInput
   postingQueue?: Prisma.PostingQueueItemUncheckedUpdateManyWithoutListingNestedInput
 }
 
@@ -2040,8 +2040,8 @@ export type ListingCreateWithoutUserInput = {
   analysisDate?: Date | string | null
   analysisConfidence?: string | null
   analysisReasoning?: string | null
-  opportunity?: Prisma.OpportunityCreateNestedOneWithoutListingInput
   messages?: Prisma.MessageCreateNestedManyWithoutListingInput
+  opportunity?: Prisma.OpportunityCreateNestedOneWithoutListingInput
   postingQueue?: Prisma.PostingQueueItemCreateNestedManyWithoutListingInput
 }
 
@@ -2100,8 +2100,8 @@ export type ListingUncheckedCreateWithoutUserInput = {
   analysisDate?: Date | string | null
   analysisConfidence?: string | null
   analysisReasoning?: string | null
-  opportunity?: Prisma.OpportunityUncheckedCreateNestedOneWithoutListingInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutListingInput
+  opportunity?: Prisma.OpportunityUncheckedCreateNestedOneWithoutListingInput
   postingQueue?: Prisma.PostingQueueItemUncheckedCreateNestedManyWithoutListingInput
 }
 
@@ -2112,6 +2112,7 @@ export type ListingCreateOrConnectWithoutUserInput = {
 
 export type ListingCreateManyUserInputEnvelope = {
   data: Prisma.ListingCreateManyUserInput | Prisma.ListingCreateManyUserInput[]
+  skipDuplicates?: boolean
 }
 
 export type ListingUpsertWithWhereUniqueWithoutUserInput = {
@@ -2503,8 +2504,8 @@ export type ListingCreateWithoutPostingQueueInput = {
   analysisConfidence?: string | null
   analysisReasoning?: string | null
   user?: Prisma.UserCreateNestedOneWithoutListingsInput
-  opportunity?: Prisma.OpportunityCreateNestedOneWithoutListingInput
   messages?: Prisma.MessageCreateNestedManyWithoutListingInput
+  opportunity?: Prisma.OpportunityCreateNestedOneWithoutListingInput
 }
 
 export type ListingUncheckedCreateWithoutPostingQueueInput = {
@@ -2563,8 +2564,8 @@ export type ListingUncheckedCreateWithoutPostingQueueInput = {
   analysisDate?: Date | string | null
   analysisConfidence?: string | null
   analysisReasoning?: string | null
-  opportunity?: Prisma.OpportunityUncheckedCreateNestedOneWithoutListingInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutListingInput
+  opportunity?: Prisma.OpportunityUncheckedCreateNestedOneWithoutListingInput
 }
 
 export type ListingCreateOrConnectWithoutPostingQueueInput = {
@@ -2639,8 +2640,8 @@ export type ListingUpdateWithoutPostingQueueInput = {
   analysisConfidence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   analysisReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneWithoutListingsNestedInput
-  opportunity?: Prisma.OpportunityUpdateOneWithoutListingNestedInput
   messages?: Prisma.MessageUpdateManyWithoutListingNestedInput
+  opportunity?: Prisma.OpportunityUpdateOneWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateWithoutPostingQueueInput = {
@@ -2699,8 +2700,8 @@ export type ListingUncheckedUpdateWithoutPostingQueueInput = {
   analysisDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   analysisConfidence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   analysisReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  opportunity?: Prisma.OpportunityUncheckedUpdateOneWithoutListingNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutListingNestedInput
+  opportunity?: Prisma.OpportunityUncheckedUpdateOneWithoutListingNestedInput
 }
 
 export type ListingCreateManyUserInput = {
@@ -2815,8 +2816,8 @@ export type ListingUpdateWithoutUserInput = {
   analysisDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   analysisConfidence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   analysisReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  opportunity?: Prisma.OpportunityUpdateOneWithoutListingNestedInput
   messages?: Prisma.MessageUpdateManyWithoutListingNestedInput
+  opportunity?: Prisma.OpportunityUpdateOneWithoutListingNestedInput
   postingQueue?: Prisma.PostingQueueItemUpdateManyWithoutListingNestedInput
 }
 
@@ -2875,8 +2876,8 @@ export type ListingUncheckedUpdateWithoutUserInput = {
   analysisDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   analysisConfidence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   analysisReasoning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  opportunity?: Prisma.OpportunityUncheckedUpdateOneWithoutListingNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutListingNestedInput
+  opportunity?: Prisma.OpportunityUncheckedUpdateOneWithoutListingNestedInput
   postingQueue?: Prisma.PostingQueueItemUncheckedUpdateManyWithoutListingNestedInput
 }
 
@@ -3034,8 +3035,8 @@ export type ListingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   analysisConfidence?: boolean
   analysisReasoning?: boolean
   user?: boolean | Prisma.Listing$userArgs<ExtArgs>
-  opportunity?: boolean | Prisma.Listing$opportunityArgs<ExtArgs>
   messages?: boolean | Prisma.Listing$messagesArgs<ExtArgs>
+  opportunity?: boolean | Prisma.Listing$opportunityArgs<ExtArgs>
   postingQueue?: boolean | Prisma.Listing$postingQueueArgs<ExtArgs>
   _count?: boolean | Prisma.ListingCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["listing"]>
@@ -3219,8 +3220,8 @@ export type ListingSelectScalar = {
 export type ListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "externalId" | "platform" | "url" | "title" | "description" | "askingPrice" | "condition" | "location" | "sellerName" | "sellerContact" | "imageUrls" | "category" | "postedAt" | "scrapedAt" | "estimatedValue" | "estimatedLow" | "estimatedHigh" | "profitPotential" | "profitLow" | "profitHigh" | "valueScore" | "discountPercent" | "resaleDifficulty" | "status" | "comparableUrls" | "priceReasoning" | "notes" | "shippable" | "estimatedWeight" | "negotiable" | "daysListed" | "tags" | "requestToBuy" | "identifiedBrand" | "identifiedModel" | "identifiedVariant" | "identifiedCondition" | "verifiedMarketValue" | "marketDataSource" | "marketDataDate" | "comparableSalesJson" | "sellabilityScore" | "demandLevel" | "expectedDaysToSell" | "authenticityRisk" | "recommendedOffer" | "recommendedList" | "resaleStrategy" | "trueDiscountPercent" | "llmAnalyzed" | "analysisDate" | "analysisConfidence" | "analysisReasoning", ExtArgs["result"]["listing"]>
 export type ListingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.Listing$userArgs<ExtArgs>
-  opportunity?: boolean | Prisma.Listing$opportunityArgs<ExtArgs>
   messages?: boolean | Prisma.Listing$messagesArgs<ExtArgs>
+  opportunity?: boolean | Prisma.Listing$opportunityArgs<ExtArgs>
   postingQueue?: boolean | Prisma.Listing$postingQueueArgs<ExtArgs>
   _count?: boolean | Prisma.ListingCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -3235,8 +3236,8 @@ export type $ListingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   name: "Listing"
   objects: {
     user: Prisma.$UserPayload<ExtArgs> | null
-    opportunity: Prisma.$OpportunityPayload<ExtArgs> | null
     messages: Prisma.$MessagePayload<ExtArgs>[]
+    opportunity: Prisma.$OpportunityPayload<ExtArgs> | null
     postingQueue: Prisma.$PostingQueueItemPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -3690,8 +3691,8 @@ readonly fields: ListingFieldRefs;
 export interface Prisma__ListingClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.Listing$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  opportunity<T extends Prisma.Listing$opportunityArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$opportunityArgs<ExtArgs>>): Prisma.Prisma__OpportunityClient<runtime.Types.Result.GetResult<Prisma.$OpportunityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   messages<T extends Prisma.Listing$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  opportunity<T extends Prisma.Listing$opportunityArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$opportunityArgs<ExtArgs>>): Prisma.Prisma__OpportunityClient<runtime.Types.Result.GetResult<Prisma.$OpportunityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   postingQueue<T extends Prisma.Listing$postingQueueArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$postingQueueArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PostingQueueItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -4006,6 +4007,7 @@ export type ListingCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * The data used to create many Listings.
    */
   data: Prisma.ListingCreateManyInput | Prisma.ListingCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -4024,6 +4026,7 @@ export type ListingCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    * The data used to create many Listings.
    */
   data: Prisma.ListingCreateManyInput | Prisma.ListingCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -4190,25 +4193,6 @@ export type Listing$userArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 }
 
 /**
- * Listing.opportunity
- */
-export type Listing$opportunityArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Opportunity
-   */
-  select?: Prisma.OpportunitySelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Opportunity
-   */
-  omit?: Prisma.OpportunityOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.OpportunityInclude<ExtArgs> | null
-  where?: Prisma.OpportunityWhereInput
-}
-
-/**
  * Listing.messages
  */
 export type Listing$messagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -4230,6 +4214,25 @@ export type Listing$messagesArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
+}
+
+/**
+ * Listing.opportunity
+ */
+export type Listing$opportunityArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Opportunity
+   */
+  select?: Prisma.OpportunitySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Opportunity
+   */
+  omit?: Prisma.OpportunityOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OpportunityInclude<ExtArgs> | null
+  where?: Prisma.OpportunityWhereInput
 }
 
 /**

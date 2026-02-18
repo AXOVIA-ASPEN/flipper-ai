@@ -320,8 +320,8 @@ export type PostingQueueItemWhereInput = {
   postedAt?: Prisma.DateTimeNullableFilter<"PostingQueueItem"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"PostingQueueItem"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PostingQueueItem"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   listing?: Prisma.XOR<Prisma.ListingScalarRelationFilter, Prisma.ListingWhereInput>
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type PostingQueueItemOrderByWithRelationInput = {
@@ -342,8 +342,8 @@ export type PostingQueueItemOrderByWithRelationInput = {
   postedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  user?: Prisma.UserOrderByWithRelationInput
   listing?: Prisma.ListingOrderByWithRelationInput
+  user?: Prisma.UserOrderByWithRelationInput
 }
 
 export type PostingQueueItemWhereUniqueInput = Prisma.AtLeast<{
@@ -368,8 +368,8 @@ export type PostingQueueItemWhereUniqueInput = Prisma.AtLeast<{
   postedAt?: Prisma.DateTimeNullableFilter<"PostingQueueItem"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"PostingQueueItem"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PostingQueueItem"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   listing?: Prisma.XOR<Prisma.ListingScalarRelationFilter, Prisma.ListingWhereInput>
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "listingId_targetPlatform_userId">
 
 export type PostingQueueItemOrderByWithAggregationInput = {
@@ -436,8 +436,8 @@ export type PostingQueueItemCreateInput = {
   postedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutPostingQueueInput
   listing: Prisma.ListingCreateNestedOneWithoutPostingQueueInput
+  user: Prisma.UserCreateNestedOneWithoutPostingQueueInput
 }
 
 export type PostingQueueItemUncheckedCreateInput = {
@@ -476,8 +476,8 @@ export type PostingQueueItemUpdateInput = {
   postedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutPostingQueueNestedInput
   listing?: Prisma.ListingUpdateOneRequiredWithoutPostingQueueNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutPostingQueueNestedInput
 }
 
 export type PostingQueueItemUncheckedUpdateInput = {
@@ -775,6 +775,7 @@ export type PostingQueueItemCreateOrConnectWithoutListingInput = {
 
 export type PostingQueueItemCreateManyListingInputEnvelope = {
   data: Prisma.PostingQueueItemCreateManyListingInput | Prisma.PostingQueueItemCreateManyListingInput[]
+  skipDuplicates?: boolean
 }
 
 export type PostingQueueItemUpsertWithWhereUniqueWithoutListingInput = {
@@ -861,6 +862,7 @@ export type PostingQueueItemCreateOrConnectWithoutUserInput = {
 
 export type PostingQueueItemCreateManyUserInputEnvelope = {
   data: Prisma.PostingQueueItemCreateManyUserInput | Prisma.PostingQueueItemCreateManyUserInput[]
+  skipDuplicates?: boolean
 }
 
 export type PostingQueueItemUpsertWithWhereUniqueWithoutUserInput = {
@@ -1051,8 +1053,8 @@ export type PostingQueueItemSelect<ExtArgs extends runtime.Types.Extensions.Inte
   postedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["postingQueueItem"]>
 
 export type PostingQueueItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1073,8 +1075,8 @@ export type PostingQueueItemSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   postedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["postingQueueItem"]>
 
 export type PostingQueueItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1095,8 +1097,8 @@ export type PostingQueueItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   postedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["postingQueueItem"]>
 
 export type PostingQueueItemSelectScalar = {
@@ -1121,23 +1123,23 @@ export type PostingQueueItemSelectScalar = {
 
 export type PostingQueueItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "listingId" | "targetPlatform" | "status" | "askingPrice" | "title" | "description" | "externalPostId" | "externalPostUrl" | "errorMessage" | "retryCount" | "maxRetries" | "scheduledAt" | "postedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["postingQueueItem"]>
 export type PostingQueueItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type PostingQueueItemIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type PostingQueueItemIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $PostingQueueItemPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PostingQueueItem"
   objects: {
-    user: Prisma.$UserPayload<ExtArgs>
     listing: Prisma.$ListingPayload<ExtArgs>
+    user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1551,8 +1553,8 @@ readonly fields: PostingQueueItemFieldRefs;
  */
 export interface Prisma__PostingQueueItemClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   listing<T extends Prisma.ListingDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ListingDefaultArgs<ExtArgs>>): Prisma.Prisma__ListingClient<runtime.Types.Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1828,6 +1830,7 @@ export type PostingQueueItemCreateManyArgs<ExtArgs extends runtime.Types.Extensi
    * The data used to create many PostingQueueItems.
    */
   data: Prisma.PostingQueueItemCreateManyInput | Prisma.PostingQueueItemCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1846,6 +1849,7 @@ export type PostingQueueItemCreateManyAndReturnArgs<ExtArgs extends runtime.Type
    * The data used to create many PostingQueueItems.
    */
   data: Prisma.PostingQueueItemCreateManyInput | Prisma.PostingQueueItemCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
