@@ -1,4 +1,12 @@
 // Tests for marketplace-scanner.ts
+
+// Mock SSE emitter
+jest.mock('../lib/sse-emitter', () => ({
+  sseEmitter: {
+    emit: jest.fn(),
+  },
+}));
+
 import {
   analyzeListing,
   meetsViabilityCriteria,
@@ -10,6 +18,7 @@ import {
   type AnalyzedListing,
   type ViabilityCriteria,
 } from '../lib/marketplace-scanner';
+import { sseEmitter } from '../lib/sse-emitter';
 
 const makeListing = (overrides: Partial<RawListing> = {}): RawListing => ({
   externalId: '123',
@@ -357,5 +366,89 @@ describe('marketplace-scanner - targeted branch coverage', () => {
     };
     const summary = generateScanSummary(results);
     expect(summary.bestOpportunity).not.toBeNull();
+  });
+});
+
+describe('marketplace-scanner - emitEvents functionality', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('emits SSE event when emitEvents option is true', () => {
+    const listing = makeListing({ externalId: 'test-123' });
+    const result = analyzeListing('CRAIGSLIST', listing, {
+      emitEvents: true,
+      userId: 'user-456',
+    });
+
+    expect(sseEmitter.emit).toHaveBeenCalledTimes(1);
+    expect(sseEmitter.emit).toHaveBeenCalledWith({
+      type: 'listing.found',
+      data: expect.objectContaining({
+        id: 'test-123',
+        platform: 'CRAIGSLIST',
+        title: listing.title,
+        askingPrice: listing.askingPrice,
+        userId: 'user-456',
+        url: listing.url,
+        isOpportunity: expect.any(Boolean),
+      }),
+    });
+
+    expect(result.platform).toBe('CRAIGSLIST');
+  });
+
+  it('does not emit SSE event when emitEvents option is false', () => {
+    const listing = makeListing();
+    analyzeListing('EBAY', listing, { emitEvents: false });
+
+    expect(sseEmitter.emit).not.toHaveBeenCalled();
+  });
+
+  it('does not emit SSE event when emitEvents option is not provided', () => {
+    const listing = makeListing();
+    analyzeListing('FACEBOOK_MARKETPLACE', listing);
+
+    expect(sseEmitter.emit).not.toHaveBeenCalled();
+  });
+
+  it('includes all required fields in emitted event', () => {
+    const listing = makeListing({
+      externalId: 'emit-test-1',
+      title: 'Test Product',
+      askingPrice: 150,
+      url: 'https://example.com/item/1',
+    });
+
+    analyzeListing('OFFERUP', listing, {
+      emitEvents: true,
+      userId: 'test-user',
+    });
+
+    expect(sseEmitter.emit).toHaveBeenCalledWith({
+      type: 'listing.found',
+      data: expect.objectContaining({
+        id: 'emit-test-1',
+        platform: 'OFFERUP',
+        title: 'Test Product',
+        askingPrice: 150,
+        estimatedValue: expect.any(Number),
+        profitPotential: expect.any(Number),
+        valueScore: expect.any(Number),
+        category: expect.any(String),
+        url: 'https://example.com/item/1',
+        isOpportunity: expect.any(Boolean),
+        userId: 'test-user',
+      }),
+    });
+  });
+
+  it('works with emitEvents option in processListings', () => {
+    const listings = [makeListing({ externalId: 'batch-1' }), makeListing({ externalId: 'batch-2' })];
+    
+    processListings('MERCARI', listings, undefined, { emitEvents: true, userId: 'batch-user' });
+
+    // Should emit once per listing
+    expect(sseEmitter.emit).toHaveBeenCalledTimes(2);
   });
 });
