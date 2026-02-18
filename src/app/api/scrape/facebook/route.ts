@@ -97,10 +97,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Process listings through central viability logic
+    // Enable SSE event emission for real-time notifications
     const processedResults = processListings(
       'FACEBOOK_MARKETPLACE',
       scrapeResult.listings,
-      viabilityCriteria
+      viabilityCriteria,
+      { emitEvents: true, userId }
     );
 
     // Save all listings to database

@@ -7,6 +7,7 @@ import {
   generatePurchaseMessage,
   EstimationResult,
 } from './value-estimator';
+import { sseEmitter } from './sse-emitter';
 
 // Platform types supported by the scanner
 export type MarketplacePlatform =
@@ -73,7 +74,8 @@ const DIFFICULTY_ORDER = {
  */
 export function analyzeListing(
   platform: MarketplacePlatform,
-  listing: RawListing
+  listing: RawListing,
+  options?: { emitEvents?: boolean; userId?: string }
 ): AnalyzedListing {
   // Detect category if not provided
   const detectedCategory =
@@ -99,7 +101,7 @@ export function analyzeListing(
   // Determine if this is an opportunity (default threshold: 70)
   const isOpportunity = estimation.valueScore >= 70;
 
-  return {
+  const analyzed: AnalyzedListing = {
     ...listing,
     platform,
     category: detectedCategory,
@@ -107,6 +109,28 @@ export function analyzeListing(
     requestToBuy,
     isOpportunity,
   };
+
+  // Emit SSE event for real-time notifications
+  if (options?.emitEvents) {
+    sseEmitter.emit({
+      type: 'listing.found',
+      data: {
+        id: listing.externalId,
+        platform,
+        title: listing.title,
+        askingPrice: listing.askingPrice,
+        estimatedValue: estimation.estimatedValue,
+        profitPotential: estimation.profitPotential,
+        valueScore: estimation.valueScore,
+        category: detectedCategory,
+        url: listing.url,
+        isOpportunity,
+        userId: options.userId,
+      },
+    });
+  }
+
+  return analyzed;
 }
 
 /**
@@ -169,14 +193,15 @@ export function meetsViabilityCriteria(
 export function processListings(
   platform: MarketplacePlatform,
   listings: RawListing[],
-  criteria?: ViabilityCriteria
+  criteria?: ViabilityCriteria,
+  options?: { emitEvents?: boolean; userId?: string }
 ): {
   all: AnalyzedListing[];
   opportunities: AnalyzedListing[];
   filtered: AnalyzedListing[];
 } {
-  // Analyze all listings
-  const analyzed = listings.map((listing) => analyzeListing(platform, listing));
+  // Analyze all listings (with optional event emission)
+  const analyzed = listings.map((listing) => analyzeListing(platform, listing, options));
 
   // Separate opportunities (score >= 70)
   const opportunities = analyzed.filter((l) => l.isOpportunity);
