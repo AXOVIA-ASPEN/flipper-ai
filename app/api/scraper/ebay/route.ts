@@ -3,6 +3,13 @@ import prisma from '@/lib/db';
 import { estimateValue, detectCategory, generatePurchaseMessage } from '@/lib/value-estimator';
 import { getAuthUserId } from '@/lib/auth-middleware';
 import { calculateVerifiedMarketValue, calculateTrueDiscount } from '@/lib/market-value-calculator';
+import {
+  processListings,
+  formatForStorage,
+  generateScanSummary,
+  ViabilityCriteria,
+  type NormalizedListing,
+} from '@/lib/marketplace-scanner';
 
 const EBAY_API_BASE_URL =
   process.env.EBAY_BROWSE_API_BASE_URL || 'https://api.ebay.com/buy/browse/v1';
@@ -160,132 +167,46 @@ function buildSellerNote(item: EbayItemSummary) {
   return `Seller feedback: ${percent ?? 'N/A'} (${score ?? 'N/A'} ratings)`;
 }
 
-async function saveListingFromEbayItem(item: EbayItemSummary, userId: string) {
-  const price = parseFloat(item.price?.value || '0');
-  const description = item.shortDescription || item.description || '';
-  const category =
-    item.categories?.[0]?.categoryName || detectCategory(item.title, description) /* istanbul ignore next */ || 'electronics';
+/**
+ * Convert eBay items to normalized listing format for marketplace-scanner
+ */
+function convertEbayItemsToNormalized(items: EbayItemSummary[]): NormalizedListing[] {
+  return items
+    .filter((item) => item.itemId && item.itemWebUrl && item.title)
+    .map((item) => {
+      const price = parseFloat(item.price?.value || '0');
+      const description = item.shortDescription || item.description || '';
+      const category = item.categories?.[0]?.categoryName || detectCategory(item.title, description) || 'electronics';
+      const imageUrls = [
+        item.image?.imageUrl,
+        ...(item.additionalImages?.map((img) => img.imageUrl) ?? []),
+      ].filter(Boolean) as string[];
 
-  const estimation = estimateValue(
-    item.title,
-    description,
-    price,
-    item.condition || null,
-    category
-  );
+      const sellerNote = buildSellerNote(item);
+      const auctionNote = item.buyingOptions?.includes('AUCTION')
+        ? 'Auction also available for this item.'
+        : null;
+      const additionalNotes = [sellerNote, auctionNote].filter(Boolean).join('\n').trim();
 
-  // Calculate verified market value from sold data
-  const marketValue = await calculateVerifiedMarketValue(item.title, 'EBAY');
-  const verifiedMarketValue = marketValue?.verifiedMarketValue || null;
-  const marketDataSource = marketValue?.marketDataSource || null;
-  const trueDiscountPercent = marketValue
-    ? calculateTrueDiscount(marketValue.verifiedMarketValue, price)
-    : null;
-
-  const sellerNote = buildSellerNote(item);
-  const auctionNote = item.buyingOptions?.includes('AUCTION')
-    ? 'Auction also available for this item.'
-    : null;
-  const combinedNotes = [estimation.notes, sellerNote, auctionNote]
-    .filter(Boolean)
-    .join('\n')
-    .trim();
-
-  const sellerName = item.seller?.username || null;
-  const requestToBuy = generatePurchaseMessage(
-    item.title,
-    price,
-    estimation.negotiable,
-    sellerName || undefined
-  );
-
-  const imageUrls = [
-    item.image?.imageUrl,
-    ...(item.additionalImages?.map((img) => img.imageUrl) ?? []),
-  ].filter(Boolean);
-
-  const serializedImages = imageUrls.length ? JSON.stringify(imageUrls) : null;
-  const tags = JSON.stringify(estimation.tags);
-  let status: 'OPPORTUNITY' | 'NEW';
-  if (estimation.valueScore >= 70) {
-    status = 'OPPORTUNITY';
-  } else {
-    status = 'NEW';
-  }
-
-  const savedListing = await prisma.listing.upsert({
-    where: {
-      platform_externalId_userId: { platform: 'EBAY', externalId: item.itemId, userId },
-    },
-    create: {
-      userId,
-      externalId: item.itemId,
-      platform: 'EBAY',
-      url: item.itemWebUrl,
-      title: item.title,
-      description,
-      askingPrice: price,
-      condition: item.condition || null,
-      location: formatLocation(item),
-      sellerName,
-      sellerContact: null,
-      imageUrls: serializedImages,
-      category,
-      postedAt: item.itemCreationDate ? new Date(item.itemCreationDate) : null,
-      estimatedValue: estimation.estimatedValue,
-      estimatedLow: estimation.estimatedLow,
-      estimatedHigh: estimation.estimatedHigh,
-      profitPotential: estimation.profitPotential,
-      profitLow: estimation.profitLow,
-      profitHigh: estimation.profitHigh,
-      valueScore: estimation.valueScore,
-      discountPercent: estimation.discountPercent,
-      resaleDifficulty: estimation.resaleDifficulty,
-      comparableUrls: JSON.stringify(estimation.comparableUrls),
-      priceReasoning: estimation.reasoning,
-      notes: combinedNotes,
-      shippable: estimation.shippable,
-      negotiable: estimation.negotiable,
-      tags,
-      requestToBuy,
-      status,
-      verifiedMarketValue,
-      marketDataSource,
-      trueDiscountPercent,
-    },
-    update: {
-      title: item.title,
-      description,
-      askingPrice: price,
-      condition: item.condition || null,
-      location: formatLocation(item),
-      sellerName,
-      imageUrls: serializedImages,
-      category,
-      estimatedValue: estimation.estimatedValue,
-      estimatedLow: estimation.estimatedLow,
-      estimatedHigh: estimation.estimatedHigh,
-      profitPotential: estimation.profitPotential,
-      profitLow: estimation.profitLow,
-      profitHigh: estimation.profitHigh,
-      valueScore: estimation.valueScore,
-      discountPercent: estimation.discountPercent,
-      resaleDifficulty: estimation.resaleDifficulty,
-      comparableUrls: JSON.stringify(estimation.comparableUrls),
-      priceReasoning: estimation.reasoning,
-      notes: combinedNotes,
-      shippable: estimation.shippable,
-      negotiable: estimation.negotiable,
-      tags,
-      requestToBuy,
-      verifiedMarketValue,
-      marketDataSource,
-      trueDiscountPercent,
-    },
-  });
-
-  return savedListing;
+      return {
+        externalId: item.itemId,
+        url: item.itemWebUrl,
+        title: item.title,
+        description,
+        price,
+        condition: item.condition || null,
+        location: formatLocation(item),
+        sellerName: item.seller?.username || null,
+        sellerContact: null,
+        imageUrls,
+        category,
+        postedAt: item.itemCreationDate ? new Date(item.itemCreationDate) : null,
+        additionalNotes: additionalNotes || null,
+      };
+    });
 }
+
+// Removed saveListingFromEbayItem() - now using centralized processListings() from marketplace-scanner
 
 async function storePriceHistoryRecords(soldItems: EbayItemSummary[], keywords: string) {
   if (!soldItems.length) return 0;
@@ -380,34 +301,97 @@ export async function POST(request: NextRequest) {
         fetchSoldListings(searchParams),
       ]);
 
+      // Convert eBay items to normalized format
+      const normalizedListings = convertEbayItemsToNormalized(activeListings);
+
+      // Build viability criteria (using defaults for eBay)
+      const viabilityCriteria: ViabilityCriteria = {
+        minValueScore: 70,
+        maxAskingPrice: body.maxPrice,
+      };
+
+      // Process listings through centralized viability logic with SSE events
+      const processedResults = processListings(
+        'EBAY',
+        normalizedListings,
+        viabilityCriteria,
+        { emitEvents: true, userId }
+      );
+
+      // Save all listings to database
       const savedListings = [];
-      for (const item of activeListings) {
-        if (!item.itemId || !item.itemWebUrl || !item.title) continue;
-        const listing = await saveListingFromEbayItem(item, userId);
-        savedListings.push(listing);
+      for (const analyzed of processedResults.all) {
+        // Get market data and calculate verified values
+        const marketValue = await calculateVerifiedMarketValue(analyzed.title, 'EBAY');
+        const verifiedMarketValue = marketValue?.verifiedMarketValue || null;
+        const marketDataSource = marketValue?.marketDataSource || null;
+        const trueDiscountPercent = marketValue
+          ? calculateTrueDiscount(marketValue.verifiedMarketValue, analyzed.price)
+          : null;
+
+        // Prepare storage data
+        const storageData = formatForStorage(analyzed);
+        
+        // Add verified market data
+        const enrichedData = {
+          ...storageData,
+          verifiedMarketValue,
+          marketDataSource,
+          trueDiscountPercent,
+        };
+
+        try {
+          const listing = await prisma.listing.upsert({
+            where: {
+              platform_externalId_userId: {
+                platform: 'EBAY',
+                externalId: analyzed.externalId,
+                userId,
+              },
+            },
+            create: enrichedData as Parameters<typeof prisma.listing.create>[0]['data'],
+            update: {
+              ...enrichedData,
+              scrapedAt: new Date(),
+            } as Parameters<typeof prisma.listing.update>[0]['data'],
+          });
+          savedListings.push(listing);
+        } catch (err) {
+          console.error(`Error saving listing ${analyzed.externalId}:`, err);
+        }
       }
 
+      // Store price history from sold listings
       const priceHistorySaved = await storePriceHistoryRecords(
         soldListings,
         searchParams.keywords!
       );
 
+      // Generate summary
+      const summary = generateScanSummary(processedResults);
+
+      // Update job as completed
       await prisma.scraperJob.update({
         where: { id: scraperJob.id },
         data: {
           status: 'COMPLETED',
-          listingsFound: savedListings.length,
-          opportunitiesFound: savedListings.filter((listing) => listing.status === 'OPPORTUNITY')
-            .length,
+          listingsFound: processedResults.all.length,
+          opportunitiesFound: processedResults.opportunities.length,
           completedAt: new Date(),
         },
       });
 
+      console.log(
+        `eBay scrape job ${scraperJob.id} completed: ${processedResults.all.length} listings, ${processedResults.opportunities.length} opportunities`
+      );
+
       return NextResponse.json({
         success: true,
         platform: 'EBAY',
+        jobId: scraperJob.id,
         listingsSaved: savedListings.length,
         priceHistorySaved,
+        summary,
         listings: savedListings,
       });
     } catch (error) {
