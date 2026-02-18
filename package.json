@@ -73,7 +73,7 @@
     "autocannon": "^8.0.0",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.5.0",
-    "dotenv": "^17.2.3",
+    "dotenv": "^16.4.5",
     "eslint": "^9",
     "eslint-config-next": "16.1.0",
     "husky": "^9.1.7",
