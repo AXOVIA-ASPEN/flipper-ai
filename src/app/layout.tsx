@@ -37,7 +37,6 @@ export default function RootLayout({
           <ThemeProvider>
             <ThemeStyles />
             <WebVitals />
-            <Navigation />
             {children}
             <Analytics />
           </ThemeProvider>
