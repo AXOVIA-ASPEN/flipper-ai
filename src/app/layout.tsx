@@ -6,6 +6,7 @@ import { ThemeStyles } from '@/components/ThemeStyles';
 import { SessionProvider } from '@/components/providers/SessionProvider';
 import { WebVitals } from '@/components/WebVitals';
 import Navigation from '@/components/Navigation';
+import { Analytics } from '@vercel/analytics/next';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -38,6 +39,7 @@ export default function RootLayout({
             <WebVitals />
             <Navigation />
             {children}
+            <Analytics />
           </ThemeProvider>
         </SessionProvider>
       </body>
