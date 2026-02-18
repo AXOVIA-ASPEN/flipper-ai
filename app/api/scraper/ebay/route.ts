@@ -9,6 +9,7 @@ import {
   generateScanSummary,
   ViabilityCriteria,
   type AnalyzedListing,
+  type RawListing,
 } from '@/lib/marketplace-scanner';
 
 const EBAY_API_BASE_URL =
@@ -170,7 +171,7 @@ function buildSellerNote(item: EbayItemSummary) {
 /**
  * Convert eBay items to normalized listing format for marketplace-scanner
  */
-function convertEbayItemsToNormalized(items: EbayItemSummary[]): AnalyzedListing[] {
+function convertEbayItemsToNormalized(items: EbayItemSummary[]): RawListing[] {
   return items
     .filter((item) => item.itemId && item.itemWebUrl && item.title)
     .map((item) => {
@@ -193,7 +194,7 @@ function convertEbayItemsToNormalized(items: EbayItemSummary[]): AnalyzedListing
         url: item.itemWebUrl,
         title: item.title,
         description,
-        price,
+        askingPrice: price,
         condition: item.condition || null,
         location: formatLocation(item),
         sellerName: item.seller?.username || null,

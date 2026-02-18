@@ -866,9 +866,12 @@ describe('eBay Scraper API', () => {
           ok: true,
           json: async () => ({
             itemSummaries: [
-              makeEbayItem({ itemId: 'e1' }),
-              makeEbayItem({ itemId: 'e2' }),
-              makeEbayItem({ itemId: 'e3' }),
+              // Opportunity: Apple product, low price, new condition = high score
+              makeEbayItem({ itemId: 'e1', price: { value: '400', currency: 'USD' }, condition: 'New' }),
+              // Not an opportunity: Generic item, low price, generic description = low score  
+              makeEbayItem({ itemId: 'e2', title: 'Random old misc lot', price: { value: '20', currency: 'USD' }, categories: undefined }),
+              // Opportunity: Apple product, low price, new condition = high score
+              makeEbayItem({ itemId: 'e3', price: { value: '400', currency: 'USD' }, condition: 'New' }),
             ],
           }),
         })
