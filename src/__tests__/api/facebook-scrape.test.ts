@@ -179,7 +179,8 @@ describe('Facebook Scrape API', () => {
       expect(mockProcessListings).toHaveBeenCalledWith(
         'FACEBOOK_MARKETPLACE',
         [],
-        expect.objectContaining({ minValueScore: 70 })
+        expect.objectContaining({ minValueScore: 70 }),
+        expect.objectContaining({ emitEvents: true, userId: 'user-1' })
       );
     });
 
@@ -217,7 +218,8 @@ describe('Facebook Scrape API', () => {
           excludeCategories: ['clothing'],
           includeCategories: ['electronics'],
           maxResaleDifficulty: 'MEDIUM',
-        })
+        }),
+        expect.objectContaining({ emitEvents: true, userId: 'user-1' })
       );
     });
 

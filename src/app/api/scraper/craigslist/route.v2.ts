@@ -49,6 +49,7 @@ export async function POST(request: NextRequest) {
       title: string;
       price: string;
       url: string;
+      externalId: string;
       location?: string;
       images?: string[];
       description?: string;
