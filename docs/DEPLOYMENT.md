@@ -129,6 +129,75 @@ See `vercel.json` for:
 
 ---
 
+## Error Tracking & Performance Monitoring (Sentry)
+
+Flipper AI uses Sentry for production error tracking and performance monitoring.
+
+### 1. Create Sentry Project
+
+1. Go to [sentry.io](https://sentry.io) and create an account (or log in)
+2. Create a new project → Select "Next.js" as the platform
+3. Choose your organization (or create one)
+4. Name the project `flipper-ai` (or your preferred name)
+5. Copy the **DSN** (Data Source Name) — looks like `https://abc123@o123456.ingest.sentry.io/123456`
+
+### 2. Generate Auth Token
+
+1. Go to **Settings** → **Account** → **API** → **Auth Tokens**
+2. Click **Create New Token**
+3. Name: `flipper-ai-source-maps`
+4. Scopes: Select **project:releases** and **project:write**
+5. Copy the token (you'll only see it once!)
+
+### 3. Configure Environment Variables
+
+Add these to your deployment platform (Vercel/Railway/Docker):
+
+| Variable                 | Value                          | Where to Get It                    |
+| ------------------------ | ------------------------------ | ---------------------------------- |
+| `SENTRY_DSN`             | Server-side DSN                | Sentry project settings            |
+| `NEXT_PUBLIC_SENTRY_DSN` | Client-side DSN (same as above)| Sentry project settings            |
+| `SENTRY_ORG`             | Your org slug (e.g. `axovia`)  | Sentry organization settings       |
+| `SENTRY_PROJECT`         | Your project slug              | Sentry project settings            |
+| `SENTRY_AUTH_TOKEN`      | Auth token for source maps     | Created in step 2                  |
+
+### 4. Verify Setup
+
+After deploying with Sentry enabled:
+
+1. Visit your app and trigger a test error (optional: create `/api/sentry-test` endpoint)
+2. Check Sentry dashboard → **Issues** — you should see the error appear within seconds
+3. Click the error → verify source maps are working (you should see original code, not minified)
+
+### 5. Configure Alerts (Optional)
+
+In Sentry dashboard:
+
+1. Go to **Alerts** → **Create Alert Rule**
+2. Example rule: Email me when error count > 10 in 1 minute
+3. Add team members or Slack integration for notifications
+
+### Features Enabled
+
+- **Error Tracking**: Automatic capture of unhandled exceptions (client + server + edge)
+- **Performance Monitoring**: 10% sampling in production (configurable in `sentry.*.config.ts`)
+- **Session Replay**: 1% of normal sessions, 100% of sessions with errors
+- **Source Maps**: Uploaded automatically during production builds
+- **Security**: Sensitive data (tokens, IPs, database URLs) filtered via `beforeSend` hooks
+
+### Development Mode
+
+Sentry is **disabled by default** in development to avoid noise. To enable locally:
+
+```bash
+# .env.local
+SENTRY_ENABLED="true"
+SENTRY_DSN="your-dsn-here"
+NEXT_PUBLIC_SENTRY_DSN="your-dsn-here"
+```
+
+---
+
 ## Quick Start (Docker)
 
 ```bash

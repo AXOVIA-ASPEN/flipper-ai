@@ -37,6 +37,7 @@
     "tests",
     "e2e",
     "src/__tests__",
-    "prisma/seed.ts"
+    "prisma/seed.ts",
+    "functions/**/*"
   ]
 }
