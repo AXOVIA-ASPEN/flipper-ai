@@ -57,6 +57,7 @@
     "@axe-core/playwright": "^4.11.1",
     "@cucumber/cucumber": "^12.4.0",
     "@playwright/test": "^1.57.0",
+    "@prisma/adapter-libsql": "^7.4.0",
     "@swc/core": "^1.15.11",
     "@swc/jest": "^0.2.39",
     "@tailwindcss/postcss": "^4",
