@@ -1,1253 +1,264 @@
 'use client';
 
-import { Suspense, useEffect, useRef, useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  TrendingUp,
-  DollarSign,
-  Package,
-  Search,
-  RefreshCw,
-  ExternalLink,
-  Star,
-  Filter,
-  Plus,
-  ImageIcon,
-  X,
-  ChevronLeft,
-  ChevronRight,
-  ChevronDown,
-  Trash2,
-  CheckCircle2,
-  AlertTriangle,
-  Loader2,
-  MapPin,
-  Tag,
-  Calendar,
-} from 'lucide-react';
-import { useFilterParams, FilterState } from '@/hooks/useFilterParams';
-import { useSseEvents } from '@/hooks/useSseEvents';
+import Link from 'next/link';
+import { DollarSign, TrendingUp, Zap, Shield, Search, BarChart } from 'lucide-react';
 
-// Location and category options (reused from settings page)
-const locations = [
-  { value: '', label: 'All Locations' },
-  { value: 'sarasota', label: 'Sarasota, FL' },
-  { value: 'tampa', label: 'Tampa, FL' },
-  { value: 'orlando', label: 'Orlando, FL' },
-  { value: 'miami', label: 'Miami, FL' },
-  { value: 'jacksonville', label: 'Jacksonville, FL' },
-  { value: 'sfbay', label: 'San Francisco Bay Area' },
-  { value: 'losangeles', label: 'Los Angeles, CA' },
-  { value: 'newyork', label: 'New York, NY' },
-  { value: 'chicago', label: 'Chicago, IL' },
-  { value: 'seattle', label: 'Seattle, WA' },
-  { value: 'austin', label: 'Austin, TX' },
-  { value: 'denver', label: 'Denver, CO' },
-];
-
-const categories = [
-  { value: '', label: 'All Categories' },
-  { value: 'electronics', label: 'Electronics' },
-  { value: 'furniture', label: 'Furniture' },
-  { value: 'appliances', label: 'Appliances' },
-  { value: 'sporting', label: 'Sporting Goods' },
-  { value: 'tools', label: 'Tools' },
-  { value: 'jewelry', label: 'Jewelry' },
-  { value: 'antiques', label: 'Antiques' },
-  { value: 'video_gaming', label: 'Video Gaming' },
-  { value: 'music_instr', label: 'Musical Instruments' },
-  { value: 'computers', label: 'Computers' },
-  { value: 'cell_phones', label: 'Cell Phones' },
-];
-
-interface Listing {
-  id: string;
-  platform: string;
-  title: string;
-  askingPrice: number;
-  estimatedValue: number | null;
-  profitPotential: number | null;
-  valueScore: number | null;
-  discountPercent: number | null;
-  status: string;
-  location: string | null;
-  url: string;
-  scrapedAt: string;
-  imageUrls: string | null;
-  opportunity?: { id: string } | null;
-}
-
-interface Stats {
-  totalListings: number;
-  opportunities: number;
-  totalPotentialProfit: number;
-  avgValueScore: number;
-}
-
-// Helper to parse imageUrls JSON and get array of URLs
-function parseImageUrls(imageUrls: string | null): string[] {
-  if (!imageUrls) return [];
-  try {
-    const parsed = JSON.parse(imageUrls);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-// Image gallery modal state type
-interface ImageModalState {
-  isOpen: boolean;
-  images: string[];
-  currentIndex: number;
-  title: string;
-}
-
-function DashboardContent() {
+export default function LandingPage() {
   const router = useRouter();
-  const [listings, setListings] = useState<Listing[]>([]);
-  const [stats, setStats] = useState<Stats>({
-    totalListings: 0,
-    opportunities: 0,
-    totalPotentialProfit: 0,
-    avgValueScore: 0,
-  });
-  const [loading, setLoading] = useState(true);
-  const { filters, setFilter, clearFilters, activeFilterCount } = useFilterParams();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  const [imageModal, setImageModal] = useState<ImageModalState>({
-    isOpen: false,
-    images: [],
-    currentIndex: 0,
-    title: '',
-  });
-  const [selectedListingIds, setSelectedListingIds] = useState<Set<string>>(new Set());
-  const selectAllRef = useRef<HTMLInputElement>(null);
+  const [email, setEmail] = useState('');
 
-  // Bulk operations state
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [bulkActionLoading, setBulkActionLoading] = useState<string | null>(null);
-  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
-
-  // Real-time SSE notifications
-  const [notifications, setNotifications] = useState<Array<{ id: string; message: string; timestamp: number }>>([]);
-  const { events, isConnected } = useSseEvents({ eventTypes: ['listing.found'] });
-
-  const openImageModal = (listing: Listing) => {
-    const images = parseImageUrls(listing.imageUrls);
-    if (images.length > 0) {
-      setImageModal({
-        isOpen: true,
-        images,
-        currentIndex: 0,
-        title: listing.title,
-      });
-    }
-  };
-
-  const closeImageModal = () => {
-    setImageModal((prev) => ({ ...prev, isOpen: false }));
-  };
-
-  const nextImage = () => {
-    setImageModal((prev) => ({
-      ...prev,
-      currentIndex: (prev.currentIndex + 1) % prev.images.length,
-    }));
-  };
-
-  const prevImage = () => {
-    setImageModal((prev) => ({
-      ...prev,
-      currentIndex: (prev.currentIndex - 1 + prev.images.length) % prev.images.length,
-    }));
-  };
-
-  const fetchListings = useCallback(async () => {
-    try {
-      setLoading(true);
-      const params = new URLSearchParams();
-
-      // Build query params from all filters
-      if (filters.status && filters.status !== 'all') params.set('status', filters.status);
-      if (filters.location) params.set('location', filters.location);
-      if (filters.category) params.set('category', filters.category);
-      if (filters.minPrice) params.set('minPrice', filters.minPrice);
-      if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
-      if (filters.dateFrom) params.set('dateFrom', filters.dateFrom);
-      if (filters.dateTo) params.set('dateTo', filters.dateTo);
-
-      const response = await fetch(`/api/listings?${params}`);
-      const data = await response.json();
-
-      setListings(data.listings || []);
-
-      // Calculate stats
-      const allListings = data.listings || [];
-      const opps = allListings.filter(
-        (l: Listing) => l.status === 'OPPORTUNITY' || (l.valueScore && l.valueScore >= 70)
-      );
-      const totalProfit = allListings.reduce(
-        (sum: number, l: Listing) => sum + (l.profitPotential || 0),
-        0
-      );
-      const avgScore =
-        allListings.length > 0
-          ? allListings.reduce((sum: number, l: Listing) => sum + (l.valueScore || 0), 0) /
-            allListings.length
-          : 0;
-
-      setStats({
-        totalListings: data.total || 0,
-        opportunities: opps.length,
-        totalPotentialProfit: totalProfit,
-        avgValueScore: Math.round(avgScore),
-      });
-    } catch (error) {
-      console.error('Failed to fetch listings:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters]);
-
-  // Redirect new users to onboarding if not complete
-  useEffect(() => {
-    fetch('/api/user/onboarding')
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.success && !data.data.onboardingComplete) {
-          router.replace('/onboarding');
-        }
-      })
-      .catch(() => {
-        // If onboarding check fails, don't block the dashboard
-      });
-  }, [router]);
-
-  useEffect(() => {
-    fetchListings();
-  }, [fetchListings]);
-
-  useEffect(() => {
-    setSelectedListingIds((prev) => {
-      const validIds = new Set(listings.map((listing) => listing.id));
-      const next = new Set<string>();
-      prev.forEach((id) => {
-        if (validIds.has(id)) {
-          next.add(id);
-        }
-      });
-      return next;
-    });
-  }, [listings]);
-
-  // Handle incoming SSE events
-  useEffect(() => {
-    if (events.length === 0) return;
-
-    const latestEvent = events[0];
-    if (latestEvent.type === 'listing.found') {
-      const data = latestEvent.data as {
-        title: string;
-        platform: string;
-        valueScore: number;
-        isOpportunity: boolean;
-      };
-
-      // Add notification
-      const notification = {
-        id: `notif-${Date.now()}`,
-        message: `New listing found: ${data.title} (Score: ${data.valueScore})`,
-        timestamp: Date.now(),
-      };
-      setNotifications((prev) => [notification, ...prev.slice(0, 4)]);
-
-      // Auto-dismiss after 5 seconds
-      setTimeout(() => {
-        setNotifications((prev) => prev.filter((n) => n.id !== notification.id));
-      }, 5000);
-
-      // If it's a high-value opportunity, refresh listings
-      if (data.isOpportunity && data.valueScore >= 85) {
-        fetchListings();
-      }
-    }
-  }, [events, fetchListings]);
-
-  async function markAsOpportunity(listingId: string) {
-    try {
-      await fetch('/api/opportunities', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ listingId }),
-      });
-      fetchListings();
-    } catch (error) {
-      console.error('Failed to create opportunity:', error);
-    }
-  }
-
-  // Bulk operations
-  async function bulkAddToOpportunities() {
-    if (selectedListingIds.size === 0) return;
-    setBulkActionLoading('opportunities');
-    try {
-      const promises = Array.from(selectedListingIds).map((listingId) =>
-        fetch('/api/opportunities', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ listingId }),
-        })
-      );
-      await Promise.all(promises);
-      setSelectedListingIds(new Set());
-      fetchListings();
-    } catch (error) {
-      console.error('Failed to bulk add opportunities:', error);
-    } finally {
-      setBulkActionLoading(null);
-    }
-  }
-
-  async function bulkUpdateStatus(newStatus: string) {
-    if (selectedListingIds.size === 0) return;
-    setBulkActionLoading('status');
-    setShowStatusDropdown(false);
-    try {
-      const promises = Array.from(selectedListingIds).map((listingId) =>
-        fetch(`/api/listings/${listingId}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: newStatus }),
-        })
-      );
-      await Promise.all(promises);
-      setSelectedListingIds(new Set());
-      fetchListings();
-    } catch (error) {
-      console.error('Failed to bulk update status:', error);
-    } finally {
-      setBulkActionLoading(null);
-    }
-  }
-
-  async function bulkDelete() {
-    if (selectedListingIds.size === 0) return;
-    setBulkActionLoading('delete');
-    setShowDeleteModal(false);
-    try {
-      const promises = Array.from(selectedListingIds).map((listingId) =>
-        fetch(`/api/listings/${listingId}`, {
-          method: 'DELETE',
-        })
-      );
-      await Promise.all(promises);
-      setSelectedListingIds(new Set());
-      fetchListings();
-    } catch (error) {
-      console.error('Failed to bulk delete:', error);
-    } finally {
-      setBulkActionLoading(null);
-    }
-  }
-
-  function clearSelection() {
-    setSelectedListingIds(new Set());
-  }
-
-  const filteredListings = listings.filter((listing) =>
-    listing.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const allVisibleSelected =
-    filteredListings.length > 0 &&
-    filteredListings.every((listing) => selectedListingIds.has(listing.id));
-
-  const someVisibleSelected =
-    filteredListings.some((listing) => selectedListingIds.has(listing.id)) && !allVisibleSelected;
-
-  useEffect(() => {
-    if (selectAllRef.current) {
-      selectAllRef.current.indeterminate = someVisibleSelected;
-    }
-  }, [someVisibleSelected, allVisibleSelected]);
-
-  const toggleListingSelection = (listingId: string) => {
-    setSelectedListingIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(listingId)) {
-        next.delete(listingId);
-      } else {
-        next.add(listingId);
-      }
-      return next;
-    });
-  };
-
-  const toggleSelectAllVisible = () => {
-    if (allVisibleSelected) {
-      setSelectedListingIds((prev) => {
-        const next = new Set(prev);
-        filteredListings.forEach((listing) => next.delete(listing.id));
-        return next;
-      });
-    } else {
-      setSelectedListingIds((prev) => {
-        const next = new Set(prev);
-        filteredListings.forEach((listing) => next.add(listing.id));
-        return next;
-      });
-    }
-  };
-
-  const getScoreColor = (score: number | null) => {
-    if (!score)
-      return 'bg-gradient-to-r from-gray-400 to-gray-600 text-white border-gray-400 shadow-gray-500/50';
-    if (score >= 80)
-      return 'bg-gradient-to-r from-green-400 to-emerald-600 text-white border-green-400 shadow-green-500/50 animate-pulse-slow';
-    if (score >= 60)
-      return 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-yellow-400 shadow-yellow-500/50';
-    if (score >= 40)
-      return 'bg-gradient-to-r from-orange-400 to-pink-500 text-white border-orange-400 shadow-orange-500/50';
-    return 'bg-gradient-to-r from-red-400 to-red-600 text-white border-red-400 shadow-red-500/50';
-  };
-
-  const getPlatformColor = (platform: string) => {
-    switch (platform.toUpperCase()) {
-      case 'CRAIGSLIST':
-        return 'bg-gradient-to-r from-purple-400 to-purple-600 text-white border-purple-400 shadow-purple-500/50';
-      case 'FACEBOOK_MARKETPLACE':
-        return 'bg-gradient-to-r from-blue-400 to-blue-600 text-white border-blue-400 shadow-blue-500/50';
-      case 'EBAY':
-        return 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-yellow-400 shadow-yellow-500/50';
-      case 'OFFERUP':
-        return 'bg-gradient-to-r from-green-400 to-emerald-600 text-white border-green-400 shadow-green-500/50';
-      default:
-        return 'bg-gradient-to-r from-gray-400 to-gray-600 text-white border-gray-400 shadow-gray-500/50';
-    }
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  const formatPercent = (value: number | null) => {
-    if (value === null || Number.isNaN(value)) return '-';
-    return `${value}%`;
+  const handleGetStarted = () => {
+    router.push('/auth/signup');
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Animated background gradient orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 -left-4 w-96 h-96 bg-theme-orb-1 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div className="absolute top-0 -right-4 w-96 h-96 bg-theme-orb-2 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-20 w-96 h-96 bg-theme-orb-3 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        {/* Animated gradient orbs */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob" />
+        <div className="absolute top-40 right-10 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000" />
+        <div className="absolute -bottom-8 left-1/2 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000" />
 
-      {/* Header */}
-      <header className="relative backdrop-blur-xl bg-white/10 border-b border-white/20 shadow-2xl sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+          {/* Header */}
+          <nav className="flex justify-between items-center mb-16">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/50 animate-pulse-slow">
-                <TrendingUp className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
-                  Flipper.ai
-                </h1>
-                <p className="text-xs text-blue-200/70">Find profitable flips</p>
-              </div>
+              <div className="text-4xl">🐧</div>
+              <h1 className="text-2xl font-bold text-white">Flipper.ai</h1>
             </div>
-            <div className="flex items-center gap-4">
-              {/* SSE Connection indicator */}
-              <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`} />
-                <span className="text-xs text-blue-200/70">
-                  {isConnected ? 'Live' : 'Offline'}
-                </span>
-              </div>
-              <button
-                onClick={fetchListings}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg shadow-blue-500/50 hover:shadow-blue-500/80 hover:scale-105"
+            <div className="flex gap-4">
+              <Link
+                href="/auth/login"
+                className="px-4 py-2 text-white hover:text-purple-300 transition-colors"
               >
-                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                Refresh
+                Log In
+              </Link>
+              <button
+                onClick={handleGetStarted}
+                className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all"
+              >
+                Get Started Free
               </button>
             </div>
-          </div>
-        </div>
-      </header>
+          </nav>
 
-      {/* Real-time notification toasts */}
-      <div className="fixed top-20 right-4 z-50 space-y-2 max-w-sm">
-        {notifications.map((notif) => (
-          <div
-            key={notif.id}
-            className="backdrop-blur-xl bg-gradient-to-r from-green-500/90 to-emerald-600/90 text-white p-4 rounded-lg shadow-2xl border border-green-400/50 animate-slide-in-right"
-          >
-            <div className="flex items-start gap-3">
-              <Star className="w-5 h-5 text-yellow-300 flex-shrink-0 mt-0.5" />
-              <p className="text-sm font-medium">{notif.message}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+          {/* Hero Content */}
+          <div className="text-center max-w-4xl mx-auto">
+            <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
+              Find Hidden Profits in
+              <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+                {' '}Every Marketplace
+              </span>
+            </h2>
+            <p className="text-xl text-blue-200/80 mb-8 max-w-2xl mx-auto">
+              AI-powered marketplace scanner that finds underpriced items on Craigslist, Facebook, eBay, OfferUp, and Mercari. 
+              Turn $50 into $500 with smart flipping.
+            </p>
 
-      <main className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="group backdrop-blur-xl bg-white/10 rounded-xl p-6 border border-white/20 shadow-xl hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 hover:scale-105 hover:bg-white/15">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-blue-200/70">Total Listings</p>
-                <p className="text-2xl font-bold text-white">{stats.totalListings}</p>
-              </div>
-              <div className="w-12 h-12 bg-theme-accent-blue rounded-xl flex items-center justify-center shadow-theme-accent-blue group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110">
-                <Package className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </div>
-
-          <div className="group backdrop-blur-xl bg-white/10 rounded-xl p-6 border border-white/20 shadow-xl hover:shadow-2xl hover:shadow-green-500/20 transition-all duration-300 hover:scale-105 hover:bg-white/15">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-green-200/70">Opportunities</p>
-                <p className="text-2xl font-bold bg-gradient-to-r from-green-300 to-emerald-300 bg-clip-text text-transparent">
-                  {stats.opportunities}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-theme-accent-green rounded-xl flex items-center justify-center shadow-theme-accent-green group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110">
-                <Star className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </div>
-
-          <div className="group backdrop-blur-xl bg-white/10 rounded-xl p-6 border border-white/20 shadow-xl hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 hover:scale-105 hover:bg-white/15">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-purple-200/70">Potential Profit</p>
-                <p className="text-2xl font-bold bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">
-                  {formatCurrency(stats.totalPotentialProfit)}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-theme-accent-purple rounded-xl flex items-center justify-center shadow-theme-accent-purple group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110 animate-pulse-slow">
-                <DollarSign className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </div>
-
-          <div className="group backdrop-blur-xl bg-white/10 rounded-xl p-6 border border-white/20 shadow-xl hover:shadow-2xl hover:shadow-orange-500/20 transition-all duration-300 hover:scale-105 hover:bg-white/15">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-orange-200/70">Avg Value Score</p>
-                <p className="text-2xl font-bold text-white">{stats.avgValueScore}</p>
-              </div>
-              <div className="w-12 h-12 bg-theme-accent-orange rounded-xl flex items-center justify-center shadow-theme-accent-orange group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110">
-                <TrendingUp className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Filters and Search */}
-        <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-6 mb-6 shadow-xl">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-blue-200/50" />
+            {/* CTA Form */}
+            <div className="flex gap-3 max-w-md mx-auto mb-12">
               <input
-                type="text"
-                placeholder="Search listings..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50 text-white placeholder-blue-200/50 transition-all duration-300 hover:bg-white/15"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="flex-1 px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-blue-200/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
-            </div>
-            <div className="flex items-center gap-2">
-              <Filter className="w-5 h-5 text-blue-200/70" />
-              <select
-                value={filters.status}
-                onChange={(e) => setFilter('status', e.target.value)}
-                className="px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50 text-white transition-all duration-300 hover:bg-white/15"
+              <button
+                onClick={handleGetStarted}
+                className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-xl hover:scale-105 transition-all"
               >
-                <option value="all" className="bg-slate-800 text-white">
-                  All Listings
-                </option>
-                <option value="NEW" className="bg-slate-800 text-white">
-                  New
-                </option>
-                <option value="OPPORTUNITY" className="bg-slate-800 text-white">
-                  Opportunities
-                </option>
-                <option value="CONTACTED" className="bg-slate-800 text-white">
-                  Contacted
-                </option>
-                <option value="PURCHASED" className="bg-slate-800 text-white">
-                  Purchased
-                </option>
-                <option value="SOLD" className="bg-slate-800 text-white">
-                  Sold
-                </option>
-              </select>
-            </div>
-            {/* Advanced Filters Toggle */}
-            <button
-              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 hover:bg-white/15 ${
-                activeFilterCount > 0
-                  ? 'bg-purple-500/20 border-purple-400/50 text-purple-200'
-                  : 'bg-white/10 border-white/20 text-blue-200/70'
-              }`}
-            >
-              <Filter className="w-4 h-4" />
-              <span>Filters</span>
-              {activeFilterCount > 0 && (
-                <span className="ml-1 px-2 py-0.5 bg-purple-500 text-white text-xs rounded-full">
-                  {activeFilterCount}
-                </span>
-              )}
-              <ChevronDown
-                className={`w-4 h-4 transition-transform duration-300 ${showAdvancedFilters ? 'rotate-180' : ''}`}
-              />
-            </button>
-          </div>
-
-          {/* Advanced Filters Panel */}
-          <div
-            className={`overflow-hidden transition-all duration-300 ${showAdvancedFilters ? 'max-h-96 mt-4 opacity-100' : 'max-h-0 opacity-0'}`}
-          >
-            <div className="pt-4 border-t border-white/10">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Location Filter */}
-                <div>
-                  <label className="flex items-center gap-2 text-sm text-blue-200/70 mb-2">
-                    <MapPin className="w-4 h-4" />
-                    Location
-                  </label>
-                  <select
-                    value={filters.location}
-                    onChange={(e) => setFilter('location', e.target.value)}
-                    className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white transition-all duration-300 hover:bg-white/15"
-                  >
-                    {locations.map((loc) => (
-                      <option key={loc.value} value={loc.value} className="bg-slate-800 text-white">
-                        {loc.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Category Filter */}
-                <div>
-                  <label className="flex items-center gap-2 text-sm text-blue-200/70 mb-2">
-                    <Tag className="w-4 h-4" />
-                    Category
-                  </label>
-                  <select
-                    value={filters.category}
-                    onChange={(e) => setFilter('category', e.target.value)}
-                    className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white transition-all duration-300 hover:bg-white/15"
-                  >
-                    {categories.map((cat) => (
-                      <option key={cat.value} value={cat.value} className="bg-slate-800 text-white">
-                        {cat.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Price Range */}
-                <div>
-                  <label className="flex items-center gap-2 text-sm text-blue-200/70 mb-2">
-                    <DollarSign className="w-4 h-4" />
-                    Price Range
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="number"
-                      placeholder="Min $"
-                      value={filters.minPrice}
-                      onChange={(e) => setFilter('minPrice', e.target.value)}
-                      className="flex-1 px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white placeholder-blue-200/50"
-                    />
-                    <input
-                      type="number"
-                      placeholder="Max $"
-                      value={filters.maxPrice}
-                      onChange={(e) => setFilter('maxPrice', e.target.value)}
-                      className="flex-1 px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white placeholder-blue-200/50"
-                    />
-                  </div>
-                </div>
-
-                {/* Date Range */}
-                <div>
-                  <label className="flex items-center gap-2 text-sm text-blue-200/70 mb-2">
-                    <Calendar className="w-4 h-4" />
-                    Scraped Date
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="date"
-                      value={filters.dateFrom}
-                      onChange={(e) => setFilter('dateFrom', e.target.value)}
-                      className="flex-1 px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white"
-                    />
-                    <input
-                      type="date"
-                      value={filters.dateTo}
-                      onChange={(e) => setFilter('dateTo', e.target.value)}
-                      className="flex-1 px-3 py-2 text-sm bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Clear Filters Button */}
-              {activeFilterCount > 0 && (
-                <div className="mt-4 flex justify-end">
-                  <button
-                    onClick={clearFilters}
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-red-300 hover:text-red-200 hover:bg-red-500/10 rounded-lg transition-all duration-300"
-                  >
-                    <X className="w-4 h-4" />
-                    Clear All Filters
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Listings Table */}
-        <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 overflow-hidden shadow-xl">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-white/5 border-b border-white/10">
-                <tr>
-                  <th className="px-4 py-4">
-                    <input
-                      ref={selectAllRef}
-                      type="checkbox"
-                      aria-label="Select all listings"
-                      checked={allVisibleSelected}
-                      onChange={toggleSelectAllVisible}
-                      className="h-4 w-4 rounded border-white/30 bg-white/10 text-blue-500 focus:ring-blue-400"
-                    />
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-blue-200/70 uppercase tracking-wider">
-                    Item
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-blue-200/70 uppercase tracking-wider">
-                    Platform
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-blue-200/70 uppercase tracking-wider">
-                    Price
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-blue-200/70 uppercase tracking-wider">
-                    Est. Value
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-blue-200/70 uppercase tracking-wider">
-                    Profit
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-blue-200/70 uppercase tracking-wider">
-                    Score
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-blue-200/70 uppercase tracking-wider">
-                    % Undervalued
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-blue-200/70 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/10">
-                {loading ? (
-                  <tr>
-                    <td colSpan={9} className="px-6 py-12 text-center">
-                      <div className="w-12 h-12 mx-auto border-4 border-blue-400/30 border-t-blue-400 rounded-full animate-spin"></div>
-                      <p className="mt-4 text-blue-200/70 animate-pulse">Loading listings...</p>
-                    </td>
-                  </tr>
-                ) : filteredListings.length === 0 ? (
-                  <tr>
-                    <td colSpan={9} className="px-6 py-12 text-center">
-                      <div className="flex flex-col items-center gap-4">
-                        <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/50 animate-pulse-slow">
-                          <Package className="w-8 h-8 text-white" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-white">No listings found</h3>
-                        <p className="text-blue-200/70">
-                          Run a marketplace scan to discover flip opportunities.
-                        </p>
-                        <a
-                          href="/scraper"
-                          className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 text-sm font-medium shadow-lg shadow-blue-500/40"
-                        >
-                          🔍 Run a Scan
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  filteredListings.map((listing) => {
-                    const isSelected = selectedListingIds.has(listing.id);
-                    return (
-                      <tr
-                        key={listing.id}
-                        className={`transition-all duration-300 ${
-                          isSelected ? 'bg-white/10' : 'hover:bg-white/5'
-                        }`}
-                      >
-                        <td className="px-4 py-4">
-                          <input
-                            type="checkbox"
-                            aria-label={`Select ${listing.title}`}
-                            checked={isSelected}
-                            onChange={() => toggleListingSelection(listing.id)}
-                            className="h-4 w-4 rounded border-white/30 bg-white/10 text-blue-500 focus:ring-blue-400"
-                          />
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            {/* Product Thumbnail */}
-                            {(() => {
-                              const images = parseImageUrls(listing.imageUrls);
-                              return images.length > 0 ? (
-                                <button
-                                  onClick={() => openImageModal(listing)}
-                                  className="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 border-white/20 hover:border-blue-400/50 transition-all duration-300 group ring-2 ring-white/10 hover:ring-blue-400/30"
-                                >
-                                  <img
-                                    src={images[0]}
-                                    alt={listing.title}
-                                    className="w-full h-full object-cover"
-                                    onError={(e) => {
-                                      e.currentTarget.style.display = 'none';
-                                      e.currentTarget.nextElementSibling?.classList.remove(
-                                        'hidden'
-                                      );
-                                    }}
-                                  />
-                                  <div className="hidden absolute inset-0 flex items-center justify-center bg-white/10">
-                                    <ImageIcon className="w-6 h-6 text-blue-200/50" />
-                                  </div>
-                                  {images.length > 1 && (
-                                    <div className="absolute bottom-1 right-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
-                                      +{images.length - 1}
-                                    </div>
-                                  )}
-                                  <div className="absolute inset-0 bg-gradient-to-t from-blue-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                                </button>
-                              ) : (
-                                <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-white/10 flex items-center justify-center border border-white/20">
-                                  <ImageIcon className="w-6 h-6 text-blue-200/50" />
-                                </div>
-                              );
-                            })()}
-                            <div className="max-w-xs">
-                              <p className="font-medium text-white truncate">{listing.title}</p>
-                              {listing.location && (
-                                <p className="text-sm text-blue-200/70">{listing.location}</p>
-                              )}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`px-3 py-1 rounded-lg text-xs font-medium shadow-lg ${getPlatformColor(
-                              listing.platform
-                            )}`}
-                          >
-                            {listing.platform.replace('_', ' ')}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 font-medium text-white">
-                          {formatCurrency(listing.askingPrice)}
-                        </td>
-                        <td className="px-6 py-4 text-blue-200/70">
-                          {listing.estimatedValue ? formatCurrency(listing.estimatedValue) : '-'}
-                        </td>
-                        <td className="px-6 py-4">
-                          {listing.profitPotential !== null && (
-                            <span
-                              className={`font-bold ${
-                                listing.profitPotential > 0
-                                  ? 'bg-gradient-to-r from-green-300 to-emerald-300 bg-clip-text text-transparent'
-                                  : 'bg-gradient-to-r from-red-300 to-pink-300 bg-clip-text text-transparent'
-                              }`}
-                            >
-                              {listing.profitPotential > 0 ? '+' : ''}
-                              {formatCurrency(listing.profitPotential)}
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`px-3 py-1 rounded-lg text-xs font-medium shadow-lg ${getScoreColor(
-                              listing.valueScore
-                            )}`}
-                          >
-                            {listing.valueScore ?? '-'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`px-3 py-1 rounded-lg text-xs font-medium shadow-lg ${
-                              listing.discountPercent && listing.discountPercent >= 90
-                                ? 'bg-gradient-to-r from-green-400 to-green-600 text-white border border-green-400/50'
-                                : listing.discountPercent && listing.discountPercent >= 70
-                                  ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white border border-yellow-400/50'
-                                  : 'bg-gradient-to-r from-gray-400 to-gray-600 text-white border border-gray-400/50'
-                            }`}
-                          >
-                            {formatPercent(listing.discountPercent)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <a
-                              href={listing.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-2 hover:bg-white/10 rounded-lg transition-all duration-300 hover:scale-110 group"
-                              title="View listing"
-                            >
-                              <ExternalLink className="w-4 h-4 text-blue-200/70 group-hover:text-blue-300" />
-                            </a>
-                            {!listing.opportunity && (
-                              <button
-                                onClick={() => markAsOpportunity(listing.id)}
-                                className="p-2 bg-gradient-to-r from-green-400/20 to-emerald-600/20 hover:from-green-400/40 hover:to-emerald-600/40 rounded-lg transition-all duration-300 hover:scale-110 shadow-lg shadow-green-500/30 hover:shadow-green-500/50"
-                                title="Mark as opportunity"
-                              >
-                                <Plus className="w-4 h-4 text-green-300" />
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="mt-8 backdrop-blur-xl bg-white/10 rounded-xl p-6 border border-white/20 shadow-xl">
-          <h2 className="text-lg font-semibold bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-transparent mb-4">
-            Quick Actions
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <a
-              href="/scraper"
-              className="group flex items-center gap-3 p-4 backdrop-blur-sm bg-gradient-to-r from-purple-400/20 to-purple-600/20 rounded-lg hover:from-purple-400/30 hover:to-purple-600/30 transition-all duration-300 border border-purple-400/30 hover:border-purple-400/50 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 hover:scale-105"
-            >
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/50 group-hover:scale-110 transition-transform duration-300">
-                <Search className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <p className="font-medium text-white">Scrape Craigslist</p>
-                <p className="text-sm text-purple-200/70">Find local deals</p>
-              </div>
-            </a>
-            <a
-              href="/opportunities"
-              className="group flex items-center gap-3 p-4 backdrop-blur-sm bg-gradient-to-r from-green-400/20 to-emerald-600/20 rounded-lg hover:from-green-400/30 hover:to-emerald-600/30 transition-all duration-300 border border-green-400/30 hover:border-green-400/50 shadow-lg shadow-green-500/20 hover:shadow-green-500/40 hover:scale-105"
-            >
-              <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg shadow-green-500/50 group-hover:scale-110 transition-transform duration-300">
-                <Star className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <p className="font-medium text-white">View Opportunities</p>
-                <p className="text-sm text-green-200/70">Track your flips</p>
-              </div>
-            </a>
-            <a
-              href="/settings"
-              className="group flex items-center gap-3 p-4 backdrop-blur-sm bg-gradient-to-r from-blue-400/20 to-blue-600/20 rounded-lg hover:from-blue-400/30 hover:to-blue-600/30 transition-all duration-300 border border-blue-400/30 hover:border-blue-400/50 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:scale-105"
-            >
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-300">
-                <Filter className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <p className="font-medium text-white">Search Settings</p>
-                <p className="text-sm text-blue-200/70">Configure scrapers</p>
-              </div>
-            </a>
-          </div>
-        </div>
-      </main>
-
-      {/* Image Gallery Modal */}
-      {imageModal.isOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
-          onClick={closeImageModal}
-        >
-          <div
-            className="relative max-w-4xl max-h-[90vh] w-full mx-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close button */}
-            <button
-              onClick={closeImageModal}
-              className="absolute -top-12 right-0 p-2 text-white hover:text-red-300 transition-all duration-300 hover:scale-110 bg-white/10 rounded-lg hover:bg-red-500/20"
-            >
-              <X className="w-6 h-6" />
-            </button>
-
-            {/* Title */}
-            <div className="absolute -top-12 left-0 text-white text-sm truncate max-w-[80%] bg-white/10 px-3 py-1 rounded-lg backdrop-blur-sm">
-              {imageModal.title}
+                Start Free
+              </button>
             </div>
 
-            {/* Main image */}
-            <div className="relative backdrop-blur-xl bg-white/10 rounded-xl overflow-hidden border border-white/20 shadow-2xl">
-              <img
-                src={imageModal.images[imageModal.currentIndex]}
-                alt={`${imageModal.title} - Image ${imageModal.currentIndex + 1}`}
-                className="w-full max-h-[80vh] object-contain"
-              />
-
-              {/* Navigation arrows */}
-              {imageModal.images.length > 1 && (
-                <>
-                  <button
-                    onClick={prevImage}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 p-3 backdrop-blur-xl bg-white/20 hover:bg-white/30 text-white rounded-full transition-all duration-300 hover:scale-110 shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 border border-white/20"
-                  >
-                    <ChevronLeft className="w-6 h-6" />
-                  </button>
-                  <button
-                    onClick={nextImage}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-3 backdrop-blur-xl bg-white/20 hover:bg-white/30 text-white rounded-full transition-all duration-300 hover:scale-110 shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 border border-white/20"
-                  >
-                    <ChevronRight className="w-6 h-6" />
-                  </button>
-                </>
-              )}
-
-              {/* Image counter */}
-              {imageModal.images.length > 1 && (
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 backdrop-blur-xl bg-white/20 text-white text-sm px-4 py-2 rounded-full border border-white/20 shadow-lg">
-                  {imageModal.currentIndex + 1} / {imageModal.images.length}
-                </div>
-              )}
-            </div>
-
-            {/* Thumbnail strip */}
-            {imageModal.images.length > 1 && (
-              <div className="flex gap-2 mt-4 justify-center overflow-x-auto pb-2">
-                {imageModal.images.map((img, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setImageModal((prev) => ({ ...prev, currentIndex: index }))}
-                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
-                      index === imageModal.currentIndex
-                        ? 'border-blue-400 shadow-lg shadow-blue-500/50 scale-110'
-                        : 'border-white/20 hover:border-blue-400/50 hover:scale-105'
-                    }`}
-                  >
-                    <img
-                      src={img}
-                      alt={`Thumbnail ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Floating Bulk Action Bar */}
-      <div
-        className={`fixed bottom-0 left-0 right-0 z-40 transform transition-all duration-500 ease-out ${
-          selectedListingIds.size > 0
-            ? 'translate-y-0 opacity-100'
-            : 'translate-y-full opacity-0 pointer-events-none'
-        }`}
-      >
-        <div className="max-w-4xl mx-auto px-4 pb-6">
-          <div className="backdrop-blur-xl bg-slate-900/95 rounded-2xl border border-white/20 shadow-2xl shadow-purple-500/20 p-4">
-            <div className="flex items-center justify-between gap-4">
-              {/* Selection info */}
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/50">
-                  <CheckCircle2 className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-white font-medium">
-                    {selectedListingIds.size} item{selectedListingIds.size !== 1 ? 's' : ''}{' '}
-                    selected
-                  </p>
-                  <button
-                    onClick={clearSelection}
-                    className="text-sm text-blue-300 hover:text-blue-200 transition-colors"
-                  >
-                    Clear selection
-                  </button>
-                </div>
-              </div>
-
-              {/* Action buttons */}
-              <div className="flex items-center gap-2">
-                {/* Add to Opportunities */}
-                <button
-                  onClick={bulkAddToOpportunities}
-                  disabled={bulkActionLoading !== null}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-medium"
-                >
-                  {bulkActionLoading === 'opportunities' ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Star className="w-4 h-4" />
-                  )}
-                  <span className="hidden sm:inline">Add to Opportunities</span>
-                  <span className="sm:hidden">Opportunities</span>
-                </button>
-
-                {/* Status Dropdown */}
-                <div className="relative">
-                  <button
-                    onClick={() => setShowStatusDropdown(!showStatusDropdown)}
-                    disabled={bulkActionLoading !== null}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-medium"
-                  >
-                    {bulkActionLoading === 'status' ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Filter className="w-4 h-4" />
-                    )}
-                    <span className="hidden sm:inline">Update Status</span>
-                    <span className="sm:hidden">Status</span>
-                  </button>
-
-                  {/* Status dropdown menu */}
-                  {showStatusDropdown && (
-                    <>
-                      <div
-                        className="fixed inset-0 z-10"
-                        onClick={() => setShowStatusDropdown(false)}
-                      />
-                      <div className="absolute bottom-full left-0 mb-2 z-20 min-w-[180px] backdrop-blur-xl bg-slate-800/95 rounded-xl border border-white/20 shadow-2xl overflow-hidden">
-                        {['NEW', 'OPPORTUNITY', 'CONTACTED', 'PURCHASED', 'SOLD'].map((status) => (
-                          <button
-                            key={status}
-                            onClick={() => bulkUpdateStatus(status)}
-                            className="w-full px-4 py-3 text-left text-white hover:bg-white/10 transition-colors flex items-center gap-2 first:rounded-t-xl last:rounded-b-xl"
-                          >
-                            <div
-                              className={`w-2 h-2 rounded-full ${
-                                status === 'NEW'
-                                  ? 'bg-gray-400'
-                                  : status === 'OPPORTUNITY'
-                                    ? 'bg-green-400'
-                                    : status === 'CONTACTED'
-                                      ? 'bg-blue-400'
-                                      : status === 'PURCHASED'
-                                        ? 'bg-purple-400'
-                                        : 'bg-emerald-400'
-                              }`}
-                            />
-                            {status.charAt(0) + status.slice(1).toLowerCase()}
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {/* Delete button */}
-                <button
-                  onClick={() => setShowDeleteModal(true)}
-                  disabled={bulkActionLoading !== null}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl hover:from-red-600 hover:to-pink-700 transition-all duration-300 shadow-lg shadow-red-500/30 hover:shadow-red-500/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-medium"
-                >
-                  {bulkActionLoading === 'delete' ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Trash2 className="w-4 h-4" />
-                  )}
-                  <span className="hidden sm:inline">Delete</span>
-                </button>
-              </div>
-            </div>
+            <p className="text-sm text-blue-200/60">
+              ✨ Free trial • No credit card required • Cancel anytime
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
-          onClick={() => setShowDeleteModal(false)}
-        >
-          <div
-            className="relative max-w-md w-full mx-4 backdrop-blur-xl bg-slate-900/95 rounded-2xl border border-white/20 shadow-2xl shadow-red-500/20 p-6 animate-in zoom-in-95 duration-200"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Warning icon */}
-            <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/50 animate-pulse">
-                <AlertTriangle className="w-8 h-8 text-white" />
-              </div>
+      {/* Features Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <h3 className="text-3xl font-bold text-white text-center mb-12">
+          Everything You Need to Flip Like a Pro
+        </h3>
+        
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Feature 1 */}
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-purple-500/50 transition-all">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mb-4">
+              <Search className="w-6 h-6 text-white" />
             </div>
+            <h4 className="text-xl font-semibold text-white mb-2">Multi-Platform Scanning</h4>
+            <p className="text-blue-200/70">
+              Search Craigslist, Facebook Marketplace, eBay, OfferUp, and Mercari simultaneously. Never miss a deal.
+            </p>
+          </div>
 
-            {/* Content */}
-            <div className="text-center mb-6">
-              <h3 className="text-xl font-bold text-white mb-2">Delete Listings?</h3>
-              <p className="text-blue-200/70">
-                You&apos;re about to delete{' '}
-                <span className="text-white font-semibold">{selectedListingIds.size}</span> listing
-                {selectedListingIds.size !== 1 ? 's' : ''}. This action cannot be undone.
-              </p>
+          {/* Feature 2 */}
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-purple-500/50 transition-all">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center mb-4">
+              <TrendingUp className="w-6 h-6 text-white" />
             </div>
+            <h4 className="text-xl font-semibold text-white mb-2">AI Value Detection</h4>
+            <p className="text-blue-200/70">
+              Claude AI analyzes every listing to estimate market value and profit potential in seconds.
+            </p>
+          </div>
 
-            {/* Actions */}
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="flex-1 px-4 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all duration-300 font-medium border border-white/20"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={bulkDelete}
-                className="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl hover:from-red-600 hover:to-pink-700 transition-all duration-300 shadow-lg shadow-red-500/30 hover:shadow-red-500/50 font-medium"
-              >
-                Delete {selectedListingIds.size} item{selectedListingIds.size !== 1 ? 's' : ''}
-              </button>
+          {/* Feature 3 */}
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-purple-500/50 transition-all">
+            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center mb-4">
+              <DollarSign className="w-6 h-6 text-white" />
             </div>
+            <h4 className="text-xl font-semibold text-white mb-2">Profit Calculator</h4>
+            <p className="text-blue-200/70">
+              See instant profit projections including fees, shipping, and resale difficulty ratings.
+            </p>
+          </div>
+
+          {/* Feature 4 */}
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-purple-500/50 transition-all">
+            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mb-4">
+              <Zap className="w-6 h-6 text-white" />
+            </div>
+            <h4 className="text-xl font-semibold text-white mb-2">Real-Time Alerts</h4>
+            <p className="text-blue-200/70">
+              Get instant notifications when high-value opportunities appear. Beat the competition.
+            </p>
+          </div>
+
+          {/* Feature 5 */}
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-purple-500/50 transition-all">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-lg flex items-center justify-center mb-4">
+              <BarChart className="w-6 h-6 text-white" />
+            </div>
+            <h4 className="text-xl font-semibold text-white mb-2">Market Insights</h4>
+            <p className="text-blue-200/70">
+              Track trends, sold listings, and pricing history to make data-driven flipping decisions.
+            </p>
+          </div>
+
+          {/* Feature 6 */}
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-purple-500/50 transition-all">
+            <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-rose-500 rounded-lg flex items-center justify-center mb-4">
+              <Shield className="w-6 h-6 text-white" />
+            </div>
+            <h4 className="text-xl font-semibold text-white mb-2">Scam Detection</h4>
+            <p className="text-blue-200/70">
+              AI flags suspicious listings, fake prices, and scams before you waste time.
+            </p>
           </div>
         </div>
-      )}
-    </div>
-  );
-}
+      </div>
 
-// Wrap with Suspense for useSearchParams
-export default function Dashboard() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-          <div className="w-12 h-12 border-4 border-blue-400/30 border-t-blue-400 rounded-full animate-spin"></div>
+      {/* Pricing Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <h3 className="text-3xl font-bold text-white text-center mb-12">
+          Simple, Transparent Pricing
+        </h3>
+        
+        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          {/* Free Tier */}
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10">
+            <h4 className="text-xl font-semibold text-white mb-2">Free</h4>
+            <p className="text-4xl font-bold text-white mb-4">$0<span className="text-lg text-blue-200/60">/mo</span></p>
+            <ul className="space-y-3 mb-6 text-blue-200/80">
+              <li>✓ 5 scans per day</li>
+              <li>✓ Basic AI analysis</li>
+              <li>✓ 1 marketplace</li>
+              <li>✓ Email alerts</li>
+            </ul>
+            <button className="w-full px-4 py-2 border border-white/20 text-white rounded-lg hover:bg-white/10 transition-all">
+              Start Free
+            </button>
+          </div>
+
+          {/* Pro Tier */}
+          <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm rounded-xl p-8 border-2 border-purple-500 scale-105 shadow-2xl">
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-semibold px-3 py-1 rounded-full w-fit mb-4">
+              MOST POPULAR
+            </div>
+            <h4 className="text-xl font-semibold text-white mb-2">Pro</h4>
+            <p className="text-4xl font-bold text-white mb-4">$29<span className="text-lg text-blue-200/60">/mo</span></p>
+            <ul className="space-y-3 mb-6 text-blue-200/80">
+              <li>✓ Unlimited scans</li>
+              <li>✓ Advanced AI analysis</li>
+              <li>✓ All 5 marketplaces</li>
+              <li>✓ Real-time alerts</li>
+              <li>✓ Profit tracking</li>
+            </ul>
+            <button
+              onClick={handleGetStarted}
+              className="w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-xl hover:scale-105 transition-all"
+            >
+              Start Pro Trial
+            </button>
+          </div>
+
+          {/* Business Tier */}
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10">
+            <h4 className="text-xl font-semibold text-white mb-2">Business</h4>
+            <p className="text-4xl font-bold text-white mb-4">$99<span className="text-lg text-blue-200/60">/mo</span></p>
+            <ul className="space-y-3 mb-6 text-blue-200/80">
+              <li>✓ Everything in Pro</li>
+              <li>✓ API access</li>
+              <li>✓ Team collaboration</li>
+              <li>✓ Custom alerts</li>
+              <li>✓ Priority support</li>
+            </ul>
+            <button className="w-full px-4 py-2 border border-white/20 text-white rounded-lg hover:bg-white/10 transition-all">
+              Contact Sales
+            </button>
+          </div>
         </div>
-      }
-    >
-      <DashboardContent />
-    </Suspense>
+      </div>
+
+      {/* CTA Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-sm rounded-2xl p-12 border border-purple-500/30 text-center">
+          <h3 className="text-3xl font-bold text-white mb-4">
+            Ready to Start Flipping Smarter?
+          </h3>
+          <p className="text-xl text-blue-200/80 mb-8 max-w-2xl mx-auto">
+            Join thousands of flippers making consistent profits with AI-powered deal detection.
+          </p>
+          <button
+            onClick={handleGetStarted}
+            className="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg rounded-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all"
+          >
+            Start Your Free Trial
+          </button>
+          <p className="text-sm text-blue-200/60 mt-4">
+            No credit card required • 14-day free trial
+          </p>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="border-t border-white/10 mt-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <div className="text-2xl">🐧</div>
+              <span className="text-white font-semibold">Flipper.ai</span>
+            </div>
+            <div className="flex gap-6 text-blue-200/60 text-sm">
+              <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+              <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+              <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
+            </div>
+          </div>
+          <div className="mt-8 text-center text-blue-200/40 text-sm">
+            © 2026 Flipper.ai by Axovia AI. All rights reserved.
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 }
