@@ -25,7 +25,10 @@
     "test:bdd:watch": "nodemon --watch features --exec 'cucumber-js --profile dev'",
     "test:all": "npm run test && npm run test:bdd && npm run test:e2e",
     "test:perf": "jest --testPathPattern=performance --no-coverage",
-    "test:load": "tsx src/__tests__/performance/load-test.ts"
+    "test:load": "tsx src/__tests__/performance/load-test.ts",
+    "test:acceptance": "playwright test e2e/acceptance/",
+    "test:acceptance:ui": "playwright test e2e/acceptance/ --ui",
+    "test:acceptance:headed": "playwright test e2e/acceptance/ --headed"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",
