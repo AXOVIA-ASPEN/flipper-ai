@@ -6,7 +6,7 @@
 const FUNCTIONS_BASE_URL = process.env.NEXT_PUBLIC_FUNCTIONS_URL || 
   `https://us-east1-${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}.cloudfunctions.net`;
 
-interface CloudFunctionResponse<T = any> {
+interface CloudFunctionResponse<T = unknown> {
   success: boolean;
   message?: string;
   error?: string;
@@ -18,9 +18,9 @@ interface CloudFunctionResponse<T = any> {
 /**
  * Call a Cloud Function
  */
-export async function callCloudFunction<T = any>(
+export async function callCloudFunction<T = unknown>(
   functionName: string,
-  data: Record<string, any>,
+  data: Record<string, unknown>,
   options: {
     timeout?: number;
     signal?: AbortSignal;

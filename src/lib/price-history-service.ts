@@ -4,7 +4,6 @@
 import { prisma } from './db';
 import {
   fetchMarketPrice,
-  fetchMarketPricesBatch,
   type MarketPrice,
   type SoldListing,
 } from './market-price';

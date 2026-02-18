@@ -20,7 +20,7 @@ const SECURITY_HEADERS: Record<string, string> = {
     "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://api.stripe.com wss:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
 };
 
-export function middleware(_request: NextRequest) {
+export function middleware() {
   const response = NextResponse.next();
 
   // Apply security headers on all routes

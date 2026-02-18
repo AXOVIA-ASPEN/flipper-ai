@@ -29,14 +29,6 @@ export interface ClaudeAnalysisResult {
   targetBuyer?: string;
 }
 
-interface CachedAnalysis {
-  id: string;
-  listingId: string;
-  analysisResult: string; // JSON
-  createdAt: Date;
-  expiresAt: Date;
-}
-
 /**
  * Check if we have a cached analysis for this listing
  */
