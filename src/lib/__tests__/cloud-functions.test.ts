@@ -123,6 +123,46 @@ describe('cloud-functions', () => {
       jest.advanceTimersByTime(300000);
       expect(mockFetch).toHaveBeenCalledTimes(1);
     });
+
+    it('should respect custom abort signal', async () => {
+      const mockResponse = { success: true };
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      } as Response);
+
+      const customController = new AbortController();
+      const result = await callCloudFunction(
+        'testFunction',
+        { param: 'value' },
+        { signal: customController.signal }
+      );
+
+      expect(result).toEqual(mockResponse);
+      expect(mockFetch).toHaveBeenCalledWith(
+        `${FUNCTIONS_BASE_URL}/testFunction`,
+        expect.objectContaining({
+          signal: customController.signal,
+        })
+      );
+    });
+
+    it('should handle custom signal abort', async () => {
+      const customController = new AbortController();
+      const abortError = new Error('AbortError');
+      abortError.name = 'AbortError';
+      mockFetch.mockRejectedValueOnce(abortError);
+
+      const promise = callCloudFunction(
+        'testFunction',
+        {},
+        { signal: customController.signal }
+      );
+
+      customController.abort();
+
+      await expect(promise).rejects.toThrow('Cloud Function request timed out');
+    });
   });
 
   describe('scrapeCraigslist', () => {
