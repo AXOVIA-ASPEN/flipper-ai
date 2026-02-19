@@ -12,7 +12,9 @@ import { defineConfig, devices } from '@playwright/test';
  * `next start` via webServer config below.
  */
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
+// In CI, always use localhost:3000 (webServer will auto-start `next start`).
+// Locally, default to :3001 (assumes PM2 staging server is running).
+const BASE_URL = process.env.BASE_URL || (process.env.CI ? 'http://localhost:3000' : 'http://localhost:3001');
 
 export default defineConfig({
   testDir: './e2e',
@@ -35,7 +37,7 @@ export default defineConfig({
     ? {
         command: 'npx next start -p 3000',
         url: 'http://localhost:3000',
-        reuseExistingServer: true,
+        reuseExistingServer: !process.env.CI, // In CI, always start fresh
         timeout: 120_000,
         env: {
           DATABASE_URL: process.env.DATABASE_URL || 'file:./dev.db',
