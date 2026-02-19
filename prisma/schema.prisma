@@ -1,0 +1,313 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Listing {
+  id                  String             @id @default(cuid())
+  userId              String?
+  externalId          String
+  platform            String
+  url                 String
+  title               String
+  description         String?
+  askingPrice         Float
+  condition           String?
+  location            String?
+  sellerName          String?
+  sellerContact       String?
+  imageUrls           String?
+  category            String?
+  postedAt            DateTime?
+  scrapedAt           DateTime           @default(now())
+  estimatedValue      Float?
+  estimatedLow        Float?
+  estimatedHigh       Float?
+  profitPotential     Float?
+  profitLow           Float?
+  profitHigh          Float?
+  valueScore          Float?
+  discountPercent     Float?
+  resaleDifficulty    String?
+  status              String             @default("NEW")
+  comparableUrls      String?
+  priceReasoning      String?
+  notes               String?
+  shippable           Boolean?
+  estimatedWeight     Float?
+  negotiable          Boolean?
+  daysListed          Int?
+  tags                String?
+  requestToBuy        String?
+  identifiedBrand     String?
+  identifiedModel     String?
+  identifiedVariant   String?
+  identifiedCondition String?
+  verifiedMarketValue Float?
+  marketDataSource    String?
+  marketDataDate      DateTime?
+  comparableSalesJson String?
+  sellabilityScore    Int?
+  demandLevel         String?
+  expectedDaysToSell  Int?
+  authenticityRisk    String?
+  recommendedOffer    Float?
+  recommendedList     Float?
+  resaleStrategy      String?
+  trueDiscountPercent Float?
+  llmAnalyzed         Boolean            @default(false)
+  analysisDate        DateTime?
+  analysisConfidence  String?
+  analysisReasoning   String?
+  user                User?              @relation(fields: [userId], references: [id])
+  messages            Message[]
+  opportunity         Opportunity?
+  postingQueue        PostingQueueItem[]
+
+  @@unique([platform, externalId, userId])
+  @@index([userId])
+  @@index([platform])
+  @@index([status])
+  @@index([valueScore])
+  @@index([scrapedAt])
+  @@index([llmAnalyzed])
+  @@index([trueDiscountPercent])
+}
+
+model Opportunity {
+  id             String    @id @default(cuid())
+  userId         String?
+  listingId      String    @unique
+  purchasePrice  Float?
+  purchaseDate   DateTime?
+  purchaseNotes  String?
+  resalePrice    Float?
+  resalePlatform String?
+  resaleUrl      String?
+  resaleDate     DateTime?
+  actualProfit   Float?
+  fees           Float?
+  status         String    @default("IDENTIFIED")
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  listing        Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user           User?     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ScraperJob {
+  id                 String    @id @default(cuid())
+  userId             String?
+  platform           String
+  location           String?
+  category           String?
+  status             String    @default("PENDING")
+  listingsFound      Int       @default(0)
+  opportunitiesFound Int       @default(0)
+  errorMessage       String?
+  startedAt          DateTime?
+  completedAt        DateTime?
+  createdAt          DateTime  @default(now())
+  user               User?     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model SearchConfig {
+  id        String    @id @default(cuid())
+  userId    String?
+  name      String
+  platform  String
+  location  String
+  category  String?
+  keywords  String?
+  minPrice  Float?
+  maxPrice  Float?
+  enabled   Boolean   @default(true)
+  lastRun   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User?     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([enabled])
+}
+
+model PriceHistory {
+  id          String   @id @default(cuid())
+  productName String
+  category    String?
+  platform    String
+  soldPrice   Float
+  condition   String?
+  soldAt      DateTime
+  createdAt   DateTime @default(now())
+
+  @@index([productName])
+  @@index([category])
+}
+
+model User {
+  id                 String             @id @default(cuid())
+  email              String             @unique
+  emailVerified      DateTime?
+  name               String?
+  image              String?
+  password           String?
+  subscriptionTier   String             @default("FREE")
+  onboardingComplete Boolean            @default(false)
+  onboardingStep     Int                @default(0)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  accounts           Account[]
+  listings           Listing[]
+  messages           Message[]
+  opportunities      Opportunity[]
+  postingQueue       PostingQueueItem[]
+  scraperJobs        ScraperJob[]
+  searchConfigs      SearchConfig[]
+  sessions           Session[]
+  settings           UserSettings?
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model UserSettings {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  openaiApiKey       String?
+  llmModel           String   @default("gpt-4o-mini")
+  discountThreshold  Int      @default(50)
+  autoAnalyze        Boolean  @default(true)
+  emailNotifications Boolean  @default(true)
+  notifyNewDeals     Boolean  @default(true)
+  notifyPriceDrops   Boolean  @default(true)
+  notifySoldItems    Boolean  @default(true)
+  notifyExpiring     Boolean  @default(true)
+  notifyWeeklyDigest Boolean  @default(true)
+  notifyFrequency    String   @default("instant")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model FacebookToken {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  accessToken String
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Message {
+  id            String    @id @default(cuid())
+  userId        String
+  listingId     String?
+  direction     String
+  status        String    @default("DRAFT")
+  subject       String?
+  body          String
+  sellerName    String?
+  sellerContact String?
+  platform      String?
+  parentId      String?
+  sentAt        DateTime?
+  readAt        DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  listing       Listing?  @relation(fields: [listingId], references: [id])
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([listingId])
+  @@index([status])
+  @@index([direction])
+  @@index([createdAt])
+}
+
+model AiAnalysisCache {
+  id             String   @id @default(cuid())
+  listingId      String
+  analysisResult String
+  createdAt      DateTime @default(now())
+  expiresAt      DateTime
+
+  @@index([listingId])
+  @@index([expiresAt])
+}
+
+model PostingQueueItem {
+  id              String    @id @default(cuid())
+  userId          String
+  listingId       String
+  targetPlatform  String
+  status          String    @default("PENDING")
+  askingPrice     Float?
+  title           String?
+  description     String?
+  externalPostId  String?
+  externalPostUrl String?
+  errorMessage    String?
+  retryCount      Int       @default(0)
+  maxRetries      Int       @default(3)
+  scheduledAt     DateTime?
+  postedAt        DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  listing         Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([listingId, targetPlatform, userId])
+  @@index([userId])
+  @@index([status])
+  @@index([targetPlatform])
+  @@index([scheduledAt])
+}
