@@ -14,12 +14,12 @@ jest.mock('@/lib/db', () => ({
   __esModule: true,
   default: {
     priceHistory: {
-      findMany: (...args: unknown[]) => mockPriceHistoryFindMany(...args),
+      findMany: mockPriceHistoryFindMany,
     },
     listing: {
-      findMany: (...args: unknown[]) => mockListingFindMany(...args),
-      findUnique: (...args: unknown[]) => mockListingFindUnique(...args),
-      update: (...args: unknown[]) => mockListingUpdate(...args),
+      findMany: mockListingFindMany,
+      findUnique: mockListingFindUnique,
+      update: mockListingUpdate,
     },
   },
 }));
@@ -29,12 +29,7 @@ import {
   calculateVerifiedMarketValue,
   calculateTrueDiscount,
   updateListingWithVerifiedValue,
-  MarketValueResult,
 } from '@/lib/market-value-calculator';
-import prisma from '@/lib/db';
-
-// Get the mocked prisma
-const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 
 describe('Market Value Calculator', () => {
   beforeEach(() => {
@@ -43,7 +38,7 @@ describe('Market Value Calculator', () => {
 
   describe('calculateVerifiedMarketValue', () => {
     test('returns null for insufficient data (< 3 sales)', async () => {
-      (mockPrisma.priceHistory.findMany as jest.Mock).mockResolvedValue([
+      mockPriceHistoryFindMany.mockResolvedValue([
         { soldPrice: 400 },
         { soldPrice: 420 },
       ]);
@@ -54,7 +49,7 @@ describe('Market Value Calculator', () => {
 
     test('calculates median market value from sold data', async () => {
       const prices = [300, 320, 330, 340, 350, 360, 370, 380, 400];
-      (mockPrisma.priceHistory.findMany as jest.Mock).mockResolvedValue(
+      mockPriceHistoryFindMany.mockResolvedValue(
         prices.map((p) => ({
           soldPrice: p,
           soldAt: new Date(),
@@ -73,7 +68,7 @@ describe('Market Value Calculator', () => {
 
     test('removes outliers using IQR method', async () => {
       const prices = [300, 320, 330, 340, 350, 360, 370, 380, 400, 100, 800];
-      (mockPrisma.priceHistory.findMany as jest.Mock).mockResolvedValue(
+      mockPriceHistoryFindMany.mockResolvedValue(
         prices.map((p) => ({
           soldPrice: p,
           soldAt: new Date(),
@@ -93,7 +88,7 @@ describe('Market Value Calculator', () => {
 
     test('provides high confidence for large datasets with low variance', async () => {
       const prices = Array.from({ length: 15 }, (_, i) => 480 + i * 3);
-      (mockPrisma.priceHistory.findMany as jest.Mock).mockResolvedValue(
+      mockPriceHistoryFindMany.mockResolvedValue(
         prices.map((p) => ({
           soldPrice: p,
           soldAt: new Date(),
@@ -111,7 +106,7 @@ describe('Market Value Calculator', () => {
 
     test('provides low confidence for small datasets with high variance', async () => {
       const prices = [200, 350, 550, 700];
-      (mockPrisma.priceHistory.findMany as jest.Mock).mockResolvedValue(
+      mockPriceHistoryFindMany.mockResolvedValue(
         prices.map((p) => ({
           soldPrice: p,
           soldAt: new Date(),
@@ -130,7 +125,7 @@ describe('Market Value Calculator', () => {
     test('filters by age (maxAge parameter)', async () => {
       // Mock returns only recent sales (DB handles filtering)
       const recentPrices = [150, 155, 160];
-      (mockPrisma.priceHistory.findMany as jest.Mock).mockResolvedValue(
+      mockPriceHistoryFindMany.mockResolvedValue(
         recentPrices.map((p) => ({
           soldPrice: p,
           soldAt: new Date(),
@@ -148,7 +143,7 @@ describe('Market Value Calculator', () => {
 
     test('returns statistics in soldPriceRange', async () => {
       const prices = [100, 110, 120, 130, 140];
-      (mockPrisma.priceHistory.findMany as jest.Mock).mockResolvedValue(
+      mockPriceHistoryFindMany.mockResolvedValue(
         prices.map((p) => ({
           soldPrice: p,
           soldAt: new Date(),
@@ -203,19 +198,19 @@ describe('Market Value Calculator', () => {
         { id: 'l2', title: 'Item B', platform: 'EBAY', askingPrice: 200 },
       ];
 
-      (mockPrisma.listing.findMany as jest.Mock).mockResolvedValue(listings);
+      mockListingFindMany.mockResolvedValue(listings);
 
       // First listing: has market data → updated
-      (mockPrisma.listing.findUnique as jest.Mock)
+      mockListingFindUnique
         .mockResolvedValueOnce(listings[0])
         .mockResolvedValueOnce(listings[1]);
 
       const prices5 = [90, 100, 110, 120, 130];
-      (mockPrisma.priceHistory.findMany as jest.Mock)
+      mockPriceHistoryFindMany
         .mockResolvedValueOnce(prices5.map((p) => ({ soldPrice: p })))
         .mockResolvedValueOnce([]); // Second listing: no data → skipped
 
-      (mockPrisma.listing.update as jest.Mock).mockResolvedValue({
+      mockListingUpdate.mockResolvedValue({
         ...listings[0],
         verifiedMarketValue: 110,
       });
@@ -229,10 +224,10 @@ describe('Market Value Calculator', () => {
     test('counts errors when update throws', async () => {
       const { batchUpdateVerifiedValues } = require('@/lib/market-value-calculator');
 
-      (mockPrisma.listing.findMany as jest.Mock).mockResolvedValue([
+      mockListingFindMany.mockResolvedValue([
         { id: 'l1', title: 'Item', platform: 'EBAY', askingPrice: 100 },
       ]);
-      (mockPrisma.listing.findUnique as jest.Mock).mockRejectedValue(new Error('DB error'));
+      mockListingFindUnique.mockRejectedValue(new Error('DB error'));
 
       const result = await batchUpdateVerifiedValues();
       expect(result.errors).toBe(1);
@@ -241,10 +236,10 @@ describe('Market Value Calculator', () => {
     test('processes all platforms when none specified', async () => {
       const { batchUpdateVerifiedValues } = require('@/lib/market-value-calculator');
 
-      (mockPrisma.listing.findMany as jest.Mock).mockResolvedValue([]);
+      mockListingFindMany.mockResolvedValue([]);
       const result = await batchUpdateVerifiedValues();
       expect(result).toEqual({ updated: 0, skipped: 0, errors: 0 });
-      expect(mockPrisma.listing.findMany).toHaveBeenCalledWith(
+      expect(mockListingFindMany).toHaveBeenCalledWith(
         expect.objectContaining({ where: {} })
       );
     });
@@ -259,10 +254,10 @@ describe('Market Value Calculator', () => {
         askingPrice: 600,
       };
 
-      (mockPrisma.listing.findUnique as jest.Mock).mockResolvedValue(testListing);
+      mockListingFindUnique.mockResolvedValue(testListing);
 
       const soldPrices = [750, 780, 800, 820, 850];
-      (mockPrisma.priceHistory.findMany as jest.Mock).mockResolvedValue(
+      mockPriceHistoryFindMany.mockResolvedValue(
         soldPrices.map((p) => ({
           soldPrice: p,
           soldAt: new Date(),
@@ -271,7 +266,7 @@ describe('Market Value Calculator', () => {
         }))
       );
 
-      (mockPrisma.listing.update as jest.Mock).mockResolvedValue({
+      mockListingUpdate.mockResolvedValue({
         ...testListing,
         verifiedMarketValue: 800,
         marketDataSource: 'ebay_sold',
@@ -294,15 +289,15 @@ describe('Market Value Calculator', () => {
         askingPrice: 100,
       };
 
-      (mockPrisma.listing.findUnique as jest.Mock).mockResolvedValue(testListing);
-      (mockPrisma.priceHistory.findMany as jest.Mock).mockResolvedValue([]);
+      mockListingFindUnique.mockResolvedValue(testListing);
+      mockPriceHistoryFindMany.mockResolvedValue([]);
 
       const result = await updateListingWithVerifiedValue('test-listing-2');
       expect(result).toBeNull();
     });
 
     test('throws error for non-existent listing', async () => {
-      (mockPrisma.listing.findUnique as jest.Mock).mockResolvedValue(null);
+      mockListingFindUnique.mockResolvedValue(null);
 
       await expect(updateListingWithVerifiedValue('invalid-id')).rejects.toThrow(
         'Listing not found'
@@ -315,7 +310,7 @@ describe('Market Value Calculator', () => {
 describe('calculateVerifiedMarketValue - default platform parameter', () => {
   it('uses default platform (EBAY) when platform is not provided', async () => {
     // Covers the default parameter branch: platform: string = 'EBAY'
-    (mockPrisma.priceHistory.findMany as jest.Mock).mockResolvedValue([
+    mockPriceHistoryFindMany.mockResolvedValue([
       { soldPrice: 200, soldAt: new Date(), platform: 'EBAY', condition: 'Good' },
       { soldPrice: 220, soldAt: new Date(), platform: 'EBAY', condition: 'Good' },
       { soldPrice: 180, soldAt: new Date(), platform: 'EBAY', condition: 'Good' },
