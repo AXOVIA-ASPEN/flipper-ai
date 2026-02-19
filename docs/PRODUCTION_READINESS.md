@@ -101,11 +101,11 @@
 - [ ] FAQ for common issues
 
 ### Legal & Compliance
-- [ ] Privacy Policy published
-- [ ] Terms of Service published
-- [ ] GDPR compliance review (if EU users)
-- [ ] Data retention policy
-- [ ] Cookie consent banner (if needed)
+- [x] Privacy Policy published (app/privacy/page.tsx - 2026-02-19)
+- [x] Terms of Service published (app/terms/page.tsx - 2026-02-19)
+- [x] GDPR compliance review (Privacy Policy includes GDPR section)
+- [x] Data retention policy (Covered in Privacy Policy)
+- [ ] Cookie consent banner (if needed - optional for MVP)
 
 ### Business Readiness
 - [ ] Payment processing tested end-to-end (Stripe)
