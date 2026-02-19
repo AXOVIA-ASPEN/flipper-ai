@@ -8,6 +8,7 @@ import { SessionProvider } from '@/components/providers/SessionProvider';
 import { WebVitals } from '@/components/WebVitals';
 import Navigation from '@/components/Navigation';
 import { Analytics } from '@vercel/analytics/next';
+import { ToastProvider } from '@/components/ToastContainer';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -36,10 +37,12 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <SessionProvider>
           <ThemeProvider>
-            <ThemeStyles />
-            <WebVitals />
-            {children}
-            <Analytics />
+            <ToastProvider>
+              <ThemeStyles />
+              <WebVitals />
+              {children}
+              <Analytics />
+            </ToastProvider>
           </ThemeProvider>
         </SessionProvider>
       </body>
