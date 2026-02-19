@@ -111,7 +111,7 @@ function setupFetchMock() {
   });
 }
 
-import Dashboard from '@/app/page';
+import Dashboard from '@/app/dashboard/page';
 
 describe('Dashboard', () => {
   beforeEach(() => {
