@@ -7,6 +7,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/db';
 import { emailService } from '@/lib/email-service';
+import { captureError } from '@/lib/error-tracker';
+import { metrics } from '@/lib/metrics';
 
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, ConflictError } from '@/lib/errors';
 interface RegisterBody {
@@ -16,6 +18,8 @@ interface RegisterBody {
 }
 
 export async function POST(request: NextRequest) {
+  metrics.increment('registration_attempts');
+  
   try {
     const body: RegisterBody = await request.json();
     const { email, password, name } = body;
@@ -64,6 +68,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    metrics.increment('registration_success');
+
     // Create default settings separately
     try {
       await prisma.userSettings.create({
@@ -75,17 +81,26 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch (settingsError) {
-      console.error('Failed to create UserSettings:', settingsError);
+      captureError(settingsError instanceof Error ? settingsError : new Error(String(settingsError)), {
+        route: '/api/auth/register',
+        action: 'create_user_settings',
+      });
       // If UserSettings creation fails, roll back by deleting the user
       await prisma.user.delete({ where: { id: user.id } }).catch((deleteErr) => {
-        console.error('Failed to rollback user creation:', deleteErr);
+        captureError(deleteErr instanceof Error ? deleteErr : new Error(String(deleteErr)), {
+          route: '/api/auth/register',
+          action: 'rollback_user_creation',
+        });
       });
       throw new Error('Failed to initialize user settings - database migration may be required');
     }
 
     // Send welcome email (non-blocking — don't fail registration if email fails)
     emailService.sendWelcome({ name: user.name ?? undefined, email: user.email }).catch((err) => {
-      console.error('Failed to send welcome email:', err);
+      captureError(err instanceof Error ? err : new Error(String(err)), {
+        route: '/api/auth/register',
+        action: 'send_welcome_email',
+      });
     });
 
     return NextResponse.json({
@@ -100,7 +115,11 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Registration error:', error);
+    metrics.increment('registration_failures');
+    captureError(error instanceof Error ? error : new Error(String(error)), {
+      route: '/api/auth/register',
+      action: 'register',
+    });
     
     // More detailed error message for debugging
     const errorMessage = error instanceof Error ? error.message : 'Failed to create account';

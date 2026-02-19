@@ -32,6 +32,18 @@ jest.mock('@/lib/email-service', () => ({
   },
 }));
 
+// Mock error-tracker and metrics
+const mockCaptureError = jest.fn();
+const mockMetricsIncrement = jest.fn();
+jest.mock('@/lib/error-tracker', () => ({
+  captureError: (...args: unknown[]) => mockCaptureError(...args),
+}));
+jest.mock('@/lib/metrics', () => ({
+  metrics: {
+    increment: (...args: unknown[]) => mockMetricsIncrement(...args),
+  },
+}));
+
 function createRequest(body: object) {
   return new NextRequest('http://localhost/api/auth/register', {
     method: 'POST',
@@ -140,8 +152,6 @@ describe('POST /api/auth/register', () => {
     // Make sendWelcome reject to exercise the .catch() error handler
     mockSendWelcome.mockRejectedValue(new Error('SMTP connection failed'));
 
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-
     const res = await POST(
       createRequest({ email: 'test@example.com', password: 'password123', name: 'Test User' })
     );
@@ -153,12 +163,13 @@ describe('POST /api/auth/register', () => {
 
     // Give the non-blocking .catch() a tick to execute
     await new Promise((r) => setImmediate(r));
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Failed to send welcome email:',
-      expect.any(Error)
+    expect(mockCaptureError).toHaveBeenCalledWith(
+      expect.any(Error),
+      expect.objectContaining({
+        route: '/api/auth/register',
+        action: 'send_welcome_email',
+      })
     );
-
-    consoleSpy.mockRestore();
   });
 
   it('returns 500 on unexpected error', async () => {
