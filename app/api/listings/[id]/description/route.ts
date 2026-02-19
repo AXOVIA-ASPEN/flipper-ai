@@ -3,7 +3,7 @@ import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
 import OpenAI from 'openai';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, AppError, ErrorCode } from '@/lib/errors';
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
@@ -109,7 +109,7 @@ Return ONLY a JSON object with these fields:
     /* istanbul ignore next -- optional chain null branch is a defensive guard for malformed API response */
     const content = completion.choices[0]?.message?.content;
     if (!content) {
-      throw new AppError(ErrorCode.INTERNAL_ERROR, 'AI failed to generate description');
+      throw new AppError(ErrorCode.EXTERNAL_SERVICE_ERROR, 'AI failed to generate description');
     }
 
     const generated = JSON.parse(content);
@@ -127,8 +127,7 @@ Return ONLY a JSON object with these fields:
       source: 'ai',
     });
   } catch (error) {
-    console.error('Error generating description:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to generate description');
+    return handleError(error, request.url);
   }
 }
 
