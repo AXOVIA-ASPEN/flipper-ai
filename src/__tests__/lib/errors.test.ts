@@ -52,7 +52,7 @@ describe('Error Handling Module', () => {
       expect(response.status).toBe(404);
       expect(data.success).toBe(false);
       expect(data.error.code).toBe(ErrorCode.NOT_FOUND);
-      expect(data.error.message).toBe('User not found');
+      expect(data.error.detail).toBe('User not found');
       expect(data.error.details).toBeUndefined();
     });
 
@@ -81,7 +81,8 @@ describe('Error Handling Module', () => {
 
       expect(response.status).toBe(403);
       expect(data.error.code).toBe(ErrorCode.FORBIDDEN);
-      expect(data.error.message).toBe('No access');
+      // User-friendly message for FORBIDDEN
+      expect(data.error.detail).toBe("You don't have permission to access this resource.");
       expect(data.error.details).toEqual({ role: 'guest' });
     });
 
@@ -127,7 +128,8 @@ describe('Error Handling Module', () => {
 
       expect(response.status).toBe(500);
       expect(data.error.code).toBe(ErrorCode.INTERNAL_ERROR);
-      expect(data.error.message).toBe('Something unexpected happened');
+      // Expect user-friendly message in production
+      expect(data.error.detail).toBe('Something went wrong. Our team has been notified.');
     });
 
     it('handles unknown error types (string)', async () => {
@@ -136,7 +138,8 @@ describe('Error Handling Module', () => {
 
       expect(response.status).toBe(500);
       expect(data.error.code).toBe(ErrorCode.INTERNAL_ERROR);
-      expect(data.error.message).toBe('An unexpected error occurred');
+      // Expect user-friendly message for unknown errors
+      expect(data.error.detail).toBe('Something went wrong. Our team has been notified.');
     });
 
     it('handles unknown error types (null)', async () => {
@@ -156,7 +159,10 @@ describe('Error Handling Module', () => {
     it('logs unexpected errors', () => {
       const spy = jest.spyOn(console, 'error').mockImplementation();
       handleError(new Error('unexpected'));
-      expect(spy).toHaveBeenCalledWith('Unhandled error:', expect.any(Error));
+      expect(spy).toHaveBeenCalledWith('Unhandled error:', expect.objectContaining({
+        message: 'unexpected',
+        stack: expect.any(String)
+      }));
       spy.mockRestore();
     });
 
