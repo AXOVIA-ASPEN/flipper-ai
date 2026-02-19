@@ -327,7 +327,7 @@ export async function POST(request: NextRequest) {
         const verifiedMarketValue = marketValue?.verifiedMarketValue || null;
         const marketDataSource = marketValue?.marketDataSource || null;
         const trueDiscountPercent = marketValue
-          ? calculateTrueDiscount(marketValue.verifiedMarketValue, analyzed.price)
+          ? calculateTrueDiscount(marketValue.verifiedMarketValue, analyzed.askingPrice)
           : null;
 
         // Prepare storage data
