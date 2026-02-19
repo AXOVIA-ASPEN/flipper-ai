@@ -533,15 +533,23 @@ export async function GET() {
  * Scrapes Mercari listings based on search parameters
  */
 export async function POST(request: NextRequest) {
+  // Auth check must be first — before parsing body
+  let userId: string;
   try {
-    const userId = await getAuthUserId();
-    if (!userId) {
-      throw new UnauthorizedError('Unauthorized');
+    const authUserId = await getAuthUserId();
+    if (!authUserId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    userId = authUserId;
+  } catch {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
     const body: ScrapeRequestBody = await request.json();
 
     if (!body.keywords || body.keywords.trim().length === 0) {
-      throw new ValidationError('keywords is required');
+      return NextResponse.json({ error: 'keywords is required' }, { status: 400 });
     }
 
     const sanitizedLimit = Math.min(body.limit ?? DEFAULT_LIMIT, MAX_LIMIT);
