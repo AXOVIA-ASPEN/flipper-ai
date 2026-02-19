@@ -1,21 +1,21 @@
-import { PrismaClient } from '@prisma/client';
+/**
+ * Database Stub - Temporary during Firebase migration
+ * 
+ * This prevents build errors while we migrate from Prisma to Firestore.
+ * Routes using this will return "Not implemented" until migrated.
+ */
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-};
-
-function createPrismaClient() {
-  if (!process.env.DATABASE_URL) {
-    throw new Error('DATABASE_URL environment variable is not set');
+const prismaStub = new Proxy({}, {
+  get(target, prop) {
+    return new Proxy({}, {
+      get(target, method) {
+        return () => {
+          throw new Error(`Prisma method ${String(prop)}.${String(method)}() not available - route needs Firebase migration`);
+        };
+      }
+    });
   }
-  
-  return new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-  });
-}
+});
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
-
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
-
+export const prisma = prismaStub;
 export default prisma;
