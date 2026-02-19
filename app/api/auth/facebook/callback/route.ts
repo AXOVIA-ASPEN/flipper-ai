@@ -13,6 +13,7 @@ import {
 } from '@/scrapers/facebook/auth';
 import { storeToken } from '@/scrapers/facebook/token-store';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 export async function GET(req: NextRequest) {
   const baseUrl = req.nextUrl.origin;
 

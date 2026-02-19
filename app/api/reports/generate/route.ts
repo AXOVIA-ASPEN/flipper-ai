@@ -13,6 +13,7 @@ import {
 } from '@/lib/report-service';
 import { getAuthUserId } from '@/lib/auth-middleware';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 // Mock data fetcher (replace with real DB query in production)
 async function fetchItems(userId: string, start: Date, end: Date) {
   // In production, this queries Prisma for items within date range
@@ -36,25 +37,22 @@ export async function POST(request: NextRequest) {
     // Session-based auth check first
     const sessionUserId = await getAuthUserId();
     if (!sessionUserId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const body = await request.json();
     const { userId = sessionUserId, period = 'weekly', startDate, endDate, format = 'json' } = body as ReportOptions & { format?: string };
 
     if (!userId) {
-      return NextResponse.json({ error: 'userId is required' }, { status: 400 });
+      throw new ValidationError('userId is required');
     }
 
     if (!['weekly', 'monthly', 'custom'].includes(period)) {
-      return NextResponse.json({ error: 'Invalid period' }, { status: 400 });
+      throw new ValidationError('Invalid period');
     }
 
     if (period === 'custom' && (!startDate || !endDate)) {
-      return NextResponse.json(
-        { error: 'startDate and endDate required for custom period' },
-        { status: 400 }
-      );
+      throw new ValidationError('startDate and endDate required for custom period');
     }
 
     const dateRange = getDateRange(
@@ -79,7 +77,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(report);
   } catch (error) {
     console.error('Report generation error:', error);
-    return NextResponse.json({ error: 'Failed to generate report' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to generate report');
   }
 }
 

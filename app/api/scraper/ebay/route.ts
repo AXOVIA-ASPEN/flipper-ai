@@ -3,6 +3,7 @@ import prisma from '@/lib/db';
 import { estimateValue, detectCategory, generatePurchaseMessage } from '@/lib/value-estimator';
 import { getAuthUserId } from '@/lib/auth-middleware';
 import { calculateVerifiedMarketValue, calculateTrueDiscount } from '@/lib/market-value-calculator';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import {
   processListings,
   formatForStorage,
@@ -257,25 +258,25 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
   } catch {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    throw new UnauthorizedError('Unauthorized');
   }
 
   const token = process.env.EBAY_OAUTH_TOKEN;
   if (!token) {
-    return NextResponse.json({ error: 'EBAY_OAUTH_TOKEN is not configured' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'EBAY_OAUTH_TOKEN is not configured');
   }
 
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
     const body: ScrapeRequestBody = await request.json();
     if (!body.keywords || body.keywords.trim().length === 0) {
-      return NextResponse.json({ error: 'keywords is required' }, { status: 400 });
+      throw new ValidationError('keywords is required');
     }
 
     const sanitizedLimit = Math.min(body.limit ?? DEFAULT_LIMIT, MAX_LIMIT);
@@ -408,6 +409,6 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     console.error('Error running eBay scraper:', error);
-    return NextResponse.json({ error: 'Failed to scrape eBay listings' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to scrape eBay listings');
   }
 }

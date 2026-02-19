@@ -8,6 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ listingId: string }> }

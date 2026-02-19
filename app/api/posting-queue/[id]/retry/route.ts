@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 type RouteContext = { params: Promise<{ id: string }> };
 
 // POST /api/posting-queue/:id/retry - Retry a failed posting
@@ -9,7 +10,7 @@ export async function POST(_request: NextRequest, context: RouteContext) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const { id } = await context.params;
@@ -18,14 +19,11 @@ export async function POST(_request: NextRequest, context: RouteContext) {
     });
 
     if (!item) {
-      return NextResponse.json({ error: 'Queue item not found' }, { status: 404 });
+      throw new NotFoundError('Queue item not found');
     }
 
     if (item.status !== 'FAILED') {
-      return NextResponse.json(
-        { error: 'Only failed items can be retried' },
-        { status: 400 }
-      );
+      throw new ValidationError('Only failed items can be retried');
     }
 
     if (item.retryCount >= item.maxRetries) {
@@ -47,6 +45,6 @@ export async function POST(_request: NextRequest, context: RouteContext) {
     return NextResponse.json(updated);
   } catch (error) {
     console.error('POST /api/posting-queue/[id]/retry error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Internal server error');
   }
 }

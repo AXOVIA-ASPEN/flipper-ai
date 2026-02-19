@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { metrics } from '@/lib/metrics';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 /**
  * Health check endpoint - lightweight liveness probe
  * GET /api/health

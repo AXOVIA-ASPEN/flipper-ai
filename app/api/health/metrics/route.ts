@@ -3,6 +3,7 @@ import { metrics } from '@/lib/metrics';
 import { getRecentErrors } from '@/lib/error-tracker';
 import { auth } from '@/lib/auth';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 /**
  * Metrics endpoint - exposes application metrics
  * GET /api/health/metrics
@@ -22,7 +23,7 @@ export async function GET(req: NextRequest) {
       // Require user session for browser-based access
       const session = await auth();
       if (!session?.user?.id) {
-        return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+        throw new UnauthorizedError('Unauthorized');
       }
     }
   }

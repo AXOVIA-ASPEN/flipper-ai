@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 // GET /api/messages - Get all messages for the authenticated user
 export async function GET(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const { searchParams } = new URL(request.url);
@@ -67,7 +68,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error fetching messages:', error);
-    return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch messages');
   }
 }
 
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const body = await request.json();
@@ -93,14 +94,11 @@ export async function POST(request: NextRequest) {
     } = body;
 
     if (!messageBody || !direction) {
-      return NextResponse.json(
-        { error: 'Missing required fields: messageBody, direction' },
-        { status: 400 }
-      );
+      throw new ValidationError('Missing required fields: messageBody, direction');
     }
 
     if (direction !== 'INBOUND' && direction !== 'OUTBOUND') {
-      return NextResponse.json({ error: 'direction must be INBOUND or OUTBOUND' }, { status: 400 });
+      throw new ValidationError('direction must be INBOUND or OUTBOUND');
     }
 
     const message = await prisma.message.create({
@@ -132,6 +130,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, data: message }, { status: 201 });
   } catch (error) {
     console.error('Error creating message:', error);
-    return NextResponse.json({ error: 'Failed to create message' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to create message');
   }
 }

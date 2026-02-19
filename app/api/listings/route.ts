@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/firebase/admin';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import {
   createListing,
   getListingsByUser,
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
   try {
     const userId = await getUserFromRequest(request);
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const { searchParams } = new URL(request.url);
@@ -53,10 +54,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error: any) {
     console.error('Get listings error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch listings' },
-      { status: 500 }
-    );
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch listings');
   }
 }
 
@@ -64,17 +62,14 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await getUserFromRequest(request);
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const body: Partial<ListingData> = await request.json();
 
     // Validate required fields
     if (!body.platform || !body.url || !body.title || body.askingPrice === undefined) {
-      return NextResponse.json(
-        { error: 'Missing required fields: platform, url, title, askingPrice' },
-        { status: 400 }
-      );
+      throw new ValidationError('Missing required fields: platform, url, title, askingPrice');
     }
 
     // Create listing
@@ -103,9 +98,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error: any) {
     console.error('Create listing error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to create listing' },
-      { status: 500 }
-    );
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to create listing');
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getCurrentUserId } from '@/lib/auth';
 import { scrapeAndConvert, FacebookScraperConfig } from '@/scrapers/facebook';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import {
   processListings,
   formatForStorage,
@@ -14,7 +15,7 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await getCurrentUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
     const body = await request.json();
     const {
@@ -178,14 +179,7 @@ export async function POST(request: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error('Error in Facebook scraper endpoint:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to run scraper',
-      },
-      { status: 500 }
-    );
+    return handleError(error, request.url);
   }
 }
 
@@ -203,7 +197,7 @@ export async function GET(request: NextRequest) {
       });
 
       if (!job) {
-        return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+        throw new NotFoundError('Job not found');
       }
 
       return NextResponse.json(job);
@@ -219,6 +213,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ jobs });
   } catch (error) {
     console.error('Error fetching scraper jobs:', error);
-    return NextResponse.json({ error: 'Failed to fetch scraper jobs' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch scraper jobs');
   }
 }

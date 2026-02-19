@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import {
   ScraperJobQuerySchema,
   CreateScraperJobSchema,
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error fetching scraper jobs:', error);
-    return NextResponse.json({ error: 'Failed to fetch scraper jobs' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch scraper jobs');
   }
 }
 
@@ -76,6 +77,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(job, { status: 201 });
   } catch (error) {
     console.error('Error creating scraper job:', error);
-    return NextResponse.json({ error: 'Failed to create scraper job' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to create scraper job');
   }
 }

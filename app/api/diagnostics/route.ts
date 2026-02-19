@@ -11,6 +11,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 export async function GET() {
   const diagnostics: Record<string, any> = {
     timestamp: new Date().toISOString(),

@@ -8,6 +8,7 @@ import { analyzeSellability, quickDiscountCheck } from '@/lib/llm-analyzer';
 import { getAuthUserId } from '@/lib/auth-middleware';
 import { sseEmitter } from '@/lib/sse-emitter';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 // Minimum discount threshold for saving a listing (50% = must be half market value)
 const MIN_DISCOUNT_THRESHOLD = 50;
 
@@ -189,7 +190,7 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
     const body = await request.json();
     const { location, category, keywords, minPrice, maxPrice } = body;

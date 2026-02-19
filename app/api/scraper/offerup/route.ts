@@ -86,6 +86,7 @@ function extractListingId(url: string): string {
 // Sleep helper for rate limiting
 import { sleep } from '@/lib/sleep';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 // Retry wrapper for browser operations
 async function withRetry<T>(
   operation: () => Promise<T>,
@@ -300,7 +301,7 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
     const body = await request.json();
     const { location, category, keywords, minPrice, maxPrice } = body;

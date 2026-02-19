@@ -10,24 +10,25 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { logger } from '@/lib/logger';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const token = searchParams.get('token');
 
   if (!token) {
-    return NextResponse.json({ success: false, error: 'Missing token' }, { status: 400 });
+    throw new ValidationError('Missing token');
   }
 
   let email: string;
   try {
     email = Buffer.from(token, 'base64url').toString('utf-8');
   } catch {
-    return NextResponse.json({ success: false, error: 'Invalid token' }, { status: 400 });
+    throw new ValidationError('Invalid token');
   }
 
   // Basic email validation
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return NextResponse.json({ success: false, error: 'Invalid token' }, { status: 400 });
+    throw new ValidationError('Invalid token');
   }
 
   try {
@@ -80,14 +81,14 @@ export async function POST(request: NextRequest) {
   const resubscribe = searchParams.get('resubscribe') === 'true';
 
   if (!token) {
-    return NextResponse.json({ success: false, error: 'Missing token' }, { status: 400 });
+    throw new ValidationError('Missing token');
   }
 
   let email: string;
   try {
     email = Buffer.from(token, 'base64url').toString('utf-8');
   } catch {
-    return NextResponse.json({ success: false, error: 'Invalid token' }, { status: 400 });
+    throw new ValidationError('Invalid token');
   }
 
   try {
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
+      throw new NotFoundError('User not found');
     }
 
     await prisma.userSettings.upsert({
@@ -109,7 +110,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, emailNotifications: resubscribe });
   } catch (err) {
     logger.error('Resubscribe error', { err });
-    return NextResponse.json({ success: false, error: 'Failed to update preferences' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to update preferences');
   }
 }
 

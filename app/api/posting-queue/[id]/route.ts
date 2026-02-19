@@ -3,6 +3,7 @@ import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
 import { UpdatePostingQueueItemSchema, validateBody } from '@/lib/validations';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 type RouteContext = { params: Promise<{ id: string }> };
 
 // GET /api/posting-queue/:id - Get a single queue item
@@ -10,7 +11,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const { id } = await context.params;
@@ -31,13 +32,13 @@ export async function GET(_request: NextRequest, context: RouteContext) {
     });
 
     if (!item) {
-      return NextResponse.json({ error: 'Queue item not found' }, { status: 404 });
+      throw new NotFoundError('Queue item not found');
     }
 
     return NextResponse.json(item);
   } catch (error) {
     console.error('GET /api/posting-queue/[id] error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Internal server error');
   }
 }
 
@@ -46,7 +47,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const { id } = await context.params;
@@ -54,7 +55,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       where: { id, userId },
     });
     if (!existing) {
-      return NextResponse.json({ error: 'Queue item not found' }, { status: 404 });
+      throw new NotFoundError('Queue item not found');
     }
 
     const body = await request.json();
@@ -81,7 +82,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     return NextResponse.json(updated);
   } catch (error) {
     console.error('PATCH /api/posting-queue/[id] error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Internal server error');
   }
 }
 
@@ -90,7 +91,7 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const { id } = await context.params;
@@ -98,21 +99,18 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
       where: { id, userId },
     });
     if (!existing) {
-      return NextResponse.json({ error: 'Queue item not found' }, { status: 404 });
+      throw new NotFoundError('Queue item not found');
     }
 
     // Only allow deletion if not currently being processed
     if (existing.status === 'IN_PROGRESS') {
-      return NextResponse.json(
-        { error: 'Cannot delete item that is currently being processed' },
-        { status: 409 }
-      );
+      throw new AppError(ErrorCode.INTERNAL_ERROR, 'Cannot delete item that is currently being processed');
     }
 
     await prisma.postingQueueItem.delete({ where: { id } });
     return NextResponse.json({ deleted: true });
   } catch (error) {
     console.error('DELETE /api/posting-queue/[id] error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Internal server error');
   }
 }

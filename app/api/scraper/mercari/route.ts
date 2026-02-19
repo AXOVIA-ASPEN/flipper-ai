@@ -15,6 +15,7 @@ import { estimateValue, detectCategory, generatePurchaseMessage } from '@/lib/va
 import { getAuthUserId } from '@/lib/auth-middleware';
 import { sseEmitter } from '@/lib/sse-emitter';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 // Mercari API configuration
 const MERCARI_API_BASE_URL = 'https://www.mercari.com/v1/api';
 const MERCARI_SEARCH_URL = 'https://www.mercari.com/search/';
@@ -535,12 +536,12 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
     const body: ScrapeRequestBody = await request.json();
 
     if (!body.keywords || body.keywords.trim().length === 0) {
-      return NextResponse.json({ error: 'keywords is required' }, { status: 400 });
+      throw new ValidationError('keywords is required');
     }
 
     const sanitizedLimit = Math.min(body.limit ?? DEFAULT_LIMIT, MAX_LIMIT);

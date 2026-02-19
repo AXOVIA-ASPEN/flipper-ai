@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
@@ -11,7 +12,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const { id } = await params;
@@ -31,13 +32,13 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     });
 
     if (!message) {
-      return NextResponse.json({ error: 'Message not found' }, { status: 404 });
+      throw new NotFoundError('Message not found');
     }
 
     return NextResponse.json({ success: true, data: message });
   } catch (error) {
     console.error('Error fetching message:', error);
-    return NextResponse.json({ error: 'Failed to fetch message' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch message');
   }
 }
 
@@ -46,7 +47,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const { id } = await params;
@@ -57,17 +58,14 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!existing) {
-      return NextResponse.json({ error: 'Message not found' }, { status: 404 });
+      throw new NotFoundError('Message not found');
     }
 
     const body = await request.json();
     const { action, body: newBody, subject: newSubject } = body;
 
     if (!action) {
-      return NextResponse.json(
-        { error: 'Missing required field: action (approve, edit, reject)' },
-        { status: 400 }
-      );
+      throw new ValidationError('Missing required field: action (approve, edit, reject)');
     }
 
     const validActions = ['approve', 'edit', 'reject'];
@@ -99,10 +97,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
       case 'edit':
         if (!newBody && !newSubject) {
-          return NextResponse.json(
-            { error: 'Edit action requires at least one of: body, subject' },
-            { status: 400 }
-          );
+          throw new ValidationError('Edit action requires at least one of: body, subject');
         }
         updateData = {
           ...(newBody && { body: newBody }),
@@ -140,7 +135,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     console.error('Error updating message:', error);
-    return NextResponse.json({ error: 'Failed to update message' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to update message');
   }
 }
 
@@ -149,7 +144,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const { id } = await params;
@@ -159,7 +154,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     });
 
     if (!existing) {
-      return NextResponse.json({ error: 'Message not found' }, { status: 404 });
+      throw new NotFoundError('Message not found');
     }
 
     await prisma.message.delete({ where: { id } });
@@ -167,6 +162,6 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ success: true, message: 'Message deleted' });
   } catch (error) {
     console.error('Error deleting message:', error);
-    return NextResponse.json({ error: 'Failed to delete message' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to delete message');
   }
 }

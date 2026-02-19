@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { downloadAndCacheImage, generateImageHash, isImageCached } from '@/lib/image-service';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 // Configuration
 const MAX_IMAGE_SIZE_MB = 5;
 const CACHE_CONTROL_HEADER = 'public, max-age=86400, s-maxage=604800'; // 1 day client, 7 days CDN
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest) {
         throw new Error('Invalid protocol');
       }
     } catch {
-      return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
+      throw new ValidationError('Invalid URL format');
     }
 
     // Check if image is already cached locally
@@ -72,7 +73,7 @@ export async function GET(request: NextRequest) {
     // Validate content type
     const contentType = response.headers.get('content-type') || 'image/jpeg';
     if (!contentType.startsWith('image/')) {
-      return NextResponse.json({ error: 'URL does not point to an image' }, { status: 400 });
+      throw new ValidationError('URL does not point to an image');
     }
 
     // Check content length if available
@@ -98,6 +99,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Image proxy error:', error);
-    return NextResponse.json({ error: 'Failed to proxy image' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to proxy image');
   }
 }

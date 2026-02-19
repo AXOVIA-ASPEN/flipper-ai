@@ -4,13 +4,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { updateListingWithMarketValue } from '@/lib/price-history-service';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 // POST /api/listings/[id]/market-value
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: listingId } = await params;
 
     if (!listingId) {
-      return NextResponse.json({ error: 'Listing ID is required' }, { status: 400 });
+      throw new ValidationError('Listing ID is required');
     }
 
     await updateListingWithMarketValue(listingId);
@@ -26,6 +27,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: error.message }, { status: 404 });
     }
 
-    return NextResponse.json({ error: 'Failed to update listing market value' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to update listing market value');
   }
 }

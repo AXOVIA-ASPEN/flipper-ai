@@ -9,12 +9,13 @@ import { auth } from '@/lib/auth';
 import { getAuthorizationUrl } from '@/scrapers/facebook/auth';
 import { randomBytes } from 'crypto';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 export async function GET(req: NextRequest) {
   // Check if user is authenticated
   const session = await auth();
 
   if (!session?.user?.email) {
-    return NextResponse.json({ error: 'Unauthorized. Please sign in first.' }, { status: 401 });
+    throw new UnauthorizedError('Unauthorized. Please sign in first.');
   }
 
   // Get Facebook app credentials from env

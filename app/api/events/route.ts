@@ -20,6 +20,7 @@ import { NextRequest } from 'next/server';
 import { sseEmitter } from '@/lib/sse-emitter';
 import { getAuthUserId } from '@/lib/auth-middleware';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 

@@ -3,6 +3,7 @@ import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
 import { calculateROI, calculatePortfolioROI, ROIInput } from '@/lib/roi-calculator';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 /**
  * GET /api/inventory/roi - Get ROI data for user's purchased items
  */
@@ -72,6 +73,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error calculating ROI:', error);
-    return NextResponse.json({ error: 'Failed to calculate ROI' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to calculate ROI');
   }
 }

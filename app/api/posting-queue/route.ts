@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import {
   PostingQueueQuerySchema,
   CreatePostingQueueItemSchema,
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const { searchParams } = new URL(request.url);
@@ -57,7 +58,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ items, total, limit, offset });
   } catch (error) {
     console.error('GET /api/posting-queue error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Internal server error');
   }
 }
 
@@ -66,7 +67,7 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const body = await request.json();
@@ -88,16 +89,13 @@ export async function POST(request: NextRequest) {
         where: { id: listingId, userId },
       });
       if (!listing) {
-        return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
+        throw new NotFoundError('Listing not found');
       }
 
       // Filter out platforms where the listing already originated
       const filteredPlatforms = platforms.filter((p) => p !== listing.platform);
       if (filteredPlatforms.length === 0) {
-        return NextResponse.json(
-          { error: 'Cannot post to the same platform the listing was scraped from' },
-          { status: 400 }
-        );
+        throw new ValidationError('Cannot post to the same platform the listing was scraped from');
       }
 
       // Create queue items, skipping duplicates
@@ -141,14 +139,11 @@ export async function POST(request: NextRequest) {
       where: { id: listingId, userId },
     });
     if (!listing) {
-      return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
+      throw new NotFoundError('Listing not found');
     }
 
     if (targetPlatform === listing.platform) {
-      return NextResponse.json(
-        { error: 'Cannot post to the same platform the listing was scraped from' },
-        { status: 400 }
-      );
+      throw new ValidationError('Cannot post to the same platform the listing was scraped from');
     }
 
     const item = await prisma.postingQueueItem.upsert({
@@ -171,6 +166,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(item, { status: 201 });
   } catch (error) {
     console.error('POST /api/posting-queue error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Internal server error');
   }
 }

@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getUserIdOrDefault } from '@/lib/auth-middleware';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 const TOTAL_STEPS = 6; // welcome, marketplaces, categories, budget, location, complete
 
 /**
@@ -22,7 +23,7 @@ export async function GET() {
     });
 
     if (!user) {
-      return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
+      throw new NotFoundError('User not found');
     }
 
     return NextResponse.json({
@@ -35,10 +36,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Error fetching onboarding status:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch onboarding status' },
-      { status: 500 }
-    );
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch onboarding status');
   }
 }
 
@@ -95,9 +93,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error('Error updating onboarding:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to update onboarding' },
-      { status: 500 }
-    );
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to update onboarding');
   }
 }

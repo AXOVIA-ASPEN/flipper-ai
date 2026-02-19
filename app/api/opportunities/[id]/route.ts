@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 // GET /api/opportunities/[id] - Get a single opportunity
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -11,13 +12,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
 
     if (!opportunity) {
-      return NextResponse.json({ error: 'Opportunity not found' }, { status: 404 });
+      throw new NotFoundError('Opportunity not found');
     }
 
     return NextResponse.json(opportunity);
   } catch (error) {
     console.error('Error fetching opportunity:', error);
-    return NextResponse.json({ error: 'Failed to fetch opportunity' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch opportunity');
   }
 }
 
@@ -43,7 +44,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json(opportunity);
   } catch (error) {
     console.error('Error updating opportunity:', error);
-    return NextResponse.json({ error: 'Failed to update opportunity' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to update opportunity');
   }
 }
 
@@ -62,7 +63,7 @@ export async function DELETE(
     });
 
     if (!opportunity) {
-      return NextResponse.json({ error: 'Opportunity not found' }, { status: 404 });
+      throw new NotFoundError('Opportunity not found');
     }
 
     // Delete opportunity and reset listing status
@@ -79,6 +80,6 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting opportunity:', error);
-    return NextResponse.json({ error: 'Failed to delete opportunity' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to delete opportunity');
   }
 }

@@ -8,6 +8,7 @@ import bcrypt from 'bcryptjs';
 import prisma from '@/lib/db';
 import { emailService } from '@/lib/email-service';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, ConflictError } from '@/lib/errors';
 interface RegisterBody {
   email: string;
   password: string;
@@ -21,24 +22,18 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!email || !password) {
-      return NextResponse.json(
-        { success: false, error: 'Email and password are required' },
-        { status: 400 }
-      );
+      throw new ValidationError('Email and password are required');
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return NextResponse.json({ success: false, error: 'Invalid email format' }, { status: 400 });
+      throw new ValidationError('Invalid email format');
     }
 
     // Validate password strength
     if (password.length < 8) {
-      return NextResponse.json(
-        { success: false, error: 'Password must be at least 8 characters' },
-        { status: 400 }
-      );
+      throw new ValidationError('Password must be at least 8 characters');
     }
 
     // Check if user already exists
@@ -47,10 +42,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingUser) {
-      return NextResponse.json(
-        { success: false, error: 'An account with this email already exists' },
-        { status: 409 }
-      );
+      throw new ConflictError('An account with this email already exists');
     }
 
     // Hash password

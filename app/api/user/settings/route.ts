@@ -3,6 +3,7 @@ import prisma from '@/lib/db';
 import { encrypt, decrypt, maskApiKey } from '@/lib/crypto';
 import { getAuthUserId } from '@/lib/auth-middleware';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 /**
  * Get or create the current user with settings
  * Requires authentication — returns null if no session
@@ -41,7 +42,7 @@ export async function GET() {
   try {
     const user = await getCurrentUserWithSettings();
     if (!user) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
     const settings = user.settings!;
 
@@ -75,10 +76,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Error fetching user settings:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch user settings' },
-      { status: 500 }
-    );
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch user settings');
   }
 }
 
@@ -87,7 +85,7 @@ export async function PATCH(request: NextRequest) {
   try {
     const user = await getCurrentUserWithSettings();
     if (!user) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
     const body = await request.json();
 
@@ -110,10 +108,7 @@ export async function PATCH(request: NextRequest) {
     if (discountThreshold !== undefined) {
       const threshold = parseInt(discountThreshold, 10);
       if (isNaN(threshold) || threshold < 0 || threshold > 100) {
-        return NextResponse.json(
-          { success: false, error: 'Discount threshold must be between 0 and 100' },
-          { status: 400 }
-        );
+        throw new ValidationError('Discount threshold must be between 0 and 100');
       }
     }
 
@@ -217,9 +212,6 @@ export async function PATCH(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error updating user settings:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to update user settings' },
-      { status: 500 }
-    );
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to update user settings');
   }
 }

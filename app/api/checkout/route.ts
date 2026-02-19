@@ -9,21 +9,19 @@ import { auth } from '@/lib/auth';
 import { stripe, STRIPE_PRICE_IDS } from '@/lib/stripe';
 import { SubscriptionTier } from '@/lib/subscription-tiers';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const body = await req.json();
     const { tier } = body as { tier: SubscriptionTier };
 
     if (!tier || !['FLIPPER', 'PRO'].includes(tier)) {
-      return NextResponse.json(
-        { error: 'Invalid tier. Must be FLIPPER or PRO.' },
-        { status: 400 }
-      );
+      throw new ValidationError('Invalid tier. Must be FLIPPER or PRO.');
     }
 
     const priceId = STRIPE_PRICE_IDS[tier as keyof typeof STRIPE_PRICE_IDS];
@@ -65,11 +63,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ url: checkoutSession.url });
-  } catch (error: unknown) {
-    console.error('Checkout error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to create checkout session' },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleError(error, request.url);
   }
 }

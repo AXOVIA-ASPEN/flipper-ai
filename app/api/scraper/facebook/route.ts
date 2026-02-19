@@ -3,6 +3,7 @@ import prisma from '@/lib/db';
 import { estimateValue, detectCategory, generatePurchaseMessage } from '@/lib/value-estimator';
 import { getAuthUserId } from '@/lib/auth-middleware';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 const FB_GRAPH_API_BASE = 'https://graph.facebook.com/v19.0';
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
@@ -298,12 +299,12 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
     const body: ScrapeRequestBody = await request.json();
 
     if (!body.keywords || body.keywords.trim().length === 0) {
-      return NextResponse.json({ error: 'keywords is required' }, { status: 400 });
+      throw new ValidationError('keywords is required');
     }
 
     // Get access token: from request body, user's stored token, or fail
@@ -385,13 +386,6 @@ export async function POST(request: NextRequest) {
       throw error;
     }
   } catch (error) {
-    console.error('Error running Facebook scraper:', error);
-    return NextResponse.json(
-      {
-        error: 'Failed to scrape Facebook Marketplace listings',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
-    );
+    return handleError(error, request.url);
   }
 }

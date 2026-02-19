@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 // POST /api/user/settings/validate-key - Test if an OpenAI API key is valid
 export async function POST(request: NextRequest) {
   try {
@@ -63,10 +64,6 @@ export async function POST(request: NextRequest) {
       });
     }
   } catch (error) {
-    console.error('Error validating API key:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to validate API key', valid: false },
-      { status: 500 }
-    );
+    return handleError(error, request.url);
   }
 }

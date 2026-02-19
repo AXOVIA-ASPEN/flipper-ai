@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import {
   generateAlgorithmicDescription,
   generateLLMDescription,
@@ -24,10 +25,10 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!itemData.condition) {
-      return NextResponse.json({ error: 'condition is required' }, { status: 400 });
+      throw new ValidationError('condition is required');
     }
     if (itemData.askingPrice == null || itemData.askingPrice < 0) {
-      return NextResponse.json({ error: 'askingPrice is required and must be >= 0' }, { status: 400 });
+      throw new ValidationError('askingPrice is required and must be >= 0');
     }
 
     const input: DescriptionGeneratorInput = {
@@ -64,6 +65,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(description);
   } catch (error) {
     console.error('Description generation error:', error);
-    return NextResponse.json({ error: 'Failed to generate description' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to generate description');
   }
 }

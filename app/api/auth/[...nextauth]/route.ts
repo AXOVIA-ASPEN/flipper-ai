@@ -5,5 +5,6 @@
 
 import { handlers } from '@/lib/auth';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 export const dynamic = 'force-dynamic';
 export const { GET, POST } = handlers;

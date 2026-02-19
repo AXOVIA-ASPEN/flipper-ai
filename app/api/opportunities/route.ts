@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/firebase/admin';
 import { getOpportunities } from '@/lib/firebase/firestore-helpers';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 async function getUserFromRequest(request: NextRequest): Promise<string | null> {
   const authHeader = request.headers.get('authorization');
   if (!authHeader?.startsWith('Bearer ')) {
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
   try {
     const userId = await getUserFromRequest(request);
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const { searchParams } = new URL(request.url);
@@ -42,9 +43,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error: any) {
     console.error('Get opportunities error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch opportunities' },
-      { status: 500 }
-    );
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch opportunities');
   }
 }

@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/firebase/admin';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import {
   getListing,
   updateListing,
@@ -35,19 +36,19 @@ export async function GET(
   try {
     const userId = await getUserFromRequest(request);
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const { id } = await params;
     const listing = await getListing(id);
 
     if (!listing) {
-      return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
+      throw new NotFoundError('Listing not found');
     }
 
     // Verify ownership
     if (listing.userId !== userId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      throw new ForbiddenError('Forbidden');
     }
 
     return NextResponse.json({
@@ -56,10 +57,7 @@ export async function GET(
     });
   } catch (error: any) {
     console.error('Get listing error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch listing' },
-      { status: 500 }
-    );
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch listing');
   }
 }
 
@@ -70,19 +68,19 @@ export async function PATCH(
   try {
     const userId = await getUserFromRequest(request);
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const { id } = await params;
     const listing = await getListing(id);
 
     if (!listing) {
-      return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
+      throw new NotFoundError('Listing not found');
     }
 
     // Verify ownership
     if (listing.userId !== userId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      throw new ForbiddenError('Forbidden');
     }
 
     const body = await request.json();
@@ -97,10 +95,7 @@ export async function PATCH(
     });
   } catch (error: any) {
     console.error('Update listing error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to update listing' },
-      { status: 500 }
-    );
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to update listing');
   }
 }
 
@@ -111,19 +106,19 @@ export async function DELETE(
   try {
     const userId = await getUserFromRequest(request);
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const { id } = await params;
     const listing = await getListing(id);
 
     if (!listing) {
-      return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
+      throw new NotFoundError('Listing not found');
     }
 
     // Verify ownership
     if (listing.userId !== userId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      throw new ForbiddenError('Forbidden');
     }
 
     await deleteDocument('listings', id);
@@ -134,9 +129,6 @@ export async function DELETE(
     });
   } catch (error: any) {
     console.error('Delete listing error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to delete listing' },
-      { status: 500 }
-    );
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to delete listing');
   }
 }

@@ -2,6 +2,7 @@
 // Fetch and manage price history for flip analysis
 
 import { NextRequest, NextResponse } from 'next/server';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import {
   fetchAndStorePriceHistory,
   getPriceHistory,
@@ -18,7 +19,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50');
 
     if (!productName) {
-      return NextResponse.json({ error: 'productName is required' }, { status: 400 });
+      throw new ValidationError('productName is required');
     }
 
     const priceHistory = await getPriceHistory({
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(priceHistory);
   } catch (error) {
     console.error('Error fetching price history:', error);
-    return NextResponse.json({ error: 'Failed to fetch price history' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch price history');
   }
 }
 
@@ -42,13 +43,13 @@ export async function POST(request: NextRequest) {
     const { productName, category } = body;
 
     if (!productName) {
-      return NextResponse.json({ error: 'productName is required' }, { status: 400 });
+      throw new ValidationError('productName is required');
     }
 
     const marketData = await fetchAndStorePriceHistory(productName, category);
 
     if (!marketData) {
-      return NextResponse.json({ error: 'No market data found' }, { status: 404 });
+      throw new NotFoundError('No market data found');
     }
 
     return NextResponse.json({
@@ -58,6 +59,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error fetching and storing price history:', error);
-    return NextResponse.json({ error: 'Failed to fetch and store price history' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch and store price history');
   }
 }

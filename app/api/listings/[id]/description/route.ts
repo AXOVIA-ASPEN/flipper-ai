@@ -3,6 +3,7 @@ import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
 import OpenAI from 'openai';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
@@ -12,7 +13,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const { id } = await params;
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!listing) {
-      return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
+      throw new NotFoundError('Listing not found');
     }
 
     const body = await request.json().catch(() => ({}));
@@ -108,7 +109,7 @@ Return ONLY a JSON object with these fields:
     /* istanbul ignore next -- optional chain null branch is a defensive guard for malformed API response */
     const content = completion.choices[0]?.message?.content;
     if (!content) {
-      return NextResponse.json({ error: 'AI failed to generate description' }, { status: 502 });
+      throw new AppError(ErrorCode.INTERNAL_ERROR, 'AI failed to generate description');
     }
 
     const generated = JSON.parse(content);
@@ -127,7 +128,7 @@ Return ONLY a JSON object with these fields:
     });
   } catch (error) {
     console.error('Error generating description:', error);
-    return NextResponse.json({ error: 'Failed to generate description' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to generate description');
   }
 }
 

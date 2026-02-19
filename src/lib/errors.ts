@@ -261,6 +261,13 @@ export class ConfigurationError extends AppError {
   }
 }
 
+export class ConflictError extends AppError {
+  constructor(message: string, details?: Record<string, unknown>) {
+    super(ErrorCode.CONFLICT, message, details);
+    this.name = 'ConflictError';
+  }
+}
+
 /**
  * Convenience factory functions for common errors.
  * @deprecated Use specific error classes (NotFoundError, ValidationError, etc.) instead

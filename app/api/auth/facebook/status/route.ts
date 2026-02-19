@@ -8,12 +8,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getToken, hasValidToken } from '@/scrapers/facebook/token-store';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 export async function GET(req: NextRequest) {
   // Check if user is authenticated
   const session = await auth();
 
   if (!session?.user?.email) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    throw new UnauthorizedError('Unauthorized');
   }
 
   const userId = session.user.id || session.user.email;
@@ -29,6 +30,6 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error('Facebook status check error:', error);
-    return NextResponse.json({ error: 'Failed to check Facebook status' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to check Facebook status');
   }
 }

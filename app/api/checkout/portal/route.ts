@@ -9,11 +9,12 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { stripe } from '@/lib/stripe';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 export async function POST() {
   try {
     const session = await auth();
     if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     const customers = await stripe.customers.list({
@@ -22,10 +23,7 @@ export async function POST() {
     });
 
     if (customers.data.length === 0) {
-      return NextResponse.json(
-        { error: 'No billing account found. Subscribe first.' },
-        { status: 404 }
-      );
+      throw new NotFoundError('No billing account found. Subscribe first.');
     }
 
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
@@ -36,11 +34,7 @@ export async function POST() {
     });
 
     return NextResponse.json({ url: portalSession.url });
-  } catch (error: unknown) {
-    console.error('Portal error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to create portal session' },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleError(error, request.url);
   }
 }

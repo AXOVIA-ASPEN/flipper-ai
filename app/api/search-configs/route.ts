@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import {
   SearchConfigQuerySchema,
   CreateSearchConfigSchema,
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error fetching search configs:', error);
-    return NextResponse.json({ error: 'Failed to fetch search configurations' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch search configurations');
   }
 }
 
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
     const body = await request.json();
     const parsed = validateBody(CreateSearchConfigSchema, body);
@@ -84,6 +85,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(config, { status: 201 });
   } catch (error) {
     console.error('Error creating search config:', error);
-    return NextResponse.json({ error: 'Failed to create search configuration' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to create search configuration');
   }
 }

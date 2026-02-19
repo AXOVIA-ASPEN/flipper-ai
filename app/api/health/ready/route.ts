@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { metrics } from '@/lib/metrics';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 /**
  * Readiness probe - checks that all dependencies are available
  * GET /api/health/ready

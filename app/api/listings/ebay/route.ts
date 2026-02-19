@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserId } from '@/lib/auth-middleware';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import {
   createDraftListing,
   publishOffer,
@@ -23,14 +24,11 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw new UnauthorizedError('Unauthorized');
     }
 
     if (!process.env.EBAY_OAUTH_TOKEN) {
-      return NextResponse.json(
-        { error: 'eBay integration not configured (missing EBAY_OAUTH_TOKEN)' },
-        { status: 503 }
-      );
+      throw new AppError(ErrorCode.INTERNAL_ERROR, 'eBay integration not configured (missing EBAY_OAUTH_TOKEN)');
     }
 
     const body = await request.json();
@@ -67,17 +65,17 @@ export async function POST(request: NextRequest) {
     // Validate price
     const price = parseFloat(body.price);
     if (isNaN(price) || price <= 0) {
-      return NextResponse.json({ error: 'Price must be a positive number' }, { status: 400 });
+      throw new ValidationError('Price must be a positive number');
     }
 
     // Validate imageUrls
     if (!Array.isArray(body.imageUrls) || body.imageUrls.length === 0) {
-      return NextResponse.json({ error: 'imageUrls must be a non-empty array' }, { status: 400 });
+      throw new ValidationError('imageUrls must be a non-empty array');
     }
 
     // Validate title length
     if (body.title.length > 80) {
-      return NextResponse.json({ error: 'Title must be 80 characters or fewer' }, { status: 400 });
+      throw new ValidationError('Title must be 80 characters or fewer');
     }
 
     const input: CreateEbayListingInput = {
@@ -144,7 +142,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error creating eBay listing:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Internal server error');
   }
 }
 

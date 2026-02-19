@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 // GET /api/search-configs/[id] - Get a single search configuration
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -10,13 +11,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
 
     if (!config) {
-      return NextResponse.json({ error: 'Search configuration not found' }, { status: 404 });
+      throw new NotFoundError('Search configuration not found');
     }
 
     return NextResponse.json(config);
   } catch (error) {
     console.error('Error fetching search config:', error);
-    return NextResponse.json({ error: 'Failed to fetch search configuration' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch search configuration');
   }
 }
 
@@ -58,7 +59,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json(config);
   } catch (error) {
     console.error('Error updating search config:', error);
-    return NextResponse.json({ error: 'Failed to update search configuration' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to update search configuration');
   }
 }
 
@@ -76,6 +77,6 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting search config:', error);
-    return NextResponse.json({ error: 'Failed to delete search configuration' }, { status: 500 });
+    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to delete search configuration');
   }
 }
