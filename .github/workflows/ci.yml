@@ -397,6 +397,17 @@ jobs:
       - name: Pull Vercel Environment
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Run Database Migrations
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
       - name: Build Project (Vercel)
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
@@ -411,3 +422,4 @@ jobs:
     # - VERCEL_TOKEN: from https://vercel.com/account/tokens
     # - VERCEL_ORG_ID: from .vercel/project.json after first `vercel link`
     # - VERCEL_PROJECT_ID: from .vercel/project.json after first `vercel link`
+    # - DATABASE_URL: Production database connection string (e.g., PostgreSQL from PrismaPostgres)
