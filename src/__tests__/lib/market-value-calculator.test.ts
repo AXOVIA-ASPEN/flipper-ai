@@ -4,6 +4,26 @@
  * Company: Axovia AI
  */
 
+// Mock prisma BEFORE imports
+const mockPriceHistoryFindMany = jest.fn();
+const mockListingFindMany = jest.fn();
+const mockListingFindUnique = jest.fn();
+const mockListingUpdate = jest.fn();
+
+jest.mock('@/lib/db', () => ({
+  __esModule: true,
+  default: {
+    priceHistory: {
+      findMany: (...args: unknown[]) => mockPriceHistoryFindMany(...args),
+    },
+    listing: {
+      findMany: (...args: unknown[]) => mockListingFindMany(...args),
+      findUnique: (...args: unknown[]) => mockListingFindUnique(...args),
+      update: (...args: unknown[]) => mockListingUpdate(...args),
+    },
+  },
+}));
+
 import { describe, test, expect, beforeEach } from '@jest/globals';
 import {
   calculateVerifiedMarketValue,
