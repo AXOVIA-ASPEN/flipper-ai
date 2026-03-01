@@ -1,5 +1,6 @@
 import ThemeSettings from '@/components/ThemeSettings';
 import NotificationSettings from '@/components/NotificationSettings';
+import PlatformFeeSettings from '@/components/PlatformFeeSettings';
 
 export default function SettingsPage() {
   return (
@@ -7,6 +8,7 @@ export default function SettingsPage() {
       <h1 className="text-3xl font-bold mb-8">Settings</h1>
       
       <div className="space-y-8">
+        <PlatformFeeSettings />
         <ThemeSettings />
         <NotificationSettings />
         

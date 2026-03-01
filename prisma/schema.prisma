@@ -226,22 +226,30 @@ model VerificationToken {
 }
 
 model UserSettings {
-  id                 String   @id @default(cuid())
-  userId             String   @unique
-  openaiApiKey       String?
-  llmModel           String   @default("gpt-4o-mini")
-  discountThreshold  Int      @default(50)
-  autoAnalyze        Boolean  @default(true)
-  emailNotifications Boolean  @default(true)
-  notifyNewDeals     Boolean  @default(true)
-  notifyPriceDrops   Boolean  @default(true)
-  notifySoldItems    Boolean  @default(true)
-  notifyExpiring     Boolean  @default(true)
-  notifyWeeklyDigest Boolean  @default(true)
-  notifyFrequency    String   @default("instant")
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  openaiApiKey         String?
+  llmModel             String   @default("gpt-4o-mini")
+  discountThreshold    Int      @default(50)
+  autoAnalyze          Boolean  @default(true)
+  emailNotifications   Boolean  @default(true)
+  notifyNewDeals       Boolean  @default(true)
+  notifyPriceDrops     Boolean  @default(true)
+  notifySoldItems      Boolean  @default(true)
+  notifyExpiring       Boolean  @default(true)
+  notifyWeeklyDigest   Boolean  @default(true)
+  notifyFrequency      String   @default("instant")
+  // Platform fee rates (percentage as decimal, e.g., 13% = 0.13)
+  ebayFeeRate          Float    @default(0.13)
+  mercariFeeRate       Float    @default(0.10)
+  facebookFeeRate      Float    @default(0.05)
+  offerupFeeRate       Float    @default(0.129)
+  craigslistFeeRate    Float    @default(0.00)
+  // Opportunity threshold (0-100 value score minimum)
+  opportunityThreshold Int      @default(70)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model FacebookToken {

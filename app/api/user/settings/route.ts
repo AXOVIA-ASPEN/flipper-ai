@@ -64,6 +64,12 @@ export async function GET() {
         notifyExpiring: settings.notifyExpiring,
         notifyWeeklyDigest: settings.notifyWeeklyDigest,
         notifyFrequency: settings.notifyFrequency,
+        ebayFeeRate: settings.ebayFeeRate,
+        mercariFeeRate: settings.mercariFeeRate,
+        facebookFeeRate: settings.facebookFeeRate,
+        offerupFeeRate: settings.offerupFeeRate,
+        craigslistFeeRate: settings.craigslistFeeRate,
+        opportunityThreshold: settings.opportunityThreshold,
         createdAt: settings.createdAt,
         updatedAt: settings.updatedAt,
         user: {
@@ -93,6 +99,8 @@ export async function PATCH(request: NextRequest) {
       openaiApiKey, llmModel, discountThreshold, autoAnalyze,
       emailNotifications, notifyNewDeals, notifyPriceDrops,
       notifySoldItems, notifyExpiring, notifyWeeklyDigest, notifyFrequency,
+      ebayFeeRate, mercariFeeRate, facebookFeeRate, offerupFeeRate, craigslistFeeRate,
+      opportunityThreshold,
     } = body;
 
     // Validate llmModel if provided
@@ -121,6 +129,32 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    // Validate platform fee rates (0 to 1)
+    const feeRateFields = [
+      { name: 'ebayFeeRate', value: ebayFeeRate },
+      { name: 'mercariFeeRate', value: mercariFeeRate },
+      { name: 'facebookFeeRate', value: facebookFeeRate },
+      { name: 'offerupFeeRate', value: offerupFeeRate },
+      { name: 'craigslistFeeRate', value: craigslistFeeRate },
+    ];
+
+    for (const { name, value } of feeRateFields) {
+      if (value !== undefined) {
+        const rate = parseFloat(value);
+        if (isNaN(rate) || rate < 0 || rate > 1) {
+          throw new ValidationError(`${name} must be between 0 and 1 (as decimal)`);
+        }
+      }
+    }
+
+    // Validate opportunity threshold (0-100)
+    if (opportunityThreshold !== undefined) {
+      const threshold = parseInt(opportunityThreshold, 10);
+      if (isNaN(threshold) || threshold < 0 || threshold > 100) {
+        throw new ValidationError('Opportunity threshold must be between 0 and 100');
+      }
+    }
+
     // Build update data
     const updateData: {
       openaiApiKey?: string | null;
@@ -134,6 +168,12 @@ export async function PATCH(request: NextRequest) {
       notifyExpiring?: boolean;
       notifyWeeklyDigest?: boolean;
       notifyFrequency?: string;
+      ebayFeeRate?: number;
+      mercariFeeRate?: number;
+      facebookFeeRate?: number;
+      offerupFeeRate?: number;
+      craigslistFeeRate?: number;
+      opportunityThreshold?: number;
     } = {};
 
     // Handle API key update
@@ -182,6 +222,28 @@ export async function PATCH(request: NextRequest) {
       updateData.notifyFrequency = notifyFrequency;
     }
 
+    // Platform fee rates
+    if (ebayFeeRate !== undefined) {
+      updateData.ebayFeeRate = parseFloat(ebayFeeRate);
+    }
+    if (mercariFeeRate !== undefined) {
+      updateData.mercariFeeRate = parseFloat(mercariFeeRate);
+    }
+    if (facebookFeeRate !== undefined) {
+      updateData.facebookFeeRate = parseFloat(facebookFeeRate);
+    }
+    if (offerupFeeRate !== undefined) {
+      updateData.offerupFeeRate = parseFloat(offerupFeeRate);
+    }
+    if (craigslistFeeRate !== undefined) {
+      updateData.craigslistFeeRate = parseFloat(craigslistFeeRate);
+    }
+
+    // Opportunity threshold
+    if (opportunityThreshold !== undefined) {
+      updateData.opportunityThreshold = parseInt(opportunityThreshold, 10);
+    }
+
     // Update settings
     const settings = await prisma.userSettings.update({
       where: { userId: user.id },
@@ -206,6 +268,12 @@ export async function PATCH(request: NextRequest) {
         notifyExpiring: settings.notifyExpiring,
         notifyWeeklyDigest: settings.notifyWeeklyDigest,
         notifyFrequency: settings.notifyFrequency,
+        ebayFeeRate: settings.ebayFeeRate,
+        mercariFeeRate: settings.mercariFeeRate,
+        facebookFeeRate: settings.facebookFeeRate,
+        offerupFeeRate: settings.offerupFeeRate,
+        craigslistFeeRate: settings.craigslistFeeRate,
+        opportunityThreshold: settings.opportunityThreshold,
         createdAt: settings.createdAt,
         updatedAt: settings.updatedAt,
       },

@@ -171,7 +171,8 @@ export function estimateValue(
   description: string | null,
   askingPrice: number,
   condition: string | null,
-  category: string | null
+  category: string | null,
+  platformFeeRate: number = 0.13
 ): EstimationResult {
   const fullText = `${title} ${description || ''}`.toLowerCase();
 
@@ -232,8 +233,8 @@ export function estimateValue(
   // Calculate discount percentage (how far below market value)
   const discountPercent = Math.round(((estimatedValue - askingPrice) / estimatedValue) * 100);
 
-  // Calculate profit potential (accounting for ~13% platform fees on eBay/Mercari)
-  const feeRate = 0.13;
+  // Calculate profit potential (accounting for platform fees)
+  const feeRate = platformFeeRate;
   const profitLow = Math.round(estimatedLow * (1 - feeRate) - askingPrice);
   const profitHigh = Math.round(estimatedHigh * (1 - feeRate) - askingPrice);
   const profitPotential = Math.round((profitLow + profitHigh) / 2);
