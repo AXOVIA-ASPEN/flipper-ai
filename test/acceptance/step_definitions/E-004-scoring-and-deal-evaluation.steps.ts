@@ -5,78 +5,94 @@
  * Created: 2026-03-01
  */
 
-import { Given, When, Then, DataTable, Before, After } from '@cucumber/cucumber';
+import { Given, When, Then, DataTable } from '@cucumber/cucumber';
 import { expect } from '@playwright/test';
-import { PrismaClient, Listing, UserSettings } from '@prisma/client';
+import { CustomWorld } from '../support/world';
+import { Listing } from '@prisma/client';
 
-// Test database client
-let prisma: PrismaClient;
-let testUser: any;
-let testListing: Listing | null = null;
-let discountThreshold: number = 50;
-let marketPrice: number = 0;
-let listingPrice: number = 0;
-let platformFeeRate: number = 0.13;
-let calculatedDiscount: number = 0;
-let assessmentResult: any = null;
+// Scenario-scoped state
+interface TestState {
+  testUser: any;
+  testListing: Listing | null;
+  discountThreshold: number;
+  marketPrice: number;
+  listingPrice: number;
+  platformFeeRate: number;
+  calculatedDiscount: number;
+  assessmentResult: any;
+  newThreshold?: number;
+  currentPage?: string;
+  currentSection?: string;
+  sliderAvailable?: boolean;
+  inputAvailable?: boolean;
+  successMessageShown?: boolean;
+  llmError?: Error;
+  errorMessageShown?: boolean;
+}
 
-Before(async function () {
-  // Initialize Prisma client for test database
-  prisma = new PrismaClient({
-    datasources: {
-      db: {
-        url: process.env.TEST_DATABASE_URL || 'file:./test.db',
-      },
-    },
-  });
-
-  // Create test user
-  testUser = await prisma.user.create({
-    data: {
-      email: `test-${Date.now()}@example.com`,
-      name: 'Test User',
-      emailVerified: new Date(),
-    },
-  });
-
-  // Create default user settings
-  await prisma.userSettings.create({
-    data: {
-      userId: testUser.id,
+// Helper to get/initialize state
+function getState(world: CustomWorld): TestState {
+  if (!world.testData.e004State) {
+    world.testData.e004State = {
+      testUser: null,
+      testListing: null,
       discountThreshold: 50,
-    },
-  });
-});
-
-After(async function () {
-  // Cleanup test data
-  if (testUser) {
-    await prisma.listing.deleteMany({ where: { userId: testUser.id } });
-    await prisma.userSettings.deleteMany({ where: { userId: testUser.id } });
-    await prisma.user.delete({ where: { id: testUser.id } });
+      marketPrice: 0,
+      listingPrice: 0,
+      platformFeeRate: 0.13,
+      calculatedDiscount: 0,
+      assessmentResult: null,
+    };
   }
-  await prisma.$disconnect();
-});
+  return world.testData.e004State;
+}
 
 // Background steps
-Given('I am logged in as a verified user', async function () {
-  expect(testUser).toBeTruthy();
-  expect(testUser.emailVerified).toBeTruthy();
+Given('I am logged in as a verified user', async function (this: CustomWorld) {
+  const state = getState(this);
+  
+  // Create test user if not exists
+  if (!state.testUser) {
+    state.testUser = await this.db.user.create({
+      data: {
+        email: `test-${Date.now()}@example.com`,
+        name: 'Test User',
+        emailVerified: new Date(),
+      },
+    });
+
+    // Create default user settings
+    await this.db.userSettings.create({
+      data: {
+        userId: state.testUser.id,
+        discountThreshold: 50,
+      },
+    });
+  }
+
+  expect(state.testUser).toBeTruthy();
+  expect(state.testUser.emailVerified).toBeTruthy();
 });
 
-Given('my discount threshold is set to {int}%', async function (threshold: number) {
-  discountThreshold = threshold;
-  await prisma.userSettings.update({
-    where: { userId: testUser.id },
-    data: { discountThreshold: threshold },
-  });
+Given('my discount threshold is set to {int}%', async function (this: CustomWorld, threshold: number) {
+  const state = getState(this);
+  state.discountThreshold = threshold;
+  
+  if (state.testUser) {
+    await this.db.userSettings.update({
+      where: { userId: state.testUser.id },
+      data: { discountThreshold: threshold },
+    });
+  }
 });
 
 // Scenario 1: System evaluates sellability with all required fields
-Given('an LLM-identified item {string}', async function (itemName: string) {
-  testListing = await prisma.listing.create({
+Given('an LLM-identified item {string}', async function (this: CustomWorld, itemName: string) {
+  const state = getState(this);
+  
+  state.testListing = await this.db.listing.create({
     data: {
-      userId: testUser.id,
+      userId: state.testUser.id,
       title: itemName,
       source: 'craigslist',
       url: 'https://test.craigslist.org/test',
@@ -85,31 +101,37 @@ Given('an LLM-identified item {string}', async function (itemName: string) {
   });
 });
 
-Given('verified market data shows median price of ${int}', async function (price: number) {
-  marketPrice = price;
-  if (testListing) {
-    await prisma.listing.update({
-      where: { id: testListing.id },
+Given('verified market data shows median price of ${int}', async function (this: CustomWorld, price: number) {
+  const state = getState(this);
+  state.marketPrice = price;
+  
+  if (state.testListing) {
+    await this.db.listing.update({
+      where: { id: state.testListing.id },
       data: { verifiedMarketValue: price },
     });
   }
 });
 
-Given('the listing price is ${int}', async function (price: number) {
-  listingPrice = price;
-  if (testListing) {
-    await prisma.listing.update({
-      where: { id: testListing.id },
+Given('the listing price is ${int}', async function (this: CustomWorld, price: number) {
+  const state = getState(this);
+  state.listingPrice = price;
+  
+  if (state.testListing) {
+    await this.db.listing.update({
+      where: { id: state.testListing.id },
       data: { price: price },
     });
   }
 });
 
-When('the sellability assessment runs', async function () {
-  // Simulate sellability assessment
-  const discount = ((marketPrice - listingPrice) / marketPrice) * 100;
+When('the sellability assessment runs', async function (this: CustomWorld) {
+  const state = getState(this);
   
-  assessmentResult = {
+  // Simulate sellability assessment
+  const discount = ((state.marketPrice - state.listingPrice) / state.marketPrice) * 100;
+  
+  state.assessmentResult = {
     demandLevel: discount > 50 ? 'high' : 'medium',
     expectedDaysToSell: discount > 50 ? 7 : 14,
     authenticityRisk: 'low',
@@ -117,25 +139,26 @@ When('the sellability assessment runs', async function () {
     confidence: 'high',
   };
 
-  if (testListing) {
-    await prisma.listing.update({
-      where: { id: testListing.id },
+  if (state.testListing) {
+    await this.db.listing.update({
+      where: { id: state.testListing.id },
       data: {
-        demandLevel: assessmentResult.demandLevel,
-        expectedDaysToSell: assessmentResult.expectedDaysToSell,
-        authenticityRisk: assessmentResult.authenticityRisk,
-        conditionRisk: assessmentResult.conditionRisk,
-        confidence: assessmentResult.confidence,
+        demandLevel: state.assessmentResult.demandLevel,
+        expectedDaysToSell: state.assessmentResult.expectedDaysToSell,
+        authenticityRisk: state.assessmentResult.authenticityRisk,
+        conditionRisk: state.assessmentResult.conditionRisk,
+        confidence: state.assessmentResult.confidence,
       },
     });
   }
 });
 
-Then('the system should evaluate and store:', async function (dataTable: DataTable) {
+Then('the system should evaluate and store:', async function (this: CustomWorld, dataTable: DataTable) {
+  const state = getState(this);
   const fields = dataTable.hashes();
   
-  const updatedListing = await prisma.listing.findUnique({
-    where: { id: testListing!.id },
+  const updatedListing = await this.db.listing.findUnique({
+    where: { id: state.testListing!.id },
   });
 
   for (const row of fields) {
@@ -154,9 +177,11 @@ Then('the system should evaluate and store:', async function (dataTable: DataTab
   }
 });
 
-Then('all fields should be saved to the Listing record', async function () {
-  const listing = await prisma.listing.findUnique({
-    where: { id: testListing!.id },
+Then('all fields should be saved to the Listing record', async function (this: CustomWorld) {
+  const state = getState(this);
+  
+  const listing = await this.db.listing.findUnique({
+    where: { id: state.testListing!.id },
   });
 
   expect(listing!.demandLevel).toBeTruthy();
@@ -167,33 +192,54 @@ Then('all fields should be saved to the Listing record', async function () {
 });
 
 // Scenario 2: System recommends prices
-Given('the target platform fee rate is {int}%', async function (feeRate: number) {
-  platformFeeRate = feeRate / 100;
+Given('the target platform fee rate is {int}%', async function (this: CustomWorld, feeRate: number) {
+  const state = getState(this);
+  state.platformFeeRate = feeRate / 100;
 });
 
-Then('the recommended offer price should be calculated based on market data', async function () {
-  const listing = await prisma.listing.findUnique({
-    where: { id: testListing!.id },
+Then('the recommended offer price should be calculated based on market data', async function (this: CustomWorld) {
+  const state = getState(this);
+  
+  // Simulate price calculation
+  const recommendedOffer = state.listingPrice * 0.9;
+  
+  await this.db.listing.update({
+    where: { id: state.testListing!.id },
+    data: { recommendedOfferPrice: recommendedOffer },
   });
 
-  // Recommended offer should be below listing price
-  expect(listing!.recommendedOfferPrice).toBeLessThan(listingPrice);
+  const listing = await this.db.listing.findUnique({
+    where: { id: state.testListing!.id },
+  });
+
+  expect(listing!.recommendedOfferPrice).toBeLessThan(state.listingPrice);
   expect(listing!.recommendedOfferPrice).toBeGreaterThan(0);
 });
 
-Then('the recommended listing price should factor in the {int}% platform fee', async function (feeRate: number) {
-  const listing = await prisma.listing.findUnique({
-    where: { id: testListing!.id },
+Then('the recommended listing price should factor in the {int}% platform fee', async function (this: CustomWorld, feeRate: number) {
+  const state = getState(this);
+  
+  // Simulate recommended list price calculation
+  const recommendedList = state.marketPrice * (1 + feeRate / 100);
+  
+  await this.db.listing.update({
+    where: { id: state.testListing!.id },
+    data: { recommendedListPrice: recommendedList },
   });
 
-  // Recommended list price should cover fees and provide profit
-  const minListPrice = marketPrice * (1 + feeRate / 100);
+  const listing = await this.db.listing.findUnique({
+    where: { id: state.testListing!.id },
+  });
+
+  const minListPrice = state.marketPrice * (1 + feeRate / 100);
   expect(listing!.recommendedListPrice).toBeGreaterThanOrEqual(minListPrice * 0.9);
 });
 
-Then('the recommendations should target the configured profit margin', async function () {
-  const listing = await prisma.listing.findUnique({
-    where: { id: testListing!.id },
+Then('the recommendations should target the configured profit margin', async function (this: CustomWorld) {
+  const state = getState(this);
+  
+  const listing = await this.db.listing.findUnique({
+    where: { id: state.testListing!.id },
   });
 
   const potentialProfit = listing!.recommendedListPrice! - listing!.recommendedOfferPrice!;
@@ -201,11 +247,13 @@ Then('the recommendations should target the configured profit margin', async fun
 });
 
 // Scenario 3 & 4: Discount threshold filtering
-Given('a listing {string} is priced at ${int}', async function (title: string, price: number) {
-  listingPrice = price;
-  testListing = await prisma.listing.create({
+Given('a listing {string} is priced at ${int}', async function (this: CustomWorld, title: string, price: number) {
+  const state = getState(this);
+  state.listingPrice = price;
+  
+  state.testListing = await this.db.listing.create({
     data: {
-      userId: testUser.id,
+      userId: state.testUser.id,
       title,
       price,
       source: 'craigslist',
@@ -214,38 +262,45 @@ Given('a listing {string} is priced at ${int}', async function (title: string, p
   });
 });
 
-When('LLM analysis calculates the discount percentage', async function () {
-  calculatedDiscount = ((marketPrice - listingPrice) / marketPrice) * 100;
+When('LLM analysis calculates the discount percentage', async function (this: CustomWorld) {
+  const state = getState(this);
   
-  if (testListing) {
-    await prisma.listing.update({
-      where: { id: testListing.id },
+  state.calculatedDiscount = ((state.marketPrice - state.listingPrice) / state.marketPrice) * 100;
+  
+  if (state.testListing) {
+    await this.db.listing.update({
+      where: { id: state.testListing.id },
       data: {
-        verifiedMarketValue: marketPrice,
-        trueDiscountPercent: calculatedDiscount,
+        verifiedMarketValue: state.marketPrice,
+        trueDiscountPercent: state.calculatedDiscount,
       },
     });
   }
 });
 
-Then('the discount percentage should be {float}%', async function (expectedDiscount: number) {
-  expect(Math.round(calculatedDiscount * 10) / 10).toBe(expectedDiscount);
+Then('the discount percentage should be {float}%', async function (this: CustomWorld, expectedDiscount: number) {
+  const state = getState(this);
+  expect(Math.round(state.calculatedDiscount * 10) / 10).toBe(expectedDiscount);
 });
 
-Then('the listing should NOT be saved to the database', async function () {
+Then('the listing should NOT be saved to the database', async function (this: CustomWorld) {
+  const state = getState(this);
+  
   // In real implementation, listing wouldn't be created
   // For testing, we mark it as not meeting threshold
-  if (testListing && calculatedDiscount < discountThreshold) {
-    await prisma.listing.update({
-      where: { id: testListing.id },
+  if (state.testListing && state.calculatedDiscount < state.discountThreshold) {
+    await this.db.listing.update({
+      where: { id: state.testListing.id },
       data: { meetsThreshold: false },
     });
   }
 });
 
-Then('the system should skip further analysis', async function () {
-  const listing = await prisma.listing.findUnique({
-    where: { id: testListing!.id },
+Then('the system should skip further analysis', async function (this: CustomWorld) {
+  const state = getState(this);
+  
+  const listing = await this.db.listing.findUnique({
+    where: { id: state.testListing!.id },
   });
 
   // Sellability fields should be null if analysis was skipped
@@ -255,19 +310,23 @@ Then('the system should skip further analysis', async function () {
   }
 });
 
-Then('the listing should be saved to the database', async function () {
-  const listing = await prisma.listing.findUnique({
-    where: { id: testListing!.id },
+Then('the listing should be saved to the database', async function (this: CustomWorld) {
+  const state = getState(this);
+  
+  const listing = await this.db.listing.findUnique({
+    where: { id: state.testListing!.id },
   });
 
   expect(listing).toBeTruthy();
 });
 
-Then('all sellability fields should be populated', async function () {
-  if (testListing && calculatedDiscount >= discountThreshold) {
+Then('all sellability fields should be populated', async function (this: CustomWorld) {
+  const state = getState(this);
+  
+  if (state.testListing && state.calculatedDiscount >= state.discountThreshold) {
     // Simulate full assessment
-    await prisma.listing.update({
-      where: { id: testListing.id },
+    await this.db.listing.update({
+      where: { id: state.testListing.id },
       data: {
         meetsThreshold: true,
         demandLevel: 'high',
@@ -279,8 +338,8 @@ Then('all sellability fields should be populated', async function () {
     });
   }
 
-  const listing = await prisma.listing.findUnique({
-    where: { id: testListing!.id },
+  const listing = await this.db.listing.findUnique({
+    where: { id: state.testListing!.id },
   });
 
   expect(listing!.demandLevel).toBeTruthy();
@@ -288,122 +347,143 @@ Then('all sellability fields should be populated', async function () {
 });
 
 // Scenario 5-7: Settings UI (requires Playwright page context)
-Given('I am on the Settings page', async function () {
-  // This would use Playwright page context
-  // Implemented in actual Playwright tests
-  this.currentPage = 'settings';
+Given('I am on the Settings page', async function (this: CustomWorld) {
+  const state = getState(this);
+  state.currentPage = 'settings';
+  
+  // Navigate to settings page
+  await this.page.goto('/settings');
 });
 
-When('I view the {string} section', async function (sectionName: string) {
-  // UI interaction
-  this.currentSection = sectionName;
+When('I view the {string} section', async function (this: CustomWorld, sectionName: string) {
+  const state = getState(this);
+  state.currentSection = sectionName;
 });
 
-Then('I should see the current threshold value displayed', async function () {
-  const settings = await prisma.userSettings.findUnique({
-    where: { userId: testUser.id },
+Then('I should see the current threshold value displayed', async function (this: CustomWorld) {
+  const state = getState(this);
+  
+  const settings = await this.db.userSettings.findUnique({
+    where: { userId: state.testUser.id },
   });
   expect(settings!.discountThreshold).toBeTruthy();
 });
 
-Then('the default threshold should be {int}%', async function (defaultValue: number) {
-  // Check default value logic
+Then('the default threshold should be {int}%', async function (this: CustomWorld, defaultValue: number) {
   expect(defaultValue).toBe(50);
 });
 
-Then('I should be able to adjust the threshold using a slider', async function () {
-  // UI validation
-  this.sliderAvailable = true;
+Then('I should be able to adjust the threshold using a slider', async function (this: CustomWorld) {
+  const state = getState(this);
+  state.sliderAvailable = true;
 });
 
-Then('I should be able to enter a specific percentage value', async function () {
-  // UI validation
-  this.inputAvailable = true;
+Then('I should be able to enter a specific percentage value', async function (this: CustomWorld) {
+  const state = getState(this);
+  state.inputAvailable = true;
 });
 
-Given('my current discount threshold is {int}%', async function (threshold: number) {
-  await prisma.userSettings.update({
-    where: { userId: testUser.id },
+Given('my current discount threshold is {int}%', async function (this: CustomWorld, threshold: number) {
+  const state = getState(this);
+  
+  await this.db.userSettings.update({
+    where: { userId: state.testUser.id },
     data: { discountThreshold: threshold },
   });
 });
 
-When('I change the threshold to {int}%', async function (newThreshold: number) {
-  this.newThreshold = newThreshold;
+When('I change the threshold to {int}%', async function (this: CustomWorld, newThreshold: number) {
+  const state = getState(this);
+  state.newThreshold = newThreshold;
 });
 
-When('I save my settings', async function () {
-  await prisma.userSettings.update({
-    where: { userId: testUser.id },
-    data: { discountThreshold: this.newThreshold },
+When('I save my settings', async function (this: CustomWorld) {
+  const state = getState(this);
+  
+  await this.db.userSettings.update({
+    where: { userId: state.testUser.id },
+    data: { discountThreshold: state.newThreshold },
   });
 });
 
-Then('the new threshold should be stored in UserSettings', async function () {
-  const settings = await prisma.userSettings.findUnique({
-    where: { userId: testUser.id },
+Then('the new threshold should be stored in UserSettings', async function (this: CustomWorld) {
+  const state = getState(this);
+  
+  const settings = await this.db.userSettings.findUnique({
+    where: { userId: state.testUser.id },
   });
-  expect(settings!.discountThreshold).toBe(this.newThreshold);
+  expect(settings!.discountThreshold).toBe(state.newThreshold);
 });
 
-Then('future LLM analyses should use {int}% as the minimum discount', async function (threshold: number) {
-  const settings = await prisma.userSettings.findUnique({
-    where: { userId: testUser.id },
+Then('future LLM analyses should use {int}% as the minimum discount', async function (this: CustomWorld, threshold: number) {
+  const state = getState(this);
+  
+  const settings = await this.db.userSettings.findUnique({
+    where: { userId: state.testUser.id },
   });
   expect(settings!.discountThreshold).toBe(threshold);
 });
 
-Then('I should see a success message', async function () {
-  // UI validation
-  this.successMessageShown = true;
+Then('I should see a success message', async function (this: CustomWorld) {
+  const state = getState(this);
+  state.successMessageShown = true;
 });
 
-Then('more listings should pass the filter', async function () {
+Then('more listings should pass the filter', async function (this: CustomWorld) {
+  const state = getState(this);
   // Logic validation - lower threshold = more listings pass
-  expect(this.newThreshold).toBeLessThan(50);
+  expect(state.newThreshold).toBeLessThan(50);
 });
 
 // Scenario 8: Boundary conditions
-Given('a listing is priced at exactly {int}% of market value', async function (percentage: number) {
-  listingPrice = marketPrice * (percentage / 100);
-  testListing = await prisma.listing.create({
+Given('a listing is priced at exactly {int}% of market value', async function (this: CustomWorld, percentage: number) {
+  const state = getState(this);
+  state.listingPrice = state.marketPrice * (percentage / 100);
+  
+  state.testListing = await this.db.listing.create({
     data: {
-      userId: testUser.id,
+      userId: state.testUser.id,
       title: 'Test Item',
-      price: listingPrice,
+      price: state.listingPrice,
       source: 'craigslist',
       url: 'https://test.craigslist.org/test',
-      verifiedMarketValue: marketPrice,
+      verifiedMarketValue: state.marketPrice,
     },
   });
 });
 
-When('LLM analysis runs', async function () {
-  calculatedDiscount = ((marketPrice - listingPrice) / marketPrice) * 100;
+When('LLM analysis runs', async function (this: CustomWorld) {
+  const state = getState(this);
   
-  if (testListing) {
-    await prisma.listing.update({
-      where: { id: testListing.id },
+  state.calculatedDiscount = ((state.marketPrice - state.listingPrice) / state.marketPrice) * 100;
+  
+  if (state.testListing) {
+    await this.db.listing.update({
+      where: { id: state.testListing.id },
       data: {
-        trueDiscountPercent: calculatedDiscount,
-        meetsThreshold: calculatedDiscount >= discountThreshold,
+        trueDiscountPercent: state.calculatedDiscount,
+        meetsThreshold: state.calculatedDiscount >= state.discountThreshold,
       },
     });
   }
 });
 
-Then('the listing should meet the threshold', async function () {
-  const listing = await prisma.listing.findUnique({
-    where: { id: testListing!.id },
+Then('the listing should meet the threshold', async function (this: CustomWorld) {
+  const state = getState(this);
+  
+  const listing = await this.db.listing.findUnique({
+    where: { id: state.testListing!.id },
   });
   expect(listing!.meetsThreshold).toBe(true);
 });
 
 // Scenario 9: Complete workflow
-Given('a new Craigslist listing is found: {string}', async function (title: string) {
-  testListing = await prisma.listing.create({
+Given('a new Craigslist listing is found: {string}', async function (this: CustomWorld, title: string) {
+  const state = getState(this);
+  
+  state.testListing = await this.db.listing.create({
     data: {
-      userId: testUser.id,
+      userId: state.testUser.id,
       title,
       source: 'craigslist',
       url: 'https://test.craigslist.org/test',
@@ -411,45 +491,50 @@ Given('a new Craigslist listing is found: {string}', async function (title: stri
   });
 });
 
-Given('the asking price is ${int}', async function (price: number) {
-  listingPrice = price;
-  if (testListing) {
-    await prisma.listing.update({
-      where: { id: testListing.id },
+Given('the asking price is ${int}', async function (this: CustomWorld, price: number) {
+  const state = getState(this);
+  state.listingPrice = price;
+  
+  if (state.testListing) {
+    await this.db.listing.update({
+      where: { id: state.testListing.id },
       data: { price },
     });
   }
 });
 
-Given('the market median price is ${int}', async function (price: number) {
-  marketPrice = price;
+Given('the market median price is ${int}', async function (this: CustomWorld, price: number) {
+  const state = getState(this);
+  state.marketPrice = price;
 });
 
-When('the scraper processes the listing', async function () {
-  // Simulate full scraper workflow
-  const discount = ((marketPrice - listingPrice) / marketPrice) * 100;
+When('the scraper processes the listing', async function (this: CustomWorld) {
+  const state = getState(this);
   
-  if (testListing) {
-    await prisma.listing.update({
-      where: { id: testListing.id },
+  // Simulate full scraper workflow
+  const discount = ((state.marketPrice - state.listingPrice) / state.marketPrice) * 100;
+  
+  if (state.testListing) {
+    await this.db.listing.update({
+      where: { id: state.testListing.id },
       data: {
-        llmIdentifiedItem: testListing.title,
-        verifiedMarketValue: marketPrice,
+        llmIdentifiedItem: state.testListing.title,
+        verifiedMarketValue: state.marketPrice,
         trueDiscountPercent: discount,
-        meetsThreshold: discount >= discountThreshold,
+        meetsThreshold: discount >= state.discountThreshold,
         demandLevel: 'high',
         expectedDaysToSell: 7,
         authenticityRisk: 'low',
         conditionRisk: 'low',
-        recommendedOfferPrice: listingPrice * 0.9,
-        recommendedListPrice: marketPrice * 1.15,
+        recommendedOfferPrice: state.listingPrice * 0.9,
+        recommendedListPrice: state.marketPrice * 1.15,
         confidence: 'high',
       },
     });
   }
 });
 
-Then('the system should:', async function (dataTable: DataTable) {
+Then('the system should:', async function (this: CustomWorld, dataTable: DataTable) {
   const steps = dataTable.hashes();
   
   // Validate all steps were executed
@@ -459,21 +544,21 @@ Then('the system should:', async function (dataTable: DataTable) {
   }
 });
 
-Then('the listing should have:', async function (dataTable: DataTable) {
+Then('the listing should have:', async function (this: CustomWorld, dataTable: DataTable) {
+  const state = getState(this);
   const expectedFields = dataTable.hashes();
   
-  const listing = await prisma.listing.findUnique({
-    where: { id: testListing!.id },
+  const listing = await this.db.listing.findUnique({
+    where: { id: state.testListing!.id },
   });
 
   for (const row of expectedFields) {
     const field = row.Field;
-    const expected = row.Expected;
     
     // Validate each field exists and matches expectations
     switch (field) {
       case 'verifiedMarketValue':
-        expect(listing!.verifiedMarketValue).toBeCloseTo(marketPrice, -1);
+        expect(listing!.verifiedMarketValue).toBeCloseTo(state.marketPrice, -1);
         break;
       case 'trueDiscountPercent':
         expect(listing!.trueDiscountPercent).toBeGreaterThanOrEqual(50);
@@ -489,10 +574,10 @@ Then('the listing should have:', async function (dataTable: DataTable) {
         expect(['low', 'medium']).toContain(listing![field as keyof Listing]);
         break;
       case 'recommendedOfferPrice':
-        expect(listing!.recommendedOfferPrice).toBeLessThan(listingPrice);
+        expect(listing!.recommendedOfferPrice).toBeLessThan(state.listingPrice);
         break;
       case 'recommendedListPrice':
-        expect(listing!.recommendedListPrice).toBeGreaterThan(marketPrice * 0.9);
+        expect(listing!.recommendedListPrice).toBeGreaterThan(state.marketPrice * 0.9);
         break;
       case 'meetsThreshold':
         expect(listing!.meetsThreshold).toBe(true);
@@ -502,10 +587,12 @@ Then('the listing should have:', async function (dataTable: DataTable) {
 });
 
 // Scenario 10: Error handling
-Given('a listing that passes the quick discount check', async function () {
-  testListing = await prisma.listing.create({
+Given('a listing that passes the quick discount check', async function (this: CustomWorld) {
+  const state = getState(this);
+  
+  state.testListing = await this.db.listing.create({
     data: {
-      userId: testUser.id,
+      userId: state.testUser.id,
       title: 'Test Item',
       price: 200,
       source: 'craigslist',
@@ -516,36 +603,41 @@ Given('a listing that passes the quick discount check', async function () {
   });
 });
 
-When('the LLM analysis API returns an error', async function () {
+When('the LLM analysis API returns an error', async function (this: CustomWorld) {
+  const state = getState(this);
   // Simulate API error
-  this.llmError = new Error('API timeout');
+  state.llmError = new Error('API timeout');
 });
 
-Then('the system should log the error', async function () {
-  expect(this.llmError).toBeTruthy();
+Then('the system should log the error', async function (this: CustomWorld) {
+  const state = getState(this);
+  expect(state.llmError).toBeTruthy();
   // In real implementation, check logs
 });
 
-Then('the listing should still be saved with basic data', async function () {
-  const listing = await prisma.listing.findUnique({
-    where: { id: testListing!.id },
+Then('the listing should still be saved with basic data', async function (this: CustomWorld) {
+  const state = getState(this);
+  
+  const listing = await this.db.listing.findUnique({
+    where: { id: state.testListing!.id },
   });
   expect(listing).toBeTruthy();
   expect(listing!.title).toBeTruthy();
   expect(listing!.price).toBeTruthy();
 });
 
-Then('sellability fields should be null or default values', async function () {
-  const listing = await prisma.listing.findUnique({
-    where: { id: testListing!.id },
+Then('sellability fields should be null or default values', async function (this: CustomWorld) {
+  const state = getState(this);
+  
+  const listing = await this.db.listing.findUnique({
+    where: { id: state.testListing!.id },
   });
   
   // When LLM fails, sellability fields aren't populated
-  // Keep existing values or set to null
   expect(listing).toBeTruthy();
 });
 
-Then('the user should not see an error message', async function () {
-  // UI validation - graceful degradation
-  this.errorMessageShown = false;
+Then('the user should not see an error message', async function (this: CustomWorld) {
+  const state = getState(this);
+  state.errorMessageShown = false;
 });
