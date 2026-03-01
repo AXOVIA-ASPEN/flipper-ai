@@ -89,6 +89,15 @@ make db-reset          # Reset database
 make clean             # Remove build artifacts
 ```
 
+## 📚 Documentation
+
+- **[API Reference](docs/api/README.md)** - Complete API documentation for all 53 endpoints
+- **[Authentication Guide](docs/api/authentication.md)** - OAuth, JWT tokens, session management
+- **[API Examples](docs/api/examples.md)** - Practical usage examples for common workflows
+- **[Development Guide](docs/development-guide.md)** - Setup and contribution guidelines
+- **[Deployment Guide](docs/deployment/DEPLOYMENT.md)** - Production deployment instructions
+
+
 ## 🧪 Testing
 
 | Suite          | Tool               | Count                    | Coverage       |
