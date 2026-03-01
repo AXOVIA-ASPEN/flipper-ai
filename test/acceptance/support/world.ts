@@ -7,6 +7,7 @@
 import { World, IWorldOptions, setWorldConstructor } from '@cucumber/cucumber';
 import { Page, Browser } from '@playwright/test';
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -37,7 +38,16 @@ export class CustomWorld extends World implements FlipperWorld {
           'DATABASE_URL is required for BDD tests. Use the same database as the app (e.g. postgres).'
         );
       }
+
+      const adapter = new PrismaPg({
+        connectionString: process.env.DATABASE_URL,
+        max: 2,
+        connectionTimeoutMillis: 10_000,
+        idleTimeoutMillis: 30_000,
+      });
+
       this._db = new PrismaClient({
+        adapter,
         log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
       });
     }
