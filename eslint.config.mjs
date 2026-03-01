@@ -12,6 +12,12 @@ const eslintConfig = defineConfig([
     'out/**',
     'build/**',
     'next-env.d.ts',
+    // Generated code — never lint
+    'src/generated/**',
+    // Coverage reports
+    'coverage/**',
+    // Legacy cloud function code
+    'functions/**',
   ]),
   // Relax rules for test files and config files
   {
@@ -22,7 +28,9 @@ const eslintConfig = defineConfig([
       '**/*.spec.ts',
       '**/*.spec.tsx',
       'features/**',
+      'test/**',
       'e2e/**',
+      'scripts/**',
       '*.config.js',
       '*.config.mjs',
     ],

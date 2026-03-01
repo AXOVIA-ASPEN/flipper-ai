@@ -5,21 +5,22 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
-import { auth } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/firebase/session';
 import { getToken, hasValidToken } from '@/scrapers/facebook/token-store';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, UnauthorizedError } from '@/lib/errors';
+
 export async function GET(req: NextRequest) {
-  // Check if user is authenticated
-  const session = await auth();
-
-  if (!session?.user?.email) {
-    throw new UnauthorizedError('Unauthorized');
-  }
-
-  const userId = session.user.id || session.user.email;
-
   try {
+    // Check if user is authenticated via Firebase session
+    const sessionUser = await getCurrentUser();
+
+    if (!sessionUser?.email) {
+      throw new UnauthorizedError('Unauthorized');
+    }
+
+    const userId = sessionUser.id;
+
     const isValid = await hasValidToken(userId);
     const tokenData = await getToken(userId);
 
@@ -29,7 +30,6 @@ export async function GET(req: NextRequest) {
       // Don't send actual token to client for security
     });
   } catch (error) {
-    console.error('Facebook status check error:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to check Facebook status');
+    return handleError(error);
   }
 }

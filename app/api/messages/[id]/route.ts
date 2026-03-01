@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
@@ -38,7 +38,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ success: true, data: message });
   } catch (error) {
     console.error('Error fetching message:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch message');
+    return handleError(error);
   }
 }
 
@@ -135,7 +135,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     console.error('Error updating message:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to update message');
+    return handleError(error);
   }
 }
 
@@ -162,6 +162,6 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ success: true, message: 'Message deleted' });
   } catch (error) {
     console.error('Error deleting message:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to delete message');
+    return handleError(error);
   }
 }

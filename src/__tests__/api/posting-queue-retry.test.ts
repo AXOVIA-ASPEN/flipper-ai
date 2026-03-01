@@ -61,9 +61,9 @@ describe('POST /api/posting-queue/[id]/retry', () => {
       maxRetries: 3,
     });
     const res = await POST(makeRequest(), makeContext());
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
     const json = await res.json();
-    expect(json.error).toContain('Only failed items');
+    expect(json.error.code).toBe('VALIDATION_ERROR');
   });
 
   it('returns 400 when max retries exceeded', async () => {

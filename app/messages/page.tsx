@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useSession } from 'next-auth/react';
+import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import { useRouter } from 'next/navigation';
 
 interface MessageListing {
@@ -41,7 +41,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function MessagesPage() {
-  const { data: session, status: authStatus } = useSession();
+  const { user: firebaseUser, loading: authLoading } = useFirebaseAuth();
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,14 +78,14 @@ export default function MessagesPage() {
   }, [tab, search, sortBy, sortOrder, offset]);
 
   useEffect(() => {
-    if (authStatus === 'unauthenticated') {
+    if (!authLoading && !firebaseUser) {
       router.push('/login');
       return;
     }
-    if (authStatus === 'authenticated') {
+    if (!authLoading && firebaseUser) {
       fetchMessages();
     }
-  }, [authStatus, router, fetchMessages]);
+  }, [authLoading, firebaseUser, router, fetchMessages]);
 
   useEffect(() => {
     setOffset(0);
@@ -118,7 +118,7 @@ export default function MessagesPage() {
     tab === 'all' ? m.direction === 'OUTBOUND' : true
   ).length;
 
-  if (authStatus === 'loading') {
+  if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />

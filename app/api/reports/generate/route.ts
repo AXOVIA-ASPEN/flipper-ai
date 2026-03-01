@@ -13,7 +13,7 @@ import {
 } from '@/lib/report-service';
 import { getAuthUserId } from '@/lib/auth-middleware';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 // Mock data fetcher (replace with real DB query in production)
 async function fetchItems(userId: string, start: Date, end: Date) {
   // In production, this queries Prisma for items within date range
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(report);
   } catch (error) {
     console.error('Report generation error:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to generate report');
+    return handleError(error);
   }
 }
 

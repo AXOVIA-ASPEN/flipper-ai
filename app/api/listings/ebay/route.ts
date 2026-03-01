@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserId } from '@/lib/auth-middleware';
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 import {
   createDraftListing,
   publishOffer,
@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error creating eBay listing:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Internal server error');
+    return handleError(error);
   }
 }
 

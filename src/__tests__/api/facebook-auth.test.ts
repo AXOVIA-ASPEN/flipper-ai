@@ -1,14 +1,16 @@
 /**
  * Tests for Facebook OAuth API Routes
  * Covers: authorize, callback, disconnect, status
+ *
+ * Routes use Firebase session-based auth (getCurrentUser from @/lib/firebase/session).
  */
 
 import { NextRequest } from 'next/server';
 
-// Mock auth
-const mockAuth = jest.fn();
-jest.mock('@/lib/auth', () => ({
-  auth: () => mockAuth(),
+// Mock Firebase session auth
+const mockGetCurrentUser = jest.fn();
+jest.mock('@/lib/firebase/session', () => ({
+  getCurrentUser: () => mockGetCurrentUser(),
 }));
 
 // Mock facebook auth functions
@@ -43,6 +45,18 @@ jest.mock('crypto', () => ({
   }),
 }));
 
+/** Helper: SessionUser shape returned by getCurrentUser */
+function sessionUser(overrides?: Record<string, unknown>) {
+  return {
+    id: 'user-1',
+    firebaseUid: 'fb-uid-1',
+    email: 'test@example.com',
+    name: 'Test User',
+    image: null,
+    ...overrides,
+  };
+}
+
 function makeRequest(url: string, method = 'GET', cookies?: Record<string, string>): NextRequest {
   const req = new NextRequest(new URL(url, 'http://localhost:3000'), { method });
   if (cookies) {
@@ -57,7 +71,6 @@ describe('Facebook Auth - Authorize', () => {
   let GET: (req: NextRequest) => Promise<Response>;
 
   beforeEach(() => {
-    jest.resetModules();
     jest.clearAllMocks();
     delete process.env.FACEBOOK_APP_ID;
     delete process.env.FACEBOOK_APP_SECRET;
@@ -70,21 +83,19 @@ describe('Facebook Auth - Authorize', () => {
   });
 
   it('returns 401 when not authenticated', async () => {
-    mockAuth.mockResolvedValue(null);
+    mockGetCurrentUser.mockResolvedValue(null);
     const res = await GET(makeRequest('/api/auth/facebook/authorize'));
     expect(res.status).toBe(401);
-    const body = await res.json();
-    expect(body.error).toContain('Unauthorized');
   });
 
   it('returns 401 when session has no email', async () => {
-    mockAuth.mockResolvedValue({ user: {} });
+    mockGetCurrentUser.mockResolvedValue(sessionUser({ email: null }));
     const res = await GET(makeRequest('/api/auth/facebook/authorize'));
     expect(res.status).toBe(401);
   });
 
   it('returns 500 when Facebook app credentials missing', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com' } });
+    mockGetCurrentUser.mockResolvedValue(sessionUser());
     const res = await GET(makeRequest('/api/auth/facebook/authorize'));
     expect(res.status).toBe(500);
     const body = await res.json();
@@ -92,7 +103,7 @@ describe('Facebook Auth - Authorize', () => {
   });
 
   it('redirects to Facebook auth URL when configured', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com' } });
+    mockGetCurrentUser.mockResolvedValue(sessionUser());
     process.env.FACEBOOK_APP_ID = 'test-app-id';
     process.env.FACEBOOK_APP_SECRET = 'test-secret';
     mockGetAuthorizationUrl.mockReturnValue('https://facebook.com/dialog/oauth?state=abc');
@@ -123,16 +134,16 @@ describe('Facebook Auth - Callback', () => {
     GET = mod.GET;
   });
 
-  it('redirects to signin when not authenticated', async () => {
-    mockAuth.mockResolvedValue(null);
+  it('redirects to login when not authenticated', async () => {
+    mockGetCurrentUser.mockResolvedValue(null);
     const res = await GET(makeRequest('/api/auth/facebook/callback?code=abc&state=xyz'));
     expect(res.status).toBe(307);
     const location = res.headers.get('location') || '';
-    expect(location).toContain('signin');
+    expect(location).toContain('login');
   });
 
   it('redirects with error when Facebook returns error', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com' } });
+    mockGetCurrentUser.mockResolvedValue(sessionUser());
     const res = await GET(makeRequest('/api/auth/facebook/callback?error=access_denied'));
     expect(res.status).toBe(307);
     const location = res.headers.get('location') || '';
@@ -140,7 +151,7 @@ describe('Facebook Auth - Callback', () => {
   });
 
   it('redirects with error when code or state missing', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com' } });
+    mockGetCurrentUser.mockResolvedValue(sessionUser());
     const res = await GET(makeRequest('/api/auth/facebook/callback'));
     expect(res.status).toBe(307);
     const location = res.headers.get('location') || '';
@@ -148,7 +159,7 @@ describe('Facebook Auth - Callback', () => {
   });
 
   it('redirects with error on state mismatch', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com' } });
+    mockGetCurrentUser.mockResolvedValue(sessionUser());
     const res = await GET(
       makeRequest('/api/auth/facebook/callback?code=abc&state=wrong', 'GET', {
         facebook_oauth_state: 'correct-state',
@@ -160,7 +171,7 @@ describe('Facebook Auth - Callback', () => {
   });
 
   it('redirects with error when app not configured', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com' } });
+    mockGetCurrentUser.mockResolvedValue(sessionUser());
     delete process.env.FACEBOOK_APP_ID;
     delete process.env.FACEBOOK_APP_SECRET;
     const res = await GET(
@@ -174,7 +185,7 @@ describe('Facebook Auth - Callback', () => {
   });
 
   it('exchanges code for token and stores it on success', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com', id: 'user-1' } });
+    mockGetCurrentUser.mockResolvedValue(sessionUser());
     mockExchangeCodeForToken.mockResolvedValue({ access_token: 'short-token' });
     mockExchangeForLongLivedToken.mockResolvedValue({
       access_token: 'long-token',
@@ -196,7 +207,7 @@ describe('Facebook Auth - Callback', () => {
   });
 
   it('redirects with error on token exchange failure', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com', id: 'user-1' } });
+    mockGetCurrentUser.mockResolvedValue(sessionUser());
     mockExchangeCodeForToken.mockRejectedValue(new Error('Exchange failed'));
 
     const res = await GET(
@@ -209,27 +220,9 @@ describe('Facebook Auth - Callback', () => {
     expect(location).toContain('token_exchange_failed');
   });
 
-  it('uses email as userId when id is not available', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com' } });
-    mockExchangeCodeForToken.mockResolvedValue({ access_token: 'short-token' });
-    mockExchangeForLongLivedToken.mockResolvedValue({
-      access_token: 'long-token',
-      expires_in: 5184000,
-    });
-    mockStoreToken.mockResolvedValue(undefined);
-
-    await GET(
-      makeRequest('/api/auth/facebook/callback?code=code&state=mystate', 'GET', {
-        facebook_oauth_state: 'mystate',
-      })
-    );
-    expect(mockStoreToken).toHaveBeenCalledWith('test@example.com', 'long-token', 5184000);
-  });
-
-  it('uses FACEBOOK_REDIRECT_URI env var when set (covers || truthy branch)', async () => {
-    // Covers: `process.env.FACEBOOK_REDIRECT_URI || 'http://localhost:3000/...'` → left side truthy
+  it('uses FACEBOOK_REDIRECT_URI env var when set', async () => {
     process.env.FACEBOOK_REDIRECT_URI = 'https://myapp.example.com/api/auth/facebook/callback';
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com', id: 'user-1' } });
+    mockGetCurrentUser.mockResolvedValue(sessionUser());
     mockExchangeCodeForToken.mockResolvedValue({ access_token: 'short-token' });
     mockExchangeForLongLivedToken.mockResolvedValue({
       access_token: 'long-token',
@@ -245,7 +238,6 @@ describe('Facebook Auth - Callback', () => {
     expect(res.status).toBe(307);
     const location = res.headers.get('location') || '';
     expect(location).toContain('facebook_auth=success');
-    // Verify exchangeCodeForToken was called with the custom redirect URI
     expect(mockExchangeCodeForToken).toHaveBeenCalledWith(
       expect.objectContaining({ redirectUri: 'https://myapp.example.com/api/auth/facebook/callback' }),
       'auth-code2'
@@ -254,9 +246,8 @@ describe('Facebook Auth - Callback', () => {
   });
 
   it('redirects with Unknown error when non-Error is thrown in callback', async () => {
-    // Covers: `error instanceof Error ? error.message : 'Unknown error'` → false branch
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com', id: 'user-1' } });
-    mockExchangeCodeForToken.mockRejectedValue('string-error'); // not an Error instance
+    mockGetCurrentUser.mockResolvedValue(sessionUser());
+    mockExchangeCodeForToken.mockRejectedValue('string-error');
 
     const res = await GET(
       makeRequest('/api/auth/facebook/callback?code=bad-code2&state=mystate3', 'GET', {
@@ -283,13 +274,13 @@ describe('Facebook Auth - Disconnect', () => {
   });
 
   it('returns 401 when not authenticated', async () => {
-    mockAuth.mockResolvedValue(null);
+    mockGetCurrentUser.mockResolvedValue(null);
     const res = await POST(makeRequest('/api/auth/facebook/disconnect', 'POST'));
     expect(res.status).toBe(401);
   });
 
   it('revokes token and deletes from store', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com', id: 'user-1' } });
+    mockGetCurrentUser.mockResolvedValue(sessionUser());
     mockGetToken.mockResolvedValue({ accessToken: 'my-token', expiresAt: Date.now() + 100000 });
     mockRevokeAccessToken.mockResolvedValue(undefined);
     mockDeleteToken.mockResolvedValue(undefined);
@@ -303,7 +294,7 @@ describe('Facebook Auth - Disconnect', () => {
   });
 
   it('still deletes local token even if revoke fails', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com', id: 'user-1' } });
+    mockGetCurrentUser.mockResolvedValue(sessionUser());
     mockGetToken.mockResolvedValue({ accessToken: 'my-token', expiresAt: Date.now() + 100000 });
     mockRevokeAccessToken.mockRejectedValue(new Error('Revoke failed'));
     mockDeleteToken.mockResolvedValue(undefined);
@@ -314,7 +305,7 @@ describe('Facebook Auth - Disconnect', () => {
   });
 
   it('handles case when no token exists', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com', id: 'user-1' } });
+    mockGetCurrentUser.mockResolvedValue(sessionUser());
     mockGetToken.mockResolvedValue(null);
     mockDeleteToken.mockResolvedValue(undefined);
 
@@ -324,20 +315,11 @@ describe('Facebook Auth - Disconnect', () => {
   });
 
   it('returns 500 on unexpected error', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com', id: 'user-1' } });
+    mockGetCurrentUser.mockResolvedValue(sessionUser());
     mockGetToken.mockRejectedValue(new Error('DB error'));
 
     const res = await POST(makeRequest('/api/auth/facebook/disconnect', 'POST'));
     expect(res.status).toBe(500);
-  });
-
-  it('uses email when id not available', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com' } });
-    mockGetToken.mockResolvedValue(null);
-    mockDeleteToken.mockResolvedValue(undefined);
-
-    await POST(makeRequest('/api/auth/facebook/disconnect', 'POST'));
-    expect(mockDeleteToken).toHaveBeenCalledWith('test@example.com');
   });
 });
 
@@ -354,14 +336,14 @@ describe('Facebook Auth - Status', () => {
   });
 
   it('returns 401 when not authenticated', async () => {
-    mockAuth.mockResolvedValue(null);
+    mockGetCurrentUser.mockResolvedValue(null);
     const res = await GET(makeRequest('/api/auth/facebook/status'));
     expect(res.status).toBe(401);
   });
 
   it('returns connected status with expiration', async () => {
     const expiresAt = Date.now() + 5184000000;
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com', id: 'user-1' } });
+    mockGetCurrentUser.mockResolvedValue(sessionUser());
     mockHasValidToken.mockResolvedValue(true);
     mockGetToken.mockResolvedValue({ accessToken: 'token', expiresAt });
 
@@ -375,7 +357,7 @@ describe('Facebook Auth - Status', () => {
   });
 
   it('returns disconnected status', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com', id: 'user-1' } });
+    mockGetCurrentUser.mockResolvedValue(sessionUser());
     mockHasValidToken.mockResolvedValue(false);
     mockGetToken.mockResolvedValue(null);
 
@@ -386,19 +368,10 @@ describe('Facebook Auth - Status', () => {
   });
 
   it('returns 500 on error', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com', id: 'user-1' } });
+    mockGetCurrentUser.mockResolvedValue(sessionUser());
     mockHasValidToken.mockRejectedValue(new Error('DB error'));
 
     const res = await GET(makeRequest('/api/auth/facebook/status'));
     expect(res.status).toBe(500);
-  });
-
-  it('uses email when id not available', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@example.com' } });
-    mockHasValidToken.mockResolvedValue(false);
-    mockGetToken.mockResolvedValue(null);
-
-    await GET(makeRequest('/api/auth/facebook/status'));
-    expect(mockHasValidToken).toHaveBeenCalledWith('test@example.com');
   });
 });

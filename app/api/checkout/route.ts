@@ -5,15 +5,15 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/auth';
 import { stripe, STRIPE_PRICE_IDS } from '@/lib/stripe';
 import { SubscriptionTier } from '@/lib/subscription-tiers';
 
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.email) {
+    const sessionUser = await getCurrentUser();
+    if (!sessionUser?.email) {
       throw new UnauthorizedError('Unauthorized');
     }
 
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 
     // Find or create Stripe customer
     const customers = await stripe.customers.list({
-      email: session.user.email,
+      email: sessionUser.email,
       limit: 1,
     });
 
@@ -37,8 +37,8 @@ export async function POST(req: NextRequest) {
       customerId = customers.data[0].id;
     } else {
       const customer = await stripe.customers.create({
-        email: session.user.email,
-        name: session.user.name || undefined,
+        email: sessionUser.email,
+        name: sessionUser.name || undefined,
         metadata: { source: 'flipper-ai' },
       });
       customerId = customer.id;
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
       success_url: `${baseUrl}/settings?checkout=success&tier=${tier}`,
       cancel_url: `${baseUrl}/settings?checkout=cancelled`,
       metadata: {
-        userId: session.user.email,
+        userId: sessionUser.email,
         tier,
       },
       subscription_data: {
@@ -64,6 +64,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ url: checkoutSession.url });
   } catch (error) {
-    return handleError(error, request.url);
+    return handleError(error, req.url);
   }
 }

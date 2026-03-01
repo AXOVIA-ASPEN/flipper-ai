@@ -7,12 +7,17 @@ jest.mock('@/lib/db', () => ({
   },
 }));
 
-jest.mock('@/lib/logger', () => ({
-  logger: {
-    error: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-  },
+jest.mock('@/lib/request-context', () => ({
+  getRequestLogger: jest.fn(async () => ({
+    requestId: 'test-request-id',
+    log: {
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+      fatal: jest.fn(),
+    },
+  })),
 }));
 
 jest.mock('@/lib/metrics', () => ({

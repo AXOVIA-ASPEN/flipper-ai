@@ -8,7 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { downloadAndCacheImage, generateImageHash, isImageCached } from '@/lib/image-service';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 // Configuration
 const MAX_IMAGE_SIZE_MB = 5;
 const CACHE_CONTROL_HEADER = 'public, max-age=86400, s-maxage=604800'; // 1 day client, 7 days CDN
@@ -99,6 +99,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Image proxy error:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to proxy image');
+    return handleError(error);
   }
 }

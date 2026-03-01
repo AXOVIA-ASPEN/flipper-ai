@@ -1,10 +1,9 @@
-// BACKUP OF ORIGINAL LAYOUT
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { ThemeStyles } from '@/components/ThemeStyles';
-import { SessionProvider } from '@/components/providers/SessionProvider';
+import { FirebaseAuthProvider } from '@/components/providers/FirebaseAuthProvider';
 import { WebVitals } from '@/components/WebVitals';
 import Navigation from '@/components/Navigation';
 import { Analytics } from '@vercel/analytics/next';
@@ -35,16 +34,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <SessionProvider>
+        <FirebaseAuthProvider>
           <ThemeProvider>
             <ToastProvider>
               <ThemeStyles />
               <WebVitals />
+              <Navigation />
               {children}
               <Analytics />
             </ToastProvider>
           </ThemeProvider>
-        </SessionProvider>
+        </FirebaseAuthProvider>
       </body>
     </html>
   );

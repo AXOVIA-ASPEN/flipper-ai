@@ -35,14 +35,14 @@ interface ToastProviderProps {
 export function ToastProvider({ children }: ToastProviderProps) {
   const [toasts, setToasts] = useState<Array<ToastProps & { id: string }>>([]);
 
-  const showToast = useCallback((toast: ToastData) => {
-    const id = toast.id ?? `toast-${Date.now()}-${Math.random()}`;
-    setToasts((prev) => [...prev, { ...toast, id, onClose: removeToast }]);
-  }, []);
-
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
+
+  const showToast = useCallback((toast: ToastData) => {
+    const id = toast.id ?? `toast-${Date.now()}-${Math.random()}`;
+    setToasts((prev) => [...prev, { ...toast, id, onClose: removeToast }]);
+  }, [removeToast]);
 
   return (
     <ToastContext.Provider value={{ showToast }}>

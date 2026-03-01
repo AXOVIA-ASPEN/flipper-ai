@@ -103,9 +103,9 @@ describe('/api/messages/[id]', () => {
       expect(res.status).toBe(404);
     });
 
-    it('returns 400 when action is missing', async () => {
+    it('returns 422 when action is missing', async () => {
       const res = await PATCH(makeRequest('PATCH', {}) as any, makeParams('msg-1'));
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
 
     it('returns 400 for invalid action', async () => {
@@ -155,9 +155,9 @@ describe('/api/messages/[id]', () => {
       expect(res.status).toBe(200);
     });
 
-    it('returns 400 when edit has no body or subject', async () => {
+    it('returns 422 when edit has no body or subject', async () => {
       const res = await PATCH(makeRequest('PATCH', { action: 'edit' }) as any, makeParams('msg-1'));
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
 
     it('rejects a message (sets REJECTED)', async () => {

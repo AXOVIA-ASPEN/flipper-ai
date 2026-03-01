@@ -35,17 +35,17 @@ function makeRequest(body: string, sig: string | null = 'sig_test'): NextRequest
 describe('POST /api/webhooks/stripe', () => {
   beforeEach(() => jest.clearAllMocks());
 
-  it('returns 400 when signature is missing', async () => {
+  it('returns 422 when signature is missing', async () => {
     const res = await POST(makeRequest('{}', null));
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
   });
 
-  it('returns 400 when signature is invalid', async () => {
+  it('returns 422 when signature is invalid', async () => {
     mockConstructEvent.mockImplementation(() => {
       throw new Error('Invalid signature');
     });
     const res = await POST(makeRequest('{}'));
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
   });
 
   it('handles checkout.session.completed', async () => {
@@ -125,7 +125,7 @@ describe('POST /api/webhooks/stripe - error handling', () => {
     const res = await POST(makeRequest('{}'));
     expect(res.status).toBe(500);
     const body = await res.json();
-    expect(body.error).toBe('Webhook handler failed');
+    expect(body.error.code).toBe('INTERNAL_ERROR');
   });
 
   it('returns 500 when subscription.deleted customers.retrieve throws', async () => {

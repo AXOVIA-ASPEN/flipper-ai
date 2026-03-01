@@ -1,0 +1,22 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Listing images: /{userId}/{platform}/{listingId}/{imageIndex}.{ext}
+    match /{userId}/{platform}/{listingId}/{allPaths=**} {
+      // Public read — listing images aren't sensitive (marketplace photos)
+      allow read: if true;
+
+      // Write only by the owning user (for future client-side uploads)
+      // Admin SDK bypasses rules entirely (server-side uploads)
+      allow write: if request.auth != null
+                   && request.auth.uid == userId
+                   && request.resource.contentType.matches('image/.*')
+                   && request.resource.size < 5 * 1024 * 1024; // 5MB
+    }
+
+    // Deny all other paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

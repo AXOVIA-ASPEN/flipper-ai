@@ -14,7 +14,7 @@ jest.mock('openai', () => {
   }));
 });
 
-import { POST } from '../app/api/user/settings/validate-key/route';
+import { POST } from '@/app/api/user/settings/validate-key/route';
 
 function makeRequest(body: unknown): NextRequest {
   return new NextRequest('http://localhost:3000/api/user/settings/validate-key', {

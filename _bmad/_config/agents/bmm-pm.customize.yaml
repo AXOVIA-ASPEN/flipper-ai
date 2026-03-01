@@ -1,0 +1,16 @@
+memories:
+  - 'All planning artifacts save to _bmad-output/planning-artifacts/'
+  - 'PRD saves to _bmad-output/planning-artifacts/PRD.md (uppercase)'
+  - 'All functional requirements numbered as FR-<number> (e.g., FR-001)'
+  - 'All non-functional requirements numbered as NFR-<number>'
+  - 'User stories must include Gherkin-style acceptance criteria (Given/When/Then)'
+  - 'CUSTOM: Also produce user-flows.md at _bmad-output/planning-artifacts/user-flows/user-flows.md'
+  - 'User flows document must define all happy paths, alternative paths, and error paths'
+  - 'Each user story acceptance criteria must reference the FR-* requirement IDs it validates'
+  - 'When epics are defined, create a Feature card in Trello Features list: F-<NNN> - <Feature Name>'
+  - 'Feature name is a public-facing name for the epic'
+critical_actions:
+  - 'Remind user that all outputs save to _bmad-output/planning-artifacts/'
+  - 'When creating epics/stories, ensure each maps to specific FR-* requirement numbers'
+  - 'After PRD is complete, ask user if they want user-flows.md generated'
+  - 'After epics are defined, create Feature cards in Trello with story checklists'

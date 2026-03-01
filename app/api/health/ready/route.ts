@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
+import { getRequestLogger } from '@/lib/request-context';
 import { metrics } from '@/lib/metrics';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 /**
  * Readiness probe - checks that all dependencies are available
  * GET /api/health/ready
  */
 export async function GET() {
+  const { log } = await getRequestLogger();
   const checks: Record<string, { status: string; latencyMs?: number }> = {};
   let healthy = true;
 
@@ -22,9 +22,7 @@ export async function GET() {
   } catch (error) {
     healthy = false;
     checks.database = { status: 'error' };
-    logger.error('Readiness check: database unreachable', {
-      error: error instanceof Error ? error.message : String(error),
-    });
+    log.error({ error: error instanceof Error ? error.message : String(error) }, 'Readiness check: database unreachable');
   }
 
   metrics.increment('readiness_checks');

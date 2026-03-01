@@ -62,7 +62,8 @@ describe('GET /api/listings/track', () => {
     const data = await res.json();
 
     expect(res.status).toBe(500);
-    expect(data.error).toBe('Failed to fetch trackable listings');
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('INTERNAL_ERROR');
   });
 });
 
@@ -123,7 +124,8 @@ describe('POST /api/listings/track', () => {
     const data = await res.json();
 
     expect(res.status).toBe(500);
-    expect(data.error).toBe('Failed to run tracking cycle');
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('INTERNAL_ERROR');
   });
 
   it('dryRun returns 500 when getTrackableListings fails', async () => {
@@ -134,7 +136,8 @@ describe('POST /api/listings/track', () => {
     const data = await res.json();
 
     expect(res.status).toBe(500);
-    expect(data.error).toBe('Failed to run tracking cycle');
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('INTERNAL_ERROR');
   });
 
   it('passes a fetcher callback that logs and returns null (placeholder)', async () => {

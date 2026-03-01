@@ -201,7 +201,8 @@ describe('GET /api/inventory/roi', () => {
     const res = await GET(makeReq());
     expect(res.status).toBe(500);
     const json = await res.json();
-    expect(json.error).toBe('Failed to calculate ROI');
+    expect(json.success).toBe(false);
+    expect(json.error.code).toBe('INTERNAL_ERROR');
   });
 
   it('returns 500 when getAuthUserId throws', async () => {
@@ -210,7 +211,8 @@ describe('GET /api/inventory/roi', () => {
     const res = await GET(makeReq());
     expect(res.status).toBe(500);
     const json = await res.json();
-    expect(json.error).toBe('Failed to calculate ROI');
+    expect(json.success).toBe(false);
+    expect(json.error.code).toBe('INTERNAL_ERROR');
   });
 
   it('passes correct ROIInput to calculateROI', async () => {

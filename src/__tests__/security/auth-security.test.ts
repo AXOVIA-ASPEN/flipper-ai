@@ -1,340 +1,259 @@
 /**
- * Comprehensive Security Tests for Authentication
+ * Security Tests for Firebase Authentication
  * @jest-environment node
  */
 import { describe, test, expect, jest, beforeEach } from '@jest/globals';
+import { NextRequest } from 'next/server';
 
-// Mock NextAuth providers
-jest.mock('next-auth/providers/google', () => ({
-  __esModule: true,
-  default: jest.fn((config) => ({ ...config, type: 'oauth', id: 'google', name: 'Google' })),
+// Mock next/headers cookies()
+const mockCookieGet = jest.fn();
+jest.mock('next/headers', () => ({
+  cookies: jest.fn().mockResolvedValue({
+    get: (...args: unknown[]) => mockCookieGet(...args),
+  }),
 }));
 
-jest.mock('next-auth/providers/github', () => ({
-  __esModule: true,
-  default: jest.fn((config) => ({ ...config, type: 'oauth', id: 'github', name: 'GitHub' })),
+// Mock Firebase Admin SDK
+const mockVerifySessionCookie = jest.fn();
+const mockAdminVerifyIdToken = jest.fn();
+const mockCreateSessionCookie = jest.fn();
+jest.mock('@/lib/firebase/admin', () => ({
+  adminAuth: {
+    verifySessionCookie: (...args: unknown[]) => mockVerifySessionCookie(...args),
+    verifyIdToken: (...args: unknown[]) => mockAdminVerifyIdToken(...args),
+    createSessionCookie: (...args: unknown[]) => mockCreateSessionCookie(...args),
+  },
 }));
 
-jest.mock('next-auth/providers/credentials', () => ({
-  __esModule: true,
-  default: jest.fn((config) => ({
-    ...config,
-    type: 'credentials',
-    id: 'credentials',
-    name: 'credentials',
-  })),
-}));
-
-// Mock NextAuth before importing auth
-const mockNextAuth = jest.fn((config) => {
-  mockNextAuth._config = config;
-  return {
-    handlers: { GET: jest.fn(), POST: jest.fn() },
-    auth: jest.fn(),
-    signIn: jest.fn(),
-    signOut: jest.fn(),
-  };
-});
-
-jest.mock('next-auth', () => ({
-  __esModule: true,
-  default: mockNextAuth,
-}));
-
-jest.mock('@auth/prisma-adapter', () => ({
-  PrismaAdapter: jest.fn(),
-}));
-
+// Mock Prisma
+const mockUserFindUnique = jest.fn();
 jest.mock('@/lib/db', () => ({
   __esModule: true,
   default: {
     user: {
-      findUnique: jest.fn(),
-    },
-    userSettings: {
-      create: jest.fn(),
+      findUnique: (...args: unknown[]) => mockUserFindUnique(...args),
     },
   },
 }));
 
-jest.mock('bcryptjs', () => ({
-  compare: jest.fn(),
-  hash: jest.fn(),
-}));
+import { getCurrentUser, requireAuth, createSessionCookie } from '@/lib/firebase/session';
+import { verifyIdToken } from '@/lib/firebase/auth-middleware';
 
-import prisma from '@/lib/db';
-import bcrypt from 'bcryptjs';
-
-// Import auth to trigger NextAuth config setup
-import '@/lib/auth';
-
-describe('Security: Authentication Attack Vectors', () => {
+describe('Security: Firebase Authentication', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockCookieGet.mockReturnValue(undefined);
   });
 
-  describe('SQL Injection Protection', () => {
-    test('should safely handle SQL injection in email field', async () => {
-      const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find((p: any) => p.id === 'credentials');
+  describe('Session Cookie Security', () => {
+    test('should verify session cookie with revocation check', async () => {
+      mockCookieGet.mockReturnValue({ value: 'session-cookie' });
+      mockVerifySessionCookie.mockResolvedValue({ uid: 'uid-123' });
+      mockUserFindUnique.mockResolvedValue(null);
 
-      const maliciousEmail = "admin'--";
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+      await getCurrentUser();
+      expect(mockVerifySessionCookie).toHaveBeenCalledWith('session-cookie', true);
+    });
 
-      await expect(
-        credentialsProvider.authorize({
-          email: maliciousEmail,
-          password: 'password123',
-        })
-      ).rejects.toThrow('Invalid email or password');
+    test('should reject expired session cookies', async () => {
+      mockCookieGet.mockReturnValue({ value: 'expired-cookie' });
+      mockVerifySessionCookie.mockRejectedValue(new Error('Session cookie has expired'));
 
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({
-        where: { email: maliciousEmail },
+      const user = await getCurrentUser();
+      expect(user).toBeNull();
+    });
+
+    test('should reject tampered session cookies', async () => {
+      mockCookieGet.mockReturnValue({ value: 'tampered-cookie' });
+      mockVerifySessionCookie.mockRejectedValue(new Error('Decoding Firebase session cookie failed'));
+
+      const user = await getCurrentUser();
+      expect(user).toBeNull();
+    });
+
+    test('should reject revoked session cookies', async () => {
+      mockCookieGet.mockReturnValue({ value: 'revoked-cookie' });
+      mockVerifySessionCookie.mockRejectedValue(new Error('Session cookie has been revoked'));
+
+      const user = await getCurrentUser();
+      expect(user).toBeNull();
+    });
+
+    test('should handle missing cookie gracefully', async () => {
+      mockCookieGet.mockReturnValue(undefined);
+
+      const user = await getCurrentUser();
+      expect(user).toBeNull();
+      expect(mockVerifySessionCookie).not.toHaveBeenCalled();
+    });
+
+    test('should create session cookie with proper expiration', async () => {
+      mockCreateSessionCookie.mockResolvedValue('new-session-cookie');
+
+      const cookie = await createSessionCookie('valid-id-token');
+
+      expect(mockCreateSessionCookie).toHaveBeenCalledWith('valid-id-token', {
+        expiresIn: 60 * 60 * 24 * 5 * 1000, // 5 days in ms
+      });
+      expect(cookie).toBe('new-session-cookie');
+    });
+  });
+
+  describe('Bearer Token Security', () => {
+    test('should reject requests without Authorization header', async () => {
+      const req = new NextRequest('http://localhost:3000/api/test');
+      const result = await verifyIdToken(req);
+      expect(result).toBeNull();
+    });
+
+    test('should reject requests with non-Bearer authorization', async () => {
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        headers: { Authorization: 'Basic dXNlcjpwYXNz' },
+      });
+      const result = await verifyIdToken(req);
+      expect(result).toBeNull();
+    });
+
+    test('should reject requests with empty Bearer token', async () => {
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        headers: { Authorization: 'Bearer ' },
+      });
+      const result = await verifyIdToken(req);
+      expect(result).toBeNull();
+    });
+
+    test('should reject invalid Firebase tokens', async () => {
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        headers: { Authorization: 'Bearer invalid-token' },
+      });
+      mockAdminVerifyIdToken.mockRejectedValue(new Error('Firebase ID token has invalid signature'));
+
+      const result = await verifyIdToken(req);
+      expect(result).toBeNull();
+    });
+
+    test('should reject expired Firebase tokens', async () => {
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        headers: { Authorization: 'Bearer expired-token' },
+      });
+      mockAdminVerifyIdToken.mockRejectedValue(new Error('Firebase ID token has expired'));
+
+      const result = await verifyIdToken(req);
+      expect(result).toBeNull();
+    });
+
+    test('should reject tokens for users not in database', async () => {
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        headers: { Authorization: 'Bearer valid-token' },
+      });
+      mockAdminVerifyIdToken.mockResolvedValue({ uid: 'unknown-uid', email: 'user@test.com' });
+      mockUserFindUnique.mockResolvedValue(null);
+
+      const result = await verifyIdToken(req);
+      expect(result).toBeNull();
+    });
+
+    test('should resolve valid tokens to user records', async () => {
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        headers: { Authorization: 'Bearer valid-token' },
+      });
+      mockAdminVerifyIdToken.mockResolvedValue({
+        uid: 'fb-123',
+        email: 'user@test.com',
+        name: 'Test',
+        picture: 'http://img.com/1',
+      });
+      mockUserFindUnique.mockResolvedValue({
+        id: 'prisma-123',
+        firebaseUid: 'fb-123',
+      });
+
+      const result = await verifyIdToken(req);
+      expect(result).toEqual({
+        uid: 'fb-123',
+        email: 'user@test.com',
+        name: 'Test',
+        picture: 'http://img.com/1',
+        prismaUserId: 'prisma-123',
       });
     });
-
-    test('should safely handle SQL injection in password field', async () => {
-      const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find((p: any) => p.id === 'credentials');
-
-      const maliciousPassword = "' OR '1'='1";
-      const mockUser = {
-        id: 'user-123',
-        email: 'test@example.com',
-        password: '$2a$10$hashedpassword',
-      };
-
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
-      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
-
-      await expect(
-        credentialsProvider.authorize({
-          email: 'test@example.com',
-          password: maliciousPassword,
-        })
-      ).rejects.toThrow('Invalid email or password');
-    });
   });
 
-  describe('Brute Force Protection', () => {
-    test('should reject rapid successive login attempts', async () => {
-      const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find((p: any) => p.id === 'credentials');
+  describe('Error Handling Security', () => {
+    test('should not leak error details for invalid sessions', async () => {
+      mockCookieGet.mockReturnValue({ value: 'bad-cookie' });
+      mockVerifySessionCookie.mockRejectedValue(new Error('Internal Firebase error'));
 
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
-
-      // Simulate 5 rapid failed login attempts
-      const attempts = Array(5)
-        .fill(null)
-        .map(() =>
-          credentialsProvider
-            .authorize({
-              email: 'test@example.com',
-              password: 'wrongpass',
-            })
-            .catch(() => 'failed')
-        );
-
-      const results = await Promise.all(attempts);
-      expect(results.every((r) => r === 'failed')).toBe(true);
-    });
-  });
-
-  describe('Password Security', () => {
-    test('should reject weak passwords (if validation exists)', async () => {
-      // This test assumes password validation would be added
-      const weakPasswords = ['123', 'password', 'abc', '11111111'];
-
-      // For now, just verify bcrypt is called for comparison
-      const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find((p: any) => p.id === 'credentials');
-
-      const mockUser = {
-        id: 'user-123',
-        email: 'test@example.com',
-        password: '$2a$10$hashedpassword',
-      };
-
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
-      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
-
-      for (const weakPass of weakPasswords) {
-        await expect(
-          credentialsProvider.authorize({
-            email: 'test@example.com',
-            password: weakPass,
-          })
-        ).rejects.toThrow('Invalid email or password');
-      }
+      const user = await getCurrentUser();
+      // Returns null — does not expose the internal error
+      expect(user).toBeNull();
     });
 
-    test('should use bcrypt for password hashing', async () => {
-      const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find((p: any) => p.id === 'credentials');
+    test('should not leak user existence for unknown Firebase UIDs', async () => {
+      mockCookieGet.mockReturnValue({ value: 'valid-cookie' });
+      mockVerifySessionCookie.mockResolvedValue({ uid: 'unknown-uid' });
+      mockUserFindUnique.mockResolvedValue(null);
 
-      const mockUser = {
-        id: 'user-123',
-        email: 'test@example.com',
-        password: '$2a$10$hashedpassword',
-      };
-
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
-      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
-
-      await credentialsProvider.authorize({
-        email: 'test@example.com',
-        password: 'correct-password',
-      });
-
-      expect(bcrypt.compare).toHaveBeenCalledWith('correct-password', '$2a$10$hashedpassword');
-    });
-  });
-
-  describe('Session Security', () => {
-    test('should use JWT strategy (not database sessions)', () => {
-      const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth._config;
-
-      expect(authConfig.session.strategy).toBe('jwt');
+      const user = await getCurrentUser();
+      // Returns null — does not indicate whether the UID exists
+      expect(user).toBeNull();
     });
 
-    test('should include user ID in JWT token', async () => {
-      const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth._config;
-      const jwtCallback = authConfig.callbacks.jwt;
+    test('requireAuth should throw consistent error message', async () => {
+      // Case 1: No cookie
+      mockCookieGet.mockReturnValue(undefined);
+      await expect(requireAuth()).rejects.toThrow('Authentication required');
 
-      const token = { sub: 'token-sub' };
-      const user = { id: 'user-123' };
+      // Case 2: Invalid cookie
+      mockCookieGet.mockReturnValue({ value: 'bad-cookie' });
+      mockVerifySessionCookie.mockRejectedValue(new Error('expired'));
+      await expect(requireAuth()).rejects.toThrow('Authentication required');
 
-      const result = await jwtCallback({ token, user });
-      expect(result.id).toBe('user-123');
-    });
-
-    test('should propagate user ID to session', async () => {
-      const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth._config;
-      const sessionCallback = authConfig.callbacks.session;
-
-      const session = { user: { email: 'test@example.com' } };
-      const token = { id: 'user-123' };
-
-      const result = await sessionCallback({ session, token });
-      expect(result.user.id).toBe('user-123');
-    });
-  });
-
-  describe('OAuth Security', () => {
-    test('should enable account linking for Google', () => {
-      const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth._config;
-      const googleProvider = authConfig.providers.find((p: any) => p.id === 'google');
-
-      expect(googleProvider.allowDangerousEmailAccountLinking).toBe(true);
-    });
-
-    test('should enable account linking for GitHub', () => {
-      const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth._config;
-      const githubProvider = authConfig.providers.find((p: any) => p.id === 'github');
-
-      expect(githubProvider.allowDangerousEmailAccountLinking).toBe(true);
+      // Case 3: User not in database
+      mockCookieGet.mockReturnValue({ value: 'valid-cookie' });
+      mockVerifySessionCookie.mockResolvedValue({ uid: 'unknown' });
+      mockUserFindUnique.mockResolvedValue(null);
+      await expect(requireAuth()).rejects.toThrow('Authentication required');
     });
   });
 
   describe('Input Validation', () => {
-    test('should reject null/undefined email', async () => {
-      const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find((p: any) => p.id === 'credentials');
-
-      await expect(
-        credentialsProvider.authorize({
-          email: null,
-          password: 'password123',
-        })
-      ).rejects.toThrow('Email and password are required');
-    });
-
-    test('should reject XSS attempts in email', async () => {
-      const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find((p: any) => p.id === 'credentials');
-
-      const xssEmail = '<script>alert("XSS")</script>@example.com';
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
-
-      await expect(
-        credentialsProvider.authorize({
-          email: xssEmail,
-          password: 'password123',
-        })
-      ).rejects.toThrow('Invalid email or password');
-    });
-
-    test('should reject extremely long inputs', async () => {
-      const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find((p: any) => p.id === 'credentials');
-
-      const longEmail = 'a'.repeat(10000) + '@example.com';
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
-
-      await expect(
-        credentialsProvider.authorize({
-          email: longEmail,
-          password: 'password123',
-        })
-      ).rejects.toThrow('Invalid email or password');
-    });
-  });
-
-  describe('Error Handling', () => {
-    test('should not leak user existence information', async () => {
-      const NextAuth = require('next-auth').default;
-      const authConfig = NextAuth._config;
-      const credentialsProvider = authConfig.providers.find((p: any) => p.id === 'credentials');
-
-      // Case 1: User doesn't exist
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
-      const errorNoUser = await credentialsProvider
-        .authorize({
-          email: 'nonexistent@example.com',
-          password: 'password123',
-        })
-        .catch((e: Error) => e.message);
-
-      // Case 2: User exists but wrong password
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue({
-        id: 'user-123',
-        email: 'exists@example.com',
-        password: '$2a$10$hashedpassword',
+    test('should safely handle tokens with SQL injection patterns', async () => {
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        headers: { Authorization: "Bearer admin'--" },
       });
-      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+      // Firebase Admin SDK validates the token; malicious strings result in rejection
+      mockAdminVerifyIdToken.mockRejectedValue(new Error('Invalid token'));
 
-      const errorWrongPass = await credentialsProvider
-        .authorize({
-          email: 'exists@example.com',
-          password: 'wrongpassword',
-        })
-        .catch((e: Error) => e.message);
+      const result = await verifyIdToken(req);
+      expect(result).toBeNull();
+    });
 
-      // Both should return same error message
-      expect(errorNoUser).toBe(errorWrongPass);
-      expect(errorNoUser).toBe('Invalid email or password');
+    test('should safely handle extremely long tokens', async () => {
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        headers: { Authorization: `Bearer ${'a'.repeat(10000)}` },
+      });
+      mockAdminVerifyIdToken.mockRejectedValue(new Error('Invalid token'));
+
+      const result = await verifyIdToken(req);
+      expect(result).toBeNull();
+    });
+
+    test('should safely handle XSS attempts in token', async () => {
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        headers: { Authorization: 'Bearer <script>alert("XSS")</script>' },
+      });
+      mockAdminVerifyIdToken.mockRejectedValue(new Error('Invalid token'));
+
+      const result = await verifyIdToken(req);
+      expect(result).toBeNull();
     });
   });
 });
 
 describe('Security: Rate Limiting & Abuse Prevention', () => {
   test('should document rate limiting strategy', () => {
-    // Note: Actual rate limiting would be implemented at middleware level
-    // This test documents the security requirement
+    // Rate limiting should be handled at the edge/middleware level
     expect(true).toBe(true);
-    console.log('INFO: Rate limiting middleware can be added for /api/auth/*');
   });
 });

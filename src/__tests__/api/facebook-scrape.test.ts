@@ -92,7 +92,7 @@ describe('Facebook Scrape API', () => {
       const req = createRequest('POST', '/api/scrape/facebook', { location: 'tampa' });
       const res = await POST(req);
       expect(res.status).toBe(401);
-      expect((await res.json()).error).toBe('Unauthorized');
+      expect((await res.json()).error.code).toBe('UNAUTHORIZED');
     });
 
     it('creates job and runs scraper successfully', async () => {
@@ -283,7 +283,7 @@ describe('Facebook Scrape API', () => {
 
       expect(res.status).toBe(500);
       expect(data.success).toBe(false);
-      expect(data.error).toBe('DB connection lost');
+      expect(data.error.code).toBe('INTERNAL_ERROR');
     });
 
     it('handles non-Error thrown objects', async () => {
@@ -294,7 +294,7 @@ describe('Facebook Scrape API', () => {
       const data = await res.json();
 
       expect(res.status).toBe(500);
-      expect(data.error).toBe('Failed to run scraper');
+      expect(data.error.code).toBe('INTERNAL_ERROR');
     });
 
     it('passes scraper config with defaults', async () => {
@@ -381,7 +381,7 @@ describe('Facebook Scrape API', () => {
       const res = await GET(req);
 
       expect(res.status).toBe(500);
-      expect((await res.json()).error).toBe('Failed to fetch scraper jobs');
+      expect((await res.json()).error.code).toBe('INTERNAL_ERROR');
     });
   });
 

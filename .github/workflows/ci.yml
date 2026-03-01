@@ -1,3 +1,23 @@
+# CI/CD Pipeline for Flipper AI
+#
+# REQUIRED GITHUB SECRETS (add via repo Settings → Secrets and variables → Actions):
+#   GCP_PROJECT_ID:                  GCP project ID (axovia-flipper)
+#   GCP_WORKLOAD_IDENTITY_PROVIDER:  WIF provider (projects/PROJECT_NUM/locations/global/workloadIdentityPools/github/providers/github)
+#   GCP_SERVICE_ACCOUNT:             CI service account (flipper-ci@axovia-flipper.iam.gserviceaccount.com)
+#   GCP_SA_KEY:                      Fallback — service account key JSON (if WIF not configured)
+#   CLOUD_RUN_SERVICE_PROD:          Production Cloud Run service name (flipper-production)
+#   CLOUD_RUN_SERVICE_STAGING:       Staging Cloud Run service name (flipper-staging)
+#
+# HARDCODED VALUES (not secrets — change in workflow if region moves):
+#   Region: us-central1
+#
+# CI SERVICE ACCOUNT IAM ROLES:
+#   roles/run.admin, roles/iam.serviceAccountUser, roles/artifactregistry.writer, roles/secretmanager.secretAccessor
+#
+# ARTIFACT REGISTRY:
+#   Repository: us-central1-docker.pkg.dev/axovia-flipper/flipper-ai
+#   Create if missing: gcloud artifacts repositories create flipper-ai --repository-format=docker --location=us-central1
+
 name: CI/CD Pipeline
 
 on:
@@ -11,6 +31,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  python-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python Dependencies
+        run: pip install -r helpers/requirements.txt
+
+      - name: Run Python Tests (Secret Manager Module)
+        run: cd helpers && python -m pytest test_secrets.py -v
+
   lint-and-typecheck:
     runs-on: ubuntu-latest
     env:
@@ -182,7 +218,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    needs: [test, integration-test]
+    needs: [test, integration-test, python-test]
     env:
       DATABASE_URL: 'file:./dev.db'
       CI: 'true'
@@ -346,39 +382,83 @@ jobs:
       - name: Audit Dependencies
         run: pnpm audit --audit-level=high || true
 
-  docker:
+  build-container:
     runs-on: ubuntu-latest
     needs: [test, build]
-    if: github.ref == 'refs/heads/main'
-
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP (Workload Identity Federation)
+        if: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER != '' }}
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Authenticate to GCP (Service Account Key)
+        if: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER == '' }}
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker Image
+      - name: Determine image tags
+        id: tags
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          GIT_REF: ${{ github.ref }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          TAGS="us-central1-docker.pkg.dev/axovia-flipper/flipper-ai/app:${COMMIT_SHA}"
+          if [ "$EVENT_NAME" = "push" ] && [ "$GIT_REF" = "refs/heads/main" ]; then
+            TAGS="${TAGS},us-central1-docker.pkg.dev/axovia-flipper/flipper-ai/app:latest"
+          fi
+          echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
+
+      - name: Build and Push Docker Image
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: false
-          tags: |
-            flipper-ai:latest
-            flipper-ai:${{ github.sha }}
+          file: config/docker/Dockerfile
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  deploy-vercel:
-    name: Deploy to Vercel (Production)
+  deploy-cloud-run:
+    name: Deploy to Cloud Run
     runs-on: ubuntu-latest
-    needs: [test, build]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    environment:
-      name: production
-      url: ${{ steps.deploy.outputs.url }}
-
+    needs: [test, integration-test, python-test, build-container]
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP (Workload Identity Federation)
+        if: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER != '' }}
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Authenticate to GCP (Service Account Key)
+        if: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER == '' }}
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -391,35 +471,101 @@ jobs:
           node-version: '22.x'
           cache: 'pnpm'
 
-      - name: Install Vercel CLI
-        run: npm install -g vercel@latest
-
-      - name: Pull Vercel Environment
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
         run: npx prisma generate
 
-      - name: Run Database Migrations
-        run: npx prisma migrate deploy
+      - name: Determine deploy target
+        id: target
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-
-      - name: Build Project (Vercel)
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy to Vercel
-        id: deploy
+          EVENT_NAME: ${{ github.event_name }}
+          GIT_REF: ${{ github.ref }}
         run: |
-          url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
-          echo "url=$url" >> $GITHUB_OUTPUT
-          echo "🚀 Deployed to: $url"
+          if [ "$EVENT_NAME" = "push" ] && [ "$GIT_REF" = "refs/heads/main" ]; then
+            echo "env=production" >> "$GITHUB_OUTPUT"
+            echo "service=flipper-production" >> "$GITHUB_OUTPUT"
+            echo "secret_prefix=PRODUCTION" >> "$GITHUB_OUTPUT"
+          else
+            echo "env=staging" >> "$GITHUB_OUTPUT"
+            echo "service=flipper-staging" >> "$GITHUB_OUTPUT"
+            echo "secret_prefix=STAGING" >> "$GITHUB_OUTPUT"
+          fi
 
-    # REQUIRED SECRETS (add via GitHub repo Settings → Secrets):
-    # - VERCEL_TOKEN: from https://vercel.com/account/tokens
-    # - VERCEL_ORG_ID: from .vercel/project.json after first `vercel link`
-    # - VERCEL_PROJECT_ID: from .vercel/project.json after first `vercel link`
-    # - DATABASE_URL: Production database connection string (e.g., PostgreSQL from PrismaPostgres)
+      - name: Run database migrations
+        run: |
+          DATABASE_URL=$(gcloud secrets versions access latest \
+            --secret="${{ steps.target.outputs.secret_prefix }}_DATABASE_URL" \
+            --project="${{ secrets.GCP_PROJECT_ID }}")
+          export DATABASE_URL
+          npx prisma migrate deploy
+
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ steps.target.outputs.service }}
+          region: us-central1
+          image: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/flipper-ai/app:${{ github.sha }}
+          secrets: |
+            DATABASE_URL=${{ steps.target.outputs.secret_prefix }}_DATABASE_URL:latest
+            AUTH_SECRET=${{ steps.target.outputs.secret_prefix }}_AUTH_SECRET:latest
+            ENCRYPTION_SECRET=${{ steps.target.outputs.secret_prefix }}_ENCRYPTION_SECRET:latest
+            STRIPE_SECRET_KEY=${{ steps.target.outputs.secret_prefix }}_STRIPE_SECRET_KEY:latest
+            STRIPE_WEBHOOK_SECRET=${{ steps.target.outputs.secret_prefix }}_STRIPE_WEBHOOK_SECRET:latest
+            OPENAI_API_KEY=${{ steps.target.outputs.secret_prefix }}_OPENAI_API_KEY:latest
+            ANTHROPIC_API_KEY=${{ steps.target.outputs.secret_prefix }}_ANTHROPIC_API_KEY:latest
+            RESEND_API_KEY=${{ steps.target.outputs.secret_prefix }}_RESEND_API_KEY:latest
+            SENTRY_DSN=${{ steps.target.outputs.secret_prefix }}_SENTRY_DSN:latest
+            SENTRY_AUTH_TOKEN=${{ steps.target.outputs.secret_prefix }}_SENTRY_AUTH_TOKEN:latest
+            GOOGLE_CLIENT_ID=${{ steps.target.outputs.secret_prefix }}_GOOGLE_CLIENT_ID:latest
+            GOOGLE_CLIENT_SECRET=${{ steps.target.outputs.secret_prefix }}_GOOGLE_CLIENT_SECRET:latest
+            GITHUB_CLIENT_ID=${{ steps.target.outputs.secret_prefix }}_GITHUB_CLIENT_ID:latest
+            GITHUB_CLIENT_SECRET=${{ steps.target.outputs.secret_prefix }}_GITHUB_CLIENT_SECRET:latest
+            HCAPTCHA_SECRET_KEY=${{ steps.target.outputs.secret_prefix }}_HCAPTCHA_SECRET_KEY:latest
+          env_vars: |
+            NODE_ENV=production
+            BUILD_ENV=${{ steps.target.outputs.env }}
+            NEXT_TELEMETRY_DISABLED=1
+            GIT_COMMIT=${{ github.sha }}
+
+      - name: Post-deploy liveness check
+        run: |
+          SERVICE_URL="${{ steps.deploy.outputs.url }}"
+          echo "Checking liveness at $SERVICE_URL/api/health"
+          RESPONSE=$(curl -sf --max-time 30 --retry 3 --retry-delay 5 "$SERVICE_URL/api/health")
+          STATUS=$(echo "$RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('status','unknown'))")
+          if [ "$STATUS" != "ok" ]; then
+            echo "❌ Liveness check FAILED — status: $STATUS"
+            exit 1
+          fi
+          echo "✅ Liveness check passed — status: $STATUS"
+
+      - name: Post-deploy readiness check
+        run: |
+          SERVICE_URL="${{ steps.deploy.outputs.url }}"
+          echo "Checking readiness at $SERVICE_URL/api/health/ready"
+          RESPONSE=$(curl -sf --max-time 30 --retry 3 --retry-delay 5 "$SERVICE_URL/api/health/ready")
+          STATUS=$(echo "$RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('status','unknown'))")
+          if [ "$STATUS" != "ready" ]; then
+            echo "❌ Readiness check FAILED — status: $STATUS"
+            exit 1
+          fi
+          echo "✅ Readiness check passed — status: $STATUS"
+
+      - name: Comment PR with staging URL
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
+          SERVICE_NAME: ${{ steps.target.outputs.service }}
+          COMMIT_SHA: ${{ github.sha }}
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🚀 **Cloud Run Staging Preview**\n\nDeployed to: ${process.env.DEPLOY_URL}\n\nCommit: \`${process.env.COMMIT_SHA}\`\nService: \`${process.env.SERVICE_NAME}\``
+            })

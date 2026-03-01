@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 import {
   SearchConfigQuerySchema,
   CreateSearchConfigSchema,
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error fetching search configs:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch search configurations');
+    return handleError(error);
   }
 }
 
@@ -85,6 +85,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(config, { status: 201 });
   } catch (error) {
     console.error('Error creating search config:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to create search configuration');
+    return handleError(error);
   }
 }

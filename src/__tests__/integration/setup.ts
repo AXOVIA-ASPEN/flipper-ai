@@ -756,17 +756,21 @@ jest.mock('@/lib/db', () => ({
 // This ensures API routes that use withAuth() work in integration tests
 jest.mock('@/lib/auth', () => ({
   __esModule: true,
-  auth: jest.fn().mockResolvedValue({
-    user: {
-      id: 'test-user-id',
-      email: 'test@example.com',
-      name: 'Test User',
-    },
-    expires: new Date(Date.now() + 86400000).toISOString(),
+  getCurrentUser: jest.fn().mockResolvedValue({
+    id: 'test-user-id',
+    email: 'test@example.com',
+    name: 'Test User',
+    firebaseUid: 'fb-test-uid',
+    image: null,
   }),
-  handlers: { GET: jest.fn(), POST: jest.fn() },
-  signIn: jest.fn(),
-  signOut: jest.fn(),
+  getCurrentUserId: jest.fn().mockResolvedValue('test-user-id'),
+  requireAuth: jest.fn().mockResolvedValue({
+    id: 'test-user-id',
+    email: 'test@example.com',
+    name: 'Test User',
+    firebaseUid: 'fb-test-uid',
+    image: null,
+  }),
 }));
 
 // Mock value-estimator to bypass the 70% discount threshold in integration tests

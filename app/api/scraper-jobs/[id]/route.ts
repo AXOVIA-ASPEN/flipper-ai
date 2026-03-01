@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 // GET /api/scraper-jobs/[id] - Get a single scraper job
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json(job);
   } catch (error) {
     console.error('Error fetching scraper job:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch scraper job');
+    return handleError(error);
   }
 }
 
@@ -66,7 +66,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json(job);
   } catch (error) {
     console.error('Error updating scraper job:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to update scraper job');
+    return handleError(error);
   }
 }
 
@@ -84,6 +84,6 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting scraper job:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to delete scraper job');
+    return handleError(error);
   }
 }

@@ -9,7 +9,8 @@ jest.mock('@/lib/auth-middleware', () => ({
 }));
 
 jest.mock('@/lib/auth', () => ({
-  auth: jest.fn(() => Promise.resolve({ user: { id: 'test-user-id', email: 'test@test.com' } })),
+  getCurrentUser: jest.fn(() => Promise.resolve({ id: 'test-user-id', email: 'test@test.com', name: 'Test User', firebaseUid: 'fb-uid', image: null })),
+  getCurrentUserId: jest.fn(() => Promise.resolve('test-user-id')),
 }));
 
 const mockEstimateValue = jest.fn();

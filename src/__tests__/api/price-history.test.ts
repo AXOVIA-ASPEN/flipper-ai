@@ -1,16 +1,24 @@
 // API tests for /api/price-history endpoints
 
-import { GET, POST } from '../../app/api/price-history/route';
+import { GET, POST } from '@/app/api/price-history/route';
 import { NextRequest } from 'next/server';
-import * as priceHistoryService from '../../lib/price-history-service';
 
 // Mock the price history service
-jest.mock('../../lib/price-history-service', () => ({
+jest.mock('@/lib/price-history-service', () => ({
   fetchAndStorePriceHistory: jest.fn(),
   getPriceHistory: jest.fn(),
   updateListingWithMarketValue: jest.fn(),
   batchUpdateListingsWithMarketValue: jest.fn(),
 }));
+
+// Mock db to prevent real database connections
+jest.mock('@/lib/db', () => ({
+  __esModule: true,
+  default: {},
+  prisma: {},
+}));
+
+import * as priceHistoryService from '@/lib/price-history-service';
 
 describe('GET /api/price-history', () => {
   it('should return price history for a product', async () => {
@@ -49,17 +57,21 @@ describe('GET /api/price-history', () => {
     expect(data.stats.avgPrice).toBe(600);
   });
 
-  it('should return 400 if productName is missing', async () => {
+  it('should return 422 if productName is missing', async () => {
     const request = new NextRequest('http://localhost:3000/api/price-history');
 
     const response = await GET(request);
     const data = await response.json();
 
-    expect(response.status).toBe(400);
-    expect(data.error).toBe('productName is required');
+    // handleError wraps ValidationError in RFC 7807 format with status 422
+    expect(response.status).toBe(422);
+    expect(data.success).toBe(false);
+    expect(data.error).toBeDefined();
+    expect(data.error.code).toBe('VALIDATION_ERROR');
   });
 
   it('should handle errors gracefully', async () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
     jest.mocked(priceHistoryService.getPriceHistory).mockRejectedValue(new Error('Database error'));
 
     const request = new NextRequest('http://localhost:3000/api/price-history?productName=Test');
@@ -68,7 +80,8 @@ describe('GET /api/price-history', () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe('Failed to fetch price history');
+    expect(data.success).toBe(false);
+    consoleSpy.mockRestore();
   });
 });
 
@@ -115,7 +128,7 @@ describe('POST /api/price-history', () => {
     expect(data.marketData).toBeTruthy();
   });
 
-  it('should return 400 if productName is missing', async () => {
+  it('should return 422 if productName is missing', async () => {
     const request = new NextRequest('http://localhost:3000/api/price-history', {
       method: 'POST',
       body: JSON.stringify({}),
@@ -124,8 +137,10 @@ describe('POST /api/price-history', () => {
     const response = await POST(request);
     const data = await response.json();
 
-    expect(response.status).toBe(400);
-    expect(data.error).toBe('productName is required');
+    // handleError wraps ValidationError in RFC 7807 format with status 422
+    expect(response.status).toBe(422);
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('VALIDATION_ERROR');
   });
 
   it('should return 404 if no market data found', async () => {
@@ -140,10 +155,12 @@ describe('POST /api/price-history', () => {
     const data = await response.json();
 
     expect(response.status).toBe(404);
-    expect(data.error).toBe('No market data found');
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('NOT_FOUND');
   });
 
   it('should handle errors gracefully', async () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
     jest
       .mocked(priceHistoryService.fetchAndStorePriceHistory)
       .mockRejectedValue(new Error('Scraping error'));
@@ -157,6 +174,7 @@ describe('POST /api/price-history', () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe('Failed to fetch and store price history');
+    expect(data.success).toBe(false);
+    consoleSpy.mockRestore();
   });
 });

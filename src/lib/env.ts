@@ -18,8 +18,25 @@ const envSchema = z.object({
   // Database
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
 
-  // Auth
-  AUTH_SECRET: z.string().min(1, 'AUTH_SECRET is required'),
+  // Firebase Auth (client config — public)
+  NEXT_PUBLIC_FIREBASE_API_KEY: z.string().optional(),
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: z.string().optional(),
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: z.string().optional(),
+
+  // Firebase Storage
+  NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: z.string().optional(),
+
+  // Firebase Cloud Messaging
+  NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: z.string().optional(),
+  NEXT_PUBLIC_FIREBASE_APP_ID: z.string().optional(),
+  NEXT_PUBLIC_FIREBASE_VAPID_KEY: z.string().min(50).optional(),
+
+  // Firebase Admin (server-side secrets)
+  FIREBASE_CLIENT_EMAIL: z.string().optional(),
+  FIREBASE_PRIVATE_KEY: z.string().optional(),
+
+  // Auth (Legacy NextAuth — deprecated, will be removed)
+  AUTH_SECRET: z.string().optional(),
   NEXTAUTH_URL: z.string().url().optional(),
 
   // OAuth Providers (optional)
@@ -81,7 +98,6 @@ function parseEnv(): Env {
     ...(isTest
       ? {
           DATABASE_URL: process.env.DATABASE_URL || 'file:./test.db',
-          AUTH_SECRET: process.env.AUTH_SECRET || 'test-auth-secret-minimum-16-chars',
           ENCRYPTION_SECRET: process.env.ENCRYPTION_SECRET || 'test-encryption-secret-min16',
         }
       : {}),
@@ -105,7 +121,6 @@ function parseEnv(): Env {
     return envSchema.parse({
       ...input,
       DATABASE_URL: 'file:./test.db',
-      AUTH_SECRET: 'test-secret-minimum-16-chars',
       ENCRYPTION_SECRET: 'test-encryption-secret-min16',
     });
   }

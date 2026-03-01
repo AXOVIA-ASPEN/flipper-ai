@@ -3,10 +3,10 @@
  * Covers: auth check, no customer found, successful portal creation, error handling.
  */
 
-// Mock @/lib/auth (next-auth v5 style)
-const mockAuth = jest.fn();
+// Mock @/lib/auth (Firebase session-based)
+const mockGetCurrentUser = jest.fn();
 jest.mock('@/lib/auth', () => ({
-  auth: mockAuth,
+  getCurrentUser: () => mockGetCurrentUser(),
 }));
 
 jest.mock('@/lib/stripe', () => ({
@@ -26,29 +26,32 @@ describe('POST /api/checkout/portal', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('returns 401 when not authenticated', async () => {
-    mockAuth.mockResolvedValue(null);
+    mockGetCurrentUser.mockResolvedValue(null);
     const res = await POST();
     expect(res.status).toBe(401);
-    expect((await res.json()).error).toBe('Unauthorized');
+    const data = await res.json();
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('UNAUTHORIZED');
   });
 
   it('returns 401 when session has no email', async () => {
-    mockAuth.mockResolvedValue({ user: {} });
+    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: null, name: null, firebaseUid: 'fb-1', image: null });
     const res = await POST();
     expect(res.status).toBe(401);
   });
 
   it('returns 404 when no Stripe customer found', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@test.com' } });
+    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: 'test@test.com', name: 'Test', firebaseUid: 'fb-1', image: null });
     mockCustomersList.mockResolvedValue({ data: [] });
 
     const res = await POST();
     expect(res.status).toBe(404);
-    expect((await res.json()).error).toContain('No billing account');
+    const data = await res.json();
+    expect(data.error.code).toBe('NOT_FOUND');
   });
 
   it('creates portal session and returns URL', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@test.com' } });
+    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: 'test@test.com', name: 'Test', firebaseUid: 'fb-1', image: null });
     mockCustomersList.mockResolvedValue({ data: [{ id: 'cus_123' }] });
     mockPortalCreate.mockResolvedValue({ url: 'https://billing.stripe.com/session/xyz' });
 
@@ -63,20 +66,24 @@ describe('POST /api/checkout/portal', () => {
   });
 
   it('returns 500 when Stripe API throws', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@test.com' } });
+    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: 'test@test.com', name: 'Test', firebaseUid: 'fb-1', image: null });
     mockCustomersList.mockRejectedValue(new Error('Stripe down'));
 
     const res = await POST();
     expect(res.status).toBe(500);
-    expect((await res.json()).error).toBe('Stripe down');
+    const data = await res.json();
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('INTERNAL_ERROR');
   });
 
-  it('returns generic message when error has no message', async () => {
-    mockAuth.mockResolvedValue({ user: { email: 'test@test.com' } });
+  it('returns 500 when error has no message', async () => {
+    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: 'test@test.com', name: 'Test', firebaseUid: 'fb-1', image: null });
     mockCustomersList.mockRejectedValue({});
 
     const res = await POST();
     expect(res.status).toBe(500);
-    expect((await res.json()).error).toBe('Failed to create portal session');
+    const data = await res.json();
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('INTERNAL_ERROR');
   });
 });

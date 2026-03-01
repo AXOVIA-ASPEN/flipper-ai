@@ -4,23 +4,24 @@
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { SessionProvider } from '@/components/providers/SessionProvider';
 
-// Mock next-auth/react
-jest.mock('next-auth/react', () => ({
-  SessionProvider: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="next-auth-provider">{children}</div>
+// Mock FirebaseAuthProvider since it depends on firebase/auth
+jest.mock('@/components/providers/FirebaseAuthProvider', () => ({
+  FirebaseAuthProvider: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="firebase-auth-provider">{children}</div>
   ),
 }));
 
+import { SessionProvider } from '@/components/providers/SessionProvider';
+
 describe('SessionProvider', () => {
-  it('renders children within NextAuth SessionProvider', () => {
+  it('renders children within FirebaseAuthProvider', () => {
     render(
       <SessionProvider>
         <div data-testid="child">Hello</div>
       </SessionProvider>
     );
-    expect(screen.getByTestId('next-auth-provider')).toBeInTheDocument();
+    expect(screen.getByTestId('firebase-auth-provider')).toBeInTheDocument();
     expect(screen.getByTestId('child')).toHaveTextContent('Hello');
   });
 

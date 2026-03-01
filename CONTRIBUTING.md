@@ -47,7 +47,7 @@ pnpm test:coverage     # Generate coverage report
 
 ## Architecture
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for system overview.
+See [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md) for system overview.
 
 ## License
 

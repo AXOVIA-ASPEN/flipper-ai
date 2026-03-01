@@ -6,12 +6,16 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-// Mock next-auth
-const mockSession = { user: { id: 'test-user', email: 'test@test.com' } };
-let mockAuthStatus = 'authenticated';
-jest.mock('next-auth/react', () => ({
-  useSession: () => ({ data: mockSession, status: mockAuthStatus }),
-  SessionProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+// Mock Firebase auth hook
+let mockFirebaseUser: any = { uid: 'test-user', email: 'test@test.com' };
+let mockAuthLoading = false;
+jest.mock('@/hooks/useFirebaseAuth', () => ({
+  useFirebaseAuth: () => ({
+    user: mockFirebaseUser,
+    loading: mockAuthLoading,
+    signIn: jest.fn(),
+    signOut: jest.fn(),
+  }),
 }));
 
 // Mock next/navigation
@@ -79,7 +83,8 @@ function setupFetch(messages = sampleMessages, total = 2) {
 describe('MessagesPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockAuthStatus = 'authenticated';
+    mockFirebaseUser = { uid: 'test-user', email: 'test@test.com' };
+    mockAuthLoading = false;
     setupFetch();
   });
 
@@ -181,13 +186,14 @@ describe('MessagesPage', () => {
   });
 
   it('redirects to login when unauthenticated', () => {
-    mockAuthStatus = 'unauthenticated';
+    mockFirebaseUser = null;
+    mockAuthLoading = false;
     render(<MessagesPage />);
     expect(mockPush).toHaveBeenCalledWith('/login');
   });
 
   it('shows loading spinner during auth check', () => {
-    mockAuthStatus = 'loading';
+    mockAuthLoading = true;
     render(<MessagesPage />);
     const spinner = document.querySelector('.animate-spin');
     expect(spinner).toBeInTheDocument();

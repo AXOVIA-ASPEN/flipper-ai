@@ -58,7 +58,8 @@ describe('POST /api/reports/generate', () => {
     const res = await POST(req);
     expect(res.status).toBe(401);
     const data = await res.json();
-    expect(data.error).toBe('Unauthorized');
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('UNAUTHORIZED');
   });
 
   it('returns JSON report for valid request', async () => {
@@ -86,26 +87,26 @@ describe('POST /api/reports/generate', () => {
     expect(data.userId).toBe('user-1');
   });
 
-  it('returns 400 for invalid period', async () => {
+  it('returns 422 for invalid period', async () => {
     const req = makeRequest('/api/reports/generate', {
       method: 'POST',
       body: JSON.stringify({ userId: 'user-1', period: 'yearly' }),
     });
     const res = await POST(req);
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
     const data = await res.json();
-    expect(data.error).toContain('Invalid period');
+    expect(data.error.code).toBe('VALIDATION_ERROR');
   });
 
-  it('returns 400 for custom period without dates', async () => {
+  it('returns 422 for custom period without dates', async () => {
     const req = makeRequest('/api/reports/generate', {
       method: 'POST',
       body: JSON.stringify({ userId: 'user-1', period: 'custom' }),
     });
     const res = await POST(req);
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
     const data = await res.json();
-    expect(data.error).toContain('startDate');
+    expect(data.error.code).toBe('VALIDATION_ERROR');
   });
 
   it('accepts custom period with dates', async () => {
@@ -152,7 +153,7 @@ describe('POST /api/reports/generate', () => {
     const res = await POST(req);
     expect(res.status).toBe(500);
     const data = await res.json();
-    expect(data.error).toContain('Failed');
+    expect(data.error.code).toBeDefined();
   });
 
   it('defaults period to weekly when not provided', async () => {

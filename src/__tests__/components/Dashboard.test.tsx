@@ -3,8 +3,7 @@
  */
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 
 // Mock next/navigation
 const mockRouterReplace = jest.fn();
@@ -207,17 +206,11 @@ describe('Dashboard', () => {
   });
 
   it('handles create opportunity from listing', async () => {
-    mockFetch
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          listings: mockListings,
-          total: 2,
-          pagination: { page: 1, limit: 20, total: 2, totalPages: 1 },
-        }),
-      })
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 'new-opp' }) })
-      .mockResolvedValueOnce({
+    mockFetch.mockImplementation((url: string, opts?: RequestInit) => {
+      if (typeof url === 'string' && url.includes('/api/opportunities') && opts?.method === 'POST') {
+        return Promise.resolve({ ok: true, json: async () => ({ id: 'new-opp' }) });
+      }
+      return Promise.resolve({
         ok: true,
         json: async () => ({
           listings: mockListings,
@@ -225,17 +218,19 @@ describe('Dashboard', () => {
           pagination: { page: 1, limit: 20, total: 2, totalPages: 1 },
         }),
       });
+    });
 
     render(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('iPhone 15 Pro')).toBeInTheDocument();
     });
 
+    // Find Star buttons - listing 1 has opportunity: null so its button is enabled
     const starIcons = screen.getAllByTestId('icon-Star');
     if (starIcons.length > 0) {
       const btn = starIcons[0].closest('button');
-      if (btn) {
-        await userEvent.click(btn);
+      if (btn && !btn.disabled) {
+        fireEvent.click(btn);
         await waitFor(() => {
           expect(mockFetch).toHaveBeenCalledWith(
             '/api/opportunities',

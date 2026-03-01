@@ -23,7 +23,8 @@ describe('GET /api/posting-queue/stats', () => {
     const data = await res.json();
 
     expect(res.status).toBe(401);
-    expect(data.error).toBe('Unauthorized');
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('UNAUTHORIZED');
   });
 
   it('returns queue stats for authenticated user', async () => {
@@ -51,6 +52,7 @@ describe('GET /api/posting-queue/stats', () => {
     const data = await res.json();
 
     expect(res.status).toBe(500);
-    expect(data.error).toBe('Internal server error');
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('INTERNAL_ERROR');
   });
 });

@@ -10,8 +10,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { logger } from '@/lib/logger';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 export async function GET(request: NextRequest) {
+  try {
   const { searchParams } = new URL(request.url);
   const token = searchParams.get('token');
 
@@ -30,8 +31,6 @@ export async function GET(request: NextRequest) {
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     throw new ValidationError('Invalid token');
   }
-
-  try {
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
       select: { id: true, settings: { select: { id: true } } },
@@ -63,6 +62,9 @@ export async function GET(request: NextRequest) {
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
     });
   } catch (err) {
+    if (err instanceof ValidationError) {
+      return handleError(err);
+    }
     logger.error('Unsubscribe error', { err });
     return new NextResponse(unsubscribeHtml(false), {
       status: 500,
@@ -76,22 +78,22 @@ export async function GET(request: NextRequest) {
  * Allows users to re-enable emails from the settings page.
  */
 export async function POST(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const token = searchParams.get('token');
-  const resubscribe = searchParams.get('resubscribe') === 'true';
-
-  if (!token) {
-    throw new ValidationError('Missing token');
-  }
-
-  let email: string;
   try {
-    email = Buffer.from(token, 'base64url').toString('utf-8');
-  } catch {
-    throw new ValidationError('Invalid token');
-  }
+    const { searchParams } = new URL(request.url);
+    const token = searchParams.get('token');
+    const resubscribe = searchParams.get('resubscribe') === 'true';
 
-  try {
+    if (!token) {
+      throw new ValidationError('Missing token');
+    }
+
+    let email: string;
+    try {
+      email = Buffer.from(token, 'base64url').toString('utf-8');
+    } catch {
+      throw new ValidationError('Invalid token');
+    }
+
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
       select: { id: true },
@@ -110,7 +112,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, emailNotifications: resubscribe });
   } catch (err) {
     logger.error('Resubscribe error', { err });
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to update preferences');
+    return handleError(err);
   }
 }
 

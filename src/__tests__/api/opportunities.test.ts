@@ -1,18 +1,21 @@
 import { NextRequest } from 'next/server';
-import { GET, POST } from '@/app/api/opportunities/route';
+import { GET } from '@/app/api/opportunities/route';
 import { GET as GET_BY_ID, PATCH, DELETE } from '@/app/api/opportunities/[id]/route';
+
+// Mock auth - getCurrentUserId is used by GET /api/opportunities
+const mockGetCurrentUserId = jest.fn<Promise<string | null>, []>();
+
+jest.mock('@/lib/auth', () => ({
+  getCurrentUserId: (...args: unknown[]) => mockGetCurrentUserId(...(args as [])),
+}));
 
 // Mock Prisma client
 const mockFindMany = jest.fn();
 const mockFindUnique = jest.fn();
-const mockCreate = jest.fn();
 const mockUpdate = jest.fn();
 const mockDelete = jest.fn();
-const mockTransaction = jest.fn();
-const mockAggregate = jest.fn();
-const mockCount = jest.fn();
-const mockListingFindUnique = jest.fn();
 const mockListingUpdate = jest.fn();
+const mockTransaction = jest.fn();
 
 jest.mock('@/lib/db', () => ({
   __esModule: true,
@@ -20,14 +23,10 @@ jest.mock('@/lib/db', () => ({
     opportunity: {
       findMany: (...args: unknown[]) => mockFindMany(...args),
       findUnique: (...args: unknown[]) => mockFindUnique(...args),
-      create: (...args: unknown[]) => mockCreate(...args),
       update: (...args: unknown[]) => mockUpdate(...args),
       delete: (...args: unknown[]) => mockDelete(...args),
-      aggregate: (...args: unknown[]) => mockAggregate(...args),
-      count: (...args: unknown[]) => mockCount(...args),
     },
     listing: {
-      findUnique: (...args: unknown[]) => mockListingFindUnique(...args),
       update: (...args: unknown[]) => mockListingUpdate(...args),
     },
     $transaction: (...args: unknown[]) => mockTransaction(...args),
@@ -40,365 +39,264 @@ function createMockRequest(
   url: string,
   body?: Record<string, unknown>
 ): NextRequest {
-  const request = new NextRequest(new URL(url, 'http://localhost:3000'), {
+  return new NextRequest(new URL(url, 'http://localhost:3000'), {
     method,
     ...(body && {
       body: JSON.stringify(body),
       headers: { 'Content-Type': 'application/json' },
     }),
   });
-  return request;
 }
 
 describe('Opportunities API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGetCurrentUserId.mockResolvedValue('test-user-id');
   });
 
+  // ──────────────────────────────────────────────────────────────────────────
+  // GET /api/opportunities
+  // ──────────────────────────────────────────────────────────────────────────
   describe('GET /api/opportunities', () => {
-    it('should return opportunities with stats', async () => {
+    it('should return 401 when not authenticated', async () => {
+      mockGetCurrentUserId.mockResolvedValue(null);
+
+      const request = createMockRequest('GET', '/api/opportunities');
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(401);
+      expect(data.success).toBe(false);
+      expect(data.error.code).toBe('UNAUTHORIZED');
+    });
+
+    it('should return opportunities list with count', async () => {
       const mockOpportunities = [
         {
-          id: '1',
+          id: 'opp1',
+          userId: 'test-user-id',
           listingId: 'listing1',
           status: 'IDENTIFIED',
           purchasePrice: null,
           resalePrice: null,
           actualProfit: null,
+          createdAt: '2026-01-15T10:00:00.000Z',
           listing: {
             id: 'listing1',
             title: 'Test Item',
             askingPrice: 100,
           },
         },
-      ];
-
-      const mockStats = {
-        _sum: {
-          actualProfit: 500,
-          purchasePrice: 1000,
-          resalePrice: 1500,
-        },
-        _count: 1,
-      };
-
-      mockFindMany.mockResolvedValue(mockOpportunities);
-      mockCount.mockResolvedValue(1);
-      mockAggregate.mockResolvedValue(mockStats);
-
-      const request = createMockRequest('GET', '/api/opportunities');
-      const response = await GET(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(200);
-      expect(data.opportunities).toEqual(mockOpportunities);
-      expect(data.stats.totalOpportunities).toBe(1);
-      expect(data.stats.totalProfit).toBe(500);
-      expect(data.stats.totalInvested).toBe(1000);
-      expect(data.stats.totalRevenue).toBe(1500);
-    });
-
-    it('should filter opportunities by status', async () => {
-      const mockOpportunities = [
         {
-          id: '1',
-          listingId: 'listing1',
+          id: 'opp2',
+          userId: 'test-user-id',
+          listingId: 'listing2',
           status: 'PURCHASED',
-          purchasePrice: 100,
+          purchasePrice: 50,
+          resalePrice: null,
+          actualProfit: null,
+          createdAt: '2026-01-14T10:00:00.000Z',
+          listing: {
+            id: 'listing2',
+            title: 'Another Item',
+            askingPrice: 200,
+          },
         },
       ];
 
       mockFindMany.mockResolvedValue(mockOpportunities);
-      mockCount.mockResolvedValue(1);
-      mockAggregate.mockResolvedValue({
-        _sum: { actualProfit: 0, purchasePrice: 0, resalePrice: 0 },
-        _count: 1,
-      });
 
-      const request = createMockRequest('GET', '/api/opportunities?status=PURCHASED');
+      const request = createMockRequest('GET', '/api/opportunities');
       const response = await GET(request);
       const data = await response.json();
 
       expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      expect(data.count).toBe(2);
+      expect(data.opportunities).toEqual(mockOpportunities);
+      expect(mockFindMany).toHaveBeenCalledWith({
+        where: { userId: 'test-user-id' },
+        include: { listing: true },
+        orderBy: { createdAt: 'desc' },
+        take: 25,
+      });
+    });
+
+    it('should return empty list when no opportunities exist', async () => {
+      mockFindMany.mockResolvedValue([]);
+
+      const request = createMockRequest('GET', '/api/opportunities');
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      expect(data.count).toBe(0);
+      expect(data.opportunities).toEqual([]);
+    });
+
+    it('should respect the limit query parameter', async () => {
+      mockFindMany.mockResolvedValue([]);
+
+      const request = createMockRequest('GET', '/api/opportunities?limit=10');
+      const response = await GET(request);
+
+      expect(response.status).toBe(200);
       expect(mockFindMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { status: 'PURCHASED' },
+          take: 10,
         })
       );
     });
 
-    it('should handle errors gracefully', async () => {
-      mockFindMany.mockRejectedValue(new Error('Database error'));
+    it('should default limit to 25 when not provided', async () => {
+      mockFindMany.mockResolvedValue([]);
+
+      const request = createMockRequest('GET', '/api/opportunities');
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          take: 25,
+        })
+      );
+    });
+
+    it('should handle database errors with 500 status', async () => {
+      mockFindMany.mockRejectedValue(new Error('Database connection failed'));
 
       const request = createMockRequest('GET', '/api/opportunities');
       const response = await GET(request);
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe('Failed to fetch opportunities');
-    });
-
-    it('should filter by platform via listing relation', async () => {
-      mockFindMany.mockResolvedValue([]);
-      mockCount.mockResolvedValue(0);
-      mockAggregate.mockResolvedValue({
-        _sum: { actualProfit: 0, purchasePrice: 0, resalePrice: 0 },
-        _count: 0,
-      });
-
-      const request = createMockRequest('GET', '/api/opportunities?platform=EBAY');
-      const response = await GET(request);
-
-      expect(response.status).toBe(200);
-      expect(mockFindMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({
-            listing: expect.objectContaining({ platform: 'EBAY' }),
-          }),
-        })
-      );
-    });
-
-    it('should filter by minScore and maxScore', async () => {
-      mockFindMany.mockResolvedValue([]);
-      mockCount.mockResolvedValue(0);
-      mockAggregate.mockResolvedValue({
-        _sum: { actualProfit: 0, purchasePrice: 0, resalePrice: 0 },
-        _count: 0,
-      });
-
-      const request = createMockRequest('GET', '/api/opportunities?minScore=50&maxScore=90');
-      const response = await GET(request);
-
-      expect(response.status).toBe(200);
-      expect(mockFindMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({
-            listing: expect.objectContaining({
-              valueScore: { gte: 50, lte: 90 },
-            }),
-          }),
-        })
-      );
-    });
-
-    it('should filter by minProfit and maxProfit', async () => {
-      mockFindMany.mockResolvedValue([]);
-      mockCount.mockResolvedValue(0);
-      mockAggregate.mockResolvedValue({
-        _sum: { actualProfit: 0, purchasePrice: 0, resalePrice: 0 },
-        _count: 0,
-      });
-
-      const request = createMockRequest('GET', '/api/opportunities?minProfit=100&maxProfit=500');
-      const response = await GET(request);
-
-      expect(response.status).toBe(200);
-      expect(mockFindMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({
-            listing: expect.objectContaining({
-              profitPotential: { gte: 100, lte: 500 },
-            }),
-          }),
-        })
-      );
-    });
-
-    it('should combine multiple filters', async () => {
-      mockFindMany.mockResolvedValue([]);
-      mockCount.mockResolvedValue(0);
-      mockAggregate.mockResolvedValue({
-        _sum: { actualProfit: 0, purchasePrice: 0, resalePrice: 0 },
-        _count: 0,
-      });
-
-      const request = createMockRequest(
-        'GET',
-        '/api/opportunities?status=IDENTIFIED&platform=CRAIGSLIST&minScore=70&minProfit=50'
-      );
-      const response = await GET(request);
-
-      expect(response.status).toBe(200);
-      expect(mockFindMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({
-            status: 'IDENTIFIED',
-            listing: expect.objectContaining({
-              platform: 'CRAIGSLIST',
-              valueScore: { gte: 70 },
-              profitPotential: { gte: 50 },
-            }),
-          }),
-        })
-      );
+      expect(data.success).toBe(false);
+      expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 
-  describe('POST /api/opportunities', () => {
-    it('should create a new opportunity from a listing', async () => {
-      const mockListing = {
-        id: 'listing1',
-        title: 'Test Item',
-      };
-
-      const mockOpportunity = {
-        id: 'opp1',
-        listingId: 'listing1',
-        status: 'IDENTIFIED',
-      };
-
-      mockListingFindUnique.mockResolvedValue(mockListing);
-      mockFindUnique.mockResolvedValue(null); // No existing opportunity
-      mockTransaction.mockResolvedValue([mockOpportunity, {}]);
-
-      const request = createMockRequest('POST', '/api/opportunities', {
-        listingId: 'listing1',
-      });
-      const response = await POST(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(201);
-      expect(data).toEqual(mockOpportunity);
-      expect(mockTransaction).toHaveBeenCalled();
-    });
-
-    it('should return 404 when listing is not found', async () => {
-      mockListingFindUnique.mockResolvedValue(null);
-
-      const request = createMockRequest('POST', '/api/opportunities', {
-        listingId: 'missing-listing',
-      });
-      const response = await POST(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(404);
-      expect(data.error).toBe('Listing not found');
-      expect(mockFindUnique).not.toHaveBeenCalled();
-      expect(mockTransaction).not.toHaveBeenCalled();
-    });
-
-    it('should prevent creating duplicate opportunities for a listing', async () => {
-      mockListingFindUnique.mockResolvedValue({ id: 'listing1' });
-      mockFindUnique.mockResolvedValue({ id: 'existing-opp', listingId: 'listing1' });
-
-      const request = createMockRequest('POST', '/api/opportunities', {
-        listingId: 'listing1',
-      });
-      const response = await POST(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(409);
-      expect(data.error).toBe('Opportunity already exists for this listing');
-      expect(mockTransaction).not.toHaveBeenCalled();
-    });
-
-    it('should handle missing listingId', async () => {
-      const request = createMockRequest('POST', '/api/opportunities', {});
-      const response = await POST(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(400);
-      expect(data.error).toBe('Invalid request body');
-    });
-
-    it('should handle errors gracefully', async () => {
-      const mockListing = {
-        id: 'listing1',
-        title: 'Test Item',
-      };
-
-      mockListingFindUnique.mockResolvedValue(mockListing);
-      mockFindUnique.mockResolvedValue(null); // No existing opportunity
-      mockTransaction.mockRejectedValue(new Error('Database error'));
-
-      const request = createMockRequest('POST', '/api/opportunities', {
-        listingId: 'listing1',
-      });
-      const response = await POST(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(500);
-      expect(data.error).toBe('Failed to create opportunity');
-    });
-  });
-
+  // ──────────────────────────────────────────────────────────────────────────
+  // GET /api/opportunities/[id]
+  // ──────────────────────────────────────────────────────────────────────────
   describe('GET /api/opportunities/[id]', () => {
-    it('should return a single opportunity', async () => {
+    it('should return a single opportunity with listing', async () => {
       const mockOpportunity = {
         id: 'opp1',
         listingId: 'listing1',
         status: 'IDENTIFIED',
+        purchasePrice: null,
+        resalePrice: null,
+        actualProfit: null,
         listing: {
           id: 'listing1',
           title: 'Test Item',
+          askingPrice: 100,
         },
       };
 
       mockFindUnique.mockResolvedValue(mockOpportunity);
 
       const request = createMockRequest('GET', '/api/opportunities/opp1');
-      const response = await GET_BY_ID(request, { params: Promise.resolve({ id: 'opp1' }) });
+      const response = await GET_BY_ID(request, {
+        params: Promise.resolve({ id: 'opp1' }),
+      });
       const data = await response.json();
 
       expect(response.status).toBe(200);
       expect(data).toEqual(mockOpportunity);
+      expect(mockFindUnique).toHaveBeenCalledWith({
+        where: { id: 'opp1' },
+        include: { listing: true },
+      });
     });
 
-    it('should return 404 if opportunity not found', async () => {
+    it('should return 404 when opportunity is not found', async () => {
       mockFindUnique.mockResolvedValue(null);
 
       const request = createMockRequest('GET', '/api/opportunities/nonexistent');
-      const response = await GET_BY_ID(request, { params: Promise.resolve({ id: 'nonexistent' }) });
+      const response = await GET_BY_ID(request, {
+        params: Promise.resolve({ id: 'nonexistent' }),
+      });
       const data = await response.json();
 
       expect(response.status).toBe(404);
-      expect(data.error).toBe('Opportunity not found');
+      expect(data.success).toBe(false);
+      expect(data.error.code).toBe('NOT_FOUND');
+    });
+
+    it('should handle database errors with 500 status', async () => {
+      mockFindUnique.mockRejectedValue(new Error('Database error'));
+
+      const request = createMockRequest('GET', '/api/opportunities/opp1');
+      const response = await GET_BY_ID(request, {
+        params: Promise.resolve({ id: 'opp1' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(500);
+      expect(data.success).toBe(false);
+      expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 
+  // ──────────────────────────────────────────────────────────────────────────
+  // PATCH /api/opportunities/[id]
+  // ──────────────────────────────────────────────────────────────────────────
   describe('PATCH /api/opportunities/[id]', () => {
     it('should update an opportunity', async () => {
-      const mockUpdatedOpportunity = {
+      const mockUpdated = {
         id: 'opp1',
         listingId: 'listing1',
         status: 'PURCHASED',
         purchasePrice: 100,
         resalePrice: null,
         actualProfit: null,
+        listing: {
+          id: 'listing1',
+          title: 'Test Item',
+        },
       };
 
-      mockUpdate.mockResolvedValue(mockUpdatedOpportunity);
+      mockUpdate.mockResolvedValue(mockUpdated);
 
       const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
         status: 'PURCHASED',
         purchasePrice: 100,
       });
-      const response = await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+      const response = await PATCH(request, {
+        params: Promise.resolve({ id: 'opp1' }),
+      });
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data).toEqual(mockUpdatedOpportunity);
+      expect(data).toEqual(mockUpdated);
+      expect(mockUpdate).toHaveBeenCalledWith({
+        where: { id: 'opp1' },
+        data: { status: 'PURCHASED', purchasePrice: 100 },
+        include: { listing: true },
+      });
     });
 
-    it('should calculate actualProfit when purchasePrice and resalePrice are provided', async () => {
-      const mockUpdatedOpportunity = {
+    it('should calculate actualProfit when purchasePrice and resalePrice are provided with fees', async () => {
+      const mockUpdated = {
         id: 'opp1',
         purchasePrice: 100,
         resalePrice: 150,
         fees: 10,
         actualProfit: 40,
+        listing: { id: 'listing1' },
       };
 
-      mockUpdate.mockResolvedValue(mockUpdatedOpportunity);
+      mockUpdate.mockResolvedValue(mockUpdated);
 
       const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
         purchasePrice: 100,
         resalePrice: 150,
         fees: 10,
       });
-      const response = await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+      await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
 
+      // actualProfit = resalePrice - purchasePrice - fees = 150 - 100 - 10 = 40
       expect(mockUpdate).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
@@ -408,17 +306,83 @@ describe('Opportunities API', () => {
       );
     });
 
-    it('should handle valid status transitions', async () => {
-      const mockUpdatedOpportunity = {
+    it('should calculate actualProfit with fees defaulting to 0 when not provided', async () => {
+      const mockUpdated = {
+        id: 'opp1',
+        purchasePrice: 100,
+        resalePrice: 150,
+        actualProfit: 50,
+        listing: { id: 'listing1' },
+      };
+
+      mockUpdate.mockResolvedValue(mockUpdated);
+
+      const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+        purchasePrice: 100,
+        resalePrice: 150,
+      });
+      await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+
+      // actualProfit = 150 - 100 - 0 = 50
+      expect(mockUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            actualProfit: 50,
+          }),
+        })
+      );
+    });
+
+    it('should not calculate actualProfit when only purchasePrice is provided', async () => {
+      mockUpdate.mockResolvedValue({
+        id: 'opp1',
+        purchasePrice: 100,
+        listing: { id: 'listing1' },
+      });
+
+      const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+        purchasePrice: 100,
+      });
+      await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+
+      expect(mockUpdate).toHaveBeenCalledWith({
+        where: { id: 'opp1' },
+        data: { purchasePrice: 100 },
+        include: { listing: true },
+      });
+    });
+
+    it('should not calculate actualProfit when only resalePrice is provided', async () => {
+      mockUpdate.mockResolvedValue({
+        id: 'opp1',
+        resalePrice: 200,
+        listing: { id: 'listing1' },
+      });
+
+      const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+        resalePrice: 200,
+      });
+      await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+
+      expect(mockUpdate).toHaveBeenCalledWith({
+        where: { id: 'opp1' },
+        data: { resalePrice: 200 },
+        include: { listing: true },
+      });
+    });
+
+    it('should handle status transition to SOLD with profit calculation', async () => {
+      const mockUpdated = {
         id: 'opp1',
         status: 'SOLD',
         purchasePrice: 500,
         resalePrice: 900,
         fees: 50,
         actualProfit: 350,
+        listing: { id: 'listing1' },
       };
 
-      mockUpdate.mockResolvedValue(mockUpdatedOpportunity);
+      mockUpdate.mockResolvedValue(mockUpdated);
 
       const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
         status: 'SOLD',
@@ -426,11 +390,14 @@ describe('Opportunities API', () => {
         resalePrice: 900,
         fees: 50,
       });
-      const response = await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+      const response = await PATCH(request, {
+        params: Promise.resolve({ id: 'opp1' }),
+      });
       const data = await response.json();
 
       expect(response.status).toBe(200);
       expect(data.status).toBe('SOLD');
+      // actualProfit = 900 - 500 - 50 = 350
       expect(mockUpdate).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
@@ -441,14 +408,15 @@ describe('Opportunities API', () => {
       );
     });
 
-    it('should persist purchase and resale dates when provided', async () => {
-      const purchaseDate = '2024-01-01T12:00:00.000Z';
-      const resaleDate = '2024-02-15T09:30:00.000Z';
+    it('should persist dates when provided', async () => {
+      const purchaseDate = '2026-01-01T12:00:00.000Z';
+      const resaleDate = '2026-02-15T09:30:00.000Z';
 
       mockUpdate.mockResolvedValue({
         id: 'opp1',
         purchaseDate,
         resaleDate,
+        listing: { id: 'listing1' },
       });
 
       const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
@@ -467,173 +435,87 @@ describe('Opportunities API', () => {
       );
     });
 
-    it('should handle errors gracefully', async () => {
+    it('should handle database errors with 500 status', async () => {
       mockUpdate.mockRejectedValue(new Error('Database error'));
 
       const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
         status: 'PURCHASED',
       });
-      const response = await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+      const response = await PATCH(request, {
+        params: Promise.resolve({ id: 'opp1' }),
+      });
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe('Failed to update opportunity');
+      expect(data.success).toBe(false);
+      expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 
+  // ──────────────────────────────────────────────────────────────────────────
+  // DELETE /api/opportunities/[id]
+  // ──────────────────────────────────────────────────────────────────────────
   describe('DELETE /api/opportunities/[id]', () => {
     it('should delete an opportunity and reset listing status', async () => {
-      const mockOpportunity = {
-        listingId: 'listing1',
-      };
-
-      mockFindUnique.mockResolvedValue(mockOpportunity);
+      mockFindUnique.mockResolvedValue({ listingId: 'listing1' });
       mockTransaction.mockResolvedValue([{}, {}]);
 
       const request = createMockRequest('DELETE', '/api/opportunities/opp1');
-      const response = await DELETE(request, { params: Promise.resolve({ id: 'opp1' }) });
+      const response = await DELETE(request, {
+        params: Promise.resolve({ id: 'opp1' }),
+      });
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data.success).toBe(true);
+      expect(data).toEqual({ success: true });
+      expect(mockFindUnique).toHaveBeenCalledWith({
+        where: { id: 'opp1' },
+        select: { listingId: true },
+      });
       expect(mockTransaction).toHaveBeenCalled();
     });
 
-    it('should return 404 if opportunity not found', async () => {
+    it('should return 404 when opportunity is not found', async () => {
       mockFindUnique.mockResolvedValue(null);
 
       const request = createMockRequest('DELETE', '/api/opportunities/nonexistent');
-      const response = await DELETE(request, { params: Promise.resolve({ id: 'nonexistent' }) });
+      const response = await DELETE(request, {
+        params: Promise.resolve({ id: 'nonexistent' }),
+      });
       const data = await response.json();
 
       expect(response.status).toBe(404);
-      expect(data.error).toBe('Opportunity not found');
+      expect(data.success).toBe(false);
+      expect(data.error.code).toBe('NOT_FOUND');
     });
 
-    it('should handle errors gracefully', async () => {
+    it('should handle database errors during findUnique with 500 status', async () => {
       mockFindUnique.mockRejectedValue(new Error('Database error'));
 
       const request = createMockRequest('DELETE', '/api/opportunities/opp1');
-      const response = await DELETE(request, { params: Promise.resolve({ id: 'opp1' }) });
+      const response = await DELETE(request, {
+        params: Promise.resolve({ id: 'opp1' }),
+      });
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe('Failed to delete opportunity');
+      expect(data.success).toBe(false);
+      expect(data.error.code).toBe('INTERNAL_ERROR');
     });
-  });
-});
 
-// ── Additional branch coverage ────────────────────────────────────────────────
-describe('Opportunities API - branch coverage', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    mockFindMany.mockResolvedValue([]);
-    mockCount.mockResolvedValue(0);
-    mockAggregate.mockResolvedValue({ _sum: { actualProfit: 0, purchasePrice: 0, resalePrice: 0 }, _count: 0 });
-  });
+    it('should handle database errors during transaction with 500 status', async () => {
+      mockFindUnique.mockResolvedValue({ listingId: 'listing1' });
+      mockTransaction.mockRejectedValue(new Error('Transaction failed'));
 
-  it('returns 400 for invalid query params', async () => {
-    const request = createMockRequest('GET', '/api/opportunities?minScore=not-a-number');
-    const response = await GET(request);
-    expect(response.status).toBe(400);
-  });
+      const request = createMockRequest('DELETE', '/api/opportunities/opp1');
+      const response = await DELETE(request, {
+        params: Promise.resolve({ id: 'opp1' }),
+      });
+      const data = await response.json();
 
-  it('GET with valid status enum param returns 200', async () => {
-    mockFindMany.mockResolvedValue([]);
-    mockCount.mockResolvedValue(0);
-    // Use a valid status enum value
-    const request = createMockRequest('GET', '/api/opportunities?status=PURCHASED');
-    const response = await GET(request);
-    expect(response.status).toBe(200);
-  });
-
-  it('GET with userId auth covers userId truthy branch', async () => {
-    // Covers: if (userId) { where.OR = [...] } branch [0]
-    // Mock @/lib/auth to return a session with a user
-    jest.mock('@/lib/auth', () => ({
-      auth: jest.fn().mockResolvedValue({ user: { id: 'test-user-id' } }),
-    }));
-    // Reimport to get the mocked version
-    const authMiddleware = require('@/lib/auth-middleware');
-    const origGetAuth = authMiddleware.getAuthUserId;
-    authMiddleware.getAuthUserId = jest.fn().mockResolvedValue('test-user-id');
-
-    const request = createMockRequest('GET', '/api/opportunities');
-    const response = await GET(request);
-    expect(response.status).toBe(200);
-
-    authMiddleware.getAuthUserId = origGetAuth;
-  });
-
-  it('GET with minScore and maxScore covers score filter branches', async () => {
-    // Covers: if (minScore !== undefined || maxScore !== undefined) → true
-    //         if (minScore !== undefined) → both branches
-    //         if (maxScore !== undefined) → both branches
-    const request = createMockRequest('GET', '/api/opportunities?minScore=50&maxScore=100');
-    const response = await GET(request);
-    expect(response.status).toBe(200);
-  });
-
-  it('GET with minProfit and maxProfit covers profit filter branches', async () => {
-    // Covers: if (minProfit !== undefined || maxProfit !== undefined) → true
-    const request = createMockRequest('GET', '/api/opportunities?minProfit=10&maxProfit=500');
-    const response = await GET(request);
-    expect(response.status).toBe(200);
-  });
-
-  it('GET with only maxScore covers left-false||right-true branch + minScore undefined inner branch', async () => {
-    // Left side: minScore === undefined (false), right side: maxScore !== undefined (true)
-    // → covers ||  branch 2, and inner `if (minScore !== undefined)` → false branch
-    const request = createMockRequest('GET', '/api/opportunities?maxScore=90');
-    const response = await GET(request);
-    expect(response.status).toBe(200);
-  });
-
-  it('GET with only minScore covers maxScore undefined inner branch', async () => {
-    // Inner `if (maxScore !== undefined)` → false branch (only minScore set)
-    const request = createMockRequest('GET', '/api/opportunities?minScore=30');
-    const response = await GET(request);
-    expect(response.status).toBe(200);
-  });
-
-  it('GET with only maxProfit covers minProfit undefined inner branch', async () => {
-    // Inner `if (minProfit !== undefined)` → false (only maxProfit is set)
-    const request = createMockRequest('GET', '/api/opportunities?maxProfit=1000');
-    const response = await GET(request);
-    expect(response.status).toBe(200);
-  });
-
-  it('GET with only minProfit covers maxProfit undefined inner branch', async () => {
-    // Inner `if (maxProfit !== undefined)` → false (only minProfit is set)
-    const request = createMockRequest('GET', '/api/opportunities?minProfit=5');
-    const response = await GET(request);
-    expect(response.status).toBe(200);
-  });
-
-  it('PATCH without fees calculates actualProfit with fees defaulting to 0', async () => {
-    // Covers: const fees = body.fees || 0 → 0 branch (line 33 in [id]/route.ts)
-    const mockUpdatedOpportunity = {
-      id: 'opp-nofees',
-      purchasePrice: 100,
-      resalePrice: 150,
-      actualProfit: 50, // 150 - 100 - 0 = 50
-    };
-    mockUpdate.mockResolvedValue(mockUpdatedOpportunity);
-
-    const request = createMockRequest('PATCH', '/api/opportunities/opp-nofees', {
-      purchasePrice: 100,
-      resalePrice: 150,
-      // No fees provided → defaults to 0
+      expect(response.status).toBe(500);
+      expect(data.success).toBe(false);
+      expect(data.error.code).toBe('INTERNAL_ERROR');
     });
-    const response = await PATCH(request, { params: Promise.resolve({ id: 'opp-nofees' }) });
-    expect(response.status).toBe(200);
-    // fees defaults to 0, actualProfit = 150 - 100 - 0 = 50
-    expect(mockUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          actualProfit: 50,
-        }),
-      })
-    );
   });
 });

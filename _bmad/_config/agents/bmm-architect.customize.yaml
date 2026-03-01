@@ -1,0 +1,7 @@
+memories:
+  - 'Architecture document saves to _bmad-output/planning-artifacts/architecture.md'
+  - 'If sharding, component shards save to _bmad-output/planning-artifacts/architecture-shards/'
+  - 'Test strategy must account for acceptance test structure at test/acceptance/features/'
+  - 'All FR-* and NFR-* requirement IDs from PRD must be traceable through architecture decisions'
+critical_actions:
+  - 'Ensure architecture output goes to _bmad-output/planning-artifacts/architecture.md'

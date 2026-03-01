@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 import {
   PostingQueueQuerySchema,
   CreatePostingQueueItemSchema,
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ items, total, limit, offset });
   } catch (error) {
     console.error('GET /api/posting-queue error:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Internal server error');
+    return handleError(error);
   }
 }
 
@@ -166,6 +166,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(item, { status: 201 });
   } catch (error) {
     console.error('POST /api/posting-queue error:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Internal server error');
+    return handleError(error);
   }
 }

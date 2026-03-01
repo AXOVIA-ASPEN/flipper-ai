@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Settings, Home, TrendingUp } from 'lucide-react';
+import UserMenu from '@/components/UserMenu';
 
 export default function Navigation() {
   const pathname = usePathname();
@@ -23,12 +24,12 @@ export default function Navigation() {
             <span>Flipper AI</span>
           </Link>
 
-          {/* Navigation Links */}
+          {/* Navigation Links + User menu (with Log out) */}
           <div className="flex items-center gap-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
-              
+
               return (
                 <Link
                   key={item.href}
@@ -44,6 +45,7 @@ export default function Navigation() {
                 </Link>
               );
             })}
+            <UserMenu />
           </div>
         </div>
       </div>

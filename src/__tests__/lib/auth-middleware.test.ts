@@ -1,13 +1,22 @@
 /**
- * Authentication middleware tests
+ * Authentication middleware tests — Firebase-based
  * @jest-environment node
  */
 import { describe, test, expect, jest, beforeEach } from '@jest/globals';
 import { NextRequest, NextResponse } from 'next/server';
 
-// Mock NextAuth auth function
-jest.mock('@/lib/auth', () => ({
-  auth: jest.fn(),
+// Mock Firebase session
+const mockGetCurrentUser = jest.fn();
+const mockGetCurrentUserId = jest.fn();
+jest.mock('@/lib/firebase/session', () => ({
+  getCurrentUser: (...args: unknown[]) => mockGetCurrentUser(...args),
+  getCurrentUserId: (...args: unknown[]) => mockGetCurrentUserId(...args),
+}));
+
+// Mock Firebase auth middleware
+const mockVerifyIdToken = jest.fn();
+jest.mock('@/lib/firebase/auth-middleware', () => ({
+  verifyIdToken: (...args: unknown[]) => mockVerifyIdToken(...args),
 }));
 
 // Mock Prisma
@@ -20,7 +29,6 @@ jest.mock('@/lib/db', () => ({
   },
 }));
 
-import { auth } from '@/lib/auth';
 import prisma from '@/lib/db';
 import {
   withAuth,
@@ -31,45 +39,65 @@ import {
   requirePageAuth,
 } from '@/lib/auth-middleware';
 
-describe('Auth Middleware', () => {
-  const mockAuth = auth as jest.Mock;
-
+describe('Auth Middleware (Firebase)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     delete process.env.NODE_ENV;
   });
 
   describe('withAuth', () => {
-    test('should call handler with authenticated request', async () => {
-      const mockSession = {
-        user: {
-          id: 'user-123',
-          email: 'test@example.com',
-          name: 'Test User',
-        },
-        expires: new Date(Date.now() + 86400000).toISOString(),
-      };
-      mockAuth.mockResolvedValue(mockSession);
+    test('should call handler when authenticated via session cookie', async () => {
+      mockGetCurrentUser.mockResolvedValue({
+        id: 'user-123',
+        email: 'test@example.com',
+        name: 'Test User',
+        firebaseUid: 'fb-123',
+        image: null,
+      });
 
       const mockHandler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
-
       const wrappedHandler = withAuth(mockHandler);
       const req = new NextRequest('http://localhost:3000/api/test');
-      const context = { params: {} };
 
-      await wrappedHandler(req, context);
+      await wrappedHandler(req, {});
 
       expect(mockHandler).toHaveBeenCalledWith(
         expect.objectContaining({
           userId: 'user-123',
           userEmail: 'test@example.com',
         }),
-        context
+        {}
+      );
+    });
+
+    test('should fall back to Bearer token when no session cookie', async () => {
+      mockGetCurrentUser.mockResolvedValue(null);
+      mockVerifyIdToken.mockResolvedValue({
+        uid: 'fb-456',
+        email: 'bearer@example.com',
+        prismaUserId: 'user-456',
+      });
+
+      const mockHandler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
+      const wrappedHandler = withAuth(mockHandler);
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        headers: { Authorization: 'Bearer valid-token' },
+      });
+
+      await wrappedHandler(req, {});
+
+      expect(mockHandler).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: 'user-456',
+          userEmail: 'bearer@example.com',
+        }),
+        {}
       );
     });
 
     test('should return 401 when not authenticated', async () => {
-      mockAuth.mockResolvedValue(null);
+      mockGetCurrentUser.mockResolvedValue(null);
+      mockVerifyIdToken.mockResolvedValue(null);
 
       const mockHandler = jest.fn();
       const wrappedHandler = withAuth(mockHandler);
@@ -84,44 +112,27 @@ describe('Auth Middleware', () => {
     });
 
     test('should return 401 when session has no user', async () => {
-      mockAuth.mockResolvedValue({
-        expires: new Date(Date.now() + 86400000).toISOString(),
-      });
+      mockGetCurrentUser.mockResolvedValue(null);
+      mockVerifyIdToken.mockResolvedValue(null);
 
       const mockHandler = jest.fn();
       const wrappedHandler = withAuth(mockHandler);
       const req = new NextRequest('http://localhost:3000/api/test');
 
       const response = await wrappedHandler(req, {});
-      const body = await response.json();
-
-      expect(response.status).toBe(401);
-      expect(body.error).toBe('Unauthorized');
-    });
-
-    test('should return 401 when user has no ID', async () => {
-      mockAuth.mockResolvedValue({
-        user: { email: 'test@example.com' },
-        expires: new Date(Date.now() + 86400000).toISOString(),
-      });
-
-      const mockHandler = jest.fn();
-      const wrappedHandler = withAuth(mockHandler);
-      const req = new NextRequest('http://localhost:3000/api/test');
-
-      const response = await wrappedHandler(req, {});
-
       expect(response.status).toBe(401);
     });
 
-    test('should attach null email when user has no email', async () => {
-      mockAuth.mockResolvedValue({
-        user: { id: 'user-123' },
-        expires: new Date(Date.now() + 86400000).toISOString(),
+    test('should attach null email when user email is missing', async () => {
+      mockGetCurrentUser.mockResolvedValue({
+        id: 'user-123',
+        email: null,
+        name: null,
+        firebaseUid: 'fb-123',
+        image: null,
       });
 
       const mockHandler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
-
       const wrappedHandler = withAuth(mockHandler);
       const req = new NextRequest('http://localhost:3000/api/test');
 
@@ -135,39 +146,72 @@ describe('Auth Middleware', () => {
         {}
       );
     });
+
+    test('should attach null email when Bearer token has no email', async () => {
+      mockGetCurrentUser.mockResolvedValue(null);
+      mockVerifyIdToken.mockResolvedValue({
+        uid: 'fb-789',
+        email: undefined,
+        prismaUserId: 'user-789',
+      });
+
+      const mockHandler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
+      const wrappedHandler = withAuth(mockHandler);
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        headers: { Authorization: 'Bearer token' },
+      });
+
+      await wrappedHandler(req, {});
+
+      expect(mockHandler).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: 'user-789',
+          userEmail: null,
+        }),
+        {}
+      );
+    });
   });
 
   describe('getAuthUserId', () => {
-    test('should return user ID when authenticated', async () => {
-      mockAuth.mockResolvedValue({
-        user: { id: 'user-123' },
-        expires: new Date(Date.now() + 86400000).toISOString(),
-      });
+    test('should return user ID from session cookie', async () => {
+      mockGetCurrentUserId.mockResolvedValue('user-123');
 
       const userId = await getAuthUserId();
       expect(userId).toBe('user-123');
     });
 
+    test('should fall back to Bearer token', async () => {
+      mockGetCurrentUserId.mockResolvedValue(null);
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        headers: { Authorization: 'Bearer valid-token' },
+      });
+      mockVerifyIdToken.mockResolvedValue({ prismaUserId: 'user-456' });
+
+      const userId = await getAuthUserId(req);
+      expect(userId).toBe('user-456');
+    });
+
     test('should return null when not authenticated', async () => {
-      mockAuth.mockResolvedValue(null);
+      mockGetCurrentUserId.mockResolvedValue(null);
       const userId = await getAuthUserId();
       expect(userId).toBeNull();
     });
 
     test('should return null when session has no user', async () => {
-      mockAuth.mockResolvedValue({
-        expires: new Date(Date.now() + 86400000).toISOString(),
-      });
+      mockGetCurrentUserId.mockResolvedValue(null);
       const userId = await getAuthUserId();
       expect(userId).toBeNull();
     });
 
     test('should return null when user has no ID', async () => {
-      mockAuth.mockResolvedValue({
-        user: { email: 'test@example.com' },
-        expires: new Date(Date.now() + 86400000).toISOString(),
+      mockGetCurrentUserId.mockResolvedValue(null);
+      mockVerifyIdToken.mockResolvedValue(null);
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        headers: { Authorization: 'Bearer invalid' },
       });
-      const userId = await getAuthUserId();
+
+      const userId = await getAuthUserId(req);
       expect(userId).toBeNull();
     });
   });
@@ -178,26 +222,23 @@ describe('Auth Middleware', () => {
         id: 'user-123',
         email: 'test@example.com',
         name: 'Test User',
+        firebaseUid: 'fb-123',
+        image: null,
       };
-      mockAuth.mockResolvedValue({
-        user: mockUser,
-        expires: new Date(Date.now() + 86400000).toISOString(),
-      });
+      mockGetCurrentUser.mockResolvedValue(mockUser);
 
       const user = await getAuthUser();
       expect(user).toEqual(mockUser);
     });
 
     test('should return null when not authenticated', async () => {
-      mockAuth.mockResolvedValue(null);
+      mockGetCurrentUser.mockResolvedValue(null);
       const user = await getAuthUser();
       expect(user).toBeNull();
     });
 
     test('should return null when session has no user', async () => {
-      mockAuth.mockResolvedValue({
-        expires: new Date(Date.now() + 86400000).toISOString(),
-      });
+      mockGetCurrentUser.mockResolvedValue(null);
       const user = await getAuthUser();
       expect(user).toBeNull();
     });
@@ -205,34 +246,25 @@ describe('Auth Middleware', () => {
 
   describe('isAuthenticated', () => {
     test('should return true when authenticated', async () => {
-      mockAuth.mockResolvedValue({
-        user: { id: 'user-123' },
-        expires: new Date(Date.now() + 86400000).toISOString(),
-      });
-
+      mockGetCurrentUserId.mockResolvedValue('user-123');
       const result = await isAuthenticated();
       expect(result).toBe(true);
     });
 
     test('should return false when not authenticated', async () => {
-      mockAuth.mockResolvedValue(null);
+      mockGetCurrentUserId.mockResolvedValue(null);
       const result = await isAuthenticated();
       expect(result).toBe(false);
     });
 
     test('should return false when session has no user', async () => {
-      mockAuth.mockResolvedValue({
-        expires: new Date(Date.now() + 86400000).toISOString(),
-      });
+      mockGetCurrentUserId.mockResolvedValue(null);
       const result = await isAuthenticated();
       expect(result).toBe(false);
     });
 
     test('should return false when user has no ID', async () => {
-      mockAuth.mockResolvedValue({
-        user: { email: 'test@example.com' },
-        expires: new Date(Date.now() + 86400000).toISOString(),
-      });
+      mockGetCurrentUserId.mockResolvedValue(null);
       const result = await isAuthenticated();
       expect(result).toBe(false);
     });
@@ -240,25 +272,23 @@ describe('Auth Middleware', () => {
 
   describe('getUserIdOrDefault', () => {
     test('should return authenticated user ID', async () => {
-      mockAuth.mockResolvedValue({
-        user: { id: 'user-123' },
-        expires: new Date(Date.now() + 86400000).toISOString(),
-      });
-
+      mockGetCurrentUserId.mockResolvedValue('user-123');
       const userId = await getUserIdOrDefault();
       expect(userId).toBe('user-123');
     });
 
     test('should throw error in production when not authenticated', async () => {
       process.env.NODE_ENV = 'production';
-      mockAuth.mockResolvedValue(null);
+      mockGetCurrentUserId.mockResolvedValue(null);
+      mockVerifyIdToken.mockResolvedValue(null);
 
       await expect(getUserIdOrDefault()).rejects.toThrow('Unauthorized');
     });
 
     test('should return default user in development when not authenticated', async () => {
       process.env.NODE_ENV = 'development';
-      mockAuth.mockResolvedValue(null);
+      mockGetCurrentUserId.mockResolvedValue(null);
+      mockVerifyIdToken.mockResolvedValue(null);
 
       const mockDefaultUser = { id: 'default-user-123' };
       (prisma.user.findFirst as jest.Mock).mockResolvedValue(mockDefaultUser);
@@ -272,7 +302,8 @@ describe('Auth Middleware', () => {
 
     test('should throw error in development when no default user exists', async () => {
       process.env.NODE_ENV = 'development';
-      mockAuth.mockResolvedValue(null);
+      mockGetCurrentUserId.mockResolvedValue(null);
+      mockVerifyIdToken.mockResolvedValue(null);
       (prisma.user.findFirst as jest.Mock).mockResolvedValue(null);
 
       await expect(getUserIdOrDefault()).rejects.toThrow('Unauthorized');
@@ -285,18 +316,17 @@ describe('Auth Middleware', () => {
         id: 'user-123',
         email: 'test@example.com',
         name: 'Test User',
+        firebaseUid: 'fb-123',
+        image: null,
       };
-      mockAuth.mockResolvedValue({
-        user: mockUser,
-        expires: new Date(Date.now() + 86400000).toISOString(),
-      });
+      mockGetCurrentUser.mockResolvedValue(mockUser);
 
       const result = await requirePageAuth();
       expect(result).toEqual({ props: { user: mockUser } });
     });
 
     test('should return redirect when not authenticated', async () => {
-      mockAuth.mockResolvedValue(null);
+      mockGetCurrentUser.mockResolvedValue(null);
 
       const result = await requirePageAuth();
       expect(result).toEqual({
@@ -308,9 +338,7 @@ describe('Auth Middleware', () => {
     });
 
     test('should return redirect when session has no user', async () => {
-      mockAuth.mockResolvedValue({
-        expires: new Date(Date.now() + 86400000).toISOString(),
-      });
+      mockGetCurrentUser.mockResolvedValue(null);
 
       const result = await requirePageAuth();
       expect(result).toHaveProperty('redirect');

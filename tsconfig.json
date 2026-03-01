@@ -32,12 +32,13 @@
   ],
   "exclude": [
     "node_modules",
-    "features",
+    "test/features",
     "flipper-ai",
     "tests",
-    "e2e",
     "src/__tests__",
     "prisma/seed.ts",
-    "functions/**/*"
+    "functions/**/*",
+    "scripts/**/*",
+    "test/**/*"
   ]
 }

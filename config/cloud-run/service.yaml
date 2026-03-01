@@ -1,0 +1,49 @@
+# Cloud Run Health Check Probe Configuration
+# ============================================
+#
+# Reference configuration for Cloud Run health probes.
+#
+# Apply via:
+#   gcloud run services replace config/cloud-run/service.yaml
+#
+# Or configure via gcloud run deploy flags:
+#   gcloud run deploy flipper-web \
+#     --startup-probe-path=/api/health \
+#     --startup-probe-initial-delay=0 \
+#     --startup-probe-period=5 \
+#     --startup-probe-failure-threshold=10 \
+#     --liveness-probe-path=/api/health \
+#     --liveness-probe-initial-delay=10 \
+#     --liveness-probe-period=30
+#
+# Environment Variables (non-secret, set via --set-env-vars):
+#   LOG_LEVEL=info          # pino log level: debug, info, warn, error, fatal
+#   NODE_ENV=production
+#
+# Notes:
+# - Cloud Run does NOT support readiness probes (Kubernetes-style).
+#   It uses startup probes to determine when a container is ready.
+# - /api/health/ready is still useful for external monitoring and deploy scripts.
+# - Next.js + Prisma cold start can take 5-15s; startup probe allows 50s (10 * 5s).
+
+# Liveness Probe
+# Detects hung processes; restarts container on failure
+livenessProbe:
+  httpGet:
+    path: /api/health
+    port: 8080  # Cloud Run injects PORT=8080
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Startup Probe
+# Gives container time to initialize (Next.js + Prisma cold start)
+startupProbe:
+  httpGet:
+    path: /api/health
+    port: 8080
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  timeoutSeconds: 5
+  failureThreshold: 10  # 10 * 5s = 50s max startup time

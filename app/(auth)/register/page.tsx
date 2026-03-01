@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import {
   Mail,
   Lock,
@@ -22,6 +22,7 @@ import {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { signUp, signInWithGoogle, signInWithGitHub } = useFirebaseAuth();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -61,35 +62,21 @@ export default function RegisterPage() {
     }
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name }),
-      });
+      // Create Firebase user and exchange token for session cookie.
+      // Name is passed through to the session exchange which upserts the Prisma user.
+      await signUp(email, password, name || undefined);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setErrorMessage(data.error || 'Failed to create account');
-        return;
-      }
-
-      // Auto sign in after registration
-      const signInResult = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (signInResult?.error) {
-        // Account created but sign-in failed, redirect to login
-        router.push('/login?registered=true');
+      router.push('/settings');
+      router.refresh();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to create account';
+      if (message.includes('auth/email-already-in-use')) {
+        setErrorMessage('An account with this email already exists');
+      } else if (message.includes('auth/weak-password')) {
+        setErrorMessage('Password is too weak. Please use a stronger password.');
       } else {
-        router.push('/settings');
-        router.refresh();
+        setErrorMessage('Something went wrong. Please try again.');
       }
-    } catch {
-      setErrorMessage('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -98,16 +85,33 @@ export default function RegisterPage() {
   async function handleOAuthSignIn(provider: 'google' | 'github') {
     setIsLoading(true);
     setErrorMessage(null);
-    await signIn(provider, { callbackUrl: '/settings' });
+    try {
+      if (provider === 'google') {
+        await signInWithGoogle();
+      } else {
+        await signInWithGitHub();
+      }
+      router.push('/settings');
+      router.refresh();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'OAuth sign-in failed';
+      if (message.includes('auth/popup-closed-by-user')) {
+        setIsLoading(false);
+        return;
+      }
+      setErrorMessage('Sign-up failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-theme-page flex items-center justify-center p-4 relative overflow-hidden">
       {/* Animated background gradient orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 -left-4 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
-        <div className="absolute top-0 -right-4 w-96 h-96 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
-        <div className="absolute -bottom-8 left-20 w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
+        <div className="absolute top-0 -left-4 w-96 h-96 bg-theme-orb-1 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
+        <div className="absolute top-0 -right-4 w-96 h-96 bg-theme-orb-2 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
+        <div className="absolute -bottom-8 left-20 w-96 h-96 bg-theme-orb-3 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
         <div className="absolute bottom-20 right-20 w-72 h-72 bg-emerald-600 rounded-full mix-blend-multiply filter blur-3xl opacity-15 animate-blob animation-delay-6000" />
       </div>
 
@@ -115,24 +119,24 @@ export default function RegisterPage() {
       <div className="absolute left-10 top-1/4 hidden xl:block space-y-4">
         <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-4 transform -rotate-3 hover:rotate-0 transition-transform duration-500 shadow-2xl max-w-xs">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 bg-theme-accent-green rounded-lg flex items-center justify-center flex-shrink-0">
               <Target className="w-5 h-5 text-white" />
             </div>
             <div>
               <p className="text-sm font-semibold text-white">AI-Powered Analysis</p>
-              <p className="text-xs text-blue-200/60">Instant profit estimates on every listing</p>
+              <p className="text-xs text-theme-muted">Instant profit estimates on every listing</p>
             </div>
           </div>
         </div>
 
         <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-4 transform rotate-2 hover:rotate-0 transition-transform duration-500 shadow-2xl max-w-xs ml-8">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-600 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 bg-theme-primary rounded-lg flex items-center justify-center flex-shrink-0">
               <TrendingUp className="w-5 h-5 text-white" />
             </div>
             <div>
               <p className="text-sm font-semibold text-white">Market Intelligence</p>
-              <p className="text-xs text-blue-200/60">Real eBay sold data for accurate pricing</p>
+              <p className="text-xs text-theme-muted">Real eBay sold data for accurate pricing</p>
             </div>
           </div>
         </div>
@@ -142,24 +146,24 @@ export default function RegisterPage() {
       <div className="absolute right-10 top-1/3 hidden xl:block space-y-4">
         <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-4 transform rotate-3 hover:rotate-0 transition-transform duration-500 shadow-2xl max-w-xs">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-cyan-600 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 bg-theme-accent-blue rounded-lg flex items-center justify-center flex-shrink-0">
               <Zap className="w-5 h-5 text-white" />
             </div>
             <div>
               <p className="text-sm font-semibold text-white">Multi-Platform</p>
-              <p className="text-xs text-blue-200/60">Craigslist, eBay, Facebook & OfferUp</p>
+              <p className="text-xs text-theme-muted">Craigslist, eBay, Facebook & OfferUp</p>
             </div>
           </div>
         </div>
 
         <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-4 transform -rotate-2 hover:rotate-0 transition-transform duration-500 shadow-2xl max-w-xs ml-8">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-red-600 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 bg-theme-accent-orange rounded-lg flex items-center justify-center flex-shrink-0">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
               <p className="text-sm font-semibold text-white">Automated Alerts</p>
-              <p className="text-xs text-blue-200/60">Never miss a high-value opportunity</p>
+              <p className="text-xs text-theme-muted">Never miss a high-value opportunity</p>
             </div>
           </div>
         </div>
@@ -172,16 +176,16 @@ export default function RegisterPage() {
           <div className="px-8 pt-8 pb-6 text-center">
             <Link href="/" className="inline-block mb-6 group">
               <div className="flex items-center justify-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/50 group-hover:shadow-purple-500/80 transition-shadow">
+                <div className="w-12 h-12 bg-theme-primary rounded-xl flex items-center justify-center shadow-lg shadow-theme-button group-hover:shadow-xl transition-shadow">
                   <Sparkles className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-purple-200 via-pink-200 to-blue-200 bg-clip-text text-transparent">
+                <span className="text-2xl font-bold bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(to right, var(--theme-text-gradient-from), var(--theme-text-gradient-via), var(--theme-text-gradient-to))' }}>
                   Flipper.ai
                 </span>
               </div>
             </Link>
             <h1 className="text-2xl font-bold text-white mb-2">Create your account</h1>
-            <p className="text-blue-200/70">Start finding profitable flips in minutes</p>
+            <p className="text-theme-muted">Start finding profitable flips in minutes</p>
           </div>
 
           {/* Error message */}
@@ -251,7 +255,7 @@ export default function RegisterPage() {
           {/* Registration form */}
           <form onSubmit={handleSubmit} className="px-8 pb-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-blue-200/90 mb-2">Full name</label>
+              <label className="block text-sm font-medium text-white/90 mb-2">Full name</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <User className="h-5 w-5 text-blue-300/50" />
@@ -267,7 +271,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-blue-200/90 mb-2">
+              <label className="block text-sm font-medium text-white/90 mb-2">
                 Email address
               </label>
               <div className="relative">
@@ -286,7 +290,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-blue-200/90 mb-2">Password</label>
+              <label className="block text-sm font-medium text-white/90 mb-2">Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-blue-300/50" />
@@ -366,7 +370,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-blue-200/90 mb-2">
+              <label className="block text-sm font-medium text-white/90 mb-2">
                 Confirm password
               </label>
               <div className="relative">
@@ -409,7 +413,7 @@ export default function RegisterPage() {
 
           {/* Footer */}
           <div className="px-8 pb-8 text-center">
-            <p className="text-blue-200/60 text-sm">
+            <p className="text-theme-muted text-sm">
               Already have an account?{' '}
               <Link
                 href="/login"

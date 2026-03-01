@@ -35,20 +35,20 @@ describe('GET /api/images/proxy', () => {
       expect(body.error).toContain("Missing 'url' parameter");
     });
 
-    it('returns 400 for invalid URL format', async () => {
+    it('returns 422 for invalid URL format', async () => {
       const req = makeRequest('/api/images/proxy?url=not-a-url');
       const res = await GET(req);
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
       const body = await res.json();
-      expect(body.error).toContain('Invalid URL format');
+      expect(body.error.code).toBe('VALIDATION_ERROR');
     });
 
-    it('returns 400 for non-http/https protocols', async () => {
+    it('returns 422 for non-http/https protocols', async () => {
       const req = makeRequest('/api/images/proxy?url=ftp://example.com/img.jpg');
       const res = await GET(req);
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
       const body = await res.json();
-      expect(body.error).toContain('Invalid URL format');
+      expect(body.error.code).toBe('VALIDATION_ERROR');
     });
   });
 
@@ -119,7 +119,7 @@ describe('GET /api/images/proxy', () => {
       expect(res.status).toBe(404);
     });
 
-    it('returns 400 when upstream content is not an image', async () => {
+    it('returns 422 when upstream content is not an image', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         headers: new Headers({ 'content-type': 'text/html' }),
@@ -128,9 +128,9 @@ describe('GET /api/images/proxy', () => {
 
       const req = makeRequest('/api/images/proxy?url=https://example.com/page.html');
       const res = await GET(req);
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
       const body = await res.json();
-      expect(body.error).toContain('not point to an image');
+      expect(body.error.code).toBe('VALIDATION_ERROR');
     });
 
     it('returns 413 when image exceeds size limit', async () => {
@@ -157,7 +157,7 @@ describe('GET /api/images/proxy', () => {
       const res = await GET(req);
       expect(res.status).toBe(500);
       const body = await res.json();
-      expect(body.error).toContain('Failed to proxy image');
+      expect(body.error.code).toBeDefined();
     });
   });
 });

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Star, ExternalLink } from 'lucide-react';
 import { useFilterParams } from '@/hooks/useFilterParams';
@@ -35,7 +35,15 @@ interface PaginationData {
   totalPages: number;
 }
 
-export default function Dashboard() {
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center">Loading dashboard...</div>}>
+      <Dashboard />
+    </Suspense>
+  );
+}
+
+function Dashboard() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { filters, setFilter, clearFilters, activeFilterCount } = useFilterParams();
@@ -260,7 +268,11 @@ export default function Dashboard() {
             {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
               <button
                 key={page}
-                onClick={() => setFilter('page', String(page))}
+                onClick={() => {
+                  const params = new URLSearchParams(searchParams.toString());
+                  params.set('page', String(page));
+                  router.push(`?${params.toString()}`, { scroll: false });
+                }}
                 className={`px-4 py-2 rounded ${
                   page === pagination.page
                     ? 'bg-purple-600 text-white'

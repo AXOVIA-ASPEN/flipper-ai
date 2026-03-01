@@ -249,36 +249,36 @@ describe('POST /api/messages', () => {
     expect(data.sentAt).toBeInstanceOf(Date);
   });
 
-  it('returns 400 when messageBody is missing', async () => {
+  it('returns 422 when messageBody is missing', async () => {
     const res = await POST(
       createRequest('/api/messages', {
         method: 'POST',
         body: JSON.stringify({ direction: 'OUTBOUND' }),
       })
     );
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
   });
 
-  it('returns 400 when direction is missing', async () => {
+  it('returns 422 when direction is missing', async () => {
     const res = await POST(
       createRequest('/api/messages', {
         method: 'POST',
         body: JSON.stringify({ messageBody: 'test' }),
       })
     );
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
   });
 
-  it('returns 400 for invalid direction', async () => {
+  it('returns 422 for invalid direction', async () => {
     const res = await POST(
       createRequest('/api/messages', {
         method: 'POST',
         body: JSON.stringify({ messageBody: 'test', direction: 'INVALID' }),
       })
     );
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
     const json = await res.json();
-    expect(json.error).toContain('INBOUND or OUTBOUND');
+    expect(json.error.code).toBe('VALIDATION_ERROR');
   });
 
   it('returns 401 when not authenticated', async () => {

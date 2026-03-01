@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
-import { auth } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/firebase/session';
 import {
   exchangeCodeForToken,
   exchangeForLongLivedToken,
@@ -17,11 +17,11 @@ import { handleError, ValidationError, NotFoundError, UnauthorizedError, Forbidd
 export async function GET(req: NextRequest) {
   const baseUrl = req.nextUrl.origin;
 
-  // Check if user is authenticated
-  const session = await auth();
+  // Check if user is authenticated via Firebase session
+  const sessionUser = await getCurrentUser();
 
-  if (!session?.user?.email) {
-    return NextResponse.redirect(new URL('/auth/signin?error=unauthorized', baseUrl));
+  if (!sessionUser?.email) {
+    return NextResponse.redirect(new URL('/login?error=unauthorized', baseUrl));
   }
 
   // Get code and state from query params
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
     );
 
     // Store encrypted token in database
-    const userId = session.user.id || session.user.email;
+    const userId = sessionUser.id;
     await storeToken(userId, longToken.access_token, longToken.expires_in);
 
     // Redirect to settings page with success message

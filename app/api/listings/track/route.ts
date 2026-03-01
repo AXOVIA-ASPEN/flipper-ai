@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runTrackingCycle, getTrackableListings } from '@/lib/listing-tracker';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 // GET /api/listings/track - Get trackable listings count
 export async function GET() {
   try {
@@ -18,7 +18,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Error fetching trackable listings:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch trackable listings');
+    return handleError(error);
   }
 }
 
@@ -53,6 +53,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     console.error('Error running tracking cycle:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to run tracking cycle');
+    return handleError(error);
   }
 }

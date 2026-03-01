@@ -1,14 +1,14 @@
-const prismaLibSqlMock = jest.fn();
+const prismaPgMock = jest.fn();
 const prismaClientMock = jest.fn();
 
-jest.mock('@prisma/adapter-libsql', () => ({
-  PrismaLibSql: jest.fn((args: { url: string }) => {
-    prismaLibSqlMock(args);
-    return { __adapter: true, url: args.url };
+jest.mock('@prisma/adapter-pg', () => ({
+  PrismaPg: jest.fn((args: { connectionString: string }) => {
+    prismaPgMock(args);
+    return { __adapter: true, connectionString: args.connectionString };
   }),
 }));
 
-jest.mock('@/generated/prisma/client', () => ({
+jest.mock('@prisma/client', () => ({
   PrismaClient: jest.fn((options: { adapter: unknown }) => {
     prismaClientMock(options);
     return {};
@@ -24,7 +24,7 @@ function resetGlobalPrisma() {
 describe('Database client configuration', () => {
   beforeEach(() => {
     jest.resetModules();
-    prismaLibSqlMock.mockClear();
+    prismaPgMock.mockClear();
     prismaClientMock.mockClear();
     resetGlobalPrisma();
   });
@@ -38,22 +38,24 @@ describe('Database client configuration', () => {
   });
 
   it('uses DATABASE_URL when provided', () => {
-    process.env.DATABASE_URL = 'file:./custom.db';
+    process.env.DATABASE_URL = 'postgresql://user:pass@localhost:5432/testdb';
 
     jest.isolateModules(() => {
       require('@/lib/db');
     });
 
-    expect(prismaLibSqlMock).toHaveBeenCalledWith({ url: 'file:./custom.db' });
+    expect(prismaPgMock).toHaveBeenCalledWith(
+      expect.objectContaining({ connectionString: 'postgresql://user:pass@localhost:5432/testdb' })
+    );
   });
 
-  it('falls back to the default database path', () => {
+  it('throws when DATABASE_URL is not set', () => {
     delete process.env.DATABASE_URL;
 
-    jest.isolateModules(() => {
-      require('@/lib/db');
-    });
-
-    expect(prismaLibSqlMock).toHaveBeenCalledWith({ url: 'file:./dev.db' });
+    expect(() => {
+      jest.isolateModules(() => {
+        require('@/lib/db');
+      });
+    }).toThrow('DATABASE_URL environment variable is not set');
   });
 });

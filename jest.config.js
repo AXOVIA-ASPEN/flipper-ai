@@ -31,7 +31,7 @@ const config = {
       },
     ],
   },
-  transformIgnorePatterns: ['/node_modules/(?!(@auth/prisma-adapter|@auth/core)/)'],
+  transformIgnorePatterns: ['/node_modules/'],
   coverageReporters: ['text', 'lcov', 'clover', 'json-summary'],
   collectCoverageFrom: [
     'src/lib/**/*.ts',

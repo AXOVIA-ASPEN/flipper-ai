@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getUserIdOrDefault } from '@/lib/auth-middleware';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 const TOTAL_STEPS = 6; // welcome, marketplaces, categories, budget, location, complete
 
 /**
@@ -36,7 +36,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Error fetching onboarding status:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch onboarding status');
+    return handleError(error);
   }
 }
 
@@ -93,6 +93,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error('Error updating onboarding:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to update onboarding');
+    return handleError(error);
   }
 }

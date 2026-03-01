@@ -34,7 +34,7 @@ describe('Environment Configuration', () => {
     const { env } = require('@/lib/env');
 
     expect(env.DATABASE_URL).toBeTruthy();
-    expect(env.AUTH_SECRET).toBeTruthy();
+    // AUTH_SECRET is now optional (Firebase Auth replaced NextAuth)
     expect(env.ENCRYPTION_SECRET).toBeTruthy();
   });
 

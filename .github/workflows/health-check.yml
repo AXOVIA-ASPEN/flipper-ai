@@ -54,4 +54,4 @@ jobs:
         if: steps.url.outputs.skip == 'true'
         run: |
           echo "ℹ️ Health check skipped — set PRODUCTION_URL secret to enable"
-          echo "   Go to: Settings → Secrets → PRODUCTION_URL = https://your-app.vercel.app"
+          echo "   Go to: Settings → Secrets → PRODUCTION_URL = https://flipper-production-<hash>.run.app"

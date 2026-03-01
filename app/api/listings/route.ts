@@ -1,36 +1,17 @@
 /**
- * Listings API Route (Firebase)
+ * Listings API Route
  * GET /api/listings - Get user's listings
  * POST /api/listings - Create new listing
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/firebase/admin';
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
-import {
-  createListing,
-  getListingsByUser,
-  ListingData,
-} from '@/lib/firebase/firestore-helpers';
-
-async function getUserFromRequest(request: NextRequest): Promise<string | null> {
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
-    return null;
-  }
-
-  try {
-    const token = authHeader.substring(7);
-    const decodedToken = await auth.verifyIdToken(token);
-    return decodedToken.uid;
-  } catch {
-    return null;
-  }
-}
+import prisma from '@/lib/db';
+import { handleError, ValidationError, UnauthorizedError } from '@/lib/errors';
+import { getCurrentUserId } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
-    const userId = await getUserFromRequest(request);
+    const userId = await getCurrentUserId();
     if (!userId) {
       throw new UnauthorizedError('Unauthorized');
     }
@@ -39,56 +20,54 @@ export async function GET(request: NextRequest) {
     const platform = searchParams.get('platform') || undefined;
     const minScore = searchParams.get('min_score');
 
-    let listings = await getListingsByUser(userId, platform);
+    const where: Record<string, unknown> = { userId };
+    if (platform) where.platform = platform;
+    if (minScore) where.valueScore = { gte: parseInt(minScore, 10) };
 
-    // Filter by minimum value score if provided
-    if (minScore) {
-      const minScoreNum = parseInt(minScore, 10);
-      listings = listings.filter((l) => (l.valueScore || 0) >= minScoreNum);
-    }
+    const listings = await prisma.listing.findMany({
+      where,
+      orderBy: { scrapedAt: 'desc' },
+    });
 
     return NextResponse.json({
       success: true,
       count: listings.length,
       listings,
     });
-  } catch (error: any) {
-    console.error('Get listings error:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch listings');
+  } catch (error) {
+    return handleError(error);
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const userId = await getUserFromRequest(request);
+    const userId = await getCurrentUserId();
     if (!userId) {
       throw new UnauthorizedError('Unauthorized');
     }
 
-    const body: Partial<ListingData> = await request.json();
+    const body = await request.json();
 
-    // Validate required fields
     if (!body.platform || !body.url || !body.title || body.askingPrice === undefined) {
       throw new ValidationError('Missing required fields: platform, url, title, askingPrice');
     }
 
-    // Create listing
-    const listing = await createListing({
-      userId,
-      platform: body.platform,
-      externalId: body.externalId || body.url.split('/').pop() || '',
-      url: body.url,
-      title: body.title,
-      description: body.description,
-      askingPrice: body.askingPrice,
-      condition: body.condition,
-      location: body.location,
-      sellerName: body.sellerName,
-      sellerContact: body.sellerContact,
-      imageUrls: body.imageUrls,
-      category: body.category,
-      postedAt: body.postedAt,
-      scrapedAt: new Date().toISOString(),
+    const listing = await prisma.listing.create({
+      data: {
+        userId,
+        platform: body.platform,
+        externalId: body.externalId || body.url.split('/').pop() || '',
+        url: body.url,
+        title: body.title,
+        description: body.description,
+        askingPrice: body.askingPrice,
+        condition: body.condition,
+        location: body.location,
+        sellerName: body.sellerName,
+        sellerContact: body.sellerContact,
+        imageUrls: body.imageUrls ? JSON.stringify(body.imageUrls) : undefined,
+        category: body.category,
+      },
     });
 
     return NextResponse.json({
@@ -96,8 +75,7 @@ export async function POST(request: NextRequest) {
       message: 'Listing created successfully',
       listing,
     });
-  } catch (error: any) {
-    console.error('Create listing error:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to create listing');
+  } catch (error) {
+    return handleError(error);
   }
 }

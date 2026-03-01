@@ -22,35 +22,40 @@ jest.mock('playwright', () => ({
   },
 }));
 
-// Mock ESM-only modules that Jest can't transform
-jest.mock('@auth/prisma-adapter', () => ({
-  PrismaAdapter: jest.fn(() => ({})),
+// Mock Firebase Admin SDK (server-side only, cannot run in test env)
+jest.mock('firebase-admin/app', () => ({
+  initializeApp: jest.fn().mockReturnValue({ name: '[DEFAULT]' }),
+  getApps: jest.fn().mockReturnValue([]),
+  cert: jest.fn(),
 }));
 
-jest.mock('next-auth', () => {
-  const fn: any = jest.fn(() => ({
-    handlers: { GET: jest.fn(), POST: jest.fn() },
-    auth: jest.fn(),
-    signIn: jest.fn(),
-    signOut: jest.fn(),
-  }));
-  fn.default = fn;
-  return fn;
-});
-
-jest.mock('next-auth/providers/google', () => ({
-  __esModule: true,
-  default: jest.fn(() => ({})),
+jest.mock('firebase-admin/auth', () => ({
+  getAuth: jest.fn().mockReturnValue({
+    verifyIdToken: jest.fn(),
+    verifySessionCookie: jest.fn(),
+    createSessionCookie: jest.fn(),
+    revokeRefreshTokens: jest.fn(),
+  }),
 }));
 
-jest.mock('next-auth/providers/github', () => ({
-  __esModule: true,
-  default: jest.fn(() => ({})),
+jest.mock('firebase-admin/storage', () => ({
+  getStorage: jest.fn().mockReturnValue({
+    bucket: jest.fn().mockReturnValue({
+      name: 'axovia-flipper.firebasestorage.app',
+      file: jest.fn().mockReturnValue({
+        save: jest.fn().mockResolvedValue(undefined),
+        delete: jest.fn().mockResolvedValue(undefined),
+      }),
+      getFiles: jest.fn().mockResolvedValue([[]]),
+    }),
+  }),
 }));
 
-jest.mock('next-auth/providers/credentials', () => ({
-  __esModule: true,
-  default: jest.fn(() => ({})),
+jest.mock('firebase-admin/messaging', () => ({
+  getMessaging: jest.fn().mockReturnValue({
+    send: jest.fn().mockResolvedValue('mock-message-id'),
+    sendEach: jest.fn().mockResolvedValue({ responses: [], successCount: 0, failureCount: 0 }),
+  }),
 }));
 
 // Helper: create a mock model with all common Prisma methods
@@ -83,6 +88,7 @@ const mockPrisma = {
   session: mockModel(),
   verificationToken: mockModel(),
   aiAnalysisCache: mockModel(),
+  listingImage: mockModel(),
   notification: mockModel(),
   flipTransaction: mockModel(),
   $connect: jest.fn(),

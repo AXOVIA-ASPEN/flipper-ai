@@ -3,7 +3,7 @@ import prisma from '@/lib/db';
 import { encrypt, decrypt, maskApiKey } from '@/lib/crypto';
 import { getAuthUserId } from '@/lib/auth-middleware';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 /**
  * Get or create the current user with settings
  * Requires authentication — returns null if no session
@@ -76,7 +76,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Error fetching user settings:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch user settings');
+    return handleError(error);
   }
 }
 
@@ -212,6 +212,6 @@ export async function PATCH(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error updating user settings:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to update user settings');
+    return handleError(error);
   }
 }

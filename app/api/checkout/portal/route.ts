@@ -6,19 +6,19 @@
  */
 
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/auth';
 import { stripe } from '@/lib/stripe';
 
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 export async function POST() {
   try {
-    const session = await auth();
-    if (!session?.user?.email) {
+    const sessionUser = await getCurrentUser();
+    if (!sessionUser?.email) {
       throw new UnauthorizedError('Unauthorized');
     }
 
     const customers = await stripe.customers.list({
-      email: session.user.email,
+      email: sessionUser.email,
       limit: 1,
     });
 
@@ -35,6 +35,6 @@ export async function POST() {
 
     return NextResponse.json({ url: portalSession.url });
   } catch (error) {
-    return handleError(error, request.url);
+    return handleError(error);
   }
 }

@@ -141,32 +141,35 @@ pnpm test -- --watch
 
 ```
 flipper-ai/
+├── app/                        # Next.js App Router (pages, API routes, layouts)
+│   ├── api/                    # API routes
+│   │   ├── listings/           # Listings CRUD
+│   │   ├── opportunities/      # Opportunities management
+│   │   ├── scraper/            # Platform scrapers
+│   │   └── search-configs/     # Saved searches
+│   ├── dashboard/              # Dashboard pages
+│   ├── (auth)/                 # Auth pages (login, register)
+│   └── settings/               # User settings
 ├── src/
-│   ├── app/
-│   │   ├── api/                # API routes
-│   │   │   ├── listings/       # Listings CRUD
-│   │   │   ├── opportunities/  # Opportunities management
-│   │   │   ├── scraper/        # Platform scrapers
-│   │   │   └── search-configs/ # Saved searches
-│   │   ├── dashboard/          # Dashboard pages
-│   │   ├── login/              # Auth pages
-│   │   └── settings/           # User settings
 │   ├── components/             # React components
 │   ├── lib/
 │   │   ├── db.ts               # Database client
 │   │   ├── value-estimator.ts  # Profit scoring engine
 │   │   └── scrapers/           # Scraper implementations
 │   └── generated/prisma/       # Generated Prisma client
-├── features/                   # BDD feature files (Gherkin)
-│   ├── step_definitions/       # Step implementations
-│   └── support/                # Test hooks and world
+├── functions/                  # Firebase Cloud Functions (production scraping)
 ├── prisma/
 │   └── schema.prisma           # Database schema
+├── test/                       # E2E and BDD tests (Playwright, Cucumber)
+├── scripts/                    # Scripts by purpose (deploy/, setup/, test/, health/, db/)
+├── config/                     # Docker, PM2, Railway configs (Vercel/Firebase at root)
 ├── .github/workflows/ci.yml    # CI/CD pipeline
 ├── vercel.json                 # Vercel deployment config
 ├── Makefile                    # Build commands
-└── docs/                       # Documentation
+└── docs/                       # Documentation (see docs/README.md)
 ```
+
+**Full layout:** [index.md](index.md)
 
 ## 🔌 API Endpoints
 
@@ -246,7 +249,7 @@ Set environment variables in the [Vercel Dashboard](https://vercel.com/dashboard
 ### Docker
 
 ```bash
-docker build -t flipper-ai .
+docker build -f config/docker/Dockerfile -t flipper-ai .
 docker run -p 3000:3000 flipper-ai
 ```
 
@@ -276,7 +279,7 @@ GET /api/health
 
 ### Setting Up Uptime Monitoring
 
-See **[docs/MONITORING.md](docs/MONITORING.md)** for full setup guide. Quick options:
+See **[docs/deployment/MONITORING.md](docs/deployment/MONITORING.md)** for full setup guide. Quick options:
 
 | Provider | Free Tier | Check Interval | Setup |
 |----------|-----------|----------------|-------|
@@ -288,8 +291,8 @@ See **[docs/MONITORING.md](docs/MONITORING.md)** for full setup guide. Quick opt
 
 **Local staging monitor:**
 ```bash
-./scripts/health-monitor.sh          # Check staging (localhost:3001)
-HEALTH_URL=https://prod.app/api/health ./scripts/health-monitor.sh
+./scripts/health/health-monitor.sh          # Check staging (localhost:3001)
+HEALTH_URL=https://prod.app/api/health ./scripts/health/health-monitor.sh
 ```
 
 ---
@@ -309,7 +312,7 @@ HEALTH_URL=https://prod.app/api/health ./scripts/health-monitor.sh
 | E2E Playwright tests           | ✅ Critical paths + user journeys |
 | GitHub Actions CI/CD           | ✅ lint → typecheck → test → build |
 | GitHub Actions health check    | ✅ Configured (needs PRODUCTION_URL secret) |
-| Uptime monitoring (external)   | ⏳ Awaiting provider signup (see docs/MONITORING.md) |
+| Uptime monitoring (external)   | ⏳ Awaiting provider signup (see docs/deployment/MONITORING.md) |
 | TypeScript strict mode         | ✅ Zero `any` types |
 | ESLint / Prettier              | ✅ Clean |
 | API documentation              | ✅ Full endpoint coverage |
@@ -325,5 +328,4 @@ MIT — see [LICENSE](LICENSE) for details.
 
 ---
 
-Built with 🐧 by [Axovia AI](https://github.com/AXOVIA-ASPEN)  
-*Last updated: February 17, 2026 — 2374 total tests (2297 unit + 77 integration), 99.64% coverage*
+Built with 🐧 by [Axovia AI](https://github.com/AXOVIA-ASPEN)

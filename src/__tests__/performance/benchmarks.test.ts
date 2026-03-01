@@ -17,11 +17,8 @@ jest.mock('next/server', () => ({
 }));
 
 jest.mock('@/lib/auth', () => ({
-  auth: jest.fn().mockResolvedValue({ user: { id: 'test-user' } }),
-}));
-
-jest.mock('next-auth', () => ({
-  default: jest.fn(),
+  getCurrentUser: jest.fn().mockResolvedValue({ id: 'test-user', email: 'test@test.com', name: 'Test', firebaseUid: 'fb-uid', image: null }),
+  getCurrentUserId: jest.fn().mockResolvedValue('test-user'),
 }));
 
 jest.mock('@/lib/metrics', () => ({

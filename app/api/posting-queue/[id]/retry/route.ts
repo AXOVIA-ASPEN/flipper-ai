@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 type RouteContext = { params: Promise<{ id: string }> };
 
 // POST /api/posting-queue/:id/retry - Retry a failed posting
@@ -45,6 +45,6 @@ export async function POST(_request: NextRequest, context: RouteContext) {
     return NextResponse.json(updated);
   } catch (error) {
     console.error('POST /api/posting-queue/[id]/retry error:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Internal server error');
+    return handleError(error);
   }
 }

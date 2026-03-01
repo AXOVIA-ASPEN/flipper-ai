@@ -9,7 +9,8 @@ jest.mock('@/lib/auth-middleware', () => ({
 }));
 
 jest.mock('@/lib/auth', () => ({
-  auth: jest.fn(() => Promise.resolve({ user: { id: 'test-user-id' } })),
+  getCurrentUser: jest.fn(() => Promise.resolve({ id: 'test-user-id', email: 'test@test.com', name: 'Test User', firebaseUid: 'fb-uid', image: null })),
+  getCurrentUserId: jest.fn(() => Promise.resolve('test-user-id')),
 }));
 
 // Mock Prisma - use jest.fn() inline to avoid hoisting issues
@@ -98,7 +99,7 @@ describe('POST /api/posting-queue', () => {
       })
     );
 
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
   });
 
   it('returns 401 when unauthenticated', async () => {
@@ -146,7 +147,7 @@ describe('POST /api/posting-queue', () => {
     expect(res.status).toBe(404);
   });
 
-  it('returns 400 when batch platforms all match source', async () => {
+  it('returns 422 when batch platforms all match source', async () => {
     const listing = { id: 'lst-1', platform: 'EBAY', userId: 'test-user-id' };
     mockPrisma.listing.findFirst.mockResolvedValue(listing);
 
@@ -156,7 +157,7 @@ describe('POST /api/posting-queue', () => {
         body: JSON.stringify({ listingId: 'lst-1', platforms: ['EBAY'] }),
       })
     );
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
   });
 
   it('returns 500 on internal error', async () => {
@@ -339,7 +340,7 @@ describe('POST /api/posting-queue/:id/retry', () => {
       makeParams('pq-1')
     );
 
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
   });
 
   it('rejects retry when max retries exceeded', async () => {

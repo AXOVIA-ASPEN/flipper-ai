@@ -5,15 +5,6 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 
-// Mock next-auth/react
-jest.mock('next-auth/react', () => ({
-  useSession: () => ({
-    data: { user: { id: 'user-1', name: 'Test User', email: 'test@example.com' } },
-    status: 'authenticated',
-  }),
-  signOut: jest.fn(),
-}));
-
 // Mock next/link
 jest.mock('next/link', () => {
   return function MockLink({ children, href, ...props }: any) {
@@ -131,14 +122,28 @@ describe('SettingsPage', () => {
 
   // ─── Basic rendering ──────────────────────────────────────────
 
-  it('renders settings page', async () => {
+  it('renders settings page with heading', async () => {
     render(<SettingsPage />);
     await waitFor(() => {
       expect(screen.getByText('Settings')).toBeInTheDocument();
     });
   });
 
-  it('loads user settings from API', async () => {
+  it('renders Theme Settings section', async () => {
+    render(<SettingsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Theme Settings')).toBeInTheDocument();
+    });
+  });
+
+  it('renders Notification Settings section', async () => {
+    render(<SettingsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Notification Settings')).toBeInTheDocument();
+    });
+  });
+
+  it('loads notification settings from API', async () => {
     render(<SettingsPage />);
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/api/user/settings'));
@@ -150,126 +155,67 @@ describe('SettingsPage', () => {
     mockFetch.mockRejectedValue(new Error('Network failure'));
     render(<SettingsPage />);
     await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalled();
+      // The component should still render, showing error state
+      expect(screen.getByText('Settings')).toBeInTheDocument();
     });
     consoleSpy.mockRestore();
   });
 
-  it('shows save button', async () => {
-    render(<SettingsPage />);
-    await waitFor(() => {
-      expect(screen.getByText(/Save Settings/i)).toBeInTheDocument();
-    });
-  });
+  // ─── Notification preferences ───────────────────────────
 
-  // ─── Notification preferences: loading from API ───────────────
-
-  it('displays Notifications section', async () => {
-    render(<SettingsPage />);
-    await waitFor(() => {
-      expect(screen.getByText('Notifications')).toBeInTheDocument();
-    });
-  });
-
-  it('shows all notification toggle labels', async () => {
+  it('shows Email Notifications toggle after loading', async () => {
     render(<SettingsPage />);
     await waitFor(() => {
       expect(screen.getByText('Email Notifications')).toBeInTheDocument();
-      expect(screen.getByText('New Deals')).toBeInTheDocument();
-      expect(screen.getByText('Price Drops')).toBeInTheDocument();
-      expect(screen.getByText('Sold Items')).toBeInTheDocument();
-      expect(screen.getByText('Expiring Listings')).toBeInTheDocument();
-      expect(screen.getByText('Weekly Digest')).toBeInTheDocument();
     });
   });
 
-  it('shows Notification Frequency selector', async () => {
+  it('shows notification type labels after loading', async () => {
+    render(<SettingsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Email Notifications')).toBeInTheDocument();
+      expect(screen.getByText('New Deal Alerts')).toBeInTheDocument();
+      expect(screen.getByText('Price Drop Alerts')).toBeInTheDocument();
+    });
+  });
+
+  it('shows Notification Frequency section', async () => {
     render(<SettingsPage />);
     await waitFor(() => {
       expect(screen.getByText('Notification Frequency')).toBeInTheDocument();
     });
   });
 
-  it('shows Save Notification Preferences button', async () => {
-    render(<SettingsPage />);
-    await waitFor(() => {
-      expect(screen.getByText(/Save Notification Preferences/i)).toBeInTheDocument();
-    });
-  });
-
-  // ─── Notification preferences: saving to API ─────────────────
-
-  it('calls PATCH /api/user/settings when Save Notification Preferences is clicked', async () => {
+  it('toggles notification and calls PATCH API', async () => {
     mockFetch.mockImplementation((url: string, opts?: RequestInit) => {
-      if (url.includes('/api/user/settings') && (!opts || opts.method !== 'PATCH')) {
-        return Promise.resolve(makeSettingsResponse());
-      }
-      if (url.includes('/api/search-configs')) {
-        return Promise.resolve({ ok: true, json: async () => ({ configs: [] }) });
-      }
-      if (opts?.method === 'PATCH') {
-        return Promise.resolve(makeSettingsResponse());
-      }
-      return Promise.resolve({ ok: true, json: async () => ({}) });
-    });
-
-    render(<SettingsPage />);
-
-    // Wait for initial load
-    await waitFor(() => {
-      expect(screen.getByText(/Save Notification Preferences/i)).toBeInTheDocument();
-    });
-
-    // Click the save button
-    const saveBtn = screen.getByText(/Save Notification Preferences/i);
-    await act(async () => {
-      fireEvent.click(saveBtn);
-    });
-
-    await waitFor(() => {
-      const patchCalls = mockFetch.mock.calls.filter(
-        ([url, opts]) =>
-          url.includes('/api/user/settings') && opts?.method === 'PATCH'
-      );
-      expect(patchCalls.length).toBeGreaterThan(0);
-    });
-  });
-
-  it('sends notification fields in the PATCH request body', async () => {
-    const patchBody: Record<string, unknown> = {};
-
-    mockFetch.mockImplementation(async (url: string, opts?: RequestInit) => {
       if (url.includes('/api/user/settings') && opts?.method === 'PATCH') {
-        Object.assign(patchBody, JSON.parse(opts.body as string));
-        return { ok: true, json: async () => ({ success: true, data: {} }) };
+        return Promise.resolve(makeSettingsResponse());
       }
       if (url.includes('/api/user/settings')) {
         return Promise.resolve(makeSettingsResponse());
       }
-      if (url.includes('/api/search-configs')) {
-        return Promise.resolve({ ok: true, json: async () => ({ configs: [] }) });
-      }
       return Promise.resolve({ ok: true, json: async () => ({}) });
     });
 
     render(<SettingsPage />);
 
+    // Wait for settings to load
     await waitFor(() => {
-      expect(screen.getByText(/Save Notification Preferences/i)).toBeInTheDocument();
+      expect(screen.getByText('Email Notifications')).toBeInTheDocument();
     });
 
+    // Click the Email Notifications toggle button
+    const toggleBtn = screen.getByLabelText('Toggle email notifications');
     await act(async () => {
-      fireEvent.click(screen.getByText(/Save Notification Preferences/i));
+      fireEvent.click(toggleBtn);
     });
 
     await waitFor(() => {
-      expect(patchBody).toHaveProperty('emailNotifications');
-      expect(patchBody).toHaveProperty('notifyNewDeals');
-      expect(patchBody).toHaveProperty('notifyPriceDrops');
-      expect(patchBody).toHaveProperty('notifySoldItems');
-      expect(patchBody).toHaveProperty('notifyExpiring');
-      expect(patchBody).toHaveProperty('notifyWeeklyDigest');
-      expect(patchBody).toHaveProperty('notifyFrequency');
+      const patchCalls = mockFetch.mock.calls.filter(
+        ([url, opts]: [string, RequestInit | undefined]) =>
+          url.includes('/api/user/settings') && opts?.method === 'PATCH'
+      );
+      expect(patchCalls.length).toBeGreaterThan(0);
     });
   });
 
@@ -285,20 +231,13 @@ describe('SettingsPage', () => {
           })
         );
       }
-      if (url.includes('/api/search-configs')) {
-        return Promise.resolve({ ok: true, json: async () => ({ configs: [] }) });
-      }
       return Promise.resolve({ ok: true, json: async () => ({}) });
     });
 
     render(<SettingsPage />);
 
-    // The component loads settings and sets notification state.
-    // We verify the page rendered with the notifications section (state
-    // is set internally; testing exact toggle state requires more DOM detail
-    // so we confirm the section renders correctly).
     await waitFor(() => {
-      expect(screen.getByText('Notifications')).toBeInTheDocument();
+      expect(screen.getByText('Email Notifications')).toBeInTheDocument();
       expect(screen.getByText('Notification Frequency')).toBeInTheDocument();
     });
   });

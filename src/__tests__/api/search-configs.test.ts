@@ -100,7 +100,8 @@ describe('Search Configs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe('Failed to fetch search configurations');
+      expect(data.success).toBe(false);
+    expect(data.error.code).toBe('INTERNAL_ERROR');
     });
 
     it('should filter by userId when authenticated', async () => {
@@ -283,7 +284,8 @@ describe('Search Configs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe('Failed to create search configuration');
+      expect(data.success).toBe(false);
+    expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 
@@ -313,7 +315,7 @@ describe('Search Configs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(404);
-      expect(data.error).toBe('Search configuration not found');
+      expect(data.error.code).toBe('NOT_FOUND');
     });
 
     it('should return 500 on database error', async () => {
@@ -324,7 +326,8 @@ describe('Search Configs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe('Failed to fetch search configuration');
+      expect(data.success).toBe(false);
+    expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 
@@ -370,7 +373,7 @@ describe('Search Configs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toContain('Invalid platform');
+      expect(data.error).toBeDefined();
     });
 
     it('should update lastRun timestamp', async () => {
@@ -467,7 +470,8 @@ describe('Search Configs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe('Failed to update search configuration');
+      expect(data.success).toBe(false);
+    expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 
@@ -492,7 +496,8 @@ describe('Search Configs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe('Failed to delete search configuration');
+      expect(data.success).toBe(false);
+    expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 });

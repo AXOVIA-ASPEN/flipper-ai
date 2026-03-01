@@ -11,16 +11,16 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 export async function GET() {
-  const diagnostics: Record<string, any> = {
+  const checks: Record<string, unknown> = {};
+  const diagnostics: Record<string, unknown> = {
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
-    checks: {},
+    checks,
   };
 
   // Check 1: Environment variables
-  diagnostics.checks.envVars = {
+  checks.envVars = {
     DATABASE_URL: process.env.DATABASE_URL ? '✅ Set' : '❌ Missing',
     NEXTAUTH_URL: process.env.NEXTAUTH_URL ? '✅ Set' : '❌ Missing',
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET ? '✅ Set' : '❌ Missing',
@@ -28,37 +28,38 @@ export async function GET() {
 
   // Check 2: Prisma client
   try {
-    diagnostics.checks.prismaClient = '✅ Initialized';
+    checks.prismaClient = '✅ Initialized';
   } catch (error) {
-    diagnostics.checks.prismaClient = `❌ Failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+    checks.prismaClient = `❌ Failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
     return NextResponse.json(diagnostics, { status: 500 });
   }
 
   // Check 3: Database connection
   try {
     await prisma.$queryRaw`SELECT 1 as test`;
-    diagnostics.checks.databaseConnection = '✅ Connected';
+    checks.databaseConnection = '✅ Connected';
   } catch (error) {
-    diagnostics.checks.databaseConnection = `❌ Failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+    checks.databaseConnection = `❌ Failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
     return NextResponse.json(diagnostics, { status: 500 });
   }
 
   // Check 4: User table query
   try {
     const userCount = await prisma.user.count();
-    diagnostics.checks.userTable = `✅ Accessible (${userCount} users)`;
+    checks.userTable = `✅ Accessible (${userCount} users)`;
   } catch (error) {
-    diagnostics.checks.userTable = `❌ Failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+    checks.userTable = `❌ Failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
     return NextResponse.json(diagnostics, { status: 500 });
   }
 
   // Check 5: bcrypt availability
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const bcrypt = require('bcryptjs');
     const testHash = await bcrypt.hash('test', 12);
-    diagnostics.checks.bcrypt = testHash ? '✅ Working' : '❌ Failed to hash';
+    checks.bcrypt = testHash ? '✅ Working' : '❌ Failed to hash';
   } catch (error) {
-    diagnostics.checks.bcrypt = `❌ Failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+    checks.bcrypt = `❌ Failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
   }
 
   // All checks passed

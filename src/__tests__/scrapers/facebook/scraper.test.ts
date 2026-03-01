@@ -3,6 +3,15 @@
  * Tests for utility functions and convertToRawListing
  */
 
+// Mock Stagehand to avoid native module loading issues in Jest
+jest.mock('@browserbasehq/stagehand', () => ({
+  Stagehand: jest.fn().mockImplementation(() => ({
+    init: jest.fn(),
+    close: jest.fn(),
+    page: null,
+  })),
+}));
+
 import { convertToRawListing } from '@/scrapers/facebook/scraper';
 import type { FacebookListingDetail } from '@/scrapers/facebook/types';
 import {

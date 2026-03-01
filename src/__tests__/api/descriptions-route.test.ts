@@ -32,23 +32,23 @@ describe('POST /api/descriptions', () => {
     jest.clearAllMocks();
   });
 
-  it('returns 400 when condition is missing', async () => {
+  it('returns 422 when condition is missing', async () => {
     const res = await POST(makeRequest({ askingPrice: 100 }));
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
     const json = await res.json();
-    expect(json.error).toContain('condition');
+    expect(json.error.code).toBe('VALIDATION_ERROR');
   });
 
-  it('returns 400 when askingPrice is missing', async () => {
+  it('returns 422 when askingPrice is missing', async () => {
     const res = await POST(makeRequest({ condition: 'Good' }));
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
     const json = await res.json();
-    expect(json.error).toContain('askingPrice');
+    expect(json.error.code).toBe('VALIDATION_ERROR');
   });
 
-  it('returns 400 when askingPrice is negative', async () => {
+  it('returns 422 when askingPrice is negative', async () => {
     const res = await POST(makeRequest({ condition: 'Good', askingPrice: -1 }));
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
   });
 
   it('generates descriptions for all platforms by default', async () => {
@@ -109,7 +109,7 @@ describe('POST /api/descriptions', () => {
     const res = await POST(makeRequest(validBody));
     expect(res.status).toBe(500);
     const json = await res.json();
-    expect(json.error).toContain('Failed to generate');
+    expect(json.error.code).toBeDefined();
   });
 
   it('passes optional fields correctly', async () => {

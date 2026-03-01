@@ -43,21 +43,21 @@ describe('POST /api/webhooks/stripe', () => {
     jest.clearAllMocks();
   });
 
-  it('returns 400 when stripe-signature header is missing', async () => {
+  it('returns 422 when stripe-signature header is missing', async () => {
     const res = await POST(makeReq('{}', null));
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
     const json = await res.json();
-    expect(json.error).toBe('Missing signature');
+    expect(json.error.code).toBe('VALIDATION_ERROR');
   });
 
-  it('returns 400 when signature verification fails', async () => {
+  it('returns 422 when signature verification fails', async () => {
     constructEvent.mockImplementation(() => {
       throw new Error('bad sig');
     });
     const res = await POST(makeReq('{}', 'sig_bad'));
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
     const json = await res.json();
-    expect(json.error).toBe('Invalid signature');
+    expect(json.error.code).toBe('VALIDATION_ERROR');
   });
 
   it('handles checkout.session.completed with email and tier metadata', async () => {
@@ -244,19 +244,19 @@ describe('POST /api/webhooks/stripe', () => {
     const res = await POST(makeReq('{}', 'sig_ok'));
     expect(res.status).toBe(500);
     const json = await res.json();
-    expect(json.error).toBe('Webhook handler failed');
+    expect(json.error.code).toBe('INTERNAL_ERROR');
   });
 
   // ── Branch coverage ────────────────────────────────────────────────────────
   it('handles non-Error signature verification failure (String(err) branch)', async () => {
     constructEvent.mockImplementation(() => {
-       
+
       throw 'string-based-error'; // Not an Error instance
     });
     const res = await POST(makeReq('{}', 'sig_bad'));
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
     const json = await res.json();
-    expect(json.error).toBe('Invalid signature');
+    expect(json.error.code).toBe('VALIDATION_ERROR');
   });
 
   it('handles subscription.updated with no items (empty priceId)', async () => {

@@ -10,7 +10,8 @@ jest.mock('@/lib/auth-middleware', () => ({
 }));
 
 jest.mock('@/lib/auth', () => ({
-  auth: jest.fn(() => Promise.resolve({ user: { id: 'test-user-id', email: 'test@test.com' } })),
+  getCurrentUser: jest.fn(() => Promise.resolve({ id: 'test-user-id', email: 'test@test.com', name: 'Test User', firebaseUid: 'fb-uid', image: null })),
+  getCurrentUserId: jest.fn(() => Promise.resolve('test-user-id')),
 }));
 
 const mockListingUpsert = jest.fn();
@@ -148,7 +149,7 @@ describe('eBay Scraper API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toContain('EBAY_OAUTH_TOKEN');
+      expect(data.error.code).toBe('INTERNAL_ERROR');
     });
 
     it('returns 401 when user is not authenticated', async () => {
@@ -158,30 +159,30 @@ describe('eBay Scraper API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(401);
-      expect(data.error).toBe('Unauthorized');
+      expect(data.error.code).toBe('UNAUTHORIZED');
     });
 
-    it('returns 400 when keywords is empty', async () => {
+    it('returns 422 when keywords is empty', async () => {
       const response = await POST(createRequest({ keywords: '' }));
       const data = await response.json();
 
-      expect(response.status).toBe(400);
-      expect(data.error).toContain('keywords');
+      expect(response.status).toBe(422);
+      expect(data.error.code).toBe('VALIDATION_ERROR');
     });
 
-    it('returns 400 when keywords is missing', async () => {
+    it('returns 422 when keywords is missing', async () => {
       const response = await POST(createRequest({}));
       const data = await response.json();
 
-      expect(response.status).toBe(400);
-      expect(data.error).toContain('keywords');
+      expect(response.status).toBe(422);
+      expect(data.error.code).toBe('VALIDATION_ERROR');
     });
 
-    it('returns 400 when keywords is whitespace only', async () => {
+    it('returns 422 when keywords is whitespace only', async () => {
       const response = await POST(createRequest({ keywords: '   ' }));
       const data = await response.json();
 
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(422);
     });
 
     it('scrapes listings and stores price history', async () => {
@@ -626,7 +627,7 @@ describe('eBay Scraper API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toContain('Failed to scrape');
+      expect(data.error.code).toBe('INTERNAL_ERROR');
       expect(mockJobUpdate).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({ status: 'FAILED' }),

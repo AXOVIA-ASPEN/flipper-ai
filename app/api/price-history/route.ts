@@ -2,7 +2,7 @@
 // Fetch and manage price history for flip analysis
 
 import { NextRequest, NextResponse } from 'next/server';
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 import {
   fetchAndStorePriceHistory,
   getPriceHistory,
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(priceHistory);
   } catch (error) {
     console.error('Error fetching price history:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch price history');
+    return handleError(error);
   }
 }
 
@@ -59,6 +59,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error fetching and storing price history:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch and store price history');
+    return handleError(error);
   }
 }

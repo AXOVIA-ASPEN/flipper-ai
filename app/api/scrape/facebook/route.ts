@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getCurrentUserId } from '@/lib/auth';
-import { scrapeAndConvert, FacebookScraperConfig } from '@/scrapers/facebook';
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 import {
   processListings,
   formatForStorage,
   generateScanSummary,
   ViabilityCriteria,
 } from '@/lib/marketplace-scanner';
+
+export const dynamic = 'force-dynamic';
 
 // POST /api/scrape/facebook - Trigger a Facebook Marketplace scrape
 export async function POST(request: NextRequest) {
@@ -37,8 +38,11 @@ export async function POST(request: NextRequest) {
       maxResaleDifficulty,
     } = body;
 
+    // Dynamically import scraper (Stagehand/Playwright not compatible with Turbopack at build time)
+    const { scrapeAndConvert } = await import('@/scrapers/facebook');
+
     // Build scraper config
-    const scraperConfig: FacebookScraperConfig = {
+    const scraperConfig = {
       location,
       category,
       keywords,
@@ -213,6 +217,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ jobs });
   } catch (error) {
     console.error('Error fetching scraper jobs:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch scraper jobs');
+    return handleError(error);
   }
 }

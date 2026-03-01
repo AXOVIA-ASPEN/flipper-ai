@@ -3,8 +3,14 @@ import {
   AppError,
   errorResponse,
   handleError,
+  getUserFriendlyMessage,
   Errors,
   ApiErrorResponse,
+  NotFoundError,
+  ValidationError,
+  UnauthorizedError,
+  ForbiddenError,
+  RateLimitError,
 } from '@/lib/errors';
 
 describe('Error Handling Module', () => {
@@ -237,6 +243,81 @@ describe('Error Handling Module', () => {
       expect(err.code).toBe(ErrorCode.EXTERNAL_SERVICE_ERROR);
       expect(err.message).toBe('OpenAI: rate limited');
       expect(err.statusCode).toBe(502);
+    });
+  });
+
+  describe('Error subclass default parameters', () => {
+    it('UnauthorizedError uses default message when none provided', () => {
+      const err = new UnauthorizedError();
+      expect(err.message).toBe('Authentication required');
+      expect(err.code).toBe(ErrorCode.UNAUTHORIZED);
+    });
+
+    it('ForbiddenError uses default message when none provided', () => {
+      const err = new ForbiddenError();
+      expect(err.message).toBe('Access denied');
+      expect(err.code).toBe(ErrorCode.FORBIDDEN);
+    });
+
+    it('RateLimitError uses default message when none provided', () => {
+      const err = new RateLimitError();
+      expect(err.message).toBe('Rate limit exceeded');
+      expect(err.code).toBe(ErrorCode.RATE_LIMITED);
+    });
+  });
+
+  describe('getUserFriendlyMessage', () => {
+    it('includes technical details in development mode', () => {
+      const origEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'development';
+      const msg = getUserFriendlyMessage(ErrorCode.INTERNAL_ERROR, 'DB connection failed');
+      expect(msg).toContain('Technical details: DB connection failed');
+      process.env.NODE_ENV = origEnv;
+    });
+
+    it('omits technical details in non-development mode', () => {
+      const msg = getUserFriendlyMessage(ErrorCode.INTERNAL_ERROR, 'DB connection failed');
+      expect(msg).not.toContain('Technical details');
+    });
+
+    it('returns friendly message without technical details when none provided', () => {
+      const origEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'development';
+      const msg = getUserFriendlyMessage(ErrorCode.INTERNAL_ERROR);
+      expect(msg).not.toContain('Technical details');
+      process.env.NODE_ENV = origEnv;
+    });
+  });
+
+  describe('filterStackTrace (via handleError in production)', () => {
+    it('filters node_modules from stack traces in production', async () => {
+      const origEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+      const spy = jest.spyOn(console, 'error').mockImplementation();
+
+      const err = new Error('prod error');
+      err.stack = [
+        'Error: prod error',
+        '    at Object.<anonymous> (/app/src/lib/test.ts:10:5)',
+        '    at node_modules/jest/runner.js:100:10',
+        '    at webpack/bootstrap:50:20',
+        '    at /app/src/lib/handler.ts:20:3',
+      ].join('\n');
+
+      const response = handleError(err);
+      const data: ApiErrorResponse = await response.json();
+      expect(response.status).toBe(500);
+
+      // Verify the logged stack was filtered
+      expect(spy).toHaveBeenCalledWith(
+        'Unhandled error:',
+        expect.objectContaining({
+          stack: expect.not.stringContaining('node_modules'),
+        })
+      );
+
+      spy.mockRestore();
+      process.env.NODE_ENV = origEnv;
     });
   });
 });

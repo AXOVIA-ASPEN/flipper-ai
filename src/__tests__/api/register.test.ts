@@ -1,24 +1,27 @@
 import { NextRequest } from 'next/server';
 import { POST } from '@/app/api/auth/register/route';
 
-// Mock bcryptjs
-jest.mock('bcryptjs', () => ({
-  hash: jest.fn(() => Promise.resolve('hashed-password')),
+// Mock Firebase admin auth
+const mockVerifyIdToken = jest.fn();
+jest.mock('@/lib/firebase/admin', () => ({
+  adminAuth: {
+    verifyIdToken: (...args: unknown[]) => mockVerifyIdToken(...args),
+  },
 }));
 
 // Mock prisma
-const mockFindUnique = jest.fn();
-const mockUserCreate = jest.fn();
+const mockUserUpsert = jest.fn();
+const mockUserSettingsFindUnique = jest.fn();
 const mockUserSettingsCreate = jest.fn();
 
 jest.mock('@/lib/db', () => ({
   __esModule: true,
   default: {
     user: {
-      findUnique: (...args: unknown[]) => mockFindUnique(...args),
-      create: (...args: unknown[]) => mockUserCreate(...args),
+      upsert: (...args: unknown[]) => mockUserUpsert(...args),
     },
     userSettings: {
+      findUnique: (...args: unknown[]) => mockUserSettingsFindUnique(...args),
       create: (...args: unknown[]) => mockUserSettingsCreate(...args),
     },
   },
@@ -44,6 +47,13 @@ jest.mock('@/lib/metrics', () => ({
   },
 }));
 
+const DECODED_TOKEN = {
+  uid: 'firebase-uid-123',
+  email: 'test@example.com',
+  name: 'Test User',
+  picture: null,
+};
+
 function createRequest(body: object) {
   return new NextRequest('http://localhost/api/auth/register', {
     method: 'POST',
@@ -55,9 +65,18 @@ function createRequest(body: object) {
 describe('POST /api/auth/register', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Default: sendWelcome succeeds
-    mockSendWelcome.mockResolvedValue(undefined);
-    // Default: userSettings.create succeeds
+    // Defaults: verifyIdToken resolves with decoded token
+    mockVerifyIdToken.mockResolvedValue(DECODED_TOKEN);
+    // Defaults: upsert resolves with a user
+    mockUserUpsert.mockResolvedValue({
+      id: 'user-1',
+      email: 'test@example.com',
+      name: 'Test User',
+      createdAt: new Date(),
+    });
+    // Defaults: no existing settings (new user)
+    mockUserSettingsFindUnique.mockResolvedValue(null);
+    // Defaults: settings creation succeeds
     mockUserSettingsCreate.mockResolvedValue({
       id: 'settings-1',
       userId: 'user-1',
@@ -65,99 +84,135 @@ describe('POST /api/auth/register', () => {
       discountThreshold: 50,
       autoAnalyze: true,
     });
+    // Defaults: sendWelcome succeeds
+    mockSendWelcome.mockResolvedValue(undefined);
   });
 
-  it('creates a new user successfully', async () => {
-    mockFindUnique.mockResolvedValue(null);
-    mockUserCreate.mockResolvedValue({
+  it('returns 422 when idToken is missing', async () => {
+    const res = await POST(createRequest({}));
+    const data = await res.json();
+
+    expect(res.status).toBe(422);
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('VALIDATION_ERROR');
+  });
+
+  it('returns 422 when idToken is not a string', async () => {
+    const res = await POST(createRequest({ idToken: 12345 }));
+    const data = await res.json();
+
+    expect(res.status).toBe(422);
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('VALIDATION_ERROR');
+  });
+
+  it('successfully creates user with valid idToken', async () => {
+    const res = await POST(createRequest({ idToken: 'valid-firebase-token' }));
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.success).toBe(true);
+    expect(data.data.user).toEqual({
       id: 'user-1',
       email: 'test@example.com',
       name: 'Test User',
-      image: null,
+    });
+
+    expect(mockVerifyIdToken).toHaveBeenCalledWith('valid-firebase-token');
+    expect(mockUserUpsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { firebaseUid: 'firebase-uid-123' },
+        create: expect.objectContaining({
+          firebaseUid: 'firebase-uid-123',
+          email: 'test@example.com',
+        }),
+      })
+    );
+    expect(mockMetricsIncrement).toHaveBeenCalledWith('registration_attempts');
+    expect(mockMetricsIncrement).toHaveBeenCalledWith('registration_success');
+  });
+
+  it('creates UserSettings for new user', async () => {
+    mockUserSettingsFindUnique.mockResolvedValue(null);
+
+    const res = await POST(createRequest({ idToken: 'valid-firebase-token' }));
+
+    expect(res.status).toBe(200);
+    expect(mockUserSettingsFindUnique).toHaveBeenCalledWith({
+      where: { userId: 'user-1' },
+    });
+    expect(mockUserSettingsCreate).toHaveBeenCalledWith({
+      data: {
+        userId: 'user-1',
+        llmModel: 'gpt-4o-mini',
+        discountThreshold: 50,
+        autoAnalyze: true,
+      },
+    });
+  });
+
+  it('skips UserSettings creation when they already exist', async () => {
+    mockUserSettingsFindUnique.mockResolvedValue({
+      id: 'settings-existing',
+      userId: 'user-1',
+      llmModel: 'gpt-4o-mini',
+      discountThreshold: 50,
+      autoAnalyze: true,
+    });
+
+    const res = await POST(createRequest({ idToken: 'valid-firebase-token' }));
+
+    expect(res.status).toBe(200);
+    expect(mockUserSettingsFindUnique).toHaveBeenCalledWith({
+      where: { userId: 'user-1' },
+    });
+    expect(mockUserSettingsCreate).not.toHaveBeenCalled();
+  });
+
+  it('updates existing user on upsert (re-registration)', async () => {
+    mockUserUpsert.mockResolvedValue({
+      id: 'user-existing',
+      email: 'test@example.com',
+      name: 'Updated Name',
       createdAt: new Date(),
     });
 
     const res = await POST(
-      createRequest({
-        email: 'Test@Example.com',
-        password: 'password123',
-        name: 'Test User',
-      })
+      createRequest({ idToken: 'valid-firebase-token', name: 'Updated Name' })
     );
     const data = await res.json();
 
     expect(res.status).toBe(200);
     expect(data.success).toBe(true);
-    expect(data.data.user.email).toBe('test@example.com');
+    expect(data.data.user.name).toBe('Updated Name');
+
+    expect(mockUserUpsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { firebaseUid: 'firebase-uid-123' },
+        update: expect.objectContaining({
+          name: 'Updated Name',
+        }),
+      })
+    );
+  });
+
+  it('sends welcome email (non-blocking)', async () => {
+    const res = await POST(createRequest({ idToken: 'valid-firebase-token' }));
+
+    expect(res.status).toBe(200);
     expect(mockSendWelcome).toHaveBeenCalledWith({
       name: 'Test User',
       email: 'test@example.com',
     });
   });
 
-  it('returns 400 when email missing', async () => {
-    const res = await POST(createRequest({ password: 'password123' }));
-    expect(res.status).toBe(400);
-  });
-
-  it('returns 400 when password missing', async () => {
-    const res = await POST(createRequest({ email: 'test@example.com' }));
-    expect(res.status).toBe(400);
-  });
-
-  it('returns 400 for invalid email format', async () => {
-    const res = await POST(createRequest({ email: 'notanemail', password: 'password123' }));
-    expect(res.status).toBe(400);
-    const data = await res.json();
-    expect(data.error).toContain('Invalid email');
-  });
-
-  it('returns 400 for short password', async () => {
-    const res = await POST(createRequest({ email: 'test@example.com', password: 'short' }));
-    expect(res.status).toBe(400);
-    const data = await res.json();
-    expect(data.error).toContain('8 characters');
-  });
-
-  it('returns 409 when user already exists', async () => {
-    mockFindUnique.mockResolvedValue({ id: 'existing-user' });
-
-    const res = await POST(createRequest({ email: 'test@example.com', password: 'password123' }));
-    expect(res.status).toBe(409);
-  });
-
-  it('creates user without name', async () => {
-    mockFindUnique.mockResolvedValue(null);
-    mockUserCreate.mockResolvedValue({
-      id: 'user-2',
-      email: 'test@example.com',
-      name: null,
-      image: null,
-      createdAt: new Date(),
-    });
-
-    const res = await POST(createRequest({ email: 'test@example.com', password: 'password123' }));
-    expect(res.status).toBe(200);
-  });
-
-  it('still succeeds even if welcome email fails (non-blocking)', async () => {
-    mockFindUnique.mockResolvedValue(null);
-    mockUserCreate.mockResolvedValue({
-      id: 'user-3',
-      email: 'test@example.com',
-      name: 'Test User',
-      image: null,
-      createdAt: new Date(),
-    });
-    // Make sendWelcome reject to exercise the .catch() error handler
+  it('still succeeds when welcome email fails', async () => {
     mockSendWelcome.mockRejectedValue(new Error('SMTP connection failed'));
 
-    const res = await POST(
-      createRequest({ email: 'test@example.com', password: 'password123', name: 'Test User' })
-    );
+    const res = await POST(createRequest({ idToken: 'valid-firebase-token' }));
     const data = await res.json();
 
-    // Registration should still succeed — email failure is non-blocking
+    // Registration should still succeed -- email failure is non-blocking
     expect(res.status).toBe(200);
     expect(data.success).toBe(true);
 
@@ -172,29 +227,29 @@ describe('POST /api/auth/register', () => {
     );
   });
 
-  it('returns 500 on unexpected error', async () => {
-    mockFindUnique.mockRejectedValue(new Error('DB connection failed'));
+  it('returns 500 on unexpected error (DB failure)', async () => {
+    mockUserUpsert.mockRejectedValue(new Error('DB connection failed'));
 
-    const res = await POST(createRequest({ email: 'test@example.com', password: 'password123' }));
+    const res = await POST(createRequest({ idToken: 'valid-firebase-token' }));
+    const data = await res.json();
+
     expect(res.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('INTERNAL_ERROR');
+    expect(mockMetricsIncrement).toHaveBeenCalledWith('registration_failures');
+    expect(mockCaptureError).toHaveBeenCalled();
   });
 
-  it('returns 500 when UserSettings creation fails', async () => {
-    mockFindUnique.mockResolvedValue(null);
-    mockUserCreate.mockResolvedValue({
-      id: 'user-4',
-      email: 'test@example.com',
-      name: 'Test User',
-      image: null,
-      createdAt: new Date(),
-    });
-    // UserSettings creation fails (e.g., table doesn't exist)
-    mockUserSettingsCreate.mockRejectedValue(new Error('relation "UserSettings" does not exist'));
+  it('returns 500 when adminAuth.verifyIdToken fails (invalid token)', async () => {
+    mockVerifyIdToken.mockRejectedValue(new Error('Firebase ID token has expired'));
 
-    const res = await POST(createRequest({ email: 'test@example.com', password: 'password123' }));
-    expect(res.status).toBe(500);
+    const res = await POST(createRequest({ idToken: 'expired-token' }));
     const data = await res.json();
+
+    expect(res.status).toBe(500);
     expect(data.success).toBe(false);
-    expect(data.error).toContain('Failed to create account');
+    expect(data.error.code).toBe('INTERNAL_ERROR');
+    expect(mockMetricsIncrement).toHaveBeenCalledWith('registration_failures');
+    expect(mockCaptureError).toHaveBeenCalled();
   });
 });

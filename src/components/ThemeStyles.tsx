@@ -1,96 +1,43 @@
 'use client';
 
 import { useTheme } from '@/contexts/ThemeContext';
+import { colorMap } from '@/lib/theme-config';
 
 /**
- * Component that injects dynamic CSS variables based on the current theme
- * This allows us to use theme colors with Tailwind's arbitrary value syntax
+ * Component that injects dynamic CSS variables based on the current theme.
+ * This allows us to use theme colors with CSS custom properties.
  */
 export function ThemeStyles() {
   const { theme } = useTheme();
   const { colors } = theme;
 
-  // Map Tailwind color names to actual hex values
-  const colorMap: Record<string, string> = {
-    // Purple shades
-    'purple-400': '#c084fc',
-    'purple-500': '#a855f7',
-    'purple-600': '#9333ea',
-    'purple-700': '#7e22ce',
-
-    // Pink shades
-    'pink-400': '#f472b6',
-    'pink-500': '#ec4899',
-    'pink-600': '#db2777',
-    'pink-700': '#be185d',
-
-    // Blue shades
-    'blue-400': '#60a5fa',
-    'blue-500': '#3b82f6',
-    'blue-600': '#2563eb',
-    'blue-700': '#1d4ed8',
-
-    // Cyan shades
-    'cyan-400': '#22d3ee',
-    'cyan-500': '#06b6d4',
-    'cyan-600': '#0891b2',
-
-    // Teal shades
-    'teal-400': '#2dd4bf',
-    'teal-500': '#14b8a6',
-    'teal-600': '#0d9488',
-
-    // Green shades
-    'green-400': '#4ade80',
-    'green-500': '#22c55e',
-    'green-600': '#16a34a',
-
-    // Emerald shades
-    'emerald-400': '#34d399',
-    'emerald-600': '#059669',
-
-    // Lime shades
-    'lime-400': '#a3e635',
-    'lime-500': '#84cc16',
-
-    // Yellow shades
-    'yellow-400': '#facc15',
-    'yellow-500': '#eab308',
-
-    // Orange shades
-    'orange-400': '#fb923c',
-    'orange-500': '#f97316',
-    'orange-600': '#ea580c',
-
-    // Red shades
-    'red-500': '#ef4444',
-    'red-600': '#dc2626',
-
-    // Indigo shades
-    'indigo-400': '#818cf8',
-    'indigo-500': '#6366f1',
-    'indigo-600': '#4f46e5',
-    'indigo-700': '#4338ca',
-
-    // Violet shades
-    'violet-400': '#a78bfa',
-    'violet-500': '#8b5cf6',
-
-    // Fuchsia shades
-    'fuchsia-400': '#e879f9',
-    'fuchsia-500': '#d946ef',
-    'fuchsia-600': '#c026d3',
-
-    // Rose shades
-    'rose-500': '#f43f5e',
-    'rose-600': '#e11d48',
-
-    // Sky shades
-    'sky-400': '#38bdf8',
+  const getColor = (colorName: string): string => {
+    // Handle opacity suffixes like 'blue-200/70' → just use the base color
+    const base = colorName.split('/')[0];
+    return colorMap[base] || '#a855f7'; // fallback to purple-500
   };
 
-  const getColor = (colorName: string): string => {
-    return colorMap[colorName] || '#a855f7'; // fallback to purple-500
+  // Compute a muted text color with opacity from the textMuted field (e.g. 'blue-200/70')
+  const getMutedColor = (colorName: string): string => {
+    const parts = colorName.split('/');
+    const hex = colorMap[parts[0]] || '#bfdbfe';
+    const opacity = parts[1] ? parseInt(parts[1]) / 100 : 0.7;
+    // Convert hex to rgba
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+  };
+
+  // Compute shadow color with opacity from e.g. 'purple-500/50'
+  const getShadowColor = (colorName: string): string => {
+    const parts = colorName.split('/');
+    const hex = colorMap[parts[0]] || '#a855f7';
+    const opacity = parts[1] ? parseInt(parts[1]) / 100 : 0.3;
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   };
 
   return (
@@ -111,6 +58,18 @@ export function ThemeStyles() {
         --theme-orb-1: ${getColor(colors.orbColors[0])};
         --theme-orb-2: ${getColor(colors.orbColors[1])};
         --theme-orb-3: ${getColor(colors.orbColors[2])};
+        --theme-page-bg-from: ${getColor(colors.pageBg[0])};
+        --theme-page-bg-via: ${getColor(colors.pageBg[1])};
+        --theme-page-bg-to: ${getColor(colors.pageBg[2])};
+        --theme-text-accent: ${getColor(colors.primaryFrom)};
+        --theme-text-muted: ${getMutedColor(colors.textMuted)};
+        --theme-text-gradient-from: ${getColor(colors.textGradient.from)};
+        --theme-text-gradient-via: ${getColor(colors.textGradient.via)};
+        --theme-text-gradient-to: ${getColor(colors.textGradient.to)};
+        --theme-nav-active-bg: ${getColor(colors.navActive.bg)};
+        --theme-nav-active-text: ${getColor(colors.navActive.text)};
+        --theme-focus-ring: ${getShadowColor(colors.primaryFrom + '/50')};
+        --theme-button-shadow: ${getShadowColor(colors.primaryShadow)};
       }
     `}</style>
   );

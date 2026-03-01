@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 import {
   generateAlgorithmicDescription,
   generateLLMDescription,
@@ -65,6 +65,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(description);
   } catch (error) {
     console.error('Description generation error:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to generate description');
+    return handleError(error);
   }
 }

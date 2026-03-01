@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getAuthUserId } from '@/lib/auth-middleware';
 import { getQueueStats } from '@/lib/posting-queue-processor';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 // GET /api/posting-queue/stats - Get queue statistics
 export async function GET() {
   try {
@@ -15,6 +15,6 @@ export async function GET() {
     return NextResponse.json(stats);
   } catch (error) {
     console.error('GET /api/posting-queue/stats error:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Internal server error');
+    return handleError(error);
   }
 }

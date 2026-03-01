@@ -94,8 +94,8 @@ describe('Facebook Marketplace Scraper API', () => {
       const response = await POST(request);
       const data = await response.json();
 
-      expect(response.status).toBe(400);
-      expect(data.error).toContain('keywords');
+      expect(response.status).toBe(422);
+      expect(data.error.code).toBe('VALIDATION_ERROR');
     });
 
     it('should require Facebook access token', async () => {
@@ -250,7 +250,7 @@ describe('Facebook Marketplace Scraper API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toContain('Failed to scrape');
+      expect(data.error.code).toBe('INTERNAL_ERROR');
 
       // Verify scraper job was marked as failed
       expect(prisma.scraperJob.update).toHaveBeenCalledWith(
@@ -369,7 +369,7 @@ describe('Facebook Marketplace Scraper API', () => {
       const res = await POST(request);
       expect(res.status).toBe(401);
       const json = await res.json();
-      expect(json.error).toBe('Unauthorized');
+      expect(json.error.code).toBe('UNAUTHORIZED');
     });
 
     it('includes categoryId in search params when provided', async () => {
@@ -624,7 +624,7 @@ describe('Facebook Marketplace Scraper API', () => {
       const res = await POST(request);
       expect(res.status).toBe(500);
       const json = await res.json();
-      expect(json.details).toBe('DB error');
+      expect(json.error.code).toBe('INTERNAL_ERROR');
     });
 
     it('covers non-Error throw branch (error.message fallback to Unknown string)', async () => {
@@ -646,7 +646,7 @@ describe('Facebook Marketplace Scraper API', () => {
       const res = await POST(request);
       expect(res.status).toBe(500);
       const json = await res.json();
-      expect(json.details).toBe('Unknown error');
+      expect(json.error.code).toBe('INTERNAL_ERROR');
     });
 
     it('falls back to "electronics" category when detectCategory returns null', async () => {

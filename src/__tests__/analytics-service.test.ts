@@ -20,9 +20,9 @@ const makeOpp = (overrides: Record<string, unknown> = {}) => ({
   userId: 'user-1',
   status: 'SOLD',
   purchasePrice: 100,
-  purchaseDate: new Date('2026-01-01'),
+  purchaseDate: new Date('2026-01-02T12:00:00Z'),
   resalePrice: 200,
-  resaleDate: new Date('2026-01-15'),
+  resaleDate: new Date('2026-01-15T12:00:00Z'),
   fees: 10,
   listing: {
     title: 'Test Item',
@@ -58,8 +58,8 @@ describe('getProfitLossAnalytics', () => {
         purchasePrice: 50,
         resalePrice: 120,
         fees: 5,
-        purchaseDate: new Date('2026-01-10'),
-        resaleDate: new Date('2026-01-20'),
+        purchaseDate: new Date('2026-01-10T12:00:00Z'),
+        resaleDate: new Date('2026-01-20T12:00:00Z'),
         listing: { title: 'Item 2', platform: 'CRAIGSLIST', category: 'Furniture' },
       }),
     ]);
@@ -226,7 +226,7 @@ describe('getProfitLossAnalytics - branch coverage', () => {
   it('computes avgROI=0 for category when invested is 0 (default param branch)', async () => {
     // Use granularity default (monthly) to hit the default branch
     (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([
-      makeOpp({ resaleDate: new Date('2026-01-20') }),
+      makeOpp({ resaleDate: new Date('2026-01-20T12:00:00Z') }),
     ]);
     const result = await getProfitLossAnalytics('user-1');
     // Just verify categoryBreakdown has entries (avgROI >0 since there's purchase price)
@@ -237,8 +237,8 @@ describe('getProfitLossAnalytics - branch coverage', () => {
     // Item is SOLD with a resaleDate but resalePrice: null → triggers ?? 0 branch in trend
     const soldWithNullPrice = makeOpp({
       status: 'SOLD',
-      purchaseDate: new Date('2026-01-01'),
-      resaleDate: new Date('2026-01-15'),
+      purchaseDate: new Date('2026-01-02T12:00:00Z'),
+      resaleDate: new Date('2026-01-15T12:00:00Z'),
       resalePrice: null,
     });
     (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([soldWithNullPrice]);
@@ -252,7 +252,7 @@ describe('getProfitLossAnalytics - branch coverage', () => {
   it('computes avgROI correctly for sold item in category', async () => {
     // Normal item, verifies the avgROI > 0 path in categoryBreakdown
     (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([
-      makeOpp({ purchasePrice: 50, resalePrice: 100, resaleDate: new Date('2026-01-20') }),
+      makeOpp({ purchasePrice: 50, resalePrice: 100, resaleDate: new Date('2026-01-20T12:00:00Z') }),
     ]);
     const result = await getProfitLossAnalytics('user-1');
     const cat = result.categoryBreakdown.find((c) => c.category === 'Electronics');

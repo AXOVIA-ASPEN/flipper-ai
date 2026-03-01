@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 // GET /api/messages - Get all messages for the authenticated user
 export async function GET(request: NextRequest) {
   try {
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error fetching messages:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to fetch messages');
+    return handleError(error);
   }
 }
 
@@ -130,6 +130,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, data: message }, { status: 201 });
   } catch (error) {
     console.error('Error creating message:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to create message');
+    return handleError(error);
   }
 }

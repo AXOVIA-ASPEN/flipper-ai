@@ -107,6 +107,6 @@ describe('POST /api/user/settings/validate-key', () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.valid).toBe(false);
+    expect(data.error.code).toBe('INTERNAL_ERROR');
   });
 });

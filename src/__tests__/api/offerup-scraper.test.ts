@@ -235,6 +235,8 @@ describe('POST /api/scraper/offerup', () => {
     mockGetAuthUserId.mockResolvedValue(null as any);
     const res = await POST(makeRequest({ location: 'tampa-fl' }));
     expect(res.status).toBe(401);
+    const json = await res.json();
+    expect(json.error.code).toBe('UNAUTHORIZED');
   });
 
   it('returns 400 when location is missing', async () => {

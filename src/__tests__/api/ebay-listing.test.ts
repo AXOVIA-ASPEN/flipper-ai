@@ -70,10 +70,13 @@ describe('POST /api/listings/ebay', () => {
     expect(res.status).toBe(401);
   });
 
-  it('returns 503 when EBAY_OAUTH_TOKEN is missing', async () => {
+  it('returns 500 when EBAY_OAUTH_TOKEN is missing', async () => {
     delete process.env.EBAY_OAUTH_TOKEN;
     const res = await POST(makeRequest(validBody));
-    expect(res.status).toBe(503);
+    expect(res.status).toBe(500);
+    const json = await res.json();
+    expect(json.success).toBe(false);
+    expect(json.error.code).toBe('INTERNAL_ERROR');
   });
 
   it('returns 400 when required fields are missing', async () => {
@@ -90,25 +93,25 @@ describe('POST /api/listings/ebay', () => {
     expect(json.error).toContain('Invalid condition');
   });
 
-  it('returns 400 for invalid price', async () => {
+  it('returns 422 for invalid price', async () => {
     const res = await POST(makeRequest({ ...validBody, price: -10 }));
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
     const json = await res.json();
-    expect(json.error).toContain('Price must be a positive number');
+    expect(json.error.code).toBe('VALIDATION_ERROR');
   });
 
-  it('returns 400 for empty imageUrls', async () => {
+  it('returns 422 for empty imageUrls', async () => {
     const res = await POST(makeRequest({ ...validBody, imageUrls: [] }));
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
     const json = await res.json();
-    expect(json.error).toContain('imageUrls must be a non-empty array');
+    expect(json.error.code).toBe('VALIDATION_ERROR');
   });
 
-  it('returns 400 for title > 80 chars', async () => {
+  it('returns 422 for title > 80 chars', async () => {
     const res = await POST(makeRequest({ ...validBody, title: 'A'.repeat(81) }));
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
     const json = await res.json();
-    expect(json.error).toContain('80 characters');
+    expect(json.error.code).toBe('VALIDATION_ERROR');
   });
 
   it('creates a draft listing successfully', async () => {

@@ -15,9 +15,9 @@ jest.mock('next/font/google', () => ({
 }));
 
 // Mock providers
-jest.mock('@/components/providers/SessionProvider', () => ({
-  SessionProvider: function MockSessionProvider({ children }: { children: React.ReactNode }) {
-    return <div data-testid="session-provider">{children}</div>;
+jest.mock('@/components/providers/FirebaseAuthProvider', () => ({
+  FirebaseAuthProvider: function MockFirebaseAuthProvider({ children }: { children: React.ReactNode }) {
+    return <div data-testid="firebase-auth-provider">{children}</div>;
   },
 }));
 
@@ -29,6 +29,26 @@ jest.mock('@/contexts/ThemeContext', () => ({
 
 jest.mock('@/components/ThemeStyles', () => ({
   ThemeStyles: () => <div data-testid="theme-styles" />,
+}));
+
+jest.mock('@/components/WebVitals', () => ({
+  WebVitals: () => null,
+}));
+
+jest.mock('@/components/Navigation', () => {
+  return function MockNavigation() {
+    return <div data-testid="navigation" />;
+  };
+});
+
+jest.mock('@/components/ToastContainer', () => ({
+  ToastProvider: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="toast-provider">{children}</div>
+  ),
+}));
+
+jest.mock('@vercel/analytics/next', () => ({
+  Analytics: () => null,
 }));
 
 import RootLayout from '@/app/layout';
@@ -44,14 +64,14 @@ describe('RootLayout', () => {
     expect(container.querySelector("[data-testid='child-content']")).toBeTruthy();
   });
 
-  it('includes session and theme providers', () => {
+  it('includes Firebase auth and theme providers', () => {
     const { container } = render(
       <RootLayout>
         <span>Test</span>
       </RootLayout>,
       { container: document.createElement('div') }
     );
-    expect(container.querySelector("[data-testid='session-provider']")).toBeTruthy();
+    expect(container.querySelector("[data-testid='firebase-auth-provider']")).toBeTruthy();
     expect(container.querySelector("[data-testid='theme-provider']")).toBeTruthy();
   });
 });

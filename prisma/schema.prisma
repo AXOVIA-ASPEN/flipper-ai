@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -63,6 +64,7 @@ model Listing {
   analysisConfidence  String?
   analysisReasoning   String?
   user                User?              @relation(fields: [userId], references: [id])
+  images              ListingImage[]
   messages            Message[]
   opportunity         Opportunity?
   postingQueue        PostingQueueItem[]
@@ -158,27 +160,30 @@ model PriceHistory {
 
 model User {
   id                 String             @id @default(cuid())
+  firebaseUid        String?            @unique // Firebase Auth UID — nullable during migration
   email              String             @unique
   emailVerified      DateTime?
   name               String?
   image              String?
-  password           String?
+  password           String?            // Kept for potential emergency rollback
   subscriptionTier   String             @default("FREE")
   onboardingComplete Boolean            @default(false)
   onboardingStep     Int                @default(0)
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
-  accounts           Account[]
+  accounts           Account[]          // Deprecated: NextAuth — removal in future cleanup story
   listings           Listing[]
   messages           Message[]
   opportunities      Opportunity[]
   postingQueue       PostingQueueItem[]
   scraperJobs        ScraperJob[]
   searchConfigs      SearchConfig[]
-  sessions           Session[]
+  sessions           Session[]          // Deprecated: NextAuth — removal in future cleanup story
   settings           UserSettings?
 }
 
+// Deprecated: NextAuth Account model — kept for backward compatibility during migration.
+// Removal planned in future cleanup story.
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -198,6 +203,8 @@ model Account {
   @@index([userId])
 }
 
+// Deprecated: NextAuth Session model — kept for backward compatibility during migration.
+// Removal planned in future cleanup story.
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
@@ -208,6 +215,8 @@ model Session {
   @@index([userId])
 }
 
+// Deprecated: NextAuth VerificationToken model — kept for backward compatibility during migration.
+// Removal planned in future cleanup story.
 model VerificationToken {
   identifier String
   token      String   @unique
@@ -310,4 +319,22 @@ model PostingQueueItem {
   @@index([status])
   @@index([targetPlatform])
   @@index([scheduledAt])
+}
+
+model ListingImage {
+  id          String   @id @default(cuid())
+  listingId   String
+  imageIndex  Int
+  originalUrl String
+  storagePath String
+  storageUrl  String
+  fileSize    Int
+  contentType String
+  width       Int?
+  height      Int?
+  uploadedAt  DateTime @default(now())
+  listing     Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([listingId, imageIndex])
+  @@index([listingId])
 }

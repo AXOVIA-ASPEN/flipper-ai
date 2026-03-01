@@ -1,7 +1,19 @@
 const { withSentryConfig } = require('@sentry/nextjs');
 
 /** @type {import('next').NextConfig} */
+const isExport = process.env.NEXT_OUTPUT === 'export';
+
 const nextConfig = {
+  output: isExport ? 'export' : 'standalone',
+  ...(isExport ? {} : {
+    outputFileTracingIncludes: {
+      '/*': ['./node_modules/.prisma/client/**/*'],
+    },
+  }),
+  images: {
+    unoptimized: isExport,
+  },
+  serverExternalPackages: ['@browserbasehq/stagehand', 'playwright'],
   typescript: {
     ignoreBuildErrors: false,
   },
@@ -23,7 +35,7 @@ const nextConfig = {
           },
           {
             key: 'X-Frame-Options',
-            value: 'SAMEORIGIN'
+            value: 'DENY'
           },
           {
             key: 'X-Content-Type-Options',
@@ -45,7 +57,7 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://www.gstatic.com",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https:",
               "font-src 'self' data:",

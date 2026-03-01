@@ -4,7 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { updateListingWithMarketValue } from '@/lib/price-history-service';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 // POST /api/listings/[id]/market-value
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -27,6 +27,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: error.message }, { status: 404 });
     }
 
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to update listing market value');
+    return handleError(error);
   }
 }

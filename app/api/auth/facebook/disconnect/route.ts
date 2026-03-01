@@ -5,22 +5,23 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
-import { auth } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/firebase/session';
 import { revokeAccessToken } from '@/scrapers/facebook/auth';
 import { getToken, deleteToken } from '@/scrapers/facebook/token-store';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, UnauthorizedError } from '@/lib/errors';
+
 export async function POST(req: NextRequest) {
-  // Check if user is authenticated
-  const session = await auth();
-
-  if (!session?.user?.email) {
-    throw new UnauthorizedError('Unauthorized');
-  }
-
-  const userId = session.user.id || session.user.email;
-
   try {
+    // Check if user is authenticated via Firebase session
+    const sessionUser = await getCurrentUser();
+
+    if (!sessionUser?.email) {
+      throw new UnauthorizedError('Unauthorized');
+    }
+
+    const userId = sessionUser.id;
+
     // Get current token
     const tokenData = await getToken(userId);
 
@@ -39,7 +40,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Facebook disconnect error:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to disconnect Facebook');
+    return handleError(error);
   }
 }

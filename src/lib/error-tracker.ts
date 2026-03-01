@@ -63,6 +63,7 @@ export function captureError(error: Error, context: ErrorContext = {}): void {
   if (process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN) {
     try {
       // Dynamic import to avoid issues in test environment
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const Sentry = require('@sentry/nextjs');
       Sentry.captureException(error, {
         extra: context,

@@ -1,0 +1,154 @@
+# generated: 2026-02-27
+# project: flipper-ai
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog -> in-progress: Automatically when first story is created (via create-story)
+#   - in-progress -> done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-02-27
+project: flipper-ai
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+  # Epic 1: Production Infrastructure & Secure Deployment
+  epic-1: in-progress
+  1-1-gcp-project-setup-secret-manager-module: done
+  1-2-cloud-sql-database-provisioning: review
+  1-3-containerize-deploy-to-cloud-run: done
+  1-4-firebase-auth-setup-migration: done
+  1-5-firebase-hosting-cors-configuration: review
+  1-6-firebase-storage-configuration: done
+  1-7-firebase-cloud-messaging-setup: review
+  1-8-github-actions-ci-cd-pipeline: done
+  1-9-health-check-monitoring-endpoints: done
+  epic-1-retrospective: optional
+
+  # Epic 2: User Registration, Auth & Onboarding
+  epic-2: in-progress
+  2-1-landing-page: ready-for-dev
+  2-2-user-registration-with-email: ready-for-dev
+  2-3-oauth-login: ready-for-dev
+  2-4-password-reset-via-email: ready-for-dev
+  2-5-onboarding-wizard: backlog
+  2-6-user-settings-preferences: backlog
+  epic-2-retrospective: optional
+
+  # Epic 3: Multi-Marketplace Scanning & Image Capture
+  epic-3: backlog
+  3-1-craigslist-scraper: backlog
+  3-2-ebay-browse-api-integration: backlog
+  3-3-facebook-marketplace-scraper: backlog
+  3-4-mercari-scraper: backlog
+  3-5-offerup-scraper: backlog
+  3-6-search-configuration-filters: backlog
+  3-7-scraper-job-management-real-time-events: backlog
+  3-8-listing-data-processing-deduplication: backlog
+  3-9-image-capture-storage: backlog
+  epic-3-retrospective: optional
+
+  # Epic 4: Core Scoring & Deal Evaluation
+  epic-4: backlog
+  4-1-algorithmic-value-score: backlog
+  4-2-platform-specific-fees-opportunity-threshold: backlog
+  4-3-llm-item-identification: backlog
+  4-4-verified-market-price-lookup: backlog
+  4-5-llm-sellability-assessment: backlog
+  4-6-ai-analysis-caching-fallback: backlog
+  epic-4-retrospective: optional
+
+  # Epic 5: Advanced Market Intelligence
+  epic-5: backlog
+  5-1-claude-sonnet-structural-analysis: backlog
+  5-2-comparable-sold-item-matching: backlog
+  5-3-sold-volume-demand-trend-analysis: backlog
+  5-4-item-completeness-seller-reputation-analysis: backlog
+  5-5-logistics-shipping-cost-analysis: backlog
+  epic-5-retrospective: optional
+
+  # Epic 6: Flip Lifecycle Management & Analytics
+  epic-6: backlog
+  6-1-dashboard-with-listings-stats: backlog
+  6-2-kanban-board-with-lifecycle-tracking: backlog
+  6-3-advanced-filtering: backlog
+  6-4-analytics-dashboard: backlog
+  6-5-performance-report-export: backlog
+  6-6-inventory-view-real-time-updates: backlog
+  epic-6-retrospective: optional
+
+  # Epic 7: Subscription & Billing
+  epic-7: backlog
+  7-1-subscription-tier-enforcement-feature-gating: backlog
+  7-2-stripe-checkout-customer-portal: backlog
+  7-3-stripe-webhook-handling: backlog
+  7-4-api-usage-tracking-metering: backlog
+  epic-7-retrospective: optional
+
+  # Epic 8: Seller Communication & Negotiation
+  epic-8: backlog
+  8-1-ai-message-generation: backlog
+  8-2-ai-negotiation-strategy: backlog
+  8-3-message-inbox-thread-history: backlog
+  8-4-message-approval-workflow: backlog
+  8-5-conversation-status-inbound-message-tracking: backlog
+  epic-8-retrospective: optional
+
+  # Epic 9: Cross-Platform Resale Listing
+  epic-9: backlog
+  9-1-ai-title-description-generation: backlog
+  9-2-optimal-listing-price-calculation: backlog
+  9-3-cross-platform-posting-queue: backlog
+  9-4-image-reuse-for-cross-posting: backlog
+  epic-9-retrospective: optional
+
+  # Epic 10: Monitoring & Email Notifications
+  epic-10: backlog
+  10-1-background-job-scheduler: backlog
+  10-2-listing-monitoring-events: backlog
+  10-3-flip-lifecycle-email-notifications: backlog
+  10-4-communication-email-notifications: backlog
+  10-5-smart-alert-email-notifications: backlog
+  10-6-notification-preferences: backlog
+  epic-10-retrospective: optional
+
+  # Epic 11: Push & SMS Notifications (Phase 2)
+  epic-11: backlog
+  11-1-fcm-push-notification-client: backlog
+  11-2-twilio-sms-integration: backlog
+  11-3-multi-channel-notification-preferences: backlog
+  epic-11-retrospective: optional
+
+  # Epic 12: Meeting & Logistics (Phase 2)
+  epic-12: backlog
+  12-1-google-calendar-integration: backlog
+  12-2-google-maps-route-generation: backlog
+  epic-12-retrospective: optional

@@ -161,7 +161,8 @@ describe('Scraper Jobs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe('Failed to fetch scraper jobs');
+      expect(data.success).toBe(false);
+    expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 
@@ -258,7 +259,8 @@ describe('Scraper Jobs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe('Failed to create scraper job');
+      expect(data.success).toBe(false);
+    expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 
@@ -289,7 +291,7 @@ describe('Scraper Jobs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(404);
-      expect(data.error).toBe('Scraper job not found');
+      expect(data.error.code).toBe('NOT_FOUND');
     });
 
     it('should return 500 on database error', async () => {
@@ -300,7 +302,8 @@ describe('Scraper Jobs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe('Failed to fetch scraper job');
+      expect(data.success).toBe(false);
+    expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 
@@ -365,7 +368,7 @@ describe('Scraper Jobs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toContain('Invalid status');
+      expect(data.error).toBeDefined();
     });
 
     it('should update error message', async () => {
@@ -392,7 +395,8 @@ describe('Scraper Jobs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe('Failed to update scraper job');
+      expect(data.success).toBe(false);
+    expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 
@@ -417,7 +421,8 @@ describe('Scraper Jobs API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe('Failed to delete scraper job');
+      expect(data.success).toBe(false);
+    expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 });

@@ -40,3 +40,18 @@ coverage-*/
 .env
 .env.local
 .env.*.local
+
+# OS files
+.DS_Store
+
+# Generated reports (Cucumber HTML/JSON/XML)
+reports/
+
+# Backup files
+*.bak
+
+# Python (helpers/ secrets module)
+helpers/__pycache__/
+*.pyc
+helpers/.pytest_cache/
+helpers/.venv/

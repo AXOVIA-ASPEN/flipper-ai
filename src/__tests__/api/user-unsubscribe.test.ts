@@ -59,45 +59,42 @@ describe('GET /api/user/unsubscribe', () => {
   beforeEach(() => jest.clearAllMocks());
 
   // ── Missing token ────────────────────────────────────────────────────────
-  it('returns 400 JSON when token is missing', async () => {
+  it('returns 422 JSON when token is missing', async () => {
     const res = await GET(makeGetRequest());
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
     const data = await res.json();
     expect(data.success).toBe(false);
-    expect(data.error).toBe('Missing token');
+    expect(data.error.code).toBe('VALIDATION_ERROR');
   });
 
   // ── Invalid base64 / bad email ──────────────────────────────────────────
-  it('returns 400 JSON for invalid base64 token', async () => {
+  it('returns 422 JSON for invalid base64 token', async () => {
     // Pass raw string that decodes to a non-email value
     const badToken = Buffer.from('not-an-email', 'utf-8').toString('base64url');
     const res = await GET(makeGetRequest(badToken));
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
     const data = await res.json();
     expect(data.success).toBe(false);
-    expect(data.error).toBe('Invalid token');
+    expect(data.error.code).toBe('VALIDATION_ERROR');
   });
 
-  it('returns 400 when token decodes to empty string (empty base64url → falsy → Missing token)', async () => {
-    // Buffer.from('').toString('base64url') === '' which is falsy — hits the
-    // "Missing token" guard before the email-validation step.
+  it('returns 422 when token decodes to empty string', async () => {
     const emptyToken = Buffer.from('', 'utf-8').toString('base64url'); // ''
     const res = await GET(makeGetRequest(emptyToken));
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
     const data = await res.json();
-    // An empty token string is treated the same as a missing token
     expect(data.success).toBe(false);
-    expect(['Missing token', 'Invalid token']).toContain(data.error);
+    expect(data.error.code).toBe('VALIDATION_ERROR');
   });
 
-  it('returns 400 when token decodes to a whitespace-only string', async () => {
+  it('returns 422 when token decodes to a whitespace-only string', async () => {
     // Decodes fine but fails email regex — should return "Invalid token"
     const wsToken = Buffer.from('   ', 'utf-8').toString('base64url');
     const res = await GET(makeGetRequest(wsToken));
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
     const data = await res.json();
     expect(data.success).toBe(false);
-    expect(data.error).toBe('Invalid token');
+    expect(data.error.code).toBe('VALIDATION_ERROR');
   });
 
   // ── User not found — should NOT leak info ───────────────────────────────
@@ -215,12 +212,12 @@ describe('POST /api/user/unsubscribe', () => {
   beforeEach(() => jest.clearAllMocks());
 
   // ── Missing token ────────────────────────────────────────────────────────
-  it('returns 400 when token is missing', async () => {
+  it('returns 422 when token is missing', async () => {
     const res = await POST(makePostRequest());
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
     const data = await res.json();
     expect(data.success).toBe(false);
-    expect(data.error).toBe('Missing token');
+    expect(data.error.code).toBe('VALIDATION_ERROR');
   });
 
   // ── User not found ───────────────────────────────────────────────────────
@@ -231,7 +228,7 @@ describe('POST /api/user/unsubscribe', () => {
     expect(res.status).toBe(404);
     const data = await res.json();
     expect(data.success).toBe(false);
-    expect(data.error).toBe('User not found');
+    expect(data.error.code).toBe('NOT_FOUND');
   });
 
   // ── Re-subscribe (resubscribe=true) ─────────────────────────────────────
@@ -295,6 +292,6 @@ describe('POST /api/user/unsubscribe', () => {
     expect(res.status).toBe(500);
     const data = await res.json();
     expect(data.success).toBe(false);
-    expect(data.error).toBe('Failed to update preferences');
+    expect(data.error.code).toBe('INTERNAL_ERROR');
   });
 });

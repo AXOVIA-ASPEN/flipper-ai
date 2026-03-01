@@ -3,7 +3,7 @@ import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
 import { UpdatePostingQueueItemSchema, validateBody } from '@/lib/validations';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, ConflictError, AppError, ErrorCode } from '@/lib/errors';
 type RouteContext = { params: Promise<{ id: string }> };
 
 // GET /api/posting-queue/:id - Get a single queue item
@@ -38,7 +38,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
     return NextResponse.json(item);
   } catch (error) {
     console.error('GET /api/posting-queue/[id] error:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Internal server error');
+    return handleError(error);
   }
 }
 
@@ -82,7 +82,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     return NextResponse.json(updated);
   } catch (error) {
     console.error('PATCH /api/posting-queue/[id] error:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Internal server error');
+    return handleError(error);
   }
 }
 
@@ -104,13 +104,13 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
 
     // Only allow deletion if not currently being processed
     if (existing.status === 'IN_PROGRESS') {
-      throw new AppError(ErrorCode.INTERNAL_ERROR, 'Cannot delete item that is currently being processed');
+      throw new ConflictError('Cannot delete item that is currently being processed');
     }
 
     await prisma.postingQueueItem.delete({ where: { id } });
     return NextResponse.json({ deleted: true });
   } catch (error) {
     console.error('DELETE /api/posting-queue/[id] error:', error);
-    throw new AppError(ErrorCode.INTERNAL_ERROR, 'Internal server error');
+    return handleError(error);
   }
 }

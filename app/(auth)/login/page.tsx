@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, Suspense, useRef, useEffect } from 'react';
-import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
+import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import {
   Mail,
   Lock,
@@ -12,6 +12,7 @@ import {
   EyeOff,
   Loader2,
   AlertCircle,
+  CheckCircle,
   Sparkles,
   TrendingUp,
   DollarSign,
@@ -23,8 +24,8 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
+        <div className="min-h-screen bg-theme-page flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-theme-accent" />
         </div>
       }
     >
@@ -37,14 +38,17 @@ function LoginPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
-  const error = searchParams.get('error');
+  const loggedOut = searchParams.get('loggedOut') === 'true' || searchParams.get('loggedOut') === '1';
+
+  const { signIn, signInWithGoogle, signInWithGitHub } = useFirebaseAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(
-    error === 'CredentialsSignin' ? 'Invalid email or password' : null
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(
+    loggedOut ? 'You have been logged out.' : null
   );
   const [showCaptcha, setShowCaptcha] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
@@ -66,7 +70,7 @@ function LoginPageInner() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: email.toLowerCase() }),
         });
-        
+
         if (response.ok) {
           const data = await response.json();
           setShowCaptcha(data.requiresCaptcha);
@@ -93,35 +97,24 @@ function LoginPageInner() {
     }
 
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        captchaToken: captchaToken || '',
-        redirect: false,
-      });
-
-      if (result?.error) {
-        if (result.error === 'CAPTCHA verification required' || 
-            result.error === 'CAPTCHA verification failed') {
-          setErrorMessage(result.error);
-          setShowCaptcha(true);
-          // Reset CAPTCHA
-          setCaptchaToken(null);
-          if (captchaRef.current) {
-            captchaRef.current.resetCaptcha();
-          }
-        } else {
-          setErrorMessage('Invalid email or password');
-          // Trigger re-check for CAPTCHA requirement
-          setShowCaptcha(false);
-          setCaptchaToken(null);
+      await signIn(email, password);
+      router.push(callbackUrl);
+      router.refresh();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Something went wrong';
+      if (message.includes('auth/wrong-password') || message.includes('auth/user-not-found') || message.includes('auth/invalid-credential')) {
+        setErrorMessage('Invalid email or password');
+        // Reset CAPTCHA on failed attempt
+        setCaptchaToken(null);
+        if (captchaRef.current) {
+          captchaRef.current.resetCaptcha();
         }
+      } else if (message.includes('auth/too-many-requests')) {
+        setErrorMessage('Too many failed attempts. Please try again later.');
+        setShowCaptcha(true);
       } else {
-        router.push(callbackUrl);
-        router.refresh();
+        setErrorMessage('Something went wrong. Please try again.');
       }
-    } catch {
-      setErrorMessage('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -130,16 +123,34 @@ function LoginPageInner() {
   async function handleOAuthSignIn(provider: 'google' | 'github') {
     setIsLoading(true);
     setErrorMessage(null);
-    await signIn(provider, { callbackUrl });
+    try {
+      if (provider === 'google') {
+        await signInWithGoogle();
+      } else {
+        await signInWithGitHub();
+      }
+      router.push(callbackUrl);
+      router.refresh();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'OAuth sign-in failed';
+      if (message.includes('auth/popup-closed-by-user')) {
+        // User closed the popup — not an error
+        setIsLoading(false);
+        return;
+      }
+      setErrorMessage('Sign-in failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-theme-page flex items-center justify-center p-4 relative overflow-hidden">
       {/* Animated background gradient orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 -left-4 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
-        <div className="absolute top-0 -right-4 w-96 h-96 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
-        <div className="absolute -bottom-8 left-20 w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
+        <div className="absolute top-0 -left-4 w-96 h-96 bg-theme-orb-1 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
+        <div className="absolute top-0 -right-4 w-96 h-96 bg-theme-orb-2 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
+        <div className="absolute -bottom-8 left-20 w-96 h-96 bg-theme-orb-3 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
         <div className="absolute bottom-20 right-20 w-72 h-72 bg-emerald-600 rounded-full mix-blend-multiply filter blur-3xl opacity-15 animate-blob animation-delay-6000" />
       </div>
 
@@ -147,11 +158,11 @@ function LoginPageInner() {
       <div className="absolute left-10 top-1/4 hidden lg:block">
         <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-4 transform -rotate-6 hover:rotate-0 transition-transform duration-500 shadow-2xl">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-600 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-theme-accent-green rounded-lg flex items-center justify-center">
               <DollarSign className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-sm text-green-300">Avg. Profit</p>
+              <p className="text-sm text-theme-muted">Avg. Profit</p>
               <p className="text-xl font-bold text-white">$127/flip</p>
             </div>
           </div>
@@ -161,11 +172,11 @@ function LoginPageInner() {
       <div className="absolute right-10 top-1/3 hidden lg:block">
         <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-4 transform rotate-6 hover:rotate-0 transition-transform duration-500 shadow-2xl">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-600 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-theme-primary rounded-lg flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-sm text-purple-300">Success Rate</p>
+              <p className="text-sm text-theme-muted">Success Rate</p>
               <p className="text-xl font-bold text-white">94%</p>
             </div>
           </div>
@@ -175,11 +186,11 @@ function LoginPageInner() {
       <div className="absolute left-20 bottom-1/4 hidden lg:block">
         <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-4 transform rotate-3 hover:rotate-0 transition-transform duration-500 shadow-2xl">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-cyan-600 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-theme-accent-blue rounded-lg flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-sm text-blue-300">AI Powered</p>
+              <p className="text-sm text-theme-muted">AI Powered</p>
               <p className="text-xl font-bold text-white">100%</p>
             </div>
           </div>
@@ -193,17 +204,30 @@ function LoginPageInner() {
           <div className="px-8 pt-8 pb-6 text-center">
             <Link href="/" className="inline-block mb-6 group">
               <div className="flex items-center justify-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/50 group-hover:shadow-purple-500/80 transition-shadow">
+                <div className="w-12 h-12 bg-theme-primary rounded-xl flex items-center justify-center shadow-lg shadow-theme-button group-hover:shadow-xl transition-shadow">
                   <Sparkles className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-purple-200 via-pink-200 to-blue-200 bg-clip-text text-transparent">
+                <span className="text-2xl font-bold bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(to right, var(--theme-text-gradient-from), var(--theme-text-gradient-via), var(--theme-text-gradient-to))' }}>
                   Flipper.ai
                 </span>
               </div>
             </Link>
             <h1 className="text-2xl font-bold text-white mb-2">Welcome back</h1>
-            <p className="text-blue-200/70">Sign in to find your next profitable flip</p>
+            <p className="text-theme-muted">Sign in to find your next profitable flip</p>
           </div>
+
+          {/* Success message (e.g. after logout) */}
+          {successMessage && (
+            <div
+              className="mx-8 mb-4 p-3 rounded-lg bg-green-500/20 border border-green-500/30 flex items-center gap-2 text-green-200"
+              role="status"
+              aria-live="polite"
+              data-testid="logout-success-message"
+            >
+              <CheckCircle className="w-5 h-5 flex-shrink-0" />
+              <span className="text-sm">{successMessage}</span>
+            </div>
+          )}
 
           {/* Error message */}
           {errorMessage && (
@@ -264,7 +288,7 @@ function LoginPageInner() {
                 <div className="w-full border-t border-white/20" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-transparent text-blue-200/50">or continue with email</span>
+                <span className="px-4 bg-transparent text-white/50">or continue with email</span>
               </div>
             </div>
           </div>
@@ -272,12 +296,12 @@ function LoginPageInner() {
           {/* Credentials form */}
           <form onSubmit={handleCredentialsSubmit} className="px-8 pb-8 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-blue-200/90 mb-2">
+              <label className="block text-sm font-medium text-white/90 mb-2">
                 Email address
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-blue-300/50" />
+                  <Mail className="h-5 w-5 text-white/50" />
                 </div>
                 <input
                   type="email"
@@ -285,16 +309,16 @@ function LoginPageInner() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="you@example.com"
-                  className="w-full pl-10 pr-4 py-3 bg-white/10 rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white placeholder-blue-200/30 transition-all duration-300"
+                  className="w-full pl-10 pr-4 py-3 bg-white/10 rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-[var(--theme-focus-ring)] focus:border-[var(--theme-focus-ring)] text-white placeholder-white/30 transition-all duration-300"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-blue-200/90 mb-2">Password</label>
+              <label className="block text-sm font-medium text-white/90 mb-2">Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-blue-300/50" />
+                  <Lock className="h-5 w-5 text-white/50" />
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -302,12 +326,12 @@ function LoginPageInner() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="Enter your password"
-                  className="w-full pl-10 pr-12 py-3 bg-white/10 rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white placeholder-blue-200/30 transition-all duration-300"
+                  className="w-full pl-10 pr-12 py-3 bg-white/10 rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-[var(--theme-focus-ring)] focus:border-[var(--theme-focus-ring)] text-white placeholder-white/30 transition-all duration-300"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-300/50 hover:text-blue-200 transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/50 hover:text-blue-200 transition-colors"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -340,7 +364,7 @@ function LoginPageInner() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-600 hover:to-pink-700 transition-all duration-300 shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed group"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-theme-button text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-theme-button hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed group"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -351,15 +375,25 @@ function LoginPageInner() {
                 </>
               )}
             </button>
+
+            {/* Forgot password link */}
+            <div className="text-center">
+              <Link
+                href="/forgot-password"
+                className="text-sm text-theme-muted hover:text-white transition-colors"
+              >
+                Forgot password?
+              </Link>
+            </div>
           </form>
 
           {/* Footer */}
           <div className="px-8 pb-8 text-center">
-            <p className="text-blue-200/60 text-sm">
-              Don't have an account?{' '}
+            <p className="text-theme-muted text-sm">
+              Don&apos;t have an account?{' '}
               <Link
                 href="/register"
-                className="text-purple-300 hover:text-purple-200 font-medium transition-colors"
+                className="text-theme-accent hover:text-white font-medium transition-colors"
               >
                 Create one free
               </Link>
@@ -368,7 +402,7 @@ function LoginPageInner() {
         </div>
 
         {/* Bottom tagline */}
-        <p className="text-center text-blue-200/40 text-sm mt-6">
+        <p className="text-center text-white/40 text-sm mt-6">
           Powered by AI to maximize your flipping profits
         </p>
       </div>

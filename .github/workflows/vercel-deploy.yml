@@ -1,10 +1,18 @@
-name: Vercel Deploy
+# DEPRECATED: Cloud Run is now the primary deployment target. See ci.yml for the Cloud Run deploy job.
+# This workflow is retained as a manual fallback only.
+name: Vercel Deploy (DEPRECATED)
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
+    inputs:
+      deploy_target:
+        description: 'Deploy target (preview or production)'
+        required: true
+        default: 'preview'
+        type: choice
+        options:
+          - preview
+          - production
 
 concurrency:
   group: vercel-${{ github.ref }}
@@ -16,7 +24,7 @@ env:
 
 jobs:
   preview:
-    if: github.event_name == 'pull_request'
+    if: github.event.inputs.deploy_target == 'preview'
     runs-on: ubuntu-latest
     environment:
       name: preview
@@ -54,7 +62,7 @@ jobs:
           echo "[$URL]($URL)" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Comment PR with Preview URL
-        if: github.event_name == 'pull_request'
+        if: false
         uses: actions/github-script@v7
         with:
           script: |
@@ -68,7 +76,7 @@ jobs:
           PREVIEW_URL: ${{ steps.deploy.outputs.preview-url }}
 
   production:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event.inputs.deploy_target == 'production'
     runs-on: ubuntu-latest
     environment:
       name: production

@@ -119,6 +119,22 @@ describe('CORS Configuration', () => {
     const headers = getCorsHeaders(null);
     expect(headers['Access-Control-Allow-Origin']).toBeUndefined();
   });
+
+  test('ALLOWED_ORIGINS env var is documented in .env.example', async () => {
+    const fs = await import('fs');
+    const path = await import('path');
+    const envExample = fs.readFileSync(
+      path.resolve(__dirname, '../../../.env.example'),
+      'utf-8'
+    );
+    expect(envExample).toContain('ALLOWED_ORIGINS');
+  });
+
+  test('unauthorized origins are rejected with no Allow-Origin', () => {
+    const headers = getCorsHeaders('https://malicious-site.example.com');
+    expect(headers['Access-Control-Allow-Origin']).toBeUndefined();
+    expect(headers['Access-Control-Allow-Credentials']).toBeUndefined();
+  });
 });
 
 // ─── CSRF Protection ────────────────────────────────────────────────
@@ -400,7 +416,7 @@ describe('Next.js Configuration Security', () => {
     // Read next.config to verify standalone mode
     const fs = await import('fs');
     const path = await import('path');
-    const configPath = path.resolve(__dirname, '../../../next.config.ts');
+    const configPath = path.resolve(__dirname, '../../../next.config.js');
     const content = fs.readFileSync(configPath, 'utf-8');
     expect(content).toContain('standalone');
   });
@@ -408,7 +424,7 @@ describe('Next.js Configuration Security', () => {
   test('TypeScript errors are not ignored in build', async () => {
     const fs = await import('fs');
     const path = await import('path');
-    const configPath = path.resolve(__dirname, '../../../next.config.ts');
+    const configPath = path.resolve(__dirname, '../../../next.config.js');
     const content = fs.readFileSync(configPath, 'utf-8');
     expect(content).toContain('ignoreBuildErrors: false');
   });

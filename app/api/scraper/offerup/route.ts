@@ -532,6 +532,11 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('OfferUp scraper error:', error);
 
+    // Return auth errors directly before updating job
+    if (error instanceof UnauthorizedError) {
+      return handleError(error);
+    }
+
     // Update job as failed
     if (job) {
       await prisma.scraperJob.update({

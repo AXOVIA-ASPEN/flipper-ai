@@ -15,11 +15,30 @@ jest.mock('next/navigation', () => ({
   useSearchParams: () => ({ get: mockGet }),
 }));
 
-// Mock next-auth/react
+// Mock Firebase auth hook
 const mockSignIn = jest.fn();
-jest.mock('next-auth/react', () => ({
-  signIn: (...args: any[]) => mockSignIn(...args),
+const mockSignInWithGoogle = jest.fn();
+const mockSignInWithGitHub = jest.fn();
+jest.mock('@/hooks/useFirebaseAuth', () => ({
+  useFirebaseAuth: () => ({
+    user: null,
+    loading: false,
+    signIn: mockSignIn,
+    signInWithGoogle: mockSignInWithGoogle,
+    signInWithGitHub: mockSignInWithGitHub,
+    signOut: jest.fn(),
+  }),
 }));
+
+// Mock HCaptcha
+jest.mock('@hcaptcha/react-hcaptcha', () => {
+  return {
+    __esModule: true,
+    default: React.forwardRef(function MockHCaptcha(_props: any, _ref: any) {
+      return <div data-testid="hcaptcha">Mock HCaptcha</div>;
+    }),
+  };
+});
 
 // Mock next/link
 jest.mock('next/link', () => {
@@ -64,18 +83,9 @@ describe('LoginPage', () => {
     expect(buttons.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('shows error when credentials are invalid from URL param', () => {
-    mockGet.mockImplementation((key: string) => {
-      if (key === 'error') return 'CredentialsSignin';
-      return null;
-    });
-    render(<LoginPage />);
-    expect(screen.getByText(/invalid email or password/i)).toBeInTheDocument();
-  });
-
   it('handles credentials login submission', async () => {
     const user = userEvent.setup();
-    mockSignIn.mockResolvedValue({ error: null });
+    mockSignIn.mockResolvedValue(undefined);
 
     render(<LoginPage />);
 
@@ -84,17 +94,13 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: /sign in/i }));
 
     await waitFor(() => {
-      expect(mockSignIn).toHaveBeenCalledWith('credentials', {
-        email: 'test@example.com',
-        password: 'password123',
-        redirect: false,
-      });
+      expect(mockSignIn).toHaveBeenCalledWith('test@example.com', 'password123');
     });
   });
 
   it('shows error on failed credentials login', async () => {
     const user = userEvent.setup();
-    mockSignIn.mockResolvedValue({ error: 'CredentialsSignin' });
+    mockSignIn.mockRejectedValue(new Error('auth/invalid-credential'));
 
     render(<LoginPage />);
 
@@ -113,7 +119,7 @@ describe('LoginPage', () => {
       if (key === 'callbackUrl') return '/dashboard';
       return null;
     });
-    mockSignIn.mockResolvedValue({ error: null });
+    mockSignIn.mockResolvedValue(undefined);
 
     render(<LoginPage />);
 

@@ -6,106 +6,128 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-**Flipper.ai** is an AI-powered marketplace scraper that finds underpriced items for resale profit. It scrapes Craigslist (with plans for Facebook Marketplace, eBay, and OfferUp), analyzes flip potential, and tracks opportunities through the resale lifecycle.
+**Flipper.ai** is an AI-powered marketplace scraper that finds underpriced items for resale profit. It scrapes Craigslist, Facebook Marketplace, eBay, OfferUp, and Mercari, analyzes flip potential with AI, and tracks opportunities through the full resale lifecycle (discovery → purchase → listing → sale → profit).
 
 ## Commands
 
 ```bash
-# Install dependencies and run migrations
+# First-time setup: install deps, create .env, migrate DB, start dev server
 make preview
 
 # Development
-pnpm dev                    # Start dev server at http://localhost:3000
+make dev                    # Start dev server at http://localhost:3000
 
 # Testing
-pnpm test                   # Run Jest unit tests
-pnpm test -- path/to/test   # Run a single test file
-pnpm test:e2e               # Run Playwright E2E tests
-pnpm test:e2e:ui            # Run E2E tests with interactive UI
-pnpm test:e2e:headed        # Run E2E tests in headed browser
+make test                   # Jest unit tests (src/**/__tests__/)
+pnpm test -- --testPathPattern="value-estimator"  # Run a single test file
+pnpm test:coverage          # Jest with coverage report
+make test-acceptance        # BDD tests (Cucumber/Gherkin, starts prod server)
+make test-acceptance TAGS=@smoke  # BDD with tag filter
+make test-e2e               # Playwright E2E tests
+make test-e2e-ui            # E2E tests with interactive UI
+make test-all               # All test suites
 
 # Database
-npx prisma migrate dev      # Run migrations
-npx prisma studio           # Open database GUI
-npx prisma generate         # Regenerate Prisma client
+make migrate                # Run migrations (prisma migrate dev, interactive)
+make db-sync                # Non-interactive schema sync (deploy + push)
+make studio                 # Prisma Studio (database GUI)
+make db-reset               # Reset database (WARNING: deletes all data)
 
-# Build
-pnpm build                  # Production build
-pnpm lint                   # Run ESLint
+# Build & quality
+make build                  # Production build (strict TS, no ignoreBuildErrors)
+make lint                   # ESLint
+pnpm lint:fix               # Auto-fix lint issues
+pnpm format                 # Prettier format
+pnpm format:check           # Check formatting
 ```
+
+Run `make help` for the full list of targets.
 
 ## Architecture
 
 ### Tech Stack
 
-- **Frontend**: Next.js 16, React 19, TypeScript, Tailwind CSS 4
-- **Backend**: Next.js API Routes
-- **Database**: SQLite with Prisma ORM (client generated to `src/generated/prisma/`)
+- **Framework**: Next.js 16 (App Router), React 19, TypeScript (strict mode)
+- **Styling**: Tailwind CSS 4
+- **Database**: PostgreSQL with Prisma ORM (SQLite/libSQL for local dev)
+- **Auth**: NextAuth.js v5 (JWT strategy) with Google, GitHub, and credentials providers
+- **AI**: Google Gemini via Stagehand, OpenAI, Anthropic Claude
+- **Payments**: Stripe (checkout, subscriptions, webhooks)
+- **Email**: Resend
+- **Error Tracking**: Sentry
 - **Scraping**: Playwright for browser automation
-- **Testing**: Jest (unit), Playwright (E2E)
+- **Testing**: Jest (unit), Cucumber/Gherkin (BDD), Playwright (E2E)
+- **CI/CD**: GitHub Actions → Vercel
 
-### Key Directories
+### Project Layout
+
+The project uses a **split directory structure** — pages live in `app/` at the project root while source code lives in `src/`:
 
 ```
-src/app/                        # Next.js App Router
-├── api/                        # API routes (REST endpoints)
-│   ├── listings/[id]/          # Single listing CRUD
-│   ├── opportunities/[id]/     # Single opportunity CRUD
-│   ├── scraper/craigslist/     # Craigslist scraper endpoint
-│   ├── scraper-jobs/[id]/      # Scraper job management
-│   └── search-configs/[id]/    # Saved search configs
-├── page.tsx                    # Dashboard (listings view)
-├── opportunities/page.tsx      # Opportunities management
-├── scraper/page.tsx            # Scraper control UI
-└── settings/page.tsx           # Settings page
+app/                            # Next.js App Router (pages + API routes)
+├── api/                        # ~50 API route files
+├── (auth)/login|register/      # Auth pages (route group, no /auth prefix in URL)
+├── dashboard/                  # Main dashboard
+├── opportunities/              # Opportunity tracking
+├── scraper/                    # Scraper control UI
+├── settings/                   # User settings
+├── messages/                   # Seller communication
+├── analytics/                  # Profit/loss analytics
+└── onboarding/                 # New user wizard
 
-src/lib/
-├── db.ts                       # Prisma client singleton
-└── value-estimator.ts          # Profit calculation & scoring logic
+src/
+├── components/                 # React components (Navigation, KanbanBoard, Onboarding/*, etc.)
+├── contexts/ThemeContext.tsx    # Theme provider (light/dark)
+├── lib/                        # Core business logic (~40 modules)
+│   ├── db.ts                   # Prisma client singleton
+│   ├── auth.ts                 # NextAuth config (exports { auth, signIn, signOut })
+│   ├── errors.ts               # AppError classes + errorResponse() + handleError()
+│   ├── value-estimator.ts      # Profit scoring engine (0-100)
+│   ├── llm-analyzer.ts         # LLM-based listing analysis
+│   ├── stripe.ts               # Stripe integration
+│   ├── subscription-tiers.ts   # FREE/PRO/ENTERPRISE tier logic
+│   └── ...                     # See src/lib/ for full list
+├── generated/prisma/           # Generated Prisma client (DO NOT EDIT)
+└── __tests__/                  # Jest unit tests
 
-src/__tests__/                  # Jest unit tests
-e2e/                            # Playwright E2E tests
-prisma/schema.prisma            # Database schema
+prisma/schema.prisma            # Database schema (14 models)
+test/features/                  # Cucumber BDD feature files + step definitions
+config/                         # Docker, PM2 configs
 ```
+
+### Path Aliases
+
+`@/*` maps to `./src/*` (configured in `tsconfig.json`). Pages in `app/` import from `src/` using `@/lib/...`, `@/components/...`, etc.
+
+### Key Architectural Patterns
+
+**API Routes**: All routes in `app/api/` export named HTTP method handlers (GET, POST, PATCH, DELETE). They use the standardized error system from `src/lib/errors.ts`:
+- Throw `AppError` subclasses (`NotFoundError`, `ValidationError`, `UnauthorizedError`, etc.)
+- Catch with `handleError(error)` which returns RFC 7807 compliant `NextResponse`
+- Response shape: `{ success: true, data: ... }` or `{ success: false, error: { code, detail, ... } }`
+
+**Auth**: `src/lib/auth.ts` configures NextAuth v5 with PrismaAdapter. API routes call `getCurrentUserId()` or `requireAuth()` to get the authenticated user. Auth pages use the `(auth)` route group.
+
+**Provider Stack**: Root layout wraps the app in `SessionProvider` → `ThemeProvider` → `ToastProvider`.
+
+**Database**: `src/lib/db.ts` exports a Prisma singleton. The schema uses `cuid()` IDs, `@updatedAt` timestamps, and extensive indexing. Prisma client is generated to `src/generated/prisma/` (runs via `postinstall` hook).
+
+**Prisma Config**: Uses `prisma.config.ts` at the project root with `dotenv/config` for env loading. The datasource URL comes from `DATABASE_URL`.
 
 ### Data Flow
 
-1. **Scraping**: `/api/scraper/craigslist` uses Playwright to extract listings from search results
-2. **Analysis**: `value-estimator.ts` scores items 0-100 based on category, brand, condition, and risk factors
-3. **Storage**: Prisma stores listings in SQLite with status tracking
-4. **Opportunities**: Listings with score 70+ become opportunities for tracking through purchase/resale
+1. **Scraping**: Platform scrapers (`app/api/scraper/`) use Playwright to extract listings
+2. **Analysis**: `value-estimator.ts` scores items 0-100 based on category, brand, condition, and risk factors. Items scoring 70+ become opportunities.
+3. **AI Enhancement**: `llm-analyzer.ts` enriches listings with market value, demand analysis, and resale strategy via LLM
+4. **Storage**: All data persisted via Prisma ORM with user-scoped queries
+5. **Lifecycle**: Users track opportunities through IDENTIFIED → PURCHASED → LISTED → SOLD statuses
 
-### Database Models
+### Testing Architecture
 
-- `Listing`: Scraped items with value analysis, comparable URLs, AI-generated purchase messages
-- `Opportunity`: Active flips linked to listings, tracks purchase/resale/profit
-- `ScraperJob`: Run history and status
-- `SearchConfig`: Saved search configurations
-- `PriceHistory`: Market value reference data
+- **Jest** (`jest.config.js`): Tests in `src/__tests__/`. Uses `ts-jest` transform, `maxWorkers: 1`. Module aliases match tsconfig paths. Coverage thresholds: 96% branches, 98% functions, 99% lines/statements. Integration tests excluded by default (run via `pnpm test:integration`).
+- **Cucumber BDD** (`test/features/`): 9 feature files with step definitions. Runs against a production build via `start-server-and-test`.
+- **Playwright** (`playwright.config.ts`): Tests in `e2e/`. 5 browser projects (chromium, firefox, webkit, mobile-chrome, mobile-safari). Locally defaults to port 3001 (PM2 staging), CI uses port 3000.
 
-### Value Scoring System
+### Coverage Enforcement
 
-Items scored 0-100 in `value-estimator.ts` using:
-
-- Category multipliers (electronics, furniture, collectibles)
-- Brand detection (Apple, Sony, Dyson, vintage items)
-- Condition analysis (new, like new, good, fair, poor)
-- Risk factors (broken, parts only, needs repair)
-
-### API Route Pattern
-
-All API routes follow Next.js App Router conventions:
-
-- `route.ts` exports HTTP method handlers (GET, POST, PATCH, DELETE)
-- Dynamic routes use `[id]` folder pattern
-- Returns `NextResponse.json()` with consistent `{ success, data/message }` shape
-
-## Scraper Implementation
-
-The Craigslist scraper (`src/app/api/scraper/craigslist/route.ts`) uses Playwright:
-
-- Launches headless Chromium with custom user agent
-- Navigates to Craigslist search URL with filters
-- Extracts listings via `page.evaluate()` with multiple selector fallbacks
-- Runs value estimation on each listing before storage
-- Always closes browser in finally block
+Jest enforces coverage thresholds in CI — branches 96%, functions 98%, lines 99%, statements 99%. Adding new code to `src/lib/`, `app/api/`, or `src/scrapers/` requires maintaining these thresholds.

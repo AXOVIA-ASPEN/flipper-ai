@@ -13,10 +13,19 @@ jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush, refresh: mockRefresh }),
 }));
 
-// Mock next-auth/react
-const mockSignIn = jest.fn();
-jest.mock('next-auth/react', () => ({
-  signIn: (...args: any[]) => mockSignIn(...args),
+// Mock Firebase auth hook
+const mockSignUp = jest.fn();
+const mockSignInWithGoogle = jest.fn();
+const mockSignInWithGitHub = jest.fn();
+jest.mock('@/hooks/useFirebaseAuth', () => ({
+  useFirebaseAuth: () => ({
+    user: null,
+    loading: false,
+    signUp: mockSignUp,
+    signInWithGoogle: mockSignInWithGoogle,
+    signInWithGitHub: mockSignInWithGitHub,
+    signOut: jest.fn(),
+  }),
 }));
 
 // Mock next/link
@@ -30,7 +39,7 @@ jest.mock('next/link', () => {
   };
 });
 
-// Mock fetch
+// Mock fetch (for PATCH /api/user/settings after signUp)
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
 
@@ -94,13 +103,10 @@ describe('RegisterPage', () => {
     });
   });
 
-  it('submits registration and auto-signs in on success', async () => {
+  it('submits registration via Firebase signUp on success', async () => {
     const user = userEvent.setup();
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ message: 'User created' }),
-    });
-    mockSignIn.mockResolvedValue({ error: null });
+    mockSignUp.mockResolvedValue(undefined);
+    mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve({}) });
 
     render(<RegisterPage />);
 
@@ -112,31 +118,17 @@ describe('RegisterPage', () => {
     await user.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith(
-        '/api/auth/register',
-        expect.objectContaining({
-          method: 'POST',
-        })
-      );
+      expect(mockSignUp).toHaveBeenCalledWith('test@example.com', 'Password123', 'Test User');
     });
 
     await waitFor(() => {
-      expect(mockSignIn).toHaveBeenCalledWith(
-        'credentials',
-        expect.objectContaining({
-          email: 'test@example.com',
-          password: 'Password123',
-        })
-      );
+      expect(mockPush).toHaveBeenCalledWith('/settings');
     });
   });
 
-  it('shows API error on registration failure', async () => {
+  it('shows error when email already in use', async () => {
     const user = userEvent.setup();
-    mockFetch.mockResolvedValue({
-      ok: false,
-      json: () => Promise.resolve({ error: 'Email already registered' }),
-    });
+    mockSignUp.mockRejectedValue(new Error('auth/email-already-in-use'));
 
     render(<RegisterPage />);
 
@@ -148,13 +140,13 @@ describe('RegisterPage', () => {
     await user.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/email already registered/i)).toBeInTheDocument();
+      expect(screen.getByText(/already exists/i)).toBeInTheDocument();
     });
   });
 
   it('handles network error gracefully', async () => {
     const user = userEvent.setup();
-    mockFetch.mockRejectedValue(new Error('Network error'));
+    mockSignUp.mockRejectedValue(new Error('Network error'));
 
     render(<RegisterPage />);
 
@@ -167,28 +159,6 @@ describe('RegisterPage', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
-    });
-  });
-
-  it('redirects to login if auto-signin fails after registration', async () => {
-    const user = userEvent.setup();
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ message: 'User created' }),
-    });
-    mockSignIn.mockResolvedValue({ error: 'SignInError' });
-
-    render(<RegisterPage />);
-
-    await user.type(screen.getByPlaceholderText('John Doe'), 'Test User');
-    await user.type(screen.getByPlaceholderText('you@example.com'), 'test@example.com');
-    await user.type(screen.getByPlaceholderText('Create a password'), 'Password123');
-    await user.type(screen.getByPlaceholderText('Confirm your password'), 'Password123');
-
-    await user.click(screen.getByRole('button', { name: /create account/i }));
-
-    await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/login?registered=true');
     });
   });
 
@@ -205,8 +175,6 @@ describe('RegisterPage', () => {
     const passwordField = screen.getByPlaceholderText('Create a password');
     await user.type(passwordField, 'Abcd1234');
 
-    // Password meets all criteria - the component should show visual indicators
-    // Just verify no errors occurred during typing
     expect(passwordField).toHaveValue('Abcd1234');
   });
 });

@@ -19,27 +19,29 @@ Object.defineProperty(window, 'localStorage', {
 });
 
 describe('ThemeStyles', () => {
-  it('renders without crashing within ThemeProvider', () => {
+  it('renders a style element within ThemeProvider', () => {
     const { container } = render(
       <ThemeProvider>
         <ThemeStyles />
       </ThemeProvider>
     );
-    // ThemeStyles returns null, it applies CSS variables via useEffect
-    expect(container.firstChild).toBeNull();
+    // ThemeStyles renders a <style> element with CSS variables
+    const styleElement = container.querySelector('style');
+    expect(styleElement).not.toBeNull();
   });
 
-  it('applies CSS custom properties to document root', () => {
-    render(
+  it('includes theme CSS custom properties in style tag', () => {
+    const { container } = render(
       <ThemeProvider>
         <ThemeStyles />
       </ThemeProvider>
     );
-    const root = document.documentElement;
-    // Should have applied CSS custom properties
-    expect(root.style.getPropertyValue('--color-primary')).toBeTruthy();
-    expect(root.style.getPropertyValue('--color-background')).toBeTruthy();
-    expect(root.style.getPropertyValue('--color-text')).toBeTruthy();
+    const styleElement = container.querySelector('style');
+    const cssText = styleElement?.textContent || '';
+    // Should contain theme CSS custom properties
+    expect(cssText).toContain('--theme-primary-from');
+    expect(cssText).toContain('--theme-primary-to');
+    expect(cssText).toContain('--theme-orb-1');
   });
 
   it('throws when used outside ThemeProvider', () => {

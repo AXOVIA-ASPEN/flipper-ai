@@ -211,6 +211,42 @@ body {
   background-color: var(--theme-orb-3);
 }
 
+.bg-theme-page {
+  background: linear-gradient(to bottom right, var(--theme-page-bg-from), var(--theme-page-bg-via), var(--theme-page-bg-to));
+}
+
+.text-theme-accent {
+  color: var(--theme-text-accent);
+}
+
+.text-theme-muted {
+  color: var(--theme-text-muted);
+}
+
+.bg-theme-button {
+  background: linear-gradient(to right, var(--theme-primary-from), var(--theme-primary-to));
+}
+
+.bg-theme-button:hover {
+  filter: brightness(1.1);
+}
+
+.shadow-theme-button {
+  box-shadow: 0 10px 15px -3px var(--theme-button-shadow), 0 4px 6px -4px var(--theme-button-shadow);
+}
+
+.ring-theme-focus {
+  --tw-ring-color: var(--theme-focus-ring);
+}
+
+.bg-theme-nav-active {
+  background-color: color-mix(in srgb, var(--theme-nav-active-bg) 15%, transparent);
+}
+
+.text-theme-nav-active {
+  color: var(--theme-nav-active-text);
+}
+
 .shadow-theme-primary {
   box-shadow:
     0 10px 15px -3px var(--theme-primary-from),

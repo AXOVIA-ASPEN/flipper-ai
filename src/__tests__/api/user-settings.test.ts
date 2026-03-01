@@ -113,13 +113,13 @@ describe('GET /api/user/settings', () => {
     expect(mockCreateSettings).toHaveBeenCalled();
   });
 
-  it('should return 500 when user not found', async () => {
+  it('should return 404 when user not found', async () => {
     mockFindUnique.mockResolvedValue(null);
 
     const response = await GET();
     const data = await response.json();
 
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
     expect(data.success).toBe(false);
   });
 
@@ -179,8 +179,8 @@ describe('PATCH /api/user/settings', () => {
     const response = await PATCH(req);
     const data = await response.json();
 
-    expect(response.status).toBe(400);
-    expect(data.error).toContain('between 0 and 100');
+    expect(response.status).toBe(422);
+    expect(data.error.code).toBe('VALIDATION_ERROR');
   });
 
   it('should reject negative discountThreshold', async () => {
@@ -188,7 +188,7 @@ describe('PATCH /api/user/settings', () => {
     const response = await PATCH(req);
     const data = await response.json();
 
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(422);
   });
 
   it('should update autoAnalyze', async () => {
