@@ -50,7 +50,7 @@ MARKET DATA (from eBay sold listings):
 {soldListingsText}
 
 TASK:
-Analyze this opportunity and provide a detailed assessment. The listing must be at least 50% below market value to be considered a good opportunity.
+Analyze this opportunity and provide a detailed assessment. The listing must be at least {discountThreshold}% below market value to be considered a good opportunity.
 
 RESPOND WITH ONLY VALID JSON:
 {
@@ -67,13 +67,13 @@ RESPOND WITH ONLY VALID JSON:
   "resalePlatform": "ebay|mercari|facebook|offerup",
   "confidence": "low|medium|high",
   "reasoning": "<2-3 sentence explanation of your assessment>",
-  "meetsThreshold": <true if 50%+ undervalued, false otherwise>
+  "meetsThreshold": <true if {discountThreshold}%+ undervalued, false otherwise>
 }
 
 GUIDELINES:
 - verifiedMarketValue should be based on the median sold price, adjusted for condition
 - trueDiscountPercent = ((verifiedMarketValue - askingPrice) / verifiedMarketValue) * 100
-- meetsThreshold = true ONLY if trueDiscountPercent >= 50
+- meetsThreshold = true ONLY if trueDiscountPercent >= {discountThreshold}
 - Be conservative with value estimates - use lower end for worn items
 - Factor in 13% platform fees when recommending list price
 - Consider shipping costs for large/heavy items`;
@@ -96,7 +96,8 @@ export async function analyzeSellability(
   title: string,
   askingPrice: number,
   identification: ItemIdentification,
-  marketData: MarketPrice
+  marketData: MarketPrice,
+  discountThreshold: number = 50
 ): Promise<SellabilityAnalysis | null> {
   if (!process.env.OPENAI_API_KEY) {
     console.log('OPENAI_API_KEY not set, skipping LLM analysis');
@@ -123,7 +124,8 @@ export async function analyzeSellability(
       .replace('{lowPrice}', marketData.lowPrice.toString())
       .replace('{highPrice}', marketData.highPrice.toString())
       .replace('{salesCount}', marketData.salesCount.toString())
-      .replace('{soldListingsText}', soldListingsText);
+      .replace('{soldListingsText}', soldListingsText)
+      .replace(/{discountThreshold}/g, discountThreshold.toString());
 
     const response = await client.chat.completions.create({
       model: 'gpt-4o-mini',
@@ -195,15 +197,17 @@ function validateConfidence(conf: string): 'low' | 'medium' | 'high' {
 // Quick algorithmic check before expensive LLM analysis
 export function quickDiscountCheck(
   askingPrice: number,
-  marketData: MarketPrice
+  marketData: MarketPrice,
+  discountThreshold: number = 50
 ): { passesQuickCheck: boolean; estimatedDiscount: number } {
   // Use median as market value
   const marketValue = marketData.medianPrice;
   const discount = ((marketValue - askingPrice) / marketValue) * 100;
 
-  // Pass if at least 40% discount (gives buffer for LLM to refine)
+  // Pass if at least (threshold - 10%) discount (gives buffer for LLM to refine)
+  const quickCheckThreshold = Math.max(0, discountThreshold - 10);
   return {
-    passesQuickCheck: discount >= 40,
+    passesQuickCheck: discount >= quickCheckThreshold,
     estimatedDiscount: Math.round(discount),
   };
 }
@@ -221,10 +225,11 @@ export async function runFullAnalysis(
   askingPrice: number,
   categoryHint: string | null,
   identification: ItemIdentification,
-  marketData: MarketPrice
+  marketData: MarketPrice,
+  discountThreshold: number = 50
 ): Promise<FullAnalysisResult | null> {
   // Run sellability analysis
-  const analysis = await analyzeSellability(title, askingPrice, identification, marketData);
+  const analysis = await analyzeSellability(title, askingPrice, identification, marketData, discountThreshold);
 
   if (!analysis) {
     return null;

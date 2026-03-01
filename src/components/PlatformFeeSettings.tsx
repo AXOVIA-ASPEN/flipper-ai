@@ -10,6 +10,7 @@ interface PlatformFeeSettings {
   offerupFeeRate: number;
   craigslistFeeRate: number;
   opportunityThreshold: number;
+  discountThreshold: number;
 }
 
 export default function PlatformFeeSettings() {
@@ -42,6 +43,7 @@ export default function PlatformFeeSettings() {
         offerupFeeRate: result.data.offerupFeeRate,
         craigslistFeeRate: result.data.craigslistFeeRate,
         opportunityThreshold: result.data.opportunityThreshold,
+        discountThreshold: result.data.discountThreshold,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load settings');
@@ -78,6 +80,7 @@ export default function PlatformFeeSettings() {
         offerupFeeRate: result.data.offerupFeeRate,
         craigslistFeeRate: result.data.craigslistFeeRate,
         opportunityThreshold: result.data.opportunityThreshold,
+        discountThreshold: result.data.discountThreshold,
       });
 
       setSuccessMessage('Settings saved successfully');
@@ -99,6 +102,11 @@ export default function PlatformFeeSettings() {
   function handleThresholdChange(value: number) {
     if (!settings) return;
     saveSettings({ opportunityThreshold: value });
+  }
+
+  function handleDiscountThresholdChange(value: number) {
+    if (!settings) return;
+    saveSettings({ discountThreshold: value });
   }
 
   if (loading) {
@@ -180,7 +188,7 @@ export default function PlatformFeeSettings() {
       </div>
 
       {/* Opportunity Threshold */}
-      <div>
+      <div className="mb-8">
         <div className="flex items-center gap-2 mb-3">
           <Target className="h-4 w-4 text-gray-600 dark:text-gray-400" />
           <h3 className="text-lg font-medium text-gray-900 dark:text-white">Opportunity Threshold</h3>
@@ -215,6 +223,47 @@ export default function PlatformFeeSettings() {
             />
             <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
               / 100
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Discount Threshold */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <Target className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">Undervalue Discount Threshold</h3>
+        </div>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Minimum discount percentage (0-100%) for LLM to consider a listing worth saving.
+          Items with discount below this threshold will be filtered out before analysis. Default: 50%
+        </p>
+
+        <div className="flex items-center gap-4">
+          <input
+            type="range"
+            id="discountThreshold"
+            min="0"
+            max="100"
+            step="5"
+            value={settings.discountThreshold}
+            onChange={(e) => handleDiscountThresholdChange(parseInt(e.target.value))}
+            className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+            disabled={saving}
+          />
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              value={settings.discountThreshold}
+              onChange={(e) => handleDiscountThresholdChange(parseInt(e.target.value) || 0)}
+              className="w-16 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white text-sm text-center"
+              disabled={saving}
+            />
+            <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+              %
             </span>
           </div>
         </div>

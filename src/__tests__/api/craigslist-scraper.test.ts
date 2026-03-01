@@ -81,6 +81,7 @@ jest.mock('playwright', () => ({
 const mockUpsert = jest.fn();
 const mockJobCreate = jest.fn();
 const mockJobUpdate = jest.fn();
+const mockUserSettingsFindUnique = jest.fn();
 
 jest.mock('@/lib/db', () => ({
   __esModule: true,
@@ -91,6 +92,9 @@ jest.mock('@/lib/db', () => ({
     scraperJob: {
       create: (...args: unknown[]) => mockJobCreate(...args),
       update: (...args: unknown[]) => mockJobUpdate(...args),
+    },
+    userSettings: {
+      findUnique: (...args: unknown[]) => mockUserSettingsFindUnique(...args),
     },
   },
 }));
@@ -130,6 +134,15 @@ describe('Craigslist Scraper API', () => {
     // Setup mock for scraperJob
     mockJobCreate.mockResolvedValue({ id: 'job-123' });
     mockJobUpdate.mockResolvedValue({ id: 'job-123' });
+
+    // Setup mock for userSettings with default discountThreshold
+    mockUserSettingsFindUnique.mockResolvedValue({
+      id: 'settings-123',
+      userId: 'test-user-id',
+      discountThreshold: 50,
+      ebayFeeRate: 0.13,
+      mercariFeeRate: 0.10,
+    });
 
     // Re-setup chromium.launch after clearAllMocks resets factory mocks
     const { chromium: chromiumMock } = require('playwright');
@@ -560,6 +573,15 @@ describe('Craigslist Scraper Helper Functions', () => {
     // Setup mock for scraperJob
     mockJobCreate.mockResolvedValue({ id: 'job-123' });
     mockJobUpdate.mockResolvedValue({ id: 'job-123' });
+
+    // Setup mock for userSettings with default discountThreshold
+    mockUserSettingsFindUnique.mockResolvedValue({
+      id: 'settings-123',
+      userId: 'test-user-id',
+      discountThreshold: 50,
+      ebayFeeRate: 0.13,
+      mercariFeeRate: 0.10,
+    });
 
     // Re-setup chromium.launch after clearAllMocks resets factory mocks
     const { chromium: chromiumMock2 } = require('playwright');
@@ -1064,6 +1086,15 @@ describe('Craigslist Scraper - additional branch coverage', () => {
     mockDetectCategory.mockReturnValue('electronics');
     mockEstimateValue.mockImplementation(() => createDefaultEstimation());
     mockGeneratePurchaseMessage.mockReturnValue('Hi, still available?');
+
+    // Setup mock for userSettings with default discountThreshold
+    mockUserSettingsFindUnique.mockResolvedValue({
+      id: 'settings-123',
+      userId: 'user-test',
+      discountThreshold: 50,
+      ebayFeeRate: 0.13,
+      mercariFeeRate: 0.10,
+    });
 
     // Default playwright mocks (reset each time to prevent test bleed)
     mockNewPage.mockReturnValue({

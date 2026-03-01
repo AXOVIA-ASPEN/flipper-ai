@@ -192,6 +192,13 @@ export async function POST(request: NextRequest) {
     if (!userId) {
       throw new UnauthorizedError('Unauthorized');
     }
+
+    // Fetch user settings to get discount threshold
+    const userSettings = await prisma.userSettings.findUnique({
+      where: { userId },
+    });
+    const discountThreshold = userSettings?.discountThreshold ?? MIN_DISCOUNT_THRESHOLD;
+
     const body = await request.json();
     const { location, category, keywords, minPrice, maxPrice } = body;
 
@@ -307,8 +314,8 @@ export async function POST(request: NextRequest) {
               );
 
               if (marketData && marketData.salesCount > 0) {
-                // Step 3: Quick check - is this potentially 40%+ undervalued?
-                const quickCheck = quickDiscountCheck(item.price, marketData);
+                // Step 3: Quick check - is this potentially undervalued based on user's threshold?
+                const quickCheck = quickDiscountCheck(item.price, marketData, discountThreshold);
 
                 if (quickCheck.passesQuickCheck) {
                   // Step 4: Full LLM sellability analysis
@@ -316,7 +323,8 @@ export async function POST(request: NextRequest) {
                     item.title,
                     item.price,
                     identification,
-                    marketData
+                    marketData,
+                    discountThreshold
                   );
 
                   /* istanbul ignore else -- LLM always returns analysis or throws; null result is an edge case tested via mock errors */
