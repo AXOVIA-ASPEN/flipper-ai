@@ -17,7 +17,7 @@ import { defineConfig, devices } from '@playwright/test';
 const BASE_URL = process.env.BASE_URL || (process.env.CI ? 'http://localhost:3000' : 'http://localhost:3001');
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: './test/e2e',
   fullyParallel: true,
   timeout: 30000,
   retries: process.env.CI ? 2 : 0,
