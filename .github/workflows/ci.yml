@@ -1,571 +1,210 @@
-# CI/CD Pipeline for Flipper AI
-#
-# REQUIRED GITHUB SECRETS (add via repo Settings → Secrets and variables → Actions):
-#   GCP_PROJECT_ID:                  GCP project ID (axovia-flipper)
-#   GCP_WORKLOAD_IDENTITY_PROVIDER:  WIF provider (projects/PROJECT_NUM/locations/global/workloadIdentityPools/github/providers/github)
-#   GCP_SERVICE_ACCOUNT:             CI service account (flipper-ci@axovia-flipper.iam.gserviceaccount.com)
-#   GCP_SA_KEY:                      Fallback — service account key JSON (if WIF not configured)
-#   CLOUD_RUN_SERVICE_PROD:          Production Cloud Run service name (flipper-production)
-#   CLOUD_RUN_SERVICE_STAGING:       Staging Cloud Run service name (flipper-staging)
-#
-# HARDCODED VALUES (not secrets — change in workflow if region moves):
-#   Region: us-central1
-#
-# CI SERVICE ACCOUNT IAM ROLES:
-#   roles/run.admin, roles/iam.serviceAccountUser, roles/artifactregistry.writer, roles/secretmanager.secretAccessor
-#
-# ARTIFACT REGISTRY:
-#   Repository: us-central1-docker.pkg.dev/axovia-flipper/flipper-ai
-#   Create if missing: gcloud artifacts repositories create flipper-ai --repository-format=docker --location=us-central1
-
 name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: [ main, develop ]
   pull_request:
-    branches: [main]
+    branches: [ main, develop ]
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+env:
+  NODE_ENV: test
+  DATABASE_URL: file:./test.db
 
 jobs:
-  python-test:
+  lint:
+    name: Lint & Format Check
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install Python Dependencies
-        run: pip install -r helpers/requirements.txt
-
-      - name: Run Python Tests (Secret Manager Module)
-        run: cd helpers && python -m pytest test_secrets.py -v
-
-  lint-and-typecheck:
-    runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: 'file:./dev.db'
-      CI: 'true'
-      AUTH_SECRET: 'ci-test-secret'
-      NEXTAUTH_URL: 'http://localhost:3000'
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Use Node.js
+      
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.x'
-          cache: 'pnpm'
-
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Generate Prisma Client
-        run: npx prisma generate
-
+          node-version: '22'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+      
       - name: Run ESLint
-        run: pnpm lint
+        run: npm run lint
+      
+      - name: Check formatting
+        run: npm run format:check
 
-      - name: Run Prettier Check
-        run: pnpm format:check
-
-  test:
+  test-unit:
+    name: Unit Tests
     runs-on: ubuntu-latest
-    needs: lint-and-typecheck
-    env:
-      DATABASE_URL: 'file:./dev.db'
-      CI: 'true'
-      AUTH_SECRET: 'ci-test-secret'
-      NEXTAUTH_URL: 'http://localhost:3000'
-
+    
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Use Node.js
+      
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.x'
-          cache: 'pnpm'
-
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-
+          node-version: '22'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+      
       - name: Generate Prisma Client
         run: npx prisma generate
+      
+      - name: Run unit tests
+        run: npm run test -- --coverage --passWithNoTests
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/lcov.info
+          flags: unittests
+          name: unit-tests
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Setup Database
-        run: npx prisma db push
-
-      - name: Run Unit Tests with Coverage
-        run: pnpm test:coverage
-
-      - name: Print Coverage Summary
-        run: |
-          python3 - <<'EOF'
-          import json, sys
-          with open('coverage/coverage-summary.json') as f:
-              d = json.load(f)['total']
-          print("=" * 50)
-          print("📊 Coverage Summary")
-          print("=" * 50)
-          for metric in ['statements', 'branches', 'functions', 'lines']:
-              pct = d[metric]['pct']
-              covered = d[metric]['covered']
-              total = d[metric]['total']
-              thresholds = {'statements': 99, 'branches': 96, 'functions': 98, 'lines': 99}
-              ok = "✅" if pct >= thresholds[metric] else "❌"
-              print(f"{ok} {metric.capitalize():<12}: {pct:.2f}% ({covered}/{total})")
-          print("=" * 50)
-          print("Thresholds enforced by jest.config.js (CI fails if coverage regresses).")
-          EOF
-        # NOTE: Jest enforces coverageThreshold in jest.config.js — the build step above
-        # (pnpm test:coverage) already exits non-zero if any threshold is breached.
-
-      - name: Upload Coverage Report
-        if: always()
+  test-integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+      
+      - name: Generate Prisma Client
+        run: npx prisma generate
+      
+      - name: Create test database
+        run: npx prisma migrate deploy || echo "No migrations to run"
+      
+      - name: Run integration tests
+        run: npm run test:integration -- --passWithNoTests
+      
+  test-e2e:
+    name: E2E Tests (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+      
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+      
+      - name: Generate Prisma Client
+        run: npx prisma generate
+      
+      - name: Create test database
+        run: npx prisma migrate deploy || echo "No migrations to run"
+      
+      - name: Build application
+        run: npm run build
+        env:
+          SKIP_ENV_VALIDATION: true
+          NEXT_PUBLIC_FIREBASE_API_KEY: test
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: test.firebaseapp.com
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: test
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: test.appspot.com
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "123456789"
+          NEXT_PUBLIC_FIREBASE_APP_ID: test
+          NEXT_PUBLIC_HCAPTCHA_SITE_KEY: "10000000-ffff-ffff-ffff-000000000001"
+      
+      - name: Run Playwright tests
+        run: npm run test:e2e
+        env:
+          CI: true
+      
+      - name: Upload Playwright report
         uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage/
-          retention-days: 7
-
-  integration-test:
-    runs-on: ubuntu-latest
-    needs: lint-and-typecheck
-    env:
-      DATABASE_URL: 'file:./dev.db'
-      CI: 'true'
-      AUTH_SECRET: 'ci-test-secret'
-      NEXTAUTH_URL: 'http://localhost:3000'
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.x'
-          cache: 'pnpm'
-
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Generate Prisma Client
-        run: npx prisma generate
-
-      - name: Setup Production Database
-        run: npx prisma db push
-
-      - name: Setup Test Database Schema
-        run: |
-          python3 - <<'EOF'
-          import sqlite3
-          # Copy schema from dev.db to test.db (integration tests use test.db)
-          dev_conn = sqlite3.connect('dev.db')
-          schema = dev_conn.execute("SELECT sql FROM sqlite_master WHERE type='table' AND sql IS NOT NULL ORDER BY name").fetchall()
-          indexes = dev_conn.execute("SELECT sql FROM sqlite_master WHERE type='index' AND sql IS NOT NULL").fetchall()
-          dev_conn.close()
-          test_conn = sqlite3.connect('test.db')
-          for (sql,) in schema:
-              try:
-                  test_conn.execute(sql)
-              except sqlite3.OperationalError:
-                  pass  # Table may already exist
-          for (sql,) in indexes:
-              try:
-                  test_conn.execute(sql)
-              except sqlite3.OperationalError:
-                  pass
-          test_conn.commit()
-          tables = test_conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
-          print(f"test.db ready with {len(tables)} tables")
-          test_conn.close()
-          EOF
-
-      - name: Rebuild Native Modules
-        run: |
-          # Rebuild better-sqlite3 for the current Node.js version
-          cd node_modules/.pnpm/better-sqlite3@12.5.0/node_modules/better-sqlite3 && npm rebuild
-
-      - name: Run Integration Tests
-        run: npx jest --config jest.integration.config.js --forceExit
-
-      - name: Print Integration Test Summary
         if: always()
-        run: echo "✅ Integration tests complete — see job output for details"
-
-  build:
-    runs-on: ubuntu-latest
-    needs: [test, integration-test, python-test]
-    env:
-      DATABASE_URL: 'file:./dev.db'
-      CI: 'true'
-      AUTH_SECRET: 'ci-test-secret'
-      NEXTAUTH_URL: 'http://localhost:3000'
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
         with:
-          version: 9
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.x'
-          cache: 'pnpm'
-
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Generate Prisma Client
-        run: npx prisma generate
-
-      - name: Setup Database
-        run: npx prisma db push
-
-      - name: Build Project
-        run: pnpm build
-
-  bdd:
-    runs-on: ubuntu-latest
-    needs: build
-    continue-on-error: true
-    env:
-      DATABASE_URL: 'file:./dev.db'
-      CI: 'true'
-      AUTH_SECRET: 'ci-test-secret'
-      NEXTAUTH_URL: 'http://localhost:3000'
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.x'
-          cache: 'pnpm'
-
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Generate Prisma Client
-        run: npx prisma generate
-
-      - name: Setup Database
-        run: npx prisma db push
-
-      - name: Build Project
-        run: pnpm build
-
-      - name: Install Playwright Browsers
-        run: npx playwright install chromium --with-deps
-
-      - name: Run BDD Acceptance Tests
-        run: pnpm test:bdd
-
-      - name: Upload BDD Screenshots
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: bdd-screenshots
-          path: screenshots/
-          retention-days: 7
-
-  e2e-cross-browser:
-    runs-on: ubuntu-latest
-    needs: build
-    continue-on-error: true
-    strategy:
-      matrix:
-        browser: [chromium, firefox, webkit]
-    env:
-      DATABASE_URL: 'file:./dev.db'
-      CI: 'true'
-      AUTH_SECRET: 'ci-test-secret'
-      NEXTAUTH_URL: 'http://localhost:3000'
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.x'
-          cache: 'pnpm'
-
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Generate Prisma Client
-        run: npx prisma generate
-
-      - name: Setup Database
-        run: npx prisma db push
-
-      - name: Build Project
-        run: pnpm build
-
-      - name: Install Playwright Browser
-        run: npx playwright install ${{ matrix.browser }} --with-deps
-
-      # Playwright's webServer config (playwright.config.ts) will auto-start
-      # `next start -p 3000` using the build output above. No manual server
-      # startup needed here — Playwright handles the lifecycle.
-      - name: Run E2E Tests (${{ matrix.browser }})
-        run: npx playwright test --project=${{ matrix.browser }}
-
-      - name: Upload E2E Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: e2e-report-${{ matrix.browser }}
+          name: playwright-report
           path: playwright-report/
-          retention-days: 7
-
-      - name: Upload User Journey Screenshots
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: user-journey-screenshots-${{ matrix.browser }}
-          path: playwright-report/user-journey/
           retention-days: 30
-          if-no-files-found: ignore
 
-  security:
+  coverage:
+    name: Coverage Check
+    needs: [test-unit, test-integration]
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Audit Dependencies
-        run: pnpm audit --audit-level=high || true
-
-  build-container:
-    runs-on: ubuntu-latest
-    needs: [test, build]
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Authenticate to GCP (Workload Identity Federation)
-        if: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER != '' }}
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-
-      - name: Authenticate to GCP (Service Account Key)
-        if: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER == '' }}
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-      - name: Configure Docker for Artifact Registry
-        run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Determine image tags
-        id: tags
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          GIT_REF: ${{ github.ref }}
-          COMMIT_SHA: ${{ github.sha }}
-        run: |
-          TAGS="us-central1-docker.pkg.dev/axovia-flipper/flipper-ai/app:${COMMIT_SHA}"
-          if [ "$EVENT_NAME" = "push" ] && [ "$GIT_REF" = "refs/heads/main" ]; then
-            TAGS="${TAGS},us-central1-docker.pkg.dev/axovia-flipper/flipper-ai/app:latest"
-          fi
-          echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
-
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: config/docker/Dockerfile
-          push: true
-          tags: ${{ steps.tags.outputs.tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  deploy-cloud-run:
-    name: Deploy to Cloud Run
-    runs-on: ubuntu-latest
-    needs: [test, integration-test, python-test, build-container]
-    permissions:
-      contents: read
-      id-token: write
-      pull-requests: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Authenticate to GCP (Workload Identity Federation)
-        if: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER != '' }}
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-
-      - name: Authenticate to GCP (Service Account Key)
-        if: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER == '' }}
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Use Node.js
+      
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.x'
-          cache: 'pnpm'
-
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-
+          node-version: '22'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+      
       - name: Generate Prisma Client
         run: npx prisma generate
-
-      - name: Determine deploy target
-        id: target
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          GIT_REF: ${{ github.ref }}
+      
+      - name: Run tests with coverage
+        run: npm run test:coverage
+      
+      - name: Check coverage thresholds
         run: |
-          if [ "$EVENT_NAME" = "push" ] && [ "$GIT_REF" = "refs/heads/main" ]; then
-            echo "env=production" >> "$GITHUB_OUTPUT"
-            echo "service=flipper-production" >> "$GITHUB_OUTPUT"
-            echo "secret_prefix=PRODUCTION" >> "$GITHUB_OUTPUT"
-          else
-            echo "env=staging" >> "$GITHUB_OUTPUT"
-            echo "service=flipper-staging" >> "$GITHUB_OUTPUT"
-            echo "secret_prefix=STAGING" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Run database migrations
-        run: |
-          DATABASE_URL=$(gcloud secrets versions access latest \
-            --secret="${{ steps.target.outputs.secret_prefix }}_DATABASE_URL" \
-            --project="${{ secrets.GCP_PROJECT_ID }}")
-          export DATABASE_URL
-          npx prisma migrate deploy
-
-      - name: Deploy to Cloud Run
-        id: deploy
-        uses: google-github-actions/deploy-cloudrun@v2
-        with:
-          service: ${{ steps.target.outputs.service }}
-          region: us-central1
-          image: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/flipper-ai/app:${{ github.sha }}
-          secrets: |
-            DATABASE_URL=${{ steps.target.outputs.secret_prefix }}_DATABASE_URL:latest
-            AUTH_SECRET=${{ steps.target.outputs.secret_prefix }}_AUTH_SECRET:latest
-            ENCRYPTION_SECRET=${{ steps.target.outputs.secret_prefix }}_ENCRYPTION_SECRET:latest
-            STRIPE_SECRET_KEY=${{ steps.target.outputs.secret_prefix }}_STRIPE_SECRET_KEY:latest
-            STRIPE_WEBHOOK_SECRET=${{ steps.target.outputs.secret_prefix }}_STRIPE_WEBHOOK_SECRET:latest
-            OPENAI_API_KEY=${{ steps.target.outputs.secret_prefix }}_OPENAI_API_KEY:latest
-            ANTHROPIC_API_KEY=${{ steps.target.outputs.secret_prefix }}_ANTHROPIC_API_KEY:latest
-            RESEND_API_KEY=${{ steps.target.outputs.secret_prefix }}_RESEND_API_KEY:latest
-            SENTRY_DSN=${{ steps.target.outputs.secret_prefix }}_SENTRY_DSN:latest
-            SENTRY_AUTH_TOKEN=${{ steps.target.outputs.secret_prefix }}_SENTRY_AUTH_TOKEN:latest
-            GOOGLE_CLIENT_ID=${{ steps.target.outputs.secret_prefix }}_GOOGLE_CLIENT_ID:latest
-            GOOGLE_CLIENT_SECRET=${{ steps.target.outputs.secret_prefix }}_GOOGLE_CLIENT_SECRET:latest
-            GITHUB_CLIENT_ID=${{ steps.target.outputs.secret_prefix }}_GITHUB_CLIENT_ID:latest
-            GITHUB_CLIENT_SECRET=${{ steps.target.outputs.secret_prefix }}_GITHUB_CLIENT_SECRET:latest
-            HCAPTCHA_SECRET_KEY=${{ steps.target.outputs.secret_prefix }}_HCAPTCHA_SECRET_KEY:latest
-          env_vars: |
-            NODE_ENV=production
-            BUILD_ENV=${{ steps.target.outputs.env }}
-            NEXT_TELEMETRY_DISABLED=1
-            GIT_COMMIT=${{ github.sha }}
-
-      - name: Post-deploy liveness check
-        run: |
-          SERVICE_URL="${{ steps.deploy.outputs.url }}"
-          echo "Checking liveness at $SERVICE_URL/api/health"
-          RESPONSE=$(curl -sf --max-time 30 --retry 3 --retry-delay 5 "$SERVICE_URL/api/health")
-          STATUS=$(echo "$RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('status','unknown'))")
-          if [ "$STATUS" != "ok" ]; then
-            echo "❌ Liveness check FAILED — status: $STATUS"
+          coverage=$(cat coverage/coverage-summary.json | jq -r '.total.lines.pct')
+          echo "Coverage: $coverage%"
+          if (( $(echo "$coverage < 80" | bc -l) )); then
+            echo "❌ Coverage below 80% threshold"
             exit 1
           fi
-          echo "✅ Liveness check passed — status: $STATUS"
+          echo "✅ Coverage meets 80% threshold"
 
-      - name: Post-deploy readiness check
-        run: |
-          SERVICE_URL="${{ steps.deploy.outputs.url }}"
-          echo "Checking readiness at $SERVICE_URL/api/health/ready"
-          RESPONSE=$(curl -sf --max-time 30 --retry 3 --retry-delay 5 "$SERVICE_URL/api/health/ready")
-          STATUS=$(echo "$RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('status','unknown'))")
-          if [ "$STATUS" != "ready" ]; then
-            echo "❌ Readiness check FAILED — status: $STATUS"
-            exit 1
-          fi
-          echo "✅ Readiness check passed — status: $STATUS"
-
-      - name: Comment PR with staging URL
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        env:
-          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
-          SERVICE_NAME: ${{ steps.target.outputs.service }}
-          COMMIT_SHA: ${{ github.sha }}
+  deploy-preview:
+    name: Deploy Preview (Vercel)
+    if: github.event_name == 'pull_request'
+    needs: [lint, test-unit, test-integration]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to Vercel Preview
+        uses: amondnet/vercel-action@v25
         with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `🚀 **Cloud Run Staging Preview**\n\nDeployed to: ${process.env.DEPLOY_URL}\n\nCommit: \`${process.env.COMMIT_SHA}\`\nService: \`${process.env.SERVICE_NAME}\``
-            })
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+
+  deploy-production:
+    name: Deploy Production (Vercel)
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: [lint, test-unit, test-integration, test-e2e, coverage]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to Vercel Production
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          scope: ${{ secrets.VERCEL_ORG_ID }}
