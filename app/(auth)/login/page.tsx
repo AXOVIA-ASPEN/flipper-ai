@@ -305,6 +305,7 @@ function LoginPageInner() {
                 </div>
                 <input
                   type="email"
+                  name="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -322,6 +323,7 @@ function LoginPageInner() {
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
+                  name="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required

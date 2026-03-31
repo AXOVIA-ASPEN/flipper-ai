@@ -82,10 +82,10 @@ describe('lib/stripe', () => {
     const { TIER_PRICING } = require('@/lib/stripe');
 
     expect(TIER_PRICING.FREE.monthly).toBe(0);
-    expect(TIER_PRICING.FLIPPER.monthly).toBe(1500);
-    expect(TIER_PRICING.PRO.monthly).toBe(4000);
+    expect(TIER_PRICING.FLIPPER.monthly).toBe(1900);
+    expect(TIER_PRICING.PRO.monthly).toBe(4900);
     expect(TIER_PRICING.FREE.label).toBe('Free');
-    expect(TIER_PRICING.FLIPPER.label).toBe('$15/mo');
-    expect(TIER_PRICING.PRO.label).toBe('$40/mo');
+    expect(TIER_PRICING.FLIPPER.label).toBe('$19/mo');
+    expect(TIER_PRICING.PRO.label).toBe('$49/mo');
   });
 });

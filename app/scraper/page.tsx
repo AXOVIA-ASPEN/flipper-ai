@@ -24,6 +24,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
+import UpgradePrompt from '@/components/UpgradePrompt';
+import type { SubscriptionTier } from '@/lib/subscription-tiers';
 
 interface ScrapedListing {
   title: string;
@@ -70,6 +72,25 @@ interface SearchConfig {
   lastRun: string | null;
 }
 
+function inferCurrentTier(errorDetail: string, details?: Record<string, unknown>): SubscriptionTier {
+  // Prefer structured tier from error details (set by enforceTierLimits)
+  if (details?.tier && typeof details.tier === 'string') {
+    const tier = details.tier as SubscriptionTier;
+    if (['FREE', 'FLIPPER', 'PRO'].includes(tier)) return tier;
+  }
+  // Fallback: infer from error message text
+  if (errorDetail.includes('FREE plan') || errorDetail.includes('Upgrade to FLIPPER')) return 'FREE';
+  if (errorDetail.includes('FLIPPER plan') || errorDetail.includes('Upgrade to PRO')) return 'FLIPPER';
+  return 'FREE';
+}
+
+function inferFeatureName(errorDetail: string): string {
+  if (errorDetail.includes('scan limit') || errorDetail.includes('scans')) return 'Scanning';
+  if (errorDetail.includes('marketplace')) return 'Marketplaces';
+  if (errorDetail.includes('Search config') || errorDetail.includes('search config')) return 'Saved Searches';
+  return 'Feature';
+}
+
 export default function ScraperPage() {
   const [platform, setPlatform] = useState('craigslist');
   const [location, setLocation] = useState('sarasota');
@@ -79,6 +100,11 @@ export default function ScraperPage() {
   const [maxPrice, setMaxPrice] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ScrapeResult | null>(null);
+  const [tierLimitError, setTierLimitError] = useState<{
+    message: string;
+    currentTier: SubscriptionTier;
+    feature: string;
+  } | null>(null);
 
   // Job history state
   const [jobs, setJobs] = useState<ScraperJob[]>([]);
@@ -133,6 +159,7 @@ export default function ScraperPage() {
   async function handleSaveConfig() {
     if (!saveConfigName.trim()) return;
     setSavingConfig(true);
+    setTierLimitError(null);
     try {
       const response = await fetch('/api/search-configs', {
         method: 'POST',
@@ -155,7 +182,19 @@ export default function ScraperPage() {
         fetchSavedConfigs();
       } else {
         const data = await response.json();
-        showMessage('error', data.error || 'Failed to save');
+        // Handle tier limit 403 responses
+        if (response.status === 403 && data.error?.code === 'FORBIDDEN') {
+          const detail = data.error.detail || data.error.message || 'Feature limit reached.';
+          setTierLimitError({
+            message: detail,
+            currentTier: inferCurrentTier(detail, data.error.details),
+            feature: inferFeatureName(detail),
+          });
+          setShowSaveDialog(false);
+          setSaveConfigName('');
+        } else {
+          showMessage('error', data.error?.detail || data.error?.message || 'Failed to save');
+        }
       }
     } catch (error) {
       console.error('Failed to save config:', error);
@@ -267,6 +306,7 @@ export default function ScraperPage() {
     e.preventDefault();
     setLoading(true);
     setResult(null);
+    setTierLimitError(null);
 
     // Determine API endpoint based on platform
     const apiEndpoint = platform === 'offerup' ? '/api/scraper/offerup' : '/api/scraper/craigslist';
@@ -285,6 +325,19 @@ export default function ScraperPage() {
       });
 
       const data = await response.json();
+
+      // Handle tier limit 403 responses
+      if (response.status === 403 && data.error?.code === 'FORBIDDEN') {
+        const detail = data.error.detail || data.error.message || 'Feature limit reached.';
+        setTierLimitError({
+          message: detail,
+          currentTier: inferCurrentTier(detail, data.error.details),
+          feature: inferFeatureName(detail),
+        });
+        fetchJobs();
+        return;
+      }
+
       setResult(data);
       // Refresh job history after scrape
       fetchJobs();
@@ -657,6 +710,17 @@ export default function ScraperPage() {
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Tier Limit Upgrade Prompt */}
+        {tierLimitError && (
+          <div className="mt-6" data-testid="tier-limit-upgrade">
+            <UpgradePrompt
+              currentTier={tierLimitError.currentTier}
+              feature={tierLimitError.feature}
+              message={tierLimitError.message}
+            />
           </div>
         )}
 

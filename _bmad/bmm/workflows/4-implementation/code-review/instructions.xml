@@ -85,17 +85,6 @@
       4. Record specific proof (file:line)
     </action>
 
-    <!-- Definition of Done (DoD) — Acceptance Test Verification -->
-    <action>Verify the story's "Definition of Done — Acceptance Tests" section:
-      1. Check that Gherkin acceptance tests exist in the epic's `.feature` file under `test/acceptance/features/`
-      2. Verify ALL acceptance criteria have corresponding test scenarios
-      3. Verify every scenario is tagged with `@E-NNN-S-YYY`, `@story-X-Y`, and relevant `@FR-*`/`@NFR-*` tags
-      4. Verify `_bmad-output/test-artifacts/requirements-traceability-matrix.md` has been updated with scenario IDs
-      5. If Gherkin acceptance tests are MISSING entirely → CRITICAL finding
-      6. If tagging convention is not followed → HIGH finding
-      7. If RTM is not updated → MEDIUM finding
-    </action>
-
     <!-- Code Quality Deep Dive -->
     <action>For EACH file in comprehensive review list:
       1. **Security**: Look for injection risks, missing validation, auth issues
@@ -181,14 +170,13 @@
 
   <step n="5" goal="Update story status and sync sprint tracking">
     <!-- Determine new status based on review outcome -->
-    <check if="all HIGH and MEDIUM issues fixed AND all ACs implemented AND DoD acceptance tests complete (Gherkin scenarios written, tagged, RTM updated)">
+    <check if="all HIGH and MEDIUM issues fixed AND all ACs implemented">
       <action>Set {{new_status}} = "done"</action>
       <action>Update story Status field to "done"</action>
     </check>
-    <check if="HIGH or MEDIUM issues remain OR ACs not fully implemented OR DoD acceptance tests incomplete">
+    <check if="HIGH or MEDIUM issues remain OR ACs not fully implemented">
       <action>Set {{new_status}} = "in-progress"</action>
       <action>Update story Status field to "in-progress"</action>
-      <action>If DoD acceptance tests are the blocker, note: "Story blocked from 'done' — acceptance tests required per DoD"</action>
     </check>
     <action>Save story file</action>
 

@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
+import { handleError, ValidationError, ForbiddenError, UnauthorizedError } from '@/lib/errors';
 import {
   ScraperJobQuerySchema,
   CreateScraperJobSchema,
   validateQuery,
   validateBody,
 } from '@/lib/validations';
+import { enforceTierLimits } from '@/lib/tier-enforcement';
 
 // GET /api/scraper-jobs - List all scraper jobs
 export async function GET(request: NextRequest) {
@@ -54,6 +55,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
+    if (!userId) {
+      throw new UnauthorizedError('Unauthorized');
+    }
+
     const body = await request.json();
     const parsed = validateBody(CreateScraperJobSchema, body);
     if (!parsed.success) {
@@ -63,6 +68,9 @@ export async function POST(request: NextRequest) {
       );
     }
     const { platform, location, category } = parsed.data;
+
+    // Enforce subscription tier limits (scan count + marketplace)
+    await enforceTierLimits(userId, platform);
 
     const job = await prisma.scraperJob.create({
       data: {

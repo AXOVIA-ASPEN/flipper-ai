@@ -2,8 +2,13 @@
 // Given item identification and market data, assess flip potential using OpenAI ChatGPT
 
 import OpenAI from 'openai';
+import prisma from '@/lib/db';
+import { analysisCache } from '@/lib/cache';
 import type { ItemIdentification } from './llm-identifier';
 import type { MarketPrice, SoldListing } from './market-price';
+
+const CACHE_DURATION_HOURS = 24;
+const L1_KEY = (listingId: string) => `openai:${listingId}`;
 
 export interface SellabilityAnalysis {
   // Verified values
@@ -31,10 +36,12 @@ export interface SellabilityAnalysis {
   reasoning: string;
 
   // Filter result
-  meetsThreshold: boolean; // True if 50%+ undervalued
+  meetsThreshold: boolean; // True if listing meets the configured discount threshold
 }
 
-const ANALYSIS_PROMPT = `You are an expert reseller analyzing a marketplace listing for flip potential.
+function buildAnalysisPrompt(discountThreshold: number, feeRate: number = 0.13): string {
+  const feePercent = Math.round(feeRate * 100);
+  return `You are an expert reseller analyzing a marketplace listing for flip potential.
 
 LISTING DETAILS:
 - Title: {title}
@@ -50,7 +57,7 @@ MARKET DATA (from eBay sold listings):
 {soldListingsText}
 
 TASK:
-Analyze this opportunity and provide a detailed assessment. The listing must be at least 50% below market value to be considered a good opportunity.
+Analyze this opportunity and provide a detailed assessment. The listing must be at least ${discountThreshold}% below market value to be considered a good opportunity.
 
 RESPOND WITH ONLY VALID JSON:
 {
@@ -67,16 +74,80 @@ RESPOND WITH ONLY VALID JSON:
   "resalePlatform": "ebay|mercari|facebook|offerup",
   "confidence": "low|medium|high",
   "reasoning": "<2-3 sentence explanation of your assessment>",
-  "meetsThreshold": <true if 50%+ undervalued, false otherwise>
+  "meetsThreshold": <true if ${discountThreshold}%+ undervalued, false otherwise>
 }
 
 GUIDELINES:
 - verifiedMarketValue should be based on the median sold price, adjusted for condition
 - trueDiscountPercent = ((verifiedMarketValue - askingPrice) / verifiedMarketValue) * 100
-- meetsThreshold = true ONLY if trueDiscountPercent >= 50
+- meetsThreshold = true ONLY if trueDiscountPercent >= ${discountThreshold}
 - Be conservative with value estimates - use lower end for worn items
-- Factor in 13% platform fees when recommending list price
+- Factor in ${feePercent}% platform fees when recommending list price
 - Consider shipping costs for large/heavy items`;
+}
+
+/**
+ * Check for a cached sellability analysis (L1 in-memory then L2 DB)
+ */
+export async function getCachedSellabilityAnalysis(
+  listingId: string
+): Promise<SellabilityAnalysis | null> {
+  // L1: in-memory LRU cache
+  const l1 = analysisCache.get(L1_KEY(listingId)) as SellabilityAnalysis | undefined;
+  if (l1) return l1;
+
+  // L2: database cache
+  try {
+    const cached = await prisma.aiAnalysisCache.findFirst({
+      where: {
+        listingId,
+        analysisType: 'openai',
+        expiresAt: { gt: new Date() },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (cached) {
+      const result = JSON.parse(cached.analysisResult) as SellabilityAnalysis;
+      analysisCache.set(L1_KEY(listingId), result);
+      return result;
+    }
+  } catch (error) {
+    console.error('Error fetching cached sellability analysis:', error);
+  }
+
+  return null;
+}
+
+/**
+ * Store a sellability analysis result in cache (L2 DB then L1 in-memory)
+ */
+export async function cacheSellabilityAnalysis(
+  listingId: string,
+  result: SellabilityAnalysis
+): Promise<void> {
+  const expiresAt = new Date();
+  expiresAt.setHours(expiresAt.getHours() + CACHE_DURATION_HOURS);
+
+  try {
+    await prisma.aiAnalysisCache.upsert({
+      where: { listingId_analysisType: { listingId, analysisType: 'openai' } },
+      create: {
+        listingId,
+        analysisType: 'openai',
+        analysisResult: JSON.stringify(result),
+        expiresAt,
+      },
+      update: {
+        analysisResult: JSON.stringify(result),
+        expiresAt,
+      },
+    });
+    analysisCache.set(L1_KEY(listingId), result);
+  } catch (error) {
+    console.error('Error caching sellability analysis:', error);
+  }
+}
 
 let openai: OpenAI | null = null;
 
@@ -96,12 +167,23 @@ export async function analyzeSellability(
   title: string,
   askingPrice: number,
   identification: ItemIdentification,
-  marketData: MarketPrice
+  marketData: MarketPrice,
+  discountThreshold?: number,
+  feeRate?: number,
+  listingId?: string
 ): Promise<SellabilityAnalysis | null> {
   if (!process.env.OPENAI_API_KEY) {
     console.log('OPENAI_API_KEY not set, skipping LLM analysis');
     return null;
   }
+
+  // Check cache when listingId is provided
+  if (listingId) {
+    const cached = await getCachedSellabilityAnalysis(listingId);
+    if (cached) return cached;
+  }
+
+  const effectiveThreshold = discountThreshold ?? 50;
 
   try {
     const client = getOpenAI();
@@ -112,7 +194,7 @@ export async function analyzeSellability(
       .map((l) => `  - "${l.title}" sold for $${l.price} (${l.condition})`)
       .join('\n');
 
-    const prompt = ANALYSIS_PROMPT.replace('{title}', title)
+    const prompt = buildAnalysisPrompt(effectiveThreshold, feeRate ?? 0.13).replace('{title}', title)
       .replace('{askingPrice}', askingPrice.toString())
       .replace('{brand}', identification.brand || 'Unknown')
       .replace('{model}', identification.model || 'Unknown')
@@ -154,7 +236,7 @@ export async function analyzeSellability(
 
     const parsed = JSON.parse(jsonMatch[0]);
 
-    return {
+    const result: SellabilityAnalysis = {
       verifiedMarketValue: parsed.verifiedMarketValue || marketData.medianPrice,
       trueDiscountPercent: parsed.trueDiscountPercent || 0,
       sellabilityScore: Math.min(100, Math.max(0, parsed.sellabilityScore || 50)),
@@ -171,6 +253,13 @@ export async function analyzeSellability(
       reasoning: parsed.reasoning || '',
       meetsThreshold: parsed.meetsThreshold === true,
     };
+
+    // Cache the result when listingId is provided
+    if (listingId) {
+      await cacheSellabilityAnalysis(listingId, result);
+    }
+
+    return result;
   } catch (error) {
     console.error('LLM analysis error:', error);
     return null;
@@ -221,10 +310,11 @@ export async function runFullAnalysis(
   askingPrice: number,
   categoryHint: string | null,
   identification: ItemIdentification,
-  marketData: MarketPrice
+  marketData: MarketPrice,
+  discountThreshold?: number
 ): Promise<FullAnalysisResult | null> {
   // Run sellability analysis
-  const analysis = await analyzeSellability(title, askingPrice, identification, marketData);
+  const analysis = await analyzeSellability(title, askingPrice, identification, marketData, discountThreshold);
 
   if (!analysis) {
     return null;

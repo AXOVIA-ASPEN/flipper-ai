@@ -13,7 +13,7 @@ module.exports = {
     features: [`${FEATURES_DIR}/**/*.feature`],
     require: [
       `${FEATURES_DIR}/step_definitions/**/*.ts`,
-      `${FEATURES_DIR}/support/**/*.ts`,
+      `${ACCEPTANCE_DIR}/support/**/*.ts`,
     ],
     requireModule: ['tsx/cjs'],
     format: [
@@ -37,7 +37,7 @@ module.exports = {
     features: [`${FEATURES_DIR}/**/*.feature`],
     require: [
       `${FEATURES_DIR}/step_definitions/**/*.ts`,
-      `${FEATURES_DIR}/support/**/*.ts`,
+      `${ACCEPTANCE_DIR}/support/**/*.ts`,
     ],
     requireModule: ['tsx/cjs'],
     format: [
@@ -58,7 +58,7 @@ module.exports = {
     features: [`${FEATURES_DIR}/**/*.feature`],
     require: [
       `${FEATURES_DIR}/step_definitions/**/*.ts`,
-      `${FEATURES_DIR}/support/**/*.ts`,
+      `${ACCEPTANCE_DIR}/support/**/*.ts`,
     ],
     requireModule: ['tsx/cjs'],
     format: ['json:reports/cucumber-report.json', 'junit:reports/cucumber-report.xml'],
@@ -71,7 +71,7 @@ module.exports = {
     features: [`${FEATURES_DIR}/**/*.feature`],
     require: [
       `${FEATURES_DIR}/step_definitions/**/*.ts`,
-      `${FEATURES_DIR}/support/**/*.ts`,
+      `${ACCEPTANCE_DIR}/support/**/*.ts`,
     ],
     requireModule: ['tsx/cjs'],
     format: ['pretty', 'html:reports/cucumber-report.html'],

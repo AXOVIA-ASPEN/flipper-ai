@@ -54,11 +54,14 @@ const PRISMA_USER = {
   firebaseUid: 'firebase-uid-abc',
 };
 
-function createRequest(body: object) {
+function createRequest(body: object, origin?: string) {
   return new NextRequest('http://localhost/api/auth/session', {
     method: 'POST',
     body: JSON.stringify(body),
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(origin ? { Origin: origin } : {}),
+    },
   });
 }
 
@@ -229,5 +232,31 @@ describe('POST /api/auth/session', () => {
 
     expect(res.status).toBe(500);
     expect(data.success).toBe(false);
+  });
+
+  it('returns 403 when Origin header is from a disallowed host', async () => {
+    const res = await POST(
+      createRequest({ idToken: 'valid-token' }, 'https://evil.example.com')
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(403);
+    expect(data.error.code).toBe('FORBIDDEN');
+  });
+
+  it('returns 403 when Origin header is malformed (invalid URL)', async () => {
+    const res = await POST(createRequest({ idToken: 'valid-token' }, 'not-a-valid-url'));
+    const data = await res.json();
+
+    expect(res.status).toBe(403);
+    expect(data.error.code).toBe('FORBIDDEN');
+  });
+
+  it('allows requests from localhost origin', async () => {
+    const res = await POST(
+      createRequest({ idToken: 'valid-token' }, 'http://localhost:3000')
+    );
+
+    expect(res.status).toBe(200);
   });
 });

@@ -8,6 +8,98 @@
  */
 
 import prisma from '@/lib/db';
+import { fetchMarketPrice } from './market-price';
+
+export interface VerifiedPriceLookupResult {
+  verifiedMarketValue: number;
+  trueDiscountPercent: number;
+  marketDataSource: string;        // 'ebay_sold' or 'ebay_scrape'
+  marketDataDate: Date;
+  confidence: 'low' | 'medium' | 'high';
+  dataPoints: number;
+  soldPriceRange: { min: number; max: number; median: number; average: number };
+  comparableSalesJson: string | null;  // JSON array of top 5 SoldListing
+}
+
+/**
+ * Two-step verified price lookup: DB price history first, Playwright eBay fallback.
+ *
+ * @param searchQuery - Product title or keywords to search
+ * @param askingPrice - The listing's asking price for discount calculation
+ * @param category - Optional category for more targeted eBay search
+ * @returns Verified price result or null if data is unavailable
+ */
+export async function lookupVerifiedMarketPrice(
+  searchQuery: string,
+  askingPrice: number,
+  category?: string
+): Promise<VerifiedPriceLookupResult | null> {
+  if (!searchQuery) return null;
+  if (askingPrice <= 0) return null;
+
+  // Step 1: Try DB price history first (calculateVerifiedMarketValue)
+  const dbResult = await calculateVerifiedMarketValue(searchQuery);
+  if (dbResult) {
+    const trueDiscountPct = calculateTrueDiscount(dbResult.verifiedMarketValue, askingPrice);
+    return {
+      verifiedMarketValue: dbResult.verifiedMarketValue,
+      trueDiscountPercent: trueDiscountPct,
+      marketDataSource: dbResult.marketDataSource,
+      marketDataDate: new Date(),
+      confidence: dbResult.confidence,
+      dataPoints: dbResult.dataPoints,
+      soldPriceRange: dbResult.soldPriceRange,
+      comparableSalesJson: null,  // PriceHistory doesn't store individual listing details
+    };
+  }
+
+  // Step 2: Playwright fallback (fetchMarketPrice from eBay sold listings)
+  try {
+    const marketPrice = await fetchMarketPrice(searchQuery, category);
+    if (!marketPrice || marketPrice.soldListings.length < 3) return null;
+
+    const soldListings = marketPrice.soldListings;
+    const prices = soldListings.map((s) => s.price).sort((a, b) => a - b);
+    const median = prices[Math.floor(prices.length / 2)];
+    const average = Math.round(prices.reduce((sum, p) => sum + p, 0) / prices.length);
+    const min = prices[0];
+    const max = prices[prices.length - 1];
+    const priceRange = max - min;
+    const variance = average > 0 ? priceRange / average : 1;
+
+    let confidence: 'low' | 'medium' | 'high' = 'medium';
+    if (soldListings.length >= 10 && variance < 0.3) {
+      confidence = 'high';
+    } else if (soldListings.length < 5 || variance > 0.5) {
+      confidence = 'low';
+    }
+
+    const verifiedMarketValue = median;
+    const trueDiscountPct = calculateTrueDiscount(verifiedMarketValue, askingPrice);
+
+    return {
+      verifiedMarketValue,
+      trueDiscountPercent: trueDiscountPct,
+      marketDataSource: 'ebay_scrape',
+      marketDataDate: new Date(),
+      confidence,
+      dataPoints: soldListings.length,
+      soldPriceRange: { min, max, median, average },
+      comparableSalesJson: soldListings.length > 0
+        ? JSON.stringify(soldListings.slice(0, 5).map((s) => ({
+            title: s.title,
+            price: s.price,
+            condition: s.condition,
+            url: s.url,
+            shippingCost: s.shippingCost,
+          })))
+        : null,
+    };
+  } catch (error) {
+    console.error(`Playwright market price lookup failed for "${searchQuery}":`, error);
+    return null;
+  }
+}
 
 export interface MarketValueResult {
   verifiedMarketValue: number;

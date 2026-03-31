@@ -15,25 +15,42 @@ jest.mock('next/navigation', () => ({
 
 // Mock useFilterParams
 const mockSetFilter = jest.fn();
+const mockSetFilters = jest.fn();
 const mockClearFilters = jest.fn();
 jest.mock('@/hooks/useFilterParams', () => ({
   useFilterParams: () => ({
     filters: {
-      search: '',
-      platform: '',
-      status: '',
-      minPrice: '',
-      maxPrice: '',
-      sort: 'newest',
+      platform: 'all',
+      status: 'all',
       location: '',
       category: '',
+      minPrice: '',
+      maxPrice: '',
       dateFrom: '',
       dateTo: '',
+      minScore: '',
+      maxScore: '',
+      minProfit: '',
+      maxProfit: '',
+      page: '1',
+      limit: '20',
+      platforms: '',
+      categories: '',
+      statuses: '',
     },
     setFilter: mockSetFilter,
+    setFilters: mockSetFilters,
     clearFilters: mockClearFilters,
     activeFilterCount: 0,
   }),
+  toggleMultiSelectValue: (current: string, value: string) => {
+    const values = current ? current.split(',').filter(Boolean) : [];
+    const idx = values.indexOf(value);
+    if (idx === -1) return [...values, value].join(',');
+    return values.filter((v: string) => v !== value).join(',');
+  },
+  isMultiSelectActive: (current: string, value: string) =>
+    current ? current.split(',').filter(Boolean).includes(value) : false,
 }));
 
 // Mock lucide-react icons
@@ -47,6 +64,16 @@ jest.mock('lucide-react', () => {
   };
   return new Proxy({}, handler);
 });
+
+// Mock useSseEvents (EventSource not available in jsdom)
+jest.mock('@/hooks/useSseEvents', () => ({
+  useSseEvents: jest.fn().mockReturnValue({
+    events: [],
+    isConnected: true,
+    lastError: null,
+    clearEvents: jest.fn(),
+  }),
+}));
 
 // Mock global fetch
 const mockFetch = jest.fn();
@@ -103,12 +130,21 @@ function setupFetchMock() {
       ok: true,
       json: async () => ({
         listings: mockListings,
-        total: 42,
+        stats: {
+          totalListings: 42,
+          opportunitiesFound: 5,
+          activeFlips: 3,
+          totalProfit: 1250,
+        },
         pagination: { page: 1, limit: 20, total: 42, totalPages: 3 },
       }),
     });
   });
 }
+
+import { useSseEvents } from '@/hooks/useSseEvents';
+
+const mockUseSseEvents = useSseEvents as jest.Mock;
 
 import Dashboard from '@/app/dashboard/page';
 
@@ -166,7 +202,7 @@ describe('Dashboard', () => {
       ok: true,
       json: async () => ({
         listings: [],
-        total: 0,
+        stats: { totalListings: 0, opportunitiesFound: 0, activeFlips: 0, totalProfit: 0 },
         pagination: { page: 1, limit: 20, total: 0, totalPages: 0 },
       }),
     });
@@ -201,8 +237,68 @@ describe('Dashboard', () => {
   it('shows opportunities stat label', async () => {
     render(<Dashboard />);
     await waitFor(() => {
-      expect(screen.getAllByText('Opportunities').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Opportunities Found').length).toBeGreaterThan(0);
     });
+  });
+
+  // SSE connection status indicator tests (Story 6.6)
+  it('shows "Live" indicator when SSE is connected', async () => {
+    mockUseSseEvents.mockReturnValue({
+      events: [],
+      isConnected: true,
+      lastError: null,
+      clearEvents: jest.fn(),
+    });
+    render(<Dashboard />);
+    await waitFor(() => {
+      expect(screen.getByText('Live')).toBeInTheDocument();
+    });
+  });
+
+  it('shows "Reconnecting…" indicator when SSE is disconnected', async () => {
+    mockUseSseEvents.mockReturnValue({
+      events: [],
+      isConnected: false,
+      lastError: null,
+      clearEvents: jest.fn(),
+    });
+    render(<Dashboard />);
+    await waitFor(() => {
+      expect(screen.getByText('Reconnecting…')).toBeInTheDocument();
+    });
+  });
+
+  it('shows dismissible error banner when SSE has lastError', async () => {
+    mockUseSseEvents.mockReturnValue({
+      events: [],
+      isConnected: false,
+      lastError: 'Connection timed out',
+      clearEvents: jest.fn(),
+    });
+    render(<Dashboard />);
+    await waitFor(() => {
+      const banner = screen.getByTestId('sse-error-banner');
+      expect(banner).toBeInTheDocument();
+      expect(banner).toHaveTextContent('Connection timed out');
+    });
+  });
+
+  it('dismisses SSE error banner when dismiss button is clicked', async () => {
+    mockUseSseEvents.mockReturnValue({
+      events: [],
+      isConnected: false,
+      lastError: 'Connection refused',
+      clearEvents: jest.fn(),
+    });
+    render(<Dashboard />);
+    await waitFor(() => {
+      expect(screen.getByTestId('sse-error-banner')).toBeInTheDocument();
+    });
+
+    const dismissBtn = screen.getByLabelText('Dismiss');
+    fireEvent.click(dismissBtn);
+
+    expect(screen.queryByTestId('sse-error-banner')).not.toBeInTheDocument();
   });
 
   it('handles create opportunity from listing', async () => {
@@ -214,7 +310,7 @@ describe('Dashboard', () => {
         ok: true,
         json: async () => ({
           listings: mockListings,
-          total: 2,
+          stats: { totalListings: 2, opportunitiesFound: 1, activeFlips: 1, totalProfit: 0 },
           pagination: { page: 1, limit: 20, total: 2, totalPages: 1 },
         }),
       });

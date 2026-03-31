@@ -1,5 +1,15 @@
 // Tests for marketplace-scanner.ts
 
+// Mock prisma db (required because marketplace-scanner.ts imports it for deduplicateListings)
+jest.mock('@/lib/db', () => ({
+  __esModule: true,
+  default: {
+    listing: {
+      findMany: jest.fn().mockResolvedValue([]),
+    },
+  },
+}));
+
 // Mock SSE emitter
 jest.mock('../lib/sse-emitter', () => ({
   sseEmitter: {

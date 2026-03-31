@@ -262,6 +262,7 @@ export default function RegisterPage() {
                 </div>
                 <input
                   type="text"
+                  name="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="John Doe"
@@ -280,6 +281,7 @@ export default function RegisterPage() {
                 </div>
                 <input
                   type="email"
+                  name="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -297,6 +299,7 @@ export default function RegisterPage() {
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
+                  name="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required

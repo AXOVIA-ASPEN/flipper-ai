@@ -2,15 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { chromium } from 'playwright';
 import prisma from '@/lib/db';
 import { estimateValue, detectCategory, generatePurchaseMessage } from '@/lib/value-estimator';
+import { getPlatformFeeRate, enrichOpportunitiesWithClaudeTier2, enrichWithCompletenessAndReputation } from '@/lib/marketplace-scanner';
+import { analyzeLogistics } from '@/lib/logistics-analyzer';
 import { identifyItem } from '@/lib/llm-identifier';
 import { fetchMarketPrice, closeBrowser as closeMarketBrowser } from '@/lib/market-price';
+import { findComparableSales, type CompMatchResult } from '@/lib/comp-matcher';
 import { analyzeSellability, quickDiscountCheck } from '@/lib/llm-analyzer';
+import { analyzeDemandTrend } from '@/lib/demand-analyzer';
+import { lookupVerifiedMarketPrice } from '@/lib/market-value-calculator';
 import { getAuthUserId } from '@/lib/auth-middleware';
 import { sseEmitter } from '@/lib/sse-emitter';
 
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
-// Minimum discount threshold for saving a listing (50% = must be half market value)
-const MIN_DISCOUNT_THRESHOLD = 50;
+import { enforceTierLimits } from '@/lib/tier-enforcement';
 
 interface CraigslistItem {
   title: string;
@@ -192,6 +196,12 @@ export async function POST(request: NextRequest) {
     if (!userId) {
       throw new UnauthorizedError('Unauthorized');
     }
+
+    const userSettings = await prisma.userSettings.findUnique({ where: { userId } });
+    const discountThreshold = userSettings?.discountThreshold ?? 50;
+    const feeRate = getPlatformFeeRate('CRAIGSLIST', userSettings);
+    const opportunityThreshold = userSettings?.opportunityThreshold ?? 70;
+
     const body = await request.json();
     const { location, category, keywords, minPrice, maxPrice } = body;
 
@@ -201,6 +211,9 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Enforce subscription tier limits (scan count + marketplace)
+    await enforceTierLimits(userId, 'CRAIGSLIST');
 
     // Create scraper job record
     job = await prisma.scraperJob.create({
@@ -245,7 +258,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Process listings with LLM analysis pipeline
-    // Only save listings that are 50%+ undervalued based on verified market data
+    // Only save listings meeting the configured discountThreshold% undervalued requirement
     let savedCount = 0;
     let opportunitiesFound = 0;
     let analyzedCount = 0;
@@ -276,7 +289,8 @@ export async function POST(request: NextRequest) {
           item.description || null,
           item.price,
           null,
-          detectedCategory
+          detectedCategory,
+          feeRate
         );
 
         // Initialize LLM analysis fields
@@ -287,6 +301,7 @@ export async function POST(request: NextRequest) {
         let verifiedMarketValue: number | null = null;
         let trueDiscountPercent: number | null = null;
         let meetsThreshold = false;
+        let compMatchResult: CompMatchResult | null = null;
 
         // LLM Analysis Pipeline (if API key is configured)
         if (hasLLM) {
@@ -316,7 +331,9 @@ export async function POST(request: NextRequest) {
                     item.title,
                     item.price,
                     identification,
-                    marketData
+                    marketData,
+                    discountThreshold,
+                    feeRate
                   );
 
                   /* istanbul ignore else -- LLM always returns analysis or throws; null result is an edge case tested via mock errors */
@@ -336,18 +353,103 @@ export async function POST(request: NextRequest) {
           }
         }
 
+        // Story 4.4: Verified market price fallback when LLM pipeline didn't produce one
+        if (!verifiedMarketValue && item.price > 0) {
+          try {
+            const vpResult = await lookupVerifiedMarketPrice(
+              identification?.searchQuery || item.title,
+              item.price,
+              identification?.category || detectedCategory
+            );
+            if (vpResult) {
+              verifiedMarketValue = vpResult.verifiedMarketValue;
+              trueDiscountPercent = vpResult.trueDiscountPercent;
+            }
+          } catch (vpErr) {
+            console.error(`Verified price lookup error for Craigslist item ${item.externalId}:`, vpErr);
+          }
+        }
+
         // Determine if we should save this listing
-        // With LLM: only save if verified 50%+ undervalued
-        // Without LLM: fall back to algorithmic estimation (save if valueScore >= 70)
+        // With LLM: only save if verified discountThreshold%+ undervalued (configurable per user)
+        // Without LLM: fall back to algorithmic estimation (save if valueScore >= opportunityThreshold)
         const shouldSave = hasLLM
           ? meetsThreshold &&
             trueDiscountPercent !== null &&
-            trueDiscountPercent >= MIN_DISCOUNT_THRESHOLD
-          : estimation.valueScore >= 70;
+            trueDiscountPercent >= discountThreshold
+          : estimation.valueScore >= opportunityThreshold;
 
         if (!shouldSave) {
           skippedCount++;
           continue;
+        }
+
+        // Claude Tier 2 structural analysis (Story 5.1) — via centralized enrichment function
+        const [claudeEnriched] = await enrichOpportunitiesWithClaudeTier2(
+          [
+            {
+              externalId: item.externalId,
+              url: item.url,
+              title: item.title,
+              description: item.description,
+              askingPrice: item.price,
+              imageUrls: item.imageUrls,
+              platform: 'CRAIGSLIST',
+              category: detectedCategory,
+              estimation,
+              requestToBuy: '',
+              isOpportunity: true,
+            },
+          ],
+          userId
+        );
+        const claudeAnalysis = claudeEnriched.claudeAnalysis;
+
+        // Step 4: Demand trend analysis (Story 5.3)
+        const demandAnalysis = marketData ? analyzeDemandTrend(marketData.soldListings) : null;
+
+        // Step 5: Comparable sold item matching (Story 5.2) — reuses fetched soldListings
+        if (identification && marketData) {
+          try {
+            compMatchResult = await findComparableSales(
+              identification.searchQuery,
+              identification.brand ?? null,
+              identification.model ?? null,
+              identification.category,
+              marketData.soldListings
+            );
+          } catch (compErr) {
+            console.error(`Comp matching error for ${item.externalId}:`, compErr);
+          }
+        }
+
+        // Step 6a: Item completeness & seller reputation enrichment (Story 5.4)
+        // Craigslist has no seller rating data — completeness analysis only (if images available)
+        const [enriched54] = await enrichWithCompletenessAndReputation([{
+          externalId: item.externalId,
+          url: item.url,
+          title: item.title,
+          description: item.description,
+          askingPrice: item.price,
+          imageUrls: item.imageUrls,
+          platform: 'CRAIGSLIST',
+          category: identification?.category || detectedCategory,
+          estimation,
+          requestToBuy: '',
+          isOpportunity: true,
+        }]);
+        const completenessLabel = enriched54.completenessAnalysis?.completenessLabel ?? null;
+
+        // Step 6b: Logistics & shipping cost analysis (Story 5.5)
+        let logisticsAnalysis = null;
+        try {
+          logisticsAnalysis = await analyzeLogistics(
+            { title: item.title, description: item.description, category: identification?.category || detectedCategory, location: item.location, estimation },
+            userSettings?.homeLocation ?? null,
+            userSettings?.maxPickupRadiusMiles ?? 50
+          );
+        } catch (logErr) {
+          console.error(`Logistics analysis error for ${item.externalId}:`, logErr);
         }
 
         // Generate purchase message
@@ -388,8 +490,10 @@ export async function POST(request: NextRequest) {
           priceReasoning: estimation.reasoning,
           notes: sellabilityAnalysis?.resaleStrategy || estimation.notes,
 
-          // Metadata
-          shippable: estimation.shippable,
+          // Metadata — Story 5.5: logistics classification overrides algorithmic shippable
+          shippable: logisticsAnalysis
+            ? logisticsAnalysis.sizeCategory !== 'large_local_only'
+            : estimation.shippable,
           negotiable: estimation.negotiable,
           tags: JSON.stringify(estimation.tags),
           requestToBuy,
@@ -404,18 +508,41 @@ export async function POST(request: NextRequest) {
           verifiedMarketValue: verifiedMarketValue,
           marketDataSource: marketData ? 'ebay_scrape' : null,
           marketDataDate: marketData ? new Date() : null,
-          comparableSalesJson: marketData
-            ? JSON.stringify(marketData.soldListings.slice(0, 5))
-            : null,
+          comparableSalesJson: compMatchResult
+            ? JSON.stringify(compMatchResult.comps)
+            : marketData ? JSON.stringify(marketData.soldListings.slice(0, 5)) : null,
+          compMatchConfidence: compMatchResult?.confidence ?? null,
 
           // LLM Sellability Analysis
           sellabilityScore: sellabilityAnalysis?.sellabilityScore || null,
-          demandLevel: sellabilityAnalysis?.demandLevel || null,
+          // Story 5.3: Demand analysis takes priority over sellability demandLevel
+          demandLevel: demandAnalysis?.demandTrend ?? sellabilityAnalysis?.demandLevel ?? null,
+          soldVolume30Days: demandAnalysis?.soldVolume30Days ?? null,
+          soldVolume60Days: demandAnalysis?.soldVolume60Days ?? null,
+          soldVolume90Days: demandAnalysis?.soldVolume90Days ?? null,
           expectedDaysToSell: sellabilityAnalysis?.expectedDaysToSell || null,
           authenticityRisk: sellabilityAnalysis?.authenticityRisk || null,
+          conditionRisk: sellabilityAnalysis?.conditionRisk || null,
           recommendedOffer: sellabilityAnalysis?.recommendedOfferPrice || null,
           recommendedList: sellabilityAnalysis?.recommendedListPrice || null,
           resaleStrategy: sellabilityAnalysis?.resaleStrategy || null,
+
+          // Story 5.4: Item completeness & seller reputation
+          completenessLabel,
+          sellerRating: null,           // Craigslist does not expose seller rating data
+          sellerReviewCount: null,
+          sellerAccountAgeDays: null,
+
+          // Story 5.5: Logistics and shipping analysis
+          sizeCategory: logisticsAnalysis?.sizeCategory ?? null,
+          shippingEstimatesJson: logisticsAnalysis?.shippingEstimates
+            ? JSON.stringify(logisticsAnalysis.shippingEstimates)
+            : null,
+          estimatedShippingCost: logisticsAnalysis?.estimatedShippingCost ?? null,
+          pickupDistanceMiles: logisticsAnalysis?.pickupDistanceMiles ?? null,
+          outsidePickupRadius: logisticsAnalysis?.outsidePickupRadius ?? null,
+          adjustedProfitMargin: logisticsAnalysis?.adjustedProfitMargin ?? null,
+          estimatedWeight: logisticsAnalysis?.estimatedWeightLbs ?? null,
 
           // True discount
           trueDiscountPercent: trueDiscountPercent,
@@ -423,8 +550,9 @@ export async function POST(request: NextRequest) {
           // Analysis metadata
           llmAnalyzed,
           analysisDate: llmAnalyzed ? new Date() : null,
-          analysisConfidence: sellabilityAnalysis?.confidence || null,
-          analysisReasoning: sellabilityAnalysis?.reasoning || null,
+          // Claude Tier 2 takes priority; fall back to sellability (Story 5.1)
+          analysisConfidence: claudeAnalysis?.confidence ?? sellabilityAnalysis?.confidence ?? null,
+          analysisReasoning: claudeAnalysis?.reasoning ?? sellabilityAnalysis?.reasoning ?? null,
 
           // Status - all saved listings are opportunities now
           status: 'OPPORTUNITY',
@@ -442,6 +570,23 @@ export async function POST(request: NextRequest) {
           create: listingData,
           update: listingData,
         });
+
+        // Cache Claude Tier 2 result for reuse (Story 5.1)
+        if (claudeAnalysis) {
+          try {
+            const expiresAt = new Date();
+            expiresAt.setHours(expiresAt.getHours() + 24);
+            await prisma.aiAnalysisCache.create({
+              data: {
+                listingId: savedListing.id,
+                analysisResult: JSON.stringify(claudeAnalysis),
+                expiresAt,
+              },
+            });
+          } catch (cacheErr) {
+            console.error(`Failed to cache Claude analysis for ${item.externalId}:`, cacheErr);
+          }
+        }
 
         // Emit SSE event for real-time notification
         await sseEmitter.emit({
@@ -491,10 +636,10 @@ export async function POST(request: NextRequest) {
     }
 
     const analysisMode = hasLLM
-      ? 'LLM-verified (50%+ undervalued only)'
+      ? `LLM-verified (${discountThreshold}%+ undervalued only)`
       : 'algorithmic (score >= 70)';
     const message = hasLLM
-      ? `Analyzed ${listings.length} listings, found ${opportunitiesFound} opportunities (${skippedCount} didn't meet 50% threshold)`
+      ? `Analyzed ${listings.length} listings, found ${opportunitiesFound} opportunities (${skippedCount} didn't meet ${discountThreshold}% threshold)`
       : `Scraped ${listings.length} listings, found ${opportunitiesFound} opportunities`;
 
     return NextResponse.json({
@@ -512,8 +657,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Scraper error:', error);
 
-    // For auth errors, return immediately without updating job
-    if (error instanceof UnauthorizedError) {
+    // For auth/tier errors, return immediately without updating job
+    if (error instanceof UnauthorizedError || error instanceof ForbiddenError) {
       return handleError(error);
     }
 

@@ -1,9 +1,16 @@
 /**
- * Subscription tier definitions for Flipper AI.
+ * @file src/lib/subscription-tiers.ts
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-03-08
+ * @version 1.0
+ * @brief Subscription tier definitions, limits, and access-check helpers.
  *
- * Free:    10 scans/day, 1 marketplace
- * Flipper: Unlimited scans, 3 marketplaces
- * Pro:     All features, unlimited everything
+ * @description
+ * Defines the FREE / FLIPPER / PRO tier hierarchy with per-tier limits
+ * (scans/day, marketplaces, search configs, active jobs) and feature
+ * flags (aiAnalysis, priceHistory, messaging, ebayCrossListing).
+ * Exports pure helper functions consumed by tier-enforcement.ts.
  */
 
 export type SubscriptionTier = 'FREE' | 'FLIPPER' | 'PRO';

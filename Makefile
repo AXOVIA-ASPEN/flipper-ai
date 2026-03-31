@@ -123,21 +123,22 @@ test-e2e-ui:
 
 # BDD acceptance tests (Cucumber). Gherkin printed in real time (green=pass, red=fail).
 # --parallel 0 avoids ERR_IPC_CHANNEL_CLOSED by running in main process only.
+# Uses dev server because output: 'standalone' in next.config.js breaks `next start`.
 # Optional: make test-acceptance TAGS=@smoke  or  TAGS="@critical and not @slow"
 test-acceptance:
 	@if [ -n "$(TAGS)" ]; then \
-		pnpm exec start-server-and-test 'pnpm start' http://localhost:3000 'pnpm exec cucumber-js test/features --profile pretty --parallel 0 --tags "$(TAGS)"'; \
+		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3000 'pnpm exec cucumber-js test/features --profile pretty --parallel 0 --tags "$(TAGS)"'; \
 	else \
-		pnpm exec start-server-and-test 'pnpm start' http://localhost:3000 'pnpm exec cucumber-js test/features --profile pretty --parallel 0'; \
+		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3000 'pnpm exec cucumber-js test/features --profile pretty --parallel 0'; \
 	fi
 
 # Epic-organized acceptance tests (test/acceptance/features/).
 # Optional: make test-ac TAGS=@story-1-3  or  TAGS="@epic-1"
 test-ac:
 	@if [ -n "$(TAGS)" ]; then \
-		pnpm exec start-server-and-test 'pnpm start' http://localhost:3000 'pnpm exec cucumber-js --profile acceptance --tags "$(TAGS)"'; \
+		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3000 'pnpm exec cucumber-js --profile acceptance --tags "$(TAGS)"'; \
 	else \
-		pnpm exec start-server-and-test 'pnpm start' http://localhost:3000 'pnpm exec cucumber-js --profile acceptance'; \
+		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3000 'pnpm exec cucumber-js --profile acceptance'; \
 	fi
 
 # All tests (unit + BDD + E2E)

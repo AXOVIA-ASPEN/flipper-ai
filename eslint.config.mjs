@@ -18,6 +18,8 @@ const eslintConfig = defineConfig([
     'coverage/**',
     // Legacy cloud function code
     'functions/**',
+    // Archived legacy files — not subject to linting
+    'docs/archive/**',
   ]),
   // Relax rules for test files and config files
   {

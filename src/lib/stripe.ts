@@ -42,6 +42,6 @@ export const PRICE_TO_TIER: Record<string, string> = {
  */
 export const TIER_PRICING = {
   FREE: { monthly: 0, label: 'Free' },
-  FLIPPER: { monthly: 1500, label: '$15/mo' },
-  PRO: { monthly: 4000, label: '$40/mo' },
+  FLIPPER: { monthly: 1900, label: '$19/mo' },
+  PRO: { monthly: 4900, label: '$49/mo' },
 } as const;

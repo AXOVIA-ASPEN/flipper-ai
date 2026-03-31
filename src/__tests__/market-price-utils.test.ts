@@ -1,7 +1,7 @@
-// Tests for market-price.ts utility functions (parseEbayPrice, median, buildEbaySoldUrl)
+// Tests for market-price.ts utility functions (parseEbayPrice, median, parseSoldDate, buildEbaySoldUrl)
 // These are pure functions that don't need Playwright mocking
 
-import { parseEbayPrice, median, buildEbaySoldUrl } from '../lib/market-price';
+import { parseEbayPrice, median, parseSoldDate, buildEbaySoldUrl } from '../lib/market-price';
 
 describe('parseEbayPrice', () => {
   it('parses standard dollar price', () => {
@@ -74,6 +74,59 @@ describe('median', () => {
     const arr = [3, 1, 2];
     median(arr);
     expect(arr).toEqual([3, 1, 2]);
+  });
+});
+
+describe('parseSoldDate', () => {
+  it('returns null for empty string', () => {
+    expect(parseSoldDate('')).toBeNull();
+  });
+
+  it('returns null for null/undefined-like empty input', () => {
+    expect(parseSoldDate('')).toBeNull();
+  });
+
+  it('parses "X days ago" format', () => {
+    const result = parseSoldDate('3 days ago');
+    expect(result).toBeInstanceOf(Date);
+    const diff = Math.round((Date.now() - result!.getTime()) / (1000 * 60 * 60 * 24));
+    expect(diff).toBe(3);
+  });
+
+  it('parses "Xd ago" short format', () => {
+    const result = parseSoldDate('5d ago');
+    expect(result).toBeInstanceOf(Date);
+  });
+
+  it('parses "Xh ago" hours format', () => {
+    const result = parseSoldDate('12h ago');
+    expect(result).toBeInstanceOf(Date);
+    const diffHours = (Date.now() - result!.getTime()) / (1000 * 60 * 60);
+    expect(Math.round(diffHours)).toBe(12);
+  });
+
+  it('parses "Sold Oct 15, 2024" format (strips "Sold" prefix)', () => {
+    const result = parseSoldDate('Sold Oct 15, 2024');
+    expect(result).toBeInstanceOf(Date);
+    expect(result!.getFullYear()).toBe(2024);
+  });
+
+  it('parses "Oct 15, 2024" standard month-day-year format', () => {
+    const result = parseSoldDate('Oct 15, 2024');
+    expect(result).toBeInstanceOf(Date);
+    expect(result!.getFullYear()).toBe(2024);
+  });
+
+  it('returns null for unrecognized format', () => {
+    expect(parseSoldDate('yesterday')).toBeNull();
+    expect(parseSoldDate('some random text')).toBeNull();
+  });
+
+  it('returns null for month-day-year that fails Date parse', () => {
+    // "Abc 1, 2024" matches the regex /^[A-Z][a-z]{2}\s+\d{1,2},\s+\d{4}$/ but
+    // new Date('Abc 1, 2024') returns Invalid Date (isNaN check → null)
+    const result = parseSoldDate('Abc 1, 2024');
+    expect(result).toBeNull();
   });
 });
 

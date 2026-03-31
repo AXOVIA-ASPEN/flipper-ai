@@ -7,7 +7,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 const {
   Decimal,
-  objectEnumValues,
+  DbNull,
+  JsonNull,
+  AnyNull,
+  NullTypes,
   makeStrictEnum,
   Public,
   getRuntime,
@@ -21,12 +24,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 6.19.2
- * Query Engine version: c2990dca591cba766e3b7ef5d9e8a84796e47ab7
+ * Prisma Client JS version: 7.4.0
+ * Query Engine version: ab56fe763f921d033a6c195e7ddeb3e255bdbb57
  */
 Prisma.prismaVersion = {
-  client: "6.19.2",
-  engine: "c2990dca591cba766e3b7ef5d9e8a84796e47ab7"
+  client: "7.4.0",
+  engine: "ab56fe763f921d033a6c195e7ddeb3e255bdbb57"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -98,15 +101,11 @@ In case this error is unexpected for you, please report it in https://pris.ly/pr
 /**
  * Shorthand utilities for JSON filtering
  */
-Prisma.DbNull = objectEnumValues.instances.DbNull
-Prisma.JsonNull = objectEnumValues.instances.JsonNull
-Prisma.AnyNull = objectEnumValues.instances.AnyNull
+Prisma.DbNull = DbNull
+Prisma.JsonNull = JsonNull
+Prisma.AnyNull = AnyNull
 
-Prisma.NullTypes = {
-  DbNull: objectEnumValues.classes.DbNull,
-  JsonNull: objectEnumValues.classes.JsonNull,
-  AnyNull: objectEnumValues.classes.AnyNull
-}
+Prisma.NullTypes = NullTypes
 
 
 
@@ -165,14 +164,29 @@ exports.Prisma.ListingScalarFieldEnum = {
   marketDataSource: 'marketDataSource',
   marketDataDate: 'marketDataDate',
   comparableSalesJson: 'comparableSalesJson',
+  compMatchConfidence: 'compMatchConfidence',
   sellabilityScore: 'sellabilityScore',
   demandLevel: 'demandLevel',
   expectedDaysToSell: 'expectedDaysToSell',
   authenticityRisk: 'authenticityRisk',
+  conditionRisk: 'conditionRisk',
   recommendedOffer: 'recommendedOffer',
   recommendedList: 'recommendedList',
   resaleStrategy: 'resaleStrategy',
   trueDiscountPercent: 'trueDiscountPercent',
+  soldVolume30Days: 'soldVolume30Days',
+  soldVolume60Days: 'soldVolume60Days',
+  soldVolume90Days: 'soldVolume90Days',
+  completenessLabel: 'completenessLabel',
+  sellerRating: 'sellerRating',
+  sellerReviewCount: 'sellerReviewCount',
+  sellerAccountAgeDays: 'sellerAccountAgeDays',
+  sizeCategory: 'sizeCategory',
+  shippingEstimatesJson: 'shippingEstimatesJson',
+  estimatedShippingCost: 'estimatedShippingCost',
+  pickupDistanceMiles: 'pickupDistanceMiles',
+  outsidePickupRadius: 'outsidePickupRadius',
+  adjustedProfitMargin: 'adjustedProfitMargin',
   llmAnalyzed: 'llmAnalyzed',
   analysisDate: 'analysisDate',
   analysisConfidence: 'analysisConfidence',
@@ -242,11 +256,13 @@ exports.Prisma.PriceHistoryScalarFieldEnum = {
 
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
+  firebaseUid: 'firebaseUid',
   email: 'email',
   emailVerified: 'emailVerified',
   name: 'name',
   image: 'image',
   password: 'password',
+  stripeCustomerId: 'stripeCustomerId',
   subscriptionTier: 'subscriptionTier',
   onboardingComplete: 'onboardingComplete',
   onboardingStep: 'onboardingStep',
@@ -296,6 +312,15 @@ exports.Prisma.UserSettingsScalarFieldEnum = {
   notifyExpiring: 'notifyExpiring',
   notifyWeeklyDigest: 'notifyWeeklyDigest',
   notifyFrequency: 'notifyFrequency',
+  opportunityThreshold: 'opportunityThreshold',
+  feeRateEbay: 'feeRateEbay',
+  feeRateMercari: 'feeRateMercari',
+  feeRateFacebook: 'feeRateFacebook',
+  feeRateOfferup: 'feeRateOfferup',
+  feeRateCraigslist: 'feeRateCraigslist',
+  maxPickupRadiusMiles: 'maxPickupRadiusMiles',
+  homeLocation: 'homeLocation',
+  holdingCostDailyRate: 'holdingCostDailyRate',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -330,6 +355,7 @@ exports.Prisma.MessageScalarFieldEnum = {
 exports.Prisma.AiAnalysisCacheScalarFieldEnum = {
   id: 'id',
   listingId: 'listingId',
+  analysisType: 'analysisType',
   analysisResult: 'analysisResult',
   createdAt: 'createdAt',
   expiresAt: 'expiresAt'
@@ -353,6 +379,38 @@ exports.Prisma.PostingQueueItemScalarFieldEnum = {
   postedAt: 'postedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ListingImageScalarFieldEnum = {
+  id: 'id',
+  listingId: 'listingId',
+  imageIndex: 'imageIndex',
+  originalUrl: 'originalUrl',
+  storagePath: 'storagePath',
+  storageUrl: 'storageUrl',
+  fileSize: 'fileSize',
+  contentType: 'contentType',
+  width: 'width',
+  height: 'height',
+  uploadedAt: 'uploadedAt'
+};
+
+exports.Prisma.UsageRecordScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  count: 'count',
+  periodStart: 'periodStart',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -385,7 +443,10 @@ exports.Prisma.ModelName = {
   FacebookToken: 'FacebookToken',
   Message: 'Message',
   AiAnalysisCache: 'AiAnalysisCache',
-  PostingQueueItem: 'PostingQueueItem'
+  PostingQueueItem: 'PostingQueueItem',
+  ListingImage: 'ListingImage',
+  UsageRecord: 'UsageRecord',
+  PasswordResetToken: 'PasswordResetToken'
 };
 
 /**

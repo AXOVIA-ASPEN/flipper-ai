@@ -20,11 +20,4 @@
 - [ ] Sprint status synced (if sprint tracking enabled)
 - [ ] Story saved successfully
 
-### Definition of Done (DoD) — Acceptance Test Verification
-- [ ] Gherkin acceptance tests exist in the epic's `.feature` file (`test/acceptance/features/E-<NNN>-<epic-slug>.feature`) for ALL acceptance criteria
-- [ ] Every scenario is tagged with `@E-NNN-S-YYY` (epic-scoped sequential), `@story-X-Y`, and relevant `@FR-*` / `@NFR-*` tags
-- [ ] Requirements traceability matrix updated at `_bmad-output/test-artifacts/requirements-traceability-matrix.md` with scenario IDs
-- [ ] All acceptance test scenarios pass
-- [ ] **CRITICAL: Story CANNOT be marked "done" if any DoD acceptance test items are incomplete**
-
 _Reviewer: {{user_name}} on {{date}}_

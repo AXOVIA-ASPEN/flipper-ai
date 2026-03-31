@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Settings, Home, TrendingUp } from 'lucide-react';
+import { Settings, Home, TrendingUp, MessageSquare } from 'lucide-react';
 import UserMenu from '@/components/UserMenu';
 
 export default function Navigation() {
@@ -11,6 +11,7 @@ export default function Navigation() {
   const navItems = [
     { href: '/', label: 'Dashboard', icon: Home },
     { href: '/opportunities', label: 'Opportunities', icon: TrendingUp },
+    { href: '/messages', label: 'Messages', icon: MessageSquare },
     { href: '/settings', label: 'Settings', icon: Settings },
   ];
 

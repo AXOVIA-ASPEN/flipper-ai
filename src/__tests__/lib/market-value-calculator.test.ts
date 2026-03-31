@@ -24,11 +24,19 @@ jest.mock('@/lib/db', () => ({
   },
 }));
 
+// Mock market-price for lookupVerifiedMarketPrice tests
+const mockFetchMarketPrice = jest.fn();
+jest.mock('@/lib/market-price', () => ({
+  fetchMarketPrice: (...args: unknown[]) => mockFetchMarketPrice(...args),
+  closeBrowser: jest.fn().mockResolvedValue(undefined),
+}));
+
 import { describe, test, expect, beforeEach } from '@jest/globals';
 import {
   calculateVerifiedMarketValue,
   calculateTrueDiscount,
   updateListingWithVerifiedValue,
+  lookupVerifiedMarketPrice,
 } from '@/lib/market-value-calculator';
 
 describe('Market Value Calculator', () => {
@@ -320,5 +328,118 @@ describe('calculateVerifiedMarketValue - default platform parameter', () => {
     const result = await calculateVerifiedMarketValue('Test Product');
     expect(result).not.toBeNull();
     expect(result!.marketDataSource).toBe('ebay_sold');
+  });
+});
+
+// ── Story 4.4: lookupVerifiedMarketPrice tests ────────────────────────────────
+describe('lookupVerifiedMarketPrice', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('returns null for empty searchQuery', async () => {
+    const result = await lookupVerifiedMarketPrice('', 100);
+    expect(result).toBeNull();
+  });
+
+  it('returns null for askingPrice <= 0', async () => {
+    const result = await lookupVerifiedMarketPrice('iPhone 14', 0);
+    expect(result).toBeNull();
+  });
+
+  it('returns null for negative askingPrice', async () => {
+    const result = await lookupVerifiedMarketPrice('iPhone 14', -50);
+    expect(result).toBeNull();
+  });
+
+  it('returns verified price from DB when calculateVerifiedMarketValue succeeds', async () => {
+    mockPriceHistoryFindMany.mockResolvedValue([
+      { soldPrice: 300 },
+      { soldPrice: 320 },
+      { soldPrice: 280 },
+    ]);
+
+    const result = await lookupVerifiedMarketPrice('iPhone 14 Pro', 200);
+    expect(result).not.toBeNull();
+    expect(result!.verifiedMarketValue).toBeGreaterThan(0);
+    expect(result!.marketDataSource).toContain('ebay');
+    expect(result!.trueDiscountPercent).toBeDefined();
+    expect(result!.marketDataDate).toBeInstanceOf(Date);
+    expect(result!.comparableSalesJson).toBeDefined();
+    expect(result!.confidence).toBeDefined();
+    expect(result!.dataPoints).toBe(3);
+    expect(result!.soldPriceRange).toBeDefined();
+  });
+
+  it('falls back to Playwright (fetchMarketPrice) when DB has insufficient data', async () => {
+    // DB returns null (< 3 data points)
+    mockPriceHistoryFindMany.mockResolvedValue([{ soldPrice: 300 }, { soldPrice: 320 }]);
+
+    // Playwright returns sold listings
+    mockFetchMarketPrice.mockResolvedValue({
+      salesCount: 5,
+      medianPrice: 350,
+      soldListings: [
+        { title: 'iPhone 14 Pro', price: 300, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },
+        { title: 'iPhone 14 Pro', price: 350, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },
+        { title: 'iPhone 14 Pro', price: 370, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },
+        { title: 'iPhone 14 Pro', price: 340, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },
+        { title: 'iPhone 14 Pro', price: 360, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },
+      ],
+    });
+
+    const result = await lookupVerifiedMarketPrice('iPhone 14 Pro', 200);
+    expect(result).not.toBeNull();
+    expect(result!.marketDataSource).toBe('ebay_scrape');
+    expect(result!.verifiedMarketValue).toBeGreaterThan(0);
+    expect(result!.confidence).toBeDefined();
+    expect(result!.dataPoints).toBe(5);
+    expect(result!.soldPriceRange).toBeDefined();
+    expect(result!.soldPriceRange.min).toBeDefined();
+    expect(result!.soldPriceRange.max).toBeDefined();
+    expect(result!.soldPriceRange.median).toBeDefined();
+    expect(result!.soldPriceRange.average).toBeDefined();
+    expect(result!.comparableSalesJson).not.toBeNull();
+    expect(mockFetchMarketPrice).toHaveBeenCalledWith('iPhone 14 Pro', undefined);
+  });
+
+  it('passes category to fetchMarketPrice when provided', async () => {
+    mockPriceHistoryFindMany.mockResolvedValue([]);
+    mockFetchMarketPrice.mockResolvedValue({
+      salesCount: 3,
+      medianPrice: 200,
+      soldListings: [
+        { title: 'Widget A', price: 180, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },
+        { title: 'Widget B', price: 200, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },
+        { title: 'Widget C', price: 220, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },
+      ],
+    });
+
+    await lookupVerifiedMarketPrice('Widget', 100, 'electronics');
+    expect(mockFetchMarketPrice).toHaveBeenCalledWith('Widget', 'electronics');
+  });
+
+  it('returns null when Playwright throws an error', async () => {
+    mockPriceHistoryFindMany.mockResolvedValue([]);
+    mockFetchMarketPrice.mockRejectedValue(new Error('Browser launch failed'));
+
+    const result = await lookupVerifiedMarketPrice('iPhone 14', 200);
+    expect(result).toBeNull();
+  });
+
+  it('returns null when both DB and Playwright have no data', async () => {
+    mockPriceHistoryFindMany.mockResolvedValue([]);
+    mockFetchMarketPrice.mockResolvedValue(null);
+
+    const result = await lookupVerifiedMarketPrice('Rare Item', 100);
+    expect(result).toBeNull();
+  });
+
+  it('returns null when Playwright returns zero sales', async () => {
+    mockPriceHistoryFindMany.mockResolvedValue([]);
+    mockFetchMarketPrice.mockResolvedValue({ salesCount: 0, soldListings: [] });
+
+    const result = await lookupVerifiedMarketPrice('Item', 100);
+    expect(result).toBeNull();
   });
 });

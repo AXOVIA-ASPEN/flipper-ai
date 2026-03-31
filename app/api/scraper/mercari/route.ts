@@ -12,10 +12,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { estimateValue, detectCategory, generatePurchaseMessage } from '@/lib/value-estimator';
+import { identifyItem } from '@/lib/llm-identifier';
+import { fetchMarketPrice, closeBrowser as closeMarketBrowser, type MarketPrice } from '@/lib/market-price';
+import { lookupVerifiedMarketPrice } from '@/lib/market-value-calculator';
+import { findComparableSales, type CompMatchResult } from '@/lib/comp-matcher';
+import { analyzeSellability, quickDiscountCheck } from '@/lib/llm-analyzer';
+import { analyzeDemandTrend } from '@/lib/demand-analyzer';
 import { getAuthUserId } from '@/lib/auth-middleware';
 import { sseEmitter } from '@/lib/sse-emitter';
 
+import { enrichOpportunitiesWithClaudeTier2, enrichWithCompletenessAndReputation, getPlatformFeeRate } from '@/lib/marketplace-scanner';
+import { analyzeLogistics } from '@/lib/logistics-analyzer';
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { enforceTierLimits } from '@/lib/tier-enforcement';
 // Mercari API configuration
 const MERCARI_API_BASE_URL = 'https://www.mercari.com/v1/api';
 const MERCARI_SEARCH_URL = 'https://www.mercari.com/search/';
@@ -335,7 +344,15 @@ function buildSellerNote(item: MercariItem): string | null {
 /**
  * Saves a Mercari listing to the database
  */
-async function saveListingFromMercariItem(item: MercariItem, userId: string) {
+async function saveListingFromMercariItem(
+  item: MercariItem,
+  userId: string,
+  discountThreshold: number = 50,
+  hasLLM: boolean = false,
+  feeRate: number = 0.10,
+  opportunityThreshold: number = 70,
+  userSettings?: { homeLocation: string | null; maxPickupRadiusMiles: number | null } | null
+): Promise<Awaited<ReturnType<typeof prisma.listing.upsert>> | null> {
   const itemUrl = `https://www.mercari.com/us/item/${item.id}/`;
   const description = item.description || '';
   const condition = normalizeCondition(item);
@@ -344,8 +361,8 @@ async function saveListingFromMercariItem(item: MercariItem, userId: string) {
   /* istanbul ignore next -- 'other' fallback only when rootCategory absent AND detectCategory returns null */
   const category = item.rootCategory?.name || detectCategory(item.name, description) || 'other';
 
-  // Get value estimation
-  const estimation = estimateValue(item.name, description, item.price, condition || null, category);
+  // Get value estimation using user's platform fee rate (Mercari default: 10%)
+  const estimation = estimateValue(item.name, description, item.price, condition || null, category, feeRate);
 
   // Build notes
   const sellerNote = buildSellerNote(item);
@@ -372,12 +389,163 @@ async function saveListingFromMercariItem(item: MercariItem, userId: string) {
     sellerName || undefined
   );
 
+  // LLM Analysis Pipeline
+  let llmAnalyzed = false;
+  let sellabilityAnalysis = null;
+  let verifiedMarketValue: number | null = null;
+  let trueDiscountPercent: number | null = null;
+  let meetsLLMThreshold = !hasLLM;
+  let capturedMarketData: MarketPrice | null = null;
+  let capturedIdentification: Awaited<ReturnType<typeof identifyItem>> | null = null;
+
+  if (hasLLM && item.price > 0) {
+    try {
+      const identification = await identifyItem(item.name, description, item.price, category);
+      capturedIdentification = identification; // Story 5.2: capture for comp matching
+      if (identification?.worthInvestigating) {
+        const marketData = await fetchMarketPrice(identification.searchQuery, identification.category);
+        capturedMarketData = marketData; // Story 5.3: capture for demand analysis
+        if (marketData && marketData.salesCount > 0) {
+          const quickCheck = quickDiscountCheck(item.price, marketData);
+          if (quickCheck.passesQuickCheck) {
+            sellabilityAnalysis = await analyzeSellability(
+              item.name,
+              item.price,
+              identification,
+              marketData,
+              discountThreshold,
+              feeRate
+            );
+            if (sellabilityAnalysis) {
+              llmAnalyzed = true;
+              verifiedMarketValue = sellabilityAnalysis.verifiedMarketValue;
+              trueDiscountPercent = sellabilityAnalysis.trueDiscountPercent;
+              meetsLLMThreshold =
+                sellabilityAnalysis.meetsThreshold &&
+                trueDiscountPercent !== null &&
+                trueDiscountPercent >= discountThreshold;
+            }
+          }
+        }
+      }
+    } catch (llmError) {
+      console.error(`LLM analysis error for Mercari item ${item.id}:`, llmError);
+    }
+  }
+
+  // Story 4.4: Verified market price fallback when LLM pipeline didn't produce one
+  if (!verifiedMarketValue && item.price > 0) {
+    try {
+      const vpResult = await lookupVerifiedMarketPrice(item.name, item.price, category);
+      if (vpResult) {
+        verifiedMarketValue = vpResult.verifiedMarketValue;
+        trueDiscountPercent = vpResult.trueDiscountPercent;
+      }
+    } catch (vpErr) {
+      console.error(`Verified price lookup error for Mercari item ${item.id}:`, vpErr);
+    }
+  }
+
+  // Story 5.3: Demand trend analysis
+  const demandAnalysis = capturedMarketData ? analyzeDemandTrend(capturedMarketData.soldListings) : null;
+
+  // Story 5.2: Comparable sold item matching — reuses fetched soldListings
+  let compMatches: CompMatchResult | null = null;
+  if (capturedIdentification && capturedMarketData) {
+    try {
+      compMatches = await findComparableSales(
+        capturedIdentification.searchQuery,
+        capturedIdentification.brand ?? null,
+        capturedIdentification.model ?? null,
+        capturedIdentification.category,
+        capturedMarketData.soldListings
+      );
+    } catch (compErr) {
+      console.error(`Comp matching error for Mercari item ${item.id}:`, compErr);
+    }
+  }
+
+  if (hasLLM && !meetsLLMThreshold) {
+    return null;
+  }
+
   // Collect images
   const imageUrls = collectImageUrls(item);
   const serializedImages = imageUrls.length ? JSON.stringify(imageUrls) : null;
 
+  // Story 5.4: Compute seller rating from Mercari's ratings object (weighted 5-star scale)
+  // good=5 stars, normal=3 stars, bad=1 star (weighted average)
+  let sellerRating: number | null = null;
+  let sellerReviewCount: number | null = null;
+  if (item.seller?.ratings) {
+    const { good = 0, normal = 0, bad = 0 } = item.seller.ratings;
+    const total = good + normal + bad;
+    if (total > 0) {
+      sellerReviewCount = total;
+      sellerRating = parseFloat(((good * 5 + normal * 3 + bad * 1) / total).toFixed(1));
+    }
+  }
+
+  // Step 7: Logistics & shipping cost analysis (Story 5.5)
+  // Note: runs here (before Step 6 completeness below) because Mercari items are processed
+  // individually rather than in a batch, so step ordering differs from the eBay batch pipeline.
+  let logisticsAnalysis = null;
+  try {
+    logisticsAnalysis = await analyzeLogistics(
+      { title: item.name, description, category, location: formatLocation(item), estimation },
+      userSettings?.homeLocation ?? null,
+      userSettings?.maxPickupRadiusMiles ?? 50
+    );
+  } catch (logErr) {
+    console.error(`Logistics analysis error for Mercari item ${item.id}:`, logErr);
+  }
+
+  // Claude Tier 2 structural analysis (Story 5.1) — via centralized enrichment function
+  const [claudeEnriched] = await enrichOpportunitiesWithClaudeTier2(
+    [
+      {
+        externalId: item.id,
+        url: itemUrl,
+        title: item.name,
+        description,
+        askingPrice: item.price,
+        imageUrls,
+        platform: 'MERCARI',
+        category,
+        estimation,
+        requestToBuy,
+        isOpportunity: true,
+      },
+    ],
+    userId
+  );
+  const claudeAnalysis = claudeEnriched.claudeAnalysis;
+
+  // Step 6: Item completeness & seller reputation enrichment (Story 5.4)
+  const [enriched54] = await enrichWithCompletenessAndReputation([{
+    externalId: item.id,
+    url: itemUrl,
+    title: item.name,
+    description,
+    askingPrice: item.price,
+    imageUrls,
+    platform: 'MERCARI',
+    category,
+    estimation,
+    requestToBuy,
+    isOpportunity: true,
+    sellerRating,
+    sellerReviewCount,
+    sellerAccountAgeDays: null, // Not available via Mercari API
+  }]);
+  const completenessLabel = enriched54.completenessAnalysis?.completenessLabel ?? null;
+  // Escalate authenticityRisk to 'high' when seller has low reputation (AC #4)
+  const escalatedAuthenticityRisk = enriched54.sellerReputation?.riskEscalation
+    ? 'high'
+    : sellabilityAnalysis?.authenticityRisk ?? null;
+
   const tags = JSON.stringify(estimation.tags);
-  const status = estimation.valueScore >= 70 ? 'OPPORTUNITY' : 'NEW';
+  const status = hasLLM ? 'OPPORTUNITY' : estimation.valueScore >= opportunityThreshold ? 'OPPORTUNITY' : 'NEW';
 
   // Determine posted date
   const postedAt = item.created
@@ -420,12 +588,50 @@ async function saveListingFromMercariItem(item: MercariItem, userId: string) {
       resaleDifficulty: estimation.resaleDifficulty,
       comparableUrls: JSON.stringify(estimation.comparableUrls),
       priceReasoning: estimation.reasoning,
-      notes: combinedNotes,
-      shippable: item.shippingMethod !== undefined,
+      notes: sellabilityAnalysis?.resaleStrategy || combinedNotes,
+      shippable: logisticsAnalysis
+        ? logisticsAnalysis.sizeCategory !== 'large_local_only'
+        : item.shippingMethod !== undefined,
+      sizeCategory: logisticsAnalysis?.sizeCategory ?? null,
+      shippingEstimatesJson: logisticsAnalysis?.shippingEstimates
+        ? JSON.stringify(logisticsAnalysis.shippingEstimates) : null,
+      estimatedShippingCost: logisticsAnalysis?.estimatedShippingCost ?? null,
+      pickupDistanceMiles: logisticsAnalysis?.pickupDistanceMiles ?? null,
+      outsidePickupRadius: logisticsAnalysis?.outsidePickupRadius ?? null,
+      adjustedProfitMargin: logisticsAnalysis?.adjustedProfitMargin ?? null,
+      estimatedWeight: logisticsAnalysis?.estimatedWeightLbs ?? null,
       negotiable: estimation.negotiable,
       tags,
       requestToBuy,
       status,
+      verifiedMarketValue,
+      marketDataSource: sellabilityAnalysis ? 'ebay_scrape' : null,
+      marketDataDate: sellabilityAnalysis ? new Date() : null,
+      trueDiscountPercent,
+      llmAnalyzed,
+      analysisDate: llmAnalyzed ? new Date() : null,
+      sellabilityScore: sellabilityAnalysis?.sellabilityScore || null,
+      demandLevel: demandAnalysis?.demandTrend ?? sellabilityAnalysis?.demandLevel ?? null,
+      soldVolume30Days: demandAnalysis?.soldVolume30Days ?? null,
+      soldVolume60Days: demandAnalysis?.soldVolume60Days ?? null,
+      soldVolume90Days: demandAnalysis?.soldVolume90Days ?? null,
+      expectedDaysToSell: sellabilityAnalysis?.expectedDaysToSell || null,
+      authenticityRisk: escalatedAuthenticityRisk,
+      conditionRisk: sellabilityAnalysis?.conditionRisk || null,
+      recommendedOffer: sellabilityAnalysis?.recommendedOfferPrice || null,
+      recommendedList: sellabilityAnalysis?.recommendedListPrice || null,
+      resaleStrategy: sellabilityAnalysis?.resaleStrategy || null,
+      // Story 5.4: Item completeness & seller reputation
+      completenessLabel,
+      sellerRating,
+      sellerReviewCount,
+      sellerAccountAgeDays: null,
+      comparableSalesJson: compMatches
+        ? JSON.stringify(compMatches.comps)
+        : capturedMarketData ? JSON.stringify(capturedMarketData.soldListings.slice(0, 5)) : null,
+      compMatchConfidence: compMatches?.confidence ?? null,
+      analysisConfidence: claudeAnalysis?.confidence ?? sellabilityAnalysis?.confidence ?? null,
+      analysisReasoning: claudeAnalysis?.reasoning ?? sellabilityAnalysis?.reasoning ?? null,
     },
     update: {
       title: item.name,
@@ -447,13 +653,68 @@ async function saveListingFromMercariItem(item: MercariItem, userId: string) {
       resaleDifficulty: estimation.resaleDifficulty,
       comparableUrls: JSON.stringify(estimation.comparableUrls),
       priceReasoning: estimation.reasoning,
-      notes: combinedNotes,
-      shippable: item.shippingMethod !== undefined,
+      notes: sellabilityAnalysis?.resaleStrategy || combinedNotes,
+      shippable: logisticsAnalysis
+        ? logisticsAnalysis.sizeCategory !== 'large_local_only'
+        : item.shippingMethod !== undefined,
+      sizeCategory: logisticsAnalysis?.sizeCategory ?? null,
+      shippingEstimatesJson: logisticsAnalysis?.shippingEstimates
+        ? JSON.stringify(logisticsAnalysis.shippingEstimates) : null,
+      estimatedShippingCost: logisticsAnalysis?.estimatedShippingCost ?? null,
+      pickupDistanceMiles: logisticsAnalysis?.pickupDistanceMiles ?? null,
+      outsidePickupRadius: logisticsAnalysis?.outsidePickupRadius ?? null,
+      adjustedProfitMargin: logisticsAnalysis?.adjustedProfitMargin ?? null,
+      estimatedWeight: logisticsAnalysis?.estimatedWeightLbs ?? null,
       negotiable: estimation.negotiable,
       tags,
       requestToBuy,
+      status,
+      verifiedMarketValue,
+      marketDataSource: sellabilityAnalysis ? 'ebay_scrape' : null,
+      marketDataDate: sellabilityAnalysis ? new Date() : null,
+      trueDiscountPercent,
+      llmAnalyzed,
+      analysisDate: llmAnalyzed ? new Date() : null,
+      sellabilityScore: sellabilityAnalysis?.sellabilityScore || null,
+      demandLevel: demandAnalysis?.demandTrend ?? sellabilityAnalysis?.demandLevel ?? null,
+      soldVolume30Days: demandAnalysis?.soldVolume30Days ?? null,
+      soldVolume60Days: demandAnalysis?.soldVolume60Days ?? null,
+      soldVolume90Days: demandAnalysis?.soldVolume90Days ?? null,
+      expectedDaysToSell: sellabilityAnalysis?.expectedDaysToSell || null,
+      authenticityRisk: escalatedAuthenticityRisk,
+      conditionRisk: sellabilityAnalysis?.conditionRisk || null,
+      recommendedOffer: sellabilityAnalysis?.recommendedOfferPrice || null,
+      recommendedList: sellabilityAnalysis?.recommendedListPrice || null,
+      resaleStrategy: sellabilityAnalysis?.resaleStrategy || null,
+      // Story 5.4: Item completeness & seller reputation
+      completenessLabel,
+      sellerRating,
+      sellerReviewCount,
+      sellerAccountAgeDays: null,
+      comparableSalesJson: compMatches
+        ? JSON.stringify(compMatches.comps)
+        : capturedMarketData ? JSON.stringify(capturedMarketData.soldListings.slice(0, 5)) : null,
+      compMatchConfidence: compMatches?.confidence ?? null,
+      analysisConfidence: claudeAnalysis?.confidence ?? sellabilityAnalysis?.confidence ?? null,
+      analysisReasoning: claudeAnalysis?.reasoning ?? sellabilityAnalysis?.reasoning ?? null,
     },
   });
+
+  if (claudeAnalysis) {
+    try {
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 24);
+      await prisma.aiAnalysisCache.create({
+        data: {
+          listingId: savedListing.id,
+          analysisResult: JSON.stringify(claudeAnalysis),
+          expiresAt,
+        },
+      });
+    } catch (cacheErr) {
+      console.error(`Failed to cache Claude analysis for Mercari item ${item.id}:`, cacheErr);
+    }
+  }
 
   // Emit SSE event for real-time notification
   await sseEmitter.emit({
@@ -552,12 +813,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'keywords is required' }, { status: 400 });
     }
 
+    const userSettings = await prisma.userSettings.findUnique({ where: { userId } });
+    const discountThreshold = userSettings?.discountThreshold ?? 50;
+    const feeRate = getPlatformFeeRate('MERCARI', userSettings);
+    const opportunityThreshold = userSettings?.opportunityThreshold ?? 70;
+    const hasLLM = !!process.env.OPENAI_API_KEY;
+
     const sanitizedLimit = Math.min(body.limit ?? DEFAULT_LIMIT, MAX_LIMIT);
     const searchParams: ScrapeRequestBody = {
       ...body,
       keywords: body.keywords.trim(),
       limit: sanitizedLimit,
     };
+
+    // Enforce subscription tier limits (scan count + marketplace)
+    await enforceTierLimits(userId, 'MERCARI');
 
     // Create scraper job record
     const scraperJob = await prisma.scraperJob.create({
@@ -583,12 +853,14 @@ export async function POST(request: NextRequest) {
       for (const item of activeListings) {
         if (!item.id || !item.name) continue;
         try {
-          const listing = await saveListingFromMercariItem(item, userId);
+          const listing = await saveListingFromMercariItem(item, userId, discountThreshold, hasLLM, feeRate, opportunityThreshold, userSettings);
+          if (!listing) continue;
           savedListings.push(listing);
         } catch (err) {
           console.error(`Failed to save Mercari item ${item.id}:`, err);
         }
       }
+      await closeMarketBrowser();
 
       // Store price history from sold listings
       const priceHistorySaved = await storePriceHistoryRecords(
@@ -628,6 +900,11 @@ export async function POST(request: NextRequest) {
       throw error;
     }
   } catch (error) {
+    // Return tier limit errors with proper 403 status
+    if (error instanceof ForbiddenError) {
+      return handleError(error);
+    }
+
     console.error('Error running Mercari scraper:', error);
 
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';

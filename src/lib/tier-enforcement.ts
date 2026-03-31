@@ -1,10 +1,23 @@
 /**
- * Tier enforcement utilities.
- * Use these in API routes to check subscription limits before allowing actions.
+ * @file src/lib/tier-enforcement.ts
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-03-08
+ * @version 2.0
+ * @brief Subscription tier enforcement — scan limits, marketplace limits, feature gates.
+ *
+ * @description
+ * Provides check functions (checkScanLimit, checkMarketplaceLimit,
+ * checkSearchConfigLimit, checkFeatureAccess) that return TierCheckResult
+ * objects, plus enforceTierLimits() which queries the database and throws
+ * ForbiddenError when limits are exceeded. Used by all scraper and
+ * feature-gated API routes.
  */
 
 import { getTierLimits, isAtScanLimit, canAddMarketplace, canAddSearchConfig, hasFeatureAccess } from './subscription-tiers';
 import type { SubscriptionTier, TierLimits } from './subscription-tiers';
+import prisma from './db';
+import { ForbiddenError } from './errors';
 
 export interface TierCheckResult {
   allowed: boolean;
@@ -23,7 +36,7 @@ export function checkScanLimit(tier: string | undefined | null, scansToday: numb
   if (isAtScanLimit(resolvedTier, scansToday)) {
     return {
       allowed: false,
-      reason: `Daily scan limit reached (${limits.scansPerDay} scans/day on ${limits.name} plan). Upgrade for more scans.`,
+      reason: 'Daily scan limit reached. Upgrade to FLIPPER for unlimited scans.',
       tier: resolvedTier,
       limits,
     };
@@ -40,9 +53,13 @@ export function checkMarketplaceLimit(tier: string | undefined | null, currentCo
   const limits = getTierLimits(resolvedTier);
 
   if (!canAddMarketplace(resolvedTier, currentCount)) {
+    const marketplaceMessages: Record<string, string> = {
+      FREE: 'FREE plan supports 1 marketplace. Upgrade to FLIPPER for 3 marketplaces.',
+      FLIPPER: 'FLIPPER plan supports 3 marketplaces. Upgrade to PRO for all 5 marketplaces.',
+    };
     return {
       allowed: false,
-      reason: `Marketplace limit reached (${limits.maxMarketplaces} on ${limits.name} plan). Upgrade for more marketplaces.`,
+      reason: marketplaceMessages[resolvedTier] || `Marketplace limit reached (${limits.maxMarketplaces} on ${limits.name} plan). Upgrade for more marketplaces.`,
       tier: resolvedTier,
       limits,
     };
@@ -96,4 +113,47 @@ export function checkFeatureAccess(
   }
 
   return { allowed: true, tier: resolvedTier, limits };
+}
+
+/**
+ * Enforce scan and marketplace tier limits for a user before creating a scraper job.
+ * Queries the database for user tier, today's scan count, and all-time distinct
+ * marketplaces (durable state). Throws ForbiddenError if any limit is exceeded.
+ *
+ * NOTE: The check-then-act pattern here is not atomic — concurrent requests can
+ * slip past the daily scan limit by a small margin. At current traffic volumes
+ * this is acceptable; if high concurrency becomes an issue, wrap the count check
+ * and job creation in a serializable transaction or use a Redis atomic counter.
+ */
+export async function enforceTierLimits(userId: string, platform: string): Promise<void> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { subscriptionTier: true },
+  });
+  const tier = user?.subscriptionTier ?? 'FREE';
+
+  // Check daily scan limit
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const scansToday = await prisma.scraperJob.count({
+    where: { userId, createdAt: { gte: startOfDay } },
+  });
+  const scanCheck = checkScanLimit(tier, scansToday);
+  if (!scanCheck.allowed) {
+    throw new ForbiddenError(scanCheck.reason, { tier });
+  }
+
+  // Check marketplace limit using all-time distinct platforms (durable state)
+  const distinctMarketplaces = await prisma.scraperJob.groupBy({
+    by: ['platform'],
+    where: { userId },
+  });
+  const existingPlatforms = distinctMarketplaces.map((g) => g.platform);
+
+  if (!existingPlatforms.includes(platform)) {
+    const marketplaceCheck = checkMarketplaceLimit(tier, existingPlatforms.length);
+    if (!marketplaceCheck.allowed) {
+      throw new ForbiddenError(marketplaceCheck.reason, { tier });
+    }
+  }
 }

@@ -3,6 +3,11 @@
 import { GET, POST } from '@/app/api/price-history/route';
 import { NextRequest } from 'next/server';
 
+// Mock auth - default to authenticated paid user for feature-gated routes
+jest.mock('@/lib/auth-middleware', () => ({
+  getAuthUserId: jest.fn(() => Promise.resolve('user-123')),
+}));
+
 // Mock the price history service
 jest.mock('@/lib/price-history-service', () => ({
   fetchAndStorePriceHistory: jest.fn(),
@@ -11,14 +16,20 @@ jest.mock('@/lib/price-history-service', () => ({
   batchUpdateListingsWithMarketValue: jest.fn(),
 }));
 
-// Mock db to prevent real database connections
+// Mock db — return FLIPPER tier user so feature gate passes
 jest.mock('@/lib/db', () => ({
   __esModule: true,
-  default: {},
+  default: {
+    user: {
+      findUnique: jest.fn(() => Promise.resolve({ subscriptionTier: 'FLIPPER' })),
+    },
+  },
   prisma: {},
 }));
 
 import * as priceHistoryService from '@/lib/price-history-service';
+import { getAuthUserId } from '@/lib/auth-middleware';
+import prisma from '@/lib/db';
 
 describe('GET /api/price-history', () => {
   it('should return price history for a product', async () => {
@@ -82,6 +93,35 @@ describe('GET /api/price-history', () => {
     expect(response.status).toBe(500);
     expect(data.success).toBe(false);
     consoleSpy.mockRestore();
+  });
+
+  it('should return 403 for FREE tier user (feature gated)', async () => {
+    (prisma.user.findUnique as jest.Mock).mockResolvedValueOnce({ subscriptionTier: 'FREE' });
+
+    const request = new NextRequest(
+      'http://localhost:3000/api/price-history?productName=iPhone+13'
+    );
+
+    const response = await GET(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('FORBIDDEN');
+  });
+
+  it('should return 403 for unauthenticated user (defaults to FREE)', async () => {
+    (getAuthUserId as jest.Mock).mockResolvedValueOnce(null);
+
+    const request = new NextRequest(
+      'http://localhost:3000/api/price-history?productName=iPhone+13'
+    );
+
+    const response = await GET(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(data.error.code).toBe('FORBIDDEN');
   });
 });
 
@@ -176,5 +216,36 @@ describe('POST /api/price-history', () => {
     expect(response.status).toBe(500);
     expect(data.success).toBe(false);
     consoleSpy.mockRestore();
+  });
+
+  it('should return 403 for FREE tier user (feature gated)', async () => {
+    (prisma.user.findUnique as jest.Mock).mockResolvedValueOnce({ subscriptionTier: 'FREE' });
+
+    const request = new NextRequest('http://localhost:3000/api/price-history', {
+      method: 'POST',
+      body: JSON.stringify({ productName: 'iPhone 13' }),
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('FORBIDDEN');
+  });
+
+  it('should return 403 for unauthenticated user (defaults to FREE)', async () => {
+    (getAuthUserId as jest.Mock).mockResolvedValueOnce(null);
+
+    const request = new NextRequest('http://localhost:3000/api/price-history', {
+      method: 'POST',
+      body: JSON.stringify({ productName: 'iPhone 13' }),
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(data.error.code).toBe('FORBIDDEN');
   });
 });

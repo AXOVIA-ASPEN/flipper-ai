@@ -21,7 +21,10 @@ export async function GET(
     }
 
     const { id } = await params;
-    const listing = await prisma.listing.findUnique({ where: { id } });
+    const listing = await prisma.listing.findUnique({
+      where: { id },
+      include: { images: true, opportunity: true },
+    });
 
     if (!listing) {
       throw new NotFoundError('Listing not found');
@@ -59,9 +62,18 @@ export async function PATCH(
     }
 
     const body = await request.json();
+    const { title, description, location, condition, askingPrice, sellerName, sellerContact } = body;
+    const updateData: Record<string, unknown> = {};
+    if (title !== undefined) updateData.title = title;
+    if (description !== undefined) updateData.description = description;
+    if (location !== undefined) updateData.location = location;
+    if (condition !== undefined) updateData.condition = condition;
+    if (askingPrice !== undefined) updateData.askingPrice = askingPrice;
+    if (sellerName !== undefined) updateData.sellerName = sellerName;
+    if (sellerContact !== undefined) updateData.sellerContact = sellerContact;
     const updatedListing = await prisma.listing.update({
       where: { id },
-      data: body,
+      data: updateData,
     });
 
     return NextResponse.json({

@@ -190,6 +190,16 @@ describe('Firebase Cloud Messaging — Client-side', () => {
       const unsub = await onForegroundMessage(jest.fn());
       expect(typeof unsub).toBe('function');
     });
+
+    it('returns no-op when onMessage throws', async () => {
+      mockOnMessage.mockImplementation(() => {
+        throw new Error('Channel closed');
+      });
+      const { onForegroundMessage } = await import('@/lib/firebase/messaging');
+      const unsub = await onForegroundMessage(jest.fn());
+      expect(typeof unsub).toBe('function');
+      unsub(); // should not throw
+    });
   });
 
   describe('import validation', () => {

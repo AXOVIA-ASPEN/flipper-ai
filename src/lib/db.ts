@@ -1,11 +1,12 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient as PrismaClientBase } from '@prisma/client';
+import type { PrismaClient } from '../generated/prisma';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-function createPrismaClient() {
+function createPrismaClient(): PrismaClient {
   if (!process.env.DATABASE_URL) {
     throw new Error('DATABASE_URL environment variable is not set');
   }
@@ -20,14 +21,24 @@ function createPrismaClient() {
     idleTimeoutMillis: 30_000,
   });
 
-  return new PrismaClient({
+  return new PrismaClientBase({
     adapter,
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-  });
+  }) as unknown as PrismaClient;
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
+// Lazy singleton — createPrismaClient() is only called on first property access,
+// not at module-import time. This prevents DATABASE_URL errors when the module
+// is imported by code that doesn't actually query the database (e.g. BDD step defs).
+const handler: ProxyHandler<object> = {
+  get(_target, prop) {
+    if (!globalForPrisma.prisma) {
+      globalForPrisma.prisma = createPrismaClient();
+    }
+    return (globalForPrisma.prisma as unknown as Record<string | symbol, unknown>)[prop];
+  },
+};
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+export const prisma = new Proxy({}, handler) as PrismaClient;
 
 export default prisma;

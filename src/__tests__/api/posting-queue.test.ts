@@ -29,6 +29,9 @@ jest.mock('@/lib/db', () => ({
     listing: {
       findFirst: jest.fn(),
     },
+    user: {
+      findUnique: jest.fn(),
+    },
   },
 }));
 
@@ -42,7 +45,11 @@ const makeRequest = (url: string, options?: RequestInit) =>
 const makeParams = (id: string) => ({ params: Promise.resolve({ id }) });
 
 describe('POST /api/posting-queue', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    // Default: PRO tier user (ebayCrossListing allowed)
+    (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({ subscriptionTier: 'PRO' });
+  });
 
   it('creates a single queue item', async () => {
     const listing = { id: 'lst-1', platform: 'CRAIGSLIST', userId: 'test-user-id' };
@@ -363,7 +370,10 @@ describe('POST /api/posting-queue/:id/retry', () => {
 
 // ── Branch coverage: scheduledAt non-null path (??  operator) ────────────────
 describe('POST /api/posting-queue - scheduledAt branch coverage', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({ subscriptionTier: 'PRO' });
+  });
 
   it('creates a single queue item with scheduledAt set (covers ?? non-null branch)', async () => {
     const listing = { id: 'lst-sched', platform: 'CRAIGSLIST', userId: 'test-user-id' };

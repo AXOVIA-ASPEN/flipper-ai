@@ -11,6 +11,8 @@ const mockFindMany = jest.fn();
 const mockCount = jest.fn();
 const mockCreate = jest.fn();
 
+const mockUserFindUnique = jest.fn();
+
 jest.mock('@/lib/db', () => ({
   __esModule: true,
   default: {
@@ -18,6 +20,9 @@ jest.mock('@/lib/db', () => ({
       findMany: (...args: unknown[]) => mockFindMany(...args),
       count: (...args: unknown[]) => mockCount(...args),
       create: (...args: unknown[]) => mockCreate(...args),
+    },
+    user: {
+      findUnique: (...args: unknown[]) => mockUserFindUnique(...args),
     },
   },
 }));
@@ -184,6 +189,8 @@ describe('POST /api/messages', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockCreate.mockResolvedValue({ ...sampleMessage, direction: 'OUTBOUND', status: 'PENDING_APPROVAL' });
+    // Default: FLIPPER tier user (messaging allowed)
+    mockUserFindUnique.mockResolvedValue({ subscriptionTier: 'FLIPPER' });
   });
 
   it('creates an outbound message', async () => {

@@ -48,6 +48,7 @@ const COLUMNS = [
   { id: 'PURCHASED', label: 'Purchased', color: 'from-purple-400 to-purple-600', border: 'border-purple-400/50', shadow: 'shadow-purple-500/20', count: 'bg-purple-500/30 text-purple-200' },
   { id: 'LISTED', label: 'Listed', color: 'from-orange-400 to-pink-500', border: 'border-orange-400/50', shadow: 'shadow-orange-500/20', count: 'bg-orange-500/30 text-orange-200' },
   { id: 'SOLD', label: 'Sold', color: 'from-green-400 to-emerald-600', border: 'border-green-400/50', shadow: 'shadow-green-500/20', count: 'bg-green-500/30 text-green-200' },
+  { id: 'PASSED', label: 'Passed', color: 'from-gray-400 to-gray-600', border: 'border-gray-400/50', shadow: 'shadow-gray-500/20', count: 'bg-gray-500/30 text-gray-200' },
 ] as const;
 
 function getPlatformIcon(platform: string) {

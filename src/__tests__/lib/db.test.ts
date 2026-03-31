@@ -11,7 +11,7 @@ jest.mock('@prisma/adapter-pg', () => ({
 jest.mock('@prisma/client', () => ({
   PrismaClient: jest.fn((options: { adapter: unknown }) => {
     prismaClientMock(options);
-    return {};
+    return { user: {} };
   }),
 }));
 
@@ -40,9 +40,13 @@ describe('Database client configuration', () => {
   it('uses DATABASE_URL when provided', () => {
     process.env.DATABASE_URL = 'postgresql://user:pass@localhost:5432/testdb';
 
+    let db: { default: Record<string, unknown> } | undefined;
     jest.isolateModules(() => {
-      require('@/lib/db');
+      db = require('@/lib/db');
     });
+
+    // Trigger lazy initialization by accessing a property
+    void db!.default.user;
 
     expect(prismaPgMock).toHaveBeenCalledWith(
       expect.objectContaining({ connectionString: 'postgresql://user:pass@localhost:5432/testdb' })
@@ -52,10 +56,14 @@ describe('Database client configuration', () => {
   it('throws when DATABASE_URL is not set', () => {
     delete process.env.DATABASE_URL;
 
+    let db: { default: Record<string, unknown> } | undefined;
+    jest.isolateModules(() => {
+      db = require('@/lib/db');
+    });
+
+    // Client is lazily created — the throw happens on first property access
     expect(() => {
-      jest.isolateModules(() => {
-        require('@/lib/db');
-      });
+      void db!.default.user;
     }).toThrow('DATABASE_URL environment variable is not set');
   });
 });

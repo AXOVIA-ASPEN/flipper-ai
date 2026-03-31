@@ -6,6 +6,13 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+// Mock next/navigation
+jest.mock('next/navigation', () => ({
+  useSearchParams: () => ({ get: () => null }),
+  useRouter: () => ({ push: jest.fn() }),
+  usePathname: () => '/opportunities',
+}));
+
 // Mock next/link
 jest.mock('next/link', () => {
   return function MockLink({ children, href, ...props }: any) {

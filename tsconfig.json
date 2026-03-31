@@ -39,6 +39,7 @@
     "prisma/seed.ts",
     "functions/**/*",
     "scripts/**/*",
-    "test/**/*"
+    "test/**/*",
+    "docs/archive/**/*"
   ]
 }

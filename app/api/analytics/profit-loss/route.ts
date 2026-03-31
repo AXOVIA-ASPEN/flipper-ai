@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserId } from '@/lib/auth-middleware';
 import { getProfitLossAnalytics } from '@/lib/analytics-service';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
+import { handleError } from '@/lib/errors';
 /**
  * GET /api/analytics/profit-loss
  * Query params: granularity=weekly|monthly (default: monthly)
@@ -10,9 +10,13 @@ import { handleError, ValidationError, NotFoundError, UnauthorizedError, Forbidd
 export async function GET(request: NextRequest) {
   try {
     const userId = await getAuthUserId();
-    const granularity = (request.nextUrl.searchParams.get('granularity') as 'weekly' | 'monthly') || 'monthly';
+    const { searchParams } = request.nextUrl;
+    const rawGranularity = searchParams.get('granularity');
+    const granularity: 'weekly' | 'monthly' = rawGranularity === 'weekly' ? 'weekly' : 'monthly';
+    const dateFrom = searchParams.get('dateFrom') || undefined;
+    const dateTo = searchParams.get('dateTo') || undefined;
 
-    const analytics = await getProfitLossAnalytics(userId, granularity);
+    const analytics = await getProfitLossAnalytics(userId, granularity, dateFrom, dateTo);
 
     return NextResponse.json(analytics);
   } catch (error) {

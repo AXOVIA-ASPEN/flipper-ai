@@ -16,6 +16,12 @@ export interface FilterState {
   maxScore: string;
   minProfit: string;
   maxProfit: string;
+  page: string;
+  limit: string;
+  // NEW: multi-select fields (comma-separated values in URL)
+  platforms: string; // e.g. "CRAIGSLIST,EBAY"
+  categories: string; // e.g. "electronics,furniture"
+  statuses: string; // e.g. "IDENTIFIED,PURCHASED"
 }
 
 const DEFAULT_FILTERS: FilterState = {
@@ -31,6 +37,11 @@ const DEFAULT_FILTERS: FilterState = {
   maxScore: '',
   minProfit: '',
   maxProfit: '',
+  page: '1',
+  limit: '20',
+  platforms: '',
+  categories: '',
+  statuses: '',
 };
 
 export interface UseFilterParamsReturn {
@@ -61,11 +72,16 @@ export function useFilterParams(): UseFilterParamsReturn {
       maxScore: searchParams.get('maxScore') || DEFAULT_FILTERS.maxScore,
       minProfit: searchParams.get('minProfit') || DEFAULT_FILTERS.minProfit,
       maxProfit: searchParams.get('maxProfit') || DEFAULT_FILTERS.maxProfit,
+      page: searchParams.get('page') || DEFAULT_FILTERS.page,
+      limit: searchParams.get('limit') || DEFAULT_FILTERS.limit,
+      platforms: searchParams.get('platforms') || DEFAULT_FILTERS.platforms,
+      categories: searchParams.get('categories') || DEFAULT_FILTERS.categories,
+      statuses: searchParams.get('statuses') || DEFAULT_FILTERS.statuses,
     }),
     [searchParams]
   );
 
-  // Calculate active filter count (excluding "all" status which is the default)
+  // Calculate active filter count (excluding "all" status, default page/limit)
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (filters.status && filters.status !== 'all') count++;
@@ -80,6 +96,9 @@ export function useFilterParams(): UseFilterParamsReturn {
     if (filters.maxScore) count++;
     if (filters.minProfit) count++;
     if (filters.maxProfit) count++;
+    if (filters.platforms) count++;
+    if (filters.categories) count++;
+    if (filters.statuses) count++;
     return count;
   }, [filters]);
 
@@ -105,6 +124,11 @@ export function useFilterParams(): UseFilterParamsReturn {
       if (newFilters.maxScore) params.set('maxScore', newFilters.maxScore);
       if (newFilters.minProfit) params.set('minProfit', newFilters.minProfit);
       if (newFilters.maxProfit) params.set('maxProfit', newFilters.maxProfit);
+      if (newFilters.page && newFilters.page !== '1') params.set('page', newFilters.page);
+      if (newFilters.limit && newFilters.limit !== '20') params.set('limit', newFilters.limit);
+      if (newFilters.platforms) params.set('platforms', newFilters.platforms);
+      if (newFilters.categories) params.set('categories', newFilters.categories);
+      if (newFilters.statuses) params.set('statuses', newFilters.statuses);
 
       const queryString = params.toString();
       const newURL = queryString ? `${pathname}?${queryString}` : pathname;
@@ -143,4 +167,24 @@ export function useFilterParams(): UseFilterParamsReturn {
     clearFilters,
     activeFilterCount,
   };
+}
+
+/**
+ * Toggles a value in a comma-separated filter string.
+ * Returns the new comma-separated string.
+ */
+export function toggleMultiSelectValue(current: string, value: string): string {
+  const values = current ? current.split(',').filter(Boolean) : [];
+  const idx = values.indexOf(value);
+  if (idx === -1) {
+    return [...values, value].join(',');
+  }
+  return values.filter((v) => v !== value).join(',');
+}
+
+/**
+ * Returns whether a value is active in a comma-separated filter string.
+ */
+export function isMultiSelectActive(current: string, value: string): boolean {
+  return current ? current.split(',').filter(Boolean).includes(value) : false;
 }

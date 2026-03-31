@@ -1,1 +1,225 @@
-[]
+[
+  {
+    "description": "  As a flipper\n  I want to scan multiple marketplaces for items\n  So I can find flip opportunities across platforms",
+    "elements": [
+      {
+        "description": "",
+        "id": "multi-marketplace-scanning;scan-ebay-for-electronics",
+        "keyword": "Scenario",
+        "line": 10,
+        "name": "Scan eBay for electronics",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 92159749
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 7,
+            "name": "I am logged in as a free user",
+            "match": {
+              "location": "test/features/step_definitions/common-steps.ts:77"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1434177915
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 8,
+            "name": "the database is seeded with test data",
+            "match": {
+              "location": "test/features/step_definitions/common-steps.ts:91"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 281613084
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 11,
+            "name": "I navigate to the scanner page",
+            "match": {
+              "location": "test/features/step_definitions/common-steps.ts:110"
+            },
+            "result": {
+              "status": "failed",
+              "duration": 30000771416,
+              "error_message": "Error: function timed out, ensure the promise resolves within 30000 milliseconds\n    at Timeout.<anonymous> (/Users/stephenboyett/Desktop/Github/axovia-aspen/flipper-ai/node_modules/.pnpm/@cucumber+cucumber@12.4.0/node_modules/@cucumber/cucumber/lib/time.js:64:20)\n    at listOnTimeout (node:internal/timers:605:17)\n    at process.processTimers (node:internal/timers:541:7)"
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 12,
+            "name": "I select \"eBay\" as the marketplace",
+            "match": {
+              "location": "test/features/step_definitions/marketplace-scanning.steps.ts:20"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 13,
+            "name": "I select \"Electronics\" as the category",
+            "match": {
+              "location": "test/features/step_definitions/marketplace-scanning.steps.ts:30"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 14,
+            "name": "I set price range to \"$50-$500\"",
+            "match": {
+              "location": "test/features/step_definitions/marketplace-scanning.steps.ts:37"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 15,
+            "name": "I click \"Start Scan\"",
+            "match": {
+              "location": "test/features/step_definitions/common-steps.ts:170"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 16,
+            "name": "I should see a \"Scanning eBay...\" progress indicator",
+            "match": {
+              "location": "test/features/step_definitions/marketplace-scanning.steps.ts:51"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 17,
+            "name": "within 10 seconds, results should be displayed",
+            "match": {
+              "location": "test/features/step_definitions/marketplace-scanning.steps.ts:63"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [
+              {
+                "rows": [
+                  {
+                    "cells": [
+                      "Field",
+                      "Present"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Title",
+                      "Yes"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Price",
+                      "Yes"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Marketplace",
+                      "Yes"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Thumbnail",
+                      "Yes"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "Flippability",
+                      "Yes"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "keyword": "And ",
+            "line": 18,
+            "name": "each result should show:",
+            "match": {
+              "location": "test/features/step_definitions/marketplace-scanning.steps.ts:73"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 25,
+            "name": "results should be sorted by flippability score descending",
+            "match": {
+              "location": "test/features/step_definitions/marketplace-scanning.steps.ts:89"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 69358666
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      }
+    ],
+    "id": "multi-marketplace-scanning",
+    "line": 1,
+    "keyword": "Feature",
+    "name": "Multi-Marketplace Scanning",
+    "tags": [],
+    "uri": "test/features/01-marketplace-scanning.feature"
+  }
+]

@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
+import { handleError, ValidationError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import {
   SearchConfigQuerySchema,
   CreateSearchConfigSchema,
   validateQuery,
   validateBody,
 } from '@/lib/validations';
+import { checkSearchConfigLimit } from '@/lib/tier-enforcement';
 
 // GET /api/search-configs - List all search configurations
 export async function GET(request: NextRequest) {
@@ -57,6 +58,15 @@ export async function POST(request: NextRequest) {
     if (!userId) {
       throw new UnauthorizedError('Unauthorized');
     }
+
+    // Enforce search config limit
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { subscriptionTier: true } });
+    const currentCount = await prisma.searchConfig.count({ where: { userId } });
+    const configCheck = checkSearchConfigLimit(user?.subscriptionTier, currentCount);
+    if (!configCheck.allowed) {
+      throw new ForbiddenError(configCheck.reason);
+    }
+
     const body = await request.json();
     const parsed = validateBody(CreateSearchConfigSchema, body);
     if (!parsed.success) {

@@ -43,6 +43,14 @@ export interface CategoryBreakdown {
   avgDaysToSell: number;
 }
 
+export interface PlatformBreakdown {
+  platform: string;
+  count: number;
+  totalProfit: number;
+  avgProfit: number;
+  successRate: number;
+}
+
 export interface ProfitLossSummary {
   totalInvested: number;
   totalRevenue: number;
@@ -54,11 +62,14 @@ export interface ProfitLossSummary {
   completedDeals: number;
   activeDeals: number;
   winRate: number; // % of completed deals that were profitable
+  avgProfitPerFlip: number; // totalNetProfit / completedDeals (0 if no completed deals)
+  successRate: number; // sold items / total items * 100
   bestDeal: ProfitLossItem | null;
   worstDeal: ProfitLossItem | null;
   items: ProfitLossItem[];
   trends: TrendPoint[];
   categoryBreakdown: CategoryBreakdown[];
+  platformBreakdown: PlatformBreakdown[];
 }
 
 function toTrendPeriod(date: Date, granularity: 'weekly' | 'monthly'): string {
@@ -78,7 +89,9 @@ function toTrendPeriod(date: Date, granularity: 'weekly' | 'monthly'): string {
 
 export async function getProfitLossAnalytics(
   userId?: string | null,
-  granularity: 'weekly' | 'monthly' = 'monthly'
+  granularity: 'weekly' | 'monthly' = 'monthly',
+  dateFrom?: string | null,
+  dateTo?: string | null,
 ): Promise<ProfitLossSummary> {
   const where: Record<string, unknown> = {
     status: { in: ['PURCHASED', 'LISTED', 'SOLD'] },
@@ -88,6 +101,13 @@ export async function getProfitLossAnalytics(
 
   if (userId) {
     where.OR = [{ userId }, { userId: null }];
+  }
+
+  if (dateFrom || dateTo) {
+    where.purchaseDate = {
+      ...(dateFrom ? { gte: new Date(dateFrom) } : {}),
+      ...(dateTo ? { lte: new Date(dateTo + 'T23:59:59Z') } : {}),
+    };
   }
 
   const opportunities = await prisma.opportunity.findMany({
@@ -145,6 +165,14 @@ export async function getProfitLossAnalytics(
     ? (completedItems.filter((i) => i.netProfit > 0).length / completedDeals) * 100
     : 0;
 
+  const soldNetProfit = completedItems.reduce((s, i) => s + i.netProfit, 0);
+  const avgProfitPerFlip = completedDeals > 0
+    ? Math.round((soldNetProfit / completedDeals) * 100) / 100
+    : 0;
+  const successRate = items.length > 0
+    ? Math.round((completedItems.length / items.length) * 10000) / 100
+    : 0;
+
   // Best/worst
   const sorted = [...items].sort((a, b) => b.netProfit - a.netProfit);
   const bestDeal = sorted.length > 0 ? sorted[0] : null;
@@ -187,6 +215,24 @@ export async function getProfitLossAnalytics(
     if (!catMap.has(cat)) catMap.set(cat, { items: [] });
     catMap.get(cat)!.items.push(item);
   }
+  // Platform breakdown
+  const platformMap = new Map<string, ProfitLossItem[]>();
+  for (const item of items) {
+    if (!platformMap.has(item.platform)) platformMap.set(item.platform, []);
+    platformMap.get(item.platform)!.push(item);
+  }
+  const platformBreakdown: PlatformBreakdown[] = [...platformMap.entries()].map(([platform, pItems]) => {
+    const profit = pItems.reduce((s, i) => s + i.netProfit, 0);
+    const sold = pItems.filter((i) => i.status === 'SOLD');
+    return {
+      platform,
+      count: pItems.length,
+      totalProfit: Math.round(profit * 100) / 100,
+      avgProfit: Math.round((pItems.length > 0 ? profit / pItems.length : 0) * 100) / 100,
+      successRate: Math.round((pItems.length > 0 ? (sold.length / pItems.length) * 100 : 0) * 100) / 100,
+    };
+  }).sort((a, b) => b.totalProfit - a.totalProfit);
+
   const categoryBreakdown: CategoryBreakdown[] = [...catMap.entries()].map(([cat, data]) => {
     const catItems = data.items;
     const invested = catItems.reduce((s, i) => s + i.purchasePrice, 0);
@@ -220,10 +266,13 @@ export async function getProfitLossAnalytics(
     completedDeals,
     activeDeals,
     winRate: Math.round(winRate * 100) / 100,
+    avgProfitPerFlip,
+    successRate,
     bestDeal,
     worstDeal,
     items,
     trends,
     categoryBreakdown,
+    platformBreakdown,
   };
 }

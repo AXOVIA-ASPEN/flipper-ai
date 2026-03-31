@@ -16,6 +16,9 @@ jest.mock('@/lib/db', () => ({
     facebookToken: {
       findUnique: jest.fn(),
     },
+    userSettings: {
+      findUnique: jest.fn().mockResolvedValue(null),
+    },
   },
 }));
 
@@ -43,6 +46,24 @@ jest.mock('@/lib/value-estimator', () => ({
   })),
   detectCategory: jest.fn(() => 'electronics'),
   generatePurchaseMessage: jest.fn(() => 'Hi, is this still available?'),
+}));
+
+jest.mock('@/lib/llm-identifier', () => ({
+  identifyItem: jest.fn(),
+}));
+
+jest.mock('@/lib/market-price', () => ({
+  fetchMarketPrice: jest.fn(),
+  closeBrowser: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock('@/lib/llm-analyzer', () => ({
+  analyzeSellability: jest.fn(),
+  quickDiscountCheck: jest.fn(),
+}));
+
+jest.mock('@/lib/tier-enforcement', () => ({
+  enforceTierLimits: jest.fn().mockResolvedValue(undefined),
 }));
 
 global.fetch = jest.fn();
@@ -622,9 +643,8 @@ describe('Facebook Marketplace Scraper API', () => {
         body: JSON.stringify({ keywords: 'test', accessToken: 'token' }),
       });
       const res = await POST(request);
-      expect(res.status).toBe(500);
-      const json = await res.json();
-      expect(json.error.code).toBe('INTERNAL_ERROR');
+      // Per-item try/catch catches DB errors without aborting the scan
+      expect(res.status).toBe(200);
     });
 
     it('covers non-Error throw branch (error.message fallback to Unknown string)', async () => {
@@ -637,16 +657,15 @@ describe('Facebook Marketplace Scraper API', () => {
           data: [{ id: 'fb-non-err', name: 'Non Error Item', price: '50' }],
         }),
       });
-      // Throw a non-Error object to hit the false branch of `error instanceof Error`
+      // Throw a non-Error object — per-item try/catch catches it gracefully
       (prisma.listing.upsert as jest.Mock).mockImplementation(() => { throw 'string-error'; });
       const request = new NextRequest('http://localhost/api/scraper/facebook', {
         method: 'POST',
         body: JSON.stringify({ keywords: 'test', accessToken: 'token' }),
       });
       const res = await POST(request);
-      expect(res.status).toBe(500);
-      const json = await res.json();
-      expect(json.error.code).toBe('INTERNAL_ERROR');
+      // Per-item try/catch catches the error; scan completes with 0 saved listings
+      expect(res.status).toBe(200);
     });
 
     it('falls back to "electronics" category when detectCategory returns null', async () => {
@@ -676,6 +695,7 @@ describe('Facebook Marketplace Scraper API', () => {
         expect.any(Number),
         null,
         'electronics',
+        expect.any(Number),  // feeRate
       );
     });
 
@@ -726,5 +746,214 @@ describe('Facebook Marketplace Scraper API', () => {
       const res = await POST(request);
       expect(res.status).toBe(200);
     });
+  });
+});
+
+// ── LLM Sellability Pipeline (hasLLM=true) ────────────────────────────────────
+describe('Facebook scraper - LLM sellability pipeline (Story 4.5)', () => {
+  const fbItem = {
+    id: 'fb-llm-001',
+    name: 'Apple iPhone 14 Pro',
+    description: 'Excellent condition, 256GB',
+    price: '300',
+    category: 'electronics',
+    condition: 'used_like_new',
+  };
+
+  const defaultIdentification = {
+    brand: 'Apple',
+    model: 'iPhone 14 Pro',
+    variant: '256GB',
+    condition: 'like new',
+    conditionNotes: '',
+    category: 'electronics',
+    searchQuery: 'Apple iPhone 14 Pro 256GB',
+    worthInvestigating: true,
+  };
+
+  const defaultMarketData = {
+    medianPrice: 500,
+    salesCount: 8,
+    averagePrice: 510,
+    minPrice: 450,
+    maxPrice: 560,
+    soldListings: [],
+  };
+
+  const defaultSellabilityAnalysis = {
+    verifiedMarketValue: 500,
+    trueDiscountPercent: 55,
+    sellabilityScore: 85,
+    meetsThreshold: true,
+    demandLevel: 'high',
+    expectedDaysToSell: 5,
+    authenticityRisk: 'low',
+    resaleStrategy: 'Sell on eBay',
+    confidence: 'high',
+    reasoning: 'Strong demand',
+  };
+
+  let mockIdentifyItem: jest.Mock;
+  let mockFetchMarketPrice: jest.Mock;
+  let mockCloseBrowser: jest.Mock;
+  let mockAnalyzeSellability: jest.Mock;
+  let mockQuickDiscountCheck: jest.Mock;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    process.env.OPENAI_API_KEY = 'test-llm-key';
+
+    mockIdentifyItem = require('@/lib/llm-identifier').identifyItem;
+    mockFetchMarketPrice = require('@/lib/market-price').fetchMarketPrice;
+    mockCloseBrowser = require('@/lib/market-price').closeBrowser;
+    mockAnalyzeSellability = require('@/lib/llm-analyzer').analyzeSellability;
+    mockQuickDiscountCheck = require('@/lib/llm-analyzer').quickDiscountCheck;
+
+    mockIdentifyItem.mockResolvedValue(defaultIdentification);
+    mockFetchMarketPrice.mockResolvedValue(defaultMarketData);
+    mockCloseBrowser.mockResolvedValue(undefined);
+    mockQuickDiscountCheck.mockReturnValue({ passesQuickCheck: true, estimatedDiscount: 40 });
+    mockAnalyzeSellability.mockResolvedValue(defaultSellabilityAnalysis);
+
+    (getAuthUserId as jest.Mock).mockResolvedValue('user-llm');
+    (prisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-llm' });
+    (prisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+    (prisma.listing.upsert as jest.Mock).mockResolvedValue({ id: 'saved-llm', status: 'OPPORTUNITY' });
+
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({ data: [fbItem] }),
+    });
+  });
+
+  afterEach(() => {
+    delete process.env.OPENAI_API_KEY;
+  });
+
+  it('runs full LLM pipeline and saves listing as OPPORTUNITY when all checks pass', async () => {
+    const req = new NextRequest('http://localhost/api/scraper/facebook', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'iphone', accessToken: 'tok' }),
+    });
+    const res = await POST(req);
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(mockIdentifyItem).toHaveBeenCalled();
+    expect(mockFetchMarketPrice).toHaveBeenCalled();
+    expect(mockQuickDiscountCheck).toHaveBeenCalled();
+    expect(mockAnalyzeSellability).toHaveBeenCalled();
+    expect(prisma.listing.upsert).toHaveBeenCalled();
+    expect(json.success).toBe(true);
+  });
+
+  it('skips item when identifyItem returns worthInvestigating=false', async () => {
+    mockIdentifyItem.mockResolvedValue({ ...defaultIdentification, worthInvestigating: false });
+
+    const req = new NextRequest('http://localhost/api/scraper/facebook', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'iphone', accessToken: 'tok' }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+    expect(mockFetchMarketPrice).not.toHaveBeenCalled();
+    expect(prisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('skips item when fetchMarketPrice returns null', async () => {
+    mockFetchMarketPrice.mockResolvedValue(null);
+
+    const req = new NextRequest('http://localhost/api/scraper/facebook', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'iphone', accessToken: 'tok' }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+    expect(mockQuickDiscountCheck).not.toHaveBeenCalled();
+    expect(prisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('skips item when fetchMarketPrice returns salesCount=0', async () => {
+    mockFetchMarketPrice.mockResolvedValue({ ...defaultMarketData, salesCount: 0 });
+
+    const req = new NextRequest('http://localhost/api/scraper/facebook', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'iphone', accessToken: 'tok' }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+    expect(mockQuickDiscountCheck).not.toHaveBeenCalled();
+    expect(prisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('skips item when quickDiscountCheck fails', async () => {
+    mockQuickDiscountCheck.mockReturnValue({ passesQuickCheck: false, estimatedDiscount: 10 });
+
+    const req = new NextRequest('http://localhost/api/scraper/facebook', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'iphone', accessToken: 'tok' }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+    expect(mockAnalyzeSellability).not.toHaveBeenCalled();
+    expect(prisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('skips item when analyzeSellability returns meetsThreshold=false', async () => {
+    mockAnalyzeSellability.mockResolvedValue({ ...defaultSellabilityAnalysis, meetsThreshold: false });
+
+    const req = new NextRequest('http://localhost/api/scraper/facebook', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'iphone', accessToken: 'tok' }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+    expect(prisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('skips item when LLM throws an error during identifyItem', async () => {
+    mockIdentifyItem.mockRejectedValue(new Error('LLM API unavailable'));
+
+    const req = new NextRequest('http://localhost/api/scraper/facebook', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'iphone', accessToken: 'tok' }),
+    });
+    const res = await POST(req);
+    // LLM error is swallowed; item skipped because meetsLLMThreshold stays false
+    expect(res.status).toBe(200);
+    expect(prisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('skips item when analyzeSellability returns null', async () => {
+    mockAnalyzeSellability.mockResolvedValue(null);
+
+    const req = new NextRequest('http://localhost/api/scraper/facebook', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'iphone', accessToken: 'tok' }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+    expect(prisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('reads discountThreshold from userSettings and passes it to analyzeSellability', async () => {
+    // Override userSettings to return a custom discountThreshold
+    (prisma.userSettings.findUnique as jest.Mock).mockResolvedValueOnce({ discountThreshold: 40 });
+
+    const req = new NextRequest('http://localhost/api/scraper/facebook', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'iphone', accessToken: 'tok' }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+
+    expect(mockAnalyzeSellability).toHaveBeenCalledWith(
+      expect.any(String),   // title
+      expect.any(Number),   // price
+      expect.any(Object),   // identification
+      expect.any(Object),   // marketData
+      40,                   // discountThreshold from userSettings
+      expect.any(Number)    // feeRate from userSettings
+    );
   });
 });

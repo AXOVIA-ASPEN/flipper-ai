@@ -1,0 +1,335 @@
+# Story 8.5: Conversation Status & Inbound Message Tracking
+
+Status: ready-for-dev
+Blocked: false
+Blocked-Reason:
+Trello-Card-ID:
+
+<!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
+
+## Story
+
+As a **user**,
+I want to track conversation status and see seller replies,
+So that I know which leads need attention and which have progressed.
+
+## Acceptance Criteria
+
+1. **Conversation Status Display**
+   - Given a listing with an active conversation
+   - When the conversation status is viewed
+   - Then it shows one of: `pending` (awaiting response), `responded` (seller replied), `purchased` (deal closed)
+
+2. **Inbound Message Capture**
+   - Given the system has authenticated marketplace sessions
+   - When a seller replies to a message on the platform
+   - Then the inbound message is captured and stored with direction INBOUND
+
+3. **Auto-Status Transition: Pending → Responded**
+   - Given a new inbound message is captured
+   - When the conversation status was "pending"
+   - Then it automatically updates to "responded"
+
+4. **Auto-Status Transition: Purchased**
+   - Given the user marks a flip as purchased (Opportunity status → PURCHASED)
+   - When a conversation exists for that listing
+   - Then the conversation status updates to "purchased"
+
+5. **Browser-Based Fallback**
+   - Given inbound message tracking
+   - When the platform does not support API-based message retrieval
+   - Then the system uses authenticated browser sessions to check for replies
+
+**FRs fulfilled:** FR-COMM-06, FR-COMM-07
+
+## Requirement Traceability
+
+| PRD Requirement | Acceptance Criteria | Test Tag |
+|---|---|---|
+| FR-COMM-06 | AC 1, AC 3, AC 4 | @FR-COMM-06 @story-8-5 |
+| FR-COMM-07 | AC 2, AC 5 | @FR-COMM-07 @story-8-5 |
+
+## Tasks / Subtasks
+
+- [ ] Task 1: Add `conversationStatus` field to Listing model (AC: #1)
+  - [ ] 1.1 Add `conversationStatus String?` to Listing model in `prisma/schema.prisma` (values: null, 'pending', 'responded', 'purchased')
+  - [ ] 1.2 Add `@@index([conversationStatus])` to Listing model
+  - [ ] 1.3 Run `npx prisma migrate dev --name add_conversation_status`
+  - [ ] 1.4 Regenerate Prisma client
+
+- [ ] Task 2: Create conversation status service `src/lib/conversation-status.ts` (AC: #1, #3, #4)
+  - [ ] 2.1 Define `ConversationStatus` type: `'pending' | 'responded' | 'purchased'`
+  - [ ] 2.2 Implement `getConversationStatus(listingId, userId)` — returns current status from Listing
+  - [ ] 2.3 Implement `updateConversationStatus(listingId, userId, status)` — atomic update with ownership check
+  - [ ] 2.4 Implement `transitionToPending(listingId, userId)` — set to 'pending' only if currently null
+  - [ ] 2.5 Implement `transitionToResponded(listingId, userId)` — set to 'responded' only if 'pending'
+  - [ ] 2.6 Implement `transitionToPurchased(listingId, userId)` — set to 'purchased' from any state
+  - [ ] 2.7 Validate transitions: null→pending, pending→responded, any→purchased; reject invalid transitions
+
+- [ ] Task 3: Create inbound message checker service `src/lib/inbound-message-checker.ts` (AC: #2, #5)
+  - [ ] 3.1 Define `InboundCheckResult` interface: `{ found: boolean; messages: InboundMessage[]; platform: string }`
+  - [ ] 3.2 Define `InboundMessage` interface: `{ body: string; sellerName?: string; receivedAt?: Date; externalId?: string }`
+  - [ ] 3.3 Implement `checkForReplies(listing, userId)` — dispatches to platform-specific checker
+  - [ ] 3.4 Implement platform router: maps platform string to checker function
+  - [ ] 3.5 Implement stub checkers for each platform (return `{ found: false }`) — real scraping is Phase 2
+  - [ ] 3.6 Add deduplication: skip creating INBOUND message if `externalId` already exists for this listing+user
+  - [ ] 3.7 When inbound message found: create Message record (direction=INBOUND, status=DELIVERED), call `transitionToResponded`
+
+- [ ] Task 4: Create `POST /api/messages/check-replies` route (AC: #2, #5)
+  - [ ] 4.1 Create `app/api/messages/check-replies/route.ts` with POST handler
+  - [ ] 4.2 Auth check via `getAuthUserId()`
+  - [ ] 4.3 Tier enforcement: `checkFeatureAccess(tier, 'messaging')`
+  - [ ] 4.4 Accept `{ listingId }` in request body, validate required
+  - [ ] 4.5 Fetch listing, verify ownership (scoped query: `{ id, userId }`)
+  - [ ] 4.6 Call `checkForReplies(listing, userId)`
+  - [ ] 4.7 Return `{ success: true, data: { checked: true, newMessages: count, conversationStatus } }`
+
+- [ ] Task 5: Create `GET /api/listings/[id]/conversation-status` route (AC: #1)
+  - [ ] 5.1 Create `app/api/listings/[id]/conversation-status/route.ts` with GET handler
+  - [ ] 5.2 Auth check, listing ownership (scoped query)
+  - [ ] 5.3 Return `{ success: true, data: { conversationStatus, messageCount, lastMessageAt, unreadCount } }`
+
+- [ ] Task 6: Hook into existing flows for auto-transitions (AC: #3, #4)
+  - [ ] 6.1 In `app/api/messages/generate/route.ts`: after creating DRAFT message, call `transitionToPending` — import from conversation-status service
+  - [ ] 6.2 In `app/api/opportunities/route.ts` PATCH handler: when status changes to 'PURCHASED', call `transitionToPurchased` for that listing
+  - [ ] 6.3 Both hooks are fire-and-forget (non-blocking, catch errors silently)
+
+- [ ] Task 7: Write unit tests (AC: all)
+  - [ ] 7.1 Create `src/__tests__/lib/conversation-status.test.ts`
+    - Test all transition functions (valid + invalid transitions)
+    - Test ownership check on updates
+    - Test idempotent transitions (e.g., pending→pending is no-op)
+  - [ ] 7.2 Create `src/__tests__/lib/inbound-message-checker.test.ts`
+    - Test platform routing
+    - Test stub checkers return `{ found: false }`
+    - Test deduplication logic
+    - Test message creation on found inbound
+    - Test auto-transition to responded
+  - [ ] 7.3 Create `src/__tests__/api/messages-check-replies.test.ts`
+    - Test auth, tier enforcement, validation
+    - Test listing not found, ownership check
+    - Test successful check with 0 messages found
+    - Test successful check with new messages found
+  - [ ] 7.4 Create `src/__tests__/api/listing-conversation-status.test.ts`
+    - Test auth, ownership, status retrieval
+    - Test null status (no conversation)
+  - [ ] 7.5 Update `src/__tests__/api/messages-generate.test.ts` — verify transitionToPending is called after message creation
+  - [ ] 7.6 Update `src/__tests__/api/opportunities.test.ts` — verify transitionToPurchased called on PURCHASED status change
+
+- [ ] Task 8: Write acceptance tests (AC: all)
+  - [ ] 8.1 Append scenarios to `test/acceptance/features/E-008-seller-communication-negotiation.feature`
+  - [ ] 8.2 Create `test/acceptance/step_definitions/E-008-conversation-status.steps.ts`
+  - [ ] 8.3 Write scenarios for AC1: conversation status display (pending, responded, purchased)
+  - [ ] 8.4 Write scenarios for AC2: inbound message capture (stub returns no messages for now)
+  - [ ] 8.5 Write scenarios for AC3: auto-transition pending→responded
+  - [ ] 8.6 Write scenarios for AC4: auto-transition to purchased
+  - [ ] 8.7 Write scenarios for AC5: browser-based fallback (validate service routes to platform checker)
+  - [ ] 8.8 Tag all scenarios with `@E-008-S-<N>` (check current highest S-N in feature file before adding), `@story-8-5`, `@FR-COMM-06`/`@FR-COMM-07`
+
+- [ ] Task 9: Update requirements traceability matrix (AC: all)
+  - [ ] 9.1 Update FR-COMM-06 row with scenario IDs and feature file
+  - [ ] 9.2 Update FR-COMM-07 row with scenario IDs and feature file
+  - [ ] 9.3 Update coverage summary counts
+
+## Definition of Done — Acceptance Tests
+
+Write Gherkin scenarios in `test/acceptance/features/E-008-seller-communication-negotiation.feature` covering ALL acceptance criteria above.
+
+**Required tags per scenario:**
+- `@E-008-S-<N>` — sequential scenario number within Epic 8 (continue from current highest)
+- `@story-8-5`
+- Applicable requirement tags: `@FR-COMM-06`, `@FR-COMM-07`
+
+**DoD Checklist:**
+- [ ] Gherkin acceptance tests written for all 5 ACs
+- [ ] Every scenario tagged with `@E-008-S-<N>`, `@story-8-5`, and relevant `@FR-COMM-*` tags
+- [ ] Requirements traceability matrix updated at `_bmad-output/test-artifacts/requirements-traceability-matrix.md`
+- [ ] All acceptance test scenarios pass
+- [ ] All unit/integration tests pass (`make test`)
+- [ ] Build succeeds (`make build`)
+
+## Dev Notes
+
+### Architecture Requirements
+
+**Database: New field on Listing model**
+- `conversationStatus String?` on the Listing model in `prisma/schema.prisma`
+- Values: `null` (no conversation), `'pending'`, `'responded'`, `'purchased'`
+- NOT a new model — conversation is 1:1 with listing for a given user
+- Add `@@index([conversationStatus])` for filtering
+- Requires Prisma migration: `npx prisma migrate dev --name add_conversation_status`
+
+**Conversation Status Transition Rules:**
+```
+null ─── (OUTBOUND message sent) ──→ pending
+pending ─ (INBOUND message received) → responded
+responded ─ (another INBOUND) ───────→ responded (no-op)
+any ──── (Opportunity → PURCHASED) ──→ purchased
+purchased ─────────────────────────→ purchased (terminal, no-op)
+```
+
+Invalid transitions: `responded → pending`, `purchased → pending`, `purchased → responded`
+
+**Inbound Message Checker: Platform Adapter Pattern**
+
+Follow the scraper architecture in `src/scrapers/{platform}/` — one adapter per platform. For this story, all platform adapters are **stubs** that return `{ found: false }`. The infrastructure and routing must be correct so real adapters can be swapped in later.
+
+```typescript
+// Platform adapter interface
+interface PlatformMessageChecker {
+  checkForReplies(listing: ListingData, userId: string): Promise<InboundCheckResult>;
+}
+
+// Router maps platform → adapter
+const PLATFORM_CHECKERS: Record<string, PlatformMessageChecker> = {
+  CRAIGSLIST: craigslistChecker,
+  FACEBOOK: facebookChecker,
+  EBAY: ebayChecker,
+  MERCARI: mercariChecker,
+  OFFERUP: offerupChecker,
+};
+```
+
+**Existing scraper auth infrastructure (for future adapter implementation):**
+- Facebook has authenticated session support: `src/scrapers/facebook/auth.ts`, `src/scrapers/facebook/token-store.ts`
+- eBay uses Browse API (REST): `src/scrapers/ebay/scraper.ts`
+- Craigslist, Mercari, OfferUp use Playwright browser automation: `src/scrapers/{platform}/scraper.ts`
+
+**Deduplication: Prevent duplicate inbound messages**
+- Use `externalId` field concept: hash of `platform + sellerName + body.substring(0,100) + receivedDate`
+- Before creating INBOUND message, check if a message with same body exists for this listing+user in last 24 hours
+- This is a soft dedup — false negatives acceptable, false positives must be avoided
+
+### API Pattern — Follow existing routes
+
+All routes follow the project's standard pattern:
+```typescript
+export async function POST(request: NextRequest) {
+  try {
+    const userId = await getAuthUserId();
+    if (!userId) throw new UnauthorizedError('Unauthorized');
+    // ... business logic ...
+    return NextResponse.json({ success: true, data: ... });
+  } catch (error) {
+    return handleError(error);
+  }
+}
+```
+
+Use `findFirst({ where: { id, userId } })` for ownership-scoped lookups (pattern from 8.1 code review fix — prevents information leakage).
+
+### Integration Points — Fire-and-Forget
+
+**Message generation hook** (Task 6.1):
+In `app/api/messages/generate/route.ts`, after the `prisma.message.create()` call, add:
+```typescript
+import { transitionToPending } from '@/lib/conversation-status';
+// ... after message create ...
+transitionToPending(listingId, userId).catch(() => {});
+```
+
+**Opportunity purchase hook** (Task 6.2):
+In `app/api/opportunities/route.ts` PATCH handler, when status is updated to 'PURCHASED':
+```typescript
+import { transitionToPurchased } from '@/lib/conversation-status';
+// ... after opportunity update ...
+if (updatedOpportunity.status === 'PURCHASED' && listing?.id) {
+  transitionToPurchased(listing.id, userId).catch(() => {});
+}
+```
+
+Both are fire-and-forget — catch errors silently. Conversation status is supplementary; failure should never block the primary operation.
+
+### Existing Infrastructure — DO NOT Recreate
+
+- **Message model** (`prisma/schema.prisma:288-312`) — already has `direction` (INBOUND/OUTBOUND), `status`, `readAt`, `listingId`, `sellerName`, `platform`
+- **Listing model** — already has `messages Message[]` relation
+- **Opportunity model** — already has `status` field with PURCHASED state, `listingId` FK
+- **Existing message routes** (`app/api/messages/route.ts`) — POST creates messages, GET lists them. DO NOT modify these.
+- **Message generator** (`src/lib/message-generator.ts`) — Story 8.1's code. Reference but do not import from.
+- **Tier enforcement** — `checkFeatureAccess(tier, 'messaging')` from `@/lib/tier-enforcement`
+- **Error hierarchy** — `UnauthorizedError`, `ForbiddenError`, `ValidationError`, `NotFoundError` from `@/lib/errors`
+
+### Imports Pattern (from 8.1)
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/db';
+import { getAuthUserId } from '@/lib/auth-middleware';
+import { handleError, UnauthorizedError, ForbiddenError, ValidationError, NotFoundError } from '@/lib/errors';
+import { checkFeatureAccess } from '@/lib/tier-enforcement';
+```
+
+### Testing Patterns (from 8.1)
+
+**Unit test mocking:**
+```typescript
+jest.mock('@/lib/auth-middleware', () => ({
+  getAuthUserId: jest.fn(() => Promise.resolve('test-user-id')),
+}));
+jest.mock('@/lib/db', () => ({
+  __esModule: true,
+  default: { listing: { findFirst: jest.fn(), update: jest.fn() }, message: { create: jest.fn() } },
+}));
+jest.mock('@/lib/tier-enforcement', () => ({
+  checkFeatureAccess: jest.fn(() => ({ allowed: true, tier: 'FLIPPER', limits: {} })),
+}));
+```
+
+**Acceptance test pattern:**
+- Step definitions use `assert` (NOT Jest `expect`)
+- Call real functions from `src/lib/` (not mocked)
+- File-reading assertions for route structure validation use regex for quote style resilience
+- Import from relative paths: `../../../src/lib/conversation-status`
+
+### Acceptance Test Numbering
+
+Before writing scenarios, check the current highest `@E-008-S-<N>` tag in `test/acceptance/features/E-008-seller-communication-negotiation.feature`. Stories 8.2-8.4 may have added scenarios by the time this story runs. Continue numbering sequentially.
+
+### Project Structure Notes
+
+New files align with existing structure:
+- `src/lib/conversation-status.ts` — follows `src/lib/` pattern for business logic
+- `src/lib/inbound-message-checker.ts` — follows `src/lib/` pattern
+- `app/api/messages/check-replies/route.ts` — follows `app/api/messages/` nesting
+- `app/api/listings/[id]/conversation-status/route.ts` — follows `app/api/listings/[id]/` nesting
+- Tests follow `src/__tests__/lib/` and `src/__tests__/api/` patterns
+
+### References
+
+- [Source: prisma/schema.prisma] — Message model (lines 288-312), Listing model (lines 11-91), Opportunity model (lines 98-118), UserSettings model (lines 247-274)
+- [Source: _bmad-output/planning-artifacts/epics.md] — Epic 8 story 8.5 requirements, FR-COMM-06, FR-COMM-07
+- [Source: _bmad-output/planning-artifacts/architecture.md] — Messaging API patterns, security, tier enforcement
+- [Source: src/scrapers/facebook/auth.ts] — Facebook OAuth auth infrastructure
+- [Source: src/scrapers/facebook/token-store.ts] — Facebook token management
+- [Source: src/lib/message-generator.ts] — OpenAI integration pattern, fallback strategy
+- [Source: app/api/messages/generate/route.ts] — API route pattern, ownership-scoped queries
+- [Source: src/__tests__/api/messages-generate.test.ts] — Unit test mocking patterns
+- [Source: test/acceptance/step_definitions/E-008-message-generation.steps.ts] — Acceptance test patterns
+- [Source: app/api/opportunities/route.ts] — Opportunity PATCH handler for purchase hook
+
+### Previous Story Intelligence (8.1)
+
+**Patterns to follow:**
+- Lazy singleton for external services (if needed)
+- `findFirst({ where: { id, userId } })` for ownership (not separate findUnique + ownership check)
+- No `console.error` in catch blocks — `handleError()` handles logging
+- Step definitions call real functions (not mocks) for acceptance tests
+- Use `assert` from Node built-in, not `expect` from external packages
+
+**Code review findings from 8.1 that apply here:**
+- Always scope DB queries to userId to prevent info leakage
+- Test all error paths (auth, tier, validation, not found)
+- Acceptance test When steps should exercise real code paths, not shortcuts
+- Use regex for source-reading assertions to handle quote styles
+
+## Dev Agent Record
+
+### Agent Model Used
+
+{{agent_model_name_version}}
+
+### Debug Log References
+
+### Completion Notes List
+
+### File List

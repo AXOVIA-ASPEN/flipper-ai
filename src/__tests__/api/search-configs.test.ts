@@ -5,9 +5,11 @@ import { GET as GET_BY_ID, PATCH, DELETE } from '@/app/api/search-configs/[id]/r
 // Mock Prisma client
 const mockFindMany = jest.fn();
 const mockFindUnique = jest.fn();
+const mockCount = jest.fn();
 const mockCreate = jest.fn();
 const mockUpdate = jest.fn();
 const mockDelete = jest.fn();
+const mockUserFindUnique = jest.fn();
 
 const mockGetAuthUserId = jest.fn().mockResolvedValue(null);
 jest.mock('@/lib/auth-middleware', () => ({
@@ -21,9 +23,13 @@ jest.mock('@/lib/db', () => ({
     searchConfig: {
       findMany: (...args: unknown[]) => mockFindMany(...args),
       findUnique: (...args: unknown[]) => mockFindUnique(...args),
+      count: (...args: unknown[]) => mockCount(...args),
       create: (...args: unknown[]) => mockCreate(...args),
       update: (...args: unknown[]) => mockUpdate(...args),
       delete: (...args: unknown[]) => mockDelete(...args),
+    },
+    user: {
+      findUnique: (...args: unknown[]) => mockUserFindUnique(...args),
     },
   },
 }));
@@ -126,6 +132,9 @@ describe('Search Configs API', () => {
     beforeEach(() => {
       // POST endpoints require authentication
       mockGetAuthUserId.mockResolvedValue('test-user-id');
+      // Default: PRO tier user (unlimited search configs)
+      mockUserFindUnique.mockResolvedValue({ subscriptionTier: 'PRO' });
+      mockCount.mockResolvedValue(0);
     });
 
     it('should create a new search config', async () => {

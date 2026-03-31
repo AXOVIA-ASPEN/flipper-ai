@@ -1,5 +1,6 @@
 generator client {
   provider      = "prisma-client-js"
+  output        = "../src/generated/prisma"
   binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
@@ -51,15 +52,30 @@ model Listing {
   marketDataSource    String?
   marketDataDate      DateTime?
   comparableSalesJson String?
+  compMatchConfidence String?   // 'high' | 'medium' | 'low' | 'insufficient'
   sellabilityScore    Int?
   demandLevel         String?
   expectedDaysToSell  Int?
   authenticityRisk    String?
+  conditionRisk       String?
   recommendedOffer    Float?
   recommendedList     Float?
   resaleStrategy      String?
-  trueDiscountPercent Float?
-  llmAnalyzed         Boolean            @default(false)
+  trueDiscountPercent  Float?
+  soldVolume30Days     Int?      // Story 5.3: units sold in last 30 days (demand analysis)
+  soldVolume60Days     Int?      // Story 5.3: units sold in last 60 days
+  soldVolume90Days     Int?      // Story 5.3: units sold in last 90 days
+  completenessLabel    String?   // Story 5.4: "Complete with box", "Missing charger", etc.
+  sellerRating         Float?    // Story 5.4: eBay feedback %, Mercari star rating (0-5)
+  sellerReviewCount    Int?      // Story 5.4: number of seller reviews/feedback
+  sellerAccountAgeDays Int?      // Story 5.4: seller account age in days
+  sizeCategory          String?   // Story 5.5: 'small_shippable' | 'large_local_only' | 'fragile_special_handling'
+  shippingEstimatesJson String?   // Story 5.5: JSON { usps, ups, fedex, lowestCost }
+  estimatedShippingCost Float?    // Story 5.5: Lowest carrier estimate in USD
+  pickupDistanceMiles   Float?    // Story 5.5: Miles from user home to seller (local-only items)
+  outsidePickupRadius   Boolean?  // Story 5.5: Exceeds user's maxPickupRadiusMiles
+  adjustedProfitMargin  Float?    // Story 5.5: profitPotential minus estimatedShippingCost
+  llmAnalyzed          Boolean            @default(false)
   analysisDate        DateTime?
   analysisConfidence  String?
   analysisReasoning   String?
@@ -166,6 +182,7 @@ model User {
   name               String?
   image              String?
   password           String?            // Kept for potential emergency rollback
+  stripeCustomerId   String?            @unique // Stripe customer ID for billing
   subscriptionTier   String             @default("FREE")
   onboardingComplete Boolean            @default(false)
   onboardingStep     Int                @default(0)
@@ -180,6 +197,8 @@ model User {
   searchConfigs      SearchConfig[]
   sessions           Session[]          // Deprecated: NextAuth — removal in future cleanup story
   settings           UserSettings?
+  passwordResetTokens PasswordResetToken[]
+  usageRecords        UsageRecord[]
 }
 
 // Deprecated: NextAuth Account model — kept for backward compatibility during migration.
@@ -239,6 +258,16 @@ model UserSettings {
   notifyExpiring     Boolean  @default(true)
   notifyWeeklyDigest Boolean  @default(true)
   notifyFrequency    String   @default("instant")
+  // Scoring & Fee Settings (Story 4.2)
+  opportunityThreshold  Int      @default(70)
+  feeRateEbay           Float    @default(13.0)
+  feeRateMercari        Float    @default(10.0)
+  feeRateFacebook       Float    @default(5.0)
+  feeRateOfferup        Float    @default(12.9)
+  feeRateCraigslist     Float    @default(0.0)
+  maxPickupRadiusMiles  Int      @default(50)   // Story 5.5: Max miles for local pickup consideration
+  homeLocation          String?                  // Story 5.5: User's home location for distance calculation
+  holdingCostDailyRate  Float    @default(2.0)   // Story 6.6: Daily cost to hold purchased inventory ($/day)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
   user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -285,10 +314,12 @@ model Message {
 model AiAnalysisCache {
   id             String   @id @default(cuid())
   listingId      String
+  analysisType   String   @default("claude") // "claude" | "openai"
   analysisResult String
   createdAt      DateTime @default(now())
   expiresAt      DateTime
 
+  @@unique([listingId, analysisType])
   @@index([listingId])
   @@index([expiresAt])
 }
@@ -337,4 +368,30 @@ model ListingImage {
 
   @@unique([listingId, imageIndex])
   @@index([listingId])
+}
+
+model UsageRecord {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   // "SCAN" or "ANALYSIS"
+  count       Int      @default(0)
+  periodStart DateTime // First day of the month (e.g., 2026-03-01T00:00:00Z)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type, periodStart])
+  @@index([userId, type, periodStart])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }

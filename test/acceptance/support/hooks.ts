@@ -4,6 +4,12 @@
  * Company: Axovia AI
  */
 
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+// Load .env before anything else so E2E_TEST_SECRET, DATABASE_URL, etc. are available
+dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+
 import { Before, After, BeforeAll, AfterAll, Status } from '@cucumber/cucumber';
 import { chromium, Browser } from '@playwright/test';
 import { CustomWorld } from './world';

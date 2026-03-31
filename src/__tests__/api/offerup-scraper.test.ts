@@ -17,6 +17,7 @@ jest.mock('@/lib/db', () => ({
   default: {
     scraperJob: { create: jest.fn(), update: jest.fn() },
     listing: { upsert: jest.fn() },
+    userSettings: { findUnique: jest.fn().mockResolvedValue(null) },
   },
 }));
 
@@ -44,6 +45,24 @@ jest.mock('playwright', () => ({
 
 jest.mock('@/lib/sleep', () => ({
   sleep: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock('@/lib/llm-identifier', () => ({
+  identifyItem: jest.fn(),
+}));
+
+jest.mock('@/lib/market-price', () => ({
+  fetchMarketPrice: jest.fn(),
+  closeBrowser: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock('@/lib/llm-analyzer', () => ({
+  analyzeSellability: jest.fn(),
+  quickDiscountCheck: jest.fn(),
+}));
+
+jest.mock('@/lib/tier-enforcement', () => ({
+  enforceTierLimits: jest.fn().mockResolvedValue(undefined),
 }));
 
 const mockGetAuthUserId = getAuthUserId as jest.MockedFunction<typeof getAuthUserId>;
@@ -813,5 +832,198 @@ describe('context.route resource blocking callbacks', () => {
     expect(mockRoute).toHaveBeenCalledTimes(3);
     // abort() is invoked once per route registration handler call
     expect(mockAbort).toHaveBeenCalledTimes(3);
+  });
+});
+
+// ── LLM Sellability Pipeline (hasLLM=true) ─────────────────────────────────────
+describe('OfferUp scraper - LLM sellability pipeline (Story 4.5)', () => {
+  const defaultIdentification = {
+    brand: 'Sony',
+    model: 'PlayStation 5',
+    variant: 'Disc Edition',
+    condition: 'good',
+    conditionNotes: '',
+    category: 'gaming',
+    searchQuery: 'Sony PlayStation 5 Disc Edition',
+    worthInvestigating: true,
+  };
+
+  const defaultMarketData = {
+    medianPrice: 400,
+    salesCount: 12,
+    averagePrice: 420,
+    minPrice: 370,
+    maxPrice: 460,
+    soldListings: [],
+  };
+
+  const defaultSellabilityResult = {
+    verifiedMarketValue: 400,
+    trueDiscountPercent: 55,
+    sellabilityScore: 90,
+    meetsThreshold: true,
+    demandLevel: 'high',
+    expectedDaysToSell: 3,
+    authenticityRisk: 'low',
+    resaleStrategy: 'Sell locally or on eBay',
+    confidence: 'high',
+    reasoning: 'PS5 high demand',
+  };
+
+  let mockIdentifyItem: jest.Mock;
+  let mockFetchMarketPrice: jest.Mock;
+  let mockCloseBrowser: jest.Mock;
+  let mockAnalyzeSellability: jest.Mock;
+  let mockQuickDiscountCheck: jest.Mock;
+
+  function buildChromiumMock(evaluate: jest.Mock) {
+    const { chromium } = require('playwright');
+    const mockPage = {
+      goto: jest.fn().mockResolvedValue(undefined),
+      waitForSelector: jest.fn().mockResolvedValue(undefined),
+      content: jest.fn().mockResolvedValue('<html></html>'),
+      evaluate,
+    };
+    const mockContext = {
+      newPage: jest.fn().mockResolvedValue(mockPage),
+      route: jest.fn().mockResolvedValue(undefined),
+    };
+    chromium.launch.mockResolvedValue({
+      newContext: jest.fn().mockResolvedValue(mockContext),
+      close: jest.fn().mockResolvedValue(undefined),
+    });
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    process.env.OPENAI_API_KEY = 'test-llm-key';
+
+    mockIdentifyItem = require('@/lib/llm-identifier').identifyItem;
+    mockFetchMarketPrice = require('@/lib/market-price').fetchMarketPrice;
+    mockCloseBrowser = require('@/lib/market-price').closeBrowser;
+    mockAnalyzeSellability = require('@/lib/llm-analyzer').analyzeSellability;
+    mockQuickDiscountCheck = require('@/lib/llm-analyzer').quickDiscountCheck;
+
+    mockIdentifyItem.mockResolvedValue(defaultIdentification);
+    mockFetchMarketPrice.mockResolvedValue(defaultMarketData);
+    mockCloseBrowser.mockResolvedValue(undefined);
+    mockQuickDiscountCheck.mockReturnValue({ passesQuickCheck: true, estimatedDiscount: 55 });
+    mockAnalyzeSellability.mockResolvedValue(defaultSellabilityResult);
+
+    mockGetAuthUserId.mockResolvedValue('user-llm');
+    (mockPrisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-llm' });
+    (mockPrisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+    (mockPrisma.listing.upsert as jest.Mock).mockResolvedValue({ id: 'listing-llm', status: 'OPPORTUNITY' });
+
+    mockEstimateValue.mockReturnValue({
+      estimatedValue: 380, estimatedLow: 300, estimatedHigh: 460,
+      profitPotential: 130, profitLow: 80, profitHigh: 180,
+      valueScore: 80, discountPercent: 38, resaleDifficulty: 'medium',
+      comparableUrls: [], reasoning: 'Good deal', notes: '',
+      shippable: true, negotiable: true, tags: ['gaming'],
+    } as any);
+    mockDetectCategory.mockReturnValue('gaming');
+    mockGeneratePurchaseMessage.mockReturnValue('Hi, is this still available?');
+    mockDownloadAndCacheImages.mockResolvedValue({ cachedUrls: [], successCount: 0 } as any);
+    mockNormalizeLocation.mockReturnValue({ normalized: 'Tampa, FL' } as any);
+
+    // Browser returns one valid listing
+    buildChromiumMock(jest.fn().mockResolvedValue([
+      { title: 'PlayStation 5', price: '$250', url: 'https://offerup.com/item/detail/99999/', location: 'Tampa, FL' },
+    ]));
+  });
+
+  afterEach(() => {
+    delete process.env.OPENAI_API_KEY;
+  });
+
+  it('runs full LLM pipeline and saves listing as OPPORTUNITY when all checks pass', async () => {
+    const res = await POST(makeRequest({ location: 'tampa-fl' }));
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(mockIdentifyItem).toHaveBeenCalled();
+    expect(mockFetchMarketPrice).toHaveBeenCalled();
+    expect(mockQuickDiscountCheck).toHaveBeenCalled();
+    expect(mockAnalyzeSellability).toHaveBeenCalled();
+    expect(mockPrisma.listing.upsert).toHaveBeenCalled();
+    expect(json.success).toBe(true);
+  });
+
+  it('skips item when identifyItem returns worthInvestigating=false', async () => {
+    mockIdentifyItem.mockResolvedValue({ ...defaultIdentification, worthInvestigating: false });
+
+    const res = await POST(makeRequest({ location: 'tampa-fl' }));
+    expect(res.status).toBe(200);
+    expect(mockFetchMarketPrice).not.toHaveBeenCalled();
+    expect(mockPrisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('skips item when fetchMarketPrice returns null', async () => {
+    mockFetchMarketPrice.mockResolvedValue(null);
+
+    const res = await POST(makeRequest({ location: 'tampa-fl' }));
+    expect(res.status).toBe(200);
+    expect(mockQuickDiscountCheck).not.toHaveBeenCalled();
+    expect(mockPrisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('skips item when fetchMarketPrice returns salesCount=0', async () => {
+    mockFetchMarketPrice.mockResolvedValue({ ...defaultMarketData, salesCount: 0 });
+
+    const res = await POST(makeRequest({ location: 'tampa-fl' }));
+    expect(res.status).toBe(200);
+    expect(mockQuickDiscountCheck).not.toHaveBeenCalled();
+    expect(mockPrisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('skips item when quickDiscountCheck fails', async () => {
+    mockQuickDiscountCheck.mockReturnValue({ passesQuickCheck: false, estimatedDiscount: 5 });
+
+    const res = await POST(makeRequest({ location: 'tampa-fl' }));
+    expect(res.status).toBe(200);
+    expect(mockAnalyzeSellability).not.toHaveBeenCalled();
+    expect(mockPrisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('skips item when analyzeSellability returns meetsThreshold=false', async () => {
+    mockAnalyzeSellability.mockResolvedValue({ ...defaultSellabilityResult, meetsThreshold: false });
+
+    const res = await POST(makeRequest({ location: 'tampa-fl' }));
+    expect(res.status).toBe(200);
+    expect(mockPrisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('swallows LLM error and skips item', async () => {
+    mockIdentifyItem.mockRejectedValue(new Error('LLM timeout'));
+
+    const res = await POST(makeRequest({ location: 'tampa-fl' }));
+    expect(res.status).toBe(200);
+    expect(mockPrisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('skips item when analyzeSellability returns null', async () => {
+    mockAnalyzeSellability.mockResolvedValue(null);
+
+    const res = await POST(makeRequest({ location: 'tampa-fl' }));
+    expect(res.status).toBe(200);
+    expect(mockPrisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('reads discountThreshold from userSettings and passes it to analyzeSellability', async () => {
+    // Override userSettings to return a custom discountThreshold
+    (mockPrisma.userSettings.findUnique as jest.Mock).mockResolvedValueOnce({ discountThreshold: 60 });
+
+    const res = await POST(makeRequest({ location: 'tampa-fl' }));
+    expect(res.status).toBe(200);
+
+    expect(mockAnalyzeSellability).toHaveBeenCalledWith(
+      expect.any(String),   // title
+      expect.any(Number),   // price
+      expect.any(Object),   // identification
+      expect.any(Object),   // marketData
+      60,                   // discountThreshold from userSettings
+      expect.any(Number)    // feeRate from userSettings
+    );
   });
 });

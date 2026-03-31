@@ -42,6 +42,22 @@ jest.mock('@/lib/llm-analyzer', () => ({
   quickDiscountCheck: (...args: unknown[]) => mockQuickDiscountCheck(...args),
 }));
 
+jest.mock('@/lib/demand-analyzer', () => ({
+  analyzeDemandTrend: jest.fn().mockReturnValue(null),
+}));
+
+jest.mock('@/lib/comp-matcher', () => ({
+  findComparableSales: jest.fn().mockResolvedValue(null),
+}));
+
+jest.mock('@/lib/claude-analyzer', () => ({
+  analyzeListingData: jest.fn().mockResolvedValue(null),
+}));
+
+jest.mock('@/lib/tier-enforcement', () => ({
+  enforceTierLimits: jest.fn().mockResolvedValue(undefined),
+}));
+
 const createDefaultEstimation = () => ({
   estimatedValue: 1200,
   estimatedLow: 1000,
@@ -91,6 +107,12 @@ jest.mock('@/lib/db', () => ({
     scraperJob: {
       create: (...args: unknown[]) => mockJobCreate(...args),
       update: (...args: unknown[]) => mockJobUpdate(...args),
+    },
+    userSettings: {
+      findUnique: jest.fn().mockResolvedValue(null),
+    },
+    aiAnalysisCache: {
+      create: jest.fn().mockResolvedValue({}),
     },
   },
 }));
@@ -1045,6 +1067,67 @@ describe('Craigslist Scraper Helper Functions', () => {
       expect(upsertCall.create.marketDataSource).toBe('ebay_scrape');
       expect(upsertCall.create.comparableSalesJson).toBeTruthy();
       expect(upsertCall.create.resaleStrategy).toBe('List immediately on eBay');
+
+      delete process.env.OPENAI_API_KEY;
+    });
+
+    it('reads discountThreshold from userSettings and passes it to analyzeSellability', async () => {
+      process.env.OPENAI_API_KEY = 'test-key';
+
+      // Mock userSettings to return a custom discountThreshold
+      const db = require('@/lib/db').default;
+      db.userSettings.findUnique.mockResolvedValueOnce({ discountThreshold: 40 });
+
+      mockQuickDiscountCheck.mockReturnValue({ passesQuickCheck: true });
+
+      mockIdentifyItem.mockResolvedValue({
+        brand: 'Apple',
+        model: 'iPhone 15',
+        variant: '128GB',
+        condition: 'good',
+        searchQuery: 'iPhone 15 128GB',
+        category: 'electronics',
+        worthInvestigating: true,
+      });
+
+      mockFetchMarketPrice.mockResolvedValue({
+        averagePrice: 800,
+        medianPrice: 750,
+        lowestPrice: 600,
+        highestPrice: 1000,
+        salesCount: 10,
+        soldListings: [{ title: 'iPhone 15', price: 750, url: 'https://ebay.com/1' }],
+      });
+
+      mockAnalyzeSellability.mockResolvedValue({
+        sellabilityScore: 85,
+        demandLevel: 'high',
+        expectedDaysToSell: 5,
+        authenticityRisk: 'low',
+        recommendedOfferPrice: 350,
+        recommendedListPrice: 700,
+        resaleStrategy: 'List on eBay',
+        verifiedMarketValue: 750,
+        trueDiscountPercent: 50,
+        meetsThreshold: true,
+        confidence: 0.9,
+        reasoning: 'Good deal on popular phone',
+      });
+
+      const request = createMockRequest('POST', '/api/scraper/craigslist', {
+        location: 'sarasota',
+        category: 'electronics',
+      });
+      await POST(request);
+
+      expect(mockAnalyzeSellability).toHaveBeenCalledWith(
+        expect.any(String),  // title
+        expect.any(Number),  // price
+        expect.any(Object),  // identification
+        expect.any(Object),  // marketData
+        40,                  // discountThreshold from userSettings
+        expect.any(Number)   // feeRate from userSettings
+      );
 
       delete process.env.OPENAI_API_KEY;
     });

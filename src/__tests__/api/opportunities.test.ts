@@ -16,6 +16,7 @@ const mockUpdate = jest.fn();
 const mockDelete = jest.fn();
 const mockListingUpdate = jest.fn();
 const mockTransaction = jest.fn();
+const mockOpportunityCount = jest.fn();
 
 jest.mock('@/lib/db', () => ({
   __esModule: true,
@@ -25,6 +26,7 @@ jest.mock('@/lib/db', () => ({
       findUnique: (...args: unknown[]) => mockFindUnique(...args),
       update: (...args: unknown[]) => mockUpdate(...args),
       delete: (...args: unknown[]) => mockDelete(...args),
+      count: (...args: unknown[]) => mockOpportunityCount(...args),
     },
     listing: {
       update: (...args: unknown[]) => mockListingUpdate(...args),
@@ -32,6 +34,18 @@ jest.mock('@/lib/db', () => ({
     $transaction: (...args: unknown[]) => mockTransaction(...args),
   },
 }));
+
+// Helper: set up GET /api/opportunities mocks
+// GET uses: findMany (paginated), count, findMany (all matching for stats)
+function setupOpportunityGetMocks(opts: {
+  opportunities?: unknown[];
+  total?: number;
+  allMatching?: Array<{ purchasePrice: number | null; resalePrice: number | null }>;
+} = {}) {
+  const { opportunities = [], total = 0, allMatching = [] } = opts;
+  mockFindMany.mockResolvedValueOnce(opportunities).mockResolvedValueOnce(allMatching);
+  mockOpportunityCount.mockResolvedValueOnce(total);
+}
 
 // Helper to create mock NextRequest
 function createMockRequest(
@@ -70,41 +84,30 @@ describe('Opportunities API', () => {
       expect(data.error.code).toBe('UNAUTHORIZED');
     });
 
-    it('should return opportunities list with count', async () => {
+    it('should return opportunities list with stats and pagination', async () => {
       const mockOpportunities = [
         {
           id: 'opp1',
           userId: 'test-user-id',
-          listingId: 'listing1',
           status: 'IDENTIFIED',
           purchasePrice: null,
           resalePrice: null,
-          actualProfit: null,
-          createdAt: '2026-01-15T10:00:00.000Z',
-          listing: {
-            id: 'listing1',
-            title: 'Test Item',
-            askingPrice: 100,
-          },
+          listing: { id: 'listing1', title: 'Test Item', askingPrice: 100 },
         },
         {
           id: 'opp2',
           userId: 'test-user-id',
-          listingId: 'listing2',
           status: 'PURCHASED',
           purchasePrice: 50,
           resalePrice: null,
-          actualProfit: null,
-          createdAt: '2026-01-14T10:00:00.000Z',
-          listing: {
-            id: 'listing2',
-            title: 'Another Item',
-            askingPrice: 200,
-          },
+          listing: { id: 'listing2', title: 'Another Item', askingPrice: 200 },
         },
       ];
-
-      mockFindMany.mockResolvedValue(mockOpportunities);
+      const allMatching = [
+        { purchasePrice: null, resalePrice: null },
+        { purchasePrice: 50, resalePrice: null },
+      ];
+      setupOpportunityGetMocks({ opportunities: mockOpportunities, total: 2, allMatching });
 
       const request = createMockRequest('GET', '/api/opportunities');
       const response = await GET(request);
@@ -112,18 +115,23 @@ describe('Opportunities API', () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      expect(data.count).toBe(2);
       expect(data.opportunities).toEqual(mockOpportunities);
-      expect(mockFindMany).toHaveBeenCalledWith({
-        where: { userId: 'test-user-id' },
-        include: { listing: true },
-        orderBy: { createdAt: 'desc' },
-        take: 25,
+      expect(data.stats).toEqual({
+        totalOpportunities: 2,
+        totalProfit: 0,
+        totalInvested: 50,
+        totalRevenue: 0,
+      });
+      expect(data.pagination).toEqual({
+        page: 1,
+        limit: 25,
+        total: 2,
+        totalPages: 1,
       });
     });
 
     it('should return empty list when no opportunities exist', async () => {
-      mockFindMany.mockResolvedValue([]);
+      setupOpportunityGetMocks();
 
       const request = createMockRequest('GET', '/api/opportunities');
       const response = await GET(request);
@@ -131,12 +139,12 @@ describe('Opportunities API', () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      expect(data.count).toBe(0);
       expect(data.opportunities).toEqual([]);
+      expect(data.stats.totalOpportunities).toBe(0);
     });
 
     it('should respect the limit query parameter', async () => {
-      mockFindMany.mockResolvedValue([]);
+      setupOpportunityGetMocks();
 
       const request = createMockRequest('GET', '/api/opportunities?limit=10');
       const response = await GET(request);
@@ -150,7 +158,7 @@ describe('Opportunities API', () => {
     });
 
     it('should default limit to 25 when not provided', async () => {
-      mockFindMany.mockResolvedValue([]);
+      setupOpportunityGetMocks();
 
       const request = createMockRequest('GET', '/api/opportunities');
       await GET(request);
@@ -158,6 +166,232 @@ describe('Opportunities API', () => {
       expect(mockFindMany).toHaveBeenCalledWith(
         expect.objectContaining({
           take: 25,
+        })
+      );
+    });
+
+    it('should filter by statuses multi-select', async () => {
+      setupOpportunityGetMocks();
+
+      const request = createMockRequest('GET', '/api/opportunities?statuses=IDENTIFIED,PURCHASED');
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            userId: 'test-user-id',
+            status: { in: ['IDENTIFIED', 'PURCHASED'] },
+          },
+        })
+      );
+    });
+
+    it('should filter by platform on nested listing', async () => {
+      setupOpportunityGetMocks();
+
+      const request = createMockRequest('GET', '/api/opportunities?platforms=EBAY');
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            userId: 'test-user-id',
+            listing: { platform: { in: ['EBAY'] } },
+          },
+        })
+      );
+    });
+
+    it('should filter by score range on nested listing', async () => {
+      setupOpportunityGetMocks();
+
+      const request = createMockRequest('GET', '/api/opportunities?minScore=80');
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            userId: 'test-user-id',
+            listing: { valueScore: { gte: 80 } },
+          },
+        })
+      );
+    });
+
+    it('should filter by profit range on nested listing', async () => {
+      setupOpportunityGetMocks();
+
+      const request = createMockRequest('GET', '/api/opportunities?minProfit=100');
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            userId: 'test-user-id',
+            listing: { profitPotential: { gte: 100 } },
+          },
+        })
+      );
+    });
+
+    it('should apply AND logic with multiple filters', async () => {
+      setupOpportunityGetMocks();
+
+      const request = createMockRequest(
+        'GET',
+        '/api/opportunities?statuses=IDENTIFIED&platforms=EBAY&minScore=80'
+      );
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            userId: 'test-user-id',
+            status: { in: ['IDENTIFIED'] },
+            listing: {
+              platform: { in: ['EBAY'] },
+              valueScore: { gte: 80 },
+            },
+          },
+        })
+      );
+    });
+
+    it('should calculate stats from all matching (not just page)', async () => {
+      const allMatching = [
+        { purchasePrice: 100, resalePrice: 200 },
+        { purchasePrice: 50, resalePrice: 150 },
+      ];
+      setupOpportunityGetMocks({ total: 2, allMatching });
+
+      const request = createMockRequest('GET', '/api/opportunities');
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(data.stats).toEqual({
+        totalOpportunities: 2,
+        totalProfit: 200, // (200-100) + (150-50)
+        totalInvested: 150, // 100 + 50
+        totalRevenue: 350, // 200 + 150
+      });
+    });
+
+    it('should support pagination with page and limit', async () => {
+      setupOpportunityGetMocks({ total: 50 });
+
+      const request = createMockRequest('GET', '/api/opportunities?page=2&limit=10');
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(data.pagination).toEqual({
+        page: 2,
+        limit: 10,
+        total: 50,
+        totalPages: 5,
+      });
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({ skip: 10, take: 10 })
+      );
+    });
+
+    it('should default page to 1 when page param is NaN', async () => {
+      setupOpportunityGetMocks();
+
+      const request = createMockRequest('GET', '/api/opportunities?page=abc');
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.pagination.page).toBe(1);
+      expect(mockFindMany).toHaveBeenCalledWith(expect.objectContaining({ skip: 0 }));
+    });
+
+    it('should default limit to 25 when limit param is out of range', async () => {
+      setupOpportunityGetMocks();
+
+      const request = createMockRequest('GET', '/api/opportunities?limit=200');
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(expect.objectContaining({ take: 25 }));
+    });
+
+    it('should filter by single status param (not statuses)', async () => {
+      setupOpportunityGetMocks();
+
+      const request = createMockRequest('GET', '/api/opportunities?status=IDENTIFIED');
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { userId: 'test-user-id', status: { in: ['IDENTIFIED'] } },
+        })
+      );
+    });
+
+    it('should filter by single platform param on nested listing', async () => {
+      setupOpportunityGetMocks();
+
+      const request = createMockRequest('GET', '/api/opportunities?platform=EBAY');
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { userId: 'test-user-id', listing: { platform: { in: ['EBAY'] } } },
+        })
+      );
+    });
+
+    it('should filter by maxScore only (no minScore — covers false gte branch)', async () => {
+      setupOpportunityGetMocks();
+
+      const request = createMockRequest('GET', '/api/opportunities?maxScore=90');
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { userId: 'test-user-id', listing: { valueScore: { lte: 90 } } },
+        })
+      );
+    });
+
+    it('should filter by maxProfit only (no minProfit — covers false gte branch)', async () => {
+      setupOpportunityGetMocks();
+
+      const request = createMockRequest('GET', '/api/opportunities?maxProfit=500');
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { userId: 'test-user-id', listing: { profitPotential: { lte: 500 } } },
+        })
+      );
+    });
+
+    it('should filter by single category param on nested listing', async () => {
+      setupOpportunityGetMocks();
+
+      const request = createMockRequest('GET', '/api/opportunities?category=electronics');
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { userId: 'test-user-id', listing: { category: { in: ['electronics'] } } },
+        })
+      );
+    });
+
+    it('should filter by categories multi-select on nested listing', async () => {
+      setupOpportunityGetMocks();
+
+      const request = createMockRequest('GET', '/api/opportunities?categories=electronics,tools');
+      await GET(request);
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            userId: 'test-user-id',
+            listing: { category: { in: ['electronics', 'tools'] } },
+          },
         })
       );
     });

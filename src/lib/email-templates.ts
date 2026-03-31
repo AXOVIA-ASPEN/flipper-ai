@@ -488,6 +488,46 @@ Flipper AI — https://flipper-ai.app
 }
 
 // ---------------------------------------------------------------------------
+// Password Changed Notification Email
+// ---------------------------------------------------------------------------
+
+export function passwordChangedEmailHtml(name?: string): string {
+  const displayName = name ? name.split(' ')[0] : 'there';
+  const body = `
+    <h1 style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:${TEXT_PRIMARY};">Password Changed 🔒</h1>
+    <p style="margin:0 0 24px 0;font-size:16px;color:${TEXT_SECONDARY};">
+      Hi ${displayName}! Your Flipper AI password was just changed successfully.
+    </p>
+
+    <div style="background-color:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:24px;margin-bottom:24px;">
+      <p style="margin:0;font-size:14px;color:${TEXT_SECONDARY};">
+        If you made this change, you can safely ignore this email — you're all set!
+      </p>
+    </div>
+
+    <p style="margin:0;font-size:14px;color:${TEXT_SECONDARY};">
+      If you did <strong>not</strong> change your password, please contact our support team immediately.
+    </p>
+  `;
+
+  return baseLayout(body, 'Your Flipper AI password was changed');
+}
+
+export function passwordChangedEmailText(): string {
+  return `Password Changed
+
+Your Flipper AI password was just changed successfully.
+
+If you made this change, you can safely ignore this email — you're all set!
+
+If you did NOT change your password, please contact our support team immediately.
+
+---
+Flipper AI — https://flipper-ai.app
+`;
+}
+
+// ---------------------------------------------------------------------------
 // Scan Summary Email
 // ---------------------------------------------------------------------------
 
@@ -559,4 +599,119 @@ export function scanSummaryEmailHtml(opts: ScanSummaryEmailOptions): string {
     .replace(/\{\{unsubscribe_url\}\}/g, opts.unsubscribeUrl)
     .replace(/\{\{settings_url\}\}/g, opts.settingsUrl)
     .replace(/\{\{app_url\}\}/g, opts.appUrl);
+}
+
+export function scanSummaryEmailText(opts: ScanSummaryEmailOptions): string {
+  const displayName = opts.name ? opts.name.split(' ')[0] : 'there';
+  const lines = [
+    `Scan Complete — ${opts.query} on ${opts.marketplace}`,
+    `Hi ${displayName}!`,
+    '',
+    `Results: ${opts.totalResults} listings found, ${opts.opportunitiesFound} opportunities`,
+    `Scan time: ${opts.duration}s`,
+  ];
+  if (opts.topOpportunity) {
+    lines.push('', `Top opportunity: ${opts.topOpportunity.title} — $${opts.topOpportunity.price.toFixed(0)} (+$${opts.topOpportunity.profit.toFixed(0)} est. profit)`);
+  }
+  lines.push('', `View results: ${opts.appUrl}/opportunities?scan=${opts.scanId}`);
+  lines.push('', '---', `Unsubscribe: ${opts.unsubscribeUrl}`, `Preferences: ${opts.settingsUrl}`);
+  return lines.join('\n');
+}
+
+// ---------------------------------------------------------------------------
+// Payment Failed Email
+// ---------------------------------------------------------------------------
+
+export interface PaymentFailedEmailOptions {
+  name?: string;
+  email: string;
+  appUrl: string;
+  settingsUrl: string;
+  unsubscribeUrl: string;
+}
+
+export function paymentFailedEmailHtml(opts: PaymentFailedEmailOptions): string {
+  const displayName = opts.name ? opts.name.split(' ')[0] : 'there';
+
+  const body = `
+    <h1 style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:${TEXT_PRIMARY};">Payment Update Needed 💳</h1>
+    <p style="margin:0 0 24px 0;font-size:16px;line-height:1.6;color:${TEXT_SECONDARY};">
+      Hey ${displayName}, we had trouble processing your latest payment for Flipper AI.
+      Don't worry — your account is still active while we sort this out.
+    </p>
+
+    <div style="background:linear-gradient(135deg,#fffbeb 0%,#fef3c7 100%);border:1px solid #fde68a;border-radius:12px;padding:28px;margin-bottom:24px;">
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+          <td width="56" valign="top" style="font-size:32px;padding-right:16px;">⚡</td>
+          <td valign="top">
+            <p style="margin:0 0 6px 0;font-size:16px;font-weight:700;color:${TEXT_PRIMARY};">Quick fix — takes 30 seconds</p>
+            <p style="margin:0;font-size:14px;line-height:1.5;color:${TEXT_SECONDARY};">
+              Just update your payment method in Settings and you'll be
+              right back to finding profitable flips.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div style="background:linear-gradient(135deg,#f0fdf4 0%,#dcfce7 100%);border:1px solid #bbf7d0;border-radius:12px;padding:24px;margin-bottom:24px;">
+      <p style="margin:0 0 4px 0;font-size:13px;font-weight:600;color:${SUCCESS_COLOR};text-transform:uppercase;letter-spacing:0.5px;">
+        While you've been away, Flipper AI has been working for you
+      </p>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:${TEXT_SECONDARY};">
+        Our AI is continuously scanning 5 marketplaces, finding underpriced
+        items other sellers miss. The deals are piling up — don't miss out!
+      </p>
+    </div>
+
+    <div style="text-align:center;margin-bottom:8px;">
+      ${btn('Update Payment Method →', opts.settingsUrl, WARNING_COLOR)}
+    </div>
+    <p style="margin:0;font-size:13px;color:${TEXT_MUTED};text-align:center;">
+      Takes less than a minute. Your subscription continues uninterrupted.
+    </p>
+
+    ${divider()}
+
+    <div style="background-color:${BG_COLOR};border-radius:10px;padding:20px;margin-bottom:16px;">
+      <p style="margin:0 0 4px 0;font-size:14px;font-weight:600;color:${TEXT_PRIMARY};">💡 Why keep your subscription?</p>
+      <p style="margin:0;font-size:13px;line-height:1.6;color:${TEXT_SECONDARY};">
+        Most Flipper AI users find their subscription pays for itself within
+        the first week. One good flip covers months of access — and our AI
+        finds dozens of opportunities every day.
+      </p>
+    </div>
+
+    <p style="margin:0;font-size:13px;color:${TEXT_MUTED};text-align:center;">
+      If you believe this is an error, just reply to this email and we'll help.
+    </p>
+  `;
+
+  return baseLayout(body, 'Action needed: Update your payment method to keep finding profitable flips')
+    .replace(/\{\{unsubscribe_url\}\}/g, opts.unsubscribeUrl)
+    .replace(/\{\{settings_url\}\}/g, opts.settingsUrl)
+    .replace(/\{\{app_url\}\}/g, opts.appUrl);
+}
+
+export function paymentFailedEmailText(opts: PaymentFailedEmailOptions): string {
+  const displayName = opts.name ? opts.name.split(' ')[0] : 'there';
+  return `Payment Update Needed
+
+Hey ${displayName}, we had trouble processing your latest payment for Flipper AI.
+Don't worry — your account is still active while we sort this out.
+
+QUICK FIX (takes 30 seconds):
+Update your payment method: ${opts.settingsUrl}
+
+WHY KEEP YOUR SUBSCRIPTION?
+Most Flipper AI users find their subscription pays for itself within the first week.
+One good flip covers months of access — and our AI finds dozens of opportunities every day.
+
+If you believe this is an error, just reply to this email.
+
+---
+Unsubscribe: ${opts.unsubscribeUrl}
+Email Preferences: ${opts.settingsUrl}
+`;
 }

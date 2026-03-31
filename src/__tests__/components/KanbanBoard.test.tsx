@@ -99,6 +99,7 @@ describe('KanbanBoard', () => {
     expect(screen.getByText('Purchased')).toBeInTheDocument();
     expect(screen.getByText('Listed')).toBeInTheDocument();
     expect(screen.getByText('Sold')).toBeInTheDocument();
+    expect(screen.getByText('Passed')).toBeInTheDocument();
   });
 
   it('renders opportunity cards in correct columns', () => {
@@ -145,5 +146,27 @@ describe('KanbanBoard', () => {
     render(<KanbanBoard opportunities={mockOpportunities} onStatusChange={mockOnStatusChange} />);
     const viewLinks = screen.getAllByText('View');
     expect(viewLinks.length).toBe(3);
+  });
+
+  it('routes PASSED status opportunity to PASSED column', () => {
+    const passedOpp = {
+      id: 'opp-4',
+      listingId: 'lst-4',
+      status: 'PASSED',
+      listing: {
+        id: 'lst-4',
+        title: 'Passed Item',
+        askingPrice: 30,
+        profitPotential: null,
+        valueScore: null,
+        platform: 'OfferUp',
+        url: 'https://example.com/passed',
+        imageUrls: null,
+      },
+    };
+    render(<KanbanBoard opportunities={[passedOpp]} onStatusChange={mockOnStatusChange} />);
+    const passedColumn = screen.getByTestId('droppable-PASSED');
+    expect(passedColumn).toBeInTheDocument();
+    expect(screen.getByText('Passed Item')).toBeInTheDocument();
   });
 });

@@ -1,15 +1,24 @@
 /**
- * POST /api/checkout — Create a Stripe Checkout session for subscription upgrade.
- * Author: ASPEN
- * Company: Axovia AI
+ * @file app/api/checkout/route.ts
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-03-01
+ * @version 1.0
+ * @brief POST /api/checkout — Create a Stripe Checkout session for subscription upgrade.
+ *
+ * @description
+ * Creates a Stripe Checkout session for subscription upgrades. Finds or creates
+ * a Stripe customer by email, stores the customer ID on the user record, and
+ * returns the hosted checkout URL. Supports FLIPPER and PRO tiers.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { stripe, STRIPE_PRICE_IDS } from '@/lib/stripe';
 import { SubscriptionTier } from '@/lib/subscription-tiers';
+import prisma from '@/lib/db';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, UnauthorizedError } from '@/lib/errors';
 export async function POST(req: NextRequest) {
   try {
     const sessionUser = await getCurrentUser();
@@ -42,6 +51,17 @@ export async function POST(req: NextRequest) {
         metadata: { source: 'flipper-ai' },
       });
       customerId = customer.id;
+    }
+
+    // Store Stripe customer ID on user record (updateMany: no throw if email missing in DB)
+    const persist = await prisma.user.updateMany({
+      where: { email: sessionUser.email },
+      data: { stripeCustomerId: customerId },
+    });
+    if (persist.count === 0) {
+      console.warn(
+        `[Checkout] No user row for email ${sessionUser.email} — stripeCustomerId not persisted; checkout session still created`
+      );
     }
 
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';

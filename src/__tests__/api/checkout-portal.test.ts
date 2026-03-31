@@ -1,6 +1,14 @@
 /**
- * Tests for POST /api/checkout/portal
- * Covers: auth check, no customer found, successful portal creation, error handling.
+ * @file src/__tests__/api/checkout-portal.test.ts
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-03-08
+ * @version 1.0
+ * @brief Tests for POST /api/checkout/portal — Stripe Customer Portal session.
+ *
+ * @description
+ * Covers auth checks, no Stripe customer found, successful portal session
+ * creation with URL return, and Stripe API error handling.
  */
 
 // Mock @/lib/auth (Firebase session-based)

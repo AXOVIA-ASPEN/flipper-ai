@@ -3,7 +3,7 @@
  * Client
 **/
 
-import * as runtime from './runtime/library.js';
+import * as runtime from './runtime/client.js';
 import $Types = runtime.Types // general types
 import $Public = runtime.Types.Public
 import $Utils = runtime.Types.Utils
@@ -83,6 +83,21 @@ export type AiAnalysisCache = $Result.DefaultSelection<Prisma.$AiAnalysisCachePa
  * 
  */
 export type PostingQueueItem = $Result.DefaultSelection<Prisma.$PostingQueueItemPayload>
+/**
+ * Model ListingImage
+ * 
+ */
+export type ListingImage = $Result.DefaultSelection<Prisma.$ListingImagePayload>
+/**
+ * Model UsageRecord
+ * 
+ */
+export type UsageRecord = $Result.DefaultSelection<Prisma.$UsageRecordPayload>
+/**
+ * Model PasswordResetToken
+ * 
+ */
+export type PasswordResetToken = $Result.DefaultSelection<Prisma.$PasswordResetTokenPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -96,7 +111,7 @@ export type PostingQueueItem = $Result.DefaultSelection<Prisma.$PostingQueueItem
  * ```
  *
  *
- * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
+ * Read more in our [docs](https://pris.ly/d/client).
  */
 export class PrismaClient<
   ClientOptions extends Prisma.PrismaClientOptions = Prisma.PrismaClientOptions,
@@ -117,7 +132,7 @@ export class PrismaClient<
    * ```
    *
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
+   * Read more in our [docs](https://pris.ly/d/client).
    */
 
   constructor(optionsArg ?: Prisma.Subset<ClientOptions, Prisma.PrismaClientOptions>);
@@ -140,7 +155,7 @@ export class PrismaClient<
    * const result = await prisma.$executeRaw`UPDATE User SET cool = ${true} WHERE email = ${'user@email.com'};`
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $executeRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<number>;
 
@@ -152,7 +167,7 @@ export class PrismaClient<
    * const result = await prisma.$executeRawUnsafe('UPDATE User SET cool = $1 WHERE email = $2 ;', true, 'user@email.com')
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $executeRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<number>;
 
@@ -163,7 +178,7 @@ export class PrismaClient<
    * const result = await prisma.$queryRaw`SELECT * FROM User WHERE id = ${1} OR email = ${'user@email.com'};`
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $queryRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<T>;
 
@@ -175,7 +190,7 @@ export class PrismaClient<
    * const result = await prisma.$queryRawUnsafe('SELECT * FROM User WHERE id = $1 OR email = $2;', 1, 'user@email.com')
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $queryRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<T>;
 
@@ -196,7 +211,6 @@ export class PrismaClient<
   $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
 
   $transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => $Utils.JsPromise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<R>
-
 
   $extends: $Extensions.ExtendsHook<"extends", Prisma.TypeMapCb<ClientOptions>, ExtArgs, $Utils.Call<Prisma.TypeMapCb<ClientOptions>, {
     extArgs: ExtArgs
@@ -341,6 +355,36 @@ export class PrismaClient<
     * ```
     */
   get postingQueueItem(): Prisma.PostingQueueItemDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.listingImage`: Exposes CRUD operations for the **ListingImage** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ListingImages
+    * const listingImages = await prisma.listingImage.findMany()
+    * ```
+    */
+  get listingImage(): Prisma.ListingImageDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.usageRecord`: Exposes CRUD operations for the **UsageRecord** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more UsageRecords
+    * const usageRecords = await prisma.usageRecord.findMany()
+    * ```
+    */
+  get usageRecord(): Prisma.UsageRecordDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.passwordResetToken`: Exposes CRUD operations for the **PasswordResetToken** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PasswordResetTokens
+    * const passwordResetTokens = await prisma.passwordResetToken.findMany()
+    * ```
+    */
+  get passwordResetToken(): Prisma.PasswordResetTokenDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -381,14 +425,6 @@ export namespace Prisma {
   export type DecimalJsLike = runtime.DecimalJsLike
 
   /**
-   * Metrics
-   */
-  export type Metrics = runtime.Metrics
-  export type Metric<T> = runtime.Metric<T>
-  export type MetricHistogram = runtime.MetricHistogram
-  export type MetricHistogramBucket = runtime.MetricHistogramBucket
-
-  /**
   * Extensions
   */
   export import Extension = $Extensions.UserArgs
@@ -399,11 +435,12 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 6.19.2
-   * Query Engine version: c2990dca591cba766e3b7ef5d9e8a84796e47ab7
+   * Prisma Client JS version: 7.4.0
+   * Query Engine version: ab56fe763f921d033a6c195e7ddeb3e255bdbb57
    */
   export type PrismaVersion = {
     client: string
+    engine: string
   }
 
   export const prismaVersion: PrismaVersion
@@ -795,15 +832,15 @@ export namespace Prisma {
     FacebookToken: 'FacebookToken',
     Message: 'Message',
     AiAnalysisCache: 'AiAnalysisCache',
-    PostingQueueItem: 'PostingQueueItem'
+    PostingQueueItem: 'PostingQueueItem',
+    ListingImage: 'ListingImage',
+    UsageRecord: 'UsageRecord',
+    PasswordResetToken: 'PasswordResetToken'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
 
 
-  export type Datasources = {
-    db?: Datasource
-  }
 
   interface TypeMapCb<ClientOptions = {}> extends $Utils.Fn<{extArgs: $Extensions.InternalArgs }, $Utils.Record<string, any>> {
     returns: Prisma.TypeMap<this['params']['extArgs'], ClientOptions extends { omit: infer OmitOptions } ? OmitOptions : {}>
@@ -814,7 +851,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "listing" | "opportunity" | "scraperJob" | "searchConfig" | "priceHistory" | "user" | "account" | "session" | "verificationToken" | "userSettings" | "facebookToken" | "message" | "aiAnalysisCache" | "postingQueueItem"
+      modelProps: "listing" | "opportunity" | "scraperJob" | "searchConfig" | "priceHistory" | "user" | "account" | "session" | "verificationToken" | "userSettings" | "facebookToken" | "message" | "aiAnalysisCache" | "postingQueueItem" | "listingImage" | "usageRecord" | "passwordResetToken"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1854,6 +1891,228 @@ export namespace Prisma {
           }
         }
       }
+      ListingImage: {
+        payload: Prisma.$ListingImagePayload<ExtArgs>
+        fields: Prisma.ListingImageFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ListingImageFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ListingImagePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ListingImageFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ListingImagePayload>
+          }
+          findFirst: {
+            args: Prisma.ListingImageFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ListingImagePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ListingImageFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ListingImagePayload>
+          }
+          findMany: {
+            args: Prisma.ListingImageFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ListingImagePayload>[]
+          }
+          create: {
+            args: Prisma.ListingImageCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ListingImagePayload>
+          }
+          createMany: {
+            args: Prisma.ListingImageCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ListingImageCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ListingImagePayload>[]
+          }
+          delete: {
+            args: Prisma.ListingImageDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ListingImagePayload>
+          }
+          update: {
+            args: Prisma.ListingImageUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ListingImagePayload>
+          }
+          deleteMany: {
+            args: Prisma.ListingImageDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ListingImageUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ListingImageUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ListingImagePayload>[]
+          }
+          upsert: {
+            args: Prisma.ListingImageUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ListingImagePayload>
+          }
+          aggregate: {
+            args: Prisma.ListingImageAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateListingImage>
+          }
+          groupBy: {
+            args: Prisma.ListingImageGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ListingImageGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ListingImageCountArgs<ExtArgs>
+            result: $Utils.Optional<ListingImageCountAggregateOutputType> | number
+          }
+        }
+      }
+      UsageRecord: {
+        payload: Prisma.$UsageRecordPayload<ExtArgs>
+        fields: Prisma.UsageRecordFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.UsageRecordFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UsageRecordPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.UsageRecordFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UsageRecordPayload>
+          }
+          findFirst: {
+            args: Prisma.UsageRecordFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UsageRecordPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.UsageRecordFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UsageRecordPayload>
+          }
+          findMany: {
+            args: Prisma.UsageRecordFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UsageRecordPayload>[]
+          }
+          create: {
+            args: Prisma.UsageRecordCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UsageRecordPayload>
+          }
+          createMany: {
+            args: Prisma.UsageRecordCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.UsageRecordCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UsageRecordPayload>[]
+          }
+          delete: {
+            args: Prisma.UsageRecordDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UsageRecordPayload>
+          }
+          update: {
+            args: Prisma.UsageRecordUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UsageRecordPayload>
+          }
+          deleteMany: {
+            args: Prisma.UsageRecordDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.UsageRecordUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.UsageRecordUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UsageRecordPayload>[]
+          }
+          upsert: {
+            args: Prisma.UsageRecordUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UsageRecordPayload>
+          }
+          aggregate: {
+            args: Prisma.UsageRecordAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateUsageRecord>
+          }
+          groupBy: {
+            args: Prisma.UsageRecordGroupByArgs<ExtArgs>
+            result: $Utils.Optional<UsageRecordGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.UsageRecordCountArgs<ExtArgs>
+            result: $Utils.Optional<UsageRecordCountAggregateOutputType> | number
+          }
+        }
+      }
+      PasswordResetToken: {
+        payload: Prisma.$PasswordResetTokenPayload<ExtArgs>
+        fields: Prisma.PasswordResetTokenFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PasswordResetTokenFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PasswordResetTokenFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload>
+          }
+          findFirst: {
+            args: Prisma.PasswordResetTokenFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PasswordResetTokenFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload>
+          }
+          findMany: {
+            args: Prisma.PasswordResetTokenFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload>[]
+          }
+          create: {
+            args: Prisma.PasswordResetTokenCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload>
+          }
+          createMany: {
+            args: Prisma.PasswordResetTokenCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PasswordResetTokenCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload>[]
+          }
+          delete: {
+            args: Prisma.PasswordResetTokenDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload>
+          }
+          update: {
+            args: Prisma.PasswordResetTokenUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload>
+          }
+          deleteMany: {
+            args: Prisma.PasswordResetTokenDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PasswordResetTokenUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PasswordResetTokenUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload>[]
+          }
+          upsert: {
+            args: Prisma.PasswordResetTokenUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload>
+          }
+          aggregate: {
+            args: Prisma.PasswordResetTokenAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePasswordResetToken>
+          }
+          groupBy: {
+            args: Prisma.PasswordResetTokenGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PasswordResetTokenGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PasswordResetTokenCountArgs<ExtArgs>
+            result: $Utils.Optional<PasswordResetTokenCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1883,14 +2142,6 @@ export namespace Prisma {
   export type ErrorFormat = 'pretty' | 'colorless' | 'minimal'
   export interface PrismaClientOptions {
     /**
-     * Overwrites the datasource url from your schema.prisma file
-     */
-    datasources?: Datasources
-    /**
-     * Overwrites the datasource url from your schema.prisma file
-     */
-    datasourceUrl?: string
-    /**
      * @default "colorless"
      */
     errorFormat?: ErrorFormat
@@ -1916,7 +2167,7 @@ export namespace Prisma {
      *  { emit: 'stdout', level: 'error' }
      * 
      * ```
-     * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/logging#the-log-option).
+     * Read more in our [docs](https://pris.ly/d/logging).
      */
     log?: (LogLevel | LogDefinition)[]
     /**
@@ -1932,7 +2183,11 @@ export namespace Prisma {
     /**
      * Instance of a Driver Adapter, e.g., like one provided by `@prisma/adapter-planetscale`
      */
-    adapter?: runtime.SqlDriverAdapterFactory | null
+    adapter?: runtime.SqlDriverAdapterFactory
+    /**
+     * Prisma Accelerate URL allowing the client to connect through Accelerate instead of a direct database.
+     */
+    accelerateUrl?: string
     /**
      * Global configuration for omitting model fields by default.
      * 
@@ -1948,6 +2203,22 @@ export namespace Prisma {
      * ```
      */
     omit?: Prisma.GlobalOmitConfig
+    /**
+     * SQL commenter plugins that add metadata to SQL queries as comments.
+     * Comments follow the sqlcommenter format: https://google.github.io/sqlcommenter/
+     * 
+     * @example
+     * ```
+     * const prisma = new PrismaClient({
+     *   adapter,
+     *   comments: [
+     *     traceContext(),
+     *     queryInsights(),
+     *   ],
+     * })
+     * ```
+     */
+    comments?: runtime.SqlCommenterPlugin[]
   }
   export type GlobalOmitConfig = {
     listing?: ListingOmit
@@ -1964,6 +2235,9 @@ export namespace Prisma {
     message?: MessageOmit
     aiAnalysisCache?: AiAnalysisCacheOmit
     postingQueueItem?: PostingQueueItemOmit
+    listingImage?: ListingImageOmit
+    usageRecord?: UsageRecordOmit
+    passwordResetToken?: PasswordResetTokenOmit
   }
 
   /* Types for Logging */
@@ -2044,11 +2318,13 @@ export namespace Prisma {
    */
 
   export type ListingCountOutputType = {
+    images: number
     messages: number
     postingQueue: number
   }
 
   export type ListingCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    images?: boolean | ListingCountOutputTypeCountImagesArgs
     messages?: boolean | ListingCountOutputTypeCountMessagesArgs
     postingQueue?: boolean | ListingCountOutputTypeCountPostingQueueArgs
   }
@@ -2062,6 +2338,13 @@ export namespace Prisma {
      * Select specific fields to fetch from the ListingCountOutputType
      */
     select?: ListingCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ListingCountOutputType without action
+   */
+  export type ListingCountOutputTypeCountImagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ListingImageWhereInput
   }
 
   /**
@@ -2092,6 +2375,8 @@ export namespace Prisma {
     scraperJobs: number
     searchConfigs: number
     sessions: number
+    passwordResetTokens: number
+    usageRecords: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2103,6 +2388,8 @@ export namespace Prisma {
     scraperJobs?: boolean | UserCountOutputTypeCountScraperJobsArgs
     searchConfigs?: boolean | UserCountOutputTypeCountSearchConfigsArgs
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs
+    passwordResetTokens?: boolean | UserCountOutputTypeCountPasswordResetTokensArgs
+    usageRecords?: boolean | UserCountOutputTypeCountUsageRecordsArgs
   }
 
   // Custom InputTypes
@@ -2172,6 +2459,20 @@ export namespace Prisma {
     where?: SessionWhereInput
   }
 
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountPasswordResetTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PasswordResetTokenWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountUsageRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UsageRecordWhereInput
+  }
+
 
   /**
    * Models
@@ -2207,6 +2508,15 @@ export namespace Prisma {
     recommendedOffer: number | null
     recommendedList: number | null
     trueDiscountPercent: number | null
+    soldVolume30Days: number | null
+    soldVolume60Days: number | null
+    soldVolume90Days: number | null
+    sellerRating: number | null
+    sellerReviewCount: number | null
+    sellerAccountAgeDays: number | null
+    estimatedShippingCost: number | null
+    pickupDistanceMiles: number | null
+    adjustedProfitMargin: number | null
   }
 
   export type ListingSumAggregateOutputType = {
@@ -2227,6 +2537,15 @@ export namespace Prisma {
     recommendedOffer: number | null
     recommendedList: number | null
     trueDiscountPercent: number | null
+    soldVolume30Days: number | null
+    soldVolume60Days: number | null
+    soldVolume90Days: number | null
+    sellerRating: number | null
+    sellerReviewCount: number | null
+    sellerAccountAgeDays: number | null
+    estimatedShippingCost: number | null
+    pickupDistanceMiles: number | null
+    adjustedProfitMargin: number | null
   }
 
   export type ListingMinAggregateOutputType = {
@@ -2273,14 +2592,29 @@ export namespace Prisma {
     marketDataSource: string | null
     marketDataDate: Date | null
     comparableSalesJson: string | null
+    compMatchConfidence: string | null
     sellabilityScore: number | null
     demandLevel: string | null
     expectedDaysToSell: number | null
     authenticityRisk: string | null
+    conditionRisk: string | null
     recommendedOffer: number | null
     recommendedList: number | null
     resaleStrategy: string | null
     trueDiscountPercent: number | null
+    soldVolume30Days: number | null
+    soldVolume60Days: number | null
+    soldVolume90Days: number | null
+    completenessLabel: string | null
+    sellerRating: number | null
+    sellerReviewCount: number | null
+    sellerAccountAgeDays: number | null
+    sizeCategory: string | null
+    shippingEstimatesJson: string | null
+    estimatedShippingCost: number | null
+    pickupDistanceMiles: number | null
+    outsidePickupRadius: boolean | null
+    adjustedProfitMargin: number | null
     llmAnalyzed: boolean | null
     analysisDate: Date | null
     analysisConfidence: string | null
@@ -2331,14 +2665,29 @@ export namespace Prisma {
     marketDataSource: string | null
     marketDataDate: Date | null
     comparableSalesJson: string | null
+    compMatchConfidence: string | null
     sellabilityScore: number | null
     demandLevel: string | null
     expectedDaysToSell: number | null
     authenticityRisk: string | null
+    conditionRisk: string | null
     recommendedOffer: number | null
     recommendedList: number | null
     resaleStrategy: string | null
     trueDiscountPercent: number | null
+    soldVolume30Days: number | null
+    soldVolume60Days: number | null
+    soldVolume90Days: number | null
+    completenessLabel: string | null
+    sellerRating: number | null
+    sellerReviewCount: number | null
+    sellerAccountAgeDays: number | null
+    sizeCategory: string | null
+    shippingEstimatesJson: string | null
+    estimatedShippingCost: number | null
+    pickupDistanceMiles: number | null
+    outsidePickupRadius: boolean | null
+    adjustedProfitMargin: number | null
     llmAnalyzed: boolean | null
     analysisDate: Date | null
     analysisConfidence: string | null
@@ -2389,14 +2738,29 @@ export namespace Prisma {
     marketDataSource: number
     marketDataDate: number
     comparableSalesJson: number
+    compMatchConfidence: number
     sellabilityScore: number
     demandLevel: number
     expectedDaysToSell: number
     authenticityRisk: number
+    conditionRisk: number
     recommendedOffer: number
     recommendedList: number
     resaleStrategy: number
     trueDiscountPercent: number
+    soldVolume30Days: number
+    soldVolume60Days: number
+    soldVolume90Days: number
+    completenessLabel: number
+    sellerRating: number
+    sellerReviewCount: number
+    sellerAccountAgeDays: number
+    sizeCategory: number
+    shippingEstimatesJson: number
+    estimatedShippingCost: number
+    pickupDistanceMiles: number
+    outsidePickupRadius: number
+    adjustedProfitMargin: number
     llmAnalyzed: number
     analysisDate: number
     analysisConfidence: number
@@ -2423,6 +2787,15 @@ export namespace Prisma {
     recommendedOffer?: true
     recommendedList?: true
     trueDiscountPercent?: true
+    soldVolume30Days?: true
+    soldVolume60Days?: true
+    soldVolume90Days?: true
+    sellerRating?: true
+    sellerReviewCount?: true
+    sellerAccountAgeDays?: true
+    estimatedShippingCost?: true
+    pickupDistanceMiles?: true
+    adjustedProfitMargin?: true
   }
 
   export type ListingSumAggregateInputType = {
@@ -2443,6 +2816,15 @@ export namespace Prisma {
     recommendedOffer?: true
     recommendedList?: true
     trueDiscountPercent?: true
+    soldVolume30Days?: true
+    soldVolume60Days?: true
+    soldVolume90Days?: true
+    sellerRating?: true
+    sellerReviewCount?: true
+    sellerAccountAgeDays?: true
+    estimatedShippingCost?: true
+    pickupDistanceMiles?: true
+    adjustedProfitMargin?: true
   }
 
   export type ListingMinAggregateInputType = {
@@ -2489,14 +2871,29 @@ export namespace Prisma {
     marketDataSource?: true
     marketDataDate?: true
     comparableSalesJson?: true
+    compMatchConfidence?: true
     sellabilityScore?: true
     demandLevel?: true
     expectedDaysToSell?: true
     authenticityRisk?: true
+    conditionRisk?: true
     recommendedOffer?: true
     recommendedList?: true
     resaleStrategy?: true
     trueDiscountPercent?: true
+    soldVolume30Days?: true
+    soldVolume60Days?: true
+    soldVolume90Days?: true
+    completenessLabel?: true
+    sellerRating?: true
+    sellerReviewCount?: true
+    sellerAccountAgeDays?: true
+    sizeCategory?: true
+    shippingEstimatesJson?: true
+    estimatedShippingCost?: true
+    pickupDistanceMiles?: true
+    outsidePickupRadius?: true
+    adjustedProfitMargin?: true
     llmAnalyzed?: true
     analysisDate?: true
     analysisConfidence?: true
@@ -2547,14 +2944,29 @@ export namespace Prisma {
     marketDataSource?: true
     marketDataDate?: true
     comparableSalesJson?: true
+    compMatchConfidence?: true
     sellabilityScore?: true
     demandLevel?: true
     expectedDaysToSell?: true
     authenticityRisk?: true
+    conditionRisk?: true
     recommendedOffer?: true
     recommendedList?: true
     resaleStrategy?: true
     trueDiscountPercent?: true
+    soldVolume30Days?: true
+    soldVolume60Days?: true
+    soldVolume90Days?: true
+    completenessLabel?: true
+    sellerRating?: true
+    sellerReviewCount?: true
+    sellerAccountAgeDays?: true
+    sizeCategory?: true
+    shippingEstimatesJson?: true
+    estimatedShippingCost?: true
+    pickupDistanceMiles?: true
+    outsidePickupRadius?: true
+    adjustedProfitMargin?: true
     llmAnalyzed?: true
     analysisDate?: true
     analysisConfidence?: true
@@ -2605,14 +3017,29 @@ export namespace Prisma {
     marketDataSource?: true
     marketDataDate?: true
     comparableSalesJson?: true
+    compMatchConfidence?: true
     sellabilityScore?: true
     demandLevel?: true
     expectedDaysToSell?: true
     authenticityRisk?: true
+    conditionRisk?: true
     recommendedOffer?: true
     recommendedList?: true
     resaleStrategy?: true
     trueDiscountPercent?: true
+    soldVolume30Days?: true
+    soldVolume60Days?: true
+    soldVolume90Days?: true
+    completenessLabel?: true
+    sellerRating?: true
+    sellerReviewCount?: true
+    sellerAccountAgeDays?: true
+    sizeCategory?: true
+    shippingEstimatesJson?: true
+    estimatedShippingCost?: true
+    pickupDistanceMiles?: true
+    outsidePickupRadius?: true
+    adjustedProfitMargin?: true
     llmAnalyzed?: true
     analysisDate?: true
     analysisConfidence?: true
@@ -2750,14 +3177,29 @@ export namespace Prisma {
     marketDataSource: string | null
     marketDataDate: Date | null
     comparableSalesJson: string | null
+    compMatchConfidence: string | null
     sellabilityScore: number | null
     demandLevel: string | null
     expectedDaysToSell: number | null
     authenticityRisk: string | null
+    conditionRisk: string | null
     recommendedOffer: number | null
     recommendedList: number | null
     resaleStrategy: string | null
     trueDiscountPercent: number | null
+    soldVolume30Days: number | null
+    soldVolume60Days: number | null
+    soldVolume90Days: number | null
+    completenessLabel: string | null
+    sellerRating: number | null
+    sellerReviewCount: number | null
+    sellerAccountAgeDays: number | null
+    sizeCategory: string | null
+    shippingEstimatesJson: string | null
+    estimatedShippingCost: number | null
+    pickupDistanceMiles: number | null
+    outsidePickupRadius: boolean | null
+    adjustedProfitMargin: number | null
     llmAnalyzed: boolean
     analysisDate: Date | null
     analysisConfidence: string | null
@@ -2827,19 +3269,35 @@ export namespace Prisma {
     marketDataSource?: boolean
     marketDataDate?: boolean
     comparableSalesJson?: boolean
+    compMatchConfidence?: boolean
     sellabilityScore?: boolean
     demandLevel?: boolean
     expectedDaysToSell?: boolean
     authenticityRisk?: boolean
+    conditionRisk?: boolean
     recommendedOffer?: boolean
     recommendedList?: boolean
     resaleStrategy?: boolean
     trueDiscountPercent?: boolean
+    soldVolume30Days?: boolean
+    soldVolume60Days?: boolean
+    soldVolume90Days?: boolean
+    completenessLabel?: boolean
+    sellerRating?: boolean
+    sellerReviewCount?: boolean
+    sellerAccountAgeDays?: boolean
+    sizeCategory?: boolean
+    shippingEstimatesJson?: boolean
+    estimatedShippingCost?: boolean
+    pickupDistanceMiles?: boolean
+    outsidePickupRadius?: boolean
+    adjustedProfitMargin?: boolean
     llmAnalyzed?: boolean
     analysisDate?: boolean
     analysisConfidence?: boolean
     analysisReasoning?: boolean
     user?: boolean | Listing$userArgs<ExtArgs>
+    images?: boolean | Listing$imagesArgs<ExtArgs>
     messages?: boolean | Listing$messagesArgs<ExtArgs>
     opportunity?: boolean | Listing$opportunityArgs<ExtArgs>
     postingQueue?: boolean | Listing$postingQueueArgs<ExtArgs>
@@ -2890,14 +3348,29 @@ export namespace Prisma {
     marketDataSource?: boolean
     marketDataDate?: boolean
     comparableSalesJson?: boolean
+    compMatchConfidence?: boolean
     sellabilityScore?: boolean
     demandLevel?: boolean
     expectedDaysToSell?: boolean
     authenticityRisk?: boolean
+    conditionRisk?: boolean
     recommendedOffer?: boolean
     recommendedList?: boolean
     resaleStrategy?: boolean
     trueDiscountPercent?: boolean
+    soldVolume30Days?: boolean
+    soldVolume60Days?: boolean
+    soldVolume90Days?: boolean
+    completenessLabel?: boolean
+    sellerRating?: boolean
+    sellerReviewCount?: boolean
+    sellerAccountAgeDays?: boolean
+    sizeCategory?: boolean
+    shippingEstimatesJson?: boolean
+    estimatedShippingCost?: boolean
+    pickupDistanceMiles?: boolean
+    outsidePickupRadius?: boolean
+    adjustedProfitMargin?: boolean
     llmAnalyzed?: boolean
     analysisDate?: boolean
     analysisConfidence?: boolean
@@ -2949,14 +3422,29 @@ export namespace Prisma {
     marketDataSource?: boolean
     marketDataDate?: boolean
     comparableSalesJson?: boolean
+    compMatchConfidence?: boolean
     sellabilityScore?: boolean
     demandLevel?: boolean
     expectedDaysToSell?: boolean
     authenticityRisk?: boolean
+    conditionRisk?: boolean
     recommendedOffer?: boolean
     recommendedList?: boolean
     resaleStrategy?: boolean
     trueDiscountPercent?: boolean
+    soldVolume30Days?: boolean
+    soldVolume60Days?: boolean
+    soldVolume90Days?: boolean
+    completenessLabel?: boolean
+    sellerRating?: boolean
+    sellerReviewCount?: boolean
+    sellerAccountAgeDays?: boolean
+    sizeCategory?: boolean
+    shippingEstimatesJson?: boolean
+    estimatedShippingCost?: boolean
+    pickupDistanceMiles?: boolean
+    outsidePickupRadius?: boolean
+    adjustedProfitMargin?: boolean
     llmAnalyzed?: boolean
     analysisDate?: boolean
     analysisConfidence?: boolean
@@ -3008,23 +3496,39 @@ export namespace Prisma {
     marketDataSource?: boolean
     marketDataDate?: boolean
     comparableSalesJson?: boolean
+    compMatchConfidence?: boolean
     sellabilityScore?: boolean
     demandLevel?: boolean
     expectedDaysToSell?: boolean
     authenticityRisk?: boolean
+    conditionRisk?: boolean
     recommendedOffer?: boolean
     recommendedList?: boolean
     resaleStrategy?: boolean
     trueDiscountPercent?: boolean
+    soldVolume30Days?: boolean
+    soldVolume60Days?: boolean
+    soldVolume90Days?: boolean
+    completenessLabel?: boolean
+    sellerRating?: boolean
+    sellerReviewCount?: boolean
+    sellerAccountAgeDays?: boolean
+    sizeCategory?: boolean
+    shippingEstimatesJson?: boolean
+    estimatedShippingCost?: boolean
+    pickupDistanceMiles?: boolean
+    outsidePickupRadius?: boolean
+    adjustedProfitMargin?: boolean
     llmAnalyzed?: boolean
     analysisDate?: boolean
     analysisConfidence?: boolean
     analysisReasoning?: boolean
   }
 
-  export type ListingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "externalId" | "platform" | "url" | "title" | "description" | "askingPrice" | "condition" | "location" | "sellerName" | "sellerContact" | "imageUrls" | "category" | "postedAt" | "scrapedAt" | "estimatedValue" | "estimatedLow" | "estimatedHigh" | "profitPotential" | "profitLow" | "profitHigh" | "valueScore" | "discountPercent" | "resaleDifficulty" | "status" | "comparableUrls" | "priceReasoning" | "notes" | "shippable" | "estimatedWeight" | "negotiable" | "daysListed" | "tags" | "requestToBuy" | "identifiedBrand" | "identifiedModel" | "identifiedVariant" | "identifiedCondition" | "verifiedMarketValue" | "marketDataSource" | "marketDataDate" | "comparableSalesJson" | "sellabilityScore" | "demandLevel" | "expectedDaysToSell" | "authenticityRisk" | "recommendedOffer" | "recommendedList" | "resaleStrategy" | "trueDiscountPercent" | "llmAnalyzed" | "analysisDate" | "analysisConfidence" | "analysisReasoning", ExtArgs["result"]["listing"]>
+  export type ListingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "externalId" | "platform" | "url" | "title" | "description" | "askingPrice" | "condition" | "location" | "sellerName" | "sellerContact" | "imageUrls" | "category" | "postedAt" | "scrapedAt" | "estimatedValue" | "estimatedLow" | "estimatedHigh" | "profitPotential" | "profitLow" | "profitHigh" | "valueScore" | "discountPercent" | "resaleDifficulty" | "status" | "comparableUrls" | "priceReasoning" | "notes" | "shippable" | "estimatedWeight" | "negotiable" | "daysListed" | "tags" | "requestToBuy" | "identifiedBrand" | "identifiedModel" | "identifiedVariant" | "identifiedCondition" | "verifiedMarketValue" | "marketDataSource" | "marketDataDate" | "comparableSalesJson" | "compMatchConfidence" | "sellabilityScore" | "demandLevel" | "expectedDaysToSell" | "authenticityRisk" | "conditionRisk" | "recommendedOffer" | "recommendedList" | "resaleStrategy" | "trueDiscountPercent" | "soldVolume30Days" | "soldVolume60Days" | "soldVolume90Days" | "completenessLabel" | "sellerRating" | "sellerReviewCount" | "sellerAccountAgeDays" | "sizeCategory" | "shippingEstimatesJson" | "estimatedShippingCost" | "pickupDistanceMiles" | "outsidePickupRadius" | "adjustedProfitMargin" | "llmAnalyzed" | "analysisDate" | "analysisConfidence" | "analysisReasoning", ExtArgs["result"]["listing"]>
   export type ListingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | Listing$userArgs<ExtArgs>
+    images?: boolean | Listing$imagesArgs<ExtArgs>
     messages?: boolean | Listing$messagesArgs<ExtArgs>
     opportunity?: boolean | Listing$opportunityArgs<ExtArgs>
     postingQueue?: boolean | Listing$postingQueueArgs<ExtArgs>
@@ -3041,6 +3545,7 @@ export namespace Prisma {
     name: "Listing"
     objects: {
       user: Prisma.$UserPayload<ExtArgs> | null
+      images: Prisma.$ListingImagePayload<ExtArgs>[]
       messages: Prisma.$MessagePayload<ExtArgs>[]
       opportunity: Prisma.$OpportunityPayload<ExtArgs> | null
       postingQueue: Prisma.$PostingQueueItemPayload<ExtArgs>[]
@@ -3089,14 +3594,29 @@ export namespace Prisma {
       marketDataSource: string | null
       marketDataDate: Date | null
       comparableSalesJson: string | null
+      compMatchConfidence: string | null
       sellabilityScore: number | null
       demandLevel: string | null
       expectedDaysToSell: number | null
       authenticityRisk: string | null
+      conditionRisk: string | null
       recommendedOffer: number | null
       recommendedList: number | null
       resaleStrategy: string | null
       trueDiscountPercent: number | null
+      soldVolume30Days: number | null
+      soldVolume60Days: number | null
+      soldVolume90Days: number | null
+      completenessLabel: string | null
+      sellerRating: number | null
+      sellerReviewCount: number | null
+      sellerAccountAgeDays: number | null
+      sizeCategory: string | null
+      shippingEstimatesJson: string | null
+      estimatedShippingCost: number | null
+      pickupDistanceMiles: number | null
+      outsidePickupRadius: boolean | null
+      adjustedProfitMargin: number | null
       llmAnalyzed: boolean
       analysisDate: Date | null
       analysisConfidence: string | null
@@ -3496,6 +4016,7 @@ export namespace Prisma {
   export interface Prisma__ListingClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends Listing$userArgs<ExtArgs> = {}>(args?: Subset<T, Listing$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    images<T extends Listing$imagesArgs<ExtArgs> = {}>(args?: Subset<T, Listing$imagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ListingImagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     messages<T extends Listing$messagesArgs<ExtArgs> = {}>(args?: Subset<T, Listing$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     opportunity<T extends Listing$opportunityArgs<ExtArgs> = {}>(args?: Subset<T, Listing$opportunityArgs<ExtArgs>>): Prisma__OpportunityClient<$Result.GetResult<Prisma.$OpportunityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     postingQueue<T extends Listing$postingQueueArgs<ExtArgs> = {}>(args?: Subset<T, Listing$postingQueueArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PostingQueueItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3571,14 +4092,29 @@ export namespace Prisma {
     readonly marketDataSource: FieldRef<"Listing", 'String'>
     readonly marketDataDate: FieldRef<"Listing", 'DateTime'>
     readonly comparableSalesJson: FieldRef<"Listing", 'String'>
+    readonly compMatchConfidence: FieldRef<"Listing", 'String'>
     readonly sellabilityScore: FieldRef<"Listing", 'Int'>
     readonly demandLevel: FieldRef<"Listing", 'String'>
     readonly expectedDaysToSell: FieldRef<"Listing", 'Int'>
     readonly authenticityRisk: FieldRef<"Listing", 'String'>
+    readonly conditionRisk: FieldRef<"Listing", 'String'>
     readonly recommendedOffer: FieldRef<"Listing", 'Float'>
     readonly recommendedList: FieldRef<"Listing", 'Float'>
     readonly resaleStrategy: FieldRef<"Listing", 'String'>
     readonly trueDiscountPercent: FieldRef<"Listing", 'Float'>
+    readonly soldVolume30Days: FieldRef<"Listing", 'Int'>
+    readonly soldVolume60Days: FieldRef<"Listing", 'Int'>
+    readonly soldVolume90Days: FieldRef<"Listing", 'Int'>
+    readonly completenessLabel: FieldRef<"Listing", 'String'>
+    readonly sellerRating: FieldRef<"Listing", 'Float'>
+    readonly sellerReviewCount: FieldRef<"Listing", 'Int'>
+    readonly sellerAccountAgeDays: FieldRef<"Listing", 'Int'>
+    readonly sizeCategory: FieldRef<"Listing", 'String'>
+    readonly shippingEstimatesJson: FieldRef<"Listing", 'String'>
+    readonly estimatedShippingCost: FieldRef<"Listing", 'Float'>
+    readonly pickupDistanceMiles: FieldRef<"Listing", 'Float'>
+    readonly outsidePickupRadius: FieldRef<"Listing", 'Boolean'>
+    readonly adjustedProfitMargin: FieldRef<"Listing", 'Float'>
     readonly llmAnalyzed: FieldRef<"Listing", 'Boolean'>
     readonly analysisDate: FieldRef<"Listing", 'DateTime'>
     readonly analysisConfidence: FieldRef<"Listing", 'String'>
@@ -3995,6 +4531,30 @@ export namespace Prisma {
      */
     include?: UserInclude<ExtArgs> | null
     where?: UserWhereInput
+  }
+
+  /**
+   * Listing.images
+   */
+  export type Listing$imagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ListingImage
+     */
+    select?: ListingImageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ListingImage
+     */
+    omit?: ListingImageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingImageInclude<ExtArgs> | null
+    where?: ListingImageWhereInput
+    orderBy?: ListingImageOrderByWithRelationInput | ListingImageOrderByWithRelationInput[]
+    cursor?: ListingImageWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ListingImageScalarFieldEnum | ListingImageScalarFieldEnum[]
   }
 
   /**
@@ -8872,11 +9432,13 @@ export namespace Prisma {
 
   export type UserMinAggregateOutputType = {
     id: string | null
+    firebaseUid: string | null
     email: string | null
     emailVerified: Date | null
     name: string | null
     image: string | null
     password: string | null
+    stripeCustomerId: string | null
     subscriptionTier: string | null
     onboardingComplete: boolean | null
     onboardingStep: number | null
@@ -8886,11 +9448,13 @@ export namespace Prisma {
 
   export type UserMaxAggregateOutputType = {
     id: string | null
+    firebaseUid: string | null
     email: string | null
     emailVerified: Date | null
     name: string | null
     image: string | null
     password: string | null
+    stripeCustomerId: string | null
     subscriptionTier: string | null
     onboardingComplete: boolean | null
     onboardingStep: number | null
@@ -8900,11 +9464,13 @@ export namespace Prisma {
 
   export type UserCountAggregateOutputType = {
     id: number
+    firebaseUid: number
     email: number
     emailVerified: number
     name: number
     image: number
     password: number
+    stripeCustomerId: number
     subscriptionTier: number
     onboardingComplete: number
     onboardingStep: number
@@ -8924,11 +9490,13 @@ export namespace Prisma {
 
   export type UserMinAggregateInputType = {
     id?: true
+    firebaseUid?: true
     email?: true
     emailVerified?: true
     name?: true
     image?: true
     password?: true
+    stripeCustomerId?: true
     subscriptionTier?: true
     onboardingComplete?: true
     onboardingStep?: true
@@ -8938,11 +9506,13 @@ export namespace Prisma {
 
   export type UserMaxAggregateInputType = {
     id?: true
+    firebaseUid?: true
     email?: true
     emailVerified?: true
     name?: true
     image?: true
     password?: true
+    stripeCustomerId?: true
     subscriptionTier?: true
     onboardingComplete?: true
     onboardingStep?: true
@@ -8952,11 +9522,13 @@ export namespace Prisma {
 
   export type UserCountAggregateInputType = {
     id?: true
+    firebaseUid?: true
     email?: true
     emailVerified?: true
     name?: true
     image?: true
     password?: true
+    stripeCustomerId?: true
     subscriptionTier?: true
     onboardingComplete?: true
     onboardingStep?: true
@@ -9053,11 +9625,13 @@ export namespace Prisma {
 
   export type UserGroupByOutputType = {
     id: string
+    firebaseUid: string | null
     email: string
     emailVerified: Date | null
     name: string | null
     image: string | null
     password: string | null
+    stripeCustomerId: string | null
     subscriptionTier: string
     onboardingComplete: boolean
     onboardingStep: number
@@ -9086,11 +9660,13 @@ export namespace Prisma {
 
   export type UserSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    firebaseUid?: boolean
     email?: boolean
     emailVerified?: boolean
     name?: boolean
     image?: boolean
     password?: boolean
+    stripeCustomerId?: boolean
     subscriptionTier?: boolean
     onboardingComplete?: boolean
     onboardingStep?: boolean
@@ -9105,16 +9681,20 @@ export namespace Prisma {
     searchConfigs?: boolean | User$searchConfigsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     settings?: boolean | User$settingsArgs<ExtArgs>
+    passwordResetTokens?: boolean | User$passwordResetTokensArgs<ExtArgs>
+    usageRecords?: boolean | User$usageRecordsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    firebaseUid?: boolean
     email?: boolean
     emailVerified?: boolean
     name?: boolean
     image?: boolean
     password?: boolean
+    stripeCustomerId?: boolean
     subscriptionTier?: boolean
     onboardingComplete?: boolean
     onboardingStep?: boolean
@@ -9124,11 +9704,13 @@ export namespace Prisma {
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    firebaseUid?: boolean
     email?: boolean
     emailVerified?: boolean
     name?: boolean
     image?: boolean
     password?: boolean
+    stripeCustomerId?: boolean
     subscriptionTier?: boolean
     onboardingComplete?: boolean
     onboardingStep?: boolean
@@ -9138,11 +9720,13 @@ export namespace Prisma {
 
   export type UserSelectScalar = {
     id?: boolean
+    firebaseUid?: boolean
     email?: boolean
     emailVerified?: boolean
     name?: boolean
     image?: boolean
     password?: boolean
+    stripeCustomerId?: boolean
     subscriptionTier?: boolean
     onboardingComplete?: boolean
     onboardingStep?: boolean
@@ -9150,7 +9734,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "emailVerified" | "name" | "image" | "password" | "subscriptionTier" | "onboardingComplete" | "onboardingStep" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "firebaseUid" | "email" | "emailVerified" | "name" | "image" | "password" | "stripeCustomerId" | "subscriptionTier" | "onboardingComplete" | "onboardingStep" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | User$accountsArgs<ExtArgs>
     listings?: boolean | User$listingsArgs<ExtArgs>
@@ -9161,6 +9745,8 @@ export namespace Prisma {
     searchConfigs?: boolean | User$searchConfigsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     settings?: boolean | User$settingsArgs<ExtArgs>
+    passwordResetTokens?: boolean | User$passwordResetTokensArgs<ExtArgs>
+    usageRecords?: boolean | User$usageRecordsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -9178,14 +9764,18 @@ export namespace Prisma {
       searchConfigs: Prisma.$SearchConfigPayload<ExtArgs>[]
       sessions: Prisma.$SessionPayload<ExtArgs>[]
       settings: Prisma.$UserSettingsPayload<ExtArgs> | null
+      passwordResetTokens: Prisma.$PasswordResetTokenPayload<ExtArgs>[]
+      usageRecords: Prisma.$UsageRecordPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      firebaseUid: string | null
       email: string
       emailVerified: Date | null
       name: string | null
       image: string | null
       password: string | null
+      stripeCustomerId: string | null
       subscriptionTier: string
       onboardingComplete: boolean
       onboardingStep: number
@@ -9594,6 +10184,8 @@ export namespace Prisma {
     searchConfigs<T extends User$searchConfigsArgs<ExtArgs> = {}>(args?: Subset<T, User$searchConfigsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SearchConfigPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     settings<T extends User$settingsArgs<ExtArgs> = {}>(args?: Subset<T, User$settingsArgs<ExtArgs>>): Prisma__UserSettingsClient<$Result.GetResult<Prisma.$UserSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    passwordResetTokens<T extends User$passwordResetTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$passwordResetTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    usageRecords<T extends User$usageRecordsArgs<ExtArgs> = {}>(args?: Subset<T, User$usageRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UsageRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9624,11 +10216,13 @@ export namespace Prisma {
    */
   interface UserFieldRefs {
     readonly id: FieldRef<"User", 'String'>
+    readonly firebaseUid: FieldRef<"User", 'String'>
     readonly email: FieldRef<"User", 'String'>
     readonly emailVerified: FieldRef<"User", 'DateTime'>
     readonly name: FieldRef<"User", 'String'>
     readonly image: FieldRef<"User", 'String'>
     readonly password: FieldRef<"User", 'String'>
+    readonly stripeCustomerId: FieldRef<"User", 'String'>
     readonly subscriptionTier: FieldRef<"User", 'String'>
     readonly onboardingComplete: FieldRef<"User", 'Boolean'>
     readonly onboardingStep: FieldRef<"User", 'Int'>
@@ -10230,6 +10824,54 @@ export namespace Prisma {
      */
     include?: UserSettingsInclude<ExtArgs> | null
     where?: UserSettingsWhereInput
+  }
+
+  /**
+   * User.passwordResetTokens
+   */
+  export type User$passwordResetTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PasswordResetToken
+     */
+    select?: PasswordResetTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PasswordResetToken
+     */
+    omit?: PasswordResetTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasswordResetTokenInclude<ExtArgs> | null
+    where?: PasswordResetTokenWhereInput
+    orderBy?: PasswordResetTokenOrderByWithRelationInput | PasswordResetTokenOrderByWithRelationInput[]
+    cursor?: PasswordResetTokenWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PasswordResetTokenScalarFieldEnum | PasswordResetTokenScalarFieldEnum[]
+  }
+
+  /**
+   * User.usageRecords
+   */
+  export type User$usageRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UsageRecord
+     */
+    select?: UsageRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UsageRecord
+     */
+    omit?: UsageRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UsageRecordInclude<ExtArgs> | null
+    where?: UsageRecordWhereInput
+    orderBy?: UsageRecordOrderByWithRelationInput | UsageRecordOrderByWithRelationInput[]
+    cursor?: UsageRecordWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: UsageRecordScalarFieldEnum | UsageRecordScalarFieldEnum[]
   }
 
   /**
@@ -13462,10 +14104,26 @@ export namespace Prisma {
 
   export type UserSettingsAvgAggregateOutputType = {
     discountThreshold: number | null
+    opportunityThreshold: number | null
+    feeRateEbay: number | null
+    feeRateMercari: number | null
+    feeRateFacebook: number | null
+    feeRateOfferup: number | null
+    feeRateCraigslist: number | null
+    maxPickupRadiusMiles: number | null
+    holdingCostDailyRate: number | null
   }
 
   export type UserSettingsSumAggregateOutputType = {
     discountThreshold: number | null
+    opportunityThreshold: number | null
+    feeRateEbay: number | null
+    feeRateMercari: number | null
+    feeRateFacebook: number | null
+    feeRateOfferup: number | null
+    feeRateCraigslist: number | null
+    maxPickupRadiusMiles: number | null
+    holdingCostDailyRate: number | null
   }
 
   export type UserSettingsMinAggregateOutputType = {
@@ -13482,6 +14140,15 @@ export namespace Prisma {
     notifyExpiring: boolean | null
     notifyWeeklyDigest: boolean | null
     notifyFrequency: string | null
+    opportunityThreshold: number | null
+    feeRateEbay: number | null
+    feeRateMercari: number | null
+    feeRateFacebook: number | null
+    feeRateOfferup: number | null
+    feeRateCraigslist: number | null
+    maxPickupRadiusMiles: number | null
+    homeLocation: string | null
+    holdingCostDailyRate: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -13500,6 +14167,15 @@ export namespace Prisma {
     notifyExpiring: boolean | null
     notifyWeeklyDigest: boolean | null
     notifyFrequency: string | null
+    opportunityThreshold: number | null
+    feeRateEbay: number | null
+    feeRateMercari: number | null
+    feeRateFacebook: number | null
+    feeRateOfferup: number | null
+    feeRateCraigslist: number | null
+    maxPickupRadiusMiles: number | null
+    homeLocation: string | null
+    holdingCostDailyRate: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -13518,6 +14194,15 @@ export namespace Prisma {
     notifyExpiring: number
     notifyWeeklyDigest: number
     notifyFrequency: number
+    opportunityThreshold: number
+    feeRateEbay: number
+    feeRateMercari: number
+    feeRateFacebook: number
+    feeRateOfferup: number
+    feeRateCraigslist: number
+    maxPickupRadiusMiles: number
+    homeLocation: number
+    holdingCostDailyRate: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -13526,10 +14211,26 @@ export namespace Prisma {
 
   export type UserSettingsAvgAggregateInputType = {
     discountThreshold?: true
+    opportunityThreshold?: true
+    feeRateEbay?: true
+    feeRateMercari?: true
+    feeRateFacebook?: true
+    feeRateOfferup?: true
+    feeRateCraigslist?: true
+    maxPickupRadiusMiles?: true
+    holdingCostDailyRate?: true
   }
 
   export type UserSettingsSumAggregateInputType = {
     discountThreshold?: true
+    opportunityThreshold?: true
+    feeRateEbay?: true
+    feeRateMercari?: true
+    feeRateFacebook?: true
+    feeRateOfferup?: true
+    feeRateCraigslist?: true
+    maxPickupRadiusMiles?: true
+    holdingCostDailyRate?: true
   }
 
   export type UserSettingsMinAggregateInputType = {
@@ -13546,6 +14247,15 @@ export namespace Prisma {
     notifyExpiring?: true
     notifyWeeklyDigest?: true
     notifyFrequency?: true
+    opportunityThreshold?: true
+    feeRateEbay?: true
+    feeRateMercari?: true
+    feeRateFacebook?: true
+    feeRateOfferup?: true
+    feeRateCraigslist?: true
+    maxPickupRadiusMiles?: true
+    homeLocation?: true
+    holdingCostDailyRate?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -13564,6 +14274,15 @@ export namespace Prisma {
     notifyExpiring?: true
     notifyWeeklyDigest?: true
     notifyFrequency?: true
+    opportunityThreshold?: true
+    feeRateEbay?: true
+    feeRateMercari?: true
+    feeRateFacebook?: true
+    feeRateOfferup?: true
+    feeRateCraigslist?: true
+    maxPickupRadiusMiles?: true
+    homeLocation?: true
+    holdingCostDailyRate?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -13582,6 +14301,15 @@ export namespace Prisma {
     notifyExpiring?: true
     notifyWeeklyDigest?: true
     notifyFrequency?: true
+    opportunityThreshold?: true
+    feeRateEbay?: true
+    feeRateMercari?: true
+    feeRateFacebook?: true
+    feeRateOfferup?: true
+    feeRateCraigslist?: true
+    maxPickupRadiusMiles?: true
+    homeLocation?: true
+    holdingCostDailyRate?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -13687,6 +14415,15 @@ export namespace Prisma {
     notifyExpiring: boolean
     notifyWeeklyDigest: boolean
     notifyFrequency: string
+    opportunityThreshold: number
+    feeRateEbay: number
+    feeRateMercari: number
+    feeRateFacebook: number
+    feeRateOfferup: number
+    feeRateCraigslist: number
+    maxPickupRadiusMiles: number
+    homeLocation: string | null
+    holdingCostDailyRate: number
     createdAt: Date
     updatedAt: Date
     _count: UserSettingsCountAggregateOutputType | null
@@ -13724,6 +14461,15 @@ export namespace Prisma {
     notifyExpiring?: boolean
     notifyWeeklyDigest?: boolean
     notifyFrequency?: boolean
+    opportunityThreshold?: boolean
+    feeRateEbay?: boolean
+    feeRateMercari?: boolean
+    feeRateFacebook?: boolean
+    feeRateOfferup?: boolean
+    feeRateCraigslist?: boolean
+    maxPickupRadiusMiles?: boolean
+    homeLocation?: boolean
+    holdingCostDailyRate?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -13743,6 +14489,15 @@ export namespace Prisma {
     notifyExpiring?: boolean
     notifyWeeklyDigest?: boolean
     notifyFrequency?: boolean
+    opportunityThreshold?: boolean
+    feeRateEbay?: boolean
+    feeRateMercari?: boolean
+    feeRateFacebook?: boolean
+    feeRateOfferup?: boolean
+    feeRateCraigslist?: boolean
+    maxPickupRadiusMiles?: boolean
+    homeLocation?: boolean
+    holdingCostDailyRate?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -13762,6 +14517,15 @@ export namespace Prisma {
     notifyExpiring?: boolean
     notifyWeeklyDigest?: boolean
     notifyFrequency?: boolean
+    opportunityThreshold?: boolean
+    feeRateEbay?: boolean
+    feeRateMercari?: boolean
+    feeRateFacebook?: boolean
+    feeRateOfferup?: boolean
+    feeRateCraigslist?: boolean
+    maxPickupRadiusMiles?: boolean
+    homeLocation?: boolean
+    holdingCostDailyRate?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -13781,11 +14545,20 @@ export namespace Prisma {
     notifyExpiring?: boolean
     notifyWeeklyDigest?: boolean
     notifyFrequency?: boolean
+    opportunityThreshold?: boolean
+    feeRateEbay?: boolean
+    feeRateMercari?: boolean
+    feeRateFacebook?: boolean
+    feeRateOfferup?: boolean
+    feeRateCraigslist?: boolean
+    maxPickupRadiusMiles?: boolean
+    homeLocation?: boolean
+    holdingCostDailyRate?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "openaiApiKey" | "llmModel" | "discountThreshold" | "autoAnalyze" | "emailNotifications" | "notifyNewDeals" | "notifyPriceDrops" | "notifySoldItems" | "notifyExpiring" | "notifyWeeklyDigest" | "notifyFrequency" | "createdAt" | "updatedAt", ExtArgs["result"]["userSettings"]>
+  export type UserSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "openaiApiKey" | "llmModel" | "discountThreshold" | "autoAnalyze" | "emailNotifications" | "notifyNewDeals" | "notifyPriceDrops" | "notifySoldItems" | "notifyExpiring" | "notifyWeeklyDigest" | "notifyFrequency" | "opportunityThreshold" | "feeRateEbay" | "feeRateMercari" | "feeRateFacebook" | "feeRateOfferup" | "feeRateCraigslist" | "maxPickupRadiusMiles" | "homeLocation" | "holdingCostDailyRate" | "createdAt" | "updatedAt", ExtArgs["result"]["userSettings"]>
   export type UserSettingsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -13815,6 +14588,15 @@ export namespace Prisma {
       notifyExpiring: boolean
       notifyWeeklyDigest: boolean
       notifyFrequency: string
+      opportunityThreshold: number
+      feeRateEbay: number
+      feeRateMercari: number
+      feeRateFacebook: number
+      feeRateOfferup: number
+      feeRateCraigslist: number
+      maxPickupRadiusMiles: number
+      homeLocation: string | null
+      holdingCostDailyRate: number
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["userSettings"]>
@@ -14254,6 +15036,15 @@ export namespace Prisma {
     readonly notifyExpiring: FieldRef<"UserSettings", 'Boolean'>
     readonly notifyWeeklyDigest: FieldRef<"UserSettings", 'Boolean'>
     readonly notifyFrequency: FieldRef<"UserSettings", 'String'>
+    readonly opportunityThreshold: FieldRef<"UserSettings", 'Int'>
+    readonly feeRateEbay: FieldRef<"UserSettings", 'Float'>
+    readonly feeRateMercari: FieldRef<"UserSettings", 'Float'>
+    readonly feeRateFacebook: FieldRef<"UserSettings", 'Float'>
+    readonly feeRateOfferup: FieldRef<"UserSettings", 'Float'>
+    readonly feeRateCraigslist: FieldRef<"UserSettings", 'Float'>
+    readonly maxPickupRadiusMiles: FieldRef<"UserSettings", 'Int'>
+    readonly homeLocation: FieldRef<"UserSettings", 'String'>
+    readonly holdingCostDailyRate: FieldRef<"UserSettings", 'Float'>
     readonly createdAt: FieldRef<"UserSettings", 'DateTime'>
     readonly updatedAt: FieldRef<"UserSettings", 'DateTime'>
   }
@@ -16906,6 +17697,7 @@ export namespace Prisma {
   export type AiAnalysisCacheMinAggregateOutputType = {
     id: string | null
     listingId: string | null
+    analysisType: string | null
     analysisResult: string | null
     createdAt: Date | null
     expiresAt: Date | null
@@ -16914,6 +17706,7 @@ export namespace Prisma {
   export type AiAnalysisCacheMaxAggregateOutputType = {
     id: string | null
     listingId: string | null
+    analysisType: string | null
     analysisResult: string | null
     createdAt: Date | null
     expiresAt: Date | null
@@ -16922,6 +17715,7 @@ export namespace Prisma {
   export type AiAnalysisCacheCountAggregateOutputType = {
     id: number
     listingId: number
+    analysisType: number
     analysisResult: number
     createdAt: number
     expiresAt: number
@@ -16932,6 +17726,7 @@ export namespace Prisma {
   export type AiAnalysisCacheMinAggregateInputType = {
     id?: true
     listingId?: true
+    analysisType?: true
     analysisResult?: true
     createdAt?: true
     expiresAt?: true
@@ -16940,6 +17735,7 @@ export namespace Prisma {
   export type AiAnalysisCacheMaxAggregateInputType = {
     id?: true
     listingId?: true
+    analysisType?: true
     analysisResult?: true
     createdAt?: true
     expiresAt?: true
@@ -16948,6 +17744,7 @@ export namespace Prisma {
   export type AiAnalysisCacheCountAggregateInputType = {
     id?: true
     listingId?: true
+    analysisType?: true
     analysisResult?: true
     createdAt?: true
     expiresAt?: true
@@ -17029,6 +17826,7 @@ export namespace Prisma {
   export type AiAnalysisCacheGroupByOutputType = {
     id: string
     listingId: string
+    analysisType: string
     analysisResult: string
     createdAt: Date
     expiresAt: Date
@@ -17054,6 +17852,7 @@ export namespace Prisma {
   export type AiAnalysisCacheSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     listingId?: boolean
+    analysisType?: boolean
     analysisResult?: boolean
     createdAt?: boolean
     expiresAt?: boolean
@@ -17062,6 +17861,7 @@ export namespace Prisma {
   export type AiAnalysisCacheSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     listingId?: boolean
+    analysisType?: boolean
     analysisResult?: boolean
     createdAt?: boolean
     expiresAt?: boolean
@@ -17070,6 +17870,7 @@ export namespace Prisma {
   export type AiAnalysisCacheSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     listingId?: boolean
+    analysisType?: boolean
     analysisResult?: boolean
     createdAt?: boolean
     expiresAt?: boolean
@@ -17078,12 +17879,13 @@ export namespace Prisma {
   export type AiAnalysisCacheSelectScalar = {
     id?: boolean
     listingId?: boolean
+    analysisType?: boolean
     analysisResult?: boolean
     createdAt?: boolean
     expiresAt?: boolean
   }
 
-  export type AiAnalysisCacheOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "listingId" | "analysisResult" | "createdAt" | "expiresAt", ExtArgs["result"]["aiAnalysisCache"]>
+  export type AiAnalysisCacheOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "listingId" | "analysisType" | "analysisResult" | "createdAt" | "expiresAt", ExtArgs["result"]["aiAnalysisCache"]>
 
   export type $AiAnalysisCachePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "AiAnalysisCache"
@@ -17091,6 +17893,7 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       listingId: string
+      analysisType: string
       analysisResult: string
       createdAt: Date
       expiresAt: Date
@@ -17519,6 +18322,7 @@ export namespace Prisma {
   interface AiAnalysisCacheFieldRefs {
     readonly id: FieldRef<"AiAnalysisCache", 'String'>
     readonly listingId: FieldRef<"AiAnalysisCache", 'String'>
+    readonly analysisType: FieldRef<"AiAnalysisCache", 'String'>
     readonly analysisResult: FieldRef<"AiAnalysisCache", 'String'>
     readonly createdAt: FieldRef<"AiAnalysisCache", 'DateTime'>
     readonly expiresAt: FieldRef<"AiAnalysisCache", 'DateTime'>
@@ -19153,6 +19957,3364 @@ export namespace Prisma {
 
 
   /**
+   * Model ListingImage
+   */
+
+  export type AggregateListingImage = {
+    _count: ListingImageCountAggregateOutputType | null
+    _avg: ListingImageAvgAggregateOutputType | null
+    _sum: ListingImageSumAggregateOutputType | null
+    _min: ListingImageMinAggregateOutputType | null
+    _max: ListingImageMaxAggregateOutputType | null
+  }
+
+  export type ListingImageAvgAggregateOutputType = {
+    imageIndex: number | null
+    fileSize: number | null
+    width: number | null
+    height: number | null
+  }
+
+  export type ListingImageSumAggregateOutputType = {
+    imageIndex: number | null
+    fileSize: number | null
+    width: number | null
+    height: number | null
+  }
+
+  export type ListingImageMinAggregateOutputType = {
+    id: string | null
+    listingId: string | null
+    imageIndex: number | null
+    originalUrl: string | null
+    storagePath: string | null
+    storageUrl: string | null
+    fileSize: number | null
+    contentType: string | null
+    width: number | null
+    height: number | null
+    uploadedAt: Date | null
+  }
+
+  export type ListingImageMaxAggregateOutputType = {
+    id: string | null
+    listingId: string | null
+    imageIndex: number | null
+    originalUrl: string | null
+    storagePath: string | null
+    storageUrl: string | null
+    fileSize: number | null
+    contentType: string | null
+    width: number | null
+    height: number | null
+    uploadedAt: Date | null
+  }
+
+  export type ListingImageCountAggregateOutputType = {
+    id: number
+    listingId: number
+    imageIndex: number
+    originalUrl: number
+    storagePath: number
+    storageUrl: number
+    fileSize: number
+    contentType: number
+    width: number
+    height: number
+    uploadedAt: number
+    _all: number
+  }
+
+
+  export type ListingImageAvgAggregateInputType = {
+    imageIndex?: true
+    fileSize?: true
+    width?: true
+    height?: true
+  }
+
+  export type ListingImageSumAggregateInputType = {
+    imageIndex?: true
+    fileSize?: true
+    width?: true
+    height?: true
+  }
+
+  export type ListingImageMinAggregateInputType = {
+    id?: true
+    listingId?: true
+    imageIndex?: true
+    originalUrl?: true
+    storagePath?: true
+    storageUrl?: true
+    fileSize?: true
+    contentType?: true
+    width?: true
+    height?: true
+    uploadedAt?: true
+  }
+
+  export type ListingImageMaxAggregateInputType = {
+    id?: true
+    listingId?: true
+    imageIndex?: true
+    originalUrl?: true
+    storagePath?: true
+    storageUrl?: true
+    fileSize?: true
+    contentType?: true
+    width?: true
+    height?: true
+    uploadedAt?: true
+  }
+
+  export type ListingImageCountAggregateInputType = {
+    id?: true
+    listingId?: true
+    imageIndex?: true
+    originalUrl?: true
+    storagePath?: true
+    storageUrl?: true
+    fileSize?: true
+    contentType?: true
+    width?: true
+    height?: true
+    uploadedAt?: true
+    _all?: true
+  }
+
+  export type ListingImageAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ListingImage to aggregate.
+     */
+    where?: ListingImageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ListingImages to fetch.
+     */
+    orderBy?: ListingImageOrderByWithRelationInput | ListingImageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ListingImageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ListingImages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ListingImages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ListingImages
+    **/
+    _count?: true | ListingImageCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ListingImageAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ListingImageSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ListingImageMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ListingImageMaxAggregateInputType
+  }
+
+  export type GetListingImageAggregateType<T extends ListingImageAggregateArgs> = {
+        [P in keyof T & keyof AggregateListingImage]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateListingImage[P]>
+      : GetScalarType<T[P], AggregateListingImage[P]>
+  }
+
+
+
+
+  export type ListingImageGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ListingImageWhereInput
+    orderBy?: ListingImageOrderByWithAggregationInput | ListingImageOrderByWithAggregationInput[]
+    by: ListingImageScalarFieldEnum[] | ListingImageScalarFieldEnum
+    having?: ListingImageScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ListingImageCountAggregateInputType | true
+    _avg?: ListingImageAvgAggregateInputType
+    _sum?: ListingImageSumAggregateInputType
+    _min?: ListingImageMinAggregateInputType
+    _max?: ListingImageMaxAggregateInputType
+  }
+
+  export type ListingImageGroupByOutputType = {
+    id: string
+    listingId: string
+    imageIndex: number
+    originalUrl: string
+    storagePath: string
+    storageUrl: string
+    fileSize: number
+    contentType: string
+    width: number | null
+    height: number | null
+    uploadedAt: Date
+    _count: ListingImageCountAggregateOutputType | null
+    _avg: ListingImageAvgAggregateOutputType | null
+    _sum: ListingImageSumAggregateOutputType | null
+    _min: ListingImageMinAggregateOutputType | null
+    _max: ListingImageMaxAggregateOutputType | null
+  }
+
+  type GetListingImageGroupByPayload<T extends ListingImageGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ListingImageGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ListingImageGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ListingImageGroupByOutputType[P]>
+            : GetScalarType<T[P], ListingImageGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ListingImageSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    listingId?: boolean
+    imageIndex?: boolean
+    originalUrl?: boolean
+    storagePath?: boolean
+    storageUrl?: boolean
+    fileSize?: boolean
+    contentType?: boolean
+    width?: boolean
+    height?: boolean
+    uploadedAt?: boolean
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["listingImage"]>
+
+  export type ListingImageSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    listingId?: boolean
+    imageIndex?: boolean
+    originalUrl?: boolean
+    storagePath?: boolean
+    storageUrl?: boolean
+    fileSize?: boolean
+    contentType?: boolean
+    width?: boolean
+    height?: boolean
+    uploadedAt?: boolean
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["listingImage"]>
+
+  export type ListingImageSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    listingId?: boolean
+    imageIndex?: boolean
+    originalUrl?: boolean
+    storagePath?: boolean
+    storageUrl?: boolean
+    fileSize?: boolean
+    contentType?: boolean
+    width?: boolean
+    height?: boolean
+    uploadedAt?: boolean
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["listingImage"]>
+
+  export type ListingImageSelectScalar = {
+    id?: boolean
+    listingId?: boolean
+    imageIndex?: boolean
+    originalUrl?: boolean
+    storagePath?: boolean
+    storageUrl?: boolean
+    fileSize?: boolean
+    contentType?: boolean
+    width?: boolean
+    height?: boolean
+    uploadedAt?: boolean
+  }
+
+  export type ListingImageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "listingId" | "imageIndex" | "originalUrl" | "storagePath" | "storageUrl" | "fileSize" | "contentType" | "width" | "height" | "uploadedAt", ExtArgs["result"]["listingImage"]>
+  export type ListingImageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+  }
+  export type ListingImageIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+  }
+  export type ListingImageIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+  }
+
+  export type $ListingImagePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ListingImage"
+    objects: {
+      listing: Prisma.$ListingPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      listingId: string
+      imageIndex: number
+      originalUrl: string
+      storagePath: string
+      storageUrl: string
+      fileSize: number
+      contentType: string
+      width: number | null
+      height: number | null
+      uploadedAt: Date
+    }, ExtArgs["result"]["listingImage"]>
+    composites: {}
+  }
+
+  type ListingImageGetPayload<S extends boolean | null | undefined | ListingImageDefaultArgs> = $Result.GetResult<Prisma.$ListingImagePayload, S>
+
+  type ListingImageCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ListingImageFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ListingImageCountAggregateInputType | true
+    }
+
+  export interface ListingImageDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ListingImage'], meta: { name: 'ListingImage' } }
+    /**
+     * Find zero or one ListingImage that matches the filter.
+     * @param {ListingImageFindUniqueArgs} args - Arguments to find a ListingImage
+     * @example
+     * // Get one ListingImage
+     * const listingImage = await prisma.listingImage.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ListingImageFindUniqueArgs>(args: SelectSubset<T, ListingImageFindUniqueArgs<ExtArgs>>): Prisma__ListingImageClient<$Result.GetResult<Prisma.$ListingImagePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ListingImage that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ListingImageFindUniqueOrThrowArgs} args - Arguments to find a ListingImage
+     * @example
+     * // Get one ListingImage
+     * const listingImage = await prisma.listingImage.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ListingImageFindUniqueOrThrowArgs>(args: SelectSubset<T, ListingImageFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ListingImageClient<$Result.GetResult<Prisma.$ListingImagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ListingImage that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ListingImageFindFirstArgs} args - Arguments to find a ListingImage
+     * @example
+     * // Get one ListingImage
+     * const listingImage = await prisma.listingImage.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ListingImageFindFirstArgs>(args?: SelectSubset<T, ListingImageFindFirstArgs<ExtArgs>>): Prisma__ListingImageClient<$Result.GetResult<Prisma.$ListingImagePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ListingImage that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ListingImageFindFirstOrThrowArgs} args - Arguments to find a ListingImage
+     * @example
+     * // Get one ListingImage
+     * const listingImage = await prisma.listingImage.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ListingImageFindFirstOrThrowArgs>(args?: SelectSubset<T, ListingImageFindFirstOrThrowArgs<ExtArgs>>): Prisma__ListingImageClient<$Result.GetResult<Prisma.$ListingImagePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ListingImages that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ListingImageFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ListingImages
+     * const listingImages = await prisma.listingImage.findMany()
+     * 
+     * // Get first 10 ListingImages
+     * const listingImages = await prisma.listingImage.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const listingImageWithIdOnly = await prisma.listingImage.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ListingImageFindManyArgs>(args?: SelectSubset<T, ListingImageFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ListingImagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ListingImage.
+     * @param {ListingImageCreateArgs} args - Arguments to create a ListingImage.
+     * @example
+     * // Create one ListingImage
+     * const ListingImage = await prisma.listingImage.create({
+     *   data: {
+     *     // ... data to create a ListingImage
+     *   }
+     * })
+     * 
+     */
+    create<T extends ListingImageCreateArgs>(args: SelectSubset<T, ListingImageCreateArgs<ExtArgs>>): Prisma__ListingImageClient<$Result.GetResult<Prisma.$ListingImagePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ListingImages.
+     * @param {ListingImageCreateManyArgs} args - Arguments to create many ListingImages.
+     * @example
+     * // Create many ListingImages
+     * const listingImage = await prisma.listingImage.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ListingImageCreateManyArgs>(args?: SelectSubset<T, ListingImageCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ListingImages and returns the data saved in the database.
+     * @param {ListingImageCreateManyAndReturnArgs} args - Arguments to create many ListingImages.
+     * @example
+     * // Create many ListingImages
+     * const listingImage = await prisma.listingImage.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ListingImages and only return the `id`
+     * const listingImageWithIdOnly = await prisma.listingImage.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ListingImageCreateManyAndReturnArgs>(args?: SelectSubset<T, ListingImageCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ListingImagePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ListingImage.
+     * @param {ListingImageDeleteArgs} args - Arguments to delete one ListingImage.
+     * @example
+     * // Delete one ListingImage
+     * const ListingImage = await prisma.listingImage.delete({
+     *   where: {
+     *     // ... filter to delete one ListingImage
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ListingImageDeleteArgs>(args: SelectSubset<T, ListingImageDeleteArgs<ExtArgs>>): Prisma__ListingImageClient<$Result.GetResult<Prisma.$ListingImagePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ListingImage.
+     * @param {ListingImageUpdateArgs} args - Arguments to update one ListingImage.
+     * @example
+     * // Update one ListingImage
+     * const listingImage = await prisma.listingImage.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ListingImageUpdateArgs>(args: SelectSubset<T, ListingImageUpdateArgs<ExtArgs>>): Prisma__ListingImageClient<$Result.GetResult<Prisma.$ListingImagePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ListingImages.
+     * @param {ListingImageDeleteManyArgs} args - Arguments to filter ListingImages to delete.
+     * @example
+     * // Delete a few ListingImages
+     * const { count } = await prisma.listingImage.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ListingImageDeleteManyArgs>(args?: SelectSubset<T, ListingImageDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ListingImages.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ListingImageUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ListingImages
+     * const listingImage = await prisma.listingImage.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ListingImageUpdateManyArgs>(args: SelectSubset<T, ListingImageUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ListingImages and returns the data updated in the database.
+     * @param {ListingImageUpdateManyAndReturnArgs} args - Arguments to update many ListingImages.
+     * @example
+     * // Update many ListingImages
+     * const listingImage = await prisma.listingImage.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ListingImages and only return the `id`
+     * const listingImageWithIdOnly = await prisma.listingImage.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ListingImageUpdateManyAndReturnArgs>(args: SelectSubset<T, ListingImageUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ListingImagePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ListingImage.
+     * @param {ListingImageUpsertArgs} args - Arguments to update or create a ListingImage.
+     * @example
+     * // Update or create a ListingImage
+     * const listingImage = await prisma.listingImage.upsert({
+     *   create: {
+     *     // ... data to create a ListingImage
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ListingImage we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ListingImageUpsertArgs>(args: SelectSubset<T, ListingImageUpsertArgs<ExtArgs>>): Prisma__ListingImageClient<$Result.GetResult<Prisma.$ListingImagePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ListingImages.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ListingImageCountArgs} args - Arguments to filter ListingImages to count.
+     * @example
+     * // Count the number of ListingImages
+     * const count = await prisma.listingImage.count({
+     *   where: {
+     *     // ... the filter for the ListingImages we want to count
+     *   }
+     * })
+    **/
+    count<T extends ListingImageCountArgs>(
+      args?: Subset<T, ListingImageCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ListingImageCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ListingImage.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ListingImageAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ListingImageAggregateArgs>(args: Subset<T, ListingImageAggregateArgs>): Prisma.PrismaPromise<GetListingImageAggregateType<T>>
+
+    /**
+     * Group by ListingImage.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ListingImageGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ListingImageGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ListingImageGroupByArgs['orderBy'] }
+        : { orderBy?: ListingImageGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ListingImageGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetListingImageGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ListingImage model
+   */
+  readonly fields: ListingImageFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ListingImage.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ListingImageClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    listing<T extends ListingDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ListingDefaultArgs<ExtArgs>>): Prisma__ListingClient<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ListingImage model
+   */
+  interface ListingImageFieldRefs {
+    readonly id: FieldRef<"ListingImage", 'String'>
+    readonly listingId: FieldRef<"ListingImage", 'String'>
+    readonly imageIndex: FieldRef<"ListingImage", 'Int'>
+    readonly originalUrl: FieldRef<"ListingImage", 'String'>
+    readonly storagePath: FieldRef<"ListingImage", 'String'>
+    readonly storageUrl: FieldRef<"ListingImage", 'String'>
+    readonly fileSize: FieldRef<"ListingImage", 'Int'>
+    readonly contentType: FieldRef<"ListingImage", 'String'>
+    readonly width: FieldRef<"ListingImage", 'Int'>
+    readonly height: FieldRef<"ListingImage", 'Int'>
+    readonly uploadedAt: FieldRef<"ListingImage", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ListingImage findUnique
+   */
+  export type ListingImageFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ListingImage
+     */
+    select?: ListingImageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ListingImage
+     */
+    omit?: ListingImageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingImageInclude<ExtArgs> | null
+    /**
+     * Filter, which ListingImage to fetch.
+     */
+    where: ListingImageWhereUniqueInput
+  }
+
+  /**
+   * ListingImage findUniqueOrThrow
+   */
+  export type ListingImageFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ListingImage
+     */
+    select?: ListingImageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ListingImage
+     */
+    omit?: ListingImageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingImageInclude<ExtArgs> | null
+    /**
+     * Filter, which ListingImage to fetch.
+     */
+    where: ListingImageWhereUniqueInput
+  }
+
+  /**
+   * ListingImage findFirst
+   */
+  export type ListingImageFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ListingImage
+     */
+    select?: ListingImageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ListingImage
+     */
+    omit?: ListingImageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingImageInclude<ExtArgs> | null
+    /**
+     * Filter, which ListingImage to fetch.
+     */
+    where?: ListingImageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ListingImages to fetch.
+     */
+    orderBy?: ListingImageOrderByWithRelationInput | ListingImageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ListingImages.
+     */
+    cursor?: ListingImageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ListingImages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ListingImages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ListingImages.
+     */
+    distinct?: ListingImageScalarFieldEnum | ListingImageScalarFieldEnum[]
+  }
+
+  /**
+   * ListingImage findFirstOrThrow
+   */
+  export type ListingImageFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ListingImage
+     */
+    select?: ListingImageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ListingImage
+     */
+    omit?: ListingImageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingImageInclude<ExtArgs> | null
+    /**
+     * Filter, which ListingImage to fetch.
+     */
+    where?: ListingImageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ListingImages to fetch.
+     */
+    orderBy?: ListingImageOrderByWithRelationInput | ListingImageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ListingImages.
+     */
+    cursor?: ListingImageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ListingImages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ListingImages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ListingImages.
+     */
+    distinct?: ListingImageScalarFieldEnum | ListingImageScalarFieldEnum[]
+  }
+
+  /**
+   * ListingImage findMany
+   */
+  export type ListingImageFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ListingImage
+     */
+    select?: ListingImageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ListingImage
+     */
+    omit?: ListingImageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingImageInclude<ExtArgs> | null
+    /**
+     * Filter, which ListingImages to fetch.
+     */
+    where?: ListingImageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ListingImages to fetch.
+     */
+    orderBy?: ListingImageOrderByWithRelationInput | ListingImageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ListingImages.
+     */
+    cursor?: ListingImageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ListingImages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ListingImages.
+     */
+    skip?: number
+    distinct?: ListingImageScalarFieldEnum | ListingImageScalarFieldEnum[]
+  }
+
+  /**
+   * ListingImage create
+   */
+  export type ListingImageCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ListingImage
+     */
+    select?: ListingImageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ListingImage
+     */
+    omit?: ListingImageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingImageInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ListingImage.
+     */
+    data: XOR<ListingImageCreateInput, ListingImageUncheckedCreateInput>
+  }
+
+  /**
+   * ListingImage createMany
+   */
+  export type ListingImageCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ListingImages.
+     */
+    data: ListingImageCreateManyInput | ListingImageCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ListingImage createManyAndReturn
+   */
+  export type ListingImageCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ListingImage
+     */
+    select?: ListingImageSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ListingImage
+     */
+    omit?: ListingImageOmit<ExtArgs> | null
+    /**
+     * The data used to create many ListingImages.
+     */
+    data: ListingImageCreateManyInput | ListingImageCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingImageIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ListingImage update
+   */
+  export type ListingImageUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ListingImage
+     */
+    select?: ListingImageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ListingImage
+     */
+    omit?: ListingImageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingImageInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ListingImage.
+     */
+    data: XOR<ListingImageUpdateInput, ListingImageUncheckedUpdateInput>
+    /**
+     * Choose, which ListingImage to update.
+     */
+    where: ListingImageWhereUniqueInput
+  }
+
+  /**
+   * ListingImage updateMany
+   */
+  export type ListingImageUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ListingImages.
+     */
+    data: XOR<ListingImageUpdateManyMutationInput, ListingImageUncheckedUpdateManyInput>
+    /**
+     * Filter which ListingImages to update
+     */
+    where?: ListingImageWhereInput
+    /**
+     * Limit how many ListingImages to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ListingImage updateManyAndReturn
+   */
+  export type ListingImageUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ListingImage
+     */
+    select?: ListingImageSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ListingImage
+     */
+    omit?: ListingImageOmit<ExtArgs> | null
+    /**
+     * The data used to update ListingImages.
+     */
+    data: XOR<ListingImageUpdateManyMutationInput, ListingImageUncheckedUpdateManyInput>
+    /**
+     * Filter which ListingImages to update
+     */
+    where?: ListingImageWhereInput
+    /**
+     * Limit how many ListingImages to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingImageIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ListingImage upsert
+   */
+  export type ListingImageUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ListingImage
+     */
+    select?: ListingImageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ListingImage
+     */
+    omit?: ListingImageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingImageInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ListingImage to update in case it exists.
+     */
+    where: ListingImageWhereUniqueInput
+    /**
+     * In case the ListingImage found by the `where` argument doesn't exist, create a new ListingImage with this data.
+     */
+    create: XOR<ListingImageCreateInput, ListingImageUncheckedCreateInput>
+    /**
+     * In case the ListingImage was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ListingImageUpdateInput, ListingImageUncheckedUpdateInput>
+  }
+
+  /**
+   * ListingImage delete
+   */
+  export type ListingImageDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ListingImage
+     */
+    select?: ListingImageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ListingImage
+     */
+    omit?: ListingImageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingImageInclude<ExtArgs> | null
+    /**
+     * Filter which ListingImage to delete.
+     */
+    where: ListingImageWhereUniqueInput
+  }
+
+  /**
+   * ListingImage deleteMany
+   */
+  export type ListingImageDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ListingImages to delete
+     */
+    where?: ListingImageWhereInput
+    /**
+     * Limit how many ListingImages to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ListingImage without action
+   */
+  export type ListingImageDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ListingImage
+     */
+    select?: ListingImageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ListingImage
+     */
+    omit?: ListingImageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingImageInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model UsageRecord
+   */
+
+  export type AggregateUsageRecord = {
+    _count: UsageRecordCountAggregateOutputType | null
+    _avg: UsageRecordAvgAggregateOutputType | null
+    _sum: UsageRecordSumAggregateOutputType | null
+    _min: UsageRecordMinAggregateOutputType | null
+    _max: UsageRecordMaxAggregateOutputType | null
+  }
+
+  export type UsageRecordAvgAggregateOutputType = {
+    count: number | null
+  }
+
+  export type UsageRecordSumAggregateOutputType = {
+    count: number | null
+  }
+
+  export type UsageRecordMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    type: string | null
+    count: number | null
+    periodStart: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type UsageRecordMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    type: string | null
+    count: number | null
+    periodStart: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type UsageRecordCountAggregateOutputType = {
+    id: number
+    userId: number
+    type: number
+    count: number
+    periodStart: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type UsageRecordAvgAggregateInputType = {
+    count?: true
+  }
+
+  export type UsageRecordSumAggregateInputType = {
+    count?: true
+  }
+
+  export type UsageRecordMinAggregateInputType = {
+    id?: true
+    userId?: true
+    type?: true
+    count?: true
+    periodStart?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type UsageRecordMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    type?: true
+    count?: true
+    periodStart?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type UsageRecordCountAggregateInputType = {
+    id?: true
+    userId?: true
+    type?: true
+    count?: true
+    periodStart?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type UsageRecordAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which UsageRecord to aggregate.
+     */
+    where?: UsageRecordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UsageRecords to fetch.
+     */
+    orderBy?: UsageRecordOrderByWithRelationInput | UsageRecordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: UsageRecordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UsageRecords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UsageRecords.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned UsageRecords
+    **/
+    _count?: true | UsageRecordCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: UsageRecordAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: UsageRecordSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: UsageRecordMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: UsageRecordMaxAggregateInputType
+  }
+
+  export type GetUsageRecordAggregateType<T extends UsageRecordAggregateArgs> = {
+        [P in keyof T & keyof AggregateUsageRecord]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateUsageRecord[P]>
+      : GetScalarType<T[P], AggregateUsageRecord[P]>
+  }
+
+
+
+
+  export type UsageRecordGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UsageRecordWhereInput
+    orderBy?: UsageRecordOrderByWithAggregationInput | UsageRecordOrderByWithAggregationInput[]
+    by: UsageRecordScalarFieldEnum[] | UsageRecordScalarFieldEnum
+    having?: UsageRecordScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: UsageRecordCountAggregateInputType | true
+    _avg?: UsageRecordAvgAggregateInputType
+    _sum?: UsageRecordSumAggregateInputType
+    _min?: UsageRecordMinAggregateInputType
+    _max?: UsageRecordMaxAggregateInputType
+  }
+
+  export type UsageRecordGroupByOutputType = {
+    id: string
+    userId: string
+    type: string
+    count: number
+    periodStart: Date
+    createdAt: Date
+    updatedAt: Date
+    _count: UsageRecordCountAggregateOutputType | null
+    _avg: UsageRecordAvgAggregateOutputType | null
+    _sum: UsageRecordSumAggregateOutputType | null
+    _min: UsageRecordMinAggregateOutputType | null
+    _max: UsageRecordMaxAggregateOutputType | null
+  }
+
+  type GetUsageRecordGroupByPayload<T extends UsageRecordGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<UsageRecordGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof UsageRecordGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], UsageRecordGroupByOutputType[P]>
+            : GetScalarType<T[P], UsageRecordGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type UsageRecordSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    type?: boolean
+    count?: boolean
+    periodStart?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["usageRecord"]>
+
+  export type UsageRecordSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    type?: boolean
+    count?: boolean
+    periodStart?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["usageRecord"]>
+
+  export type UsageRecordSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    type?: boolean
+    count?: boolean
+    periodStart?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["usageRecord"]>
+
+  export type UsageRecordSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    type?: boolean
+    count?: boolean
+    periodStart?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type UsageRecordOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "type" | "count" | "periodStart" | "createdAt" | "updatedAt", ExtArgs["result"]["usageRecord"]>
+  export type UsageRecordInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type UsageRecordIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type UsageRecordIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $UsageRecordPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "UsageRecord"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      type: string
+      count: number
+      periodStart: Date
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["usageRecord"]>
+    composites: {}
+  }
+
+  type UsageRecordGetPayload<S extends boolean | null | undefined | UsageRecordDefaultArgs> = $Result.GetResult<Prisma.$UsageRecordPayload, S>
+
+  type UsageRecordCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<UsageRecordFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: UsageRecordCountAggregateInputType | true
+    }
+
+  export interface UsageRecordDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['UsageRecord'], meta: { name: 'UsageRecord' } }
+    /**
+     * Find zero or one UsageRecord that matches the filter.
+     * @param {UsageRecordFindUniqueArgs} args - Arguments to find a UsageRecord
+     * @example
+     * // Get one UsageRecord
+     * const usageRecord = await prisma.usageRecord.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends UsageRecordFindUniqueArgs>(args: SelectSubset<T, UsageRecordFindUniqueArgs<ExtArgs>>): Prisma__UsageRecordClient<$Result.GetResult<Prisma.$UsageRecordPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one UsageRecord that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {UsageRecordFindUniqueOrThrowArgs} args - Arguments to find a UsageRecord
+     * @example
+     * // Get one UsageRecord
+     * const usageRecord = await prisma.usageRecord.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends UsageRecordFindUniqueOrThrowArgs>(args: SelectSubset<T, UsageRecordFindUniqueOrThrowArgs<ExtArgs>>): Prisma__UsageRecordClient<$Result.GetResult<Prisma.$UsageRecordPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first UsageRecord that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UsageRecordFindFirstArgs} args - Arguments to find a UsageRecord
+     * @example
+     * // Get one UsageRecord
+     * const usageRecord = await prisma.usageRecord.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends UsageRecordFindFirstArgs>(args?: SelectSubset<T, UsageRecordFindFirstArgs<ExtArgs>>): Prisma__UsageRecordClient<$Result.GetResult<Prisma.$UsageRecordPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first UsageRecord that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UsageRecordFindFirstOrThrowArgs} args - Arguments to find a UsageRecord
+     * @example
+     * // Get one UsageRecord
+     * const usageRecord = await prisma.usageRecord.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends UsageRecordFindFirstOrThrowArgs>(args?: SelectSubset<T, UsageRecordFindFirstOrThrowArgs<ExtArgs>>): Prisma__UsageRecordClient<$Result.GetResult<Prisma.$UsageRecordPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more UsageRecords that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UsageRecordFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all UsageRecords
+     * const usageRecords = await prisma.usageRecord.findMany()
+     * 
+     * // Get first 10 UsageRecords
+     * const usageRecords = await prisma.usageRecord.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const usageRecordWithIdOnly = await prisma.usageRecord.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends UsageRecordFindManyArgs>(args?: SelectSubset<T, UsageRecordFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UsageRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a UsageRecord.
+     * @param {UsageRecordCreateArgs} args - Arguments to create a UsageRecord.
+     * @example
+     * // Create one UsageRecord
+     * const UsageRecord = await prisma.usageRecord.create({
+     *   data: {
+     *     // ... data to create a UsageRecord
+     *   }
+     * })
+     * 
+     */
+    create<T extends UsageRecordCreateArgs>(args: SelectSubset<T, UsageRecordCreateArgs<ExtArgs>>): Prisma__UsageRecordClient<$Result.GetResult<Prisma.$UsageRecordPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many UsageRecords.
+     * @param {UsageRecordCreateManyArgs} args - Arguments to create many UsageRecords.
+     * @example
+     * // Create many UsageRecords
+     * const usageRecord = await prisma.usageRecord.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends UsageRecordCreateManyArgs>(args?: SelectSubset<T, UsageRecordCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many UsageRecords and returns the data saved in the database.
+     * @param {UsageRecordCreateManyAndReturnArgs} args - Arguments to create many UsageRecords.
+     * @example
+     * // Create many UsageRecords
+     * const usageRecord = await prisma.usageRecord.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many UsageRecords and only return the `id`
+     * const usageRecordWithIdOnly = await prisma.usageRecord.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends UsageRecordCreateManyAndReturnArgs>(args?: SelectSubset<T, UsageRecordCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UsageRecordPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a UsageRecord.
+     * @param {UsageRecordDeleteArgs} args - Arguments to delete one UsageRecord.
+     * @example
+     * // Delete one UsageRecord
+     * const UsageRecord = await prisma.usageRecord.delete({
+     *   where: {
+     *     // ... filter to delete one UsageRecord
+     *   }
+     * })
+     * 
+     */
+    delete<T extends UsageRecordDeleteArgs>(args: SelectSubset<T, UsageRecordDeleteArgs<ExtArgs>>): Prisma__UsageRecordClient<$Result.GetResult<Prisma.$UsageRecordPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one UsageRecord.
+     * @param {UsageRecordUpdateArgs} args - Arguments to update one UsageRecord.
+     * @example
+     * // Update one UsageRecord
+     * const usageRecord = await prisma.usageRecord.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends UsageRecordUpdateArgs>(args: SelectSubset<T, UsageRecordUpdateArgs<ExtArgs>>): Prisma__UsageRecordClient<$Result.GetResult<Prisma.$UsageRecordPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more UsageRecords.
+     * @param {UsageRecordDeleteManyArgs} args - Arguments to filter UsageRecords to delete.
+     * @example
+     * // Delete a few UsageRecords
+     * const { count } = await prisma.usageRecord.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends UsageRecordDeleteManyArgs>(args?: SelectSubset<T, UsageRecordDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more UsageRecords.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UsageRecordUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many UsageRecords
+     * const usageRecord = await prisma.usageRecord.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends UsageRecordUpdateManyArgs>(args: SelectSubset<T, UsageRecordUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more UsageRecords and returns the data updated in the database.
+     * @param {UsageRecordUpdateManyAndReturnArgs} args - Arguments to update many UsageRecords.
+     * @example
+     * // Update many UsageRecords
+     * const usageRecord = await prisma.usageRecord.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more UsageRecords and only return the `id`
+     * const usageRecordWithIdOnly = await prisma.usageRecord.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends UsageRecordUpdateManyAndReturnArgs>(args: SelectSubset<T, UsageRecordUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UsageRecordPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one UsageRecord.
+     * @param {UsageRecordUpsertArgs} args - Arguments to update or create a UsageRecord.
+     * @example
+     * // Update or create a UsageRecord
+     * const usageRecord = await prisma.usageRecord.upsert({
+     *   create: {
+     *     // ... data to create a UsageRecord
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the UsageRecord we want to update
+     *   }
+     * })
+     */
+    upsert<T extends UsageRecordUpsertArgs>(args: SelectSubset<T, UsageRecordUpsertArgs<ExtArgs>>): Prisma__UsageRecordClient<$Result.GetResult<Prisma.$UsageRecordPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of UsageRecords.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UsageRecordCountArgs} args - Arguments to filter UsageRecords to count.
+     * @example
+     * // Count the number of UsageRecords
+     * const count = await prisma.usageRecord.count({
+     *   where: {
+     *     // ... the filter for the UsageRecords we want to count
+     *   }
+     * })
+    **/
+    count<T extends UsageRecordCountArgs>(
+      args?: Subset<T, UsageRecordCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], UsageRecordCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a UsageRecord.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UsageRecordAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends UsageRecordAggregateArgs>(args: Subset<T, UsageRecordAggregateArgs>): Prisma.PrismaPromise<GetUsageRecordAggregateType<T>>
+
+    /**
+     * Group by UsageRecord.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UsageRecordGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends UsageRecordGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: UsageRecordGroupByArgs['orderBy'] }
+        : { orderBy?: UsageRecordGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, UsageRecordGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetUsageRecordGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the UsageRecord model
+   */
+  readonly fields: UsageRecordFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for UsageRecord.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__UsageRecordClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the UsageRecord model
+   */
+  interface UsageRecordFieldRefs {
+    readonly id: FieldRef<"UsageRecord", 'String'>
+    readonly userId: FieldRef<"UsageRecord", 'String'>
+    readonly type: FieldRef<"UsageRecord", 'String'>
+    readonly count: FieldRef<"UsageRecord", 'Int'>
+    readonly periodStart: FieldRef<"UsageRecord", 'DateTime'>
+    readonly createdAt: FieldRef<"UsageRecord", 'DateTime'>
+    readonly updatedAt: FieldRef<"UsageRecord", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * UsageRecord findUnique
+   */
+  export type UsageRecordFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UsageRecord
+     */
+    select?: UsageRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UsageRecord
+     */
+    omit?: UsageRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UsageRecordInclude<ExtArgs> | null
+    /**
+     * Filter, which UsageRecord to fetch.
+     */
+    where: UsageRecordWhereUniqueInput
+  }
+
+  /**
+   * UsageRecord findUniqueOrThrow
+   */
+  export type UsageRecordFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UsageRecord
+     */
+    select?: UsageRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UsageRecord
+     */
+    omit?: UsageRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UsageRecordInclude<ExtArgs> | null
+    /**
+     * Filter, which UsageRecord to fetch.
+     */
+    where: UsageRecordWhereUniqueInput
+  }
+
+  /**
+   * UsageRecord findFirst
+   */
+  export type UsageRecordFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UsageRecord
+     */
+    select?: UsageRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UsageRecord
+     */
+    omit?: UsageRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UsageRecordInclude<ExtArgs> | null
+    /**
+     * Filter, which UsageRecord to fetch.
+     */
+    where?: UsageRecordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UsageRecords to fetch.
+     */
+    orderBy?: UsageRecordOrderByWithRelationInput | UsageRecordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for UsageRecords.
+     */
+    cursor?: UsageRecordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UsageRecords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UsageRecords.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of UsageRecords.
+     */
+    distinct?: UsageRecordScalarFieldEnum | UsageRecordScalarFieldEnum[]
+  }
+
+  /**
+   * UsageRecord findFirstOrThrow
+   */
+  export type UsageRecordFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UsageRecord
+     */
+    select?: UsageRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UsageRecord
+     */
+    omit?: UsageRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UsageRecordInclude<ExtArgs> | null
+    /**
+     * Filter, which UsageRecord to fetch.
+     */
+    where?: UsageRecordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UsageRecords to fetch.
+     */
+    orderBy?: UsageRecordOrderByWithRelationInput | UsageRecordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for UsageRecords.
+     */
+    cursor?: UsageRecordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UsageRecords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UsageRecords.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of UsageRecords.
+     */
+    distinct?: UsageRecordScalarFieldEnum | UsageRecordScalarFieldEnum[]
+  }
+
+  /**
+   * UsageRecord findMany
+   */
+  export type UsageRecordFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UsageRecord
+     */
+    select?: UsageRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UsageRecord
+     */
+    omit?: UsageRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UsageRecordInclude<ExtArgs> | null
+    /**
+     * Filter, which UsageRecords to fetch.
+     */
+    where?: UsageRecordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UsageRecords to fetch.
+     */
+    orderBy?: UsageRecordOrderByWithRelationInput | UsageRecordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing UsageRecords.
+     */
+    cursor?: UsageRecordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UsageRecords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UsageRecords.
+     */
+    skip?: number
+    distinct?: UsageRecordScalarFieldEnum | UsageRecordScalarFieldEnum[]
+  }
+
+  /**
+   * UsageRecord create
+   */
+  export type UsageRecordCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UsageRecord
+     */
+    select?: UsageRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UsageRecord
+     */
+    omit?: UsageRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UsageRecordInclude<ExtArgs> | null
+    /**
+     * The data needed to create a UsageRecord.
+     */
+    data: XOR<UsageRecordCreateInput, UsageRecordUncheckedCreateInput>
+  }
+
+  /**
+   * UsageRecord createMany
+   */
+  export type UsageRecordCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many UsageRecords.
+     */
+    data: UsageRecordCreateManyInput | UsageRecordCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * UsageRecord createManyAndReturn
+   */
+  export type UsageRecordCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UsageRecord
+     */
+    select?: UsageRecordSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the UsageRecord
+     */
+    omit?: UsageRecordOmit<ExtArgs> | null
+    /**
+     * The data used to create many UsageRecords.
+     */
+    data: UsageRecordCreateManyInput | UsageRecordCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UsageRecordIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * UsageRecord update
+   */
+  export type UsageRecordUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UsageRecord
+     */
+    select?: UsageRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UsageRecord
+     */
+    omit?: UsageRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UsageRecordInclude<ExtArgs> | null
+    /**
+     * The data needed to update a UsageRecord.
+     */
+    data: XOR<UsageRecordUpdateInput, UsageRecordUncheckedUpdateInput>
+    /**
+     * Choose, which UsageRecord to update.
+     */
+    where: UsageRecordWhereUniqueInput
+  }
+
+  /**
+   * UsageRecord updateMany
+   */
+  export type UsageRecordUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update UsageRecords.
+     */
+    data: XOR<UsageRecordUpdateManyMutationInput, UsageRecordUncheckedUpdateManyInput>
+    /**
+     * Filter which UsageRecords to update
+     */
+    where?: UsageRecordWhereInput
+    /**
+     * Limit how many UsageRecords to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * UsageRecord updateManyAndReturn
+   */
+  export type UsageRecordUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UsageRecord
+     */
+    select?: UsageRecordSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the UsageRecord
+     */
+    omit?: UsageRecordOmit<ExtArgs> | null
+    /**
+     * The data used to update UsageRecords.
+     */
+    data: XOR<UsageRecordUpdateManyMutationInput, UsageRecordUncheckedUpdateManyInput>
+    /**
+     * Filter which UsageRecords to update
+     */
+    where?: UsageRecordWhereInput
+    /**
+     * Limit how many UsageRecords to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UsageRecordIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * UsageRecord upsert
+   */
+  export type UsageRecordUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UsageRecord
+     */
+    select?: UsageRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UsageRecord
+     */
+    omit?: UsageRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UsageRecordInclude<ExtArgs> | null
+    /**
+     * The filter to search for the UsageRecord to update in case it exists.
+     */
+    where: UsageRecordWhereUniqueInput
+    /**
+     * In case the UsageRecord found by the `where` argument doesn't exist, create a new UsageRecord with this data.
+     */
+    create: XOR<UsageRecordCreateInput, UsageRecordUncheckedCreateInput>
+    /**
+     * In case the UsageRecord was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<UsageRecordUpdateInput, UsageRecordUncheckedUpdateInput>
+  }
+
+  /**
+   * UsageRecord delete
+   */
+  export type UsageRecordDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UsageRecord
+     */
+    select?: UsageRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UsageRecord
+     */
+    omit?: UsageRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UsageRecordInclude<ExtArgs> | null
+    /**
+     * Filter which UsageRecord to delete.
+     */
+    where: UsageRecordWhereUniqueInput
+  }
+
+  /**
+   * UsageRecord deleteMany
+   */
+  export type UsageRecordDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which UsageRecords to delete
+     */
+    where?: UsageRecordWhereInput
+    /**
+     * Limit how many UsageRecords to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * UsageRecord without action
+   */
+  export type UsageRecordDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UsageRecord
+     */
+    select?: UsageRecordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UsageRecord
+     */
+    omit?: UsageRecordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UsageRecordInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model PasswordResetToken
+   */
+
+  export type AggregatePasswordResetToken = {
+    _count: PasswordResetTokenCountAggregateOutputType | null
+    _min: PasswordResetTokenMinAggregateOutputType | null
+    _max: PasswordResetTokenMaxAggregateOutputType | null
+  }
+
+  export type PasswordResetTokenMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    tokenHash: string | null
+    expiresAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type PasswordResetTokenMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    tokenHash: string | null
+    expiresAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type PasswordResetTokenCountAggregateOutputType = {
+    id: number
+    userId: number
+    tokenHash: number
+    expiresAt: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type PasswordResetTokenMinAggregateInputType = {
+    id?: true
+    userId?: true
+    tokenHash?: true
+    expiresAt?: true
+    createdAt?: true
+  }
+
+  export type PasswordResetTokenMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    tokenHash?: true
+    expiresAt?: true
+    createdAt?: true
+  }
+
+  export type PasswordResetTokenCountAggregateInputType = {
+    id?: true
+    userId?: true
+    tokenHash?: true
+    expiresAt?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type PasswordResetTokenAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PasswordResetToken to aggregate.
+     */
+    where?: PasswordResetTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PasswordResetTokens to fetch.
+     */
+    orderBy?: PasswordResetTokenOrderByWithRelationInput | PasswordResetTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PasswordResetTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PasswordResetTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PasswordResetTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PasswordResetTokens
+    **/
+    _count?: true | PasswordResetTokenCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PasswordResetTokenMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PasswordResetTokenMaxAggregateInputType
+  }
+
+  export type GetPasswordResetTokenAggregateType<T extends PasswordResetTokenAggregateArgs> = {
+        [P in keyof T & keyof AggregatePasswordResetToken]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePasswordResetToken[P]>
+      : GetScalarType<T[P], AggregatePasswordResetToken[P]>
+  }
+
+
+
+
+  export type PasswordResetTokenGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PasswordResetTokenWhereInput
+    orderBy?: PasswordResetTokenOrderByWithAggregationInput | PasswordResetTokenOrderByWithAggregationInput[]
+    by: PasswordResetTokenScalarFieldEnum[] | PasswordResetTokenScalarFieldEnum
+    having?: PasswordResetTokenScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PasswordResetTokenCountAggregateInputType | true
+    _min?: PasswordResetTokenMinAggregateInputType
+    _max?: PasswordResetTokenMaxAggregateInputType
+  }
+
+  export type PasswordResetTokenGroupByOutputType = {
+    id: string
+    userId: string
+    tokenHash: string
+    expiresAt: Date
+    createdAt: Date
+    _count: PasswordResetTokenCountAggregateOutputType | null
+    _min: PasswordResetTokenMinAggregateOutputType | null
+    _max: PasswordResetTokenMaxAggregateOutputType | null
+  }
+
+  type GetPasswordResetTokenGroupByPayload<T extends PasswordResetTokenGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PasswordResetTokenGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PasswordResetTokenGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PasswordResetTokenGroupByOutputType[P]>
+            : GetScalarType<T[P], PasswordResetTokenGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PasswordResetTokenSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    tokenHash?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["passwordResetToken"]>
+
+  export type PasswordResetTokenSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    tokenHash?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["passwordResetToken"]>
+
+  export type PasswordResetTokenSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    tokenHash?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["passwordResetToken"]>
+
+  export type PasswordResetTokenSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    tokenHash?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+  }
+
+  export type PasswordResetTokenOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "tokenHash" | "expiresAt" | "createdAt", ExtArgs["result"]["passwordResetToken"]>
+  export type PasswordResetTokenInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type PasswordResetTokenIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type PasswordResetTokenIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $PasswordResetTokenPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PasswordResetToken"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      tokenHash: string
+      expiresAt: Date
+      createdAt: Date
+    }, ExtArgs["result"]["passwordResetToken"]>
+    composites: {}
+  }
+
+  type PasswordResetTokenGetPayload<S extends boolean | null | undefined | PasswordResetTokenDefaultArgs> = $Result.GetResult<Prisma.$PasswordResetTokenPayload, S>
+
+  type PasswordResetTokenCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PasswordResetTokenFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PasswordResetTokenCountAggregateInputType | true
+    }
+
+  export interface PasswordResetTokenDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PasswordResetToken'], meta: { name: 'PasswordResetToken' } }
+    /**
+     * Find zero or one PasswordResetToken that matches the filter.
+     * @param {PasswordResetTokenFindUniqueArgs} args - Arguments to find a PasswordResetToken
+     * @example
+     * // Get one PasswordResetToken
+     * const passwordResetToken = await prisma.passwordResetToken.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PasswordResetTokenFindUniqueArgs>(args: SelectSubset<T, PasswordResetTokenFindUniqueArgs<ExtArgs>>): Prisma__PasswordResetTokenClient<$Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PasswordResetToken that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PasswordResetTokenFindUniqueOrThrowArgs} args - Arguments to find a PasswordResetToken
+     * @example
+     * // Get one PasswordResetToken
+     * const passwordResetToken = await prisma.passwordResetToken.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PasswordResetTokenFindUniqueOrThrowArgs>(args: SelectSubset<T, PasswordResetTokenFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PasswordResetTokenClient<$Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PasswordResetToken that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PasswordResetTokenFindFirstArgs} args - Arguments to find a PasswordResetToken
+     * @example
+     * // Get one PasswordResetToken
+     * const passwordResetToken = await prisma.passwordResetToken.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PasswordResetTokenFindFirstArgs>(args?: SelectSubset<T, PasswordResetTokenFindFirstArgs<ExtArgs>>): Prisma__PasswordResetTokenClient<$Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PasswordResetToken that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PasswordResetTokenFindFirstOrThrowArgs} args - Arguments to find a PasswordResetToken
+     * @example
+     * // Get one PasswordResetToken
+     * const passwordResetToken = await prisma.passwordResetToken.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PasswordResetTokenFindFirstOrThrowArgs>(args?: SelectSubset<T, PasswordResetTokenFindFirstOrThrowArgs<ExtArgs>>): Prisma__PasswordResetTokenClient<$Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PasswordResetTokens that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PasswordResetTokenFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PasswordResetTokens
+     * const passwordResetTokens = await prisma.passwordResetToken.findMany()
+     * 
+     * // Get first 10 PasswordResetTokens
+     * const passwordResetTokens = await prisma.passwordResetToken.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const passwordResetTokenWithIdOnly = await prisma.passwordResetToken.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PasswordResetTokenFindManyArgs>(args?: SelectSubset<T, PasswordResetTokenFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PasswordResetToken.
+     * @param {PasswordResetTokenCreateArgs} args - Arguments to create a PasswordResetToken.
+     * @example
+     * // Create one PasswordResetToken
+     * const PasswordResetToken = await prisma.passwordResetToken.create({
+     *   data: {
+     *     // ... data to create a PasswordResetToken
+     *   }
+     * })
+     * 
+     */
+    create<T extends PasswordResetTokenCreateArgs>(args: SelectSubset<T, PasswordResetTokenCreateArgs<ExtArgs>>): Prisma__PasswordResetTokenClient<$Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PasswordResetTokens.
+     * @param {PasswordResetTokenCreateManyArgs} args - Arguments to create many PasswordResetTokens.
+     * @example
+     * // Create many PasswordResetTokens
+     * const passwordResetToken = await prisma.passwordResetToken.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PasswordResetTokenCreateManyArgs>(args?: SelectSubset<T, PasswordResetTokenCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PasswordResetTokens and returns the data saved in the database.
+     * @param {PasswordResetTokenCreateManyAndReturnArgs} args - Arguments to create many PasswordResetTokens.
+     * @example
+     * // Create many PasswordResetTokens
+     * const passwordResetToken = await prisma.passwordResetToken.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PasswordResetTokens and only return the `id`
+     * const passwordResetTokenWithIdOnly = await prisma.passwordResetToken.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PasswordResetTokenCreateManyAndReturnArgs>(args?: SelectSubset<T, PasswordResetTokenCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PasswordResetToken.
+     * @param {PasswordResetTokenDeleteArgs} args - Arguments to delete one PasswordResetToken.
+     * @example
+     * // Delete one PasswordResetToken
+     * const PasswordResetToken = await prisma.passwordResetToken.delete({
+     *   where: {
+     *     // ... filter to delete one PasswordResetToken
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PasswordResetTokenDeleteArgs>(args: SelectSubset<T, PasswordResetTokenDeleteArgs<ExtArgs>>): Prisma__PasswordResetTokenClient<$Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PasswordResetToken.
+     * @param {PasswordResetTokenUpdateArgs} args - Arguments to update one PasswordResetToken.
+     * @example
+     * // Update one PasswordResetToken
+     * const passwordResetToken = await prisma.passwordResetToken.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PasswordResetTokenUpdateArgs>(args: SelectSubset<T, PasswordResetTokenUpdateArgs<ExtArgs>>): Prisma__PasswordResetTokenClient<$Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PasswordResetTokens.
+     * @param {PasswordResetTokenDeleteManyArgs} args - Arguments to filter PasswordResetTokens to delete.
+     * @example
+     * // Delete a few PasswordResetTokens
+     * const { count } = await prisma.passwordResetToken.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PasswordResetTokenDeleteManyArgs>(args?: SelectSubset<T, PasswordResetTokenDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PasswordResetTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PasswordResetTokenUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PasswordResetTokens
+     * const passwordResetToken = await prisma.passwordResetToken.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PasswordResetTokenUpdateManyArgs>(args: SelectSubset<T, PasswordResetTokenUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PasswordResetTokens and returns the data updated in the database.
+     * @param {PasswordResetTokenUpdateManyAndReturnArgs} args - Arguments to update many PasswordResetTokens.
+     * @example
+     * // Update many PasswordResetTokens
+     * const passwordResetToken = await prisma.passwordResetToken.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PasswordResetTokens and only return the `id`
+     * const passwordResetTokenWithIdOnly = await prisma.passwordResetToken.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PasswordResetTokenUpdateManyAndReturnArgs>(args: SelectSubset<T, PasswordResetTokenUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PasswordResetToken.
+     * @param {PasswordResetTokenUpsertArgs} args - Arguments to update or create a PasswordResetToken.
+     * @example
+     * // Update or create a PasswordResetToken
+     * const passwordResetToken = await prisma.passwordResetToken.upsert({
+     *   create: {
+     *     // ... data to create a PasswordResetToken
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PasswordResetToken we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PasswordResetTokenUpsertArgs>(args: SelectSubset<T, PasswordResetTokenUpsertArgs<ExtArgs>>): Prisma__PasswordResetTokenClient<$Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PasswordResetTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PasswordResetTokenCountArgs} args - Arguments to filter PasswordResetTokens to count.
+     * @example
+     * // Count the number of PasswordResetTokens
+     * const count = await prisma.passwordResetToken.count({
+     *   where: {
+     *     // ... the filter for the PasswordResetTokens we want to count
+     *   }
+     * })
+    **/
+    count<T extends PasswordResetTokenCountArgs>(
+      args?: Subset<T, PasswordResetTokenCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PasswordResetTokenCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PasswordResetToken.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PasswordResetTokenAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PasswordResetTokenAggregateArgs>(args: Subset<T, PasswordResetTokenAggregateArgs>): Prisma.PrismaPromise<GetPasswordResetTokenAggregateType<T>>
+
+    /**
+     * Group by PasswordResetToken.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PasswordResetTokenGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PasswordResetTokenGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PasswordResetTokenGroupByArgs['orderBy'] }
+        : { orderBy?: PasswordResetTokenGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PasswordResetTokenGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPasswordResetTokenGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PasswordResetToken model
+   */
+  readonly fields: PasswordResetTokenFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PasswordResetToken.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PasswordResetTokenClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PasswordResetToken model
+   */
+  interface PasswordResetTokenFieldRefs {
+    readonly id: FieldRef<"PasswordResetToken", 'String'>
+    readonly userId: FieldRef<"PasswordResetToken", 'String'>
+    readonly tokenHash: FieldRef<"PasswordResetToken", 'String'>
+    readonly expiresAt: FieldRef<"PasswordResetToken", 'DateTime'>
+    readonly createdAt: FieldRef<"PasswordResetToken", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PasswordResetToken findUnique
+   */
+  export type PasswordResetTokenFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PasswordResetToken
+     */
+    select?: PasswordResetTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PasswordResetToken
+     */
+    omit?: PasswordResetTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasswordResetTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which PasswordResetToken to fetch.
+     */
+    where: PasswordResetTokenWhereUniqueInput
+  }
+
+  /**
+   * PasswordResetToken findUniqueOrThrow
+   */
+  export type PasswordResetTokenFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PasswordResetToken
+     */
+    select?: PasswordResetTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PasswordResetToken
+     */
+    omit?: PasswordResetTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasswordResetTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which PasswordResetToken to fetch.
+     */
+    where: PasswordResetTokenWhereUniqueInput
+  }
+
+  /**
+   * PasswordResetToken findFirst
+   */
+  export type PasswordResetTokenFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PasswordResetToken
+     */
+    select?: PasswordResetTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PasswordResetToken
+     */
+    omit?: PasswordResetTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasswordResetTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which PasswordResetToken to fetch.
+     */
+    where?: PasswordResetTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PasswordResetTokens to fetch.
+     */
+    orderBy?: PasswordResetTokenOrderByWithRelationInput | PasswordResetTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PasswordResetTokens.
+     */
+    cursor?: PasswordResetTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PasswordResetTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PasswordResetTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PasswordResetTokens.
+     */
+    distinct?: PasswordResetTokenScalarFieldEnum | PasswordResetTokenScalarFieldEnum[]
+  }
+
+  /**
+   * PasswordResetToken findFirstOrThrow
+   */
+  export type PasswordResetTokenFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PasswordResetToken
+     */
+    select?: PasswordResetTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PasswordResetToken
+     */
+    omit?: PasswordResetTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasswordResetTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which PasswordResetToken to fetch.
+     */
+    where?: PasswordResetTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PasswordResetTokens to fetch.
+     */
+    orderBy?: PasswordResetTokenOrderByWithRelationInput | PasswordResetTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PasswordResetTokens.
+     */
+    cursor?: PasswordResetTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PasswordResetTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PasswordResetTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PasswordResetTokens.
+     */
+    distinct?: PasswordResetTokenScalarFieldEnum | PasswordResetTokenScalarFieldEnum[]
+  }
+
+  /**
+   * PasswordResetToken findMany
+   */
+  export type PasswordResetTokenFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PasswordResetToken
+     */
+    select?: PasswordResetTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PasswordResetToken
+     */
+    omit?: PasswordResetTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasswordResetTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which PasswordResetTokens to fetch.
+     */
+    where?: PasswordResetTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PasswordResetTokens to fetch.
+     */
+    orderBy?: PasswordResetTokenOrderByWithRelationInput | PasswordResetTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PasswordResetTokens.
+     */
+    cursor?: PasswordResetTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PasswordResetTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PasswordResetTokens.
+     */
+    skip?: number
+    distinct?: PasswordResetTokenScalarFieldEnum | PasswordResetTokenScalarFieldEnum[]
+  }
+
+  /**
+   * PasswordResetToken create
+   */
+  export type PasswordResetTokenCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PasswordResetToken
+     */
+    select?: PasswordResetTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PasswordResetToken
+     */
+    omit?: PasswordResetTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasswordResetTokenInclude<ExtArgs> | null
+    /**
+     * The data needed to create a PasswordResetToken.
+     */
+    data: XOR<PasswordResetTokenCreateInput, PasswordResetTokenUncheckedCreateInput>
+  }
+
+  /**
+   * PasswordResetToken createMany
+   */
+  export type PasswordResetTokenCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PasswordResetTokens.
+     */
+    data: PasswordResetTokenCreateManyInput | PasswordResetTokenCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PasswordResetToken createManyAndReturn
+   */
+  export type PasswordResetTokenCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PasswordResetToken
+     */
+    select?: PasswordResetTokenSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PasswordResetToken
+     */
+    omit?: PasswordResetTokenOmit<ExtArgs> | null
+    /**
+     * The data used to create many PasswordResetTokens.
+     */
+    data: PasswordResetTokenCreateManyInput | PasswordResetTokenCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasswordResetTokenIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PasswordResetToken update
+   */
+  export type PasswordResetTokenUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PasswordResetToken
+     */
+    select?: PasswordResetTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PasswordResetToken
+     */
+    omit?: PasswordResetTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasswordResetTokenInclude<ExtArgs> | null
+    /**
+     * The data needed to update a PasswordResetToken.
+     */
+    data: XOR<PasswordResetTokenUpdateInput, PasswordResetTokenUncheckedUpdateInput>
+    /**
+     * Choose, which PasswordResetToken to update.
+     */
+    where: PasswordResetTokenWhereUniqueInput
+  }
+
+  /**
+   * PasswordResetToken updateMany
+   */
+  export type PasswordResetTokenUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PasswordResetTokens.
+     */
+    data: XOR<PasswordResetTokenUpdateManyMutationInput, PasswordResetTokenUncheckedUpdateManyInput>
+    /**
+     * Filter which PasswordResetTokens to update
+     */
+    where?: PasswordResetTokenWhereInput
+    /**
+     * Limit how many PasswordResetTokens to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PasswordResetToken updateManyAndReturn
+   */
+  export type PasswordResetTokenUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PasswordResetToken
+     */
+    select?: PasswordResetTokenSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PasswordResetToken
+     */
+    omit?: PasswordResetTokenOmit<ExtArgs> | null
+    /**
+     * The data used to update PasswordResetTokens.
+     */
+    data: XOR<PasswordResetTokenUpdateManyMutationInput, PasswordResetTokenUncheckedUpdateManyInput>
+    /**
+     * Filter which PasswordResetTokens to update
+     */
+    where?: PasswordResetTokenWhereInput
+    /**
+     * Limit how many PasswordResetTokens to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasswordResetTokenIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PasswordResetToken upsert
+   */
+  export type PasswordResetTokenUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PasswordResetToken
+     */
+    select?: PasswordResetTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PasswordResetToken
+     */
+    omit?: PasswordResetTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasswordResetTokenInclude<ExtArgs> | null
+    /**
+     * The filter to search for the PasswordResetToken to update in case it exists.
+     */
+    where: PasswordResetTokenWhereUniqueInput
+    /**
+     * In case the PasswordResetToken found by the `where` argument doesn't exist, create a new PasswordResetToken with this data.
+     */
+    create: XOR<PasswordResetTokenCreateInput, PasswordResetTokenUncheckedCreateInput>
+    /**
+     * In case the PasswordResetToken was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PasswordResetTokenUpdateInput, PasswordResetTokenUncheckedUpdateInput>
+  }
+
+  /**
+   * PasswordResetToken delete
+   */
+  export type PasswordResetTokenDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PasswordResetToken
+     */
+    select?: PasswordResetTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PasswordResetToken
+     */
+    omit?: PasswordResetTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasswordResetTokenInclude<ExtArgs> | null
+    /**
+     * Filter which PasswordResetToken to delete.
+     */
+    where: PasswordResetTokenWhereUniqueInput
+  }
+
+  /**
+   * PasswordResetToken deleteMany
+   */
+  export type PasswordResetTokenDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PasswordResetTokens to delete
+     */
+    where?: PasswordResetTokenWhereInput
+    /**
+     * Limit how many PasswordResetTokens to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PasswordResetToken without action
+   */
+  export type PasswordResetTokenDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PasswordResetToken
+     */
+    select?: PasswordResetTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PasswordResetToken
+     */
+    omit?: PasswordResetTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasswordResetTokenInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -19210,14 +23372,29 @@ export namespace Prisma {
     marketDataSource: 'marketDataSource',
     marketDataDate: 'marketDataDate',
     comparableSalesJson: 'comparableSalesJson',
+    compMatchConfidence: 'compMatchConfidence',
     sellabilityScore: 'sellabilityScore',
     demandLevel: 'demandLevel',
     expectedDaysToSell: 'expectedDaysToSell',
     authenticityRisk: 'authenticityRisk',
+    conditionRisk: 'conditionRisk',
     recommendedOffer: 'recommendedOffer',
     recommendedList: 'recommendedList',
     resaleStrategy: 'resaleStrategy',
     trueDiscountPercent: 'trueDiscountPercent',
+    soldVolume30Days: 'soldVolume30Days',
+    soldVolume60Days: 'soldVolume60Days',
+    soldVolume90Days: 'soldVolume90Days',
+    completenessLabel: 'completenessLabel',
+    sellerRating: 'sellerRating',
+    sellerReviewCount: 'sellerReviewCount',
+    sellerAccountAgeDays: 'sellerAccountAgeDays',
+    sizeCategory: 'sizeCategory',
+    shippingEstimatesJson: 'shippingEstimatesJson',
+    estimatedShippingCost: 'estimatedShippingCost',
+    pickupDistanceMiles: 'pickupDistanceMiles',
+    outsidePickupRadius: 'outsidePickupRadius',
+    adjustedProfitMargin: 'adjustedProfitMargin',
     llmAnalyzed: 'llmAnalyzed',
     analysisDate: 'analysisDate',
     analysisConfidence: 'analysisConfidence',
@@ -19302,11 +23479,13 @@ export namespace Prisma {
 
   export const UserScalarFieldEnum: {
     id: 'id',
+    firebaseUid: 'firebaseUid',
     email: 'email',
     emailVerified: 'emailVerified',
     name: 'name',
     image: 'image',
     password: 'password',
+    stripeCustomerId: 'stripeCustomerId',
     subscriptionTier: 'subscriptionTier',
     onboardingComplete: 'onboardingComplete',
     onboardingStep: 'onboardingStep',
@@ -19368,6 +23547,15 @@ export namespace Prisma {
     notifyExpiring: 'notifyExpiring',
     notifyWeeklyDigest: 'notifyWeeklyDigest',
     notifyFrequency: 'notifyFrequency',
+    opportunityThreshold: 'opportunityThreshold',
+    feeRateEbay: 'feeRateEbay',
+    feeRateMercari: 'feeRateMercari',
+    feeRateFacebook: 'feeRateFacebook',
+    feeRateOfferup: 'feeRateOfferup',
+    feeRateCraigslist: 'feeRateCraigslist',
+    maxPickupRadiusMiles: 'maxPickupRadiusMiles',
+    homeLocation: 'homeLocation',
+    holdingCostDailyRate: 'holdingCostDailyRate',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -19411,6 +23599,7 @@ export namespace Prisma {
   export const AiAnalysisCacheScalarFieldEnum: {
     id: 'id',
     listingId: 'listingId',
+    analysisType: 'analysisType',
     analysisResult: 'analysisResult',
     createdAt: 'createdAt',
     expiresAt: 'expiresAt'
@@ -19440,6 +23629,47 @@ export namespace Prisma {
   };
 
   export type PostingQueueItemScalarFieldEnum = (typeof PostingQueueItemScalarFieldEnum)[keyof typeof PostingQueueItemScalarFieldEnum]
+
+
+  export const ListingImageScalarFieldEnum: {
+    id: 'id',
+    listingId: 'listingId',
+    imageIndex: 'imageIndex',
+    originalUrl: 'originalUrl',
+    storagePath: 'storagePath',
+    storageUrl: 'storageUrl',
+    fileSize: 'fileSize',
+    contentType: 'contentType',
+    width: 'width',
+    height: 'height',
+    uploadedAt: 'uploadedAt'
+  };
+
+  export type ListingImageScalarFieldEnum = (typeof ListingImageScalarFieldEnum)[keyof typeof ListingImageScalarFieldEnum]
+
+
+  export const UsageRecordScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    type: 'type',
+    count: 'count',
+    periodStart: 'periodStart',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type UsageRecordScalarFieldEnum = (typeof UsageRecordScalarFieldEnum)[keyof typeof UsageRecordScalarFieldEnum]
+
+
+  export const PasswordResetTokenScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    tokenHash: 'tokenHash',
+    expiresAt: 'expiresAt',
+    createdAt: 'createdAt'
+  };
+
+  export type PasswordResetTokenScalarFieldEnum = (typeof PasswordResetTokenScalarFieldEnum)[keyof typeof PasswordResetTokenScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -19584,19 +23814,35 @@ export namespace Prisma {
     marketDataSource?: StringNullableFilter<"Listing"> | string | null
     marketDataDate?: DateTimeNullableFilter<"Listing"> | Date | string | null
     comparableSalesJson?: StringNullableFilter<"Listing"> | string | null
+    compMatchConfidence?: StringNullableFilter<"Listing"> | string | null
     sellabilityScore?: IntNullableFilter<"Listing"> | number | null
     demandLevel?: StringNullableFilter<"Listing"> | string | null
     expectedDaysToSell?: IntNullableFilter<"Listing"> | number | null
     authenticityRisk?: StringNullableFilter<"Listing"> | string | null
+    conditionRisk?: StringNullableFilter<"Listing"> | string | null
     recommendedOffer?: FloatNullableFilter<"Listing"> | number | null
     recommendedList?: FloatNullableFilter<"Listing"> | number | null
     resaleStrategy?: StringNullableFilter<"Listing"> | string | null
     trueDiscountPercent?: FloatNullableFilter<"Listing"> | number | null
+    soldVolume30Days?: IntNullableFilter<"Listing"> | number | null
+    soldVolume60Days?: IntNullableFilter<"Listing"> | number | null
+    soldVolume90Days?: IntNullableFilter<"Listing"> | number | null
+    completenessLabel?: StringNullableFilter<"Listing"> | string | null
+    sellerRating?: FloatNullableFilter<"Listing"> | number | null
+    sellerReviewCount?: IntNullableFilter<"Listing"> | number | null
+    sellerAccountAgeDays?: IntNullableFilter<"Listing"> | number | null
+    sizeCategory?: StringNullableFilter<"Listing"> | string | null
+    shippingEstimatesJson?: StringNullableFilter<"Listing"> | string | null
+    estimatedShippingCost?: FloatNullableFilter<"Listing"> | number | null
+    pickupDistanceMiles?: FloatNullableFilter<"Listing"> | number | null
+    outsidePickupRadius?: BoolNullableFilter<"Listing"> | boolean | null
+    adjustedProfitMargin?: FloatNullableFilter<"Listing"> | number | null
     llmAnalyzed?: BoolFilter<"Listing"> | boolean
     analysisDate?: DateTimeNullableFilter<"Listing"> | Date | string | null
     analysisConfidence?: StringNullableFilter<"Listing"> | string | null
     analysisReasoning?: StringNullableFilter<"Listing"> | string | null
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    images?: ListingImageListRelationFilter
     messages?: MessageListRelationFilter
     opportunity?: XOR<OpportunityNullableScalarRelationFilter, OpportunityWhereInput> | null
     postingQueue?: PostingQueueItemListRelationFilter
@@ -19646,19 +23892,35 @@ export namespace Prisma {
     marketDataSource?: SortOrderInput | SortOrder
     marketDataDate?: SortOrderInput | SortOrder
     comparableSalesJson?: SortOrderInput | SortOrder
+    compMatchConfidence?: SortOrderInput | SortOrder
     sellabilityScore?: SortOrderInput | SortOrder
     demandLevel?: SortOrderInput | SortOrder
     expectedDaysToSell?: SortOrderInput | SortOrder
     authenticityRisk?: SortOrderInput | SortOrder
+    conditionRisk?: SortOrderInput | SortOrder
     recommendedOffer?: SortOrderInput | SortOrder
     recommendedList?: SortOrderInput | SortOrder
     resaleStrategy?: SortOrderInput | SortOrder
     trueDiscountPercent?: SortOrderInput | SortOrder
+    soldVolume30Days?: SortOrderInput | SortOrder
+    soldVolume60Days?: SortOrderInput | SortOrder
+    soldVolume90Days?: SortOrderInput | SortOrder
+    completenessLabel?: SortOrderInput | SortOrder
+    sellerRating?: SortOrderInput | SortOrder
+    sellerReviewCount?: SortOrderInput | SortOrder
+    sellerAccountAgeDays?: SortOrderInput | SortOrder
+    sizeCategory?: SortOrderInput | SortOrder
+    shippingEstimatesJson?: SortOrderInput | SortOrder
+    estimatedShippingCost?: SortOrderInput | SortOrder
+    pickupDistanceMiles?: SortOrderInput | SortOrder
+    outsidePickupRadius?: SortOrderInput | SortOrder
+    adjustedProfitMargin?: SortOrderInput | SortOrder
     llmAnalyzed?: SortOrder
     analysisDate?: SortOrderInput | SortOrder
     analysisConfidence?: SortOrderInput | SortOrder
     analysisReasoning?: SortOrderInput | SortOrder
     user?: UserOrderByWithRelationInput
+    images?: ListingImageOrderByRelationAggregateInput
     messages?: MessageOrderByRelationAggregateInput
     opportunity?: OpportunityOrderByWithRelationInput
     postingQueue?: PostingQueueItemOrderByRelationAggregateInput
@@ -19712,19 +23974,35 @@ export namespace Prisma {
     marketDataSource?: StringNullableFilter<"Listing"> | string | null
     marketDataDate?: DateTimeNullableFilter<"Listing"> | Date | string | null
     comparableSalesJson?: StringNullableFilter<"Listing"> | string | null
+    compMatchConfidence?: StringNullableFilter<"Listing"> | string | null
     sellabilityScore?: IntNullableFilter<"Listing"> | number | null
     demandLevel?: StringNullableFilter<"Listing"> | string | null
     expectedDaysToSell?: IntNullableFilter<"Listing"> | number | null
     authenticityRisk?: StringNullableFilter<"Listing"> | string | null
+    conditionRisk?: StringNullableFilter<"Listing"> | string | null
     recommendedOffer?: FloatNullableFilter<"Listing"> | number | null
     recommendedList?: FloatNullableFilter<"Listing"> | number | null
     resaleStrategy?: StringNullableFilter<"Listing"> | string | null
     trueDiscountPercent?: FloatNullableFilter<"Listing"> | number | null
+    soldVolume30Days?: IntNullableFilter<"Listing"> | number | null
+    soldVolume60Days?: IntNullableFilter<"Listing"> | number | null
+    soldVolume90Days?: IntNullableFilter<"Listing"> | number | null
+    completenessLabel?: StringNullableFilter<"Listing"> | string | null
+    sellerRating?: FloatNullableFilter<"Listing"> | number | null
+    sellerReviewCount?: IntNullableFilter<"Listing"> | number | null
+    sellerAccountAgeDays?: IntNullableFilter<"Listing"> | number | null
+    sizeCategory?: StringNullableFilter<"Listing"> | string | null
+    shippingEstimatesJson?: StringNullableFilter<"Listing"> | string | null
+    estimatedShippingCost?: FloatNullableFilter<"Listing"> | number | null
+    pickupDistanceMiles?: FloatNullableFilter<"Listing"> | number | null
+    outsidePickupRadius?: BoolNullableFilter<"Listing"> | boolean | null
+    adjustedProfitMargin?: FloatNullableFilter<"Listing"> | number | null
     llmAnalyzed?: BoolFilter<"Listing"> | boolean
     analysisDate?: DateTimeNullableFilter<"Listing"> | Date | string | null
     analysisConfidence?: StringNullableFilter<"Listing"> | string | null
     analysisReasoning?: StringNullableFilter<"Listing"> | string | null
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    images?: ListingImageListRelationFilter
     messages?: MessageListRelationFilter
     opportunity?: XOR<OpportunityNullableScalarRelationFilter, OpportunityWhereInput> | null
     postingQueue?: PostingQueueItemListRelationFilter
@@ -19774,14 +24052,29 @@ export namespace Prisma {
     marketDataSource?: SortOrderInput | SortOrder
     marketDataDate?: SortOrderInput | SortOrder
     comparableSalesJson?: SortOrderInput | SortOrder
+    compMatchConfidence?: SortOrderInput | SortOrder
     sellabilityScore?: SortOrderInput | SortOrder
     demandLevel?: SortOrderInput | SortOrder
     expectedDaysToSell?: SortOrderInput | SortOrder
     authenticityRisk?: SortOrderInput | SortOrder
+    conditionRisk?: SortOrderInput | SortOrder
     recommendedOffer?: SortOrderInput | SortOrder
     recommendedList?: SortOrderInput | SortOrder
     resaleStrategy?: SortOrderInput | SortOrder
     trueDiscountPercent?: SortOrderInput | SortOrder
+    soldVolume30Days?: SortOrderInput | SortOrder
+    soldVolume60Days?: SortOrderInput | SortOrder
+    soldVolume90Days?: SortOrderInput | SortOrder
+    completenessLabel?: SortOrderInput | SortOrder
+    sellerRating?: SortOrderInput | SortOrder
+    sellerReviewCount?: SortOrderInput | SortOrder
+    sellerAccountAgeDays?: SortOrderInput | SortOrder
+    sizeCategory?: SortOrderInput | SortOrder
+    shippingEstimatesJson?: SortOrderInput | SortOrder
+    estimatedShippingCost?: SortOrderInput | SortOrder
+    pickupDistanceMiles?: SortOrderInput | SortOrder
+    outsidePickupRadius?: SortOrderInput | SortOrder
+    adjustedProfitMargin?: SortOrderInput | SortOrder
     llmAnalyzed?: SortOrder
     analysisDate?: SortOrderInput | SortOrder
     analysisConfidence?: SortOrderInput | SortOrder
@@ -19840,14 +24133,29 @@ export namespace Prisma {
     marketDataSource?: StringNullableWithAggregatesFilter<"Listing"> | string | null
     marketDataDate?: DateTimeNullableWithAggregatesFilter<"Listing"> | Date | string | null
     comparableSalesJson?: StringNullableWithAggregatesFilter<"Listing"> | string | null
+    compMatchConfidence?: StringNullableWithAggregatesFilter<"Listing"> | string | null
     sellabilityScore?: IntNullableWithAggregatesFilter<"Listing"> | number | null
     demandLevel?: StringNullableWithAggregatesFilter<"Listing"> | string | null
     expectedDaysToSell?: IntNullableWithAggregatesFilter<"Listing"> | number | null
     authenticityRisk?: StringNullableWithAggregatesFilter<"Listing"> | string | null
+    conditionRisk?: StringNullableWithAggregatesFilter<"Listing"> | string | null
     recommendedOffer?: FloatNullableWithAggregatesFilter<"Listing"> | number | null
     recommendedList?: FloatNullableWithAggregatesFilter<"Listing"> | number | null
     resaleStrategy?: StringNullableWithAggregatesFilter<"Listing"> | string | null
     trueDiscountPercent?: FloatNullableWithAggregatesFilter<"Listing"> | number | null
+    soldVolume30Days?: IntNullableWithAggregatesFilter<"Listing"> | number | null
+    soldVolume60Days?: IntNullableWithAggregatesFilter<"Listing"> | number | null
+    soldVolume90Days?: IntNullableWithAggregatesFilter<"Listing"> | number | null
+    completenessLabel?: StringNullableWithAggregatesFilter<"Listing"> | string | null
+    sellerRating?: FloatNullableWithAggregatesFilter<"Listing"> | number | null
+    sellerReviewCount?: IntNullableWithAggregatesFilter<"Listing"> | number | null
+    sellerAccountAgeDays?: IntNullableWithAggregatesFilter<"Listing"> | number | null
+    sizeCategory?: StringNullableWithAggregatesFilter<"Listing"> | string | null
+    shippingEstimatesJson?: StringNullableWithAggregatesFilter<"Listing"> | string | null
+    estimatedShippingCost?: FloatNullableWithAggregatesFilter<"Listing"> | number | null
+    pickupDistanceMiles?: FloatNullableWithAggregatesFilter<"Listing"> | number | null
+    outsidePickupRadius?: BoolNullableWithAggregatesFilter<"Listing"> | boolean | null
+    adjustedProfitMargin?: FloatNullableWithAggregatesFilter<"Listing"> | number | null
     llmAnalyzed?: BoolWithAggregatesFilter<"Listing"> | boolean
     analysisDate?: DateTimeNullableWithAggregatesFilter<"Listing"> | Date | string | null
     analysisConfidence?: StringNullableWithAggregatesFilter<"Listing"> | string | null
@@ -20232,11 +24540,13 @@ export namespace Prisma {
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     id?: StringFilter<"User"> | string
+    firebaseUid?: StringNullableFilter<"User"> | string | null
     email?: StringFilter<"User"> | string
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
     name?: StringNullableFilter<"User"> | string | null
     image?: StringNullableFilter<"User"> | string | null
     password?: StringNullableFilter<"User"> | string | null
+    stripeCustomerId?: StringNullableFilter<"User"> | string | null
     subscriptionTier?: StringFilter<"User"> | string
     onboardingComplete?: BoolFilter<"User"> | boolean
     onboardingStep?: IntFilter<"User"> | number
@@ -20251,15 +24561,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigListRelationFilter
     sessions?: SessionListRelationFilter
     settings?: XOR<UserSettingsNullableScalarRelationFilter, UserSettingsWhereInput> | null
+    passwordResetTokens?: PasswordResetTokenListRelationFilter
+    usageRecords?: UsageRecordListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
     id?: SortOrder
+    firebaseUid?: SortOrderInput | SortOrder
     email?: SortOrder
     emailVerified?: SortOrderInput | SortOrder
     name?: SortOrderInput | SortOrder
     image?: SortOrderInput | SortOrder
     password?: SortOrderInput | SortOrder
+    stripeCustomerId?: SortOrderInput | SortOrder
     subscriptionTier?: SortOrder
     onboardingComplete?: SortOrder
     onboardingStep?: SortOrder
@@ -20274,11 +24588,15 @@ export namespace Prisma {
     searchConfigs?: SearchConfigOrderByRelationAggregateInput
     sessions?: SessionOrderByRelationAggregateInput
     settings?: UserSettingsOrderByWithRelationInput
+    passwordResetTokens?: PasswordResetTokenOrderByRelationAggregateInput
+    usageRecords?: UsageRecordOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    firebaseUid?: string
     email?: string
+    stripeCustomerId?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
@@ -20300,15 +24618,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigListRelationFilter
     sessions?: SessionListRelationFilter
     settings?: XOR<UserSettingsNullableScalarRelationFilter, UserSettingsWhereInput> | null
-  }, "id" | "email">
+    passwordResetTokens?: PasswordResetTokenListRelationFilter
+    usageRecords?: UsageRecordListRelationFilter
+  }, "id" | "firebaseUid" | "email" | "stripeCustomerId">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
+    firebaseUid?: SortOrderInput | SortOrder
     email?: SortOrder
     emailVerified?: SortOrderInput | SortOrder
     name?: SortOrderInput | SortOrder
     image?: SortOrderInput | SortOrder
     password?: SortOrderInput | SortOrder
+    stripeCustomerId?: SortOrderInput | SortOrder
     subscriptionTier?: SortOrder
     onboardingComplete?: SortOrder
     onboardingStep?: SortOrder
@@ -20326,11 +24648,13 @@ export namespace Prisma {
     OR?: UserScalarWhereWithAggregatesInput[]
     NOT?: UserScalarWhereWithAggregatesInput | UserScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"User"> | string
+    firebaseUid?: StringNullableWithAggregatesFilter<"User"> | string | null
     email?: StringWithAggregatesFilter<"User"> | string
     emailVerified?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     name?: StringNullableWithAggregatesFilter<"User"> | string | null
     image?: StringNullableWithAggregatesFilter<"User"> | string | null
     password?: StringNullableWithAggregatesFilter<"User"> | string | null
+    stripeCustomerId?: StringNullableWithAggregatesFilter<"User"> | string | null
     subscriptionTier?: StringWithAggregatesFilter<"User"> | string
     onboardingComplete?: BoolWithAggregatesFilter<"User"> | boolean
     onboardingStep?: IntWithAggregatesFilter<"User"> | number
@@ -20541,6 +24865,15 @@ export namespace Prisma {
     notifyExpiring?: BoolFilter<"UserSettings"> | boolean
     notifyWeeklyDigest?: BoolFilter<"UserSettings"> | boolean
     notifyFrequency?: StringFilter<"UserSettings"> | string
+    opportunityThreshold?: IntFilter<"UserSettings"> | number
+    feeRateEbay?: FloatFilter<"UserSettings"> | number
+    feeRateMercari?: FloatFilter<"UserSettings"> | number
+    feeRateFacebook?: FloatFilter<"UserSettings"> | number
+    feeRateOfferup?: FloatFilter<"UserSettings"> | number
+    feeRateCraigslist?: FloatFilter<"UserSettings"> | number
+    maxPickupRadiusMiles?: IntFilter<"UserSettings"> | number
+    homeLocation?: StringNullableFilter<"UserSettings"> | string | null
+    holdingCostDailyRate?: FloatFilter<"UserSettings"> | number
     createdAt?: DateTimeFilter<"UserSettings"> | Date | string
     updatedAt?: DateTimeFilter<"UserSettings"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -20560,6 +24893,15 @@ export namespace Prisma {
     notifyExpiring?: SortOrder
     notifyWeeklyDigest?: SortOrder
     notifyFrequency?: SortOrder
+    opportunityThreshold?: SortOrder
+    feeRateEbay?: SortOrder
+    feeRateMercari?: SortOrder
+    feeRateFacebook?: SortOrder
+    feeRateOfferup?: SortOrder
+    feeRateCraigslist?: SortOrder
+    maxPickupRadiusMiles?: SortOrder
+    homeLocation?: SortOrderInput | SortOrder
+    holdingCostDailyRate?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -20582,6 +24924,15 @@ export namespace Prisma {
     notifyExpiring?: BoolFilter<"UserSettings"> | boolean
     notifyWeeklyDigest?: BoolFilter<"UserSettings"> | boolean
     notifyFrequency?: StringFilter<"UserSettings"> | string
+    opportunityThreshold?: IntFilter<"UserSettings"> | number
+    feeRateEbay?: FloatFilter<"UserSettings"> | number
+    feeRateMercari?: FloatFilter<"UserSettings"> | number
+    feeRateFacebook?: FloatFilter<"UserSettings"> | number
+    feeRateOfferup?: FloatFilter<"UserSettings"> | number
+    feeRateCraigslist?: FloatFilter<"UserSettings"> | number
+    maxPickupRadiusMiles?: IntFilter<"UserSettings"> | number
+    homeLocation?: StringNullableFilter<"UserSettings"> | string | null
+    holdingCostDailyRate?: FloatFilter<"UserSettings"> | number
     createdAt?: DateTimeFilter<"UserSettings"> | Date | string
     updatedAt?: DateTimeFilter<"UserSettings"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -20601,6 +24952,15 @@ export namespace Prisma {
     notifyExpiring?: SortOrder
     notifyWeeklyDigest?: SortOrder
     notifyFrequency?: SortOrder
+    opportunityThreshold?: SortOrder
+    feeRateEbay?: SortOrder
+    feeRateMercari?: SortOrder
+    feeRateFacebook?: SortOrder
+    feeRateOfferup?: SortOrder
+    feeRateCraigslist?: SortOrder
+    maxPickupRadiusMiles?: SortOrder
+    homeLocation?: SortOrderInput | SortOrder
+    holdingCostDailyRate?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserSettingsCountOrderByAggregateInput
@@ -20627,6 +24987,15 @@ export namespace Prisma {
     notifyExpiring?: BoolWithAggregatesFilter<"UserSettings"> | boolean
     notifyWeeklyDigest?: BoolWithAggregatesFilter<"UserSettings"> | boolean
     notifyFrequency?: StringWithAggregatesFilter<"UserSettings"> | string
+    opportunityThreshold?: IntWithAggregatesFilter<"UserSettings"> | number
+    feeRateEbay?: FloatWithAggregatesFilter<"UserSettings"> | number
+    feeRateMercari?: FloatWithAggregatesFilter<"UserSettings"> | number
+    feeRateFacebook?: FloatWithAggregatesFilter<"UserSettings"> | number
+    feeRateOfferup?: FloatWithAggregatesFilter<"UserSettings"> | number
+    feeRateCraigslist?: FloatWithAggregatesFilter<"UserSettings"> | number
+    maxPickupRadiusMiles?: IntWithAggregatesFilter<"UserSettings"> | number
+    homeLocation?: StringNullableWithAggregatesFilter<"UserSettings"> | string | null
+    holdingCostDailyRate?: FloatWithAggregatesFilter<"UserSettings"> | number
     createdAt?: DateTimeWithAggregatesFilter<"UserSettings"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"UserSettings"> | Date | string
   }
@@ -20802,6 +25171,7 @@ export namespace Prisma {
     NOT?: AiAnalysisCacheWhereInput | AiAnalysisCacheWhereInput[]
     id?: StringFilter<"AiAnalysisCache"> | string
     listingId?: StringFilter<"AiAnalysisCache"> | string
+    analysisType?: StringFilter<"AiAnalysisCache"> | string
     analysisResult?: StringFilter<"AiAnalysisCache"> | string
     createdAt?: DateTimeFilter<"AiAnalysisCache"> | Date | string
     expiresAt?: DateTimeFilter<"AiAnalysisCache"> | Date | string
@@ -20810,6 +25180,7 @@ export namespace Prisma {
   export type AiAnalysisCacheOrderByWithRelationInput = {
     id?: SortOrder
     listingId?: SortOrder
+    analysisType?: SortOrder
     analysisResult?: SortOrder
     createdAt?: SortOrder
     expiresAt?: SortOrder
@@ -20817,18 +25188,21 @@ export namespace Prisma {
 
   export type AiAnalysisCacheWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    listingId_analysisType?: AiAnalysisCacheListingIdAnalysisTypeCompoundUniqueInput
     AND?: AiAnalysisCacheWhereInput | AiAnalysisCacheWhereInput[]
     OR?: AiAnalysisCacheWhereInput[]
     NOT?: AiAnalysisCacheWhereInput | AiAnalysisCacheWhereInput[]
     listingId?: StringFilter<"AiAnalysisCache"> | string
+    analysisType?: StringFilter<"AiAnalysisCache"> | string
     analysisResult?: StringFilter<"AiAnalysisCache"> | string
     createdAt?: DateTimeFilter<"AiAnalysisCache"> | Date | string
     expiresAt?: DateTimeFilter<"AiAnalysisCache"> | Date | string
-  }, "id">
+  }, "id" | "listingId_analysisType">
 
   export type AiAnalysisCacheOrderByWithAggregationInput = {
     id?: SortOrder
     listingId?: SortOrder
+    analysisType?: SortOrder
     analysisResult?: SortOrder
     createdAt?: SortOrder
     expiresAt?: SortOrder
@@ -20843,6 +25217,7 @@ export namespace Prisma {
     NOT?: AiAnalysisCacheScalarWhereWithAggregatesInput | AiAnalysisCacheScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"AiAnalysisCache"> | string
     listingId?: StringWithAggregatesFilter<"AiAnalysisCache"> | string
+    analysisType?: StringWithAggregatesFilter<"AiAnalysisCache"> | string
     analysisResult?: StringWithAggregatesFilter<"AiAnalysisCache"> | string
     createdAt?: DateTimeWithAggregatesFilter<"AiAnalysisCache"> | Date | string
     expiresAt?: DateTimeWithAggregatesFilter<"AiAnalysisCache"> | Date | string
@@ -20969,6 +25344,217 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"PostingQueueItem"> | Date | string
   }
 
+  export type ListingImageWhereInput = {
+    AND?: ListingImageWhereInput | ListingImageWhereInput[]
+    OR?: ListingImageWhereInput[]
+    NOT?: ListingImageWhereInput | ListingImageWhereInput[]
+    id?: StringFilter<"ListingImage"> | string
+    listingId?: StringFilter<"ListingImage"> | string
+    imageIndex?: IntFilter<"ListingImage"> | number
+    originalUrl?: StringFilter<"ListingImage"> | string
+    storagePath?: StringFilter<"ListingImage"> | string
+    storageUrl?: StringFilter<"ListingImage"> | string
+    fileSize?: IntFilter<"ListingImage"> | number
+    contentType?: StringFilter<"ListingImage"> | string
+    width?: IntNullableFilter<"ListingImage"> | number | null
+    height?: IntNullableFilter<"ListingImage"> | number | null
+    uploadedAt?: DateTimeFilter<"ListingImage"> | Date | string
+    listing?: XOR<ListingScalarRelationFilter, ListingWhereInput>
+  }
+
+  export type ListingImageOrderByWithRelationInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    imageIndex?: SortOrder
+    originalUrl?: SortOrder
+    storagePath?: SortOrder
+    storageUrl?: SortOrder
+    fileSize?: SortOrder
+    contentType?: SortOrder
+    width?: SortOrderInput | SortOrder
+    height?: SortOrderInput | SortOrder
+    uploadedAt?: SortOrder
+    listing?: ListingOrderByWithRelationInput
+  }
+
+  export type ListingImageWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    listingId_imageIndex?: ListingImageListingIdImageIndexCompoundUniqueInput
+    AND?: ListingImageWhereInput | ListingImageWhereInput[]
+    OR?: ListingImageWhereInput[]
+    NOT?: ListingImageWhereInput | ListingImageWhereInput[]
+    listingId?: StringFilter<"ListingImage"> | string
+    imageIndex?: IntFilter<"ListingImage"> | number
+    originalUrl?: StringFilter<"ListingImage"> | string
+    storagePath?: StringFilter<"ListingImage"> | string
+    storageUrl?: StringFilter<"ListingImage"> | string
+    fileSize?: IntFilter<"ListingImage"> | number
+    contentType?: StringFilter<"ListingImage"> | string
+    width?: IntNullableFilter<"ListingImage"> | number | null
+    height?: IntNullableFilter<"ListingImage"> | number | null
+    uploadedAt?: DateTimeFilter<"ListingImage"> | Date | string
+    listing?: XOR<ListingScalarRelationFilter, ListingWhereInput>
+  }, "id" | "listingId_imageIndex">
+
+  export type ListingImageOrderByWithAggregationInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    imageIndex?: SortOrder
+    originalUrl?: SortOrder
+    storagePath?: SortOrder
+    storageUrl?: SortOrder
+    fileSize?: SortOrder
+    contentType?: SortOrder
+    width?: SortOrderInput | SortOrder
+    height?: SortOrderInput | SortOrder
+    uploadedAt?: SortOrder
+    _count?: ListingImageCountOrderByAggregateInput
+    _avg?: ListingImageAvgOrderByAggregateInput
+    _max?: ListingImageMaxOrderByAggregateInput
+    _min?: ListingImageMinOrderByAggregateInput
+    _sum?: ListingImageSumOrderByAggregateInput
+  }
+
+  export type ListingImageScalarWhereWithAggregatesInput = {
+    AND?: ListingImageScalarWhereWithAggregatesInput | ListingImageScalarWhereWithAggregatesInput[]
+    OR?: ListingImageScalarWhereWithAggregatesInput[]
+    NOT?: ListingImageScalarWhereWithAggregatesInput | ListingImageScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ListingImage"> | string
+    listingId?: StringWithAggregatesFilter<"ListingImage"> | string
+    imageIndex?: IntWithAggregatesFilter<"ListingImage"> | number
+    originalUrl?: StringWithAggregatesFilter<"ListingImage"> | string
+    storagePath?: StringWithAggregatesFilter<"ListingImage"> | string
+    storageUrl?: StringWithAggregatesFilter<"ListingImage"> | string
+    fileSize?: IntWithAggregatesFilter<"ListingImage"> | number
+    contentType?: StringWithAggregatesFilter<"ListingImage"> | string
+    width?: IntNullableWithAggregatesFilter<"ListingImage"> | number | null
+    height?: IntNullableWithAggregatesFilter<"ListingImage"> | number | null
+    uploadedAt?: DateTimeWithAggregatesFilter<"ListingImage"> | Date | string
+  }
+
+  export type UsageRecordWhereInput = {
+    AND?: UsageRecordWhereInput | UsageRecordWhereInput[]
+    OR?: UsageRecordWhereInput[]
+    NOT?: UsageRecordWhereInput | UsageRecordWhereInput[]
+    id?: StringFilter<"UsageRecord"> | string
+    userId?: StringFilter<"UsageRecord"> | string
+    type?: StringFilter<"UsageRecord"> | string
+    count?: IntFilter<"UsageRecord"> | number
+    periodStart?: DateTimeFilter<"UsageRecord"> | Date | string
+    createdAt?: DateTimeFilter<"UsageRecord"> | Date | string
+    updatedAt?: DateTimeFilter<"UsageRecord"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type UsageRecordOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    type?: SortOrder
+    count?: SortOrder
+    periodStart?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type UsageRecordWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_type_periodStart?: UsageRecordUserIdTypePeriodStartCompoundUniqueInput
+    AND?: UsageRecordWhereInput | UsageRecordWhereInput[]
+    OR?: UsageRecordWhereInput[]
+    NOT?: UsageRecordWhereInput | UsageRecordWhereInput[]
+    userId?: StringFilter<"UsageRecord"> | string
+    type?: StringFilter<"UsageRecord"> | string
+    count?: IntFilter<"UsageRecord"> | number
+    periodStart?: DateTimeFilter<"UsageRecord"> | Date | string
+    createdAt?: DateTimeFilter<"UsageRecord"> | Date | string
+    updatedAt?: DateTimeFilter<"UsageRecord"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "userId_type_periodStart">
+
+  export type UsageRecordOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    type?: SortOrder
+    count?: SortOrder
+    periodStart?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: UsageRecordCountOrderByAggregateInput
+    _avg?: UsageRecordAvgOrderByAggregateInput
+    _max?: UsageRecordMaxOrderByAggregateInput
+    _min?: UsageRecordMinOrderByAggregateInput
+    _sum?: UsageRecordSumOrderByAggregateInput
+  }
+
+  export type UsageRecordScalarWhereWithAggregatesInput = {
+    AND?: UsageRecordScalarWhereWithAggregatesInput | UsageRecordScalarWhereWithAggregatesInput[]
+    OR?: UsageRecordScalarWhereWithAggregatesInput[]
+    NOT?: UsageRecordScalarWhereWithAggregatesInput | UsageRecordScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"UsageRecord"> | string
+    userId?: StringWithAggregatesFilter<"UsageRecord"> | string
+    type?: StringWithAggregatesFilter<"UsageRecord"> | string
+    count?: IntWithAggregatesFilter<"UsageRecord"> | number
+    periodStart?: DateTimeWithAggregatesFilter<"UsageRecord"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"UsageRecord"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"UsageRecord"> | Date | string
+  }
+
+  export type PasswordResetTokenWhereInput = {
+    AND?: PasswordResetTokenWhereInput | PasswordResetTokenWhereInput[]
+    OR?: PasswordResetTokenWhereInput[]
+    NOT?: PasswordResetTokenWhereInput | PasswordResetTokenWhereInput[]
+    id?: StringFilter<"PasswordResetToken"> | string
+    userId?: StringFilter<"PasswordResetToken"> | string
+    tokenHash?: StringFilter<"PasswordResetToken"> | string
+    expiresAt?: DateTimeFilter<"PasswordResetToken"> | Date | string
+    createdAt?: DateTimeFilter<"PasswordResetToken"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type PasswordResetTokenOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    tokenHash?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type PasswordResetTokenWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    tokenHash?: string
+    AND?: PasswordResetTokenWhereInput | PasswordResetTokenWhereInput[]
+    OR?: PasswordResetTokenWhereInput[]
+    NOT?: PasswordResetTokenWhereInput | PasswordResetTokenWhereInput[]
+    userId?: StringFilter<"PasswordResetToken"> | string
+    expiresAt?: DateTimeFilter<"PasswordResetToken"> | Date | string
+    createdAt?: DateTimeFilter<"PasswordResetToken"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "tokenHash">
+
+  export type PasswordResetTokenOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    tokenHash?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+    _count?: PasswordResetTokenCountOrderByAggregateInput
+    _max?: PasswordResetTokenMaxOrderByAggregateInput
+    _min?: PasswordResetTokenMinOrderByAggregateInput
+  }
+
+  export type PasswordResetTokenScalarWhereWithAggregatesInput = {
+    AND?: PasswordResetTokenScalarWhereWithAggregatesInput | PasswordResetTokenScalarWhereWithAggregatesInput[]
+    OR?: PasswordResetTokenScalarWhereWithAggregatesInput[]
+    NOT?: PasswordResetTokenScalarWhereWithAggregatesInput | PasswordResetTokenScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"PasswordResetToken"> | string
+    userId?: StringWithAggregatesFilter<"PasswordResetToken"> | string
+    tokenHash?: StringWithAggregatesFilter<"PasswordResetToken"> | string
+    expiresAt?: DateTimeWithAggregatesFilter<"PasswordResetToken"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"PasswordResetToken"> | Date | string
+  }
+
   export type ListingCreateInput = {
     id?: string
     externalId: string
@@ -21012,19 +25598,35 @@ export namespace Prisma {
     marketDataSource?: string | null
     marketDataDate?: Date | string | null
     comparableSalesJson?: string | null
+    compMatchConfidence?: string | null
     sellabilityScore?: number | null
     demandLevel?: string | null
     expectedDaysToSell?: number | null
     authenticityRisk?: string | null
+    conditionRisk?: string | null
     recommendedOffer?: number | null
     recommendedList?: number | null
     resaleStrategy?: string | null
     trueDiscountPercent?: number | null
+    soldVolume30Days?: number | null
+    soldVolume60Days?: number | null
+    soldVolume90Days?: number | null
+    completenessLabel?: string | null
+    sellerRating?: number | null
+    sellerReviewCount?: number | null
+    sellerAccountAgeDays?: number | null
+    sizeCategory?: string | null
+    shippingEstimatesJson?: string | null
+    estimatedShippingCost?: number | null
+    pickupDistanceMiles?: number | null
+    outsidePickupRadius?: boolean | null
+    adjustedProfitMargin?: number | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
     analysisReasoning?: string | null
     user?: UserCreateNestedOneWithoutListingsInput
+    images?: ListingImageCreateNestedManyWithoutListingInput
     messages?: MessageCreateNestedManyWithoutListingInput
     opportunity?: OpportunityCreateNestedOneWithoutListingInput
     postingQueue?: PostingQueueItemCreateNestedManyWithoutListingInput
@@ -21074,18 +25676,34 @@ export namespace Prisma {
     marketDataSource?: string | null
     marketDataDate?: Date | string | null
     comparableSalesJson?: string | null
+    compMatchConfidence?: string | null
     sellabilityScore?: number | null
     demandLevel?: string | null
     expectedDaysToSell?: number | null
     authenticityRisk?: string | null
+    conditionRisk?: string | null
     recommendedOffer?: number | null
     recommendedList?: number | null
     resaleStrategy?: string | null
     trueDiscountPercent?: number | null
+    soldVolume30Days?: number | null
+    soldVolume60Days?: number | null
+    soldVolume90Days?: number | null
+    completenessLabel?: string | null
+    sellerRating?: number | null
+    sellerReviewCount?: number | null
+    sellerAccountAgeDays?: number | null
+    sizeCategory?: string | null
+    shippingEstimatesJson?: string | null
+    estimatedShippingCost?: number | null
+    pickupDistanceMiles?: number | null
+    outsidePickupRadius?: boolean | null
+    adjustedProfitMargin?: number | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
     analysisReasoning?: string | null
+    images?: ListingImageUncheckedCreateNestedManyWithoutListingInput
     messages?: MessageUncheckedCreateNestedManyWithoutListingInput
     opportunity?: OpportunityUncheckedCreateNestedOneWithoutListingInput
     postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutListingInput
@@ -21134,19 +25752,35 @@ export namespace Prisma {
     marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
     marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
     demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
     expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
     authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
     recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
     recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
     resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
     trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
+    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
+    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
+    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
+    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneWithoutListingsNestedInput
+    images?: ListingImageUpdateManyWithoutListingNestedInput
     messages?: MessageUpdateManyWithoutListingNestedInput
     opportunity?: OpportunityUpdateOneWithoutListingNestedInput
     postingQueue?: PostingQueueItemUpdateManyWithoutListingNestedInput
@@ -21196,18 +25830,34 @@ export namespace Prisma {
     marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
     marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
     demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
     expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
     authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
     recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
     recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
     resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
     trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
+    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
+    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
+    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
+    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: ListingImageUncheckedUpdateManyWithoutListingNestedInput
     messages?: MessageUncheckedUpdateManyWithoutListingNestedInput
     opportunity?: OpportunityUncheckedUpdateOneWithoutListingNestedInput
     postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutListingNestedInput
@@ -21257,14 +25907,29 @@ export namespace Prisma {
     marketDataSource?: string | null
     marketDataDate?: Date | string | null
     comparableSalesJson?: string | null
+    compMatchConfidence?: string | null
     sellabilityScore?: number | null
     demandLevel?: string | null
     expectedDaysToSell?: number | null
     authenticityRisk?: string | null
+    conditionRisk?: string | null
     recommendedOffer?: number | null
     recommendedList?: number | null
     resaleStrategy?: string | null
     trueDiscountPercent?: number | null
+    soldVolume30Days?: number | null
+    soldVolume60Days?: number | null
+    soldVolume90Days?: number | null
+    completenessLabel?: string | null
+    sellerRating?: number | null
+    sellerReviewCount?: number | null
+    sellerAccountAgeDays?: number | null
+    sizeCategory?: string | null
+    shippingEstimatesJson?: string | null
+    estimatedShippingCost?: number | null
+    pickupDistanceMiles?: number | null
+    outsidePickupRadius?: boolean | null
+    adjustedProfitMargin?: number | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
@@ -21314,14 +25979,29 @@ export namespace Prisma {
     marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
     marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
     demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
     expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
     authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
     recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
     recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
     resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
     trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
+    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
+    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
+    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
+    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
@@ -21372,14 +26052,29 @@ export namespace Prisma {
     marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
     marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
     demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
     expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
     authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
     recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
     recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
     resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
     trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
+    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
+    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
+    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
+    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
@@ -21811,11 +26506,13 @@ export namespace Prisma {
 
   export type UserCreateInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -21830,15 +26527,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     settings?: UserSettingsCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -21853,15 +26554,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -21876,15 +26581,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     settings?: UserSettingsUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -21899,15 +26608,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -21917,11 +26630,13 @@ export namespace Prisma {
 
   export type UserUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -21931,11 +26646,13 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -22150,6 +26867,15 @@ export namespace Prisma {
     notifyExpiring?: boolean
     notifyWeeklyDigest?: boolean
     notifyFrequency?: string
+    opportunityThreshold?: number
+    feeRateEbay?: number
+    feeRateMercari?: number
+    feeRateFacebook?: number
+    feeRateOfferup?: number
+    feeRateCraigslist?: number
+    maxPickupRadiusMiles?: number
+    homeLocation?: string | null
+    holdingCostDailyRate?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSettingsInput
@@ -22169,6 +26895,15 @@ export namespace Prisma {
     notifyExpiring?: boolean
     notifyWeeklyDigest?: boolean
     notifyFrequency?: string
+    opportunityThreshold?: number
+    feeRateEbay?: number
+    feeRateMercari?: number
+    feeRateFacebook?: number
+    feeRateOfferup?: number
+    feeRateCraigslist?: number
+    maxPickupRadiusMiles?: number
+    homeLocation?: string | null
+    holdingCostDailyRate?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -22186,6 +26921,15 @@ export namespace Prisma {
     notifyExpiring?: BoolFieldUpdateOperationsInput | boolean
     notifyWeeklyDigest?: BoolFieldUpdateOperationsInput | boolean
     notifyFrequency?: StringFieldUpdateOperationsInput | string
+    opportunityThreshold?: IntFieldUpdateOperationsInput | number
+    feeRateEbay?: FloatFieldUpdateOperationsInput | number
+    feeRateMercari?: FloatFieldUpdateOperationsInput | number
+    feeRateFacebook?: FloatFieldUpdateOperationsInput | number
+    feeRateOfferup?: FloatFieldUpdateOperationsInput | number
+    feeRateCraigslist?: FloatFieldUpdateOperationsInput | number
+    maxPickupRadiusMiles?: IntFieldUpdateOperationsInput | number
+    homeLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCostDailyRate?: FloatFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSettingsNestedInput
@@ -22205,6 +26949,15 @@ export namespace Prisma {
     notifyExpiring?: BoolFieldUpdateOperationsInput | boolean
     notifyWeeklyDigest?: BoolFieldUpdateOperationsInput | boolean
     notifyFrequency?: StringFieldUpdateOperationsInput | string
+    opportunityThreshold?: IntFieldUpdateOperationsInput | number
+    feeRateEbay?: FloatFieldUpdateOperationsInput | number
+    feeRateMercari?: FloatFieldUpdateOperationsInput | number
+    feeRateFacebook?: FloatFieldUpdateOperationsInput | number
+    feeRateOfferup?: FloatFieldUpdateOperationsInput | number
+    feeRateCraigslist?: FloatFieldUpdateOperationsInput | number
+    maxPickupRadiusMiles?: IntFieldUpdateOperationsInput | number
+    homeLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCostDailyRate?: FloatFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -22223,6 +26976,15 @@ export namespace Prisma {
     notifyExpiring?: boolean
     notifyWeeklyDigest?: boolean
     notifyFrequency?: string
+    opportunityThreshold?: number
+    feeRateEbay?: number
+    feeRateMercari?: number
+    feeRateFacebook?: number
+    feeRateOfferup?: number
+    feeRateCraigslist?: number
+    maxPickupRadiusMiles?: number
+    homeLocation?: string | null
+    holdingCostDailyRate?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -22240,6 +27002,15 @@ export namespace Prisma {
     notifyExpiring?: BoolFieldUpdateOperationsInput | boolean
     notifyWeeklyDigest?: BoolFieldUpdateOperationsInput | boolean
     notifyFrequency?: StringFieldUpdateOperationsInput | string
+    opportunityThreshold?: IntFieldUpdateOperationsInput | number
+    feeRateEbay?: FloatFieldUpdateOperationsInput | number
+    feeRateMercari?: FloatFieldUpdateOperationsInput | number
+    feeRateFacebook?: FloatFieldUpdateOperationsInput | number
+    feeRateOfferup?: FloatFieldUpdateOperationsInput | number
+    feeRateCraigslist?: FloatFieldUpdateOperationsInput | number
+    maxPickupRadiusMiles?: IntFieldUpdateOperationsInput | number
+    homeLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCostDailyRate?: FloatFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -22258,6 +27029,15 @@ export namespace Prisma {
     notifyExpiring?: BoolFieldUpdateOperationsInput | boolean
     notifyWeeklyDigest?: BoolFieldUpdateOperationsInput | boolean
     notifyFrequency?: StringFieldUpdateOperationsInput | string
+    opportunityThreshold?: IntFieldUpdateOperationsInput | number
+    feeRateEbay?: FloatFieldUpdateOperationsInput | number
+    feeRateMercari?: FloatFieldUpdateOperationsInput | number
+    feeRateFacebook?: FloatFieldUpdateOperationsInput | number
+    feeRateOfferup?: FloatFieldUpdateOperationsInput | number
+    feeRateCraigslist?: FloatFieldUpdateOperationsInput | number
+    maxPickupRadiusMiles?: IntFieldUpdateOperationsInput | number
+    homeLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCostDailyRate?: FloatFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -22452,6 +27232,7 @@ export namespace Prisma {
   export type AiAnalysisCacheCreateInput = {
     id?: string
     listingId: string
+    analysisType?: string
     analysisResult: string
     createdAt?: Date | string
     expiresAt: Date | string
@@ -22460,6 +27241,7 @@ export namespace Prisma {
   export type AiAnalysisCacheUncheckedCreateInput = {
     id?: string
     listingId: string
+    analysisType?: string
     analysisResult: string
     createdAt?: Date | string
     expiresAt: Date | string
@@ -22468,6 +27250,7 @@ export namespace Prisma {
   export type AiAnalysisCacheUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     listingId?: StringFieldUpdateOperationsInput | string
+    analysisType?: StringFieldUpdateOperationsInput | string
     analysisResult?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22476,6 +27259,7 @@ export namespace Prisma {
   export type AiAnalysisCacheUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     listingId?: StringFieldUpdateOperationsInput | string
+    analysisType?: StringFieldUpdateOperationsInput | string
     analysisResult?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22484,6 +27268,7 @@ export namespace Prisma {
   export type AiAnalysisCacheCreateManyInput = {
     id?: string
     listingId: string
+    analysisType?: string
     analysisResult: string
     createdAt?: Date | string
     expiresAt: Date | string
@@ -22492,6 +27277,7 @@ export namespace Prisma {
   export type AiAnalysisCacheUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     listingId?: StringFieldUpdateOperationsInput | string
+    analysisType?: StringFieldUpdateOperationsInput | string
     analysisResult?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22500,6 +27286,7 @@ export namespace Prisma {
   export type AiAnalysisCacheUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     listingId?: StringFieldUpdateOperationsInput | string
+    analysisType?: StringFieldUpdateOperationsInput | string
     analysisResult?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22643,6 +27430,227 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ListingImageCreateInput = {
+    id?: string
+    imageIndex: number
+    originalUrl: string
+    storagePath: string
+    storageUrl: string
+    fileSize: number
+    contentType: string
+    width?: number | null
+    height?: number | null
+    uploadedAt?: Date | string
+    listing: ListingCreateNestedOneWithoutImagesInput
+  }
+
+  export type ListingImageUncheckedCreateInput = {
+    id?: string
+    listingId: string
+    imageIndex: number
+    originalUrl: string
+    storagePath: string
+    storageUrl: string
+    fileSize: number
+    contentType: string
+    width?: number | null
+    height?: number | null
+    uploadedAt?: Date | string
+  }
+
+  export type ListingImageUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    imageIndex?: IntFieldUpdateOperationsInput | number
+    originalUrl?: StringFieldUpdateOperationsInput | string
+    storagePath?: StringFieldUpdateOperationsInput | string
+    storageUrl?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    contentType?: StringFieldUpdateOperationsInput | string
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
+    uploadedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    listing?: ListingUpdateOneRequiredWithoutImagesNestedInput
+  }
+
+  export type ListingImageUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    listingId?: StringFieldUpdateOperationsInput | string
+    imageIndex?: IntFieldUpdateOperationsInput | number
+    originalUrl?: StringFieldUpdateOperationsInput | string
+    storagePath?: StringFieldUpdateOperationsInput | string
+    storageUrl?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    contentType?: StringFieldUpdateOperationsInput | string
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
+    uploadedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ListingImageCreateManyInput = {
+    id?: string
+    listingId: string
+    imageIndex: number
+    originalUrl: string
+    storagePath: string
+    storageUrl: string
+    fileSize: number
+    contentType: string
+    width?: number | null
+    height?: number | null
+    uploadedAt?: Date | string
+  }
+
+  export type ListingImageUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    imageIndex?: IntFieldUpdateOperationsInput | number
+    originalUrl?: StringFieldUpdateOperationsInput | string
+    storagePath?: StringFieldUpdateOperationsInput | string
+    storageUrl?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    contentType?: StringFieldUpdateOperationsInput | string
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
+    uploadedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ListingImageUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    listingId?: StringFieldUpdateOperationsInput | string
+    imageIndex?: IntFieldUpdateOperationsInput | number
+    originalUrl?: StringFieldUpdateOperationsInput | string
+    storagePath?: StringFieldUpdateOperationsInput | string
+    storageUrl?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    contentType?: StringFieldUpdateOperationsInput | string
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
+    uploadedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UsageRecordCreateInput = {
+    id?: string
+    type: string
+    count?: number
+    periodStart: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutUsageRecordsInput
+  }
+
+  export type UsageRecordUncheckedCreateInput = {
+    id?: string
+    userId: string
+    type: string
+    count?: number
+    periodStart: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UsageRecordUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    count?: IntFieldUpdateOperationsInput | number
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutUsageRecordsNestedInput
+  }
+
+  export type UsageRecordUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    count?: IntFieldUpdateOperationsInput | number
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UsageRecordCreateManyInput = {
+    id?: string
+    userId: string
+    type: string
+    count?: number
+    periodStart: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UsageRecordUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    count?: IntFieldUpdateOperationsInput | number
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UsageRecordUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    count?: IntFieldUpdateOperationsInput | number
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PasswordResetTokenCreateInput = {
+    id?: string
+    tokenHash: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutPasswordResetTokensInput
+  }
+
+  export type PasswordResetTokenUncheckedCreateInput = {
+    id?: string
+    userId: string
+    tokenHash: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type PasswordResetTokenUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutPasswordResetTokensNestedInput
+  }
+
+  export type PasswordResetTokenUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PasswordResetTokenCreateManyInput = {
+    id?: string
+    userId: string
+    tokenHash: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type PasswordResetTokenUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PasswordResetTokenUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -22743,6 +27751,12 @@ export namespace Prisma {
     isNot?: UserWhereInput | null
   }
 
+  export type ListingImageListRelationFilter = {
+    every?: ListingImageWhereInput
+    some?: ListingImageWhereInput
+    none?: ListingImageWhereInput
+  }
+
   export type MessageListRelationFilter = {
     every?: MessageWhereInput
     some?: MessageWhereInput
@@ -22763,6 +27777,10 @@ export namespace Prisma {
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
+  }
+
+  export type ListingImageOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type MessageOrderByRelationAggregateInput = {
@@ -22823,14 +27841,29 @@ export namespace Prisma {
     marketDataSource?: SortOrder
     marketDataDate?: SortOrder
     comparableSalesJson?: SortOrder
+    compMatchConfidence?: SortOrder
     sellabilityScore?: SortOrder
     demandLevel?: SortOrder
     expectedDaysToSell?: SortOrder
     authenticityRisk?: SortOrder
+    conditionRisk?: SortOrder
     recommendedOffer?: SortOrder
     recommendedList?: SortOrder
     resaleStrategy?: SortOrder
     trueDiscountPercent?: SortOrder
+    soldVolume30Days?: SortOrder
+    soldVolume60Days?: SortOrder
+    soldVolume90Days?: SortOrder
+    completenessLabel?: SortOrder
+    sellerRating?: SortOrder
+    sellerReviewCount?: SortOrder
+    sellerAccountAgeDays?: SortOrder
+    sizeCategory?: SortOrder
+    shippingEstimatesJson?: SortOrder
+    estimatedShippingCost?: SortOrder
+    pickupDistanceMiles?: SortOrder
+    outsidePickupRadius?: SortOrder
+    adjustedProfitMargin?: SortOrder
     llmAnalyzed?: SortOrder
     analysisDate?: SortOrder
     analysisConfidence?: SortOrder
@@ -22855,6 +27888,15 @@ export namespace Prisma {
     recommendedOffer?: SortOrder
     recommendedList?: SortOrder
     trueDiscountPercent?: SortOrder
+    soldVolume30Days?: SortOrder
+    soldVolume60Days?: SortOrder
+    soldVolume90Days?: SortOrder
+    sellerRating?: SortOrder
+    sellerReviewCount?: SortOrder
+    sellerAccountAgeDays?: SortOrder
+    estimatedShippingCost?: SortOrder
+    pickupDistanceMiles?: SortOrder
+    adjustedProfitMargin?: SortOrder
   }
 
   export type ListingMaxOrderByAggregateInput = {
@@ -22901,14 +27943,29 @@ export namespace Prisma {
     marketDataSource?: SortOrder
     marketDataDate?: SortOrder
     comparableSalesJson?: SortOrder
+    compMatchConfidence?: SortOrder
     sellabilityScore?: SortOrder
     demandLevel?: SortOrder
     expectedDaysToSell?: SortOrder
     authenticityRisk?: SortOrder
+    conditionRisk?: SortOrder
     recommendedOffer?: SortOrder
     recommendedList?: SortOrder
     resaleStrategy?: SortOrder
     trueDiscountPercent?: SortOrder
+    soldVolume30Days?: SortOrder
+    soldVolume60Days?: SortOrder
+    soldVolume90Days?: SortOrder
+    completenessLabel?: SortOrder
+    sellerRating?: SortOrder
+    sellerReviewCount?: SortOrder
+    sellerAccountAgeDays?: SortOrder
+    sizeCategory?: SortOrder
+    shippingEstimatesJson?: SortOrder
+    estimatedShippingCost?: SortOrder
+    pickupDistanceMiles?: SortOrder
+    outsidePickupRadius?: SortOrder
+    adjustedProfitMargin?: SortOrder
     llmAnalyzed?: SortOrder
     analysisDate?: SortOrder
     analysisConfidence?: SortOrder
@@ -22959,14 +28016,29 @@ export namespace Prisma {
     marketDataSource?: SortOrder
     marketDataDate?: SortOrder
     comparableSalesJson?: SortOrder
+    compMatchConfidence?: SortOrder
     sellabilityScore?: SortOrder
     demandLevel?: SortOrder
     expectedDaysToSell?: SortOrder
     authenticityRisk?: SortOrder
+    conditionRisk?: SortOrder
     recommendedOffer?: SortOrder
     recommendedList?: SortOrder
     resaleStrategy?: SortOrder
     trueDiscountPercent?: SortOrder
+    soldVolume30Days?: SortOrder
+    soldVolume60Days?: SortOrder
+    soldVolume90Days?: SortOrder
+    completenessLabel?: SortOrder
+    sellerRating?: SortOrder
+    sellerReviewCount?: SortOrder
+    sellerAccountAgeDays?: SortOrder
+    sizeCategory?: SortOrder
+    shippingEstimatesJson?: SortOrder
+    estimatedShippingCost?: SortOrder
+    pickupDistanceMiles?: SortOrder
+    outsidePickupRadius?: SortOrder
+    adjustedProfitMargin?: SortOrder
     llmAnalyzed?: SortOrder
     analysisDate?: SortOrder
     analysisConfidence?: SortOrder
@@ -22991,6 +28063,15 @@ export namespace Prisma {
     recommendedOffer?: SortOrder
     recommendedList?: SortOrder
     trueDiscountPercent?: SortOrder
+    soldVolume30Days?: SortOrder
+    soldVolume60Days?: SortOrder
+    soldVolume90Days?: SortOrder
+    sellerRating?: SortOrder
+    sellerReviewCount?: SortOrder
+    sellerAccountAgeDays?: SortOrder
+    estimatedShippingCost?: SortOrder
+    pickupDistanceMiles?: SortOrder
+    adjustedProfitMargin?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -23419,6 +28500,18 @@ export namespace Prisma {
     isNot?: UserSettingsWhereInput | null
   }
 
+  export type PasswordResetTokenListRelationFilter = {
+    every?: PasswordResetTokenWhereInput
+    some?: PasswordResetTokenWhereInput
+    none?: PasswordResetTokenWhereInput
+  }
+
+  export type UsageRecordListRelationFilter = {
+    every?: UsageRecordWhereInput
+    some?: UsageRecordWhereInput
+    none?: UsageRecordWhereInput
+  }
+
   export type AccountOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -23443,13 +28536,23 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type PasswordResetTokenOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type UsageRecordOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
+    firebaseUid?: SortOrder
     email?: SortOrder
     emailVerified?: SortOrder
     name?: SortOrder
     image?: SortOrder
     password?: SortOrder
+    stripeCustomerId?: SortOrder
     subscriptionTier?: SortOrder
     onboardingComplete?: SortOrder
     onboardingStep?: SortOrder
@@ -23463,11 +28566,13 @@ export namespace Prisma {
 
   export type UserMaxOrderByAggregateInput = {
     id?: SortOrder
+    firebaseUid?: SortOrder
     email?: SortOrder
     emailVerified?: SortOrder
     name?: SortOrder
     image?: SortOrder
     password?: SortOrder
+    stripeCustomerId?: SortOrder
     subscriptionTier?: SortOrder
     onboardingComplete?: SortOrder
     onboardingStep?: SortOrder
@@ -23477,11 +28582,13 @@ export namespace Prisma {
 
   export type UserMinOrderByAggregateInput = {
     id?: SortOrder
+    firebaseUid?: SortOrder
     email?: SortOrder
     emailVerified?: SortOrder
     name?: SortOrder
     image?: SortOrder
     password?: SortOrder
+    stripeCustomerId?: SortOrder
     subscriptionTier?: SortOrder
     onboardingComplete?: SortOrder
     onboardingStep?: SortOrder
@@ -23614,12 +28721,29 @@ export namespace Prisma {
     notifyExpiring?: SortOrder
     notifyWeeklyDigest?: SortOrder
     notifyFrequency?: SortOrder
+    opportunityThreshold?: SortOrder
+    feeRateEbay?: SortOrder
+    feeRateMercari?: SortOrder
+    feeRateFacebook?: SortOrder
+    feeRateOfferup?: SortOrder
+    feeRateCraigslist?: SortOrder
+    maxPickupRadiusMiles?: SortOrder
+    homeLocation?: SortOrder
+    holdingCostDailyRate?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type UserSettingsAvgOrderByAggregateInput = {
     discountThreshold?: SortOrder
+    opportunityThreshold?: SortOrder
+    feeRateEbay?: SortOrder
+    feeRateMercari?: SortOrder
+    feeRateFacebook?: SortOrder
+    feeRateOfferup?: SortOrder
+    feeRateCraigslist?: SortOrder
+    maxPickupRadiusMiles?: SortOrder
+    holdingCostDailyRate?: SortOrder
   }
 
   export type UserSettingsMaxOrderByAggregateInput = {
@@ -23636,6 +28760,15 @@ export namespace Prisma {
     notifyExpiring?: SortOrder
     notifyWeeklyDigest?: SortOrder
     notifyFrequency?: SortOrder
+    opportunityThreshold?: SortOrder
+    feeRateEbay?: SortOrder
+    feeRateMercari?: SortOrder
+    feeRateFacebook?: SortOrder
+    feeRateOfferup?: SortOrder
+    feeRateCraigslist?: SortOrder
+    maxPickupRadiusMiles?: SortOrder
+    homeLocation?: SortOrder
+    holdingCostDailyRate?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -23654,12 +28787,29 @@ export namespace Prisma {
     notifyExpiring?: SortOrder
     notifyWeeklyDigest?: SortOrder
     notifyFrequency?: SortOrder
+    opportunityThreshold?: SortOrder
+    feeRateEbay?: SortOrder
+    feeRateMercari?: SortOrder
+    feeRateFacebook?: SortOrder
+    feeRateOfferup?: SortOrder
+    feeRateCraigslist?: SortOrder
+    maxPickupRadiusMiles?: SortOrder
+    homeLocation?: SortOrder
+    holdingCostDailyRate?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type UserSettingsSumOrderByAggregateInput = {
     discountThreshold?: SortOrder
+    opportunityThreshold?: SortOrder
+    feeRateEbay?: SortOrder
+    feeRateMercari?: SortOrder
+    feeRateFacebook?: SortOrder
+    feeRateOfferup?: SortOrder
+    feeRateCraigslist?: SortOrder
+    maxPickupRadiusMiles?: SortOrder
+    holdingCostDailyRate?: SortOrder
   }
 
   export type FacebookTokenCountOrderByAggregateInput = {
@@ -23748,9 +28898,15 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type AiAnalysisCacheListingIdAnalysisTypeCompoundUniqueInput = {
+    listingId: string
+    analysisType: string
+  }
+
   export type AiAnalysisCacheCountOrderByAggregateInput = {
     id?: SortOrder
     listingId?: SortOrder
+    analysisType?: SortOrder
     analysisResult?: SortOrder
     createdAt?: SortOrder
     expiresAt?: SortOrder
@@ -23759,6 +28915,7 @@ export namespace Prisma {
   export type AiAnalysisCacheMaxOrderByAggregateInput = {
     id?: SortOrder
     listingId?: SortOrder
+    analysisType?: SortOrder
     analysisResult?: SortOrder
     createdAt?: SortOrder
     expiresAt?: SortOrder
@@ -23767,6 +28924,7 @@ export namespace Prisma {
   export type AiAnalysisCacheMinOrderByAggregateInput = {
     id?: SortOrder
     listingId?: SortOrder
+    analysisType?: SortOrder
     analysisResult?: SortOrder
     createdAt?: SortOrder
     expiresAt?: SortOrder
@@ -23850,10 +29008,146 @@ export namespace Prisma {
     maxRetries?: SortOrder
   }
 
+  export type ListingImageListingIdImageIndexCompoundUniqueInput = {
+    listingId: string
+    imageIndex: number
+  }
+
+  export type ListingImageCountOrderByAggregateInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    imageIndex?: SortOrder
+    originalUrl?: SortOrder
+    storagePath?: SortOrder
+    storageUrl?: SortOrder
+    fileSize?: SortOrder
+    contentType?: SortOrder
+    width?: SortOrder
+    height?: SortOrder
+    uploadedAt?: SortOrder
+  }
+
+  export type ListingImageAvgOrderByAggregateInput = {
+    imageIndex?: SortOrder
+    fileSize?: SortOrder
+    width?: SortOrder
+    height?: SortOrder
+  }
+
+  export type ListingImageMaxOrderByAggregateInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    imageIndex?: SortOrder
+    originalUrl?: SortOrder
+    storagePath?: SortOrder
+    storageUrl?: SortOrder
+    fileSize?: SortOrder
+    contentType?: SortOrder
+    width?: SortOrder
+    height?: SortOrder
+    uploadedAt?: SortOrder
+  }
+
+  export type ListingImageMinOrderByAggregateInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    imageIndex?: SortOrder
+    originalUrl?: SortOrder
+    storagePath?: SortOrder
+    storageUrl?: SortOrder
+    fileSize?: SortOrder
+    contentType?: SortOrder
+    width?: SortOrder
+    height?: SortOrder
+    uploadedAt?: SortOrder
+  }
+
+  export type ListingImageSumOrderByAggregateInput = {
+    imageIndex?: SortOrder
+    fileSize?: SortOrder
+    width?: SortOrder
+    height?: SortOrder
+  }
+
+  export type UsageRecordUserIdTypePeriodStartCompoundUniqueInput = {
+    userId: string
+    type: string
+    periodStart: Date | string
+  }
+
+  export type UsageRecordCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    type?: SortOrder
+    count?: SortOrder
+    periodStart?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type UsageRecordAvgOrderByAggregateInput = {
+    count?: SortOrder
+  }
+
+  export type UsageRecordMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    type?: SortOrder
+    count?: SortOrder
+    periodStart?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type UsageRecordMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    type?: SortOrder
+    count?: SortOrder
+    periodStart?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type UsageRecordSumOrderByAggregateInput = {
+    count?: SortOrder
+  }
+
+  export type PasswordResetTokenCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    tokenHash?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type PasswordResetTokenMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    tokenHash?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type PasswordResetTokenMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    tokenHash?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
   export type UserCreateNestedOneWithoutListingsInput = {
     create?: XOR<UserCreateWithoutListingsInput, UserUncheckedCreateWithoutListingsInput>
     connectOrCreate?: UserCreateOrConnectWithoutListingsInput
     connect?: UserWhereUniqueInput
+  }
+
+  export type ListingImageCreateNestedManyWithoutListingInput = {
+    create?: XOR<ListingImageCreateWithoutListingInput, ListingImageUncheckedCreateWithoutListingInput> | ListingImageCreateWithoutListingInput[] | ListingImageUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: ListingImageCreateOrConnectWithoutListingInput | ListingImageCreateOrConnectWithoutListingInput[]
+    createMany?: ListingImageCreateManyListingInputEnvelope
+    connect?: ListingImageWhereUniqueInput | ListingImageWhereUniqueInput[]
   }
 
   export type MessageCreateNestedManyWithoutListingInput = {
@@ -23874,6 +29168,13 @@ export namespace Prisma {
     connectOrCreate?: PostingQueueItemCreateOrConnectWithoutListingInput | PostingQueueItemCreateOrConnectWithoutListingInput[]
     createMany?: PostingQueueItemCreateManyListingInputEnvelope
     connect?: PostingQueueItemWhereUniqueInput | PostingQueueItemWhereUniqueInput[]
+  }
+
+  export type ListingImageUncheckedCreateNestedManyWithoutListingInput = {
+    create?: XOR<ListingImageCreateWithoutListingInput, ListingImageUncheckedCreateWithoutListingInput> | ListingImageCreateWithoutListingInput[] | ListingImageUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: ListingImageCreateOrConnectWithoutListingInput | ListingImageCreateOrConnectWithoutListingInput[]
+    createMany?: ListingImageCreateManyListingInputEnvelope
+    connect?: ListingImageWhereUniqueInput | ListingImageWhereUniqueInput[]
   }
 
   export type MessageUncheckedCreateNestedManyWithoutListingInput = {
@@ -23954,6 +29255,20 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutListingsInput, UserUpdateWithoutListingsInput>, UserUncheckedUpdateWithoutListingsInput>
   }
 
+  export type ListingImageUpdateManyWithoutListingNestedInput = {
+    create?: XOR<ListingImageCreateWithoutListingInput, ListingImageUncheckedCreateWithoutListingInput> | ListingImageCreateWithoutListingInput[] | ListingImageUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: ListingImageCreateOrConnectWithoutListingInput | ListingImageCreateOrConnectWithoutListingInput[]
+    upsert?: ListingImageUpsertWithWhereUniqueWithoutListingInput | ListingImageUpsertWithWhereUniqueWithoutListingInput[]
+    createMany?: ListingImageCreateManyListingInputEnvelope
+    set?: ListingImageWhereUniqueInput | ListingImageWhereUniqueInput[]
+    disconnect?: ListingImageWhereUniqueInput | ListingImageWhereUniqueInput[]
+    delete?: ListingImageWhereUniqueInput | ListingImageWhereUniqueInput[]
+    connect?: ListingImageWhereUniqueInput | ListingImageWhereUniqueInput[]
+    update?: ListingImageUpdateWithWhereUniqueWithoutListingInput | ListingImageUpdateWithWhereUniqueWithoutListingInput[]
+    updateMany?: ListingImageUpdateManyWithWhereWithoutListingInput | ListingImageUpdateManyWithWhereWithoutListingInput[]
+    deleteMany?: ListingImageScalarWhereInput | ListingImageScalarWhereInput[]
+  }
+
   export type MessageUpdateManyWithoutListingNestedInput = {
     create?: XOR<MessageCreateWithoutListingInput, MessageUncheckedCreateWithoutListingInput> | MessageCreateWithoutListingInput[] | MessageUncheckedCreateWithoutListingInput[]
     connectOrCreate?: MessageCreateOrConnectWithoutListingInput | MessageCreateOrConnectWithoutListingInput[]
@@ -23990,6 +29305,20 @@ export namespace Prisma {
     update?: PostingQueueItemUpdateWithWhereUniqueWithoutListingInput | PostingQueueItemUpdateWithWhereUniqueWithoutListingInput[]
     updateMany?: PostingQueueItemUpdateManyWithWhereWithoutListingInput | PostingQueueItemUpdateManyWithWhereWithoutListingInput[]
     deleteMany?: PostingQueueItemScalarWhereInput | PostingQueueItemScalarWhereInput[]
+  }
+
+  export type ListingImageUncheckedUpdateManyWithoutListingNestedInput = {
+    create?: XOR<ListingImageCreateWithoutListingInput, ListingImageUncheckedCreateWithoutListingInput> | ListingImageCreateWithoutListingInput[] | ListingImageUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: ListingImageCreateOrConnectWithoutListingInput | ListingImageCreateOrConnectWithoutListingInput[]
+    upsert?: ListingImageUpsertWithWhereUniqueWithoutListingInput | ListingImageUpsertWithWhereUniqueWithoutListingInput[]
+    createMany?: ListingImageCreateManyListingInputEnvelope
+    set?: ListingImageWhereUniqueInput | ListingImageWhereUniqueInput[]
+    disconnect?: ListingImageWhereUniqueInput | ListingImageWhereUniqueInput[]
+    delete?: ListingImageWhereUniqueInput | ListingImageWhereUniqueInput[]
+    connect?: ListingImageWhereUniqueInput | ListingImageWhereUniqueInput[]
+    update?: ListingImageUpdateWithWhereUniqueWithoutListingInput | ListingImageUpdateWithWhereUniqueWithoutListingInput[]
+    updateMany?: ListingImageUpdateManyWithWhereWithoutListingInput | ListingImageUpdateManyWithWhereWithoutListingInput[]
+    deleteMany?: ListingImageScalarWhereInput | ListingImageScalarWhereInput[]
   }
 
   export type MessageUncheckedUpdateManyWithoutListingNestedInput = {
@@ -24162,6 +29491,20 @@ export namespace Prisma {
     connect?: UserSettingsWhereUniqueInput
   }
 
+  export type PasswordResetTokenCreateNestedManyWithoutUserInput = {
+    create?: XOR<PasswordResetTokenCreateWithoutUserInput, PasswordResetTokenUncheckedCreateWithoutUserInput> | PasswordResetTokenCreateWithoutUserInput[] | PasswordResetTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PasswordResetTokenCreateOrConnectWithoutUserInput | PasswordResetTokenCreateOrConnectWithoutUserInput[]
+    createMany?: PasswordResetTokenCreateManyUserInputEnvelope
+    connect?: PasswordResetTokenWhereUniqueInput | PasswordResetTokenWhereUniqueInput[]
+  }
+
+  export type UsageRecordCreateNestedManyWithoutUserInput = {
+    create?: XOR<UsageRecordCreateWithoutUserInput, UsageRecordUncheckedCreateWithoutUserInput> | UsageRecordCreateWithoutUserInput[] | UsageRecordUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UsageRecordCreateOrConnectWithoutUserInput | UsageRecordCreateOrConnectWithoutUserInput[]
+    createMany?: UsageRecordCreateManyUserInputEnvelope
+    connect?: UsageRecordWhereUniqueInput | UsageRecordWhereUniqueInput[]
+  }
+
   export type AccountUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -24222,6 +29565,20 @@ export namespace Prisma {
     create?: XOR<UserSettingsCreateWithoutUserInput, UserSettingsUncheckedCreateWithoutUserInput>
     connectOrCreate?: UserSettingsCreateOrConnectWithoutUserInput
     connect?: UserSettingsWhereUniqueInput
+  }
+
+  export type PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<PasswordResetTokenCreateWithoutUserInput, PasswordResetTokenUncheckedCreateWithoutUserInput> | PasswordResetTokenCreateWithoutUserInput[] | PasswordResetTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PasswordResetTokenCreateOrConnectWithoutUserInput | PasswordResetTokenCreateOrConnectWithoutUserInput[]
+    createMany?: PasswordResetTokenCreateManyUserInputEnvelope
+    connect?: PasswordResetTokenWhereUniqueInput | PasswordResetTokenWhereUniqueInput[]
+  }
+
+  export type UsageRecordUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<UsageRecordCreateWithoutUserInput, UsageRecordUncheckedCreateWithoutUserInput> | UsageRecordCreateWithoutUserInput[] | UsageRecordUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UsageRecordCreateOrConnectWithoutUserInput | UsageRecordCreateOrConnectWithoutUserInput[]
+    createMany?: UsageRecordCreateManyUserInputEnvelope
+    connect?: UsageRecordWhereUniqueInput | UsageRecordWhereUniqueInput[]
   }
 
   export type AccountUpdateManyWithoutUserNestedInput = {
@@ -24346,6 +29703,34 @@ export namespace Prisma {
     update?: XOR<XOR<UserSettingsUpdateToOneWithWhereWithoutUserInput, UserSettingsUpdateWithoutUserInput>, UserSettingsUncheckedUpdateWithoutUserInput>
   }
 
+  export type PasswordResetTokenUpdateManyWithoutUserNestedInput = {
+    create?: XOR<PasswordResetTokenCreateWithoutUserInput, PasswordResetTokenUncheckedCreateWithoutUserInput> | PasswordResetTokenCreateWithoutUserInput[] | PasswordResetTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PasswordResetTokenCreateOrConnectWithoutUserInput | PasswordResetTokenCreateOrConnectWithoutUserInput[]
+    upsert?: PasswordResetTokenUpsertWithWhereUniqueWithoutUserInput | PasswordResetTokenUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: PasswordResetTokenCreateManyUserInputEnvelope
+    set?: PasswordResetTokenWhereUniqueInput | PasswordResetTokenWhereUniqueInput[]
+    disconnect?: PasswordResetTokenWhereUniqueInput | PasswordResetTokenWhereUniqueInput[]
+    delete?: PasswordResetTokenWhereUniqueInput | PasswordResetTokenWhereUniqueInput[]
+    connect?: PasswordResetTokenWhereUniqueInput | PasswordResetTokenWhereUniqueInput[]
+    update?: PasswordResetTokenUpdateWithWhereUniqueWithoutUserInput | PasswordResetTokenUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: PasswordResetTokenUpdateManyWithWhereWithoutUserInput | PasswordResetTokenUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: PasswordResetTokenScalarWhereInput | PasswordResetTokenScalarWhereInput[]
+  }
+
+  export type UsageRecordUpdateManyWithoutUserNestedInput = {
+    create?: XOR<UsageRecordCreateWithoutUserInput, UsageRecordUncheckedCreateWithoutUserInput> | UsageRecordCreateWithoutUserInput[] | UsageRecordUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UsageRecordCreateOrConnectWithoutUserInput | UsageRecordCreateOrConnectWithoutUserInput[]
+    upsert?: UsageRecordUpsertWithWhereUniqueWithoutUserInput | UsageRecordUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: UsageRecordCreateManyUserInputEnvelope
+    set?: UsageRecordWhereUniqueInput | UsageRecordWhereUniqueInput[]
+    disconnect?: UsageRecordWhereUniqueInput | UsageRecordWhereUniqueInput[]
+    delete?: UsageRecordWhereUniqueInput | UsageRecordWhereUniqueInput[]
+    connect?: UsageRecordWhereUniqueInput | UsageRecordWhereUniqueInput[]
+    update?: UsageRecordUpdateWithWhereUniqueWithoutUserInput | UsageRecordUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: UsageRecordUpdateManyWithWhereWithoutUserInput | UsageRecordUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: UsageRecordScalarWhereInput | UsageRecordScalarWhereInput[]
+  }
+
   export type AccountUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -24468,6 +29853,34 @@ export namespace Prisma {
     update?: XOR<XOR<UserSettingsUpdateToOneWithWhereWithoutUserInput, UserSettingsUpdateWithoutUserInput>, UserSettingsUncheckedUpdateWithoutUserInput>
   }
 
+  export type PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<PasswordResetTokenCreateWithoutUserInput, PasswordResetTokenUncheckedCreateWithoutUserInput> | PasswordResetTokenCreateWithoutUserInput[] | PasswordResetTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PasswordResetTokenCreateOrConnectWithoutUserInput | PasswordResetTokenCreateOrConnectWithoutUserInput[]
+    upsert?: PasswordResetTokenUpsertWithWhereUniqueWithoutUserInput | PasswordResetTokenUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: PasswordResetTokenCreateManyUserInputEnvelope
+    set?: PasswordResetTokenWhereUniqueInput | PasswordResetTokenWhereUniqueInput[]
+    disconnect?: PasswordResetTokenWhereUniqueInput | PasswordResetTokenWhereUniqueInput[]
+    delete?: PasswordResetTokenWhereUniqueInput | PasswordResetTokenWhereUniqueInput[]
+    connect?: PasswordResetTokenWhereUniqueInput | PasswordResetTokenWhereUniqueInput[]
+    update?: PasswordResetTokenUpdateWithWhereUniqueWithoutUserInput | PasswordResetTokenUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: PasswordResetTokenUpdateManyWithWhereWithoutUserInput | PasswordResetTokenUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: PasswordResetTokenScalarWhereInput | PasswordResetTokenScalarWhereInput[]
+  }
+
+  export type UsageRecordUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<UsageRecordCreateWithoutUserInput, UsageRecordUncheckedCreateWithoutUserInput> | UsageRecordCreateWithoutUserInput[] | UsageRecordUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UsageRecordCreateOrConnectWithoutUserInput | UsageRecordCreateOrConnectWithoutUserInput[]
+    upsert?: UsageRecordUpsertWithWhereUniqueWithoutUserInput | UsageRecordUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: UsageRecordCreateManyUserInputEnvelope
+    set?: UsageRecordWhereUniqueInput | UsageRecordWhereUniqueInput[]
+    disconnect?: UsageRecordWhereUniqueInput | UsageRecordWhereUniqueInput[]
+    delete?: UsageRecordWhereUniqueInput | UsageRecordWhereUniqueInput[]
+    connect?: UsageRecordWhereUniqueInput | UsageRecordWhereUniqueInput[]
+    update?: UsageRecordUpdateWithWhereUniqueWithoutUserInput | UsageRecordUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: UsageRecordUpdateManyWithWhereWithoutUserInput | UsageRecordUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: UsageRecordScalarWhereInput | UsageRecordScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutAccountsInput = {
     create?: XOR<UserCreateWithoutAccountsInput, UserUncheckedCreateWithoutAccountsInput>
     connectOrCreate?: UserCreateOrConnectWithoutAccountsInput
@@ -24566,6 +29979,48 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutPostingQueueInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutPostingQueueInput, UserUpdateWithoutPostingQueueInput>, UserUncheckedUpdateWithoutPostingQueueInput>
+  }
+
+  export type ListingCreateNestedOneWithoutImagesInput = {
+    create?: XOR<ListingCreateWithoutImagesInput, ListingUncheckedCreateWithoutImagesInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutImagesInput
+    connect?: ListingWhereUniqueInput
+  }
+
+  export type ListingUpdateOneRequiredWithoutImagesNestedInput = {
+    create?: XOR<ListingCreateWithoutImagesInput, ListingUncheckedCreateWithoutImagesInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutImagesInput
+    upsert?: ListingUpsertWithoutImagesInput
+    connect?: ListingWhereUniqueInput
+    update?: XOR<XOR<ListingUpdateToOneWithWhereWithoutImagesInput, ListingUpdateWithoutImagesInput>, ListingUncheckedUpdateWithoutImagesInput>
+  }
+
+  export type UserCreateNestedOneWithoutUsageRecordsInput = {
+    create?: XOR<UserCreateWithoutUsageRecordsInput, UserUncheckedCreateWithoutUsageRecordsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUsageRecordsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutUsageRecordsNestedInput = {
+    create?: XOR<UserCreateWithoutUsageRecordsInput, UserUncheckedCreateWithoutUsageRecordsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUsageRecordsInput
+    upsert?: UserUpsertWithoutUsageRecordsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutUsageRecordsInput, UserUpdateWithoutUsageRecordsInput>, UserUncheckedUpdateWithoutUsageRecordsInput>
+  }
+
+  export type UserCreateNestedOneWithoutPasswordResetTokensInput = {
+    create?: XOR<UserCreateWithoutPasswordResetTokensInput, UserUncheckedCreateWithoutPasswordResetTokensInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPasswordResetTokensInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutPasswordResetTokensNestedInput = {
+    create?: XOR<UserCreateWithoutPasswordResetTokensInput, UserUncheckedCreateWithoutPasswordResetTokensInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPasswordResetTokensInput
+    upsert?: UserUpsertWithoutPasswordResetTokensInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutPasswordResetTokensInput, UserUpdateWithoutPasswordResetTokensInput>, UserUncheckedUpdateWithoutPasswordResetTokensInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -24816,11 +30271,13 @@ export namespace Prisma {
 
   export type UserCreateWithoutListingsInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -24834,15 +30291,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     settings?: UserSettingsCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutListingsInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -24856,11 +30317,49 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutListingsInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutListingsInput, UserUncheckedCreateWithoutListingsInput>
+  }
+
+  export type ListingImageCreateWithoutListingInput = {
+    id?: string
+    imageIndex: number
+    originalUrl: string
+    storagePath: string
+    storageUrl: string
+    fileSize: number
+    contentType: string
+    width?: number | null
+    height?: number | null
+    uploadedAt?: Date | string
+  }
+
+  export type ListingImageUncheckedCreateWithoutListingInput = {
+    id?: string
+    imageIndex: number
+    originalUrl: string
+    storagePath: string
+    storageUrl: string
+    fileSize: number
+    contentType: string
+    width?: number | null
+    height?: number | null
+    uploadedAt?: Date | string
+  }
+
+  export type ListingImageCreateOrConnectWithoutListingInput = {
+    where: ListingImageWhereUniqueInput
+    create: XOR<ListingImageCreateWithoutListingInput, ListingImageUncheckedCreateWithoutListingInput>
+  }
+
+  export type ListingImageCreateManyListingInputEnvelope = {
+    data: ListingImageCreateManyListingInput | ListingImageCreateManyListingInput[]
+    skipDuplicates?: boolean
   }
 
   export type MessageCreateWithoutListingInput = {
@@ -25009,11 +30508,13 @@ export namespace Prisma {
 
   export type UserUpdateWithoutListingsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -25027,15 +30528,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     settings?: UserSettingsUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutListingsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -25049,6 +30554,41 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type ListingImageUpsertWithWhereUniqueWithoutListingInput = {
+    where: ListingImageWhereUniqueInput
+    update: XOR<ListingImageUpdateWithoutListingInput, ListingImageUncheckedUpdateWithoutListingInput>
+    create: XOR<ListingImageCreateWithoutListingInput, ListingImageUncheckedCreateWithoutListingInput>
+  }
+
+  export type ListingImageUpdateWithWhereUniqueWithoutListingInput = {
+    where: ListingImageWhereUniqueInput
+    data: XOR<ListingImageUpdateWithoutListingInput, ListingImageUncheckedUpdateWithoutListingInput>
+  }
+
+  export type ListingImageUpdateManyWithWhereWithoutListingInput = {
+    where: ListingImageScalarWhereInput
+    data: XOR<ListingImageUpdateManyMutationInput, ListingImageUncheckedUpdateManyWithoutListingInput>
+  }
+
+  export type ListingImageScalarWhereInput = {
+    AND?: ListingImageScalarWhereInput | ListingImageScalarWhereInput[]
+    OR?: ListingImageScalarWhereInput[]
+    NOT?: ListingImageScalarWhereInput | ListingImageScalarWhereInput[]
+    id?: StringFilter<"ListingImage"> | string
+    listingId?: StringFilter<"ListingImage"> | string
+    imageIndex?: IntFilter<"ListingImage"> | number
+    originalUrl?: StringFilter<"ListingImage"> | string
+    storagePath?: StringFilter<"ListingImage"> | string
+    storageUrl?: StringFilter<"ListingImage"> | string
+    fileSize?: IntFilter<"ListingImage"> | number
+    contentType?: StringFilter<"ListingImage"> | string
+    width?: IntNullableFilter<"ListingImage"> | number | null
+    height?: IntNullableFilter<"ListingImage"> | number | null
+    uploadedAt?: DateTimeFilter<"ListingImage"> | Date | string
   }
 
   export type MessageUpsertWithWhereUniqueWithoutListingInput = {
@@ -25217,19 +30757,35 @@ export namespace Prisma {
     marketDataSource?: string | null
     marketDataDate?: Date | string | null
     comparableSalesJson?: string | null
+    compMatchConfidence?: string | null
     sellabilityScore?: number | null
     demandLevel?: string | null
     expectedDaysToSell?: number | null
     authenticityRisk?: string | null
+    conditionRisk?: string | null
     recommendedOffer?: number | null
     recommendedList?: number | null
     resaleStrategy?: string | null
     trueDiscountPercent?: number | null
+    soldVolume30Days?: number | null
+    soldVolume60Days?: number | null
+    soldVolume90Days?: number | null
+    completenessLabel?: string | null
+    sellerRating?: number | null
+    sellerReviewCount?: number | null
+    sellerAccountAgeDays?: number | null
+    sizeCategory?: string | null
+    shippingEstimatesJson?: string | null
+    estimatedShippingCost?: number | null
+    pickupDistanceMiles?: number | null
+    outsidePickupRadius?: boolean | null
+    adjustedProfitMargin?: number | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
     analysisReasoning?: string | null
     user?: UserCreateNestedOneWithoutListingsInput
+    images?: ListingImageCreateNestedManyWithoutListingInput
     messages?: MessageCreateNestedManyWithoutListingInput
     postingQueue?: PostingQueueItemCreateNestedManyWithoutListingInput
   }
@@ -25278,18 +30834,34 @@ export namespace Prisma {
     marketDataSource?: string | null
     marketDataDate?: Date | string | null
     comparableSalesJson?: string | null
+    compMatchConfidence?: string | null
     sellabilityScore?: number | null
     demandLevel?: string | null
     expectedDaysToSell?: number | null
     authenticityRisk?: string | null
+    conditionRisk?: string | null
     recommendedOffer?: number | null
     recommendedList?: number | null
     resaleStrategy?: string | null
     trueDiscountPercent?: number | null
+    soldVolume30Days?: number | null
+    soldVolume60Days?: number | null
+    soldVolume90Days?: number | null
+    completenessLabel?: string | null
+    sellerRating?: number | null
+    sellerReviewCount?: number | null
+    sellerAccountAgeDays?: number | null
+    sizeCategory?: string | null
+    shippingEstimatesJson?: string | null
+    estimatedShippingCost?: number | null
+    pickupDistanceMiles?: number | null
+    outsidePickupRadius?: boolean | null
+    adjustedProfitMargin?: number | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
     analysisReasoning?: string | null
+    images?: ListingImageUncheckedCreateNestedManyWithoutListingInput
     messages?: MessageUncheckedCreateNestedManyWithoutListingInput
     postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutListingInput
   }
@@ -25301,11 +30873,13 @@ export namespace Prisma {
 
   export type UserCreateWithoutOpportunitiesInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -25319,15 +30893,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     settings?: UserSettingsCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOpportunitiesInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -25341,6 +30919,8 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOpportunitiesInput = {
@@ -25402,19 +30982,35 @@ export namespace Prisma {
     marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
     marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
     demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
     expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
     authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
     recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
     recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
     resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
     trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
+    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
+    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
+    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
+    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneWithoutListingsNestedInput
+    images?: ListingImageUpdateManyWithoutListingNestedInput
     messages?: MessageUpdateManyWithoutListingNestedInput
     postingQueue?: PostingQueueItemUpdateManyWithoutListingNestedInput
   }
@@ -25463,18 +31059,34 @@ export namespace Prisma {
     marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
     marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
     demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
     expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
     authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
     recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
     recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
     resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
     trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
+    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
+    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
+    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
+    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: ListingImageUncheckedUpdateManyWithoutListingNestedInput
     messages?: MessageUncheckedUpdateManyWithoutListingNestedInput
     postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutListingNestedInput
   }
@@ -25492,11 +31104,13 @@ export namespace Prisma {
 
   export type UserUpdateWithoutOpportunitiesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -25510,15 +31124,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     settings?: UserSettingsUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOpportunitiesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -25532,15 +31150,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutScraperJobsInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -25554,15 +31176,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     settings?: UserSettingsCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutScraperJobsInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -25576,6 +31202,8 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutScraperJobsInput = {
@@ -25596,11 +31224,13 @@ export namespace Prisma {
 
   export type UserUpdateWithoutScraperJobsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -25614,15 +31244,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     settings?: UserSettingsUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutScraperJobsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -25636,15 +31270,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSearchConfigsInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -25658,15 +31296,19 @@ export namespace Prisma {
     scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     settings?: UserSettingsCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSearchConfigsInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -25680,6 +31322,8 @@ export namespace Prisma {
     scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSearchConfigsInput = {
@@ -25700,11 +31344,13 @@ export namespace Prisma {
 
   export type UserUpdateWithoutSearchConfigsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -25718,15 +31364,19 @@ export namespace Prisma {
     scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     settings?: UserSettingsUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSearchConfigsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -25740,6 +31390,8 @@ export namespace Prisma {
     scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type AccountCreateWithoutUserInput = {
@@ -25823,18 +31475,34 @@ export namespace Prisma {
     marketDataSource?: string | null
     marketDataDate?: Date | string | null
     comparableSalesJson?: string | null
+    compMatchConfidence?: string | null
     sellabilityScore?: number | null
     demandLevel?: string | null
     expectedDaysToSell?: number | null
     authenticityRisk?: string | null
+    conditionRisk?: string | null
     recommendedOffer?: number | null
     recommendedList?: number | null
     resaleStrategy?: string | null
     trueDiscountPercent?: number | null
+    soldVolume30Days?: number | null
+    soldVolume60Days?: number | null
+    soldVolume90Days?: number | null
+    completenessLabel?: string | null
+    sellerRating?: number | null
+    sellerReviewCount?: number | null
+    sellerAccountAgeDays?: number | null
+    sizeCategory?: string | null
+    shippingEstimatesJson?: string | null
+    estimatedShippingCost?: number | null
+    pickupDistanceMiles?: number | null
+    outsidePickupRadius?: boolean | null
+    adjustedProfitMargin?: number | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
     analysisReasoning?: string | null
+    images?: ListingImageCreateNestedManyWithoutListingInput
     messages?: MessageCreateNestedManyWithoutListingInput
     opportunity?: OpportunityCreateNestedOneWithoutListingInput
     postingQueue?: PostingQueueItemCreateNestedManyWithoutListingInput
@@ -25883,18 +31551,34 @@ export namespace Prisma {
     marketDataSource?: string | null
     marketDataDate?: Date | string | null
     comparableSalesJson?: string | null
+    compMatchConfidence?: string | null
     sellabilityScore?: number | null
     demandLevel?: string | null
     expectedDaysToSell?: number | null
     authenticityRisk?: string | null
+    conditionRisk?: string | null
     recommendedOffer?: number | null
     recommendedList?: number | null
     resaleStrategy?: string | null
     trueDiscountPercent?: number | null
+    soldVolume30Days?: number | null
+    soldVolume60Days?: number | null
+    soldVolume90Days?: number | null
+    completenessLabel?: string | null
+    sellerRating?: number | null
+    sellerReviewCount?: number | null
+    sellerAccountAgeDays?: number | null
+    sizeCategory?: string | null
+    shippingEstimatesJson?: string | null
+    estimatedShippingCost?: number | null
+    pickupDistanceMiles?: number | null
+    outsidePickupRadius?: boolean | null
+    adjustedProfitMargin?: number | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
     analysisReasoning?: string | null
+    images?: ListingImageUncheckedCreateNestedManyWithoutListingInput
     messages?: MessageUncheckedCreateNestedManyWithoutListingInput
     opportunity?: OpportunityUncheckedCreateNestedOneWithoutListingInput
     postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutListingInput
@@ -26161,6 +31845,15 @@ export namespace Prisma {
     notifyExpiring?: boolean
     notifyWeeklyDigest?: boolean
     notifyFrequency?: string
+    opportunityThreshold?: number
+    feeRateEbay?: number
+    feeRateMercari?: number
+    feeRateFacebook?: number
+    feeRateOfferup?: number
+    feeRateCraigslist?: number
+    maxPickupRadiusMiles?: number
+    homeLocation?: string | null
+    holdingCostDailyRate?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -26178,6 +31871,15 @@ export namespace Prisma {
     notifyExpiring?: boolean
     notifyWeeklyDigest?: boolean
     notifyFrequency?: string
+    opportunityThreshold?: number
+    feeRateEbay?: number
+    feeRateMercari?: number
+    feeRateFacebook?: number
+    feeRateOfferup?: number
+    feeRateCraigslist?: number
+    maxPickupRadiusMiles?: number
+    homeLocation?: string | null
+    holdingCostDailyRate?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -26185,6 +31887,58 @@ export namespace Prisma {
   export type UserSettingsCreateOrConnectWithoutUserInput = {
     where: UserSettingsWhereUniqueInput
     create: XOR<UserSettingsCreateWithoutUserInput, UserSettingsUncheckedCreateWithoutUserInput>
+  }
+
+  export type PasswordResetTokenCreateWithoutUserInput = {
+    id?: string
+    tokenHash: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type PasswordResetTokenUncheckedCreateWithoutUserInput = {
+    id?: string
+    tokenHash: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type PasswordResetTokenCreateOrConnectWithoutUserInput = {
+    where: PasswordResetTokenWhereUniqueInput
+    create: XOR<PasswordResetTokenCreateWithoutUserInput, PasswordResetTokenUncheckedCreateWithoutUserInput>
+  }
+
+  export type PasswordResetTokenCreateManyUserInputEnvelope = {
+    data: PasswordResetTokenCreateManyUserInput | PasswordResetTokenCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type UsageRecordCreateWithoutUserInput = {
+    id?: string
+    type: string
+    count?: number
+    periodStart: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UsageRecordUncheckedCreateWithoutUserInput = {
+    id?: string
+    type: string
+    count?: number
+    periodStart: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UsageRecordCreateOrConnectWithoutUserInput = {
+    where: UsageRecordWhereUniqueInput
+    create: XOR<UsageRecordCreateWithoutUserInput, UsageRecordUncheckedCreateWithoutUserInput>
+  }
+
+  export type UsageRecordCreateManyUserInputEnvelope = {
+    data: UsageRecordCreateManyUserInput | UsageRecordCreateManyUserInput[]
+    skipDuplicates?: boolean
   }
 
   export type AccountUpsertWithWhereUniqueWithoutUserInput = {
@@ -26284,14 +32038,29 @@ export namespace Prisma {
     marketDataSource?: StringNullableFilter<"Listing"> | string | null
     marketDataDate?: DateTimeNullableFilter<"Listing"> | Date | string | null
     comparableSalesJson?: StringNullableFilter<"Listing"> | string | null
+    compMatchConfidence?: StringNullableFilter<"Listing"> | string | null
     sellabilityScore?: IntNullableFilter<"Listing"> | number | null
     demandLevel?: StringNullableFilter<"Listing"> | string | null
     expectedDaysToSell?: IntNullableFilter<"Listing"> | number | null
     authenticityRisk?: StringNullableFilter<"Listing"> | string | null
+    conditionRisk?: StringNullableFilter<"Listing"> | string | null
     recommendedOffer?: FloatNullableFilter<"Listing"> | number | null
     recommendedList?: FloatNullableFilter<"Listing"> | number | null
     resaleStrategy?: StringNullableFilter<"Listing"> | string | null
     trueDiscountPercent?: FloatNullableFilter<"Listing"> | number | null
+    soldVolume30Days?: IntNullableFilter<"Listing"> | number | null
+    soldVolume60Days?: IntNullableFilter<"Listing"> | number | null
+    soldVolume90Days?: IntNullableFilter<"Listing"> | number | null
+    completenessLabel?: StringNullableFilter<"Listing"> | string | null
+    sellerRating?: FloatNullableFilter<"Listing"> | number | null
+    sellerReviewCount?: IntNullableFilter<"Listing"> | number | null
+    sellerAccountAgeDays?: IntNullableFilter<"Listing"> | number | null
+    sizeCategory?: StringNullableFilter<"Listing"> | string | null
+    shippingEstimatesJson?: StringNullableFilter<"Listing"> | string | null
+    estimatedShippingCost?: FloatNullableFilter<"Listing"> | number | null
+    pickupDistanceMiles?: FloatNullableFilter<"Listing"> | number | null
+    outsidePickupRadius?: BoolNullableFilter<"Listing"> | boolean | null
+    adjustedProfitMargin?: FloatNullableFilter<"Listing"> | number | null
     llmAnalyzed?: BoolFilter<"Listing"> | boolean
     analysisDate?: DateTimeNullableFilter<"Listing"> | Date | string | null
     analysisConfidence?: StringNullableFilter<"Listing"> | string | null
@@ -26487,6 +32256,15 @@ export namespace Prisma {
     notifyExpiring?: BoolFieldUpdateOperationsInput | boolean
     notifyWeeklyDigest?: BoolFieldUpdateOperationsInput | boolean
     notifyFrequency?: StringFieldUpdateOperationsInput | string
+    opportunityThreshold?: IntFieldUpdateOperationsInput | number
+    feeRateEbay?: FloatFieldUpdateOperationsInput | number
+    feeRateMercari?: FloatFieldUpdateOperationsInput | number
+    feeRateFacebook?: FloatFieldUpdateOperationsInput | number
+    feeRateOfferup?: FloatFieldUpdateOperationsInput | number
+    feeRateCraigslist?: FloatFieldUpdateOperationsInput | number
+    maxPickupRadiusMiles?: IntFieldUpdateOperationsInput | number
+    homeLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCostDailyRate?: FloatFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -26504,17 +32282,84 @@ export namespace Prisma {
     notifyExpiring?: BoolFieldUpdateOperationsInput | boolean
     notifyWeeklyDigest?: BoolFieldUpdateOperationsInput | boolean
     notifyFrequency?: StringFieldUpdateOperationsInput | string
+    opportunityThreshold?: IntFieldUpdateOperationsInput | number
+    feeRateEbay?: FloatFieldUpdateOperationsInput | number
+    feeRateMercari?: FloatFieldUpdateOperationsInput | number
+    feeRateFacebook?: FloatFieldUpdateOperationsInput | number
+    feeRateOfferup?: FloatFieldUpdateOperationsInput | number
+    feeRateCraigslist?: FloatFieldUpdateOperationsInput | number
+    maxPickupRadiusMiles?: IntFieldUpdateOperationsInput | number
+    homeLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    holdingCostDailyRate?: FloatFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type PasswordResetTokenUpsertWithWhereUniqueWithoutUserInput = {
+    where: PasswordResetTokenWhereUniqueInput
+    update: XOR<PasswordResetTokenUpdateWithoutUserInput, PasswordResetTokenUncheckedUpdateWithoutUserInput>
+    create: XOR<PasswordResetTokenCreateWithoutUserInput, PasswordResetTokenUncheckedCreateWithoutUserInput>
+  }
+
+  export type PasswordResetTokenUpdateWithWhereUniqueWithoutUserInput = {
+    where: PasswordResetTokenWhereUniqueInput
+    data: XOR<PasswordResetTokenUpdateWithoutUserInput, PasswordResetTokenUncheckedUpdateWithoutUserInput>
+  }
+
+  export type PasswordResetTokenUpdateManyWithWhereWithoutUserInput = {
+    where: PasswordResetTokenScalarWhereInput
+    data: XOR<PasswordResetTokenUpdateManyMutationInput, PasswordResetTokenUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type PasswordResetTokenScalarWhereInput = {
+    AND?: PasswordResetTokenScalarWhereInput | PasswordResetTokenScalarWhereInput[]
+    OR?: PasswordResetTokenScalarWhereInput[]
+    NOT?: PasswordResetTokenScalarWhereInput | PasswordResetTokenScalarWhereInput[]
+    id?: StringFilter<"PasswordResetToken"> | string
+    userId?: StringFilter<"PasswordResetToken"> | string
+    tokenHash?: StringFilter<"PasswordResetToken"> | string
+    expiresAt?: DateTimeFilter<"PasswordResetToken"> | Date | string
+    createdAt?: DateTimeFilter<"PasswordResetToken"> | Date | string
+  }
+
+  export type UsageRecordUpsertWithWhereUniqueWithoutUserInput = {
+    where: UsageRecordWhereUniqueInput
+    update: XOR<UsageRecordUpdateWithoutUserInput, UsageRecordUncheckedUpdateWithoutUserInput>
+    create: XOR<UsageRecordCreateWithoutUserInput, UsageRecordUncheckedCreateWithoutUserInput>
+  }
+
+  export type UsageRecordUpdateWithWhereUniqueWithoutUserInput = {
+    where: UsageRecordWhereUniqueInput
+    data: XOR<UsageRecordUpdateWithoutUserInput, UsageRecordUncheckedUpdateWithoutUserInput>
+  }
+
+  export type UsageRecordUpdateManyWithWhereWithoutUserInput = {
+    where: UsageRecordScalarWhereInput
+    data: XOR<UsageRecordUpdateManyMutationInput, UsageRecordUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type UsageRecordScalarWhereInput = {
+    AND?: UsageRecordScalarWhereInput | UsageRecordScalarWhereInput[]
+    OR?: UsageRecordScalarWhereInput[]
+    NOT?: UsageRecordScalarWhereInput | UsageRecordScalarWhereInput[]
+    id?: StringFilter<"UsageRecord"> | string
+    userId?: StringFilter<"UsageRecord"> | string
+    type?: StringFilter<"UsageRecord"> | string
+    count?: IntFilter<"UsageRecord"> | number
+    periodStart?: DateTimeFilter<"UsageRecord"> | Date | string
+    createdAt?: DateTimeFilter<"UsageRecord"> | Date | string
+    updatedAt?: DateTimeFilter<"UsageRecord"> | Date | string
+  }
+
   export type UserCreateWithoutAccountsInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -26528,15 +32373,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     settings?: UserSettingsCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -26550,6 +32399,8 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -26570,11 +32421,13 @@ export namespace Prisma {
 
   export type UserUpdateWithoutAccountsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -26588,15 +32441,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     settings?: UserSettingsUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -26610,15 +32467,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSessionsInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -26632,15 +32493,19 @@ export namespace Prisma {
     scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
     searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
     settings?: UserSettingsCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -26654,6 +32519,8 @@ export namespace Prisma {
     scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
     searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
     settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -26674,11 +32541,13 @@ export namespace Prisma {
 
   export type UserUpdateWithoutSessionsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -26692,15 +32561,19 @@ export namespace Prisma {
     scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
     searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
     settings?: UserSettingsUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -26714,15 +32587,19 @@ export namespace Prisma {
     scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
     searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
     settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSettingsInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -26736,15 +32613,19 @@ export namespace Prisma {
     scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
     searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSettingsInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -26758,6 +32639,8 @@ export namespace Prisma {
     scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
     searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSettingsInput = {
@@ -26778,11 +32661,13 @@ export namespace Prisma {
 
   export type UserUpdateWithoutSettingsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -26796,15 +32681,19 @@ export namespace Prisma {
     scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
     searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSettingsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -26818,6 +32707,8 @@ export namespace Prisma {
     scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
     searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ListingCreateWithoutMessagesInput = {
@@ -26863,19 +32754,35 @@ export namespace Prisma {
     marketDataSource?: string | null
     marketDataDate?: Date | string | null
     comparableSalesJson?: string | null
+    compMatchConfidence?: string | null
     sellabilityScore?: number | null
     demandLevel?: string | null
     expectedDaysToSell?: number | null
     authenticityRisk?: string | null
+    conditionRisk?: string | null
     recommendedOffer?: number | null
     recommendedList?: number | null
     resaleStrategy?: string | null
     trueDiscountPercent?: number | null
+    soldVolume30Days?: number | null
+    soldVolume60Days?: number | null
+    soldVolume90Days?: number | null
+    completenessLabel?: string | null
+    sellerRating?: number | null
+    sellerReviewCount?: number | null
+    sellerAccountAgeDays?: number | null
+    sizeCategory?: string | null
+    shippingEstimatesJson?: string | null
+    estimatedShippingCost?: number | null
+    pickupDistanceMiles?: number | null
+    outsidePickupRadius?: boolean | null
+    adjustedProfitMargin?: number | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
     analysisReasoning?: string | null
     user?: UserCreateNestedOneWithoutListingsInput
+    images?: ListingImageCreateNestedManyWithoutListingInput
     opportunity?: OpportunityCreateNestedOneWithoutListingInput
     postingQueue?: PostingQueueItemCreateNestedManyWithoutListingInput
   }
@@ -26924,18 +32831,34 @@ export namespace Prisma {
     marketDataSource?: string | null
     marketDataDate?: Date | string | null
     comparableSalesJson?: string | null
+    compMatchConfidence?: string | null
     sellabilityScore?: number | null
     demandLevel?: string | null
     expectedDaysToSell?: number | null
     authenticityRisk?: string | null
+    conditionRisk?: string | null
     recommendedOffer?: number | null
     recommendedList?: number | null
     resaleStrategy?: string | null
     trueDiscountPercent?: number | null
+    soldVolume30Days?: number | null
+    soldVolume60Days?: number | null
+    soldVolume90Days?: number | null
+    completenessLabel?: string | null
+    sellerRating?: number | null
+    sellerReviewCount?: number | null
+    sellerAccountAgeDays?: number | null
+    sizeCategory?: string | null
+    shippingEstimatesJson?: string | null
+    estimatedShippingCost?: number | null
+    pickupDistanceMiles?: number | null
+    outsidePickupRadius?: boolean | null
+    adjustedProfitMargin?: number | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
     analysisReasoning?: string | null
+    images?: ListingImageUncheckedCreateNestedManyWithoutListingInput
     opportunity?: OpportunityUncheckedCreateNestedOneWithoutListingInput
     postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutListingInput
   }
@@ -26947,11 +32870,13 @@ export namespace Prisma {
 
   export type UserCreateWithoutMessagesInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -26965,15 +32890,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     settings?: UserSettingsCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMessagesInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -26987,6 +32916,8 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMessagesInput = {
@@ -27048,19 +32979,35 @@ export namespace Prisma {
     marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
     marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
     demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
     expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
     authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
     recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
     recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
     resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
     trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
+    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
+    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
+    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
+    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneWithoutListingsNestedInput
+    images?: ListingImageUpdateManyWithoutListingNestedInput
     opportunity?: OpportunityUpdateOneWithoutListingNestedInput
     postingQueue?: PostingQueueItemUpdateManyWithoutListingNestedInput
   }
@@ -27109,18 +33056,34 @@ export namespace Prisma {
     marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
     marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
     demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
     expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
     authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
     recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
     recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
     resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
     trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
+    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
+    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
+    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
+    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: ListingImageUncheckedUpdateManyWithoutListingNestedInput
     opportunity?: OpportunityUncheckedUpdateOneWithoutListingNestedInput
     postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutListingNestedInput
   }
@@ -27138,11 +33101,13 @@ export namespace Prisma {
 
   export type UserUpdateWithoutMessagesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -27156,15 +33121,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     settings?: UserSettingsUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMessagesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -27178,6 +33147,8 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ListingCreateWithoutPostingQueueInput = {
@@ -27223,19 +33194,35 @@ export namespace Prisma {
     marketDataSource?: string | null
     marketDataDate?: Date | string | null
     comparableSalesJson?: string | null
+    compMatchConfidence?: string | null
     sellabilityScore?: number | null
     demandLevel?: string | null
     expectedDaysToSell?: number | null
     authenticityRisk?: string | null
+    conditionRisk?: string | null
     recommendedOffer?: number | null
     recommendedList?: number | null
     resaleStrategy?: string | null
     trueDiscountPercent?: number | null
+    soldVolume30Days?: number | null
+    soldVolume60Days?: number | null
+    soldVolume90Days?: number | null
+    completenessLabel?: string | null
+    sellerRating?: number | null
+    sellerReviewCount?: number | null
+    sellerAccountAgeDays?: number | null
+    sizeCategory?: string | null
+    shippingEstimatesJson?: string | null
+    estimatedShippingCost?: number | null
+    pickupDistanceMiles?: number | null
+    outsidePickupRadius?: boolean | null
+    adjustedProfitMargin?: number | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
     analysisReasoning?: string | null
     user?: UserCreateNestedOneWithoutListingsInput
+    images?: ListingImageCreateNestedManyWithoutListingInput
     messages?: MessageCreateNestedManyWithoutListingInput
     opportunity?: OpportunityCreateNestedOneWithoutListingInput
   }
@@ -27284,18 +33271,34 @@ export namespace Prisma {
     marketDataSource?: string | null
     marketDataDate?: Date | string | null
     comparableSalesJson?: string | null
+    compMatchConfidence?: string | null
     sellabilityScore?: number | null
     demandLevel?: string | null
     expectedDaysToSell?: number | null
     authenticityRisk?: string | null
+    conditionRisk?: string | null
     recommendedOffer?: number | null
     recommendedList?: number | null
     resaleStrategy?: string | null
     trueDiscountPercent?: number | null
+    soldVolume30Days?: number | null
+    soldVolume60Days?: number | null
+    soldVolume90Days?: number | null
+    completenessLabel?: string | null
+    sellerRating?: number | null
+    sellerReviewCount?: number | null
+    sellerAccountAgeDays?: number | null
+    sizeCategory?: string | null
+    shippingEstimatesJson?: string | null
+    estimatedShippingCost?: number | null
+    pickupDistanceMiles?: number | null
+    outsidePickupRadius?: boolean | null
+    adjustedProfitMargin?: number | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
     analysisReasoning?: string | null
+    images?: ListingImageUncheckedCreateNestedManyWithoutListingInput
     messages?: MessageUncheckedCreateNestedManyWithoutListingInput
     opportunity?: OpportunityUncheckedCreateNestedOneWithoutListingInput
   }
@@ -27307,11 +33310,13 @@ export namespace Prisma {
 
   export type UserCreateWithoutPostingQueueInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -27325,15 +33330,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     settings?: UserSettingsCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutPostingQueueInput = {
     id?: string
+    firebaseUid?: string | null
     email: string
     emailVerified?: Date | string | null
     name?: string | null
     image?: string | null
     password?: string | null
+    stripeCustomerId?: string | null
     subscriptionTier?: string
     onboardingComplete?: boolean
     onboardingStep?: number
@@ -27347,6 +33356,8 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutPostingQueueInput = {
@@ -27408,19 +33419,35 @@ export namespace Prisma {
     marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
     marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
     demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
     expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
     authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
     recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
     recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
     resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
     trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
+    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
+    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
+    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
+    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneWithoutListingsNestedInput
+    images?: ListingImageUpdateManyWithoutListingNestedInput
     messages?: MessageUpdateManyWithoutListingNestedInput
     opportunity?: OpportunityUpdateOneWithoutListingNestedInput
   }
@@ -27469,18 +33496,34 @@ export namespace Prisma {
     marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
     marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
     demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
     expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
     authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
     recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
     recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
     resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
     trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
+    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
+    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
+    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
+    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: ListingImageUncheckedUpdateManyWithoutListingNestedInput
     messages?: MessageUncheckedUpdateManyWithoutListingNestedInput
     opportunity?: OpportunityUncheckedUpdateOneWithoutListingNestedInput
   }
@@ -27498,11 +33541,13 @@ export namespace Prisma {
 
   export type UserUpdateWithoutPostingQueueInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -27516,15 +33561,19 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     settings?: UserSettingsUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPostingQueueInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionTier?: StringFieldUpdateOperationsInput | string
     onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
     onboardingStep?: IntFieldUpdateOperationsInput | number
@@ -27538,6 +33587,581 @@ export namespace Prisma {
     searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type ListingCreateWithoutImagesInput = {
+    id?: string
+    externalId: string
+    platform: string
+    url: string
+    title: string
+    description?: string | null
+    askingPrice: number
+    condition?: string | null
+    location?: string | null
+    sellerName?: string | null
+    sellerContact?: string | null
+    imageUrls?: string | null
+    category?: string | null
+    postedAt?: Date | string | null
+    scrapedAt?: Date | string
+    estimatedValue?: number | null
+    estimatedLow?: number | null
+    estimatedHigh?: number | null
+    profitPotential?: number | null
+    profitLow?: number | null
+    profitHigh?: number | null
+    valueScore?: number | null
+    discountPercent?: number | null
+    resaleDifficulty?: string | null
+    status?: string
+    comparableUrls?: string | null
+    priceReasoning?: string | null
+    notes?: string | null
+    shippable?: boolean | null
+    estimatedWeight?: number | null
+    negotiable?: boolean | null
+    daysListed?: number | null
+    tags?: string | null
+    requestToBuy?: string | null
+    identifiedBrand?: string | null
+    identifiedModel?: string | null
+    identifiedVariant?: string | null
+    identifiedCondition?: string | null
+    verifiedMarketValue?: number | null
+    marketDataSource?: string | null
+    marketDataDate?: Date | string | null
+    comparableSalesJson?: string | null
+    compMatchConfidence?: string | null
+    sellabilityScore?: number | null
+    demandLevel?: string | null
+    expectedDaysToSell?: number | null
+    authenticityRisk?: string | null
+    conditionRisk?: string | null
+    recommendedOffer?: number | null
+    recommendedList?: number | null
+    resaleStrategy?: string | null
+    trueDiscountPercent?: number | null
+    soldVolume30Days?: number | null
+    soldVolume60Days?: number | null
+    soldVolume90Days?: number | null
+    completenessLabel?: string | null
+    sellerRating?: number | null
+    sellerReviewCount?: number | null
+    sellerAccountAgeDays?: number | null
+    sizeCategory?: string | null
+    shippingEstimatesJson?: string | null
+    estimatedShippingCost?: number | null
+    pickupDistanceMiles?: number | null
+    outsidePickupRadius?: boolean | null
+    adjustedProfitMargin?: number | null
+    llmAnalyzed?: boolean
+    analysisDate?: Date | string | null
+    analysisConfidence?: string | null
+    analysisReasoning?: string | null
+    user?: UserCreateNestedOneWithoutListingsInput
+    messages?: MessageCreateNestedManyWithoutListingInput
+    opportunity?: OpportunityCreateNestedOneWithoutListingInput
+    postingQueue?: PostingQueueItemCreateNestedManyWithoutListingInput
+  }
+
+  export type ListingUncheckedCreateWithoutImagesInput = {
+    id?: string
+    userId?: string | null
+    externalId: string
+    platform: string
+    url: string
+    title: string
+    description?: string | null
+    askingPrice: number
+    condition?: string | null
+    location?: string | null
+    sellerName?: string | null
+    sellerContact?: string | null
+    imageUrls?: string | null
+    category?: string | null
+    postedAt?: Date | string | null
+    scrapedAt?: Date | string
+    estimatedValue?: number | null
+    estimatedLow?: number | null
+    estimatedHigh?: number | null
+    profitPotential?: number | null
+    profitLow?: number | null
+    profitHigh?: number | null
+    valueScore?: number | null
+    discountPercent?: number | null
+    resaleDifficulty?: string | null
+    status?: string
+    comparableUrls?: string | null
+    priceReasoning?: string | null
+    notes?: string | null
+    shippable?: boolean | null
+    estimatedWeight?: number | null
+    negotiable?: boolean | null
+    daysListed?: number | null
+    tags?: string | null
+    requestToBuy?: string | null
+    identifiedBrand?: string | null
+    identifiedModel?: string | null
+    identifiedVariant?: string | null
+    identifiedCondition?: string | null
+    verifiedMarketValue?: number | null
+    marketDataSource?: string | null
+    marketDataDate?: Date | string | null
+    comparableSalesJson?: string | null
+    compMatchConfidence?: string | null
+    sellabilityScore?: number | null
+    demandLevel?: string | null
+    expectedDaysToSell?: number | null
+    authenticityRisk?: string | null
+    conditionRisk?: string | null
+    recommendedOffer?: number | null
+    recommendedList?: number | null
+    resaleStrategy?: string | null
+    trueDiscountPercent?: number | null
+    soldVolume30Days?: number | null
+    soldVolume60Days?: number | null
+    soldVolume90Days?: number | null
+    completenessLabel?: string | null
+    sellerRating?: number | null
+    sellerReviewCount?: number | null
+    sellerAccountAgeDays?: number | null
+    sizeCategory?: string | null
+    shippingEstimatesJson?: string | null
+    estimatedShippingCost?: number | null
+    pickupDistanceMiles?: number | null
+    outsidePickupRadius?: boolean | null
+    adjustedProfitMargin?: number | null
+    llmAnalyzed?: boolean
+    analysisDate?: Date | string | null
+    analysisConfidence?: string | null
+    analysisReasoning?: string | null
+    messages?: MessageUncheckedCreateNestedManyWithoutListingInput
+    opportunity?: OpportunityUncheckedCreateNestedOneWithoutListingInput
+    postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutListingInput
+  }
+
+  export type ListingCreateOrConnectWithoutImagesInput = {
+    where: ListingWhereUniqueInput
+    create: XOR<ListingCreateWithoutImagesInput, ListingUncheckedCreateWithoutImagesInput>
+  }
+
+  export type ListingUpsertWithoutImagesInput = {
+    update: XOR<ListingUpdateWithoutImagesInput, ListingUncheckedUpdateWithoutImagesInput>
+    create: XOR<ListingCreateWithoutImagesInput, ListingUncheckedCreateWithoutImagesInput>
+    where?: ListingWhereInput
+  }
+
+  export type ListingUpdateToOneWithWhereWithoutImagesInput = {
+    where?: ListingWhereInput
+    data: XOR<ListingUpdateWithoutImagesInput, ListingUncheckedUpdateWithoutImagesInput>
+  }
+
+  export type ListingUpdateWithoutImagesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    externalId?: StringFieldUpdateOperationsInput | string
+    platform?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    askingPrice?: FloatFieldUpdateOperationsInput | number
+    condition?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerName?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerContact?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrls?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
+    estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
+    estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
+    profitPotential?: NullableFloatFieldUpdateOperationsInput | number | null
+    profitLow?: NullableFloatFieldUpdateOperationsInput | number | null
+    profitHigh?: NullableFloatFieldUpdateOperationsInput | number | null
+    valueScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    discountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    resaleDifficulty?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    comparableUrls?: NullableStringFieldUpdateOperationsInput | string | null
+    priceReasoning?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    shippable?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    estimatedWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    negotiable?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    daysListed?: NullableIntFieldUpdateOperationsInput | number | null
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    requestToBuy?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedBrand?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedModel?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedVariant?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedCondition?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedMarketValue?: NullableFloatFieldUpdateOperationsInput | number | null
+    marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
+    marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
+    demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
+    authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
+    recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
+    resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
+    trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
+    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
+    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
+    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
+    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
+    analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneWithoutListingsNestedInput
+    messages?: MessageUpdateManyWithoutListingNestedInput
+    opportunity?: OpportunityUpdateOneWithoutListingNestedInput
+    postingQueue?: PostingQueueItemUpdateManyWithoutListingNestedInput
+  }
+
+  export type ListingUncheckedUpdateWithoutImagesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalId?: StringFieldUpdateOperationsInput | string
+    platform?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    askingPrice?: FloatFieldUpdateOperationsInput | number
+    condition?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerName?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerContact?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrls?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
+    estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
+    estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
+    profitPotential?: NullableFloatFieldUpdateOperationsInput | number | null
+    profitLow?: NullableFloatFieldUpdateOperationsInput | number | null
+    profitHigh?: NullableFloatFieldUpdateOperationsInput | number | null
+    valueScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    discountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    resaleDifficulty?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    comparableUrls?: NullableStringFieldUpdateOperationsInput | string | null
+    priceReasoning?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    shippable?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    estimatedWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    negotiable?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    daysListed?: NullableIntFieldUpdateOperationsInput | number | null
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    requestToBuy?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedBrand?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedModel?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedVariant?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedCondition?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedMarketValue?: NullableFloatFieldUpdateOperationsInput | number | null
+    marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
+    marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
+    demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
+    authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
+    recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
+    resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
+    trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
+    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
+    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
+    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
+    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
+    analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
+    messages?: MessageUncheckedUpdateManyWithoutListingNestedInput
+    opportunity?: OpportunityUncheckedUpdateOneWithoutListingNestedInput
+    postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutListingNestedInput
+  }
+
+  export type UserCreateWithoutUsageRecordsInput = {
+    id?: string
+    firebaseUid?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    name?: string | null
+    image?: string | null
+    password?: string | null
+    stripeCustomerId?: string | null
+    subscriptionTier?: string
+    onboardingComplete?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    listings?: ListingCreateNestedManyWithoutUserInput
+    messages?: MessageCreateNestedManyWithoutUserInput
+    opportunities?: OpportunityCreateNestedManyWithoutUserInput
+    postingQueue?: PostingQueueItemCreateNestedManyWithoutUserInput
+    scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
+    searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    settings?: UserSettingsCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutUsageRecordsInput = {
+    id?: string
+    firebaseUid?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    name?: string | null
+    image?: string | null
+    password?: string | null
+    stripeCustomerId?: string | null
+    subscriptionTier?: string
+    onboardingComplete?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    listings?: ListingUncheckedCreateNestedManyWithoutUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    opportunities?: OpportunityUncheckedCreateNestedManyWithoutUserInput
+    postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
+    scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
+    searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutUsageRecordsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutUsageRecordsInput, UserUncheckedCreateWithoutUsageRecordsInput>
+  }
+
+  export type UserUpsertWithoutUsageRecordsInput = {
+    update: XOR<UserUpdateWithoutUsageRecordsInput, UserUncheckedUpdateWithoutUsageRecordsInput>
+    create: XOR<UserCreateWithoutUsageRecordsInput, UserUncheckedCreateWithoutUsageRecordsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutUsageRecordsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutUsageRecordsInput, UserUncheckedUpdateWithoutUsageRecordsInput>
+  }
+
+  export type UserUpdateWithoutUsageRecordsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionTier?: StringFieldUpdateOperationsInput | string
+    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    listings?: ListingUpdateManyWithoutUserNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
+    opportunities?: OpportunityUpdateManyWithoutUserNestedInput
+    postingQueue?: PostingQueueItemUpdateManyWithoutUserNestedInput
+    scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
+    searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    settings?: UserSettingsUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutUsageRecordsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionTier?: StringFieldUpdateOperationsInput | string
+    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    opportunities?: OpportunityUncheckedUpdateManyWithoutUserNestedInput
+    postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
+    scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
+    searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutPasswordResetTokensInput = {
+    id?: string
+    firebaseUid?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    name?: string | null
+    image?: string | null
+    password?: string | null
+    stripeCustomerId?: string | null
+    subscriptionTier?: string
+    onboardingComplete?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    listings?: ListingCreateNestedManyWithoutUserInput
+    messages?: MessageCreateNestedManyWithoutUserInput
+    opportunities?: OpportunityCreateNestedManyWithoutUserInput
+    postingQueue?: PostingQueueItemCreateNestedManyWithoutUserInput
+    scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
+    searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    settings?: UserSettingsCreateNestedOneWithoutUserInput
+    usageRecords?: UsageRecordCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
+    id?: string
+    firebaseUid?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    name?: string | null
+    image?: string | null
+    password?: string | null
+    stripeCustomerId?: string | null
+    subscriptionTier?: string
+    onboardingComplete?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    listings?: ListingUncheckedCreateNestedManyWithoutUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    opportunities?: OpportunityUncheckedCreateNestedManyWithoutUserInput
+    postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
+    scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
+    searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
+    usageRecords?: UsageRecordUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutPasswordResetTokensInput, UserUncheckedCreateWithoutPasswordResetTokensInput>
+  }
+
+  export type UserUpsertWithoutPasswordResetTokensInput = {
+    update: XOR<UserUpdateWithoutPasswordResetTokensInput, UserUncheckedUpdateWithoutPasswordResetTokensInput>
+    create: XOR<UserCreateWithoutPasswordResetTokensInput, UserUncheckedCreateWithoutPasswordResetTokensInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutPasswordResetTokensInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutPasswordResetTokensInput, UserUncheckedUpdateWithoutPasswordResetTokensInput>
+  }
+
+  export type UserUpdateWithoutPasswordResetTokensInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionTier?: StringFieldUpdateOperationsInput | string
+    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    listings?: ListingUpdateManyWithoutUserNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
+    opportunities?: OpportunityUpdateManyWithoutUserNestedInput
+    postingQueue?: PostingQueueItemUpdateManyWithoutUserNestedInput
+    scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
+    searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    settings?: UserSettingsUpdateOneWithoutUserNestedInput
+    usageRecords?: UsageRecordUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionTier?: StringFieldUpdateOperationsInput | string
+    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    opportunities?: OpportunityUncheckedUpdateManyWithoutUserNestedInput
+    postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
+    scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
+    searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+    usageRecords?: UsageRecordUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type ListingImageCreateManyListingInput = {
+    id?: string
+    imageIndex: number
+    originalUrl: string
+    storagePath: string
+    storageUrl: string
+    fileSize: number
+    contentType: string
+    width?: number | null
+    height?: number | null
+    uploadedAt?: Date | string
   }
 
   export type MessageCreateManyListingInput = {
@@ -27574,6 +34198,45 @@ export namespace Prisma {
     postedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type ListingImageUpdateWithoutListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    imageIndex?: IntFieldUpdateOperationsInput | number
+    originalUrl?: StringFieldUpdateOperationsInput | string
+    storagePath?: StringFieldUpdateOperationsInput | string
+    storageUrl?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    contentType?: StringFieldUpdateOperationsInput | string
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
+    uploadedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ListingImageUncheckedUpdateWithoutListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    imageIndex?: IntFieldUpdateOperationsInput | number
+    originalUrl?: StringFieldUpdateOperationsInput | string
+    storagePath?: StringFieldUpdateOperationsInput | string
+    storageUrl?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    contentType?: StringFieldUpdateOperationsInput | string
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
+    uploadedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ListingImageUncheckedUpdateManyWithoutListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    imageIndex?: IntFieldUpdateOperationsInput | number
+    originalUrl?: StringFieldUpdateOperationsInput | string
+    storagePath?: StringFieldUpdateOperationsInput | string
+    storageUrl?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    contentType?: StringFieldUpdateOperationsInput | string
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
+    uploadedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type MessageUpdateWithoutListingInput = {
@@ -27741,14 +34404,29 @@ export namespace Prisma {
     marketDataSource?: string | null
     marketDataDate?: Date | string | null
     comparableSalesJson?: string | null
+    compMatchConfidence?: string | null
     sellabilityScore?: number | null
     demandLevel?: string | null
     expectedDaysToSell?: number | null
     authenticityRisk?: string | null
+    conditionRisk?: string | null
     recommendedOffer?: number | null
     recommendedList?: number | null
     resaleStrategy?: string | null
     trueDiscountPercent?: number | null
+    soldVolume30Days?: number | null
+    soldVolume60Days?: number | null
+    soldVolume90Days?: number | null
+    completenessLabel?: string | null
+    sellerRating?: number | null
+    sellerReviewCount?: number | null
+    sellerAccountAgeDays?: number | null
+    sizeCategory?: string | null
+    shippingEstimatesJson?: string | null
+    estimatedShippingCost?: number | null
+    pickupDistanceMiles?: number | null
+    outsidePickupRadius?: boolean | null
+    adjustedProfitMargin?: number | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
@@ -27844,6 +34522,22 @@ export namespace Prisma {
     expires: Date | string
   }
 
+  export type PasswordResetTokenCreateManyUserInput = {
+    id?: string
+    tokenHash: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type UsageRecordCreateManyUserInput = {
+    id?: string
+    type: string
+    count?: number
+    periodStart: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type AccountUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: StringFieldUpdateOperationsInput | string
@@ -27929,18 +34623,34 @@ export namespace Prisma {
     marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
     marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
     demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
     expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
     authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
     recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
     recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
     resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
     trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
+    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
+    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
+    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
+    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: ListingImageUpdateManyWithoutListingNestedInput
     messages?: MessageUpdateManyWithoutListingNestedInput
     opportunity?: OpportunityUpdateOneWithoutListingNestedInput
     postingQueue?: PostingQueueItemUpdateManyWithoutListingNestedInput
@@ -27989,18 +34699,34 @@ export namespace Prisma {
     marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
     marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
     demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
     expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
     authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
     recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
     recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
     resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
     trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
+    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
+    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
+    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
+    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: ListingImageUncheckedUpdateManyWithoutListingNestedInput
     messages?: MessageUncheckedUpdateManyWithoutListingNestedInput
     opportunity?: OpportunityUncheckedUpdateOneWithoutListingNestedInput
     postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutListingNestedInput
@@ -28049,14 +34775,29 @@ export namespace Prisma {
     marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
     marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
     demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
     expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
     authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
     recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
     recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
     resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
     trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
+    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
+    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
+    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
+    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28328,6 +35069,54 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     sessionToken?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PasswordResetTokenUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PasswordResetTokenUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PasswordResetTokenUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UsageRecordUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    count?: IntFieldUpdateOperationsInput | number
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UsageRecordUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    count?: IntFieldUpdateOperationsInput | number
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UsageRecordUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    count?: IntFieldUpdateOperationsInput | number
+    periodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

@@ -171,7 +171,8 @@ export function estimateValue(
   description: string | null,
   askingPrice: number,
   condition: string | null,
-  category: string | null
+  category: string | null,
+  feeRate?: number
 ): EstimationResult {
   const fullText = `${title} ${description || ''}`.toLowerCase();
 
@@ -232,10 +233,12 @@ export function estimateValue(
   // Calculate discount percentage (how far below market value)
   const discountPercent = Math.round(((estimatedValue - askingPrice) / estimatedValue) * 100);
 
-  // Calculate profit potential (accounting for ~13% platform fees on eBay/Mercari)
-  const feeRate = 0.13;
-  const profitLow = Math.round(estimatedLow * (1 - feeRate) - askingPrice);
-  const profitHigh = Math.round(estimatedHigh * (1 - feeRate) - askingPrice);
+  // Calculate profit potential (accounting for platform fees; default 13%)
+  const effectiveFeeRate = (feeRate !== undefined && isFinite(feeRate) && feeRate >= 0 && feeRate <= 1)
+    ? feeRate
+    : 0.13;
+  const profitLow = Math.round(estimatedLow * (1 - effectiveFeeRate) - askingPrice);
+  const profitHigh = Math.round(estimatedHigh * (1 - effectiveFeeRate) - askingPrice);
   const profitPotential = Math.round((profitLow + profitHigh) / 2);
 
   // Calculate value score (0-100)
@@ -275,7 +278,7 @@ export function estimateValue(
   if (riskMatches.length > 0) {
     reasons.push(`Risk factors: ${riskMatches.join(', ')}`);
   }
-  reasons.push(`Platform fees estimated at 13%`);
+  reasons.push(`Platform fees estimated at ${Math.round(effectiveFeeRate * 100)}%`);
 
   // Generate notes (AI-style analysis)
   const notes: string[] = [];

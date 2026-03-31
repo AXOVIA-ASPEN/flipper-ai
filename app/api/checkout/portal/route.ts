@@ -1,15 +1,22 @@
 /**
- * POST /api/checkout/portal — Create a Stripe Customer Portal session.
- * Allows users to manage their subscription (upgrade/downgrade/cancel).
- * Author: ASPEN
- * Company: Axovia AI
+ * @file app/api/checkout/portal/route.ts
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-03-01
+ * @version 1.0
+ * @brief POST /api/checkout/portal — Create a Stripe Customer Portal session.
+ *
+ * @description
+ * Creates a Stripe Customer Portal session for subscription management.
+ * Allows authenticated subscribers to update payment methods, view invoices,
+ * or cancel their subscription. Requires an existing Stripe customer record.
  */
 
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { stripe } from '@/lib/stripe';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, NotFoundError, UnauthorizedError } from '@/lib/errors';
 export async function POST() {
   try {
     const sessionUser = await getCurrentUser();

@@ -3,7 +3,26 @@ import {
   checkMarketplaceLimit,
   checkSearchConfigLimit,
   checkFeatureAccess,
+  enforceTierLimits,
 } from '../../lib/tier-enforcement';
+import { ForbiddenError } from '../../lib/errors';
+
+// Mock prisma
+jest.mock('../../lib/db', () => ({
+  __esModule: true,
+  default: {
+    user: {
+      findUnique: jest.fn(),
+    },
+    scraperJob: {
+      count: jest.fn(),
+      groupBy: jest.fn(),
+    },
+  },
+}));
+
+import prisma from '../../lib/db';
+const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 
 describe('tier-enforcement', () => {
   describe('checkScanLimit', () => {
@@ -18,7 +37,7 @@ describe('tier-enforcement', () => {
       const result = checkScanLimit('FREE', 10);
       expect(result.allowed).toBe(false);
       expect(result.reason).toContain('Daily scan limit reached');
-      expect(result.reason).toContain('10 scans/day');
+      expect(result.reason).toContain('Upgrade to FLIPPER');
     });
 
     it('allows unlimited scans for FLIPPER tier', () => {
@@ -58,7 +77,7 @@ describe('tier-enforcement', () => {
     it('blocks adding marketplace at FREE limit', () => {
       const result = checkMarketplaceLimit('FREE', 1);
       expect(result.allowed).toBe(false);
-      expect(result.reason).toContain('Marketplace limit reached');
+      expect(result.reason).toContain('FREE plan supports 1 marketplace');
     });
 
     it('allows more marketplaces for FLIPPER', () => {
@@ -168,6 +187,111 @@ describe('tier-enforcement', () => {
       const result = checkFeatureAccess(null, 'messaging');
       expect(result.allowed).toBe(false);
       expect(result.tier).toBe('FREE');
+    });
+  });
+
+  describe('enforceTierLimits', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('allows scan for FREE user under daily limit with existing platform', async () => {
+      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({ subscriptionTier: 'FREE' });
+      (mockPrisma.scraperJob.count as jest.Mock).mockResolvedValue(5);
+      (mockPrisma.scraperJob.groupBy as jest.Mock).mockResolvedValue([
+        { platform: 'CRAIGSLIST' },
+      ]);
+
+      await expect(enforceTierLimits('user-1', 'CRAIGSLIST')).resolves.toBeUndefined();
+    });
+
+    it('throws ForbiddenError when FREE user exceeds daily scan limit', async () => {
+      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({ subscriptionTier: 'FREE' });
+      (mockPrisma.scraperJob.count as jest.Mock).mockResolvedValue(10);
+
+      await expect(enforceTierLimits('user-1', 'CRAIGSLIST')).rejects.toThrow(ForbiddenError);
+      await expect(enforceTierLimits('user-1', 'CRAIGSLIST')).rejects.toThrow(/Daily scan limit reached/);
+    });
+
+    it('throws ForbiddenError when FREE user tries a second marketplace', async () => {
+      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({ subscriptionTier: 'FREE' });
+      (mockPrisma.scraperJob.count as jest.Mock).mockResolvedValue(3);
+      (mockPrisma.scraperJob.groupBy as jest.Mock).mockResolvedValue([
+        { platform: 'CRAIGSLIST' },
+      ]);
+
+      await expect(enforceTierLimits('user-1', 'EBAY')).rejects.toThrow(ForbiddenError);
+      await expect(enforceTierLimits('user-1', 'EBAY')).rejects.toThrow(/FREE plan supports 1 marketplace/);
+    });
+
+    it('allows FLIPPER user with unlimited scans and up to 3 marketplaces', async () => {
+      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({ subscriptionTier: 'FLIPPER' });
+      (mockPrisma.scraperJob.count as jest.Mock).mockResolvedValue(100);
+      (mockPrisma.scraperJob.groupBy as jest.Mock).mockResolvedValue([
+        { platform: 'CRAIGSLIST' },
+        { platform: 'EBAY' },
+      ]);
+
+      await expect(enforceTierLimits('user-1', 'OFFERUP')).resolves.toBeUndefined();
+    });
+
+    it('throws ForbiddenError when FLIPPER user tries 4th marketplace', async () => {
+      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({ subscriptionTier: 'FLIPPER' });
+      (mockPrisma.scraperJob.count as jest.Mock).mockResolvedValue(10);
+      (mockPrisma.scraperJob.groupBy as jest.Mock).mockResolvedValue([
+        { platform: 'CRAIGSLIST' },
+        { platform: 'EBAY' },
+        { platform: 'OFFERUP' },
+      ]);
+
+      await expect(enforceTierLimits('user-1', 'MERCARI')).rejects.toThrow(ForbiddenError);
+      await expect(enforceTierLimits('user-1', 'MERCARI')).rejects.toThrow(/FLIPPER plan supports 3 marketplaces/);
+    });
+
+    it('allows PRO user with unlimited scans and marketplaces', async () => {
+      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({ subscriptionTier: 'PRO' });
+      (mockPrisma.scraperJob.count as jest.Mock).mockResolvedValue(99999);
+      (mockPrisma.scraperJob.groupBy as jest.Mock).mockResolvedValue([
+        { platform: 'CRAIGSLIST' },
+        { platform: 'EBAY' },
+        { platform: 'OFFERUP' },
+        { platform: 'MERCARI' },
+      ]);
+
+      await expect(enforceTierLimits('user-1', 'FACEBOOK_MARKETPLACE')).resolves.toBeUndefined();
+    });
+
+    it('defaults to FREE tier when user not found', async () => {
+      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+      (mockPrisma.scraperJob.count as jest.Mock).mockResolvedValue(10);
+
+      await expect(enforceTierLimits('user-1', 'CRAIGSLIST')).rejects.toThrow(ForbiddenError);
+    });
+
+    it('uses all-time distinct platforms (not just today)', async () => {
+      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({ subscriptionTier: 'FREE' });
+      (mockPrisma.scraperJob.count as jest.Mock).mockResolvedValue(0);
+      (mockPrisma.scraperJob.groupBy as jest.Mock).mockResolvedValue([
+        { platform: 'CRAIGSLIST' },
+      ]);
+
+      // Verify groupBy is called WITHOUT date filter (all-time)
+      await enforceTierLimits('user-1', 'CRAIGSLIST');
+      expect(mockPrisma.scraperJob.groupBy).toHaveBeenCalledWith({
+        by: ['platform'],
+        where: { userId: 'user-1' },
+      });
+    });
+
+    it('skips marketplace check when platform already exists', async () => {
+      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({ subscriptionTier: 'FREE' });
+      (mockPrisma.scraperJob.count as jest.Mock).mockResolvedValue(3);
+      (mockPrisma.scraperJob.groupBy as jest.Mock).mockResolvedValue([
+        { platform: 'CRAIGSLIST' },
+      ]);
+
+      // CRAIGSLIST already exists — should not throw
+      await expect(enforceTierLimits('user-1', 'CRAIGSLIST')).resolves.toBeUndefined();
     });
   });
 });

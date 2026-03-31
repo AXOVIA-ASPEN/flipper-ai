@@ -252,4 +252,43 @@ describe('POST /api/auth/register', () => {
     expect(mockMetricsIncrement).toHaveBeenCalledWith('registration_failures');
     expect(mockCaptureError).toHaveBeenCalled();
   });
+
+  it('sends email with name undefined when user has null name (line 56 null coalesce)', async () => {
+    mockUserUpsert.mockResolvedValue({
+      id: 'user-1',
+      email: 'test@example.com',
+      name: null, // null name — covers user.name ?? undefined false branch
+    });
+
+    await POST(createRequest({ idToken: 'valid-token' }));
+
+    expect(mockSendWelcome).toHaveBeenCalledWith(
+      expect.objectContaining({ name: undefined })
+    );
+  });
+
+  it('captures non-Error thrown from sendWelcome catch (line 57 instanceof false branch)', async () => {
+    mockSendWelcome.mockRejectedValue('string-smtp-error');
+
+    await POST(createRequest({ idToken: 'valid-token' }));
+    await new Promise((r) => setImmediate(r));
+
+    expect(mockCaptureError).toHaveBeenCalledWith(
+      expect.any(Error),
+      expect.objectContaining({ action: 'send_welcome_email' })
+    );
+  });
+
+  it('captures non-Error thrown in outer catch (line 76 instanceof false branch)', async () => {
+    mockUserUpsert.mockRejectedValue('string-db-error');
+
+    const res = await POST(createRequest({ idToken: 'valid-token' }));
+    const data = await res.json();
+
+    expect(res.status).toBe(500);
+    expect(mockCaptureError).toHaveBeenCalledWith(
+      expect.any(Error),
+      expect.objectContaining({ action: 'register' })
+    );
+  });
 });

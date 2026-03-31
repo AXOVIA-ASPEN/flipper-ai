@@ -8,6 +8,26 @@ import {
   EstimationResult,
 } from './value-estimator';
 import { sseEmitter } from './sse-emitter';
+import prisma from '@/lib/db';
+import { lookupVerifiedMarketPrice } from './market-value-calculator';
+import type { VerifiedPriceLookupResult } from './market-value-calculator';
+import { fetchMarketPrice, closeBrowser } from './market-price';
+import { identifyItem } from './llm-identifier';
+import type { ItemIdentification } from './llm-identifier';
+import { analyzeSellability, quickDiscountCheck } from './llm-analyzer';
+import type { SellabilityAnalysis } from './llm-analyzer';
+import { analyzeListingData } from './claude-analyzer';
+import type { ClaudeAnalysisResult } from './claude-analyzer';
+import { analyzeDemandTrend } from './demand-analyzer';
+import type { DemandAnalysisResult } from './demand-analyzer';
+import { findComparableSales } from './comp-matcher';
+import type { CompMatchResult } from './comp-matcher';
+import { analyzeItemCompleteness } from './item-completeness-analyzer';
+import type { CompletenessAnalysisResult } from './item-completeness-analyzer';
+import { analyzeSellerReputation } from './seller-reputation-analyzer';
+import type { SellerReputationResult } from './seller-reputation-analyzer';
+import { analyzeLogistics } from './logistics-analyzer';
+import type { LogisticsAnalysisResult } from './logistics-analyzer';
 
 // Platform types supported by the scanner
 export type MarketplacePlatform =
@@ -31,6 +51,10 @@ export interface RawListing {
   imageUrls?: string[];
   category?: string | null;
   postedAt?: Date | null;
+  // Story 5.4: seller reputation data (optional, populated by platform scrapers)
+  sellerRating?: number | null;
+  sellerReviewCount?: number | null;
+  sellerAccountAgeDays?: number | null;
 }
 
 // Processed listing with viability analysis
@@ -40,6 +64,21 @@ export interface AnalyzedListing extends RawListing {
   estimation: EstimationResult;
   requestToBuy: string;
   isOpportunity: boolean;
+  sellabilityAnalysis?: SellabilityAnalysis | null;
+  verifiedPrice?: VerifiedPriceLookupResult | null;
+  // Story 5.1: Claude Tier 2 structural analysis (opportunities only, after Tier 1)
+  claudeAnalysis?: ClaudeAnalysisResult | null;
+  // Story 5.2: LLM item identification (used as input to comp matching)
+  llmIdentification?: ItemIdentification | null;
+  // Story 5.2: Comparable sold item matching (opportunities only, after market price lookup)
+  compMatches?: CompMatchResult | null;
+  // Story 5.3: Demand trend analysis (populated post-analysis for opportunities)
+  demandAnalysis?: DemandAnalysisResult | null;
+  // Story 5.4: Item completeness and seller reputation analysis
+  completenessAnalysis?: CompletenessAnalysisResult | null;
+  sellerReputation?: SellerReputationResult | null;
+  // Story 5.5: Logistics and shipping analysis
+  logisticsAnalysis?: LogisticsAnalysisResult | null;
 }
 
 // Viability criteria for filtering opportunities
@@ -75,11 +114,13 @@ const DIFFICULTY_ORDER = {
 export function analyzeListing(
   platform: MarketplacePlatform,
   listing: RawListing,
-  options?: { emitEvents?: boolean; userId?: string }
+  options?: { emitEvents?: boolean; userId?: string; feeRate?: number; opportunityThreshold?: number }
 ): AnalyzedListing {
   // Detect category if not provided
   const detectedCategory =
     listing.category || detectCategory(listing.title, listing.description || null);
+
+  const opportunityThreshold = options?.opportunityThreshold ?? 70;
 
   // Get full value estimation
   const estimation = estimateValue(
@@ -87,7 +128,8 @@ export function analyzeListing(
     listing.description || null,
     listing.askingPrice,
     listing.condition || null,
-    detectedCategory
+    detectedCategory,
+    options?.feeRate
   );
 
   // Generate purchase message
@@ -98,8 +140,8 @@ export function analyzeListing(
     listing.sellerName
   );
 
-  // Determine if this is an opportunity (default threshold: 70)
-  const isOpportunity = estimation.valueScore >= 70;
+  // Determine if this is an opportunity based on configurable threshold
+  const isOpportunity = estimation.valueScore >= opportunityThreshold;
 
   const analyzed: AnalyzedListing = {
     ...listing,
@@ -194,7 +236,7 @@ export function processListings(
   platform: MarketplacePlatform,
   listings: RawListing[],
   criteria?: ViabilityCriteria,
-  options?: { emitEvents?: boolean; userId?: string }
+  options?: { emitEvents?: boolean; userId?: string; feeRate?: number; opportunityThreshold?: number }
 ): {
   all: AnalyzedListing[];
   opportunities: AnalyzedListing[];
@@ -242,6 +284,8 @@ export function sortByOpportunity(listings: AnalyzedListing[]): AnalyzedListing[
  * Formats an analyzed listing for API response/database storage
  */
 export function formatForStorage(listing: AnalyzedListing): Record<string, unknown> {
+  const { sellabilityAnalysis, verifiedPrice } = listing;
+
   return {
     // Basic info
     externalId: listing.externalId,
@@ -272,16 +316,69 @@ export function formatForStorage(listing: AnalyzedListing): Record<string, unkno
     // Market references
     comparableUrls: JSON.stringify(listing.estimation.comparableUrls),
     priceReasoning: listing.estimation.reasoning,
-    notes: listing.estimation.notes,
+    notes: sellabilityAnalysis?.resaleStrategy ?? listing.estimation.notes,
 
-    // Metadata
-    shippable: listing.estimation.shippable,
+    // Metadata — Story 5.5: logistics classification overrides algorithmic shippable
+    shippable: listing.logisticsAnalysis
+      ? listing.logisticsAnalysis.sizeCategory !== 'large_local_only'
+      : listing.estimation.shippable,
     negotiable: listing.estimation.negotiable,
     tags: JSON.stringify(listing.estimation.tags),
     requestToBuy: listing.requestToBuy,
 
     // Status
-    status: listing.isOpportunity ? 'OPPORTUNITY' : 'NEW',
+    status: sellabilityAnalysis ? 'OPPORTUNITY' : listing.isOpportunity ? 'OPPORTUNITY' : 'NEW',
+
+    // Verified price data (Story 4.4)
+    verifiedMarketValue: verifiedPrice?.verifiedMarketValue ?? sellabilityAnalysis?.verifiedMarketValue ?? null,
+    trueDiscountPercent: verifiedPrice?.trueDiscountPercent ?? sellabilityAnalysis?.trueDiscountPercent ?? null,
+    marketDataSource: verifiedPrice?.marketDataSource ?? (sellabilityAnalysis ? 'ebay_scrape' : null),
+    marketDataDate: verifiedPrice?.marketDataDate ?? (sellabilityAnalysis ? new Date() : null),
+    // Comparable sold item matching (Story 5.2)
+    // Overwrite comparableSalesJson with enhanced format (includes soldDate + platform)
+    // if comp matching ran; otherwise preserve what Story 4.4 stored.
+    comparableSalesJson: listing.compMatches
+      ? JSON.stringify(listing.compMatches.comps)
+      : (verifiedPrice?.comparableSalesJson ?? null),
+    compMatchConfidence: listing.compMatches?.confidence ?? null,
+
+    // Sellability analysis (Story 4.5)
+    sellabilityScore: sellabilityAnalysis?.sellabilityScore ?? null,
+    // Story 5.3: Demand analysis takes priority over sellability demandLevel when available
+    demandLevel: listing.demandAnalysis?.demandTrend ?? sellabilityAnalysis?.demandLevel ?? null,
+    // Story 5.3: Sold volume counts (demand analysis)
+    soldVolume30Days: listing.demandAnalysis?.soldVolume30Days ?? null,
+    soldVolume60Days: listing.demandAnalysis?.soldVolume60Days ?? null,
+    soldVolume90Days: listing.demandAnalysis?.soldVolume90Days ?? null,
+    expectedDaysToSell: sellabilityAnalysis?.expectedDaysToSell ?? null,
+    // Story 5.4: seller reputation escalation takes priority; falls back to LLM value
+    authenticityRisk: listing.sellerReputation?.riskEscalation
+      ? 'high'
+      : (sellabilityAnalysis?.authenticityRisk ?? null),
+    conditionRisk: sellabilityAnalysis?.conditionRisk ?? null,
+    recommendedOffer: sellabilityAnalysis?.recommendedOfferPrice ?? null,
+    recommendedList: sellabilityAnalysis?.recommendedListPrice ?? null,
+    resaleStrategy: sellabilityAnalysis?.resaleStrategy ?? null,
+    // Story 5.4: Item completeness & seller reputation
+    completenessLabel: listing.completenessAnalysis?.completenessLabel ?? null,
+    sellerRating: listing.sellerReputation?.sellerRating ?? listing.sellerRating ?? null,
+    sellerReviewCount: listing.sellerReputation?.sellerReviewCount ?? listing.sellerReviewCount ?? null,
+    sellerAccountAgeDays: listing.sellerReputation?.sellerAccountAgeDays ?? listing.sellerAccountAgeDays ?? null,
+    // Story 5.5: Logistics and shipping analysis
+    sizeCategory: listing.logisticsAnalysis?.sizeCategory ?? null,
+    shippingEstimatesJson: listing.logisticsAnalysis?.shippingEstimates
+      ? JSON.stringify(listing.logisticsAnalysis.shippingEstimates)
+      : null,
+    estimatedShippingCost: listing.logisticsAnalysis?.estimatedShippingCost ?? null,
+    pickupDistanceMiles: listing.logisticsAnalysis?.pickupDistanceMiles ?? null,
+    outsidePickupRadius: listing.logisticsAnalysis?.outsidePickupRadius ?? null,
+    adjustedProfitMargin: listing.logisticsAnalysis?.adjustedProfitMargin ?? null,
+    estimatedWeight: listing.logisticsAnalysis?.estimatedWeightLbs ?? null,
+    // Claude Tier 2 takes priority; fall back to sellability confidence/reasoning (Story 5.1)
+    analysisConfidence: listing.claudeAnalysis?.confidence ?? sellabilityAnalysis?.confidence ?? null,
+    analysisReasoning: listing.claudeAnalysis?.reasoning ?? sellabilityAnalysis?.reasoning ?? null,
+    llmAnalyzed: sellabilityAnalysis != null,
+    analysisDate: sellabilityAnalysis ? new Date() : null,
   };
 }
 
@@ -329,5 +426,465 @@ export function generateScanSummary(results: {
     totalPotentialProfit,
     bestOpportunity,
     categoryCounts,
+  };
+}
+
+// ─── Story 4.2: Platform fees & pre-filtering ────────────────────────────────
+
+/** How free ($0) listings are handled during pre-filtering */
+export type FreeItemHandling = 'include_review' | 'auto_analyze' | 'skip';
+
+/** Default resale fee rates (as decimal) for each platform */
+export const PLATFORM_FEE_DEFAULTS: Record<string, number> = {
+  EBAY: 0.13,
+  MERCARI: 0.10,
+  FACEBOOK_MARKETPLACE: 0.05,
+  OFFERUP: 0.129,
+  CRAIGSLIST: 0,
+};
+
+/** Maps platform names to the userSettings field that stores their custom fee */
+const PLATFORM_FEE_KEYS: Record<string, string> = {
+  EBAY: 'feeRateEbay',
+  MERCARI: 'feeRateMercari',
+  FACEBOOK_MARKETPLACE: 'feeRateFacebook',
+  OFFERUP: 'feeRateOfferup',
+  CRAIGSLIST: 'feeRateCraigslist',
+};
+
+/**
+ * Returns the effective fee rate (as a decimal 0–1) for a platform.
+ * Falls back to PLATFORM_FEE_DEFAULTS if no valid user override exists.
+ */
+export function getPlatformFeeRate(
+  platform: string,
+  userSettings: Record<string, unknown> | null | undefined
+): number {
+  const defaultRate = PLATFORM_FEE_DEFAULTS[platform] ?? 0.13;
+  if (!userSettings) return defaultRate;
+
+  const key = PLATFORM_FEE_KEYS[platform];
+  if (!key) return defaultRate;
+
+  const userRate = userSettings[key];
+  if (userRate === null || userRate === undefined) return defaultRate;
+
+  const decimal = Number(userRate) / 100;
+  if (!isFinite(decimal) || decimal < 0 || decimal > 0.5) return defaultRate;
+
+  return decimal;
+}
+
+/** A listing that was skipped during pre-filtering, with the reason */
+export interface SkippedListing {
+  listing: RawListing;
+  reason: string;
+}
+
+/** Result of pre-filtering a batch of raw listings */
+export interface PreFilterResult {
+  /** Listings that passed all checks and should be processed normally */
+  accepted: RawListing[];
+  /** Free ($0) listings flagged for manual review (include_review mode only) */
+  flaggedForReview: RawListing[];
+  /** Listings that were discarded, with reasons */
+  skipped: SkippedListing[];
+}
+
+/**
+ * Pre-filters a batch of raw listings before full analysis.
+ * Removes obviously invalid listings (negative prices, sponsored) and
+ * handles free items according to the freeItemHandling strategy.
+ */
+export function preFilterListings(
+  _platform: string,
+  listings: RawListing[],
+  options: { userId: string; freeItemHandling: FreeItemHandling; opportunityThreshold?: number }
+): PreFilterResult {
+  const accepted: RawListing[] = [];
+  const flaggedForReview: RawListing[] = [];
+  const skipped: SkippedListing[] = [];
+
+  for (const listing of listings) {
+    // Skip listings with negative prices
+    if (listing.askingPrice < 0) {
+      skipped.push({ listing, reason: 'negative_price' });
+      continue;
+    }
+
+    // Skip sponsored listings
+    if (/sponsored/i.test(listing.title)) {
+      skipped.push({ listing, reason: 'sponsored' });
+      continue;
+    }
+
+    // Handle free ($0) items
+    if (listing.askingPrice === 0) {
+      if (options.freeItemHandling === 'include_review') {
+        flaggedForReview.push(listing);
+      } else if (options.freeItemHandling === 'auto_analyze') {
+        const category = detectCategory(listing.title, listing.description ?? null);
+        const estimation = estimateValue(
+          listing.title,
+          listing.description ?? null,
+          0,
+          listing.condition ?? null,
+          category
+        );
+        if (estimation.valueScore >= (options.opportunityThreshold ?? 70)) {
+          accepted.push(listing);
+        } else {
+          skipped.push({ listing, reason: 'free_item_below_threshold' });
+        }
+      } else {
+        // 'skip'
+        skipped.push({ listing, reason: 'free_item_skipped' });
+      }
+      continue;
+    }
+
+    accepted.push(listing);
+  }
+
+  return { accepted, flaggedForReview, skipped };
+}
+
+// ─── Story 4.4: Verified market price enrichment ─────────────────────────────
+
+/**
+ * Enriches a batch of analyzed listings with verified market prices.
+ * Uses identifiedSearchQuery (from Story 4.3 LLM identification) if available,
+ * falls back to listing title.
+ * Uses a two-step lookup: DB price history first, Playwright eBay fallback.
+ * Processes listings sequentially to avoid concurrent Playwright calls.
+ * Calls closeBrowser() once after all lookups are complete.
+ */
+export async function enrichWithVerifiedMarketPrice(
+  listings: AnalyzedListing[]
+): Promise<AnalyzedListing[]> {
+  const enriched: AnalyzedListing[] = [];
+  try {
+    for (let i = 0; i < listings.length; i++) {
+      const listing = listings[i];
+      try {
+        // Prefer LLM-optimized search query (Story 4.3), fall back to title
+        const searchQuery = listing.llmIdentification?.searchQuery || listing.title;
+        const category = listing.llmIdentification?.category || listing.category;
+        const verifiedPrice = await lookupVerifiedMarketPrice(
+          searchQuery, listing.askingPrice, category
+        );
+        enriched.push({ ...listing, verifiedPrice });
+      } catch (err) {
+        console.error(`Error looking up verified price for "${listing.title}":`, err);
+        enriched.push({ ...listing, verifiedPrice: null });
+      }
+      // Rate-limiting delay between listings (not after the last one)
+      if (i < listings.length - 1) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+    }
+  } finally {
+    await closeBrowser();
+  }
+  return enriched;
+}
+
+// ─── Story 4.5: LLM sellability enrichment ───────────────────────────────────
+
+/**
+ * Enriches opportunities with full LLM sellability analysis.
+ * Runs the 4-step pipeline: identifyItem → fetchMarketPrice → quickDiscountCheck → analyzeSellability.
+ * Only listings that pass the discountThreshold are returned.
+ * Calls closeBrowser() once after all analysis is complete.
+ */
+export async function enrichWithSellabilityAnalysis(
+  listings: AnalyzedListing[],
+  discountThreshold: number = 50,
+  feeRate?: number
+): Promise<AnalyzedListing[]> {
+  const enriched: AnalyzedListing[] = [];
+  for (const listing of listings) {
+    if (listing.askingPrice <= 0) continue;
+    try {
+      const identification = await identifyItem(
+        listing.title,
+        listing.description || '',
+        listing.askingPrice,
+        listing.category
+      );
+      if (!identification?.worthInvestigating) continue;
+
+      const marketData = await fetchMarketPrice(identification.searchQuery, identification.category);
+      if (!marketData || marketData.salesCount === 0) continue;
+
+      const quickCheck = quickDiscountCheck(listing.askingPrice, marketData);
+      if (!quickCheck.passesQuickCheck) continue;
+
+      const sellabilityAnalysis = await analyzeSellability(
+        listing.title,
+        listing.askingPrice,
+        identification,
+        marketData,
+        discountThreshold,
+        feeRate
+      );
+      if (!sellabilityAnalysis) continue;
+      if (!sellabilityAnalysis.meetsThreshold) continue;
+      if (sellabilityAnalysis.trueDiscountPercent < discountThreshold) {
+        console.warn(
+          `[enrichWithSellabilityAnalysis] LLM inconsistency for "${listing.title}": meetsThreshold=true but trueDiscountPercent=${sellabilityAnalysis.trueDiscountPercent} < threshold=${discountThreshold}`
+        );
+        continue;
+      }
+
+      enriched.push({ ...listing, sellabilityAnalysis, llmIdentification: identification });
+    } catch (err) {
+      console.error(`Error analyzing sellability for "${listing.title}":`, err);
+    }
+  }
+  await closeBrowser();
+  return enriched;
+}
+
+// ─── Story 5.3: Sold volume & demand trend analysis ──────────────────────────
+
+/**
+ * Enriches analyzed opportunity listings with sold volume and demand trend data.
+ * Uses comparableSalesJson from Story 4.4 when available (avoids redundant eBay scraping),
+ * otherwise calls fetchMarketPrice() to get recent sold listings.
+ * Only enriches listings marked as opportunities (isOpportunity=true).
+ * Processes listings sequentially to avoid concurrent Playwright calls.
+ */
+export async function enrichWithDemandAnalysis(
+  listings: AnalyzedListing[]
+): Promise<AnalyzedListing[]> {
+  const enriched: AnalyzedListing[] = [];
+  for (const listing of listings) {
+    try {
+      // Use search query from LLM identification (via verifiedPrice) or title
+      const searchQuery = listing.llmIdentification?.searchQuery || listing.title;
+
+      // Prefer existing sold listing data from Story 4.4 to avoid redundant scraping
+      let soldListings: import('./market-price').SoldListing[] | null = null;
+
+      if (listing.verifiedPrice?.comparableSalesJson) {
+        try {
+          const parsed = JSON.parse(listing.verifiedPrice.comparableSalesJson);
+          if (Array.isArray(parsed) && parsed.length >= 5) {
+            // Enough data for analysis — reuse it
+            soldListings = parsed;
+          }
+        } catch {
+          // JSON parse failure — fall through to fresh fetch
+        }
+      }
+
+      if (!soldListings) {
+        const marketData = await fetchMarketPrice(searchQuery, listing.llmIdentification?.category || listing.category);
+        soldListings = marketData?.soldListings ?? null;
+      }
+
+      if (!soldListings) {
+        enriched.push({ ...listing, demandAnalysis: null });
+        continue;
+      }
+
+      const demandAnalysis = analyzeDemandTrend(soldListings);
+      enriched.push({ ...listing, demandAnalysis });
+    } catch (err) {
+      console.error(`Error running demand analysis for "${listing.title}":`, err);
+      enriched.push({ ...listing, demandAnalysis: null });
+    }
+  }
+  return enriched;
+}
+
+// ─── Story 5.1: Claude Sonnet Tier 2 structural analysis ─────────────────────
+
+/**
+ * Enriches opportunity listings with Claude Sonnet Tier 2 structural analysis.
+ * Called AFTER Tier 1 LLM identification (Story 4.3).
+ * Falls back gracefully when Claude API is unavailable — claudeAnalysis stays null.
+ * Only runs on opportunities (score >= 70) to minimize API costs.
+ */
+export async function enrichOpportunitiesWithClaudeTier2(
+  listings: AnalyzedListing[],
+  userId?: string | null
+): Promise<AnalyzedListing[]> {
+  return Promise.all(
+    listings.map(async (listing) => {
+      try {
+        const claudeAnalysis = await analyzeListingData(
+          listing.title,
+          listing.description || null,
+          listing.askingPrice,
+          listing.imageUrls,
+          userId ?? undefined
+        );
+        return { ...listing, claudeAnalysis };
+      } catch (error) {
+        console.error(
+          `Claude Tier 2 analysis failed for listing ${listing.externalId}:`,
+          error
+        );
+        return { ...listing, claudeAnalysis: null };
+      }
+    })
+  );
+}
+
+// ─── Story 5.2: Comparable sold item matching ────────────────────────────────
+
+/**
+ * Enriches opportunity listings with comparable sold item matches.
+ * Uses identifiedSearchQuery (Story 4.3) and verifiedPrice.soldListings (Story 4.4)
+ * to find and filter comps without redundant Playwright calls.
+ * Falls back gracefully when comp matching fails — compMatches stays null.
+ */
+export async function enrichWithCompMatches(
+  listings: AnalyzedListing[]
+): Promise<AnalyzedListing[]> {
+  const enriched: AnalyzedListing[] = [];
+  for (const listing of listings) {
+    // Hoist rawComps outside try so the delay guard can access it
+    const rawComps = (listing.verifiedPrice as Record<string, unknown> | null | undefined)
+      ?.rawSoldListings as import('./market-price').SoldListing[] | undefined;
+    try {
+      // Use LLM-optimized query (Story 4.3) or fall back to title
+      const searchQuery = listing.llmIdentification?.searchQuery || listing.title;
+      const brand = listing.llmIdentification?.brand ?? null;
+      const model = listing.llmIdentification?.model ?? null;
+      const category = listing.llmIdentification?.category || listing.category;
+
+      const compMatches = await findComparableSales(
+        searchQuery,
+        brand,
+        model,
+        category,
+        rawComps
+      );
+      enriched.push({ ...listing, compMatches });
+    } catch (error) {
+      console.error(`Comp matching failed for listing ${listing.externalId}:`, error);
+      enriched.push({ ...listing, compMatches: null });
+    }
+    // Only delay when rawComps were not pre-fetched — a Playwright call may have been made
+    if (!rawComps || rawComps.length === 0) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+  }
+  return enriched;
+}
+
+// ─── Story 5.4: Item completeness & seller reputation enrichment ──────────────
+
+/**
+ * Enriches listings with item completeness (via GPT-4o Vision) and seller reputation analysis.
+ * Completeness analysis only runs when image URLs are available.
+ * Seller reputation analysis only runs for eBay and Mercari (not Craigslist, Facebook, OfferUp).
+ * Seller risk escalation overrides authenticityRisk to 'high' when the seller is low reputation.
+ * All errors are caught per-listing — failures return the listing unchanged.
+ */
+export async function enrichWithCompletenessAndReputation(
+  listings: AnalyzedListing[]
+): Promise<AnalyzedListing[]> {
+  const enriched: AnalyzedListing[] = [];
+  for (const listing of listings) {
+    try {
+      const imageUrls = listing.imageUrls ?? [];
+
+      // Completeness analysis (requires images, uses GPT-4o Vision)
+      const completenessAnalysis = await analyzeItemCompleteness(
+        imageUrls,
+        listing.title,
+        listing.description ?? null,
+        listing.category
+      );
+
+      // Seller reputation analysis (reads pre-populated listing fields, no network calls)
+      const sellerReputation = analyzeSellerReputation(
+        listing.platform,
+        listing.sellerRating ?? null,
+        listing.sellerReviewCount ?? null,
+        listing.sellerAccountAgeDays ?? null
+      );
+
+      // Escalate authenticityRisk to 'high' if seller has low reputation
+      let updatedSellabilityAnalysis = listing.sellabilityAnalysis;
+      if (sellerReputation?.riskEscalation && updatedSellabilityAnalysis) {
+        updatedSellabilityAnalysis = { ...updatedSellabilityAnalysis, authenticityRisk: 'high' };
+      }
+
+      enriched.push({
+        ...listing,
+        sellabilityAnalysis: updatedSellabilityAnalysis,
+        completenessAnalysis,
+        sellerReputation,
+      });
+    } catch (err) {
+      console.error(
+        `[enrichWithCompletenessAndReputation] Failed for listing ${listing.externalId}:`,
+        err
+      );
+      enriched.push(listing);
+    }
+  }
+  return enriched;
+}
+
+// ─── Story 5.5: Logistics & shipping cost analysis ────────────────────────────
+
+/**
+ * Enriches analyzed opportunity listings with logistics analysis data.
+ * Classifies items by size, estimates shipping costs (shippable items),
+ * and calculates pickup distance (local-only items).
+ * Processes listings sequentially — Shippo/Geoapify API calls can be slow.
+ * Failures per listing do NOT abort the batch.
+ */
+export async function enrichWithLogisticsAnalysis(
+  listings: AnalyzedListing[],
+  userLocation: string | null,
+  maxPickupRadiusMiles: number = 50
+): Promise<AnalyzedListing[]> {
+  const enriched: AnalyzedListing[] = [];
+  for (const listing of listings) {
+    try {
+      const logisticsAnalysis = await analyzeLogistics(listing, userLocation, maxPickupRadiusMiles);
+      enriched.push({ ...listing, logisticsAnalysis });
+    } catch (err) {
+      console.warn('Logistics analysis failed for listing', { id: listing.externalId, err });
+      enriched.push({ ...listing, logisticsAnalysis: null });
+    }
+  }
+  return enriched;
+}
+
+/**
+ * Checks a batch of raw listings against the database to identify duplicates
+ * (same platform + userId + externalId already exists).
+ */
+export async function deduplicateListings(
+  platform: string,
+  listings: RawListing[],
+  userId: string
+): Promise<{ unique: RawListing[]; duplicates: RawListing[] }> {
+  if (listings.length === 0) return { unique: [], duplicates: [] };
+
+  const externalIds = listings.map((l) => l.externalId);
+
+  const existing = await prisma.listing.findMany({
+    where: {
+      platform,
+      userId,
+      externalId: { in: externalIds },
+    },
+    select: { externalId: true },
+  });
+
+  const existingIds = new Set(existing.map((l) => l.externalId));
+
+  return {
+    unique: listings.filter((l) => !existingIds.has(l.externalId)),
+    duplicates: listings.filter((l) => existingIds.has(l.externalId)),
   };
 }

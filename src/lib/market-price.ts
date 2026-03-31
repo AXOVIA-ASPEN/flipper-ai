@@ -42,6 +42,40 @@ export function median(numbers: number[]): number {
   return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
 }
 
+/**
+ * Parse eBay sold date text into a Date object.
+ * eBay shows formats like: "Oct 15, 2024", "Sold Oct 15, 2024",
+ * "2 days ago", "12h ago".
+ * Returns null for unrecognized formats.
+ */
+export function parseSoldDate(rawText: string): Date | null {
+  if (!rawText) return null;
+  const text = rawText.replace(/^sold\s*/i, '').trim();
+
+  // "X days ago"
+  const daysAgo = text.match(/^(\d+)\s*d(?:ays?)?\s*ago$/i);
+  if (daysAgo) {
+    const d = new Date();
+    d.setDate(d.getDate() - parseInt(daysAgo[1], 10));
+    return d;
+  }
+
+  // "Xh ago"
+  const hoursAgo = text.match(/^(\d+)\s*h(?:ours?)?\s*ago$/i);
+  if (hoursAgo) {
+    return new Date(Date.now() - parseInt(hoursAgo[1], 10) * 60 * 60 * 1000);
+  }
+
+  // "Oct 15, 2024" — standard month-day-year
+  const monthDate = text.match(/^[A-Z][a-z]{2}\s+\d{1,2},\s+\d{4}$/);
+  if (monthDate) {
+    const parsed = new Date(text);
+    return isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  return null;
+}
+
 // Build eBay sold listings search URL
 export function buildEbaySoldUrl(searchQuery: string, category?: string): string {
   const params = new URLSearchParams({
@@ -177,7 +211,7 @@ export async function fetchMarketPrice(
       return {
         title: item.title,
         price: price,
-        soldDate: null, // Would need more parsing for actual date
+        soldDate: parseSoldDate(item.soldDate),
         condition: item.condition,
         url: item.url,
         shippingCost,

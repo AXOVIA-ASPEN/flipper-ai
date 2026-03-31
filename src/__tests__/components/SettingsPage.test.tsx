@@ -18,8 +18,19 @@ jest.mock('next/link', () => {
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
-  useRouter: () => ({ push: jest.fn() }),
+  useRouter: () => ({ push: jest.fn(), replace: jest.fn() }),
+  useSearchParams: () => new URLSearchParams(),
 }));
+
+// Mock components that use ToastProvider context not available in test
+jest.mock('@/components/CheckoutResultBanner', () => {
+  return function MockCheckoutResultBanner() { return null; };
+});
+jest.mock('@/components/BillingSettings', () => {
+  return function MockBillingSettings() {
+    return <div data-testid="billing-settings">Billing Settings</div>;
+  };
+});
 
 // Mock ThemeContext
 const mockTheme = {

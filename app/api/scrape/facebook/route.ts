@@ -8,6 +8,8 @@ import {
   generateScanSummary,
   ViabilityCriteria,
 } from '@/lib/marketplace-scanner';
+import { lookupVerifiedMarketPrice } from '@/lib/market-value-calculator';
+import { closeBrowser } from '@/lib/market-price';
 
 export const dynamic = 'force-dynamic';
 
@@ -113,7 +115,22 @@ export async function POST(request: NextRequest) {
     // Save all listings to database
     const savedListings = [];
     for (const analyzed of processedResults.all) {
-      const storageData = formatForStorage(analyzed);
+      let storageData = formatForStorage(analyzed);
+
+      // Inline verified price lookup for opportunity listings (Story 4.4)
+      if (analyzed.isOpportunity) {
+        const verifiedPrice = await lookupVerifiedMarketPrice(analyzed.title, analyzed.askingPrice);
+        if (verifiedPrice) {
+          storageData = {
+            ...storageData,
+            verifiedMarketValue: verifiedPrice.verifiedMarketValue,
+            trueDiscountPercent: verifiedPrice.trueDiscountPercent,
+            marketDataSource: verifiedPrice.marketDataSource,
+            marketDataDate: verifiedPrice.marketDataDate,
+            comparableSalesJson: verifiedPrice.comparableSalesJson,
+          };
+        }
+      }
 
       try {
         const listing = await prisma.listing.upsert({
@@ -135,6 +152,9 @@ export async function POST(request: NextRequest) {
         console.error(`Error saving listing ${analyzed.externalId}:`, err);
       }
     }
+
+    // Clean up Playwright browser instance after listings processing loop
+    await closeBrowser();
 
     // Generate summary
     const summary = generateScanSummary(processedResults);

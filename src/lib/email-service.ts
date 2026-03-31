@@ -20,11 +20,14 @@ import {
   passwordResetEmailHtml,
   passwordResetEmailText,
   scanSummaryEmailHtml,
+  paymentFailedEmailHtml,
+  paymentFailedEmailText,
   type WelcomeEmailOptions,
   type DigestEmailOptions,
   type PriceAlertEmailOptions,
   type PasswordResetEmailOptions,
   type ScanSummaryEmailOptions,
+  type PaymentFailedEmailOptions,
 } from '@/lib/email-templates';
 import { logger } from '@/lib/logger';
 
@@ -249,6 +252,29 @@ export class EmailService {
       to: opts.email,
       subject: `✅ Scan complete: ${opts.opportunitiesFound} opportunities found for "${opts.query}"`,
       html: scanSummaryEmailHtml(emailOpts),
+    });
+  }
+
+  /**
+   * Send a payment failure notification.
+   */
+  async sendPaymentFailed(opts: {
+    name?: string;
+    email: string;
+  }): Promise<SendEmailResult> {
+    const emailOpts: PaymentFailedEmailOptions = {
+      name: opts.name,
+      email: opts.email,
+      appUrl: this.appUrl,
+      unsubscribeUrl: this.unsubscribeUrl(opts.email),
+      settingsUrl: this.settingsUrl(),
+    };
+
+    return this.send({
+      to: opts.email,
+      subject: '💳 Action needed: Update your payment method — Flipper AI',
+      html: paymentFailedEmailHtml(emailOpts),
+      text: paymentFailedEmailText(emailOpts),
     });
   }
 }

@@ -33,13 +33,45 @@ jest.mock('@/lib/value-estimator', () => ({
 
 // Mock Prisma
 const mockUpsert = jest.fn();
+const mockUserSettingsFindUnique = jest.fn();
+const mockAiAnalysisCacheCreate = jest.fn();
 jest.mock('@/lib/db', () => ({
   __esModule: true,
   default: {
     listing: {
       upsert: (...args: unknown[]) => mockUpsert(...args),
     },
+    userSettings: {
+      findUnique: (...args: unknown[]) => mockUserSettingsFindUnique(...args),
+    },
+    aiAnalysisCache: {
+      create: (...args: unknown[]) => mockAiAnalysisCacheCreate(...args),
+    },
   },
+}));
+
+// Mock marketplace-scanner (getPlatformFeeRate)
+const mockGetPlatformFeeRate = jest.fn();
+jest.mock('@/lib/marketplace-scanner', () => ({
+  getPlatformFeeRate: (...args: unknown[]) => mockGetPlatformFeeRate(...args),
+}));
+
+// Mock claude-analyzer
+const mockAnalyzeListingData = jest.fn();
+jest.mock('@/lib/claude-analyzer', () => ({
+  analyzeListingData: (...args: unknown[]) => mockAnalyzeListingData(...args),
+}));
+
+// Mock market-value-calculator
+const mockLookupVerifiedMarketPrice = jest.fn();
+jest.mock('@/lib/market-value-calculator', () => ({
+  lookupVerifiedMarketPrice: (...args: unknown[]) => mockLookupVerifiedMarketPrice(...args),
+}));
+
+// Mock market-price (closeBrowser)
+const mockCloseBrowser = jest.fn();
+jest.mock('@/lib/market-price', () => ({
+  closeBrowser: (...args: unknown[]) => mockCloseBrowser(...args),
 }));
 
 // Helper to create NextRequest
@@ -84,6 +116,12 @@ describe('Craigslist Scraper V2 API Route', () => {
     });
     mockGeneratePurchaseMessage.mockReturnValue('Hi, is this still available?');
     mockUpsert.mockResolvedValue({ id: 'listing-123' });
+    mockUserSettingsFindUnique.mockResolvedValue(null);
+    mockAiAnalysisCacheCreate.mockResolvedValue({});
+    mockGetPlatformFeeRate.mockReturnValue(0);
+    mockAnalyzeListingData.mockResolvedValue(null);
+    mockLookupVerifiedMarketPrice.mockResolvedValue(null);
+    mockCloseBrowser.mockResolvedValue(undefined);
   });
 
   describe('GET /api/scraper/craigslist', () => {
@@ -535,7 +573,8 @@ describe('Craigslist Scraper V2 API Route', () => {
         null,
         1234.56, // Parsed correctly
         null,
-        'electronics'
+        'electronics',
+        expect.any(Number) // feeRate
       );
 
       expect(mockUpsert).toHaveBeenCalledWith(

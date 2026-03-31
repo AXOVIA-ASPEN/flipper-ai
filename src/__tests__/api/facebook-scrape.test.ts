@@ -23,6 +23,16 @@ jest.mock('@/lib/auth', () => ({
   getCurrentUserId: () => mockGetCurrentUserId(),
 }));
 
+// Mock market-value-calculator (Story 4.4: inline verified price lookup)
+jest.mock('@/lib/market-value-calculator', () => ({
+  lookupVerifiedMarketPrice: jest.fn().mockResolvedValue(null),
+}));
+
+// Mock market-price (Story 4.4: browser cleanup after listing loop)
+jest.mock('@/lib/market-price', () => ({
+  closeBrowser: jest.fn().mockResolvedValue(undefined),
+}));
+
 // Mock Prisma
 const mockListingUpsert = jest.fn();
 const mockJobCreate = jest.fn();

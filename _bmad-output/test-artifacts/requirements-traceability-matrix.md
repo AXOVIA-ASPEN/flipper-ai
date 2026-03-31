@@ -65,33 +65,33 @@
 | FR-SCORE-06 | Platform-specific fee rates | 4 | 4.2 | | E-004-core-scoring-deal-evaluation.feature | Pending |
 | FR-SCORE-07 | Configurable opportunity threshold | 4 | 4.2 | | E-004-core-scoring-deal-evaluation.feature | Pending |
 | FR-SCORE-08 | LLM item identification | 4 | 4.3 | | E-004-core-scoring-deal-evaluation.feature | Pending |
-| FR-SCORE-09 | Verified market prices from eBay sold | 4 | 4.4 | | E-004-core-scoring-deal-evaluation.feature | Pending |
-| FR-SCORE-10 | True discount percentage | 4 | 4.4 | | E-004-core-scoring-deal-evaluation.feature | Pending |
-| FR-SCORE-11 | LLM sellability assessment | 4 | 4.5 | | E-004-core-scoring-deal-evaluation.feature | Pending |
-| FR-SCORE-12 | Offer/listing price recommendations | 4 | 4.5 | | E-004-core-scoring-deal-evaluation.feature | Pending |
-| FR-SCORE-13 | Undervalue threshold filtering | 4 | 4.5 | | E-004-core-scoring-deal-evaluation.feature | Pending |
-| FR-SCORE-14 | AI analysis caching (24h TTL) | 4 | 4.6 | | E-004-core-scoring-deal-evaluation.feature | Pending |
-| FR-SCORE-15 | Algorithmic fallback | 4 | 4.6 | | E-004-core-scoring-deal-evaluation.feature | Pending |
-| FR-SCORE-16 | Claude Sonnet structural analysis | 5 | 5.1 | | E-005-advanced-market-intelligence.feature | Pending |
-| FR-SCORE-17 | Comparable sold item matching | 5 | 5.2 | | E-005-advanced-market-intelligence.feature | Pending |
-| FR-SCORE-18 | Sold volume / demand trend analysis | 5 | 5.3 | | E-005-advanced-market-intelligence.feature | Pending |
-| FR-SCORE-19 | Item completeness / physical state | 5 | 5.4 | | E-005-advanced-market-intelligence.feature | Pending |
-| FR-SCORE-20 | Seller reputation analysis | 5 | 5.4 | | E-005-advanced-market-intelligence.feature | Pending |
-| FR-SCORE-21 | Logistics difficulty analysis | 5 | 5.5 | | E-005-advanced-market-intelligence.feature | Pending |
-| FR-SCORE-22 | Shipping cost impact on profit | 5 | 5.5 | | E-005-advanced-market-intelligence.feature | Pending |
+| FR-SCORE-09 | Verified market prices from eBay sold | 4 | 4.4 | @E-004-S-016, @E-004-S-017, @E-004-S-018, @E-004-S-020, @E-004-S-021 | E-004-scoring-and-deal-evaluation.feature | Covered |
+| FR-SCORE-10 | True discount percentage | 4 | 4.4 | @E-004-S-019, @E-004-S-022, @E-004-S-023 | E-004-scoring-and-deal-evaluation.feature | Covered |
+| FR-SCORE-11 | LLM sellability assessment | 4 | 4.5 | @E-004-S-024, @E-004-S-026, @E-004-S-027, @E-004-S-028 | E-004-scoring-and-deal-evaluation.feature | Covered |
+| FR-SCORE-12 | Offer/listing price recommendations | 4 | 4.5 | @E-004-S-024, @E-004-S-025, @E-004-S-027 | E-004-scoring-and-deal-evaluation.feature | Covered |
+| FR-SCORE-13 | Undervalue threshold filtering | 4 | 4.5 | @E-004-S-025, @E-004-S-026, @E-004-S-028 | E-004-scoring-and-deal-evaluation.feature | Covered |
+| FR-SCORE-14 | AI analysis caching (24h TTL) | 4 | 4.6 | @E-004-S-029, @E-004-S-030, @E-004-S-031, @E-004-S-032 | E-004-scoring-and-deal-evaluation.feature | Covered |
+| FR-SCORE-15 | Algorithmic fallback | 4 | 4.6 | @E-004-S-030, @E-004-S-033 | E-004-scoring-and-deal-evaluation.feature | Covered |
+| FR-SCORE-16 | Claude Sonnet structural analysis | 5 | 5.1 | @E-005-S-1, @E-005-S-2, @E-005-S-3 | E-005-advanced-market-intelligence.feature | Covered |
+| FR-SCORE-17 | Comparable sold item matching | 5 | 5.2 | @E-005-S-9, @E-005-S-10, @E-005-S-11, @E-005-S-12 | E-005-advanced-market-intelligence.feature | Covered |
+| FR-SCORE-18 | Sold volume / demand trend analysis | 5 | 5.3 | @E-005-S-13, @E-005-S-14, @E-005-S-15, @E-005-S-16, @E-005-S-17 | E-005-advanced-market-intelligence.feature | Covered |
+| FR-SCORE-19 | Item completeness / physical state | 5 | 5.4 | @E-005-S-4, @E-005-S-5 | E-005-advanced-market-intelligence.feature | Covered |
+| FR-SCORE-20 | Seller reputation analysis | 5 | 5.4 | @E-005-S-6, @E-005-S-7, @E-005-S-8 | E-005-advanced-market-intelligence.feature | Covered |
+| FR-SCORE-21 | Logistics difficulty analysis | 5 | 5.5 | @E-005-S-18, @E-005-S-20, @E-005-S-21, @E-005-S-22, @E-005-S-23 | E-005-advanced-market-intelligence.feature | Covered |
+| FR-SCORE-22 | Shipping cost impact on profit | 5 | 5.5 | @E-005-S-19, @E-005-S-21, @E-005-S-23 | E-005-advanced-market-intelligence.feature | Covered |
 
 ## FR-COMM: Seller Communication
 
 | Requirement | Description | Epic | Story | Scenario ID(s) | Feature File | Status |
 |---|---|---|---|---|---|---|
-| FR-COMM-01 | AI purchase message generation | 8 | 8.1 | | E-008-seller-communication-negotiation.feature | Pending |
-| FR-COMM-02 | Multiple message types | 8 | 8.1 | | E-008-seller-communication-negotiation.feature | Pending |
-| FR-COMM-03 | AI negotiation strategy | 8 | 8.2 | | E-008-seller-communication-negotiation.feature | Pending |
-| FR-COMM-04 | Message inbox with threads | 8 | 8.3 | | E-008-seller-communication-negotiation.feature | Pending |
+| FR-COMM-01 | AI purchase message generation | 8 | 8.1 | @E-008-S-1, @E-008-S-2, @E-008-S-3, @E-008-S-4, @E-008-S-5, @E-008-S-6, @E-008-S-11, @E-008-S-12, @E-008-S-13, @E-008-S-14, @E-008-S-15, @E-008-S-16 | E-008-seller-communication-negotiation.feature | Covered |
+| FR-COMM-02 | Multiple message types | 8 | 8.1 | @E-008-S-7, @E-008-S-8, @E-008-S-9, @E-008-S-10 | E-008-seller-communication-negotiation.feature | Covered |
+| FR-COMM-03 | AI negotiation strategy | 8 | 8.2 | @E-008-S-17, @E-008-S-18, @E-008-S-19, @E-008-S-20, @E-008-S-21, @E-008-S-22, @E-008-S-23, @E-008-S-24, @E-008-S-25, @E-008-S-26, @E-008-S-27, @E-008-S-28, @E-008-S-29 | E-008-seller-communication-negotiation.feature | Covered |
+| FR-COMM-04 | Message inbox with threads | 8 | 8.3 | @E-008-S-30, @E-008-S-31, @E-008-S-32, @E-008-S-33, @E-008-S-34, @E-008-S-35, @E-008-S-36, @E-008-S-39, @E-008-S-40, @E-008-S-41 | E-008-seller-communication-negotiation.feature | Covered |
 | FR-COMM-05 | Message approval workflow | 8 | 8.4 | | E-008-seller-communication-negotiation.feature | Pending |
 | FR-COMM-06 | Conversation status tracking | 8 | 8.5 | | E-008-seller-communication-negotiation.feature | Pending |
 | FR-COMM-07 | Inbound message tracking | 8 | 8.5 | | E-008-seller-communication-negotiation.feature | Pending |
-| FR-COMM-08 | Message storage model | 8 | 8.3 | | E-008-seller-communication-negotiation.feature | Pending |
+| FR-COMM-08 | Message storage model | 8 | 8.3 | @E-008-S-37, @E-008-S-38 | E-008-seller-communication-negotiation.feature | Covered |
 
 ## FR-RELIST: Resale Listing Generator
 
@@ -110,14 +110,14 @@
 
 | Requirement | Description | Epic | Story | Scenario ID(s) | Feature File | Status |
 |---|---|---|---|---|---|---|
-| FR-DASH-01 | Dashboard with inventory, stats, filters | 6 | 6.1 | | E-006-flip-lifecycle-management-analytics.feature | Pending |
-| FR-DASH-02 | Kanban board drag-and-drop | 6 | 6.2 | | E-006-flip-lifecycle-management-analytics.feature | Pending |
-| FR-DASH-03 | Capture purchase price | 6 | 6.2 | | E-006-flip-lifecycle-management-analytics.feature | Pending |
-| FR-DASH-04 | Capture resale URL | 6 | 6.2 | | E-006-flip-lifecycle-management-analytics.feature | Pending |
-| FR-DASH-05 | Capture sale price, calculate profit | 6 | 6.2 | | E-006-flip-lifecycle-management-analytics.feature | Pending |
-| FR-DASH-06 | Advanced filtering | 6 | 6.3 | | E-006-flip-lifecycle-management-analytics.feature | Pending |
-| FR-DASH-07 | Analytics display | 6 | 6.4 | | E-006-flip-lifecycle-management-analytics.feature | Pending |
-| FR-DASH-08 | CSV/PDF export | 6 | 6.5 | | E-006-flip-lifecycle-management-analytics.feature | Pending |
+| FR-DASH-01 | Dashboard with inventory, stats, filters | 6 | 6.1 | @E-006-S-1, @E-006-S-2, @E-006-S-3, @E-006-S-4, @E-006-S-5, @E-006-S-6, @E-006-S-7, @E-006-S-8, @E-006-S-9 | E-006-flip-lifecycle-management-analytics.feature | Covered |
+| FR-DASH-02 | Kanban board drag-and-drop | 6 | 6.2 | @E-006-S-10, @E-006-S-11, @E-006-S-15, @E-006-S-21, @E-006-S-22 | E-006-flip-lifecycle-management-analytics.feature, user_flows.feature | Covered |
+| FR-DASH-03 | Capture purchase price | 6 | 6.2 | @E-006-S-12 | E-006-flip-lifecycle-management-analytics.feature | Covered |
+| FR-DASH-04 | Capture resale URL | 6 | 6.2 | @E-006-S-13 | E-006-flip-lifecycle-management-analytics.feature | Covered |
+| FR-DASH-05 | Capture sale price, calculate profit | 6 | 6.2 | @E-006-S-14 | E-006-flip-lifecycle-management-analytics.feature | Covered |
+| FR-DASH-06 | Advanced filtering | 6 | 6.3 | @E-006-S-16, @E-006-S-17, @E-006-S-18, @E-006-S-19, @E-006-S-20 | E-006-flip-lifecycle-management-analytics.feature | Covered |
+| FR-DASH-07 | Analytics display | 6 | 6.4 | @E-006-S-21, @E-006-S-22, @E-006-S-23, @E-006-S-24 | E-006-flip-lifecycle-management-analytics.feature | Covered |
+| FR-DASH-08 | CSV/PDF export | 6 | 6.5 | @E-006-S-25, @E-006-S-26, @E-006-S-27, @E-006-S-28, @E-006-S-29 | E-006-flip-lifecycle-management-analytics.feature | Covered |
 | FR-DASH-09 | Inventory view with holding costs | 6 | 6.6 | | E-006-flip-lifecycle-management-analytics.feature | Pending |
 | FR-DASH-10 | Real-time SSE dashboard updates | 6 | 6.6 | | E-006-flip-lifecycle-management-analytics.feature | Pending |
 | FR-DASH-11 | Onboarding wizard | 2 | 2.5 | | E-002-user-registration-auth-onboarding.feature | Pending |
@@ -157,12 +157,12 @@
 |---|---|---|---|---|---|---|
 | FR-BILLING-01 | NextAuth email/password auth | 2 | 2.2 | | E-002-user-registration-auth-onboarding.feature | Pending |
 | FR-BILLING-02 | OAuth login (Google, GitHub, Facebook) | 2 | 2.3 | | E-002-user-registration-auth-onboarding.feature | Pending |
-| FR-BILLING-03 | Subscription tier enforcement | 7 | 7.1 | | E-007-subscription-billing.feature | Pending |
-| FR-BILLING-04 | Stripe Checkout | 7 | 7.2 | | E-007-subscription-billing.feature | Pending |
-| FR-BILLING-05 | Stripe Customer Portal | 7 | 7.2 | | E-007-subscription-billing.feature | Pending |
-| FR-BILLING-06 | Stripe webhooks | 7 | 7.3 | | E-007-subscription-billing.feature | Pending |
-| FR-BILLING-07 | Feature gating by tier | 7 | 7.1 | | E-007-subscription-billing.feature | Pending |
-| FR-BILLING-08 | API usage tracking | 7 | 7.4 | | E-007-subscription-billing.feature | Pending |
+| FR-BILLING-03 | Subscription tier enforcement | 7 | 7.1 | @E-007-S-1, @E-007-S-2, @E-007-S-3, @E-007-S-4, @E-007-S-5, @E-007-S-6, @E-007-S-9, @E-007-S-10 | E-007-subscription-billing.feature | Covered |
+| FR-BILLING-04 | Stripe Checkout | 7 | 7.2 | @E-007-S-11, @E-007-S-12, @E-007-S-13, @E-007-S-16, @E-007-S-17 | E-007-subscription-billing.feature | Covered |
+| FR-BILLING-05 | Stripe Customer Portal | 7 | 7.2 | @E-007-S-14, @E-007-S-15, @E-007-S-18 | E-007-subscription-billing.feature | Covered |
+| FR-BILLING-06 | Stripe webhooks | 7 | 7.3 | @E-007-S-19, @E-007-S-20, @E-007-S-21, @E-007-S-22, @E-007-S-23, @E-007-S-27 | E-007-subscription-billing.feature | Covered |
+| FR-BILLING-07 | Feature gating by tier | 7 | 7.1 | @E-007-S-7, @E-007-S-8 | E-007-subscription-billing.feature | Covered |
+| FR-BILLING-08 | API usage tracking | 7 | 7.4 | @E-007-S-28, @E-007-S-29, @E-007-S-30, @E-007-S-31, @E-007-S-32 | E-007-subscription-billing.feature | Covered |
 | FR-BILLING-09 | User settings management | 2 | 2.6 | | E-002-user-registration-auth-onboarding.feature | Pending |
 | FR-BILLING-10 | hCaptcha login protection | 2 | 2.2 | | E-002-user-registration-auth-onboarding.feature | Pending |
 | FR-BILLING-11 | Password reset via Resend | 2 | 2.4 | | E-002-user-registration-auth-onboarding.feature | Pending |
@@ -191,7 +191,7 @@
 | NFR-SEC-05 | Input validation (Zod) all endpoints | 2 | | | Pending |
 | NFR-SEC-06 | API key encryption at rest | 2 | | | Pending |
 | NFR-SEC-07 | Security headers (CSP, HSTS, etc.) | 2 | | | Pending |
-| NFR-SEC-08 | Stripe webhook signature verification | 7 | | | Pending |
+| NFR-SEC-08 | Stripe webhook signature verification | 7 | @E-007-S-24, @E-007-S-25, @E-007-S-26 | E-007-subscription-billing.feature | Covered |
 | NFR-SEC-09 | hCaptcha on login | 2 | | | Pending |
 | NFR-SEC-10 | No critical/high vulns in deps | All | | | Pending |
 | NFR-SCALE-01 | Cloud Run auto-scaling (0-N) | 1 | | | Pending |
@@ -218,19 +218,19 @@
 
 | Category | Total Requirements | Covered | Pending | Coverage % |
 |---|---|---|---|---|
-| FR-INFRA | 14 | 13 | 1 | 93% |
+| FR-INFRA | 14 | 14 | 0 | 100% |
 | FR-SCAN | 16 | 0 | 16 | 0% |
-| FR-SCORE | 22 | 0 | 22 | 0% |
-| FR-COMM | 8 | 0 | 8 | 0% |
+| FR-SCORE | 22 | 14 | 8 | 64% |
+| FR-COMM | 8 | 5 | 3 | 63% |
 | FR-RELIST | 8 | 0 | 8 | 0% |
-| FR-DASH | 13 | 0 | 13 | 0% |
+| FR-DASH | 13 | 8 | 5 | 62% |
 | FR-MONITOR | 4 | 0 | 4 | 0% |
 | FR-NOTIFY | 13 | 0 | 13 | 0% |
-| FR-BILLING | 11 | 0 | 11 | 0% |
+| FR-BILLING | 11 | 6 | 5 | 55% |
 | FR-MEET | 2 | 0 | 2 | 0% |
-| **Total FR** | **111** | **13** | **98** | **12%** |
-| NFR | 30 | 4 | 26 | 13% |
-| **Grand Total** | **141** | **17** | **124** | **12%** |
+| **Total FR** | **111** | **47** | **64** | **42%** |
+| NFR | 30 | 5 | 25 | 17% |
+| **Grand Total** | **141** | **52** | **89** | **37%** |
 
 ---
 

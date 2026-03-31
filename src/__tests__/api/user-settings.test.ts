@@ -1,10 +1,13 @@
 import { NextRequest } from 'next/server';
 import { GET, PATCH } from '@/app/api/user/settings/route';
+import { getAuthUserId } from '@/lib/auth-middleware';
 
 // Mock auth middleware
 jest.mock('@/lib/auth-middleware', () => ({
   getAuthUserId: jest.fn().mockResolvedValue('test-user-id'),
 }));
+
+const mockGetAuthUserId = getAuthUserId as jest.Mock;
 
 // Mock crypto
 jest.mock('@/lib/crypto', () => ({
@@ -60,6 +63,15 @@ const mockUser = {
     notifyExpiring: true,
     notifyWeeklyDigest: true,
     notifyFrequency: 'instant',
+    opportunityThreshold: 70,
+    feeRateEbay: 13.0,
+    feeRateMercari: 10.0,
+    feeRateFacebook: 5.0,
+    feeRateOfferup: 12.9,
+    feeRateCraigslist: 0.0,
+    homeLocation: null,
+    maxPickupRadiusMiles: 25,
+    holdingCostDailyRate: 2.0,
     createdAt: new Date(),
     updatedAt: new Date(),
   },
@@ -131,6 +143,16 @@ describe('GET /api/user/settings', () => {
 
     expect(response.status).toBe(500);
     expect(data.success).toBe(false);
+  });
+
+  it('should return 401 when not authenticated', async () => {
+    mockGetAuthUserId.mockResolvedValueOnce(null);
+
+    const response = await GET();
+    const data = await response.json();
+
+    expect(response.status).toBe(401);
+    expect(data.error.code).toBe('UNAUTHORIZED');
   });
 });
 
@@ -374,5 +396,166 @@ describe('PATCH /api/user/settings', () => {
     expect(data.data.notifyExpiring).toBe(true);
     expect(data.data.notifyWeeklyDigest).toBe(true);
     expect(data.data.notifyFrequency).toBe('instant');
+  });
+
+  // Unauthorized paths
+  it('should return 401 when not authenticated for PATCH', async () => {
+    mockGetAuthUserId.mockResolvedValueOnce(null);
+
+    const req = createMockRequest('PATCH', { llmModel: 'gpt-4o' });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(response.status).toBe(401);
+    expect(data.error.code).toBe('UNAUTHORIZED');
+  });
+
+  // opportunityThreshold validation
+  it('should reject opportunityThreshold below 10', async () => {
+    const req = createMockRequest('PATCH', { opportunityThreshold: 5 });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(response.status).toBe(422);
+    expect(data.error.code).toBe('VALIDATION_ERROR');
+  });
+
+  it('should reject opportunityThreshold above 100', async () => {
+    const req = createMockRequest('PATCH', { opportunityThreshold: 110 });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(response.status).toBe(422);
+    expect(data.error.code).toBe('VALIDATION_ERROR');
+  });
+
+  it('should update valid opportunityThreshold', async () => {
+    const updated = { ...mockUser.settings, opportunityThreshold: 50 };
+    mockUpdateSettings.mockResolvedValue(updated);
+
+    const req = createMockRequest('PATCH', { opportunityThreshold: 50 });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(mockUpdateSettings).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ opportunityThreshold: 50 }),
+      })
+    );
+  });
+
+  // Fee rate validation
+  it('should reject fee rate above 50', async () => {
+    const req = createMockRequest('PATCH', { feeRateEbay: 60 });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(response.status).toBe(422);
+    expect(data.error.code).toBe('VALIDATION_ERROR');
+  });
+
+  it('should reject negative fee rate', async () => {
+    const req = createMockRequest('PATCH', { feeRateMercari: -1 });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(response.status).toBe(422);
+    expect(data.error.code).toBe('VALIDATION_ERROR');
+  });
+
+  it('should update valid fee rates', async () => {
+    const updated = { ...mockUser.settings, feeRateEbay: 12.9, feeRateMercari: 10 };
+    mockUpdateSettings.mockResolvedValue(updated);
+
+    const req = createMockRequest('PATCH', { feeRateEbay: 12.9, feeRateMercari: 10 });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(mockUpdateSettings).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ feeRateEbay: 12.9, feeRateMercari: 10 }),
+      })
+    );
+  });
+
+  // holdingCostDailyRate validation (Story 6.6)
+  it('should return holdingCostDailyRate in GET response', async () => {
+    mockFindUnique.mockResolvedValue(mockUser);
+
+    const response = await GET();
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(data.data.holdingCostDailyRate).toBe(2.0);
+  });
+
+  it('should update valid holdingCostDailyRate', async () => {
+    const updated = { ...mockUser.settings, holdingCostDailyRate: 3.5 };
+    mockUpdateSettings.mockResolvedValue(updated);
+
+    const req = createMockRequest('PATCH', { holdingCostDailyRate: 3.5 });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(data.data.holdingCostDailyRate).toBe(3.5);
+    expect(mockUpdateSettings).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ holdingCostDailyRate: 3.5 }),
+      })
+    );
+  });
+
+  it('should accept holdingCostDailyRate of 0 (boundary)', async () => {
+    const updated = { ...mockUser.settings, holdingCostDailyRate: 0 };
+    mockUpdateSettings.mockResolvedValue(updated);
+
+    const req = createMockRequest('PATCH', { holdingCostDailyRate: 0 });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(data.data.holdingCostDailyRate).toBe(0);
+  });
+
+  it('should accept holdingCostDailyRate of 100 (boundary)', async () => {
+    const updated = { ...mockUser.settings, holdingCostDailyRate: 100 };
+    mockUpdateSettings.mockResolvedValue(updated);
+
+    const req = createMockRequest('PATCH', { holdingCostDailyRate: 100 });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(data.data.holdingCostDailyRate).toBe(100);
+  });
+
+  it('should reject holdingCostDailyRate above 100', async () => {
+    const req = createMockRequest('PATCH', { holdingCostDailyRate: 101 });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(response.status).toBe(422);
+    expect(data.error.code).toBe('VALIDATION_ERROR');
+  });
+
+  it('should reject negative holdingCostDailyRate', async () => {
+    const req = createMockRequest('PATCH', { holdingCostDailyRate: -1 });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(response.status).toBe(422);
+    expect(data.error.code).toBe('VALIDATION_ERROR');
+  });
+
+  it('should reject non-numeric holdingCostDailyRate', async () => {
+    const req = createMockRequest('PATCH', { holdingCostDailyRate: 'abc' });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(response.status).toBe(422);
+    expect(data.error.code).toBe('VALIDATION_ERROR');
   });
 });

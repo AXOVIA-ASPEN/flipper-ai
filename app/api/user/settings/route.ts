@@ -64,6 +64,15 @@ export async function GET() {
         notifyExpiring: settings.notifyExpiring,
         notifyWeeklyDigest: settings.notifyWeeklyDigest,
         notifyFrequency: settings.notifyFrequency,
+        opportunityThreshold: settings.opportunityThreshold,
+        feeRateEbay: settings.feeRateEbay,
+        feeRateMercari: settings.feeRateMercari,
+        feeRateFacebook: settings.feeRateFacebook,
+        feeRateOfferup: settings.feeRateOfferup,
+        feeRateCraigslist: settings.feeRateCraigslist,
+        homeLocation: settings.homeLocation,
+        maxPickupRadiusMiles: settings.maxPickupRadiusMiles,
+        holdingCostDailyRate: settings.holdingCostDailyRate,
         createdAt: settings.createdAt,
         updatedAt: settings.updatedAt,
         user: {
@@ -93,6 +102,8 @@ export async function PATCH(request: NextRequest) {
       openaiApiKey, llmModel, discountThreshold, autoAnalyze,
       emailNotifications, notifyNewDeals, notifyPriceDrops,
       notifySoldItems, notifyExpiring, notifyWeeklyDigest, notifyFrequency,
+      opportunityThreshold, feeRateEbay, feeRateMercari, feeRateFacebook, feeRateOfferup, feeRateCraigslist,
+      homeLocation, maxPickupRadiusMiles, holdingCostDailyRate,
     } = body;
 
     // Validate llmModel if provided
@@ -109,6 +120,25 @@ export async function PATCH(request: NextRequest) {
       const threshold = parseInt(discountThreshold, 10);
       if (isNaN(threshold) || threshold < 0 || threshold > 100) {
         throw new ValidationError('Discount threshold must be between 0 and 100');
+      }
+    }
+
+    // Validate opportunityThreshold if provided
+    if (opportunityThreshold !== undefined) {
+      const ot = Math.round(Number(opportunityThreshold));
+      if (ot < 10 || ot > 100) {
+        throw new ValidationError('Opportunity threshold must be between 10 and 100');
+      }
+    }
+
+    // Validate fee rates if provided
+    const feeFields = { feeRateEbay, feeRateMercari, feeRateFacebook, feeRateOfferup, feeRateCraigslist };
+    for (const [field, value] of Object.entries(feeFields)) {
+      if (value !== undefined) {
+        const rate = Number(value);
+        if (!isFinite(rate) || rate < 0 || rate > 50) {
+          throw new ValidationError(`${field} must be a number between 0 and 50`);
+        }
       }
     }
 
@@ -134,6 +164,15 @@ export async function PATCH(request: NextRequest) {
       notifyExpiring?: boolean;
       notifyWeeklyDigest?: boolean;
       notifyFrequency?: string;
+      opportunityThreshold?: number;
+      feeRateEbay?: number;
+      feeRateMercari?: number;
+      feeRateFacebook?: number;
+      feeRateOfferup?: number;
+      feeRateCraigslist?: number;
+      homeLocation?: string | null;
+      maxPickupRadiusMiles?: number;
+      holdingCostDailyRate?: number;
     } = {};
 
     // Handle API key update
@@ -182,6 +221,37 @@ export async function PATCH(request: NextRequest) {
       updateData.notifyFrequency = notifyFrequency;
     }
 
+    if (opportunityThreshold !== undefined) {
+      updateData.opportunityThreshold = Math.round(Number(opportunityThreshold));
+    }
+
+    if (feeRateEbay !== undefined) updateData.feeRateEbay = Number(feeRateEbay);
+    if (feeRateMercari !== undefined) updateData.feeRateMercari = Number(feeRateMercari);
+    if (feeRateFacebook !== undefined) updateData.feeRateFacebook = Number(feeRateFacebook);
+    if (feeRateOfferup !== undefined) updateData.feeRateOfferup = Number(feeRateOfferup);
+    if (feeRateCraigslist !== undefined) updateData.feeRateCraigslist = Number(feeRateCraigslist);
+
+    // Logistics settings (Story 5.5)
+    if (homeLocation !== undefined) {
+      updateData.homeLocation = homeLocation === '' ? null : homeLocation;
+    }
+    if (maxPickupRadiusMiles !== undefined) {
+      const radius = Math.round(Number(maxPickupRadiusMiles));
+      if (!isFinite(radius) || radius < 5 || radius > 500) {
+        throw new ValidationError('maxPickupRadiusMiles must be between 5 and 500');
+      }
+      updateData.maxPickupRadiusMiles = radius;
+    }
+
+    // Holding cost rate (Story 6.6)
+    if (holdingCostDailyRate !== undefined) {
+      const rate = Number(holdingCostDailyRate);
+      if (!isFinite(rate) || rate < 0 || rate > 100) {
+        throw new ValidationError('holdingCostDailyRate must be a number between 0 and 100');
+      }
+      updateData.holdingCostDailyRate = rate;
+    }
+
     // Update settings
     const settings = await prisma.userSettings.update({
       where: { userId: user.id },
@@ -206,6 +276,15 @@ export async function PATCH(request: NextRequest) {
         notifyExpiring: settings.notifyExpiring,
         notifyWeeklyDigest: settings.notifyWeeklyDigest,
         notifyFrequency: settings.notifyFrequency,
+        opportunityThreshold: settings.opportunityThreshold,
+        feeRateEbay: settings.feeRateEbay,
+        feeRateMercari: settings.feeRateMercari,
+        feeRateFacebook: settings.feeRateFacebook,
+        feeRateOfferup: settings.feeRateOfferup,
+        feeRateCraigslist: settings.feeRateCraigslist,
+        homeLocation: settings.homeLocation,
+        maxPickupRadiusMiles: settings.maxPickupRadiusMiles,
+        holdingCostDailyRate: settings.holdingCostDailyRate,
         createdAt: settings.createdAt,
         updatedAt: settings.updatedAt,
       },

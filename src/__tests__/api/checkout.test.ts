@@ -1,7 +1,14 @@
 /**
- * Tests for POST /api/checkout
- * Author: ASPEN
- * Company: Axovia AI
+ * @file src/__tests__/api/checkout.test.ts
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-03-08
+ * @version 1.0
+ * @brief Tests for POST /api/checkout — Stripe Checkout session creation.
+ *
+ * @description
+ * Covers auth checks, tier validation, Stripe customer find-or-create,
+ * checkout session creation, stripeCustomerId persistence, and error handling.
  */
 
 import { NextRequest } from 'next/server';
@@ -10,6 +17,17 @@ import { NextRequest } from 'next/server';
 const mockGetCurrentUser = jest.fn();
 jest.mock('@/lib/auth', () => ({
   getCurrentUser: () => mockGetCurrentUser(),
+}));
+
+// Mock prisma
+const mockUserUpdateMany = jest.fn().mockResolvedValue({ count: 1 });
+jest.mock('@/lib/db', () => ({
+  __esModule: true,
+  default: {
+    user: {
+      updateMany: (...args: unknown[]) => mockUserUpdateMany(...args),
+    },
+  },
 }));
 
 // Mock stripe
@@ -40,6 +58,7 @@ describe('POST /api/checkout', () => {
     jest.clearAllMocks();
     mockCustomersList.mockResolvedValue({ data: [{ id: 'cus_123' }] });
     mockCheckoutCreate.mockResolvedValue({ url: 'https://checkout.stripe.com/xyz' });
+    mockUserUpdateMany.mockResolvedValue({ count: 1 });
   });
 
   it('returns 401 when not authenticated', async () => {
@@ -80,6 +99,11 @@ describe('POST /api/checkout', () => {
         line_items: [{ price: 'price_flipper_monthly', quantity: 1 }],
       })
     );
+    // Verify stripeCustomerId is stored on user
+    expect(mockUserUpdateMany).toHaveBeenCalledWith({
+      where: { email: 'test@test.com' },
+      data: { stripeCustomerId: 'cus_123' },
+    });
   });
 
   it('creates checkout session for PRO tier', async () => {
@@ -119,6 +143,22 @@ describe('POST /api/checkout', () => {
     expect(mockCheckoutCreate).toHaveBeenCalledWith(
       expect.objectContaining({ customer: 'cus_existing' })
     );
+  });
+
+  it('returns 200 and still creates checkout when no DB user row matches email', async () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: 'orphan@test.com', name: 'Orphan', firebaseUid: 'fb-1', image: null });
+    mockCustomersList.mockResolvedValue({ data: [{ id: 'cus_orphan' }] });
+    mockUserUpdateMany.mockResolvedValue({ count: 0 });
+
+    const res = await POST(makeRequest({ tier: 'FLIPPER' }));
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.url).toBe('https://checkout.stripe.com/xyz');
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('orphan@test.com'));
+    warnSpy.mockRestore();
+    mockUserUpdateMany.mockResolvedValue({ count: 1 });
   });
 
   it('returns 500 when checkout throws Error instance', async () => {

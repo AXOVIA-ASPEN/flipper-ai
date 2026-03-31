@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import {
   PostingQueueQuerySchema,
   CreatePostingQueueItemSchema,
@@ -9,6 +9,7 @@ import {
   validateQuery,
   validateBody,
 } from '@/lib/validations';
+import { checkFeatureAccess } from '@/lib/tier-enforcement';
 
 // GET /api/posting-queue - List posting queue items with filters
 export async function GET(request: NextRequest) {
@@ -68,6 +69,13 @@ export async function POST(request: NextRequest) {
     const userId = await getAuthUserId();
     if (!userId) {
       throw new UnauthorizedError('Unauthorized');
+    }
+
+    // Enforce eBay cross-listing feature gate
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { subscriptionTier: true } });
+    const featureCheck = checkFeatureAccess(user?.subscriptionTier, 'ebayCrossListing');
+    if (!featureCheck.allowed) {
+      throw new ForbiddenError(featureCheck.reason);
     }
 
     const body = await request.json();

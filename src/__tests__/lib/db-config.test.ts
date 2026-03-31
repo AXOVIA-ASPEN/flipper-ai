@@ -35,11 +35,15 @@ describe('Database Configuration', () => {
 
   it('should throw if DATABASE_URL is not set', () => {
     delete process.env.DATABASE_URL;
-    expect(() => require('../../lib/db')).toThrow('DATABASE_URL environment variable is not set');
+    // Client is lazily created — the throw happens on first property access, not at require() time
+    const db = require('../../lib/db');
+    expect(() => { void db.default.user; }).toThrow('DATABASE_URL environment variable is not set');
   });
 
   it('should create PrismaPg adapter with correct pool settings and pass to PrismaClient', () => {
-    require('../../lib/db');
+    const db = require('../../lib/db');
+    // Trigger lazy initialization by accessing a property
+    void db.default.user;
 
     // Verify adapter created with correct pool config
     expect(mockPrismaPg).toHaveBeenCalledTimes(1);

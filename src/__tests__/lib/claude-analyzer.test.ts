@@ -32,8 +32,24 @@ jest.mock('@/lib/db', () => ({
     aiAnalysisCache: {
       findFirst: jest.fn(),
       create: jest.fn(),
+      upsert: jest.fn(),
     },
   },
+}));
+
+// Mock in-memory L1 cache
+const mockCacheGet = jest.fn().mockReturnValue(undefined);
+const mockCacheSet = jest.fn();
+jest.mock('@/lib/cache', () => ({
+  analysisCache: {
+    get: (...args: unknown[]) => mockCacheGet(...args),
+    set: (...args: unknown[]) => mockCacheSet(...args),
+    delete: jest.fn(),
+  },
+}));
+
+jest.mock('@/lib/usage-tracker', () => ({
+  recordUsage: jest.fn().mockResolvedValue(undefined),
 }));
 
 import Anthropic from '@anthropic-ai/sdk';
@@ -44,12 +60,16 @@ import {
   ClaudeAnalysisResult,
 } from '@/lib/claude-analyzer';
 import prisma from '@/lib/db';
+import { recordUsage } from '@/lib/usage-tracker';
 
 describe('Claude Analyzer', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.resetModules();
     process.env.ANTHROPIC_API_KEY = 'test-key';
+    // Default: L1 cache miss
+    mockCacheGet.mockReturnValue(undefined);
+    mockCacheSet.mockReturnValue(undefined);
   });
 
   describe('analyzeListingData', () => {
@@ -99,6 +119,42 @@ describe('Claude Analyzer', () => {
       expect(result.flippabilityScore).toBe(85);
       expect(result.confidence).toBe('high');
       expect(result.keyFeatures).toHaveLength(3);
+      expect(recordUsage).not.toHaveBeenCalled();
+    });
+
+    test('records analysis usage when userId is provided', async () => {
+      const mockResponse = {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              category: 'electronics',
+              brand: 'Apple',
+              condition: 'good',
+              keyFeatures: ['a'],
+              potentialIssues: [],
+              flippabilityScore: 80,
+              confidence: 'high',
+              reasoning: 'ok',
+            }),
+          },
+        ],
+      };
+
+      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
+      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
+      AnthropicMock.mockImplementation(
+        () =>
+          ({
+            messages: {
+              create: mockCreate,
+            },
+          }) as any
+      );
+
+      await analyzeListingData('Item', 'Desc', 100, undefined, 'user-meter-1');
+
+      expect(recordUsage).toHaveBeenCalledWith('user-meter-1', 'ANALYSIS');
     });
 
     test('should handle Claude response with markdown wrapper', async () => {
@@ -497,10 +553,11 @@ describe('Claude Analyzer', () => {
 
       await analyzeListing('listing-cache-test');
 
-      expect(prisma.aiAnalysisCache.create).toHaveBeenCalledWith(
+      expect(prisma.aiAnalysisCache.upsert).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({
+          create: expect.objectContaining({
             listingId: 'listing-cache-test',
+            analysisType: 'claude',
             analysisResult: expect.any(String),
             expiresAt: expect.any(Date),
           }),
@@ -556,7 +613,7 @@ describe('Claude Analyzer', () => {
 
     test('should handle cache storage errors gracefully', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
-      (prisma.aiAnalysisCache.create as jest.Mock).mockRejectedValue(
+      (prisma.aiAnalysisCache.upsert as jest.Mock).mockRejectedValue(
         new Error('Cache write error')
       );
       (prisma.listing.findUnique as jest.Mock).mockResolvedValue({
@@ -674,6 +731,90 @@ describe('Claude Analyzer', () => {
 
       expect(result.reasoning).toBe('Parsed without images');
       // Should still complete successfully
+    });
+
+    test('should return L1 cached result immediately without DB or API call', async () => {
+      const l1Result: ClaudeAnalysisResult = {
+        category: 'electronics',
+        condition: 'good',
+        keyFeatures: ['L1 cached feature'],
+        potentialIssues: [],
+        flippabilityScore: 88,
+        confidence: 'high',
+        reasoning: 'From L1 memory cache',
+      };
+      mockCacheGet.mockReturnValue(l1Result);
+
+      const result = await analyzeListing('listing-l1-hit');
+
+      expect(result.reasoning).toBe('From L1 memory cache');
+      expect(prisma.aiAnalysisCache.findFirst).not.toHaveBeenCalled();
+      expect(Anthropic).not.toHaveBeenCalled();
+    });
+
+    test('should populate L1 cache after L2 database cache hit', async () => {
+      const dbData = {
+        category: 'tools',
+        condition: 'good',
+        keyFeatures: ['L2 cached'],
+        potentialIssues: [],
+        flippabilityScore: 72,
+        confidence: 'medium',
+        reasoning: 'From L2 database cache',
+      };
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue({
+        id: 'db-cache-id',
+        listingId: 'listing-l2-pop',
+        analysisResult: JSON.stringify(dbData),
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+      });
+
+      await analyzeListing('listing-l2-pop');
+
+      expect(mockCacheSet).toHaveBeenCalledWith(
+        'claude:listing-l2-pop',
+        expect.objectContaining({ reasoning: 'From L2 database cache' })
+      );
+      expect(Anthropic).not.toHaveBeenCalled();
+    });
+
+    test('should populate L1 cache after successful API call', async () => {
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
+      (prisma.aiAnalysisCache.upsert as jest.Mock).mockResolvedValue({});
+      (prisma.listing.findUnique as jest.Mock).mockResolvedValue({
+        id: 'listing-api-l1',
+        title: 'New Item',
+        description: 'Fresh',
+        askingPrice: 75,
+        imageUrls: '[]',
+      });
+
+      const mockResponse = {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            category: 'electronics',
+            condition: 'excellent',
+            keyFeatures: ['Fresh result'],
+            potentialIssues: [],
+            flippabilityScore: 90,
+            confidence: 'high',
+            reasoning: 'API populated L1',
+          }),
+        }],
+      };
+
+      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
+      AnthropicMock.mockImplementation(() => ({
+        messages: { create: jest.fn().mockResolvedValue(mockResponse) },
+      }) as any);
+
+      await analyzeListing('listing-api-l1');
+
+      expect(mockCacheSet).toHaveBeenCalledWith(
+        'claude:listing-api-l1',
+        expect.objectContaining({ reasoning: 'API populated L1' })
+      );
     });
   });
 

@@ -36,6 +36,12 @@ jest.mock('@/lib/db', () => ({
       create: (...args: unknown[]) => mockJobCreate(...args),
       update: (...args: unknown[]) => mockJobUpdate(...args),
     },
+    userSettings: {
+      findUnique: jest.fn().mockResolvedValue(null),
+    },
+    aiAnalysisCache: {
+      create: jest.fn().mockResolvedValue({}),
+    },
   },
 }));
 
@@ -45,6 +51,37 @@ jest.mock('@/lib/market-value-calculator', () => ({
     marketDataSource: 'ebay_sold',
   }),
   calculateTrueDiscount: jest.fn().mockReturnValue(5.5),
+  lookupVerifiedMarketPrice: jest.fn().mockResolvedValue(null),
+}));
+
+jest.mock('@/lib/market-price', () => ({
+  closeBrowser: jest.fn().mockResolvedValue(undefined),
+  fetchMarketPrice: jest.fn().mockResolvedValue(null),
+}));
+
+// Mocks for enrichment pipeline modules added by parallel stories (5.1, 5.2, 5.3, 5.4)
+jest.mock('@/lib/claude-analyzer', () => ({
+  analyzeListingData: jest.fn().mockResolvedValue(null),
+}));
+
+jest.mock('@/lib/demand-analyzer', () => ({
+  analyzeDemandTrend: jest.fn().mockReturnValue(null),
+}));
+
+jest.mock('@/lib/comp-matcher', () => ({
+  findComparableSales: jest.fn().mockResolvedValue(null),
+}));
+
+jest.mock('@/lib/item-completeness-analyzer', () => ({
+  analyzeItemCompleteness: jest.fn().mockResolvedValue(null),
+}));
+
+jest.mock('@/lib/seller-reputation-analyzer', () => ({
+  analyzeSellerReputation: jest.fn().mockReturnValue(null),
+}));
+
+jest.mock('@/lib/tier-enforcement', () => ({
+  enforceTierLimits: jest.fn().mockResolvedValue(undefined),
 }));
 
 function createRequest(body: Record<string, unknown>) {
@@ -187,10 +224,12 @@ describe('eBay Scraper API', () => {
 
     it('scrapes listings and stores price history', async () => {
       const mockFetch = global.fetch as jest.Mock;
+      // Use condition: 'New' so item scores >= 70 (opportunity) and gets saved
+      // Apple iPhone in New condition → valueScore ~91 → isOpportunity=true
       mockFetch
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ itemSummaries: [makeEbayItem()] }),
+          json: async () => ({ itemSummaries: [makeEbayItem({ condition: 'New' })] }),
         })
         .mockResolvedValueOnce({
           ok: true,
@@ -305,10 +344,9 @@ describe('eBay Scraper API', () => {
         .mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
       const response = await POST(createRequest({ keywords: 'test' }));
-      const data = await response.json();
 
+      // price=0 → valueScore=NaN → not an opportunity → not saved (Story 5.3 only saves opportunities)
       expect(response.status).toBe(200);
-      expect(data.listingsSaved).toBe(1);
     });
 
     it('handles item with no condition', async () => {
@@ -323,9 +361,9 @@ describe('eBay Scraper API', () => {
         .mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
       const response = await POST(createRequest({ keywords: 'test' }));
-      const data = await response.json();
 
-      expect(data.listingsSaved).toBe(1);
+      // Apple iPhone at $850 with fallback condition scores ~56 → not an opportunity → not saved
+      expect(response.status).toBe(200);
     });
 
     it('handles item with no seller info', async () => {
@@ -340,9 +378,9 @@ describe('eBay Scraper API', () => {
         .mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
       const response = await POST(createRequest({ keywords: 'test' }));
-      const data = await response.json();
 
-      expect(data.listingsSaved).toBe(1);
+      // Apple iPhone at $850 USED scores ~56 → not an opportunity → not saved
+      expect(response.status).toBe(200);
     });
 
     it('handles seller with only feedbackScore (no percentage)', async () => {
@@ -449,8 +487,8 @@ describe('eBay Scraper API', () => {
         .mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
       const response = await POST(createRequest({ keywords: 'test' }));
+      // No categories → detectCategory falls back to 'electronics'; score ~60 → not an opportunity → not saved
       expect(response.status).toBe(200);
-      expect(mockListingUpsert).toHaveBeenCalled();
     });
 
     it('handles item with empty categories array', async () => {
@@ -881,7 +919,8 @@ describe('eBay Scraper API', () => {
       const response = await POST(createRequest({ keywords: 'test' }));
       const data = await response.json();
 
-      expect(data.listingsSaved).toBe(3);
+      // Only the 2 opportunity items (e1 and e3) are saved; e2 (low score) is filtered out by Story 5.3
+      expect(data.listingsSaved).toBe(2);
       expect(mockJobUpdate).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
@@ -892,15 +931,17 @@ describe('eBay Scraper API', () => {
       );
     });
 
-    it('saves listing as NEW status when valueScore < 70 (low-value generic item)', async () => {
-      // A $20 item with no brand/no categories → detectCategory used (no categories path) → score < 70 → 'NEW'
+    it('skips saving non-opportunity items when valueScore < 70 (low-value generic item)', async () => {
+      // A $20 generic item with no brand/no categories → score < 70 → not an opportunity
+      // Story 5.3: enrichWithDemandAnalysis filters to only isOpportunity=true listings,
+      // so non-opportunities are dropped before the save loop runs.
       const lowValueItem = makeEbayItem({
         itemId: 'low-value-1',
         title: 'Random old misc lot junk',
         shortDescription: '',
         price: { value: '20', currency: 'USD' }, // very low price, no brand = low/negative profit
-        categories: undefined, // triggers detectCategory fallback (covers line 168 category branch)
-        condition: undefined, // triggers item.condition || null → null (covers line 229/261)
+        categories: undefined, // triggers detectCategory fallback (covers category detection branch)
+        condition: undefined, // triggers item.condition || null → null
         image: undefined,
         additionalImages: undefined,
         seller: { username: 'seller', feedbackPercentage: '95', feedbackScore: 10 },
@@ -919,12 +960,8 @@ describe('eBay Scraper API', () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      // The upsert should be called with status 'NEW' (low valueScore from generic item)
-      expect(mockListingUpsert).toHaveBeenCalledWith(
-        expect.objectContaining({
-          create: expect.objectContaining({ status: 'NEW' }),
-        })
-      );
+      // Non-opportunity items are filtered out before saving — only opportunities are persisted
+      expect(mockListingUpsert).not.toHaveBeenCalled();
     });
 
     it('saves listing as OPPORTUNITY when valueScore >= 70 (high-margin item)', async () => {

@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { estimateValue, detectCategory, generatePurchaseMessage } from '@/lib/value-estimator';
+import { identifyItem } from '@/lib/llm-identifier';
+import { fetchMarketPrice, closeBrowser as closeMarketBrowser, type MarketPrice } from '@/lib/market-price';
+import { lookupVerifiedMarketPrice } from '@/lib/market-value-calculator';
+import { findComparableSales, type CompMatchResult } from '@/lib/comp-matcher';
+import { analyzeSellability, quickDiscountCheck } from '@/lib/llm-analyzer';
+import { analyzeDemandTrend } from '@/lib/demand-analyzer';
+import { enrichOpportunitiesWithClaudeTier2, enrichWithCompletenessAndReputation, getPlatformFeeRate } from '@/lib/marketplace-scanner';
+import { analyzeLogistics } from '@/lib/logistics-analyzer';
 import { getAuthUserId } from '@/lib/auth-middleware';
 
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { enforceTierLimits } from '@/lib/tier-enforcement';
 const FB_GRAPH_API_BASE = 'https://graph.facebook.com/v19.0';
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
@@ -173,7 +182,15 @@ function formatLocation(location?: FacebookMarketplaceListing['location']): stri
 /**
  * Save a Facebook listing to the database
  */
-async function saveListingFromFacebookItem(item: FacebookMarketplaceListing, userId: string) {
+async function saveListingFromFacebookItem(
+  item: FacebookMarketplaceListing,
+  userId: string,
+  discountThreshold: number = 50,
+  hasLLM: boolean = false,
+  feeRate: number = 0.05,
+  opportunityThreshold: number = 70,
+  userSettings?: { homeLocation: string | null; maxPickupRadiusMiles: number | null } | null
+): Promise<Awaited<ReturnType<typeof prisma.listing.upsert>> | null> {
   const price = parseFloat(item.price || '0');
   const description = item.description || '';
   /* istanbul ignore next -- item.category is optional; detectCategory and 'electronics' fallback are defensive defaults */
@@ -185,14 +202,94 @@ async function saveListingFromFacebookItem(item: FacebookMarketplaceListing, use
     description,
     price,
     item.condition || null,
-    category
+    category,
+    feeRate
   );
+
+  // LLM Analysis Pipeline
+  let llmAnalyzed = false;
+  let sellabilityAnalysis = null;
+  let verifiedMarketValue: number | null = null;
+  let trueDiscountPercent: number | null = null;
+  let meetsLLMThreshold = !hasLLM; // Without LLM, always proceed to save
+  let capturedMarketData: MarketPrice | null = null;
+  let capturedIdentification: Awaited<ReturnType<typeof identifyItem>> | null = null;
+
+  if (hasLLM && price > 0) {
+    try {
+      const identification = await identifyItem(item.name || '', description, price, category);
+      capturedIdentification = identification; // Story 5.2: capture for comp matching
+      if (identification?.worthInvestigating) {
+        const marketData = await fetchMarketPrice(identification.searchQuery, identification.category);
+        capturedMarketData = marketData; // Story 5.3: capture for demand analysis
+        if (marketData && marketData.salesCount > 0) {
+          const quickCheck = quickDiscountCheck(price, marketData);
+          if (quickCheck.passesQuickCheck) {
+            sellabilityAnalysis = await analyzeSellability(
+              item.name || '',
+              price,
+              identification,
+              marketData,
+              discountThreshold,
+              feeRate
+            );
+            if (sellabilityAnalysis) {
+              llmAnalyzed = true;
+              verifiedMarketValue = sellabilityAnalysis.verifiedMarketValue;
+              trueDiscountPercent = sellabilityAnalysis.trueDiscountPercent;
+              meetsLLMThreshold =
+                sellabilityAnalysis.meetsThreshold &&
+                trueDiscountPercent !== null &&
+                trueDiscountPercent >= discountThreshold;
+            }
+          }
+        }
+      }
+    } catch (llmError) {
+      console.error(`LLM analysis error for Facebook item ${item.id}:`, llmError);
+    }
+  }
+
+  // Story 4.4: Verified market price fallback when LLM pipeline didn't produce one
+  if (!verifiedMarketValue && price > 0) {
+    try {
+      const vpResult = await lookupVerifiedMarketPrice(item.name || '', price, category);
+      if (vpResult) {
+        verifiedMarketValue = vpResult.verifiedMarketValue;
+        trueDiscountPercent = vpResult.trueDiscountPercent;
+      }
+    } catch (vpErr) {
+      console.error(`Verified price lookup error for Facebook item ${item.id}:`, vpErr);
+    }
+  }
+
+  // Story 5.3: Demand trend analysis
+  const demandAnalysis = capturedMarketData ? analyzeDemandTrend(capturedMarketData.soldListings) : null;
+
+  // Story 5.2: Comparable sold item matching — reuses fetched soldListings
+  let compMatches: CompMatchResult | null = null;
+  if (capturedIdentification && capturedMarketData) {
+    try {
+      compMatches = await findComparableSales(
+        capturedIdentification.searchQuery,
+        capturedIdentification.brand ?? null,
+        capturedIdentification.model ?? null,
+        capturedIdentification.category,
+        capturedMarketData.soldListings
+      );
+    } catch (compErr) {
+      console.error(`Comp matching error for Facebook item ${item.id}:`, compErr);
+    }
+  }
+
+  // If LLM is active but item doesn't meet threshold, skip
+  if (hasLLM && !meetsLLMThreshold) {
+    return null;
+  }
 
   /* istanbul ignore next -- item.images is optional; || [] is a defensive default */
   const imageUrls = item.images?.map((img) => img.url) || [];
   const serializedImages = imageUrls.length ? JSON.stringify(imageUrls) : null;
-  const tags = JSON.stringify(estimation.tags);
-  const status = estimation.valueScore >= 70 ? 'OPPORTUNITY' : 'NEW';
 
   /* istanbul ignore next -- item.seller is optional; || null is a defensive default */
   const sellerName = item.seller?.name || null;
@@ -203,6 +300,59 @@ async function saveListingFromFacebookItem(item: FacebookMarketplaceListing, use
     estimation.negotiable,
     sellerName || undefined
   );
+
+  // Step 6: Logistics & shipping cost analysis (Story 5.5)
+  let logisticsAnalysis = null;
+  try {
+    logisticsAnalysis = await analyzeLogistics(
+      { title: item.name || '', description, category, location: formatLocation(item.location), estimation },
+      userSettings?.homeLocation ?? null,
+      userSettings?.maxPickupRadiusMiles ?? 50
+    );
+  } catch (logErr) {
+    console.error(`Logistics analysis error for Facebook item ${item.id}:`, logErr);
+  }
+
+  // Claude Tier 2 structural analysis (Story 5.1) — via centralized enrichment function
+  const [claudeEnriched] = await enrichOpportunitiesWithClaudeTier2(
+    [
+      {
+        externalId: item.id,
+        url: item.marketplace_listing_url || `https://www.facebook.com/marketplace/item/${item.id}`,
+        title: item.name || '',
+        description,
+        askingPrice: price,
+        imageUrls,
+        platform: 'FACEBOOK_MARKETPLACE',
+        category,
+        estimation,
+        requestToBuy,
+        isOpportunity: true,
+      },
+    ],
+    userId
+  );
+  const claudeAnalysis = claudeEnriched.claudeAnalysis;
+
+  // Story 5.4: Item completeness & seller reputation enrichment (Step 6 in pipeline)
+  // Facebook Marketplace does not expose seller ratings — completeness analysis only
+  const [enriched54] = await enrichWithCompletenessAndReputation([{
+    externalId: item.id,
+    url: item.marketplace_listing_url || `https://www.facebook.com/marketplace/item/${item.id}`,
+    title: item.name || '',
+    description,
+    askingPrice: price,
+    imageUrls,
+    platform: 'FACEBOOK_MARKETPLACE',
+    category,
+    estimation,
+    requestToBuy,
+    isOpportunity: true,
+  }]);
+  const completenessLabel = enriched54.completenessAnalysis?.completenessLabel ?? null;
+
+  const tags = JSON.stringify(estimation.tags);
+  const status = hasLLM ? 'OPPORTUNITY' : estimation.valueScore >= opportunityThreshold ? 'OPPORTUNITY' : 'NEW';
 
   const savedListing = await prisma.listing.upsert({
     where: {
@@ -238,12 +388,50 @@ async function saveListingFromFacebookItem(item: FacebookMarketplaceListing, use
       resaleDifficulty: estimation.resaleDifficulty,
       comparableUrls: JSON.stringify(estimation.comparableUrls),
       priceReasoning: estimation.reasoning,
-      notes: estimation.notes,
-      shippable: estimation.shippable,
+      notes: sellabilityAnalysis?.resaleStrategy || estimation.notes,
+      shippable: logisticsAnalysis
+        ? logisticsAnalysis.sizeCategory !== 'large_local_only'
+        : estimation.shippable,
+      sizeCategory: logisticsAnalysis?.sizeCategory ?? null,
+      shippingEstimatesJson: logisticsAnalysis?.shippingEstimates
+        ? JSON.stringify(logisticsAnalysis.shippingEstimates) : null,
+      estimatedShippingCost: logisticsAnalysis?.estimatedShippingCost ?? null,
+      pickupDistanceMiles: logisticsAnalysis?.pickupDistanceMiles ?? null,
+      outsidePickupRadius: logisticsAnalysis?.outsidePickupRadius ?? null,
+      adjustedProfitMargin: logisticsAnalysis?.adjustedProfitMargin ?? null,
+      estimatedWeight: logisticsAnalysis?.estimatedWeightLbs ?? null,
       negotiable: estimation.negotiable,
       tags,
       requestToBuy,
       status,
+      verifiedMarketValue,
+      marketDataSource: sellabilityAnalysis ? 'ebay_scrape' : null,
+      marketDataDate: sellabilityAnalysis ? new Date() : null,
+      trueDiscountPercent,
+      llmAnalyzed,
+      analysisDate: llmAnalyzed ? new Date() : null,
+      sellabilityScore: sellabilityAnalysis?.sellabilityScore || null,
+      demandLevel: demandAnalysis?.demandTrend ?? sellabilityAnalysis?.demandLevel ?? null,
+      soldVolume30Days: demandAnalysis?.soldVolume30Days ?? null,
+      soldVolume60Days: demandAnalysis?.soldVolume60Days ?? null,
+      soldVolume90Days: demandAnalysis?.soldVolume90Days ?? null,
+      expectedDaysToSell: sellabilityAnalysis?.expectedDaysToSell || null,
+      authenticityRisk: sellabilityAnalysis?.authenticityRisk || null,
+      conditionRisk: sellabilityAnalysis?.conditionRisk || null,
+      recommendedOffer: sellabilityAnalysis?.recommendedOfferPrice || null,
+      recommendedList: sellabilityAnalysis?.recommendedListPrice || null,
+      resaleStrategy: sellabilityAnalysis?.resaleStrategy || null,
+      // Story 5.4: Item completeness & seller reputation
+      completenessLabel,
+      sellerRating: null,         // Facebook Marketplace does not expose seller rating data
+      sellerReviewCount: null,
+      sellerAccountAgeDays: null,
+      comparableSalesJson: compMatches
+        ? JSON.stringify(compMatches.comps)
+        : capturedMarketData ? JSON.stringify(capturedMarketData.soldListings.slice(0, 5)) : null,
+      compMatchConfidence: compMatches?.confidence ?? null,
+      analysisConfidence: claudeAnalysis?.confidence ?? sellabilityAnalysis?.confidence ?? null,
+      analysisReasoning: claudeAnalysis?.reasoning ?? sellabilityAnalysis?.reasoning ?? null,
     },
     update: {
       title: item.name || /* istanbul ignore next */ 'Untitled',
@@ -265,13 +453,68 @@ async function saveListingFromFacebookItem(item: FacebookMarketplaceListing, use
       resaleDifficulty: estimation.resaleDifficulty,
       comparableUrls: JSON.stringify(estimation.comparableUrls),
       priceReasoning: estimation.reasoning,
-      notes: estimation.notes,
-      shippable: estimation.shippable,
+      notes: sellabilityAnalysis?.resaleStrategy || estimation.notes,
+      shippable: logisticsAnalysis
+        ? logisticsAnalysis.sizeCategory !== 'large_local_only'
+        : estimation.shippable,
+      sizeCategory: logisticsAnalysis?.sizeCategory ?? null,
+      shippingEstimatesJson: logisticsAnalysis?.shippingEstimates
+        ? JSON.stringify(logisticsAnalysis.shippingEstimates) : null,
+      estimatedShippingCost: logisticsAnalysis?.estimatedShippingCost ?? null,
+      pickupDistanceMiles: logisticsAnalysis?.pickupDistanceMiles ?? null,
+      outsidePickupRadius: logisticsAnalysis?.outsidePickupRadius ?? null,
+      adjustedProfitMargin: logisticsAnalysis?.adjustedProfitMargin ?? null,
+      estimatedWeight: logisticsAnalysis?.estimatedWeightLbs ?? null,
       negotiable: estimation.negotiable,
       tags,
       requestToBuy,
+      status,
+      verifiedMarketValue,
+      marketDataSource: sellabilityAnalysis ? 'ebay_scrape' : null,
+      marketDataDate: sellabilityAnalysis ? new Date() : null,
+      trueDiscountPercent,
+      llmAnalyzed,
+      analysisDate: llmAnalyzed ? new Date() : null,
+      sellabilityScore: sellabilityAnalysis?.sellabilityScore || null,
+      demandLevel: demandAnalysis?.demandTrend ?? sellabilityAnalysis?.demandLevel ?? null,
+      soldVolume30Days: demandAnalysis?.soldVolume30Days ?? null,
+      soldVolume60Days: demandAnalysis?.soldVolume60Days ?? null,
+      soldVolume90Days: demandAnalysis?.soldVolume90Days ?? null,
+      expectedDaysToSell: sellabilityAnalysis?.expectedDaysToSell || null,
+      authenticityRisk: sellabilityAnalysis?.authenticityRisk || null,
+      conditionRisk: sellabilityAnalysis?.conditionRisk || null,
+      recommendedOffer: sellabilityAnalysis?.recommendedOfferPrice || null,
+      recommendedList: sellabilityAnalysis?.recommendedListPrice || null,
+      resaleStrategy: sellabilityAnalysis?.resaleStrategy || null,
+      // Story 5.4: Item completeness & seller reputation
+      completenessLabel,
+      sellerRating: null,
+      sellerReviewCount: null,
+      sellerAccountAgeDays: null,
+      comparableSalesJson: compMatches
+        ? JSON.stringify(compMatches.comps)
+        : capturedMarketData ? JSON.stringify(capturedMarketData.soldListings.slice(0, 5)) : null,
+      compMatchConfidence: compMatches?.confidence ?? null,
+      analysisConfidence: claudeAnalysis?.confidence ?? sellabilityAnalysis?.confidence ?? null,
+      analysisReasoning: claudeAnalysis?.reasoning ?? sellabilityAnalysis?.reasoning ?? null,
     },
   });
+
+  if (claudeAnalysis) {
+    try {
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 24);
+      await prisma.aiAnalysisCache.create({
+        data: {
+          listingId: savedListing.id,
+          analysisResult: JSON.stringify(claudeAnalysis),
+          expiresAt,
+        },
+      });
+    } catch (cacheErr) {
+      console.error(`Failed to cache Claude analysis for Facebook item ${item.id}:`, cacheErr);
+    }
+  }
 
   return savedListing;
 }
@@ -323,6 +566,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const userSettings = await prisma.userSettings.findUnique({ where: { userId } });
+    const discountThreshold = userSettings?.discountThreshold ?? 50;
+    const feeRate = getPlatformFeeRate('FACEBOOK_MARKETPLACE', userSettings);
+    const opportunityThreshold = userSettings?.opportunityThreshold ?? 70;
+    const hasLLM = !!process.env.OPENAI_API_KEY;
+
     const sanitizedLimit = Math.min(body.limit ?? DEFAULT_LIMIT, MAX_LIMIT);
     const searchParams: ScrapeRequestBody = {
       ...body,
@@ -330,6 +579,9 @@ export async function POST(request: NextRequest) {
       limit: sanitizedLimit,
       accessToken,
     };
+
+    // Enforce subscription tier limits (scan count + marketplace)
+    await enforceTierLimits(userId, 'FACEBOOK_MARKETPLACE');
 
     // Create scraper job record
     const scraperJob = await prisma.scraperJob.create({
@@ -351,9 +603,15 @@ export async function POST(request: NextRequest) {
       const savedListings = [];
       for (const item of listings) {
         if (!item.id || !item.name) continue;
-        const listing = await saveListingFromFacebookItem(item, userId);
-        savedListings.push(listing);
+        try {
+          const listing = await saveListingFromFacebookItem(item, userId, discountThreshold, hasLLM, feeRate, opportunityThreshold, userSettings);
+          if (!listing) continue;
+          savedListings.push(listing);
+        } catch (itemError) {
+          console.error(`Error processing Facebook item ${item.id}:`, itemError);
+        }
       }
+      await closeMarketBrowser();
 
       // Update scraper job status
       await prisma.scraperJob.update({

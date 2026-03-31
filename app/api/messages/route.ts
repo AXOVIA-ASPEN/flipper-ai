@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
+import { handleError, ValidationError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { checkFeatureAccess } from '@/lib/tier-enforcement';
 // GET /api/messages - Get all messages for the authenticated user
 export async function GET(request: NextRequest) {
   try {
@@ -78,6 +79,13 @@ export async function POST(request: NextRequest) {
     const userId = await getAuthUserId();
     if (!userId) {
       throw new UnauthorizedError('Unauthorized');
+    }
+
+    // Enforce messaging feature gate
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { subscriptionTier: true } });
+    const featureCheck = checkFeatureAccess(user?.subscriptionTier, 'messaging');
+    if (!featureCheck.allowed) {
+      throw new ForbiddenError(featureCheck.reason);
     }
 
     const body = await request.json();

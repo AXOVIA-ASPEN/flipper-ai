@@ -259,3 +259,147 @@ describe('getProfitLossAnalytics - branch coverage', () => {
     expect(cat?.avgROI).toBeGreaterThan(0);
   });
 });
+
+// ── Story 6.4: New metrics and date range tests ─────────────────────────────
+
+describe('getProfitLossAnalytics - avgProfitPerFlip and successRate', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('computes avgProfitPerFlip: 2 SOLD items with netProfit $100 and $200 → avgProfitPerFlip = 150', async () => {
+    // Use same purchase and resale date to eliminate carrying cost, making netProfit exact
+    const sameDay = new Date('2026-01-02T12:00:00Z');
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([
+      makeOpp({ id: 'opp-a', purchasePrice: 50, resalePrice: 160, fees: 10,
+        purchaseDate: sameDay, resaleDate: sameDay }),
+      makeOpp({ id: 'opp-b', purchasePrice: 50, resalePrice: 260, fees: 10,
+        purchaseDate: sameDay, resaleDate: sameDay }),
+    ]);
+    const result = await getProfitLossAnalytics('user-1');
+    // opp-a netProfit: 160-50-10=100, opp-b: 260-50-10=200, avg=150
+    expect(result.avgProfitPerFlip).toBe(150);
+  });
+
+  it('returns avgProfitPerFlip = 0 when no completed deals', async () => {
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([
+      makeOpp({ status: 'PURCHASED', resalePrice: null, resaleDate: null }),
+    ]);
+    const result = await getProfitLossAnalytics('user-1');
+    expect(result.avgProfitPerFlip).toBe(0);
+  });
+
+  it('computes successRate: 2 SOLD out of 3 total → successRate = 66.67', async () => {
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([
+      makeOpp({ id: 'sold-1', status: 'SOLD' }),
+      makeOpp({ id: 'sold-2', status: 'SOLD',
+        purchaseDate: new Date('2026-01-05T12:00:00Z'),
+        resaleDate: new Date('2026-01-20T12:00:00Z') }),
+      makeOpp({ id: 'active-1', status: 'PURCHASED', resalePrice: null, resaleDate: null }),
+    ]);
+    const result = await getProfitLossAnalytics('user-1');
+    expect(result.successRate).toBeCloseTo(66.67, 1);
+  });
+
+  it('returns successRate = 0 when no items', async () => {
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([]);
+    const result = await getProfitLossAnalytics('user-1');
+    expect(result.successRate).toBe(0);
+  });
+
+  it('computes platformBreakdown: 2 EBAY items, 1 CRAIGSLIST → two entries sorted by totalProfit', async () => {
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([
+      makeOpp({ id: 'eb-1', purchasePrice: 50, resalePrice: 200, fees: 10,
+        listing: { title: 'eBay 1', platform: 'EBAY', category: 'Electronics' } }),
+      makeOpp({ id: 'eb-2', purchasePrice: 50, resalePrice: 200, fees: 10,
+        purchaseDate: new Date('2026-01-05T12:00:00Z'),
+        resaleDate: new Date('2026-01-20T12:00:00Z'),
+        listing: { title: 'eBay 2', platform: 'EBAY', category: 'Electronics' } }),
+      makeOpp({ id: 'cl-1', purchasePrice: 100, resalePrice: 120, fees: 0,
+        listing: { title: 'CL item', platform: 'CRAIGSLIST', category: 'Furniture' } }),
+    ]);
+    const result = await getProfitLossAnalytics('user-1');
+    expect(result.platformBreakdown).toHaveLength(2);
+    // EBAY has higher totalProfit → sorted first
+    expect(result.platformBreakdown[0].platform).toBe('EBAY');
+    expect(result.platformBreakdown[1].platform).toBe('CRAIGSLIST');
+    expect(result.platformBreakdown[0].count).toBe(2);
+  });
+
+  it('avgProfitPerFlip uses only SOLD items netProfit, ignoring active item carrying costs', async () => {
+    const sameDay = new Date('2026-01-02T12:00:00Z');
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([
+      // SOLD item: netProfit = 200 - 100 - 10 = 90 (same-day purchase/resale, no carrying cost)
+      makeOpp({ id: 'sold-1', purchasePrice: 100, resalePrice: 200, fees: 10,
+        purchaseDate: sameDay, resaleDate: sameDay }),
+      // PURCHASED item: contributes large negative netProfit to totalNetProfit via carrying costs
+      makeOpp({ id: 'active-1', status: 'PURCHASED', purchasePrice: 500,
+        resalePrice: null, resaleDate: null }),
+    ]);
+    const result = await getProfitLossAnalytics('user-1');
+    // avgProfitPerFlip must reflect only the SOLD item: 90 / 1 = 90
+    // NOT totalNetProfit / 1 (which would be −$500+ due to active item carrying costs)
+    expect(result.avgProfitPerFlip).toBe(90);
+    expect(result.completedDeals).toBe(1);
+  });
+
+  it('platformBreakdown successRate is SOLD / all items per platform', async () => {
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([
+      makeOpp({ id: 'eb-sold', status: 'SOLD',
+        listing: { title: 'eBay sold', platform: 'EBAY', category: 'Electronics' } }),
+      makeOpp({ id: 'eb-active', status: 'PURCHASED', resalePrice: null, resaleDate: null,
+        listing: { title: 'eBay active', platform: 'EBAY', category: 'Electronics' } }),
+    ]);
+    const result = await getProfitLossAnalytics('user-1');
+    const ebay = result.platformBreakdown.find((p) => p.platform === 'EBAY');
+    expect(ebay?.successRate).toBeCloseTo(50, 1);
+  });
+});
+
+describe('getProfitLossAnalytics - date range filtering', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('passes dateFrom/dateTo to prisma where clause', async () => {
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([makeOpp()]);
+    await getProfitLossAnalytics('user-1', 'monthly', '2026-01-01', '2026-01-31');
+    const call = (prisma.opportunity.findMany as jest.Mock).mock.calls[0][0];
+    expect(call.where.purchaseDate).toBeDefined();
+    expect(call.where.purchaseDate.gte).toEqual(new Date('2026-01-01'));
+    expect(call.where.purchaseDate.lte).toEqual(new Date('2026-01-31T23:59:59Z'));
+  });
+
+  it('passes only dateFrom when dateTo is null', async () => {
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([]);
+    await getProfitLossAnalytics('user-1', 'monthly', '2026-01-01', null);
+    const call = (prisma.opportunity.findMany as jest.Mock).mock.calls[0][0];
+    expect(call.where.purchaseDate.gte).toEqual(new Date('2026-01-01'));
+    expect(call.where.purchaseDate.lte).toBeUndefined();
+  });
+
+  it('passes only dateTo when dateFrom is null', async () => {
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([]);
+    await getProfitLossAnalytics('user-1', 'monthly', null, '2026-01-31');
+    const call = (prisma.opportunity.findMany as jest.Mock).mock.calls[0][0];
+    expect(call.where.purchaseDate.lte).toEqual(new Date('2026-01-31T23:59:59Z'));
+    expect(call.where.purchaseDate.gte).toBeUndefined();
+  });
+
+  it('does not add purchaseDate filter when no dates provided', async () => {
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([]);
+    await getProfitLossAnalytics('user-1', 'monthly', null, null);
+    const call = (prisma.opportunity.findMany as jest.Mock).mock.calls[0][0];
+    // purchaseDate.not is the initial value from the base where clause, not a range
+    expect(call.where.purchaseDate).toEqual({ not: null });
+  });
+
+  it('returns empty summary with empty date range results', async () => {
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([]);
+    const result = await getProfitLossAnalytics('user-1', 'monthly', '2026-06-01', '2026-06-30');
+    expect(result.items).toHaveLength(0);
+    expect(result.avgProfitPerFlip).toBe(0);
+    expect(result.successRate).toBe(0);
+    expect(result.platformBreakdown).toHaveLength(0);
+  });
+});

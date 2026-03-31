@@ -1,22 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
+import { getAuthUserId } from '@/lib/auth-middleware';
+import { handleError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { recordUsage } from '@/lib/usage-tracker';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
+/**
+ * Fetches the job and verifies the current user owns it.
+ * Allows legacy null-userId jobs for any authenticated user.
+ */
+async function fetchAndAuthorize(id: string, userId: string) {
+  const job = await prisma.scraperJob.findUnique({ where: { id } });
+  if (!job) throw new NotFoundError('Scraper job not found');
+  // Allow legacy jobs that predate userId tracking
+  if (job.userId != null && job.userId !== userId) {
+    throw new ForbiddenError('Access denied');
+  }
+  return job;
+}
+
 // GET /api/scraper-jobs/[id] - Get a single scraper job
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const userId = await getAuthUserId();
+    if (!userId) throw new UnauthorizedError('Authentication required');
+
     const { id } = await params;
-    const job = await prisma.scraperJob.findUnique({
-      where: { id },
-    });
-
-    if (!job) {
-      throw new NotFoundError('Scraper job not found');
-    }
-
+    const job = await fetchAndAuthorize(id, userId);
     return NextResponse.json(job);
   } catch (error) {
-    console.error('Error fetching scraper job:', error);
     return handleError(error);
   }
 }
@@ -24,10 +35,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 // PATCH /api/scraper-jobs/[id] - Update a scraper job
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = await params;
-    const body = await request.json();
+    const userId = await getAuthUserId();
+    if (!userId) throw new UnauthorizedError('Authentication required');
 
-    // Build update data
+    const { id } = await params;
+    const existingJob = await fetchAndAuthorize(id, userId);
+    const previousStatus = existingJob.status;
+
+    const body = await request.json();
     const updateData: Record<string, unknown> = {};
 
     // Validate status if provided
@@ -58,14 +73,22 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       updateData.completedAt = body.completedAt ? new Date(body.completedAt) : null;
     }
 
-    const job = await prisma.scraperJob.update({
+    const updatedJob = await prisma.scraperJob.update({
       where: { id },
       data: updateData,
     });
 
-    return NextResponse.json(job);
+    // Record scan usage when job completes — non-blocking (once per job, not on repeat COMPLETED)
+    if (body.status === 'COMPLETED' && previousStatus !== 'COMPLETED') {
+      try {
+        await recordUsage(userId, 'SCAN');
+      } catch (usageError) {
+        console.error('[Usage Tracker] Failed to record scan usage:', usageError);
+      }
+    }
+
+    return NextResponse.json(updatedJob);
   } catch (error) {
-    console.error('Error updating scraper job:', error);
     return handleError(error);
   }
 }
@@ -76,14 +99,18 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const userId = await getAuthUserId();
+    if (!userId) throw new UnauthorizedError('Authentication required');
+
     const { id } = await params;
+    await fetchAndAuthorize(id, userId);
+
     await prisma.scraperJob.delete({
       where: { id },
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting scraper job:', error);
     return handleError(error);
   }
 }

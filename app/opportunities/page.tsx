@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import {
   ArrowLeft,
   TrendingUp,
@@ -24,10 +24,18 @@ import {
   User,
   LayoutGrid,
   List,
+  Warehouse,
 } from 'lucide-react';
+import { calculateDaysHeld, calculateCarryingCost, isAgingInventory } from '@/lib/holding-cost';
 import KanbanBoard from '@/components/KanbanBoard';
+import FilterPanel from '@/components/FilterPanel';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
+import {
+  useFilterParams,
+  toggleMultiSelectValue,
+  isMultiSelectActive,
+} from '@/hooks/useFilterParams';
 
 interface Listing {
   id: string;
@@ -76,6 +84,22 @@ interface Listing {
   analysisDate: string | null;
   analysisConfidence: string | null;
   analysisReasoning: string | null;
+  // Story 5.2
+  compMatchConfidence: string | null;
+  // Story 5.3
+  soldVolume30Days: number | null;
+  soldVolume60Days: number | null;
+  soldVolume90Days: number | null;
+  // Story 5.4
+  completenessLabel: string | null;
+  sellerRating: number | null;
+  sellerReviewCount: number | null;
+  // Story 5.5
+  sizeCategory: string | null;
+  estimatedShippingCost: number | null;
+  pickupDistanceMiles: number | null;
+  outsidePickupRadius: boolean | null;
+  adjustedProfitMargin: number | null;
 }
 
 interface Opportunity {
@@ -182,11 +206,19 @@ function parseComparableSales(value: string | null): ComparableSale[] {
       .map((item) => {
         if (!item || typeof item !== 'object') return null;
         const record = item as Record<string, unknown>;
+        // Handle both new format (soldPrice/soldDate from comp-matcher) and
+        // legacy format (price/soldAt from market-price raw listings)
+        const price =
+          typeof record.soldPrice === 'number' ? record.soldPrice :
+          typeof record.price === 'number' ? record.price : null;
+        const soldAt =
+          typeof record.soldDate === 'string' ? record.soldDate :
+          typeof record.soldAt === 'string' ? record.soldAt : null;
         return {
           title: typeof record.title === 'string' ? record.title : 'Comparable Sale',
-          price: typeof record.price === 'number' ? record.price : null,
+          price,
           url: typeof record.url === 'string' ? record.url : null,
-          soldAt: typeof record.soldAt === 'string' ? record.soldAt : null,
+          soldAt,
         };
       })
       .filter((item): item is ComparableSale => Boolean(item));
@@ -215,6 +247,22 @@ function formatDateTime(value: string | null) {
 }
 
 export default function OpportunitiesPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+          <p className="text-white">Loading opportunities...</p>
+        </div>
+      }
+    >
+      <OpportunitiesContent />
+    </Suspense>
+  );
+}
+
+function OpportunitiesContent() {
+  const { filters, setFilter, setFilters, clearFilters, activeFilterCount } = useFilterParams();
+
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [stats, setStats] = useState<Stats>({
     totalOpportunities: 0,
@@ -223,22 +271,38 @@ export default function OpportunitiesPage() {
     totalRevenue: 0,
   });
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [platformFilter, setPlatformFilter] = useState<string>('all');
-  const [minScore, setMinScore] = useState<string>('');
-  const [maxScore, setMaxScore] = useState<string>('');
-  const [minProfit, setMinProfit] = useState<string>('');
-  const [maxProfit, setMaxProfit] = useState<string>('');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<Opportunity>>({});
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'kanban' | 'inventory'>('list');
+  const [holdingCostRate, setHoldingCostRate] = useState<number>(2.0);
+  const [pendingKanbanMove, setPendingKanbanMove] = useState<{
+    opportunityId: string;
+    targetStatus: string;
+  } | null>(null);
+  const [modalPurchasePrice, setModalPurchasePrice] = useState('');
+  const [modalResaleUrl, setModalResaleUrl] = useState('');
+  const [modalSalePrice, setModalSalePrice] = useState('');
+  const [modalFees, setModalFees] = useState('');
 
   useEffect(() => {
     fetchOpportunities();
-  }, [statusFilter, platformFilter, minScore, maxScore, minProfit, maxProfit]);
+  }, [filters]);
+
+  useEffect(() => {
+    fetch('/api/user/settings')
+      .then((res) => res.json())
+      .then((result) => {
+        if (result.success && typeof result.data.holdingCostDailyRate === 'number') {
+          setHoldingCostRate(result.data.holdingCostDailyRate);
+        }
+      })
+      .catch(() => {
+        console.warn('Failed to fetch holding cost rate, using default ($2.00/day)');
+      });
+  }, []);
 
   useEffect(() => {
     if (!copiedMessageId) return;
@@ -250,12 +314,16 @@ export default function OpportunitiesPage() {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (statusFilter !== 'all') params.set('status', statusFilter);
-      if (platformFilter !== 'all') params.set('platform', platformFilter);
-      if (minScore) params.set('minScore', minScore);
-      if (maxScore) params.set('maxScore', maxScore);
-      if (minProfit) params.set('minProfit', minProfit);
-      if (maxProfit) params.set('maxProfit', maxProfit);
+      if (filters.statuses) params.set('statuses', filters.statuses);
+      else if (filters.status && filters.status !== 'all') params.set('status', filters.status);
+      if (filters.platforms) params.set('platforms', filters.platforms);
+      else if (filters.platform && filters.platform !== 'all') params.set('platform', filters.platform);
+      if (filters.minScore) params.set('minScore', filters.minScore);
+      if (filters.maxScore) params.set('maxScore', filters.maxScore);
+      if (filters.minProfit) params.set('minProfit', filters.minProfit);
+      if (filters.maxProfit) params.set('maxProfit', filters.maxProfit);
+      if (filters.categories) params.set('categories', filters.categories);
+      else if (filters.category) params.set('category', filters.category);
       const qs = params.toString();
       const url = qs ? `/api/opportunities?${qs}` : '/api/opportunities';
       const response = await fetch(url);
@@ -347,16 +415,65 @@ export default function OpportunitiesPage() {
   }
 
   async function handleKanbanStatusChange(id: string, newStatus: string) {
-    await updateOpportunity(id, { status: newStatus });
+    if (newStatus === 'PURCHASED' || newStatus === 'LISTED' || newStatus === 'SOLD') {
+      setModalPurchasePrice('');
+      setModalResaleUrl('');
+      setModalSalePrice('');
+      setModalFees('');
+      setPendingKanbanMove({ opportunityId: id, targetStatus: newStatus });
+    } else {
+      await updateOpportunity(id, { status: newStatus });
+    }
   }
 
-  const normalizedSearch = searchTerm.toLowerCase();
-  const filteredOpportunities = opportunities.filter((opp) => {
-    const matchesSearch = opp.listing.title.toLowerCase().includes(normalizedSearch);
-    const matchesStatus = statusFilter === 'all' || opp.status === statusFilter;
-    const matchesPlatform = platformFilter === 'all' || opp.listing.platform === platformFilter;
-    return matchesSearch && matchesStatus && matchesPlatform;
-  });
+  async function confirmPurchasedModal() {
+    if (!pendingKanbanMove) return;
+    await updateOpportunity(pendingKanbanMove.opportunityId, {
+      status: 'PURCHASED',
+      purchasePrice: parseFloat(modalPurchasePrice),
+      purchaseDate: new Date().toISOString(),
+    });
+    setPendingKanbanMove(null);
+  }
+
+  async function confirmListedModal() {
+    if (!pendingKanbanMove) return;
+    await updateOpportunity(pendingKanbanMove.opportunityId, {
+      status: 'LISTED',
+      resaleUrl: modalResaleUrl,
+    });
+    setPendingKanbanMove(null);
+  }
+
+  async function confirmSoldModal() {
+    if (!pendingKanbanMove) return;
+    const opp = opportunities.find((o) => o.id === pendingKanbanMove.opportunityId);
+    const payload: Partial<Opportunity> = {
+      status: 'SOLD',
+      resalePrice: parseFloat(modalSalePrice),
+      resaleDate: new Date().toISOString(),
+    };
+    if (modalFees) payload.fees = parseFloat(modalFees);
+    if (opp?.purchasePrice != null) payload.purchasePrice = opp.purchasePrice;
+    await updateOpportunity(pendingKanbanMove.opportunityId, payload);
+    setPendingKanbanMove(null);
+  }
+
+  function cancelKanbanModal() {
+    setPendingKanbanMove(null);
+  }
+
+  // Server handles all filter params; client-side only applies searchTerm
+  const filteredOpportunities = searchTerm
+    ? opportunities.filter((opp) => {
+        const normalized = searchTerm.toLowerCase();
+        return (
+          opp.listing.title.toLowerCase().includes(normalized) ||
+          opp.listing.platform.toLowerCase().includes(normalized) ||
+          (opp.listing.category || '').toLowerCase().includes(normalized)
+        );
+      })
+    : opportunities;
 
   const statusOptions = [
     { value: 'all', label: 'All Statuses', icon: Package },
@@ -530,18 +647,42 @@ export default function OpportunitiesPage() {
               >
                 <LayoutGrid className="w-4 h-4" />
               </button>
+              <button
+                onClick={() => setViewMode('inventory')}
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-sm transition-all duration-200 ${
+                  viewMode === 'inventory'
+                    ? 'bg-white/20 text-white shadow-sm'
+                    : 'text-white/60 hover:text-white hover:bg-white/10'
+                }`}
+                title="Inventory view"
+              >
+                <Warehouse className="w-4 h-4" />
+              </button>
             </div>
 
             {/* Status Filter */}
             <div className="flex gap-2 flex-wrap">
               {statusOptions.map((option) => {
                 const Icon = option.icon;
+                const isAll = option.value === 'all';
+                const isActive = isAll
+                  ? !filters.statuses
+                  : isMultiSelectActive(filters.statuses, option.value);
                 return (
                   <button
                     key={option.value}
-                    onClick={() => setStatusFilter(option.value)}
+                    onClick={() => {
+                      if (isAll) {
+                        setFilter('statuses', '');
+                      } else {
+                        setFilter(
+                          'statuses',
+                          toggleMultiSelectValue(filters.statuses, option.value)
+                        );
+                      }
+                    }}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${
-                      statusFilter === option.value
+                      isActive
                         ? 'bg-theme-primary text-white border-blue-400 shadow-theme-primary scale-105'
                         : 'bg-white/10 text-white border-white/20 hover:bg-white/20 hover:scale-105 hover:shadow-lg'
                     }`}
@@ -565,87 +706,22 @@ export default function OpportunitiesPage() {
 
           {/* Advanced Filters Panel */}
           {showAdvancedFilters && (
-            <div className="mt-4 pt-4 border-t border-white/10 grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Platform Filter */}
-              <div>
-                <label className="block text-xs text-blue-200/70 mb-1 font-medium">Platform</label>
-                <select
-                  value={platformFilter}
-                  onChange={(e) => setPlatformFilter(e.target.value)}
-                  className="w-full px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm appearance-none cursor-pointer"
-                >
-                  <option value="all" className="bg-slate-800">All Platforms</option>
-                  <option value="CRAIGSLIST" className="bg-slate-800">Craigslist</option>
-                  <option value="FACEBOOK_MARKETPLACE" className="bg-slate-800">Facebook</option>
-                  <option value="EBAY" className="bg-slate-800">eBay</option>
-                  <option value="OFFERUP" className="bg-slate-800">OfferUp</option>
-                  <option value="MERCARI" className="bg-slate-800">Mercari</option>
-                </select>
-              </div>
-
-              {/* Score Range */}
-              <div>
-                <label className="block text-xs text-blue-200/70 mb-1 font-medium">Value Score Range</label>
-                <div className="flex gap-2 items-center">
-                  <input
-                    type="number"
-                    placeholder="Min"
-                    min="0"
-                    max="100"
-                    value={minScore}
-                    onChange={(e) => setMinScore(e.target.value)}
-                    className="w-full px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm placeholder-blue-200/40"
-                  />
-                  <span className="text-white/40">–</span>
-                  <input
-                    type="number"
-                    placeholder="Max"
-                    min="0"
-                    max="100"
-                    value={maxScore}
-                    onChange={(e) => setMaxScore(e.target.value)}
-                    className="w-full px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm placeholder-blue-200/40"
-                  />
-                </div>
-              </div>
-
-              {/* Profit Range */}
-              <div>
-                <label className="block text-xs text-blue-200/70 mb-1 font-medium">Profit Range ($)</label>
-                <div className="flex gap-2 items-center">
-                  <input
-                    type="number"
-                    placeholder="Min"
-                    value={minProfit}
-                    onChange={(e) => setMinProfit(e.target.value)}
-                    className="w-full px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm placeholder-blue-200/40"
-                  />
-                  <span className="text-white/40">–</span>
-                  <input
-                    type="number"
-                    placeholder="Max"
-                    value={maxProfit}
-                    onChange={(e) => setMaxProfit(e.target.value)}
-                    className="w-full px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-white text-sm placeholder-blue-200/40"
-                  />
-                </div>
-              </div>
-
-              {/* Clear Filters */}
-              <div className="md:col-span-3 flex justify-end">
-                <button
-                  onClick={() => {
-                    setPlatformFilter('all');
-                    setMinScore('');
-                    setMaxScore('');
-                    setMinProfit('');
-                    setMaxProfit('');
-                  }}
-                  className="text-xs text-blue-300/70 hover:text-white transition-colors"
-                >
-                  Clear all filters
-                </button>
-              </div>
+            <div className="mt-4 pt-4 border-t border-white/10">
+              <FilterPanel
+                filters={filters}
+                setFilter={setFilter}
+                setFilters={setFilters}
+                clearFilters={clearFilters}
+                activeFilterCount={activeFilterCount}
+                statusOptions={[
+                  { value: 'IDENTIFIED', label: 'Identified' },
+                  { value: 'CONTACTED', label: 'Contacted' },
+                  { value: 'PURCHASED', label: 'Purchased' },
+                  { value: 'LISTED', label: 'Listed' },
+                  { value: 'SOLD', label: 'Sold' },
+                  { value: 'PASSED', label: 'Passed' },
+                ]}
+              />
             </div>
           )}
         </div>
@@ -658,13 +734,93 @@ export default function OpportunitiesPage() {
           />
         )}
 
+        {/* Inventory View */}
+        {viewMode === 'inventory' && !loading && (() => {
+          const purchasedItems = opportunities.filter((opp) => opp.status === 'PURCHASED');
+          if (purchasedItems.length === 0) {
+            return (
+              <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-12 text-center shadow-xl">
+                <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-orange-500/50 animate-pulse-slow">
+                  <Warehouse className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-2">No inventory yet</h3>
+                <p className="text-blue-200/80">
+                  Mark an opportunity as Purchased to track holding costs here.
+                </p>
+              </div>
+            );
+          }
+          return (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="inventory-view">
+              {purchasedItems.map((opp) => {
+                const daysHeld = opp.purchaseDate
+                  ? calculateDaysHeld(new Date(opp.purchaseDate))
+                  : null;
+                const carryingCost =
+                  daysHeld !== null ? calculateCarryingCost(daysHeld, holdingCostRate) : null;
+                const aging = daysHeld !== null ? isAgingInventory(daysHeld) : false;
+                return (
+                  <div
+                    key={opp.id}
+                    className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-5 shadow-xl"
+                    data-testid="inventory-card"
+                  >
+                    {aging && (
+                      <div className="mb-3 inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/20 border border-amber-400/40 rounded-full text-amber-300 text-xs font-semibold">
+                        ⚠️ Aging Inventory
+                      </div>
+                    )}
+                    <h3 className="font-semibold text-white mb-3 line-clamp-2">
+                      {opp.listing.title}
+                    </h3>
+                    <div className="space-y-1.5 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-blue-200/70">Purchase Price</span>
+                        <span className="text-white font-medium">
+                          {opp.purchasePrice != null ? `$${opp.purchasePrice.toFixed(2)}` : '—'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-blue-200/70">Market Value</span>
+                        <span className="text-white font-medium">
+                          {opp.listing.estimatedValue != null
+                            ? `$${opp.listing.estimatedValue.toFixed(2)}`
+                            : '—'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-blue-200/70">Days Held</span>
+                        <span className="text-white font-medium">
+                          {daysHeld !== null ? `${daysHeld} days` : 'N/A'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-blue-200/70">Carrying Cost</span>
+                        <span
+                          className={
+                            aging
+                              ? 'font-bold text-red-400'
+                              : 'text-white font-medium'
+                          }
+                        >
+                          {carryingCost !== null ? `$${carryingCost.toFixed(2)}` : 'N/A'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
+
         {/* List View */}
         {loading ? (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-400/30 border-t-blue-400"></div>
             <p className="mt-4 text-blue-200 font-medium animate-pulse">Loading opportunities...</p>
           </div>
-        ) : viewMode === 'kanban' ? null : filteredOpportunities.length === 0 ? (
+        ) : viewMode === 'kanban' || viewMode === 'inventory' ? null : filteredOpportunities.length === 0 ? (
           <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-12 text-center shadow-xl">
             <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-purple-500/50 animate-pulse-slow">
               <Package className="w-10 h-10 text-white" />
@@ -764,6 +920,27 @@ export default function OpportunitiesPage() {
                   value: opp.listing.demandLevel || '—',
                 },
                 {
+                  label: 'Sold (30 days)',
+                  value:
+                    opp.listing.soldVolume30Days !== null
+                      ? `${opp.listing.soldVolume30Days} units`
+                      : '—',
+                },
+                {
+                  label: 'Sold (60 days)',
+                  value:
+                    opp.listing.soldVolume60Days !== null
+                      ? `${opp.listing.soldVolume60Days} units`
+                      : '—',
+                },
+                {
+                  label: 'Sold (90 days)',
+                  value:
+                    opp.listing.soldVolume90Days !== null
+                      ? `${opp.listing.soldVolume90Days} units`
+                      : '—',
+                },
+                {
                   label: 'Expected Days to Sell',
                   value:
                     opp.listing.expectedDaysToSell !== null
@@ -773,6 +950,45 @@ export default function OpportunitiesPage() {
                 {
                   label: 'Authenticity Risk',
                   value: opp.listing.authenticityRisk || '—',
+                },
+                {
+                  label: 'Item Completeness',
+                  value: opp.listing.completenessLabel || '—',
+                },
+                {
+                  label: 'Seller Rating',
+                  value:
+                    opp.listing.sellerRating !== null
+                      ? `${opp.listing.sellerRating}${opp.listing.platform === 'MERCARI' ? '/5' : '%'} (${opp.listing.sellerReviewCount ?? '?'} reviews)`
+                      : '—',
+                },
+                // Story 5.5: Logistics
+                {
+                  label: 'Size Category',
+                  value: opp.listing.sizeCategory
+                    ? opp.listing.sizeCategory.replace(/_/g, ' ')
+                    : '—',
+                },
+                {
+                  label: 'Est. Shipping Cost',
+                  value:
+                    opp.listing.estimatedShippingCost != null
+                      ? `$${opp.listing.estimatedShippingCost.toFixed(2)}`
+                      : '—',
+                },
+                {
+                  label: 'Pickup Distance',
+                  value:
+                    opp.listing.pickupDistanceMiles != null
+                      ? `${opp.listing.pickupDistanceMiles} mi`
+                      : '—',
+                },
+                {
+                  label: 'Adj. Profit Margin',
+                  value:
+                    opp.listing.adjustedProfitMargin != null
+                      ? `$${opp.listing.adjustedProfitMargin.toFixed(2)}`
+                      : '—',
                 },
               ];
 
@@ -873,9 +1089,11 @@ export default function OpportunitiesPage() {
                             </p>
                           </div>
                           <div className="backdrop-blur-sm bg-white/5 rounded-lg p-3 border border-white/10 hover:bg-white/10 transition-all duration-300">
-                            <p className="text-xs text-blue-200/70 mb-1">Est. Value</p>
+                            <p className="text-xs text-blue-200/70 mb-1">
+                              {opp.listing.verifiedMarketValue !== null ? 'Verified Value' : 'Est. Value'}
+                            </p>
                             <p className="text-lg font-bold bg-gradient-to-r from-blue-300 to-cyan-300 bg-clip-text text-transparent">
-                              ${opp.listing.estimatedValue?.toFixed(0) || '—'}
+                              ${(opp.listing.verifiedMarketValue ?? opp.listing.estimatedValue)?.toFixed(0) || '—'}
                             </p>
                           </div>
                           <div className="backdrop-blur-sm bg-white/5 rounded-lg p-3 border border-white/10 hover:bg-white/10 transition-all duration-300">
@@ -922,6 +1140,34 @@ export default function OpportunitiesPage() {
                           </div>
                         )}
 
+                        {/* Low-liquidity warning (Story 5.3) */}
+                        {opp.listing.demandLevel === 'low_liquidity' && (
+                          <div
+                            className="backdrop-blur-sm bg-red-500/20 rounded-lg p-4 mb-4 border border-red-400/30"
+                            data-testid="low-liquidity-warning"
+                          >
+                            <p className="text-sm font-semibold text-red-200">⚠ Low Liquidity Warning</p>
+                            <p className="text-xs text-red-200/80 mt-1">
+                              No verified sales found in the past 90 days. Resale may take significantly longer than expected.
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Outside pickup radius warning (Story 5.5) */}
+                        {opp.listing.outsidePickupRadius && (
+                          <div
+                            className="backdrop-blur-sm bg-orange-500/20 rounded-lg p-4 mb-4 border border-orange-400/30"
+                            data-testid="outside-pickup-radius-warning"
+                          >
+                            <p className="text-sm font-semibold text-orange-200">⚠ Outside Pickup Radius</p>
+                            <p className="text-xs text-orange-200/80 mt-1">
+                              This local-only item is beyond your configured pickup radius.
+                              {opp.listing.pickupDistanceMiles !== null &&
+                                ` Estimated distance: ${opp.listing.pickupDistanceMiles} miles.`}
+                            </p>
+                          </div>
+                        )}
+
                         {displayedMarketDetails.length > 0 && (
                           <div
                             className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10"
@@ -936,6 +1182,19 @@ export default function OpportunitiesPage() {
                                 </div>
                               ))}
                             </div>
+                            {/* Story 5.4: Low seller rating warning (AC #4) — uses platform thresholds
+                                to avoid false positives from LLM-driven authenticityRisk escalation */}
+                            {opp.listing.sellerRating !== null &&
+                              ((opp.listing.platform === 'EBAY' && opp.listing.sellerRating < 97) ||
+                                (opp.listing.platform === 'MERCARI' &&
+                                  opp.listing.sellerRating < 4.0)) && (
+                                <div
+                                  className="mt-3 rounded-md bg-yellow-500/10 border border-yellow-400/30 px-3 py-2 text-sm text-yellow-300"
+                                  data-testid="low-seller-rating-warning"
+                                >
+                                  ⚠️ Low Seller Rating — Below-average feedback. Verify item condition carefully before purchasing.
+                                </div>
+                              )}
                           </div>
                         )}
 
@@ -1086,11 +1345,33 @@ export default function OpportunitiesPage() {
                           </div>
                         )}
 
-                        {comparableSales.length > 0 && (
+                        {(comparableSales.length > 0 || opp.listing.compMatchConfidence === 'insufficient') && (
                           <div className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10">
-                            <p className="text-xs text-blue-200/70 mb-2">
-                              Comparable Sold Listings
-                            </p>
+                            <div className="flex items-center justify-between mb-2">
+                              <p className="text-xs text-blue-200/70">
+                                Comparable Sold Listings
+                              </p>
+                              {opp.listing.compMatchConfidence && (
+                                <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${
+                                  opp.listing.compMatchConfidence === 'high'
+                                    ? 'bg-green-500/20 border-green-400/40 text-green-300'
+                                    : opp.listing.compMatchConfidence === 'medium'
+                                    ? 'bg-yellow-500/20 border-yellow-400/40 text-yellow-300'
+                                    : opp.listing.compMatchConfidence === 'low'
+                                    ? 'bg-orange-500/20 border-orange-400/40 text-orange-300'
+                                    : 'bg-gray-500/20 border-gray-400/40 text-gray-300'
+                                }`}>
+                                  {opp.listing.compMatchConfidence === 'insufficient'
+                                    ? 'Insufficient Market Data'
+                                    : `${opp.listing.compMatchConfidence.charAt(0).toUpperCase() + opp.listing.compMatchConfidence.slice(1)} Confidence`}
+                                </span>
+                              )}
+                            </div>
+                            {comparableSales.length === 0 && opp.listing.compMatchConfidence === 'insufficient' && (
+                              <p className="text-sm text-blue-200/50 italic">
+                                No comparable sold listings found for this item.
+                              </p>
+                            )}
                             <div className="flex flex-col gap-3">
                               {comparableSales.map((sale, index) => (
                                 <div
@@ -1389,6 +1670,153 @@ export default function OpportunitiesPage() {
           </div>
         )}
       </main>
+
+      {/* Kanban Lifecycle Modals */}
+
+      {/* PURCHASED Modal */}
+      {pendingKanbanMove?.targetStatus === 'PURCHASED' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-xl bg-black/60">
+          <div
+            role="dialog"
+            aria-label="Mark as Purchased"
+            className="max-w-md w-full mx-4 backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-6 shadow-2xl"
+          >
+            <h2 className="text-lg font-semibold text-white mb-4">Mark as Purchased</h2>
+            <div className="mb-5">
+              <label htmlFor="modal-purchase-price" className="block text-sm text-blue-200/80 mb-1">
+                Purchase Price *
+              </label>
+              <input
+                id="modal-purchase-price"
+                type="number"
+                min="0"
+                step="0.01"
+                value={modalPurchasePrice}
+                onChange={(e) => setModalPurchasePrice(e.target.value)}
+                className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                placeholder="0.00"
+                autoFocus
+              />
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={cancelKanbanModal}
+                className="px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all text-sm border border-white/20"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmPurchasedModal}
+                disabled={!modalPurchasePrice}
+                className="px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-700 text-white rounded-lg hover:from-purple-600 hover:to-purple-800 transition-all text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* LISTED Modal */}
+      {pendingKanbanMove?.targetStatus === 'LISTED' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-xl bg-black/60">
+          <div
+            role="dialog"
+            aria-label="Mark as Listed"
+            className="max-w-md w-full mx-4 backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-6 shadow-2xl"
+          >
+            <h2 className="text-lg font-semibold text-white mb-4">Mark as Listed</h2>
+            <div className="mb-5">
+              <label htmlFor="modal-resale-url" className="block text-sm text-blue-200/80 mb-1">
+                Resale URL *
+              </label>
+              <input
+                id="modal-resale-url"
+                type="url"
+                value={modalResaleUrl}
+                onChange={(e) => setModalResaleUrl(e.target.value)}
+                className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                placeholder="https://ebay.com/..."
+                autoFocus
+              />
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={cancelKanbanModal}
+                className="px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all text-sm border border-white/20"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmListedModal}
+                disabled={!modalResaleUrl}
+                className="px-4 py-2 bg-gradient-to-r from-orange-500 to-pink-600 text-white rounded-lg hover:from-orange-600 hover:to-pink-700 transition-all text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SOLD Modal */}
+      {pendingKanbanMove?.targetStatus === 'SOLD' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-xl bg-black/60">
+          <div
+            role="dialog"
+            aria-label="Mark as Sold"
+            className="max-w-md w-full mx-4 backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-6 shadow-2xl"
+          >
+            <h2 className="text-lg font-semibold text-white mb-4">Mark as Sold</h2>
+            <div className="mb-4">
+              <label htmlFor="modal-sale-price" className="block text-sm text-blue-200/80 mb-1">
+                Sale Price *
+              </label>
+              <input
+                id="modal-sale-price"
+                type="number"
+                min="0"
+                step="0.01"
+                value={modalSalePrice}
+                onChange={(e) => setModalSalePrice(e.target.value)}
+                className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-green-400"
+                placeholder="0.00"
+                autoFocus
+              />
+            </div>
+            <div className="mb-5">
+              <label htmlFor="modal-fees" className="block text-sm text-blue-200/80 mb-1">
+                Fees (optional)
+              </label>
+              <input
+                id="modal-fees"
+                type="number"
+                min="0"
+                step="0.01"
+                value={modalFees}
+                onChange={(e) => setModalFees(e.target.value)}
+                className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-green-400"
+                placeholder="0.00"
+              />
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={cancelKanbanModal}
+                className="px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all text-sm border border-white/20"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmSoldModal}
+                disabled={!modalSalePrice}
+                className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-700 text-white rounded-lg hover:from-green-600 hover:to-emerald-800 transition-all text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

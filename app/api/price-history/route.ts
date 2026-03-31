@@ -2,17 +2,28 @@
 // Fetch and manage price history for flip analysis
 
 import { NextRequest, NextResponse } from 'next/server';
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, ForbiddenError } from '@/lib/errors';
+import { getAuthUserId } from '@/lib/auth-middleware';
+import prisma from '@/lib/db';
+import { checkFeatureAccess } from '@/lib/tier-enforcement';
 import {
   fetchAndStorePriceHistory,
   getPriceHistory,
-  updateListingWithMarketValue,
-  batchUpdateListingsWithMarketValue,
 } from '@/lib/price-history-service';
 
 // GET /api/price-history?productName=iPhone+13&category=electronics
 export async function GET(request: NextRequest) {
   try {
+    // Enforce priceHistory feature gate — check ALL users (including unauthenticated)
+    const userId = await getAuthUserId();
+    const user = userId
+      ? await prisma.user.findUnique({ where: { id: userId }, select: { subscriptionTier: true } })
+      : null;
+    const featureCheck = checkFeatureAccess(user?.subscriptionTier, 'priceHistory');
+    if (!featureCheck.allowed) {
+      throw new ForbiddenError(featureCheck.reason);
+    }
+
     const { searchParams } = new URL(request.url);
     const productName = searchParams.get('productName');
     const category = searchParams.get('category') || undefined;
@@ -39,6 +50,16 @@ export async function GET(request: NextRequest) {
 // Body: { productName: string, category?: string }
 export async function POST(request: NextRequest) {
   try {
+    // Enforce auth + priceHistory feature gate (same as GET)
+    const userId = await getAuthUserId();
+    const user = userId
+      ? await prisma.user.findUnique({ where: { id: userId }, select: { subscriptionTier: true } })
+      : null;
+    const featureCheck = checkFeatureAccess(user?.subscriptionTier, 'priceHistory');
+    if (!featureCheck.allowed) {
+      throw new ForbiddenError(featureCheck.reason);
+    }
+
     const body = await request.json();
     const { productName, category } = body;
 

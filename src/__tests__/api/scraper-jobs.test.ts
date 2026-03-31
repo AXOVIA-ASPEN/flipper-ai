@@ -8,6 +8,9 @@ const mockFindUnique = jest.fn();
 const mockCreate = jest.fn();
 const mockUpdate = jest.fn();
 const mockDelete = jest.fn();
+const mockCount = jest.fn();
+const mockGroupBy = jest.fn();
+const mockUserFindUnique = jest.fn();
 
 jest.mock('@/lib/db', () => ({
   __esModule: true,
@@ -18,6 +21,11 @@ jest.mock('@/lib/db', () => ({
       create: (...args: unknown[]) => mockCreate(...args),
       update: (...args: unknown[]) => mockUpdate(...args),
       delete: (...args: unknown[]) => mockDelete(...args),
+      count: (...args: unknown[]) => mockCount(...args),
+      groupBy: (...args: unknown[]) => mockGroupBy(...args),
+    },
+    user: {
+      findUnique: (...args: unknown[]) => mockUserFindUnique(...args),
     },
   },
 }));
@@ -42,12 +50,22 @@ function createMockRequest(
 jest.mock('@/lib/auth-middleware', () => ({
   getAuthUserId: jest.fn().mockResolvedValue(null),
 }));
+
+jest.mock('@/lib/usage-tracker', () => ({
+  recordUsage: jest.fn().mockResolvedValue(undefined),
+}));
+
 import { getAuthUserId } from '@/lib/auth-middleware';
+import { recordUsage } from '@/lib/usage-tracker';
 
 describe('Scraper Jobs API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (getAuthUserId as jest.Mock).mockResolvedValue(null);
+    // Default: FREE tier, 0 scans today, 0 marketplaces
+    mockUserFindUnique.mockResolvedValue({ subscriptionTier: 'FREE' });
+    mockCount.mockResolvedValue(0);
+    mockGroupBy.mockResolvedValue([]);
   });
 
   describe('GET /api/scraper-jobs - branch coverage', () => {
@@ -167,6 +185,23 @@ describe('Scraper Jobs API', () => {
   });
 
   describe('POST /api/scraper-jobs', () => {
+    beforeEach(() => {
+      (getAuthUserId as jest.Mock).mockResolvedValue('user-123');
+      mockUserFindUnique.mockResolvedValue({ subscriptionTier: 'FREE' });
+      mockCount.mockResolvedValue(0);
+      mockGroupBy.mockResolvedValue([]);
+    });
+
+    it('returns 401 for unauthenticated requests', async () => {
+      (getAuthUserId as jest.Mock).mockResolvedValue(null);
+      const request = createMockRequest('POST', '/api/scraper-jobs', { platform: 'CRAIGSLIST' });
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(401);
+      expect(data.error.code).toBe('UNAUTHORIZED');
+    });
+
     it('should create a new scraper job', async () => {
       const newJob = {
         platform: 'CRAIGSLIST',
@@ -218,6 +253,9 @@ describe('Scraper Jobs API', () => {
 
       for (const platform of platforms) {
         mockCreate.mockResolvedValue({ id: 'job-1', platform, status: 'PENDING' });
+        // Reset tier enforcement mocks for each iteration
+        mockCount.mockResolvedValue(0);
+        mockGroupBy.mockResolvedValue([]);
 
         const request = createMockRequest('POST', '/api/scraper-jobs', {
           platform,
@@ -244,7 +282,7 @@ describe('Scraper Jobs API', () => {
           location: null,
           category: null,
           status: 'PENDING',
-          userId: null,
+          userId: 'user-123',
         },
       });
     });
@@ -265,6 +303,10 @@ describe('Scraper Jobs API', () => {
   });
 
   describe('GET /api/scraper-jobs/[id]', () => {
+    beforeEach(() => {
+      (getAuthUserId as jest.Mock).mockResolvedValue('user-123');
+    });
+
     it('should return a single scraper job', async () => {
       const mockJob = {
         id: 'job-1',
@@ -308,6 +350,12 @@ describe('Scraper Jobs API', () => {
   });
 
   describe('PATCH /api/scraper-jobs/[id]', () => {
+    beforeEach(() => {
+      (getAuthUserId as jest.Mock).mockResolvedValue('user-123');
+      mockFindUnique.mockResolvedValue({ id: 'job-1', userId: null, status: 'RUNNING' });
+      (recordUsage as jest.Mock).mockClear();
+    });
+
     it('should update a scraper job status', async () => {
       const updatedJob = {
         id: 'job-1',
@@ -398,9 +446,39 @@ describe('Scraper Jobs API', () => {
       expect(data.success).toBe(false);
     expect(data.error.code).toBe('INTERNAL_ERROR');
     });
+
+    it('records scan usage once when transitioning to COMPLETED', async () => {
+      mockFindUnique.mockResolvedValue({ id: 'job-1', userId: 'user-123', status: 'RUNNING' });
+      mockUpdate.mockResolvedValue({ id: 'job-1', status: 'COMPLETED' });
+
+      const request = createMockRequest('PATCH', '/api/scraper-jobs/job-1', {
+        status: 'COMPLETED',
+      });
+      await PATCH(request, { params: Promise.resolve({ id: 'job-1' }) });
+
+      expect(recordUsage).toHaveBeenCalledTimes(1);
+      expect(recordUsage).toHaveBeenCalledWith('user-123', 'SCAN');
+    });
+
+    it('does not record scan usage when job was already COMPLETED', async () => {
+      mockFindUnique.mockResolvedValue({ id: 'job-1', userId: 'user-123', status: 'COMPLETED' });
+      mockUpdate.mockResolvedValue({ id: 'job-1', status: 'COMPLETED' });
+
+      const request = createMockRequest('PATCH', '/api/scraper-jobs/job-1', {
+        status: 'COMPLETED',
+      });
+      await PATCH(request, { params: Promise.resolve({ id: 'job-1' }) });
+
+      expect(recordUsage).not.toHaveBeenCalled();
+    });
   });
 
   describe('DELETE /api/scraper-jobs/[id]', () => {
+    beforeEach(() => {
+      (getAuthUserId as jest.Mock).mockResolvedValue('user-123');
+      mockFindUnique.mockResolvedValue({ id: 'job-1', userId: null });
+    });
+
     it('should delete a scraper job', async () => {
       mockDelete.mockResolvedValue({ id: 'job-1' });
 
@@ -427,8 +505,117 @@ describe('Scraper Jobs API', () => {
   });
 });
 
+// ── Tier enforcement tests ────────────────────────────────────────────────────
+describe('POST /api/scraper-jobs - tier enforcement', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (getAuthUserId as jest.Mock).mockResolvedValue('user-123');
+    mockUserFindUnique.mockResolvedValue({ subscriptionTier: 'FREE' });
+    mockCount.mockResolvedValue(0);
+    mockGroupBy.mockResolvedValue([]);
+    mockCreate.mockResolvedValue({ id: 'job-1', platform: 'CRAIGSLIST', status: 'PENDING' });
+  });
+
+  it('returns 403 when FREE user exceeds daily scan limit', async () => {
+    mockCount.mockResolvedValue(10); // FREE limit is 10
+    const request = createMockRequest('POST', '/api/scraper-jobs', { platform: 'CRAIGSLIST' });
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('FORBIDDEN');
+  });
+
+  it('allows FREE user below daily scan limit', async () => {
+    mockCount.mockResolvedValue(5); // Under FREE limit of 10
+    const request = createMockRequest('POST', '/api/scraper-jobs', { platform: 'CRAIGSLIST' });
+    const response = await POST(request);
+
+    expect(response.status).toBe(201);
+  });
+
+  it('allows FLIPPER user with unlimited scans', async () => {
+    mockUserFindUnique.mockResolvedValue({ subscriptionTier: 'FLIPPER' });
+    mockCount.mockResolvedValue(100);
+    const request = createMockRequest('POST', '/api/scraper-jobs', { platform: 'CRAIGSLIST' });
+    const response = await POST(request);
+
+    expect(response.status).toBe(201);
+  });
+
+  it('returns 403 when FREE user tries a second marketplace', async () => {
+    mockGroupBy.mockResolvedValue([{ platform: 'CRAIGSLIST' }]); // Already using 1 marketplace
+    const request = createMockRequest('POST', '/api/scraper-jobs', { platform: 'EBAY' });
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(data.error.code).toBe('FORBIDDEN');
+  });
+
+  it('allows FREE user to scan same marketplace again', async () => {
+    mockGroupBy.mockResolvedValue([{ platform: 'CRAIGSLIST' }]);
+    const request = createMockRequest('POST', '/api/scraper-jobs', { platform: 'CRAIGSLIST' });
+    const response = await POST(request);
+
+    expect(response.status).toBe(201);
+  });
+
+  it('allows FLIPPER user up to 3 marketplaces', async () => {
+    mockUserFindUnique.mockResolvedValue({ subscriptionTier: 'FLIPPER' });
+    mockGroupBy.mockResolvedValue([{ platform: 'CRAIGSLIST' }, { platform: 'EBAY' }]);
+    const request = createMockRequest('POST', '/api/scraper-jobs', { platform: 'OFFERUP' });
+    const response = await POST(request);
+
+    expect(response.status).toBe(201);
+  });
+
+  it('returns 403 when FLIPPER user exceeds marketplace limit', async () => {
+    mockUserFindUnique.mockResolvedValue({ subscriptionTier: 'FLIPPER' });
+    mockGroupBy.mockResolvedValue([
+      { platform: 'CRAIGSLIST' },
+      { platform: 'EBAY' },
+      { platform: 'OFFERUP' },
+    ]);
+    const request = createMockRequest('POST', '/api/scraper-jobs', { platform: 'FACEBOOK_MARKETPLACE' });
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(data.error.code).toBe('FORBIDDEN');
+  });
+
+  it('allows PRO user unlimited marketplaces', async () => {
+    mockUserFindUnique.mockResolvedValue({ subscriptionTier: 'PRO' });
+    mockGroupBy.mockResolvedValue([
+      { platform: 'CRAIGSLIST' },
+      { platform: 'EBAY' },
+      { platform: 'OFFERUP' },
+    ]);
+    const request = createMockRequest('POST', '/api/scraper-jobs', { platform: 'FACEBOOK_MARKETPLACE' });
+    const response = await POST(request);
+
+    expect(response.status).toBe(201);
+  });
+
+  it('defaults to FREE tier when user not found', async () => {
+    mockUserFindUnique.mockResolvedValue(null);
+    mockCount.mockResolvedValue(10);
+    const request = createMockRequest('POST', '/api/scraper-jobs', { platform: 'CRAIGSLIST' });
+    const response = await POST(request);
+
+    expect(response.status).toBe(403);
+  });
+});
+
 // ── Additional branch coverage ────────────────────────────────────────────────
 describe('PATCH /api/scraper-jobs/[id] - null date branches', () => {
+  beforeEach(() => {
+    (getAuthUserId as jest.Mock).mockResolvedValue('user-123');
+    mockFindUnique.mockResolvedValue({ id: 'job-null-dates', userId: null });
+  });
+
   it('sets startedAt and completedAt to null when provided as empty/null values', async () => {
     // Covers: body.startedAt ? new Date(body.startedAt) : null (null branch)
     //         body.completedAt ? new Date(body.completedAt) : null (null branch)

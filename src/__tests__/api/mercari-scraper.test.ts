@@ -28,12 +28,33 @@ jest.mock('@/lib/db', () => ({
     priceHistory: {
       createMany: jest.fn().mockResolvedValue({ count: 0 }),
     },
+    userSettings: {
+      findUnique: jest.fn().mockResolvedValue(null),
+    },
   },
 }));
 
 // Mock auth middleware
 jest.mock('@/lib/auth-middleware', () => ({
   getAuthUserId: jest.fn().mockResolvedValue('user-123'),
+}));
+
+jest.mock('@/lib/llm-identifier', () => ({
+  identifyItem: jest.fn(),
+}));
+
+jest.mock('@/lib/market-price', () => ({
+  fetchMarketPrice: jest.fn(),
+  closeBrowser: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock('@/lib/llm-analyzer', () => ({
+  analyzeSellability: jest.fn(),
+  quickDiscountCheck: jest.fn(),
+}));
+
+jest.mock('@/lib/tier-enforcement', () => ({
+  enforceTierLimits: jest.fn().mockResolvedValue(undefined),
 }));
 
 // Mock fetch globally
@@ -1440,5 +1461,200 @@ describe('Mercari Scraper - extended branch coverage', () => {
     });
     const response = await POST(request);
     expect(response.status).toBe(200);
+  });
+});
+
+// ── LLM Sellability Pipeline (hasLLM=true) ─────────────────────────────────────
+describe('Mercari scraper - LLM sellability pipeline (Story 4.5)', () => {
+  const mercariItem = {
+    id: 'm-llm-001',
+    name: 'Apple MacBook Pro 14',
+    description: 'M2 chip, 16GB RAM',
+    price: 900,
+    status: 'on_sale',
+    thumbnails: ['https://mercari.com/img.jpg'],
+    itemCondition: { id: '3', name: 'Very good' },
+    seller: { id: 's1', name: 'Seller1', ratings: { good: 100, normal: 2, bad: 0 } },
+    shippingPayer: { id: '1', name: 'Seller' },
+    shippingMethod: { id: '1', name: 'Standard' },
+    created: Math.floor(Date.now() / 1000),
+    rootCategory: { id: '3', name: 'Electronics' },
+  };
+
+  const activeApiResponse = {
+    ok: true,
+    headers: { get: () => 'application/json' },
+    json: () => Promise.resolve({ result: 'success', data: [mercariItem] }),
+  };
+
+  const soldApiResponse = {
+    ok: true,
+    headers: { get: () => 'application/json' },
+    json: () => Promise.resolve({ result: 'success', data: [] }),
+  };
+
+  const defaultIdentification = {
+    brand: 'Apple',
+    model: 'MacBook Pro 14',
+    variant: 'M2',
+    condition: 'very good',
+    conditionNotes: '',
+    category: 'electronics',
+    searchQuery: 'Apple MacBook Pro 14 M2',
+    worthInvestigating: true,
+  };
+
+  const defaultMarketData = {
+    medianPrice: 1400,
+    salesCount: 6,
+    averagePrice: 1420,
+    minPrice: 1300,
+    maxPrice: 1550,
+    soldListings: [],
+  };
+
+  const defaultSellabilityResult = {
+    verifiedMarketValue: 1400,
+    trueDiscountPercent: 55,
+    sellabilityScore: 88,
+    meetsThreshold: true,
+    demandLevel: 'high',
+    expectedDaysToSell: 7,
+    authenticityRisk: 'low',
+    resaleStrategy: 'Sell on eBay or Back Market',
+    confidence: 'high',
+    reasoning: 'Strong demand for Apple laptops',
+  };
+
+  let mockIdentifyItem: jest.Mock;
+  let mockFetchMarketPrice: jest.Mock;
+  let mockCloseBrowser: jest.Mock;
+  let mockAnalyzeSellability: jest.Mock;
+  let mockQuickDiscountCheck: jest.Mock;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    process.env.OPENAI_API_KEY = 'test-llm-key';
+
+    mockIdentifyItem = require('@/lib/llm-identifier').identifyItem;
+    mockFetchMarketPrice = require('@/lib/market-price').fetchMarketPrice;
+    mockCloseBrowser = require('@/lib/market-price').closeBrowser;
+    mockAnalyzeSellability = require('@/lib/llm-analyzer').analyzeSellability;
+    mockQuickDiscountCheck = require('@/lib/llm-analyzer').quickDiscountCheck;
+
+    mockIdentifyItem.mockResolvedValue(defaultIdentification);
+    mockFetchMarketPrice.mockResolvedValue(defaultMarketData);
+    mockCloseBrowser.mockResolvedValue(undefined);
+    mockQuickDiscountCheck.mockReturnValue({ passesQuickCheck: true, estimatedDiscount: 36 });
+    mockAnalyzeSellability.mockResolvedValue(defaultSellabilityResult);
+
+    (prisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-llm' });
+    (prisma.scraperJob.update as jest.Mock).mockResolvedValue({});
+    (prisma.listing.upsert as jest.Mock).mockResolvedValue({ id: 'listing-llm', status: 'OPPORTUNITY' });
+
+    mockFetch
+      .mockResolvedValueOnce(activeApiResponse)
+      .mockResolvedValueOnce(soldApiResponse);
+  });
+
+  afterEach(() => {
+    delete process.env.OPENAI_API_KEY;
+  });
+
+  function makeRequest() {
+    return new NextRequest('http://localhost:3000/api/scraper/mercari', {
+      method: 'POST',
+      body: JSON.stringify({ keywords: 'macbook' }),
+    });
+  }
+
+  it('runs full LLM pipeline and saves listing as OPPORTUNITY when all checks pass', async () => {
+    const res = await POST(makeRequest());
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(mockIdentifyItem).toHaveBeenCalled();
+    expect(mockFetchMarketPrice).toHaveBeenCalled();
+    expect(mockQuickDiscountCheck).toHaveBeenCalled();
+    expect(mockAnalyzeSellability).toHaveBeenCalled();
+    expect(prisma.listing.upsert).toHaveBeenCalled();
+    expect(json.success).toBe(true);
+  });
+
+  it('skips item when identifyItem returns worthInvestigating=false', async () => {
+    mockIdentifyItem.mockResolvedValue({ ...defaultIdentification, worthInvestigating: false });
+
+    const res = await POST(makeRequest());
+    expect(res.status).toBe(200);
+    expect(mockFetchMarketPrice).not.toHaveBeenCalled();
+    expect(prisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('skips item when fetchMarketPrice returns null', async () => {
+    mockFetchMarketPrice.mockResolvedValue(null);
+
+    const res = await POST(makeRequest());
+    expect(res.status).toBe(200);
+    expect(mockQuickDiscountCheck).not.toHaveBeenCalled();
+    expect(prisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('skips item when fetchMarketPrice returns salesCount=0', async () => {
+    mockFetchMarketPrice.mockResolvedValue({ ...defaultMarketData, salesCount: 0 });
+
+    const res = await POST(makeRequest());
+    expect(res.status).toBe(200);
+    expect(mockQuickDiscountCheck).not.toHaveBeenCalled();
+    expect(prisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('skips item when quickDiscountCheck fails', async () => {
+    mockQuickDiscountCheck.mockReturnValue({ passesQuickCheck: false, estimatedDiscount: 8 });
+
+    const res = await POST(makeRequest());
+    expect(res.status).toBe(200);
+    expect(mockAnalyzeSellability).not.toHaveBeenCalled();
+    expect(prisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('skips item when analyzeSellability returns meetsThreshold=false', async () => {
+    mockAnalyzeSellability.mockResolvedValue({ ...defaultSellabilityResult, meetsThreshold: false });
+
+    const res = await POST(makeRequest());
+    expect(res.status).toBe(200);
+    expect(prisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('swallows LLM error and skips item', async () => {
+    mockIdentifyItem.mockRejectedValue(new Error('LLM error'));
+
+    const res = await POST(makeRequest());
+    expect(res.status).toBe(200);
+    expect(prisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('skips item when analyzeSellability returns null', async () => {
+    mockAnalyzeSellability.mockResolvedValue(null);
+
+    const res = await POST(makeRequest());
+    expect(res.status).toBe(200);
+    expect(prisma.listing.upsert).not.toHaveBeenCalled();
+  });
+
+  it('reads discountThreshold from userSettings and passes it to analyzeSellability', async () => {
+    // Override userSettings to return a custom discountThreshold
+    (prisma.userSettings.findUnique as jest.Mock).mockResolvedValueOnce({ discountThreshold: 45 });
+
+    const res = await POST(makeRequest());
+    expect(res.status).toBe(200);
+
+    expect(mockAnalyzeSellability).toHaveBeenCalledWith(
+      expect.any(String),   // title
+      expect.any(Number),   // price
+      expect.any(Object),   // identification
+      expect.any(Object),   // marketData
+      45,                   // discountThreshold from userSettings
+      expect.any(Number)    // feeRate from userSettings
+    );
   });
 });

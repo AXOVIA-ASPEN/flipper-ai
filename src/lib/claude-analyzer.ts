@@ -9,6 +9,8 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import prisma from '@/lib/db';
+import { analysisCache } from '@/lib/cache';
+import { recordUsage } from '@/lib/usage-tracker';
 
 const getClaudeApiKey = () => process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
 const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-5-20250929';
@@ -29,14 +31,22 @@ export interface ClaudeAnalysisResult {
   targetBuyer?: string;
 }
 
+const L1_KEY = (listingId: string) => `claude:${listingId}`;
+
 /**
- * Check if we have a cached analysis for this listing
+ * Check if we have a cached analysis for this listing (L1 in-memory, then L2 DB)
  */
 async function getCachedAnalysis(listingId: string): Promise<ClaudeAnalysisResult | null> {
+  // L1: in-memory LRU cache
+  const l1 = analysisCache.get(L1_KEY(listingId)) as ClaudeAnalysisResult | undefined;
+  if (l1) return l1;
+
+  // L2: database cache
   try {
     const cached = await prisma.aiAnalysisCache.findFirst({
       where: {
         listingId,
+        analysisType: 'claude',
         expiresAt: {
           gt: new Date(),
         },
@@ -47,7 +57,9 @@ async function getCachedAnalysis(listingId: string): Promise<ClaudeAnalysisResul
     });
 
     if (cached) {
-      return JSON.parse(cached.analysisResult);
+      const result = JSON.parse(cached.analysisResult) as ClaudeAnalysisResult;
+      analysisCache.set(L1_KEY(listingId), result);
+      return result;
     }
   } catch (error) {
     console.error('Error fetching cached analysis:', error);
@@ -57,20 +69,27 @@ async function getCachedAnalysis(listingId: string): Promise<ClaudeAnalysisResul
 }
 
 /**
- * Store analysis result in cache
+ * Store analysis result in cache (L2 DB then L1 in-memory)
  */
 async function cacheAnalysis(listingId: string, result: ClaudeAnalysisResult): Promise<void> {
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + CACHE_DURATION_HOURS);
 
   try {
-    await prisma.aiAnalysisCache.create({
-      data: {
+    await prisma.aiAnalysisCache.upsert({
+      where: { listingId_analysisType: { listingId, analysisType: 'claude' } },
+      create: {
         listingId,
+        analysisType: 'claude',
+        analysisResult: JSON.stringify(result),
+        expiresAt,
+      },
+      update: {
         analysisResult: JSON.stringify(result),
         expiresAt,
       },
     });
+    analysisCache.set(L1_KEY(listingId), result);
   } catch (error) {
     console.error('Error caching analysis:', error);
   }
@@ -268,11 +287,20 @@ export async function analyzeListingData(
   title: string,
   description: string | null,
   askingPrice: number,
-  imageUrls?: string[]
+  imageUrls?: string[],
+  userId?: string
 ): Promise<ClaudeAnalysisResult> {
   const prompt = buildAnalysisPrompt(title, description, askingPrice, imageUrls);
   const responseText = await callClaudeAPI(prompt);
-  return parseClaudeResponse(responseText);
+  const result = parseClaudeResponse(responseText);
+  if (userId) {
+    try {
+      await recordUsage(userId, 'ANALYSIS');
+    } catch (usageError) {
+      console.error('[Usage Tracker] Failed to record analysis usage:', usageError);
+    }
+  }
+  return result;
 }
 
 /**

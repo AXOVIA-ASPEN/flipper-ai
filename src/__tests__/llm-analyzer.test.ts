@@ -3,6 +3,26 @@ import { analyzeSellability, quickDiscountCheck, runFullAnalysis } from '../lib/
 import type { ItemIdentification } from '../lib/llm-identifier';
 import type { MarketPrice } from '../lib/market-price';
 
+// Mock Prisma db — added because llm-analyzer.ts imports @/lib/db for caching
+jest.mock('@/lib/db', () => ({
+  __esModule: true,
+  default: {
+    aiAnalysisCache: {
+      findFirst: jest.fn().mockResolvedValue(null),
+      upsert: jest.fn().mockResolvedValue({}),
+    },
+  },
+}));
+
+// Mock in-memory L1 cache — llm-analyzer.ts imports analysisCache for L1 reads/writes
+jest.mock('@/lib/cache', () => ({
+  analysisCache: {
+    get: jest.fn().mockReturnValue(undefined),
+    set: jest.fn(),
+    delete: jest.fn(),
+  },
+}));
+
 // Mock OpenAI
 jest.mock('openai', () => {
   return jest.fn().mockImplementation(() => ({
@@ -204,6 +224,101 @@ describe('llm-analyzer', () => {
       expect(result!.verifiedMarketValue).toBe(mockMarketData.medianPrice);
       expect(result!.recommendedOfferPrice).toBe(200);
       expect(result!.recommendedListPrice).toBe(mockMarketData.medianPrice);
+    });
+  });
+
+  describe('analyzeSellability with discountThreshold', () => {
+    it('embeds custom discountThreshold in the prompt sent to OpenAI', async () => {
+      jest.resetModules();
+      let capturedPrompt = '';
+      const mockCreate = jest.fn().mockImplementation((params: { messages: Array<{ role: string; content: string }> }) => {
+        capturedPrompt = params.messages[1]?.content || '';
+        return Promise.resolve({
+          choices: [{ message: { content: JSON.stringify({
+            verifiedMarketValue: 500, trueDiscountPercent: 75,
+            sellabilityScore: 85, demandLevel: 'high', expectedDaysToSell: 7,
+            authenticityRisk: 'low', conditionRisk: 'low',
+            recommendedOfferPrice: 180, recommendedListPrice: 450,
+            resaleStrategy: 'List on eBay', resalePlatform: 'ebay',
+            confidence: 'high', reasoning: 'Great deal', meetsThreshold: true,
+          }) } }],
+        });
+      });
+      jest.mock('openai', () => jest.fn().mockImplementation(() => ({
+        chat: { completions: { create: mockCreate } },
+      })));
+      const { analyzeSellability: freshAnalyze } = require('../lib/llm-analyzer');
+      process.env.OPENAI_API_KEY = 'test-key';
+      const fullMarket = {
+        medianPrice: 500, lowPrice: 400, highPrice: 600, salesCount: 10,
+        soldListings: [{ title: 'iPhone', price: 500, soldDate: null, condition: 'Good', url: 'https://ebay.com/1', shippingCost: 0 }],
+        source: 'ebay_scrape' as const, avgPrice: 500, avgDaysToSell: null, searchQuery: 'iPhone', fetchedAt: new Date(),
+      };
+      await freshAnalyze('iPhone 14', 200, mockIdentification, fullMarket, 70);
+      expect(capturedPrompt).toContain('70');
+    });
+
+    it('uses default 50% threshold when discountThreshold is not provided', async () => {
+      jest.resetModules();
+      let capturedPrompt = '';
+      const mockCreate = jest.fn().mockImplementation((params: { messages: Array<{ role: string; content: string }> }) => {
+        capturedPrompt = params.messages[1]?.content || '';
+        return Promise.resolve({
+          choices: [{ message: { content: JSON.stringify({
+            verifiedMarketValue: 500, trueDiscountPercent: 60,
+            sellabilityScore: 75, demandLevel: 'medium', expectedDaysToSell: 14,
+            authenticityRisk: 'low', conditionRisk: 'low',
+            recommendedOfferPrice: 180, recommendedListPrice: 400,
+            resaleStrategy: 'List on eBay', resalePlatform: 'ebay',
+            confidence: 'medium', reasoning: 'OK deal', meetsThreshold: true,
+          }) } }],
+        });
+      });
+      jest.mock('openai', () => jest.fn().mockImplementation(() => ({
+        chat: { completions: { create: mockCreate } },
+      })));
+      const { analyzeSellability: freshAnalyze } = require('../lib/llm-analyzer');
+      process.env.OPENAI_API_KEY = 'test-key';
+      const fullMarket = {
+        medianPrice: 500, lowPrice: 400, highPrice: 600, salesCount: 10,
+        soldListings: [{ title: 'iPhone', price: 500, soldDate: null, condition: 'Good', url: 'https://ebay.com/1', shippingCost: 0 }],
+        source: 'ebay_scrape' as const, avgPrice: 500, avgDaysToSell: null, searchQuery: 'iPhone', fetchedAt: new Date(),
+      };
+      await freshAnalyze('iPhone 14', 200, mockIdentification, fullMarket); // no discountThreshold
+      expect(capturedPrompt).toContain('50');
+    });
+
+    it('returns meetsThreshold false when LLM reports discount is below configured threshold', async () => {
+      jest.resetModules();
+      let capturedPrompt = '';
+      const mockCreate = jest.fn().mockImplementation((params: { messages: Array<{ role: string; content: string }> }) => {
+        capturedPrompt = params.messages[1]?.content || '';
+        return Promise.resolve({
+          choices: [{ message: { content: JSON.stringify({
+            verifiedMarketValue: 500, trueDiscountPercent: 60,
+            sellabilityScore: 70, demandLevel: 'medium', expectedDaysToSell: 14,
+            authenticityRisk: 'low', conditionRisk: 'low',
+            recommendedOfferPrice: 200, recommendedListPrice: 400,
+            resaleStrategy: 'List on eBay', resalePlatform: 'ebay',
+            confidence: 'medium', reasoning: 'Only 60% below market, below 75% threshold',
+            meetsThreshold: false,
+          }) } }],
+        });
+      });
+      jest.mock('openai', () => jest.fn().mockImplementation(() => ({
+        chat: { completions: { create: mockCreate } },
+      })));
+      const { analyzeSellability: freshAnalyze } = require('../lib/llm-analyzer');
+      process.env.OPENAI_API_KEY = 'test-key';
+      const fullMarket = {
+        medianPrice: 500, lowPrice: 400, highPrice: 600, salesCount: 10,
+        soldListings: [{ title: 'iPhone', price: 500, soldDate: null, condition: 'Good', url: 'https://ebay.com/1', shippingCost: 0 }],
+        source: 'ebay_scrape' as const, avgPrice: 500, avgDaysToSell: null, searchQuery: 'iPhone', fetchedAt: new Date(),
+      };
+      const result = await freshAnalyze('iPhone 14', 200, mockIdentification, fullMarket, 75);
+      expect(result).not.toBeNull();
+      expect(result!.meetsThreshold).toBe(false);
+      expect(capturedPrompt).toContain('75');
     });
   });
 

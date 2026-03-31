@@ -2,12 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { estimateValue, detectCategory, generatePurchaseMessage } from '@/lib/value-estimator';
 import { getAuthUserId } from '@/lib/auth-middleware';
-import { calculateVerifiedMarketValue, calculateTrueDiscount } from '@/lib/market-value-calculator';
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
+import { enforceTierLimits } from '@/lib/tier-enforcement';
 import {
   processListings,
   formatForStorage,
   generateScanSummary,
+  enrichWithVerifiedMarketPrice,
+  enrichWithSellabilityAnalysis,
+  enrichOpportunitiesWithClaudeTier2,
+  enrichWithDemandAnalysis,
+  enrichWithCompMatches,
+  enrichWithCompletenessAndReputation,
+  enrichWithLogisticsAnalysis,
+  getPlatformFeeRate,
   ViabilityCriteria,
   type AnalyzedListing,
   type RawListing,
@@ -190,6 +198,9 @@ function convertEbayItemsToNormalized(items: EbayItemSummary[]): RawListing[] {
         : null;
       const additionalNotes = [sellerNote, auctionNote].filter(Boolean).join('\n').trim();
 
+      const feedbackPctStr = item.seller?.feedbackPercentage;
+      const parsedPct = feedbackPctStr != null ? parseFloat(feedbackPctStr) : null;
+
       return {
         externalId: item.itemId,
         url: item.itemWebUrl,
@@ -204,6 +215,9 @@ function convertEbayItemsToNormalized(items: EbayItemSummary[]): RawListing[] {
         category,
         postedAt: item.itemCreationDate ? new Date(item.itemCreationDate) : null,
         additionalNotes: additionalNotes || null,
+        sellerRating: parsedPct !== null && !isNaN(parsedPct) ? parsedPct : null,
+        sellerReviewCount: item.seller?.feedbackScore ?? null,
+        sellerAccountAgeDays: null, // Not available from eBay Browse API
       };
     });
 }
@@ -270,12 +284,21 @@ export async function POST(request: NextRequest) {
       throw new ValidationError('keywords is required');
     }
 
+    const userSettings = await prisma.userSettings.findUnique({ where: { userId } });
+    const discountThreshold = userSettings?.discountThreshold ?? 50;
+    const feeRate = getPlatformFeeRate('EBAY', userSettings);
+    const opportunityThreshold = userSettings?.opportunityThreshold ?? 70;
+    const hasLLM = !!process.env.OPENAI_API_KEY;
+
     const sanitizedLimit = Math.min(body.limit ?? DEFAULT_LIMIT, MAX_LIMIT);
     const searchParams: ScrapeRequestBody = {
       ...body,
       keywords: body.keywords.trim(),
       limit: sanitizedLimit,
     };
+
+    // Enforce subscription tier limits (scan count + marketplace)
+    await enforceTierLimits(userId, 'EBAY');
 
     const scraperJob = await prisma.scraperJob.create({
       data: {
@@ -297,9 +320,9 @@ export async function POST(request: NextRequest) {
       // Convert eBay items to normalized format
       const normalizedListings = convertEbayItemsToNormalized(activeListings);
 
-      // Build viability criteria (using defaults for eBay)
+      // Build viability criteria using user's configurable opportunity threshold
       const viabilityCriteria: ViabilityCriteria = {
-        minValueScore: 70,
+        minValueScore: opportunityThreshold,
         maxAskingPrice: body.maxPrice,
       };
 
@@ -308,31 +331,44 @@ export async function POST(request: NextRequest) {
         'EBAY',
         normalizedListings,
         viabilityCriteria,
-        { emitEvents: true, userId }
+        { emitEvents: true, userId, feeRate, opportunityThreshold }
       );
 
-      // Save all listings to database
+      // Enrich listings with market data (LLM path or verified price path)
+      let enrichedListings: AnalyzedListing[];
+      if (hasLLM) {
+        enrichedListings = await enrichWithSellabilityAnalysis(processedResults.all, discountThreshold, feeRate);
+      } else {
+        enrichedListings = await enrichWithVerifiedMarketPrice(processedResults.all);
+      }
+
+      // Tier 2: Claude Sonnet structural analysis on enriched opportunities (Story 5.1)
+      enrichedListings = await enrichOpportunitiesWithClaudeTier2(enrichedListings, userId);
+
+      // Step 4: Demand trend analysis on opportunity listings (Story 5.3)
+      enrichedListings = await enrichWithDemandAnalysis(
+        enrichedListings.filter((l) => l.isOpportunity)
+      );
+
+      // Step 5: Comparable sold item matching (Story 5.2)
+      enrichedListings = await enrichWithCompMatches(enrichedListings);
+
+      // Step 6: Item completeness & seller reputation analysis (Story 5.4)
+      enrichedListings = await enrichWithCompletenessAndReputation(enrichedListings);
+
+      // Step 7: Logistics & shipping cost analysis (Story 5.5)
+      const userLocation = userSettings?.homeLocation ?? null;
+      const maxPickupRadiusMiles = userSettings?.maxPickupRadiusMiles ?? 50;
+      enrichedListings = await enrichWithLogisticsAnalysis(
+        enrichedListings,
+        userLocation,
+        maxPickupRadiusMiles
+      );
+
+      // Save all enriched opportunity listings to database
       const savedListings = [];
-      for (const analyzed of processedResults.all) {
-        // Get market data and calculate verified values
-        const marketValue = await calculateVerifiedMarketValue(analyzed.title, 'EBAY');
-        const verifiedMarketValue = marketValue?.verifiedMarketValue || null;
-        const marketDataSource = marketValue?.marketDataSource || null;
-        const trueDiscountPercent = marketValue
-          ? calculateTrueDiscount(marketValue.verifiedMarketValue, analyzed.askingPrice)
-          : null;
-
-        // Prepare storage data
+      for (const analyzed of enrichedListings) {
         const storageData = formatForStorage(analyzed);
-        
-        // Add verified market data
-        const enrichedData = {
-          ...storageData,
-          verifiedMarketValue,
-          marketDataSource,
-          trueDiscountPercent,
-        };
-
         try {
           const listing = await prisma.listing.upsert({
             where: {
@@ -342,12 +378,31 @@ export async function POST(request: NextRequest) {
                 userId,
               },
             },
-            create: enrichedData as Parameters<typeof prisma.listing.create>[0]['data'],
+            create: {
+              userId,
+              ...storageData,
+            } as Parameters<typeof prisma.listing.create>[0]['data'],
             update: {
-              ...enrichedData,
+              ...storageData,
               scrapedAt: new Date(),
             } as Parameters<typeof prisma.listing.update>[0]['data'],
           });
+          // Cache Claude Tier 2 result for reuse (Story 5.1)
+          if (analyzed.claudeAnalysis) {
+            try {
+              const expiresAt = new Date();
+              expiresAt.setHours(expiresAt.getHours() + 24);
+              await prisma.aiAnalysisCache.create({
+                data: {
+                  listingId: listing.id,
+                  analysisResult: JSON.stringify(analyzed.claudeAnalysis),
+                  expiresAt,
+                },
+              });
+            } catch (cacheErr) {
+              console.error(`Failed to cache Claude analysis for ${analyzed.externalId}:`, cacheErr);
+            }
+          }
           savedListings.push(listing);
         } catch (err) {
           console.error(`Error saving listing ${analyzed.externalId}:`, err);
