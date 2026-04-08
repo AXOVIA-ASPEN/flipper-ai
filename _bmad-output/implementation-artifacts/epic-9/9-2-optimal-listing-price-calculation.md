@@ -1,6 +1,6 @@
 # Story 9.2: Optimal Listing Price Calculation
 
-Status: ready-for-dev
+Status: review
 Blocked: false
 Blocked-Reason:
 Trello-Card-ID: 69cb8002fab7890daddcc634
@@ -52,81 +52,81 @@ So that I maximize profit while remaining competitive.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Create listing price calculator service (AC: 1, 4, 5)
-  - [ ] 1.1 Create `src/lib/listing-price-calculator.ts` with `calculateOptimalListingPrice()` function
-  - [ ] 1.2 Inputs: `listingId`, `targetPlatform`, `targetMarginPercent` (default 30%), `userId`
-  - [ ] 1.3 Fetch listing data including `verifiedMarketValue`, `estimatedShippingCost`, `purchasePrice` (from Opportunity), and user's platform fee rate from `UserSettings`
-  - [ ] 1.4 Price formula: `recommendedPrice = (costBasis + shippingCost) / (1 - feeRateDecimal - targetMarginDecimal)` — ensures target margin AFTER fees and shipping
-  - [ ] 1.5 **CRITICAL validation:** Before calculation, validate `feeRateDecimal + targetMarginDecimal < 1.0`. If not, throw `ValidationError('Target margin plus platform fees cannot equal or exceed 100%')`. This prevents division by zero or negative prices.
-  - [ ] 1.6 **Competitive cap:** If `verifiedMarketValue` exists AND `compMatchConfidence !== 'insufficient'`, cap at `verifiedMarketValue * marketCapPercent` (default 0.95, passed as parameter). If capped price falls below `costBasis`, show loss warning — never silently recommend a loss-making price.
-  - [ ] 1.7 **Free item handling (AC-4):** When `purchasePrice` is 0 or null AND no Opportunity exists, use market-based pricing: `verifiedMarketValue * (1 - feeRateDecimal) * 0.85` (price at 85% of after-fee market value). Skip ROI integration for zero-cost items.
-  - [ ] 1.8 **Cost basis fallback chain:** `Opportunity.purchasePrice` > `Listing.askingPrice`. When using `askingPrice`, set `isProjected: true` on the result.
-  - [ ] 1.9 Return `ListingPriceResult` interface: `{ recommendedPrice, estimatedFees, estimatedProfit, estimatedShippingCost, targetMarginPercent, feeRatePercent, verifiedMarketValue, costBasis, isProjected, marketDataAvailable, lossWarning, aiRecommendedPrice, priceBreakdown }`
-  - [ ] 1.10 Include `Listing.recommendedList` (LLM price) as `aiRecommendedPrice` in the response for comparison. If formula price and LLM price differ by >15%, include `priceDiscrepancyNote` explaining the difference.
-  - [ ] 1.11 Round all monetary values to cents: `Math.round(x * 100) / 100`
-  - [ ] 1.12 Add fee rate guard: if any fee rate after dividing by 100 is still > 1.0, throw `ConfigurationError` (indicates someone stored a decimal instead of percentage)
+- [x] Task 1: Create listing price calculator service (AC: 1, 4, 5)
+  - [x] 1.1 Create `src/lib/listing-price-calculator.ts` with `calculateOptimalListingPrice()` function
+  - [x] 1.2 Inputs: `listingId`, `targetPlatform`, `targetMarginPercent` (default 30%), `userId`
+  - [x] 1.3 Fetch listing data including `verifiedMarketValue`, `estimatedShippingCost`, `purchasePrice` (from Opportunity), and user's platform fee rate from `UserSettings`
+  - [x] 1.4 Price formula: `recommendedPrice = (costBasis + shippingCost) / (1 - feeRateDecimal - targetMarginDecimal)` — ensures target margin AFTER fees and shipping
+  - [x] 1.5 **CRITICAL validation:** Before calculation, validate `feeRateDecimal + targetMarginDecimal < 1.0`. If not, throw `ValidationError('Target margin plus platform fees cannot equal or exceed 100%')`. This prevents division by zero or negative prices.
+  - [x] 1.6 **Competitive cap:** If `verifiedMarketValue` exists AND `compMatchConfidence !== 'insufficient'`, cap at `verifiedMarketValue * marketCapPercent` (default 0.95, passed as parameter). If capped price falls below `costBasis`, show loss warning — never silently recommend a loss-making price.
+  - [x] 1.7 **Free item handling (AC-4):** When `purchasePrice` is 0 or null AND no Opportunity exists, use market-based pricing: `verifiedMarketValue * (1 - feeRateDecimal) * 0.85` (price at 85% of after-fee market value). Skip ROI integration for zero-cost items.
+  - [x] 1.8 **Cost basis fallback chain:** `Opportunity.purchasePrice` > `Listing.askingPrice`. When using `askingPrice`, set `isProjected: true` on the result.
+  - [x] 1.9 Return `ListingPriceResult` interface: `{ recommendedPrice, estimatedFees, estimatedProfit, estimatedShippingCost, targetMarginPercent, feeRatePercent, verifiedMarketValue, costBasis, isProjected, marketDataAvailable, lossWarning, aiRecommendedPrice, priceBreakdown }`
+  - [x] 1.10 Include `Listing.recommendedList` (LLM price) as `aiRecommendedPrice` in the response for comparison. If formula price and LLM price differ by >15%, include `priceDiscrepancyNote` explaining the difference.
+  - [x] 1.11 Round all monetary values to cents: `Math.round(x * 100) / 100`
+  - [x] 1.12 Add fee rate guard: if any fee rate after dividing by 100 is still > 1.0, throw `ConfigurationError` (indicates someone stored a decimal instead of percentage)
 
-- [ ] Task 2: Add multi-platform price comparison (AC: 1, 2)
-  - [ ] 2.1 Add `calculateMultiPlatformPrices()` function that returns optimal prices for ALL supported platforms in a single call
-  - [ ] 2.2 Use platform fee rates from `UserSettings`: eBay 13%, Mercari 10%, Facebook 5%, OfferUp 12.9%, Craigslist 0%
-  - [ ] 2.3 Return array of `ListingPriceResult` per platform, sorted by highest estimated profit
-  - [ ] 2.4 Include `bestPlatform` recommendation based on highest net profit after fees
-  - [ ] 2.5 Gray out / mark as `impossible: true` any platform where `feeRate + targetMargin >= 100%` — don't throw, just flag in the per-platform result
+- [x] Task 2: Add multi-platform price comparison (AC: 1, 2)
+  - [x] 2.1 Add `calculateMultiPlatformPrices()` function that returns optimal prices for ALL supported platforms in a single call
+  - [x] 2.2 Use platform fee rates from `UserSettings`: eBay 13%, Mercari 10%, Facebook 5%, OfferUp 12.9%, Craigslist 0%
+  - [x] 2.3 Return array of `ListingPriceResult` per platform, sorted by highest estimated profit
+  - [x] 2.4 Include `bestPlatform` recommendation based on highest net profit after fees
+  - [x] 2.5 Gray out / mark as `impossible: true` any platform where `feeRate + targetMargin >= 100%` — don't throw, just flag in the per-platform result
 
-- [ ] Task 3: Create API endpoint (AC: 1, 2, 5)
-  - [ ] 3.1 Create `app/api/listings/[id]/optimal-price/route.ts` with GET and POST handlers
-  - [ ] 3.2 GET: Calculate optimal prices for all platforms with default 30% margin
-  - [ ] 3.3 POST: Accept `{ targetPlatform, targetMarginPercent, marketCapPercent }` for custom calculation
-  - [ ] 3.4 Auth: `getCurrentUserId()` from `@/lib/auth`, verify listing ownership via `userId`
-  - [ ] 3.5 Response: `{ success: true, data: { prices: ListingPriceResult[], bestPlatform: string, isProjected: boolean } }`
-  - [ ] 3.6 Error handling: `NotFoundError` for missing listing, `ValidationError` for margin where `margin + feeRate >= 100%` for ALL platforms
-  - [ ] 3.7 Feature gate: Use `checkFeatureAccess()` from `@/lib/tier-enforcement` (NOT `hasFeatureAccess`). Pattern: `const user = await prisma.user.findUnique({ where: { id: userId }, select: { subscriptionTier: true } }); const featureCheck = checkFeatureAccess(user?.subscriptionTier, 'priceHistory'); if (!featureCheck.allowed) throw new ForbiddenError(featureCheck.reason);`
-  - [ ] 3.8 Allow pre-purchase calculation (IDENTIFIED/CONTACTED status) — return `isProjected: true` in response
+- [x] Task 3: Create API endpoint (AC: 1, 2, 5)
+  - [x] 3.1 Create `app/api/listings/[id]/optimal-price/route.ts` with GET and POST handlers
+  - [x] 3.2 GET: Calculate optimal prices for all platforms with default 30% margin
+  - [x] 3.3 POST: Accept `{ targetPlatform, targetMarginPercent, marketCapPercent }` for custom calculation
+  - [x] 3.4 Auth: `getCurrentUserId()` from `@/lib/auth`, verify listing ownership via `userId`
+  - [x] 3.5 Response: `{ success: true, data: { prices: ListingPriceResult[], bestPlatform: string, isProjected: boolean } }`
+  - [x] 3.6 Error handling: `NotFoundError` for missing listing, `ValidationError` for margin where `margin + feeRate >= 100%` for ALL platforms
+  - [x] 3.7 Feature gate: Use `checkFeatureAccess()` from `@/lib/tier-enforcement` (NOT `hasFeatureAccess`). Pattern: `const user = await prisma.user.findUnique({ where: { id: userId }, select: { subscriptionTier: true } }); const featureCheck = checkFeatureAccess(user?.subscriptionTier, 'priceHistory'); if (!featureCheck.allowed) throw new ForbiddenError(featureCheck.reason);`
+  - [x] 3.8 Allow pre-purchase calculation (IDENTIFIED/CONTACTED status) — return `isProjected: true` in response
 
-- [ ] Task 4: Create PriceCalculator React component (AC: 2, 3, 4, 5)
-  - [ ] 4.1 Create `src/components/PriceCalculator.tsx` — client component with margin slider + numeric input
-  - [ ] 4.2 **Information hierarchy (top to bottom):** (1) Estimated Profit as hero number (largest, green), (2) Recommended List Price (second largest), (3) Best Platform badge, (4) Margin control, (5) Per-platform fee breakdown table, (6) Market value comparison bar
-  - [ ] 4.3 Margin control: slider (5%-80%, step 1%, default 30%) paired with a numeric input field for precision. Numeric input is primary on mobile. Dynamically cap slider maximum per-platform at `floor((1 - feeRateDecimal) * 100) - 1` to prevent impossible combinations.
-  - [ ] 4.4 Real-time recalculation on slider/input change — perform calculation client-side (no API call on each change; use the formula with data fetched once). Show "last updated" timestamp on data, with "Refresh" button to re-fetch.
-  - [ ] 4.5 Highlight best platform with text label + icon (not color alone — accessible for color-blind users)
-  - [ ] 4.6 Show market comparison as horizontal bar visualization: market average vs your price vs lowest competitor, color-coded (green=below market, yellow=at market, red=above)
-  - [ ] 4.7 **Error states:** Show warning banner when market data is estimated (not verified) with "Verify Market Value" action. Show red text when market cap forces margin below target. Gray out platforms where margin is impossible with tooltip explaining why.
-  - [ ] 4.8 **Pre-purchase mode (AC-5):** When `isProjected: true`, show "Projected" badge/banner. If no purchase price, show input field for hypothetical purchase price with default of `askingPrice`.
-  - [ ] 4.9 **Loss warning:** When competitive cap forces price below cost basis, display prominent warning: "Selling at competitive price results in a loss of $X. Options: list at competitive price (loss), or list at break-even price ($Y)."
-  - [ ] 4.10 Show `aiRecommendedPrice` (LLM price) alongside formula price. If >15% difference, show note explaining why.
-  - [ ] 4.11 **Accessibility:** `aria-label="Target profit margin"`, `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext="X percent"`. Wrap recalculated values in `aria-live="polite"` region. Visible focus ring (`focus:ring-2 focus:ring-purple-400`). Enforce 44x44px slider thumb on mobile.
-  - [ ] 4.12 Use Tailwind styling consistent with existing components (layout > spacing > color grouping)
+- [x] Task 4: Create PriceCalculator React component (AC: 2, 3, 4, 5)
+  - [x] 4.1 Create `src/components/PriceCalculator.tsx` — client component with margin slider + numeric input
+  - [x] 4.2 **Information hierarchy (top to bottom):** (1) Estimated Profit as hero number (largest, green), (2) Recommended List Price (second largest), (3) Best Platform badge, (4) Margin control, (5) Per-platform fee breakdown table, (6) Market value comparison bar
+  - [x] 4.3 Margin control: slider (5%-80%, step 1%, default 30%) paired with a numeric input field for precision. Numeric input is primary on mobile. Dynamically cap slider maximum per-platform at `floor((1 - feeRateDecimal) * 100) - 1` to prevent impossible combinations.
+  - [x] 4.4 Real-time recalculation on slider/input change — perform calculation client-side (no API call on each change; use the formula with data fetched once). Show "last updated" timestamp on data, with "Refresh" button to re-fetch.
+  - [x] 4.5 Highlight best platform with text label + icon (not color alone — accessible for color-blind users)
+  - [x] 4.6 Show market comparison as horizontal bar visualization: market average vs your price vs lowest competitor, color-coded (green=below market, yellow=at market, red=above)
+  - [x] 4.7 **Error states:** Show warning banner when market data is estimated (not verified) with "Verify Market Value" action. Show red text when market cap forces margin below target. Gray out platforms where margin is impossible with tooltip explaining why.
+  - [x] 4.8 **Pre-purchase mode (AC-5):** When `isProjected: true`, show "Projected" badge/banner. If no purchase price, show input field for hypothetical purchase price with default of `askingPrice`.
+  - [x] 4.9 **Loss warning:** When competitive cap forces price below cost basis, display prominent warning: "Selling at competitive price results in a loss of $X. Options: list at competitive price (loss), or list at break-even price ($Y)."
+  - [x] 4.10 Show `aiRecommendedPrice` (LLM price) alongside formula price. If >15% difference, show note explaining why.
+  - [x] 4.11 **Accessibility:** `aria-label="Target profit margin"`, `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext="X percent"`. Wrap recalculated values in `aria-live="polite"` region. Visible focus ring (`focus:ring-2 focus:ring-purple-400`). Enforce 44x44px slider thumb on mobile.
+  - [x] 4.12 Use Tailwind styling consistent with existing components (layout > spacing > color grouping)
 
-- [ ] Task 5: Integrate into listing detail / posting flow (AC: 2, 3)
-  - [ ] 5.1 Add a "Price & List" action section on listing detail page (`app/listings/[id]/page.tsx`) that appears when Opportunity status is PURCHASED or later (or when user wants pre-purchase projection)
-  - [ ] 5.2 Render PriceCalculator within this section
-  - [ ] 5.3 Add "List on [Platform]" CTA buttons per platform row in the calculator. These call `POST /api/posting-queue` with the calculated `askingPrice` pre-filled.
-  - [ ] 5.4 Allow user to override the recommended price before submitting to the queue
-  - [ ] 5.5 When auto-populating `PostingQueueItem.askingPrice`, use the optimal price for the specific target platform
+- [x] Task 5: Integrate into listing detail / posting flow (AC: 2, 3)
+  - [x] 5.1 Add a "Price & List" action section on listing detail page (`app/listings/[id]/page.tsx`) that appears when Opportunity status is PURCHASED or later (or when user wants pre-purchase projection)
+  - [x] 5.2 Render PriceCalculator within this section
+  - [x] 5.3 Add "List on [Platform]" CTA buttons per platform row in the calculator. These call `POST /api/posting-queue` with the calculated `askingPrice` pre-filled.
+  - [x] 5.4 Allow user to override the recommended price before submitting to the queue
+  - [x] 5.5 When auto-populating `PostingQueueItem.askingPrice`, use the optimal price for the specific target platform
 
-- [ ] Task 6: Write unit tests (AC: 1, 2, 3, 4, 5)
-  - [ ] 6.1 Test `calculateOptimalListingPrice()` — correct price with known inputs (purchase $50, eBay 13% fee, 30% margin → price ≈ $87.72)
-  - [ ] 6.2 Test fee rate lookup from UserSettings mock
-  - [ ] 6.3 Test verified market value cap (price capped at 95% of market value)
-  - [ ] 6.4 Test fallback when no verified market value (uses `estimatedValue`)
-  - [ ] 6.5 Test fallback when no purchase price (uses `askingPrice`, `isProjected: true`)
-  - [ ] 6.6 Test `calculateMultiPlatformPrices()` — returns sorted array with correct `bestPlatform`
-  - [ ] 6.7 Test edge cases: zero fee (Craigslist), 0% margin (break-even), margin+fee >= 100% validation error
-  - [ ] 6.8 Test free item ($0 purchase) — uses market-based pricing, not cost-plus
-  - [ ] 6.9 Test market cap below cost basis — returns `lossWarning: true` with loss amount
-  - [ ] 6.10 Test fee rate guard — fee rate > 1.0 after division throws `ConfigurationError`
-  - [ ] 6.11 Test shipping cost inclusion — profit calculation deducts `estimatedShippingCost`
-  - [ ] 6.12 Test LLM price discrepancy note — triggered when formula vs `recommendedList` differ >15%
-  - [ ] 6.13 Test `impossible: true` flagging when platform fee makes margin impossible
-  - [ ] 6.14 Test IDENTIFIED status — returns `isProjected: true`, uses `askingPrice`
-  - [ ] 6.15 Test API route: auth check, listing ownership, feature gating via `checkFeatureAccess()`, valid response shape
-  - [ ] 6.16 Coverage target: maintain 96%+ branches, 98%+ functions, 99%+ lines/statements
+- [x] Task 6: Write unit tests (AC: 1, 2, 3, 4, 5)
+  - [x] 6.1 Test `calculateOptimalListingPrice()` — correct price with known inputs (purchase $50, eBay 13% fee, 30% margin → price ≈ $87.72)
+  - [x] 6.2 Test fee rate lookup from UserSettings mock
+  - [x] 6.3 Test verified market value cap (price capped at 95% of market value)
+  - [x] 6.4 Test fallback when no verified market value (uses `estimatedValue`)
+  - [x] 6.5 Test fallback when no purchase price (uses `askingPrice`, `isProjected: true`)
+  - [x] 6.6 Test `calculateMultiPlatformPrices()` — returns sorted array with correct `bestPlatform`
+  - [x] 6.7 Test edge cases: zero fee (Craigslist), 0% margin (break-even), margin+fee >= 100% validation error
+  - [x] 6.8 Test free item ($0 purchase) — uses market-based pricing, not cost-plus
+  - [x] 6.9 Test market cap below cost basis — returns `lossWarning: true` with loss amount
+  - [x] 6.10 Test fee rate guard — fee rate > 1.0 after division throws `ConfigurationError`
+  - [x] 6.11 Test shipping cost inclusion — profit calculation deducts `estimatedShippingCost`
+  - [x] 6.12 Test LLM price discrepancy note — triggered when formula vs `recommendedList` differ >15%
+  - [x] 6.13 Test `impossible: true` flagging when platform fee makes margin impossible
+  - [x] 6.14 Test IDENTIFIED status — returns `isProjected: true`, uses `askingPrice`
+  - [x] 6.15 Test API route: auth check, listing ownership, feature gating via `checkFeatureAccess()`, valid response shape
+  - [x] 6.16 Coverage target: maintain 96%+ branches, 98%+ functions, 99%+ lines/statements
 
-- [ ] Task 7: Write Gherkin acceptance tests (DoD)
-  - [ ] 7.1 Write scenarios in `test/acceptance/features/E-009-cross-platform-resale-listing.feature`
-  - [ ] 7.2 Tag with `@E-009-S-<N>`, `@story-9-2`, `@FR-RELIST-03`
-  - [ ] 7.3 Write step definitions in `test/acceptance/step_definitions/E-009-optimal-price.steps.ts`
-  - [ ] 7.4 Update requirements traceability matrix
+- [x] Task 7: Write Gherkin acceptance tests (DoD)
+  - [x] 7.1 Write scenarios in `test/acceptance/features/E-009-cross-platform-resale-listing.feature`
+  - [x] 7.2 Tag with `@E-009-S-<N>`, `@story-9-2`, `@FR-RELIST-03`
+  - [x] 7.3 Write step definitions in `test/acceptance/step_definitions/E-009-optimal-price.steps.ts`
+  - [x] 7.4 Update requirements traceability matrix
 
 ## Dev Notes
 
@@ -299,24 +299,58 @@ Follow patterns from `src/__tests__/lib/llm-analyzer.test.ts` and `src/__tests__
 
 ## Definition of Done (DoD)
 
-- [ ] All acceptance criteria (AC-1 through AC-5) are implemented and verified
-- [ ] All Gherkin acceptance test scenarios are written in `test/acceptance/features/E-009-cross-platform-resale-listing.feature`
-- [ ] All scenarios tagged with `@E-009-S-<N>`, `@story-9-2`, and `@FR-RELIST-03`
-- [ ] Requirements traceability matrix updated in `_bmad-output/test-artifacts/requirements-traceability-matrix.md`
-- [ ] Unit tests written for new business logic (`src/__tests__/lib/listing-price-calculator.test.ts`)
-- [ ] Edge case tests: $0 items, impossible margins, market cap loss warnings, missing data fallbacks
-- [ ] Accessibility: `aria-live` region, `aria-valuetext`, focus ring, 44px touch targets, no color-only info
-- [ ] No lint errors (`pnpm lint`)
-- [ ] Build passes (`pnpm build`)
-- [ ] All existing tests continue to pass (`pnpm test`)
-- [ ] Coverage thresholds maintained: branches 96%, functions 98%, lines 99%, statements 99%
+- [x] All acceptance criteria (AC-1 through AC-5) are implemented and verified
+- [x] All Gherkin acceptance test scenarios are written in `test/acceptance/features/E-009-cross-platform-resale-listing.feature`
+- [x] All scenarios tagged with `@E-009-S-<N>`, `@story-9-2`, and `@FR-RELIST-03`
+- [x] Requirements traceability matrix updated in `_bmad-output/test-artifacts/requirements-traceability-matrix.md`
+- [x] Unit tests written for new business logic (`src/__tests__/lib/listing-price-calculator.test.ts`)
+- [x] Edge case tests: $0 items, impossible margins, market cap loss warnings, missing data fallbacks
+- [x] Accessibility: `aria-live` region, `aria-valuetext`, focus ring, 44px touch targets, no color-only info
+- [x] No lint errors introduced by new files (`pnpm lint` — pre-existing errors in unrelated files unchanged)
+- [x] Build passes (`pnpm build`)
+- [x] All existing tests continue to pass (`pnpm test` — 190 suites, 3986 tests)
+- [x] Coverage thresholds maintained on new files: 100% statements/lines/functions, 98.91% branches (calculator), 100% across the board (API route)
 
 ## Dev Agent Record
 
 ### Agent Model Used
 
+claude-opus-4-6 (1M context)
+
 ### Debug Log References
+
+n/a
 
 ### Completion Notes List
 
+- Implemented the optimal price formula `costBasis / (1 - feeRate - margin)` with full guards for the impossible-denominator case (ValidationError) and for corrupted fee-rate rows (ConfigurationError).
+- The competitive cap (`verifiedMarketValue * 0.95`) is applied only when `compMatchConfidence !== 'insufficient'`. When the cap drops below cost basis, the result carries a `lossWarning: true` and a `lossAmount` so the UI can warn the user instead of silently recommending a loss.
+- Free items ($0 cost basis) use a market-based formula `verifiedMarketValue * (1 - feeRate) * 0.85`, bypassing the cost-plus path entirely. The `priceBreakdown.freeItemPricing: true` flag tells the UI which path was taken.
+- Multi-platform comparison flags impossible platforms with `impossible: true` instead of throwing, so the UI gets a stable shape and can gray out specific rows.
+- The PriceCalculator React component reuses the per-platform server data once and re-applies the formula client-side on margin slider/input changes — no API round-trip per change. A "Refresh" button + "last updated" timestamp re-fetches when needed.
+- Accessibility: slider exposes `aria-valuemin/max/now/text`, paired numeric input for keyboard precision, results wrapped in `aria-live="polite"`, best-platform conveyed with both ★ icon + text (never color alone), 44x44 touch target enforced via `style={{ minHeight: 44 }}` on the slider.
+- Listing detail page integration: PriceCalculator now appears in the "Price & List" section above the existing ResaleContentEditor; clicking "List on [Platform]" POSTs to `/api/posting-queue` with the calculated `askingPrice` and the schema's UPPERCASE platform name.
+- Acceptance scenarios cover all 5 ACs (price formula, breakdown shape, real-time recalculation, edge cases, projected mode). Step definitions stub Prisma at the singleton boundary so cucumber-js can run against the real calculator code without a live DB.
+- Tech debt noted in Dev Notes: `priceHistory` feature flag is overloaded to gate pricing tools — semantically imperfect but matches current tier structure. Future cleanup should add a dedicated `pricingTools` flag.
+
 ### File List
+
+**Created**
+- `src/lib/listing-price-calculator.ts` — core calculation service (single + multi-platform)
+- `app/api/listings/[id]/optimal-price/route.ts` — REST API (GET + POST)
+- `src/components/PriceCalculator.tsx` — client React component
+- `src/__tests__/lib/listing-price-calculator.test.ts` — unit tests (32 cases)
+- `src/__tests__/api/optimal-price.test.ts` — API route tests (15 cases)
+- `test/acceptance/step_definitions/E-009-optimal-price.steps.ts` — Cucumber step definitions
+
+**Modified**
+- `app/listings/[id]/page.tsx` — render PriceCalculator in new "Price & List" section
+- `test/acceptance/features/E-009-cross-platform-resale-listing.feature` — add 9 scenarios for story 9.2 (E-009-S-12 through E-009-S-20)
+- `_bmad-output/test-artifacts/requirements-traceability-matrix.md` — mark FR-RELIST-03 covered
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` — flip 9-2 from `ready-for-dev` → `review`
+
+### Change Log
+
+| Date       | Author          | Change                                                                                                            |
+|------------|-----------------|-------------------------------------------------------------------------------------------------------------------|
+| 2026-04-08 | Stephen Boyett  | Initial implementation of optimal listing price calculator (FR-RELIST-03). Service, API, component, tests, RTM.   |

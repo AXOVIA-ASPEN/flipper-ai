@@ -104,6 +104,12 @@ describe('GET /api/messages', () => {
     );
   });
 
+  it('supports comma-separated multi-status filter', async () => {
+    await GET(createRequest('/api/messages?status=DRAFT,PENDING_APPROVAL'));
+    const where = mockFindMany.mock.calls[0][0].where;
+    expect(where.status).toEqual({ in: ['DRAFT', 'PENDING_APPROVAL'] });
+  });
+
   it('filters by listingId', async () => {
     await GET(createRequest('/api/messages?listingId=listing-1'));
     expect(mockFindMany).toHaveBeenCalledWith(
@@ -188,7 +194,7 @@ describe('GET /api/messages', () => {
 describe('POST /api/messages', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCreate.mockResolvedValue({ ...sampleMessage, direction: 'OUTBOUND', status: 'PENDING_APPROVAL' });
+    mockCreate.mockResolvedValue({ ...sampleMessage, direction: 'OUTBOUND', status: 'DRAFT' });
     // Default: FLIPPER tier user (messaging allowed)
     mockUserFindUnique.mockResolvedValue({ subscriptionTier: 'FLIPPER' });
   });
@@ -215,7 +221,7 @@ describe('POST /api/messages', () => {
           userId: 'test-user-id',
           direction: 'OUTBOUND',
           body: 'Hello, is this available?',
-          status: 'PENDING_APPROVAL',
+          status: 'DRAFT',
         }),
       })
     );

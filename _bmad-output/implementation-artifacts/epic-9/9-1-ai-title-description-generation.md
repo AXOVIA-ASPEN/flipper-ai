@@ -1,6 +1,6 @@
 # Story 9.1: AI Title & Description Generation
 
-Status: ready-for-dev
+Status: done
 Blocked: false
 Blocked-Reason:
 Trello-Card-ID:
@@ -52,83 +52,83 @@ So that my listings attract buyers and rank well in marketplace search.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Create unified resale content generation endpoint `POST /api/listings/[id]/generate-resale-content` (AC: #1, #2, #3, #4)
-  - [ ] 1.1 Create `app/api/listings/[id]/generate-resale-content/route.ts` with POST handler
-  - [ ] 1.2 Auth check via `getAuthUserId()`
-  - [ ] 1.3 Tier enforcement: `checkFeatureAccess(tier, 'ebayCrossListing')`
-  - [ ] 1.4 Accept `{ platform?: string, useLLM?: boolean }` in request body; `platform` defaults to `'all'`, `useLLM` defaults to `true`
-  - [ ] 1.5 Fetch listing with identification fields (brand, model, variant, condition, category, askingPrice, etc.)
-  - [ ] 1.6 Verify listing ownership (scoped query: `{ id, userId }`)
-  - [ ] 1.7 Build `TitleGeneratorInput` and `DescriptionGeneratorInput` from listing data directly (see Dev Notes — do NOT use `fromIdentification()` as signatures differ between modules and require `ItemIdentification` not raw listing data)
-  - [ ] 1.8 **Normalize platform casing:** Listing model stores UPPERCASE (`CRAIGSLIST`, `EBAY`), generators expect lowercase (`ebay`, `mercari`). Apply `.toLowerCase()` before passing to any generator function
-  - [ ] 1.9 When `platform='all'` AND `useLLM=true`: loop over `['ebay', 'mercari', 'facebook', 'offerup']` and call `generateLLMTitle()` + `generateLLMDescription()` for each (WARNING: `generateTitlesForAllPlatforms()` is algorithmic-only — it ignores `useLLM` param despite the story's earlier claim)
-  - [ ] 1.10 When `platform='all'` AND `useLLM=false`: use `generateTitlesForAllPlatforms()` + `generateDescriptionsForAllPlatforms()` (these are synchronous, algorithmic-only)
-  - [ ] 1.11 When `platform` is specific: call `generateLLMTitle()`/`generateAlgorithmicTitle()` + `generateLLMDescription()`/`generateAlgorithmicDescription()` based on `useLLM`
-  - [ ] 1.12 Handle `platform='craigslist'`: generators don't include Craigslist — map to `'generic'` style
-  - [ ] 1.13 Return `{ success: true, data: { titles, descriptions, primary: { title, description }, source: 'ai'|'template' } }`
+- [x] Task 1: Create unified resale content generation endpoint `POST /api/listings/[id]/generate-resale-content` (AC: #1, #2, #3, #4)
+  - [x] 1.1 Create `app/api/listings/[id]/generate-resale-content/route.ts` with POST handler
+  - [x] 1.2 Auth check via `getAuthUserId()`
+  - [x] 1.3 Tier enforcement: `checkFeatureAccess(tier, 'ebayCrossListing')`
+  - [x] 1.4 Accept `{ platform?: string, useLLM?: boolean }` in request body; `platform` defaults to `'all'`, `useLLM` defaults to `true`
+  - [x] 1.5 Fetch listing with identification fields (brand, model, variant, condition, category, askingPrice, etc.)
+  - [x] 1.6 Verify listing ownership (scoped query: `{ id, userId }`)
+  - [x] 1.7 Build `TitleGeneratorInput` and `DescriptionGeneratorInput` from listing data directly (see Dev Notes — do NOT use `fromIdentification()` as signatures differ between modules and require `ItemIdentification` not raw listing data)
+  - [x] 1.8 **Normalize platform casing:** Listing model stores UPPERCASE (`CRAIGSLIST`, `EBAY`), generators expect lowercase (`ebay`, `mercari`). Apply `.toLowerCase()` before passing to any generator function
+  - [x] 1.9 When `platform='all'` AND `useLLM=true`: loop over `['ebay', 'mercari', 'facebook', 'offerup']` and call `generateLLMTitle()` + `generateLLMDescription()` for each (WARNING: `generateTitlesForAllPlatforms()` is algorithmic-only — it ignores `useLLM` param despite the story's earlier claim)
+  - [x] 1.10 When `platform='all'` AND `useLLM=false`: use `generateTitlesForAllPlatforms()` + `generateDescriptionsForAllPlatforms()` (these are synchronous, algorithmic-only)
+  - [x] 1.11 When `platform` is specific: call `generateLLMTitle()`/`generateAlgorithmicTitle()` + `generateLLMDescription()`/`generateAlgorithmicDescription()` based on `useLLM`
+  - [x] 1.12 Handle `platform='craigslist'`: generators don't include Craigslist — map to `'generic'` style
+  - [x] 1.13 Return `{ success: true, data: { titles, descriptions, primary: { title, description }, source: 'ai'|'template' } }`
 
-- [ ] Task 2: Integrate auto-generation into PostingQueueItem creation (AC: #1, #3)
-  - [ ] 2.1 In `app/api/posting-queue/route.ts` POST handler: when `title` and `description` are NOT provided in the request body, auto-generate using existing generators
-  - [ ] 2.2 Build generator input from the associated listing's identification fields
-  - [ ] 2.3 Call `generateAlgorithmicTitle()` + `generateAlgorithmicDescription()` (algorithmic = fast, no API key needed, suitable for batch creation)
-  - [ ] 2.4 Populate the PostingQueueItem's `title` and `description` fields with generated content
-  - [ ] 2.5 Ensure this works for both single-platform and batch-platform creation modes
-  - [ ] 2.6 **Normalize platform casing**: PostingQueueItem `targetPlatform` is UPPERCASE but generators expect lowercase — call `.toLowerCase()` before passing to generator functions
-  - [ ] 2.7 Handle Craigslist mapping: if `targetPlatform === 'CRAIGSLIST'`, pass `'generic'` to generator functions
+- [x] Task 2: Integrate auto-generation into PostingQueueItem creation (AC: #1, #3)
+  - [x] 2.1 In `app/api/posting-queue/route.ts` POST handler: when `title` and `description` are NOT provided in the request body, auto-generate using existing generators
+  - [x] 2.2 Build generator input from the associated listing's identification fields
+  - [x] 2.3 Call `generateAlgorithmicTitle()` + `generateAlgorithmicDescription()` (algorithmic = fast, no API key needed, suitable for batch creation)
+  - [x] 2.4 Populate the PostingQueueItem's `title` and `description` fields with generated content
+  - [x] 2.5 Ensure this works for both single-platform and batch-platform creation modes
+  - [x] 2.6 **Normalize platform casing**: PostingQueueItem `targetPlatform` is UPPERCASE but generators expect lowercase — call `.toLowerCase()` before passing to generator functions
+  - [x] 2.7 Handle Craigslist mapping: if `targetPlatform === 'CRAIGSLIST'`, pass `'generic'` to generator functions
 
-- [ ] Task 3: Integrate ResaleContentEditor into listing detail page (AC: #5)
-  - [ ] 3.1 Create `src/components/ResaleContentEditor.tsx` (Client Component)
-  - [ ] 3.2 Props: `listingId: string`, `platform: string`, `initialTitle?: string`, `initialDescription?: string`, `onSave: (title, description) => void`
-  - [ ] 3.3 "Generate" button calls `POST /api/listings/[id]/generate-resale-content` with selected platform
-  - [ ] 3.4 Display generated title in `<input>` (editable, shows char count vs platform limit)
-  - [ ] 3.5 Display generated description in `<textarea>` (editable, shows word count vs platform limit)
-  - [ ] 3.6 Platform selector dropdown to switch platform and regenerate
-  - [ ] 3.7 "Use Algorithmic" / "Use AI" toggle (maps to `useLLM` param)
-  - [ ] 3.8 Loading state during generation, error toast on failure
-  - [ ] 3.9 "Save to Queue" button calls onSave callback with current title/description
-  - [ ] 3.10 Dark mode support (follow `app/dashboard/page.tsx` pattern)
-  - [ ] 3.11 Integrate into `app/listings/[id]/page.tsx` — add a "Generate Resale Listing" section below the AI Analysis block, conditionally rendered when `listing.opportunity?.status` is `PURCHASED` or later
-  - [ ] 3.12 Platform char limits displayed next to title input: eBay 80, Mercari 40, Facebook 99, OfferUp 70 — highlight red when exceeded
-  - [ ] 3.13 Description word count displayed next to textarea: eBay 500, Mercari 200, Facebook 250, OfferUp 200 — highlight red when exceeded
+- [x] Task 3: Integrate ResaleContentEditor into listing detail page (AC: #5)
+  - [x] 3.1 Create `src/components/ResaleContentEditor.tsx` (Client Component)
+  - [x] 3.2 Props: `listingId: string`, `platform: string`, `initialTitle?: string`, `initialDescription?: string`, `onSave: (title, description) => void`
+  - [x] 3.3 "Generate" button calls `POST /api/listings/[id]/generate-resale-content` with selected platform
+  - [x] 3.4 Display generated title in `<input>` (editable, shows char count vs platform limit)
+  - [x] 3.5 Display generated description in `<textarea>` (editable, shows word count vs platform limit)
+  - [x] 3.6 Platform selector dropdown to switch platform and regenerate
+  - [x] 3.7 "Use Algorithmic" / "Use AI" toggle (maps to `useLLM` param)
+  - [x] 3.8 Loading state during generation, error toast on failure
+  - [x] 3.9 "Save to Queue" button calls onSave callback with current title/description
+  - [x] 3.10 Dark mode support (follow `app/dashboard/page.tsx` pattern)
+  - [x] 3.11 Integrate into `app/listings/[id]/page.tsx` — add a "Generate Resale Listing" section below the AI Analysis block, conditionally rendered when `listing.opportunity?.status` is `PURCHASED` or later
+  - [x] 3.12 Platform char limits displayed next to title input: eBay 80, Mercari 40, Facebook 99, OfferUp 70 — highlight red when exceeded
+  - [x] 3.13 Description word count displayed next to textarea: eBay 500, Mercari 200, Facebook 250, OfferUp 200 — highlight red when exceeded
 
-- [ ] Task 4: Write unit tests for the resale content endpoint (AC: #1, #2, #3, #4)
-  - [ ] 4.1 Create `src/__tests__/api/listing-generate-resale-content.test.ts`
-  - [ ] 4.2 Test auth (401), tier enforcement (403), validation, listing not found (404)
-  - [ ] 4.3 Test listing ownership check (scoped query)
-  - [ ] 4.4 Test `platform='all'` calls multi-platform generators
-  - [ ] 4.5 Test `platform='ebay'` calls single-platform generators
-  - [ ] 4.6 Test `useLLM=false` uses algorithmic generators
-  - [ ] 4.7 Test fallback when OpenAI key missing (still returns content via algorithmic)
-  - [ ] 4.8 Test response shape matches expected contract
-  - [ ] 4.9 Test `platform='craigslist'` maps to `'generic'` generator platform
-  - [ ] 4.10 Test listing without identification data returns content with warnings array
-  - [ ] 4.11 Test `useLLM=true` + `platform='all'` calls LLM per-platform (not `generateTitlesForAllPlatforms`)
-  - [ ] 4.12 Test UPPERCASE platform input is normalized to lowercase before generators
+- [x] Task 4: Write unit tests for the resale content endpoint (AC: #1, #2, #3, #4)
+  - [x] 4.1 Create `src/__tests__/api/listing-generate-resale-content.test.ts`
+  - [x] 4.2 Test auth (401), tier enforcement (403), validation, listing not found (404)
+  - [x] 4.3 Test listing ownership check (scoped query)
+  - [x] 4.4 Test `platform='all'` calls multi-platform generators
+  - [x] 4.5 Test `platform='ebay'` calls single-platform generators
+  - [x] 4.6 Test `useLLM=false` uses algorithmic generators
+  - [x] 4.7 Test fallback when OpenAI key missing (still returns content via algorithmic)
+  - [x] 4.8 Test response shape matches expected contract
+  - [x] 4.9 Test `platform='craigslist'` maps to `'generic'` generator platform
+  - [x] 4.10 Test listing without identification data returns content with warnings array
+  - [x] 4.11 Test `useLLM=true` + `platform='all'` calls LLM per-platform (not `generateTitlesForAllPlatforms`)
+  - [x] 4.12 Test UPPERCASE platform input is normalized to lowercase before generators
 
-- [ ] Task 5: Write unit tests for posting queue auto-generation (AC: #1, #3)
-  - [ ] 5.1 Update `src/__tests__/api/posting-queue.test.ts`
-  - [ ] 5.2 Test: POST without title/description auto-generates from listing data
-  - [ ] 5.3 Test: POST with explicit title/description uses provided values (no generation)
-  - [ ] 5.4 Test: batch creation auto-generates platform-specific titles for each target
-  - [ ] 5.5 Test: auto-generation normalizes platform casing (EBAY → ebay)
-  - [ ] 5.6 Test: auto-generation maps CRAIGSLIST → generic platform
-  - [ ] 5.7 Test: auto-generation handles listing with null identification fields gracefully
+- [x] Task 5: Write unit tests for posting queue auto-generation (AC: #1, #3)
+  - [x] 5.1 Update `src/__tests__/api/posting-queue.test.ts`
+  - [x] 5.2 Test: POST without title/description auto-generates from listing data
+  - [x] 5.3 Test: POST with explicit title/description uses provided values (no generation)
+  - [x] 5.4 Test: batch creation auto-generates platform-specific titles for each target
+  - [x] 5.5 Test: auto-generation normalizes platform casing (EBAY → ebay)
+  - [x] 5.6 Test: auto-generation maps CRAIGSLIST → generic platform
+  - [x] 5.7 Test: auto-generation handles listing with null identification fields gracefully
 
-- [ ] Task 6: Write acceptance tests (AC: all)
-  - [ ] 6.1 Create `test/acceptance/features/E-009-cross-platform-resale-listing.feature`
-  - [ ] 6.2 Create `test/acceptance/step_definitions/E-009-title-description-generation.steps.ts`
-  - [ ] 6.3 Write scenarios for AC1: SEO-optimized title generation (eBay max 80 chars)
-  - [ ] 6.4 Write scenarios for AC2: platform-specific title conventions (eBay, Facebook, Mercari, OfferUp)
-  - [ ] 6.5 Write scenarios for AC3: platform-specific description generation
-  - [ ] 6.6 Write scenarios for AC4: algorithmic fallback when AI unavailable
-  - [ ] 6.7 Write scenarios for AC5: editable draft display (generated content is mutable)
-  - [ ] 6.8 Tag all scenarios with `@E-009-S-<N>` (sequential starting from 1), `@story-9-1`, and `@FR-RELIST-01`/`@FR-RELIST-02`/`@FR-RELIST-07`
+- [x] Task 6: Write acceptance tests (AC: all)
+  - [x] 6.1 Create `test/acceptance/features/E-009-cross-platform-resale-listing.feature`
+  - [x] 6.2 Create `test/acceptance/step_definitions/E-009-title-description-generation.steps.ts`
+  - [x] 6.3 Write scenarios for AC1: SEO-optimized title generation (eBay max 80 chars)
+  - [x] 6.4 Write scenarios for AC2: platform-specific title conventions (eBay, Facebook, Mercari, OfferUp)
+  - [x] 6.5 Write scenarios for AC3: platform-specific description generation
+  - [x] 6.6 Write scenarios for AC4: algorithmic fallback when AI unavailable
+  - [x] 6.7 Write scenarios for AC5: editable draft display (generated content is mutable)
+  - [x] 6.8 Tag all scenarios with `@E-009-S-<N>` (sequential starting from 1), `@story-9-1`, and `@FR-RELIST-01`/`@FR-RELIST-02`/`@FR-RELIST-07`
 
-- [ ] Task 7: Update requirements traceability matrix (AC: all)
-  - [ ] 7.1 Update FR-RELIST-01 row with scenario IDs and feature file
-  - [ ] 7.2 Update FR-RELIST-02 row with scenario IDs and feature file
-  - [ ] 7.3 Update FR-RELIST-07 row with scenario IDs and feature file
-  - [ ] 7.4 Update coverage summary counts
+- [x] Task 7: Update requirements traceability matrix (AC: all)
+  - [x] 7.1 Update FR-RELIST-01 row with scenario IDs and feature file
+  - [x] 7.2 Update FR-RELIST-02 row with scenario IDs and feature file
+  - [x] 7.3 Update FR-RELIST-07 row with scenario IDs and feature file
+  - [x] 7.4 Update coverage summary counts
 
 ## Definition of Done — Acceptance Tests
 
@@ -140,12 +140,12 @@ Write Gherkin scenarios in `test/acceptance/features/E-009-cross-platform-resale
 - Applicable requirement tags: `@FR-RELIST-01`, `@FR-RELIST-02`, `@FR-RELIST-07`
 
 **DoD Checklist:**
-- [ ] Gherkin acceptance tests written for all 5 ACs
-- [ ] Every scenario tagged with `@E-009-S-<N>`, `@story-9-1`, and relevant `@FR-RELIST-*` tags
-- [ ] Requirements traceability matrix updated at `_bmad-output/test-artifacts/requirements-traceability-matrix.md`
-- [ ] All acceptance test scenarios pass
-- [ ] All unit/integration tests pass (`make test`)
-- [ ] Build succeeds (`make build`)
+- [x] Gherkin acceptance tests written for all 5 ACs
+- [x] Every scenario tagged with `@E-009-S-<N>`, `@story-9-1`, and relevant `@FR-RELIST-*` tags
+- [x] Requirements traceability matrix updated at `_bmad-output/test-artifacts/requirements-traceability-matrix.md`
+- [x] All acceptance test scenarios pass
+- [x] All unit/integration tests pass (`make test`)
+- [x] Build succeeds (`make build`)
 
 ## Dev Notes
 
@@ -474,13 +474,67 @@ Modified files:
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+claude-opus-4-6 (1M context)
 
 ### Debug Log References
 
+- Jest unit suite: `npx jest --no-coverage` → 187 suites, 3919 tests passed
+- Cucumber acceptance: `npx cucumber-js --profile acceptance --tags "@story-9-1"` → 14 scenarios passed (Scenario Outline expands E-009-S-3 to 4 rows; 11 base scenarios)
+- Production build: `make build` → success, new endpoint registered as `ƒ /api/listings/[id]/generate-resale-content`
+- Lint scoped to changed files: 0 errors
+
 ### Completion Notes List
 
+- Implemented unified `POST /api/listings/[id]/generate-resale-content` endpoint that supports per-platform LLM, multi-platform LLM (loops over `[ebay, mercari, facebook, offerup]` because `generateTitlesForAllPlatforms()` is algorithmic-only), algorithmic-only mode, and Craigslist→generic mapping. Returns `{ titles, descriptions, primary, limits, source, warnings }`.
+- Wired auto-generation into `app/api/posting-queue/route.ts` for both single and batch creation paths. Listing select expanded to include identification fields. New `ListingForGeneration` type and `resolveTitleAndDescription()` helper keep the auto-generation logic deduped between paths.
+- Added `src/components/ResaleContentEditor.tsx` (Client Component) with platform selector, AI/algorithmic toggle, live char/word counts vs platform limits (red when exceeded), warnings panel, and dark-mode classes. Integrated into `app/listings/[id]/page.tsx` rendered conditionally when `listing.opportunity.status` is one of `PURCHASED|LISTED|SOLD`.
+- Added rate-limit config for `/api/listings/` (trailing slash) with 10/min limit. Trailing slash is intentional — it only matches `/api/listings/<id>/...` so existing rate-limiter tests that use bare `/api/listings` continue to pass via `DEFAULT_CONFIG`.
+- Wrote 17 unit tests for the new endpoint (auth/tier/validation/ownership/all generator branches/casing/Craigslist mapping/warnings/response shape/error path) and 5 unit tests for posting queue auto-generation (single, explicit-content passthrough, batch, Craigslist→generic, null identification fields). All passing.
+- Wrote `test/acceptance/features/E-009-cross-platform-resale-listing.feature` with 11 scenarios (one Scenario Outline → 4 rows = 14 total) tagged `@FR-RELIST-01`, `@FR-RELIST-02`, `@FR-RELIST-07`, `@story-9-1`, and sequential `@E-009-S-N`. New step definitions in `test/acceptance/step_definitions/E-009-title-description-generation.steps.ts` exercise the real generator modules and assert API route structure.
+- Updated requirements traceability matrix: FR-RELIST coverage 0/8 → 3/8 (38%); Total FR coverage 49/111 → 52/111 (47%); Grand Total 54/141 → 57/141 (40%).
+
+### Code Review Fixes (2026-04-08)
+
+An adversarial code review surfaced 2 HIGH and 3 MEDIUM issues that were fixed in-place before marking the story done:
+
+- **H1 — Dead rate-limit config.** `src/lib/rate-limiter.ts` had a `/api/listings/` entry (added for G6) but nothing in production code actually called `rateLimit()` — middleware does not wire it, and the route handler did not either. A PRO user could have hammered the OpenAI-calling endpoint with no throttle. Fix: `app/api/listings/[id]/generate-resale-content/route.ts` now calls `rateLimit(ip, pathname, userId)` immediately after auth and throws `RateLimitError` (→ 429) when blocked. Two new tests (`returns 429 when the rate limiter blocks the request`, `invokes the rate limiter with the request pathname and authenticated user id`) lock the wiring in.
+- **H2 — `FACEBOOK_MARKETPLACE` platform normalization gap.** The G3 gotcha only covered `CRAIGSLIST → generic`; it missed that the schema enum `FACEBOOK_MARKETPLACE` naïvely lowercases to `facebook_marketplace`, which is not a key in `PLATFORM_LIMITS` / `PLATFORM_STYLES`. Result: Facebook descriptions were using the generic template and emitting `"Ships quickly with tracking"` instead of the correct `"Local pickup available..."` — exactly backwards for Facebook Marketplace, which is a local-pickup-first platform. Facebook titles were also capped at 80 chars instead of 99. Fix: introduce `GENERATOR_PLATFORM_MAP = { facebook_marketplace: 'facebook', craigslist: 'generic' }` in both `app/api/posting-queue/route.ts` and `app/api/listings/[id]/generate-resale-content/route.ts`. Two regression tests in `posting-queue.test.ts` cover single-target and batch `FACEBOOK_MARKETPLACE` paths.
+- **M1 — Missing component test coverage.** `src/components/ResaleContentEditor.tsx` shipped without any test file, inconsistent with the rest of Epic 8/9 components. Fix: added `src/__tests__/components/ResaleContentEditor.test.tsx` with 10 tests covering initial render, platform switching and dynamic char/word limit counters, over-limit red highlighting, Generate fetch contract, response mapping, warnings display, error rendering, useLLM checkbox, onSave callback contract, and Save-button disabled state.
+- **M2 — Unused opportunity fetch + UI-only business rule.** The generate-resale-content endpoint was selecting `opportunity: { purchasePrice, status }` but never reading either field, and the "only when PURCHASED/LISTED/SOLD" rule from Dev Note G8 was enforced in the React page only. A PRO user could bypass the UI guard with a direct HTTP call. Fix: endpoint now throws `ForbiddenError` unless `listing.opportunity.status ∈ { PURCHASED, LISTED, SOLD }`. Five new tests cover the gate (no opportunity → 403, IDENTIFIED → 403, and an `it.each` loop that asserts the three allowed statuses all return 200).
+- **M3 — Task 4.7 fallback assertion.** The API test file had no route-level smoke for the LLM-fallback path (the fallback itself is tested at the `title-generator.test.ts` module level). Added a route-level test (`still returns a 200 with template source when the LLM mocks silently fall back`) so the endpoint contract is asserted end-to-end.
+
+Test impact after fixes:
+- `listing-generate-resale-content.test.ts`: 17 → 25 passing tests
+- `posting-queue.test.ts`: 27 → 29 passing tests
+- `ResaleContentEditor.test.tsx`: 0 → 10 passing tests (new file)
+
+LOW-severity follow-ups deferred (non-blocking, no behavioural regression):
+- L1 — `ResaleContentEditor` craigslist platform-matching fallback is accidental-but-correct (single-request payloads always contain exactly one entry).
+- L2 — Legacy `app/api/listings/[id]/description/route.ts` with inline OpenAI prompt (G5 anti-pattern) still exists; it is not imported by any new code and should be deprecated or removed in a dedicated tech-debt story.
+- L3 — Story G8 references a `PASSED` opportunity status that is not in `OpportunityStatusEnum`; doc drift only, the code uses the correct status set.
+- L4 — `primary.platform` may report `'generic'` when the caller requested `craigslist` (single-platform path). Minor API contract cosmetic; consider stamping the requested platform in a future iteration.
+- L5 — Inconsistent `handleError(error)` vs `handleError(error, request.url)` arg usage across Epic 8/9 routes. Worth a sweeping alignment PR.
+
 ### File List
+
+**Created:**
+- `app/api/listings/[id]/generate-resale-content/route.ts`
+- `src/components/ResaleContentEditor.tsx`
+- `src/__tests__/api/listing-generate-resale-content.test.ts`
+- `src/__tests__/components/ResaleContentEditor.test.tsx` *(added during code review — M1 fix, 10 tests covering render, platform switching, char/word limits, Generate fetch, warnings, errors, useLLM toggle, onSave, Save disabled state)*
+- `test/acceptance/features/E-009-cross-platform-resale-listing.feature`
+- `test/acceptance/step_definitions/E-009-title-description-generation.steps.ts`
+
+**Modified:**
+- `app/api/listings/[id]/generate-resale-content/route.ts` *(code review fixes: H1 — wire `rateLimit()` into the handler so the `/api/listings/` config is actually enforced; H2 — `GENERATOR_PLATFORM_MAP` handles `facebook_marketplace → facebook` in addition to `craigslist → generic`; M2 — enforce opportunity-status gate on PURCHASED/LISTED/SOLD instead of relying on UI-only guard)*
+- `app/api/posting-queue/route.ts` (auto-generate title/description from listing data when not provided; expanded listing select) *(code review fix: H2 — `toGeneratorPlatform()` now uses `GENERATOR_PLATFORM_MAP` so `FACEBOOK_MARKETPLACE` normalizes to `facebook` and FBMP descriptions correctly say "Local pickup available" instead of the generic "Ships quickly with tracking" fallback)*
+- `app/listings/[id]/page.tsx` (integrated ResaleContentEditor below price grid for purchased opportunities)
+- `src/lib/rate-limiter.ts` (added `/api/listings/` rate-limit config — trailing slash to scope to sub-routes)
+- `src/__tests__/api/listing-generate-resale-content.test.ts` *(code review: added 8 tests — 2 rate-limit, 2 opportunity-gate 403, 3 opportunity-status allowed paths via `it.each`, 1 M3 fallback smoke)*
+- `src/__tests__/api/posting-queue.test.ts` (5 new tests for auto-generation) *(code review: added 2 tests for the H2 regression — single and batch `FACEBOOK_MARKETPLACE` assert descriptions contain "local pickup" and respect the 99-char title limit)*
+- `_bmad-output/test-artifacts/requirements-traceability-matrix.md` (FR-RELIST-01/02/07 marked Covered)
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` (9-1 status: ready-for-dev → in-progress → review → done)
+- `_bmad-output/implementation-artifacts/epic-9/9-1-ai-title-description-generation.md` (this file)
 
 ## Change Log
 
@@ -488,3 +542,5 @@ Modified files:
 |---|---|---|
 | 2026-03-31 | Story created by create-story workflow | SM Agent |
 | 2026-03-31 | Advanced elicitation: 10 findings applied (3 critical, 4 medium, 3 low). Fixed multi-platform LLM logic, platform casing normalization, fromIdentification signature mismatch, Craigslist mapping, rate limiting gap, listing detail page integration, inline prompt anti-pattern warning, identification data warnings | SM Agent |
+| 2026-04-08 | Adversarial code review: 2 HIGH + 3 MEDIUM fixed in-place. H1 — wired `rateLimit()` into the generate-resale-content handler (config existed but was dead). H2 — `GENERATOR_PLATFORM_MAP` maps `facebook_marketplace → facebook` in both posting-queue and generate-resale-content routes (G3 gap). M1 — added 10-test ResaleContentEditor component suite. M2 — enforce PURCHASED/LISTED/SOLD opportunity-status gate on the endpoint (not just the UI). M3 — added route-level smoke for LLM fallback path. Story Status: review → done. | Code Review Agent |
+| 2026-04-08 | Implemented all 7 tasks: new generate-resale-content endpoint, posting-queue auto-generation, ResaleContentEditor component + listing page integration, 17 endpoint tests + 5 posting-queue tests, 11 acceptance scenarios, RTM update. All Jest tests (3919) and acceptance tests (14) pass. Build succeeds. | Dev Agent (Opus 4.6) |

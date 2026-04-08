@@ -73,6 +73,7 @@ export async function GET() {
         homeLocation: settings.homeLocation,
         maxPickupRadiusMiles: settings.maxPickupRadiusMiles,
         holdingCostDailyRate: settings.holdingCostDailyRate,
+        messageApprovalRequired: settings.messageApprovalRequired,
         createdAt: settings.createdAt,
         updatedAt: settings.updatedAt,
         user: {
@@ -80,6 +81,7 @@ export async function GET() {
           email: user.email,
           name: user.name,
           image: user.image,
+          subscriptionTier: user.subscriptionTier,
         },
       },
     });
@@ -104,6 +106,7 @@ export async function PATCH(request: NextRequest) {
       notifySoldItems, notifyExpiring, notifyWeeklyDigest, notifyFrequency,
       opportunityThreshold, feeRateEbay, feeRateMercari, feeRateFacebook, feeRateOfferup, feeRateCraigslist,
       homeLocation, maxPickupRadiusMiles, holdingCostDailyRate,
+      messageApprovalRequired,
     } = body;
 
     // Validate llmModel if provided
@@ -173,6 +176,7 @@ export async function PATCH(request: NextRequest) {
       homeLocation?: string | null;
       maxPickupRadiusMiles?: number;
       holdingCostDailyRate?: number;
+      messageApprovalRequired?: boolean;
     } = {};
 
     // Handle API key update
@@ -252,6 +256,11 @@ export async function PATCH(request: NextRequest) {
       updateData.holdingCostDailyRate = rate;
     }
 
+    // Message approval setting (Story 8.4)
+    if (messageApprovalRequired !== undefined) {
+      updateData.messageApprovalRequired = Boolean(messageApprovalRequired);
+    }
+
     // Update settings
     const settings = await prisma.userSettings.update({
       where: { userId: user.id },
@@ -285,6 +294,7 @@ export async function PATCH(request: NextRequest) {
         homeLocation: settings.homeLocation,
         maxPickupRadiusMiles: settings.maxPickupRadiusMiles,
         holdingCostDailyRate: settings.holdingCostDailyRate,
+        messageApprovalRequired: settings.messageApprovalRequired,
         createdAt: settings.createdAt,
         updatedAt: settings.updatedAt,
       },

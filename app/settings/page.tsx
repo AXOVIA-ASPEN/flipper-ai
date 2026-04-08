@@ -17,6 +17,7 @@ import ThemeSettings from '@/components/ThemeSettings';
 import NotificationSettings from '@/components/NotificationSettings';
 import ScoringSettings from '@/components/ScoringSettings';
 import LogisticsSettings from '@/components/LogisticsSettings';
+import MessagingSettings from '@/components/MessagingSettings';
 import BillingSettings from '@/components/BillingSettings';
 import UsageDisplay from '@/components/UsageDisplay';
 import CheckoutResultBanner from '@/components/CheckoutResultBanner';
@@ -36,6 +37,7 @@ export default function SettingsPage() {
         <NotificationSettings />
         <ScoringSettings />
         <LogisticsSettings />
+        <MessagingSettings />
       </div>
     </div>
   );

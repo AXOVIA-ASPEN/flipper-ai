@@ -49,6 +49,7 @@ const mockUser = {
   email: 'test@example.com',
   name: 'Test User',
   image: null,
+  subscriptionTier: 'FLIPPER',
   settings: {
     id: 'settings-1',
     userId: 'test-user-id',
@@ -72,6 +73,7 @@ const mockUser = {
     homeLocation: null,
     maxPickupRadiusMiles: 25,
     holdingCostDailyRate: 2.0,
+    messageApprovalRequired: false,
     createdAt: new Date(),
     updatedAt: new Date(),
   },
@@ -95,6 +97,7 @@ describe('GET /api/user/settings', () => {
     expect(data.data.hasOpenaiApiKey).toBe(false);
     expect(data.data.openaiApiKey).toBeNull();
     expect(data.data.user.email).toBe('test@example.com');
+    expect(data.data.user.subscriptionTier).toBe('FLIPPER');
   });
 
   it('should return masked API key when set', async () => {
@@ -557,5 +560,56 @@ describe('PATCH /api/user/settings', () => {
 
     expect(response.status).toBe(422);
     expect(data.error.code).toBe('VALIDATION_ERROR');
+  });
+
+  // messageApprovalRequired tests (Story 8.4)
+  it('should return messageApprovalRequired in GET response', async () => {
+    mockFindUnique.mockResolvedValue(mockUser);
+
+    const response = await GET();
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(data.data.messageApprovalRequired).toBe(false);
+  });
+
+  it('should update messageApprovalRequired to true', async () => {
+    const updated = { ...mockUser.settings, messageApprovalRequired: true };
+    mockUpdateSettings.mockResolvedValue(updated);
+
+    const req = createMockRequest('PATCH', { messageApprovalRequired: true });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(data.data.messageApprovalRequired).toBe(true);
+    expect(mockUpdateSettings).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ messageApprovalRequired: true }),
+      })
+    );
+  });
+
+  it('should default messageApprovalRequired to false', async () => {
+    mockFindUnique.mockResolvedValue(mockUser);
+
+    const response = await GET();
+    const data = await response.json();
+
+    expect(data.data.messageApprovalRequired).toBe(false);
+  });
+
+  it('should not auto-transition existing PENDING_APPROVAL messages when toggling setting', async () => {
+    // Toggle on then off — only settings change, no message status change
+    const updated = { ...mockUser.settings, messageApprovalRequired: false };
+    mockUpdateSettings.mockResolvedValue(updated);
+
+    const req = createMockRequest('PATCH', { messageApprovalRequired: false });
+    const response = await PATCH(req);
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    // The update only touches userSettings, not messages
+    expect(mockUpdateSettings).toHaveBeenCalledTimes(1);
   });
 });

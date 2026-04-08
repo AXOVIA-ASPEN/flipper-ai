@@ -88,22 +88,22 @@
 | FR-COMM-02 | Multiple message types | 8 | 8.1 | @E-008-S-7, @E-008-S-8, @E-008-S-9, @E-008-S-10 | E-008-seller-communication-negotiation.feature | Covered |
 | FR-COMM-03 | AI negotiation strategy | 8 | 8.2 | @E-008-S-17, @E-008-S-18, @E-008-S-19, @E-008-S-20, @E-008-S-21, @E-008-S-22, @E-008-S-23, @E-008-S-24, @E-008-S-25, @E-008-S-26, @E-008-S-27, @E-008-S-28, @E-008-S-29 | E-008-seller-communication-negotiation.feature | Covered |
 | FR-COMM-04 | Message inbox with threads | 8 | 8.3 | @E-008-S-30, @E-008-S-31, @E-008-S-32, @E-008-S-33, @E-008-S-34, @E-008-S-35, @E-008-S-36, @E-008-S-39, @E-008-S-40, @E-008-S-41 | E-008-seller-communication-negotiation.feature | Covered |
-| FR-COMM-05 | Message approval workflow | 8 | 8.4 | | E-008-seller-communication-negotiation.feature | Pending |
-| FR-COMM-06 | Conversation status tracking | 8 | 8.5 | | E-008-seller-communication-negotiation.feature | Pending |
-| FR-COMM-07 | Inbound message tracking | 8 | 8.5 | | E-008-seller-communication-negotiation.feature | Pending |
+| FR-COMM-05 | Message approval workflow | 8 | 8.4 | @E-008-S-56, @E-008-S-57, @E-008-S-58, @E-008-S-59, @E-008-S-60, @E-008-S-61, @E-008-S-62, @E-008-S-63, @E-008-S-64, @E-008-S-65, @E-008-S-66 | E-008-seller-communication-negotiation.feature | Covered |
+| FR-COMM-06 | Conversation status tracking | 8 | 8.5 | @E-008-S-42, @E-008-S-43, @E-008-S-44, @E-008-S-45, @E-008-S-49, @E-008-S-50, @E-008-S-51, @E-008-S-52, @E-008-S-53, @E-008-S-55b | E-008-seller-communication-negotiation.feature | Covered |
+| FR-COMM-07 | Inbound message tracking | 8 | 8.5 | @E-008-S-46, @E-008-S-47, @E-008-S-48, @E-008-S-54, @E-008-S-55, @E-008-S-55a | E-008-seller-communication-negotiation.feature | Covered |
 | FR-COMM-08 | Message storage model | 8 | 8.3 | @E-008-S-37, @E-008-S-38 | E-008-seller-communication-negotiation.feature | Covered |
 
 ## FR-RELIST: Resale Listing Generator
 
 | Requirement | Description | Epic | Story | Scenario ID(s) | Feature File | Status |
 |---|---|---|---|---|---|---|
-| FR-RELIST-01 | AI resale title generation | 9 | 9.1 | | E-009-cross-platform-resale-listing.feature | Pending |
-| FR-RELIST-02 | AI resale description generation | 9 | 9.1 | | E-009-cross-platform-resale-listing.feature | Pending |
-| FR-RELIST-03 | Optimal listing price calculation | 9 | 9.2 | | E-009-cross-platform-resale-listing.feature | Pending |
+| FR-RELIST-01 | AI resale title generation | 9 | 9.1 | @E-009-S-1, @E-009-S-2, @E-009-S-3, @E-009-S-9, @E-009-S-10, @E-009-S-11 | E-009-cross-platform-resale-listing.feature | Covered |
+| FR-RELIST-02 | AI resale description generation | 9 | 9.1 | @E-009-S-4, @E-009-S-5, @E-009-S-6, @E-009-S-9, @E-009-S-10 | E-009-cross-platform-resale-listing.feature | Covered |
+| FR-RELIST-03 | Optimal listing price calculation | 9 | 9.2 | @E-009-S-12, @E-009-S-13, @E-009-S-14, @E-009-S-15, @E-009-S-16, @E-009-S-17, @E-009-S-18, @E-009-S-19, @E-009-S-20 | E-009-cross-platform-resale-listing.feature | Covered |
 | FR-RELIST-04 | Cross-platform posting queue | 9 | 9.3 | | E-009-cross-platform-resale-listing.feature | Pending |
 | FR-RELIST-05 | Posting status workflow + retry | 9 | 9.3 | | E-009-cross-platform-resale-listing.feature | Pending |
 | FR-RELIST-06 | Duplicate posting prevention | 9 | 9.3 | | E-009-cross-platform-resale-listing.feature | Pending |
-| FR-RELIST-07 | Algorithmic fallback templates | 9 | 9.1 | | E-009-cross-platform-resale-listing.feature | Pending |
+| FR-RELIST-07 | Algorithmic fallback templates | 9 | 9.1 | @E-009-S-7, @E-009-S-8, @E-009-S-10 | E-009-cross-platform-resale-listing.feature | Covered |
 | FR-RELIST-08 | Firebase image reuse for cross-posting | 9 | 9.4 | | E-009-cross-platform-resale-listing.feature | Pending |
 
 ## FR-DASH: Dashboard & Tracking
@@ -221,16 +221,16 @@
 | FR-INFRA | 14 | 14 | 0 | 100% |
 | FR-SCAN | 16 | 0 | 16 | 0% |
 | FR-SCORE | 22 | 14 | 8 | 64% |
-| FR-COMM | 8 | 5 | 3 | 63% |
-| FR-RELIST | 8 | 0 | 8 | 0% |
+| FR-COMM | 8 | 7 | 1 | 88% |
+| FR-RELIST | 8 | 3 | 5 | 38% |
 | FR-DASH | 13 | 8 | 5 | 62% |
 | FR-MONITOR | 4 | 0 | 4 | 0% |
 | FR-NOTIFY | 13 | 0 | 13 | 0% |
 | FR-BILLING | 11 | 6 | 5 | 55% |
 | FR-MEET | 2 | 0 | 2 | 0% |
-| **Total FR** | **111** | **47** | **64** | **42%** |
+| **Total FR** | **111** | **52** | **59** | **47%** |
 | NFR | 30 | 5 | 25 | 17% |
-| **Grand Total** | **141** | **52** | **89** | **37%** |
+| **Grand Total** | **141** | **57** | **84** | **40%** |
 
 ---
 

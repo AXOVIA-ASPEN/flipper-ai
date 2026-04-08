@@ -53,11 +53,17 @@ export async function POST(
     }
 
     // Parse and validate request body
-    const body = await request.json();
+    let body: { counterOfferPrice?: number; ourPreviousOffer?: number };
+    try {
+      body = await request.json();
+    } catch {
+      throw new ValidationError('Invalid request body: expected valid JSON');
+    }
     const { counterOfferPrice, ourPreviousOffer } = body;
 
     if (
       !Number.isFinite(counterOfferPrice) ||
+      !counterOfferPrice ||
       counterOfferPrice <= 0 ||
       counterOfferPrice > 999999
     ) {
@@ -68,6 +74,7 @@ export async function POST(
 
     if (
       !Number.isFinite(ourPreviousOffer) ||
+      !ourPreviousOffer ||
       ourPreviousOffer <= 0 ||
       ourPreviousOffer > 999999
     ) {
@@ -91,6 +98,7 @@ export async function POST(
         sellabilityScore: true,
         platform: true,
         recommendedOffer: true,
+        marketDataDate: true,
       },
     });
 
@@ -119,6 +127,7 @@ export async function POST(
       recommendedOffer: listing.recommendedOffer
         ? Number(listing.recommendedOffer)
         : null,
+      marketDataDate: listing.marketDataDate ?? null,
     };
 
     const analysis = await analyzeCounterOffer(

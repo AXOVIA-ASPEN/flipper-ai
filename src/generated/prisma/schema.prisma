@@ -25,6 +25,7 @@ model Listing {
   category              String?
   postedAt              DateTime?
   scrapedAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
   estimatedValue        Float?
   estimatedLow          Float?
   estimatedHigh         Float?
@@ -75,6 +76,7 @@ model Listing {
   pickupDistanceMiles   Float? // Story 5.5: Miles from user home to seller (local-only items)
   outsidePickupRadius   Boolean? // Story 5.5: Exceeds user's maxPickupRadiusMiles
   adjustedProfitMargin  Float? // Story 5.5: profitPotential minus estimatedShippingCost
+  conversationStatus    String? // Story 8.5: null | 'pending' | 'responded' | 'purchased'
   llmAnalyzed           Boolean            @default(false)
   analysisDate          DateTime?
   analysisConfidence    String?
@@ -93,6 +95,7 @@ model Listing {
   @@index([scrapedAt])
   @@index([llmAnalyzed])
   @@index([trueDiscountPercent])
+  @@index([conversationStatus])
 }
 
 model Opportunity {
@@ -245,32 +248,33 @@ model VerificationToken {
 }
 
 model UserSettings {
-  id                   String   @id @default(cuid())
-  userId               String   @unique
-  openaiApiKey         String?
-  llmModel             String   @default("gpt-4o-mini")
-  discountThreshold    Int      @default(50)
-  autoAnalyze          Boolean  @default(true)
-  emailNotifications   Boolean  @default(true)
-  notifyNewDeals       Boolean  @default(true)
-  notifyPriceDrops     Boolean  @default(true)
-  notifySoldItems      Boolean  @default(true)
-  notifyExpiring       Boolean  @default(true)
-  notifyWeeklyDigest   Boolean  @default(true)
-  notifyFrequency      String   @default("instant")
+  id                      String   @id @default(cuid())
+  userId                  String   @unique
+  openaiApiKey            String?
+  llmModel                String   @default("gpt-4o-mini")
+  discountThreshold       Int      @default(50)
+  autoAnalyze             Boolean  @default(true)
+  emailNotifications      Boolean  @default(true)
+  notifyNewDeals          Boolean  @default(true)
+  notifyPriceDrops        Boolean  @default(true)
+  notifySoldItems         Boolean  @default(true)
+  notifyExpiring          Boolean  @default(true)
+  notifyWeeklyDigest      Boolean  @default(true)
+  notifyFrequency         String   @default("instant")
   // Scoring & Fee Settings (Story 4.2)
-  opportunityThreshold Int      @default(70)
-  feeRateEbay          Float    @default(13.0)
-  feeRateMercari       Float    @default(10.0)
-  feeRateFacebook      Float    @default(5.0)
-  feeRateOfferup       Float    @default(12.9)
-  feeRateCraigslist    Float    @default(0.0)
-  maxPickupRadiusMiles Int      @default(50) // Story 5.5: Max miles for local pickup consideration
-  homeLocation         String? // Story 5.5: User's home location for distance calculation
-  holdingCostDailyRate Float    @default(2.0) // Story 6.6: Daily cost to hold purchased inventory ($/day)
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
-  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunityThreshold    Int      @default(70)
+  feeRateEbay             Float    @default(13.0)
+  feeRateMercari          Float    @default(10.0)
+  feeRateFacebook         Float    @default(5.0)
+  feeRateOfferup          Float    @default(12.9)
+  feeRateCraigslist       Float    @default(0.0)
+  maxPickupRadiusMiles    Int      @default(50) // Story 5.5: Max miles for local pickup consideration
+  homeLocation            String? // Story 5.5: User's home location for distance calculation
+  holdingCostDailyRate    Float    @default(2.0) // Story 6.6: Daily cost to hold purchased inventory ($/day)
+  messageApprovalRequired Boolean  @default(false) // Story 8.4: Two-step send confirmation
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model FacebookToken {
@@ -309,6 +313,7 @@ model Message {
   @@index([status])
   @@index([direction])
   @@index([createdAt])
+  @@index([userId, status, direction]) // Story 8.4: Compound index for approval queue queries
 }
 
 model AiAnalysisCache {

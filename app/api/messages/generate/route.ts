@@ -22,6 +22,7 @@ import { handleError, UnauthorizedError, ForbiddenError, ValidationError, NotFou
 import { checkFeatureAccess } from '@/lib/tier-enforcement';
 import { generatePurchaseMessage, isValidMessageType } from '@/lib/message-generator';
 import type { MessageType } from '@/lib/message-generator';
+import { transitionToPending } from '@/lib/conversation-status';
 
 export async function POST(request: NextRequest) {
   try {
@@ -107,6 +108,9 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+
+    // Fire-and-forget: transition conversation status to pending
+    transitionToPending(listingId, userId).catch(() => {});
 
     return NextResponse.json(
       {

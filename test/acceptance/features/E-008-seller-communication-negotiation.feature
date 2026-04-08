@@ -324,3 +324,176 @@ Feature: Seller Communication & Negotiation
     When a user opens a thread
     Then all INBOUND messages with null readAt are marked with current timestamp
     And the read marking is fire-and-forget for performance
+
+  # ── Story 8.5: Conversation Status & Inbound Message Tracking ─────────────
+
+  # AC1: Conversation Status Display (FR-COMM-06)
+
+  @FR-COMM-06 @story-8-5 @E-008-S-42
+  Scenario: Conversation status API returns pending status
+    Given the conversation status service at "src/lib/conversation-status.ts"
+    When the conversation status is "pending"
+    Then it is a valid conversation status value
+
+  @FR-COMM-06 @story-8-5 @E-008-S-43
+  Scenario: Conversation status API returns responded status
+    Given the conversation status service at "src/lib/conversation-status.ts"
+    When the conversation status is "responded"
+    Then it is a valid conversation status value
+
+  @FR-COMM-06 @story-8-5 @E-008-S-44
+  Scenario: Conversation status API returns purchased status
+    Given the conversation status service at "src/lib/conversation-status.ts"
+    When the conversation status is "purchased"
+    Then it is a valid conversation status value
+
+  @FR-COMM-06 @story-8-5 @E-008-S-45
+  Scenario: Conversation status API endpoint returns status with message stats
+    Given the conversation status API endpoint exists at "app/api/listings/[id]/conversation-status/route.ts"
+    Then the route exports a GET handler
+    And the route requires authentication via getAuthUserId
+    And the route scopes listing lookup to userId for ownership
+
+  # AC2: Inbound Message Capture (FR-COMM-07)
+
+  @FR-COMM-07 @story-8-5 @E-008-S-46
+  Scenario: Inbound message checker service has platform adapters for all marketplaces
+    Given the inbound message checker service at "src/lib/inbound-message-checker.ts"
+    Then it has platform checkers for "CRAIGSLIST", "FACEBOOK", "EBAY", "MERCARI", and "OFFERUP"
+
+  @FR-COMM-07 @story-8-5 @E-008-S-47
+  Scenario: Check-replies API endpoint requires auth and tier enforcement
+    Given the check-replies API endpoint exists at "app/api/messages/check-replies/route.ts"
+    Then the route exports a POST handler
+    And the route requires authentication via getAuthUserId
+    And the route enforces messaging tier access via checkFeatureAccess
+
+  @FR-COMM-07 @story-8-5 @E-008-S-48
+  Scenario: Inbound messages are stored with INBOUND direction
+    Given the inbound message checker service at "src/lib/inbound-message-checker.ts"
+    Then inbound messages are created with direction "INBOUND" and status "DELIVERED"
+
+  # AC3: Auto-Status Transition: Pending → Responded (FR-COMM-06)
+
+  @FR-COMM-06 @story-8-5 @E-008-S-49
+  Scenario: Conversation transitions from pending to responded on inbound message
+    Given the conversation status service at "src/lib/conversation-status.ts"
+    Then transition from "pending" to "responded" is valid
+
+  @FR-COMM-06 @story-8-5 @E-008-S-50
+  Scenario: Inbound message checker calls transitionToResponded on new messages
+    Given the inbound message checker service at "src/lib/inbound-message-checker.ts"
+    Then the service calls transitionToResponded when new inbound messages are stored
+
+  # AC4: Auto-Status Transition: Purchased (FR-COMM-06)
+
+  @FR-COMM-06 @story-8-5 @E-008-S-51
+  Scenario: Conversation transitions to purchased from any state
+    Given the conversation status service at "src/lib/conversation-status.ts"
+    Then transition from "pending" to "purchased" is valid
+    And transition from "responded" to "purchased" is valid
+
+  @FR-COMM-06 @story-8-5 @E-008-S-52
+  Scenario: Opportunity PATCH handler triggers purchased transition
+    Given the opportunities API route at "app/api/opportunities/[id]/route.ts"
+    Then the PATCH handler imports transitionToPurchased from conversation-status
+    And the transition is fire-and-forget
+
+  @FR-COMM-06 @story-8-5 @E-008-S-53
+  Scenario: Message generate route triggers pending transition
+    Given the message generate API route at "app/api/messages/generate/route.ts"
+    Then the route imports transitionToPending from conversation-status
+    And the transition is fire-and-forget
+
+  # AC5: Browser-Based Fallback (FR-COMM-07)
+
+  @FR-COMM-07 @story-8-5 @E-008-S-54
+  Scenario: Platform checker routes to platform-specific adapter
+    Given the inbound message checker service at "src/lib/inbound-message-checker.ts"
+    Then each platform has a dedicated checker that can be replaced with a real implementation
+
+  @FR-COMM-07 @story-8-5 @E-008-S-55
+  Scenario: Stub checkers return no messages found for all platforms
+    Given the inbound message checker service at "src/lib/inbound-message-checker.ts"
+    Then all stub checkers return found false with empty messages array
+
+  # Behavioral scenarios — exercise actual function behavior, not just source structure.
+
+  @FR-COMM-07 @story-8-5 @E-008-S-55a @behavioral
+  Scenario: checkForReplies returns unchecked result for unsupported platform
+    When checkForReplies is called with an unsupported platform
+    Then the result has checked false and newMessages 0 and conversationStatus null
+
+  @FR-COMM-06 @story-8-5 @E-008-S-55b @behavioral
+  Scenario: CONVERSATION_STATUSES exposes exactly the three documented states
+    Then CONVERSATION_STATUSES contains exactly "pending", "responded", and "purchased"
+
+  # ── Story 8.4: Message Approval Workflow ──────────────────────────────────
+
+  # AC1: Draft Status on Creation (FR-COMM-05)
+
+  @FR-COMM-05 @story-8-4 @E-008-S-56
+  Scenario: OUTBOUND messages default to DRAFT status
+    Given the messages API route at "app/api/messages/route.ts"
+    Then OUTBOUND messages are created with default status "DRAFT"
+
+  # AC2: Approve with Optional Approval Gate (FR-COMM-05)
+
+  @FR-COMM-05 @story-8-4 @E-008-S-57
+  Scenario: Approve DRAFT message transitions to SENT when approval not required
+    Given the messages PATCH route at "app/api/messages/[id]/route.ts"
+    Then approve action on DRAFT with messageApprovalRequired false sets status to "SENT"
+
+  @FR-COMM-05 @story-8-4 @E-008-S-58
+  Scenario: Approve DRAFT message transitions to PENDING_APPROVAL when approval required
+    Given the messages PATCH route at "app/api/messages/[id]/route.ts"
+    Then approve action on DRAFT with messageApprovalRequired true sets status to "PENDING_APPROVAL"
+
+  # AC3: Confirm Send from Pending (FR-COMM-05)
+
+  @FR-COMM-05 @story-8-4 @E-008-S-59
+  Scenario: Confirm PENDING_APPROVAL message transitions to SENT
+    Given the messages PATCH route at "app/api/messages/[id]/route.ts"
+    Then confirm action on PENDING_APPROVAL sets status to "SENT" with sentAt timestamp
+
+  @FR-COMM-05 @story-8-4 @E-008-S-60
+  Scenario: Confirm on DRAFT returns ConflictError
+    Given the messages PATCH route at "app/api/messages/[id]/route.ts"
+    Then confirm action on DRAFT returns status 409
+
+  # AC4: Dispatch Stub (FR-COMM-05)
+
+  @FR-COMM-05 @story-8-4 @E-008-S-61 @stub
+  Scenario: Dispatch stub logs intent and returns success
+    Given the message dispatcher at "src/lib/message-dispatcher.ts"
+    Then dispatchMessage returns success true and stub true for SENT messages
+
+  @FR-COMM-05 @story-8-4 @E-008-S-62 @stub
+  Scenario: Dispatch stub does not update message status
+    Given the message dispatcher at "src/lib/message-dispatcher.ts"
+    Then dispatchMessage does not call prisma message update
+
+  # AC5: Edit Keeps Draft Status (FR-COMM-05)
+
+  @FR-COMM-05 @story-8-4 @E-008-S-63
+  Scenario: Edit action only allowed on DRAFT messages
+    Given the messages PATCH route at "app/api/messages/[id]/route.ts"
+    Then edit action on DRAFT updates body and keeps status "DRAFT"
+    And edit action on PENDING_APPROVAL returns status 409
+
+  @FR-COMM-05 @story-8-4 @E-008-S-64
+  Scenario: Reject from PENDING_APPROVAL returns to DRAFT
+    Given the messages PATCH route at "app/api/messages/[id]/route.ts"
+    Then reject action on PENDING_APPROVAL sets status to "DRAFT"
+    And reject action on DRAFT sets status to "REJECTED"
+
+  @FR-COMM-05 @story-8-4 @E-008-S-65
+  Scenario: Settings API exposes messageApprovalRequired field
+    Given the user settings API route at "app/api/user/settings/route.ts"
+    Then GET response includes messageApprovalRequired field
+    And PATCH accepts and persists messageApprovalRequired boolean
+
+  @FR-COMM-05 @story-8-4 @E-008-S-66
+  Scenario: GET messages supports comma-separated status filter
+    Given the messages API route at "app/api/messages/route.ts"
+    Then GET with status "DRAFT,PENDING_APPROVAL" returns messages matching either status

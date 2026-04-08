@@ -137,6 +137,7 @@ exports.Prisma.ListingScalarFieldEnum = {
   category: 'category',
   postedAt: 'postedAt',
   scrapedAt: 'scrapedAt',
+  updatedAt: 'updatedAt',
   estimatedValue: 'estimatedValue',
   estimatedLow: 'estimatedLow',
   estimatedHigh: 'estimatedHigh',
@@ -187,6 +188,7 @@ exports.Prisma.ListingScalarFieldEnum = {
   pickupDistanceMiles: 'pickupDistanceMiles',
   outsidePickupRadius: 'outsidePickupRadius',
   adjustedProfitMargin: 'adjustedProfitMargin',
+  conversationStatus: 'conversationStatus',
   llmAnalyzed: 'llmAnalyzed',
   analysisDate: 'analysisDate',
   analysisConfidence: 'analysisConfidence',
@@ -321,6 +323,7 @@ exports.Prisma.UserSettingsScalarFieldEnum = {
   maxPickupRadiusMiles: 'maxPickupRadiusMiles',
   homeLocation: 'homeLocation',
   holdingCostDailyRate: 'holdingCostDailyRate',
+  messageApprovalRequired: 'messageApprovalRequired',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

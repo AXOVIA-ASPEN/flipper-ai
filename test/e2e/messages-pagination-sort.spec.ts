@@ -2,90 +2,105 @@ import { test, expect } from '@playwright/test';
 import { mockAuthSession } from './fixtures/auth';
 
 /**
- * E2E: Messages Pagination, Sorting, Search & Tab Filtering
+ * E2E: Thread Inbox Pagination, Search & Tab Filtering
  *
- * BDD Feature: Message List Management
- * As a user, I want to paginate, sort, search, and filter messages
- * so that I can efficiently find and manage seller communications.
+ * Tests pagination, search, and tab filtering on the thread-based message
+ * inbox. Threads are sorted by lastMessageAt DESC (server-side), so there
+ * are no user-controlled sort controls.
+ *
+ * Updated for story 8.3 (thread-based UI refactor).
  */
 
-// Generate mock messages for pagination testing
-function generateMessages(count: number, direction: 'INBOUND' | 'OUTBOUND' = 'INBOUND') {
+// Generate mock threads for pagination testing
+function generateThreads(count: number, direction: 'INBOUND' | 'OUTBOUND' = 'INBOUND') {
   return Array.from({ length: count }, (_, i) => ({
-    id: `msg-${direction.toLowerCase()}-${i + 1}`,
-    direction,
-    senderName: direction === 'INBOUND' ? `Seller ${i + 1}` : 'Me',
-    recipientName: direction === 'INBOUND' ? 'Me' : `Seller ${i + 1}`,
-    subject: `Subject ${i + 1}`,
-    body: `Message body number ${i + 1} about a listing`,
-    createdAt: new Date(Date.now() - i * 3600000).toISOString(),
+    listingId: `listing-${direction.toLowerCase()}-${i + 1}`,
     listing: {
-      id: `listing-${i + 1}`,
-      title: `Item ${i + 1}`,
+      id: `listing-${direction.toLowerCase()}-${i + 1}`,
+      title: `Item ${direction === 'INBOUND' ? 'In' : 'Out'} ${i + 1}`,
+      platform: i % 2 === 0 ? 'EBAY' : 'CRAIGSLIST',
       askingPrice: 100 + i * 50,
+      imageUrls: null,
     },
+    lastMessage: {
+      body: `Message body number ${i + 1} about a listing`,
+      direction,
+      status: direction === 'INBOUND' ? 'DELIVERED' : 'SENT',
+      createdAt: new Date(Date.now() - i * 3600000).toISOString(),
+    },
+    sellerName: `Seller ${i + 1}`,
+    messageCount: 1 + (i % 5),
+    unreadCount: direction === 'INBOUND' ? 1 : 0,
+    lastMessageAt: new Date(Date.now() - i * 3600000).toISOString(),
   }));
 }
 
-const allInbound = generateMessages(30, 'INBOUND');
-const allOutbound = generateMessages(10, 'OUTBOUND');
-const allMessages = [...allInbound, ...allOutbound].sort(
-  (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+const inboundThreads = generateThreads(30, 'INBOUND');
+const outboundThreads = generateThreads(10, 'OUTBOUND');
+const allThreads = [...inboundThreads, ...outboundThreads].sort(
+  (a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime()
 );
 
-test.describe('Feature: Messages Pagination, Sort & Filter', () => {
+test.describe('Feature: Thread Inbox Pagination, Search & Filter', () => {
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
 
-    // Intercept messages API and handle query params
-    await page.route('**/api/messages**', async (route) => {
+    // Intercept threads API and handle query params
+    await page.route('**/api/messages/threads**', async (route) => {
       const url = new URL(route.request().url(), 'http://localhost');
-      const direction = url.searchParams.get('direction');
+
+      // Skip thread detail routes
+      const pathParts = url.pathname.split('/').filter(Boolean);
+      if (pathParts.length > 3) {
+        await route.continue();
+        return;
+      }
+
       const search = url.searchParams.get('search');
-      const sortBy = url.searchParams.get('sortBy') || 'createdAt';
-      const sortOrder = url.searchParams.get('sortOrder') || 'desc';
       const limit = parseInt(url.searchParams.get('limit') || '20');
       const offset = parseInt(url.searchParams.get('offset') || '0');
 
-      let filtered = [...allMessages];
+      let filtered = [...allThreads];
 
-      // Filter by direction (tab)
-      if (direction === 'INBOUND') {
-        filtered = filtered.filter((m) => m.direction === 'INBOUND');
-      } else if (direction === 'OUTBOUND') {
-        filtered = filtered.filter((m) => m.direction === 'OUTBOUND');
-      }
-
-      // Filter by search
+      // Filter by search (server-side in the real API)
       if (search) {
         const q = search.toLowerCase();
         filtered = filtered.filter(
-          (m) =>
-            m.subject.toLowerCase().includes(q) ||
-            m.body.toLowerCase().includes(q) ||
-            m.senderName.toLowerCase().includes(q)
+          (t) =>
+            t.listing.title.toLowerCase().includes(q) ||
+            (t.sellerName?.toLowerCase().includes(q))
         );
       }
-
-      // Sort
-      filtered.sort((a, b) => {
-        const aVal = sortBy === 'createdAt' ? new Date(a.createdAt).getTime() : a.subject;
-        const bVal = sortBy === 'createdAt' ? new Date(b.createdAt).getTime() : b.subject;
-        if (sortOrder === 'asc') return aVal < bVal ? -1 : 1;
-        return aVal > bVal ? -1 : 1;
-      });
 
       const total = filtered.length;
       const data = filtered.slice(offset, offset + limit);
 
       await route.fulfill({
-        json: { data, pagination: { total, limit, offset } },
+        json: {
+          success: true,
+          data,
+          pagination: { total, limit, offset, hasMore: offset + limit < total },
+        },
+      });
+    });
+
+    // User settings (for approval tab)
+    await page.route('**/api/user/settings', async (route) => {
+      await route.fulfill({
+        json: { success: true, data: { user: { subscriptionTier: 'PRO' }, messageApprovalRequired: false } },
+      });
+    });
+
+    // Approval count
+    await page.route('**/api/messages?**', async (route) => {
+      await route.fulfill({
+        json: { success: true, data: [], pagination: { total: 0 } },
       });
     });
   });
 
   test.describe('Scenario: Pagination controls', () => {
-    test('Given 40 messages, When I load the page, Then I see pagination with page info', async ({
+    test('Given 40 threads, When I load the page, Then I see pagination with page info', async ({
       page,
     }) => {
       await page.goto('/messages');
@@ -95,18 +110,16 @@ test.describe('Feature: Messages Pagination, Sort & Filter', () => {
       await expect(page.getByText(/1–20 of 40/)).toBeVisible();
     });
 
-    test('Given I am on page 1, When I click Next, Then I see the next page of messages', async ({
+    test('Given I am on page 1, When I click Next, Then I see the next page of threads', async ({
       page,
     }) => {
       await page.goto('/messages');
       await page.waitForLoadState('networkidle');
 
-      // Click next
       const nextBtn = page.getByRole('button', { name: /Next/ });
       await expect(nextBtn).toBeEnabled();
       await nextBtn.click();
 
-      // Should now show page 2
       await expect(page.getByText(/21–40 of 40/)).toBeVisible();
     });
 
@@ -116,11 +129,9 @@ test.describe('Feature: Messages Pagination, Sort & Filter', () => {
       await page.goto('/messages');
       await page.waitForLoadState('networkidle');
 
-      // Go to page 2
       await page.getByRole('button', { name: /Next/ }).click();
       await expect(page.getByText(/21–40 of 40/)).toBeVisible();
 
-      // Go back
       const prevBtn = page.getByRole('button', { name: /Previous/ });
       await expect(prevBtn).toBeEnabled();
       await prevBtn.click();
@@ -140,7 +151,6 @@ test.describe('Feature: Messages Pagination, Sort & Filter', () => {
       await page.goto('/messages');
       await page.waitForLoadState('networkidle');
 
-      // Go to last page
       await page.getByRole('button', { name: /Next/ }).click();
       await page.waitForLoadState('networkidle');
 
@@ -150,57 +160,37 @@ test.describe('Feature: Messages Pagination, Sort & Filter', () => {
   });
 
   test.describe('Scenario: Tab filtering', () => {
-    test('Given I click the Inbox tab, Then I only see inbound messages', async ({ page }) => {
+    test('Given I click the Inbox tab, Then I only see inbound threads', async ({ page }) => {
       await page.goto('/messages');
       await page.waitForLoadState('networkidle');
 
-      // Click Inbox tab
-      const inboxTab = page.getByRole('button', { name: /Inbox/i }).or(page.getByText('Inbox'));
-      if (await inboxTab.first().isVisible()) {
-        await inboxTab.first().click();
-        await page.waitForLoadState('networkidle');
-
-        // With 30 inbound messages, pagination should show 30 total
-        await expect(page.getByText(/of 30/)).toBeVisible();
-      }
+      await page.getByRole('button', { name: 'Inbox' }).click();
+      // Client-side filtering — should show inbound threads only
+      // First inbound thread title starts with "Item In"
+      await expect(page.getByText('Item In 1')).toBeVisible();
+      // Outbound threads should not be visible
+      await expect(page.getByText('Item Out 1')).not.toBeVisible();
     });
 
-    test('Given I click the Outbox tab, Then I only see outbound messages', async ({ page }) => {
+    test('Given I click the Sent tab, Then I only see outbound threads', async ({ page }) => {
       await page.goto('/messages');
       await page.waitForLoadState('networkidle');
 
-      const outboxTab = page
-        .getByRole('button', { name: /Outbox|Sent/i })
-        .or(page.getByText(/Outbox|Sent/));
-      if (await outboxTab.first().isVisible()) {
-        await outboxTab.first().click();
-        await page.waitForLoadState('networkidle');
-
-        // 10 outbound messages - no pagination needed (under limit)
-        // Should not show pagination controls
-        const _paginationInfo = page.getByText(/of 10/);
-        // 10 < 20 limit, so no pagination visible
-        await expect(page.getByRole('button', { name: /Next/ })).not.toBeVisible();
-      }
+      await page.getByRole('button', { name: 'Sent' }).click();
+      await expect(page.getByText('Item Out 1')).toBeVisible();
+      await expect(page.getByText('Item In 1')).not.toBeVisible();
     });
 
-    test('Given I switch tabs, Then pagination resets to page 1', async ({ page }) => {
+    test('Given a tab filter is active, Then pagination is hidden', async ({ page }) => {
       await page.goto('/messages');
       await page.waitForLoadState('networkidle');
 
-      // Navigate to page 2
-      await page.getByRole('button', { name: /Next/ }).click();
-      await expect(page.getByText(/21–40 of 40/)).toBeVisible();
+      // Pagination should be visible on All tab
+      await expect(page.getByText(/1–20 of 40/)).toBeVisible();
 
-      // Switch to inbox tab
-      const inboxTab = page.getByRole('button', { name: /Inbox/i }).or(page.getByText('Inbox'));
-      if (await inboxTab.first().isVisible()) {
-        await inboxTab.first().click();
-        await page.waitForLoadState('networkidle');
-
-        // Should reset to first page
-        await expect(page.getByText(/1–20 of 30/)).toBeVisible();
-      }
+      // Switch to Inbox — pagination hidden (client-side filter)
+      await page.getByRole('button', { name: 'Inbox' }).click();
+      await expect(page.getByRole('button', { name: /Next/ })).not.toBeVisible();
     });
   });
 
@@ -209,83 +199,29 @@ test.describe('Feature: Messages Pagination, Sort & Filter', () => {
       await page.goto('/messages');
       await page.waitForLoadState('networkidle');
 
-      const searchInput = page
-        .getByPlaceholder(/search/i)
-        .or(page.getByRole('searchbox'))
-        .or(page.getByRole('textbox', { name: /search/i }));
+      const searchInput = page.getByPlaceholder(/Search by listing title or seller name/);
+      await searchInput.fill('Seller 1');
+      // Wait for re-fetch
+      await page.waitForLoadState('networkidle');
 
-      if (await searchInput.first().isVisible()) {
-        await searchInput.first().fill('Seller 1');
-        // Wait for debounced search
-        await page.waitForTimeout(500);
-        await page.waitForLoadState('networkidle');
-
-        // Results should be filtered (Seller 1, Seller 10-19 match)
-        // Pagination should not show for small result sets
-      }
+      // Results should be filtered (Seller 1, Seller 10-19 match)
+      await expect(page.getByText('Seller 1')).toBeVisible();
     });
 
-    test('Given I search and then clear, Then all messages return', async ({ page }) => {
+    test('Given I search and then clear, Then all threads return', async ({ page }) => {
       await page.goto('/messages');
       await page.waitForLoadState('networkidle');
 
-      const searchInput = page
-        .getByPlaceholder(/search/i)
-        .or(page.getByRole('searchbox'))
-        .or(page.getByRole('textbox', { name: /search/i }));
-
-      if (await searchInput.first().isVisible()) {
-        await searchInput.first().fill('nonexistent');
-        await page.waitForTimeout(500);
-        await page.waitForLoadState('networkidle');
-
-        // Clear search
-        await searchInput.first().clear();
-        await page.waitForTimeout(500);
-        await page.waitForLoadState('networkidle');
-
-        // Should show all messages again with pagination
-        await expect(page.getByText(/1–20 of 40/)).toBeVisible();
-      }
-    });
-  });
-
-  test.describe('Scenario: Sorting', () => {
-    test('Given I click a sortable column header, Then messages are re-sorted', async ({
-      page,
-    }) => {
-      await page.goto('/messages');
+      const searchInput = page.getByPlaceholder(/Search by listing title or seller name/);
+      await searchInput.fill('nonexistent');
       await page.waitForLoadState('networkidle');
 
-      // Look for a sortable header (Date, Subject, etc.)
-      const dateHeader = page.getByRole('button', { name: /Date/i }).or(page.getByText('Date'));
-      if (await dateHeader.first().isVisible()) {
-        // Click to toggle sort order
-        await dateHeader.first().click();
-        await page.waitForLoadState('networkidle');
-
-        // Page should still show pagination
-        await expect(page.getByText(/1–20 of 40/)).toBeVisible();
-      }
-    });
-
-    test('Given I change sort, Then pagination resets to page 1', async ({ page }) => {
-      await page.goto('/messages');
+      // Clear search
+      await searchInput.clear();
       await page.waitForLoadState('networkidle');
 
-      // Go to page 2 first
-      await page.getByRole('button', { name: /Next/ }).click();
-      await expect(page.getByText(/21–40 of 40/)).toBeVisible();
-
-      // Click sort header
-      const dateHeader = page.getByRole('button', { name: /Date/i }).or(page.getByText('Date'));
-      if (await dateHeader.first().isVisible()) {
-        await dateHeader.first().click();
-        await page.waitForLoadState('networkidle');
-
-        // Should reset to page 1
-        await expect(page.getByText(/1–20 of 40/)).toBeVisible();
-      }
+      // Should show all threads again with pagination
+      await expect(page.getByText(/1–20 of 40/)).toBeVisible();
     });
   });
 });

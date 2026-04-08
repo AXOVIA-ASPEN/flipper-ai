@@ -368,6 +368,219 @@ describe('POST /api/posting-queue/:id/retry', () => {
   });
 });
 
+// ── Auto-generation: title/description from listing data when not provided ──
+describe('POST /api/posting-queue - auto-generates title/description', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({ subscriptionTier: 'PRO' });
+  });
+
+  const richListing = {
+    id: 'lst-rich',
+    platform: 'CRAIGSLIST',
+    userId: 'test-user-id',
+    identifiedBrand: 'Apple',
+    identifiedModel: 'iPhone 14',
+    identifiedVariant: '256GB',
+    identifiedCondition: 'good',
+    condition: 'used',
+    category: 'Electronics',
+    askingPrice: 80,
+    recommendedList: 120,
+    verifiedMarketValue: 110,
+    notes: null,
+  };
+
+  it('auto-generates title and description when not provided (single)', async () => {
+    mockPrisma.listing.findFirst.mockResolvedValue(richListing);
+    mockPrisma.postingQueueItem.upsert.mockImplementation(
+      ({ create }: { create: Record<string, unknown> }) =>
+        Promise.resolve({ id: 'pq-auto', ...create })
+    );
+
+    const res = await POST(
+      makeRequest('http://localhost:3000/api/posting-queue', {
+        method: 'POST',
+        body: JSON.stringify({ listingId: 'lst-rich', targetPlatform: 'EBAY' }),
+      })
+    );
+
+    expect(res.status).toBe(201);
+    const upsertCall = (mockPrisma.postingQueueItem.upsert as jest.Mock).mock.calls[0][0];
+    // Generators ran and produced non-empty title + description
+    expect(typeof upsertCall.create.title).toBe('string');
+    expect(upsertCall.create.title.length).toBeGreaterThan(0);
+    expect(typeof upsertCall.create.description).toBe('string');
+    expect(upsertCall.create.description.length).toBeGreaterThan(0);
+    // The brand should appear in the algorithmic title
+    expect(upsertCall.create.title.toLowerCase()).toContain('apple');
+  });
+
+  it('uses provided title and description verbatim when supplied', async () => {
+    mockPrisma.listing.findFirst.mockResolvedValue(richListing);
+    mockPrisma.postingQueueItem.upsert.mockImplementation(
+      ({ create }: { create: Record<string, unknown> }) =>
+        Promise.resolve({ id: 'pq-prov', ...create })
+    );
+
+    const res = await POST(
+      makeRequest('http://localhost:3000/api/posting-queue', {
+        method: 'POST',
+        body: JSON.stringify({
+          listingId: 'lst-rich',
+          targetPlatform: 'EBAY',
+          title: 'Custom Title',
+          description: 'Custom Description',
+        }),
+      })
+    );
+
+    expect(res.status).toBe(201);
+    const upsertCall = (mockPrisma.postingQueueItem.upsert as jest.Mock).mock.calls[0][0];
+    expect(upsertCall.create.title).toBe('Custom Title');
+    expect(upsertCall.create.description).toBe('Custom Description');
+  });
+
+  it('batch auto-generates per-platform title/description for each target', async () => {
+    mockPrisma.listing.findFirst.mockResolvedValue(richListing);
+    mockPrisma.postingQueueItem.upsert.mockImplementation(
+      ({ create }: { create: Record<string, unknown> }) =>
+        Promise.resolve({ id: `pq-${create.targetPlatform}`, ...create })
+    );
+
+    const res = await POST(
+      makeRequest('http://localhost:3000/api/posting-queue', {
+        method: 'POST',
+        body: JSON.stringify({
+          listingId: 'lst-rich',
+          platforms: ['EBAY', 'MERCARI', 'OFFERUP'],
+        }),
+      })
+    );
+
+    expect(res.status).toBe(201);
+    const calls = (mockPrisma.postingQueueItem.upsert as jest.Mock).mock.calls;
+    expect(calls).toHaveLength(3);
+    for (const call of calls) {
+      expect(typeof call[0].create.title).toBe('string');
+      expect(call[0].create.title.length).toBeGreaterThan(0);
+      expect(typeof call[0].create.description).toBe('string');
+      expect(call[0].create.description.length).toBeGreaterThan(0);
+    }
+    // The Mercari title must respect Mercari's 40-char limit
+    const mercari = calls.find((c) => c[0].create.targetPlatform === 'MERCARI');
+    expect(mercari![0].create.title.length).toBeLessThanOrEqual(40);
+  });
+
+  it('maps CRAIGSLIST target to generic generator without throwing', async () => {
+    // A listing on EBAY can be cross-posted to CRAIGSLIST
+    const ebayListing = { ...richListing, platform: 'EBAY' };
+    mockPrisma.listing.findFirst.mockResolvedValue(ebayListing);
+    mockPrisma.postingQueueItem.upsert.mockImplementation(
+      ({ create }: { create: Record<string, unknown> }) =>
+        Promise.resolve({ id: 'pq-cl', ...create })
+    );
+
+    const res = await POST(
+      makeRequest('http://localhost:3000/api/posting-queue', {
+        method: 'POST',
+        body: JSON.stringify({ listingId: 'lst-rich', targetPlatform: 'CRAIGSLIST' }),
+      })
+    );
+
+    expect(res.status).toBe(201);
+    const upsertCall = (mockPrisma.postingQueueItem.upsert as jest.Mock).mock.calls[0][0];
+    expect(typeof upsertCall.create.title).toBe('string');
+    expect(upsertCall.create.title.length).toBeGreaterThan(0);
+  });
+
+  it('handles listing with null identification fields gracefully', async () => {
+    const minimalListing = {
+      ...richListing,
+      identifiedBrand: null,
+      identifiedModel: null,
+      identifiedVariant: null,
+      identifiedCondition: null,
+      condition: null,
+      category: null,
+      notes: null,
+      recommendedList: null,
+      verifiedMarketValue: null,
+    };
+    mockPrisma.listing.findFirst.mockResolvedValue(minimalListing);
+    mockPrisma.postingQueueItem.upsert.mockImplementation(
+      ({ create }: { create: Record<string, unknown> }) =>
+        Promise.resolve({ id: 'pq-min', ...create })
+    );
+
+    const res = await POST(
+      makeRequest('http://localhost:3000/api/posting-queue', {
+        method: 'POST',
+        body: JSON.stringify({ listingId: 'lst-rich', targetPlatform: 'EBAY' }),
+      })
+    );
+
+    expect(res.status).toBe(201);
+    const upsertCall = (mockPrisma.postingQueueItem.upsert as jest.Mock).mock.calls[0][0];
+    // Falls back to a generic title rather than crashing
+    expect(typeof upsertCall.create.title).toBe('string');
+  });
+
+  it('FACEBOOK_MARKETPLACE single target generates a facebook-styled description with a local pickup note', async () => {
+    // Regression guard for the H2 fix: the schema enum FACEBOOK_MARKETPLACE
+    // must be mapped to the generator's "facebook" key so the description
+    // path produces "Local pickup available..." rather than the generic
+    // "Ships quickly with tracking" fallback.
+    const ebayListing = { ...richListing, platform: 'EBAY' };
+    mockPrisma.listing.findFirst.mockResolvedValue(ebayListing);
+    mockPrisma.postingQueueItem.upsert.mockImplementation(
+      ({ create }: { create: Record<string, unknown> }) =>
+        Promise.resolve({ id: 'pq-fb', ...create })
+    );
+
+    const res = await POST(
+      makeRequest('http://localhost:3000/api/posting-queue', {
+        method: 'POST',
+        body: JSON.stringify({
+          listingId: 'lst-rich',
+          targetPlatform: 'FACEBOOK_MARKETPLACE',
+        }),
+      })
+    );
+
+    expect(res.status).toBe(201);
+    const upsertCall = (mockPrisma.postingQueueItem.upsert as jest.Mock).mock.calls[0][0];
+    expect(upsertCall.create.description.toLowerCase()).toContain('local pickup');
+    // And the title respects Facebook's 99-char limit, not the default 80.
+    expect(upsertCall.create.title.length).toBeLessThanOrEqual(99);
+  });
+
+  it('FACEBOOK_MARKETPLACE in batch mode also maps to the facebook generator', async () => {
+    const ebayListing = { ...richListing, platform: 'EBAY' };
+    mockPrisma.listing.findFirst.mockResolvedValue(ebayListing);
+    mockPrisma.postingQueueItem.upsert.mockImplementation(
+      ({ create }: { create: Record<string, unknown> }) =>
+        Promise.resolve({ id: `pq-${create.targetPlatform}`, ...create })
+    );
+
+    const res = await POST(
+      makeRequest('http://localhost:3000/api/posting-queue', {
+        method: 'POST',
+        body: JSON.stringify({
+          listingId: 'lst-rich',
+          platforms: ['FACEBOOK_MARKETPLACE', 'MERCARI'],
+        }),
+      })
+    );
+
+    expect(res.status).toBe(201);
+    const calls = (mockPrisma.postingQueueItem.upsert as jest.Mock).mock.calls;
+    const fb = calls.find((c) => c[0].create.targetPlatform === 'FACEBOOK_MARKETPLACE');
+    expect(fb).toBeDefined();
+    expect(fb![0].create.description.toLowerCase()).toContain('local pickup');
+  });
+});
+
 // ── Branch coverage: scheduledAt non-null path (??  operator) ────────────────
 describe('POST /api/posting-queue - scheduledAt branch coverage', () => {
   beforeEach(() => {

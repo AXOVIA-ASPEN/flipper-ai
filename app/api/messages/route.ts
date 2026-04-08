@@ -27,7 +27,13 @@ export async function GET(request: NextRequest) {
     if (direction && (direction === 'INBOUND' || direction === 'OUTBOUND')) {
       where.direction = direction;
     }
-    if (status) where.status = status;
+    if (status) {
+      if (status.includes(',')) {
+        where.status = { in: status.split(',').map((s: string) => s.trim()) };
+      } else {
+        where.status = status;
+      }
+    }
     if (listingId) where.listingId = listingId;
     if (search) {
       where.OR = [
@@ -55,6 +61,7 @@ export async function GET(request: NextRequest) {
               platform: true,
               askingPrice: true,
               imageUrls: true,
+              updatedAt: true,
             },
           },
         },
@@ -114,7 +121,7 @@ export async function POST(request: NextRequest) {
         userId,
         listingId: listingId || null,
         direction,
-        status: msgStatus || (direction === 'OUTBOUND' ? 'PENDING_APPROVAL' : 'DELIVERED'),
+        status: msgStatus || (direction === 'OUTBOUND' ? 'DRAFT' : 'DELIVERED'),
         subject: subject || null,
         body: messageBody,
         sellerName: sellerName || null,

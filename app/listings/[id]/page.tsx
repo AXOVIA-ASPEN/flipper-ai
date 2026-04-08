@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { ExternalLink, ArrowLeft } from 'lucide-react';
 import { getListingImageUrl, getAllListingImageUrls } from '@/lib/image-helpers';
 import type { ListingWithImages } from '@/lib/image-helpers';
+import ResaleContentEditor from '@/components/ResaleContentEditor';
+import PriceCalculator from '@/components/PriceCalculator';
 
 interface ListingImage {
   id: string;
@@ -260,6 +262,72 @@ function ListingDetail() {
                 )}
               </div>
             )}
+
+            {/* Price & List — optimal pricing calculator (Story 9.2). Available
+                pre-purchase as a projection and post-purchase as the
+                authoritative recommendation. */}
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-3">Price & List</h2>
+              <PriceCalculator
+                listingId={listing.id}
+                onListPlatform={async (platform, recommendedPrice) => {
+                  const platformMap: Record<string, string> = {
+                    ebay: 'EBAY',
+                    mercari: 'MERCARI',
+                    facebook: 'FACEBOOK_MARKETPLACE',
+                    offerup: 'OFFERUP',
+                    craigslist: 'CRAIGSLIST',
+                  };
+                  try {
+                    await fetch('/api/posting-queue', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        listingId: listing.id,
+                        targetPlatform: platformMap[platform] ?? 'EBAY',
+                        askingPrice: recommendedPrice,
+                      }),
+                    });
+                  } catch (err) {
+                    console.error('Failed to add to posting queue', err);
+                  }
+                }}
+              />
+            </div>
+
+            {/* Resale Listing Generator — only when an opportunity has progressed past identification */}
+            {listing.opportunity &&
+              ['PURCHASED', 'LISTED', 'SOLD'].includes(listing.opportunity.status) && (
+                <div className="mb-6">
+                  <ResaleContentEditor
+                    listingId={listing.id}
+                    initialPlatform="ebay"
+                    onSave={async (title, description, platform) => {
+                      const platformMap: Record<string, string> = {
+                        ebay: 'EBAY',
+                        mercari: 'MERCARI',
+                        facebook: 'FACEBOOK_MARKETPLACE',
+                        offerup: 'OFFERUP',
+                        craigslist: 'CRAIGSLIST',
+                      };
+                      try {
+                        await fetch('/api/posting-queue', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            listingId: listing.id,
+                            targetPlatform: platformMap[platform] ?? 'EBAY',
+                            title,
+                            description,
+                          }),
+                        });
+                      } catch (err) {
+                        console.error('Failed to add to posting queue', err);
+                      }
+                    }}
+                  />
+                </div>
+              )}
 
             {/* Description */}
             {listing.description && (

@@ -18,6 +18,7 @@ import { Given, When, Then } from '@cucumber/cucumber';
 import assert from 'assert';
 import {
   generateFallbackStrategy,
+  generateFallbackCounterAnalysis,
 } from '../../../src/lib/negotiation-strategy';
 import type {
   NegotiationStrategyInput,
@@ -29,12 +30,14 @@ import type {
 let negotiationInput: NegotiationStrategyInput;
 let negotiationStrategy: NegotiationStrategy;
 let counterOfferResult: CounterOfferAnalysis;
+let aiUnavailableForNegotiation = false;
 
 // ── Given: Negotiation listing setup ─────────────────────────────────────────
 
 Given(
   'a listing for negotiation with asking price {int} and market value {int} on {string}',
   function (askingPrice: number, marketValue: number, platform: string) {
+    aiUnavailableForNegotiation = false;
     negotiationInput = {
       listingId: 'test-listing-negotiation',
       askingPrice,
@@ -47,6 +50,7 @@ Given(
       sellabilityScore: 70,
       platform,
       recommendedOffer: null,
+      marketDataDate: null,
     };
   }
 );
@@ -54,6 +58,7 @@ Given(
 Given(
   'a listing for negotiation with asking price {int} and estimated value {int} on {string}',
   function (askingPrice: number, estimatedValue: number, platform: string) {
+    aiUnavailableForNegotiation = false;
     negotiationInput = {
       listingId: 'test-listing-negotiation',
       askingPrice,
@@ -66,6 +71,7 @@ Given(
       sellabilityScore: 70,
       platform,
       recommendedOffer: null,
+      marketDataDate: null,
     };
   }
 );
@@ -101,71 +107,12 @@ When('the negotiation strategy is generated', function () {
 When(
   'the counter-offer of {int} is analyzed against our previous offer of {int}',
   function (counterPrice: number, ourOffer: number) {
-    // Use fallback counter-offer analysis (algorithmic, no OpenAI)
-    // We call the exported generateFallbackStrategy to get context, then analyze
-    const marketValue =
-      negotiationInput.verifiedMarketValue ??
-      negotiationInput.estimatedValue ??
-      negotiationInput.askingPrice;
-
-    const PLATFORM_FEE_RATES: Record<string, number> = {
-      EBAY: 0.13,
-      MERCARI: 0.10,
-      FACEBOOK_MARKETPLACE: 0.05,
-      OFFERUP: 0.129,
-      CRAIGSLIST: 0,
-    };
-    const feeRate = PLATFORM_FEE_RATES[negotiationInput.platform.toUpperCase()] ?? 0.13;
-    const maxPayable = marketValue * (1 - feeRate) - 10;
-    const profitAtCounter = Math.round(marketValue * (1 - feeRate) - counterPrice);
-
-    // Bidding war detection
-    if (
-      counterPrice > negotiationInput.askingPrice * 1.1 &&
-      (negotiationInput.demandLevel === 'very_high' || negotiationInput.demandLevel === 'high')
-    ) {
-      counterOfferResult = {
-        recommendation: 'walkaway',
-        suggestedCounterPrice: null,
-        reasoning:
-          'Seller counter exceeds asking price with high demand — price escalation detected. Risk of overpaying.',
-        confidence: 'high',
-        profitAtThisPrice: profitAtCounter,
-      };
-      return;
-    }
-
-    if (counterPrice <= ourOffer) {
-      counterOfferResult = {
-        recommendation: 'accept',
-        suggestedCounterPrice: null,
-        reasoning: 'Counter-offer is at or below our previous offer — accept the deal.',
-        confidence: 'high',
-        profitAtThisPrice: profitAtCounter,
-      };
-      return;
-    }
-
-    if (counterPrice > maxPayable) {
-      counterOfferResult = {
-        recommendation: 'walkaway',
-        suggestedCounterPrice: null,
-        reasoning: `Counter-offer of $${counterPrice} exceeds maximum payable for minimum profit after platform fees.`,
-        confidence: 'high',
-        profitAtThisPrice: profitAtCounter,
-      };
-      return;
-    }
-
-    // Counter at midpoint
-    const suggestedCounter = Math.round((ourOffer + counterPrice) / 2);
-    counterOfferResult = {
-      recommendation: 'counter',
-      suggestedCounterPrice: suggestedCounter,
-      reasoning: `Counter at $${suggestedCounter} — halfway between our offer and seller's counter.`,
-      confidence: 'medium',
-      profitAtThisPrice: profitAtCounter,
-    };
+    // Use the actual library fallback counter-offer analysis (algorithmic, no OpenAI)
+    counterOfferResult = generateFallbackCounterAnalysis(
+      negotiationInput,
+      counterPrice,
+      ourOffer
+    );
   }
 );
 

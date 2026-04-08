@@ -12,6 +12,7 @@ jest.mock('@/lib/auth', () => ({
 // Mock Prisma client
 const mockFindMany = jest.fn();
 const mockFindUnique = jest.fn();
+const mockFindFirst = jest.fn();
 const mockUpdate = jest.fn();
 const mockDelete = jest.fn();
 const mockListingUpdate = jest.fn();
@@ -24,6 +25,7 @@ jest.mock('@/lib/db', () => ({
     opportunity: {
       findMany: (...args: unknown[]) => mockFindMany(...args),
       findUnique: (...args: unknown[]) => mockFindUnique(...args),
+      findFirst: (...args: unknown[]) => mockFindFirst(...args),
       update: (...args: unknown[]) => mockUpdate(...args),
       delete: (...args: unknown[]) => mockDelete(...args),
       count: (...args: unknown[]) => mockOpportunityCount(...args),
@@ -33,6 +35,12 @@ jest.mock('@/lib/db', () => ({
     },
     $transaction: (...args: unknown[]) => mockTransaction(...args),
   },
+}));
+
+// Mock conversation status (Story 8.5)
+const mockTransitionToPurchased = jest.fn();
+jest.mock('@/lib/conversation-status', () => ({
+  transitionToPurchased: (...args: unknown[]) => mockTransitionToPurchased(...args),
 }));
 
 // Helper: set up GET /api/opportunities mocks
@@ -66,6 +74,7 @@ describe('Opportunities API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGetCurrentUserId.mockResolvedValue('test-user-id');
+    mockTransitionToPurchased.mockResolvedValue(undefined);
   });
 
   // ──────────────────────────────────────────────────────────────────────────
@@ -413,6 +422,20 @@ describe('Opportunities API', () => {
   // GET /api/opportunities/[id]
   // ──────────────────────────────────────────────────────────────────────────
   describe('GET /api/opportunities/[id]', () => {
+    it('should return 401 when not authenticated', async () => {
+      mockGetCurrentUserId.mockResolvedValue(null);
+
+      const request = createMockRequest('GET', '/api/opportunities/opp1');
+      const response = await GET_BY_ID(request, {
+        params: Promise.resolve({ id: 'opp1' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(401);
+      expect(data.success).toBe(false);
+      expect(data.error.code).toBe('UNAUTHORIZED');
+    });
+
     it('should return a single opportunity with listing', async () => {
       const mockOpportunity = {
         id: 'opp1',
@@ -428,7 +451,7 @@ describe('Opportunities API', () => {
         },
       };
 
-      mockFindUnique.mockResolvedValue(mockOpportunity);
+      mockFindFirst.mockResolvedValue(mockOpportunity);
 
       const request = createMockRequest('GET', '/api/opportunities/opp1');
       const response = await GET_BY_ID(request, {
@@ -438,14 +461,14 @@ describe('Opportunities API', () => {
 
       expect(response.status).toBe(200);
       expect(data).toEqual(mockOpportunity);
-      expect(mockFindUnique).toHaveBeenCalledWith({
-        where: { id: 'opp1' },
+      expect(mockFindFirst).toHaveBeenCalledWith({
+        where: { id: 'opp1', userId: 'test-user-id' },
         include: { listing: true },
       });
     });
 
-    it('should return 404 when opportunity is not found', async () => {
-      mockFindUnique.mockResolvedValue(null);
+    it('should return 404 when opportunity is not found or not owned by user', async () => {
+      mockFindFirst.mockResolvedValue(null);
 
       const request = createMockRequest('GET', '/api/opportunities/nonexistent');
       const response = await GET_BY_ID(request, {
@@ -459,7 +482,7 @@ describe('Opportunities API', () => {
     });
 
     it('should handle database errors with 500 status', async () => {
-      mockFindUnique.mockRejectedValue(new Error('Database error'));
+      mockFindFirst.mockRejectedValue(new Error('Database error'));
 
       const request = createMockRequest('GET', '/api/opportunities/opp1');
       const response = await GET_BY_ID(request, {
@@ -477,6 +500,66 @@ describe('Opportunities API', () => {
   // PATCH /api/opportunities/[id]
   // ──────────────────────────────────────────────────────────────────────────
   describe('PATCH /api/opportunities/[id]', () => {
+    beforeEach(() => {
+      // PATCH does an ownership-scoped findFirst before the update.
+      mockFindFirst.mockResolvedValue({ id: 'opp1' });
+    });
+
+    it('should return 401 when not authenticated', async () => {
+      mockGetCurrentUserId.mockResolvedValue(null);
+
+      const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+        status: 'PURCHASED',
+      });
+      const response = await PATCH(request, {
+        params: Promise.resolve({ id: 'opp1' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(401);
+      expect(data.success).toBe(false);
+      expect(data.error.code).toBe('UNAUTHORIZED');
+      expect(mockUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should return 404 when opportunity is not owned by user', async () => {
+      mockFindFirst.mockResolvedValue(null);
+
+      const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+        status: 'PURCHASED',
+      });
+      const response = await PATCH(request, {
+        params: Promise.resolve({ id: 'opp1' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(404);
+      expect(data.error.code).toBe('NOT_FOUND');
+      expect(mockUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should reject mass-assigned non-allowlisted fields', async () => {
+      mockUpdate.mockResolvedValue({
+        id: 'opp1',
+        status: 'PURCHASED',
+        listing: { id: 'listing1' },
+      });
+
+      const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+        status: 'PURCHASED',
+        userId: 'attacker-id', // Should be ignored
+        listingId: 'other-listing', // Should be ignored
+        id: 'different-id', // Should be ignored
+      });
+      await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+
+      const updateCall = mockUpdate.mock.calls[0][0];
+      expect(updateCall.data.userId).toBeUndefined();
+      expect(updateCall.data.listingId).toBeUndefined();
+      expect(updateCall.data.id).toBeUndefined();
+      expect(updateCall.data.status).toBe('PURCHASED');
+    });
+
     it('should update an opportunity', async () => {
       const mockUpdated = {
         id: 'opp1',
@@ -684,14 +767,82 @@ describe('Opportunities API', () => {
       expect(data.success).toBe(false);
       expect(data.error.code).toBe('INTERNAL_ERROR');
     });
+
+    // ── Conversation status transition (Story 8.5) ──────────────────────
+
+    it('should call transitionToPurchased when status changes to PURCHASED', async () => {
+      mockUpdate.mockResolvedValue({
+        id: 'opp1',
+        status: 'PURCHASED',
+        userId: 'test-user-id',
+        listing: { id: 'listing1' },
+      });
+
+      const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+        status: 'PURCHASED',
+        purchasePrice: 100,
+      });
+      await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+
+      expect(mockTransitionToPurchased).toHaveBeenCalledWith('listing1', 'test-user-id');
+    });
+
+    it('should not call transitionToPurchased for non-PURCHASED status', async () => {
+      mockUpdate.mockResolvedValue({
+        id: 'opp1',
+        status: 'LISTED',
+        userId: 'test-user-id',
+        listing: { id: 'listing1' },
+      });
+
+      const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+        status: 'LISTED',
+      });
+      await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+
+      expect(mockTransitionToPurchased).not.toHaveBeenCalled();
+    });
+
+    it('should not block response if transitionToPurchased fails', async () => {
+      mockTransitionToPurchased.mockRejectedValue(new Error('DB error'));
+      mockUpdate.mockResolvedValue({
+        id: 'opp1',
+        status: 'PURCHASED',
+        userId: 'test-user-id',
+        listing: { id: 'listing1' },
+      });
+
+      const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+        status: 'PURCHASED',
+        purchasePrice: 100,
+      });
+      const response = await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+
+      expect(response.status).toBe(200);
+    });
   });
 
   // ──────────────────────────────────────────────────────────────────────────
   // DELETE /api/opportunities/[id]
   // ──────────────────────────────────────────────────────────────────────────
   describe('DELETE /api/opportunities/[id]', () => {
+    it('should return 401 when not authenticated', async () => {
+      mockGetCurrentUserId.mockResolvedValue(null);
+
+      const request = createMockRequest('DELETE', '/api/opportunities/opp1');
+      const response = await DELETE(request, {
+        params: Promise.resolve({ id: 'opp1' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(401);
+      expect(data.success).toBe(false);
+      expect(data.error.code).toBe('UNAUTHORIZED');
+      expect(mockTransaction).not.toHaveBeenCalled();
+    });
+
     it('should delete an opportunity and reset listing status', async () => {
-      mockFindUnique.mockResolvedValue({ listingId: 'listing1' });
+      mockFindFirst.mockResolvedValue({ listingId: 'listing1' });
       mockTransaction.mockResolvedValue([{}, {}]);
 
       const request = createMockRequest('DELETE', '/api/opportunities/opp1');
@@ -702,15 +853,15 @@ describe('Opportunities API', () => {
 
       expect(response.status).toBe(200);
       expect(data).toEqual({ success: true });
-      expect(mockFindUnique).toHaveBeenCalledWith({
-        where: { id: 'opp1' },
+      expect(mockFindFirst).toHaveBeenCalledWith({
+        where: { id: 'opp1', userId: 'test-user-id' },
         select: { listingId: true },
       });
       expect(mockTransaction).toHaveBeenCalled();
     });
 
-    it('should return 404 when opportunity is not found', async () => {
-      mockFindUnique.mockResolvedValue(null);
+    it('should return 404 when opportunity is not found or not owned by user', async () => {
+      mockFindFirst.mockResolvedValue(null);
 
       const request = createMockRequest('DELETE', '/api/opportunities/nonexistent');
       const response = await DELETE(request, {
@@ -721,10 +872,11 @@ describe('Opportunities API', () => {
       expect(response.status).toBe(404);
       expect(data.success).toBe(false);
       expect(data.error.code).toBe('NOT_FOUND');
+      expect(mockTransaction).not.toHaveBeenCalled();
     });
 
-    it('should handle database errors during findUnique with 500 status', async () => {
-      mockFindUnique.mockRejectedValue(new Error('Database error'));
+    it('should handle database errors during findFirst with 500 status', async () => {
+      mockFindFirst.mockRejectedValue(new Error('Database error'));
 
       const request = createMockRequest('DELETE', '/api/opportunities/opp1');
       const response = await DELETE(request, {
@@ -738,7 +890,7 @@ describe('Opportunities API', () => {
     });
 
     it('should handle database errors during transaction with 500 status', async () => {
-      mockFindUnique.mockResolvedValue({ listingId: 'listing1' });
+      mockFindFirst.mockResolvedValue({ listingId: 'listing1' });
       mockTransaction.mockRejectedValue(new Error('Transaction failed'));
 
       const request = createMockRequest('DELETE', '/api/opportunities/opp1');

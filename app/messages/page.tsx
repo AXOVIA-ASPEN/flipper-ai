@@ -20,6 +20,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import { useRouter } from 'next/navigation';
 import ThreadItem from '@/components/messages/ThreadItem';
+import ApprovalQueue from '@/components/ApprovalQueue';
 
 interface ThreadListing {
   id: string;
@@ -44,7 +45,7 @@ interface ThreadSummary {
   lastMessageAt: string;
 }
 
-type TabType = 'all' | 'inbox' | 'sent';
+type TabType = 'all' | 'inbox' | 'sent' | 'approval';
 
 export default function MessagesPage() {
   const { user: firebaseUser, loading: authLoading } = useFirebaseAuth();
@@ -56,7 +57,43 @@ export default function MessagesPage() {
   const [search, setSearch] = useState('');
   const [total, setTotal] = useState(0);
   const [offset, setOffset] = useState(0);
+  const [approvalCount, setApprovalCount] = useState(0);
+  const [subscriptionTier, setSubscriptionTier] = useState<string | null>(null);
+  const [messageApprovalRequired, setMessageApprovalRequired] = useState(false);
   const limit = 20;
+
+  // Fetch user settings for approval tab
+  useEffect(() => {
+    async function fetchUserSettings() {
+      try {
+        const res = await fetch('/api/user/settings');
+        const json = await res.json();
+        if (res.ok && json.success) {
+          setSubscriptionTier(json.data.user?.subscriptionTier ?? null);
+          setMessageApprovalRequired(json.data.messageApprovalRequired ?? false);
+        }
+      } catch {
+        // Non-critical — defaults are safe
+      }
+    }
+    if (!authLoading && firebaseUser) fetchUserSettings();
+  }, [authLoading, firebaseUser]);
+
+  // Fetch initial approval count for badge
+  useEffect(() => {
+    async function fetchApprovalCount() {
+      try {
+        const res = await fetch('/api/messages?status=DRAFT,PENDING_APPROVAL&direction=OUTBOUND&limit=0');
+        const json = await res.json();
+        if (res.ok && json.success) {
+          setApprovalCount(json.pagination?.total ?? 0);
+        }
+      } catch {
+        // Non-critical
+      }
+    }
+    if (!authLoading && firebaseUser) fetchApprovalCount();
+  }, [authLoading, firebaseUser]);
 
   const fetchThreads = useCallback(async () => {
     setLoading(true);
@@ -126,7 +163,11 @@ export default function MessagesPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Messages</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            {total} conversation{total !== 1 ? 's' : ''}
+            {tab === 'all'
+              ? `${total} conversation${total !== 1 ? 's' : ''}`
+              : tab === 'approval'
+                ? `${approvalCount} pending approval`
+                : `${filteredThreads.length} ${tab} thread${filteredThreads.length !== 1 ? 's' : ''}`}
             {totalUnread > 0 && (
               <span className="ml-2 text-blue-600 dark:text-blue-400 font-medium">
                 ({totalUnread} unread)
@@ -161,6 +202,7 @@ export default function MessagesPage() {
           { key: 'all' as TabType, label: 'All' },
           { key: 'inbox' as TabType, label: 'Inbox' },
           { key: 'sent' as TabType, label: 'Sent' },
+          { key: 'approval' as TabType, label: `Approval${approvalCount > 0 ? ` (${approvalCount})` : ''}` },
         ]).map((t) => (
           <button
             key={t.key}
@@ -176,6 +218,15 @@ export default function MessagesPage() {
         ))}
       </div>
 
+      {/* Approval tab content */}
+      {tab === 'approval' ? (
+        <ApprovalQueue
+          subscriptionTier={subscriptionTier}
+          messageApprovalRequired={messageApprovalRequired}
+          onCountChange={setApprovalCount}
+        />
+      ) : (
+      <>
       {/* Search */}
       <div className="mb-4">
         <input
@@ -236,8 +287,8 @@ export default function MessagesPage() {
         </div>
       )}
 
-      {/* Pagination */}
-      {total > limit && (
+      {/* Pagination — only shown on "All" tab since Inbox/Sent filter client-side */}
+      {tab === 'all' && total > limit && (
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
           <button
             onClick={() => setOffset(Math.max(0, offset - limit))}
@@ -257,6 +308,8 @@ export default function MessagesPage() {
             Next &rarr;
           </button>
         </div>
+      )}
+      </>
       )}
     </div>
   );

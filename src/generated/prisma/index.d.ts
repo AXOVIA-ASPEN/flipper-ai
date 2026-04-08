@@ -2565,6 +2565,7 @@ export namespace Prisma {
     category: string | null
     postedAt: Date | null
     scrapedAt: Date | null
+    updatedAt: Date | null
     estimatedValue: number | null
     estimatedLow: number | null
     estimatedHigh: number | null
@@ -2615,6 +2616,7 @@ export namespace Prisma {
     pickupDistanceMiles: number | null
     outsidePickupRadius: boolean | null
     adjustedProfitMargin: number | null
+    conversationStatus: string | null
     llmAnalyzed: boolean | null
     analysisDate: Date | null
     analysisConfidence: string | null
@@ -2638,6 +2640,7 @@ export namespace Prisma {
     category: string | null
     postedAt: Date | null
     scrapedAt: Date | null
+    updatedAt: Date | null
     estimatedValue: number | null
     estimatedLow: number | null
     estimatedHigh: number | null
@@ -2688,6 +2691,7 @@ export namespace Prisma {
     pickupDistanceMiles: number | null
     outsidePickupRadius: boolean | null
     adjustedProfitMargin: number | null
+    conversationStatus: string | null
     llmAnalyzed: boolean | null
     analysisDate: Date | null
     analysisConfidence: string | null
@@ -2711,6 +2715,7 @@ export namespace Prisma {
     category: number
     postedAt: number
     scrapedAt: number
+    updatedAt: number
     estimatedValue: number
     estimatedLow: number
     estimatedHigh: number
@@ -2761,6 +2766,7 @@ export namespace Prisma {
     pickupDistanceMiles: number
     outsidePickupRadius: number
     adjustedProfitMargin: number
+    conversationStatus: number
     llmAnalyzed: number
     analysisDate: number
     analysisConfidence: number
@@ -2844,6 +2850,7 @@ export namespace Prisma {
     category?: true
     postedAt?: true
     scrapedAt?: true
+    updatedAt?: true
     estimatedValue?: true
     estimatedLow?: true
     estimatedHigh?: true
@@ -2894,6 +2901,7 @@ export namespace Prisma {
     pickupDistanceMiles?: true
     outsidePickupRadius?: true
     adjustedProfitMargin?: true
+    conversationStatus?: true
     llmAnalyzed?: true
     analysisDate?: true
     analysisConfidence?: true
@@ -2917,6 +2925,7 @@ export namespace Prisma {
     category?: true
     postedAt?: true
     scrapedAt?: true
+    updatedAt?: true
     estimatedValue?: true
     estimatedLow?: true
     estimatedHigh?: true
@@ -2967,6 +2976,7 @@ export namespace Prisma {
     pickupDistanceMiles?: true
     outsidePickupRadius?: true
     adjustedProfitMargin?: true
+    conversationStatus?: true
     llmAnalyzed?: true
     analysisDate?: true
     analysisConfidence?: true
@@ -2990,6 +3000,7 @@ export namespace Prisma {
     category?: true
     postedAt?: true
     scrapedAt?: true
+    updatedAt?: true
     estimatedValue?: true
     estimatedLow?: true
     estimatedHigh?: true
@@ -3040,6 +3051,7 @@ export namespace Prisma {
     pickupDistanceMiles?: true
     outsidePickupRadius?: true
     adjustedProfitMargin?: true
+    conversationStatus?: true
     llmAnalyzed?: true
     analysisDate?: true
     analysisConfidence?: true
@@ -3150,6 +3162,7 @@ export namespace Prisma {
     category: string | null
     postedAt: Date | null
     scrapedAt: Date
+    updatedAt: Date
     estimatedValue: number | null
     estimatedLow: number | null
     estimatedHigh: number | null
@@ -3200,6 +3213,7 @@ export namespace Prisma {
     pickupDistanceMiles: number | null
     outsidePickupRadius: boolean | null
     adjustedProfitMargin: number | null
+    conversationStatus: string | null
     llmAnalyzed: boolean
     analysisDate: Date | null
     analysisConfidence: string | null
@@ -3242,6 +3256,7 @@ export namespace Prisma {
     category?: boolean
     postedAt?: boolean
     scrapedAt?: boolean
+    updatedAt?: boolean
     estimatedValue?: boolean
     estimatedLow?: boolean
     estimatedHigh?: boolean
@@ -3292,6 +3307,7 @@ export namespace Prisma {
     pickupDistanceMiles?: boolean
     outsidePickupRadius?: boolean
     adjustedProfitMargin?: boolean
+    conversationStatus?: boolean
     llmAnalyzed?: boolean
     analysisDate?: boolean
     analysisConfidence?: boolean
@@ -3321,6 +3337,7 @@ export namespace Prisma {
     category?: boolean
     postedAt?: boolean
     scrapedAt?: boolean
+    updatedAt?: boolean
     estimatedValue?: boolean
     estimatedLow?: boolean
     estimatedHigh?: boolean
@@ -3371,6 +3388,7 @@ export namespace Prisma {
     pickupDistanceMiles?: boolean
     outsidePickupRadius?: boolean
     adjustedProfitMargin?: boolean
+    conversationStatus?: boolean
     llmAnalyzed?: boolean
     analysisDate?: boolean
     analysisConfidence?: boolean
@@ -3395,6 +3413,7 @@ export namespace Prisma {
     category?: boolean
     postedAt?: boolean
     scrapedAt?: boolean
+    updatedAt?: boolean
     estimatedValue?: boolean
     estimatedLow?: boolean
     estimatedHigh?: boolean
@@ -3445,6 +3464,7 @@ export namespace Prisma {
     pickupDistanceMiles?: boolean
     outsidePickupRadius?: boolean
     adjustedProfitMargin?: boolean
+    conversationStatus?: boolean
     llmAnalyzed?: boolean
     analysisDate?: boolean
     analysisConfidence?: boolean
@@ -3469,6 +3489,7 @@ export namespace Prisma {
     category?: boolean
     postedAt?: boolean
     scrapedAt?: boolean
+    updatedAt?: boolean
     estimatedValue?: boolean
     estimatedLow?: boolean
     estimatedHigh?: boolean
@@ -3519,13 +3540,14 @@ export namespace Prisma {
     pickupDistanceMiles?: boolean
     outsidePickupRadius?: boolean
     adjustedProfitMargin?: boolean
+    conversationStatus?: boolean
     llmAnalyzed?: boolean
     analysisDate?: boolean
     analysisConfidence?: boolean
     analysisReasoning?: boolean
   }
 
-  export type ListingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "externalId" | "platform" | "url" | "title" | "description" | "askingPrice" | "condition" | "location" | "sellerName" | "sellerContact" | "imageUrls" | "category" | "postedAt" | "scrapedAt" | "estimatedValue" | "estimatedLow" | "estimatedHigh" | "profitPotential" | "profitLow" | "profitHigh" | "valueScore" | "discountPercent" | "resaleDifficulty" | "status" | "comparableUrls" | "priceReasoning" | "notes" | "shippable" | "estimatedWeight" | "negotiable" | "daysListed" | "tags" | "requestToBuy" | "identifiedBrand" | "identifiedModel" | "identifiedVariant" | "identifiedCondition" | "verifiedMarketValue" | "marketDataSource" | "marketDataDate" | "comparableSalesJson" | "compMatchConfidence" | "sellabilityScore" | "demandLevel" | "expectedDaysToSell" | "authenticityRisk" | "conditionRisk" | "recommendedOffer" | "recommendedList" | "resaleStrategy" | "trueDiscountPercent" | "soldVolume30Days" | "soldVolume60Days" | "soldVolume90Days" | "completenessLabel" | "sellerRating" | "sellerReviewCount" | "sellerAccountAgeDays" | "sizeCategory" | "shippingEstimatesJson" | "estimatedShippingCost" | "pickupDistanceMiles" | "outsidePickupRadius" | "adjustedProfitMargin" | "llmAnalyzed" | "analysisDate" | "analysisConfidence" | "analysisReasoning", ExtArgs["result"]["listing"]>
+  export type ListingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "externalId" | "platform" | "url" | "title" | "description" | "askingPrice" | "condition" | "location" | "sellerName" | "sellerContact" | "imageUrls" | "category" | "postedAt" | "scrapedAt" | "updatedAt" | "estimatedValue" | "estimatedLow" | "estimatedHigh" | "profitPotential" | "profitLow" | "profitHigh" | "valueScore" | "discountPercent" | "resaleDifficulty" | "status" | "comparableUrls" | "priceReasoning" | "notes" | "shippable" | "estimatedWeight" | "negotiable" | "daysListed" | "tags" | "requestToBuy" | "identifiedBrand" | "identifiedModel" | "identifiedVariant" | "identifiedCondition" | "verifiedMarketValue" | "marketDataSource" | "marketDataDate" | "comparableSalesJson" | "compMatchConfidence" | "sellabilityScore" | "demandLevel" | "expectedDaysToSell" | "authenticityRisk" | "conditionRisk" | "recommendedOffer" | "recommendedList" | "resaleStrategy" | "trueDiscountPercent" | "soldVolume30Days" | "soldVolume60Days" | "soldVolume90Days" | "completenessLabel" | "sellerRating" | "sellerReviewCount" | "sellerAccountAgeDays" | "sizeCategory" | "shippingEstimatesJson" | "estimatedShippingCost" | "pickupDistanceMiles" | "outsidePickupRadius" | "adjustedProfitMargin" | "conversationStatus" | "llmAnalyzed" | "analysisDate" | "analysisConfidence" | "analysisReasoning", ExtArgs["result"]["listing"]>
   export type ListingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | Listing$userArgs<ExtArgs>
     images?: boolean | Listing$imagesArgs<ExtArgs>
@@ -3567,6 +3589,7 @@ export namespace Prisma {
       category: string | null
       postedAt: Date | null
       scrapedAt: Date
+      updatedAt: Date
       estimatedValue: number | null
       estimatedLow: number | null
       estimatedHigh: number | null
@@ -3617,6 +3640,7 @@ export namespace Prisma {
       pickupDistanceMiles: number | null
       outsidePickupRadius: boolean | null
       adjustedProfitMargin: number | null
+      conversationStatus: string | null
       llmAnalyzed: boolean
       analysisDate: Date | null
       analysisConfidence: string | null
@@ -4065,6 +4089,7 @@ export namespace Prisma {
     readonly category: FieldRef<"Listing", 'String'>
     readonly postedAt: FieldRef<"Listing", 'DateTime'>
     readonly scrapedAt: FieldRef<"Listing", 'DateTime'>
+    readonly updatedAt: FieldRef<"Listing", 'DateTime'>
     readonly estimatedValue: FieldRef<"Listing", 'Float'>
     readonly estimatedLow: FieldRef<"Listing", 'Float'>
     readonly estimatedHigh: FieldRef<"Listing", 'Float'>
@@ -4115,6 +4140,7 @@ export namespace Prisma {
     readonly pickupDistanceMiles: FieldRef<"Listing", 'Float'>
     readonly outsidePickupRadius: FieldRef<"Listing", 'Boolean'>
     readonly adjustedProfitMargin: FieldRef<"Listing", 'Float'>
+    readonly conversationStatus: FieldRef<"Listing", 'String'>
     readonly llmAnalyzed: FieldRef<"Listing", 'Boolean'>
     readonly analysisDate: FieldRef<"Listing", 'DateTime'>
     readonly analysisConfidence: FieldRef<"Listing", 'String'>
@@ -14149,6 +14175,7 @@ export namespace Prisma {
     maxPickupRadiusMiles: number | null
     homeLocation: string | null
     holdingCostDailyRate: number | null
+    messageApprovalRequired: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -14176,6 +14203,7 @@ export namespace Prisma {
     maxPickupRadiusMiles: number | null
     homeLocation: string | null
     holdingCostDailyRate: number | null
+    messageApprovalRequired: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -14203,6 +14231,7 @@ export namespace Prisma {
     maxPickupRadiusMiles: number
     homeLocation: number
     holdingCostDailyRate: number
+    messageApprovalRequired: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -14256,6 +14285,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: true
     homeLocation?: true
     holdingCostDailyRate?: true
+    messageApprovalRequired?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -14283,6 +14313,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: true
     homeLocation?: true
     holdingCostDailyRate?: true
+    messageApprovalRequired?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -14310,6 +14341,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: true
     homeLocation?: true
     holdingCostDailyRate?: true
+    messageApprovalRequired?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -14424,6 +14456,7 @@ export namespace Prisma {
     maxPickupRadiusMiles: number
     homeLocation: string | null
     holdingCostDailyRate: number
+    messageApprovalRequired: boolean
     createdAt: Date
     updatedAt: Date
     _count: UserSettingsCountAggregateOutputType | null
@@ -14470,6 +14503,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: boolean
     homeLocation?: boolean
     holdingCostDailyRate?: boolean
+    messageApprovalRequired?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -14498,6 +14532,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: boolean
     homeLocation?: boolean
     holdingCostDailyRate?: boolean
+    messageApprovalRequired?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -14526,6 +14561,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: boolean
     homeLocation?: boolean
     holdingCostDailyRate?: boolean
+    messageApprovalRequired?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -14554,11 +14590,12 @@ export namespace Prisma {
     maxPickupRadiusMiles?: boolean
     homeLocation?: boolean
     holdingCostDailyRate?: boolean
+    messageApprovalRequired?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "openaiApiKey" | "llmModel" | "discountThreshold" | "autoAnalyze" | "emailNotifications" | "notifyNewDeals" | "notifyPriceDrops" | "notifySoldItems" | "notifyExpiring" | "notifyWeeklyDigest" | "notifyFrequency" | "opportunityThreshold" | "feeRateEbay" | "feeRateMercari" | "feeRateFacebook" | "feeRateOfferup" | "feeRateCraigslist" | "maxPickupRadiusMiles" | "homeLocation" | "holdingCostDailyRate" | "createdAt" | "updatedAt", ExtArgs["result"]["userSettings"]>
+  export type UserSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "openaiApiKey" | "llmModel" | "discountThreshold" | "autoAnalyze" | "emailNotifications" | "notifyNewDeals" | "notifyPriceDrops" | "notifySoldItems" | "notifyExpiring" | "notifyWeeklyDigest" | "notifyFrequency" | "opportunityThreshold" | "feeRateEbay" | "feeRateMercari" | "feeRateFacebook" | "feeRateOfferup" | "feeRateCraigslist" | "maxPickupRadiusMiles" | "homeLocation" | "holdingCostDailyRate" | "messageApprovalRequired" | "createdAt" | "updatedAt", ExtArgs["result"]["userSettings"]>
   export type UserSettingsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -14597,6 +14634,7 @@ export namespace Prisma {
       maxPickupRadiusMiles: number
       homeLocation: string | null
       holdingCostDailyRate: number
+      messageApprovalRequired: boolean
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["userSettings"]>
@@ -15045,6 +15083,7 @@ export namespace Prisma {
     readonly maxPickupRadiusMiles: FieldRef<"UserSettings", 'Int'>
     readonly homeLocation: FieldRef<"UserSettings", 'String'>
     readonly holdingCostDailyRate: FieldRef<"UserSettings", 'Float'>
+    readonly messageApprovalRequired: FieldRef<"UserSettings", 'Boolean'>
     readonly createdAt: FieldRef<"UserSettings", 'DateTime'>
     readonly updatedAt: FieldRef<"UserSettings", 'DateTime'>
   }
@@ -23345,6 +23384,7 @@ export namespace Prisma {
     category: 'category',
     postedAt: 'postedAt',
     scrapedAt: 'scrapedAt',
+    updatedAt: 'updatedAt',
     estimatedValue: 'estimatedValue',
     estimatedLow: 'estimatedLow',
     estimatedHigh: 'estimatedHigh',
@@ -23395,6 +23435,7 @@ export namespace Prisma {
     pickupDistanceMiles: 'pickupDistanceMiles',
     outsidePickupRadius: 'outsidePickupRadius',
     adjustedProfitMargin: 'adjustedProfitMargin',
+    conversationStatus: 'conversationStatus',
     llmAnalyzed: 'llmAnalyzed',
     analysisDate: 'analysisDate',
     analysisConfidence: 'analysisConfidence',
@@ -23556,6 +23597,7 @@ export namespace Prisma {
     maxPickupRadiusMiles: 'maxPickupRadiusMiles',
     homeLocation: 'homeLocation',
     holdingCostDailyRate: 'holdingCostDailyRate',
+    messageApprovalRequired: 'messageApprovalRequired',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -23787,6 +23829,7 @@ export namespace Prisma {
     category?: StringNullableFilter<"Listing"> | string | null
     postedAt?: DateTimeNullableFilter<"Listing"> | Date | string | null
     scrapedAt?: DateTimeFilter<"Listing"> | Date | string
+    updatedAt?: DateTimeFilter<"Listing"> | Date | string
     estimatedValue?: FloatNullableFilter<"Listing"> | number | null
     estimatedLow?: FloatNullableFilter<"Listing"> | number | null
     estimatedHigh?: FloatNullableFilter<"Listing"> | number | null
@@ -23837,6 +23880,7 @@ export namespace Prisma {
     pickupDistanceMiles?: FloatNullableFilter<"Listing"> | number | null
     outsidePickupRadius?: BoolNullableFilter<"Listing"> | boolean | null
     adjustedProfitMargin?: FloatNullableFilter<"Listing"> | number | null
+    conversationStatus?: StringNullableFilter<"Listing"> | string | null
     llmAnalyzed?: BoolFilter<"Listing"> | boolean
     analysisDate?: DateTimeNullableFilter<"Listing"> | Date | string | null
     analysisConfidence?: StringNullableFilter<"Listing"> | string | null
@@ -23865,6 +23909,7 @@ export namespace Prisma {
     category?: SortOrderInput | SortOrder
     postedAt?: SortOrderInput | SortOrder
     scrapedAt?: SortOrder
+    updatedAt?: SortOrder
     estimatedValue?: SortOrderInput | SortOrder
     estimatedLow?: SortOrderInput | SortOrder
     estimatedHigh?: SortOrderInput | SortOrder
@@ -23915,6 +23960,7 @@ export namespace Prisma {
     pickupDistanceMiles?: SortOrderInput | SortOrder
     outsidePickupRadius?: SortOrderInput | SortOrder
     adjustedProfitMargin?: SortOrderInput | SortOrder
+    conversationStatus?: SortOrderInput | SortOrder
     llmAnalyzed?: SortOrder
     analysisDate?: SortOrderInput | SortOrder
     analysisConfidence?: SortOrderInput | SortOrder
@@ -23947,6 +23993,7 @@ export namespace Prisma {
     category?: StringNullableFilter<"Listing"> | string | null
     postedAt?: DateTimeNullableFilter<"Listing"> | Date | string | null
     scrapedAt?: DateTimeFilter<"Listing"> | Date | string
+    updatedAt?: DateTimeFilter<"Listing"> | Date | string
     estimatedValue?: FloatNullableFilter<"Listing"> | number | null
     estimatedLow?: FloatNullableFilter<"Listing"> | number | null
     estimatedHigh?: FloatNullableFilter<"Listing"> | number | null
@@ -23997,6 +24044,7 @@ export namespace Prisma {
     pickupDistanceMiles?: FloatNullableFilter<"Listing"> | number | null
     outsidePickupRadius?: BoolNullableFilter<"Listing"> | boolean | null
     adjustedProfitMargin?: FloatNullableFilter<"Listing"> | number | null
+    conversationStatus?: StringNullableFilter<"Listing"> | string | null
     llmAnalyzed?: BoolFilter<"Listing"> | boolean
     analysisDate?: DateTimeNullableFilter<"Listing"> | Date | string | null
     analysisConfidence?: StringNullableFilter<"Listing"> | string | null
@@ -24025,6 +24073,7 @@ export namespace Prisma {
     category?: SortOrderInput | SortOrder
     postedAt?: SortOrderInput | SortOrder
     scrapedAt?: SortOrder
+    updatedAt?: SortOrder
     estimatedValue?: SortOrderInput | SortOrder
     estimatedLow?: SortOrderInput | SortOrder
     estimatedHigh?: SortOrderInput | SortOrder
@@ -24075,6 +24124,7 @@ export namespace Prisma {
     pickupDistanceMiles?: SortOrderInput | SortOrder
     outsidePickupRadius?: SortOrderInput | SortOrder
     adjustedProfitMargin?: SortOrderInput | SortOrder
+    conversationStatus?: SortOrderInput | SortOrder
     llmAnalyzed?: SortOrder
     analysisDate?: SortOrderInput | SortOrder
     analysisConfidence?: SortOrderInput | SortOrder
@@ -24106,6 +24156,7 @@ export namespace Prisma {
     category?: StringNullableWithAggregatesFilter<"Listing"> | string | null
     postedAt?: DateTimeNullableWithAggregatesFilter<"Listing"> | Date | string | null
     scrapedAt?: DateTimeWithAggregatesFilter<"Listing"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Listing"> | Date | string
     estimatedValue?: FloatNullableWithAggregatesFilter<"Listing"> | number | null
     estimatedLow?: FloatNullableWithAggregatesFilter<"Listing"> | number | null
     estimatedHigh?: FloatNullableWithAggregatesFilter<"Listing"> | number | null
@@ -24156,6 +24207,7 @@ export namespace Prisma {
     pickupDistanceMiles?: FloatNullableWithAggregatesFilter<"Listing"> | number | null
     outsidePickupRadius?: BoolNullableWithAggregatesFilter<"Listing"> | boolean | null
     adjustedProfitMargin?: FloatNullableWithAggregatesFilter<"Listing"> | number | null
+    conversationStatus?: StringNullableWithAggregatesFilter<"Listing"> | string | null
     llmAnalyzed?: BoolWithAggregatesFilter<"Listing"> | boolean
     analysisDate?: DateTimeNullableWithAggregatesFilter<"Listing"> | Date | string | null
     analysisConfidence?: StringNullableWithAggregatesFilter<"Listing"> | string | null
@@ -24874,6 +24926,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: IntFilter<"UserSettings"> | number
     homeLocation?: StringNullableFilter<"UserSettings"> | string | null
     holdingCostDailyRate?: FloatFilter<"UserSettings"> | number
+    messageApprovalRequired?: BoolFilter<"UserSettings"> | boolean
     createdAt?: DateTimeFilter<"UserSettings"> | Date | string
     updatedAt?: DateTimeFilter<"UserSettings"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -24902,6 +24955,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: SortOrder
     homeLocation?: SortOrderInput | SortOrder
     holdingCostDailyRate?: SortOrder
+    messageApprovalRequired?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -24933,6 +24987,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: IntFilter<"UserSettings"> | number
     homeLocation?: StringNullableFilter<"UserSettings"> | string | null
     holdingCostDailyRate?: FloatFilter<"UserSettings"> | number
+    messageApprovalRequired?: BoolFilter<"UserSettings"> | boolean
     createdAt?: DateTimeFilter<"UserSettings"> | Date | string
     updatedAt?: DateTimeFilter<"UserSettings"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -24961,6 +25016,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: SortOrder
     homeLocation?: SortOrderInput | SortOrder
     holdingCostDailyRate?: SortOrder
+    messageApprovalRequired?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserSettingsCountOrderByAggregateInput
@@ -24996,6 +25052,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: IntWithAggregatesFilter<"UserSettings"> | number
     homeLocation?: StringNullableWithAggregatesFilter<"UserSettings"> | string | null
     holdingCostDailyRate?: FloatWithAggregatesFilter<"UserSettings"> | number
+    messageApprovalRequired?: BoolWithAggregatesFilter<"UserSettings"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"UserSettings"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"UserSettings"> | Date | string
   }
@@ -25571,6 +25628,7 @@ export namespace Prisma {
     category?: string | null
     postedAt?: Date | string | null
     scrapedAt?: Date | string
+    updatedAt?: Date | string
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -25621,6 +25679,7 @@ export namespace Prisma {
     pickupDistanceMiles?: number | null
     outsidePickupRadius?: boolean | null
     adjustedProfitMargin?: number | null
+    conversationStatus?: string | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
@@ -25649,6 +25708,7 @@ export namespace Prisma {
     category?: string | null
     postedAt?: Date | string | null
     scrapedAt?: Date | string
+    updatedAt?: Date | string
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -25699,6 +25759,7 @@ export namespace Prisma {
     pickupDistanceMiles?: number | null
     outsidePickupRadius?: boolean | null
     adjustedProfitMargin?: number | null
+    conversationStatus?: string | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
@@ -25725,6 +25786,7 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -25775,6 +25837,7 @@ export namespace Prisma {
     pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
     outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
     adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
@@ -25803,6 +25866,7 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -25853,6 +25917,7 @@ export namespace Prisma {
     pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
     outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
     adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
@@ -25880,6 +25945,7 @@ export namespace Prisma {
     category?: string | null
     postedAt?: Date | string | null
     scrapedAt?: Date | string
+    updatedAt?: Date | string
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -25930,6 +25996,7 @@ export namespace Prisma {
     pickupDistanceMiles?: number | null
     outsidePickupRadius?: boolean | null
     adjustedProfitMargin?: number | null
+    conversationStatus?: string | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
@@ -25952,6 +26019,7 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -26002,6 +26070,7 @@ export namespace Prisma {
     pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
     outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
     adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26025,6 +26094,7 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -26075,6 +26145,7 @@ export namespace Prisma {
     pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
     outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
     adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26876,6 +26947,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: number
     homeLocation?: string | null
     holdingCostDailyRate?: number
+    messageApprovalRequired?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSettingsInput
@@ -26904,6 +26976,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: number
     homeLocation?: string | null
     holdingCostDailyRate?: number
+    messageApprovalRequired?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -26930,6 +27003,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: IntFieldUpdateOperationsInput | number
     homeLocation?: NullableStringFieldUpdateOperationsInput | string | null
     holdingCostDailyRate?: FloatFieldUpdateOperationsInput | number
+    messageApprovalRequired?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSettingsNestedInput
@@ -26958,6 +27032,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: IntFieldUpdateOperationsInput | number
     homeLocation?: NullableStringFieldUpdateOperationsInput | string | null
     holdingCostDailyRate?: FloatFieldUpdateOperationsInput | number
+    messageApprovalRequired?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -26985,6 +27060,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: number
     homeLocation?: string | null
     holdingCostDailyRate?: number
+    messageApprovalRequired?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -27011,6 +27087,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: IntFieldUpdateOperationsInput | number
     homeLocation?: NullableStringFieldUpdateOperationsInput | string | null
     holdingCostDailyRate?: FloatFieldUpdateOperationsInput | number
+    messageApprovalRequired?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -27038,6 +27115,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: IntFieldUpdateOperationsInput | number
     homeLocation?: NullableStringFieldUpdateOperationsInput | string | null
     holdingCostDailyRate?: FloatFieldUpdateOperationsInput | number
+    messageApprovalRequired?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -27814,6 +27892,7 @@ export namespace Prisma {
     category?: SortOrder
     postedAt?: SortOrder
     scrapedAt?: SortOrder
+    updatedAt?: SortOrder
     estimatedValue?: SortOrder
     estimatedLow?: SortOrder
     estimatedHigh?: SortOrder
@@ -27864,6 +27943,7 @@ export namespace Prisma {
     pickupDistanceMiles?: SortOrder
     outsidePickupRadius?: SortOrder
     adjustedProfitMargin?: SortOrder
+    conversationStatus?: SortOrder
     llmAnalyzed?: SortOrder
     analysisDate?: SortOrder
     analysisConfidence?: SortOrder
@@ -27916,6 +27996,7 @@ export namespace Prisma {
     category?: SortOrder
     postedAt?: SortOrder
     scrapedAt?: SortOrder
+    updatedAt?: SortOrder
     estimatedValue?: SortOrder
     estimatedLow?: SortOrder
     estimatedHigh?: SortOrder
@@ -27966,6 +28047,7 @@ export namespace Prisma {
     pickupDistanceMiles?: SortOrder
     outsidePickupRadius?: SortOrder
     adjustedProfitMargin?: SortOrder
+    conversationStatus?: SortOrder
     llmAnalyzed?: SortOrder
     analysisDate?: SortOrder
     analysisConfidence?: SortOrder
@@ -27989,6 +28071,7 @@ export namespace Prisma {
     category?: SortOrder
     postedAt?: SortOrder
     scrapedAt?: SortOrder
+    updatedAt?: SortOrder
     estimatedValue?: SortOrder
     estimatedLow?: SortOrder
     estimatedHigh?: SortOrder
@@ -28039,6 +28122,7 @@ export namespace Prisma {
     pickupDistanceMiles?: SortOrder
     outsidePickupRadius?: SortOrder
     adjustedProfitMargin?: SortOrder
+    conversationStatus?: SortOrder
     llmAnalyzed?: SortOrder
     analysisDate?: SortOrder
     analysisConfidence?: SortOrder
@@ -28730,6 +28814,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: SortOrder
     homeLocation?: SortOrder
     holdingCostDailyRate?: SortOrder
+    messageApprovalRequired?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -28769,6 +28854,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: SortOrder
     homeLocation?: SortOrder
     holdingCostDailyRate?: SortOrder
+    messageApprovalRequired?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -28796,6 +28882,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: SortOrder
     homeLocation?: SortOrder
     holdingCostDailyRate?: SortOrder
+    messageApprovalRequired?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -30730,6 +30817,7 @@ export namespace Prisma {
     category?: string | null
     postedAt?: Date | string | null
     scrapedAt?: Date | string
+    updatedAt?: Date | string
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -30780,6 +30868,7 @@ export namespace Prisma {
     pickupDistanceMiles?: number | null
     outsidePickupRadius?: boolean | null
     adjustedProfitMargin?: number | null
+    conversationStatus?: string | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
@@ -30807,6 +30896,7 @@ export namespace Prisma {
     category?: string | null
     postedAt?: Date | string | null
     scrapedAt?: Date | string
+    updatedAt?: Date | string
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -30857,6 +30947,7 @@ export namespace Prisma {
     pickupDistanceMiles?: number | null
     outsidePickupRadius?: boolean | null
     adjustedProfitMargin?: number | null
+    conversationStatus?: string | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
@@ -30955,6 +31046,7 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -31005,6 +31097,7 @@ export namespace Prisma {
     pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
     outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
     adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31032,6 +31125,7 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -31082,6 +31176,7 @@ export namespace Prisma {
     pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
     outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
     adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31448,6 +31543,7 @@ export namespace Prisma {
     category?: string | null
     postedAt?: Date | string | null
     scrapedAt?: Date | string
+    updatedAt?: Date | string
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -31498,6 +31594,7 @@ export namespace Prisma {
     pickupDistanceMiles?: number | null
     outsidePickupRadius?: boolean | null
     adjustedProfitMargin?: number | null
+    conversationStatus?: string | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
@@ -31524,6 +31621,7 @@ export namespace Prisma {
     category?: string | null
     postedAt?: Date | string | null
     scrapedAt?: Date | string
+    updatedAt?: Date | string
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -31574,6 +31672,7 @@ export namespace Prisma {
     pickupDistanceMiles?: number | null
     outsidePickupRadius?: boolean | null
     adjustedProfitMargin?: number | null
+    conversationStatus?: string | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
@@ -31854,6 +31953,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: number
     homeLocation?: string | null
     holdingCostDailyRate?: number
+    messageApprovalRequired?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -31880,6 +31980,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: number
     homeLocation?: string | null
     holdingCostDailyRate?: number
+    messageApprovalRequired?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -32011,6 +32112,7 @@ export namespace Prisma {
     category?: StringNullableFilter<"Listing"> | string | null
     postedAt?: DateTimeNullableFilter<"Listing"> | Date | string | null
     scrapedAt?: DateTimeFilter<"Listing"> | Date | string
+    updatedAt?: DateTimeFilter<"Listing"> | Date | string
     estimatedValue?: FloatNullableFilter<"Listing"> | number | null
     estimatedLow?: FloatNullableFilter<"Listing"> | number | null
     estimatedHigh?: FloatNullableFilter<"Listing"> | number | null
@@ -32061,6 +32163,7 @@ export namespace Prisma {
     pickupDistanceMiles?: FloatNullableFilter<"Listing"> | number | null
     outsidePickupRadius?: BoolNullableFilter<"Listing"> | boolean | null
     adjustedProfitMargin?: FloatNullableFilter<"Listing"> | number | null
+    conversationStatus?: StringNullableFilter<"Listing"> | string | null
     llmAnalyzed?: BoolFilter<"Listing"> | boolean
     analysisDate?: DateTimeNullableFilter<"Listing"> | Date | string | null
     analysisConfidence?: StringNullableFilter<"Listing"> | string | null
@@ -32265,6 +32368,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: IntFieldUpdateOperationsInput | number
     homeLocation?: NullableStringFieldUpdateOperationsInput | string | null
     holdingCostDailyRate?: FloatFieldUpdateOperationsInput | number
+    messageApprovalRequired?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -32291,6 +32395,7 @@ export namespace Prisma {
     maxPickupRadiusMiles?: IntFieldUpdateOperationsInput | number
     homeLocation?: NullableStringFieldUpdateOperationsInput | string | null
     holdingCostDailyRate?: FloatFieldUpdateOperationsInput | number
+    messageApprovalRequired?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -32727,6 +32832,7 @@ export namespace Prisma {
     category?: string | null
     postedAt?: Date | string | null
     scrapedAt?: Date | string
+    updatedAt?: Date | string
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -32777,6 +32883,7 @@ export namespace Prisma {
     pickupDistanceMiles?: number | null
     outsidePickupRadius?: boolean | null
     adjustedProfitMargin?: number | null
+    conversationStatus?: string | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
@@ -32804,6 +32911,7 @@ export namespace Prisma {
     category?: string | null
     postedAt?: Date | string | null
     scrapedAt?: Date | string
+    updatedAt?: Date | string
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -32854,6 +32962,7 @@ export namespace Prisma {
     pickupDistanceMiles?: number | null
     outsidePickupRadius?: boolean | null
     adjustedProfitMargin?: number | null
+    conversationStatus?: string | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
@@ -32952,6 +33061,7 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -33002,6 +33112,7 @@ export namespace Prisma {
     pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
     outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
     adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
@@ -33029,6 +33140,7 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -33079,6 +33191,7 @@ export namespace Prisma {
     pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
     outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
     adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
@@ -33167,6 +33280,7 @@ export namespace Prisma {
     category?: string | null
     postedAt?: Date | string | null
     scrapedAt?: Date | string
+    updatedAt?: Date | string
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -33217,6 +33331,7 @@ export namespace Prisma {
     pickupDistanceMiles?: number | null
     outsidePickupRadius?: boolean | null
     adjustedProfitMargin?: number | null
+    conversationStatus?: string | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
@@ -33244,6 +33359,7 @@ export namespace Prisma {
     category?: string | null
     postedAt?: Date | string | null
     scrapedAt?: Date | string
+    updatedAt?: Date | string
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -33294,6 +33410,7 @@ export namespace Prisma {
     pickupDistanceMiles?: number | null
     outsidePickupRadius?: boolean | null
     adjustedProfitMargin?: number | null
+    conversationStatus?: string | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
@@ -33392,6 +33509,7 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -33442,6 +33560,7 @@ export namespace Prisma {
     pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
     outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
     adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
@@ -33469,6 +33588,7 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -33519,6 +33639,7 @@ export namespace Prisma {
     pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
     outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
     adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
@@ -33607,6 +33728,7 @@ export namespace Prisma {
     category?: string | null
     postedAt?: Date | string | null
     scrapedAt?: Date | string
+    updatedAt?: Date | string
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -33657,6 +33779,7 @@ export namespace Prisma {
     pickupDistanceMiles?: number | null
     outsidePickupRadius?: boolean | null
     adjustedProfitMargin?: number | null
+    conversationStatus?: string | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
@@ -33684,6 +33807,7 @@ export namespace Prisma {
     category?: string | null
     postedAt?: Date | string | null
     scrapedAt?: Date | string
+    updatedAt?: Date | string
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -33734,6 +33858,7 @@ export namespace Prisma {
     pickupDistanceMiles?: number | null
     outsidePickupRadius?: boolean | null
     adjustedProfitMargin?: number | null
+    conversationStatus?: string | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
@@ -33775,6 +33900,7 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -33825,6 +33951,7 @@ export namespace Prisma {
     pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
     outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
     adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
@@ -33852,6 +33979,7 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -33902,6 +34030,7 @@ export namespace Prisma {
     pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
     outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
     adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
@@ -34377,6 +34506,7 @@ export namespace Prisma {
     category?: string | null
     postedAt?: Date | string | null
     scrapedAt?: Date | string
+    updatedAt?: Date | string
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -34427,6 +34557,7 @@ export namespace Prisma {
     pickupDistanceMiles?: number | null
     outsidePickupRadius?: boolean | null
     adjustedProfitMargin?: number | null
+    conversationStatus?: string | null
     llmAnalyzed?: boolean
     analysisDate?: Date | string | null
     analysisConfidence?: string | null
@@ -34596,6 +34727,7 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -34646,6 +34778,7 @@ export namespace Prisma {
     pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
     outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
     adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
@@ -34672,6 +34805,7 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -34722,6 +34856,7 @@ export namespace Prisma {
     pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
     outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
     adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
@@ -34748,6 +34883,7 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -34798,6 +34934,7 @@ export namespace Prisma {
     pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
     outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
     adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
     llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
     analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null

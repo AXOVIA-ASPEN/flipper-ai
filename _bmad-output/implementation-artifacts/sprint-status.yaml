@@ -116,16 +116,16 @@ development_status:
   # Epic 8: Seller Communication & Negotiation
   epic-8: in-progress
   8-1-ai-message-generation: done
-  8-2-ai-negotiation-strategy: review
-  8-3-message-inbox-thread-history: review
-  8-4-message-approval-workflow: ready-for-dev
-  8-5-conversation-status-inbound-message-tracking: ready-for-dev
+  8-2-ai-negotiation-strategy: done
+  8-3-message-inbox-thread-history: done
+  8-4-message-approval-workflow: done
+  8-5-conversation-status-inbound-message-tracking: done
   epic-8-retrospective: optional
 
   # Epic 9: Cross-Platform Resale Listing
   epic-9: in-progress
-  9-1-ai-title-description-generation: ready-for-dev
-  9-2-optimal-listing-price-calculation: ready-for-dev
+  9-1-ai-title-description-generation: done
+  9-2-optimal-listing-price-calculation: review
   9-3-cross-platform-posting-queue: ready-for-dev
   9-4-image-reuse-for-cross-posting: ready-for-dev
   epic-9-retrospective: optional
@@ -133,18 +133,18 @@ development_status:
   # Epic 10: Monitoring & Email Notifications
   epic-10: in-progress
   10-1-background-job-scheduler: ready-for-dev
-  10-2-listing-monitoring-events: backlog
-  10-3-flip-lifecycle-email-notifications: backlog
-  10-4-communication-email-notifications: backlog
-  10-5-smart-alert-email-notifications: backlog
-  10-6-notification-preferences: backlog
+  10-2-listing-monitoring-events: ready-for-dev
+  10-3-flip-lifecycle-email-notifications: ready-for-dev
+  10-4-communication-email-notifications: ready-for-dev
+  10-5-smart-alert-email-notifications: ready-for-dev
+  10-6-notification-preferences: ready-for-dev
   epic-10-retrospective: optional
 
   # Epic 11: Push & SMS Notifications (Phase 2)
   epic-11: backlog
   11-1-fcm-push-notification-client: backlog
   11-2-twilio-sms-integration: backlog
-  11-3-multi-channel-notification-preferences: backlog
+  11-3-multi-channel-notification-preferences: ready-for-dev
   epic-11-retrospective: optional
 
   # Epic 12: Meeting & Logistics (Phase 2)

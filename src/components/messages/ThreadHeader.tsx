@@ -12,6 +12,8 @@
  * with a "Listing removed" placeholder. Supports dark mode.
  */
 
+import { PLATFORM_COLORS, getImageUrl } from './utils';
+
 interface ThreadHeaderProps {
   listing: {
     id: string;
@@ -21,24 +23,6 @@ interface ThreadHeaderProps {
     imageUrls: string | null;
   } | null;
   sellerName: string | null;
-}
-
-const PLATFORM_COLORS: Record<string, string> = {
-  CRAIGSLIST: 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300',
-  EBAY: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
-  FACEBOOK: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300',
-  MERCARI: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
-  OFFERUP: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
-};
-
-function getImageUrl(imageUrls: string | null): string | null {
-  if (!imageUrls) return null;
-  try {
-    const urls = JSON.parse(imageUrls) as string[];
-    return urls[0] || null;
-  } catch {
-    return null;
-  }
 }
 
 export default function ThreadHeader({ listing, sellerName }: ThreadHeaderProps) {

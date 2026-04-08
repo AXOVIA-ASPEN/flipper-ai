@@ -29,6 +29,10 @@ const ENDPOINT_CONFIGS: Record<string, RateLimitConfig> = {
   '/api/analyze': { limit: 10, windowSeconds: 60 },
   '/api/scrape': { limit: 5, windowSeconds: 60 },
   '/api/scraper': { limit: 5, windowSeconds: 60 },
+  // LLM-calling listing endpoints (generate-resale-content, description) — cap to prevent
+  // OpenAI abuse. Trailing slash is intentional: only matches /api/listings/<id>/... paths,
+  // not the bare /api/listings collection endpoint which has its own usage profile.
+  '/api/listings/': { limit: 10, windowSeconds: 60 },
 };
 
 // In-memory stores (reset on server restart — fine for single-instance)

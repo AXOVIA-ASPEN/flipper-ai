@@ -68,6 +68,7 @@ export async function POST(
         sellabilityScore: true,
         platform: true,
         recommendedOffer: true,
+        marketDataDate: true,
       },
     });
 
@@ -96,6 +97,7 @@ export async function POST(
       recommendedOffer: listing.recommendedOffer
         ? Number(listing.recommendedOffer)
         : null,
+      marketDataDate: listing.marketDataDate ?? null,
     };
 
     const strategy = await generateNegotiationStrategy(strategyInput);

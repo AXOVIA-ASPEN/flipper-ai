@@ -55,6 +55,12 @@ jest.mock('@/lib/message-generator', () => ({
     ['inquiry', 'offer', 'follow-up', 'negotiation'].includes(type),
 }));
 
+// Mock conversation status
+const mockTransitionToPending = jest.fn();
+jest.mock('@/lib/conversation-status', () => ({
+  transitionToPending: (...args: unknown[]) => mockTransitionToPending(...args),
+}));
+
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
 const createRequest = (body: Record<string, unknown>) =>
@@ -113,6 +119,7 @@ describe('POST /api/messages/generate', () => {
     mockListingFindFirst.mockResolvedValue(sampleListing);
     mockGeneratePurchaseMessage.mockResolvedValue(sampleGenerated);
     mockMessageCreate.mockResolvedValue(sampleMessage);
+    mockTransitionToPending.mockResolvedValue(undefined);
   });
 
   // ── Auth ────────────────────────────────────────────────────────────────
@@ -266,5 +273,18 @@ describe('POST /api/messages/generate', () => {
     expect(mockGeneratePurchaseMessage).toHaveBeenCalledWith(
       expect.objectContaining({ askingPrice: 0 })
     );
+  });
+
+  // ── Conversation status transition (Story 8.5) ──────────────────────
+
+  it('calls transitionToPending after message creation', async () => {
+    await POST(createRequest({ listingId: 'listing-1' }));
+    expect(mockTransitionToPending).toHaveBeenCalledWith('listing-1', 'test-user-id');
+  });
+
+  it('does not block response if transitionToPending fails', async () => {
+    mockTransitionToPending.mockRejectedValue(new Error('DB error'));
+    const res = await POST(createRequest({ listingId: 'listing-1' }));
+    expect(res.status).toBe(201);
   });
 });

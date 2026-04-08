@@ -85,6 +85,7 @@ const baseInput: NegotiationStrategyInput = {
   sellabilityScore: 70,
   platform: 'EBAY',
   recommendedOffer: 85,
+  marketDataDate: null,
 };
 
 const mockStrategyAIResponse = (overrides: Record<string, unknown> = {}) => ({
@@ -608,6 +609,55 @@ describe('negotiation-strategy', () => {
       const result = await analyzeCounterOffer(baseInput, 95, 80);
 
       expect(['accept', 'counter', 'walkaway']).toContain(result.recommendation);
+    });
+  });
+
+  // ── Market Data Freshness Check ───────────────────────────────────────
+
+  describe('market data freshness check', () => {
+    it('downgrades confidence to low when market data is >14 days old', async () => {
+      const staleDate = new Date();
+      staleDate.setDate(staleDate.getDate() - 20);
+      const { generateFallbackStrategy: fallback } = await importModule();
+
+      delete process.env.OPENAI_API_KEY;
+      const { generateNegotiationStrategy } = await importModule();
+
+      const result = await generateNegotiationStrategy({
+        ...baseInput,
+        marketDataDate: staleDate,
+      });
+
+      expect(result.confidence).toBe('low');
+      expect(result.reasoning).toContain('Market data is');
+      expect(result.reasoning).toContain('days old');
+    });
+
+    it('does not downgrade confidence when market data is fresh (<= 14 days)', async () => {
+      const freshDate = new Date();
+      freshDate.setDate(freshDate.getDate() - 5);
+      mockCreate.mockResolvedValue(mockStrategyAIResponse({ confidence: 'high' }));
+      const { generateNegotiationStrategy } = await importModule();
+
+      const result = await generateNegotiationStrategy({
+        ...baseInput,
+        marketDataDate: freshDate,
+      });
+
+      expect(result.confidence).toBe('high');
+      expect(result.reasoning).not.toContain('days old');
+    });
+
+    it('does not modify strategy when marketDataDate is null', async () => {
+      mockCreate.mockResolvedValue(mockStrategyAIResponse({ confidence: 'high' }));
+      const { generateNegotiationStrategy } = await importModule();
+
+      const result = await generateNegotiationStrategy({
+        ...baseInput,
+        marketDataDate: null,
+      });
+
+      expect(result.confidence).toBe('high');
     });
   });
 });

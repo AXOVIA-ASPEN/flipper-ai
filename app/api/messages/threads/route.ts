@@ -58,6 +58,40 @@ export async function GET(request: NextRequest) {
       listingId: { not: null },
     };
 
+    // Push search filtering to DB level to avoid loading all threads into memory
+    if (search) {
+      const lowerSearch = search.toLowerCase();
+      const [matchingListings, matchingMessages] = await Promise.all([
+        prisma.listing.findMany({
+          where: { title: { contains: lowerSearch, mode: 'insensitive' } },
+          select: { id: true },
+        }),
+        prisma.message.findMany({
+          where: {
+            userId,
+            listingId: { not: null },
+            sellerName: { contains: lowerSearch, mode: 'insensitive' },
+          },
+          select: { listingId: true },
+          distinct: ['listingId'],
+        }),
+      ]);
+      const searchListingIds = [
+        ...new Set([
+          ...matchingListings.map((l) => l.id),
+          ...matchingMessages.map((m) => m.listingId).filter((id): id is string => id !== null),
+        ]),
+      ];
+      if (searchListingIds.length === 0) {
+        return NextResponse.json({
+          success: true,
+          data: [],
+          pagination: { total: 0, limit, offset, hasMore: false },
+        });
+      }
+      baseWhere.listingId = { in: searchListingIds };
+    }
+
     // Get distinct listingIds with aggregates
     const groupResult = await prisma.message.groupBy({
       by: ['listingId'],
@@ -149,17 +183,7 @@ export async function GET(request: NextRequest) {
       (a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime()
     );
 
-    // Apply search filter (listing title or seller name)
-    if (search) {
-      const lowerSearch = search.toLowerCase();
-      threads = threads.filter(
-        (t) =>
-          (t.listing?.title?.toLowerCase().includes(lowerSearch)) ||
-          (t.sellerName?.toLowerCase().includes(lowerSearch))
-      );
-    }
-
-    // Apply pagination
+    // Apply pagination (search filtering already handled at DB level above)
     const total = threads.length;
     const paginatedThreads = threads.slice(offset, offset + limit);
 

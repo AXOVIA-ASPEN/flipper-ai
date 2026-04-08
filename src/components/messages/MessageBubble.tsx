@@ -14,6 +14,7 @@
  */
 
 import { formatDistanceToNow } from 'date-fns';
+import { STATUS_COLORS } from '@/lib/message-constants';
 
 interface MessageBubbleProps {
   direction: string;
@@ -22,17 +23,6 @@ interface MessageBubbleProps {
   body: string;
   createdAt: string;
 }
-
-const STATUS_COLORS: Record<string, string> = {
-  DRAFT: 'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-300',
-  PENDING_APPROVAL: 'bg-yellow-200 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
-  SENT: 'bg-blue-200 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
-  DELIVERED: 'bg-green-200 text-green-700 dark:bg-green-900 dark:text-green-300',
-  READ: 'bg-purple-200 text-purple-700 dark:bg-purple-900 dark:text-purple-300',
-  REPLIED: 'bg-teal-200 text-teal-700 dark:bg-teal-900 dark:text-teal-300',
-  FAILED: 'bg-red-200 text-red-700 dark:bg-red-900 dark:text-red-300',
-  REJECTED: 'bg-red-200 text-red-700 dark:bg-red-900 dark:text-red-300',
-};
 
 export default function MessageBubble({
   direction,

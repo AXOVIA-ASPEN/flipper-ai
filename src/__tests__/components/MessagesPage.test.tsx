@@ -85,13 +85,38 @@ const sampleThreads = [
 ];
 
 function setupFetch(threads = sampleThreads, total = 2) {
-  mockFetch.mockResolvedValue({
-    ok: true,
-    json: () =>
-      Promise.resolve({
-        data: threads,
-        pagination: { total, limit: 20, offset: 0, hasMore: false },
-      }),
+  mockFetch.mockImplementation((url: string) => {
+    if (url.includes('/api/user/settings')) {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          success: true,
+          data: {
+            messageApprovalRequired: false,
+            user: { subscriptionTier: 'FLIPPER' },
+          },
+        }),
+      });
+    }
+    if (url.includes('/api/messages?')) {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          success: true,
+          data: [],
+          pagination: { total: 0, limit: 0, offset: 0, hasMore: false },
+        }),
+      });
+    }
+    // Default: threads endpoint
+    return Promise.resolve({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          data: threads,
+          pagination: { total, limit: 20, offset: 0, hasMore: false },
+        }),
+    });
   });
 }
 
@@ -147,11 +172,12 @@ describe('MessagesPage', () => {
     });
   });
 
-  it('shows tabs: All, Inbox, Sent', async () => {
+  it('shows tabs: All, Inbox, Sent, Approval', async () => {
     render(<MessagesPage />);
     expect(screen.getByText('All')).toBeInTheDocument();
     expect(screen.getByText('Inbox')).toBeInTheDocument();
     expect(screen.getByText('Sent')).toBeInTheDocument();
+    expect(screen.getByText('Approval')).toBeInTheDocument();
   });
 
   it('filters threads by inbox tab (client-side)', async () => {
@@ -247,8 +273,8 @@ describe('MessagesPage', () => {
   it('fetches from threads endpoint', async () => {
     render(<MessagesPage />);
     await waitFor(() => {
-      const url = mockFetch.mock.calls[0][0];
-      expect(url).toContain('/api/messages/threads');
+      const urls = mockFetch.mock.calls.map((c: any[]) => c[0]);
+      expect(urls.some((u: string) => u.includes('/api/messages/threads'))).toBe(true);
     });
   });
 });

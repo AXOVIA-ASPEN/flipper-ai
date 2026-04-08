@@ -27,6 +27,7 @@ jest.mock('@/lib/auth-middleware', () => ({
 const mockGroupBy = jest.fn();
 const mockFindMany = jest.fn();
 const mockUpdateMany = jest.fn();
+const mockListingFindMany = jest.fn();
 
 jest.mock('@/lib/db', () => ({
   __esModule: true,
@@ -35,6 +36,9 @@ jest.mock('@/lib/db', () => ({
       groupBy: (...args: unknown[]) => mockGroupBy(...args),
       findMany: (...args: unknown[]) => mockFindMany(...args),
       updateMany: (...args: unknown[]) => mockUpdateMany(...args),
+    },
+    listing: {
+      findMany: (...args: unknown[]) => mockListingFindMany(...args),
     },
   },
 }));
@@ -178,7 +182,19 @@ describe('GET /api/messages/threads', () => {
     expect(json.data[1].unreadCount).toBe(0);
   });
 
-  it('filters by search (listing title)', async () => {
+  it('filters by search (listing title) at DB level', async () => {
+    // Search triggers DB-level filtering: listing.findMany + message.findMany for matching IDs
+    mockListingFindMany.mockResolvedValue([{ id: 'listing-1' }]);
+    // Reset mocks for search path (message.findMany called for seller search + latest messages)
+    mockFindMany.mockReset();
+    mockFindMany
+      .mockResolvedValueOnce([]) // seller name search returns no matches
+      .mockResolvedValueOnce([sampleLatestMessages[0]]); // latest messages for filtered set
+    mockGroupBy.mockReset();
+    mockGroupBy
+      .mockResolvedValueOnce([sampleGroupResult[0]]) // groupBy with filtered listingIds
+      .mockResolvedValueOnce(sampleUnreadCounts); // unread counts
+
     const res = await getThreads(
       createRequest('/api/messages/threads?search=iPhone')
     );
@@ -186,9 +202,26 @@ describe('GET /api/messages/threads', () => {
 
     expect(json.data).toHaveLength(1);
     expect(json.data[0].listing.title).toBe('iPhone 15 Pro');
+    expect(mockListingFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          title: expect.objectContaining({ contains: 'iphone', mode: 'insensitive' }),
+        }),
+      })
+    );
   });
 
-  it('filters by search (seller name)', async () => {
+  it('filters by search (seller name) at DB level', async () => {
+    mockListingFindMany.mockResolvedValue([]); // no listing title matches
+    mockFindMany.mockReset();
+    mockFindMany
+      .mockResolvedValueOnce([{ listingId: 'listing-2' }]) // seller name search matches
+      .mockResolvedValueOnce([sampleLatestMessages[1]]); // latest messages
+    mockGroupBy.mockReset();
+    mockGroupBy
+      .mockResolvedValueOnce([sampleGroupResult[1]]) // groupBy filtered
+      .mockResolvedValueOnce([]); // unread counts
+
     const res = await getThreads(
       createRequest('/api/messages/threads?search=Bob')
     );
@@ -196,6 +229,20 @@ describe('GET /api/messages/threads', () => {
 
     expect(json.data).toHaveLength(1);
     expect(json.data[0].sellerName).toBe('Bob');
+  });
+
+  it('returns empty data when search matches nothing', async () => {
+    mockListingFindMany.mockResolvedValue([]);
+    mockFindMany.mockReset();
+    mockFindMany.mockResolvedValueOnce([]); // seller name search returns nothing
+
+    const res = await getThreads(
+      createRequest('/api/messages/threads?search=nonexistent')
+    );
+    const json = await res.json();
+
+    expect(json.data).toEqual([]);
+    expect(json.pagination.total).toBe(0);
   });
 
   it('supports pagination with limit and offset', async () => {

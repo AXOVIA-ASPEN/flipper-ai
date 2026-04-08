@@ -1,6 +1,6 @@
 # Story 8.2: AI Negotiation Strategy
 
-Status: review
+Status: done
 Blocked: false
 Blocked-Reason:
 Trello-Card-ID: 69cb70a7158067cddedad244
@@ -618,12 +618,42 @@ None — clean implementation with no blocking issues.
 - `src/lib/negotiation-strategy.ts` — NEW: Negotiation strategy generation library (OpenAI + fallback + caching)
 - `app/api/listings/[id]/negotiation-strategy/route.ts` — NEW: POST strategy endpoint
 - `app/api/listings/[id]/counter-offer-analysis/route.ts` — NEW: POST counter-offer analysis endpoint
-- `src/__tests__/negotiation-strategy.test.ts` — NEW: 34 unit tests covering all ACs
+- `src/__tests__/negotiation-strategy.test.ts` — NEW: 37 unit tests covering all ACs + freshness check
+- `src/__tests__/api/negotiation-strategy.test.ts` — NEW: 14 route-level tests (auth, tier, validation, success)
+- `src/__tests__/api/counter-offer-analysis.test.ts` — NEW: 12 route-level tests (auth, tier, body validation, success)
 - `test/acceptance/features/E-008-seller-communication-negotiation.feature` — MODIFIED: Added 13 Story 8.2 scenarios (S-17 through S-29)
 - `test/acceptance/step_definitions/E-008-negotiation-strategy.steps.ts` — NEW: Step definitions for negotiation scenarios
 - `_bmad-output/test-artifacts/requirements-traceability-matrix.md` — MODIFIED: FR-COMM-03 coverage updated
 - `_bmad-output/implementation-artifacts/sprint-status.yaml` — MODIFIED: 8-2 status → review
 - `_bmad-output/implementation-artifacts/epic-8/8-2-ai-negotiation-strategy.md` — MODIFIED: Tasks marked complete, DoD, status, change log
+
+## Senior Developer Review (AI)
+
+**Reviewer:** Stephenboyett
+**Date:** 2026-03-31
+**Outcome:** Approved with fixes applied
+
+### Issues Found & Fixed
+
+| # | Severity | Issue | Fix |
+|---|---|---|---|
+| H-1 | HIGH | Undeclared variable `aiUnavailableForNegotiation` in step defs (line 90) — implicit global, never consumed | Declared with `let`, reset in `Given` steps |
+| H-2 | HIGH | Counter-offer step defs duplicate library logic inline instead of calling actual function | Exported `generateFallbackCounterAnalysis()`, step now calls it directly |
+| M-1 | MEDIUM | Market Data Freshness Check from Dev Notes not implemented (marketDataDate >14d → low confidence) | Added `applyMarketDataFreshnessCheck()`, added `marketDataDate` to interface/routes/select |
+| M-2 | MEDIUM | No route-level API tests for either endpoint | Created 14 + 12 route tests covering auth, tier, validation, listing lookup, success |
+| M-3 | MEDIUM | `request.json()` parse error returns 500 instead of 422 | Added try-catch returning `ValidationError('Invalid request body')` |
+
+### Remaining (Low, not fixed)
+
+- L-1: Zod validation schemas from Dev Notes not used (manual validation works correctly)
+- L-2: Negotiation strategy POST accepts no request body (optional `maxBudget`/`negotiationContext` not implemented — not in ACs)
+- L-3: Resolved by H-2 fix (`generateFallbackCounterAnalysis` now exported)
+
+### Test Results After Fix
+
+- 180 test suites, 3794 tests passed, 0 failures
+- 63 tests across negotiation/counter-offer files (37 unit + 14 route + 12 route)
+- TypeScript strict mode: 0 new errors in changed files
 
 ## Change Log
 
@@ -632,3 +662,4 @@ None — clean implementation with no blocking issues.
 | 2026-03-31 | Story created with 10-method advanced elicitation analysis | SM Agent |
 | 2026-03-31 | Applied 20 additional elicitation methods (boundary values, state machine, prompt engineering, error taxonomy, observability, API contract, testability, backward compatibility, cognitive load, tech debt, stakeholder impact, competitive benchmarking, constraint analysis, regulatory compliance, cost-benefit, scenario planning, risk-value matrix, accessibility, SWOT, root cause analysis) | SM Agent |
 | 2026-03-31 | Implementation complete: negotiation-strategy module, 2 API routes, 34 unit tests, 13 acceptance tests. All tests pass. Status → review. | Dev Agent (Claude Opus 4.6) |
+| 2026-03-31 | Code review: Fixed 2 HIGH + 3 MEDIUM issues. Added market data freshness check, route-level API tests (26 new), body parsing error handling, exported fallback function, fixed step def variable. 3 LOW items noted but not blocking. | Review Agent (Claude Opus 4.6) |

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Settings, Home, TrendingUp, MessageSquare } from 'lucide-react';
@@ -7,6 +8,24 @@ import UserMenu from '@/components/UserMenu';
 
 export default function Navigation() {
   const pathname = usePathname();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/messages/threads?limit=100')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => {
+        if (!cancelled && json?.data) {
+          const total = (json.data as { unreadCount: number }[]).reduce(
+            (sum, t) => sum + (t.unreadCount || 0),
+            0
+          );
+          setUnreadCount(total);
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [pathname]);
 
   const navItems = [
     { href: '/', label: 'Dashboard', icon: Home },
@@ -43,6 +62,14 @@ export default function Navigation() {
                 >
                   <Icon size={18} />
                   <span className="hidden md:inline">{item.label}</span>
+                  {item.href === '/messages' && unreadCount > 0 && (
+                    <span
+                      className="flex items-center justify-center min-w-[18px] h-[18px] px-1 text-xs font-bold text-white bg-blue-600 rounded-full"
+                      aria-label={`${unreadCount} unread message${unreadCount !== 1 ? 's' : ''}`}
+                    >
+                      {unreadCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}

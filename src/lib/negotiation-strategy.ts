@@ -36,6 +36,7 @@ export interface NegotiationStrategyInput {
   sellabilityScore: number | null;
   platform: string;
   recommendedOffer: number | null;
+  marketDataDate: Date | null;
 }
 
 export interface NegotiationStrategy {
@@ -479,7 +480,7 @@ function buildFallbackReasoning(
 
 // ── Fallback Counter-Offer Analysis ──────────────────────────────────────────
 
-function generateFallbackCounterAnalysis(
+export function generateFallbackCounterAnalysis(
   input: NegotiationStrategyInput,
   counterOfferPrice: number,
   ourPreviousOffer: number
@@ -537,6 +538,29 @@ function generateFallbackCounterAnalysis(
 
 // ── Main Functions ───────────────────────────────────────────────────────────
 
+function applyMarketDataFreshnessCheck(
+  strategy: NegotiationStrategy,
+  marketDataDate: Date | null
+): NegotiationStrategy {
+  if (!marketDataDate) return strategy;
+
+  const marketDataAge = Math.floor(
+    (Date.now() - marketDataDate.getTime()) / (1000 * 60 * 60 * 24)
+  );
+
+  if (marketDataAge > 14) {
+    return {
+      ...strategy,
+      confidence: 'low',
+      reasoning:
+        strategy.reasoning +
+        ` Note: Market data is ${marketDataAge} days old — recommendations may not reflect current market.`,
+    };
+  }
+
+  return strategy;
+}
+
 export async function generateNegotiationStrategy(
   input: NegotiationStrategyInput
 ): Promise<NegotiationStrategy> {
@@ -547,7 +571,10 @@ export async function generateNegotiationStrategy(
   // No API key → fallback immediately
   if (!process.env.OPENAI_API_KEY) {
     metrics.increment('negotiation_fallback_used');
-    const fallback = generateFallbackStrategy(input);
+    const fallback = applyMarketDataFreshnessCheck(
+      generateFallbackStrategy(input),
+      input.marketDataDate
+    );
     await cacheStrategy(input.listingId, fallback);
     return fallback;
   }
@@ -580,14 +607,20 @@ export async function generateNegotiationStrategy(
         responsePreview: responseText.slice(0, 200),
       });
       metrics.increment('negotiation_fallback_used');
-      const fallback = generateFallbackStrategy(input);
+      const fallback = applyMarketDataFreshnessCheck(
+        generateFallbackStrategy(input),
+        input.marketDataDate
+      );
       await cacheStrategy(input.listingId, fallback);
       end();
       return fallback;
     }
 
     const parsed = JSON.parse(jsonMatch[0]);
-    const strategy = validateStrategyResponse(parsed, input);
+    const strategy = applyMarketDataFreshnessCheck(
+      validateStrategyResponse(parsed, input),
+      input.marketDataDate
+    );
 
     metrics.increment('negotiation_strategy_generated');
     await cacheStrategy(input.listingId, strategy);
@@ -606,7 +639,10 @@ export async function generateNegotiationStrategy(
         action: 'generateNegotiationStrategy',
       });
     }
-    const fallback = generateFallbackStrategy(input);
+    const fallback = applyMarketDataFreshnessCheck(
+      generateFallbackStrategy(input),
+      input.marketDataDate
+    );
     await cacheStrategy(input.listingId, fallback);
     end();
     return fallback;
