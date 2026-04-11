@@ -1,3 +1,18 @@
+/**
+ * @file src/components/FilterPanel.tsx
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2025-01-01
+ * @version 1.1
+ * @brief Reusable filter panel for opportunities and dashboard listing views.
+ *
+ * @description
+ * Provides multi-select platform/category/status filters, score range sliders,
+ * and profit range number inputs. Renders active filter chips above the filter
+ * grid. Accepts a statusOptions prop so callers can supply context-appropriate
+ * status values (listing statuses vs opportunity statuses).
+ */
+
 'use client';
 
 import { FilterState, toggleMultiSelectValue, isMultiSelectActive } from '@/hooks/useFilterParams';
@@ -46,19 +61,19 @@ export default function FilterPanel({
   const activeStatuses = filters.statuses ? filters.statuses.split(',').filter(Boolean) : [];
 
   return (
-    <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-4 shadow-xl space-y-4">
+    <div className="fp-glass" style={{ padding: 24, marginBottom: 24 }}>
       {/* Active filter chips */}
       {activeFilterCount > 0 && (
-        <div className="flex flex-wrap gap-2 pb-2 border-b border-white/10">
+        <div className="flex flex-wrap gap-2 pb-2 border-b border-white/10" style={{ marginBottom: 16 }}>
           {activePlatforms.map((p) => (
             <button
               key={p}
               onClick={() =>
                 setFilter('platforms', toggleMultiSelectValue(filters.platforms, p))
               }
-              className="flex items-center gap-1 px-2 py-1 rounded-full bg-blue-500/30 border border-blue-400/50 text-xs text-blue-200 hover:bg-blue-500/50 transition-colors"
+              className="fp-badge fp-badge-purple flex items-center gap-1"
             >
-              {p} <span className="text-blue-300">×</span>
+              {p} <span style={{ opacity: 0.7 }}>×</span>
             </button>
           ))}
           {activeCategories.map((c) => (
@@ -67,9 +82,9 @@ export default function FilterPanel({
               onClick={() =>
                 setFilter('categories', toggleMultiSelectValue(filters.categories, c))
               }
-              className="flex items-center gap-1 px-2 py-1 rounded-full bg-purple-500/30 border border-purple-400/50 text-xs text-purple-200 hover:bg-purple-500/50 transition-colors"
+              className="fp-badge fp-badge-purple flex items-center gap-1"
             >
-              {c} <span className="text-purple-300">×</span>
+              {c} <span style={{ opacity: 0.7 }}>×</span>
             </button>
           ))}
           {activeStatuses.map((s) => (
@@ -78,32 +93,33 @@ export default function FilterPanel({
               onClick={() =>
                 setFilter('statuses', toggleMultiSelectValue(filters.statuses, s))
               }
-              className="flex items-center gap-1 px-2 py-1 rounded-full bg-green-500/30 border border-green-400/50 text-xs text-green-200 hover:bg-green-500/50 transition-colors"
+              className="fp-badge fp-badge-purple flex items-center gap-1"
             >
-              {s} <span className="text-green-300">×</span>
+              {s} <span style={{ opacity: 0.7 }}>×</span>
             </button>
           ))}
           {(filters.minScore || filters.maxScore) && (
             <button
               onClick={() => setFilters({ minScore: '', maxScore: '' })}
-              className="flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-500/30 border border-yellow-400/50 text-xs text-yellow-200 hover:bg-yellow-500/50 transition-colors"
+              className="fp-badge fp-badge-purple flex items-center gap-1"
             >
               Score: {filters.minScore || '0'}–{filters.maxScore || '100'}{' '}
-              <span className="text-yellow-300">×</span>
+              <span style={{ opacity: 0.7 }}>×</span>
             </button>
           )}
           {(filters.minProfit || filters.maxProfit) && (
             <button
               onClick={() => setFilters({ minProfit: '', maxProfit: '' })}
-              className="flex items-center gap-1 px-2 py-1 rounded-full bg-orange-500/30 border border-orange-400/50 text-xs text-orange-200 hover:bg-orange-500/50 transition-colors"
+              className="fp-badge fp-badge-purple flex items-center gap-1"
             >
               Profit: ${filters.minProfit || '0'}–{filters.maxProfit ? `$${filters.maxProfit}` : '∞'}{' '}
-              <span className="text-orange-300">×</span>
+              <span style={{ opacity: 0.7 }}>×</span>
             </button>
           )}
           <button
             onClick={clearFilters}
-            className="px-2 py-1 rounded-full bg-white/10 border border-white/20 text-xs text-white/60 hover:text-white hover:bg-white/20 transition-colors"
+            className="px-2 py-1 rounded-full border border-white/20 text-xs transition-colors"
+            style={{ background: 'rgba(255,255,255,0.07)', color: '#94a3b8' }}
           >
             Clear all
           </button>
@@ -113,7 +129,12 @@ export default function FilterPanel({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Platform multi-select */}
         <div>
-          <label className="block text-xs text-blue-200/70 mb-2 font-medium">Platform</label>
+          <label
+            className="block mb-2"
+            style={{ color: '#94a3b8', fontSize: 12, fontWeight: 600 }}
+          >
+            Platform
+          </label>
           <div className="flex flex-wrap gap-1">
             {PLATFORM_OPTIONS.map((platform) => {
               const active = isMultiSelectActive(filters.platforms, platform.value);
@@ -126,8 +147,9 @@ export default function FilterPanel({
                   className={`px-2 py-1 rounded-lg border text-xs font-medium transition-all duration-200 ${
                     active
                       ? 'bg-blue-500/40 border-blue-400 text-blue-200 shadow-sm shadow-blue-500/30'
-                      : 'bg-white/5 border-white/20 text-white/60 hover:bg-white/10 hover:text-white'
+                      : 'border-white/20 text-white/60 hover:bg-white/10 hover:text-white'
                   }`}
+                  style={active ? {} : { background: 'rgba(255,255,255,0.04)' }}
                 >
                   {platform.label}
                 </button>
@@ -138,12 +160,15 @@ export default function FilterPanel({
 
         {/* Score range slider */}
         <div>
-          <label className="block text-xs text-blue-200/70 mb-2 font-medium">
+          <label
+            className="block mb-2"
+            style={{ color: '#94a3b8', fontSize: 12, fontWeight: 600 }}
+          >
             Score: {filters.minScore || '0'} – {filters.maxScore || '100'}
           </label>
           <div className="space-y-2">
             <div className="flex gap-2 items-center">
-              <span className="text-xs text-blue-200/50 w-6">Min</span>
+              <span className="text-xs w-6" style={{ color: '#64748b' }}>Min</span>
               <input
                 type="range"
                 min="0"
@@ -153,11 +178,11 @@ export default function FilterPanel({
                 onChange={(e) =>
                   setFilter('minScore', e.target.value === '0' ? '' : e.target.value)
                 }
-                className="flex-1 accent-blue-500"
+                className="flex-1 accent-purple-500"
               />
             </div>
             <div className="flex gap-2 items-center">
-              <span className="text-xs text-blue-200/50 w-6">Max</span>
+              <span className="text-xs w-6" style={{ color: '#64748b' }}>Max</span>
               <input
                 type="range"
                 min="0"
@@ -167,7 +192,7 @@ export default function FilterPanel({
                 onChange={(e) =>
                   setFilter('maxScore', e.target.value === '100' ? '' : e.target.value)
                 }
-                className="flex-1 accent-blue-500"
+                className="flex-1 accent-purple-500"
               />
             </div>
           </div>
@@ -175,29 +200,39 @@ export default function FilterPanel({
 
         {/* Profit range */}
         <div>
-          <label className="block text-xs text-blue-200/70 mb-2 font-medium">Profit Range ($)</label>
+          <label
+            className="block mb-2"
+            style={{ color: '#94a3b8', fontSize: 12, fontWeight: 600 }}
+          >
+            Profit Range ($)
+          </label>
           <div className="flex gap-2 items-center">
             <input
               type="number"
               placeholder="Min $"
               value={filters.minProfit}
               onChange={(e) => setFilter('minProfit', e.target.value)}
-              className="w-full px-2 py-1.5 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-1 focus:ring-blue-400/50 text-white text-xs placeholder-blue-200/40"
+              className="fp-input w-full"
             />
-            <span className="text-white/40 text-xs">–</span>
+            <span className="text-xs" style={{ color: '#475569' }}>–</span>
             <input
               type="number"
               placeholder="Max $"
               value={filters.maxProfit}
               onChange={(e) => setFilter('maxProfit', e.target.value)}
-              className="w-full px-2 py-1.5 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-1 focus:ring-blue-400/50 text-white text-xs placeholder-blue-200/40"
+              className="fp-input w-full"
             />
           </div>
         </div>
 
         {/* Category multi-select */}
         <div>
-          <label className="block text-xs text-blue-200/70 mb-2 font-medium">Category</label>
+          <label
+            className="block mb-2"
+            style={{ color: '#94a3b8', fontSize: 12, fontWeight: 600 }}
+          >
+            Category
+          </label>
           <div className="flex flex-wrap gap-1">
             {CATEGORY_OPTIONS.map((cat) => {
               const active = isMultiSelectActive(filters.categories, cat);
@@ -210,8 +245,9 @@ export default function FilterPanel({
                   className={`px-2 py-1 rounded-lg border text-xs font-medium transition-all duration-200 ${
                     active
                       ? 'bg-purple-500/40 border-purple-400 text-purple-200 shadow-sm shadow-purple-500/30'
-                      : 'bg-white/5 border-white/20 text-white/60 hover:bg-white/10 hover:text-white'
+                      : 'border-white/20 text-white/60 hover:bg-white/10 hover:text-white'
                   }`}
+                  style={active ? {} : { background: 'rgba(255,255,255,0.04)' }}
                 >
                   {cat}
                 </button>
@@ -223,7 +259,12 @@ export default function FilterPanel({
         {/* Status multi-select */}
         {statusOptions && statusOptions.length > 0 && (
           <div>
-            <label className="block text-xs text-blue-200/70 mb-2 font-medium">Status</label>
+            <label
+              className="block mb-2"
+              style={{ color: '#94a3b8', fontSize: 12, fontWeight: 600 }}
+            >
+              Status
+            </label>
             <div className="flex flex-wrap gap-1">
               {statusOptions.map((option) => {
                 const active = isMultiSelectActive(filters.statuses, option.value);
@@ -236,8 +277,9 @@ export default function FilterPanel({
                     className={`px-2 py-1 rounded-lg border text-xs font-medium transition-all duration-200 ${
                       active
                         ? 'bg-green-500/40 border-green-400 text-green-200 shadow-sm shadow-green-500/30'
-                        : 'bg-white/5 border-white/20 text-white/60 hover:bg-white/10 hover:text-white'
+                        : 'border-white/20 text-white/60 hover:bg-white/10 hover:text-white'
                     }`}
+                    style={active ? {} : { background: 'rgba(255,255,255,0.04)' }}
                   >
                     {option.label}
                   </button>
