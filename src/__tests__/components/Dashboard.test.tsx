@@ -168,7 +168,7 @@ describe('Dashboard', () => {
       return new Promise(() => {});
     });
     render(<Dashboard />);
-    expect(screen.getByText('Loading listings...')).toBeInTheDocument();
+    expect(screen.getByText('Loading listings…')).toBeInTheDocument();
   });
 
   it('fetches and displays listings', async () => {
@@ -237,7 +237,7 @@ describe('Dashboard', () => {
   it('shows opportunities stat label', async () => {
     render(<Dashboard />);
     await waitFor(() => {
-      expect(screen.getAllByText('Opportunities Found').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Opportunities').length).toBeGreaterThan(0);
     });
   });
 

@@ -221,7 +221,7 @@ export default function KanbanBoard({
                                   <DollarSign className="w-3 h-3" style={{ color: '#475569' }} />
                                   <span style={{ fontSize: 11, color: '#475569' }}>Asking:</span>
                                   <span style={{ fontWeight: 700, fontSize: 15, color: '#e2e8f0' }}>
-                                    ${opp.listing.askingPrice.toFixed(0)}
+                                    <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 400 }}>$</span>{opp.listing.askingPrice.toFixed(0)}
                                   </span>
                                 </div>
                                 {opp.listing.profitPotential != null && (
