@@ -345,7 +345,7 @@ export default function BillingSettings() {
             <div
               key={tier}
               className={`
-                relative rounded-2xl border-2 p-6 transition-all duration-300
+                relative rounded-2xl border-2 border-white/10 p-6 transition-all duration-300
                 fp-glass-sm
                 ${isCurrentTier ? 'ring-2 ring-offset-2 ring-indigo-500 dark:ring-offset-gray-800' : 'hover:scale-[1.02]'}
                 ${isPopular && !isCurrentTier ? 'shimmer-border glow-card' : ''}
