@@ -277,22 +277,6 @@ body {
     0 4px 6px -4px var(--theme-accent-purple-from);
 }
 
-/* Toast animations */
-@keyframes slide-in-right {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-.animate-slide-in-right {
-  animation: slide-in-right 0.3s ease-out;
-}
-
 /* ═══════════════════════════════════════════════
    FLIPPER.AI DESIGN SYSTEM
    Dark glassmorphism — canonical source of truth
@@ -322,11 +306,6 @@ body {
     radial-gradient(ellipse 60% 50% at 85% 75%, rgba(109,40,217,0.07) 0%, transparent 55%),
     radial-gradient(ellipse 50% 40% at 50% 10%, rgba(139,92,246,0.06) 0%, transparent 50%),
     var(--fp-bg);
-  animation: fp-meshShift 20s ease-in-out infinite alternate;
-}
-@keyframes fp-meshShift {
-  0%   { background-position: 0% 0%, 100% 100%, 50% 0%; }
-  100% { background-position: 10% 15%, 90% 85%, 55% 5%; }
 }
 
 .fp-bg-grid {
