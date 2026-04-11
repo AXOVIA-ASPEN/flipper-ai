@@ -45,6 +45,26 @@ pnpm format:check           # Check formatting
 
 Run `make help` for the full list of targets.
 
+## Versioning & Releases
+
+Full spec: `_bmad-output/project-context.md` → _Versioning & Release Pipeline_ section.
+
+**Semver rules:** `PATCH` = bug fixes · `MINOR` = new features · `MAJOR` = breaking changes
+
+**As you work:** add entries to the `[Unreleased]` section of `CHANGELOG.md` under the appropriate category (`Added`, `Changed`, `Fixed`, `Removed`, `Security`, `Deprecated`).
+
+**To cut a release:**
+```bash
+# 1. Update CHANGELOG.md — promote [Unreleased] to ## [X.Y.Z] - YYYY-MM-DD, leave fresh [Unreleased] at top
+# 2. Update VERSION.md — set to new version number
+git add CHANGELOG.md VERSION.md
+git commit -m "chore: release vX.Y.Z"
+git push origin main
+git tag vX.Y.Z
+git push origin vX.Y.Z
+# GitHub Actions creates the GitHub Release automatically from the CHANGELOG.md section
+```
+
 ## Architecture
 
 ### Tech Stack
@@ -161,9 +181,44 @@ Key patterns: `hasRunningJob()` check prevents duplicate concurrent jobs, `Promi
 - **Cucumber BDD**: Two test directories — `test/features/` (legacy) and `test/acceptance/features/` (epic-organized). Step definitions follow `E-{epic}-{descriptor}.steps.ts` naming. Runs against production build via `start-server-and-test`.
 - **Playwright** (`playwright.config.ts`): Tests in `e2e/`. 5 browser projects. Locally defaults to port 3001, CI uses port 3000.
 
-### Coverage Enforcement
+### Story Definition of Done — Quality Gate
 
-Jest enforces coverage thresholds — branches 96%, functions 98%, lines 99%, statements 99%. Adding new code to `src/lib/`, `app/api/`, or `src/scrapers/` requires maintaining these thresholds.
+**Canonical source:** `_bmad-output/project-context.md` → _Story Definition of Done_ section.
+
+Every story MUST pass ALL items before status changes to `review`. Hard gate — no exceptions.
+
+**1. Implementation Complete**
+- All tasks/subtasks marked `[x]`; every AC satisfied; no `any` in production code
+
+**2. Code Quality Gates** _(run these commands — all must pass)_
+- `make lint` — zero ESLint errors
+- `make build` — strict TypeScript, no `ignoreBuildErrors`
+- `make test` — all tests green, zero regressions
+- Coverage: branches ≥96%, functions ≥98%, lines ≥99%, statements ≥99%
+
+**3. Test Coverage**
+- Unit tests for all new/changed logic in `src/lib/`, `app/api/`, `src/scrapers/`
+- Every AC has a test at the **correct level**:
+  - Logic/calculation AC → service-level Jest test
+  - UI-visible AC ("displayed to the user", "user adjusts") → full E2E Playwright test — a mocked service call does **NOT** satisfy a UI AC
+- Full acceptance test suite written covering **every AC** — no ACs skipped, no placeholder scenarios, no `@wip`/`@skip`/`@pending` tags on any submitted scenario
+- Scenarios in `test/acceptance/features/E-<epic_padded>-*.feature`, written as genuine Playwright E2E journeys (real pages, real UI interactions, visible outcome assertions)
+- Every scenario tagged with **ALL THREE** (missing any tag = DoD failure):
+  - `@FR-<name>` — requirement traceability tag per FR covered (e.g. `@FR-MEET-01`)
+  - `@story-<epic>-<story>` — story under test (e.g. `@story-12-1`); enables `make test-ac STORY=<epic>.<story>`
+  - `@E-<epic_padded>-S-<sequential>` — globally unique scenario number (e.g. `@E-012-S-03`)
+- RTM (`_bmad-output/test-artifacts/requirements-traceability-matrix.md`) updated — FR → AC → feature file → scenario tag → step definition file
+- **FINAL GATE** — last action before `Status → review`:
+  - `make test-ac STORY=<epic>.<story>` passes with zero failures, zero skipped scenarios
+  - `make test-ac FEATURE=F<epic_num>` passes cleanly (all stories in the epic)
+
+**4. Documentation & Tracking**
+- Story `Status` → `review`; `sprint-status.yaml` → `review`
+- RTM (`_bmad-output/test-artifacts/requirements-traceability-matrix.md`) updated
+- Story `File List` updated with every new/modified/deleted file
+
+**5. Trello**
+- Story card moved to Done list (trello-axovia)
 
 ### Linting Rules
 
