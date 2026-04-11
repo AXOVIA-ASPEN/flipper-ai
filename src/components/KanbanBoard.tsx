@@ -192,6 +192,8 @@ export default function KanbanBoard({
                                 overflow: 'hidden',
                                 cursor: snapshot.isDragging ? 'grabbing' : 'grab',
                               }}
+                              aria-label={opp.listing.title}
+                              aria-roledescription="draggable card"
                               data-testid="kanban-card"
                             >
                               {/* Card Image */}
@@ -204,7 +206,7 @@ export default function KanbanBoard({
                               )}
 
                               {/* Title + Platform */}
-                              <div className="flex items-start gap-2 mb-2" style={{ padding: image ? '0 12px' : '12px 12px 0' }}>
+                              <div className="flex items-start gap-2 mb-2" style={{ padding: image ? '0 12px 8px' : '12px 12px 0' }}>
                                 <span className="text-base" title={opp.listing.platform}>
                                   {getPlatformIcon(opp.listing.platform)}
                                 </span>
