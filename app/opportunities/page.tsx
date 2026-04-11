@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState, useEffect } from 'react';
+import { Suspense, useState, useEffect, useCallback } from 'react';
 import {
   ArrowLeft,
   TrendingUp,
@@ -27,7 +27,8 @@ import {
   Warehouse,
 } from 'lucide-react';
 import { calculateDaysHeld, calculateCarryingCost, isAgingInventory } from '@/lib/holding-cost';
-import KanbanBoard from '@/components/KanbanBoard';
+import KanbanBoard, { type KanbanOpportunity } from '@/components/KanbanBoard';
+import CrossPostModal from '@/components/posting-queue/CrossPostModal';
 import FilterPanel from '@/components/FilterPanel';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
@@ -250,8 +251,8 @@ export default function OpportunitiesPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-          <p className="text-white">Loading opportunities...</p>
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <p style={{ color: '#e2e8f0' }}>Loading opportunities...</p>
         </div>
       }
     >
@@ -286,10 +287,47 @@ function OpportunitiesContent() {
   const [modalResaleUrl, setModalResaleUrl] = useState('');
   const [modalSalePrice, setModalSalePrice] = useState('');
   const [modalFees, setModalFees] = useState('');
+  // Cross-post state — the parent owns modal visibility and stores the
+  // source opportunity so the modal can read its platform + listing fields.
+  const [crossPostTarget, setCrossPostTarget] = useState<Opportunity | null>(
+    null
+  );
+  // Fetched from /api/user/tier on mount. The Firebase client session does
+  // not include subscriptionTier, so without this we cannot decide whether
+  // to wire up onCrossPost on the KanbanBoard.
+  const [crossPostEnabled, setCrossPostEnabled] = useState(false);
 
   useEffect(() => {
     fetchOpportunities();
   }, [filters]);
+
+  // Fetch tier once on mount. Cross-post CTA is gated to PRO+ tiers where
+  // the ebayCrossListing feature is enabled.
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/user/tier')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => {
+        if (!cancelled && json?.success) {
+          const tier = (json.data?.tier ?? 'FREE') as string;
+          setCrossPostEnabled(tier !== 'FREE');
+        }
+      })
+      .catch(() => {
+        // Non-critical — fall back to disabled cross-post button.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleCrossPost = useCallback(
+    (opp: KanbanOpportunity) => {
+      const source = opportunities.find((o) => o.id === opp.id);
+      if (source) setCrossPostTarget(source);
+    },
+    [opportunities]
+  );
 
   useEffect(() => {
     fetch('/api/user/settings')
@@ -519,7 +557,7 @@ function OpportunitiesContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+    <div style={{ minHeight: '100vh' }} className="relative overflow-hidden">
       {/* Animated background gradient orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 -left-4 w-96 h-96 bg-theme-orb-1 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
@@ -542,10 +580,10 @@ function OpportunitiesContent() {
                 <Trophy className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent">
+                <h1 style={{ fontSize: 28, fontWeight: 800, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
                   Opportunities
                 </h1>
-                <p className="text-xs text-blue-200/80">Track your flips from start to finish</p>
+                <p style={{ fontSize: 12, color: '#64748b' }}>Track your flips from start to finish</p>
               </div>
             </div>
           </div>
@@ -729,8 +767,26 @@ function OpportunitiesContent() {
         {/* Kanban View */}
         {viewMode === 'kanban' && !loading && (
           <KanbanBoard
-            opportunities={filteredOpportunities}
+            opportunities={filteredOpportunities as unknown as KanbanOpportunity[]}
             onStatusChange={handleKanbanStatusChange}
+            onCrossPost={crossPostEnabled ? handleCrossPost : undefined}
+          />
+        )}
+
+        {/* Cross-post modal — rendered at the page level so it overlays the
+            full screen regardless of which view is active. */}
+        {crossPostTarget && (
+          <CrossPostModal
+            listingId={crossPostTarget.listing.id}
+            sourcePlatform={crossPostTarget.listing.platform}
+            listingTitle={crossPostTarget.listing.title}
+            askingPrice={crossPostTarget.listing.askingPrice}
+            onClose={() => setCrossPostTarget(null)}
+            onSuccess={() => {
+              // Modal handles its own success toast. Parent just clears
+              // the target; no refetch needed here because cross-posts
+              // show up on /posting-queue, not on this page.
+            }}
           />
         )}
 
@@ -1359,7 +1415,7 @@ function OpportunitiesContent() {
                                     ? 'bg-yellow-500/20 border-yellow-400/40 text-yellow-300'
                                     : opp.listing.compMatchConfidence === 'low'
                                     ? 'bg-orange-500/20 border-orange-400/40 text-orange-300'
-                                    : 'bg-gray-500/20 border-gray-400/40 text-gray-300'
+                                    : 'bg-slate-500/20 border-slate-400/40 text-slate-300'
                                 }`}>
                                   {opp.listing.compMatchConfidence === 'insufficient'
                                     ? 'Insufficient Market Data'

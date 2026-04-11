@@ -17,6 +17,7 @@ import {
   TrendingUp,
   Star,
   ExternalLink,
+  Send,
 } from 'lucide-react';
 
 interface Listing {
@@ -30,7 +31,7 @@ interface Listing {
   imageUrls: string | null;
 }
 
-interface Opportunity {
+export interface KanbanOpportunity {
   id: string;
   listingId: string;
   status: string;
@@ -38,18 +39,31 @@ interface Opportunity {
 }
 
 export interface KanbanBoardProps {
-  opportunities: Opportunity[];
+  opportunities: KanbanOpportunity[];
   onStatusChange: (id: string, newStatus: string) => Promise<void>;
+  /**
+   * Optional cross-post handler. When provided, the Kanban renders a
+   * "Cross-Post" button on PURCHASED and LISTED cards. The parent owns the
+   * modal state so this component stays presentational. The handler is only
+   * wired up when the user has a tier that permits cross-listing — callers
+   * should omit it for FREE users.
+   */
+  onCrossPost?: (opportunity: KanbanOpportunity) => void;
 }
 
 const COLUMNS = [
-  { id: 'IDENTIFIED', label: 'New', color: 'from-blue-400 to-blue-600', border: 'border-blue-400/50', shadow: 'shadow-blue-500/20', count: 'bg-blue-500/30 text-blue-200' },
-  { id: 'CONTACTED', label: 'Contacted', color: 'from-yellow-400 to-orange-500', border: 'border-yellow-400/50', shadow: 'shadow-yellow-500/20', count: 'bg-yellow-500/30 text-yellow-200' },
-  { id: 'PURCHASED', label: 'Purchased', color: 'from-purple-400 to-purple-600', border: 'border-purple-400/50', shadow: 'shadow-purple-500/20', count: 'bg-purple-500/30 text-purple-200' },
-  { id: 'LISTED', label: 'Listed', color: 'from-orange-400 to-pink-500', border: 'border-orange-400/50', shadow: 'shadow-orange-500/20', count: 'bg-orange-500/30 text-orange-200' },
-  { id: 'SOLD', label: 'Sold', color: 'from-green-400 to-emerald-600', border: 'border-green-400/50', shadow: 'shadow-green-500/20', count: 'bg-green-500/30 text-green-200' },
-  { id: 'PASSED', label: 'Passed', color: 'from-gray-400 to-gray-600', border: 'border-gray-400/50', shadow: 'shadow-gray-500/20', count: 'bg-gray-500/30 text-gray-200' },
+  { id: 'IDENTIFIED', label: 'New',       badgeClass: 'fp-badge fp-badge-blue',   headerColor: 'rgba(96,165,250,0.15)',  borderColor: 'rgba(96,165,250,0.25)' },
+  { id: 'CONTACTED',  label: 'Contacted', badgeClass: 'fp-badge fp-badge-yellow', headerColor: 'rgba(251,191,36,0.12)',  borderColor: 'rgba(251,191,36,0.25)' },
+  { id: 'PURCHASED',  label: 'Purchased', badgeClass: 'fp-badge fp-badge-purple', headerColor: 'rgba(139,92,246,0.15)', borderColor: 'rgba(139,92,246,0.3)'  },
+  { id: 'LISTED',     label: 'Listed',    badgeClass: 'fp-badge fp-badge-orange', headerColor: 'rgba(251,146,60,0.12)',  borderColor: 'rgba(251,146,60,0.25)' },
+  { id: 'SOLD',       label: 'Sold',      badgeClass: 'fp-badge fp-badge-green',  headerColor: 'rgba(52,211,153,0.12)', borderColor: 'rgba(52,211,153,0.25)' },
+  { id: 'PASSED',     label: 'Passed',    badgeClass: 'fp-badge fp-badge-gray',   headerColor: 'rgba(148,163,184,0.08)', borderColor: 'rgba(148,163,184,0.15)' },
 ] as const;
+
+// Columns where the Cross-Post button should render. PURCHASED = user owns
+// the item and is ready to list. LISTED = item is up on source platform and
+// the user may want to add more platforms to maximize reach.
+const CROSS_POST_ALLOWED_STATUSES = new Set(['PURCHASED', 'LISTED']);
 
 function getPlatformIcon(platform: string) {
   const p = platform.toLowerCase();
@@ -72,9 +86,13 @@ function getFirstImage(imageUrls: string | null): string | null {
   }
 }
 
-export default function KanbanBoard({ opportunities, onStatusChange }: KanbanBoardProps) {
+export default function KanbanBoard({
+  opportunities,
+  onStatusChange,
+  onCrossPost,
+}: KanbanBoardProps) {
   const groupedOpportunities = React.useMemo(() => {
-    const grouped: Record<string, Opportunity[]> = {};
+    const grouped: Record<string, KanbanOpportunity[]> = {};
     for (const col of COLUMNS) {
       grouped[col.id] = [];
     }
@@ -110,20 +128,24 @@ export default function KanbanBoard({ opportunities, onStatusChange }: KanbanBoa
       <div className="flex gap-4 overflow-x-auto pb-4" data-testid="kanban-board">
         {COLUMNS.map((col) => {
           const items = groupedOpportunities[col.id] || [];
+          const showCrossPost =
+            !!onCrossPost && CROSS_POST_ALLOWED_STATUSES.has(col.id);
           return (
             <div
               key={col.id}
-              className={`flex-shrink-0 w-72 backdrop-blur-xl bg-white/5 rounded-xl border ${col.border} ${col.shadow} shadow-lg`}
+              className="flex-shrink-0 w-72"
+              style={{ borderRadius: 12 }}
             >
               {/* Column Header */}
-              <div className={`p-3 border-b border-white/10 flex items-center justify-between`}>
-                <div className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${col.color}`} />
-                  <h3 className="text-sm font-semibold text-white">{col.label}</h3>
+              <div style={{ padding: '12px 16px', borderBottom: `1px solid ${col.borderColor}`, background: col.headerColor, borderRadius: '12px 12px 0 0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#94a3b8' }}>
+                    {col.label}
+                  </span>
+                  <span className={col.badgeClass} style={{ fontSize: 10 }}>
+                    {items.length}
+                  </span>
                 </div>
-                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${col.count}`}>
-                  {items.length}
-                </span>
               </div>
 
               {/* Droppable Area */}
@@ -132,17 +154,25 @@ export default function KanbanBoard({ opportunities, onStatusChange }: KanbanBoa
                   <div
                     ref={provided.innerRef}
                     {...provided.droppableProps}
-                    className={`p-2 min-h-[200px] transition-colors duration-200 ${
-                      snapshot.isDraggingOver ? 'bg-white/10' : ''
-                    }`}
+                    className="fp-glass-sm fp-scroll"
+                    style={{
+                      minHeight: 200,
+                      maxHeight: 'calc(100vh - 220px)',
+                      overflowY: 'auto',
+                      padding: '8px',
+                      borderRadius: '0 0 12px 12px',
+                      border: `1px solid ${col.borderColor}`,
+                      borderTop: 'none',
+                      background: snapshot.isDraggingOver ? 'rgba(255,255,255,0.05)' : undefined,
+                    }}
                   >
                     {/* Empty column placeholder */}
                     {items.length === 0 && !snapshot.isDraggingOver && (
-                      <div className="flex flex-col items-center justify-center py-8 px-3 text-center opacity-40">
-                        <div className="w-10 h-10 rounded-full border-2 border-dashed border-white/30 flex items-center justify-center mb-2">
-                          <span className="text-lg">📭</span>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 12px', textAlign: 'center', opacity: 0.4 }}>
+                        <div style={{ width: 40, height: 40, borderRadius: '50%', border: '2px dashed rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+                          <span style={{ fontSize: 18 }}>📭</span>
                         </div>
-                        <p className="text-xs text-blue-200/60">Drag cards here</p>
+                        <p style={{ fontSize: 11, color: '#64748b' }}>Drag cards here</p>
                       </div>
                     )}
                     {items.map((opp, index) => {
@@ -154,11 +184,14 @@ export default function KanbanBoard({ opportunities, onStatusChange }: KanbanBoa
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
-                              className={`mb-2 p-3 rounded-lg border border-white/10 backdrop-blur-sm transition-all duration-200 cursor-grab active:cursor-grabbing ${
-                                snapshot.isDragging
-                                  ? 'bg-white/20 shadow-xl scale-105 rotate-1'
-                                  : 'bg-white/5 hover:bg-white/10'
-                              }`}
+                              className="fp-glass"
+                              style={{
+                                ...provided.draggableProps.style,
+                                marginBottom: 8,
+                                borderRadius: 12,
+                                overflow: 'hidden',
+                                cursor: snapshot.isDragging ? 'grabbing' : 'grab',
+                              }}
                               data-testid="kanban-card"
                             >
                               {/* Card Image */}
@@ -171,46 +204,72 @@ export default function KanbanBoard({ opportunities, onStatusChange }: KanbanBoa
                               )}
 
                               {/* Title + Platform */}
-                              <div className="flex items-start gap-2 mb-2">
+                              <div className="flex items-start gap-2 mb-2" style={{ padding: image ? '0 12px' : '12px 12px 0' }}>
                                 <span className="text-base" title={opp.listing.platform}>
                                   {getPlatformIcon(opp.listing.platform)}
                                 </span>
-                                <h4 className="text-sm font-medium text-white line-clamp-2 flex-1">
+                                <h4 style={{ fontWeight: 600, fontSize: 13, color: '#e2e8f0', marginBottom: 8, lineHeight: 1.4 }} className="line-clamp-2 flex-1">
                                   {opp.listing.title}
                                 </h4>
                               </div>
 
                               {/* Metrics */}
-                              <div className="flex items-center gap-3 text-xs text-blue-200/70">
-                                <span className="flex items-center gap-1">
-                                  <DollarSign className="w-3 h-3" />
-                                  {opp.listing.askingPrice.toFixed(0)}
-                                </span>
-                                {opp.listing.profitPotential != null && (
-                                  <span className="flex items-center gap-1 text-green-300">
-                                    <TrendingUp className="w-3 h-3" />
-                                    +${opp.listing.profitPotential.toFixed(0)}
+                              <div style={{ padding: '0 12px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                  <DollarSign className="w-3 h-3" style={{ color: '#475569' }} />
+                                  <span style={{ fontSize: 11, color: '#475569' }}>Asking:</span>
+                                  <span style={{ fontWeight: 700, fontSize: 15, color: '#e2e8f0' }}>
+                                    ${opp.listing.askingPrice.toFixed(0)}
                                   </span>
+                                </div>
+                                {opp.listing.profitPotential != null && (
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                    <TrendingUp className="w-3 h-3" style={{ color: '#475569' }} />
+                                    <span style={{ fontSize: 11, color: '#475569' }}>Profit:</span>
+                                    <span className="fp-grad-green" style={{ fontWeight: 700, fontSize: 15 }}>
+                                      +${opp.listing.profitPotential.toFixed(0)}
+                                    </span>
+                                  </div>
                                 )}
                                 {opp.listing.valueScore != null && (
-                                  <span className="flex items-center gap-1 text-purple-300">
-                                    <Star className="w-3 h-3" />
-                                    {opp.listing.valueScore.toFixed(0)}
-                                  </span>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                    <Star className="w-3 h-3" style={{ color: '#475569' }} />
+                                    <span style={{ fontSize: 11, color: '#94a3b8' }}>Score:</span>
+                                    <span style={{ fontWeight: 600, fontSize: 13, color: '#8b5cf6' }}>
+                                      {opp.listing.valueScore.toFixed(0)}
+                                    </span>
+                                  </div>
                                 )}
                               </div>
 
-                              {/* Link */}
-                              <a
-                                href={opp.listing.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="mt-2 flex items-center gap-1 text-xs text-blue-300 hover:text-white transition-colors"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <ExternalLink className="w-3 h-3" />
-                                View
-                              </a>
+                              {/* Actions */}
+                              <div style={{ padding: '0 12px 12px', marginTop: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <a
+                                  href={opp.listing.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: '#8b5cf6', textDecoration: 'none' }}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <ExternalLink className="w-3 h-3" />
+                                  View
+                                </a>
+                                {showCrossPost && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onCrossPost?.(opp);
+                                    }}
+                                    className="flex items-center gap-1 rounded border border-blue-400/40 bg-blue-500/20 px-2 py-0.5 text-xs text-blue-200 hover:bg-blue-500/40 hover:text-white transition-colors"
+                                    data-testid="kanban-cross-post-button"
+                                    aria-label={`Cross-post ${opp.listing.title}`}
+                                  >
+                                    <Send className="w-3 h-3" />
+                                    Cross-Post
+                                  </button>
+                                )}
+                              </div>
                             </div>
                           )}
                         </Draggable>
