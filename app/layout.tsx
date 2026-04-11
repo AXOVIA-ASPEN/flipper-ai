@@ -33,14 +33,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={{ background: '#080b14', color: '#e2e8f0', minHeight: '100vh' }}
+      >
+        <div className="fp-bg-mesh" aria-hidden="true" />
+        <div className="fp-bg-grid" aria-hidden="true" />
         <FirebaseAuthProvider>
           <ThemeProvider>
             <ToastProvider>
               <ThemeStyles />
               <WebVitals />
               <Navigation />
-              {children}
+              <div className="fp-content">
+                {children}
+              </div>
               <Analytics />
             </ToastProvider>
           </ThemeProvider>
