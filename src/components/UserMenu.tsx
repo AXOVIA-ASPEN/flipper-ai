@@ -49,8 +49,8 @@ export default function UserMenu() {
         aria-haspopup="true"
         aria-label="User menu"
       >
-        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-          <User className="w-4 h-4 text-blue-600" />
+        <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(139,92,246,0.2)' }}>
+          <User className="w-4 h-4" style={{ color: '#8b5cf6' }} />
         </div>
         <span className="hidden sm:inline text-sm font-medium max-w-[120px] truncate">
           {name}
