@@ -4,6 +4,7 @@ import { getAuthUserId } from '@/lib/auth-middleware';
 import { UpdatePostingQueueItemSchema, validateBody } from '@/lib/validations';
 
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, ConflictError, AppError, ErrorCode } from '@/lib/errors';
+import { computeImageStatus } from '@/lib/posting-queue-image-status';
 type RouteContext = { params: Promise<{ id: string }> };
 
 // GET /api/posting-queue/:id - Get a single queue item
@@ -26,6 +27,17 @@ export async function GET(_request: NextRequest, context: RouteContext) {
             askingPrice: true,
             imageUrls: true,
             url: true,
+            // Eager-load sorted Firebase Storage images for the detail view
+            // (AC-1, AC-2: AC-3 falls back to the legacy imageUrls column).
+            images: {
+              select: {
+                id: true,
+                imageIndex: true,
+                storageUrl: true,
+                contentType: true,
+              },
+              orderBy: { imageIndex: 'asc' },
+            },
           },
         },
       },
@@ -35,7 +47,11 @@ export async function GET(_request: NextRequest, context: RouteContext) {
       throw new NotFoundError('Queue item not found');
     }
 
-    return NextResponse.json(item);
+    // Compute imageStatus at serialization time — see posting-queue-image-status.ts
+    return NextResponse.json({
+      ...item,
+      imageStatus: computeImageStatus(item.listing),
+    });
   } catch (error) {
     console.error('GET /api/posting-queue/[id] error:', error);
     return handleError(error);

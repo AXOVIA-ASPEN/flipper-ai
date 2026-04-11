@@ -40,6 +40,13 @@ jest.mock('@/lib/image-helpers', () => ({
   getAllListingImageUrls: jest.fn(() => []),
 }));
 
+// Mock the toast hook so the page can call useToast() outside of a real
+// ToastProvider in tests. The page wires toast feedback into its
+// PriceCalculator onListPlatform handler (Story 9.2 review fix M4).
+jest.mock('@/components/ToastContainer', () => ({
+  useToast: () => ({ showToast: jest.fn() }),
+}));
+
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
 

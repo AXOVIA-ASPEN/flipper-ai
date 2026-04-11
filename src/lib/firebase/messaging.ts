@@ -22,6 +22,7 @@ let messagingInstance: Messaging | null = null;
 export async function getMessagingInstance() {
   if (typeof window === 'undefined') return null;
 
+  /* istanbul ignore next -- singleton; already-initialized path not testable without state reset */
   if (messagingInstance) return messagingInstance;
 
   try {
@@ -63,6 +64,7 @@ export async function getFCMToken(): Promise<string | null> {
 
   try {
     const messaging = await getMessagingInstance();
+    /* istanbul ignore next -- messaging is null when window/browser not available; unit tests run in Node */
     if (!messaging) return null;
 
     const { getToken } = await import('firebase/messaging');

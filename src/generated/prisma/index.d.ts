@@ -64,10 +64,20 @@ export type VerificationToken = $Result.DefaultSelection<Prisma.$VerificationTok
  */
 export type UserSettings = $Result.DefaultSelection<Prisma.$UserSettingsPayload>
 /**
+ * Model DeviceToken
+ * 
+ */
+export type DeviceToken = $Result.DefaultSelection<Prisma.$DeviceTokenPayload>
+/**
  * Model FacebookToken
  * 
  */
 export type FacebookToken = $Result.DefaultSelection<Prisma.$FacebookTokenPayload>
+/**
+ * Model GoogleCalendarToken
+ * 
+ */
+export type GoogleCalendarToken = $Result.DefaultSelection<Prisma.$GoogleCalendarTokenPayload>
 /**
  * Model Message
  * 
@@ -98,6 +108,16 @@ export type UsageRecord = $Result.DefaultSelection<Prisma.$UsageRecordPayload>
  * 
  */
 export type PasswordResetToken = $Result.DefaultSelection<Prisma.$PasswordResetTokenPayload>
+/**
+ * Model MonitoringJob
+ * 
+ */
+export type MonitoringJob = $Result.DefaultSelection<Prisma.$MonitoringJobPayload>
+/**
+ * Model NotificationEvent
+ * 
+ */
+export type NotificationEvent = $Result.DefaultSelection<Prisma.$NotificationEventPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -317,6 +337,16 @@ export class PrismaClient<
   get userSettings(): Prisma.UserSettingsDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.deviceToken`: Exposes CRUD operations for the **DeviceToken** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DeviceTokens
+    * const deviceTokens = await prisma.deviceToken.findMany()
+    * ```
+    */
+  get deviceToken(): Prisma.DeviceTokenDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.facebookToken`: Exposes CRUD operations for the **FacebookToken** model.
     * Example usage:
     * ```ts
@@ -325,6 +355,16 @@ export class PrismaClient<
     * ```
     */
   get facebookToken(): Prisma.FacebookTokenDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.googleCalendarToken`: Exposes CRUD operations for the **GoogleCalendarToken** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more GoogleCalendarTokens
+    * const googleCalendarTokens = await prisma.googleCalendarToken.findMany()
+    * ```
+    */
+  get googleCalendarToken(): Prisma.GoogleCalendarTokenDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.message`: Exposes CRUD operations for the **Message** model.
@@ -385,6 +425,26 @@ export class PrismaClient<
     * ```
     */
   get passwordResetToken(): Prisma.PasswordResetTokenDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.monitoringJob`: Exposes CRUD operations for the **MonitoringJob** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MonitoringJobs
+    * const monitoringJobs = await prisma.monitoringJob.findMany()
+    * ```
+    */
+  get monitoringJob(): Prisma.MonitoringJobDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.notificationEvent`: Exposes CRUD operations for the **NotificationEvent** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more NotificationEvents
+    * const notificationEvents = await prisma.notificationEvent.findMany()
+    * ```
+    */
+  get notificationEvent(): Prisma.NotificationEventDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -829,13 +889,17 @@ export namespace Prisma {
     Session: 'Session',
     VerificationToken: 'VerificationToken',
     UserSettings: 'UserSettings',
+    DeviceToken: 'DeviceToken',
     FacebookToken: 'FacebookToken',
+    GoogleCalendarToken: 'GoogleCalendarToken',
     Message: 'Message',
     AiAnalysisCache: 'AiAnalysisCache',
     PostingQueueItem: 'PostingQueueItem',
     ListingImage: 'ListingImage',
     UsageRecord: 'UsageRecord',
-    PasswordResetToken: 'PasswordResetToken'
+    PasswordResetToken: 'PasswordResetToken',
+    MonitoringJob: 'MonitoringJob',
+    NotificationEvent: 'NotificationEvent'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -851,7 +915,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "listing" | "opportunity" | "scraperJob" | "searchConfig" | "priceHistory" | "user" | "account" | "session" | "verificationToken" | "userSettings" | "facebookToken" | "message" | "aiAnalysisCache" | "postingQueueItem" | "listingImage" | "usageRecord" | "passwordResetToken"
+      modelProps: "listing" | "opportunity" | "scraperJob" | "searchConfig" | "priceHistory" | "user" | "account" | "session" | "verificationToken" | "userSettings" | "deviceToken" | "facebookToken" | "googleCalendarToken" | "message" | "aiAnalysisCache" | "postingQueueItem" | "listingImage" | "usageRecord" | "passwordResetToken" | "monitoringJob" | "notificationEvent"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1595,6 +1659,80 @@ export namespace Prisma {
           }
         }
       }
+      DeviceToken: {
+        payload: Prisma.$DeviceTokenPayload<ExtArgs>
+        fields: Prisma.DeviceTokenFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DeviceTokenFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceTokenPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DeviceTokenFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceTokenPayload>
+          }
+          findFirst: {
+            args: Prisma.DeviceTokenFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceTokenPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DeviceTokenFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceTokenPayload>
+          }
+          findMany: {
+            args: Prisma.DeviceTokenFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceTokenPayload>[]
+          }
+          create: {
+            args: Prisma.DeviceTokenCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceTokenPayload>
+          }
+          createMany: {
+            args: Prisma.DeviceTokenCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DeviceTokenCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceTokenPayload>[]
+          }
+          delete: {
+            args: Prisma.DeviceTokenDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceTokenPayload>
+          }
+          update: {
+            args: Prisma.DeviceTokenUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceTokenPayload>
+          }
+          deleteMany: {
+            args: Prisma.DeviceTokenDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DeviceTokenUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DeviceTokenUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceTokenPayload>[]
+          }
+          upsert: {
+            args: Prisma.DeviceTokenUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceTokenPayload>
+          }
+          aggregate: {
+            args: Prisma.DeviceTokenAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDeviceToken>
+          }
+          groupBy: {
+            args: Prisma.DeviceTokenGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DeviceTokenGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DeviceTokenCountArgs<ExtArgs>
+            result: $Utils.Optional<DeviceTokenCountAggregateOutputType> | number
+          }
+        }
+      }
       FacebookToken: {
         payload: Prisma.$FacebookTokenPayload<ExtArgs>
         fields: Prisma.FacebookTokenFieldRefs
@@ -1666,6 +1804,80 @@ export namespace Prisma {
           count: {
             args: Prisma.FacebookTokenCountArgs<ExtArgs>
             result: $Utils.Optional<FacebookTokenCountAggregateOutputType> | number
+          }
+        }
+      }
+      GoogleCalendarToken: {
+        payload: Prisma.$GoogleCalendarTokenPayload<ExtArgs>
+        fields: Prisma.GoogleCalendarTokenFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.GoogleCalendarTokenFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.GoogleCalendarTokenFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload>
+          }
+          findFirst: {
+            args: Prisma.GoogleCalendarTokenFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.GoogleCalendarTokenFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload>
+          }
+          findMany: {
+            args: Prisma.GoogleCalendarTokenFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload>[]
+          }
+          create: {
+            args: Prisma.GoogleCalendarTokenCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload>
+          }
+          createMany: {
+            args: Prisma.GoogleCalendarTokenCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.GoogleCalendarTokenCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload>[]
+          }
+          delete: {
+            args: Prisma.GoogleCalendarTokenDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload>
+          }
+          update: {
+            args: Prisma.GoogleCalendarTokenUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload>
+          }
+          deleteMany: {
+            args: Prisma.GoogleCalendarTokenDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.GoogleCalendarTokenUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.GoogleCalendarTokenUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload>[]
+          }
+          upsert: {
+            args: Prisma.GoogleCalendarTokenUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload>
+          }
+          aggregate: {
+            args: Prisma.GoogleCalendarTokenAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateGoogleCalendarToken>
+          }
+          groupBy: {
+            args: Prisma.GoogleCalendarTokenGroupByArgs<ExtArgs>
+            result: $Utils.Optional<GoogleCalendarTokenGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.GoogleCalendarTokenCountArgs<ExtArgs>
+            result: $Utils.Optional<GoogleCalendarTokenCountAggregateOutputType> | number
           }
         }
       }
@@ -2113,6 +2325,154 @@ export namespace Prisma {
           }
         }
       }
+      MonitoringJob: {
+        payload: Prisma.$MonitoringJobPayload<ExtArgs>
+        fields: Prisma.MonitoringJobFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MonitoringJobFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MonitoringJobPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MonitoringJobFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MonitoringJobPayload>
+          }
+          findFirst: {
+            args: Prisma.MonitoringJobFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MonitoringJobPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MonitoringJobFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MonitoringJobPayload>
+          }
+          findMany: {
+            args: Prisma.MonitoringJobFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MonitoringJobPayload>[]
+          }
+          create: {
+            args: Prisma.MonitoringJobCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MonitoringJobPayload>
+          }
+          createMany: {
+            args: Prisma.MonitoringJobCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MonitoringJobCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MonitoringJobPayload>[]
+          }
+          delete: {
+            args: Prisma.MonitoringJobDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MonitoringJobPayload>
+          }
+          update: {
+            args: Prisma.MonitoringJobUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MonitoringJobPayload>
+          }
+          deleteMany: {
+            args: Prisma.MonitoringJobDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MonitoringJobUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MonitoringJobUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MonitoringJobPayload>[]
+          }
+          upsert: {
+            args: Prisma.MonitoringJobUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MonitoringJobPayload>
+          }
+          aggregate: {
+            args: Prisma.MonitoringJobAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMonitoringJob>
+          }
+          groupBy: {
+            args: Prisma.MonitoringJobGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MonitoringJobGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MonitoringJobCountArgs<ExtArgs>
+            result: $Utils.Optional<MonitoringJobCountAggregateOutputType> | number
+          }
+        }
+      }
+      NotificationEvent: {
+        payload: Prisma.$NotificationEventPayload<ExtArgs>
+        fields: Prisma.NotificationEventFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.NotificationEventFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationEventPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.NotificationEventFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationEventPayload>
+          }
+          findFirst: {
+            args: Prisma.NotificationEventFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationEventPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.NotificationEventFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationEventPayload>
+          }
+          findMany: {
+            args: Prisma.NotificationEventFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationEventPayload>[]
+          }
+          create: {
+            args: Prisma.NotificationEventCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationEventPayload>
+          }
+          createMany: {
+            args: Prisma.NotificationEventCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.NotificationEventCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationEventPayload>[]
+          }
+          delete: {
+            args: Prisma.NotificationEventDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationEventPayload>
+          }
+          update: {
+            args: Prisma.NotificationEventUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationEventPayload>
+          }
+          deleteMany: {
+            args: Prisma.NotificationEventDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.NotificationEventUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.NotificationEventUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationEventPayload>[]
+          }
+          upsert: {
+            args: Prisma.NotificationEventUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationEventPayload>
+          }
+          aggregate: {
+            args: Prisma.NotificationEventAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateNotificationEvent>
+          }
+          groupBy: {
+            args: Prisma.NotificationEventGroupByArgs<ExtArgs>
+            result: $Utils.Optional<NotificationEventGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.NotificationEventCountArgs<ExtArgs>
+            result: $Utils.Optional<NotificationEventCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2231,13 +2591,17 @@ export namespace Prisma {
     session?: SessionOmit
     verificationToken?: VerificationTokenOmit
     userSettings?: UserSettingsOmit
+    deviceToken?: DeviceTokenOmit
     facebookToken?: FacebookTokenOmit
+    googleCalendarToken?: GoogleCalendarTokenOmit
     message?: MessageOmit
     aiAnalysisCache?: AiAnalysisCacheOmit
     postingQueueItem?: PostingQueueItemOmit
     listingImage?: ListingImageOmit
     usageRecord?: UsageRecordOmit
     passwordResetToken?: PasswordResetTokenOmit
+    monitoringJob?: MonitoringJobOmit
+    notificationEvent?: NotificationEventOmit
   }
 
   /* Types for Logging */
@@ -2320,12 +2684,14 @@ export namespace Prisma {
   export type ListingCountOutputType = {
     images: number
     messages: number
+    notificationEvents: number
     postingQueue: number
   }
 
   export type ListingCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     images?: boolean | ListingCountOutputTypeCountImagesArgs
     messages?: boolean | ListingCountOutputTypeCountMessagesArgs
+    notificationEvents?: boolean | ListingCountOutputTypeCountNotificationEventsArgs
     postingQueue?: boolean | ListingCountOutputTypeCountPostingQueueArgs
   }
 
@@ -2357,6 +2723,13 @@ export namespace Prisma {
   /**
    * ListingCountOutputType without action
    */
+  export type ListingCountOutputTypeCountNotificationEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: NotificationEventWhereInput
+  }
+
+  /**
+   * ListingCountOutputType without action
+   */
   export type ListingCountOutputTypeCountPostingQueueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PostingQueueItemWhereInput
   }
@@ -2368,8 +2741,10 @@ export namespace Prisma {
 
   export type UserCountOutputType = {
     accounts: number
+    deviceTokens: number
     listings: number
     messages: number
+    notificationEvents: number
     opportunities: number
     postingQueue: number
     scraperJobs: number
@@ -2381,8 +2756,10 @@ export namespace Prisma {
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | UserCountOutputTypeCountAccountsArgs
+    deviceTokens?: boolean | UserCountOutputTypeCountDeviceTokensArgs
     listings?: boolean | UserCountOutputTypeCountListingsArgs
     messages?: boolean | UserCountOutputTypeCountMessagesArgs
+    notificationEvents?: boolean | UserCountOutputTypeCountNotificationEventsArgs
     opportunities?: boolean | UserCountOutputTypeCountOpportunitiesArgs
     postingQueue?: boolean | UserCountOutputTypeCountPostingQueueArgs
     scraperJobs?: boolean | UserCountOutputTypeCountScraperJobsArgs
@@ -2413,6 +2790,13 @@ export namespace Prisma {
   /**
    * UserCountOutputType without action
    */
+  export type UserCountOutputTypeCountDeviceTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeviceTokenWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
   export type UserCountOutputTypeCountListingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ListingWhereInput
   }
@@ -2422,6 +2806,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountMessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: MessageWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountNotificationEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: NotificationEventWhereInput
   }
 
   /**
@@ -2566,6 +2957,8 @@ export namespace Prisma {
     postedAt: Date | null
     scrapedAt: Date | null
     updatedAt: Date | null
+    lastMonitoredAt: Date | null
+    estimatedExpiresAt: Date | null
     estimatedValue: number | null
     estimatedLow: number | null
     estimatedHigh: number | null
@@ -2641,6 +3034,8 @@ export namespace Prisma {
     postedAt: Date | null
     scrapedAt: Date | null
     updatedAt: Date | null
+    lastMonitoredAt: Date | null
+    estimatedExpiresAt: Date | null
     estimatedValue: number | null
     estimatedLow: number | null
     estimatedHigh: number | null
@@ -2716,6 +3111,8 @@ export namespace Prisma {
     postedAt: number
     scrapedAt: number
     updatedAt: number
+    lastMonitoredAt: number
+    estimatedExpiresAt: number
     estimatedValue: number
     estimatedLow: number
     estimatedHigh: number
@@ -2851,6 +3248,8 @@ export namespace Prisma {
     postedAt?: true
     scrapedAt?: true
     updatedAt?: true
+    lastMonitoredAt?: true
+    estimatedExpiresAt?: true
     estimatedValue?: true
     estimatedLow?: true
     estimatedHigh?: true
@@ -2926,6 +3325,8 @@ export namespace Prisma {
     postedAt?: true
     scrapedAt?: true
     updatedAt?: true
+    lastMonitoredAt?: true
+    estimatedExpiresAt?: true
     estimatedValue?: true
     estimatedLow?: true
     estimatedHigh?: true
@@ -3001,6 +3402,8 @@ export namespace Prisma {
     postedAt?: true
     scrapedAt?: true
     updatedAt?: true
+    lastMonitoredAt?: true
+    estimatedExpiresAt?: true
     estimatedValue?: true
     estimatedLow?: true
     estimatedHigh?: true
@@ -3163,6 +3566,8 @@ export namespace Prisma {
     postedAt: Date | null
     scrapedAt: Date
     updatedAt: Date
+    lastMonitoredAt: Date | null
+    estimatedExpiresAt: Date | null
     estimatedValue: number | null
     estimatedLow: number | null
     estimatedHigh: number | null
@@ -3257,6 +3662,8 @@ export namespace Prisma {
     postedAt?: boolean
     scrapedAt?: boolean
     updatedAt?: boolean
+    lastMonitoredAt?: boolean
+    estimatedExpiresAt?: boolean
     estimatedValue?: boolean
     estimatedLow?: boolean
     estimatedHigh?: boolean
@@ -3315,6 +3722,7 @@ export namespace Prisma {
     user?: boolean | Listing$userArgs<ExtArgs>
     images?: boolean | Listing$imagesArgs<ExtArgs>
     messages?: boolean | Listing$messagesArgs<ExtArgs>
+    notificationEvents?: boolean | Listing$notificationEventsArgs<ExtArgs>
     opportunity?: boolean | Listing$opportunityArgs<ExtArgs>
     postingQueue?: boolean | Listing$postingQueueArgs<ExtArgs>
     _count?: boolean | ListingCountOutputTypeDefaultArgs<ExtArgs>
@@ -3338,6 +3746,8 @@ export namespace Prisma {
     postedAt?: boolean
     scrapedAt?: boolean
     updatedAt?: boolean
+    lastMonitoredAt?: boolean
+    estimatedExpiresAt?: boolean
     estimatedValue?: boolean
     estimatedLow?: boolean
     estimatedHigh?: boolean
@@ -3414,6 +3824,8 @@ export namespace Prisma {
     postedAt?: boolean
     scrapedAt?: boolean
     updatedAt?: boolean
+    lastMonitoredAt?: boolean
+    estimatedExpiresAt?: boolean
     estimatedValue?: boolean
     estimatedLow?: boolean
     estimatedHigh?: boolean
@@ -3490,6 +3902,8 @@ export namespace Prisma {
     postedAt?: boolean
     scrapedAt?: boolean
     updatedAt?: boolean
+    lastMonitoredAt?: boolean
+    estimatedExpiresAt?: boolean
     estimatedValue?: boolean
     estimatedLow?: boolean
     estimatedHigh?: boolean
@@ -3547,11 +3961,12 @@ export namespace Prisma {
     analysisReasoning?: boolean
   }
 
-  export type ListingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "externalId" | "platform" | "url" | "title" | "description" | "askingPrice" | "condition" | "location" | "sellerName" | "sellerContact" | "imageUrls" | "category" | "postedAt" | "scrapedAt" | "updatedAt" | "estimatedValue" | "estimatedLow" | "estimatedHigh" | "profitPotential" | "profitLow" | "profitHigh" | "valueScore" | "discountPercent" | "resaleDifficulty" | "status" | "comparableUrls" | "priceReasoning" | "notes" | "shippable" | "estimatedWeight" | "negotiable" | "daysListed" | "tags" | "requestToBuy" | "identifiedBrand" | "identifiedModel" | "identifiedVariant" | "identifiedCondition" | "verifiedMarketValue" | "marketDataSource" | "marketDataDate" | "comparableSalesJson" | "compMatchConfidence" | "sellabilityScore" | "demandLevel" | "expectedDaysToSell" | "authenticityRisk" | "conditionRisk" | "recommendedOffer" | "recommendedList" | "resaleStrategy" | "trueDiscountPercent" | "soldVolume30Days" | "soldVolume60Days" | "soldVolume90Days" | "completenessLabel" | "sellerRating" | "sellerReviewCount" | "sellerAccountAgeDays" | "sizeCategory" | "shippingEstimatesJson" | "estimatedShippingCost" | "pickupDistanceMiles" | "outsidePickupRadius" | "adjustedProfitMargin" | "conversationStatus" | "llmAnalyzed" | "analysisDate" | "analysisConfidence" | "analysisReasoning", ExtArgs["result"]["listing"]>
+  export type ListingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "externalId" | "platform" | "url" | "title" | "description" | "askingPrice" | "condition" | "location" | "sellerName" | "sellerContact" | "imageUrls" | "category" | "postedAt" | "scrapedAt" | "updatedAt" | "lastMonitoredAt" | "estimatedExpiresAt" | "estimatedValue" | "estimatedLow" | "estimatedHigh" | "profitPotential" | "profitLow" | "profitHigh" | "valueScore" | "discountPercent" | "resaleDifficulty" | "status" | "comparableUrls" | "priceReasoning" | "notes" | "shippable" | "estimatedWeight" | "negotiable" | "daysListed" | "tags" | "requestToBuy" | "identifiedBrand" | "identifiedModel" | "identifiedVariant" | "identifiedCondition" | "verifiedMarketValue" | "marketDataSource" | "marketDataDate" | "comparableSalesJson" | "compMatchConfidence" | "sellabilityScore" | "demandLevel" | "expectedDaysToSell" | "authenticityRisk" | "conditionRisk" | "recommendedOffer" | "recommendedList" | "resaleStrategy" | "trueDiscountPercent" | "soldVolume30Days" | "soldVolume60Days" | "soldVolume90Days" | "completenessLabel" | "sellerRating" | "sellerReviewCount" | "sellerAccountAgeDays" | "sizeCategory" | "shippingEstimatesJson" | "estimatedShippingCost" | "pickupDistanceMiles" | "outsidePickupRadius" | "adjustedProfitMargin" | "conversationStatus" | "llmAnalyzed" | "analysisDate" | "analysisConfidence" | "analysisReasoning", ExtArgs["result"]["listing"]>
   export type ListingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | Listing$userArgs<ExtArgs>
     images?: boolean | Listing$imagesArgs<ExtArgs>
     messages?: boolean | Listing$messagesArgs<ExtArgs>
+    notificationEvents?: boolean | Listing$notificationEventsArgs<ExtArgs>
     opportunity?: boolean | Listing$opportunityArgs<ExtArgs>
     postingQueue?: boolean | Listing$postingQueueArgs<ExtArgs>
     _count?: boolean | ListingCountOutputTypeDefaultArgs<ExtArgs>
@@ -3569,6 +3984,7 @@ export namespace Prisma {
       user: Prisma.$UserPayload<ExtArgs> | null
       images: Prisma.$ListingImagePayload<ExtArgs>[]
       messages: Prisma.$MessagePayload<ExtArgs>[]
+      notificationEvents: Prisma.$NotificationEventPayload<ExtArgs>[]
       opportunity: Prisma.$OpportunityPayload<ExtArgs> | null
       postingQueue: Prisma.$PostingQueueItemPayload<ExtArgs>[]
     }
@@ -3590,6 +4006,8 @@ export namespace Prisma {
       postedAt: Date | null
       scrapedAt: Date
       updatedAt: Date
+      lastMonitoredAt: Date | null
+      estimatedExpiresAt: Date | null
       estimatedValue: number | null
       estimatedLow: number | null
       estimatedHigh: number | null
@@ -4042,6 +4460,7 @@ export namespace Prisma {
     user<T extends Listing$userArgs<ExtArgs> = {}>(args?: Subset<T, Listing$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     images<T extends Listing$imagesArgs<ExtArgs> = {}>(args?: Subset<T, Listing$imagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ListingImagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     messages<T extends Listing$messagesArgs<ExtArgs> = {}>(args?: Subset<T, Listing$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    notificationEvents<T extends Listing$notificationEventsArgs<ExtArgs> = {}>(args?: Subset<T, Listing$notificationEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     opportunity<T extends Listing$opportunityArgs<ExtArgs> = {}>(args?: Subset<T, Listing$opportunityArgs<ExtArgs>>): Prisma__OpportunityClient<$Result.GetResult<Prisma.$OpportunityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     postingQueue<T extends Listing$postingQueueArgs<ExtArgs> = {}>(args?: Subset<T, Listing$postingQueueArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PostingQueueItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -4090,6 +4509,8 @@ export namespace Prisma {
     readonly postedAt: FieldRef<"Listing", 'DateTime'>
     readonly scrapedAt: FieldRef<"Listing", 'DateTime'>
     readonly updatedAt: FieldRef<"Listing", 'DateTime'>
+    readonly lastMonitoredAt: FieldRef<"Listing", 'DateTime'>
+    readonly estimatedExpiresAt: FieldRef<"Listing", 'DateTime'>
     readonly estimatedValue: FieldRef<"Listing", 'Float'>
     readonly estimatedLow: FieldRef<"Listing", 'Float'>
     readonly estimatedHigh: FieldRef<"Listing", 'Float'>
@@ -4608,6 +5029,30 @@ export namespace Prisma {
   }
 
   /**
+   * Listing.notificationEvents
+   */
+  export type Listing$notificationEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NotificationEvent
+     */
+    select?: NotificationEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the NotificationEvent
+     */
+    omit?: NotificationEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationEventInclude<ExtArgs> | null
+    where?: NotificationEventWhereInput
+    orderBy?: NotificationEventOrderByWithRelationInput | NotificationEventOrderByWithRelationInput[]
+    cursor?: NotificationEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: NotificationEventScalarFieldEnum | NotificationEventScalarFieldEnum[]
+  }
+
+  /**
    * Listing.opportunity
    */
   export type Listing$opportunityArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4710,6 +5155,10 @@ export namespace Prisma {
     fees: number | null
     status: string | null
     notes: string | null
+    meetingTime: Date | null
+    meetingLocation: string | null
+    meetingType: string | null
+    calendarEventId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4729,6 +5178,10 @@ export namespace Prisma {
     fees: number | null
     status: string | null
     notes: string | null
+    meetingTime: Date | null
+    meetingLocation: string | null
+    meetingType: string | null
+    calendarEventId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4748,6 +5201,10 @@ export namespace Prisma {
     fees: number
     status: number
     notes: number
+    meetingTime: number
+    meetingLocation: number
+    meetingType: number
+    calendarEventId: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -4783,6 +5240,10 @@ export namespace Prisma {
     fees?: true
     status?: true
     notes?: true
+    meetingTime?: true
+    meetingLocation?: true
+    meetingType?: true
+    calendarEventId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4802,6 +5263,10 @@ export namespace Prisma {
     fees?: true
     status?: true
     notes?: true
+    meetingTime?: true
+    meetingLocation?: true
+    meetingType?: true
+    calendarEventId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4821,6 +5286,10 @@ export namespace Prisma {
     fees?: true
     status?: true
     notes?: true
+    meetingTime?: true
+    meetingLocation?: true
+    meetingType?: true
+    calendarEventId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -4927,6 +5396,10 @@ export namespace Prisma {
     fees: number | null
     status: string
     notes: string | null
+    meetingTime: Date | null
+    meetingLocation: string | null
+    meetingType: string | null
+    calendarEventId: string | null
     createdAt: Date
     updatedAt: Date
     _count: OpportunityCountAggregateOutputType | null
@@ -4965,6 +5438,10 @@ export namespace Prisma {
     fees?: boolean
     status?: boolean
     notes?: boolean
+    meetingTime?: boolean
+    meetingLocation?: boolean
+    meetingType?: boolean
+    calendarEventId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     listing?: boolean | ListingDefaultArgs<ExtArgs>
@@ -4986,6 +5463,10 @@ export namespace Prisma {
     fees?: boolean
     status?: boolean
     notes?: boolean
+    meetingTime?: boolean
+    meetingLocation?: boolean
+    meetingType?: boolean
+    calendarEventId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     listing?: boolean | ListingDefaultArgs<ExtArgs>
@@ -5007,6 +5488,10 @@ export namespace Prisma {
     fees?: boolean
     status?: boolean
     notes?: boolean
+    meetingTime?: boolean
+    meetingLocation?: boolean
+    meetingType?: boolean
+    calendarEventId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     listing?: boolean | ListingDefaultArgs<ExtArgs>
@@ -5028,11 +5513,15 @@ export namespace Prisma {
     fees?: boolean
     status?: boolean
     notes?: boolean
+    meetingTime?: boolean
+    meetingLocation?: boolean
+    meetingType?: boolean
+    calendarEventId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type OpportunityOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "listingId" | "purchasePrice" | "purchaseDate" | "purchaseNotes" | "resalePrice" | "resalePlatform" | "resaleUrl" | "resaleDate" | "actualProfit" | "fees" | "status" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["opportunity"]>
+  export type OpportunityOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "listingId" | "purchasePrice" | "purchaseDate" | "purchaseNotes" | "resalePrice" | "resalePlatform" | "resaleUrl" | "resaleDate" | "actualProfit" | "fees" | "status" | "notes" | "meetingTime" | "meetingLocation" | "meetingType" | "calendarEventId" | "createdAt" | "updatedAt", ExtArgs["result"]["opportunity"]>
   export type OpportunityInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     listing?: boolean | ListingDefaultArgs<ExtArgs>
     user?: boolean | Opportunity$userArgs<ExtArgs>
@@ -5067,6 +5556,10 @@ export namespace Prisma {
       fees: number | null
       status: string
       notes: string | null
+      meetingTime: Date | null
+      meetingLocation: string | null
+      meetingType: string | null
+      calendarEventId: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["opportunity"]>
@@ -5508,6 +6001,10 @@ export namespace Prisma {
     readonly fees: FieldRef<"Opportunity", 'Float'>
     readonly status: FieldRef<"Opportunity", 'String'>
     readonly notes: FieldRef<"Opportunity", 'String'>
+    readonly meetingTime: FieldRef<"Opportunity", 'DateTime'>
+    readonly meetingLocation: FieldRef<"Opportunity", 'String'>
+    readonly meetingType: FieldRef<"Opportunity", 'String'>
+    readonly calendarEventId: FieldRef<"Opportunity", 'String'>
     readonly createdAt: FieldRef<"Opportunity", 'DateTime'>
     readonly updatedAt: FieldRef<"Opportunity", 'DateTime'>
   }
@@ -9699,8 +10196,11 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     accounts?: boolean | User$accountsArgs<ExtArgs>
+    deviceTokens?: boolean | User$deviceTokensArgs<ExtArgs>
+    googleCalendarToken?: boolean | User$googleCalendarTokenArgs<ExtArgs>
     listings?: boolean | User$listingsArgs<ExtArgs>
     messages?: boolean | User$messagesArgs<ExtArgs>
+    notificationEvents?: boolean | User$notificationEventsArgs<ExtArgs>
     opportunities?: boolean | User$opportunitiesArgs<ExtArgs>
     postingQueue?: boolean | User$postingQueueArgs<ExtArgs>
     scraperJobs?: boolean | User$scraperJobsArgs<ExtArgs>
@@ -9763,8 +10263,11 @@ export namespace Prisma {
   export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "firebaseUid" | "email" | "emailVerified" | "name" | "image" | "password" | "stripeCustomerId" | "subscriptionTier" | "onboardingComplete" | "onboardingStep" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | User$accountsArgs<ExtArgs>
+    deviceTokens?: boolean | User$deviceTokensArgs<ExtArgs>
+    googleCalendarToken?: boolean | User$googleCalendarTokenArgs<ExtArgs>
     listings?: boolean | User$listingsArgs<ExtArgs>
     messages?: boolean | User$messagesArgs<ExtArgs>
+    notificationEvents?: boolean | User$notificationEventsArgs<ExtArgs>
     opportunities?: boolean | User$opportunitiesArgs<ExtArgs>
     postingQueue?: boolean | User$postingQueueArgs<ExtArgs>
     scraperJobs?: boolean | User$scraperJobsArgs<ExtArgs>
@@ -9782,8 +10285,11 @@ export namespace Prisma {
     name: "User"
     objects: {
       accounts: Prisma.$AccountPayload<ExtArgs>[]
+      deviceTokens: Prisma.$DeviceTokenPayload<ExtArgs>[]
+      googleCalendarToken: Prisma.$GoogleCalendarTokenPayload<ExtArgs> | null
       listings: Prisma.$ListingPayload<ExtArgs>[]
       messages: Prisma.$MessagePayload<ExtArgs>[]
+      notificationEvents: Prisma.$NotificationEventPayload<ExtArgs>[]
       opportunities: Prisma.$OpportunityPayload<ExtArgs>[]
       postingQueue: Prisma.$PostingQueueItemPayload<ExtArgs>[]
       scraperJobs: Prisma.$ScraperJobPayload<ExtArgs>[]
@@ -10202,8 +10708,11 @@ export namespace Prisma {
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     accounts<T extends User$accountsArgs<ExtArgs> = {}>(args?: Subset<T, User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    deviceTokens<T extends User$deviceTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$deviceTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeviceTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    googleCalendarToken<T extends User$googleCalendarTokenArgs<ExtArgs> = {}>(args?: Subset<T, User$googleCalendarTokenArgs<ExtArgs>>): Prisma__GoogleCalendarTokenClient<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     listings<T extends User$listingsArgs<ExtArgs> = {}>(args?: Subset<T, User$listingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     messages<T extends User$messagesArgs<ExtArgs> = {}>(args?: Subset<T, User$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    notificationEvents<T extends User$notificationEventsArgs<ExtArgs> = {}>(args?: Subset<T, User$notificationEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     opportunities<T extends User$opportunitiesArgs<ExtArgs> = {}>(args?: Subset<T, User$opportunitiesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OpportunityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     postingQueue<T extends User$postingQueueArgs<ExtArgs> = {}>(args?: Subset<T, User$postingQueueArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PostingQueueItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     scraperJobs<T extends User$scraperJobsArgs<ExtArgs> = {}>(args?: Subset<T, User$scraperJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScraperJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -10666,6 +11175,49 @@ export namespace Prisma {
   }
 
   /**
+   * User.deviceTokens
+   */
+  export type User$deviceTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceToken
+     */
+    select?: DeviceTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeviceToken
+     */
+    omit?: DeviceTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceTokenInclude<ExtArgs> | null
+    where?: DeviceTokenWhereInput
+    orderBy?: DeviceTokenOrderByWithRelationInput | DeviceTokenOrderByWithRelationInput[]
+    cursor?: DeviceTokenWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DeviceTokenScalarFieldEnum | DeviceTokenScalarFieldEnum[]
+  }
+
+  /**
+   * User.googleCalendarToken
+   */
+  export type User$googleCalendarTokenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    where?: GoogleCalendarTokenWhereInput
+  }
+
+  /**
    * User.listings
    */
   export type User$listingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -10711,6 +11263,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: MessageScalarFieldEnum | MessageScalarFieldEnum[]
+  }
+
+  /**
+   * User.notificationEvents
+   */
+  export type User$notificationEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NotificationEvent
+     */
+    select?: NotificationEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the NotificationEvent
+     */
+    omit?: NotificationEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationEventInclude<ExtArgs> | null
+    where?: NotificationEventWhereInput
+    orderBy?: NotificationEventOrderByWithRelationInput | NotificationEventOrderByWithRelationInput[]
+    cursor?: NotificationEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: NotificationEventScalarFieldEnum | NotificationEventScalarFieldEnum[]
   }
 
   /**
@@ -14138,6 +14714,9 @@ export namespace Prisma {
     feeRateCraigslist: number | null
     maxPickupRadiusMiles: number | null
     holdingCostDailyRate: number | null
+    flipGoneColdHours: number | null
+    flipTurnedHotCount: number | null
+    meetingDepartureBufferMinutes: number | null
   }
 
   export type UserSettingsSumAggregateOutputType = {
@@ -14150,6 +14729,9 @@ export namespace Prisma {
     feeRateCraigslist: number | null
     maxPickupRadiusMiles: number | null
     holdingCostDailyRate: number | null
+    flipGoneColdHours: number | null
+    flipTurnedHotCount: number | null
+    meetingDepartureBufferMinutes: number | null
   }
 
   export type UserSettingsMinAggregateOutputType = {
@@ -14176,6 +14758,49 @@ export namespace Prisma {
     homeLocation: string | null
     holdingCostDailyRate: number | null
     messageApprovalRequired: boolean | null
+    pushNotifications: boolean | null
+    phoneNumber: string | null
+    phoneVerified: boolean | null
+    phoneVerificationCode: string | null
+    phoneVerificationExpiry: Date | null
+    phoneVerificationSentAt: Date | null
+    smsNotifications: boolean | null
+    notifyMessageReceived: boolean | null
+    notifyDraftReady: boolean | null
+    notifyMessageSent: boolean | null
+    notifyReviewReceived: boolean | null
+    notifyFlipGoneCold: boolean | null
+    notifyFlipTurnedHot: boolean | null
+    notifyPriceChanges: boolean | null
+    flipGoneColdHours: number | null
+    flipTurnedHotCount: number | null
+    notifyListingUnavailable: boolean | null
+    pushNotifyNewDeals: boolean | null
+    pushNotifySoldItems: boolean | null
+    pushNotifyMessageReceived: boolean | null
+    pushNotifyDraftReady: boolean | null
+    pushNotifyMessageSent: boolean | null
+    pushNotifyReviewReceived: boolean | null
+    pushNotifyFlipGoneCold: boolean | null
+    pushNotifyFlipTurnedHot: boolean | null
+    pushNotifyPriceDrops: boolean | null
+    pushNotifyExpiring: boolean | null
+    pushNotifyListingUnavailable: boolean | null
+    pushNotifyWeeklyDigest: boolean | null
+    smsNotifyNewDeals: boolean | null
+    smsNotifySoldItems: boolean | null
+    smsNotifyMessageReceived: boolean | null
+    smsNotifyDraftReady: boolean | null
+    smsNotifyMessageSent: boolean | null
+    smsNotifyReviewReceived: boolean | null
+    smsNotifyFlipGoneCold: boolean | null
+    smsNotifyFlipTurnedHot: boolean | null
+    smsNotifyPriceDrops: boolean | null
+    smsNotifyExpiring: boolean | null
+    smsNotifyListingUnavailable: boolean | null
+    smsNotifyWeeklyDigest: boolean | null
+    meetingDepartureBufferMinutes: number | null
+    notifyMeetingReminder: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -14204,6 +14829,49 @@ export namespace Prisma {
     homeLocation: string | null
     holdingCostDailyRate: number | null
     messageApprovalRequired: boolean | null
+    pushNotifications: boolean | null
+    phoneNumber: string | null
+    phoneVerified: boolean | null
+    phoneVerificationCode: string | null
+    phoneVerificationExpiry: Date | null
+    phoneVerificationSentAt: Date | null
+    smsNotifications: boolean | null
+    notifyMessageReceived: boolean | null
+    notifyDraftReady: boolean | null
+    notifyMessageSent: boolean | null
+    notifyReviewReceived: boolean | null
+    notifyFlipGoneCold: boolean | null
+    notifyFlipTurnedHot: boolean | null
+    notifyPriceChanges: boolean | null
+    flipGoneColdHours: number | null
+    flipTurnedHotCount: number | null
+    notifyListingUnavailable: boolean | null
+    pushNotifyNewDeals: boolean | null
+    pushNotifySoldItems: boolean | null
+    pushNotifyMessageReceived: boolean | null
+    pushNotifyDraftReady: boolean | null
+    pushNotifyMessageSent: boolean | null
+    pushNotifyReviewReceived: boolean | null
+    pushNotifyFlipGoneCold: boolean | null
+    pushNotifyFlipTurnedHot: boolean | null
+    pushNotifyPriceDrops: boolean | null
+    pushNotifyExpiring: boolean | null
+    pushNotifyListingUnavailable: boolean | null
+    pushNotifyWeeklyDigest: boolean | null
+    smsNotifyNewDeals: boolean | null
+    smsNotifySoldItems: boolean | null
+    smsNotifyMessageReceived: boolean | null
+    smsNotifyDraftReady: boolean | null
+    smsNotifyMessageSent: boolean | null
+    smsNotifyReviewReceived: boolean | null
+    smsNotifyFlipGoneCold: boolean | null
+    smsNotifyFlipTurnedHot: boolean | null
+    smsNotifyPriceDrops: boolean | null
+    smsNotifyExpiring: boolean | null
+    smsNotifyListingUnavailable: boolean | null
+    smsNotifyWeeklyDigest: boolean | null
+    meetingDepartureBufferMinutes: number | null
+    notifyMeetingReminder: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -14232,6 +14900,49 @@ export namespace Prisma {
     homeLocation: number
     holdingCostDailyRate: number
     messageApprovalRequired: number
+    pushNotifications: number
+    phoneNumber: number
+    phoneVerified: number
+    phoneVerificationCode: number
+    phoneVerificationExpiry: number
+    phoneVerificationSentAt: number
+    smsNotifications: number
+    notifyMessageReceived: number
+    notifyDraftReady: number
+    notifyMessageSent: number
+    notifyReviewReceived: number
+    notifyFlipGoneCold: number
+    notifyFlipTurnedHot: number
+    notifyPriceChanges: number
+    flipGoneColdHours: number
+    flipTurnedHotCount: number
+    notifyListingUnavailable: number
+    pushNotifyNewDeals: number
+    pushNotifySoldItems: number
+    pushNotifyMessageReceived: number
+    pushNotifyDraftReady: number
+    pushNotifyMessageSent: number
+    pushNotifyReviewReceived: number
+    pushNotifyFlipGoneCold: number
+    pushNotifyFlipTurnedHot: number
+    pushNotifyPriceDrops: number
+    pushNotifyExpiring: number
+    pushNotifyListingUnavailable: number
+    pushNotifyWeeklyDigest: number
+    smsNotifyNewDeals: number
+    smsNotifySoldItems: number
+    smsNotifyMessageReceived: number
+    smsNotifyDraftReady: number
+    smsNotifyMessageSent: number
+    smsNotifyReviewReceived: number
+    smsNotifyFlipGoneCold: number
+    smsNotifyFlipTurnedHot: number
+    smsNotifyPriceDrops: number
+    smsNotifyExpiring: number
+    smsNotifyListingUnavailable: number
+    smsNotifyWeeklyDigest: number
+    meetingDepartureBufferMinutes: number
+    notifyMeetingReminder: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -14248,6 +14959,9 @@ export namespace Prisma {
     feeRateCraigslist?: true
     maxPickupRadiusMiles?: true
     holdingCostDailyRate?: true
+    flipGoneColdHours?: true
+    flipTurnedHotCount?: true
+    meetingDepartureBufferMinutes?: true
   }
 
   export type UserSettingsSumAggregateInputType = {
@@ -14260,6 +14974,9 @@ export namespace Prisma {
     feeRateCraigslist?: true
     maxPickupRadiusMiles?: true
     holdingCostDailyRate?: true
+    flipGoneColdHours?: true
+    flipTurnedHotCount?: true
+    meetingDepartureBufferMinutes?: true
   }
 
   export type UserSettingsMinAggregateInputType = {
@@ -14286,6 +15003,49 @@ export namespace Prisma {
     homeLocation?: true
     holdingCostDailyRate?: true
     messageApprovalRequired?: true
+    pushNotifications?: true
+    phoneNumber?: true
+    phoneVerified?: true
+    phoneVerificationCode?: true
+    phoneVerificationExpiry?: true
+    phoneVerificationSentAt?: true
+    smsNotifications?: true
+    notifyMessageReceived?: true
+    notifyDraftReady?: true
+    notifyMessageSent?: true
+    notifyReviewReceived?: true
+    notifyFlipGoneCold?: true
+    notifyFlipTurnedHot?: true
+    notifyPriceChanges?: true
+    flipGoneColdHours?: true
+    flipTurnedHotCount?: true
+    notifyListingUnavailable?: true
+    pushNotifyNewDeals?: true
+    pushNotifySoldItems?: true
+    pushNotifyMessageReceived?: true
+    pushNotifyDraftReady?: true
+    pushNotifyMessageSent?: true
+    pushNotifyReviewReceived?: true
+    pushNotifyFlipGoneCold?: true
+    pushNotifyFlipTurnedHot?: true
+    pushNotifyPriceDrops?: true
+    pushNotifyExpiring?: true
+    pushNotifyListingUnavailable?: true
+    pushNotifyWeeklyDigest?: true
+    smsNotifyNewDeals?: true
+    smsNotifySoldItems?: true
+    smsNotifyMessageReceived?: true
+    smsNotifyDraftReady?: true
+    smsNotifyMessageSent?: true
+    smsNotifyReviewReceived?: true
+    smsNotifyFlipGoneCold?: true
+    smsNotifyFlipTurnedHot?: true
+    smsNotifyPriceDrops?: true
+    smsNotifyExpiring?: true
+    smsNotifyListingUnavailable?: true
+    smsNotifyWeeklyDigest?: true
+    meetingDepartureBufferMinutes?: true
+    notifyMeetingReminder?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -14314,6 +15074,49 @@ export namespace Prisma {
     homeLocation?: true
     holdingCostDailyRate?: true
     messageApprovalRequired?: true
+    pushNotifications?: true
+    phoneNumber?: true
+    phoneVerified?: true
+    phoneVerificationCode?: true
+    phoneVerificationExpiry?: true
+    phoneVerificationSentAt?: true
+    smsNotifications?: true
+    notifyMessageReceived?: true
+    notifyDraftReady?: true
+    notifyMessageSent?: true
+    notifyReviewReceived?: true
+    notifyFlipGoneCold?: true
+    notifyFlipTurnedHot?: true
+    notifyPriceChanges?: true
+    flipGoneColdHours?: true
+    flipTurnedHotCount?: true
+    notifyListingUnavailable?: true
+    pushNotifyNewDeals?: true
+    pushNotifySoldItems?: true
+    pushNotifyMessageReceived?: true
+    pushNotifyDraftReady?: true
+    pushNotifyMessageSent?: true
+    pushNotifyReviewReceived?: true
+    pushNotifyFlipGoneCold?: true
+    pushNotifyFlipTurnedHot?: true
+    pushNotifyPriceDrops?: true
+    pushNotifyExpiring?: true
+    pushNotifyListingUnavailable?: true
+    pushNotifyWeeklyDigest?: true
+    smsNotifyNewDeals?: true
+    smsNotifySoldItems?: true
+    smsNotifyMessageReceived?: true
+    smsNotifyDraftReady?: true
+    smsNotifyMessageSent?: true
+    smsNotifyReviewReceived?: true
+    smsNotifyFlipGoneCold?: true
+    smsNotifyFlipTurnedHot?: true
+    smsNotifyPriceDrops?: true
+    smsNotifyExpiring?: true
+    smsNotifyListingUnavailable?: true
+    smsNotifyWeeklyDigest?: true
+    meetingDepartureBufferMinutes?: true
+    notifyMeetingReminder?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -14342,6 +15145,49 @@ export namespace Prisma {
     homeLocation?: true
     holdingCostDailyRate?: true
     messageApprovalRequired?: true
+    pushNotifications?: true
+    phoneNumber?: true
+    phoneVerified?: true
+    phoneVerificationCode?: true
+    phoneVerificationExpiry?: true
+    phoneVerificationSentAt?: true
+    smsNotifications?: true
+    notifyMessageReceived?: true
+    notifyDraftReady?: true
+    notifyMessageSent?: true
+    notifyReviewReceived?: true
+    notifyFlipGoneCold?: true
+    notifyFlipTurnedHot?: true
+    notifyPriceChanges?: true
+    flipGoneColdHours?: true
+    flipTurnedHotCount?: true
+    notifyListingUnavailable?: true
+    pushNotifyNewDeals?: true
+    pushNotifySoldItems?: true
+    pushNotifyMessageReceived?: true
+    pushNotifyDraftReady?: true
+    pushNotifyMessageSent?: true
+    pushNotifyReviewReceived?: true
+    pushNotifyFlipGoneCold?: true
+    pushNotifyFlipTurnedHot?: true
+    pushNotifyPriceDrops?: true
+    pushNotifyExpiring?: true
+    pushNotifyListingUnavailable?: true
+    pushNotifyWeeklyDigest?: true
+    smsNotifyNewDeals?: true
+    smsNotifySoldItems?: true
+    smsNotifyMessageReceived?: true
+    smsNotifyDraftReady?: true
+    smsNotifyMessageSent?: true
+    smsNotifyReviewReceived?: true
+    smsNotifyFlipGoneCold?: true
+    smsNotifyFlipTurnedHot?: true
+    smsNotifyPriceDrops?: true
+    smsNotifyExpiring?: true
+    smsNotifyListingUnavailable?: true
+    smsNotifyWeeklyDigest?: true
+    meetingDepartureBufferMinutes?: true
+    notifyMeetingReminder?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -14457,6 +15303,49 @@ export namespace Prisma {
     homeLocation: string | null
     holdingCostDailyRate: number
     messageApprovalRequired: boolean
+    pushNotifications: boolean
+    phoneNumber: string | null
+    phoneVerified: boolean
+    phoneVerificationCode: string | null
+    phoneVerificationExpiry: Date | null
+    phoneVerificationSentAt: Date | null
+    smsNotifications: boolean
+    notifyMessageReceived: boolean
+    notifyDraftReady: boolean
+    notifyMessageSent: boolean
+    notifyReviewReceived: boolean
+    notifyFlipGoneCold: boolean
+    notifyFlipTurnedHot: boolean
+    notifyPriceChanges: boolean
+    flipGoneColdHours: number
+    flipTurnedHotCount: number
+    notifyListingUnavailable: boolean
+    pushNotifyNewDeals: boolean
+    pushNotifySoldItems: boolean
+    pushNotifyMessageReceived: boolean
+    pushNotifyDraftReady: boolean
+    pushNotifyMessageSent: boolean
+    pushNotifyReviewReceived: boolean
+    pushNotifyFlipGoneCold: boolean
+    pushNotifyFlipTurnedHot: boolean
+    pushNotifyPriceDrops: boolean
+    pushNotifyExpiring: boolean
+    pushNotifyListingUnavailable: boolean
+    pushNotifyWeeklyDigest: boolean
+    smsNotifyNewDeals: boolean
+    smsNotifySoldItems: boolean
+    smsNotifyMessageReceived: boolean
+    smsNotifyDraftReady: boolean
+    smsNotifyMessageSent: boolean
+    smsNotifyReviewReceived: boolean
+    smsNotifyFlipGoneCold: boolean
+    smsNotifyFlipTurnedHot: boolean
+    smsNotifyPriceDrops: boolean
+    smsNotifyExpiring: boolean
+    smsNotifyListingUnavailable: boolean
+    smsNotifyWeeklyDigest: boolean
+    meetingDepartureBufferMinutes: number
+    notifyMeetingReminder: boolean
     createdAt: Date
     updatedAt: Date
     _count: UserSettingsCountAggregateOutputType | null
@@ -14504,6 +15393,49 @@ export namespace Prisma {
     homeLocation?: boolean
     holdingCostDailyRate?: boolean
     messageApprovalRequired?: boolean
+    pushNotifications?: boolean
+    phoneNumber?: boolean
+    phoneVerified?: boolean
+    phoneVerificationCode?: boolean
+    phoneVerificationExpiry?: boolean
+    phoneVerificationSentAt?: boolean
+    smsNotifications?: boolean
+    notifyMessageReceived?: boolean
+    notifyDraftReady?: boolean
+    notifyMessageSent?: boolean
+    notifyReviewReceived?: boolean
+    notifyFlipGoneCold?: boolean
+    notifyFlipTurnedHot?: boolean
+    notifyPriceChanges?: boolean
+    flipGoneColdHours?: boolean
+    flipTurnedHotCount?: boolean
+    notifyListingUnavailable?: boolean
+    pushNotifyNewDeals?: boolean
+    pushNotifySoldItems?: boolean
+    pushNotifyMessageReceived?: boolean
+    pushNotifyDraftReady?: boolean
+    pushNotifyMessageSent?: boolean
+    pushNotifyReviewReceived?: boolean
+    pushNotifyFlipGoneCold?: boolean
+    pushNotifyFlipTurnedHot?: boolean
+    pushNotifyPriceDrops?: boolean
+    pushNotifyExpiring?: boolean
+    pushNotifyListingUnavailable?: boolean
+    pushNotifyWeeklyDigest?: boolean
+    smsNotifyNewDeals?: boolean
+    smsNotifySoldItems?: boolean
+    smsNotifyMessageReceived?: boolean
+    smsNotifyDraftReady?: boolean
+    smsNotifyMessageSent?: boolean
+    smsNotifyReviewReceived?: boolean
+    smsNotifyFlipGoneCold?: boolean
+    smsNotifyFlipTurnedHot?: boolean
+    smsNotifyPriceDrops?: boolean
+    smsNotifyExpiring?: boolean
+    smsNotifyListingUnavailable?: boolean
+    smsNotifyWeeklyDigest?: boolean
+    meetingDepartureBufferMinutes?: boolean
+    notifyMeetingReminder?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -14533,6 +15465,49 @@ export namespace Prisma {
     homeLocation?: boolean
     holdingCostDailyRate?: boolean
     messageApprovalRequired?: boolean
+    pushNotifications?: boolean
+    phoneNumber?: boolean
+    phoneVerified?: boolean
+    phoneVerificationCode?: boolean
+    phoneVerificationExpiry?: boolean
+    phoneVerificationSentAt?: boolean
+    smsNotifications?: boolean
+    notifyMessageReceived?: boolean
+    notifyDraftReady?: boolean
+    notifyMessageSent?: boolean
+    notifyReviewReceived?: boolean
+    notifyFlipGoneCold?: boolean
+    notifyFlipTurnedHot?: boolean
+    notifyPriceChanges?: boolean
+    flipGoneColdHours?: boolean
+    flipTurnedHotCount?: boolean
+    notifyListingUnavailable?: boolean
+    pushNotifyNewDeals?: boolean
+    pushNotifySoldItems?: boolean
+    pushNotifyMessageReceived?: boolean
+    pushNotifyDraftReady?: boolean
+    pushNotifyMessageSent?: boolean
+    pushNotifyReviewReceived?: boolean
+    pushNotifyFlipGoneCold?: boolean
+    pushNotifyFlipTurnedHot?: boolean
+    pushNotifyPriceDrops?: boolean
+    pushNotifyExpiring?: boolean
+    pushNotifyListingUnavailable?: boolean
+    pushNotifyWeeklyDigest?: boolean
+    smsNotifyNewDeals?: boolean
+    smsNotifySoldItems?: boolean
+    smsNotifyMessageReceived?: boolean
+    smsNotifyDraftReady?: boolean
+    smsNotifyMessageSent?: boolean
+    smsNotifyReviewReceived?: boolean
+    smsNotifyFlipGoneCold?: boolean
+    smsNotifyFlipTurnedHot?: boolean
+    smsNotifyPriceDrops?: boolean
+    smsNotifyExpiring?: boolean
+    smsNotifyListingUnavailable?: boolean
+    smsNotifyWeeklyDigest?: boolean
+    meetingDepartureBufferMinutes?: boolean
+    notifyMeetingReminder?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -14562,6 +15537,49 @@ export namespace Prisma {
     homeLocation?: boolean
     holdingCostDailyRate?: boolean
     messageApprovalRequired?: boolean
+    pushNotifications?: boolean
+    phoneNumber?: boolean
+    phoneVerified?: boolean
+    phoneVerificationCode?: boolean
+    phoneVerificationExpiry?: boolean
+    phoneVerificationSentAt?: boolean
+    smsNotifications?: boolean
+    notifyMessageReceived?: boolean
+    notifyDraftReady?: boolean
+    notifyMessageSent?: boolean
+    notifyReviewReceived?: boolean
+    notifyFlipGoneCold?: boolean
+    notifyFlipTurnedHot?: boolean
+    notifyPriceChanges?: boolean
+    flipGoneColdHours?: boolean
+    flipTurnedHotCount?: boolean
+    notifyListingUnavailable?: boolean
+    pushNotifyNewDeals?: boolean
+    pushNotifySoldItems?: boolean
+    pushNotifyMessageReceived?: boolean
+    pushNotifyDraftReady?: boolean
+    pushNotifyMessageSent?: boolean
+    pushNotifyReviewReceived?: boolean
+    pushNotifyFlipGoneCold?: boolean
+    pushNotifyFlipTurnedHot?: boolean
+    pushNotifyPriceDrops?: boolean
+    pushNotifyExpiring?: boolean
+    pushNotifyListingUnavailable?: boolean
+    pushNotifyWeeklyDigest?: boolean
+    smsNotifyNewDeals?: boolean
+    smsNotifySoldItems?: boolean
+    smsNotifyMessageReceived?: boolean
+    smsNotifyDraftReady?: boolean
+    smsNotifyMessageSent?: boolean
+    smsNotifyReviewReceived?: boolean
+    smsNotifyFlipGoneCold?: boolean
+    smsNotifyFlipTurnedHot?: boolean
+    smsNotifyPriceDrops?: boolean
+    smsNotifyExpiring?: boolean
+    smsNotifyListingUnavailable?: boolean
+    smsNotifyWeeklyDigest?: boolean
+    meetingDepartureBufferMinutes?: boolean
+    notifyMeetingReminder?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -14591,11 +15609,54 @@ export namespace Prisma {
     homeLocation?: boolean
     holdingCostDailyRate?: boolean
     messageApprovalRequired?: boolean
+    pushNotifications?: boolean
+    phoneNumber?: boolean
+    phoneVerified?: boolean
+    phoneVerificationCode?: boolean
+    phoneVerificationExpiry?: boolean
+    phoneVerificationSentAt?: boolean
+    smsNotifications?: boolean
+    notifyMessageReceived?: boolean
+    notifyDraftReady?: boolean
+    notifyMessageSent?: boolean
+    notifyReviewReceived?: boolean
+    notifyFlipGoneCold?: boolean
+    notifyFlipTurnedHot?: boolean
+    notifyPriceChanges?: boolean
+    flipGoneColdHours?: boolean
+    flipTurnedHotCount?: boolean
+    notifyListingUnavailable?: boolean
+    pushNotifyNewDeals?: boolean
+    pushNotifySoldItems?: boolean
+    pushNotifyMessageReceived?: boolean
+    pushNotifyDraftReady?: boolean
+    pushNotifyMessageSent?: boolean
+    pushNotifyReviewReceived?: boolean
+    pushNotifyFlipGoneCold?: boolean
+    pushNotifyFlipTurnedHot?: boolean
+    pushNotifyPriceDrops?: boolean
+    pushNotifyExpiring?: boolean
+    pushNotifyListingUnavailable?: boolean
+    pushNotifyWeeklyDigest?: boolean
+    smsNotifyNewDeals?: boolean
+    smsNotifySoldItems?: boolean
+    smsNotifyMessageReceived?: boolean
+    smsNotifyDraftReady?: boolean
+    smsNotifyMessageSent?: boolean
+    smsNotifyReviewReceived?: boolean
+    smsNotifyFlipGoneCold?: boolean
+    smsNotifyFlipTurnedHot?: boolean
+    smsNotifyPriceDrops?: boolean
+    smsNotifyExpiring?: boolean
+    smsNotifyListingUnavailable?: boolean
+    smsNotifyWeeklyDigest?: boolean
+    meetingDepartureBufferMinutes?: boolean
+    notifyMeetingReminder?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "openaiApiKey" | "llmModel" | "discountThreshold" | "autoAnalyze" | "emailNotifications" | "notifyNewDeals" | "notifyPriceDrops" | "notifySoldItems" | "notifyExpiring" | "notifyWeeklyDigest" | "notifyFrequency" | "opportunityThreshold" | "feeRateEbay" | "feeRateMercari" | "feeRateFacebook" | "feeRateOfferup" | "feeRateCraigslist" | "maxPickupRadiusMiles" | "homeLocation" | "holdingCostDailyRate" | "messageApprovalRequired" | "createdAt" | "updatedAt", ExtArgs["result"]["userSettings"]>
+  export type UserSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "openaiApiKey" | "llmModel" | "discountThreshold" | "autoAnalyze" | "emailNotifications" | "notifyNewDeals" | "notifyPriceDrops" | "notifySoldItems" | "notifyExpiring" | "notifyWeeklyDigest" | "notifyFrequency" | "opportunityThreshold" | "feeRateEbay" | "feeRateMercari" | "feeRateFacebook" | "feeRateOfferup" | "feeRateCraigslist" | "maxPickupRadiusMiles" | "homeLocation" | "holdingCostDailyRate" | "messageApprovalRequired" | "pushNotifications" | "phoneNumber" | "phoneVerified" | "phoneVerificationCode" | "phoneVerificationExpiry" | "phoneVerificationSentAt" | "smsNotifications" | "notifyMessageReceived" | "notifyDraftReady" | "notifyMessageSent" | "notifyReviewReceived" | "notifyFlipGoneCold" | "notifyFlipTurnedHot" | "notifyPriceChanges" | "flipGoneColdHours" | "flipTurnedHotCount" | "notifyListingUnavailable" | "pushNotifyNewDeals" | "pushNotifySoldItems" | "pushNotifyMessageReceived" | "pushNotifyDraftReady" | "pushNotifyMessageSent" | "pushNotifyReviewReceived" | "pushNotifyFlipGoneCold" | "pushNotifyFlipTurnedHot" | "pushNotifyPriceDrops" | "pushNotifyExpiring" | "pushNotifyListingUnavailable" | "pushNotifyWeeklyDigest" | "smsNotifyNewDeals" | "smsNotifySoldItems" | "smsNotifyMessageReceived" | "smsNotifyDraftReady" | "smsNotifyMessageSent" | "smsNotifyReviewReceived" | "smsNotifyFlipGoneCold" | "smsNotifyFlipTurnedHot" | "smsNotifyPriceDrops" | "smsNotifyExpiring" | "smsNotifyListingUnavailable" | "smsNotifyWeeklyDigest" | "meetingDepartureBufferMinutes" | "notifyMeetingReminder" | "createdAt" | "updatedAt", ExtArgs["result"]["userSettings"]>
   export type UserSettingsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -14635,6 +15696,49 @@ export namespace Prisma {
       homeLocation: string | null
       holdingCostDailyRate: number
       messageApprovalRequired: boolean
+      pushNotifications: boolean
+      phoneNumber: string | null
+      phoneVerified: boolean
+      phoneVerificationCode: string | null
+      phoneVerificationExpiry: Date | null
+      phoneVerificationSentAt: Date | null
+      smsNotifications: boolean
+      notifyMessageReceived: boolean
+      notifyDraftReady: boolean
+      notifyMessageSent: boolean
+      notifyReviewReceived: boolean
+      notifyFlipGoneCold: boolean
+      notifyFlipTurnedHot: boolean
+      notifyPriceChanges: boolean
+      flipGoneColdHours: number
+      flipTurnedHotCount: number
+      notifyListingUnavailable: boolean
+      pushNotifyNewDeals: boolean
+      pushNotifySoldItems: boolean
+      pushNotifyMessageReceived: boolean
+      pushNotifyDraftReady: boolean
+      pushNotifyMessageSent: boolean
+      pushNotifyReviewReceived: boolean
+      pushNotifyFlipGoneCold: boolean
+      pushNotifyFlipTurnedHot: boolean
+      pushNotifyPriceDrops: boolean
+      pushNotifyExpiring: boolean
+      pushNotifyListingUnavailable: boolean
+      pushNotifyWeeklyDigest: boolean
+      smsNotifyNewDeals: boolean
+      smsNotifySoldItems: boolean
+      smsNotifyMessageReceived: boolean
+      smsNotifyDraftReady: boolean
+      smsNotifyMessageSent: boolean
+      smsNotifyReviewReceived: boolean
+      smsNotifyFlipGoneCold: boolean
+      smsNotifyFlipTurnedHot: boolean
+      smsNotifyPriceDrops: boolean
+      smsNotifyExpiring: boolean
+      smsNotifyListingUnavailable: boolean
+      smsNotifyWeeklyDigest: boolean
+      meetingDepartureBufferMinutes: number
+      notifyMeetingReminder: boolean
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["userSettings"]>
@@ -15084,6 +16188,49 @@ export namespace Prisma {
     readonly homeLocation: FieldRef<"UserSettings", 'String'>
     readonly holdingCostDailyRate: FieldRef<"UserSettings", 'Float'>
     readonly messageApprovalRequired: FieldRef<"UserSettings", 'Boolean'>
+    readonly pushNotifications: FieldRef<"UserSettings", 'Boolean'>
+    readonly phoneNumber: FieldRef<"UserSettings", 'String'>
+    readonly phoneVerified: FieldRef<"UserSettings", 'Boolean'>
+    readonly phoneVerificationCode: FieldRef<"UserSettings", 'String'>
+    readonly phoneVerificationExpiry: FieldRef<"UserSettings", 'DateTime'>
+    readonly phoneVerificationSentAt: FieldRef<"UserSettings", 'DateTime'>
+    readonly smsNotifications: FieldRef<"UserSettings", 'Boolean'>
+    readonly notifyMessageReceived: FieldRef<"UserSettings", 'Boolean'>
+    readonly notifyDraftReady: FieldRef<"UserSettings", 'Boolean'>
+    readonly notifyMessageSent: FieldRef<"UserSettings", 'Boolean'>
+    readonly notifyReviewReceived: FieldRef<"UserSettings", 'Boolean'>
+    readonly notifyFlipGoneCold: FieldRef<"UserSettings", 'Boolean'>
+    readonly notifyFlipTurnedHot: FieldRef<"UserSettings", 'Boolean'>
+    readonly notifyPriceChanges: FieldRef<"UserSettings", 'Boolean'>
+    readonly flipGoneColdHours: FieldRef<"UserSettings", 'Int'>
+    readonly flipTurnedHotCount: FieldRef<"UserSettings", 'Int'>
+    readonly notifyListingUnavailable: FieldRef<"UserSettings", 'Boolean'>
+    readonly pushNotifyNewDeals: FieldRef<"UserSettings", 'Boolean'>
+    readonly pushNotifySoldItems: FieldRef<"UserSettings", 'Boolean'>
+    readonly pushNotifyMessageReceived: FieldRef<"UserSettings", 'Boolean'>
+    readonly pushNotifyDraftReady: FieldRef<"UserSettings", 'Boolean'>
+    readonly pushNotifyMessageSent: FieldRef<"UserSettings", 'Boolean'>
+    readonly pushNotifyReviewReceived: FieldRef<"UserSettings", 'Boolean'>
+    readonly pushNotifyFlipGoneCold: FieldRef<"UserSettings", 'Boolean'>
+    readonly pushNotifyFlipTurnedHot: FieldRef<"UserSettings", 'Boolean'>
+    readonly pushNotifyPriceDrops: FieldRef<"UserSettings", 'Boolean'>
+    readonly pushNotifyExpiring: FieldRef<"UserSettings", 'Boolean'>
+    readonly pushNotifyListingUnavailable: FieldRef<"UserSettings", 'Boolean'>
+    readonly pushNotifyWeeklyDigest: FieldRef<"UserSettings", 'Boolean'>
+    readonly smsNotifyNewDeals: FieldRef<"UserSettings", 'Boolean'>
+    readonly smsNotifySoldItems: FieldRef<"UserSettings", 'Boolean'>
+    readonly smsNotifyMessageReceived: FieldRef<"UserSettings", 'Boolean'>
+    readonly smsNotifyDraftReady: FieldRef<"UserSettings", 'Boolean'>
+    readonly smsNotifyMessageSent: FieldRef<"UserSettings", 'Boolean'>
+    readonly smsNotifyReviewReceived: FieldRef<"UserSettings", 'Boolean'>
+    readonly smsNotifyFlipGoneCold: FieldRef<"UserSettings", 'Boolean'>
+    readonly smsNotifyFlipTurnedHot: FieldRef<"UserSettings", 'Boolean'>
+    readonly smsNotifyPriceDrops: FieldRef<"UserSettings", 'Boolean'>
+    readonly smsNotifyExpiring: FieldRef<"UserSettings", 'Boolean'>
+    readonly smsNotifyListingUnavailable: FieldRef<"UserSettings", 'Boolean'>
+    readonly smsNotifyWeeklyDigest: FieldRef<"UserSettings", 'Boolean'>
+    readonly meetingDepartureBufferMinutes: FieldRef<"UserSettings", 'Int'>
+    readonly notifyMeetingReminder: FieldRef<"UserSettings", 'Boolean'>
     readonly createdAt: FieldRef<"UserSettings", 'DateTime'>
     readonly updatedAt: FieldRef<"UserSettings", 'DateTime'>
   }
@@ -15497,6 +16644,1077 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: UserSettingsInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model DeviceToken
+   */
+
+  export type AggregateDeviceToken = {
+    _count: DeviceTokenCountAggregateOutputType | null
+    _min: DeviceTokenMinAggregateOutputType | null
+    _max: DeviceTokenMaxAggregateOutputType | null
+  }
+
+  export type DeviceTokenMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    token: string | null
+    userAgent: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DeviceTokenMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    token: string | null
+    userAgent: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DeviceTokenCountAggregateOutputType = {
+    id: number
+    userId: number
+    token: number
+    userAgent: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type DeviceTokenMinAggregateInputType = {
+    id?: true
+    userId?: true
+    token?: true
+    userAgent?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DeviceTokenMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    token?: true
+    userAgent?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DeviceTokenCountAggregateInputType = {
+    id?: true
+    userId?: true
+    token?: true
+    userAgent?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type DeviceTokenAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DeviceToken to aggregate.
+     */
+    where?: DeviceTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceTokens to fetch.
+     */
+    orderBy?: DeviceTokenOrderByWithRelationInput | DeviceTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DeviceTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DeviceTokens
+    **/
+    _count?: true | DeviceTokenCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DeviceTokenMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DeviceTokenMaxAggregateInputType
+  }
+
+  export type GetDeviceTokenAggregateType<T extends DeviceTokenAggregateArgs> = {
+        [P in keyof T & keyof AggregateDeviceToken]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDeviceToken[P]>
+      : GetScalarType<T[P], AggregateDeviceToken[P]>
+  }
+
+
+
+
+  export type DeviceTokenGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeviceTokenWhereInput
+    orderBy?: DeviceTokenOrderByWithAggregationInput | DeviceTokenOrderByWithAggregationInput[]
+    by: DeviceTokenScalarFieldEnum[] | DeviceTokenScalarFieldEnum
+    having?: DeviceTokenScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DeviceTokenCountAggregateInputType | true
+    _min?: DeviceTokenMinAggregateInputType
+    _max?: DeviceTokenMaxAggregateInputType
+  }
+
+  export type DeviceTokenGroupByOutputType = {
+    id: string
+    userId: string
+    token: string
+    userAgent: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: DeviceTokenCountAggregateOutputType | null
+    _min: DeviceTokenMinAggregateOutputType | null
+    _max: DeviceTokenMaxAggregateOutputType | null
+  }
+
+  type GetDeviceTokenGroupByPayload<T extends DeviceTokenGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DeviceTokenGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DeviceTokenGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DeviceTokenGroupByOutputType[P]>
+            : GetScalarType<T[P], DeviceTokenGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DeviceTokenSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    token?: boolean
+    userAgent?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["deviceToken"]>
+
+  export type DeviceTokenSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    token?: boolean
+    userAgent?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["deviceToken"]>
+
+  export type DeviceTokenSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    token?: boolean
+    userAgent?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["deviceToken"]>
+
+  export type DeviceTokenSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    token?: boolean
+    userAgent?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type DeviceTokenOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "token" | "userAgent" | "createdAt" | "updatedAt", ExtArgs["result"]["deviceToken"]>
+  export type DeviceTokenInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type DeviceTokenIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type DeviceTokenIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $DeviceTokenPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DeviceToken"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      token: string
+      userAgent: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["deviceToken"]>
+    composites: {}
+  }
+
+  type DeviceTokenGetPayload<S extends boolean | null | undefined | DeviceTokenDefaultArgs> = $Result.GetResult<Prisma.$DeviceTokenPayload, S>
+
+  type DeviceTokenCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DeviceTokenFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DeviceTokenCountAggregateInputType | true
+    }
+
+  export interface DeviceTokenDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DeviceToken'], meta: { name: 'DeviceToken' } }
+    /**
+     * Find zero or one DeviceToken that matches the filter.
+     * @param {DeviceTokenFindUniqueArgs} args - Arguments to find a DeviceToken
+     * @example
+     * // Get one DeviceToken
+     * const deviceToken = await prisma.deviceToken.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DeviceTokenFindUniqueArgs>(args: SelectSubset<T, DeviceTokenFindUniqueArgs<ExtArgs>>): Prisma__DeviceTokenClient<$Result.GetResult<Prisma.$DeviceTokenPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DeviceToken that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DeviceTokenFindUniqueOrThrowArgs} args - Arguments to find a DeviceToken
+     * @example
+     * // Get one DeviceToken
+     * const deviceToken = await prisma.deviceToken.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DeviceTokenFindUniqueOrThrowArgs>(args: SelectSubset<T, DeviceTokenFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DeviceTokenClient<$Result.GetResult<Prisma.$DeviceTokenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DeviceToken that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceTokenFindFirstArgs} args - Arguments to find a DeviceToken
+     * @example
+     * // Get one DeviceToken
+     * const deviceToken = await prisma.deviceToken.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DeviceTokenFindFirstArgs>(args?: SelectSubset<T, DeviceTokenFindFirstArgs<ExtArgs>>): Prisma__DeviceTokenClient<$Result.GetResult<Prisma.$DeviceTokenPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DeviceToken that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceTokenFindFirstOrThrowArgs} args - Arguments to find a DeviceToken
+     * @example
+     * // Get one DeviceToken
+     * const deviceToken = await prisma.deviceToken.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DeviceTokenFindFirstOrThrowArgs>(args?: SelectSubset<T, DeviceTokenFindFirstOrThrowArgs<ExtArgs>>): Prisma__DeviceTokenClient<$Result.GetResult<Prisma.$DeviceTokenPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DeviceTokens that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceTokenFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DeviceTokens
+     * const deviceTokens = await prisma.deviceToken.findMany()
+     * 
+     * // Get first 10 DeviceTokens
+     * const deviceTokens = await prisma.deviceToken.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const deviceTokenWithIdOnly = await prisma.deviceToken.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DeviceTokenFindManyArgs>(args?: SelectSubset<T, DeviceTokenFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeviceTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DeviceToken.
+     * @param {DeviceTokenCreateArgs} args - Arguments to create a DeviceToken.
+     * @example
+     * // Create one DeviceToken
+     * const DeviceToken = await prisma.deviceToken.create({
+     *   data: {
+     *     // ... data to create a DeviceToken
+     *   }
+     * })
+     * 
+     */
+    create<T extends DeviceTokenCreateArgs>(args: SelectSubset<T, DeviceTokenCreateArgs<ExtArgs>>): Prisma__DeviceTokenClient<$Result.GetResult<Prisma.$DeviceTokenPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DeviceTokens.
+     * @param {DeviceTokenCreateManyArgs} args - Arguments to create many DeviceTokens.
+     * @example
+     * // Create many DeviceTokens
+     * const deviceToken = await prisma.deviceToken.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DeviceTokenCreateManyArgs>(args?: SelectSubset<T, DeviceTokenCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DeviceTokens and returns the data saved in the database.
+     * @param {DeviceTokenCreateManyAndReturnArgs} args - Arguments to create many DeviceTokens.
+     * @example
+     * // Create many DeviceTokens
+     * const deviceToken = await prisma.deviceToken.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DeviceTokens and only return the `id`
+     * const deviceTokenWithIdOnly = await prisma.deviceToken.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DeviceTokenCreateManyAndReturnArgs>(args?: SelectSubset<T, DeviceTokenCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeviceTokenPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a DeviceToken.
+     * @param {DeviceTokenDeleteArgs} args - Arguments to delete one DeviceToken.
+     * @example
+     * // Delete one DeviceToken
+     * const DeviceToken = await prisma.deviceToken.delete({
+     *   where: {
+     *     // ... filter to delete one DeviceToken
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DeviceTokenDeleteArgs>(args: SelectSubset<T, DeviceTokenDeleteArgs<ExtArgs>>): Prisma__DeviceTokenClient<$Result.GetResult<Prisma.$DeviceTokenPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DeviceToken.
+     * @param {DeviceTokenUpdateArgs} args - Arguments to update one DeviceToken.
+     * @example
+     * // Update one DeviceToken
+     * const deviceToken = await prisma.deviceToken.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DeviceTokenUpdateArgs>(args: SelectSubset<T, DeviceTokenUpdateArgs<ExtArgs>>): Prisma__DeviceTokenClient<$Result.GetResult<Prisma.$DeviceTokenPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DeviceTokens.
+     * @param {DeviceTokenDeleteManyArgs} args - Arguments to filter DeviceTokens to delete.
+     * @example
+     * // Delete a few DeviceTokens
+     * const { count } = await prisma.deviceToken.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DeviceTokenDeleteManyArgs>(args?: SelectSubset<T, DeviceTokenDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DeviceTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceTokenUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DeviceTokens
+     * const deviceToken = await prisma.deviceToken.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DeviceTokenUpdateManyArgs>(args: SelectSubset<T, DeviceTokenUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DeviceTokens and returns the data updated in the database.
+     * @param {DeviceTokenUpdateManyAndReturnArgs} args - Arguments to update many DeviceTokens.
+     * @example
+     * // Update many DeviceTokens
+     * const deviceToken = await prisma.deviceToken.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more DeviceTokens and only return the `id`
+     * const deviceTokenWithIdOnly = await prisma.deviceToken.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DeviceTokenUpdateManyAndReturnArgs>(args: SelectSubset<T, DeviceTokenUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeviceTokenPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one DeviceToken.
+     * @param {DeviceTokenUpsertArgs} args - Arguments to update or create a DeviceToken.
+     * @example
+     * // Update or create a DeviceToken
+     * const deviceToken = await prisma.deviceToken.upsert({
+     *   create: {
+     *     // ... data to create a DeviceToken
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DeviceToken we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DeviceTokenUpsertArgs>(args: SelectSubset<T, DeviceTokenUpsertArgs<ExtArgs>>): Prisma__DeviceTokenClient<$Result.GetResult<Prisma.$DeviceTokenPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DeviceTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceTokenCountArgs} args - Arguments to filter DeviceTokens to count.
+     * @example
+     * // Count the number of DeviceTokens
+     * const count = await prisma.deviceToken.count({
+     *   where: {
+     *     // ... the filter for the DeviceTokens we want to count
+     *   }
+     * })
+    **/
+    count<T extends DeviceTokenCountArgs>(
+      args?: Subset<T, DeviceTokenCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DeviceTokenCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DeviceToken.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceTokenAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DeviceTokenAggregateArgs>(args: Subset<T, DeviceTokenAggregateArgs>): Prisma.PrismaPromise<GetDeviceTokenAggregateType<T>>
+
+    /**
+     * Group by DeviceToken.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceTokenGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DeviceTokenGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DeviceTokenGroupByArgs['orderBy'] }
+        : { orderBy?: DeviceTokenGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DeviceTokenGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDeviceTokenGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DeviceToken model
+   */
+  readonly fields: DeviceTokenFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DeviceToken.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DeviceTokenClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DeviceToken model
+   */
+  interface DeviceTokenFieldRefs {
+    readonly id: FieldRef<"DeviceToken", 'String'>
+    readonly userId: FieldRef<"DeviceToken", 'String'>
+    readonly token: FieldRef<"DeviceToken", 'String'>
+    readonly userAgent: FieldRef<"DeviceToken", 'String'>
+    readonly createdAt: FieldRef<"DeviceToken", 'DateTime'>
+    readonly updatedAt: FieldRef<"DeviceToken", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DeviceToken findUnique
+   */
+  export type DeviceTokenFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceToken
+     */
+    select?: DeviceTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeviceToken
+     */
+    omit?: DeviceTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceToken to fetch.
+     */
+    where: DeviceTokenWhereUniqueInput
+  }
+
+  /**
+   * DeviceToken findUniqueOrThrow
+   */
+  export type DeviceTokenFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceToken
+     */
+    select?: DeviceTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeviceToken
+     */
+    omit?: DeviceTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceToken to fetch.
+     */
+    where: DeviceTokenWhereUniqueInput
+  }
+
+  /**
+   * DeviceToken findFirst
+   */
+  export type DeviceTokenFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceToken
+     */
+    select?: DeviceTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeviceToken
+     */
+    omit?: DeviceTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceToken to fetch.
+     */
+    where?: DeviceTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceTokens to fetch.
+     */
+    orderBy?: DeviceTokenOrderByWithRelationInput | DeviceTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DeviceTokens.
+     */
+    cursor?: DeviceTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DeviceTokens.
+     */
+    distinct?: DeviceTokenScalarFieldEnum | DeviceTokenScalarFieldEnum[]
+  }
+
+  /**
+   * DeviceToken findFirstOrThrow
+   */
+  export type DeviceTokenFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceToken
+     */
+    select?: DeviceTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeviceToken
+     */
+    omit?: DeviceTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceToken to fetch.
+     */
+    where?: DeviceTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceTokens to fetch.
+     */
+    orderBy?: DeviceTokenOrderByWithRelationInput | DeviceTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DeviceTokens.
+     */
+    cursor?: DeviceTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DeviceTokens.
+     */
+    distinct?: DeviceTokenScalarFieldEnum | DeviceTokenScalarFieldEnum[]
+  }
+
+  /**
+   * DeviceToken findMany
+   */
+  export type DeviceTokenFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceToken
+     */
+    select?: DeviceTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeviceToken
+     */
+    omit?: DeviceTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceTokens to fetch.
+     */
+    where?: DeviceTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceTokens to fetch.
+     */
+    orderBy?: DeviceTokenOrderByWithRelationInput | DeviceTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DeviceTokens.
+     */
+    cursor?: DeviceTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceTokens.
+     */
+    skip?: number
+    distinct?: DeviceTokenScalarFieldEnum | DeviceTokenScalarFieldEnum[]
+  }
+
+  /**
+   * DeviceToken create
+   */
+  export type DeviceTokenCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceToken
+     */
+    select?: DeviceTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeviceToken
+     */
+    omit?: DeviceTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceTokenInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DeviceToken.
+     */
+    data: XOR<DeviceTokenCreateInput, DeviceTokenUncheckedCreateInput>
+  }
+
+  /**
+   * DeviceToken createMany
+   */
+  export type DeviceTokenCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DeviceTokens.
+     */
+    data: DeviceTokenCreateManyInput | DeviceTokenCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DeviceToken createManyAndReturn
+   */
+  export type DeviceTokenCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceToken
+     */
+    select?: DeviceTokenSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeviceToken
+     */
+    omit?: DeviceTokenOmit<ExtArgs> | null
+    /**
+     * The data used to create many DeviceTokens.
+     */
+    data: DeviceTokenCreateManyInput | DeviceTokenCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceTokenIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DeviceToken update
+   */
+  export type DeviceTokenUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceToken
+     */
+    select?: DeviceTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeviceToken
+     */
+    omit?: DeviceTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceTokenInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DeviceToken.
+     */
+    data: XOR<DeviceTokenUpdateInput, DeviceTokenUncheckedUpdateInput>
+    /**
+     * Choose, which DeviceToken to update.
+     */
+    where: DeviceTokenWhereUniqueInput
+  }
+
+  /**
+   * DeviceToken updateMany
+   */
+  export type DeviceTokenUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DeviceTokens.
+     */
+    data: XOR<DeviceTokenUpdateManyMutationInput, DeviceTokenUncheckedUpdateManyInput>
+    /**
+     * Filter which DeviceTokens to update
+     */
+    where?: DeviceTokenWhereInput
+    /**
+     * Limit how many DeviceTokens to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DeviceToken updateManyAndReturn
+   */
+  export type DeviceTokenUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceToken
+     */
+    select?: DeviceTokenSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeviceToken
+     */
+    omit?: DeviceTokenOmit<ExtArgs> | null
+    /**
+     * The data used to update DeviceTokens.
+     */
+    data: XOR<DeviceTokenUpdateManyMutationInput, DeviceTokenUncheckedUpdateManyInput>
+    /**
+     * Filter which DeviceTokens to update
+     */
+    where?: DeviceTokenWhereInput
+    /**
+     * Limit how many DeviceTokens to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceTokenIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DeviceToken upsert
+   */
+  export type DeviceTokenUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceToken
+     */
+    select?: DeviceTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeviceToken
+     */
+    omit?: DeviceTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceTokenInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DeviceToken to update in case it exists.
+     */
+    where: DeviceTokenWhereUniqueInput
+    /**
+     * In case the DeviceToken found by the `where` argument doesn't exist, create a new DeviceToken with this data.
+     */
+    create: XOR<DeviceTokenCreateInput, DeviceTokenUncheckedCreateInput>
+    /**
+     * In case the DeviceToken was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DeviceTokenUpdateInput, DeviceTokenUncheckedUpdateInput>
+  }
+
+  /**
+   * DeviceToken delete
+   */
+  export type DeviceTokenDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceToken
+     */
+    select?: DeviceTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeviceToken
+     */
+    omit?: DeviceTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceTokenInclude<ExtArgs> | null
+    /**
+     * Filter which DeviceToken to delete.
+     */
+    where: DeviceTokenWhereUniqueInput
+  }
+
+  /**
+   * DeviceToken deleteMany
+   */
+  export type DeviceTokenDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DeviceTokens to delete
+     */
+    where?: DeviceTokenWhereInput
+    /**
+     * Limit how many DeviceTokens to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DeviceToken without action
+   */
+  export type DeviceTokenDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceToken
+     */
+    select?: DeviceTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeviceToken
+     */
+    omit?: DeviceTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceTokenInclude<ExtArgs> | null
   }
 
 
@@ -16505,6 +18723,1103 @@ export namespace Prisma {
      * Omit specific fields from the FacebookToken
      */
     omit?: FacebookTokenOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model GoogleCalendarToken
+   */
+
+  export type AggregateGoogleCalendarToken = {
+    _count: GoogleCalendarTokenCountAggregateOutputType | null
+    _min: GoogleCalendarTokenMinAggregateOutputType | null
+    _max: GoogleCalendarTokenMaxAggregateOutputType | null
+  }
+
+  export type GoogleCalendarTokenMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    accessToken: string | null
+    refreshToken: string | null
+    expiresAt: Date | null
+    calendarEmail: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type GoogleCalendarTokenMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    accessToken: string | null
+    refreshToken: string | null
+    expiresAt: Date | null
+    calendarEmail: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type GoogleCalendarTokenCountAggregateOutputType = {
+    id: number
+    userId: number
+    accessToken: number
+    refreshToken: number
+    expiresAt: number
+    calendarEmail: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type GoogleCalendarTokenMinAggregateInputType = {
+    id?: true
+    userId?: true
+    accessToken?: true
+    refreshToken?: true
+    expiresAt?: true
+    calendarEmail?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type GoogleCalendarTokenMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    accessToken?: true
+    refreshToken?: true
+    expiresAt?: true
+    calendarEmail?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type GoogleCalendarTokenCountAggregateInputType = {
+    id?: true
+    userId?: true
+    accessToken?: true
+    refreshToken?: true
+    expiresAt?: true
+    calendarEmail?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type GoogleCalendarTokenAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which GoogleCalendarToken to aggregate.
+     */
+    where?: GoogleCalendarTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GoogleCalendarTokens to fetch.
+     */
+    orderBy?: GoogleCalendarTokenOrderByWithRelationInput | GoogleCalendarTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: GoogleCalendarTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GoogleCalendarTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GoogleCalendarTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned GoogleCalendarTokens
+    **/
+    _count?: true | GoogleCalendarTokenCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: GoogleCalendarTokenMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: GoogleCalendarTokenMaxAggregateInputType
+  }
+
+  export type GetGoogleCalendarTokenAggregateType<T extends GoogleCalendarTokenAggregateArgs> = {
+        [P in keyof T & keyof AggregateGoogleCalendarToken]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateGoogleCalendarToken[P]>
+      : GetScalarType<T[P], AggregateGoogleCalendarToken[P]>
+  }
+
+
+
+
+  export type GoogleCalendarTokenGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: GoogleCalendarTokenWhereInput
+    orderBy?: GoogleCalendarTokenOrderByWithAggregationInput | GoogleCalendarTokenOrderByWithAggregationInput[]
+    by: GoogleCalendarTokenScalarFieldEnum[] | GoogleCalendarTokenScalarFieldEnum
+    having?: GoogleCalendarTokenScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: GoogleCalendarTokenCountAggregateInputType | true
+    _min?: GoogleCalendarTokenMinAggregateInputType
+    _max?: GoogleCalendarTokenMaxAggregateInputType
+  }
+
+  export type GoogleCalendarTokenGroupByOutputType = {
+    id: string
+    userId: string
+    accessToken: string
+    refreshToken: string
+    expiresAt: Date
+    calendarEmail: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: GoogleCalendarTokenCountAggregateOutputType | null
+    _min: GoogleCalendarTokenMinAggregateOutputType | null
+    _max: GoogleCalendarTokenMaxAggregateOutputType | null
+  }
+
+  type GetGoogleCalendarTokenGroupByPayload<T extends GoogleCalendarTokenGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<GoogleCalendarTokenGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof GoogleCalendarTokenGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], GoogleCalendarTokenGroupByOutputType[P]>
+            : GetScalarType<T[P], GoogleCalendarTokenGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type GoogleCalendarTokenSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    accessToken?: boolean
+    refreshToken?: boolean
+    expiresAt?: boolean
+    calendarEmail?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["googleCalendarToken"]>
+
+  export type GoogleCalendarTokenSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    accessToken?: boolean
+    refreshToken?: boolean
+    expiresAt?: boolean
+    calendarEmail?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["googleCalendarToken"]>
+
+  export type GoogleCalendarTokenSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    accessToken?: boolean
+    refreshToken?: boolean
+    expiresAt?: boolean
+    calendarEmail?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["googleCalendarToken"]>
+
+  export type GoogleCalendarTokenSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    accessToken?: boolean
+    refreshToken?: boolean
+    expiresAt?: boolean
+    calendarEmail?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type GoogleCalendarTokenOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "accessToken" | "refreshToken" | "expiresAt" | "calendarEmail" | "createdAt" | "updatedAt", ExtArgs["result"]["googleCalendarToken"]>
+  export type GoogleCalendarTokenInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type GoogleCalendarTokenIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type GoogleCalendarTokenIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $GoogleCalendarTokenPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "GoogleCalendarToken"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      accessToken: string
+      refreshToken: string
+      expiresAt: Date
+      calendarEmail: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["googleCalendarToken"]>
+    composites: {}
+  }
+
+  type GoogleCalendarTokenGetPayload<S extends boolean | null | undefined | GoogleCalendarTokenDefaultArgs> = $Result.GetResult<Prisma.$GoogleCalendarTokenPayload, S>
+
+  type GoogleCalendarTokenCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<GoogleCalendarTokenFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: GoogleCalendarTokenCountAggregateInputType | true
+    }
+
+  export interface GoogleCalendarTokenDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['GoogleCalendarToken'], meta: { name: 'GoogleCalendarToken' } }
+    /**
+     * Find zero or one GoogleCalendarToken that matches the filter.
+     * @param {GoogleCalendarTokenFindUniqueArgs} args - Arguments to find a GoogleCalendarToken
+     * @example
+     * // Get one GoogleCalendarToken
+     * const googleCalendarToken = await prisma.googleCalendarToken.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends GoogleCalendarTokenFindUniqueArgs>(args: SelectSubset<T, GoogleCalendarTokenFindUniqueArgs<ExtArgs>>): Prisma__GoogleCalendarTokenClient<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one GoogleCalendarToken that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {GoogleCalendarTokenFindUniqueOrThrowArgs} args - Arguments to find a GoogleCalendarToken
+     * @example
+     * // Get one GoogleCalendarToken
+     * const googleCalendarToken = await prisma.googleCalendarToken.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends GoogleCalendarTokenFindUniqueOrThrowArgs>(args: SelectSubset<T, GoogleCalendarTokenFindUniqueOrThrowArgs<ExtArgs>>): Prisma__GoogleCalendarTokenClient<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first GoogleCalendarToken that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GoogleCalendarTokenFindFirstArgs} args - Arguments to find a GoogleCalendarToken
+     * @example
+     * // Get one GoogleCalendarToken
+     * const googleCalendarToken = await prisma.googleCalendarToken.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends GoogleCalendarTokenFindFirstArgs>(args?: SelectSubset<T, GoogleCalendarTokenFindFirstArgs<ExtArgs>>): Prisma__GoogleCalendarTokenClient<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first GoogleCalendarToken that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GoogleCalendarTokenFindFirstOrThrowArgs} args - Arguments to find a GoogleCalendarToken
+     * @example
+     * // Get one GoogleCalendarToken
+     * const googleCalendarToken = await prisma.googleCalendarToken.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends GoogleCalendarTokenFindFirstOrThrowArgs>(args?: SelectSubset<T, GoogleCalendarTokenFindFirstOrThrowArgs<ExtArgs>>): Prisma__GoogleCalendarTokenClient<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more GoogleCalendarTokens that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GoogleCalendarTokenFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all GoogleCalendarTokens
+     * const googleCalendarTokens = await prisma.googleCalendarToken.findMany()
+     * 
+     * // Get first 10 GoogleCalendarTokens
+     * const googleCalendarTokens = await prisma.googleCalendarToken.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const googleCalendarTokenWithIdOnly = await prisma.googleCalendarToken.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends GoogleCalendarTokenFindManyArgs>(args?: SelectSubset<T, GoogleCalendarTokenFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a GoogleCalendarToken.
+     * @param {GoogleCalendarTokenCreateArgs} args - Arguments to create a GoogleCalendarToken.
+     * @example
+     * // Create one GoogleCalendarToken
+     * const GoogleCalendarToken = await prisma.googleCalendarToken.create({
+     *   data: {
+     *     // ... data to create a GoogleCalendarToken
+     *   }
+     * })
+     * 
+     */
+    create<T extends GoogleCalendarTokenCreateArgs>(args: SelectSubset<T, GoogleCalendarTokenCreateArgs<ExtArgs>>): Prisma__GoogleCalendarTokenClient<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many GoogleCalendarTokens.
+     * @param {GoogleCalendarTokenCreateManyArgs} args - Arguments to create many GoogleCalendarTokens.
+     * @example
+     * // Create many GoogleCalendarTokens
+     * const googleCalendarToken = await prisma.googleCalendarToken.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends GoogleCalendarTokenCreateManyArgs>(args?: SelectSubset<T, GoogleCalendarTokenCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many GoogleCalendarTokens and returns the data saved in the database.
+     * @param {GoogleCalendarTokenCreateManyAndReturnArgs} args - Arguments to create many GoogleCalendarTokens.
+     * @example
+     * // Create many GoogleCalendarTokens
+     * const googleCalendarToken = await prisma.googleCalendarToken.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many GoogleCalendarTokens and only return the `id`
+     * const googleCalendarTokenWithIdOnly = await prisma.googleCalendarToken.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends GoogleCalendarTokenCreateManyAndReturnArgs>(args?: SelectSubset<T, GoogleCalendarTokenCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a GoogleCalendarToken.
+     * @param {GoogleCalendarTokenDeleteArgs} args - Arguments to delete one GoogleCalendarToken.
+     * @example
+     * // Delete one GoogleCalendarToken
+     * const GoogleCalendarToken = await prisma.googleCalendarToken.delete({
+     *   where: {
+     *     // ... filter to delete one GoogleCalendarToken
+     *   }
+     * })
+     * 
+     */
+    delete<T extends GoogleCalendarTokenDeleteArgs>(args: SelectSubset<T, GoogleCalendarTokenDeleteArgs<ExtArgs>>): Prisma__GoogleCalendarTokenClient<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one GoogleCalendarToken.
+     * @param {GoogleCalendarTokenUpdateArgs} args - Arguments to update one GoogleCalendarToken.
+     * @example
+     * // Update one GoogleCalendarToken
+     * const googleCalendarToken = await prisma.googleCalendarToken.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends GoogleCalendarTokenUpdateArgs>(args: SelectSubset<T, GoogleCalendarTokenUpdateArgs<ExtArgs>>): Prisma__GoogleCalendarTokenClient<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more GoogleCalendarTokens.
+     * @param {GoogleCalendarTokenDeleteManyArgs} args - Arguments to filter GoogleCalendarTokens to delete.
+     * @example
+     * // Delete a few GoogleCalendarTokens
+     * const { count } = await prisma.googleCalendarToken.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends GoogleCalendarTokenDeleteManyArgs>(args?: SelectSubset<T, GoogleCalendarTokenDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more GoogleCalendarTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GoogleCalendarTokenUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many GoogleCalendarTokens
+     * const googleCalendarToken = await prisma.googleCalendarToken.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends GoogleCalendarTokenUpdateManyArgs>(args: SelectSubset<T, GoogleCalendarTokenUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more GoogleCalendarTokens and returns the data updated in the database.
+     * @param {GoogleCalendarTokenUpdateManyAndReturnArgs} args - Arguments to update many GoogleCalendarTokens.
+     * @example
+     * // Update many GoogleCalendarTokens
+     * const googleCalendarToken = await prisma.googleCalendarToken.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more GoogleCalendarTokens and only return the `id`
+     * const googleCalendarTokenWithIdOnly = await prisma.googleCalendarToken.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends GoogleCalendarTokenUpdateManyAndReturnArgs>(args: SelectSubset<T, GoogleCalendarTokenUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one GoogleCalendarToken.
+     * @param {GoogleCalendarTokenUpsertArgs} args - Arguments to update or create a GoogleCalendarToken.
+     * @example
+     * // Update or create a GoogleCalendarToken
+     * const googleCalendarToken = await prisma.googleCalendarToken.upsert({
+     *   create: {
+     *     // ... data to create a GoogleCalendarToken
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the GoogleCalendarToken we want to update
+     *   }
+     * })
+     */
+    upsert<T extends GoogleCalendarTokenUpsertArgs>(args: SelectSubset<T, GoogleCalendarTokenUpsertArgs<ExtArgs>>): Prisma__GoogleCalendarTokenClient<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of GoogleCalendarTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GoogleCalendarTokenCountArgs} args - Arguments to filter GoogleCalendarTokens to count.
+     * @example
+     * // Count the number of GoogleCalendarTokens
+     * const count = await prisma.googleCalendarToken.count({
+     *   where: {
+     *     // ... the filter for the GoogleCalendarTokens we want to count
+     *   }
+     * })
+    **/
+    count<T extends GoogleCalendarTokenCountArgs>(
+      args?: Subset<T, GoogleCalendarTokenCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], GoogleCalendarTokenCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a GoogleCalendarToken.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GoogleCalendarTokenAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends GoogleCalendarTokenAggregateArgs>(args: Subset<T, GoogleCalendarTokenAggregateArgs>): Prisma.PrismaPromise<GetGoogleCalendarTokenAggregateType<T>>
+
+    /**
+     * Group by GoogleCalendarToken.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GoogleCalendarTokenGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends GoogleCalendarTokenGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: GoogleCalendarTokenGroupByArgs['orderBy'] }
+        : { orderBy?: GoogleCalendarTokenGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, GoogleCalendarTokenGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetGoogleCalendarTokenGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the GoogleCalendarToken model
+   */
+  readonly fields: GoogleCalendarTokenFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for GoogleCalendarToken.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__GoogleCalendarTokenClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the GoogleCalendarToken model
+   */
+  interface GoogleCalendarTokenFieldRefs {
+    readonly id: FieldRef<"GoogleCalendarToken", 'String'>
+    readonly userId: FieldRef<"GoogleCalendarToken", 'String'>
+    readonly accessToken: FieldRef<"GoogleCalendarToken", 'String'>
+    readonly refreshToken: FieldRef<"GoogleCalendarToken", 'String'>
+    readonly expiresAt: FieldRef<"GoogleCalendarToken", 'DateTime'>
+    readonly calendarEmail: FieldRef<"GoogleCalendarToken", 'String'>
+    readonly createdAt: FieldRef<"GoogleCalendarToken", 'DateTime'>
+    readonly updatedAt: FieldRef<"GoogleCalendarToken", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * GoogleCalendarToken findUnique
+   */
+  export type GoogleCalendarTokenFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which GoogleCalendarToken to fetch.
+     */
+    where: GoogleCalendarTokenWhereUniqueInput
+  }
+
+  /**
+   * GoogleCalendarToken findUniqueOrThrow
+   */
+  export type GoogleCalendarTokenFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which GoogleCalendarToken to fetch.
+     */
+    where: GoogleCalendarTokenWhereUniqueInput
+  }
+
+  /**
+   * GoogleCalendarToken findFirst
+   */
+  export type GoogleCalendarTokenFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which GoogleCalendarToken to fetch.
+     */
+    where?: GoogleCalendarTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GoogleCalendarTokens to fetch.
+     */
+    orderBy?: GoogleCalendarTokenOrderByWithRelationInput | GoogleCalendarTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for GoogleCalendarTokens.
+     */
+    cursor?: GoogleCalendarTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GoogleCalendarTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GoogleCalendarTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of GoogleCalendarTokens.
+     */
+    distinct?: GoogleCalendarTokenScalarFieldEnum | GoogleCalendarTokenScalarFieldEnum[]
+  }
+
+  /**
+   * GoogleCalendarToken findFirstOrThrow
+   */
+  export type GoogleCalendarTokenFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which GoogleCalendarToken to fetch.
+     */
+    where?: GoogleCalendarTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GoogleCalendarTokens to fetch.
+     */
+    orderBy?: GoogleCalendarTokenOrderByWithRelationInput | GoogleCalendarTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for GoogleCalendarTokens.
+     */
+    cursor?: GoogleCalendarTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GoogleCalendarTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GoogleCalendarTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of GoogleCalendarTokens.
+     */
+    distinct?: GoogleCalendarTokenScalarFieldEnum | GoogleCalendarTokenScalarFieldEnum[]
+  }
+
+  /**
+   * GoogleCalendarToken findMany
+   */
+  export type GoogleCalendarTokenFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which GoogleCalendarTokens to fetch.
+     */
+    where?: GoogleCalendarTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GoogleCalendarTokens to fetch.
+     */
+    orderBy?: GoogleCalendarTokenOrderByWithRelationInput | GoogleCalendarTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing GoogleCalendarTokens.
+     */
+    cursor?: GoogleCalendarTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GoogleCalendarTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GoogleCalendarTokens.
+     */
+    skip?: number
+    distinct?: GoogleCalendarTokenScalarFieldEnum | GoogleCalendarTokenScalarFieldEnum[]
+  }
+
+  /**
+   * GoogleCalendarToken create
+   */
+  export type GoogleCalendarTokenCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    /**
+     * The data needed to create a GoogleCalendarToken.
+     */
+    data: XOR<GoogleCalendarTokenCreateInput, GoogleCalendarTokenUncheckedCreateInput>
+  }
+
+  /**
+   * GoogleCalendarToken createMany
+   */
+  export type GoogleCalendarTokenCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many GoogleCalendarTokens.
+     */
+    data: GoogleCalendarTokenCreateManyInput | GoogleCalendarTokenCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * GoogleCalendarToken createManyAndReturn
+   */
+  export type GoogleCalendarTokenCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * The data used to create many GoogleCalendarTokens.
+     */
+    data: GoogleCalendarTokenCreateManyInput | GoogleCalendarTokenCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * GoogleCalendarToken update
+   */
+  export type GoogleCalendarTokenUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    /**
+     * The data needed to update a GoogleCalendarToken.
+     */
+    data: XOR<GoogleCalendarTokenUpdateInput, GoogleCalendarTokenUncheckedUpdateInput>
+    /**
+     * Choose, which GoogleCalendarToken to update.
+     */
+    where: GoogleCalendarTokenWhereUniqueInput
+  }
+
+  /**
+   * GoogleCalendarToken updateMany
+   */
+  export type GoogleCalendarTokenUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update GoogleCalendarTokens.
+     */
+    data: XOR<GoogleCalendarTokenUpdateManyMutationInput, GoogleCalendarTokenUncheckedUpdateManyInput>
+    /**
+     * Filter which GoogleCalendarTokens to update
+     */
+    where?: GoogleCalendarTokenWhereInput
+    /**
+     * Limit how many GoogleCalendarTokens to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * GoogleCalendarToken updateManyAndReturn
+   */
+  export type GoogleCalendarTokenUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * The data used to update GoogleCalendarTokens.
+     */
+    data: XOR<GoogleCalendarTokenUpdateManyMutationInput, GoogleCalendarTokenUncheckedUpdateManyInput>
+    /**
+     * Filter which GoogleCalendarTokens to update
+     */
+    where?: GoogleCalendarTokenWhereInput
+    /**
+     * Limit how many GoogleCalendarTokens to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * GoogleCalendarToken upsert
+   */
+  export type GoogleCalendarTokenUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    /**
+     * The filter to search for the GoogleCalendarToken to update in case it exists.
+     */
+    where: GoogleCalendarTokenWhereUniqueInput
+    /**
+     * In case the GoogleCalendarToken found by the `where` argument doesn't exist, create a new GoogleCalendarToken with this data.
+     */
+    create: XOR<GoogleCalendarTokenCreateInput, GoogleCalendarTokenUncheckedCreateInput>
+    /**
+     * In case the GoogleCalendarToken was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<GoogleCalendarTokenUpdateInput, GoogleCalendarTokenUncheckedUpdateInput>
+  }
+
+  /**
+   * GoogleCalendarToken delete
+   */
+  export type GoogleCalendarTokenDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    /**
+     * Filter which GoogleCalendarToken to delete.
+     */
+    where: GoogleCalendarTokenWhereUniqueInput
+  }
+
+  /**
+   * GoogleCalendarToken deleteMany
+   */
+  export type GoogleCalendarTokenDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which GoogleCalendarTokens to delete
+     */
+    where?: GoogleCalendarTokenWhereInput
+    /**
+     * Limit how many GoogleCalendarTokens to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * GoogleCalendarToken without action
+   */
+  export type GoogleCalendarTokenDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
   }
 
 
@@ -23354,6 +26669,2379 @@ export namespace Prisma {
 
 
   /**
+   * Model MonitoringJob
+   */
+
+  export type AggregateMonitoringJob = {
+    _count: MonitoringJobCountAggregateOutputType | null
+    _avg: MonitoringJobAvgAggregateOutputType | null
+    _sum: MonitoringJobSumAggregateOutputType | null
+    _min: MonitoringJobMinAggregateOutputType | null
+    _max: MonitoringJobMaxAggregateOutputType | null
+  }
+
+  export type MonitoringJobAvgAggregateOutputType = {
+    listingsChecked: number | null
+    eventsCreated: number | null
+    errorsEncountered: number | null
+    totalListings: number | null
+    retryCount: number | null
+  }
+
+  export type MonitoringJobSumAggregateOutputType = {
+    listingsChecked: number | null
+    eventsCreated: number | null
+    errorsEncountered: number | null
+    totalListings: number | null
+    retryCount: number | null
+  }
+
+  export type MonitoringJobMinAggregateOutputType = {
+    id: string | null
+    status: string | null
+    startedAt: Date | null
+    completedAt: Date | null
+    listingsChecked: number | null
+    eventsCreated: number | null
+    errorsEncountered: number | null
+    totalListings: number | null
+    completedEarly: boolean | null
+    canaryWarning: boolean | null
+    errorMessage: string | null
+    retryCount: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MonitoringJobMaxAggregateOutputType = {
+    id: string | null
+    status: string | null
+    startedAt: Date | null
+    completedAt: Date | null
+    listingsChecked: number | null
+    eventsCreated: number | null
+    errorsEncountered: number | null
+    totalListings: number | null
+    completedEarly: boolean | null
+    canaryWarning: boolean | null
+    errorMessage: string | null
+    retryCount: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MonitoringJobCountAggregateOutputType = {
+    id: number
+    status: number
+    startedAt: number
+    completedAt: number
+    listingsChecked: number
+    eventsCreated: number
+    errorsEncountered: number
+    totalListings: number
+    platformStats: number
+    skippedPlatforms: number
+    completedEarly: number
+    canaryWarning: number
+    errorMessage: number
+    retryCount: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type MonitoringJobAvgAggregateInputType = {
+    listingsChecked?: true
+    eventsCreated?: true
+    errorsEncountered?: true
+    totalListings?: true
+    retryCount?: true
+  }
+
+  export type MonitoringJobSumAggregateInputType = {
+    listingsChecked?: true
+    eventsCreated?: true
+    errorsEncountered?: true
+    totalListings?: true
+    retryCount?: true
+  }
+
+  export type MonitoringJobMinAggregateInputType = {
+    id?: true
+    status?: true
+    startedAt?: true
+    completedAt?: true
+    listingsChecked?: true
+    eventsCreated?: true
+    errorsEncountered?: true
+    totalListings?: true
+    completedEarly?: true
+    canaryWarning?: true
+    errorMessage?: true
+    retryCount?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MonitoringJobMaxAggregateInputType = {
+    id?: true
+    status?: true
+    startedAt?: true
+    completedAt?: true
+    listingsChecked?: true
+    eventsCreated?: true
+    errorsEncountered?: true
+    totalListings?: true
+    completedEarly?: true
+    canaryWarning?: true
+    errorMessage?: true
+    retryCount?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MonitoringJobCountAggregateInputType = {
+    id?: true
+    status?: true
+    startedAt?: true
+    completedAt?: true
+    listingsChecked?: true
+    eventsCreated?: true
+    errorsEncountered?: true
+    totalListings?: true
+    platformStats?: true
+    skippedPlatforms?: true
+    completedEarly?: true
+    canaryWarning?: true
+    errorMessage?: true
+    retryCount?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type MonitoringJobAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MonitoringJob to aggregate.
+     */
+    where?: MonitoringJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MonitoringJobs to fetch.
+     */
+    orderBy?: MonitoringJobOrderByWithRelationInput | MonitoringJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MonitoringJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MonitoringJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MonitoringJobs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MonitoringJobs
+    **/
+    _count?: true | MonitoringJobCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MonitoringJobAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MonitoringJobSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MonitoringJobMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MonitoringJobMaxAggregateInputType
+  }
+
+  export type GetMonitoringJobAggregateType<T extends MonitoringJobAggregateArgs> = {
+        [P in keyof T & keyof AggregateMonitoringJob]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMonitoringJob[P]>
+      : GetScalarType<T[P], AggregateMonitoringJob[P]>
+  }
+
+
+
+
+  export type MonitoringJobGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MonitoringJobWhereInput
+    orderBy?: MonitoringJobOrderByWithAggregationInput | MonitoringJobOrderByWithAggregationInput[]
+    by: MonitoringJobScalarFieldEnum[] | MonitoringJobScalarFieldEnum
+    having?: MonitoringJobScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MonitoringJobCountAggregateInputType | true
+    _avg?: MonitoringJobAvgAggregateInputType
+    _sum?: MonitoringJobSumAggregateInputType
+    _min?: MonitoringJobMinAggregateInputType
+    _max?: MonitoringJobMaxAggregateInputType
+  }
+
+  export type MonitoringJobGroupByOutputType = {
+    id: string
+    status: string
+    startedAt: Date | null
+    completedAt: Date | null
+    listingsChecked: number
+    eventsCreated: number
+    errorsEncountered: number
+    totalListings: number
+    platformStats: JsonValue | null
+    skippedPlatforms: JsonValue | null
+    completedEarly: boolean
+    canaryWarning: boolean
+    errorMessage: string | null
+    retryCount: number
+    createdAt: Date
+    updatedAt: Date
+    _count: MonitoringJobCountAggregateOutputType | null
+    _avg: MonitoringJobAvgAggregateOutputType | null
+    _sum: MonitoringJobSumAggregateOutputType | null
+    _min: MonitoringJobMinAggregateOutputType | null
+    _max: MonitoringJobMaxAggregateOutputType | null
+  }
+
+  type GetMonitoringJobGroupByPayload<T extends MonitoringJobGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MonitoringJobGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MonitoringJobGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MonitoringJobGroupByOutputType[P]>
+            : GetScalarType<T[P], MonitoringJobGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MonitoringJobSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    status?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    listingsChecked?: boolean
+    eventsCreated?: boolean
+    errorsEncountered?: boolean
+    totalListings?: boolean
+    platformStats?: boolean
+    skippedPlatforms?: boolean
+    completedEarly?: boolean
+    canaryWarning?: boolean
+    errorMessage?: boolean
+    retryCount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["monitoringJob"]>
+
+  export type MonitoringJobSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    status?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    listingsChecked?: boolean
+    eventsCreated?: boolean
+    errorsEncountered?: boolean
+    totalListings?: boolean
+    platformStats?: boolean
+    skippedPlatforms?: boolean
+    completedEarly?: boolean
+    canaryWarning?: boolean
+    errorMessage?: boolean
+    retryCount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["monitoringJob"]>
+
+  export type MonitoringJobSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    status?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    listingsChecked?: boolean
+    eventsCreated?: boolean
+    errorsEncountered?: boolean
+    totalListings?: boolean
+    platformStats?: boolean
+    skippedPlatforms?: boolean
+    completedEarly?: boolean
+    canaryWarning?: boolean
+    errorMessage?: boolean
+    retryCount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["monitoringJob"]>
+
+  export type MonitoringJobSelectScalar = {
+    id?: boolean
+    status?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    listingsChecked?: boolean
+    eventsCreated?: boolean
+    errorsEncountered?: boolean
+    totalListings?: boolean
+    platformStats?: boolean
+    skippedPlatforms?: boolean
+    completedEarly?: boolean
+    canaryWarning?: boolean
+    errorMessage?: boolean
+    retryCount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type MonitoringJobOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "status" | "startedAt" | "completedAt" | "listingsChecked" | "eventsCreated" | "errorsEncountered" | "totalListings" | "platformStats" | "skippedPlatforms" | "completedEarly" | "canaryWarning" | "errorMessage" | "retryCount" | "createdAt" | "updatedAt", ExtArgs["result"]["monitoringJob"]>
+
+  export type $MonitoringJobPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MonitoringJob"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      status: string
+      startedAt: Date | null
+      completedAt: Date | null
+      listingsChecked: number
+      eventsCreated: number
+      errorsEncountered: number
+      totalListings: number
+      platformStats: Prisma.JsonValue | null
+      skippedPlatforms: Prisma.JsonValue | null
+      completedEarly: boolean
+      canaryWarning: boolean
+      errorMessage: string | null
+      retryCount: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["monitoringJob"]>
+    composites: {}
+  }
+
+  type MonitoringJobGetPayload<S extends boolean | null | undefined | MonitoringJobDefaultArgs> = $Result.GetResult<Prisma.$MonitoringJobPayload, S>
+
+  type MonitoringJobCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MonitoringJobFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MonitoringJobCountAggregateInputType | true
+    }
+
+  export interface MonitoringJobDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MonitoringJob'], meta: { name: 'MonitoringJob' } }
+    /**
+     * Find zero or one MonitoringJob that matches the filter.
+     * @param {MonitoringJobFindUniqueArgs} args - Arguments to find a MonitoringJob
+     * @example
+     * // Get one MonitoringJob
+     * const monitoringJob = await prisma.monitoringJob.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MonitoringJobFindUniqueArgs>(args: SelectSubset<T, MonitoringJobFindUniqueArgs<ExtArgs>>): Prisma__MonitoringJobClient<$Result.GetResult<Prisma.$MonitoringJobPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MonitoringJob that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MonitoringJobFindUniqueOrThrowArgs} args - Arguments to find a MonitoringJob
+     * @example
+     * // Get one MonitoringJob
+     * const monitoringJob = await prisma.monitoringJob.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MonitoringJobFindUniqueOrThrowArgs>(args: SelectSubset<T, MonitoringJobFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MonitoringJobClient<$Result.GetResult<Prisma.$MonitoringJobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MonitoringJob that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MonitoringJobFindFirstArgs} args - Arguments to find a MonitoringJob
+     * @example
+     * // Get one MonitoringJob
+     * const monitoringJob = await prisma.monitoringJob.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MonitoringJobFindFirstArgs>(args?: SelectSubset<T, MonitoringJobFindFirstArgs<ExtArgs>>): Prisma__MonitoringJobClient<$Result.GetResult<Prisma.$MonitoringJobPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MonitoringJob that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MonitoringJobFindFirstOrThrowArgs} args - Arguments to find a MonitoringJob
+     * @example
+     * // Get one MonitoringJob
+     * const monitoringJob = await prisma.monitoringJob.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MonitoringJobFindFirstOrThrowArgs>(args?: SelectSubset<T, MonitoringJobFindFirstOrThrowArgs<ExtArgs>>): Prisma__MonitoringJobClient<$Result.GetResult<Prisma.$MonitoringJobPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MonitoringJobs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MonitoringJobFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MonitoringJobs
+     * const monitoringJobs = await prisma.monitoringJob.findMany()
+     * 
+     * // Get first 10 MonitoringJobs
+     * const monitoringJobs = await prisma.monitoringJob.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const monitoringJobWithIdOnly = await prisma.monitoringJob.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MonitoringJobFindManyArgs>(args?: SelectSubset<T, MonitoringJobFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MonitoringJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MonitoringJob.
+     * @param {MonitoringJobCreateArgs} args - Arguments to create a MonitoringJob.
+     * @example
+     * // Create one MonitoringJob
+     * const MonitoringJob = await prisma.monitoringJob.create({
+     *   data: {
+     *     // ... data to create a MonitoringJob
+     *   }
+     * })
+     * 
+     */
+    create<T extends MonitoringJobCreateArgs>(args: SelectSubset<T, MonitoringJobCreateArgs<ExtArgs>>): Prisma__MonitoringJobClient<$Result.GetResult<Prisma.$MonitoringJobPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MonitoringJobs.
+     * @param {MonitoringJobCreateManyArgs} args - Arguments to create many MonitoringJobs.
+     * @example
+     * // Create many MonitoringJobs
+     * const monitoringJob = await prisma.monitoringJob.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MonitoringJobCreateManyArgs>(args?: SelectSubset<T, MonitoringJobCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MonitoringJobs and returns the data saved in the database.
+     * @param {MonitoringJobCreateManyAndReturnArgs} args - Arguments to create many MonitoringJobs.
+     * @example
+     * // Create many MonitoringJobs
+     * const monitoringJob = await prisma.monitoringJob.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MonitoringJobs and only return the `id`
+     * const monitoringJobWithIdOnly = await prisma.monitoringJob.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MonitoringJobCreateManyAndReturnArgs>(args?: SelectSubset<T, MonitoringJobCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MonitoringJobPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MonitoringJob.
+     * @param {MonitoringJobDeleteArgs} args - Arguments to delete one MonitoringJob.
+     * @example
+     * // Delete one MonitoringJob
+     * const MonitoringJob = await prisma.monitoringJob.delete({
+     *   where: {
+     *     // ... filter to delete one MonitoringJob
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MonitoringJobDeleteArgs>(args: SelectSubset<T, MonitoringJobDeleteArgs<ExtArgs>>): Prisma__MonitoringJobClient<$Result.GetResult<Prisma.$MonitoringJobPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MonitoringJob.
+     * @param {MonitoringJobUpdateArgs} args - Arguments to update one MonitoringJob.
+     * @example
+     * // Update one MonitoringJob
+     * const monitoringJob = await prisma.monitoringJob.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MonitoringJobUpdateArgs>(args: SelectSubset<T, MonitoringJobUpdateArgs<ExtArgs>>): Prisma__MonitoringJobClient<$Result.GetResult<Prisma.$MonitoringJobPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MonitoringJobs.
+     * @param {MonitoringJobDeleteManyArgs} args - Arguments to filter MonitoringJobs to delete.
+     * @example
+     * // Delete a few MonitoringJobs
+     * const { count } = await prisma.monitoringJob.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MonitoringJobDeleteManyArgs>(args?: SelectSubset<T, MonitoringJobDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MonitoringJobs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MonitoringJobUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MonitoringJobs
+     * const monitoringJob = await prisma.monitoringJob.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MonitoringJobUpdateManyArgs>(args: SelectSubset<T, MonitoringJobUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MonitoringJobs and returns the data updated in the database.
+     * @param {MonitoringJobUpdateManyAndReturnArgs} args - Arguments to update many MonitoringJobs.
+     * @example
+     * // Update many MonitoringJobs
+     * const monitoringJob = await prisma.monitoringJob.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MonitoringJobs and only return the `id`
+     * const monitoringJobWithIdOnly = await prisma.monitoringJob.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MonitoringJobUpdateManyAndReturnArgs>(args: SelectSubset<T, MonitoringJobUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MonitoringJobPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MonitoringJob.
+     * @param {MonitoringJobUpsertArgs} args - Arguments to update or create a MonitoringJob.
+     * @example
+     * // Update or create a MonitoringJob
+     * const monitoringJob = await prisma.monitoringJob.upsert({
+     *   create: {
+     *     // ... data to create a MonitoringJob
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MonitoringJob we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MonitoringJobUpsertArgs>(args: SelectSubset<T, MonitoringJobUpsertArgs<ExtArgs>>): Prisma__MonitoringJobClient<$Result.GetResult<Prisma.$MonitoringJobPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MonitoringJobs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MonitoringJobCountArgs} args - Arguments to filter MonitoringJobs to count.
+     * @example
+     * // Count the number of MonitoringJobs
+     * const count = await prisma.monitoringJob.count({
+     *   where: {
+     *     // ... the filter for the MonitoringJobs we want to count
+     *   }
+     * })
+    **/
+    count<T extends MonitoringJobCountArgs>(
+      args?: Subset<T, MonitoringJobCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MonitoringJobCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MonitoringJob.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MonitoringJobAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MonitoringJobAggregateArgs>(args: Subset<T, MonitoringJobAggregateArgs>): Prisma.PrismaPromise<GetMonitoringJobAggregateType<T>>
+
+    /**
+     * Group by MonitoringJob.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MonitoringJobGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MonitoringJobGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MonitoringJobGroupByArgs['orderBy'] }
+        : { orderBy?: MonitoringJobGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MonitoringJobGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMonitoringJobGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MonitoringJob model
+   */
+  readonly fields: MonitoringJobFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MonitoringJob.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MonitoringJobClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MonitoringJob model
+   */
+  interface MonitoringJobFieldRefs {
+    readonly id: FieldRef<"MonitoringJob", 'String'>
+    readonly status: FieldRef<"MonitoringJob", 'String'>
+    readonly startedAt: FieldRef<"MonitoringJob", 'DateTime'>
+    readonly completedAt: FieldRef<"MonitoringJob", 'DateTime'>
+    readonly listingsChecked: FieldRef<"MonitoringJob", 'Int'>
+    readonly eventsCreated: FieldRef<"MonitoringJob", 'Int'>
+    readonly errorsEncountered: FieldRef<"MonitoringJob", 'Int'>
+    readonly totalListings: FieldRef<"MonitoringJob", 'Int'>
+    readonly platformStats: FieldRef<"MonitoringJob", 'Json'>
+    readonly skippedPlatforms: FieldRef<"MonitoringJob", 'Json'>
+    readonly completedEarly: FieldRef<"MonitoringJob", 'Boolean'>
+    readonly canaryWarning: FieldRef<"MonitoringJob", 'Boolean'>
+    readonly errorMessage: FieldRef<"MonitoringJob", 'String'>
+    readonly retryCount: FieldRef<"MonitoringJob", 'Int'>
+    readonly createdAt: FieldRef<"MonitoringJob", 'DateTime'>
+    readonly updatedAt: FieldRef<"MonitoringJob", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MonitoringJob findUnique
+   */
+  export type MonitoringJobFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringJob
+     */
+    select?: MonitoringJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MonitoringJob
+     */
+    omit?: MonitoringJobOmit<ExtArgs> | null
+    /**
+     * Filter, which MonitoringJob to fetch.
+     */
+    where: MonitoringJobWhereUniqueInput
+  }
+
+  /**
+   * MonitoringJob findUniqueOrThrow
+   */
+  export type MonitoringJobFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringJob
+     */
+    select?: MonitoringJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MonitoringJob
+     */
+    omit?: MonitoringJobOmit<ExtArgs> | null
+    /**
+     * Filter, which MonitoringJob to fetch.
+     */
+    where: MonitoringJobWhereUniqueInput
+  }
+
+  /**
+   * MonitoringJob findFirst
+   */
+  export type MonitoringJobFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringJob
+     */
+    select?: MonitoringJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MonitoringJob
+     */
+    omit?: MonitoringJobOmit<ExtArgs> | null
+    /**
+     * Filter, which MonitoringJob to fetch.
+     */
+    where?: MonitoringJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MonitoringJobs to fetch.
+     */
+    orderBy?: MonitoringJobOrderByWithRelationInput | MonitoringJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MonitoringJobs.
+     */
+    cursor?: MonitoringJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MonitoringJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MonitoringJobs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MonitoringJobs.
+     */
+    distinct?: MonitoringJobScalarFieldEnum | MonitoringJobScalarFieldEnum[]
+  }
+
+  /**
+   * MonitoringJob findFirstOrThrow
+   */
+  export type MonitoringJobFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringJob
+     */
+    select?: MonitoringJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MonitoringJob
+     */
+    omit?: MonitoringJobOmit<ExtArgs> | null
+    /**
+     * Filter, which MonitoringJob to fetch.
+     */
+    where?: MonitoringJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MonitoringJobs to fetch.
+     */
+    orderBy?: MonitoringJobOrderByWithRelationInput | MonitoringJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MonitoringJobs.
+     */
+    cursor?: MonitoringJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MonitoringJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MonitoringJobs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MonitoringJobs.
+     */
+    distinct?: MonitoringJobScalarFieldEnum | MonitoringJobScalarFieldEnum[]
+  }
+
+  /**
+   * MonitoringJob findMany
+   */
+  export type MonitoringJobFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringJob
+     */
+    select?: MonitoringJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MonitoringJob
+     */
+    omit?: MonitoringJobOmit<ExtArgs> | null
+    /**
+     * Filter, which MonitoringJobs to fetch.
+     */
+    where?: MonitoringJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MonitoringJobs to fetch.
+     */
+    orderBy?: MonitoringJobOrderByWithRelationInput | MonitoringJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MonitoringJobs.
+     */
+    cursor?: MonitoringJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MonitoringJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MonitoringJobs.
+     */
+    skip?: number
+    distinct?: MonitoringJobScalarFieldEnum | MonitoringJobScalarFieldEnum[]
+  }
+
+  /**
+   * MonitoringJob create
+   */
+  export type MonitoringJobCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringJob
+     */
+    select?: MonitoringJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MonitoringJob
+     */
+    omit?: MonitoringJobOmit<ExtArgs> | null
+    /**
+     * The data needed to create a MonitoringJob.
+     */
+    data: XOR<MonitoringJobCreateInput, MonitoringJobUncheckedCreateInput>
+  }
+
+  /**
+   * MonitoringJob createMany
+   */
+  export type MonitoringJobCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MonitoringJobs.
+     */
+    data: MonitoringJobCreateManyInput | MonitoringJobCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MonitoringJob createManyAndReturn
+   */
+  export type MonitoringJobCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringJob
+     */
+    select?: MonitoringJobSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MonitoringJob
+     */
+    omit?: MonitoringJobOmit<ExtArgs> | null
+    /**
+     * The data used to create many MonitoringJobs.
+     */
+    data: MonitoringJobCreateManyInput | MonitoringJobCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MonitoringJob update
+   */
+  export type MonitoringJobUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringJob
+     */
+    select?: MonitoringJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MonitoringJob
+     */
+    omit?: MonitoringJobOmit<ExtArgs> | null
+    /**
+     * The data needed to update a MonitoringJob.
+     */
+    data: XOR<MonitoringJobUpdateInput, MonitoringJobUncheckedUpdateInput>
+    /**
+     * Choose, which MonitoringJob to update.
+     */
+    where: MonitoringJobWhereUniqueInput
+  }
+
+  /**
+   * MonitoringJob updateMany
+   */
+  export type MonitoringJobUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MonitoringJobs.
+     */
+    data: XOR<MonitoringJobUpdateManyMutationInput, MonitoringJobUncheckedUpdateManyInput>
+    /**
+     * Filter which MonitoringJobs to update
+     */
+    where?: MonitoringJobWhereInput
+    /**
+     * Limit how many MonitoringJobs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MonitoringJob updateManyAndReturn
+   */
+  export type MonitoringJobUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringJob
+     */
+    select?: MonitoringJobSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MonitoringJob
+     */
+    omit?: MonitoringJobOmit<ExtArgs> | null
+    /**
+     * The data used to update MonitoringJobs.
+     */
+    data: XOR<MonitoringJobUpdateManyMutationInput, MonitoringJobUncheckedUpdateManyInput>
+    /**
+     * Filter which MonitoringJobs to update
+     */
+    where?: MonitoringJobWhereInput
+    /**
+     * Limit how many MonitoringJobs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MonitoringJob upsert
+   */
+  export type MonitoringJobUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringJob
+     */
+    select?: MonitoringJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MonitoringJob
+     */
+    omit?: MonitoringJobOmit<ExtArgs> | null
+    /**
+     * The filter to search for the MonitoringJob to update in case it exists.
+     */
+    where: MonitoringJobWhereUniqueInput
+    /**
+     * In case the MonitoringJob found by the `where` argument doesn't exist, create a new MonitoringJob with this data.
+     */
+    create: XOR<MonitoringJobCreateInput, MonitoringJobUncheckedCreateInput>
+    /**
+     * In case the MonitoringJob was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MonitoringJobUpdateInput, MonitoringJobUncheckedUpdateInput>
+  }
+
+  /**
+   * MonitoringJob delete
+   */
+  export type MonitoringJobDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringJob
+     */
+    select?: MonitoringJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MonitoringJob
+     */
+    omit?: MonitoringJobOmit<ExtArgs> | null
+    /**
+     * Filter which MonitoringJob to delete.
+     */
+    where: MonitoringJobWhereUniqueInput
+  }
+
+  /**
+   * MonitoringJob deleteMany
+   */
+  export type MonitoringJobDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MonitoringJobs to delete
+     */
+    where?: MonitoringJobWhereInput
+    /**
+     * Limit how many MonitoringJobs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MonitoringJob without action
+   */
+  export type MonitoringJobDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringJob
+     */
+    select?: MonitoringJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MonitoringJob
+     */
+    omit?: MonitoringJobOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model NotificationEvent
+   */
+
+  export type AggregateNotificationEvent = {
+    _count: NotificationEventCountAggregateOutputType | null
+    _avg: NotificationEventAvgAggregateOutputType | null
+    _sum: NotificationEventSumAggregateOutputType | null
+    _min: NotificationEventMinAggregateOutputType | null
+    _max: NotificationEventMaxAggregateOutputType | null
+  }
+
+  export type NotificationEventAvgAggregateOutputType = {
+    retryCount: number | null
+  }
+
+  export type NotificationEventSumAggregateOutputType = {
+    retryCount: number | null
+  }
+
+  export type NotificationEventMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    listingId: string | null
+    eventType: string | null
+    deduplicationKey: string | null
+    status: string | null
+    retryCount: number | null
+    errorMessage: string | null
+    processedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type NotificationEventMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    listingId: string | null
+    eventType: string | null
+    deduplicationKey: string | null
+    status: string | null
+    retryCount: number | null
+    errorMessage: string | null
+    processedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type NotificationEventCountAggregateOutputType = {
+    id: number
+    userId: number
+    listingId: number
+    eventType: number
+    payload: number
+    deduplicationKey: number
+    status: number
+    retryCount: number
+    errorMessage: number
+    processedAt: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type NotificationEventAvgAggregateInputType = {
+    retryCount?: true
+  }
+
+  export type NotificationEventSumAggregateInputType = {
+    retryCount?: true
+  }
+
+  export type NotificationEventMinAggregateInputType = {
+    id?: true
+    userId?: true
+    listingId?: true
+    eventType?: true
+    deduplicationKey?: true
+    status?: true
+    retryCount?: true
+    errorMessage?: true
+    processedAt?: true
+    createdAt?: true
+  }
+
+  export type NotificationEventMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    listingId?: true
+    eventType?: true
+    deduplicationKey?: true
+    status?: true
+    retryCount?: true
+    errorMessage?: true
+    processedAt?: true
+    createdAt?: true
+  }
+
+  export type NotificationEventCountAggregateInputType = {
+    id?: true
+    userId?: true
+    listingId?: true
+    eventType?: true
+    payload?: true
+    deduplicationKey?: true
+    status?: true
+    retryCount?: true
+    errorMessage?: true
+    processedAt?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type NotificationEventAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which NotificationEvent to aggregate.
+     */
+    where?: NotificationEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of NotificationEvents to fetch.
+     */
+    orderBy?: NotificationEventOrderByWithRelationInput | NotificationEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: NotificationEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` NotificationEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` NotificationEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned NotificationEvents
+    **/
+    _count?: true | NotificationEventCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: NotificationEventAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: NotificationEventSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: NotificationEventMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: NotificationEventMaxAggregateInputType
+  }
+
+  export type GetNotificationEventAggregateType<T extends NotificationEventAggregateArgs> = {
+        [P in keyof T & keyof AggregateNotificationEvent]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateNotificationEvent[P]>
+      : GetScalarType<T[P], AggregateNotificationEvent[P]>
+  }
+
+
+
+
+  export type NotificationEventGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: NotificationEventWhereInput
+    orderBy?: NotificationEventOrderByWithAggregationInput | NotificationEventOrderByWithAggregationInput[]
+    by: NotificationEventScalarFieldEnum[] | NotificationEventScalarFieldEnum
+    having?: NotificationEventScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: NotificationEventCountAggregateInputType | true
+    _avg?: NotificationEventAvgAggregateInputType
+    _sum?: NotificationEventSumAggregateInputType
+    _min?: NotificationEventMinAggregateInputType
+    _max?: NotificationEventMaxAggregateInputType
+  }
+
+  export type NotificationEventGroupByOutputType = {
+    id: string
+    userId: string
+    listingId: string | null
+    eventType: string
+    payload: JsonValue
+    deduplicationKey: string | null
+    status: string
+    retryCount: number
+    errorMessage: string | null
+    processedAt: Date | null
+    createdAt: Date
+    _count: NotificationEventCountAggregateOutputType | null
+    _avg: NotificationEventAvgAggregateOutputType | null
+    _sum: NotificationEventSumAggregateOutputType | null
+    _min: NotificationEventMinAggregateOutputType | null
+    _max: NotificationEventMaxAggregateOutputType | null
+  }
+
+  type GetNotificationEventGroupByPayload<T extends NotificationEventGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<NotificationEventGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof NotificationEventGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], NotificationEventGroupByOutputType[P]>
+            : GetScalarType<T[P], NotificationEventGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type NotificationEventSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    listingId?: boolean
+    eventType?: boolean
+    payload?: boolean
+    deduplicationKey?: boolean
+    status?: boolean
+    retryCount?: boolean
+    errorMessage?: boolean
+    processedAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    listing?: boolean | NotificationEvent$listingArgs<ExtArgs>
+  }, ExtArgs["result"]["notificationEvent"]>
+
+  export type NotificationEventSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    listingId?: boolean
+    eventType?: boolean
+    payload?: boolean
+    deduplicationKey?: boolean
+    status?: boolean
+    retryCount?: boolean
+    errorMessage?: boolean
+    processedAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    listing?: boolean | NotificationEvent$listingArgs<ExtArgs>
+  }, ExtArgs["result"]["notificationEvent"]>
+
+  export type NotificationEventSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    listingId?: boolean
+    eventType?: boolean
+    payload?: boolean
+    deduplicationKey?: boolean
+    status?: boolean
+    retryCount?: boolean
+    errorMessage?: boolean
+    processedAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    listing?: boolean | NotificationEvent$listingArgs<ExtArgs>
+  }, ExtArgs["result"]["notificationEvent"]>
+
+  export type NotificationEventSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    listingId?: boolean
+    eventType?: boolean
+    payload?: boolean
+    deduplicationKey?: boolean
+    status?: boolean
+    retryCount?: boolean
+    errorMessage?: boolean
+    processedAt?: boolean
+    createdAt?: boolean
+  }
+
+  export type NotificationEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "listingId" | "eventType" | "payload" | "deduplicationKey" | "status" | "retryCount" | "errorMessage" | "processedAt" | "createdAt", ExtArgs["result"]["notificationEvent"]>
+  export type NotificationEventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    listing?: boolean | NotificationEvent$listingArgs<ExtArgs>
+  }
+  export type NotificationEventIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    listing?: boolean | NotificationEvent$listingArgs<ExtArgs>
+  }
+  export type NotificationEventIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    listing?: boolean | NotificationEvent$listingArgs<ExtArgs>
+  }
+
+  export type $NotificationEventPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "NotificationEvent"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      listing: Prisma.$ListingPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      listingId: string | null
+      eventType: string
+      payload: Prisma.JsonValue
+      deduplicationKey: string | null
+      status: string
+      retryCount: number
+      errorMessage: string | null
+      processedAt: Date | null
+      createdAt: Date
+    }, ExtArgs["result"]["notificationEvent"]>
+    composites: {}
+  }
+
+  type NotificationEventGetPayload<S extends boolean | null | undefined | NotificationEventDefaultArgs> = $Result.GetResult<Prisma.$NotificationEventPayload, S>
+
+  type NotificationEventCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<NotificationEventFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: NotificationEventCountAggregateInputType | true
+    }
+
+  export interface NotificationEventDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['NotificationEvent'], meta: { name: 'NotificationEvent' } }
+    /**
+     * Find zero or one NotificationEvent that matches the filter.
+     * @param {NotificationEventFindUniqueArgs} args - Arguments to find a NotificationEvent
+     * @example
+     * // Get one NotificationEvent
+     * const notificationEvent = await prisma.notificationEvent.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends NotificationEventFindUniqueArgs>(args: SelectSubset<T, NotificationEventFindUniqueArgs<ExtArgs>>): Prisma__NotificationEventClient<$Result.GetResult<Prisma.$NotificationEventPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one NotificationEvent that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {NotificationEventFindUniqueOrThrowArgs} args - Arguments to find a NotificationEvent
+     * @example
+     * // Get one NotificationEvent
+     * const notificationEvent = await prisma.notificationEvent.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends NotificationEventFindUniqueOrThrowArgs>(args: SelectSubset<T, NotificationEventFindUniqueOrThrowArgs<ExtArgs>>): Prisma__NotificationEventClient<$Result.GetResult<Prisma.$NotificationEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first NotificationEvent that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NotificationEventFindFirstArgs} args - Arguments to find a NotificationEvent
+     * @example
+     * // Get one NotificationEvent
+     * const notificationEvent = await prisma.notificationEvent.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends NotificationEventFindFirstArgs>(args?: SelectSubset<T, NotificationEventFindFirstArgs<ExtArgs>>): Prisma__NotificationEventClient<$Result.GetResult<Prisma.$NotificationEventPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first NotificationEvent that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NotificationEventFindFirstOrThrowArgs} args - Arguments to find a NotificationEvent
+     * @example
+     * // Get one NotificationEvent
+     * const notificationEvent = await prisma.notificationEvent.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends NotificationEventFindFirstOrThrowArgs>(args?: SelectSubset<T, NotificationEventFindFirstOrThrowArgs<ExtArgs>>): Prisma__NotificationEventClient<$Result.GetResult<Prisma.$NotificationEventPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more NotificationEvents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NotificationEventFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all NotificationEvents
+     * const notificationEvents = await prisma.notificationEvent.findMany()
+     * 
+     * // Get first 10 NotificationEvents
+     * const notificationEvents = await prisma.notificationEvent.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const notificationEventWithIdOnly = await prisma.notificationEvent.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends NotificationEventFindManyArgs>(args?: SelectSubset<T, NotificationEventFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a NotificationEvent.
+     * @param {NotificationEventCreateArgs} args - Arguments to create a NotificationEvent.
+     * @example
+     * // Create one NotificationEvent
+     * const NotificationEvent = await prisma.notificationEvent.create({
+     *   data: {
+     *     // ... data to create a NotificationEvent
+     *   }
+     * })
+     * 
+     */
+    create<T extends NotificationEventCreateArgs>(args: SelectSubset<T, NotificationEventCreateArgs<ExtArgs>>): Prisma__NotificationEventClient<$Result.GetResult<Prisma.$NotificationEventPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many NotificationEvents.
+     * @param {NotificationEventCreateManyArgs} args - Arguments to create many NotificationEvents.
+     * @example
+     * // Create many NotificationEvents
+     * const notificationEvent = await prisma.notificationEvent.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends NotificationEventCreateManyArgs>(args?: SelectSubset<T, NotificationEventCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many NotificationEvents and returns the data saved in the database.
+     * @param {NotificationEventCreateManyAndReturnArgs} args - Arguments to create many NotificationEvents.
+     * @example
+     * // Create many NotificationEvents
+     * const notificationEvent = await prisma.notificationEvent.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many NotificationEvents and only return the `id`
+     * const notificationEventWithIdOnly = await prisma.notificationEvent.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends NotificationEventCreateManyAndReturnArgs>(args?: SelectSubset<T, NotificationEventCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationEventPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a NotificationEvent.
+     * @param {NotificationEventDeleteArgs} args - Arguments to delete one NotificationEvent.
+     * @example
+     * // Delete one NotificationEvent
+     * const NotificationEvent = await prisma.notificationEvent.delete({
+     *   where: {
+     *     // ... filter to delete one NotificationEvent
+     *   }
+     * })
+     * 
+     */
+    delete<T extends NotificationEventDeleteArgs>(args: SelectSubset<T, NotificationEventDeleteArgs<ExtArgs>>): Prisma__NotificationEventClient<$Result.GetResult<Prisma.$NotificationEventPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one NotificationEvent.
+     * @param {NotificationEventUpdateArgs} args - Arguments to update one NotificationEvent.
+     * @example
+     * // Update one NotificationEvent
+     * const notificationEvent = await prisma.notificationEvent.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends NotificationEventUpdateArgs>(args: SelectSubset<T, NotificationEventUpdateArgs<ExtArgs>>): Prisma__NotificationEventClient<$Result.GetResult<Prisma.$NotificationEventPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more NotificationEvents.
+     * @param {NotificationEventDeleteManyArgs} args - Arguments to filter NotificationEvents to delete.
+     * @example
+     * // Delete a few NotificationEvents
+     * const { count } = await prisma.notificationEvent.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends NotificationEventDeleteManyArgs>(args?: SelectSubset<T, NotificationEventDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more NotificationEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NotificationEventUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many NotificationEvents
+     * const notificationEvent = await prisma.notificationEvent.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends NotificationEventUpdateManyArgs>(args: SelectSubset<T, NotificationEventUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more NotificationEvents and returns the data updated in the database.
+     * @param {NotificationEventUpdateManyAndReturnArgs} args - Arguments to update many NotificationEvents.
+     * @example
+     * // Update many NotificationEvents
+     * const notificationEvent = await prisma.notificationEvent.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more NotificationEvents and only return the `id`
+     * const notificationEventWithIdOnly = await prisma.notificationEvent.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends NotificationEventUpdateManyAndReturnArgs>(args: SelectSubset<T, NotificationEventUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationEventPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one NotificationEvent.
+     * @param {NotificationEventUpsertArgs} args - Arguments to update or create a NotificationEvent.
+     * @example
+     * // Update or create a NotificationEvent
+     * const notificationEvent = await prisma.notificationEvent.upsert({
+     *   create: {
+     *     // ... data to create a NotificationEvent
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the NotificationEvent we want to update
+     *   }
+     * })
+     */
+    upsert<T extends NotificationEventUpsertArgs>(args: SelectSubset<T, NotificationEventUpsertArgs<ExtArgs>>): Prisma__NotificationEventClient<$Result.GetResult<Prisma.$NotificationEventPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of NotificationEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NotificationEventCountArgs} args - Arguments to filter NotificationEvents to count.
+     * @example
+     * // Count the number of NotificationEvents
+     * const count = await prisma.notificationEvent.count({
+     *   where: {
+     *     // ... the filter for the NotificationEvents we want to count
+     *   }
+     * })
+    **/
+    count<T extends NotificationEventCountArgs>(
+      args?: Subset<T, NotificationEventCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], NotificationEventCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a NotificationEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NotificationEventAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends NotificationEventAggregateArgs>(args: Subset<T, NotificationEventAggregateArgs>): Prisma.PrismaPromise<GetNotificationEventAggregateType<T>>
+
+    /**
+     * Group by NotificationEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NotificationEventGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends NotificationEventGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: NotificationEventGroupByArgs['orderBy'] }
+        : { orderBy?: NotificationEventGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, NotificationEventGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetNotificationEventGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the NotificationEvent model
+   */
+  readonly fields: NotificationEventFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for NotificationEvent.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__NotificationEventClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    listing<T extends NotificationEvent$listingArgs<ExtArgs> = {}>(args?: Subset<T, NotificationEvent$listingArgs<ExtArgs>>): Prisma__ListingClient<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the NotificationEvent model
+   */
+  interface NotificationEventFieldRefs {
+    readonly id: FieldRef<"NotificationEvent", 'String'>
+    readonly userId: FieldRef<"NotificationEvent", 'String'>
+    readonly listingId: FieldRef<"NotificationEvent", 'String'>
+    readonly eventType: FieldRef<"NotificationEvent", 'String'>
+    readonly payload: FieldRef<"NotificationEvent", 'Json'>
+    readonly deduplicationKey: FieldRef<"NotificationEvent", 'String'>
+    readonly status: FieldRef<"NotificationEvent", 'String'>
+    readonly retryCount: FieldRef<"NotificationEvent", 'Int'>
+    readonly errorMessage: FieldRef<"NotificationEvent", 'String'>
+    readonly processedAt: FieldRef<"NotificationEvent", 'DateTime'>
+    readonly createdAt: FieldRef<"NotificationEvent", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * NotificationEvent findUnique
+   */
+  export type NotificationEventFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NotificationEvent
+     */
+    select?: NotificationEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the NotificationEvent
+     */
+    omit?: NotificationEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationEventInclude<ExtArgs> | null
+    /**
+     * Filter, which NotificationEvent to fetch.
+     */
+    where: NotificationEventWhereUniqueInput
+  }
+
+  /**
+   * NotificationEvent findUniqueOrThrow
+   */
+  export type NotificationEventFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NotificationEvent
+     */
+    select?: NotificationEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the NotificationEvent
+     */
+    omit?: NotificationEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationEventInclude<ExtArgs> | null
+    /**
+     * Filter, which NotificationEvent to fetch.
+     */
+    where: NotificationEventWhereUniqueInput
+  }
+
+  /**
+   * NotificationEvent findFirst
+   */
+  export type NotificationEventFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NotificationEvent
+     */
+    select?: NotificationEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the NotificationEvent
+     */
+    omit?: NotificationEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationEventInclude<ExtArgs> | null
+    /**
+     * Filter, which NotificationEvent to fetch.
+     */
+    where?: NotificationEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of NotificationEvents to fetch.
+     */
+    orderBy?: NotificationEventOrderByWithRelationInput | NotificationEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for NotificationEvents.
+     */
+    cursor?: NotificationEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` NotificationEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` NotificationEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of NotificationEvents.
+     */
+    distinct?: NotificationEventScalarFieldEnum | NotificationEventScalarFieldEnum[]
+  }
+
+  /**
+   * NotificationEvent findFirstOrThrow
+   */
+  export type NotificationEventFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NotificationEvent
+     */
+    select?: NotificationEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the NotificationEvent
+     */
+    omit?: NotificationEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationEventInclude<ExtArgs> | null
+    /**
+     * Filter, which NotificationEvent to fetch.
+     */
+    where?: NotificationEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of NotificationEvents to fetch.
+     */
+    orderBy?: NotificationEventOrderByWithRelationInput | NotificationEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for NotificationEvents.
+     */
+    cursor?: NotificationEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` NotificationEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` NotificationEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of NotificationEvents.
+     */
+    distinct?: NotificationEventScalarFieldEnum | NotificationEventScalarFieldEnum[]
+  }
+
+  /**
+   * NotificationEvent findMany
+   */
+  export type NotificationEventFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NotificationEvent
+     */
+    select?: NotificationEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the NotificationEvent
+     */
+    omit?: NotificationEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationEventInclude<ExtArgs> | null
+    /**
+     * Filter, which NotificationEvents to fetch.
+     */
+    where?: NotificationEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of NotificationEvents to fetch.
+     */
+    orderBy?: NotificationEventOrderByWithRelationInput | NotificationEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing NotificationEvents.
+     */
+    cursor?: NotificationEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` NotificationEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` NotificationEvents.
+     */
+    skip?: number
+    distinct?: NotificationEventScalarFieldEnum | NotificationEventScalarFieldEnum[]
+  }
+
+  /**
+   * NotificationEvent create
+   */
+  export type NotificationEventCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NotificationEvent
+     */
+    select?: NotificationEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the NotificationEvent
+     */
+    omit?: NotificationEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationEventInclude<ExtArgs> | null
+    /**
+     * The data needed to create a NotificationEvent.
+     */
+    data: XOR<NotificationEventCreateInput, NotificationEventUncheckedCreateInput>
+  }
+
+  /**
+   * NotificationEvent createMany
+   */
+  export type NotificationEventCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many NotificationEvents.
+     */
+    data: NotificationEventCreateManyInput | NotificationEventCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * NotificationEvent createManyAndReturn
+   */
+  export type NotificationEventCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NotificationEvent
+     */
+    select?: NotificationEventSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the NotificationEvent
+     */
+    omit?: NotificationEventOmit<ExtArgs> | null
+    /**
+     * The data used to create many NotificationEvents.
+     */
+    data: NotificationEventCreateManyInput | NotificationEventCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationEventIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * NotificationEvent update
+   */
+  export type NotificationEventUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NotificationEvent
+     */
+    select?: NotificationEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the NotificationEvent
+     */
+    omit?: NotificationEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationEventInclude<ExtArgs> | null
+    /**
+     * The data needed to update a NotificationEvent.
+     */
+    data: XOR<NotificationEventUpdateInput, NotificationEventUncheckedUpdateInput>
+    /**
+     * Choose, which NotificationEvent to update.
+     */
+    where: NotificationEventWhereUniqueInput
+  }
+
+  /**
+   * NotificationEvent updateMany
+   */
+  export type NotificationEventUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update NotificationEvents.
+     */
+    data: XOR<NotificationEventUpdateManyMutationInput, NotificationEventUncheckedUpdateManyInput>
+    /**
+     * Filter which NotificationEvents to update
+     */
+    where?: NotificationEventWhereInput
+    /**
+     * Limit how many NotificationEvents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * NotificationEvent updateManyAndReturn
+   */
+  export type NotificationEventUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NotificationEvent
+     */
+    select?: NotificationEventSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the NotificationEvent
+     */
+    omit?: NotificationEventOmit<ExtArgs> | null
+    /**
+     * The data used to update NotificationEvents.
+     */
+    data: XOR<NotificationEventUpdateManyMutationInput, NotificationEventUncheckedUpdateManyInput>
+    /**
+     * Filter which NotificationEvents to update
+     */
+    where?: NotificationEventWhereInput
+    /**
+     * Limit how many NotificationEvents to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationEventIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * NotificationEvent upsert
+   */
+  export type NotificationEventUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NotificationEvent
+     */
+    select?: NotificationEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the NotificationEvent
+     */
+    omit?: NotificationEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationEventInclude<ExtArgs> | null
+    /**
+     * The filter to search for the NotificationEvent to update in case it exists.
+     */
+    where: NotificationEventWhereUniqueInput
+    /**
+     * In case the NotificationEvent found by the `where` argument doesn't exist, create a new NotificationEvent with this data.
+     */
+    create: XOR<NotificationEventCreateInput, NotificationEventUncheckedCreateInput>
+    /**
+     * In case the NotificationEvent was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<NotificationEventUpdateInput, NotificationEventUncheckedUpdateInput>
+  }
+
+  /**
+   * NotificationEvent delete
+   */
+  export type NotificationEventDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NotificationEvent
+     */
+    select?: NotificationEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the NotificationEvent
+     */
+    omit?: NotificationEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationEventInclude<ExtArgs> | null
+    /**
+     * Filter which NotificationEvent to delete.
+     */
+    where: NotificationEventWhereUniqueInput
+  }
+
+  /**
+   * NotificationEvent deleteMany
+   */
+  export type NotificationEventDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which NotificationEvents to delete
+     */
+    where?: NotificationEventWhereInput
+    /**
+     * Limit how many NotificationEvents to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * NotificationEvent.listing
+   */
+  export type NotificationEvent$listingArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Listing
+     */
+    select?: ListingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Listing
+     */
+    omit?: ListingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingInclude<ExtArgs> | null
+    where?: ListingWhereInput
+  }
+
+  /**
+   * NotificationEvent without action
+   */
+  export type NotificationEventDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NotificationEvent
+     */
+    select?: NotificationEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the NotificationEvent
+     */
+    omit?: NotificationEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationEventInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -23385,6 +29073,8 @@ export namespace Prisma {
     postedAt: 'postedAt',
     scrapedAt: 'scrapedAt',
     updatedAt: 'updatedAt',
+    lastMonitoredAt: 'lastMonitoredAt',
+    estimatedExpiresAt: 'estimatedExpiresAt',
     estimatedValue: 'estimatedValue',
     estimatedLow: 'estimatedLow',
     estimatedHigh: 'estimatedHigh',
@@ -23460,6 +29150,10 @@ export namespace Prisma {
     fees: 'fees',
     status: 'status',
     notes: 'notes',
+    meetingTime: 'meetingTime',
+    meetingLocation: 'meetingLocation',
+    meetingType: 'meetingType',
+    calendarEventId: 'calendarEventId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -23598,11 +29292,66 @@ export namespace Prisma {
     homeLocation: 'homeLocation',
     holdingCostDailyRate: 'holdingCostDailyRate',
     messageApprovalRequired: 'messageApprovalRequired',
+    pushNotifications: 'pushNotifications',
+    phoneNumber: 'phoneNumber',
+    phoneVerified: 'phoneVerified',
+    phoneVerificationCode: 'phoneVerificationCode',
+    phoneVerificationExpiry: 'phoneVerificationExpiry',
+    phoneVerificationSentAt: 'phoneVerificationSentAt',
+    smsNotifications: 'smsNotifications',
+    notifyMessageReceived: 'notifyMessageReceived',
+    notifyDraftReady: 'notifyDraftReady',
+    notifyMessageSent: 'notifyMessageSent',
+    notifyReviewReceived: 'notifyReviewReceived',
+    notifyFlipGoneCold: 'notifyFlipGoneCold',
+    notifyFlipTurnedHot: 'notifyFlipTurnedHot',
+    notifyPriceChanges: 'notifyPriceChanges',
+    flipGoneColdHours: 'flipGoneColdHours',
+    flipTurnedHotCount: 'flipTurnedHotCount',
+    notifyListingUnavailable: 'notifyListingUnavailable',
+    pushNotifyNewDeals: 'pushNotifyNewDeals',
+    pushNotifySoldItems: 'pushNotifySoldItems',
+    pushNotifyMessageReceived: 'pushNotifyMessageReceived',
+    pushNotifyDraftReady: 'pushNotifyDraftReady',
+    pushNotifyMessageSent: 'pushNotifyMessageSent',
+    pushNotifyReviewReceived: 'pushNotifyReviewReceived',
+    pushNotifyFlipGoneCold: 'pushNotifyFlipGoneCold',
+    pushNotifyFlipTurnedHot: 'pushNotifyFlipTurnedHot',
+    pushNotifyPriceDrops: 'pushNotifyPriceDrops',
+    pushNotifyExpiring: 'pushNotifyExpiring',
+    pushNotifyListingUnavailable: 'pushNotifyListingUnavailable',
+    pushNotifyWeeklyDigest: 'pushNotifyWeeklyDigest',
+    smsNotifyNewDeals: 'smsNotifyNewDeals',
+    smsNotifySoldItems: 'smsNotifySoldItems',
+    smsNotifyMessageReceived: 'smsNotifyMessageReceived',
+    smsNotifyDraftReady: 'smsNotifyDraftReady',
+    smsNotifyMessageSent: 'smsNotifyMessageSent',
+    smsNotifyReviewReceived: 'smsNotifyReviewReceived',
+    smsNotifyFlipGoneCold: 'smsNotifyFlipGoneCold',
+    smsNotifyFlipTurnedHot: 'smsNotifyFlipTurnedHot',
+    smsNotifyPriceDrops: 'smsNotifyPriceDrops',
+    smsNotifyExpiring: 'smsNotifyExpiring',
+    smsNotifyListingUnavailable: 'smsNotifyListingUnavailable',
+    smsNotifyWeeklyDigest: 'smsNotifyWeeklyDigest',
+    meetingDepartureBufferMinutes: 'meetingDepartureBufferMinutes',
+    notifyMeetingReminder: 'notifyMeetingReminder',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
   export type UserSettingsScalarFieldEnum = (typeof UserSettingsScalarFieldEnum)[keyof typeof UserSettingsScalarFieldEnum]
+
+
+  export const DeviceTokenScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    token: 'token',
+    userAgent: 'userAgent',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type DeviceTokenScalarFieldEnum = (typeof DeviceTokenScalarFieldEnum)[keyof typeof DeviceTokenScalarFieldEnum]
 
 
   export const FacebookTokenScalarFieldEnum: {
@@ -23615,6 +29364,20 @@ export namespace Prisma {
   };
 
   export type FacebookTokenScalarFieldEnum = (typeof FacebookTokenScalarFieldEnum)[keyof typeof FacebookTokenScalarFieldEnum]
+
+
+  export const GoogleCalendarTokenScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    accessToken: 'accessToken',
+    refreshToken: 'refreshToken',
+    expiresAt: 'expiresAt',
+    calendarEmail: 'calendarEmail',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type GoogleCalendarTokenScalarFieldEnum = (typeof GoogleCalendarTokenScalarFieldEnum)[keyof typeof GoogleCalendarTokenScalarFieldEnum]
 
 
   export const MessageScalarFieldEnum: {
@@ -23714,12 +29477,66 @@ export namespace Prisma {
   export type PasswordResetTokenScalarFieldEnum = (typeof PasswordResetTokenScalarFieldEnum)[keyof typeof PasswordResetTokenScalarFieldEnum]
 
 
+  export const MonitoringJobScalarFieldEnum: {
+    id: 'id',
+    status: 'status',
+    startedAt: 'startedAt',
+    completedAt: 'completedAt',
+    listingsChecked: 'listingsChecked',
+    eventsCreated: 'eventsCreated',
+    errorsEncountered: 'errorsEncountered',
+    totalListings: 'totalListings',
+    platformStats: 'platformStats',
+    skippedPlatforms: 'skippedPlatforms',
+    completedEarly: 'completedEarly',
+    canaryWarning: 'canaryWarning',
+    errorMessage: 'errorMessage',
+    retryCount: 'retryCount',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type MonitoringJobScalarFieldEnum = (typeof MonitoringJobScalarFieldEnum)[keyof typeof MonitoringJobScalarFieldEnum]
+
+
+  export const NotificationEventScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    listingId: 'listingId',
+    eventType: 'eventType',
+    payload: 'payload',
+    deduplicationKey: 'deduplicationKey',
+    status: 'status',
+    retryCount: 'retryCount',
+    errorMessage: 'errorMessage',
+    processedAt: 'processedAt',
+    createdAt: 'createdAt'
+  };
+
+  export type NotificationEventScalarFieldEnum = (typeof NotificationEventScalarFieldEnum)[keyof typeof NotificationEventScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
   export const QueryMode: {
@@ -23736,6 +29553,15 @@ export namespace Prisma {
   };
 
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   /**
@@ -23804,6 +29630,20 @@ export namespace Prisma {
    */
   export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
   /**
    * Deep Input Types
    */
@@ -23830,6 +29670,8 @@ export namespace Prisma {
     postedAt?: DateTimeNullableFilter<"Listing"> | Date | string | null
     scrapedAt?: DateTimeFilter<"Listing"> | Date | string
     updatedAt?: DateTimeFilter<"Listing"> | Date | string
+    lastMonitoredAt?: DateTimeNullableFilter<"Listing"> | Date | string | null
+    estimatedExpiresAt?: DateTimeNullableFilter<"Listing"> | Date | string | null
     estimatedValue?: FloatNullableFilter<"Listing"> | number | null
     estimatedLow?: FloatNullableFilter<"Listing"> | number | null
     estimatedHigh?: FloatNullableFilter<"Listing"> | number | null
@@ -23888,6 +29730,7 @@ export namespace Prisma {
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     images?: ListingImageListRelationFilter
     messages?: MessageListRelationFilter
+    notificationEvents?: NotificationEventListRelationFilter
     opportunity?: XOR<OpportunityNullableScalarRelationFilter, OpportunityWhereInput> | null
     postingQueue?: PostingQueueItemListRelationFilter
   }
@@ -23910,6 +29753,8 @@ export namespace Prisma {
     postedAt?: SortOrderInput | SortOrder
     scrapedAt?: SortOrder
     updatedAt?: SortOrder
+    lastMonitoredAt?: SortOrderInput | SortOrder
+    estimatedExpiresAt?: SortOrderInput | SortOrder
     estimatedValue?: SortOrderInput | SortOrder
     estimatedLow?: SortOrderInput | SortOrder
     estimatedHigh?: SortOrderInput | SortOrder
@@ -23968,6 +29813,7 @@ export namespace Prisma {
     user?: UserOrderByWithRelationInput
     images?: ListingImageOrderByRelationAggregateInput
     messages?: MessageOrderByRelationAggregateInput
+    notificationEvents?: NotificationEventOrderByRelationAggregateInput
     opportunity?: OpportunityOrderByWithRelationInput
     postingQueue?: PostingQueueItemOrderByRelationAggregateInput
   }
@@ -23994,6 +29840,8 @@ export namespace Prisma {
     postedAt?: DateTimeNullableFilter<"Listing"> | Date | string | null
     scrapedAt?: DateTimeFilter<"Listing"> | Date | string
     updatedAt?: DateTimeFilter<"Listing"> | Date | string
+    lastMonitoredAt?: DateTimeNullableFilter<"Listing"> | Date | string | null
+    estimatedExpiresAt?: DateTimeNullableFilter<"Listing"> | Date | string | null
     estimatedValue?: FloatNullableFilter<"Listing"> | number | null
     estimatedLow?: FloatNullableFilter<"Listing"> | number | null
     estimatedHigh?: FloatNullableFilter<"Listing"> | number | null
@@ -24052,6 +29900,7 @@ export namespace Prisma {
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     images?: ListingImageListRelationFilter
     messages?: MessageListRelationFilter
+    notificationEvents?: NotificationEventListRelationFilter
     opportunity?: XOR<OpportunityNullableScalarRelationFilter, OpportunityWhereInput> | null
     postingQueue?: PostingQueueItemListRelationFilter
   }, "id" | "platform_externalId_userId">
@@ -24074,6 +29923,8 @@ export namespace Prisma {
     postedAt?: SortOrderInput | SortOrder
     scrapedAt?: SortOrder
     updatedAt?: SortOrder
+    lastMonitoredAt?: SortOrderInput | SortOrder
+    estimatedExpiresAt?: SortOrderInput | SortOrder
     estimatedValue?: SortOrderInput | SortOrder
     estimatedLow?: SortOrderInput | SortOrder
     estimatedHigh?: SortOrderInput | SortOrder
@@ -24157,6 +30008,8 @@ export namespace Prisma {
     postedAt?: DateTimeNullableWithAggregatesFilter<"Listing"> | Date | string | null
     scrapedAt?: DateTimeWithAggregatesFilter<"Listing"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Listing"> | Date | string
+    lastMonitoredAt?: DateTimeNullableWithAggregatesFilter<"Listing"> | Date | string | null
+    estimatedExpiresAt?: DateTimeNullableWithAggregatesFilter<"Listing"> | Date | string | null
     estimatedValue?: FloatNullableWithAggregatesFilter<"Listing"> | number | null
     estimatedLow?: FloatNullableWithAggregatesFilter<"Listing"> | number | null
     estimatedHigh?: FloatNullableWithAggregatesFilter<"Listing"> | number | null
@@ -24232,6 +30085,10 @@ export namespace Prisma {
     fees?: FloatNullableFilter<"Opportunity"> | number | null
     status?: StringFilter<"Opportunity"> | string
     notes?: StringNullableFilter<"Opportunity"> | string | null
+    meetingTime?: DateTimeNullableFilter<"Opportunity"> | Date | string | null
+    meetingLocation?: StringNullableFilter<"Opportunity"> | string | null
+    meetingType?: StringNullableFilter<"Opportunity"> | string | null
+    calendarEventId?: StringNullableFilter<"Opportunity"> | string | null
     createdAt?: DateTimeFilter<"Opportunity"> | Date | string
     updatedAt?: DateTimeFilter<"Opportunity"> | Date | string
     listing?: XOR<ListingScalarRelationFilter, ListingWhereInput>
@@ -24253,6 +30110,10 @@ export namespace Prisma {
     fees?: SortOrderInput | SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
+    meetingTime?: SortOrderInput | SortOrder
+    meetingLocation?: SortOrderInput | SortOrder
+    meetingType?: SortOrderInput | SortOrder
+    calendarEventId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     listing?: ListingOrderByWithRelationInput
@@ -24277,6 +30138,10 @@ export namespace Prisma {
     fees?: FloatNullableFilter<"Opportunity"> | number | null
     status?: StringFilter<"Opportunity"> | string
     notes?: StringNullableFilter<"Opportunity"> | string | null
+    meetingTime?: DateTimeNullableFilter<"Opportunity"> | Date | string | null
+    meetingLocation?: StringNullableFilter<"Opportunity"> | string | null
+    meetingType?: StringNullableFilter<"Opportunity"> | string | null
+    calendarEventId?: StringNullableFilter<"Opportunity"> | string | null
     createdAt?: DateTimeFilter<"Opportunity"> | Date | string
     updatedAt?: DateTimeFilter<"Opportunity"> | Date | string
     listing?: XOR<ListingScalarRelationFilter, ListingWhereInput>
@@ -24298,6 +30163,10 @@ export namespace Prisma {
     fees?: SortOrderInput | SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
+    meetingTime?: SortOrderInput | SortOrder
+    meetingLocation?: SortOrderInput | SortOrder
+    meetingType?: SortOrderInput | SortOrder
+    calendarEventId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: OpportunityCountOrderByAggregateInput
@@ -24325,6 +30194,10 @@ export namespace Prisma {
     fees?: FloatNullableWithAggregatesFilter<"Opportunity"> | number | null
     status?: StringWithAggregatesFilter<"Opportunity"> | string
     notes?: StringNullableWithAggregatesFilter<"Opportunity"> | string | null
+    meetingTime?: DateTimeNullableWithAggregatesFilter<"Opportunity"> | Date | string | null
+    meetingLocation?: StringNullableWithAggregatesFilter<"Opportunity"> | string | null
+    meetingType?: StringNullableWithAggregatesFilter<"Opportunity"> | string | null
+    calendarEventId?: StringNullableWithAggregatesFilter<"Opportunity"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Opportunity"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Opportunity"> | Date | string
   }
@@ -24605,8 +30478,11 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     accounts?: AccountListRelationFilter
+    deviceTokens?: DeviceTokenListRelationFilter
+    googleCalendarToken?: XOR<GoogleCalendarTokenNullableScalarRelationFilter, GoogleCalendarTokenWhereInput> | null
     listings?: ListingListRelationFilter
     messages?: MessageListRelationFilter
+    notificationEvents?: NotificationEventListRelationFilter
     opportunities?: OpportunityListRelationFilter
     postingQueue?: PostingQueueItemListRelationFilter
     scraperJobs?: ScraperJobListRelationFilter
@@ -24632,8 +30508,11 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     accounts?: AccountOrderByRelationAggregateInput
+    deviceTokens?: DeviceTokenOrderByRelationAggregateInput
+    googleCalendarToken?: GoogleCalendarTokenOrderByWithRelationInput
     listings?: ListingOrderByRelationAggregateInput
     messages?: MessageOrderByRelationAggregateInput
+    notificationEvents?: NotificationEventOrderByRelationAggregateInput
     opportunities?: OpportunityOrderByRelationAggregateInput
     postingQueue?: PostingQueueItemOrderByRelationAggregateInput
     scraperJobs?: ScraperJobOrderByRelationAggregateInput
@@ -24662,8 +30541,11 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     accounts?: AccountListRelationFilter
+    deviceTokens?: DeviceTokenListRelationFilter
+    googleCalendarToken?: XOR<GoogleCalendarTokenNullableScalarRelationFilter, GoogleCalendarTokenWhereInput> | null
     listings?: ListingListRelationFilter
     messages?: MessageListRelationFilter
+    notificationEvents?: NotificationEventListRelationFilter
     opportunities?: OpportunityListRelationFilter
     postingQueue?: PostingQueueItemListRelationFilter
     scraperJobs?: ScraperJobListRelationFilter
@@ -24927,6 +30809,49 @@ export namespace Prisma {
     homeLocation?: StringNullableFilter<"UserSettings"> | string | null
     holdingCostDailyRate?: FloatFilter<"UserSettings"> | number
     messageApprovalRequired?: BoolFilter<"UserSettings"> | boolean
+    pushNotifications?: BoolFilter<"UserSettings"> | boolean
+    phoneNumber?: StringNullableFilter<"UserSettings"> | string | null
+    phoneVerified?: BoolFilter<"UserSettings"> | boolean
+    phoneVerificationCode?: StringNullableFilter<"UserSettings"> | string | null
+    phoneVerificationExpiry?: DateTimeNullableFilter<"UserSettings"> | Date | string | null
+    phoneVerificationSentAt?: DateTimeNullableFilter<"UserSettings"> | Date | string | null
+    smsNotifications?: BoolFilter<"UserSettings"> | boolean
+    notifyMessageReceived?: BoolFilter<"UserSettings"> | boolean
+    notifyDraftReady?: BoolFilter<"UserSettings"> | boolean
+    notifyMessageSent?: BoolFilter<"UserSettings"> | boolean
+    notifyReviewReceived?: BoolFilter<"UserSettings"> | boolean
+    notifyFlipGoneCold?: BoolFilter<"UserSettings"> | boolean
+    notifyFlipTurnedHot?: BoolFilter<"UserSettings"> | boolean
+    notifyPriceChanges?: BoolFilter<"UserSettings"> | boolean
+    flipGoneColdHours?: IntFilter<"UserSettings"> | number
+    flipTurnedHotCount?: IntFilter<"UserSettings"> | number
+    notifyListingUnavailable?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyNewDeals?: BoolFilter<"UserSettings"> | boolean
+    pushNotifySoldItems?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyMessageReceived?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyDraftReady?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyMessageSent?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyReviewReceived?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyFlipGoneCold?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyFlipTurnedHot?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyPriceDrops?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyExpiring?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyListingUnavailable?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyWeeklyDigest?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyNewDeals?: BoolFilter<"UserSettings"> | boolean
+    smsNotifySoldItems?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyMessageReceived?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyDraftReady?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyMessageSent?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyReviewReceived?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyFlipGoneCold?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyFlipTurnedHot?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyPriceDrops?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyExpiring?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyListingUnavailable?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyWeeklyDigest?: BoolFilter<"UserSettings"> | boolean
+    meetingDepartureBufferMinutes?: IntFilter<"UserSettings"> | number
+    notifyMeetingReminder?: BoolFilter<"UserSettings"> | boolean
     createdAt?: DateTimeFilter<"UserSettings"> | Date | string
     updatedAt?: DateTimeFilter<"UserSettings"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -24956,6 +30881,49 @@ export namespace Prisma {
     homeLocation?: SortOrderInput | SortOrder
     holdingCostDailyRate?: SortOrder
     messageApprovalRequired?: SortOrder
+    pushNotifications?: SortOrder
+    phoneNumber?: SortOrderInput | SortOrder
+    phoneVerified?: SortOrder
+    phoneVerificationCode?: SortOrderInput | SortOrder
+    phoneVerificationExpiry?: SortOrderInput | SortOrder
+    phoneVerificationSentAt?: SortOrderInput | SortOrder
+    smsNotifications?: SortOrder
+    notifyMessageReceived?: SortOrder
+    notifyDraftReady?: SortOrder
+    notifyMessageSent?: SortOrder
+    notifyReviewReceived?: SortOrder
+    notifyFlipGoneCold?: SortOrder
+    notifyFlipTurnedHot?: SortOrder
+    notifyPriceChanges?: SortOrder
+    flipGoneColdHours?: SortOrder
+    flipTurnedHotCount?: SortOrder
+    notifyListingUnavailable?: SortOrder
+    pushNotifyNewDeals?: SortOrder
+    pushNotifySoldItems?: SortOrder
+    pushNotifyMessageReceived?: SortOrder
+    pushNotifyDraftReady?: SortOrder
+    pushNotifyMessageSent?: SortOrder
+    pushNotifyReviewReceived?: SortOrder
+    pushNotifyFlipGoneCold?: SortOrder
+    pushNotifyFlipTurnedHot?: SortOrder
+    pushNotifyPriceDrops?: SortOrder
+    pushNotifyExpiring?: SortOrder
+    pushNotifyListingUnavailable?: SortOrder
+    pushNotifyWeeklyDigest?: SortOrder
+    smsNotifyNewDeals?: SortOrder
+    smsNotifySoldItems?: SortOrder
+    smsNotifyMessageReceived?: SortOrder
+    smsNotifyDraftReady?: SortOrder
+    smsNotifyMessageSent?: SortOrder
+    smsNotifyReviewReceived?: SortOrder
+    smsNotifyFlipGoneCold?: SortOrder
+    smsNotifyFlipTurnedHot?: SortOrder
+    smsNotifyPriceDrops?: SortOrder
+    smsNotifyExpiring?: SortOrder
+    smsNotifyListingUnavailable?: SortOrder
+    smsNotifyWeeklyDigest?: SortOrder
+    meetingDepartureBufferMinutes?: SortOrder
+    notifyMeetingReminder?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -24988,6 +30956,49 @@ export namespace Prisma {
     homeLocation?: StringNullableFilter<"UserSettings"> | string | null
     holdingCostDailyRate?: FloatFilter<"UserSettings"> | number
     messageApprovalRequired?: BoolFilter<"UserSettings"> | boolean
+    pushNotifications?: BoolFilter<"UserSettings"> | boolean
+    phoneNumber?: StringNullableFilter<"UserSettings"> | string | null
+    phoneVerified?: BoolFilter<"UserSettings"> | boolean
+    phoneVerificationCode?: StringNullableFilter<"UserSettings"> | string | null
+    phoneVerificationExpiry?: DateTimeNullableFilter<"UserSettings"> | Date | string | null
+    phoneVerificationSentAt?: DateTimeNullableFilter<"UserSettings"> | Date | string | null
+    smsNotifications?: BoolFilter<"UserSettings"> | boolean
+    notifyMessageReceived?: BoolFilter<"UserSettings"> | boolean
+    notifyDraftReady?: BoolFilter<"UserSettings"> | boolean
+    notifyMessageSent?: BoolFilter<"UserSettings"> | boolean
+    notifyReviewReceived?: BoolFilter<"UserSettings"> | boolean
+    notifyFlipGoneCold?: BoolFilter<"UserSettings"> | boolean
+    notifyFlipTurnedHot?: BoolFilter<"UserSettings"> | boolean
+    notifyPriceChanges?: BoolFilter<"UserSettings"> | boolean
+    flipGoneColdHours?: IntFilter<"UserSettings"> | number
+    flipTurnedHotCount?: IntFilter<"UserSettings"> | number
+    notifyListingUnavailable?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyNewDeals?: BoolFilter<"UserSettings"> | boolean
+    pushNotifySoldItems?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyMessageReceived?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyDraftReady?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyMessageSent?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyReviewReceived?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyFlipGoneCold?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyFlipTurnedHot?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyPriceDrops?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyExpiring?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyListingUnavailable?: BoolFilter<"UserSettings"> | boolean
+    pushNotifyWeeklyDigest?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyNewDeals?: BoolFilter<"UserSettings"> | boolean
+    smsNotifySoldItems?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyMessageReceived?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyDraftReady?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyMessageSent?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyReviewReceived?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyFlipGoneCold?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyFlipTurnedHot?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyPriceDrops?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyExpiring?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyListingUnavailable?: BoolFilter<"UserSettings"> | boolean
+    smsNotifyWeeklyDigest?: BoolFilter<"UserSettings"> | boolean
+    meetingDepartureBufferMinutes?: IntFilter<"UserSettings"> | number
+    notifyMeetingReminder?: BoolFilter<"UserSettings"> | boolean
     createdAt?: DateTimeFilter<"UserSettings"> | Date | string
     updatedAt?: DateTimeFilter<"UserSettings"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -25017,6 +31028,49 @@ export namespace Prisma {
     homeLocation?: SortOrderInput | SortOrder
     holdingCostDailyRate?: SortOrder
     messageApprovalRequired?: SortOrder
+    pushNotifications?: SortOrder
+    phoneNumber?: SortOrderInput | SortOrder
+    phoneVerified?: SortOrder
+    phoneVerificationCode?: SortOrderInput | SortOrder
+    phoneVerificationExpiry?: SortOrderInput | SortOrder
+    phoneVerificationSentAt?: SortOrderInput | SortOrder
+    smsNotifications?: SortOrder
+    notifyMessageReceived?: SortOrder
+    notifyDraftReady?: SortOrder
+    notifyMessageSent?: SortOrder
+    notifyReviewReceived?: SortOrder
+    notifyFlipGoneCold?: SortOrder
+    notifyFlipTurnedHot?: SortOrder
+    notifyPriceChanges?: SortOrder
+    flipGoneColdHours?: SortOrder
+    flipTurnedHotCount?: SortOrder
+    notifyListingUnavailable?: SortOrder
+    pushNotifyNewDeals?: SortOrder
+    pushNotifySoldItems?: SortOrder
+    pushNotifyMessageReceived?: SortOrder
+    pushNotifyDraftReady?: SortOrder
+    pushNotifyMessageSent?: SortOrder
+    pushNotifyReviewReceived?: SortOrder
+    pushNotifyFlipGoneCold?: SortOrder
+    pushNotifyFlipTurnedHot?: SortOrder
+    pushNotifyPriceDrops?: SortOrder
+    pushNotifyExpiring?: SortOrder
+    pushNotifyListingUnavailable?: SortOrder
+    pushNotifyWeeklyDigest?: SortOrder
+    smsNotifyNewDeals?: SortOrder
+    smsNotifySoldItems?: SortOrder
+    smsNotifyMessageReceived?: SortOrder
+    smsNotifyDraftReady?: SortOrder
+    smsNotifyMessageSent?: SortOrder
+    smsNotifyReviewReceived?: SortOrder
+    smsNotifyFlipGoneCold?: SortOrder
+    smsNotifyFlipTurnedHot?: SortOrder
+    smsNotifyPriceDrops?: SortOrder
+    smsNotifyExpiring?: SortOrder
+    smsNotifyListingUnavailable?: SortOrder
+    smsNotifyWeeklyDigest?: SortOrder
+    meetingDepartureBufferMinutes?: SortOrder
+    notifyMeetingReminder?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserSettingsCountOrderByAggregateInput
@@ -25053,8 +31107,112 @@ export namespace Prisma {
     homeLocation?: StringNullableWithAggregatesFilter<"UserSettings"> | string | null
     holdingCostDailyRate?: FloatWithAggregatesFilter<"UserSettings"> | number
     messageApprovalRequired?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    pushNotifications?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    phoneNumber?: StringNullableWithAggregatesFilter<"UserSettings"> | string | null
+    phoneVerified?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    phoneVerificationCode?: StringNullableWithAggregatesFilter<"UserSettings"> | string | null
+    phoneVerificationExpiry?: DateTimeNullableWithAggregatesFilter<"UserSettings"> | Date | string | null
+    phoneVerificationSentAt?: DateTimeNullableWithAggregatesFilter<"UserSettings"> | Date | string | null
+    smsNotifications?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    notifyMessageReceived?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    notifyDraftReady?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    notifyMessageSent?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    notifyReviewReceived?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    notifyFlipGoneCold?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    notifyFlipTurnedHot?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    notifyPriceChanges?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    flipGoneColdHours?: IntWithAggregatesFilter<"UserSettings"> | number
+    flipTurnedHotCount?: IntWithAggregatesFilter<"UserSettings"> | number
+    notifyListingUnavailable?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    pushNotifyNewDeals?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    pushNotifySoldItems?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    pushNotifyMessageReceived?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    pushNotifyDraftReady?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    pushNotifyMessageSent?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    pushNotifyReviewReceived?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    pushNotifyFlipGoneCold?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    pushNotifyFlipTurnedHot?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    pushNotifyPriceDrops?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    pushNotifyExpiring?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    pushNotifyListingUnavailable?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    pushNotifyWeeklyDigest?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    smsNotifyNewDeals?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    smsNotifySoldItems?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    smsNotifyMessageReceived?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    smsNotifyDraftReady?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    smsNotifyMessageSent?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    smsNotifyReviewReceived?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    smsNotifyFlipGoneCold?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    smsNotifyFlipTurnedHot?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    smsNotifyPriceDrops?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    smsNotifyExpiring?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    smsNotifyListingUnavailable?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    smsNotifyWeeklyDigest?: BoolWithAggregatesFilter<"UserSettings"> | boolean
+    meetingDepartureBufferMinutes?: IntWithAggregatesFilter<"UserSettings"> | number
+    notifyMeetingReminder?: BoolWithAggregatesFilter<"UserSettings"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"UserSettings"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"UserSettings"> | Date | string
+  }
+
+  export type DeviceTokenWhereInput = {
+    AND?: DeviceTokenWhereInput | DeviceTokenWhereInput[]
+    OR?: DeviceTokenWhereInput[]
+    NOT?: DeviceTokenWhereInput | DeviceTokenWhereInput[]
+    id?: StringFilter<"DeviceToken"> | string
+    userId?: StringFilter<"DeviceToken"> | string
+    token?: StringFilter<"DeviceToken"> | string
+    userAgent?: StringNullableFilter<"DeviceToken"> | string | null
+    createdAt?: DateTimeFilter<"DeviceToken"> | Date | string
+    updatedAt?: DateTimeFilter<"DeviceToken"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type DeviceTokenOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    token?: SortOrder
+    userAgent?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type DeviceTokenWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_token?: DeviceTokenUserIdTokenCompoundUniqueInput
+    AND?: DeviceTokenWhereInput | DeviceTokenWhereInput[]
+    OR?: DeviceTokenWhereInput[]
+    NOT?: DeviceTokenWhereInput | DeviceTokenWhereInput[]
+    userId?: StringFilter<"DeviceToken"> | string
+    token?: StringFilter<"DeviceToken"> | string
+    userAgent?: StringNullableFilter<"DeviceToken"> | string | null
+    createdAt?: DateTimeFilter<"DeviceToken"> | Date | string
+    updatedAt?: DateTimeFilter<"DeviceToken"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "userId_token">
+
+  export type DeviceTokenOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    token?: SortOrder
+    userAgent?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: DeviceTokenCountOrderByAggregateInput
+    _max?: DeviceTokenMaxOrderByAggregateInput
+    _min?: DeviceTokenMinOrderByAggregateInput
+  }
+
+  export type DeviceTokenScalarWhereWithAggregatesInput = {
+    AND?: DeviceTokenScalarWhereWithAggregatesInput | DeviceTokenScalarWhereWithAggregatesInput[]
+    OR?: DeviceTokenScalarWhereWithAggregatesInput[]
+    NOT?: DeviceTokenScalarWhereWithAggregatesInput | DeviceTokenScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DeviceToken"> | string
+    userId?: StringWithAggregatesFilter<"DeviceToken"> | string
+    token?: StringWithAggregatesFilter<"DeviceToken"> | string
+    userAgent?: StringNullableWithAggregatesFilter<"DeviceToken"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"DeviceToken"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"DeviceToken"> | Date | string
   }
 
   export type FacebookTokenWhereInput = {
@@ -25112,6 +31270,76 @@ export namespace Prisma {
     expiresAt?: DateTimeWithAggregatesFilter<"FacebookToken"> | Date | string
     createdAt?: DateTimeWithAggregatesFilter<"FacebookToken"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"FacebookToken"> | Date | string
+  }
+
+  export type GoogleCalendarTokenWhereInput = {
+    AND?: GoogleCalendarTokenWhereInput | GoogleCalendarTokenWhereInput[]
+    OR?: GoogleCalendarTokenWhereInput[]
+    NOT?: GoogleCalendarTokenWhereInput | GoogleCalendarTokenWhereInput[]
+    id?: StringFilter<"GoogleCalendarToken"> | string
+    userId?: StringFilter<"GoogleCalendarToken"> | string
+    accessToken?: StringFilter<"GoogleCalendarToken"> | string
+    refreshToken?: StringFilter<"GoogleCalendarToken"> | string
+    expiresAt?: DateTimeFilter<"GoogleCalendarToken"> | Date | string
+    calendarEmail?: StringNullableFilter<"GoogleCalendarToken"> | string | null
+    createdAt?: DateTimeFilter<"GoogleCalendarToken"> | Date | string
+    updatedAt?: DateTimeFilter<"GoogleCalendarToken"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type GoogleCalendarTokenOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    accessToken?: SortOrder
+    refreshToken?: SortOrder
+    expiresAt?: SortOrder
+    calendarEmail?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type GoogleCalendarTokenWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId?: string
+    AND?: GoogleCalendarTokenWhereInput | GoogleCalendarTokenWhereInput[]
+    OR?: GoogleCalendarTokenWhereInput[]
+    NOT?: GoogleCalendarTokenWhereInput | GoogleCalendarTokenWhereInput[]
+    accessToken?: StringFilter<"GoogleCalendarToken"> | string
+    refreshToken?: StringFilter<"GoogleCalendarToken"> | string
+    expiresAt?: DateTimeFilter<"GoogleCalendarToken"> | Date | string
+    calendarEmail?: StringNullableFilter<"GoogleCalendarToken"> | string | null
+    createdAt?: DateTimeFilter<"GoogleCalendarToken"> | Date | string
+    updatedAt?: DateTimeFilter<"GoogleCalendarToken"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "userId">
+
+  export type GoogleCalendarTokenOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    accessToken?: SortOrder
+    refreshToken?: SortOrder
+    expiresAt?: SortOrder
+    calendarEmail?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: GoogleCalendarTokenCountOrderByAggregateInput
+    _max?: GoogleCalendarTokenMaxOrderByAggregateInput
+    _min?: GoogleCalendarTokenMinOrderByAggregateInput
+  }
+
+  export type GoogleCalendarTokenScalarWhereWithAggregatesInput = {
+    AND?: GoogleCalendarTokenScalarWhereWithAggregatesInput | GoogleCalendarTokenScalarWhereWithAggregatesInput[]
+    OR?: GoogleCalendarTokenScalarWhereWithAggregatesInput[]
+    NOT?: GoogleCalendarTokenScalarWhereWithAggregatesInput | GoogleCalendarTokenScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"GoogleCalendarToken"> | string
+    userId?: StringWithAggregatesFilter<"GoogleCalendarToken"> | string
+    accessToken?: StringWithAggregatesFilter<"GoogleCalendarToken"> | string
+    refreshToken?: StringWithAggregatesFilter<"GoogleCalendarToken"> | string
+    expiresAt?: DateTimeWithAggregatesFilter<"GoogleCalendarToken"> | Date | string
+    calendarEmail?: StringNullableWithAggregatesFilter<"GoogleCalendarToken"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"GoogleCalendarToken"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"GoogleCalendarToken"> | Date | string
   }
 
   export type MessageWhereInput = {
@@ -25612,6 +31840,206 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"PasswordResetToken"> | Date | string
   }
 
+  export type MonitoringJobWhereInput = {
+    AND?: MonitoringJobWhereInput | MonitoringJobWhereInput[]
+    OR?: MonitoringJobWhereInput[]
+    NOT?: MonitoringJobWhereInput | MonitoringJobWhereInput[]
+    id?: StringFilter<"MonitoringJob"> | string
+    status?: StringFilter<"MonitoringJob"> | string
+    startedAt?: DateTimeNullableFilter<"MonitoringJob"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"MonitoringJob"> | Date | string | null
+    listingsChecked?: IntFilter<"MonitoringJob"> | number
+    eventsCreated?: IntFilter<"MonitoringJob"> | number
+    errorsEncountered?: IntFilter<"MonitoringJob"> | number
+    totalListings?: IntFilter<"MonitoringJob"> | number
+    platformStats?: JsonNullableFilter<"MonitoringJob">
+    skippedPlatforms?: JsonNullableFilter<"MonitoringJob">
+    completedEarly?: BoolFilter<"MonitoringJob"> | boolean
+    canaryWarning?: BoolFilter<"MonitoringJob"> | boolean
+    errorMessage?: StringNullableFilter<"MonitoringJob"> | string | null
+    retryCount?: IntFilter<"MonitoringJob"> | number
+    createdAt?: DateTimeFilter<"MonitoringJob"> | Date | string
+    updatedAt?: DateTimeFilter<"MonitoringJob"> | Date | string
+  }
+
+  export type MonitoringJobOrderByWithRelationInput = {
+    id?: SortOrder
+    status?: SortOrder
+    startedAt?: SortOrderInput | SortOrder
+    completedAt?: SortOrderInput | SortOrder
+    listingsChecked?: SortOrder
+    eventsCreated?: SortOrder
+    errorsEncountered?: SortOrder
+    totalListings?: SortOrder
+    platformStats?: SortOrderInput | SortOrder
+    skippedPlatforms?: SortOrderInput | SortOrder
+    completedEarly?: SortOrder
+    canaryWarning?: SortOrder
+    errorMessage?: SortOrderInput | SortOrder
+    retryCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MonitoringJobWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: MonitoringJobWhereInput | MonitoringJobWhereInput[]
+    OR?: MonitoringJobWhereInput[]
+    NOT?: MonitoringJobWhereInput | MonitoringJobWhereInput[]
+    status?: StringFilter<"MonitoringJob"> | string
+    startedAt?: DateTimeNullableFilter<"MonitoringJob"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"MonitoringJob"> | Date | string | null
+    listingsChecked?: IntFilter<"MonitoringJob"> | number
+    eventsCreated?: IntFilter<"MonitoringJob"> | number
+    errorsEncountered?: IntFilter<"MonitoringJob"> | number
+    totalListings?: IntFilter<"MonitoringJob"> | number
+    platformStats?: JsonNullableFilter<"MonitoringJob">
+    skippedPlatforms?: JsonNullableFilter<"MonitoringJob">
+    completedEarly?: BoolFilter<"MonitoringJob"> | boolean
+    canaryWarning?: BoolFilter<"MonitoringJob"> | boolean
+    errorMessage?: StringNullableFilter<"MonitoringJob"> | string | null
+    retryCount?: IntFilter<"MonitoringJob"> | number
+    createdAt?: DateTimeFilter<"MonitoringJob"> | Date | string
+    updatedAt?: DateTimeFilter<"MonitoringJob"> | Date | string
+  }, "id">
+
+  export type MonitoringJobOrderByWithAggregationInput = {
+    id?: SortOrder
+    status?: SortOrder
+    startedAt?: SortOrderInput | SortOrder
+    completedAt?: SortOrderInput | SortOrder
+    listingsChecked?: SortOrder
+    eventsCreated?: SortOrder
+    errorsEncountered?: SortOrder
+    totalListings?: SortOrder
+    platformStats?: SortOrderInput | SortOrder
+    skippedPlatforms?: SortOrderInput | SortOrder
+    completedEarly?: SortOrder
+    canaryWarning?: SortOrder
+    errorMessage?: SortOrderInput | SortOrder
+    retryCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: MonitoringJobCountOrderByAggregateInput
+    _avg?: MonitoringJobAvgOrderByAggregateInput
+    _max?: MonitoringJobMaxOrderByAggregateInput
+    _min?: MonitoringJobMinOrderByAggregateInput
+    _sum?: MonitoringJobSumOrderByAggregateInput
+  }
+
+  export type MonitoringJobScalarWhereWithAggregatesInput = {
+    AND?: MonitoringJobScalarWhereWithAggregatesInput | MonitoringJobScalarWhereWithAggregatesInput[]
+    OR?: MonitoringJobScalarWhereWithAggregatesInput[]
+    NOT?: MonitoringJobScalarWhereWithAggregatesInput | MonitoringJobScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"MonitoringJob"> | string
+    status?: StringWithAggregatesFilter<"MonitoringJob"> | string
+    startedAt?: DateTimeNullableWithAggregatesFilter<"MonitoringJob"> | Date | string | null
+    completedAt?: DateTimeNullableWithAggregatesFilter<"MonitoringJob"> | Date | string | null
+    listingsChecked?: IntWithAggregatesFilter<"MonitoringJob"> | number
+    eventsCreated?: IntWithAggregatesFilter<"MonitoringJob"> | number
+    errorsEncountered?: IntWithAggregatesFilter<"MonitoringJob"> | number
+    totalListings?: IntWithAggregatesFilter<"MonitoringJob"> | number
+    platformStats?: JsonNullableWithAggregatesFilter<"MonitoringJob">
+    skippedPlatforms?: JsonNullableWithAggregatesFilter<"MonitoringJob">
+    completedEarly?: BoolWithAggregatesFilter<"MonitoringJob"> | boolean
+    canaryWarning?: BoolWithAggregatesFilter<"MonitoringJob"> | boolean
+    errorMessage?: StringNullableWithAggregatesFilter<"MonitoringJob"> | string | null
+    retryCount?: IntWithAggregatesFilter<"MonitoringJob"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"MonitoringJob"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"MonitoringJob"> | Date | string
+  }
+
+  export type NotificationEventWhereInput = {
+    AND?: NotificationEventWhereInput | NotificationEventWhereInput[]
+    OR?: NotificationEventWhereInput[]
+    NOT?: NotificationEventWhereInput | NotificationEventWhereInput[]
+    id?: StringFilter<"NotificationEvent"> | string
+    userId?: StringFilter<"NotificationEvent"> | string
+    listingId?: StringNullableFilter<"NotificationEvent"> | string | null
+    eventType?: StringFilter<"NotificationEvent"> | string
+    payload?: JsonFilter<"NotificationEvent">
+    deduplicationKey?: StringNullableFilter<"NotificationEvent"> | string | null
+    status?: StringFilter<"NotificationEvent"> | string
+    retryCount?: IntFilter<"NotificationEvent"> | number
+    errorMessage?: StringNullableFilter<"NotificationEvent"> | string | null
+    processedAt?: DateTimeNullableFilter<"NotificationEvent"> | Date | string | null
+    createdAt?: DateTimeFilter<"NotificationEvent"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    listing?: XOR<ListingNullableScalarRelationFilter, ListingWhereInput> | null
+  }
+
+  export type NotificationEventOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    listingId?: SortOrderInput | SortOrder
+    eventType?: SortOrder
+    payload?: SortOrder
+    deduplicationKey?: SortOrderInput | SortOrder
+    status?: SortOrder
+    retryCount?: SortOrder
+    errorMessage?: SortOrderInput | SortOrder
+    processedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    listing?: ListingOrderByWithRelationInput
+  }
+
+  export type NotificationEventWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_listingId_eventType_deduplicationKey?: NotificationEventUserIdListingIdEventTypeDeduplicationKeyCompoundUniqueInput
+    AND?: NotificationEventWhereInput | NotificationEventWhereInput[]
+    OR?: NotificationEventWhereInput[]
+    NOT?: NotificationEventWhereInput | NotificationEventWhereInput[]
+    userId?: StringFilter<"NotificationEvent"> | string
+    listingId?: StringNullableFilter<"NotificationEvent"> | string | null
+    eventType?: StringFilter<"NotificationEvent"> | string
+    payload?: JsonFilter<"NotificationEvent">
+    deduplicationKey?: StringNullableFilter<"NotificationEvent"> | string | null
+    status?: StringFilter<"NotificationEvent"> | string
+    retryCount?: IntFilter<"NotificationEvent"> | number
+    errorMessage?: StringNullableFilter<"NotificationEvent"> | string | null
+    processedAt?: DateTimeNullableFilter<"NotificationEvent"> | Date | string | null
+    createdAt?: DateTimeFilter<"NotificationEvent"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    listing?: XOR<ListingNullableScalarRelationFilter, ListingWhereInput> | null
+  }, "id" | "userId_listingId_eventType_deduplicationKey">
+
+  export type NotificationEventOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    listingId?: SortOrderInput | SortOrder
+    eventType?: SortOrder
+    payload?: SortOrder
+    deduplicationKey?: SortOrderInput | SortOrder
+    status?: SortOrder
+    retryCount?: SortOrder
+    errorMessage?: SortOrderInput | SortOrder
+    processedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: NotificationEventCountOrderByAggregateInput
+    _avg?: NotificationEventAvgOrderByAggregateInput
+    _max?: NotificationEventMaxOrderByAggregateInput
+    _min?: NotificationEventMinOrderByAggregateInput
+    _sum?: NotificationEventSumOrderByAggregateInput
+  }
+
+  export type NotificationEventScalarWhereWithAggregatesInput = {
+    AND?: NotificationEventScalarWhereWithAggregatesInput | NotificationEventScalarWhereWithAggregatesInput[]
+    OR?: NotificationEventScalarWhereWithAggregatesInput[]
+    NOT?: NotificationEventScalarWhereWithAggregatesInput | NotificationEventScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"NotificationEvent"> | string
+    userId?: StringWithAggregatesFilter<"NotificationEvent"> | string
+    listingId?: StringNullableWithAggregatesFilter<"NotificationEvent"> | string | null
+    eventType?: StringWithAggregatesFilter<"NotificationEvent"> | string
+    payload?: JsonWithAggregatesFilter<"NotificationEvent">
+    deduplicationKey?: StringNullableWithAggregatesFilter<"NotificationEvent"> | string | null
+    status?: StringWithAggregatesFilter<"NotificationEvent"> | string
+    retryCount?: IntWithAggregatesFilter<"NotificationEvent"> | number
+    errorMessage?: StringNullableWithAggregatesFilter<"NotificationEvent"> | string | null
+    processedAt?: DateTimeNullableWithAggregatesFilter<"NotificationEvent"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"NotificationEvent"> | Date | string
+  }
+
   export type ListingCreateInput = {
     id?: string
     externalId: string
@@ -25629,6 +32057,8 @@ export namespace Prisma {
     postedAt?: Date | string | null
     scrapedAt?: Date | string
     updatedAt?: Date | string
+    lastMonitoredAt?: Date | string | null
+    estimatedExpiresAt?: Date | string | null
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -25687,6 +32117,7 @@ export namespace Prisma {
     user?: UserCreateNestedOneWithoutListingsInput
     images?: ListingImageCreateNestedManyWithoutListingInput
     messages?: MessageCreateNestedManyWithoutListingInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutListingInput
     opportunity?: OpportunityCreateNestedOneWithoutListingInput
     postingQueue?: PostingQueueItemCreateNestedManyWithoutListingInput
   }
@@ -25709,6 +32140,8 @@ export namespace Prisma {
     postedAt?: Date | string | null
     scrapedAt?: Date | string
     updatedAt?: Date | string
+    lastMonitoredAt?: Date | string | null
+    estimatedExpiresAt?: Date | string | null
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -25766,6 +32199,7 @@ export namespace Prisma {
     analysisReasoning?: string | null
     images?: ListingImageUncheckedCreateNestedManyWithoutListingInput
     messages?: MessageUncheckedCreateNestedManyWithoutListingInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutListingInput
     opportunity?: OpportunityUncheckedCreateNestedOneWithoutListingInput
     postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutListingInput
   }
@@ -25787,6 +32221,8 @@ export namespace Prisma {
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastMonitoredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -25845,6 +32281,7 @@ export namespace Prisma {
     user?: UserUpdateOneWithoutListingsNestedInput
     images?: ListingImageUpdateManyWithoutListingNestedInput
     messages?: MessageUpdateManyWithoutListingNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutListingNestedInput
     opportunity?: OpportunityUpdateOneWithoutListingNestedInput
     postingQueue?: PostingQueueItemUpdateManyWithoutListingNestedInput
   }
@@ -25867,6 +32304,8 @@ export namespace Prisma {
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastMonitoredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -25924,6 +32363,7 @@ export namespace Prisma {
     analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
     images?: ListingImageUncheckedUpdateManyWithoutListingNestedInput
     messages?: MessageUncheckedUpdateManyWithoutListingNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutListingNestedInput
     opportunity?: OpportunityUncheckedUpdateOneWithoutListingNestedInput
     postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutListingNestedInput
   }
@@ -25946,6 +32386,8 @@ export namespace Prisma {
     postedAt?: Date | string | null
     scrapedAt?: Date | string
     updatedAt?: Date | string
+    lastMonitoredAt?: Date | string | null
+    estimatedExpiresAt?: Date | string | null
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -26020,6 +32462,8 @@ export namespace Prisma {
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastMonitoredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -26095,6 +32539,8 @@ export namespace Prisma {
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastMonitoredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -26165,6 +32611,10 @@ export namespace Prisma {
     fees?: number | null
     status?: string
     notes?: string | null
+    meetingTime?: Date | string | null
+    meetingLocation?: string | null
+    meetingType?: string | null
+    calendarEventId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     listing: ListingCreateNestedOneWithoutOpportunityInput
@@ -26186,6 +32636,10 @@ export namespace Prisma {
     fees?: number | null
     status?: string
     notes?: string | null
+    meetingTime?: Date | string | null
+    meetingLocation?: string | null
+    meetingType?: string | null
+    calendarEventId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -26203,6 +32657,10 @@ export namespace Prisma {
     fees?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    meetingTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    meetingLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    meetingType?: NullableStringFieldUpdateOperationsInput | string | null
+    calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     listing?: ListingUpdateOneRequiredWithoutOpportunityNestedInput
@@ -26224,6 +32682,10 @@ export namespace Prisma {
     fees?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    meetingTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    meetingLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    meetingType?: NullableStringFieldUpdateOperationsInput | string | null
+    calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -26243,6 +32705,10 @@ export namespace Prisma {
     fees?: number | null
     status?: string
     notes?: string | null
+    meetingTime?: Date | string | null
+    meetingLocation?: string | null
+    meetingType?: string | null
+    calendarEventId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -26260,6 +32726,10 @@ export namespace Prisma {
     fees?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    meetingTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    meetingLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    meetingType?: NullableStringFieldUpdateOperationsInput | string | null
+    calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -26279,6 +32749,10 @@ export namespace Prisma {
     fees?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    meetingTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    meetingLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    meetingType?: NullableStringFieldUpdateOperationsInput | string | null
+    calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -26590,8 +33064,11 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenCreateNestedOneWithoutUserInput
     listings?: ListingCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutUserInput
     opportunities?: OpportunityCreateNestedManyWithoutUserInput
     postingQueue?: PostingQueueItemCreateNestedManyWithoutUserInput
     scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
@@ -26617,8 +33094,11 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput
     listings?: ListingUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutUserInput
     opportunities?: OpportunityUncheckedCreateNestedManyWithoutUserInput
     postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
     scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
@@ -26644,8 +33124,11 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUpdateOneWithoutUserNestedInput
     listings?: ListingUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutUserNestedInput
     opportunities?: OpportunityUpdateManyWithoutUserNestedInput
     postingQueue?: PostingQueueItemUpdateManyWithoutUserNestedInput
     scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
@@ -26671,8 +33154,11 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput
     listings?: ListingUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutUserNestedInput
     opportunities?: OpportunityUncheckedUpdateManyWithoutUserNestedInput
     postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
     scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
@@ -26948,6 +33434,49 @@ export namespace Prisma {
     homeLocation?: string | null
     holdingCostDailyRate?: number
     messageApprovalRequired?: boolean
+    pushNotifications?: boolean
+    phoneNumber?: string | null
+    phoneVerified?: boolean
+    phoneVerificationCode?: string | null
+    phoneVerificationExpiry?: Date | string | null
+    phoneVerificationSentAt?: Date | string | null
+    smsNotifications?: boolean
+    notifyMessageReceived?: boolean
+    notifyDraftReady?: boolean
+    notifyMessageSent?: boolean
+    notifyReviewReceived?: boolean
+    notifyFlipGoneCold?: boolean
+    notifyFlipTurnedHot?: boolean
+    notifyPriceChanges?: boolean
+    flipGoneColdHours?: number
+    flipTurnedHotCount?: number
+    notifyListingUnavailable?: boolean
+    pushNotifyNewDeals?: boolean
+    pushNotifySoldItems?: boolean
+    pushNotifyMessageReceived?: boolean
+    pushNotifyDraftReady?: boolean
+    pushNotifyMessageSent?: boolean
+    pushNotifyReviewReceived?: boolean
+    pushNotifyFlipGoneCold?: boolean
+    pushNotifyFlipTurnedHot?: boolean
+    pushNotifyPriceDrops?: boolean
+    pushNotifyExpiring?: boolean
+    pushNotifyListingUnavailable?: boolean
+    pushNotifyWeeklyDigest?: boolean
+    smsNotifyNewDeals?: boolean
+    smsNotifySoldItems?: boolean
+    smsNotifyMessageReceived?: boolean
+    smsNotifyDraftReady?: boolean
+    smsNotifyMessageSent?: boolean
+    smsNotifyReviewReceived?: boolean
+    smsNotifyFlipGoneCold?: boolean
+    smsNotifyFlipTurnedHot?: boolean
+    smsNotifyPriceDrops?: boolean
+    smsNotifyExpiring?: boolean
+    smsNotifyListingUnavailable?: boolean
+    smsNotifyWeeklyDigest?: boolean
+    meetingDepartureBufferMinutes?: number
+    notifyMeetingReminder?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSettingsInput
@@ -26977,6 +33506,49 @@ export namespace Prisma {
     homeLocation?: string | null
     holdingCostDailyRate?: number
     messageApprovalRequired?: boolean
+    pushNotifications?: boolean
+    phoneNumber?: string | null
+    phoneVerified?: boolean
+    phoneVerificationCode?: string | null
+    phoneVerificationExpiry?: Date | string | null
+    phoneVerificationSentAt?: Date | string | null
+    smsNotifications?: boolean
+    notifyMessageReceived?: boolean
+    notifyDraftReady?: boolean
+    notifyMessageSent?: boolean
+    notifyReviewReceived?: boolean
+    notifyFlipGoneCold?: boolean
+    notifyFlipTurnedHot?: boolean
+    notifyPriceChanges?: boolean
+    flipGoneColdHours?: number
+    flipTurnedHotCount?: number
+    notifyListingUnavailable?: boolean
+    pushNotifyNewDeals?: boolean
+    pushNotifySoldItems?: boolean
+    pushNotifyMessageReceived?: boolean
+    pushNotifyDraftReady?: boolean
+    pushNotifyMessageSent?: boolean
+    pushNotifyReviewReceived?: boolean
+    pushNotifyFlipGoneCold?: boolean
+    pushNotifyFlipTurnedHot?: boolean
+    pushNotifyPriceDrops?: boolean
+    pushNotifyExpiring?: boolean
+    pushNotifyListingUnavailable?: boolean
+    pushNotifyWeeklyDigest?: boolean
+    smsNotifyNewDeals?: boolean
+    smsNotifySoldItems?: boolean
+    smsNotifyMessageReceived?: boolean
+    smsNotifyDraftReady?: boolean
+    smsNotifyMessageSent?: boolean
+    smsNotifyReviewReceived?: boolean
+    smsNotifyFlipGoneCold?: boolean
+    smsNotifyFlipTurnedHot?: boolean
+    smsNotifyPriceDrops?: boolean
+    smsNotifyExpiring?: boolean
+    smsNotifyListingUnavailable?: boolean
+    smsNotifyWeeklyDigest?: boolean
+    meetingDepartureBufferMinutes?: number
+    notifyMeetingReminder?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -27004,6 +33576,49 @@ export namespace Prisma {
     homeLocation?: NullableStringFieldUpdateOperationsInput | string | null
     holdingCostDailyRate?: FloatFieldUpdateOperationsInput | number
     messageApprovalRequired?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifications?: BoolFieldUpdateOperationsInput | boolean
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phoneVerificationSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    smsNotifications?: BoolFieldUpdateOperationsInput | boolean
+    notifyMessageReceived?: BoolFieldUpdateOperationsInput | boolean
+    notifyDraftReady?: BoolFieldUpdateOperationsInput | boolean
+    notifyMessageSent?: BoolFieldUpdateOperationsInput | boolean
+    notifyReviewReceived?: BoolFieldUpdateOperationsInput | boolean
+    notifyFlipGoneCold?: BoolFieldUpdateOperationsInput | boolean
+    notifyFlipTurnedHot?: BoolFieldUpdateOperationsInput | boolean
+    notifyPriceChanges?: BoolFieldUpdateOperationsInput | boolean
+    flipGoneColdHours?: IntFieldUpdateOperationsInput | number
+    flipTurnedHotCount?: IntFieldUpdateOperationsInput | number
+    notifyListingUnavailable?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyNewDeals?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifySoldItems?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyMessageReceived?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyDraftReady?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyMessageSent?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyReviewReceived?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyFlipGoneCold?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyFlipTurnedHot?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyPriceDrops?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyExpiring?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyListingUnavailable?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyWeeklyDigest?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyNewDeals?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifySoldItems?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyMessageReceived?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyDraftReady?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyMessageSent?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyReviewReceived?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyFlipGoneCold?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyFlipTurnedHot?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyPriceDrops?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyExpiring?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyListingUnavailable?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyWeeklyDigest?: BoolFieldUpdateOperationsInput | boolean
+    meetingDepartureBufferMinutes?: IntFieldUpdateOperationsInput | number
+    notifyMeetingReminder?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSettingsNestedInput
@@ -27033,6 +33648,49 @@ export namespace Prisma {
     homeLocation?: NullableStringFieldUpdateOperationsInput | string | null
     holdingCostDailyRate?: FloatFieldUpdateOperationsInput | number
     messageApprovalRequired?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifications?: BoolFieldUpdateOperationsInput | boolean
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phoneVerificationSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    smsNotifications?: BoolFieldUpdateOperationsInput | boolean
+    notifyMessageReceived?: BoolFieldUpdateOperationsInput | boolean
+    notifyDraftReady?: BoolFieldUpdateOperationsInput | boolean
+    notifyMessageSent?: BoolFieldUpdateOperationsInput | boolean
+    notifyReviewReceived?: BoolFieldUpdateOperationsInput | boolean
+    notifyFlipGoneCold?: BoolFieldUpdateOperationsInput | boolean
+    notifyFlipTurnedHot?: BoolFieldUpdateOperationsInput | boolean
+    notifyPriceChanges?: BoolFieldUpdateOperationsInput | boolean
+    flipGoneColdHours?: IntFieldUpdateOperationsInput | number
+    flipTurnedHotCount?: IntFieldUpdateOperationsInput | number
+    notifyListingUnavailable?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyNewDeals?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifySoldItems?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyMessageReceived?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyDraftReady?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyMessageSent?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyReviewReceived?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyFlipGoneCold?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyFlipTurnedHot?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyPriceDrops?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyExpiring?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyListingUnavailable?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyWeeklyDigest?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyNewDeals?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifySoldItems?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyMessageReceived?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyDraftReady?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyMessageSent?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyReviewReceived?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyFlipGoneCold?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyFlipTurnedHot?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyPriceDrops?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyExpiring?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyListingUnavailable?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyWeeklyDigest?: BoolFieldUpdateOperationsInput | boolean
+    meetingDepartureBufferMinutes?: IntFieldUpdateOperationsInput | number
+    notifyMeetingReminder?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -27061,6 +33719,49 @@ export namespace Prisma {
     homeLocation?: string | null
     holdingCostDailyRate?: number
     messageApprovalRequired?: boolean
+    pushNotifications?: boolean
+    phoneNumber?: string | null
+    phoneVerified?: boolean
+    phoneVerificationCode?: string | null
+    phoneVerificationExpiry?: Date | string | null
+    phoneVerificationSentAt?: Date | string | null
+    smsNotifications?: boolean
+    notifyMessageReceived?: boolean
+    notifyDraftReady?: boolean
+    notifyMessageSent?: boolean
+    notifyReviewReceived?: boolean
+    notifyFlipGoneCold?: boolean
+    notifyFlipTurnedHot?: boolean
+    notifyPriceChanges?: boolean
+    flipGoneColdHours?: number
+    flipTurnedHotCount?: number
+    notifyListingUnavailable?: boolean
+    pushNotifyNewDeals?: boolean
+    pushNotifySoldItems?: boolean
+    pushNotifyMessageReceived?: boolean
+    pushNotifyDraftReady?: boolean
+    pushNotifyMessageSent?: boolean
+    pushNotifyReviewReceived?: boolean
+    pushNotifyFlipGoneCold?: boolean
+    pushNotifyFlipTurnedHot?: boolean
+    pushNotifyPriceDrops?: boolean
+    pushNotifyExpiring?: boolean
+    pushNotifyListingUnavailable?: boolean
+    pushNotifyWeeklyDigest?: boolean
+    smsNotifyNewDeals?: boolean
+    smsNotifySoldItems?: boolean
+    smsNotifyMessageReceived?: boolean
+    smsNotifyDraftReady?: boolean
+    smsNotifyMessageSent?: boolean
+    smsNotifyReviewReceived?: boolean
+    smsNotifyFlipGoneCold?: boolean
+    smsNotifyFlipTurnedHot?: boolean
+    smsNotifyPriceDrops?: boolean
+    smsNotifyExpiring?: boolean
+    smsNotifyListingUnavailable?: boolean
+    smsNotifyWeeklyDigest?: boolean
+    meetingDepartureBufferMinutes?: number
+    notifyMeetingReminder?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -27088,6 +33789,49 @@ export namespace Prisma {
     homeLocation?: NullableStringFieldUpdateOperationsInput | string | null
     holdingCostDailyRate?: FloatFieldUpdateOperationsInput | number
     messageApprovalRequired?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifications?: BoolFieldUpdateOperationsInput | boolean
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phoneVerificationSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    smsNotifications?: BoolFieldUpdateOperationsInput | boolean
+    notifyMessageReceived?: BoolFieldUpdateOperationsInput | boolean
+    notifyDraftReady?: BoolFieldUpdateOperationsInput | boolean
+    notifyMessageSent?: BoolFieldUpdateOperationsInput | boolean
+    notifyReviewReceived?: BoolFieldUpdateOperationsInput | boolean
+    notifyFlipGoneCold?: BoolFieldUpdateOperationsInput | boolean
+    notifyFlipTurnedHot?: BoolFieldUpdateOperationsInput | boolean
+    notifyPriceChanges?: BoolFieldUpdateOperationsInput | boolean
+    flipGoneColdHours?: IntFieldUpdateOperationsInput | number
+    flipTurnedHotCount?: IntFieldUpdateOperationsInput | number
+    notifyListingUnavailable?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyNewDeals?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifySoldItems?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyMessageReceived?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyDraftReady?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyMessageSent?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyReviewReceived?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyFlipGoneCold?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyFlipTurnedHot?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyPriceDrops?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyExpiring?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyListingUnavailable?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyWeeklyDigest?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyNewDeals?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifySoldItems?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyMessageReceived?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyDraftReady?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyMessageSent?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyReviewReceived?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyFlipGoneCold?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyFlipTurnedHot?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyPriceDrops?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyExpiring?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyListingUnavailable?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyWeeklyDigest?: BoolFieldUpdateOperationsInput | boolean
+    meetingDepartureBufferMinutes?: IntFieldUpdateOperationsInput | number
+    notifyMeetingReminder?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -27116,6 +33860,111 @@ export namespace Prisma {
     homeLocation?: NullableStringFieldUpdateOperationsInput | string | null
     holdingCostDailyRate?: FloatFieldUpdateOperationsInput | number
     messageApprovalRequired?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifications?: BoolFieldUpdateOperationsInput | boolean
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phoneVerificationSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    smsNotifications?: BoolFieldUpdateOperationsInput | boolean
+    notifyMessageReceived?: BoolFieldUpdateOperationsInput | boolean
+    notifyDraftReady?: BoolFieldUpdateOperationsInput | boolean
+    notifyMessageSent?: BoolFieldUpdateOperationsInput | boolean
+    notifyReviewReceived?: BoolFieldUpdateOperationsInput | boolean
+    notifyFlipGoneCold?: BoolFieldUpdateOperationsInput | boolean
+    notifyFlipTurnedHot?: BoolFieldUpdateOperationsInput | boolean
+    notifyPriceChanges?: BoolFieldUpdateOperationsInput | boolean
+    flipGoneColdHours?: IntFieldUpdateOperationsInput | number
+    flipTurnedHotCount?: IntFieldUpdateOperationsInput | number
+    notifyListingUnavailable?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyNewDeals?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifySoldItems?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyMessageReceived?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyDraftReady?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyMessageSent?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyReviewReceived?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyFlipGoneCold?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyFlipTurnedHot?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyPriceDrops?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyExpiring?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyListingUnavailable?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyWeeklyDigest?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyNewDeals?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifySoldItems?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyMessageReceived?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyDraftReady?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyMessageSent?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyReviewReceived?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyFlipGoneCold?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyFlipTurnedHot?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyPriceDrops?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyExpiring?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyListingUnavailable?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyWeeklyDigest?: BoolFieldUpdateOperationsInput | boolean
+    meetingDepartureBufferMinutes?: IntFieldUpdateOperationsInput | number
+    notifyMeetingReminder?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceTokenCreateInput = {
+    id?: string
+    token: string
+    userAgent?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutDeviceTokensInput
+  }
+
+  export type DeviceTokenUncheckedCreateInput = {
+    id?: string
+    userId: string
+    token: string
+    userAgent?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceTokenUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutDeviceTokensNestedInput
+  }
+
+  export type DeviceTokenUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceTokenCreateManyInput = {
+    id?: string
+    userId: string
+    token: string
+    userAgent?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceTokenUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceTokenUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -27179,6 +34028,82 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     accessToken?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GoogleCalendarTokenCreateInput = {
+    id?: string
+    accessToken: string
+    refreshToken: string
+    expiresAt: Date | string
+    calendarEmail?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutGoogleCalendarTokenInput
+  }
+
+  export type GoogleCalendarTokenUncheckedCreateInput = {
+    id?: string
+    userId: string
+    accessToken: string
+    refreshToken: string
+    expiresAt: Date | string
+    calendarEmail?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GoogleCalendarTokenUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    accessToken?: StringFieldUpdateOperationsInput | string
+    refreshToken?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    calendarEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutGoogleCalendarTokenNestedInput
+  }
+
+  export type GoogleCalendarTokenUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    accessToken?: StringFieldUpdateOperationsInput | string
+    refreshToken?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    calendarEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GoogleCalendarTokenCreateManyInput = {
+    id?: string
+    userId: string
+    accessToken: string
+    refreshToken: string
+    expiresAt: Date | string
+    calendarEmail?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GoogleCalendarTokenUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    accessToken?: StringFieldUpdateOperationsInput | string
+    refreshToken?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    calendarEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GoogleCalendarTokenUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    accessToken?: StringFieldUpdateOperationsInput | string
+    refreshToken?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    calendarEmail?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -27729,6 +34654,235 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type MonitoringJobCreateInput = {
+    id?: string
+    status?: string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    listingsChecked?: number
+    eventsCreated?: number
+    errorsEncountered?: number
+    totalListings?: number
+    platformStats?: NullableJsonNullValueInput | InputJsonValue
+    skippedPlatforms?: NullableJsonNullValueInput | InputJsonValue
+    completedEarly?: boolean
+    canaryWarning?: boolean
+    errorMessage?: string | null
+    retryCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MonitoringJobUncheckedCreateInput = {
+    id?: string
+    status?: string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    listingsChecked?: number
+    eventsCreated?: number
+    errorsEncountered?: number
+    totalListings?: number
+    platformStats?: NullableJsonNullValueInput | InputJsonValue
+    skippedPlatforms?: NullableJsonNullValueInput | InputJsonValue
+    completedEarly?: boolean
+    canaryWarning?: boolean
+    errorMessage?: string | null
+    retryCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MonitoringJobUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    listingsChecked?: IntFieldUpdateOperationsInput | number
+    eventsCreated?: IntFieldUpdateOperationsInput | number
+    errorsEncountered?: IntFieldUpdateOperationsInput | number
+    totalListings?: IntFieldUpdateOperationsInput | number
+    platformStats?: NullableJsonNullValueInput | InputJsonValue
+    skippedPlatforms?: NullableJsonNullValueInput | InputJsonValue
+    completedEarly?: BoolFieldUpdateOperationsInput | boolean
+    canaryWarning?: BoolFieldUpdateOperationsInput | boolean
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    retryCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MonitoringJobUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    listingsChecked?: IntFieldUpdateOperationsInput | number
+    eventsCreated?: IntFieldUpdateOperationsInput | number
+    errorsEncountered?: IntFieldUpdateOperationsInput | number
+    totalListings?: IntFieldUpdateOperationsInput | number
+    platformStats?: NullableJsonNullValueInput | InputJsonValue
+    skippedPlatforms?: NullableJsonNullValueInput | InputJsonValue
+    completedEarly?: BoolFieldUpdateOperationsInput | boolean
+    canaryWarning?: BoolFieldUpdateOperationsInput | boolean
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    retryCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MonitoringJobCreateManyInput = {
+    id?: string
+    status?: string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    listingsChecked?: number
+    eventsCreated?: number
+    errorsEncountered?: number
+    totalListings?: number
+    platformStats?: NullableJsonNullValueInput | InputJsonValue
+    skippedPlatforms?: NullableJsonNullValueInput | InputJsonValue
+    completedEarly?: boolean
+    canaryWarning?: boolean
+    errorMessage?: string | null
+    retryCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MonitoringJobUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    listingsChecked?: IntFieldUpdateOperationsInput | number
+    eventsCreated?: IntFieldUpdateOperationsInput | number
+    errorsEncountered?: IntFieldUpdateOperationsInput | number
+    totalListings?: IntFieldUpdateOperationsInput | number
+    platformStats?: NullableJsonNullValueInput | InputJsonValue
+    skippedPlatforms?: NullableJsonNullValueInput | InputJsonValue
+    completedEarly?: BoolFieldUpdateOperationsInput | boolean
+    canaryWarning?: BoolFieldUpdateOperationsInput | boolean
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    retryCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MonitoringJobUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    listingsChecked?: IntFieldUpdateOperationsInput | number
+    eventsCreated?: IntFieldUpdateOperationsInput | number
+    errorsEncountered?: IntFieldUpdateOperationsInput | number
+    totalListings?: IntFieldUpdateOperationsInput | number
+    platformStats?: NullableJsonNullValueInput | InputJsonValue
+    skippedPlatforms?: NullableJsonNullValueInput | InputJsonValue
+    completedEarly?: BoolFieldUpdateOperationsInput | boolean
+    canaryWarning?: BoolFieldUpdateOperationsInput | boolean
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    retryCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type NotificationEventCreateInput = {
+    id?: string
+    eventType: string
+    payload: JsonNullValueInput | InputJsonValue
+    deduplicationKey?: string | null
+    status?: string
+    retryCount?: number
+    errorMessage?: string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutNotificationEventsInput
+    listing?: ListingCreateNestedOneWithoutNotificationEventsInput
+  }
+
+  export type NotificationEventUncheckedCreateInput = {
+    id?: string
+    userId: string
+    listingId?: string | null
+    eventType: string
+    payload: JsonNullValueInput | InputJsonValue
+    deduplicationKey?: string | null
+    status?: string
+    retryCount?: number
+    errorMessage?: string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type NotificationEventUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    eventType?: StringFieldUpdateOperationsInput | string
+    payload?: JsonNullValueInput | InputJsonValue
+    deduplicationKey?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    retryCount?: IntFieldUpdateOperationsInput | number
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutNotificationEventsNestedInput
+    listing?: ListingUpdateOneWithoutNotificationEventsNestedInput
+  }
+
+  export type NotificationEventUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    eventType?: StringFieldUpdateOperationsInput | string
+    payload?: JsonNullValueInput | InputJsonValue
+    deduplicationKey?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    retryCount?: IntFieldUpdateOperationsInput | number
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type NotificationEventCreateManyInput = {
+    id?: string
+    userId: string
+    listingId?: string | null
+    eventType: string
+    payload: JsonNullValueInput | InputJsonValue
+    deduplicationKey?: string | null
+    status?: string
+    retryCount?: number
+    errorMessage?: string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type NotificationEventUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    eventType?: StringFieldUpdateOperationsInput | string
+    payload?: JsonNullValueInput | InputJsonValue
+    deduplicationKey?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    retryCount?: IntFieldUpdateOperationsInput | number
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type NotificationEventUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    eventType?: StringFieldUpdateOperationsInput | string
+    payload?: JsonNullValueInput | InputJsonValue
+    deduplicationKey?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    retryCount?: IntFieldUpdateOperationsInput | number
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -27841,6 +34995,12 @@ export namespace Prisma {
     none?: MessageWhereInput
   }
 
+  export type NotificationEventListRelationFilter = {
+    every?: NotificationEventWhereInput
+    some?: NotificationEventWhereInput
+    none?: NotificationEventWhereInput
+  }
+
   export type OpportunityNullableScalarRelationFilter = {
     is?: OpportunityWhereInput | null
     isNot?: OpportunityWhereInput | null
@@ -27862,6 +35022,10 @@ export namespace Prisma {
   }
 
   export type MessageOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type NotificationEventOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -27893,6 +35057,8 @@ export namespace Prisma {
     postedAt?: SortOrder
     scrapedAt?: SortOrder
     updatedAt?: SortOrder
+    lastMonitoredAt?: SortOrder
+    estimatedExpiresAt?: SortOrder
     estimatedValue?: SortOrder
     estimatedLow?: SortOrder
     estimatedHigh?: SortOrder
@@ -27997,6 +35163,8 @@ export namespace Prisma {
     postedAt?: SortOrder
     scrapedAt?: SortOrder
     updatedAt?: SortOrder
+    lastMonitoredAt?: SortOrder
+    estimatedExpiresAt?: SortOrder
     estimatedValue?: SortOrder
     estimatedLow?: SortOrder
     estimatedHigh?: SortOrder
@@ -28072,6 +35240,8 @@ export namespace Prisma {
     postedAt?: SortOrder
     scrapedAt?: SortOrder
     updatedAt?: SortOrder
+    lastMonitoredAt?: SortOrder
+    estimatedExpiresAt?: SortOrder
     estimatedValue?: SortOrder
     estimatedLow?: SortOrder
     estimatedHigh?: SortOrder
@@ -28306,6 +35476,10 @@ export namespace Prisma {
     fees?: SortOrder
     status?: SortOrder
     notes?: SortOrder
+    meetingTime?: SortOrder
+    meetingLocation?: SortOrder
+    meetingType?: SortOrder
+    calendarEventId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -28332,6 +35506,10 @@ export namespace Prisma {
     fees?: SortOrder
     status?: SortOrder
     notes?: SortOrder
+    meetingTime?: SortOrder
+    meetingLocation?: SortOrder
+    meetingType?: SortOrder
+    calendarEventId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -28351,6 +35529,10 @@ export namespace Prisma {
     fees?: SortOrder
     status?: SortOrder
     notes?: SortOrder
+    meetingTime?: SortOrder
+    meetingLocation?: SortOrder
+    meetingType?: SortOrder
+    calendarEventId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -28549,6 +35731,17 @@ export namespace Prisma {
     none?: AccountWhereInput
   }
 
+  export type DeviceTokenListRelationFilter = {
+    every?: DeviceTokenWhereInput
+    some?: DeviceTokenWhereInput
+    none?: DeviceTokenWhereInput
+  }
+
+  export type GoogleCalendarTokenNullableScalarRelationFilter = {
+    is?: GoogleCalendarTokenWhereInput | null
+    isNot?: GoogleCalendarTokenWhereInput | null
+  }
+
   export type ListingListRelationFilter = {
     every?: ListingWhereInput
     some?: ListingWhereInput
@@ -28597,6 +35790,10 @@ export namespace Prisma {
   }
 
   export type AccountOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DeviceTokenOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -28815,6 +36012,49 @@ export namespace Prisma {
     homeLocation?: SortOrder
     holdingCostDailyRate?: SortOrder
     messageApprovalRequired?: SortOrder
+    pushNotifications?: SortOrder
+    phoneNumber?: SortOrder
+    phoneVerified?: SortOrder
+    phoneVerificationCode?: SortOrder
+    phoneVerificationExpiry?: SortOrder
+    phoneVerificationSentAt?: SortOrder
+    smsNotifications?: SortOrder
+    notifyMessageReceived?: SortOrder
+    notifyDraftReady?: SortOrder
+    notifyMessageSent?: SortOrder
+    notifyReviewReceived?: SortOrder
+    notifyFlipGoneCold?: SortOrder
+    notifyFlipTurnedHot?: SortOrder
+    notifyPriceChanges?: SortOrder
+    flipGoneColdHours?: SortOrder
+    flipTurnedHotCount?: SortOrder
+    notifyListingUnavailable?: SortOrder
+    pushNotifyNewDeals?: SortOrder
+    pushNotifySoldItems?: SortOrder
+    pushNotifyMessageReceived?: SortOrder
+    pushNotifyDraftReady?: SortOrder
+    pushNotifyMessageSent?: SortOrder
+    pushNotifyReviewReceived?: SortOrder
+    pushNotifyFlipGoneCold?: SortOrder
+    pushNotifyFlipTurnedHot?: SortOrder
+    pushNotifyPriceDrops?: SortOrder
+    pushNotifyExpiring?: SortOrder
+    pushNotifyListingUnavailable?: SortOrder
+    pushNotifyWeeklyDigest?: SortOrder
+    smsNotifyNewDeals?: SortOrder
+    smsNotifySoldItems?: SortOrder
+    smsNotifyMessageReceived?: SortOrder
+    smsNotifyDraftReady?: SortOrder
+    smsNotifyMessageSent?: SortOrder
+    smsNotifyReviewReceived?: SortOrder
+    smsNotifyFlipGoneCold?: SortOrder
+    smsNotifyFlipTurnedHot?: SortOrder
+    smsNotifyPriceDrops?: SortOrder
+    smsNotifyExpiring?: SortOrder
+    smsNotifyListingUnavailable?: SortOrder
+    smsNotifyWeeklyDigest?: SortOrder
+    meetingDepartureBufferMinutes?: SortOrder
+    notifyMeetingReminder?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -28829,6 +36069,9 @@ export namespace Prisma {
     feeRateCraigslist?: SortOrder
     maxPickupRadiusMiles?: SortOrder
     holdingCostDailyRate?: SortOrder
+    flipGoneColdHours?: SortOrder
+    flipTurnedHotCount?: SortOrder
+    meetingDepartureBufferMinutes?: SortOrder
   }
 
   export type UserSettingsMaxOrderByAggregateInput = {
@@ -28855,6 +36098,49 @@ export namespace Prisma {
     homeLocation?: SortOrder
     holdingCostDailyRate?: SortOrder
     messageApprovalRequired?: SortOrder
+    pushNotifications?: SortOrder
+    phoneNumber?: SortOrder
+    phoneVerified?: SortOrder
+    phoneVerificationCode?: SortOrder
+    phoneVerificationExpiry?: SortOrder
+    phoneVerificationSentAt?: SortOrder
+    smsNotifications?: SortOrder
+    notifyMessageReceived?: SortOrder
+    notifyDraftReady?: SortOrder
+    notifyMessageSent?: SortOrder
+    notifyReviewReceived?: SortOrder
+    notifyFlipGoneCold?: SortOrder
+    notifyFlipTurnedHot?: SortOrder
+    notifyPriceChanges?: SortOrder
+    flipGoneColdHours?: SortOrder
+    flipTurnedHotCount?: SortOrder
+    notifyListingUnavailable?: SortOrder
+    pushNotifyNewDeals?: SortOrder
+    pushNotifySoldItems?: SortOrder
+    pushNotifyMessageReceived?: SortOrder
+    pushNotifyDraftReady?: SortOrder
+    pushNotifyMessageSent?: SortOrder
+    pushNotifyReviewReceived?: SortOrder
+    pushNotifyFlipGoneCold?: SortOrder
+    pushNotifyFlipTurnedHot?: SortOrder
+    pushNotifyPriceDrops?: SortOrder
+    pushNotifyExpiring?: SortOrder
+    pushNotifyListingUnavailable?: SortOrder
+    pushNotifyWeeklyDigest?: SortOrder
+    smsNotifyNewDeals?: SortOrder
+    smsNotifySoldItems?: SortOrder
+    smsNotifyMessageReceived?: SortOrder
+    smsNotifyDraftReady?: SortOrder
+    smsNotifyMessageSent?: SortOrder
+    smsNotifyReviewReceived?: SortOrder
+    smsNotifyFlipGoneCold?: SortOrder
+    smsNotifyFlipTurnedHot?: SortOrder
+    smsNotifyPriceDrops?: SortOrder
+    smsNotifyExpiring?: SortOrder
+    smsNotifyListingUnavailable?: SortOrder
+    smsNotifyWeeklyDigest?: SortOrder
+    meetingDepartureBufferMinutes?: SortOrder
+    notifyMeetingReminder?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -28883,6 +36169,49 @@ export namespace Prisma {
     homeLocation?: SortOrder
     holdingCostDailyRate?: SortOrder
     messageApprovalRequired?: SortOrder
+    pushNotifications?: SortOrder
+    phoneNumber?: SortOrder
+    phoneVerified?: SortOrder
+    phoneVerificationCode?: SortOrder
+    phoneVerificationExpiry?: SortOrder
+    phoneVerificationSentAt?: SortOrder
+    smsNotifications?: SortOrder
+    notifyMessageReceived?: SortOrder
+    notifyDraftReady?: SortOrder
+    notifyMessageSent?: SortOrder
+    notifyReviewReceived?: SortOrder
+    notifyFlipGoneCold?: SortOrder
+    notifyFlipTurnedHot?: SortOrder
+    notifyPriceChanges?: SortOrder
+    flipGoneColdHours?: SortOrder
+    flipTurnedHotCount?: SortOrder
+    notifyListingUnavailable?: SortOrder
+    pushNotifyNewDeals?: SortOrder
+    pushNotifySoldItems?: SortOrder
+    pushNotifyMessageReceived?: SortOrder
+    pushNotifyDraftReady?: SortOrder
+    pushNotifyMessageSent?: SortOrder
+    pushNotifyReviewReceived?: SortOrder
+    pushNotifyFlipGoneCold?: SortOrder
+    pushNotifyFlipTurnedHot?: SortOrder
+    pushNotifyPriceDrops?: SortOrder
+    pushNotifyExpiring?: SortOrder
+    pushNotifyListingUnavailable?: SortOrder
+    pushNotifyWeeklyDigest?: SortOrder
+    smsNotifyNewDeals?: SortOrder
+    smsNotifySoldItems?: SortOrder
+    smsNotifyMessageReceived?: SortOrder
+    smsNotifyDraftReady?: SortOrder
+    smsNotifyMessageSent?: SortOrder
+    smsNotifyReviewReceived?: SortOrder
+    smsNotifyFlipGoneCold?: SortOrder
+    smsNotifyFlipTurnedHot?: SortOrder
+    smsNotifyPriceDrops?: SortOrder
+    smsNotifyExpiring?: SortOrder
+    smsNotifyListingUnavailable?: SortOrder
+    smsNotifyWeeklyDigest?: SortOrder
+    meetingDepartureBufferMinutes?: SortOrder
+    notifyMeetingReminder?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -28897,6 +36226,41 @@ export namespace Prisma {
     feeRateCraigslist?: SortOrder
     maxPickupRadiusMiles?: SortOrder
     holdingCostDailyRate?: SortOrder
+    flipGoneColdHours?: SortOrder
+    flipTurnedHotCount?: SortOrder
+    meetingDepartureBufferMinutes?: SortOrder
+  }
+
+  export type DeviceTokenUserIdTokenCompoundUniqueInput = {
+    userId: string
+    token: string
+  }
+
+  export type DeviceTokenCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    token?: SortOrder
+    userAgent?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DeviceTokenMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    token?: SortOrder
+    userAgent?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DeviceTokenMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    token?: SortOrder
+    userAgent?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type FacebookTokenCountOrderByAggregateInput = {
@@ -28922,6 +36286,39 @@ export namespace Prisma {
     userId?: SortOrder
     accessToken?: SortOrder
     expiresAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type GoogleCalendarTokenCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    accessToken?: SortOrder
+    refreshToken?: SortOrder
+    expiresAt?: SortOrder
+    calendarEmail?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type GoogleCalendarTokenMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    accessToken?: SortOrder
+    refreshToken?: SortOrder
+    expiresAt?: SortOrder
+    calendarEmail?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type GoogleCalendarTokenMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    accessToken?: SortOrder
+    refreshToken?: SortOrder
+    expiresAt?: SortOrder
+    calendarEmail?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -29223,6 +36620,228 @@ export namespace Prisma {
     expiresAt?: SortOrder
     createdAt?: SortOrder
   }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type MonitoringJobCountOrderByAggregateInput = {
+    id?: SortOrder
+    status?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    listingsChecked?: SortOrder
+    eventsCreated?: SortOrder
+    errorsEncountered?: SortOrder
+    totalListings?: SortOrder
+    platformStats?: SortOrder
+    skippedPlatforms?: SortOrder
+    completedEarly?: SortOrder
+    canaryWarning?: SortOrder
+    errorMessage?: SortOrder
+    retryCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MonitoringJobAvgOrderByAggregateInput = {
+    listingsChecked?: SortOrder
+    eventsCreated?: SortOrder
+    errorsEncountered?: SortOrder
+    totalListings?: SortOrder
+    retryCount?: SortOrder
+  }
+
+  export type MonitoringJobMaxOrderByAggregateInput = {
+    id?: SortOrder
+    status?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    listingsChecked?: SortOrder
+    eventsCreated?: SortOrder
+    errorsEncountered?: SortOrder
+    totalListings?: SortOrder
+    completedEarly?: SortOrder
+    canaryWarning?: SortOrder
+    errorMessage?: SortOrder
+    retryCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MonitoringJobMinOrderByAggregateInput = {
+    id?: SortOrder
+    status?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    listingsChecked?: SortOrder
+    eventsCreated?: SortOrder
+    errorsEncountered?: SortOrder
+    totalListings?: SortOrder
+    completedEarly?: SortOrder
+    canaryWarning?: SortOrder
+    errorMessage?: SortOrder
+    retryCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MonitoringJobSumOrderByAggregateInput = {
+    listingsChecked?: SortOrder
+    eventsCreated?: SortOrder
+    errorsEncountered?: SortOrder
+    totalListings?: SortOrder
+    retryCount?: SortOrder
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NotificationEventUserIdListingIdEventTypeDeduplicationKeyCompoundUniqueInput = {
+    userId: string
+    listingId: string
+    eventType: string
+    deduplicationKey: string
+  }
+
+  export type NotificationEventCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    listingId?: SortOrder
+    eventType?: SortOrder
+    payload?: SortOrder
+    deduplicationKey?: SortOrder
+    status?: SortOrder
+    retryCount?: SortOrder
+    errorMessage?: SortOrder
+    processedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type NotificationEventAvgOrderByAggregateInput = {
+    retryCount?: SortOrder
+  }
+
+  export type NotificationEventMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    listingId?: SortOrder
+    eventType?: SortOrder
+    deduplicationKey?: SortOrder
+    status?: SortOrder
+    retryCount?: SortOrder
+    errorMessage?: SortOrder
+    processedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type NotificationEventMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    listingId?: SortOrder
+    eventType?: SortOrder
+    deduplicationKey?: SortOrder
+    status?: SortOrder
+    retryCount?: SortOrder
+    errorMessage?: SortOrder
+    processedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type NotificationEventSumOrderByAggregateInput = {
+    retryCount?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
+  }
 
   export type UserCreateNestedOneWithoutListingsInput = {
     create?: XOR<UserCreateWithoutListingsInput, UserUncheckedCreateWithoutListingsInput>
@@ -29242,6 +36861,13 @@ export namespace Prisma {
     connectOrCreate?: MessageCreateOrConnectWithoutListingInput | MessageCreateOrConnectWithoutListingInput[]
     createMany?: MessageCreateManyListingInputEnvelope
     connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+  }
+
+  export type NotificationEventCreateNestedManyWithoutListingInput = {
+    create?: XOR<NotificationEventCreateWithoutListingInput, NotificationEventUncheckedCreateWithoutListingInput> | NotificationEventCreateWithoutListingInput[] | NotificationEventUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: NotificationEventCreateOrConnectWithoutListingInput | NotificationEventCreateOrConnectWithoutListingInput[]
+    createMany?: NotificationEventCreateManyListingInputEnvelope
+    connect?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
   }
 
   export type OpportunityCreateNestedOneWithoutListingInput = {
@@ -29269,6 +36895,13 @@ export namespace Prisma {
     connectOrCreate?: MessageCreateOrConnectWithoutListingInput | MessageCreateOrConnectWithoutListingInput[]
     createMany?: MessageCreateManyListingInputEnvelope
     connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+  }
+
+  export type NotificationEventUncheckedCreateNestedManyWithoutListingInput = {
+    create?: XOR<NotificationEventCreateWithoutListingInput, NotificationEventUncheckedCreateWithoutListingInput> | NotificationEventCreateWithoutListingInput[] | NotificationEventUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: NotificationEventCreateOrConnectWithoutListingInput | NotificationEventCreateOrConnectWithoutListingInput[]
+    createMany?: NotificationEventCreateManyListingInputEnvelope
+    connect?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
   }
 
   export type OpportunityUncheckedCreateNestedOneWithoutListingInput = {
@@ -29370,6 +37003,20 @@ export namespace Prisma {
     deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
   }
 
+  export type NotificationEventUpdateManyWithoutListingNestedInput = {
+    create?: XOR<NotificationEventCreateWithoutListingInput, NotificationEventUncheckedCreateWithoutListingInput> | NotificationEventCreateWithoutListingInput[] | NotificationEventUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: NotificationEventCreateOrConnectWithoutListingInput | NotificationEventCreateOrConnectWithoutListingInput[]
+    upsert?: NotificationEventUpsertWithWhereUniqueWithoutListingInput | NotificationEventUpsertWithWhereUniqueWithoutListingInput[]
+    createMany?: NotificationEventCreateManyListingInputEnvelope
+    set?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
+    disconnect?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
+    delete?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
+    connect?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
+    update?: NotificationEventUpdateWithWhereUniqueWithoutListingInput | NotificationEventUpdateWithWhereUniqueWithoutListingInput[]
+    updateMany?: NotificationEventUpdateManyWithWhereWithoutListingInput | NotificationEventUpdateManyWithWhereWithoutListingInput[]
+    deleteMany?: NotificationEventScalarWhereInput | NotificationEventScalarWhereInput[]
+  }
+
   export type OpportunityUpdateOneWithoutListingNestedInput = {
     create?: XOR<OpportunityCreateWithoutListingInput, OpportunityUncheckedCreateWithoutListingInput>
     connectOrCreate?: OpportunityCreateOrConnectWithoutListingInput
@@ -29420,6 +37067,20 @@ export namespace Prisma {
     update?: MessageUpdateWithWhereUniqueWithoutListingInput | MessageUpdateWithWhereUniqueWithoutListingInput[]
     updateMany?: MessageUpdateManyWithWhereWithoutListingInput | MessageUpdateManyWithWhereWithoutListingInput[]
     deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
+  }
+
+  export type NotificationEventUncheckedUpdateManyWithoutListingNestedInput = {
+    create?: XOR<NotificationEventCreateWithoutListingInput, NotificationEventUncheckedCreateWithoutListingInput> | NotificationEventCreateWithoutListingInput[] | NotificationEventUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: NotificationEventCreateOrConnectWithoutListingInput | NotificationEventCreateOrConnectWithoutListingInput[]
+    upsert?: NotificationEventUpsertWithWhereUniqueWithoutListingInput | NotificationEventUpsertWithWhereUniqueWithoutListingInput[]
+    createMany?: NotificationEventCreateManyListingInputEnvelope
+    set?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
+    disconnect?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
+    delete?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
+    connect?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
+    update?: NotificationEventUpdateWithWhereUniqueWithoutListingInput | NotificationEventUpdateWithWhereUniqueWithoutListingInput[]
+    updateMany?: NotificationEventUpdateManyWithWhereWithoutListingInput | NotificationEventUpdateManyWithWhereWithoutListingInput[]
+    deleteMany?: NotificationEventScalarWhereInput | NotificationEventScalarWhereInput[]
   }
 
   export type OpportunityUncheckedUpdateOneWithoutListingNestedInput = {
@@ -29523,6 +37184,19 @@ export namespace Prisma {
     connect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
   }
 
+  export type DeviceTokenCreateNestedManyWithoutUserInput = {
+    create?: XOR<DeviceTokenCreateWithoutUserInput, DeviceTokenUncheckedCreateWithoutUserInput> | DeviceTokenCreateWithoutUserInput[] | DeviceTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DeviceTokenCreateOrConnectWithoutUserInput | DeviceTokenCreateOrConnectWithoutUserInput[]
+    createMany?: DeviceTokenCreateManyUserInputEnvelope
+    connect?: DeviceTokenWhereUniqueInput | DeviceTokenWhereUniqueInput[]
+  }
+
+  export type GoogleCalendarTokenCreateNestedOneWithoutUserInput = {
+    create?: XOR<GoogleCalendarTokenCreateWithoutUserInput, GoogleCalendarTokenUncheckedCreateWithoutUserInput>
+    connectOrCreate?: GoogleCalendarTokenCreateOrConnectWithoutUserInput
+    connect?: GoogleCalendarTokenWhereUniqueInput
+  }
+
   export type ListingCreateNestedManyWithoutUserInput = {
     create?: XOR<ListingCreateWithoutUserInput, ListingUncheckedCreateWithoutUserInput> | ListingCreateWithoutUserInput[] | ListingUncheckedCreateWithoutUserInput[]
     connectOrCreate?: ListingCreateOrConnectWithoutUserInput | ListingCreateOrConnectWithoutUserInput[]
@@ -29535,6 +37209,13 @@ export namespace Prisma {
     connectOrCreate?: MessageCreateOrConnectWithoutUserInput | MessageCreateOrConnectWithoutUserInput[]
     createMany?: MessageCreateManyUserInputEnvelope
     connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+  }
+
+  export type NotificationEventCreateNestedManyWithoutUserInput = {
+    create?: XOR<NotificationEventCreateWithoutUserInput, NotificationEventUncheckedCreateWithoutUserInput> | NotificationEventCreateWithoutUserInput[] | NotificationEventUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: NotificationEventCreateOrConnectWithoutUserInput | NotificationEventCreateOrConnectWithoutUserInput[]
+    createMany?: NotificationEventCreateManyUserInputEnvelope
+    connect?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
   }
 
   export type OpportunityCreateNestedManyWithoutUserInput = {
@@ -29599,6 +37280,19 @@ export namespace Prisma {
     connect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
   }
 
+  export type DeviceTokenUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<DeviceTokenCreateWithoutUserInput, DeviceTokenUncheckedCreateWithoutUserInput> | DeviceTokenCreateWithoutUserInput[] | DeviceTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DeviceTokenCreateOrConnectWithoutUserInput | DeviceTokenCreateOrConnectWithoutUserInput[]
+    createMany?: DeviceTokenCreateManyUserInputEnvelope
+    connect?: DeviceTokenWhereUniqueInput | DeviceTokenWhereUniqueInput[]
+  }
+
+  export type GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput = {
+    create?: XOR<GoogleCalendarTokenCreateWithoutUserInput, GoogleCalendarTokenUncheckedCreateWithoutUserInput>
+    connectOrCreate?: GoogleCalendarTokenCreateOrConnectWithoutUserInput
+    connect?: GoogleCalendarTokenWhereUniqueInput
+  }
+
   export type ListingUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<ListingCreateWithoutUserInput, ListingUncheckedCreateWithoutUserInput> | ListingCreateWithoutUserInput[] | ListingUncheckedCreateWithoutUserInput[]
     connectOrCreate?: ListingCreateOrConnectWithoutUserInput | ListingCreateOrConnectWithoutUserInput[]
@@ -29611,6 +37305,13 @@ export namespace Prisma {
     connectOrCreate?: MessageCreateOrConnectWithoutUserInput | MessageCreateOrConnectWithoutUserInput[]
     createMany?: MessageCreateManyUserInputEnvelope
     connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+  }
+
+  export type NotificationEventUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<NotificationEventCreateWithoutUserInput, NotificationEventUncheckedCreateWithoutUserInput> | NotificationEventCreateWithoutUserInput[] | NotificationEventUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: NotificationEventCreateOrConnectWithoutUserInput | NotificationEventCreateOrConnectWithoutUserInput[]
+    createMany?: NotificationEventCreateManyUserInputEnvelope
+    connect?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
   }
 
   export type OpportunityUncheckedCreateNestedManyWithoutUserInput = {
@@ -29682,6 +37383,30 @@ export namespace Prisma {
     deleteMany?: AccountScalarWhereInput | AccountScalarWhereInput[]
   }
 
+  export type DeviceTokenUpdateManyWithoutUserNestedInput = {
+    create?: XOR<DeviceTokenCreateWithoutUserInput, DeviceTokenUncheckedCreateWithoutUserInput> | DeviceTokenCreateWithoutUserInput[] | DeviceTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DeviceTokenCreateOrConnectWithoutUserInput | DeviceTokenCreateOrConnectWithoutUserInput[]
+    upsert?: DeviceTokenUpsertWithWhereUniqueWithoutUserInput | DeviceTokenUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: DeviceTokenCreateManyUserInputEnvelope
+    set?: DeviceTokenWhereUniqueInput | DeviceTokenWhereUniqueInput[]
+    disconnect?: DeviceTokenWhereUniqueInput | DeviceTokenWhereUniqueInput[]
+    delete?: DeviceTokenWhereUniqueInput | DeviceTokenWhereUniqueInput[]
+    connect?: DeviceTokenWhereUniqueInput | DeviceTokenWhereUniqueInput[]
+    update?: DeviceTokenUpdateWithWhereUniqueWithoutUserInput | DeviceTokenUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: DeviceTokenUpdateManyWithWhereWithoutUserInput | DeviceTokenUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: DeviceTokenScalarWhereInput | DeviceTokenScalarWhereInput[]
+  }
+
+  export type GoogleCalendarTokenUpdateOneWithoutUserNestedInput = {
+    create?: XOR<GoogleCalendarTokenCreateWithoutUserInput, GoogleCalendarTokenUncheckedCreateWithoutUserInput>
+    connectOrCreate?: GoogleCalendarTokenCreateOrConnectWithoutUserInput
+    upsert?: GoogleCalendarTokenUpsertWithoutUserInput
+    disconnect?: GoogleCalendarTokenWhereInput | boolean
+    delete?: GoogleCalendarTokenWhereInput | boolean
+    connect?: GoogleCalendarTokenWhereUniqueInput
+    update?: XOR<XOR<GoogleCalendarTokenUpdateToOneWithWhereWithoutUserInput, GoogleCalendarTokenUpdateWithoutUserInput>, GoogleCalendarTokenUncheckedUpdateWithoutUserInput>
+  }
+
   export type ListingUpdateManyWithoutUserNestedInput = {
     create?: XOR<ListingCreateWithoutUserInput, ListingUncheckedCreateWithoutUserInput> | ListingCreateWithoutUserInput[] | ListingUncheckedCreateWithoutUserInput[]
     connectOrCreate?: ListingCreateOrConnectWithoutUserInput | ListingCreateOrConnectWithoutUserInput[]
@@ -29708,6 +37433,20 @@ export namespace Prisma {
     update?: MessageUpdateWithWhereUniqueWithoutUserInput | MessageUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: MessageUpdateManyWithWhereWithoutUserInput | MessageUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
+  }
+
+  export type NotificationEventUpdateManyWithoutUserNestedInput = {
+    create?: XOR<NotificationEventCreateWithoutUserInput, NotificationEventUncheckedCreateWithoutUserInput> | NotificationEventCreateWithoutUserInput[] | NotificationEventUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: NotificationEventCreateOrConnectWithoutUserInput | NotificationEventCreateOrConnectWithoutUserInput[]
+    upsert?: NotificationEventUpsertWithWhereUniqueWithoutUserInput | NotificationEventUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: NotificationEventCreateManyUserInputEnvelope
+    set?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
+    disconnect?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
+    delete?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
+    connect?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
+    update?: NotificationEventUpdateWithWhereUniqueWithoutUserInput | NotificationEventUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: NotificationEventUpdateManyWithWhereWithoutUserInput | NotificationEventUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: NotificationEventScalarWhereInput | NotificationEventScalarWhereInput[]
   }
 
   export type OpportunityUpdateManyWithoutUserNestedInput = {
@@ -29832,6 +37571,30 @@ export namespace Prisma {
     deleteMany?: AccountScalarWhereInput | AccountScalarWhereInput[]
   }
 
+  export type DeviceTokenUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<DeviceTokenCreateWithoutUserInput, DeviceTokenUncheckedCreateWithoutUserInput> | DeviceTokenCreateWithoutUserInput[] | DeviceTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DeviceTokenCreateOrConnectWithoutUserInput | DeviceTokenCreateOrConnectWithoutUserInput[]
+    upsert?: DeviceTokenUpsertWithWhereUniqueWithoutUserInput | DeviceTokenUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: DeviceTokenCreateManyUserInputEnvelope
+    set?: DeviceTokenWhereUniqueInput | DeviceTokenWhereUniqueInput[]
+    disconnect?: DeviceTokenWhereUniqueInput | DeviceTokenWhereUniqueInput[]
+    delete?: DeviceTokenWhereUniqueInput | DeviceTokenWhereUniqueInput[]
+    connect?: DeviceTokenWhereUniqueInput | DeviceTokenWhereUniqueInput[]
+    update?: DeviceTokenUpdateWithWhereUniqueWithoutUserInput | DeviceTokenUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: DeviceTokenUpdateManyWithWhereWithoutUserInput | DeviceTokenUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: DeviceTokenScalarWhereInput | DeviceTokenScalarWhereInput[]
+  }
+
+  export type GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput = {
+    create?: XOR<GoogleCalendarTokenCreateWithoutUserInput, GoogleCalendarTokenUncheckedCreateWithoutUserInput>
+    connectOrCreate?: GoogleCalendarTokenCreateOrConnectWithoutUserInput
+    upsert?: GoogleCalendarTokenUpsertWithoutUserInput
+    disconnect?: GoogleCalendarTokenWhereInput | boolean
+    delete?: GoogleCalendarTokenWhereInput | boolean
+    connect?: GoogleCalendarTokenWhereUniqueInput
+    update?: XOR<XOR<GoogleCalendarTokenUpdateToOneWithWhereWithoutUserInput, GoogleCalendarTokenUpdateWithoutUserInput>, GoogleCalendarTokenUncheckedUpdateWithoutUserInput>
+  }
+
   export type ListingUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<ListingCreateWithoutUserInput, ListingUncheckedCreateWithoutUserInput> | ListingCreateWithoutUserInput[] | ListingUncheckedCreateWithoutUserInput[]
     connectOrCreate?: ListingCreateOrConnectWithoutUserInput | ListingCreateOrConnectWithoutUserInput[]
@@ -29858,6 +37621,20 @@ export namespace Prisma {
     update?: MessageUpdateWithWhereUniqueWithoutUserInput | MessageUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: MessageUpdateManyWithWhereWithoutUserInput | MessageUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
+  }
+
+  export type NotificationEventUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<NotificationEventCreateWithoutUserInput, NotificationEventUncheckedCreateWithoutUserInput> | NotificationEventCreateWithoutUserInput[] | NotificationEventUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: NotificationEventCreateOrConnectWithoutUserInput | NotificationEventCreateOrConnectWithoutUserInput[]
+    upsert?: NotificationEventUpsertWithWhereUniqueWithoutUserInput | NotificationEventUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: NotificationEventCreateManyUserInputEnvelope
+    set?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
+    disconnect?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
+    delete?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
+    connect?: NotificationEventWhereUniqueInput | NotificationEventWhereUniqueInput[]
+    update?: NotificationEventUpdateWithWhereUniqueWithoutUserInput | NotificationEventUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: NotificationEventUpdateManyWithWhereWithoutUserInput | NotificationEventUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: NotificationEventScalarWhereInput | NotificationEventScalarWhereInput[]
   }
 
   export type OpportunityUncheckedUpdateManyWithoutUserNestedInput = {
@@ -30010,6 +37787,34 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSettingsInput, UserUpdateWithoutSettingsInput>, UserUncheckedUpdateWithoutSettingsInput>
   }
 
+  export type UserCreateNestedOneWithoutDeviceTokensInput = {
+    create?: XOR<UserCreateWithoutDeviceTokensInput, UserUncheckedCreateWithoutDeviceTokensInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDeviceTokensInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutDeviceTokensNestedInput = {
+    create?: XOR<UserCreateWithoutDeviceTokensInput, UserUncheckedCreateWithoutDeviceTokensInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDeviceTokensInput
+    upsert?: UserUpsertWithoutDeviceTokensInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutDeviceTokensInput, UserUpdateWithoutDeviceTokensInput>, UserUncheckedUpdateWithoutDeviceTokensInput>
+  }
+
+  export type UserCreateNestedOneWithoutGoogleCalendarTokenInput = {
+    create?: XOR<UserCreateWithoutGoogleCalendarTokenInput, UserUncheckedCreateWithoutGoogleCalendarTokenInput>
+    connectOrCreate?: UserCreateOrConnectWithoutGoogleCalendarTokenInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutGoogleCalendarTokenNestedInput = {
+    create?: XOR<UserCreateWithoutGoogleCalendarTokenInput, UserUncheckedCreateWithoutGoogleCalendarTokenInput>
+    connectOrCreate?: UserCreateOrConnectWithoutGoogleCalendarTokenInput
+    upsert?: UserUpsertWithoutGoogleCalendarTokenInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutGoogleCalendarTokenInput, UserUpdateWithoutGoogleCalendarTokenInput>, UserUncheckedUpdateWithoutGoogleCalendarTokenInput>
+  }
+
   export type ListingCreateNestedOneWithoutMessagesInput = {
     create?: XOR<ListingCreateWithoutMessagesInput, ListingUncheckedCreateWithoutMessagesInput>
     connectOrCreate?: ListingCreateOrConnectWithoutMessagesInput
@@ -30108,6 +37913,36 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutPasswordResetTokensInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutPasswordResetTokensInput, UserUpdateWithoutPasswordResetTokensInput>, UserUncheckedUpdateWithoutPasswordResetTokensInput>
+  }
+
+  export type UserCreateNestedOneWithoutNotificationEventsInput = {
+    create?: XOR<UserCreateWithoutNotificationEventsInput, UserUncheckedCreateWithoutNotificationEventsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutNotificationEventsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ListingCreateNestedOneWithoutNotificationEventsInput = {
+    create?: XOR<ListingCreateWithoutNotificationEventsInput, ListingUncheckedCreateWithoutNotificationEventsInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutNotificationEventsInput
+    connect?: ListingWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutNotificationEventsNestedInput = {
+    create?: XOR<UserCreateWithoutNotificationEventsInput, UserUncheckedCreateWithoutNotificationEventsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutNotificationEventsInput
+    upsert?: UserUpsertWithoutNotificationEventsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutNotificationEventsInput, UserUpdateWithoutNotificationEventsInput>, UserUncheckedUpdateWithoutNotificationEventsInput>
+  }
+
+  export type ListingUpdateOneWithoutNotificationEventsNestedInput = {
+    create?: XOR<ListingCreateWithoutNotificationEventsInput, ListingUncheckedCreateWithoutNotificationEventsInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutNotificationEventsInput
+    upsert?: ListingUpsertWithoutNotificationEventsInput
+    disconnect?: ListingWhereInput | boolean
+    delete?: ListingWhereInput | boolean
+    connect?: ListingWhereUniqueInput
+    update?: XOR<XOR<ListingUpdateToOneWithWhereWithoutNotificationEventsInput, ListingUpdateWithoutNotificationEventsInput>, ListingUncheckedUpdateWithoutNotificationEventsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -30355,6 +38190,52 @@ export namespace Prisma {
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
   }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type UserCreateWithoutListingsInput = {
     id?: string
@@ -30371,7 +38252,10 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenCreateNestedOneWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutUserInput
     opportunities?: OpportunityCreateNestedManyWithoutUserInput
     postingQueue?: PostingQueueItemCreateNestedManyWithoutUserInput
     scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
@@ -30397,7 +38281,10 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutUserInput
     opportunities?: OpportunityUncheckedCreateNestedManyWithoutUserInput
     postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
     scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
@@ -30493,6 +38380,42 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type NotificationEventCreateWithoutListingInput = {
+    id?: string
+    eventType: string
+    payload: JsonNullValueInput | InputJsonValue
+    deduplicationKey?: string | null
+    status?: string
+    retryCount?: number
+    errorMessage?: string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutNotificationEventsInput
+  }
+
+  export type NotificationEventUncheckedCreateWithoutListingInput = {
+    id?: string
+    userId: string
+    eventType: string
+    payload: JsonNullValueInput | InputJsonValue
+    deduplicationKey?: string | null
+    status?: string
+    retryCount?: number
+    errorMessage?: string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type NotificationEventCreateOrConnectWithoutListingInput = {
+    where: NotificationEventWhereUniqueInput
+    create: XOR<NotificationEventCreateWithoutListingInput, NotificationEventUncheckedCreateWithoutListingInput>
+  }
+
+  export type NotificationEventCreateManyListingInputEnvelope = {
+    data: NotificationEventCreateManyListingInput | NotificationEventCreateManyListingInput[]
+    skipDuplicates?: boolean
+  }
+
   export type OpportunityCreateWithoutListingInput = {
     id?: string
     purchasePrice?: number | null
@@ -30506,6 +38429,10 @@ export namespace Prisma {
     fees?: number | null
     status?: string
     notes?: string | null
+    meetingTime?: Date | string | null
+    meetingLocation?: string | null
+    meetingType?: string | null
+    calendarEventId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user?: UserCreateNestedOneWithoutOpportunitiesInput
@@ -30525,6 +38452,10 @@ export namespace Prisma {
     fees?: number | null
     status?: string
     notes?: string | null
+    meetingTime?: Date | string | null
+    meetingLocation?: string | null
+    meetingType?: string | null
+    calendarEventId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -30608,7 +38539,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUpdateOneWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutUserNestedInput
     opportunities?: OpportunityUpdateManyWithoutUserNestedInput
     postingQueue?: PostingQueueItemUpdateManyWithoutUserNestedInput
     scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
@@ -30634,7 +38568,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutUserNestedInput
     opportunities?: OpportunityUncheckedUpdateManyWithoutUserNestedInput
     postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
     scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
@@ -30715,6 +38652,39 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Message"> | Date | string
   }
 
+  export type NotificationEventUpsertWithWhereUniqueWithoutListingInput = {
+    where: NotificationEventWhereUniqueInput
+    update: XOR<NotificationEventUpdateWithoutListingInput, NotificationEventUncheckedUpdateWithoutListingInput>
+    create: XOR<NotificationEventCreateWithoutListingInput, NotificationEventUncheckedCreateWithoutListingInput>
+  }
+
+  export type NotificationEventUpdateWithWhereUniqueWithoutListingInput = {
+    where: NotificationEventWhereUniqueInput
+    data: XOR<NotificationEventUpdateWithoutListingInput, NotificationEventUncheckedUpdateWithoutListingInput>
+  }
+
+  export type NotificationEventUpdateManyWithWhereWithoutListingInput = {
+    where: NotificationEventScalarWhereInput
+    data: XOR<NotificationEventUpdateManyMutationInput, NotificationEventUncheckedUpdateManyWithoutListingInput>
+  }
+
+  export type NotificationEventScalarWhereInput = {
+    AND?: NotificationEventScalarWhereInput | NotificationEventScalarWhereInput[]
+    OR?: NotificationEventScalarWhereInput[]
+    NOT?: NotificationEventScalarWhereInput | NotificationEventScalarWhereInput[]
+    id?: StringFilter<"NotificationEvent"> | string
+    userId?: StringFilter<"NotificationEvent"> | string
+    listingId?: StringNullableFilter<"NotificationEvent"> | string | null
+    eventType?: StringFilter<"NotificationEvent"> | string
+    payload?: JsonFilter<"NotificationEvent">
+    deduplicationKey?: StringNullableFilter<"NotificationEvent"> | string | null
+    status?: StringFilter<"NotificationEvent"> | string
+    retryCount?: IntFilter<"NotificationEvent"> | number
+    errorMessage?: StringNullableFilter<"NotificationEvent"> | string | null
+    processedAt?: DateTimeNullableFilter<"NotificationEvent"> | Date | string | null
+    createdAt?: DateTimeFilter<"NotificationEvent"> | Date | string
+  }
+
   export type OpportunityUpsertWithoutListingInput = {
     update: XOR<OpportunityUpdateWithoutListingInput, OpportunityUncheckedUpdateWithoutListingInput>
     create: XOR<OpportunityCreateWithoutListingInput, OpportunityUncheckedCreateWithoutListingInput>
@@ -30739,6 +38709,10 @@ export namespace Prisma {
     fees?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    meetingTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    meetingLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    meetingType?: NullableStringFieldUpdateOperationsInput | string | null
+    calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneWithoutOpportunitiesNestedInput
@@ -30758,6 +38732,10 @@ export namespace Prisma {
     fees?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    meetingTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    meetingLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    meetingType?: NullableStringFieldUpdateOperationsInput | string | null
+    calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30818,6 +38796,8 @@ export namespace Prisma {
     postedAt?: Date | string | null
     scrapedAt?: Date | string
     updatedAt?: Date | string
+    lastMonitoredAt?: Date | string | null
+    estimatedExpiresAt?: Date | string | null
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -30876,6 +38856,7 @@ export namespace Prisma {
     user?: UserCreateNestedOneWithoutListingsInput
     images?: ListingImageCreateNestedManyWithoutListingInput
     messages?: MessageCreateNestedManyWithoutListingInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutListingInput
     postingQueue?: PostingQueueItemCreateNestedManyWithoutListingInput
   }
 
@@ -30897,6 +38878,8 @@ export namespace Prisma {
     postedAt?: Date | string | null
     scrapedAt?: Date | string
     updatedAt?: Date | string
+    lastMonitoredAt?: Date | string | null
+    estimatedExpiresAt?: Date | string | null
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -30954,6 +38937,7 @@ export namespace Prisma {
     analysisReasoning?: string | null
     images?: ListingImageUncheckedCreateNestedManyWithoutListingInput
     messages?: MessageUncheckedCreateNestedManyWithoutListingInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutListingInput
     postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutListingInput
   }
 
@@ -30977,8 +38961,11 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenCreateNestedOneWithoutUserInput
     listings?: ListingCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutUserInput
     postingQueue?: PostingQueueItemCreateNestedManyWithoutUserInput
     scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
     searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
@@ -31003,8 +38990,11 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput
     listings?: ListingUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutUserInput
     postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
     scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
     searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
@@ -31047,6 +39037,8 @@ export namespace Prisma {
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastMonitoredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -31105,6 +39097,7 @@ export namespace Prisma {
     user?: UserUpdateOneWithoutListingsNestedInput
     images?: ListingImageUpdateManyWithoutListingNestedInput
     messages?: MessageUpdateManyWithoutListingNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutListingNestedInput
     postingQueue?: PostingQueueItemUpdateManyWithoutListingNestedInput
   }
 
@@ -31126,6 +39119,8 @@ export namespace Prisma {
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastMonitoredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -31183,6 +39178,7 @@ export namespace Prisma {
     analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
     images?: ListingImageUncheckedUpdateManyWithoutListingNestedInput
     messages?: MessageUncheckedUpdateManyWithoutListingNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutListingNestedInput
     postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutListingNestedInput
   }
 
@@ -31212,8 +39208,11 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUpdateOneWithoutUserNestedInput
     listings?: ListingUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutUserNestedInput
     postingQueue?: PostingQueueItemUpdateManyWithoutUserNestedInput
     scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
     searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
@@ -31238,8 +39237,11 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput
     listings?: ListingUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutUserNestedInput
     postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
     scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
     searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
@@ -31264,8 +39266,11 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenCreateNestedOneWithoutUserInput
     listings?: ListingCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutUserInput
     opportunities?: OpportunityCreateNestedManyWithoutUserInput
     postingQueue?: PostingQueueItemCreateNestedManyWithoutUserInput
     searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
@@ -31290,8 +39295,11 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput
     listings?: ListingUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutUserInput
     opportunities?: OpportunityUncheckedCreateNestedManyWithoutUserInput
     postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
     searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
@@ -31332,8 +39340,11 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUpdateOneWithoutUserNestedInput
     listings?: ListingUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutUserNestedInput
     opportunities?: OpportunityUpdateManyWithoutUserNestedInput
     postingQueue?: PostingQueueItemUpdateManyWithoutUserNestedInput
     searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
@@ -31358,8 +39369,11 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput
     listings?: ListingUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutUserNestedInput
     opportunities?: OpportunityUncheckedUpdateManyWithoutUserNestedInput
     postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
     searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
@@ -31384,8 +39398,11 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenCreateNestedOneWithoutUserInput
     listings?: ListingCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutUserInput
     opportunities?: OpportunityCreateNestedManyWithoutUserInput
     postingQueue?: PostingQueueItemCreateNestedManyWithoutUserInput
     scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
@@ -31410,8 +39427,11 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput
     listings?: ListingUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutUserInput
     opportunities?: OpportunityUncheckedCreateNestedManyWithoutUserInput
     postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
     scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
@@ -31452,8 +39472,11 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUpdateOneWithoutUserNestedInput
     listings?: ListingUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutUserNestedInput
     opportunities?: OpportunityUpdateManyWithoutUserNestedInput
     postingQueue?: PostingQueueItemUpdateManyWithoutUserNestedInput
     scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
@@ -31478,8 +39501,11 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput
     listings?: ListingUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutUserNestedInput
     opportunities?: OpportunityUncheckedUpdateManyWithoutUserNestedInput
     postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
     scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
@@ -31527,6 +39553,57 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type DeviceTokenCreateWithoutUserInput = {
+    id?: string
+    token: string
+    userAgent?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceTokenUncheckedCreateWithoutUserInput = {
+    id?: string
+    token: string
+    userAgent?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceTokenCreateOrConnectWithoutUserInput = {
+    where: DeviceTokenWhereUniqueInput
+    create: XOR<DeviceTokenCreateWithoutUserInput, DeviceTokenUncheckedCreateWithoutUserInput>
+  }
+
+  export type DeviceTokenCreateManyUserInputEnvelope = {
+    data: DeviceTokenCreateManyUserInput | DeviceTokenCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type GoogleCalendarTokenCreateWithoutUserInput = {
+    id?: string
+    accessToken: string
+    refreshToken: string
+    expiresAt: Date | string
+    calendarEmail?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GoogleCalendarTokenUncheckedCreateWithoutUserInput = {
+    id?: string
+    accessToken: string
+    refreshToken: string
+    expiresAt: Date | string
+    calendarEmail?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GoogleCalendarTokenCreateOrConnectWithoutUserInput = {
+    where: GoogleCalendarTokenWhereUniqueInput
+    create: XOR<GoogleCalendarTokenCreateWithoutUserInput, GoogleCalendarTokenUncheckedCreateWithoutUserInput>
+  }
+
   export type ListingCreateWithoutUserInput = {
     id?: string
     externalId: string
@@ -31544,6 +39621,8 @@ export namespace Prisma {
     postedAt?: Date | string | null
     scrapedAt?: Date | string
     updatedAt?: Date | string
+    lastMonitoredAt?: Date | string | null
+    estimatedExpiresAt?: Date | string | null
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -31601,6 +39680,7 @@ export namespace Prisma {
     analysisReasoning?: string | null
     images?: ListingImageCreateNestedManyWithoutListingInput
     messages?: MessageCreateNestedManyWithoutListingInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutListingInput
     opportunity?: OpportunityCreateNestedOneWithoutListingInput
     postingQueue?: PostingQueueItemCreateNestedManyWithoutListingInput
   }
@@ -31622,6 +39702,8 @@ export namespace Prisma {
     postedAt?: Date | string | null
     scrapedAt?: Date | string
     updatedAt?: Date | string
+    lastMonitoredAt?: Date | string | null
+    estimatedExpiresAt?: Date | string | null
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -31679,6 +39761,7 @@ export namespace Prisma {
     analysisReasoning?: string | null
     images?: ListingImageUncheckedCreateNestedManyWithoutListingInput
     messages?: MessageUncheckedCreateNestedManyWithoutListingInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutListingInput
     opportunity?: OpportunityUncheckedCreateNestedOneWithoutListingInput
     postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutListingInput
   }
@@ -31737,6 +39820,42 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type NotificationEventCreateWithoutUserInput = {
+    id?: string
+    eventType: string
+    payload: JsonNullValueInput | InputJsonValue
+    deduplicationKey?: string | null
+    status?: string
+    retryCount?: number
+    errorMessage?: string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+    listing?: ListingCreateNestedOneWithoutNotificationEventsInput
+  }
+
+  export type NotificationEventUncheckedCreateWithoutUserInput = {
+    id?: string
+    listingId?: string | null
+    eventType: string
+    payload: JsonNullValueInput | InputJsonValue
+    deduplicationKey?: string | null
+    status?: string
+    retryCount?: number
+    errorMessage?: string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type NotificationEventCreateOrConnectWithoutUserInput = {
+    where: NotificationEventWhereUniqueInput
+    create: XOR<NotificationEventCreateWithoutUserInput, NotificationEventUncheckedCreateWithoutUserInput>
+  }
+
+  export type NotificationEventCreateManyUserInputEnvelope = {
+    data: NotificationEventCreateManyUserInput | NotificationEventCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type OpportunityCreateWithoutUserInput = {
     id?: string
     purchasePrice?: number | null
@@ -31750,6 +39869,10 @@ export namespace Prisma {
     fees?: number | null
     status?: string
     notes?: string | null
+    meetingTime?: Date | string | null
+    meetingLocation?: string | null
+    meetingType?: string | null
+    calendarEventId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     listing: ListingCreateNestedOneWithoutOpportunityInput
@@ -31769,6 +39892,10 @@ export namespace Prisma {
     fees?: number | null
     status?: string
     notes?: string | null
+    meetingTime?: Date | string | null
+    meetingLocation?: string | null
+    meetingType?: string | null
+    calendarEventId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -31954,6 +40081,49 @@ export namespace Prisma {
     homeLocation?: string | null
     holdingCostDailyRate?: number
     messageApprovalRequired?: boolean
+    pushNotifications?: boolean
+    phoneNumber?: string | null
+    phoneVerified?: boolean
+    phoneVerificationCode?: string | null
+    phoneVerificationExpiry?: Date | string | null
+    phoneVerificationSentAt?: Date | string | null
+    smsNotifications?: boolean
+    notifyMessageReceived?: boolean
+    notifyDraftReady?: boolean
+    notifyMessageSent?: boolean
+    notifyReviewReceived?: boolean
+    notifyFlipGoneCold?: boolean
+    notifyFlipTurnedHot?: boolean
+    notifyPriceChanges?: boolean
+    flipGoneColdHours?: number
+    flipTurnedHotCount?: number
+    notifyListingUnavailable?: boolean
+    pushNotifyNewDeals?: boolean
+    pushNotifySoldItems?: boolean
+    pushNotifyMessageReceived?: boolean
+    pushNotifyDraftReady?: boolean
+    pushNotifyMessageSent?: boolean
+    pushNotifyReviewReceived?: boolean
+    pushNotifyFlipGoneCold?: boolean
+    pushNotifyFlipTurnedHot?: boolean
+    pushNotifyPriceDrops?: boolean
+    pushNotifyExpiring?: boolean
+    pushNotifyListingUnavailable?: boolean
+    pushNotifyWeeklyDigest?: boolean
+    smsNotifyNewDeals?: boolean
+    smsNotifySoldItems?: boolean
+    smsNotifyMessageReceived?: boolean
+    smsNotifyDraftReady?: boolean
+    smsNotifyMessageSent?: boolean
+    smsNotifyReviewReceived?: boolean
+    smsNotifyFlipGoneCold?: boolean
+    smsNotifyFlipTurnedHot?: boolean
+    smsNotifyPriceDrops?: boolean
+    smsNotifyExpiring?: boolean
+    smsNotifyListingUnavailable?: boolean
+    smsNotifyWeeklyDigest?: boolean
+    meetingDepartureBufferMinutes?: number
+    notifyMeetingReminder?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -31981,6 +40151,49 @@ export namespace Prisma {
     homeLocation?: string | null
     holdingCostDailyRate?: number
     messageApprovalRequired?: boolean
+    pushNotifications?: boolean
+    phoneNumber?: string | null
+    phoneVerified?: boolean
+    phoneVerificationCode?: string | null
+    phoneVerificationExpiry?: Date | string | null
+    phoneVerificationSentAt?: Date | string | null
+    smsNotifications?: boolean
+    notifyMessageReceived?: boolean
+    notifyDraftReady?: boolean
+    notifyMessageSent?: boolean
+    notifyReviewReceived?: boolean
+    notifyFlipGoneCold?: boolean
+    notifyFlipTurnedHot?: boolean
+    notifyPriceChanges?: boolean
+    flipGoneColdHours?: number
+    flipTurnedHotCount?: number
+    notifyListingUnavailable?: boolean
+    pushNotifyNewDeals?: boolean
+    pushNotifySoldItems?: boolean
+    pushNotifyMessageReceived?: boolean
+    pushNotifyDraftReady?: boolean
+    pushNotifyMessageSent?: boolean
+    pushNotifyReviewReceived?: boolean
+    pushNotifyFlipGoneCold?: boolean
+    pushNotifyFlipTurnedHot?: boolean
+    pushNotifyPriceDrops?: boolean
+    pushNotifyExpiring?: boolean
+    pushNotifyListingUnavailable?: boolean
+    pushNotifyWeeklyDigest?: boolean
+    smsNotifyNewDeals?: boolean
+    smsNotifySoldItems?: boolean
+    smsNotifyMessageReceived?: boolean
+    smsNotifyDraftReady?: boolean
+    smsNotifyMessageSent?: boolean
+    smsNotifyReviewReceived?: boolean
+    smsNotifyFlipGoneCold?: boolean
+    smsNotifyFlipTurnedHot?: boolean
+    smsNotifyPriceDrops?: boolean
+    smsNotifyExpiring?: boolean
+    smsNotifyListingUnavailable?: boolean
+    smsNotifyWeeklyDigest?: boolean
+    meetingDepartureBufferMinutes?: number
+    notifyMeetingReminder?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -32076,6 +40289,65 @@ export namespace Prisma {
     session_state?: StringNullableFilter<"Account"> | string | null
   }
 
+  export type DeviceTokenUpsertWithWhereUniqueWithoutUserInput = {
+    where: DeviceTokenWhereUniqueInput
+    update: XOR<DeviceTokenUpdateWithoutUserInput, DeviceTokenUncheckedUpdateWithoutUserInput>
+    create: XOR<DeviceTokenCreateWithoutUserInput, DeviceTokenUncheckedCreateWithoutUserInput>
+  }
+
+  export type DeviceTokenUpdateWithWhereUniqueWithoutUserInput = {
+    where: DeviceTokenWhereUniqueInput
+    data: XOR<DeviceTokenUpdateWithoutUserInput, DeviceTokenUncheckedUpdateWithoutUserInput>
+  }
+
+  export type DeviceTokenUpdateManyWithWhereWithoutUserInput = {
+    where: DeviceTokenScalarWhereInput
+    data: XOR<DeviceTokenUpdateManyMutationInput, DeviceTokenUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type DeviceTokenScalarWhereInput = {
+    AND?: DeviceTokenScalarWhereInput | DeviceTokenScalarWhereInput[]
+    OR?: DeviceTokenScalarWhereInput[]
+    NOT?: DeviceTokenScalarWhereInput | DeviceTokenScalarWhereInput[]
+    id?: StringFilter<"DeviceToken"> | string
+    userId?: StringFilter<"DeviceToken"> | string
+    token?: StringFilter<"DeviceToken"> | string
+    userAgent?: StringNullableFilter<"DeviceToken"> | string | null
+    createdAt?: DateTimeFilter<"DeviceToken"> | Date | string
+    updatedAt?: DateTimeFilter<"DeviceToken"> | Date | string
+  }
+
+  export type GoogleCalendarTokenUpsertWithoutUserInput = {
+    update: XOR<GoogleCalendarTokenUpdateWithoutUserInput, GoogleCalendarTokenUncheckedUpdateWithoutUserInput>
+    create: XOR<GoogleCalendarTokenCreateWithoutUserInput, GoogleCalendarTokenUncheckedCreateWithoutUserInput>
+    where?: GoogleCalendarTokenWhereInput
+  }
+
+  export type GoogleCalendarTokenUpdateToOneWithWhereWithoutUserInput = {
+    where?: GoogleCalendarTokenWhereInput
+    data: XOR<GoogleCalendarTokenUpdateWithoutUserInput, GoogleCalendarTokenUncheckedUpdateWithoutUserInput>
+  }
+
+  export type GoogleCalendarTokenUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    accessToken?: StringFieldUpdateOperationsInput | string
+    refreshToken?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    calendarEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GoogleCalendarTokenUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    accessToken?: StringFieldUpdateOperationsInput | string
+    refreshToken?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    calendarEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type ListingUpsertWithWhereUniqueWithoutUserInput = {
     where: ListingWhereUniqueInput
     update: XOR<ListingUpdateWithoutUserInput, ListingUncheckedUpdateWithoutUserInput>
@@ -32113,6 +40385,8 @@ export namespace Prisma {
     postedAt?: DateTimeNullableFilter<"Listing"> | Date | string | null
     scrapedAt?: DateTimeFilter<"Listing"> | Date | string
     updatedAt?: DateTimeFilter<"Listing"> | Date | string
+    lastMonitoredAt?: DateTimeNullableFilter<"Listing"> | Date | string | null
+    estimatedExpiresAt?: DateTimeNullableFilter<"Listing"> | Date | string | null
     estimatedValue?: FloatNullableFilter<"Listing"> | number | null
     estimatedLow?: FloatNullableFilter<"Listing"> | number | null
     estimatedHigh?: FloatNullableFilter<"Listing"> | number | null
@@ -32186,6 +40460,22 @@ export namespace Prisma {
     data: XOR<MessageUpdateManyMutationInput, MessageUncheckedUpdateManyWithoutUserInput>
   }
 
+  export type NotificationEventUpsertWithWhereUniqueWithoutUserInput = {
+    where: NotificationEventWhereUniqueInput
+    update: XOR<NotificationEventUpdateWithoutUserInput, NotificationEventUncheckedUpdateWithoutUserInput>
+    create: XOR<NotificationEventCreateWithoutUserInput, NotificationEventUncheckedCreateWithoutUserInput>
+  }
+
+  export type NotificationEventUpdateWithWhereUniqueWithoutUserInput = {
+    where: NotificationEventWhereUniqueInput
+    data: XOR<NotificationEventUpdateWithoutUserInput, NotificationEventUncheckedUpdateWithoutUserInput>
+  }
+
+  export type NotificationEventUpdateManyWithWhereWithoutUserInput = {
+    where: NotificationEventScalarWhereInput
+    data: XOR<NotificationEventUpdateManyMutationInput, NotificationEventUncheckedUpdateManyWithoutUserInput>
+  }
+
   export type OpportunityUpsertWithWhereUniqueWithoutUserInput = {
     where: OpportunityWhereUniqueInput
     update: XOR<OpportunityUpdateWithoutUserInput, OpportunityUncheckedUpdateWithoutUserInput>
@@ -32220,6 +40510,10 @@ export namespace Prisma {
     fees?: FloatNullableFilter<"Opportunity"> | number | null
     status?: StringFilter<"Opportunity"> | string
     notes?: StringNullableFilter<"Opportunity"> | string | null
+    meetingTime?: DateTimeNullableFilter<"Opportunity"> | Date | string | null
+    meetingLocation?: StringNullableFilter<"Opportunity"> | string | null
+    meetingType?: StringNullableFilter<"Opportunity"> | string | null
+    calendarEventId?: StringNullableFilter<"Opportunity"> | string | null
     createdAt?: DateTimeFilter<"Opportunity"> | Date | string
     updatedAt?: DateTimeFilter<"Opportunity"> | Date | string
   }
@@ -32369,6 +40663,49 @@ export namespace Prisma {
     homeLocation?: NullableStringFieldUpdateOperationsInput | string | null
     holdingCostDailyRate?: FloatFieldUpdateOperationsInput | number
     messageApprovalRequired?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifications?: BoolFieldUpdateOperationsInput | boolean
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phoneVerificationSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    smsNotifications?: BoolFieldUpdateOperationsInput | boolean
+    notifyMessageReceived?: BoolFieldUpdateOperationsInput | boolean
+    notifyDraftReady?: BoolFieldUpdateOperationsInput | boolean
+    notifyMessageSent?: BoolFieldUpdateOperationsInput | boolean
+    notifyReviewReceived?: BoolFieldUpdateOperationsInput | boolean
+    notifyFlipGoneCold?: BoolFieldUpdateOperationsInput | boolean
+    notifyFlipTurnedHot?: BoolFieldUpdateOperationsInput | boolean
+    notifyPriceChanges?: BoolFieldUpdateOperationsInput | boolean
+    flipGoneColdHours?: IntFieldUpdateOperationsInput | number
+    flipTurnedHotCount?: IntFieldUpdateOperationsInput | number
+    notifyListingUnavailable?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyNewDeals?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifySoldItems?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyMessageReceived?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyDraftReady?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyMessageSent?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyReviewReceived?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyFlipGoneCold?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyFlipTurnedHot?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyPriceDrops?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyExpiring?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyListingUnavailable?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyWeeklyDigest?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyNewDeals?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifySoldItems?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyMessageReceived?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyDraftReady?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyMessageSent?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyReviewReceived?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyFlipGoneCold?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyFlipTurnedHot?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyPriceDrops?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyExpiring?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyListingUnavailable?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyWeeklyDigest?: BoolFieldUpdateOperationsInput | boolean
+    meetingDepartureBufferMinutes?: IntFieldUpdateOperationsInput | number
+    notifyMeetingReminder?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -32396,6 +40733,49 @@ export namespace Prisma {
     homeLocation?: NullableStringFieldUpdateOperationsInput | string | null
     holdingCostDailyRate?: FloatFieldUpdateOperationsInput | number
     messageApprovalRequired?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifications?: BoolFieldUpdateOperationsInput | boolean
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerificationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phoneVerificationSentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    smsNotifications?: BoolFieldUpdateOperationsInput | boolean
+    notifyMessageReceived?: BoolFieldUpdateOperationsInput | boolean
+    notifyDraftReady?: BoolFieldUpdateOperationsInput | boolean
+    notifyMessageSent?: BoolFieldUpdateOperationsInput | boolean
+    notifyReviewReceived?: BoolFieldUpdateOperationsInput | boolean
+    notifyFlipGoneCold?: BoolFieldUpdateOperationsInput | boolean
+    notifyFlipTurnedHot?: BoolFieldUpdateOperationsInput | boolean
+    notifyPriceChanges?: BoolFieldUpdateOperationsInput | boolean
+    flipGoneColdHours?: IntFieldUpdateOperationsInput | number
+    flipTurnedHotCount?: IntFieldUpdateOperationsInput | number
+    notifyListingUnavailable?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyNewDeals?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifySoldItems?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyMessageReceived?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyDraftReady?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyMessageSent?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyReviewReceived?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyFlipGoneCold?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyFlipTurnedHot?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyPriceDrops?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyExpiring?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyListingUnavailable?: BoolFieldUpdateOperationsInput | boolean
+    pushNotifyWeeklyDigest?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyNewDeals?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifySoldItems?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyMessageReceived?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyDraftReady?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyMessageSent?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyReviewReceived?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyFlipGoneCold?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyFlipTurnedHot?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyPriceDrops?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyExpiring?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyListingUnavailable?: BoolFieldUpdateOperationsInput | boolean
+    smsNotifyWeeklyDigest?: BoolFieldUpdateOperationsInput | boolean
+    meetingDepartureBufferMinutes?: IntFieldUpdateOperationsInput | number
+    notifyMeetingReminder?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -32470,8 +40850,11 @@ export namespace Prisma {
     onboardingStep?: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    deviceTokens?: DeviceTokenCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenCreateNestedOneWithoutUserInput
     listings?: ListingCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutUserInput
     opportunities?: OpportunityCreateNestedManyWithoutUserInput
     postingQueue?: PostingQueueItemCreateNestedManyWithoutUserInput
     scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
@@ -32496,8 +40879,11 @@ export namespace Prisma {
     onboardingStep?: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    deviceTokens?: DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput
     listings?: ListingUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutUserInput
     opportunities?: OpportunityUncheckedCreateNestedManyWithoutUserInput
     postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
     scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
@@ -32538,8 +40924,11 @@ export namespace Prisma {
     onboardingStep?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deviceTokens?: DeviceTokenUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUpdateOneWithoutUserNestedInput
     listings?: ListingUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutUserNestedInput
     opportunities?: OpportunityUpdateManyWithoutUserNestedInput
     postingQueue?: PostingQueueItemUpdateManyWithoutUserNestedInput
     scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
@@ -32564,8 +40953,11 @@ export namespace Prisma {
     onboardingStep?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deviceTokens?: DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput
     listings?: ListingUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutUserNestedInput
     opportunities?: OpportunityUncheckedUpdateManyWithoutUserNestedInput
     postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
     scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
@@ -32591,8 +40983,11 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenCreateNestedOneWithoutUserInput
     listings?: ListingCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutUserInput
     opportunities?: OpportunityCreateNestedManyWithoutUserInput
     postingQueue?: PostingQueueItemCreateNestedManyWithoutUserInput
     scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
@@ -32617,8 +41012,11 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput
     listings?: ListingUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutUserInput
     opportunities?: OpportunityUncheckedCreateNestedManyWithoutUserInput
     postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
     scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
@@ -32659,8 +41057,11 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUpdateOneWithoutUserNestedInput
     listings?: ListingUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutUserNestedInput
     opportunities?: OpportunityUpdateManyWithoutUserNestedInput
     postingQueue?: PostingQueueItemUpdateManyWithoutUserNestedInput
     scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
@@ -32685,8 +41086,11 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput
     listings?: ListingUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutUserNestedInput
     opportunities?: OpportunityUncheckedUpdateManyWithoutUserNestedInput
     postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
     scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
@@ -32711,8 +41115,11 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenCreateNestedOneWithoutUserInput
     listings?: ListingCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutUserInput
     opportunities?: OpportunityCreateNestedManyWithoutUserInput
     postingQueue?: PostingQueueItemCreateNestedManyWithoutUserInput
     scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
@@ -32737,8 +41144,11 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput
     listings?: ListingUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutUserInput
     opportunities?: OpportunityUncheckedCreateNestedManyWithoutUserInput
     postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
     scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
@@ -32779,8 +41189,11 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUpdateOneWithoutUserNestedInput
     listings?: ListingUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutUserNestedInput
     opportunities?: OpportunityUpdateManyWithoutUserNestedInput
     postingQueue?: PostingQueueItemUpdateManyWithoutUserNestedInput
     scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
@@ -32805,13 +41218,280 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput
     listings?: ListingUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutUserNestedInput
     opportunities?: OpportunityUncheckedUpdateManyWithoutUserNestedInput
     postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
     scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
     searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutDeviceTokensInput = {
+    id?: string
+    firebaseUid?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    name?: string | null
+    image?: string | null
+    password?: string | null
+    stripeCustomerId?: string | null
+    subscriptionTier?: string
+    onboardingComplete?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenCreateNestedOneWithoutUserInput
+    listings?: ListingCreateNestedManyWithoutUserInput
+    messages?: MessageCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutUserInput
+    opportunities?: OpportunityCreateNestedManyWithoutUserInput
+    postingQueue?: PostingQueueItemCreateNestedManyWithoutUserInput
+    scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
+    searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    settings?: UserSettingsCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutDeviceTokensInput = {
+    id?: string
+    firebaseUid?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    name?: string | null
+    image?: string | null
+    password?: string | null
+    stripeCustomerId?: string | null
+    subscriptionTier?: string
+    onboardingComplete?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput
+    listings?: ListingUncheckedCreateNestedManyWithoutUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutUserInput
+    opportunities?: OpportunityUncheckedCreateNestedManyWithoutUserInput
+    postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
+    scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
+    searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutDeviceTokensInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutDeviceTokensInput, UserUncheckedCreateWithoutDeviceTokensInput>
+  }
+
+  export type UserUpsertWithoutDeviceTokensInput = {
+    update: XOR<UserUpdateWithoutDeviceTokensInput, UserUncheckedUpdateWithoutDeviceTokensInput>
+    create: XOR<UserCreateWithoutDeviceTokensInput, UserUncheckedCreateWithoutDeviceTokensInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutDeviceTokensInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutDeviceTokensInput, UserUncheckedUpdateWithoutDeviceTokensInput>
+  }
+
+  export type UserUpdateWithoutDeviceTokensInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionTier?: StringFieldUpdateOperationsInput | string
+    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUpdateOneWithoutUserNestedInput
+    listings?: ListingUpdateManyWithoutUserNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutUserNestedInput
+    opportunities?: OpportunityUpdateManyWithoutUserNestedInput
+    postingQueue?: PostingQueueItemUpdateManyWithoutUserNestedInput
+    scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
+    searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    settings?: UserSettingsUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutDeviceTokensInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionTier?: StringFieldUpdateOperationsInput | string
+    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutUserNestedInput
+    opportunities?: OpportunityUncheckedUpdateManyWithoutUserNestedInput
+    postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
+    scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
+    searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutGoogleCalendarTokenInput = {
+    id?: string
+    firebaseUid?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    name?: string | null
+    image?: string | null
+    password?: string | null
+    stripeCustomerId?: string | null
+    subscriptionTier?: string
+    onboardingComplete?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenCreateNestedManyWithoutUserInput
+    listings?: ListingCreateNestedManyWithoutUserInput
+    messages?: MessageCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutUserInput
+    opportunities?: OpportunityCreateNestedManyWithoutUserInput
+    postingQueue?: PostingQueueItemCreateNestedManyWithoutUserInput
+    scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
+    searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    settings?: UserSettingsCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutGoogleCalendarTokenInput = {
+    id?: string
+    firebaseUid?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    name?: string | null
+    image?: string | null
+    password?: string | null
+    stripeCustomerId?: string | null
+    subscriptionTier?: string
+    onboardingComplete?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    listings?: ListingUncheckedCreateNestedManyWithoutUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutUserInput
+    opportunities?: OpportunityUncheckedCreateNestedManyWithoutUserInput
+    postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
+    scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
+    searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutGoogleCalendarTokenInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutGoogleCalendarTokenInput, UserUncheckedCreateWithoutGoogleCalendarTokenInput>
+  }
+
+  export type UserUpsertWithoutGoogleCalendarTokenInput = {
+    update: XOR<UserUpdateWithoutGoogleCalendarTokenInput, UserUncheckedUpdateWithoutGoogleCalendarTokenInput>
+    create: XOR<UserCreateWithoutGoogleCalendarTokenInput, UserUncheckedCreateWithoutGoogleCalendarTokenInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutGoogleCalendarTokenInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutGoogleCalendarTokenInput, UserUncheckedUpdateWithoutGoogleCalendarTokenInput>
+  }
+
+  export type UserUpdateWithoutGoogleCalendarTokenInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionTier?: StringFieldUpdateOperationsInput | string
+    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUpdateManyWithoutUserNestedInput
+    listings?: ListingUpdateManyWithoutUserNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutUserNestedInput
+    opportunities?: OpportunityUpdateManyWithoutUserNestedInput
+    postingQueue?: PostingQueueItemUpdateManyWithoutUserNestedInput
+    scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
+    searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    settings?: UserSettingsUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutGoogleCalendarTokenInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionTier?: StringFieldUpdateOperationsInput | string
+    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutUserNestedInput
+    opportunities?: OpportunityUncheckedUpdateManyWithoutUserNestedInput
+    postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
+    scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
+    searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     usageRecords?: UsageRecordUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -32833,6 +41513,8 @@ export namespace Prisma {
     postedAt?: Date | string | null
     scrapedAt?: Date | string
     updatedAt?: Date | string
+    lastMonitoredAt?: Date | string | null
+    estimatedExpiresAt?: Date | string | null
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -32890,6 +41572,7 @@ export namespace Prisma {
     analysisReasoning?: string | null
     user?: UserCreateNestedOneWithoutListingsInput
     images?: ListingImageCreateNestedManyWithoutListingInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutListingInput
     opportunity?: OpportunityCreateNestedOneWithoutListingInput
     postingQueue?: PostingQueueItemCreateNestedManyWithoutListingInput
   }
@@ -32912,6 +41595,8 @@ export namespace Prisma {
     postedAt?: Date | string | null
     scrapedAt?: Date | string
     updatedAt?: Date | string
+    lastMonitoredAt?: Date | string | null
+    estimatedExpiresAt?: Date | string | null
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -32968,6 +41653,7 @@ export namespace Prisma {
     analysisConfidence?: string | null
     analysisReasoning?: string | null
     images?: ListingImageUncheckedCreateNestedManyWithoutListingInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutListingInput
     opportunity?: OpportunityUncheckedCreateNestedOneWithoutListingInput
     postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutListingInput
   }
@@ -32992,7 +41678,10 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenCreateNestedOneWithoutUserInput
     listings?: ListingCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutUserInput
     opportunities?: OpportunityCreateNestedManyWithoutUserInput
     postingQueue?: PostingQueueItemCreateNestedManyWithoutUserInput
     scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
@@ -33018,7 +41707,10 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput
     listings?: ListingUncheckedCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutUserInput
     opportunities?: OpportunityUncheckedCreateNestedManyWithoutUserInput
     postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
     scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
@@ -33062,6 +41754,8 @@ export namespace Prisma {
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastMonitoredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -33119,6 +41813,7 @@ export namespace Prisma {
     analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneWithoutListingsNestedInput
     images?: ListingImageUpdateManyWithoutListingNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutListingNestedInput
     opportunity?: OpportunityUpdateOneWithoutListingNestedInput
     postingQueue?: PostingQueueItemUpdateManyWithoutListingNestedInput
   }
@@ -33141,6 +41836,8 @@ export namespace Prisma {
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastMonitoredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -33197,6 +41894,7 @@ export namespace Prisma {
     analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
     analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
     images?: ListingImageUncheckedUpdateManyWithoutListingNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutListingNestedInput
     opportunity?: OpportunityUncheckedUpdateOneWithoutListingNestedInput
     postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutListingNestedInput
   }
@@ -33227,7 +41925,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUpdateOneWithoutUserNestedInput
     listings?: ListingUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutUserNestedInput
     opportunities?: OpportunityUpdateManyWithoutUserNestedInput
     postingQueue?: PostingQueueItemUpdateManyWithoutUserNestedInput
     scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
@@ -33253,7 +41954,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput
     listings?: ListingUncheckedUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutUserNestedInput
     opportunities?: OpportunityUncheckedUpdateManyWithoutUserNestedInput
     postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
     scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
@@ -33281,6 +41985,1147 @@ export namespace Prisma {
     postedAt?: Date | string | null
     scrapedAt?: Date | string
     updatedAt?: Date | string
+    lastMonitoredAt?: Date | string | null
+    estimatedExpiresAt?: Date | string | null
+    estimatedValue?: number | null
+    estimatedLow?: number | null
+    estimatedHigh?: number | null
+    profitPotential?: number | null
+    profitLow?: number | null
+    profitHigh?: number | null
+    valueScore?: number | null
+    discountPercent?: number | null
+    resaleDifficulty?: string | null
+    status?: string
+    comparableUrls?: string | null
+    priceReasoning?: string | null
+    notes?: string | null
+    shippable?: boolean | null
+    estimatedWeight?: number | null
+    negotiable?: boolean | null
+    daysListed?: number | null
+    tags?: string | null
+    requestToBuy?: string | null
+    identifiedBrand?: string | null
+    identifiedModel?: string | null
+    identifiedVariant?: string | null
+    identifiedCondition?: string | null
+    verifiedMarketValue?: number | null
+    marketDataSource?: string | null
+    marketDataDate?: Date | string | null
+    comparableSalesJson?: string | null
+    compMatchConfidence?: string | null
+    sellabilityScore?: number | null
+    demandLevel?: string | null
+    expectedDaysToSell?: number | null
+    authenticityRisk?: string | null
+    conditionRisk?: string | null
+    recommendedOffer?: number | null
+    recommendedList?: number | null
+    resaleStrategy?: string | null
+    trueDiscountPercent?: number | null
+    soldVolume30Days?: number | null
+    soldVolume60Days?: number | null
+    soldVolume90Days?: number | null
+    completenessLabel?: string | null
+    sellerRating?: number | null
+    sellerReviewCount?: number | null
+    sellerAccountAgeDays?: number | null
+    sizeCategory?: string | null
+    shippingEstimatesJson?: string | null
+    estimatedShippingCost?: number | null
+    pickupDistanceMiles?: number | null
+    outsidePickupRadius?: boolean | null
+    adjustedProfitMargin?: number | null
+    conversationStatus?: string | null
+    llmAnalyzed?: boolean
+    analysisDate?: Date | string | null
+    analysisConfidence?: string | null
+    analysisReasoning?: string | null
+    user?: UserCreateNestedOneWithoutListingsInput
+    images?: ListingImageCreateNestedManyWithoutListingInput
+    messages?: MessageCreateNestedManyWithoutListingInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutListingInput
+    opportunity?: OpportunityCreateNestedOneWithoutListingInput
+  }
+
+  export type ListingUncheckedCreateWithoutPostingQueueInput = {
+    id?: string
+    userId?: string | null
+    externalId: string
+    platform: string
+    url: string
+    title: string
+    description?: string | null
+    askingPrice: number
+    condition?: string | null
+    location?: string | null
+    sellerName?: string | null
+    sellerContact?: string | null
+    imageUrls?: string | null
+    category?: string | null
+    postedAt?: Date | string | null
+    scrapedAt?: Date | string
+    updatedAt?: Date | string
+    lastMonitoredAt?: Date | string | null
+    estimatedExpiresAt?: Date | string | null
+    estimatedValue?: number | null
+    estimatedLow?: number | null
+    estimatedHigh?: number | null
+    profitPotential?: number | null
+    profitLow?: number | null
+    profitHigh?: number | null
+    valueScore?: number | null
+    discountPercent?: number | null
+    resaleDifficulty?: string | null
+    status?: string
+    comparableUrls?: string | null
+    priceReasoning?: string | null
+    notes?: string | null
+    shippable?: boolean | null
+    estimatedWeight?: number | null
+    negotiable?: boolean | null
+    daysListed?: number | null
+    tags?: string | null
+    requestToBuy?: string | null
+    identifiedBrand?: string | null
+    identifiedModel?: string | null
+    identifiedVariant?: string | null
+    identifiedCondition?: string | null
+    verifiedMarketValue?: number | null
+    marketDataSource?: string | null
+    marketDataDate?: Date | string | null
+    comparableSalesJson?: string | null
+    compMatchConfidence?: string | null
+    sellabilityScore?: number | null
+    demandLevel?: string | null
+    expectedDaysToSell?: number | null
+    authenticityRisk?: string | null
+    conditionRisk?: string | null
+    recommendedOffer?: number | null
+    recommendedList?: number | null
+    resaleStrategy?: string | null
+    trueDiscountPercent?: number | null
+    soldVolume30Days?: number | null
+    soldVolume60Days?: number | null
+    soldVolume90Days?: number | null
+    completenessLabel?: string | null
+    sellerRating?: number | null
+    sellerReviewCount?: number | null
+    sellerAccountAgeDays?: number | null
+    sizeCategory?: string | null
+    shippingEstimatesJson?: string | null
+    estimatedShippingCost?: number | null
+    pickupDistanceMiles?: number | null
+    outsidePickupRadius?: boolean | null
+    adjustedProfitMargin?: number | null
+    conversationStatus?: string | null
+    llmAnalyzed?: boolean
+    analysisDate?: Date | string | null
+    analysisConfidence?: string | null
+    analysisReasoning?: string | null
+    images?: ListingImageUncheckedCreateNestedManyWithoutListingInput
+    messages?: MessageUncheckedCreateNestedManyWithoutListingInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutListingInput
+    opportunity?: OpportunityUncheckedCreateNestedOneWithoutListingInput
+  }
+
+  export type ListingCreateOrConnectWithoutPostingQueueInput = {
+    where: ListingWhereUniqueInput
+    create: XOR<ListingCreateWithoutPostingQueueInput, ListingUncheckedCreateWithoutPostingQueueInput>
+  }
+
+  export type UserCreateWithoutPostingQueueInput = {
+    id?: string
+    firebaseUid?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    name?: string | null
+    image?: string | null
+    password?: string | null
+    stripeCustomerId?: string | null
+    subscriptionTier?: string
+    onboardingComplete?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenCreateNestedOneWithoutUserInput
+    listings?: ListingCreateNestedManyWithoutUserInput
+    messages?: MessageCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutUserInput
+    opportunities?: OpportunityCreateNestedManyWithoutUserInput
+    scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
+    searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    settings?: UserSettingsCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutPostingQueueInput = {
+    id?: string
+    firebaseUid?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    name?: string | null
+    image?: string | null
+    password?: string | null
+    stripeCustomerId?: string | null
+    subscriptionTier?: string
+    onboardingComplete?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput
+    listings?: ListingUncheckedCreateNestedManyWithoutUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutUserInput
+    opportunities?: OpportunityUncheckedCreateNestedManyWithoutUserInput
+    scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
+    searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutPostingQueueInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutPostingQueueInput, UserUncheckedCreateWithoutPostingQueueInput>
+  }
+
+  export type ListingUpsertWithoutPostingQueueInput = {
+    update: XOR<ListingUpdateWithoutPostingQueueInput, ListingUncheckedUpdateWithoutPostingQueueInput>
+    create: XOR<ListingCreateWithoutPostingQueueInput, ListingUncheckedCreateWithoutPostingQueueInput>
+    where?: ListingWhereInput
+  }
+
+  export type ListingUpdateToOneWithWhereWithoutPostingQueueInput = {
+    where?: ListingWhereInput
+    data: XOR<ListingUpdateWithoutPostingQueueInput, ListingUncheckedUpdateWithoutPostingQueueInput>
+  }
+
+  export type ListingUpdateWithoutPostingQueueInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    externalId?: StringFieldUpdateOperationsInput | string
+    platform?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    askingPrice?: FloatFieldUpdateOperationsInput | number
+    condition?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerName?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerContact?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrls?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastMonitoredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
+    estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
+    estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
+    profitPotential?: NullableFloatFieldUpdateOperationsInput | number | null
+    profitLow?: NullableFloatFieldUpdateOperationsInput | number | null
+    profitHigh?: NullableFloatFieldUpdateOperationsInput | number | null
+    valueScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    discountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    resaleDifficulty?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    comparableUrls?: NullableStringFieldUpdateOperationsInput | string | null
+    priceReasoning?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    shippable?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    estimatedWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    negotiable?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    daysListed?: NullableIntFieldUpdateOperationsInput | number | null
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    requestToBuy?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedBrand?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedModel?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedVariant?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedCondition?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedMarketValue?: NullableFloatFieldUpdateOperationsInput | number | null
+    marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
+    marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
+    demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
+    authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
+    recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
+    resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
+    trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
+    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
+    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
+    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
+    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
+    analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneWithoutListingsNestedInput
+    images?: ListingImageUpdateManyWithoutListingNestedInput
+    messages?: MessageUpdateManyWithoutListingNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutListingNestedInput
+    opportunity?: OpportunityUpdateOneWithoutListingNestedInput
+  }
+
+  export type ListingUncheckedUpdateWithoutPostingQueueInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalId?: StringFieldUpdateOperationsInput | string
+    platform?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    askingPrice?: FloatFieldUpdateOperationsInput | number
+    condition?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerName?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerContact?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrls?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastMonitoredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
+    estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
+    estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
+    profitPotential?: NullableFloatFieldUpdateOperationsInput | number | null
+    profitLow?: NullableFloatFieldUpdateOperationsInput | number | null
+    profitHigh?: NullableFloatFieldUpdateOperationsInput | number | null
+    valueScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    discountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    resaleDifficulty?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    comparableUrls?: NullableStringFieldUpdateOperationsInput | string | null
+    priceReasoning?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    shippable?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    estimatedWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    negotiable?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    daysListed?: NullableIntFieldUpdateOperationsInput | number | null
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    requestToBuy?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedBrand?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedModel?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedVariant?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedCondition?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedMarketValue?: NullableFloatFieldUpdateOperationsInput | number | null
+    marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
+    marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
+    demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
+    authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
+    recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
+    resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
+    trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
+    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
+    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
+    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
+    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
+    analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: ListingImageUncheckedUpdateManyWithoutListingNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutListingNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutListingNestedInput
+    opportunity?: OpportunityUncheckedUpdateOneWithoutListingNestedInput
+  }
+
+  export type UserUpsertWithoutPostingQueueInput = {
+    update: XOR<UserUpdateWithoutPostingQueueInput, UserUncheckedUpdateWithoutPostingQueueInput>
+    create: XOR<UserCreateWithoutPostingQueueInput, UserUncheckedCreateWithoutPostingQueueInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutPostingQueueInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutPostingQueueInput, UserUncheckedUpdateWithoutPostingQueueInput>
+  }
+
+  export type UserUpdateWithoutPostingQueueInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionTier?: StringFieldUpdateOperationsInput | string
+    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUpdateOneWithoutUserNestedInput
+    listings?: ListingUpdateManyWithoutUserNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutUserNestedInput
+    opportunities?: OpportunityUpdateManyWithoutUserNestedInput
+    scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
+    searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    settings?: UserSettingsUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutPostingQueueInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionTier?: StringFieldUpdateOperationsInput | string
+    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutUserNestedInput
+    opportunities?: OpportunityUncheckedUpdateManyWithoutUserNestedInput
+    scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
+    searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type ListingCreateWithoutImagesInput = {
+    id?: string
+    externalId: string
+    platform: string
+    url: string
+    title: string
+    description?: string | null
+    askingPrice: number
+    condition?: string | null
+    location?: string | null
+    sellerName?: string | null
+    sellerContact?: string | null
+    imageUrls?: string | null
+    category?: string | null
+    postedAt?: Date | string | null
+    scrapedAt?: Date | string
+    updatedAt?: Date | string
+    lastMonitoredAt?: Date | string | null
+    estimatedExpiresAt?: Date | string | null
+    estimatedValue?: number | null
+    estimatedLow?: number | null
+    estimatedHigh?: number | null
+    profitPotential?: number | null
+    profitLow?: number | null
+    profitHigh?: number | null
+    valueScore?: number | null
+    discountPercent?: number | null
+    resaleDifficulty?: string | null
+    status?: string
+    comparableUrls?: string | null
+    priceReasoning?: string | null
+    notes?: string | null
+    shippable?: boolean | null
+    estimatedWeight?: number | null
+    negotiable?: boolean | null
+    daysListed?: number | null
+    tags?: string | null
+    requestToBuy?: string | null
+    identifiedBrand?: string | null
+    identifiedModel?: string | null
+    identifiedVariant?: string | null
+    identifiedCondition?: string | null
+    verifiedMarketValue?: number | null
+    marketDataSource?: string | null
+    marketDataDate?: Date | string | null
+    comparableSalesJson?: string | null
+    compMatchConfidence?: string | null
+    sellabilityScore?: number | null
+    demandLevel?: string | null
+    expectedDaysToSell?: number | null
+    authenticityRisk?: string | null
+    conditionRisk?: string | null
+    recommendedOffer?: number | null
+    recommendedList?: number | null
+    resaleStrategy?: string | null
+    trueDiscountPercent?: number | null
+    soldVolume30Days?: number | null
+    soldVolume60Days?: number | null
+    soldVolume90Days?: number | null
+    completenessLabel?: string | null
+    sellerRating?: number | null
+    sellerReviewCount?: number | null
+    sellerAccountAgeDays?: number | null
+    sizeCategory?: string | null
+    shippingEstimatesJson?: string | null
+    estimatedShippingCost?: number | null
+    pickupDistanceMiles?: number | null
+    outsidePickupRadius?: boolean | null
+    adjustedProfitMargin?: number | null
+    conversationStatus?: string | null
+    llmAnalyzed?: boolean
+    analysisDate?: Date | string | null
+    analysisConfidence?: string | null
+    analysisReasoning?: string | null
+    user?: UserCreateNestedOneWithoutListingsInput
+    messages?: MessageCreateNestedManyWithoutListingInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutListingInput
+    opportunity?: OpportunityCreateNestedOneWithoutListingInput
+    postingQueue?: PostingQueueItemCreateNestedManyWithoutListingInput
+  }
+
+  export type ListingUncheckedCreateWithoutImagesInput = {
+    id?: string
+    userId?: string | null
+    externalId: string
+    platform: string
+    url: string
+    title: string
+    description?: string | null
+    askingPrice: number
+    condition?: string | null
+    location?: string | null
+    sellerName?: string | null
+    sellerContact?: string | null
+    imageUrls?: string | null
+    category?: string | null
+    postedAt?: Date | string | null
+    scrapedAt?: Date | string
+    updatedAt?: Date | string
+    lastMonitoredAt?: Date | string | null
+    estimatedExpiresAt?: Date | string | null
+    estimatedValue?: number | null
+    estimatedLow?: number | null
+    estimatedHigh?: number | null
+    profitPotential?: number | null
+    profitLow?: number | null
+    profitHigh?: number | null
+    valueScore?: number | null
+    discountPercent?: number | null
+    resaleDifficulty?: string | null
+    status?: string
+    comparableUrls?: string | null
+    priceReasoning?: string | null
+    notes?: string | null
+    shippable?: boolean | null
+    estimatedWeight?: number | null
+    negotiable?: boolean | null
+    daysListed?: number | null
+    tags?: string | null
+    requestToBuy?: string | null
+    identifiedBrand?: string | null
+    identifiedModel?: string | null
+    identifiedVariant?: string | null
+    identifiedCondition?: string | null
+    verifiedMarketValue?: number | null
+    marketDataSource?: string | null
+    marketDataDate?: Date | string | null
+    comparableSalesJson?: string | null
+    compMatchConfidence?: string | null
+    sellabilityScore?: number | null
+    demandLevel?: string | null
+    expectedDaysToSell?: number | null
+    authenticityRisk?: string | null
+    conditionRisk?: string | null
+    recommendedOffer?: number | null
+    recommendedList?: number | null
+    resaleStrategy?: string | null
+    trueDiscountPercent?: number | null
+    soldVolume30Days?: number | null
+    soldVolume60Days?: number | null
+    soldVolume90Days?: number | null
+    completenessLabel?: string | null
+    sellerRating?: number | null
+    sellerReviewCount?: number | null
+    sellerAccountAgeDays?: number | null
+    sizeCategory?: string | null
+    shippingEstimatesJson?: string | null
+    estimatedShippingCost?: number | null
+    pickupDistanceMiles?: number | null
+    outsidePickupRadius?: boolean | null
+    adjustedProfitMargin?: number | null
+    conversationStatus?: string | null
+    llmAnalyzed?: boolean
+    analysisDate?: Date | string | null
+    analysisConfidence?: string | null
+    analysisReasoning?: string | null
+    messages?: MessageUncheckedCreateNestedManyWithoutListingInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutListingInput
+    opportunity?: OpportunityUncheckedCreateNestedOneWithoutListingInput
+    postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutListingInput
+  }
+
+  export type ListingCreateOrConnectWithoutImagesInput = {
+    where: ListingWhereUniqueInput
+    create: XOR<ListingCreateWithoutImagesInput, ListingUncheckedCreateWithoutImagesInput>
+  }
+
+  export type ListingUpsertWithoutImagesInput = {
+    update: XOR<ListingUpdateWithoutImagesInput, ListingUncheckedUpdateWithoutImagesInput>
+    create: XOR<ListingCreateWithoutImagesInput, ListingUncheckedCreateWithoutImagesInput>
+    where?: ListingWhereInput
+  }
+
+  export type ListingUpdateToOneWithWhereWithoutImagesInput = {
+    where?: ListingWhereInput
+    data: XOR<ListingUpdateWithoutImagesInput, ListingUncheckedUpdateWithoutImagesInput>
+  }
+
+  export type ListingUpdateWithoutImagesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    externalId?: StringFieldUpdateOperationsInput | string
+    platform?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    askingPrice?: FloatFieldUpdateOperationsInput | number
+    condition?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerName?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerContact?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrls?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastMonitoredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
+    estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
+    estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
+    profitPotential?: NullableFloatFieldUpdateOperationsInput | number | null
+    profitLow?: NullableFloatFieldUpdateOperationsInput | number | null
+    profitHigh?: NullableFloatFieldUpdateOperationsInput | number | null
+    valueScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    discountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    resaleDifficulty?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    comparableUrls?: NullableStringFieldUpdateOperationsInput | string | null
+    priceReasoning?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    shippable?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    estimatedWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    negotiable?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    daysListed?: NullableIntFieldUpdateOperationsInput | number | null
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    requestToBuy?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedBrand?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedModel?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedVariant?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedCondition?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedMarketValue?: NullableFloatFieldUpdateOperationsInput | number | null
+    marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
+    marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
+    demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
+    authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
+    recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
+    resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
+    trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
+    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
+    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
+    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
+    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
+    analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneWithoutListingsNestedInput
+    messages?: MessageUpdateManyWithoutListingNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutListingNestedInput
+    opportunity?: OpportunityUpdateOneWithoutListingNestedInput
+    postingQueue?: PostingQueueItemUpdateManyWithoutListingNestedInput
+  }
+
+  export type ListingUncheckedUpdateWithoutImagesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    externalId?: StringFieldUpdateOperationsInput | string
+    platform?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    askingPrice?: FloatFieldUpdateOperationsInput | number
+    condition?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerName?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerContact?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrls?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastMonitoredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
+    estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
+    estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
+    profitPotential?: NullableFloatFieldUpdateOperationsInput | number | null
+    profitLow?: NullableFloatFieldUpdateOperationsInput | number | null
+    profitHigh?: NullableFloatFieldUpdateOperationsInput | number | null
+    valueScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    discountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    resaleDifficulty?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    comparableUrls?: NullableStringFieldUpdateOperationsInput | string | null
+    priceReasoning?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    shippable?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    estimatedWeight?: NullableFloatFieldUpdateOperationsInput | number | null
+    negotiable?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    daysListed?: NullableIntFieldUpdateOperationsInput | number | null
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    requestToBuy?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedBrand?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedModel?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedVariant?: NullableStringFieldUpdateOperationsInput | string | null
+    identifiedCondition?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedMarketValue?: NullableFloatFieldUpdateOperationsInput | number | null
+    marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
+    marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
+    demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
+    authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
+    recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
+    recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
+    resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
+    trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
+    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
+    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
+    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
+    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
+    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
+    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
+    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
+    analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
+    messages?: MessageUncheckedUpdateManyWithoutListingNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutListingNestedInput
+    opportunity?: OpportunityUncheckedUpdateOneWithoutListingNestedInput
+    postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutListingNestedInput
+  }
+
+  export type UserCreateWithoutUsageRecordsInput = {
+    id?: string
+    firebaseUid?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    name?: string | null
+    image?: string | null
+    password?: string | null
+    stripeCustomerId?: string | null
+    subscriptionTier?: string
+    onboardingComplete?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenCreateNestedOneWithoutUserInput
+    listings?: ListingCreateNestedManyWithoutUserInput
+    messages?: MessageCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutUserInput
+    opportunities?: OpportunityCreateNestedManyWithoutUserInput
+    postingQueue?: PostingQueueItemCreateNestedManyWithoutUserInput
+    scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
+    searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    settings?: UserSettingsCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutUsageRecordsInput = {
+    id?: string
+    firebaseUid?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    name?: string | null
+    image?: string | null
+    password?: string | null
+    stripeCustomerId?: string | null
+    subscriptionTier?: string
+    onboardingComplete?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput
+    listings?: ListingUncheckedCreateNestedManyWithoutUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutUserInput
+    opportunities?: OpportunityUncheckedCreateNestedManyWithoutUserInput
+    postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
+    scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
+    searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutUsageRecordsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutUsageRecordsInput, UserUncheckedCreateWithoutUsageRecordsInput>
+  }
+
+  export type UserUpsertWithoutUsageRecordsInput = {
+    update: XOR<UserUpdateWithoutUsageRecordsInput, UserUncheckedUpdateWithoutUsageRecordsInput>
+    create: XOR<UserCreateWithoutUsageRecordsInput, UserUncheckedCreateWithoutUsageRecordsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutUsageRecordsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutUsageRecordsInput, UserUncheckedUpdateWithoutUsageRecordsInput>
+  }
+
+  export type UserUpdateWithoutUsageRecordsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionTier?: StringFieldUpdateOperationsInput | string
+    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUpdateOneWithoutUserNestedInput
+    listings?: ListingUpdateManyWithoutUserNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutUserNestedInput
+    opportunities?: OpportunityUpdateManyWithoutUserNestedInput
+    postingQueue?: PostingQueueItemUpdateManyWithoutUserNestedInput
+    scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
+    searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    settings?: UserSettingsUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutUsageRecordsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionTier?: StringFieldUpdateOperationsInput | string
+    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutUserNestedInput
+    opportunities?: OpportunityUncheckedUpdateManyWithoutUserNestedInput
+    postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
+    scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
+    searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutPasswordResetTokensInput = {
+    id?: string
+    firebaseUid?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    name?: string | null
+    image?: string | null
+    password?: string | null
+    stripeCustomerId?: string | null
+    subscriptionTier?: string
+    onboardingComplete?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenCreateNestedOneWithoutUserInput
+    listings?: ListingCreateNestedManyWithoutUserInput
+    messages?: MessageCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventCreateNestedManyWithoutUserInput
+    opportunities?: OpportunityCreateNestedManyWithoutUserInput
+    postingQueue?: PostingQueueItemCreateNestedManyWithoutUserInput
+    scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
+    searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    settings?: UserSettingsCreateNestedOneWithoutUserInput
+    usageRecords?: UsageRecordCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
+    id?: string
+    firebaseUid?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    name?: string | null
+    image?: string | null
+    password?: string | null
+    stripeCustomerId?: string | null
+    subscriptionTier?: string
+    onboardingComplete?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput
+    listings?: ListingUncheckedCreateNestedManyWithoutUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    notificationEvents?: NotificationEventUncheckedCreateNestedManyWithoutUserInput
+    opportunities?: OpportunityUncheckedCreateNestedManyWithoutUserInput
+    postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
+    scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
+    searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
+    usageRecords?: UsageRecordUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutPasswordResetTokensInput, UserUncheckedCreateWithoutPasswordResetTokensInput>
+  }
+
+  export type UserUpsertWithoutPasswordResetTokensInput = {
+    update: XOR<UserUpdateWithoutPasswordResetTokensInput, UserUncheckedUpdateWithoutPasswordResetTokensInput>
+    create: XOR<UserCreateWithoutPasswordResetTokensInput, UserUncheckedCreateWithoutPasswordResetTokensInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutPasswordResetTokensInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutPasswordResetTokensInput, UserUncheckedUpdateWithoutPasswordResetTokensInput>
+  }
+
+  export type UserUpdateWithoutPasswordResetTokensInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionTier?: StringFieldUpdateOperationsInput | string
+    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUpdateOneWithoutUserNestedInput
+    listings?: ListingUpdateManyWithoutUserNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutUserNestedInput
+    opportunities?: OpportunityUpdateManyWithoutUserNestedInput
+    postingQueue?: PostingQueueItemUpdateManyWithoutUserNestedInput
+    scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
+    searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    settings?: UserSettingsUpdateOneWithoutUserNestedInput
+    usageRecords?: UsageRecordUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionTier?: StringFieldUpdateOperationsInput | string
+    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutUserNestedInput
+    opportunities?: OpportunityUncheckedUpdateManyWithoutUserNestedInput
+    postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
+    scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
+    searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+    usageRecords?: UsageRecordUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutNotificationEventsInput = {
+    id?: string
+    firebaseUid?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    name?: string | null
+    image?: string | null
+    password?: string | null
+    stripeCustomerId?: string | null
+    subscriptionTier?: string
+    onboardingComplete?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenCreateNestedOneWithoutUserInput
+    listings?: ListingCreateNestedManyWithoutUserInput
+    messages?: MessageCreateNestedManyWithoutUserInput
+    opportunities?: OpportunityCreateNestedManyWithoutUserInput
+    postingQueue?: PostingQueueItemCreateNestedManyWithoutUserInput
+    scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
+    searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    settings?: UserSettingsCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutNotificationEventsInput = {
+    id?: string
+    firebaseUid?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    name?: string | null
+    image?: string | null
+    password?: string | null
+    stripeCustomerId?: string | null
+    subscriptionTier?: string
+    onboardingComplete?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput
+    listings?: ListingUncheckedCreateNestedManyWithoutUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    opportunities?: OpportunityUncheckedCreateNestedManyWithoutUserInput
+    postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
+    scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
+    searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    usageRecords?: UsageRecordUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutNotificationEventsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutNotificationEventsInput, UserUncheckedCreateWithoutNotificationEventsInput>
+  }
+
+  export type ListingCreateWithoutNotificationEventsInput = {
+    id?: string
+    externalId: string
+    platform: string
+    url: string
+    title: string
+    description?: string | null
+    askingPrice: number
+    condition?: string | null
+    location?: string | null
+    sellerName?: string | null
+    sellerContact?: string | null
+    imageUrls?: string | null
+    category?: string | null
+    postedAt?: Date | string | null
+    scrapedAt?: Date | string
+    updatedAt?: Date | string
+    lastMonitoredAt?: Date | string | null
+    estimatedExpiresAt?: Date | string | null
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -33340,9 +43185,10 @@ export namespace Prisma {
     images?: ListingImageCreateNestedManyWithoutListingInput
     messages?: MessageCreateNestedManyWithoutListingInput
     opportunity?: OpportunityCreateNestedOneWithoutListingInput
+    postingQueue?: PostingQueueItemCreateNestedManyWithoutListingInput
   }
 
-  export type ListingUncheckedCreateWithoutPostingQueueInput = {
+  export type ListingUncheckedCreateWithoutNotificationEventsInput = {
     id?: string
     userId?: string | null
     externalId: string
@@ -33360,6 +43206,8 @@ export namespace Prisma {
     postedAt?: Date | string | null
     scrapedAt?: Date | string
     updatedAt?: Date | string
+    lastMonitoredAt?: Date | string | null
+    estimatedExpiresAt?: Date | string | null
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -33418,82 +43266,95 @@ export namespace Prisma {
     images?: ListingImageUncheckedCreateNestedManyWithoutListingInput
     messages?: MessageUncheckedCreateNestedManyWithoutListingInput
     opportunity?: OpportunityUncheckedCreateNestedOneWithoutListingInput
+    postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutListingInput
   }
 
-  export type ListingCreateOrConnectWithoutPostingQueueInput = {
+  export type ListingCreateOrConnectWithoutNotificationEventsInput = {
     where: ListingWhereUniqueInput
-    create: XOR<ListingCreateWithoutPostingQueueInput, ListingUncheckedCreateWithoutPostingQueueInput>
+    create: XOR<ListingCreateWithoutNotificationEventsInput, ListingUncheckedCreateWithoutNotificationEventsInput>
   }
 
-  export type UserCreateWithoutPostingQueueInput = {
-    id?: string
-    firebaseUid?: string | null
-    email: string
-    emailVerified?: Date | string | null
-    name?: string | null
-    image?: string | null
-    password?: string | null
-    stripeCustomerId?: string | null
-    subscriptionTier?: string
-    onboardingComplete?: boolean
-    onboardingStep?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    accounts?: AccountCreateNestedManyWithoutUserInput
-    listings?: ListingCreateNestedManyWithoutUserInput
-    messages?: MessageCreateNestedManyWithoutUserInput
-    opportunities?: OpportunityCreateNestedManyWithoutUserInput
-    scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
-    searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
-    sessions?: SessionCreateNestedManyWithoutUserInput
-    settings?: UserSettingsCreateNestedOneWithoutUserInput
-    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
-    usageRecords?: UsageRecordCreateNestedManyWithoutUserInput
+  export type UserUpsertWithoutNotificationEventsInput = {
+    update: XOR<UserUpdateWithoutNotificationEventsInput, UserUncheckedUpdateWithoutNotificationEventsInput>
+    create: XOR<UserCreateWithoutNotificationEventsInput, UserUncheckedCreateWithoutNotificationEventsInput>
+    where?: UserWhereInput
   }
 
-  export type UserUncheckedCreateWithoutPostingQueueInput = {
-    id?: string
-    firebaseUid?: string | null
-    email: string
-    emailVerified?: Date | string | null
-    name?: string | null
-    image?: string | null
-    password?: string | null
-    stripeCustomerId?: string | null
-    subscriptionTier?: string
-    onboardingComplete?: boolean
-    onboardingStep?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
-    listings?: ListingUncheckedCreateNestedManyWithoutUserInput
-    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
-    opportunities?: OpportunityUncheckedCreateNestedManyWithoutUserInput
-    scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
-    searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
-    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
-    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
-    usageRecords?: UsageRecordUncheckedCreateNestedManyWithoutUserInput
+  export type UserUpdateToOneWithWhereWithoutNotificationEventsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutNotificationEventsInput, UserUncheckedUpdateWithoutNotificationEventsInput>
   }
 
-  export type UserCreateOrConnectWithoutPostingQueueInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutPostingQueueInput, UserUncheckedCreateWithoutPostingQueueInput>
+  export type UserUpdateWithoutNotificationEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionTier?: StringFieldUpdateOperationsInput | string
+    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUpdateOneWithoutUserNestedInput
+    listings?: ListingUpdateManyWithoutUserNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
+    opportunities?: OpportunityUpdateManyWithoutUserNestedInput
+    postingQueue?: PostingQueueItemUpdateManyWithoutUserNestedInput
+    scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
+    searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    settings?: UserSettingsUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUpdateManyWithoutUserNestedInput
   }
 
-  export type ListingUpsertWithoutPostingQueueInput = {
-    update: XOR<ListingUpdateWithoutPostingQueueInput, ListingUncheckedUpdateWithoutPostingQueueInput>
-    create: XOR<ListingCreateWithoutPostingQueueInput, ListingUncheckedCreateWithoutPostingQueueInput>
+  export type UserUncheckedUpdateWithoutNotificationEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionTier?: StringFieldUpdateOperationsInput | string
+    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    opportunities?: OpportunityUncheckedUpdateManyWithoutUserNestedInput
+    postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
+    scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
+    searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    usageRecords?: UsageRecordUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type ListingUpsertWithoutNotificationEventsInput = {
+    update: XOR<ListingUpdateWithoutNotificationEventsInput, ListingUncheckedUpdateWithoutNotificationEventsInput>
+    create: XOR<ListingCreateWithoutNotificationEventsInput, ListingUncheckedCreateWithoutNotificationEventsInput>
     where?: ListingWhereInput
   }
 
-  export type ListingUpdateToOneWithWhereWithoutPostingQueueInput = {
+  export type ListingUpdateToOneWithWhereWithoutNotificationEventsInput = {
     where?: ListingWhereInput
-    data: XOR<ListingUpdateWithoutPostingQueueInput, ListingUncheckedUpdateWithoutPostingQueueInput>
+    data: XOR<ListingUpdateWithoutNotificationEventsInput, ListingUncheckedUpdateWithoutNotificationEventsInput>
   }
 
-  export type ListingUpdateWithoutPostingQueueInput = {
+  export type ListingUpdateWithoutNotificationEventsInput = {
     id?: StringFieldUpdateOperationsInput | string
     externalId?: StringFieldUpdateOperationsInput | string
     platform?: StringFieldUpdateOperationsInput | string
@@ -33510,6 +43371,8 @@ export namespace Prisma {
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastMonitoredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -33569,9 +43432,10 @@ export namespace Prisma {
     images?: ListingImageUpdateManyWithoutListingNestedInput
     messages?: MessageUpdateManyWithoutListingNestedInput
     opportunity?: OpportunityUpdateOneWithoutListingNestedInput
+    postingQueue?: PostingQueueItemUpdateManyWithoutListingNestedInput
   }
 
-  export type ListingUncheckedUpdateWithoutPostingQueueInput = {
+  export type ListingUncheckedUpdateWithoutNotificationEventsInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: NullableStringFieldUpdateOperationsInput | string | null
     externalId?: StringFieldUpdateOperationsInput | string
@@ -33589,6 +43453,8 @@ export namespace Prisma {
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastMonitoredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -33647,637 +43513,7 @@ export namespace Prisma {
     images?: ListingImageUncheckedUpdateManyWithoutListingNestedInput
     messages?: MessageUncheckedUpdateManyWithoutListingNestedInput
     opportunity?: OpportunityUncheckedUpdateOneWithoutListingNestedInput
-  }
-
-  export type UserUpsertWithoutPostingQueueInput = {
-    update: XOR<UserUpdateWithoutPostingQueueInput, UserUncheckedUpdateWithoutPostingQueueInput>
-    create: XOR<UserCreateWithoutPostingQueueInput, UserUncheckedCreateWithoutPostingQueueInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutPostingQueueInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutPostingQueueInput, UserUncheckedUpdateWithoutPostingQueueInput>
-  }
-
-  export type UserUpdateWithoutPostingQueueInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: StringFieldUpdateOperationsInput | string
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    name?: NullableStringFieldUpdateOperationsInput | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    password?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    subscriptionTier?: StringFieldUpdateOperationsInput | string
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
-    onboardingStep?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    accounts?: AccountUpdateManyWithoutUserNestedInput
-    listings?: ListingUpdateManyWithoutUserNestedInput
-    messages?: MessageUpdateManyWithoutUserNestedInput
-    opportunities?: OpportunityUpdateManyWithoutUserNestedInput
-    scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
-    searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
-    sessions?: SessionUpdateManyWithoutUserNestedInput
-    settings?: UserSettingsUpdateOneWithoutUserNestedInput
-    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
-    usageRecords?: UsageRecordUpdateManyWithoutUserNestedInput
-  }
-
-  export type UserUncheckedUpdateWithoutPostingQueueInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: StringFieldUpdateOperationsInput | string
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    name?: NullableStringFieldUpdateOperationsInput | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    password?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    subscriptionTier?: StringFieldUpdateOperationsInput | string
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
-    onboardingStep?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
-    listings?: ListingUncheckedUpdateManyWithoutUserNestedInput
-    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
-    opportunities?: OpportunityUncheckedUpdateManyWithoutUserNestedInput
-    scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
-    searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
-    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
-    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
-    usageRecords?: UsageRecordUncheckedUpdateManyWithoutUserNestedInput
-  }
-
-  export type ListingCreateWithoutImagesInput = {
-    id?: string
-    externalId: string
-    platform: string
-    url: string
-    title: string
-    description?: string | null
-    askingPrice: number
-    condition?: string | null
-    location?: string | null
-    sellerName?: string | null
-    sellerContact?: string | null
-    imageUrls?: string | null
-    category?: string | null
-    postedAt?: Date | string | null
-    scrapedAt?: Date | string
-    updatedAt?: Date | string
-    estimatedValue?: number | null
-    estimatedLow?: number | null
-    estimatedHigh?: number | null
-    profitPotential?: number | null
-    profitLow?: number | null
-    profitHigh?: number | null
-    valueScore?: number | null
-    discountPercent?: number | null
-    resaleDifficulty?: string | null
-    status?: string
-    comparableUrls?: string | null
-    priceReasoning?: string | null
-    notes?: string | null
-    shippable?: boolean | null
-    estimatedWeight?: number | null
-    negotiable?: boolean | null
-    daysListed?: number | null
-    tags?: string | null
-    requestToBuy?: string | null
-    identifiedBrand?: string | null
-    identifiedModel?: string | null
-    identifiedVariant?: string | null
-    identifiedCondition?: string | null
-    verifiedMarketValue?: number | null
-    marketDataSource?: string | null
-    marketDataDate?: Date | string | null
-    comparableSalesJson?: string | null
-    compMatchConfidence?: string | null
-    sellabilityScore?: number | null
-    demandLevel?: string | null
-    expectedDaysToSell?: number | null
-    authenticityRisk?: string | null
-    conditionRisk?: string | null
-    recommendedOffer?: number | null
-    recommendedList?: number | null
-    resaleStrategy?: string | null
-    trueDiscountPercent?: number | null
-    soldVolume30Days?: number | null
-    soldVolume60Days?: number | null
-    soldVolume90Days?: number | null
-    completenessLabel?: string | null
-    sellerRating?: number | null
-    sellerReviewCount?: number | null
-    sellerAccountAgeDays?: number | null
-    sizeCategory?: string | null
-    shippingEstimatesJson?: string | null
-    estimatedShippingCost?: number | null
-    pickupDistanceMiles?: number | null
-    outsidePickupRadius?: boolean | null
-    adjustedProfitMargin?: number | null
-    conversationStatus?: string | null
-    llmAnalyzed?: boolean
-    analysisDate?: Date | string | null
-    analysisConfidence?: string | null
-    analysisReasoning?: string | null
-    user?: UserCreateNestedOneWithoutListingsInput
-    messages?: MessageCreateNestedManyWithoutListingInput
-    opportunity?: OpportunityCreateNestedOneWithoutListingInput
-    postingQueue?: PostingQueueItemCreateNestedManyWithoutListingInput
-  }
-
-  export type ListingUncheckedCreateWithoutImagesInput = {
-    id?: string
-    userId?: string | null
-    externalId: string
-    platform: string
-    url: string
-    title: string
-    description?: string | null
-    askingPrice: number
-    condition?: string | null
-    location?: string | null
-    sellerName?: string | null
-    sellerContact?: string | null
-    imageUrls?: string | null
-    category?: string | null
-    postedAt?: Date | string | null
-    scrapedAt?: Date | string
-    updatedAt?: Date | string
-    estimatedValue?: number | null
-    estimatedLow?: number | null
-    estimatedHigh?: number | null
-    profitPotential?: number | null
-    profitLow?: number | null
-    profitHigh?: number | null
-    valueScore?: number | null
-    discountPercent?: number | null
-    resaleDifficulty?: string | null
-    status?: string
-    comparableUrls?: string | null
-    priceReasoning?: string | null
-    notes?: string | null
-    shippable?: boolean | null
-    estimatedWeight?: number | null
-    negotiable?: boolean | null
-    daysListed?: number | null
-    tags?: string | null
-    requestToBuy?: string | null
-    identifiedBrand?: string | null
-    identifiedModel?: string | null
-    identifiedVariant?: string | null
-    identifiedCondition?: string | null
-    verifiedMarketValue?: number | null
-    marketDataSource?: string | null
-    marketDataDate?: Date | string | null
-    comparableSalesJson?: string | null
-    compMatchConfidence?: string | null
-    sellabilityScore?: number | null
-    demandLevel?: string | null
-    expectedDaysToSell?: number | null
-    authenticityRisk?: string | null
-    conditionRisk?: string | null
-    recommendedOffer?: number | null
-    recommendedList?: number | null
-    resaleStrategy?: string | null
-    trueDiscountPercent?: number | null
-    soldVolume30Days?: number | null
-    soldVolume60Days?: number | null
-    soldVolume90Days?: number | null
-    completenessLabel?: string | null
-    sellerRating?: number | null
-    sellerReviewCount?: number | null
-    sellerAccountAgeDays?: number | null
-    sizeCategory?: string | null
-    shippingEstimatesJson?: string | null
-    estimatedShippingCost?: number | null
-    pickupDistanceMiles?: number | null
-    outsidePickupRadius?: boolean | null
-    adjustedProfitMargin?: number | null
-    conversationStatus?: string | null
-    llmAnalyzed?: boolean
-    analysisDate?: Date | string | null
-    analysisConfidence?: string | null
-    analysisReasoning?: string | null
-    messages?: MessageUncheckedCreateNestedManyWithoutListingInput
-    opportunity?: OpportunityUncheckedCreateNestedOneWithoutListingInput
-    postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutListingInput
-  }
-
-  export type ListingCreateOrConnectWithoutImagesInput = {
-    where: ListingWhereUniqueInput
-    create: XOR<ListingCreateWithoutImagesInput, ListingUncheckedCreateWithoutImagesInput>
-  }
-
-  export type ListingUpsertWithoutImagesInput = {
-    update: XOR<ListingUpdateWithoutImagesInput, ListingUncheckedUpdateWithoutImagesInput>
-    create: XOR<ListingCreateWithoutImagesInput, ListingUncheckedCreateWithoutImagesInput>
-    where?: ListingWhereInput
-  }
-
-  export type ListingUpdateToOneWithWhereWithoutImagesInput = {
-    where?: ListingWhereInput
-    data: XOR<ListingUpdateWithoutImagesInput, ListingUncheckedUpdateWithoutImagesInput>
-  }
-
-  export type ListingUpdateWithoutImagesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    externalId?: StringFieldUpdateOperationsInput | string
-    platform?: StringFieldUpdateOperationsInput | string
-    url?: StringFieldUpdateOperationsInput | string
-    title?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    askingPrice?: FloatFieldUpdateOperationsInput | number
-    condition?: NullableStringFieldUpdateOperationsInput | string | null
-    location?: NullableStringFieldUpdateOperationsInput | string | null
-    sellerName?: NullableStringFieldUpdateOperationsInput | string | null
-    sellerContact?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrls?: NullableStringFieldUpdateOperationsInput | string | null
-    category?: NullableStringFieldUpdateOperationsInput | string | null
-    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
-    estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
-    estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
-    profitPotential?: NullableFloatFieldUpdateOperationsInput | number | null
-    profitLow?: NullableFloatFieldUpdateOperationsInput | number | null
-    profitHigh?: NullableFloatFieldUpdateOperationsInput | number | null
-    valueScore?: NullableFloatFieldUpdateOperationsInput | number | null
-    discountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
-    resaleDifficulty?: NullableStringFieldUpdateOperationsInput | string | null
-    status?: StringFieldUpdateOperationsInput | string
-    comparableUrls?: NullableStringFieldUpdateOperationsInput | string | null
-    priceReasoning?: NullableStringFieldUpdateOperationsInput | string | null
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
-    shippable?: NullableBoolFieldUpdateOperationsInput | boolean | null
-    estimatedWeight?: NullableFloatFieldUpdateOperationsInput | number | null
-    negotiable?: NullableBoolFieldUpdateOperationsInput | boolean | null
-    daysListed?: NullableIntFieldUpdateOperationsInput | number | null
-    tags?: NullableStringFieldUpdateOperationsInput | string | null
-    requestToBuy?: NullableStringFieldUpdateOperationsInput | string | null
-    identifiedBrand?: NullableStringFieldUpdateOperationsInput | string | null
-    identifiedModel?: NullableStringFieldUpdateOperationsInput | string | null
-    identifiedVariant?: NullableStringFieldUpdateOperationsInput | string | null
-    identifiedCondition?: NullableStringFieldUpdateOperationsInput | string | null
-    verifiedMarketValue?: NullableFloatFieldUpdateOperationsInput | number | null
-    marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
-    marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
-    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
-    sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
-    demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
-    expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
-    authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
-    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
-    recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
-    recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
-    resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
-    trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
-    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
-    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
-    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
-    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
-    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
-    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
-    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
-    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
-    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
-    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
-    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
-    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
-    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
-    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
-    llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
-    analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
-    analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
-    user?: UserUpdateOneWithoutListingsNestedInput
-    messages?: MessageUpdateManyWithoutListingNestedInput
-    opportunity?: OpportunityUpdateOneWithoutListingNestedInput
-    postingQueue?: PostingQueueItemUpdateManyWithoutListingNestedInput
-  }
-
-  export type ListingUncheckedUpdateWithoutImagesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: NullableStringFieldUpdateOperationsInput | string | null
-    externalId?: StringFieldUpdateOperationsInput | string
-    platform?: StringFieldUpdateOperationsInput | string
-    url?: StringFieldUpdateOperationsInput | string
-    title?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    askingPrice?: FloatFieldUpdateOperationsInput | number
-    condition?: NullableStringFieldUpdateOperationsInput | string | null
-    location?: NullableStringFieldUpdateOperationsInput | string | null
-    sellerName?: NullableStringFieldUpdateOperationsInput | string | null
-    sellerContact?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrls?: NullableStringFieldUpdateOperationsInput | string | null
-    category?: NullableStringFieldUpdateOperationsInput | string | null
-    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
-    estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
-    estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
-    profitPotential?: NullableFloatFieldUpdateOperationsInput | number | null
-    profitLow?: NullableFloatFieldUpdateOperationsInput | number | null
-    profitHigh?: NullableFloatFieldUpdateOperationsInput | number | null
-    valueScore?: NullableFloatFieldUpdateOperationsInput | number | null
-    discountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
-    resaleDifficulty?: NullableStringFieldUpdateOperationsInput | string | null
-    status?: StringFieldUpdateOperationsInput | string
-    comparableUrls?: NullableStringFieldUpdateOperationsInput | string | null
-    priceReasoning?: NullableStringFieldUpdateOperationsInput | string | null
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
-    shippable?: NullableBoolFieldUpdateOperationsInput | boolean | null
-    estimatedWeight?: NullableFloatFieldUpdateOperationsInput | number | null
-    negotiable?: NullableBoolFieldUpdateOperationsInput | boolean | null
-    daysListed?: NullableIntFieldUpdateOperationsInput | number | null
-    tags?: NullableStringFieldUpdateOperationsInput | string | null
-    requestToBuy?: NullableStringFieldUpdateOperationsInput | string | null
-    identifiedBrand?: NullableStringFieldUpdateOperationsInput | string | null
-    identifiedModel?: NullableStringFieldUpdateOperationsInput | string | null
-    identifiedVariant?: NullableStringFieldUpdateOperationsInput | string | null
-    identifiedCondition?: NullableStringFieldUpdateOperationsInput | string | null
-    verifiedMarketValue?: NullableFloatFieldUpdateOperationsInput | number | null
-    marketDataSource?: NullableStringFieldUpdateOperationsInput | string | null
-    marketDataDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    comparableSalesJson?: NullableStringFieldUpdateOperationsInput | string | null
-    compMatchConfidence?: NullableStringFieldUpdateOperationsInput | string | null
-    sellabilityScore?: NullableIntFieldUpdateOperationsInput | number | null
-    demandLevel?: NullableStringFieldUpdateOperationsInput | string | null
-    expectedDaysToSell?: NullableIntFieldUpdateOperationsInput | number | null
-    authenticityRisk?: NullableStringFieldUpdateOperationsInput | string | null
-    conditionRisk?: NullableStringFieldUpdateOperationsInput | string | null
-    recommendedOffer?: NullableFloatFieldUpdateOperationsInput | number | null
-    recommendedList?: NullableFloatFieldUpdateOperationsInput | number | null
-    resaleStrategy?: NullableStringFieldUpdateOperationsInput | string | null
-    trueDiscountPercent?: NullableFloatFieldUpdateOperationsInput | number | null
-    soldVolume30Days?: NullableIntFieldUpdateOperationsInput | number | null
-    soldVolume60Days?: NullableIntFieldUpdateOperationsInput | number | null
-    soldVolume90Days?: NullableIntFieldUpdateOperationsInput | number | null
-    completenessLabel?: NullableStringFieldUpdateOperationsInput | string | null
-    sellerRating?: NullableFloatFieldUpdateOperationsInput | number | null
-    sellerReviewCount?: NullableIntFieldUpdateOperationsInput | number | null
-    sellerAccountAgeDays?: NullableIntFieldUpdateOperationsInput | number | null
-    sizeCategory?: NullableStringFieldUpdateOperationsInput | string | null
-    shippingEstimatesJson?: NullableStringFieldUpdateOperationsInput | string | null
-    estimatedShippingCost?: NullableFloatFieldUpdateOperationsInput | number | null
-    pickupDistanceMiles?: NullableFloatFieldUpdateOperationsInput | number | null
-    outsidePickupRadius?: NullableBoolFieldUpdateOperationsInput | boolean | null
-    adjustedProfitMargin?: NullableFloatFieldUpdateOperationsInput | number | null
-    conversationStatus?: NullableStringFieldUpdateOperationsInput | string | null
-    llmAnalyzed?: BoolFieldUpdateOperationsInput | boolean
-    analysisDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    analysisConfidence?: NullableStringFieldUpdateOperationsInput | string | null
-    analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
-    messages?: MessageUncheckedUpdateManyWithoutListingNestedInput
-    opportunity?: OpportunityUncheckedUpdateOneWithoutListingNestedInput
     postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutListingNestedInput
-  }
-
-  export type UserCreateWithoutUsageRecordsInput = {
-    id?: string
-    firebaseUid?: string | null
-    email: string
-    emailVerified?: Date | string | null
-    name?: string | null
-    image?: string | null
-    password?: string | null
-    stripeCustomerId?: string | null
-    subscriptionTier?: string
-    onboardingComplete?: boolean
-    onboardingStep?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    accounts?: AccountCreateNestedManyWithoutUserInput
-    listings?: ListingCreateNestedManyWithoutUserInput
-    messages?: MessageCreateNestedManyWithoutUserInput
-    opportunities?: OpportunityCreateNestedManyWithoutUserInput
-    postingQueue?: PostingQueueItemCreateNestedManyWithoutUserInput
-    scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
-    searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
-    sessions?: SessionCreateNestedManyWithoutUserInput
-    settings?: UserSettingsCreateNestedOneWithoutUserInput
-    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
-  }
-
-  export type UserUncheckedCreateWithoutUsageRecordsInput = {
-    id?: string
-    firebaseUid?: string | null
-    email: string
-    emailVerified?: Date | string | null
-    name?: string | null
-    image?: string | null
-    password?: string | null
-    stripeCustomerId?: string | null
-    subscriptionTier?: string
-    onboardingComplete?: boolean
-    onboardingStep?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
-    listings?: ListingUncheckedCreateNestedManyWithoutUserInput
-    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
-    opportunities?: OpportunityUncheckedCreateNestedManyWithoutUserInput
-    postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
-    scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
-    searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
-    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
-    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
-  }
-
-  export type UserCreateOrConnectWithoutUsageRecordsInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutUsageRecordsInput, UserUncheckedCreateWithoutUsageRecordsInput>
-  }
-
-  export type UserUpsertWithoutUsageRecordsInput = {
-    update: XOR<UserUpdateWithoutUsageRecordsInput, UserUncheckedUpdateWithoutUsageRecordsInput>
-    create: XOR<UserCreateWithoutUsageRecordsInput, UserUncheckedCreateWithoutUsageRecordsInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutUsageRecordsInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutUsageRecordsInput, UserUncheckedUpdateWithoutUsageRecordsInput>
-  }
-
-  export type UserUpdateWithoutUsageRecordsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: StringFieldUpdateOperationsInput | string
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    name?: NullableStringFieldUpdateOperationsInput | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    password?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    subscriptionTier?: StringFieldUpdateOperationsInput | string
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
-    onboardingStep?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    accounts?: AccountUpdateManyWithoutUserNestedInput
-    listings?: ListingUpdateManyWithoutUserNestedInput
-    messages?: MessageUpdateManyWithoutUserNestedInput
-    opportunities?: OpportunityUpdateManyWithoutUserNestedInput
-    postingQueue?: PostingQueueItemUpdateManyWithoutUserNestedInput
-    scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
-    searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
-    sessions?: SessionUpdateManyWithoutUserNestedInput
-    settings?: UserSettingsUpdateOneWithoutUserNestedInput
-    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
-  }
-
-  export type UserUncheckedUpdateWithoutUsageRecordsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: StringFieldUpdateOperationsInput | string
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    name?: NullableStringFieldUpdateOperationsInput | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    password?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    subscriptionTier?: StringFieldUpdateOperationsInput | string
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
-    onboardingStep?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
-    listings?: ListingUncheckedUpdateManyWithoutUserNestedInput
-    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
-    opportunities?: OpportunityUncheckedUpdateManyWithoutUserNestedInput
-    postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
-    scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
-    searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
-    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
-    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
-  }
-
-  export type UserCreateWithoutPasswordResetTokensInput = {
-    id?: string
-    firebaseUid?: string | null
-    email: string
-    emailVerified?: Date | string | null
-    name?: string | null
-    image?: string | null
-    password?: string | null
-    stripeCustomerId?: string | null
-    subscriptionTier?: string
-    onboardingComplete?: boolean
-    onboardingStep?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    accounts?: AccountCreateNestedManyWithoutUserInput
-    listings?: ListingCreateNestedManyWithoutUserInput
-    messages?: MessageCreateNestedManyWithoutUserInput
-    opportunities?: OpportunityCreateNestedManyWithoutUserInput
-    postingQueue?: PostingQueueItemCreateNestedManyWithoutUserInput
-    scraperJobs?: ScraperJobCreateNestedManyWithoutUserInput
-    searchConfigs?: SearchConfigCreateNestedManyWithoutUserInput
-    sessions?: SessionCreateNestedManyWithoutUserInput
-    settings?: UserSettingsCreateNestedOneWithoutUserInput
-    usageRecords?: UsageRecordCreateNestedManyWithoutUserInput
-  }
-
-  export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
-    id?: string
-    firebaseUid?: string | null
-    email: string
-    emailVerified?: Date | string | null
-    name?: string | null
-    image?: string | null
-    password?: string | null
-    stripeCustomerId?: string | null
-    subscriptionTier?: string
-    onboardingComplete?: boolean
-    onboardingStep?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
-    listings?: ListingUncheckedCreateNestedManyWithoutUserInput
-    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
-    opportunities?: OpportunityUncheckedCreateNestedManyWithoutUserInput
-    postingQueue?: PostingQueueItemUncheckedCreateNestedManyWithoutUserInput
-    scraperJobs?: ScraperJobUncheckedCreateNestedManyWithoutUserInput
-    searchConfigs?: SearchConfigUncheckedCreateNestedManyWithoutUserInput
-    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    settings?: UserSettingsUncheckedCreateNestedOneWithoutUserInput
-    usageRecords?: UsageRecordUncheckedCreateNestedManyWithoutUserInput
-  }
-
-  export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutPasswordResetTokensInput, UserUncheckedCreateWithoutPasswordResetTokensInput>
-  }
-
-  export type UserUpsertWithoutPasswordResetTokensInput = {
-    update: XOR<UserUpdateWithoutPasswordResetTokensInput, UserUncheckedUpdateWithoutPasswordResetTokensInput>
-    create: XOR<UserCreateWithoutPasswordResetTokensInput, UserUncheckedCreateWithoutPasswordResetTokensInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutPasswordResetTokensInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutPasswordResetTokensInput, UserUncheckedUpdateWithoutPasswordResetTokensInput>
-  }
-
-  export type UserUpdateWithoutPasswordResetTokensInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: StringFieldUpdateOperationsInput | string
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    name?: NullableStringFieldUpdateOperationsInput | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    password?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    subscriptionTier?: StringFieldUpdateOperationsInput | string
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
-    onboardingStep?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    accounts?: AccountUpdateManyWithoutUserNestedInput
-    listings?: ListingUpdateManyWithoutUserNestedInput
-    messages?: MessageUpdateManyWithoutUserNestedInput
-    opportunities?: OpportunityUpdateManyWithoutUserNestedInput
-    postingQueue?: PostingQueueItemUpdateManyWithoutUserNestedInput
-    scraperJobs?: ScraperJobUpdateManyWithoutUserNestedInput
-    searchConfigs?: SearchConfigUpdateManyWithoutUserNestedInput
-    sessions?: SessionUpdateManyWithoutUserNestedInput
-    settings?: UserSettingsUpdateOneWithoutUserNestedInput
-    usageRecords?: UsageRecordUpdateManyWithoutUserNestedInput
-  }
-
-  export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    firebaseUid?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: StringFieldUpdateOperationsInput | string
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    name?: NullableStringFieldUpdateOperationsInput | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    password?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    subscriptionTier?: StringFieldUpdateOperationsInput | string
-    onboardingComplete?: BoolFieldUpdateOperationsInput | boolean
-    onboardingStep?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
-    listings?: ListingUncheckedUpdateManyWithoutUserNestedInput
-    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
-    opportunities?: OpportunityUncheckedUpdateManyWithoutUserNestedInput
-    postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutUserNestedInput
-    scraperJobs?: ScraperJobUncheckedUpdateManyWithoutUserNestedInput
-    searchConfigs?: SearchConfigUncheckedUpdateManyWithoutUserNestedInput
-    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    settings?: UserSettingsUncheckedUpdateOneWithoutUserNestedInput
-    usageRecords?: UsageRecordUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ListingImageCreateManyListingInput = {
@@ -34308,6 +43544,19 @@ export namespace Prisma {
     readAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type NotificationEventCreateManyListingInput = {
+    id?: string
+    userId: string
+    eventType: string
+    payload: JsonNullValueInput | InputJsonValue
+    deduplicationKey?: string | null
+    status?: string
+    retryCount?: number
+    errorMessage?: string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
   }
 
   export type PostingQueueItemCreateManyListingInput = {
@@ -34419,6 +43668,45 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type NotificationEventUpdateWithoutListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    eventType?: StringFieldUpdateOperationsInput | string
+    payload?: JsonNullValueInput | InputJsonValue
+    deduplicationKey?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    retryCount?: IntFieldUpdateOperationsInput | number
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutNotificationEventsNestedInput
+  }
+
+  export type NotificationEventUncheckedUpdateWithoutListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    eventType?: StringFieldUpdateOperationsInput | string
+    payload?: JsonNullValueInput | InputJsonValue
+    deduplicationKey?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    retryCount?: IntFieldUpdateOperationsInput | number
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type NotificationEventUncheckedUpdateManyWithoutListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    eventType?: StringFieldUpdateOperationsInput | string
+    payload?: JsonNullValueInput | InputJsonValue
+    deduplicationKey?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    retryCount?: IntFieldUpdateOperationsInput | number
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type PostingQueueItemUpdateWithoutListingInput = {
     id?: StringFieldUpdateOperationsInput | string
     targetPlatform?: StringFieldUpdateOperationsInput | string
@@ -34490,6 +43778,14 @@ export namespace Prisma {
     session_state?: string | null
   }
 
+  export type DeviceTokenCreateManyUserInput = {
+    id?: string
+    token: string
+    userAgent?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type ListingCreateManyUserInput = {
     id?: string
     externalId: string
@@ -34507,6 +43803,8 @@ export namespace Prisma {
     postedAt?: Date | string | null
     scrapedAt?: Date | string
     updatedAt?: Date | string
+    lastMonitoredAt?: Date | string | null
+    estimatedExpiresAt?: Date | string | null
     estimatedValue?: number | null
     estimatedLow?: number | null
     estimatedHigh?: number | null
@@ -34581,6 +43879,19 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type NotificationEventCreateManyUserInput = {
+    id?: string
+    listingId?: string | null
+    eventType: string
+    payload: JsonNullValueInput | InputJsonValue
+    deduplicationKey?: string | null
+    status?: string
+    retryCount?: number
+    errorMessage?: string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
   export type OpportunityCreateManyUserInput = {
     id?: string
     listingId: string
@@ -34595,6 +43906,10 @@ export namespace Prisma {
     fees?: number | null
     status?: string
     notes?: string | null
+    meetingTime?: Date | string | null
+    meetingLocation?: string | null
+    meetingType?: string | null
+    calendarEventId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -34711,6 +44026,30 @@ export namespace Prisma {
     session_state?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type DeviceTokenUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceTokenUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceTokenUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type ListingUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     externalId?: StringFieldUpdateOperationsInput | string
@@ -34728,6 +44067,8 @@ export namespace Prisma {
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastMonitoredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -34785,6 +44126,7 @@ export namespace Prisma {
     analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
     images?: ListingImageUpdateManyWithoutListingNestedInput
     messages?: MessageUpdateManyWithoutListingNestedInput
+    notificationEvents?: NotificationEventUpdateManyWithoutListingNestedInput
     opportunity?: OpportunityUpdateOneWithoutListingNestedInput
     postingQueue?: PostingQueueItemUpdateManyWithoutListingNestedInput
   }
@@ -34806,6 +44148,8 @@ export namespace Prisma {
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastMonitoredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -34863,6 +44207,7 @@ export namespace Prisma {
     analysisReasoning?: NullableStringFieldUpdateOperationsInput | string | null
     images?: ListingImageUncheckedUpdateManyWithoutListingNestedInput
     messages?: MessageUncheckedUpdateManyWithoutListingNestedInput
+    notificationEvents?: NotificationEventUncheckedUpdateManyWithoutListingNestedInput
     opportunity?: OpportunityUncheckedUpdateOneWithoutListingNestedInput
     postingQueue?: PostingQueueItemUncheckedUpdateManyWithoutListingNestedInput
   }
@@ -34884,6 +44229,8 @@ export namespace Prisma {
     postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scrapedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastMonitoredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    estimatedExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimatedValue?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedLow?: NullableFloatFieldUpdateOperationsInput | number | null
     estimatedHigh?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -34992,6 +44339,45 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type NotificationEventUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    eventType?: StringFieldUpdateOperationsInput | string
+    payload?: JsonNullValueInput | InputJsonValue
+    deduplicationKey?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    retryCount?: IntFieldUpdateOperationsInput | number
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    listing?: ListingUpdateOneWithoutNotificationEventsNestedInput
+  }
+
+  export type NotificationEventUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    eventType?: StringFieldUpdateOperationsInput | string
+    payload?: JsonNullValueInput | InputJsonValue
+    deduplicationKey?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    retryCount?: IntFieldUpdateOperationsInput | number
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type NotificationEventUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    eventType?: StringFieldUpdateOperationsInput | string
+    payload?: JsonNullValueInput | InputJsonValue
+    deduplicationKey?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    retryCount?: IntFieldUpdateOperationsInput | number
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type OpportunityUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     purchasePrice?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -35005,6 +44391,10 @@ export namespace Prisma {
     fees?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    meetingTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    meetingLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    meetingType?: NullableStringFieldUpdateOperationsInput | string | null
+    calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     listing?: ListingUpdateOneRequiredWithoutOpportunityNestedInput
@@ -35024,6 +44414,10 @@ export namespace Prisma {
     fees?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    meetingTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    meetingLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    meetingType?: NullableStringFieldUpdateOperationsInput | string | null
+    calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -35042,6 +44436,10 @@ export namespace Prisma {
     fees?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    meetingTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    meetingLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    meetingType?: NullableStringFieldUpdateOperationsInput | string | null
+    calendarEventId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

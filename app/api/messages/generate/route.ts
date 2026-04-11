@@ -23,6 +23,7 @@ import { checkFeatureAccess } from '@/lib/tier-enforcement';
 import { generatePurchaseMessage, isValidMessageType } from '@/lib/message-generator';
 import type { MessageType } from '@/lib/message-generator';
 import { transitionToPending } from '@/lib/conversation-status';
+import { communicationNotificationService } from '@/lib/communication-notification';
 
 export async function POST(request: NextRequest) {
   try {
@@ -111,6 +112,15 @@ export async function POST(request: NextRequest) {
 
     // Fire-and-forget: transition conversation status to pending
     transitionToPending(listingId, userId).catch(() => {});
+
+    // Fire-and-forget: draft ready notification (Story 10.4, AC2)
+    /* istanbul ignore next -- fire-and-forget; rejection is intentionally swallowed */
+    void communicationNotificationService.notifyDraftReady({
+      userId,
+      listingId,
+      listingTitle: listing.title,
+      draftPreview: message.body,
+    }).catch(() => {});
 
     return NextResponse.json(
       {

@@ -1,6 +1,6 @@
 # Story 9.2: Optimal Listing Price Calculation
 
-Status: review
+Status: done
 Blocked: false
 Blocked-Reason:
 Trello-Card-ID: 69cb8002fab7890daddcc634
@@ -303,13 +303,22 @@ Follow patterns from `src/__tests__/lib/llm-analyzer.test.ts` and `src/__tests__
 - [x] All Gherkin acceptance test scenarios are written in `test/acceptance/features/E-009-cross-platform-resale-listing.feature`
 - [x] All scenarios tagged with `@E-009-S-<N>`, `@story-9-2`, and `@FR-RELIST-03`
 - [x] Requirements traceability matrix updated in `_bmad-output/test-artifacts/requirements-traceability-matrix.md`
-- [x] Unit tests written for new business logic (`src/__tests__/lib/listing-price-calculator.test.ts`)
-- [x] Edge case tests: $0 items, impossible margins, market cap loss warnings, missing data fallbacks
+- [x] Unit tests written for new business logic (`src/__tests__/lib/listing-price-calculator.test.ts` — 37 tests)
+- [x] **Component-level UI tests for all UI ACs** (`src/__tests__/components/PriceCalculator.test.tsx` — 36 tests):
+  - AC-1: hero numbers render from API data (profit + price)
+  - AC-2: full display hierarchy verified — green profit hero, purple price hero, best platform badge with star+text, slider+numeric input, 5-platform table, market comparison bar, source-platform hidden
+  - AC-3: slider change recalculates without new fetch, numeric input recalculates, onBlur normalizes invalid input, Refresh re-fetches
+  - AC-4: loss warning banner, insufficient data banner with "Verify Market Value" CTA, impossible platforms grayed with label, estimated-data warning, AI discrepancy note, error+retry state
+  - AC-5: projected badge via aria-label, "Recommended Projected Price" heading, hypothetical purchase price input visible and functional, projected hidden when false
+  - Task 5.4: editable price input per row, onListPlatform receives overridden price, help text
+  - Accessibility: aria-valuemin/max/now/text, aria-live region, icon+text (no color alone), 44px touch target
+- [x] Edge case tests: $0 items, impossible margins, market cap loss warnings, missing data fallbacks, free-item shipping loss
 - [x] Accessibility: `aria-live` region, `aria-valuetext`, focus ring, 44px touch targets, no color-only info
 - [x] No lint errors introduced by new files (`pnpm lint` — pre-existing errors in unrelated files unchanged)
 - [x] Build passes (`pnpm build`)
-- [x] All existing tests continue to pass (`pnpm test` — 190 suites, 3986 tests)
-- [x] Coverage thresholds maintained on new files: 100% statements/lines/functions, 98.91% branches (calculator), 100% across the board (API route)
+- [x] All existing tests continue to pass (`pnpm test` — 210 suites, 4272 tests)
+- [x] Coverage thresholds maintained on new files
+- [x] All ACs have acceptance test scenarios that exercise the full stack the AC describes (service-level for logic ACs, component-level for UI ACs)
 
 ## Dev Agent Record
 
@@ -322,6 +331,26 @@ claude-opus-4-6 (1M context)
 n/a
 
 ### Completion Notes List
+
+**2026-04-08 — Adversarial code review fixes (4 HIGH, 6 MEDIUM, 3 LOW addressed)**
+
+- **H1 (Task 4.3 enforcement):** PriceCalculator now computes a dynamic max margin from the loaded platform fees as `floor((1 - maxFeeDecimal) * 100) - 1`. Slider, numeric input, and aria-valuemax all use this dynamic ceiling. A useEffect re-clamps the current margin if a refresh narrows the ceiling. Helper text under the slider explains the cap.
+- **H2 (Task 4.8 enforcement):** Projected mode now exposes a "Hypothetical purchase price" numeric input inside the amber Projected banner. Edits flow through `recalcForMargin` as a per-row `costBasisOverride = hypotheticalPurchasePrice + p.estimatedShippingCost`, so each platform's recommendation reflects the user's hypothetical without an API round-trip.
+- **H3 (free-item + no market data):** Calculator now early-returns with `priceBreakdown.insufficientData = true` and a `fallbackMessage` when `isFreeItem && verifiedMarketValue === null`. The component renders a dedicated banner ("Cannot recommend a price yet") with a "Verify Market Value" action instead of silently displaying $0.
+- **H4 (Task 5.4 enforcement):** Each row in the platform comparison table now has an inline numeric input for the list price (defaulting to the recommended price). The "List on [Platform]" button submits the user's edited value rather than the recommended price.
+- **M1 (Task 4.6):** Market Value Comparison bar redesigned with three states — green (below market, ratio < 0.95), yellow (at market, 0.95 ≤ ratio ≤ 1.05), red (above market, ratio > 1.05). A vertical reference line marks the verified-market value at 95% of the bar width. State label is text + color (never color alone).
+- **M2 (Task 4.7):** When `marketDataAvailable` is false but data is otherwise sufficient, a yellow "Market value is estimated" banner appears with a "Verify Market Value" action.
+- **M3 (free-item shipping loss):** Calculator now performs a profit-negative check on the free-item branch and emits `lossWarning: true` + `lossAmount` so the UI surfaces high-shipping free items in red instead of recommending a silent loss. Mirrored in client-side `recalcForMargin`.
+- **M4 (queue feedback):** Listing detail page now uses `useToast()` to surface success ("Added to posting queue") and error ("Could not queue listing") notifications when the user clicks "List on [Platform]". Errors decode the API error detail when available.
+- **M5 (source platform):** PriceCalculator accepts a `sourcePlatform` prop and filters that row out of the comparison table since the posting-queue API rejects same-platform reposts. Detail page passes `listing.platform` through.
+- **M6 (test coverage):** Added five regression tests to `listing-price-calculator.test.ts`: H3 (free + no market data, with and without shipping), M3 (free + high shipping → lossWarning), free + safe shipping → no warning, and the `purchasePrice: null` fallback path.
+- **L1 (zero market value guard):** Market comparison bar now requires `verifiedMarketValue > 0` before rendering, eliminating the divide-by-zero NaN width edge case.
+- **L2 (numeric input drift):** Margin numeric input now resets to the clamped value on blur, so an invalid in-progress entry like "-5" cannot linger after focus moves.
+- **L4 (constant duplication):** `FREE_ITEM_DISCOUNT_FACTOR` (and the other shared constants) now live in `src/lib/listing-price-constants.ts`, a Prisma-free module that both the server calculator and the client component import. Calculator re-exports them for backwards compatibility. This was non-obvious to get right: importing the calculator module from a `'use client'` component pulled Prisma into the test bundle and broke `ListingDetail.test.tsx` with a `TextEncoder is not defined` error — the constants-only module breaks that import chain.
+
+**Test status after fixes:** 197 suites passed, 4052 tests passed (5 new on `listing-price-calculator.test.ts` for H3/M3/null-purchasePrice regressions). No new lint errors introduced.
+
+**Original implementation notes (pre-review):**
 
 - Implemented the optimal price formula `costBasis / (1 - feeRate - margin)` with full guards for the impossible-denominator case (ValidationError) and for corrupted fee-rate rows (ConfigurationError).
 - The competitive cap (`verifiedMarketValue * 0.95`) is applied only when `compMatchConfidence !== 'insufficient'`. When the cap drops below cost basis, the result carries a `lossWarning: true` and a `lossAmount` so the UI can warn the user instead of silently recommending a loss.
@@ -337,20 +366,24 @@ n/a
 
 **Created**
 - `src/lib/listing-price-calculator.ts` — core calculation service (single + multi-platform)
+- `src/lib/listing-price-constants.ts` — Prisma-free shared constants (added during review fixes so the client component can import without dragging Prisma into the browser bundle)
 - `app/api/listings/[id]/optimal-price/route.ts` — REST API (GET + POST)
 - `src/components/PriceCalculator.tsx` — client React component
-- `src/__tests__/lib/listing-price-calculator.test.ts` — unit tests (32 cases)
+- `src/__tests__/lib/listing-price-calculator.test.ts` — unit tests (37 cases — 5 added for H3/M3/null-purchasePrice regressions during review)
 - `src/__tests__/api/optimal-price.test.ts` — API route tests (15 cases)
+- `src/__tests__/components/PriceCalculator.test.tsx` — component-level UI tests (36 cases) covering all 5 ACs at the rendered UI level
 - `test/acceptance/step_definitions/E-009-optimal-price.steps.ts` — Cucumber step definitions
 
 **Modified**
-- `app/listings/[id]/page.tsx` — render PriceCalculator in new "Price & List" section
+- `app/listings/[id]/page.tsx` — render PriceCalculator in new "Price & List" section; wire `useToast()` for queue success/error feedback; pass `sourcePlatform` to hide same-platform row
+- `src/__tests__/components/ListingDetail.test.tsx` — mock `@/components/ToastContainer` so the page can be rendered without a real ToastProvider in tests
 - `test/acceptance/features/E-009-cross-platform-resale-listing.feature` — add 9 scenarios for story 9.2 (E-009-S-12 through E-009-S-20)
 - `_bmad-output/test-artifacts/requirements-traceability-matrix.md` — mark FR-RELIST-03 covered
-- `_bmad-output/implementation-artifacts/sprint-status.yaml` — flip 9-2 from `ready-for-dev` → `review`
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` — flip 9-2 from `ready-for-dev` → `review` → `done`
 
 ### Change Log
 
 | Date       | Author          | Change                                                                                                            |
 |------------|-----------------|-------------------------------------------------------------------------------------------------------------------|
 | 2026-04-08 | Stephen Boyett  | Initial implementation of optimal listing price calculator (FR-RELIST-03). Service, API, component, tests, RTM.   |
+| 2026-04-08 | Stephen Boyett  | Adversarial code review fixes: H1 dynamic slider cap, H2 hypothetical purchase price input, H3 insufficientData fallback for free items with no market data, H4 per-row price override before queueing, M1 3-color market bar, M2 estimated-data warning, M3 free-item shipping loss warning, M4 toast feedback, M5 hide source-platform row, plus L1/L2/L4. Status review → done. |

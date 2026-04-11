@@ -50,11 +50,22 @@ import {
   ValidationError,
   ConfigurationError,
 } from './errors';
+import {
+  DEFAULT_TARGET_MARGIN_PERCENT,
+  DEFAULT_MARKET_CAP_PERCENT,
+  FREE_ITEM_DISCOUNT_FACTOR,
+  PRICE_DISCREPANCY_THRESHOLD,
+} from './listing-price-constants';
 
-export const DEFAULT_TARGET_MARGIN_PERCENT = 30;
-export const DEFAULT_MARKET_CAP_PERCENT = 0.95;
-const FREE_ITEM_DISCOUNT_FACTOR = 0.85;
-const PRICE_DISCREPANCY_THRESHOLD = 0.15;
+// Re-export for backwards compatibility. Existing callers import these
+// names from the calculator module directly; the constants now live in
+// listing-price-constants.ts so the React PriceCalculator can import them
+// without dragging the Prisma client into the browser bundle.
+export {
+  DEFAULT_TARGET_MARGIN_PERCENT,
+  DEFAULT_MARKET_CAP_PERCENT,
+  FREE_ITEM_DISCOUNT_FACTOR,
+};
 
 /** Supported target platforms for the calculator. */
 export type TargetPlatform =
@@ -84,6 +95,15 @@ export interface PriceBreakdown {
   priceDiscrepancyNote?: string;
   /** Reason a platform is impossible — only set when `impossible: true`. */
   impossibleReason?: string;
+  /**
+   * True when the calculator cannot produce a meaningful recommendation
+   * because the inputs don't supply enough information (e.g. free item with
+   * no verified market data). UI should show `fallbackMessage` and surface
+   * a "Verify Market Value" action instead of a silent $0 price.
+   */
+  insufficientData?: boolean;
+  /** Human-readable explanation paired with `insufficientData: true`. */
+  fallbackMessage?: string;
 }
 
 /** Result returned by the per-platform price calculator. */
@@ -304,6 +324,36 @@ function computeForPlatform(args: ComputeArgs): ListingPriceResult {
     };
   }
 
+  // Free item + no verified market data: the cost-plus formula collapses to
+  // zero (or reports shipping-only) and the market-based formula has no
+  // anchor. Rather than silently recommending $0, flag `insufficientData`
+  // so the UI can direct the user to verify the market value first.
+  if (isFreeItem && verifiedMarketValue === null) {
+    return {
+      targetPlatform,
+      recommendedPrice: 0,
+      estimatedFees: 0,
+      estimatedProfit: 0,
+      estimatedShippingCost: shippingCost,
+      targetMarginPercent,
+      feeRatePercent,
+      verifiedMarketValue: null,
+      costBasis,
+      isProjected,
+      marketDataAvailable: false,
+      lossWarning: false,
+      aiRecommendedPrice: listing.recommendedList ?? null,
+      priceBreakdown: {
+        cappedByMarket: false,
+        freeItemPricing: true,
+        insufficientData: true,
+        fallbackMessage:
+          'Cannot recommend a price: free item with no verified market data. Run market value lookup to enable pricing.',
+      },
+      impossible: false,
+    };
+  }
+
   // Free items: cost basis is zero (or no purchase price recorded). The
   // standard formula collapses to zero, so price purely against market data.
   let recommendedPrice: number;
@@ -342,7 +392,6 @@ function computeForPlatform(args: ComputeArgs): ListingPriceResult {
   }
 
   breakdown.cappedByMarket = cappedByMarket;
-  if (lossAmount !== undefined) breakdown.lossAmount = lossAmount;
 
   const estimatedFees = roundCents(recommendedPrice * feeRateDecimal);
   const purchasePortion = isFreeItem
@@ -351,6 +400,16 @@ function computeForPlatform(args: ComputeArgs): ListingPriceResult {
   const estimatedProfit = roundCents(
     recommendedPrice - estimatedFees - purchasePortion - shippingCost
   );
+
+  // Free-item loss check: the market-based formula doesn't reserve anything
+  // for shipping, so a high-shipping free item can still come out negative.
+  // Never silently recommend a loss-making list price.
+  if (isFreeItem && !lossWarning && estimatedProfit < 0) {
+    lossWarning = true;
+    lossAmount = roundCents(-estimatedProfit);
+  }
+
+  if (lossAmount !== undefined) breakdown.lossAmount = lossAmount;
 
   // LLM vs formula sanity check. The LLM (description-generator's
   // recommendedList) is opinionated and often diverges from the cold-math

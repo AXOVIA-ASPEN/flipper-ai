@@ -6,6 +6,15 @@ jest.mock('@/lib/auth-middleware', () => ({
   getAuthUserId: jest.fn(() => Promise.resolve('test-user-id')),
 }));
 
+// Mock communication notifications (Story 10.4) — isolate from email side-effects
+jest.mock('@/lib/communication-notification', () => ({
+  communicationNotificationService: {
+    notifyMessageReceived: jest.fn().mockResolvedValue(undefined),
+    notifyDraftReady: jest.fn().mockResolvedValue(undefined),
+    notifyMessageSent: jest.fn().mockResolvedValue(undefined),
+  },
+}));
+
 // Mock prisma
 const mockFindMany = jest.fn();
 const mockCount = jest.fn();
@@ -346,5 +355,65 @@ describe('POST /api/messages', () => {
     );
     const data = mockCreate.mock.calls[0][0].data;
     expect(data.parentId).toBe('msg-parent');
+  });
+
+  // Story 10.4: notification hook assertions (Task 7.4)
+  it('fires notifyMessageReceived for INBOUND+DELIVERED messages (fire-and-forget)', async () => {
+    const { communicationNotificationService } = require('@/lib/communication-notification');
+    (communicationNotificationService.notifyMessageReceived as jest.Mock).mockClear();
+
+    mockCreate.mockResolvedValue({
+      ...sampleMessage,
+      direction: 'INBOUND',
+      status: 'DELIVERED',
+      listing: sampleMessage.listing,
+    });
+
+    await POST(
+      createRequest('/api/messages', {
+        method: 'POST',
+        body: JSON.stringify({
+          direction: 'INBOUND',
+          messageBody: 'Is it available?',
+          listingId: 'listing-1',
+          sellerName: 'Alice',
+        }),
+      })
+    );
+
+    expect(communicationNotificationService.notifyMessageReceived).toHaveBeenCalledTimes(1);
+    expect(communicationNotificationService.notifyMessageReceived).toHaveBeenCalledWith(
+      expect.objectContaining({ userId: 'test-user-id', listingId: 'listing-1' })
+    );
+  });
+
+  it('does NOT fire notifyMessageReceived for OUTBOUND messages', async () => {
+    const { communicationNotificationService } = require('@/lib/communication-notification');
+    (communicationNotificationService.notifyMessageReceived as jest.Mock).mockClear();
+
+    await POST(
+      createRequest('/api/messages', {
+        method: 'POST',
+        body: JSON.stringify({ direction: 'OUTBOUND', messageBody: 'Hello' }),
+      })
+    );
+
+    expect(communicationNotificationService.notifyMessageReceived).not.toHaveBeenCalled();
+  });
+
+  it('notification hook failure does not affect API response', async () => {
+    const { communicationNotificationService } = require('@/lib/communication-notification');
+    (communicationNotificationService.notifyMessageReceived as jest.Mock).mockRejectedValueOnce(
+      new Error('Email down')
+    );
+
+    const res = await POST(
+      createRequest('/api/messages', {
+        method: 'POST',
+        body: JSON.stringify({ direction: 'INBOUND', messageBody: 'test', listingId: 'l1' }),
+      })
+    );
+
+    expect(res.status).toBe(201);
   });
 });

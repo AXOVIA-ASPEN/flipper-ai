@@ -13,6 +13,8 @@ import { getAuthUserId } from '@/lib/auth-middleware';
 
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import { enforceTierLimits } from '@/lib/tier-enforcement';
+import { computeEstimatedExpiry } from '@/lib/listing-expiry';
+import { emitOpportunityFoundEvent } from '@/lib/notification-events';
 const FB_GRAPH_API_BASE = 'https://graph.facebook.com/v19.0';
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
@@ -377,6 +379,7 @@ async function saveListingFromFacebookItem(
       imageUrls: serializedImages,
       category,
       postedAt: item.created_time ? new Date(item.created_time) : null,
+      estimatedExpiresAt: computeEstimatedExpiry('FACEBOOK_MARKETPLACE', item.created_time ? new Date(item.created_time) : null),
       estimatedValue: estimation.estimatedValue,
       estimatedLow: estimation.estimatedLow,
       estimatedHigh: estimation.estimatedHigh,
@@ -606,6 +609,8 @@ export async function POST(request: NextRequest) {
         try {
           const listing = await saveListingFromFacebookItem(item, userId, discountThreshold, hasLLM, feeRate, opportunityThreshold, userSettings);
           if (!listing) continue;
+          // Story 10.3: Emit opportunity.found notification event (fire-and-forget).
+          void emitOpportunityFoundEvent(listing, userId);
           savedListings.push(listing);
         } catch (itemError) {
           console.error(`Error processing Facebook item ${item.id}:`, itemError);

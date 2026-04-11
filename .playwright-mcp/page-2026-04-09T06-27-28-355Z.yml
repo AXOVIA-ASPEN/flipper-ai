@@ -1,0 +1,127 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e4]:
+      - link "🐧 Flipper AI" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e6]: 🐧
+        - generic [ref=e7]: Flipper AI
+      - generic [ref=e8]:
+        - link "Dashboard" [ref=e9] [cursor=pointer]:
+          - /url: /
+          - img [ref=e10]
+          - generic [ref=e13]: Dashboard
+        - link "Opportunities" [ref=e14] [cursor=pointer]:
+          - /url: /opportunities
+          - img [ref=e15]
+          - generic [ref=e18]: Opportunities
+        - link "Messages" [ref=e19] [cursor=pointer]:
+          - /url: /messages
+          - img [ref=e20]
+          - generic [ref=e22]: Messages
+        - link "Cross-Posts" [ref=e23] [cursor=pointer]:
+          - /url: /posting-queue
+          - img [ref=e24]
+          - generic [ref=e27]: Cross-Posts
+        - link "Settings" [ref=e28] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e29]
+          - generic [ref=e32]: Settings
+  - generic [ref=e33]:
+    - generic [ref=e38]:
+      - navigation [ref=e39]:
+        - generic [ref=e40]:
+          - generic [ref=e41]: 🐧
+          - heading "Flipper.ai" [level=1] [ref=e42]
+        - generic [ref=e43]:
+          - link "Log In" [ref=e44] [cursor=pointer]:
+            - /url: /auth/login
+          - button "Get Started Free" [ref=e45]
+      - generic [ref=e46]:
+        - heading "Find Hidden Profits in Every Marketplace" [level=2] [ref=e47]:
+          - text: Find Hidden Profits in
+          - generic [ref=e48]: Every Marketplace
+        - paragraph [ref=e49]: AI-powered marketplace scanner that finds underpriced items on Craigslist, Facebook, eBay, OfferUp, and Mercari. Turn $50 into $500 with smart flipping.
+        - generic [ref=e50]:
+          - textbox "Enter your email" [ref=e51]
+          - button "Start Free" [ref=e52]
+        - paragraph [ref=e53]: ✨ Free trial • No credit card required • Cancel anytime
+    - generic [ref=e54]:
+      - heading "Everything You Need to Flip Like a Pro" [level=3] [ref=e55]
+      - generic [ref=e56]:
+        - generic [ref=e57]:
+          - img [ref=e59]
+          - heading "Multi-Platform Scanning" [level=4] [ref=e62]
+          - paragraph [ref=e63]: Search Craigslist, Facebook Marketplace, eBay, OfferUp, and Mercari simultaneously. Never miss a deal.
+        - generic [ref=e64]:
+          - img [ref=e66]
+          - heading "AI Value Detection" [level=4] [ref=e69]
+          - paragraph [ref=e70]: Claude AI analyzes every listing to estimate market value and profit potential in seconds.
+        - generic [ref=e71]:
+          - img [ref=e73]
+          - heading "Profit Calculator" [level=4] [ref=e75]
+          - paragraph [ref=e76]: See instant profit projections including fees, shipping, and resale difficulty ratings.
+        - generic [ref=e77]:
+          - img [ref=e79]
+          - heading "Real-Time Alerts" [level=4] [ref=e81]
+          - paragraph [ref=e82]: Get instant notifications when high-value opportunities appear. Beat the competition.
+        - generic [ref=e83]:
+          - img [ref=e85]
+          - heading "Market Insights" [level=4] [ref=e86]
+          - paragraph [ref=e87]: Track trends, sold listings, and pricing history to make data-driven flipping decisions.
+        - generic [ref=e88]:
+          - img [ref=e90]
+          - heading "Scam Detection" [level=4] [ref=e92]
+          - paragraph [ref=e93]: AI flags suspicious listings, fake prices, and scams before you waste time.
+    - generic [ref=e94]:
+      - heading "Simple, Transparent Pricing" [level=3] [ref=e95]
+      - generic [ref=e96]:
+        - generic [ref=e97]:
+          - heading "Free" [level=4] [ref=e98]
+          - paragraph [ref=e99]: $0/mo
+          - list [ref=e100]:
+            - listitem [ref=e101]: ✓ 5 scans per day
+            - listitem [ref=e102]: ✓ Basic AI analysis
+            - listitem [ref=e103]: ✓ 1 marketplace
+            - listitem [ref=e104]: ✓ Email alerts
+          - button "Start Free" [ref=e105]
+        - generic [ref=e106]:
+          - generic [ref=e107]: MOST POPULAR
+          - heading "Pro" [level=4] [ref=e108]
+          - paragraph [ref=e109]: $29/mo
+          - list [ref=e110]:
+            - listitem [ref=e111]: ✓ Unlimited scans
+            - listitem [ref=e112]: ✓ Advanced AI analysis
+            - listitem [ref=e113]: ✓ All 5 marketplaces
+            - listitem [ref=e114]: ✓ Real-time alerts
+            - listitem [ref=e115]: ✓ Profit tracking
+          - button "Start Pro Trial" [ref=e116]
+        - generic [ref=e117]:
+          - heading "Business" [level=4] [ref=e118]
+          - paragraph [ref=e119]: $99/mo
+          - list [ref=e120]:
+            - listitem [ref=e121]: ✓ Everything in Pro
+            - listitem [ref=e122]: ✓ API access
+            - listitem [ref=e123]: ✓ Team collaboration
+            - listitem [ref=e124]: ✓ Custom alerts
+            - listitem [ref=e125]: ✓ Priority support
+          - button "Contact Sales" [ref=e126]
+    - generic [ref=e128]:
+      - heading "Ready to Start Flipping Smarter?" [level=3] [ref=e129]
+      - paragraph [ref=e130]: Join thousands of flippers making consistent profits with AI-powered deal detection.
+      - button "Start Your Free Trial" [ref=e131]
+      - paragraph [ref=e132]: No credit card required • 14-day free trial
+    - contentinfo [ref=e133]:
+      - generic [ref=e134]:
+        - generic [ref=e135]:
+          - generic [ref=e136]:
+            - generic [ref=e137]: 🐧
+            - generic [ref=e138]: Flipper.ai
+          - generic [ref=e139]:
+            - link "Privacy" [ref=e140] [cursor=pointer]:
+              - /url: /privacy
+            - link "Terms" [ref=e141] [cursor=pointer]:
+              - /url: /terms
+            - link "Contact" [ref=e142] [cursor=pointer]:
+              - /url: /contact
+        - generic [ref=e143]: © 2026 Flipper.ai by Axovia AI. All rights reserved.
+  - alert [ref=e144]

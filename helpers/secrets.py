@@ -54,8 +54,13 @@ class AuthSecrets:
 class FirebaseSecrets:
     FIREBASE_CLIENT_EMAIL: Optional[str] = None
     FIREBASE_PRIVATE_KEY: Optional[str] = None
-    # Note: NEXT_PUBLIC_ prefix means this value is exposed in the client bundle.
-    # Consider setting as a regular env var instead of a Secret Manager secret.
+    # Note: NEXT_PUBLIC_ prefix means these values are exposed in the client
+    # bundle. They are public Firebase config values, not true secrets, but
+    # stored here for consistency and single-source management.
+    NEXT_PUBLIC_FIREBASE_API_KEY: Optional[str] = None
+    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: Optional[str] = None
+    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: Optional[str] = None
+    NEXT_PUBLIC_FIREBASE_APP_ID: Optional[str] = None
     NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: Optional[str] = None
 
 
@@ -87,6 +92,13 @@ class MonitoringSecrets:
     METRICS_TOKEN: Optional[str] = None
 
 
+@dataclass
+class IntegrationSecrets:
+    # Story 12.1: Google Calendar OAuth credentials (FR-INFRA-11)
+    GOOGLE_CALENDAR_CLIENT_ID: Optional[str] = None
+    GOOGLE_CALENDAR_CLIENT_SECRET: Optional[str] = None
+
+
 # All dataclass types in loading order
 _SECRET_CLASSES = (
     DatabaseSecrets,
@@ -96,6 +108,7 @@ _SECRET_CLASSES = (
     PaymentSecrets,
     EmailSecrets,
     MonitoringSecrets,
+    IntegrationSecrets,
 )
 
 # Pre-computed list of (field_name, is_required) for every secret field.

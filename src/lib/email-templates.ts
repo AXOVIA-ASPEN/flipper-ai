@@ -715,3 +715,796 @@ Unsubscribe: ${opts.unsubscribeUrl}
 Email Preferences: ${opts.settingsUrl}
 `;
 }
+
+// ---------------------------------------------------------------------------
+// Flip Lifecycle — Shared Helpers
+// ---------------------------------------------------------------------------
+
+const AMBER_COLOR = '#d97706'; // amber-600 — urgency
+const TEAL_COLOR = '#0d9488'; // teal-600 — progress
+
+/** Sanitize HTML entities in user-provided content. */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/** Truncate a string to maxLen characters with ellipsis. */
+function truncate(str: string, maxLen: number): string {
+  return str.length > maxLen ? str.slice(0, maxLen - 1) + '…' : str;
+}
+
+/** Format a relative time string from a Date. */
+function relativeTime(date: Date): string {
+  const now = Date.now();
+  const diffMs = now - date.getTime();
+  const diffMin = Math.floor(diffMs / 60_000);
+  if (diffMin < 1) return 'Just now';
+  if (diffMin < 60) return `${diffMin} minute${diffMin === 1 ? '' : 's'} ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr} hour${diffHr === 1 ? '' : 's'} ago`;
+  const diffDay = Math.floor(diffHr / 24);
+  return `${diffDay} day${diffDay === 1 ? '' : 's'} ago`;
+}
+
+/** Map a flippability score (0-100) to a colour for the score badge. */
+function scoreColor(score: number): string {
+  if (score >= 80) return SUCCESS_COLOR;
+  if (score >= 60) return AMBER_COLOR;
+  return DANGER_COLOR;
+}
+
+// Export helpers for testing
+export { escapeHtml, truncate, relativeTime, scoreColor };
+
+// ---------------------------------------------------------------------------
+// Opportunity Found Email (amber/urgency)
+// ---------------------------------------------------------------------------
+
+export interface OpportunityFoundEmailOptions {
+  email: string;
+  name?: string;
+  platform: string;
+  buyPrice: number;
+  estimatedProfit: number;
+  flippabilityScore: number;
+  flippabilityLabel: string;
+  itemTitle: string;
+  imageUrl?: string;
+  eventCreatedAt?: Date;
+  opportunityUrl?: string;
+  appUrl: string;
+  unsubscribeUrl: string;
+  settingsUrl: string;
+}
+
+export function opportunityFoundEmailHtml(opts: OpportunityFoundEmailOptions): string {
+  const displayName = opts.name ? opts.name.split(' ')[0] : 'there';
+  const title = escapeHtml(truncate(opts.itemTitle, 100));
+  const score = opts.flippabilityScore ?? 0;
+  const buyPrice = (opts.buyPrice ?? 0).toFixed(2);
+  const profit = (opts.estimatedProfit ?? 0).toFixed(2);
+  const timeAgo = opts.eventCreatedAt ? relativeTime(opts.eventCreatedAt) : '';
+
+  const imageBlock = opts.imageUrl
+    ? `<img src="${opts.imageUrl}" alt="${title}" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px 8px 0 0;" />`
+    : '';
+
+  const body = `
+    <h1 style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:${TEXT_PRIMARY};">New Flip Opportunity! 🔥</h1>
+    <p style="margin:0 0 24px 0;font-size:16px;color:${TEXT_SECONDARY};">
+      Hey ${displayName}, we found a deal worth checking out${timeAgo ? ` — ${timeAgo}` : ''}.
+    </p>
+
+    <div style="background-color:#fffbeb;border:1px solid #fde68a;border-radius:10px;overflow:hidden;margin-bottom:24px;">
+      ${imageBlock}
+      <div style="padding:20px;">
+        <p style="margin:0 0 8px 0;font-size:18px;font-weight:700;color:${TEXT_PRIMARY};">${title}</p>
+        <p style="margin:0 0 16px 0;font-size:13px;color:${TEXT_MUTED};">${escapeHtml(opts.platform)}</p>
+
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+          <tr>
+            <td width="33%" style="text-align:center;padding:0 4px;">
+              <div style="background-color:#ffffff;border:1px solid ${BORDER_COLOR};border-radius:8px;padding:12px;">
+                <p style="margin:0;font-size:20px;font-weight:700;color:${AMBER_COLOR};">$${buyPrice}</p>
+                <p style="margin:4px 0 0 0;font-size:11px;color:${TEXT_MUTED};">Buy Price</p>
+              </div>
+            </td>
+            <td width="33%" style="text-align:center;padding:0 4px;">
+              <div style="background-color:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;">
+                <p style="margin:0;font-size:20px;font-weight:700;color:${SUCCESS_COLOR};">+$${profit}</p>
+                <p style="margin:4px 0 0 0;font-size:11px;color:${TEXT_MUTED};">Est. Profit</p>
+              </div>
+            </td>
+            <td width="33%" style="text-align:center;padding:0 4px;">
+              <div style="background-color:#ffffff;border:1px solid ${BORDER_COLOR};border-radius:8px;padding:12px;">
+                <p style="margin:0;font-size:20px;font-weight:700;color:${scoreColor(score)};">${score}</p>
+                <p style="margin:4px 0 0 0;font-size:11px;color:${TEXT_MUTED};">${escapeHtml(opts.flippabilityLabel)}</p>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div style="text-align:center;">
+      ${btn('View Opportunity →', opts.opportunityUrl ?? opts.appUrl + '/opportunities', AMBER_COLOR)}
+    </div>
+
+    ${divider()}
+
+    <p style="margin:0;font-size:14px;color:${TEXT_MUTED};text-align:center;">
+      Act fast — great deals don't last long!<br/>
+      <a href="${opts.settingsUrl}" style="color:${BRAND_COLOR};text-decoration:none;">Manage alerts</a> ·
+      <a href="${opts.unsubscribeUrl}" style="color:${BRAND_COLOR};text-decoration:none;">Unsubscribe</a>
+    </p>
+  `;
+
+  return baseLayout(body, `New opportunity: ${opts.itemTitle} for $${buyPrice} — est. +$${profit} profit`)
+    .replace(/\{\{unsubscribe_url\}\}/g, opts.unsubscribeUrl)
+    .replace(/\{\{settings_url\}\}/g, opts.settingsUrl)
+    .replace(/\{\{app_url\}\}/g, opts.appUrl);
+}
+
+export function opportunityFoundEmailText(opts: OpportunityFoundEmailOptions): string {
+  const title = truncate(opts.itemTitle, 100);
+  const buyPrice = (opts.buyPrice ?? 0).toFixed(2);
+  const profit = (opts.estimatedProfit ?? 0).toFixed(2);
+  const score = opts.flippabilityScore ?? 0;
+  const timeAgo = opts.eventCreatedAt ? ` (${relativeTime(opts.eventCreatedAt)})` : '';
+
+  return `New Flip Opportunity! 🔥${timeAgo}
+
+${title}
+${opts.platform}
+
+Buy Price: $${buyPrice}
+Est. Profit: +$${profit}
+Flippability: ${score}/100 (${opts.flippabilityLabel})
+
+View: ${opts.opportunityUrl ?? opts.appUrl + '/opportunities'}
+
+---
+Manage alerts: ${opts.settingsUrl}
+Unsubscribe: ${opts.unsubscribeUrl}
+`;
+}
+
+// ---------------------------------------------------------------------------
+// Flip Purchased Email (blue/brand — confirmation)
+// ---------------------------------------------------------------------------
+
+export interface FlipPurchasedEmailOptions {
+  email: string;
+  name?: string;
+  itemTitle: string;
+  purchasePrice: number;
+  estimatedProfit: number;
+  platform: string;
+  eventCreatedAt?: Date;
+  opportunityUrl?: string;
+  appUrl: string;
+  unsubscribeUrl: string;
+  settingsUrl: string;
+}
+
+export function flipPurchasedEmailHtml(opts: FlipPurchasedEmailOptions): string {
+  const displayName = opts.name ? opts.name.split(' ')[0] : 'there';
+  const title = escapeHtml(truncate(opts.itemTitle, 100));
+  const price = (opts.purchasePrice ?? 0).toFixed(2);
+  const profit = (opts.estimatedProfit ?? 0).toFixed(2);
+  const timeLabel = opts.eventCreatedAt ? relativeTime(opts.eventCreatedAt) : 'Today';
+
+  const body = `
+    <h1 style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:${TEXT_PRIMARY};">Flip Purchased! 🛒</h1>
+    <p style="margin:0 0 24px 0;font-size:16px;color:${TEXT_SECONDARY};">
+      Hey ${displayName}, your purchase has been recorded — ${timeLabel}.
+    </p>
+
+    <div style="background-color:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:24px;margin-bottom:24px;">
+      <p style="margin:0 0 8px 0;font-size:18px;font-weight:700;color:${TEXT_PRIMARY};">${title}</p>
+      <p style="margin:0 0 16px 0;font-size:13px;color:${TEXT_MUTED};">${escapeHtml(opts.platform)}</p>
+
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+          <td width="50%" style="text-align:center;padding:0 4px;">
+            <div style="background-color:#ffffff;border:1px solid ${BORDER_COLOR};border-radius:8px;padding:12px;">
+              <p style="margin:0;font-size:22px;font-weight:700;color:${BRAND_COLOR};">$${price}</p>
+              <p style="margin:4px 0 0 0;font-size:11px;color:${TEXT_MUTED};">Purchase Price</p>
+            </div>
+          </td>
+          <td width="50%" style="text-align:center;padding:0 4px;">
+            <div style="background-color:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;">
+              <p style="margin:0;font-size:22px;font-weight:700;color:${SUCCESS_COLOR};">+$${profit}</p>
+              <p style="margin:4px 0 0 0;font-size:11px;color:${TEXT_MUTED};">Est. Profit</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div style="text-align:center;">
+      ${btn('View Flip →', opts.opportunityUrl ?? opts.appUrl + '/opportunities')}
+    </div>
+
+    ${divider()}
+
+    <p style="margin:0;font-size:14px;color:${TEXT_MUTED};text-align:center;">
+      Next step: list this item for resale to lock in your profit.<br/>
+      <a href="${opts.settingsUrl}" style="color:${BRAND_COLOR};text-decoration:none;">Email Preferences</a> ·
+      <a href="${opts.unsubscribeUrl}" style="color:${BRAND_COLOR};text-decoration:none;">Unsubscribe</a>
+    </p>
+  `;
+
+  return baseLayout(body, `Flip purchased: ${opts.itemTitle} for $${price}`)
+    .replace(/\{\{unsubscribe_url\}\}/g, opts.unsubscribeUrl)
+    .replace(/\{\{settings_url\}\}/g, opts.settingsUrl)
+    .replace(/\{\{app_url\}\}/g, opts.appUrl);
+}
+
+export function flipPurchasedEmailText(opts: FlipPurchasedEmailOptions): string {
+  const title = truncate(opts.itemTitle, 100);
+  const price = (opts.purchasePrice ?? 0).toFixed(2);
+  const profit = (opts.estimatedProfit ?? 0).toFixed(2);
+  const timeLabel = opts.eventCreatedAt ? relativeTime(opts.eventCreatedAt) : 'Today';
+
+  return `Flip Purchased! 🛒 (${timeLabel})
+
+${title}
+${opts.platform}
+
+Purchase Price: $${price}
+Est. Profit: +$${profit}
+
+View: ${opts.opportunityUrl ?? opts.appUrl + '/opportunities'}
+
+---
+Email Preferences: ${opts.settingsUrl}
+Unsubscribe: ${opts.unsubscribeUrl}
+`;
+}
+
+// ---------------------------------------------------------------------------
+// Flip Listed Email (teal/progress — in transit)
+// ---------------------------------------------------------------------------
+
+export interface FlipListedEmailOptions {
+  email: string;
+  name?: string;
+  itemTitle: string;
+  destinationPlatform: string;
+  listingUrl?: string;
+  eventCreatedAt?: Date;
+  opportunityUrl?: string;
+  appUrl: string;
+  unsubscribeUrl: string;
+  settingsUrl: string;
+}
+
+export function flipListedEmailHtml(opts: FlipListedEmailOptions): string {
+  const displayName = opts.name ? opts.name.split(' ')[0] : 'there';
+  const title = escapeHtml(truncate(opts.itemTitle, 100));
+  const timeLabel = opts.eventCreatedAt ? relativeTime(opts.eventCreatedAt) : 'Just now';
+
+  const listingLink = opts.listingUrl
+    ? `<p style="margin:12px 0 0 0;font-size:14px;"><a href="${opts.listingUrl}" style="color:${TEAL_COLOR};text-decoration:none;font-weight:600;">View Resale Listing →</a></p>`
+    : '';
+
+  const body = `
+    <h1 style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:${TEXT_PRIMARY};">Flip Listed! 📦</h1>
+    <p style="margin:0 0 24px 0;font-size:16px;color:${TEXT_SECONDARY};">
+      Hey ${displayName}, your item is now listed for resale — ${timeLabel}.
+    </p>
+
+    <div style="background-color:#f0fdfa;border:1px solid #99f6e4;border-radius:10px;padding:24px;margin-bottom:24px;">
+      <p style="margin:0 0 8px 0;font-size:18px;font-weight:700;color:${TEXT_PRIMARY};">${title}</p>
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-top:12px;">
+        <tr>
+          <td width="48" valign="top" style="font-size:28px;">🏪</td>
+          <td valign="top">
+            <p style="margin:0;font-size:14px;font-weight:600;color:${TEXT_PRIMARY};">Listed on ${escapeHtml(opts.destinationPlatform)}</p>
+            <p style="margin:4px 0 0 0;font-size:13px;color:${TEXT_SECONDARY};">Your item is live and visible to buyers.</p>
+            ${listingLink}
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div style="text-align:center;">
+      ${btn('Track Your Flips →', opts.opportunityUrl ?? opts.appUrl + '/opportunities', TEAL_COLOR)}
+    </div>
+
+    ${divider()}
+
+    <p style="margin:0;font-size:14px;color:${TEXT_MUTED};text-align:center;">
+      You'll be notified when this item sells.<br/>
+      <a href="${opts.settingsUrl}" style="color:${BRAND_COLOR};text-decoration:none;">Email Preferences</a> ·
+      <a href="${opts.unsubscribeUrl}" style="color:${BRAND_COLOR};text-decoration:none;">Unsubscribe</a>
+    </p>
+  `;
+
+  return baseLayout(body, `Item listed: ${opts.itemTitle} on ${opts.destinationPlatform}`)
+    .replace(/\{\{unsubscribe_url\}\}/g, opts.unsubscribeUrl)
+    .replace(/\{\{settings_url\}\}/g, opts.settingsUrl)
+    .replace(/\{\{app_url\}\}/g, opts.appUrl);
+}
+
+export function flipListedEmailText(opts: FlipListedEmailOptions): string {
+  const title = truncate(opts.itemTitle, 100);
+  const timeLabel = opts.eventCreatedAt ? relativeTime(opts.eventCreatedAt) : 'Just now';
+
+  const lines = [
+    `Flip Listed! 📦 (${timeLabel})`,
+    '',
+    title,
+    `Listed on: ${opts.destinationPlatform}`,
+  ];
+  if (opts.listingUrl) lines.push(`Resale listing: ${opts.listingUrl}`);
+  lines.push(
+    '',
+    `Track your flips: ${opts.opportunityUrl ?? opts.appUrl + '/opportunities'}`,
+    '',
+    '---',
+    `Email Preferences: ${opts.settingsUrl}`,
+    `Unsubscribe: ${opts.unsubscribeUrl}`
+  );
+  return lines.join('\n') + '\n';
+}
+
+// ---------------------------------------------------------------------------
+// Flip Sold Email (green/celebration — achievement)
+// ---------------------------------------------------------------------------
+
+export interface FlipSoldEmailOptions {
+  email: string;
+  name?: string;
+  itemTitle: string;
+  salePrice: number;
+  actualProfit: number;
+  roiPercent: number;
+  daysToFlip?: number;
+  platform: string;
+  purchasePrice: number;
+  eventCreatedAt?: Date;
+  opportunityUrl?: string;
+  appUrl: string;
+  unsubscribeUrl: string;
+  settingsUrl: string;
+}
+
+export function flipSoldEmailHtml(opts: FlipSoldEmailOptions): string {
+  const displayName = opts.name ? opts.name.split(' ')[0] : 'there';
+  const title = escapeHtml(truncate(opts.itemTitle, 100));
+  const salePrice = (opts.salePrice ?? 0).toFixed(2);
+  const profit = (opts.actualProfit ?? 0).toFixed(2);
+  const roi = (opts.roiPercent ?? 0).toFixed(0);
+  const purchasePrice = (opts.purchasePrice ?? 0).toFixed(2);
+  const daysLabel = opts.daysToFlip != null ? `${opts.daysToFlip} day${opts.daysToFlip === 1 ? '' : 's'}` : null;
+
+  const body = `
+    <h1 style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:${TEXT_PRIMARY};">Flip Sold! 🎉</h1>
+    <p style="margin:0 0 24px 0;font-size:16px;color:${TEXT_SECONDARY};">
+      Congratulations ${displayName}! You just locked in a profit.
+    </p>
+
+    <div style="background-color:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:24px;margin-bottom:24px;">
+      <p style="margin:0 0 8px 0;font-size:18px;font-weight:700;color:${TEXT_PRIMARY};">${title}</p>
+      <p style="margin:0 0 16px 0;font-size:13px;color:${TEXT_MUTED};">Sold on ${escapeHtml(opts.platform)}</p>
+
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom:16px;">
+        <tr>
+          <td style="text-align:center;padding:16px;background-color:#dcfce7;border-radius:8px;">
+            <p style="margin:0;font-size:36px;font-weight:800;color:${SUCCESS_COLOR};">+$${profit}</p>
+            <p style="margin:4px 0 0 0;font-size:14px;color:${TEXT_SECONDARY};">Actual Profit</p>
+          </td>
+        </tr>
+      </table>
+
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+          <td width="${daysLabel ? '33%' : '50%'}" style="text-align:center;padding:0 4px;">
+            <div style="background-color:#ffffff;border:1px solid ${BORDER_COLOR};border-radius:8px;padding:10px;">
+              <p style="margin:0;font-size:18px;font-weight:700;color:${TEXT_PRIMARY};">$${salePrice}</p>
+              <p style="margin:2px 0 0 0;font-size:11px;color:${TEXT_MUTED};">Sale Price</p>
+            </div>
+          </td>
+          <td width="${daysLabel ? '33%' : '50%'}" style="text-align:center;padding:0 4px;">
+            <div style="background-color:#ffffff;border:1px solid ${BORDER_COLOR};border-radius:8px;padding:10px;">
+              <p style="margin:0;font-size:18px;font-weight:700;color:${SUCCESS_COLOR};">${roi}%</p>
+              <p style="margin:2px 0 0 0;font-size:11px;color:${TEXT_MUTED};">ROI</p>
+            </div>
+          </td>
+          ${
+            daysLabel
+              ? `<td width="33%" style="text-align:center;padding:0 4px;">
+              <div style="background-color:#ffffff;border:1px solid ${BORDER_COLOR};border-radius:8px;padding:10px;">
+                <p style="margin:0;font-size:18px;font-weight:700;color:${BRAND_COLOR};">${daysLabel}</p>
+                <p style="margin:2px 0 0 0;font-size:11px;color:${TEXT_MUTED};">Time to Flip</p>
+              </div>
+            </td>`
+              : ''
+          }
+        </tr>
+      </table>
+
+      <p style="margin:16px 0 0 0;font-size:13px;color:${TEXT_MUTED};text-align:center;">Bought for $${purchasePrice}</p>
+    </div>
+
+    <div style="text-align:center;">
+      ${btn('View Your Stats →', opts.appUrl + '/dashboard', SUCCESS_COLOR)}
+    </div>
+
+    ${divider()}
+
+    <p style="margin:0;font-size:14px;color:${TEXT_MUTED};text-align:center;">
+      Keep the momentum going — check your dashboard for more opportunities!<br/>
+      <a href="${opts.settingsUrl}" style="color:${BRAND_COLOR};text-decoration:none;">Email Preferences</a> ·
+      <a href="${opts.unsubscribeUrl}" style="color:${BRAND_COLOR};text-decoration:none;">Unsubscribe</a>
+    </p>
+  `;
+
+  return baseLayout(body, `Flip sold: ${opts.itemTitle} — +$${profit} profit (${roi}% ROI)`)
+    .replace(/\{\{unsubscribe_url\}\}/g, opts.unsubscribeUrl)
+    .replace(/\{\{settings_url\}\}/g, opts.settingsUrl)
+    .replace(/\{\{app_url\}\}/g, opts.appUrl);
+}
+
+export function flipSoldEmailText(opts: FlipSoldEmailOptions): string {
+  const title = truncate(opts.itemTitle, 100);
+  const salePrice = (opts.salePrice ?? 0).toFixed(2);
+  const profit = (opts.actualProfit ?? 0).toFixed(2);
+  const roi = (opts.roiPercent ?? 0).toFixed(0);
+  const purchasePrice = (opts.purchasePrice ?? 0).toFixed(2);
+  const daysLabel = opts.daysToFlip != null ? `Time to Flip: ${opts.daysToFlip} day${opts.daysToFlip === 1 ? '' : 's'}` : '';
+
+  return `Flip Sold! 🎉
+
+${title}
+Sold on ${opts.platform}
+
+Sale Price: $${salePrice}
+Purchase Price: $${purchasePrice}
+Actual Profit: +$${profit}
+ROI: ${roi}%${daysLabel ? '\n' + daysLabel : ''}
+
+Dashboard: ${opts.appUrl}/dashboard
+
+---
+Email Preferences: ${opts.settingsUrl}
+Unsubscribe: ${opts.unsubscribeUrl}
+`;
+}
+
+// ---------------------------------------------------------------------------
+// Story 10.5: URL validation helper
+// ---------------------------------------------------------------------------
+
+/** Known marketplace domains — URLs from scraped data are validated against this list. */
+const ALLOWED_PLATFORM_DOMAINS = [
+  'ebay.com',
+  'mercari.com',
+  'facebook.com',
+  'offerup.com',
+  'craigslist.org',
+];
+
+/**
+ * Validate an external URL from scraped data against the platform whitelist.
+ * Returns the validated URL, or the internal app fallback if not trusted.
+ */
+export function validateExternalUrl(url: string | undefined | null, fallbackUrl: string): string {
+  if (!url) return fallbackUrl;
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+    const trusted = ALLOWED_PLATFORM_DOMAINS.some(
+      (domain) => host === domain || host.endsWith('.' + domain)
+    );
+    return trusted ? url : fallbackUrl;
+  } catch {
+    return fallbackUrl;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Story 10.5: Review Received Email
+// ---------------------------------------------------------------------------
+
+export interface ReviewReceivedEmailOptions {
+  email: string;
+  name?: string;
+  platform: string;
+  rating: number; // 1-5
+  reviewText: string;
+  reviewerName?: string;
+  reviewUrl: string;
+  appUrl: string;
+  unsubscribeUrl: string;
+  settingsUrl: string;
+}
+
+export function reviewReceivedEmailHtml(opts: ReviewReceivedEmailOptions): string {
+  const displayName = opts.name ? opts.name.split(' ')[0] : undefined;
+  const greeting = displayName ? `<p style="margin:0 0 16px 0;font-size:16px;color:${TEXT_SECONDARY};">Hi ${escapeHtml(displayName)},</p>` : '';
+  const rating = Math.max(1, Math.min(5, Math.round(opts.rating)));
+  const stars = Array.from({ length: 5 }, (_, i) =>
+    `<span style="color:${WARNING_COLOR};font-size:20px;">${i < rating ? '&#9733;' : '&#9734;'}</span>`
+  ).join('');
+  const reviewer = escapeHtml(opts.reviewerName ?? 'A buyer');
+  const reviewPreview = escapeHtml(opts.reviewText.slice(0, 200));
+  const validatedReviewUrl = validateExternalUrl(opts.reviewUrl, `${opts.appUrl}/opportunities`);
+
+  const body = `
+    ${greeting}
+    <h1 style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:${TEXT_PRIMARY};">New Review Received</h1>
+    <p style="margin:0 0 16px 0;font-size:14px;color:${TEXT_MUTED};">On: ${escapeHtml(opts.platform)}</p>
+
+    <div style="background-color:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:20px;margin-bottom:24px;">
+      <p style="margin:0 0 8px 0;font-size:13px;color:${TEXT_MUTED};">Rating</p>
+      <div>${stars}</div>
+      <p style="margin:12px 0 4px 0;font-size:13px;color:${TEXT_MUTED};">From: ${reviewer}</p>
+      <p style="margin:0;font-size:14px;font-style:italic;line-height:1.6;color:${TEXT_PRIMARY};">&ldquo;${reviewPreview}&rdquo;</p>
+    </div>
+
+    <div style="text-align:center;">
+      ${btn('View Review', validatedReviewUrl, BRAND_COLOR)}
+    </div>
+  `;
+
+  const preview = `New ${rating}★ review on ${opts.platform}`;
+  return baseLayout(body, preview)
+    .replace(/\{\{unsubscribe_url\}\}/g, opts.unsubscribeUrl)
+    .replace(/\{\{settings_url\}\}/g, opts.settingsUrl)
+    .replace(/\{\{app_url\}\}/g, opts.appUrl);
+}
+
+export function reviewReceivedEmailText(opts: ReviewReceivedEmailOptions): string {
+  const displayName = opts.name ? opts.name.split(' ')[0] : null;
+  const rating = Math.max(1, Math.min(5, Math.round(opts.rating)));
+  const reviewer = opts.reviewerName ?? 'A buyer';
+  const reviewPreview = opts.reviewText.slice(0, 200);
+  const validatedReviewUrl = validateExternalUrl(opts.reviewUrl, `${opts.appUrl}/opportunities`);
+
+  const lines: string[] = [`New Review Received — ${opts.platform}`];
+  if (displayName) lines.push(`Hi ${displayName},`);
+  lines.push('', `Rating: ${rating}/5 stars`, `From: ${reviewer}`, '', `"${reviewPreview}"`, '', `View Review: ${validatedReviewUrl}`);
+  lines.push('', '---', `Unsubscribe: ${opts.unsubscribeUrl}`, `Preferences: ${opts.settingsUrl}`);
+  return lines.join('\n');
+}
+
+// ---------------------------------------------------------------------------
+// Story 10.5: Flip Gone Cold Email
+// ---------------------------------------------------------------------------
+
+export interface FlipGoneColdEmailOptions {
+  email: string;
+  name?: string;
+  listingTitle: string;
+  hoursSinceLastResponse: number;
+  sellerName?: string;
+  coldReason: 'user_not_replied' | 'seller_not_replied';
+  threadUrl: string;
+  appUrl: string;
+  unsubscribeUrl: string;
+  settingsUrl: string;
+}
+
+export function flipGoneColdEmailHtml(opts: FlipGoneColdEmailOptions): string {
+  const displayName = opts.name ? opts.name.split(' ')[0] : undefined;
+  const greeting = displayName ? `<p style="margin:0 0 16px 0;font-size:16px;color:${TEXT_SECONDARY};">Hi ${escapeHtml(displayName)},</p>` : '';
+  const title = escapeHtml(opts.listingTitle);
+  const sellerDisplay = escapeHtml(opts.sellerName ?? 'the seller');
+  const headline = opts.coldReason === 'user_not_replied'
+    ? "You haven't responded"
+    : "Seller hasn't responded";
+  const subtext = opts.coldReason === 'user_not_replied'
+    ? `${sellerDisplay} is waiting for your reply on this flip.`
+    : `You sent a message and ${sellerDisplay} hasn't responded yet.`;
+
+  const body = `
+    ${greeting}
+    <h1 style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:${WARNING_COLOR};">${headline}</h1>
+    <p style="margin:0 0 20px 0;font-size:15px;line-height:1.6;color:${TEXT_SECONDARY};">${subtext}</p>
+
+    <div style="background-color:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:20px;margin-bottom:24px;">
+      <p style="margin:0 0 8px 0;font-size:16px;font-weight:600;color:${TEXT_PRIMARY};">${title}</p>
+      <p style="margin:0;font-size:13px;color:${TEXT_MUTED};">
+        <span style="background-color:${WARNING_COLOR};color:#fff;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600;">${opts.hoursSinceLastResponse}h since last response</span>
+      </p>
+      <p style="margin:12px 0 0 0;font-size:14px;color:${TEXT_SECONDARY};">From: ${sellerDisplay}</p>
+    </div>
+
+    <div style="text-align:center;">
+      ${btn('View Conversation', opts.threadUrl, WARNING_COLOR)}
+    </div>
+  `;
+
+  const preview = opts.coldReason === 'user_not_replied'
+    ? `No response for ${opts.hoursSinceLastResponse}h on ${title}`
+    : `Seller hasn't responded for ${opts.hoursSinceLastResponse}h on ${title}`;
+
+  return baseLayout(body, preview)
+    .replace(/\{\{unsubscribe_url\}\}/g, opts.unsubscribeUrl)
+    .replace(/\{\{settings_url\}\}/g, opts.settingsUrl)
+    .replace(/\{\{app_url\}\}/g, opts.appUrl);
+}
+
+export function flipGoneColdEmailText(opts: FlipGoneColdEmailOptions): string {
+  const displayName = opts.name ? opts.name.split(' ')[0] : null;
+  const sellerDisplay = opts.sellerName ?? 'the seller';
+  const headline = opts.coldReason === 'user_not_replied'
+    ? "You haven't responded"
+    : "Seller hasn't responded";
+
+  const lines: string[] = [headline];
+  if (displayName) lines.push(`Hi ${displayName},`);
+  lines.push(
+    '',
+    `Listing: ${opts.listingTitle}`,
+    `Hours since last response: ${opts.hoursSinceLastResponse}h`,
+    `From: ${sellerDisplay}`,
+    '',
+    `View Conversation: ${opts.threadUrl}`
+  );
+  lines.push('', '---', `Unsubscribe: ${opts.unsubscribeUrl}`, `Preferences: ${opts.settingsUrl}`);
+  return lines.join('\n');
+}
+
+// ---------------------------------------------------------------------------
+// Story 10.5: Flip Turned Hot Email
+// ---------------------------------------------------------------------------
+
+export interface FlipTurnedHotEmailOptions {
+  email: string;
+  name?: string;
+  listingTitle: string;
+  unreadCount: number;
+  latestMessagePreview: string;
+  sellerName?: string;
+  threadUrl: string;
+  appUrl: string;
+  unsubscribeUrl: string;
+  settingsUrl: string;
+}
+
+export function flipTurnedHotEmailHtml(opts: FlipTurnedHotEmailOptions): string {
+  const displayName = opts.name ? opts.name.split(' ')[0] : undefined;
+  const greeting = displayName ? `<p style="margin:0 0 16px 0;font-size:16px;color:${TEXT_SECONDARY};">Hi ${escapeHtml(displayName)},</p>` : '';
+  const title = escapeHtml(opts.listingTitle);
+  const preview = escapeHtml(opts.latestMessagePreview.slice(0, 200));
+  const sellerDisplay = escapeHtml(opts.sellerName ?? 'the seller');
+
+  const body = `
+    ${greeting}
+    <h1 style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:${DANGER_COLOR};">Flip Is Hot! 🔥</h1>
+    <p style="margin:0 0 20px 0;font-size:15px;line-height:1.6;color:${TEXT_SECONDARY};">
+      ${sellerDisplay} has sent multiple messages and is ready to talk.
+    </p>
+
+    <div style="background-color:#fff1f2;border:1px solid #fecdd3;border-radius:10px;padding:20px;margin-bottom:24px;">
+      <p style="margin:0 0 8px 0;font-size:16px;font-weight:600;color:${TEXT_PRIMARY};">${title}</p>
+      <p style="margin:0 0 12px 0;font-size:13px;">
+        <span style="background-color:${DANGER_COLOR};color:#fff;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600;">${opts.unreadCount} unread messages</span>
+      </p>
+      <p style="margin:0;font-size:14px;font-style:italic;line-height:1.6;color:${TEXT_PRIMARY};">&ldquo;${preview}&rdquo;</p>
+    </div>
+
+    <div style="text-align:center;">
+      ${btn('Review &amp; Respond', opts.threadUrl, DANGER_COLOR)}
+    </div>
+  `;
+
+  const previewText = `${opts.unreadCount} unread messages on ${opts.listingTitle}`;
+  return baseLayout(body, previewText)
+    .replace(/\{\{unsubscribe_url\}\}/g, opts.unsubscribeUrl)
+    .replace(/\{\{settings_url\}\}/g, opts.settingsUrl)
+    .replace(/\{\{app_url\}\}/g, opts.appUrl);
+}
+
+export function flipTurnedHotEmailText(opts: FlipTurnedHotEmailOptions): string {
+  const displayName = opts.name ? opts.name.split(' ')[0] : null;
+  const sellerDisplay = opts.sellerName ?? 'the seller';
+  const msgPreview = opts.latestMessagePreview.slice(0, 200);
+
+  const lines: string[] = ['Flip Is Hot!'];
+  if (displayName) lines.push(`Hi ${displayName},`);
+  lines.push(
+    '',
+    `Listing: ${opts.listingTitle}`,
+    `Unread messages from ${sellerDisplay}: ${opts.unreadCount}`,
+    '',
+    `Latest message: "${msgPreview}"`,
+    '',
+    `Review & Respond: ${opts.threadUrl}`
+  );
+  lines.push('', '---', `Unsubscribe: ${opts.unsubscribeUrl}`, `Preferences: ${opts.settingsUrl}`);
+  return lines.join('\n');
+}
+
+// ---------------------------------------------------------------------------
+// Story 10.5: Price Change Alert Email
+// ---------------------------------------------------------------------------
+
+export interface PriceChangeAlertEmailOptions {
+  email: string;
+  name?: string;
+  listingTitle: string;
+  platform: string;
+  oldPrice: number;
+  newPrice: number;
+  changePercent: number;
+  direction: 'increase' | 'decrease';
+  updatedProfitMargin?: number;
+  listingUrl: string;
+  appUrl: string;
+  unsubscribeUrl: string;
+  settingsUrl: string;
+}
+
+export function priceChangeAlertEmailHtml(opts: PriceChangeAlertEmailOptions): string {
+  const displayName = opts.name ? opts.name.split(' ')[0] : undefined;
+  const greeting = displayName ? `<p style="margin:0 0 16px 0;font-size:16px;color:${TEXT_SECONDARY};">Hi ${escapeHtml(displayName)},</p>` : '';
+  const title = escapeHtml(opts.listingTitle);
+  const changeColor = opts.direction === 'decrease' ? SUCCESS_COLOR : DANGER_COLOR;
+  const changeLabel = opts.direction === 'decrease' ? '↓ Price Decrease' : '↑ Price Increase';
+  const changePct = Math.abs(opts.changePercent).toFixed(1);
+  const profitLine = opts.updatedProfitMargin != null
+    ? `<p style="margin:12px 0 0 0;font-size:14px;color:${TEXT_SECONDARY};">Updated profit margin: <strong style="color:${SUCCESS_COLOR};">$${opts.updatedProfitMargin.toFixed(2)}</strong></p>`
+    : '';
+  const bgColor = opts.direction === 'decrease' ? '#f0fdf4' : '#fff1f2';
+  const borderColor = opts.direction === 'decrease' ? '#bbf7d0' : '#fecdd3';
+
+  const body = `
+    ${greeting}
+    <h1 style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:${TEXT_PRIMARY};">Listing Price Changed</h1>
+    <p style="margin:0 0 20px 0;font-size:14px;color:${TEXT_MUTED};">On: ${escapeHtml(opts.platform)}</p>
+
+    <div style="background-color:${bgColor};border:1px solid ${borderColor};border-radius:10px;padding:20px;margin-bottom:24px;">
+      <p style="margin:0 0 12px 0;font-size:16px;font-weight:600;color:${TEXT_PRIMARY};">${title}</p>
+      <p style="margin:0 0 8px 0;font-size:22px;font-weight:700;color:${TEXT_PRIMARY};">
+        <span style="color:${TEXT_MUTED};text-decoration:line-through;font-size:16px;">$${opts.oldPrice.toFixed(2)}</span>
+        &nbsp;→&nbsp;
+        <span style="color:${changeColor};">$${opts.newPrice.toFixed(2)}</span>
+      </p>
+      <p style="margin:0;">
+        <span style="background-color:${changeColor};color:#fff;padding:2px 10px;border-radius:12px;font-size:13px;font-weight:600;">${changeLabel} ${changePct}%</span>
+      </p>
+      ${profitLine}
+    </div>
+
+    <div style="text-align:center;">
+      ${btn('View Listing', opts.listingUrl, BRAND_COLOR)}
+    </div>
+  `;
+
+  const previewText = `Price ${opts.direction} on ${title}: $${opts.oldPrice.toFixed(2)} → $${opts.newPrice.toFixed(2)}`;
+  return baseLayout(body, previewText)
+    .replace(/\{\{unsubscribe_url\}\}/g, opts.unsubscribeUrl)
+    .replace(/\{\{settings_url\}\}/g, opts.settingsUrl)
+    .replace(/\{\{app_url\}\}/g, opts.appUrl);
+}
+
+export function priceChangeAlertEmailText(opts: PriceChangeAlertEmailOptions): string {
+  const displayName = opts.name ? opts.name.split(' ')[0] : null;
+  const changePct = Math.abs(opts.changePercent).toFixed(1);
+  const direction = opts.direction === 'decrease' ? 'decreased' : 'increased';
+
+  const lines: string[] = ['Listing Price Changed'];
+  if (displayName) lines.push(`Hi ${displayName},`);
+  lines.push(
+    '',
+    `Listing: ${opts.listingTitle}`,
+    `Platform: ${opts.platform}`,
+    `Price ${direction}: $${opts.oldPrice.toFixed(2)} → $${opts.newPrice.toFixed(2)} (${changePct}%)`,
+  );
+  if (opts.updatedProfitMargin != null) {
+    lines.push(`Updated profit margin: $${opts.updatedProfitMargin.toFixed(2)}`);
+  }
+  lines.push('', `View Listing: ${opts.listingUrl}`);
+  lines.push('', '---', `Unsubscribe: ${opts.unsubscribeUrl}`, `Preferences: ${opts.settingsUrl}`);
+  return lines.join('\n');
+}

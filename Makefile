@@ -31,6 +31,10 @@ help:
 	@echo "  make test-e2e-ui - Run E2E tests with UI (Playwright)"
 	@echo "  make test-acceptance - Run BDD acceptance tests (Cucumber, Gherkin in real time)"
 	@echo "                       - Optional: make test-acceptance TAGS=@smoke"
+	@echo "  make test-ac    - Run epic-organized acceptance tests (test/acceptance/features/)"
+	@echo "                       - Filter by story:   make test-ac STORY=9.2"
+	@echo "                       - Filter by feature: make test-ac FEATURE=F012"
+	@echo "                       - Filter by tags:    make test-ac TAGS=@FR-RELIST-01"
 	@echo "  make test-all   - Run all tests (unit + BDD + E2E)"
 	@echo ""
 	@echo "Setup:"
@@ -133,9 +137,16 @@ test-acceptance:
 	fi
 
 # Epic-organized acceptance tests (test/acceptance/features/).
-# Optional: make test-ac TAGS=@story-1-3  or  TAGS="@epic-1"
+# Filter by story:  make test-ac STORY=9.2      (converts to --tags "@story-9-2")
+# Filter by feature: make test-ac FEATURE=F012  (runs all scenarios in E-012-*.feature)
+# Filter by tags:   make test-ac TAGS=@FR-RELIST-01  or  TAGS="@story-9-2 and @FR-RELIST-03"
 test-ac:
-	@if [ -n "$(TAGS)" ]; then \
+	@if [ -n "$(STORY)" ]; then \
+		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3000 'pnpm exec cucumber-js --profile acceptance --tags "@story-$(subst .,-,$(STORY))"'; \
+	elif [ -n "$(FEATURE)" ]; then \
+		EPIC_NUM=$$(echo "$(FEATURE)" | tr -d 'Ff' | sed 's/^0*//'); \
+		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3000 "pnpm exec cucumber-js --profile acceptance --tags \"@epic-$$EPIC_NUM\""; \
+	elif [ -n "$(TAGS)" ]; then \
 		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3000 'pnpm exec cucumber-js --profile acceptance --tags "$(TAGS)"'; \
 	else \
 		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3000 'pnpm exec cucumber-js --profile acceptance'; \

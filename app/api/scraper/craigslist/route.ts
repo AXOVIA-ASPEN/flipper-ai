@@ -15,6 +15,8 @@ import { sseEmitter } from '@/lib/sse-emitter';
 
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import { enforceTierLimits } from '@/lib/tier-enforcement';
+import { computeEstimatedExpiry } from '@/lib/listing-expiry';
+import { emitOpportunityFoundEvent } from '@/lib/notification-events';
 
 interface CraigslistItem {
   title: string;
@@ -473,6 +475,7 @@ export async function POST(request: NextRequest) {
           imageUrls: item.imageUrls ? JSON.stringify(item.imageUrls) : null,
           category: identification?.category || detectedCategory,
           postedAt: item.postedAt,
+          estimatedExpiresAt: computeEstimatedExpiry('CRAIGSLIST', item.postedAt ?? null),
 
           // Algorithmic estimation (baseline)
           estimatedValue: estimation.estimatedValue,
@@ -602,6 +605,11 @@ export async function POST(request: NextRequest) {
             location: item.location,
           },
         });
+
+        // Story 10.3: Emit opportunity.found notification event (fire-and-forget).
+        // emitOpportunityFoundEvent handles its own errors internally — void ensures
+        // a failure here can never propagate and abort the scraper run.
+        void emitOpportunityFoundEvent(savedListing, userId);
 
         savedCount++;
         opportunitiesFound++;

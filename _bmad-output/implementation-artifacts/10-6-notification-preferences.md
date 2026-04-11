@@ -1,8 +1,8 @@
 # Story 10.6: Notification Preferences
 
-Status: ready-for-dev
-Blocked: true
-Blocked-Reason: Depends on Stories 10.3, 10.4, and 10.5 which add the notification event types and preference fields that this UI exposes. Story 10.1 must also be complete for the NotificationEvent infrastructure. The UI cannot meaningfully toggle notification types that have no backend processor.
+Status: done
+Blocked: false
+Blocked-Reason:
 Trello-Card-ID: 69cc20eefd97946d81876f20
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
@@ -37,119 +37,52 @@ So that I only receive alerts that matter to me.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Add new notification preference fields to Prisma schema (AC: #1, #2, #3, #5)
-  - [ ] 1.1 Add Smart Alert notification toggle fields to `UserSettings` model in `prisma/schema.prisma`:
-    - `notifyReviewReceived   Boolean @default(true)` — Toggle for review left alerts (FR-NOTIFY-08)
-    - `notifyFlipGoneCold     Boolean @default(true)` — Toggle for cold flip alerts (FR-NOTIFY-09)
-    - `notifyFlipTurnedHot    Boolean @default(true)` — Toggle for hot flip alerts (FR-NOTIFY-10)
-    - `notifyListingUnavailable Boolean @default(true)` — Toggle for listing removal alerts (FR-MONITOR-04)
-  - [ ] 1.2 Add configurable alert threshold fields:
-    - `flipGoneColdHours      Int     @default(24)` — Hours before a flip is considered "gone cold" (FR-NOTIFY-09)
-    - `flipTurnedHotCount     Int     @default(3)` — Consecutive inbound messages before flip is "hot" (FR-NOTIFY-10)
-  - [ ] 1.3 **CHECK FIRST**: Run `grep -c 'notifyMessageReceived' prisma/schema.prisma`. If the count is 0 (field does NOT exist), then also add these 3 message notification fields from Story 10.4's spec:
-    - `notifyMessageReceived  Boolean @default(true)` — FR-NOTIFY-02
-    - `notifyDraftReady       Boolean @default(true)` — FR-NOTIFY-03
-    - `notifyMessageSent      Boolean @default(false)` — FR-NOTIFY-04 (default OFF — low urgency)
-  - [ ] 1.4 Run `npx prisma migrate dev` to generate migration
-  - [ ] 1.5 Verify all new fields have correct defaults (all true except `notifyMessageSent` which is false)
+- [x] Task 1: Add new notification preference fields to Prisma schema (AC: #1, #2, #3, #5)
+  - [x] 1.1 Add Smart Alert notification toggle fields to `UserSettings` model in `prisma/schema.prisma`:
+    - `notifyReviewReceived   Boolean @default(true)` — already added by Story 10.5
+    - `notifyFlipGoneCold     Boolean @default(true)` — already added by Story 10.5
+    - `notifyFlipTurnedHot    Boolean @default(true)` — already added by Story 10.5
+    - `notifyListingUnavailable Boolean @default(true)` — **added by this story**
+  - [x] 1.2 Add configurable alert threshold fields:
+    - `flipGoneColdHours      Int     @default(24)` — already added by Story 10.5
+    - `flipTurnedHotCount     Int     @default(3)` — already added by Story 10.5
+  - [x] 1.3 **CHECK FIRST**: `notifyMessageReceived` already exists (added by Story 10.4). No changes needed.
+  - [x] 1.4 Run `make db-sync` — schema synced with `notifyListingUnavailable`
+  - [x] 1.5 Verified all defaults: `notifyListingUnavailable @default(true)` ✅
 
-- [ ] Task 2: Update Settings API to accept new fields (AC: #2, #5)
-  - [ ] 2.1 In `app/api/user/settings/route.ts` PATCH handler, add validation for the new Boolean toggle fields in the same pattern as existing toggles (lines 202-222: coerce to Boolean):
-    - `notifyReviewReceived`, `notifyFlipGoneCold`, `notifyFlipTurnedHot`, `notifyListingUnavailable`
-    - `notifyMessageReceived`, `notifyDraftReady`, `notifyMessageSent` (if not already added by Story 10.4)
-  - [ ] 2.2 Add numeric validation for alert threshold fields:
-    - `flipGoneColdHours`: Integer 1-168 (1 hour to 7 days), rounded via `Math.round()`
-    - `flipTurnedHotCount`: Integer 1-20, rounded via `Math.round()`
-  - [ ] 2.3 Ensure GET handler returns all new fields (Prisma returns all fields by default, but verify)
-  - [ ] 2.4 Add the new fields to the `prisma.userSettings.update()` data object in the PATCH handler
+- [x] Task 2: Update Settings API to accept new fields (AC: #2, #5)
+  - [x] 2.1 Added `notifyListingUnavailable` to PATCH handler body destructure with Boolean coercion
+  - [x] 2.2 Numeric validation for `flipGoneColdHours` and `flipTurnedHotCount` already in place from Story 10.5
+  - [x] 2.3 GET handler returns `notifyListingUnavailable` — verified
+  - [x] 2.4 Added `notifyListingUnavailable` to `prisma.userSettings.update()` data object
 
-- [ ] Task 3: Redesign NotificationSettings component (AC: #1, #2, #4)
-  - [ ] 3.1 Replace the current `src/components/NotificationSettings.tsx` with a comprehensive notification preferences UI. **MUST include `'use client'` directive** (line 1). Update the component's internal `UserSettings` interface to include all new fields.
-  - [ ] 3.2 Organize UI by category:
-    - **Section Header**: "Notification Preferences" with description text
-    - **Master Toggle**: `emailNotifications` — when off, all toggles below are visually disabled (existing pattern: `opacity-50` class + `disabled` prop)
-    - **Table Header Row**: Event | Email | Push (Coming Soon) | SMS (Coming Soon)
-    - **Category: Flip Lifecycle** (uses toggles from Stories 10.3/existing):
-      - New Opportunity Found → `notifyNewDeals`
-      - Flip Lifecycle Updates (purchased, shipped, sold) → `notifySoldItems` (single combined row with tooltip: "Controls email for purchase, shipping, and sale events")
-    - **Category: Communication** (uses toggles from Story 10.4):
-      - Seller Reply Received → `notifyMessageReceived`
-      - AI Draft Ready → `notifyDraftReady`
-      - Message Sent → `notifyMessageSent`
-    - **Category: Smart Alerts** (uses new toggles):
-      - Review Received → `notifyReviewReceived`
-      - Flip Gone Cold → `notifyFlipGoneCold` (with threshold input below, see Task 4)
-      - Flip Turned Hot → `notifyFlipTurnedHot` (with threshold input below, see Task 4)
-      - Price Change Alert → `notifyPriceDrops`
-    - **Category: Monitoring**:
-      - Listing Expiring → `notifyExpiring`
-      - Listing Unavailable → `notifyListingUnavailable`
-    - **Section: Digest**:
-      - Weekly Digest → `notifyWeeklyDigest`
-      - Frequency selector → `notifyFrequency` (instant / daily / weekly) — use existing `FrequencyOption` radio pattern
-  - [ ] 3.3 "Push" and "SMS" columns: render grayed-out toggle placeholders with `title` attribute tooltip "Coming Soon — Available in Phase 2". On mobile (< `sm` breakpoint), hide these columns and show a note below the table: "Push and SMS notifications coming soon."
-  - [ ] 3.4 Each toggle saves immediately on change via PATCH `/api/user/settings` (existing pattern: `saveSettings({ [field]: newValue })`). **Use `useToast()` from `@/components/ToastContainer`** for save feedback instead of inline banners — matches BillingSettings pattern:
-    ```typescript
-    const { showToast } = useToast();
-    // On success: showToast({ type: 'success', title: 'Saved', message: 'Notification preferences updated.' });
-    // On failure: showToast({ type: 'error', title: 'Error', message: 'Failed to save. Please try again.' });
-    ```
-  - [ ] 3.5 **Optimistic update with rollback**: Toggle visually immediately on click. If PATCH fails, revert toggle to previous state and show error toast. Pattern:
-    ```typescript
-    const previousSettings = { ...settings };
-    setSettings({ ...settings, [field]: newValue }); // optimistic
-    try { await saveSettings({ [field]: newValue }); }
-    catch { setSettings(previousSettings); showToast({ type: 'error', ... }); }
-    ```
-  - [ ] 3.6 When master toggle (`emailNotifications`) is OFF, all individual email toggles should be visually muted/disabled with `opacity-50 cursor-not-allowed` classes and an info banner: "Email notifications are turned off. Enable the master toggle above to configure individual preferences."
-  - [ ] 3.7 Use Tailwind CSS for all styling. Match existing settings card pattern: `bg-white dark:bg-gray-800 rounded-lg shadow p-6`. Dark mode: `dark:bg-gray-700` for inputs, `dark:border-gray-600` for borders, `dark:text-gray-300` for text.
-  - [ ] 3.8 **WCAG AA Accessibility** (NFR-UX-02):
-    - Every toggle button must have `aria-label={`Toggle ${eventDisplayName} email notification`}`
-    - Every toggle must have `role="switch"` and `aria-checked={value}`
-    - Tab order must flow naturally through all toggles (top-to-bottom, left-to-right)
-    - Master toggle disable/enable must announce via `aria-live="polite"` region
-    - Disabled toggles: ensure 4.5:1 contrast ratio for disabled text
-    - Focus ring: `focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`
-  - [ ] 3.9 **Hash anchor support**: If `window.location.hash === '#notifications'`, scroll the component into view on mount. Emails link to `${appUrl}/settings#notifications` when users click "Email Preferences" in email footers.
-  - [ ] 3.10 **Loading state**: Show a loading skeleton (animated gray bars matching layout shape) while settings are fetching, not a spinner. Match pattern: `animate-pulse bg-gray-200 dark:bg-gray-700 rounded`.
+- [x] Task 3: Redesign NotificationSettings component (AC: #1, #2, #4)
+  - [x] 3.1 Full redesign of `src/components/NotificationSettings.tsx` — `'use client'` on line 21 (after JSDoc)
+  - [x] 3.2 Category-based table: Flip Lifecycle, Communication, Smart Alerts, Monitoring, Digest
+  - [x] 3.3 Push/SMS columns: grayed-out "Coming Soon" toggles, hidden on mobile (< sm)
+  - [x] 3.4 `useToast()` for save feedback
+  - [x] 3.5 Optimistic update with rollback on failure
+  - [x] 3.6 Master toggle OFF: opacity-50, info banner
+  - [x] 3.7 Tailwind CSS matching settings card pattern
+  - [x] 3.8 WCAG AA: `role="switch"`, `aria-checked`, `aria-label`, `aria-live="polite"` on disabled banner
+  - [x] 3.9 Hash anchor support: `#notifications` scroll on mount
+  - [x] 3.10 Loading skeleton with `animate-pulse`
 
-- [ ] Task 4: Add configurable alert thresholds UI (AC: #5)
-  - [ ] 4.1 Within the "Smart Alerts" category section, add configurable threshold inputs:
-    - **Flip Gone Cold Time**: Number input with "hours" suffix, min 1, max 168 (7 days), default 24. Label: "Flip Gone Cold Time" with helper text: "Hours with no response before alerting"
-    - **Flip Turned Hot #**: Number input, min 1, max 20, default 3. Label: "Flip Turned Hot Threshold" with helper text: "Consecutive inbound messages that trigger a hot alert"
-  - [ ] 4.2 Save on blur or on change with debounce (300ms) — same pattern as other numeric settings in ScoringSettings
-  - [ ] 4.3 Show validation error inline if values are outside valid range
+- [x] Task 4: Add configurable alert thresholds UI (AC: #5)
+  - [x] 4.1 Flip Gone Cold Time input (1-168 hrs) and Flip Turned Hot Threshold input (1-20) in Smart Alerts section
+  - [x] 4.2 Save on blur via `handleColdHoursBlur` and `handleHotCountBlur`
+  - [x] 4.3 Inline validation error shown when value out of range
 
-- [ ] Task 5: Unit tests (AC: all)
-  - [ ] 5.1 **Extend existing test file** `src/__tests__/api/user-settings.test.ts` (NOT `user/settings/route.test.ts` — the file uses flat naming). Add tests for new Boolean toggle fields using the established mock pattern (`mockFindUnique`, `mockUpdateSettings`):
-    - Toggle `notifyReviewReceived` to false → `mockUpdateSettings` called with `{ notifyReviewReceived: false }`
-    - Toggle `notifyFlipGoneCold` to false → saved correctly
-    - Toggle `notifyFlipTurnedHot` to false → saved correctly
-    - Toggle `notifyListingUnavailable` to false → saved correctly
-    - All new toggles default to true on GET for new users (except `notifyMessageSent`)
-  - [ ] 5.2 Unit tests for alert threshold validation (same file):
-    - `flipGoneColdHours` accepts 1-168, rejects 0 (422 ValidationError), rejects 169, rounds floats
-    - `flipTurnedHotCount` accepts 1-20, rejects 0 (422 ValidationError), rejects 21, rounds floats
-    - Non-numeric values return 422 ValidationError
-  - [ ] 5.3 **Update existing component test file** `src/components/__tests__/NotificationSettings.test.tsx` (120+ lines, already exists). Add/update tests for:
-    - Renders all category sections (Flip Lifecycle, Communication, Smart Alerts, Monitoring, Digest)
-    - Master toggle disables individual toggles (existing test may need update)
-    - "Coming Soon" columns visible for Push and SMS
-    - Threshold inputs accept valid ranges
-    - Toast notifications shown on save success/failure (mock `useToast`)
-    - New fields appear in the component's `UserSettings` interface
-  - [ ] 5.4 Maintain Jest coverage thresholds: **branches 93%, functions 99%, lines 98%, statements 98%** (from jest.config.js — NOT the higher values in CLAUDE.md which are aspirational)
+- [x] Task 5: Unit tests (AC: all)
+  - [x] 5.1 Extended `src/__tests__/api/user-settings.test.ts` with `notifyListingUnavailable` tests (80 tests total, all pass)
+  - [x] 5.2 Float rounding and non-numeric validation tests added
+  - [x] 5.3 Updated `src/components/__tests__/NotificationSettings.test.tsx` — 25 tests covering all categories, toast, skeleton, accessibility
+  - [x] 5.4 Coverage thresholds met
 
-- [ ] Task 6: Acceptance tests (AC: all)
-  - [ ] 6.1 Write Gherkin scenarios in `test/acceptance/features/E-010-monitoring-email-notifications.feature` (append to existing file):
-    - Scenario: Notification preferences page shows all event types with email toggles (`@E-010-S-<N> @story-10-6 @FR-NOTIFY-12`)
-    - Scenario: Toggle off individual email notification type (`@E-010-S-<N> @story-10-6 @FR-NOTIFY-12`)
-    - Scenario: New user gets all email toggles enabled by default (`@E-010-S-<N> @story-10-6 @FR-NOTIFY-12`)
-    - Scenario: Phase 2 Push/SMS columns show Coming Soon (`@E-010-S-<N> @story-10-6 @FR-NOTIFY-12`)
-    - Scenario: Configure Flip Gone Cold Time threshold (`@E-010-S-<N> @story-10-6 @FR-NOTIFY-09 @FR-NOTIFY-10 @FR-NOTIFY-12`)
-    - Scenario: Configure Flip Turned Hot threshold (`@E-010-S-<N> @story-10-6 @FR-NOTIFY-09 @FR-NOTIFY-10 @FR-NOTIFY-12`)
-  - [ ] 6.2 Write step definitions in `test/acceptance/step_definitions/E-010-monitoring-email-notifications.steps.ts` (extend existing file)
-  - [ ] 6.3 Update RTM at `_bmad-output/test-artifacts/requirements-traceability-matrix.md`
+- [x] Task 6: Acceptance tests (AC: all)
+  - [x] 6.1 Appended 8 Gherkin scenarios to E-010 feature file (@E-010-S-50 through @E-010-S-57)
+  - [x] 6.2 Created `test/acceptance/step_definitions/E-010-notification-preferences.steps.ts`
+  - [x] 6.3 RTM updated at `_bmad-output/test-artifacts/requirements-traceability-matrix.md`
 
 ## Dev Notes
 
@@ -478,8 +411,42 @@ bg-white dark:bg-gray-800 rounded-lg shadow p-6
 
 ### Agent Model Used
 
+claude-sonnet-4-6
+
 ### Debug Log References
+
+- `make db-sync` used instead of `prisma migrate dev` — DB had accumulated schema drift from Stories 10.4/10.5 without migrations; `migrate dev` attempted a reset. `db-sync` (deploy + push) applied the single new field safely.
+- `SettingsPage.test.tsx` required `jest.mock('@/components/ToastContainer')` after redesigned `NotificationSettings` started calling `useToast()` which requires `ToastProvider` in component tree.
+- Story spec referenced `notifyPriceDrops` for "Price Change Alert" but Story 10.5 added `notifyPriceChanges`; used `notifyPriceDrops` as spec directs (UI field).
+- Phase 2 push/SMS: Stories 11.1/11.2 had already implemented full push/SMS globally; preserved those sections and added "Coming Soon" columns only to per-event-type table.
+- Code review (2026-04-10): `saveSettings()` was missing a catch block — errors were silently swallowed. Fixed by adding catch + error toast + boolean return value. `handleColdHoursBlur`/`handleHotCountBlur` were synchronous and showed success toast before save resolved; made async with conditional toast. PATCH response was missing `user` object (inconsistency with GET shape); added. Acceptance test threshold validation assertions used trivial string matching; replaced with regex patterns.
 
 ### Completion Notes List
 
+- All 6 tasks implemented. 81 API tests + 28 component tests, all passing, zero regressions.
+- `notifyListingUnavailable` was the only new schema field — all other Story 10.6 fields were pre-added by Stories 10.4 and 10.5.
+- `src/components/NotificationSettings.tsx` fully redesigned: category-based table (Flip Lifecycle, Communication, Smart Alerts, Monitoring, Digest), optimistic toggle with toast rollback, threshold inputs, WCAG AA accessibility, loading skeleton, hash-anchor scroll.
+- 8 source-inspection BDD scenarios added to E-010 feature file (@E-010-S-50 through @E-010-S-57), all passing.
+- RTM updated: FR-NOTIFY-09, FR-NOTIFY-10, FR-NOTIFY-12 now "Covered" with new scenario tags.
+- Code review fixes: `saveSettings()` error handling, async blur handlers, PATCH response shape parity, acceptance test assertion quality.
+
 ### File List
+
+**Modified:**
+- `prisma/schema.prisma` — added `notifyListingUnavailable Boolean @default(true)`
+- `app/api/user/settings/route.ts` — added `notifyListingUnavailable` to GET/PATCH handlers; PATCH response now includes `user` object for shape parity with GET
+- `src/components/NotificationSettings.tsx` — full redesign; code review fixes: `saveSettings()` catch block + boolean return, async blur handlers, `notifyFrequency` synced from server response
+- `src/__tests__/api/user-settings.test.ts` — extended with 9 new Story 10.6 tests (81 total); added PATCH response shape test
+- `src/__tests__/components/SettingsPage.test.tsx` — added ToastContainer mock, updated text assertions
+- `src/components/__tests__/NotificationSettings.test.tsx` — complete rewrite (28 tests); added error handling + async blur handler tests
+- `test/acceptance/features/E-010-monitoring-email-notifications.feature` — appended @E-010-S-50 through @E-010-S-57
+- `test/acceptance/step_definitions/E-010-notification-preferences.steps.ts` — source-inspection steps; threshold validation assertions replaced with regex patterns; company name fixed
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` — 10-6 status: in-progress → review
+- `_bmad-output/test-artifacts/requirements-traceability-matrix.md` — updated FR-NOTIFY-09/10/12 coverage
+
+## Change Log
+
+| Date | Version | Description |
+|------|---------|-------------|
+| 2026-04-10 | 1.0 | Story implemented: NotificationSettings redesign, notifyListingUnavailable schema field, settings API extension, unit + acceptance tests, RTM updated |
+| 2026-04-10 | 1.1 | Code review fixes: saveSettings() silent failure (catch block), async blur handlers (premature success toast), PATCH response user field, acceptance test assertion quality |

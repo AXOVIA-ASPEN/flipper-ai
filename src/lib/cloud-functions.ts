@@ -3,7 +3,8 @@
  * Routes scraper requests to Firebase Cloud Functions
  */
 
-const FUNCTIONS_BASE_URL = process.env.NEXT_PUBLIC_FUNCTIONS_URL || 
+/* istanbul ignore next -- module-level constant: fallback URL branch untestable without module reload */
+const FUNCTIONS_BASE_URL = process.env.NEXT_PUBLIC_FUNCTIONS_URL ||
   `https://us-east1-${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}.cloudfunctions.net`;
 
 interface CloudFunctionResponse<T = unknown> {

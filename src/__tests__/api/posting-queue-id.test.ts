@@ -42,12 +42,94 @@ describe('GET /api/posting-queue/[id]', () => {
 
   it('returns item when found', async () => {
     (getAuthUserId as jest.Mock).mockResolvedValue('user-1');
-    const item = { id: '1', userId: 'user-1', status: 'PENDING', listing: { title: 'Test' } };
+    const item = {
+      id: '1',
+      userId: 'user-1',
+      status: 'PENDING',
+      listing: { title: 'Test', images: [], imageUrls: null },
+    };
     mockFindFirst.mockResolvedValue(item);
     const res = await GET(new NextRequest('http://localhost/api/posting-queue/1'), makeContext('1'));
     const data = await res.json();
     expect(res.status).toBe(200);
     expect(data.id).toBe('1');
+  });
+
+  // Story 9.4: the detail route eager-loads sorted images and computes imageStatus.
+  it('eager-loads sorted listing.images and computes imageStatus (Story 9.4)', async () => {
+    (getAuthUserId as jest.Mock).mockResolvedValue('user-1');
+    mockFindFirst.mockResolvedValue({
+      id: '1',
+      userId: 'user-1',
+      status: 'PENDING',
+      listing: {
+        id: 'lst-1',
+        title: 'Test',
+        images: [
+          { id: 'img-1', imageIndex: 0, storageUrl: 'https://x', contentType: 'image/jpeg' },
+        ],
+        imageUrls: null,
+      },
+    });
+
+    const res = await GET(
+      new NextRequest('http://localhost/api/posting-queue/1'),
+      makeContext('1')
+    );
+
+    expect(mockFindFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        include: expect.objectContaining({
+          listing: expect.objectContaining({
+            select: expect.objectContaining({
+              images: expect.objectContaining({
+                select: expect.objectContaining({ storageUrl: true }),
+                orderBy: { imageIndex: 'asc' },
+              }),
+            }),
+          }),
+        }),
+      })
+    );
+
+    const data = await res.json();
+    expect(data.imageStatus).toBe('available');
+  });
+
+  it("GET /:id returns imageStatus='legacy-fallback' for listings with only imageUrls", async () => {
+    (getAuthUserId as jest.Mock).mockResolvedValue('user-1');
+    mockFindFirst.mockResolvedValue({
+      id: '1',
+      userId: 'user-1',
+      listing: {
+        id: 'lst-1',
+        images: [],
+        imageUrls: JSON.stringify(['https://legacy.example/a.jpg']),
+      },
+    });
+
+    const res = await GET(
+      new NextRequest('http://localhost/api/posting-queue/1'),
+      makeContext('1')
+    );
+    const data = await res.json();
+    expect(data.imageStatus).toBe('legacy-fallback');
+  });
+
+  it("GET /:id returns imageStatus='manual-upload-required' when neither source has URLs", async () => {
+    (getAuthUserId as jest.Mock).mockResolvedValue('user-1');
+    mockFindFirst.mockResolvedValue({
+      id: '1',
+      userId: 'user-1',
+      listing: { id: 'lst-1', images: [], imageUrls: null },
+    });
+
+    const res = await GET(
+      new NextRequest('http://localhost/api/posting-queue/1'),
+      makeContext('1')
+    );
+    const data = await res.json();
+    expect(data.imageStatus).toBe('manual-upload-required');
   });
 
   it('returns 500 on error', async () => {

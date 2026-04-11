@@ -3,6 +3,7 @@ import {
   checkMarketplaceLimit,
   checkSearchConfigLimit,
   checkFeatureAccess,
+  enforceFeatureAccess,
   enforceTierLimits,
 } from '../../lib/tier-enforcement';
 import { ForbiddenError } from '../../lib/errors';
@@ -187,6 +188,37 @@ describe('tier-enforcement', () => {
       const result = checkFeatureAccess(null, 'messaging');
       expect(result.allowed).toBe(false);
       expect(result.tier).toBe('FREE');
+    });
+  });
+
+  describe('enforceFeatureAccess', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('resolves when user has the required feature (PRO tier)', async () => {
+      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({ subscriptionTier: 'PRO' });
+      await expect(enforceFeatureAccess('user-1', 'ebayCrossListing')).resolves.toBeUndefined();
+    });
+
+    it('throws ForbiddenError when user does not have the feature (FREE tier)', async () => {
+      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({ subscriptionTier: 'FREE' });
+      await expect(enforceFeatureAccess('user-1', 'priceHistory')).rejects.toThrow(ForbiddenError);
+    });
+
+    it('defaults to FREE and throws when user is not found', async () => {
+      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+      await expect(enforceFeatureAccess('user-1', 'priceHistory')).rejects.toThrow(ForbiddenError);
+    });
+
+    it('resolves when feature is available on FREE tier (aiAnalysis)', async () => {
+      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({ subscriptionTier: 'FREE' });
+      await expect(enforceFeatureAccess('user-1', 'aiAnalysis')).resolves.toBeUndefined();
+    });
+
+    it('throws for meetingLogistics on FREE tier', async () => {
+      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({ subscriptionTier: 'FREE' });
+      await expect(enforceFeatureAccess('user-1', 'meetingLogistics')).rejects.toThrow(ForbiddenError);
     });
   });
 

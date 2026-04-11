@@ -14,6 +14,7 @@ import { generateAlgorithmicTitle } from '@/lib/title-generator';
 import { generateAlgorithmicDescription } from '@/lib/description-generator';
 import type { TitleGeneratorInput } from '@/lib/title-generator';
 import type { DescriptionGeneratorInput } from '@/lib/description-generator';
+import { computeImageStatus } from '@/lib/posting-queue-image-status';
 
 // Listing fields needed for auto-generating titles/descriptions when the
 // caller does not supply explicit values. Kept narrow so the listing select
@@ -169,6 +170,19 @@ export async function GET(request: NextRequest) {
               platform: true,
               askingPrice: true,
               imageUrls: true,
+              // Pull the sorted Firebase Storage images so the UI can show
+              // thumbnails and decide whether a manual upload is required
+              // without a follow-up request. We intentionally use nested
+              // `select` (not `include`) to keep the listing payload narrow.
+              images: {
+                select: {
+                  id: true,
+                  imageIndex: true,
+                  storageUrl: true,
+                  contentType: true,
+                },
+                orderBy: { imageIndex: 'asc' },
+              },
             },
           },
         },
@@ -179,7 +193,15 @@ export async function GET(request: NextRequest) {
       prisma.postingQueueItem.count({ where }),
     ]);
 
-    return NextResponse.json({ items, total, limit, offset });
+    // Compute imageStatus at serialization time. This field is intentionally
+    // NOT persisted on PostingQueueItem — it becomes stale the moment images
+    // are uploaded later. Cheap to compute here via the eagerly-loaded images.
+    const serialized = items.map((item) => ({
+      ...item,
+      imageStatus: computeImageStatus(item.listing),
+    }));
+
+    return NextResponse.json({ items: serialized, total, limit, offset });
   } catch (error) {
     console.error('GET /api/posting-queue error:', error);
     return handleError(error);

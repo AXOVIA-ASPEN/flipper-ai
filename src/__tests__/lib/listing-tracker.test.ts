@@ -4,9 +4,16 @@ import {
   processListingCheck,
   getTrackableListings,
   runTrackingCycle,
+  classifyHttpResponse,
+  isPriceChangeMeaningful,
+  updatePlatformParseStats,
+  isAnomalyThresholdExceeded,
+  updateListingStateWithEvent,
   TRACKABLE_STATUSES,
   TERMINAL_STATUSES,
+  type PlatformParseStats,
 } from '@/lib/listing-tracker';
+import { NotificationEventType } from '@/lib/notification-events';
 
 // Mock prisma
 jest.mock('@/lib/db', () => ({
@@ -16,7 +23,20 @@ jest.mock('@/lib/db', () => ({
       findUnique: jest.fn(),
       update: jest.fn(),
     },
+    $transaction: jest.fn(),
   },
+}));
+
+// Mock notification-events — listing-tracker imports it for updateListingStateWithEvent
+jest.mock('@/lib/notification-events', () => ({
+  createNotificationEvent: jest.fn().mockResolvedValue(undefined),
+  NotificationEventType: {
+    LISTING_SOLD: 'listing.sold',
+    LISTING_PRICE_CHANGED: 'listing.price_changed',
+    LISTING_EXPIRING: 'listing.expiring',
+    LISTING_UNAVAILABLE: 'listing.unavailable',
+  },
+  buildDeduplicationKey: jest.fn().mockReturnValue('key'),
 }));
 
 import { prisma } from '@/lib/db';
@@ -127,27 +147,55 @@ describe('listing-tracker', () => {
   });
 
   describe('getTrackableListings', () => {
-    it('queries for trackable statuses', async () => {
+    it('queries for trackable statuses with lastMonitoredAt ordering', async () => {
       (mockPrisma.listing.findMany as jest.Mock).mockResolvedValue([]);
       await getTrackableListings();
 
-      expect(mockPrisma.listing.findMany).toHaveBeenCalledWith({
-        where: { status: { in: TRACKABLE_STATUSES } },
-        select: {
-          id: true,
-          title: true,
-          platform: true,
-          url: true,
-          askingPrice: true,
-          status: true,
-          userId: true,
-        },
-      });
+      expect(mockPrisma.listing.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { status: { in: TRACKABLE_STATUSES } },
+          select: expect.objectContaining({
+            id: true,
+            title: true,
+            platform: true,
+            url: true,
+            askingPrice: true,
+            status: true,
+            userId: true,
+            lastMonitoredAt: true,
+          }),
+          orderBy: [{ lastMonitoredAt: 'asc' }],
+        })
+      );
     });
 
-    it('returns listing data', async () => {
+    it('applies cursor pagination when cursor is provided', async () => {
+      (mockPrisma.listing.findMany as jest.Mock).mockResolvedValue([]);
+      await getTrackableListings({ cursor: 'listing-5', take: 20 });
+
+      expect(mockPrisma.listing.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          cursor: { id: 'listing-5' },
+          skip: 1,
+          take: 20,
+        })
+      );
+    });
+
+    it('scopes to userId when provided', async () => {
+      (mockPrisma.listing.findMany as jest.Mock).mockResolvedValue([]);
+      await getTrackableListings({ userId: 'user-123' });
+
+      expect(mockPrisma.listing.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({ userId: 'user-123' }),
+        })
+      );
+    });
+
+    it('returns listing data including lastMonitoredAt', async () => {
       const mockListings = [
-        { id: '1', title: 'iPhone', platform: 'EBAY', url: 'https://ebay.com/1', askingPrice: 500, status: 'NEW', userId: 'u1' },
+        { id: '1', title: 'iPhone', platform: 'EBAY', url: 'https://ebay.com/1', askingPrice: 500, status: 'NEW', userId: 'u1', lastMonitoredAt: null },
       ];
       (mockPrisma.listing.findMany as jest.Mock).mockResolvedValue(mockListings);
 
@@ -361,5 +409,285 @@ describe('listing-tracker - additional branch coverage', () => {
 
     expect(result.errors).toHaveLength(1);
     expect(result.errors[0].error).toBe('non-error string thrown'); // String('non-error string thrown')
+  });
+});
+
+// ── Story 10.1 additions ──────────────────────────────────────────────────────
+
+describe('listing-tracker - Story 10.1 additions', () => {
+  describe('classifyHttpResponse()', () => {
+    it('returns "removed" for HTTP 404', () => {
+      expect(classifyHttpResponse(404, '')).toBe('removed');
+    });
+
+    it('returns "removed" for HTTP 410', () => {
+      expect(classifyHttpResponse(410, '')).toBe('removed');
+    });
+
+    it('returns "removed" for 200 with "deleted" text', () => {
+      expect(classifyHttpResponse(200, 'this posting has been deleted by its author')).toBe('removed');
+    });
+
+    it('returns "rate_limited" for HTTP 403', () => {
+      expect(classifyHttpResponse(403, '')).toBe('rate_limited');
+    });
+
+    it('returns "rate_limited" for HTTP 429', () => {
+      expect(classifyHttpResponse(429, '')).toBe('rate_limited');
+    });
+
+    it('returns "rate_limited" for 200 with CAPTCHA content', () => {
+      expect(classifyHttpResponse(200, 'Please complete the captcha to continue')).toBe('rate_limited');
+    });
+
+    it('returns "rate_limited" for 200 with "blocked" text', () => {
+      expect(classifyHttpResponse(200, 'you have been blocked')).toBe('rate_limited');
+    });
+
+    it('returns "ok" for 200 with normal listing content', () => {
+      expect(classifyHttpResponse(200, 'iPhone 14 Pro - $500')).toBe('ok');
+    });
+
+    it('does NOT classify 403 as "removed" (rate limit, not removal)', () => {
+      const result = classifyHttpResponse(403, '');
+      expect(result).toBe('rate_limited');
+      expect(result).not.toBe('removed');
+    });
+
+    it('does NOT classify 200 with incidental "blocked" word as rate_limited', () => {
+      // "blocked drains" is legitimate listing content — should not trigger rate limit
+      expect(classifyHttpResponse(200, 'Blocked drains cleaning tool - $25')).toBe('ok');
+    });
+  });
+
+  describe('isPriceChangeMeaningful()', () => {
+    it('returns true when change exceeds both thresholds via max()', () => {
+      // threshold = max(1.0, 100 * 5/100) = max(1.0, 5.0) = 5.0; $6 >= 5.0 → true
+      expect(isPriceChangeMeaningful(100, 94, 1.0, 5)).toBe(true);
+    });
+
+    it('returns true when absolute dominates the max threshold', () => {
+      // threshold = max(100, 1000 * 5/100) = max(100, 50) = 100; $110 >= 100 → true
+      expect(isPriceChangeMeaningful(1000, 890, 100, 5)).toBe(true);
+    });
+
+    it('returns false when change is below max(minDelta, percentThreshold)', () => {
+      // threshold = max(1.0, 100 * 5/100) = max(1.0, 5.0) = 5.0; $0.50 < 5.0 → false
+      expect(isPriceChangeMeaningful(100, 100.5, 1.0, 5)).toBe(false);
+    });
+
+    it('returns false for small absolute change on expensive item (percent threshold dominates)', () => {
+      // threshold = max(1.0, 10000 * 5/100) = max(1.0, 500) = 500; $2 < 500 → false
+      expect(isPriceChangeMeaningful(10000, 9998, 1.0, 5)).toBe(false);
+    });
+
+    it('returns false when absolute exceeds minDelta but not the percent-derived threshold', () => {
+      // threshold = max(1.0, 100 * 5/100) = max(1.0, 5.0) = 5.0; $2 < 5.0 → false
+      expect(isPriceChangeMeaningful(100, 98, 1.0, 5)).toBe(false);
+    });
+
+    it('returns false when percent exceeds minPercent but absolute below percent-derived threshold', () => {
+      // threshold = max(100, 1000 * 5/100) = max(100, 50) = 100; $60 < 100 → false
+      expect(isPriceChangeMeaningful(1000, 940, 100, 5)).toBe(false);
+    });
+  });
+
+  describe('updatePlatformParseStats()', () => {
+    it('initializes platform entry on first call', () => {
+      const stats: Record<string, PlatformParseStats> = {};
+      updatePlatformParseStats(stats, 'CRAIGSLIST', true, false, false);
+
+      expect(stats['CRAIGSLIST']).toEqual({
+        checked: 1,
+        parsed: 1,
+        events: 0,
+        unavailable: 0,
+      });
+    });
+
+    it('accumulates counts across multiple calls', () => {
+      const stats: Record<string, PlatformParseStats> = {};
+      updatePlatformParseStats(stats, 'EBAY', true, true, false);
+      updatePlatformParseStats(stats, 'EBAY', false, false, true);
+      updatePlatformParseStats(stats, 'EBAY', true, false, false);
+
+      expect(stats['EBAY']).toEqual({
+        checked: 3,
+        parsed: 2,
+        events: 1,
+        unavailable: 1,
+      });
+    });
+
+    it('tracks different platforms independently', () => {
+      const stats: Record<string, PlatformParseStats> = {};
+      updatePlatformParseStats(stats, 'CRAIGSLIST', true, false, false);
+      updatePlatformParseStats(stats, 'OFFERUP', false, false, true);
+
+      expect(stats['CRAIGSLIST'].checked).toBe(1);
+      expect(stats['OFFERUP'].checked).toBe(1);
+      expect(stats['OFFERUP'].unavailable).toBe(1);
+    });
+  });
+
+  describe('isAnomalyThresholdExceeded()', () => {
+    it('returns false when fewer than 3 checks (avoid false positives on small batches)', () => {
+      const stats: PlatformParseStats = { checked: 2, parsed: 0, events: 0, unavailable: 2 };
+      expect(isAnomalyThresholdExceeded(stats, 30)).toBe(false);
+    });
+
+    it('returns true when unavailable ratio exceeds threshold', () => {
+      const stats: PlatformParseStats = { checked: 10, parsed: 3, events: 0, unavailable: 5 };
+      expect(isAnomalyThresholdExceeded(stats, 30)).toBe(true); // 50% > 30%
+    });
+
+    it('returns false when unavailable ratio is below threshold', () => {
+      const stats: PlatformParseStats = { checked: 10, parsed: 8, events: 2, unavailable: 2 };
+      expect(isAnomalyThresholdExceeded(stats, 30)).toBe(false); // 20% < 30%
+    });
+
+    it('returns false when exactly at threshold (not exceeded)', () => {
+      const stats: PlatformParseStats = { checked: 10, parsed: 7, events: 0, unavailable: 3 };
+      expect(isAnomalyThresholdExceeded(stats, 30)).toBe(false); // 30% = 30%, not exceeded
+    });
+  });
+
+  describe('updateListingStateWithEvent()', () => {
+    const makeTx = (overrides: Partial<{ update: jest.Mock; create: jest.Mock }> = {}) => ({
+      listing: { update: overrides.update ?? jest.fn().mockResolvedValue({}) },
+      notificationEvent: { create: overrides.create ?? jest.fn().mockResolvedValue({}) },
+    });
+
+    const baseListing = {
+      userId: 'user-1',
+      title: 'Test Item',
+      url: 'https://craigslist.org/item/1',
+      platform: 'CRAIGSLIST',
+    };
+
+    it('updates listing to SOLD on sold event', async () => {
+      const updateMock = jest.fn().mockResolvedValue({});
+      const tx = makeTx({ update: updateMock });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await updateListingStateWithEvent(tx as any, 'listing-1', baseListing, {
+        type: NotificationEventType.LISTING_SOLD,
+      });
+
+      expect(updateMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'listing-1' },
+          data: expect.objectContaining({ status: 'SOLD', lastMonitoredAt: expect.any(Date) }),
+        })
+      );
+    });
+
+    it('updates listing to EXPIRED on unavailable event', async () => {
+      const updateMock = jest.fn().mockResolvedValue({});
+      const tx = makeTx({ update: updateMock });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await updateListingStateWithEvent(tx as any, 'listing-1', baseListing, {
+        type: NotificationEventType.LISTING_UNAVAILABLE,
+      });
+
+      expect(updateMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ status: 'EXPIRED' }),
+        })
+      );
+    });
+
+    it('updates asking price on price changed event', async () => {
+      const updateMock = jest.fn().mockResolvedValue({});
+      const tx = makeTx({ update: updateMock });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await updateListingStateWithEvent(tx as any, 'listing-1', baseListing, {
+        type: NotificationEventType.LISTING_PRICE_CHANGED,
+        oldPrice: 100,
+        newPrice: 75,
+      });
+
+      expect(updateMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ askingPrice: 75 }),
+        })
+      );
+    });
+
+    it('calls createNotificationEvent for user with userId', async () => {
+      const tx = makeTx();
+      const { createNotificationEvent: createMock } = jest.requireMock('@/lib/notification-events') as {
+        createNotificationEvent: jest.Mock;
+      };
+      createMock.mockClear();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await updateListingStateWithEvent(tx as any, 'listing-1', baseListing, {
+        type: NotificationEventType.LISTING_SOLD,
+      });
+
+      expect(createMock).toHaveBeenCalledWith(
+        expect.anything(), // tx
+        expect.objectContaining({
+          userId: 'user-1',
+          listingId: 'listing-1',
+          eventType: 'listing.sold',
+        })
+      );
+    });
+
+    it('includes expiryDate in payload for expiring events', async () => {
+      const tx = makeTx();
+      const { createNotificationEvent: createMock } = jest.requireMock('@/lib/notification-events') as {
+        createNotificationEvent: jest.Mock;
+      };
+      createMock.mockClear();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await updateListingStateWithEvent(tx as any, 'listing-1', baseListing, {
+        type: NotificationEventType.LISTING_EXPIRING,
+        expiryDate: '2026-05-01T00:00:00Z',
+      });
+
+      expect(createMock).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          eventType: 'listing.expiring',
+          payload: expect.objectContaining({ expiryDate: '2026-05-01T00:00:00Z' }),
+        })
+      );
+    });
+
+    it('handles price changed without newPrice (no price update)', async () => {
+      const updateMock = jest.fn().mockResolvedValue({});
+      const tx = makeTx({ update: updateMock });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await updateListingStateWithEvent(tx as any, 'listing-1', baseListing, {
+        type: NotificationEventType.LISTING_PRICE_CHANGED,
+        // newPrice intentionally omitted
+      });
+
+      expect(updateMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.not.objectContaining({ askingPrice: expect.anything() }),
+        })
+      );
+    });
+
+    it('skips notification event when userId is null', async () => {
+      const createMock = jest.fn().mockResolvedValue({});
+      const tx = makeTx({ create: createMock });
+      const listingNoUser = { ...baseListing, userId: null };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await updateListingStateWithEvent(tx as any, 'listing-1', listingNoUser, {
+        type: NotificationEventType.LISTING_SOLD,
+      });
+
+      expect(createMock).not.toHaveBeenCalled();
+    });
   });
 });

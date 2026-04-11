@@ -63,6 +63,21 @@ describe('logger', () => {
       logger.info('no meta');
       expect(mockPinoInstance.info).toHaveBeenCalledWith({}, 'no meta');
     });
+
+    it('passes empty object for warn when no meta provided', () => {
+      logger.warn('warn no meta');
+      expect(mockPinoInstance.warn).toHaveBeenCalledWith({}, 'warn no meta');
+    });
+
+    it('passes empty object for error when no meta provided', () => {
+      logger.error('error no meta');
+      expect(mockPinoInstance.error).toHaveBeenCalledWith({}, 'error no meta');
+    });
+
+    it('passes empty object for fatal when no meta provided', () => {
+      logger.fatal('fatal no meta');
+      expect(mockPinoInstance.fatal).toHaveBeenCalledWith({}, 'fatal no meta');
+    });
   });
 
   describe('timed()', () => {

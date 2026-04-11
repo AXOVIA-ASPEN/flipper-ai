@@ -207,6 +207,85 @@ describe('GET /api/posting-queue', () => {
     expect(data).toHaveProperty('total');
   });
 
+  // Story 9.4: the GET route must include ListingImage[] in the listing select
+  // AND must expose a computed imageStatus field per queue item.
+  it('eager-loads sorted listing.images in the listing select (Story 9.4)', async () => {
+    mockPrisma.postingQueueItem.findMany.mockResolvedValue([]);
+    mockPrisma.postingQueueItem.count.mockResolvedValue(0);
+
+    await GET(makeRequest('http://localhost:3000/api/posting-queue'));
+
+    expect(mockPrisma.postingQueueItem.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        include: expect.objectContaining({
+          listing: expect.objectContaining({
+            select: expect.objectContaining({
+              images: expect.objectContaining({
+                select: expect.objectContaining({
+                  id: true,
+                  imageIndex: true,
+                  storageUrl: true,
+                  contentType: true,
+                }),
+                orderBy: { imageIndex: 'asc' },
+              }),
+            }),
+          }),
+        }),
+      })
+    );
+  });
+
+  it("computes imageStatus='available' for items whose listing has Firebase Storage images", async () => {
+    mockPrisma.postingQueueItem.findMany.mockResolvedValue([
+      {
+        id: 'pq-1',
+        listing: {
+          id: 'lst-1',
+          images: [{ id: 'img-1', imageIndex: 0, storageUrl: 'https://x', contentType: 'image/jpeg' }],
+          imageUrls: null,
+        },
+      },
+    ]);
+    mockPrisma.postingQueueItem.count.mockResolvedValue(1);
+
+    const res = await GET(makeRequest('http://localhost:3000/api/posting-queue'));
+    const data = await res.json();
+    expect(data.items[0].imageStatus).toBe('available');
+  });
+
+  it("computes imageStatus='legacy-fallback' for items with only legacy imageUrls", async () => {
+    mockPrisma.postingQueueItem.findMany.mockResolvedValue([
+      {
+        id: 'pq-1',
+        listing: {
+          id: 'lst-1',
+          images: [],
+          imageUrls: JSON.stringify(['https://legacy.example/a.jpg']),
+        },
+      },
+    ]);
+    mockPrisma.postingQueueItem.count.mockResolvedValue(1);
+
+    const res = await GET(makeRequest('http://localhost:3000/api/posting-queue'));
+    const data = await res.json();
+    expect(data.items[0].imageStatus).toBe('legacy-fallback');
+  });
+
+  it("computes imageStatus='manual-upload-required' for items with no images at all", async () => {
+    mockPrisma.postingQueueItem.findMany.mockResolvedValue([
+      {
+        id: 'pq-1',
+        listing: { id: 'lst-1', images: [], imageUrls: null },
+      },
+    ]);
+    mockPrisma.postingQueueItem.count.mockResolvedValue(1);
+
+    const res = await GET(makeRequest('http://localhost:3000/api/posting-queue'));
+    const data = await res.json();
+    expect(data.items[0].imageStatus).toBe('manual-upload-required');
+  });
+
   it('returns 401 when unauthenticated', async () => {
     const { getAuthUserId } = require('@/lib/auth-middleware');
     getAuthUserId.mockResolvedValueOnce(null);

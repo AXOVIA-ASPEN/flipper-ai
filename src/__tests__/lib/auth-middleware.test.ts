@@ -308,6 +308,14 @@ describe('Auth Middleware (Firebase)', () => {
 
       await expect(getUserIdOrDefault()).rejects.toThrow('Unauthorized');
     });
+
+    test('should return authenticated user ID in development mode', async () => {
+      process.env.NODE_ENV = 'development';
+      mockGetCurrentUserId.mockResolvedValue('dev-user-123');
+
+      const userId = await getUserIdOrDefault();
+      expect(userId).toBe('dev-user-123');
+    });
   });
 
   describe('requirePageAuth', () => {

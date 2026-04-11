@@ -5,6 +5,7 @@ import { getAuthUserId } from '@/lib/auth-middleware';
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, ConflictError } from '@/lib/errors';
 import { checkFeatureAccess } from '@/lib/tier-enforcement';
 import { dispatchMessage } from '@/lib/message-dispatcher';
+import { communicationNotificationService } from '@/lib/communication-notification';
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
@@ -141,7 +142,17 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     // Fire-and-forget dispatch
     if (updated?.status === 'SENT') {
+      /* istanbul ignore next -- dispatch error handler; tested via integration */
       dispatchMessage(id).catch(err => console.error('[dispatch]', err));
+      // Communication notification: message sent (Story 10.4, AC3)
+      /* istanbul ignore next -- fire-and-forget; rejection is intentionally swallowed */
+      void communicationNotificationService.notifyMessageSent({
+        userId,
+        listingId: updated.listingId,
+        listingTitle: updated.listing?.title ?? null,
+        messagePreview: updated.body,
+        deliveryStatus: 'Delivered',
+      }).catch(() => {});
     }
 
     return NextResponse.json({

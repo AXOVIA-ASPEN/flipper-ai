@@ -34,6 +34,8 @@ export interface TierLimits {
   messaging: boolean;
   /** Access to eBay cross-listing */
   ebayCrossListing: boolean;
+  /** Access to meeting & logistics features (Google Maps routes, calendar) — Story 12.x */
+  meetingLogistics: boolean;
 }
 
 export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
@@ -47,6 +49,7 @@ export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
     priceHistory: false,
     messaging: false,
     ebayCrossListing: false,
+    meetingLogistics: false,
   },
   FLIPPER: {
     name: 'Flipper',
@@ -58,6 +61,7 @@ export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
     priceHistory: true,
     messaging: true,
     ebayCrossListing: false,
+    meetingLogistics: false,
   },
   PRO: {
     name: 'Pro',
@@ -69,6 +73,7 @@ export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
     priceHistory: true,
     messaging: true,
     ebayCrossListing: true,
+    meetingLogistics: true,
   },
 };
 
@@ -126,7 +131,7 @@ export function canAddSearchConfig(tier: SubscriptionTier, currentCount: number)
  */
 export function hasFeatureAccess(
   tier: SubscriptionTier,
-  feature: keyof Pick<TierLimits, 'aiAnalysis' | 'priceHistory' | 'messaging' | 'ebayCrossListing'>
+  feature: keyof Pick<TierLimits, 'aiAnalysis' | 'priceHistory' | 'messaging' | 'ebayCrossListing' | 'meetingLogistics'>
 ): boolean {
   return TIER_LIMITS[tier][feature];
 }

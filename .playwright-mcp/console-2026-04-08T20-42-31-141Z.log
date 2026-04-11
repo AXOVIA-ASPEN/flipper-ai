@@ -1,0 +1,885 @@
+[     452ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[     527ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[     595ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:5744:40)
+    at _assert (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:5748:15)
+    at Component.instanceFactory (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:15591:9)
+    at Provider.getOrInitializeService (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:3295:39)
+    at Provider.initialize (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:3243:31)
+    at initializeAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:8731:27)
+    at getAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:15673:18)
+    at getFirebaseAuth (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:657:297)
+    at FirebaseAuthProvider.useEffect (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:790:179)
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:14877:22)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:966:74)
+    at commitHookEffectListMount (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7267:167)
+    at commitHookPassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7302:60)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8697:33)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+[     651ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[     692ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/messages/threads?limit=100:0
+[     714ms] [LOG] [Fast Refresh] done in 169ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[   12187ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[   12302ms] [LOG] [Fast Refresh] done in 216ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[   20889ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[   20932ms] [LOG] [Fast Refresh] done in 144ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[   62838ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[   62905ms] [LOG] [Fast Refresh] done in 170ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[   91608ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[   91643ms] [LOG] [Fast Refresh] done in 138ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  103783ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  103877ms] [LOG] [Fast Refresh] done in 195ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  105024ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  105038ms] [LOG] [Fast Refresh] done in 116ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  122472ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  122488ms] [LOG] [Fast Refresh] done in 117ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  138078ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  138145ms] [LOG] [Fast Refresh] done in 169ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  146207ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  146241ms] [LOG] [Fast Refresh] done in 136ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  152786ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  152826ms] [LOG] [Fast Refresh] done in 140ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  160624ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  160638ms] [LOG] [Fast Refresh] done in 115ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  165155ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  165164ms] [LOG] [Fast Refresh] done in 110ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  177785ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  177830ms] [LOG] [Fast Refresh] done in 148ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  192516ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  192549ms] [LOG] [Fast Refresh] done in 134ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  203966ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  203986ms] [LOG] [Fast Refresh] done in 122ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  212257ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  212283ms] [LOG] [Fast Refresh] done in 128ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  213783ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  213799ms] [LOG] [Fast Refresh] done in 117ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  218210ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  218245ms] [LOG] [Fast Refresh] done in 137ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  251644ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  251689ms] [LOG] [Fast Refresh] done in 146ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  313010ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  313135ms] [LOG] [Fast Refresh] done in 226ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  359960ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  360037ms] [LOG] [Fast Refresh] done in 179ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  383005ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  383034ms] [LOG] [Fast Refresh] done in 131ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  390745ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  390792ms] [LOG] [Fast Refresh] done in 149ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  428822ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  428903ms] [LOG] [Fast Refresh] done in 183ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  438341ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  438376ms] [LOG] [Fast Refresh] done in 137ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  460123ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  460156ms] [LOG] [Fast Refresh] done in 135ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  497795ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  497996ms] [LOG] [Fast Refresh] done in 304ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  520791ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  520827ms] [LOG] [Fast Refresh] done in 137ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  534838ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  534919ms] [LOG] [Fast Refresh] done in 183ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  545814ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  545899ms] [LOG] [Fast Refresh] done in 187ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  573886ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  574064ms] [LOG] [Fast Refresh] done in 279ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  637130ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  637310ms] [LOG] [Fast Refresh] done in 281ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  651689ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  651703ms] [LOG] [Fast Refresh] done in 117ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  659518ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  659527ms] [LOG] [Fast Refresh] done in 110ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  684088ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  684380ms] [LOG] [Fast Refresh] done in 395ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  713217ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  713560ms] [LOG] [Fast Refresh] done in 445ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  786096ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  786795ms] [LOG] [Fast Refresh] done in 801ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  790574ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  791306ms] [LOG] [Fast Refresh] done in 834ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  855983ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  856939ms] [LOG] [Fast Refresh] done in 1057ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  908527ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  909446ms] [LOG] [Fast Refresh] done in 1021ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  917928ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  918460ms] [LOG] [Fast Refresh] done in 634ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  925124ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  925269ms] [LOG] [Fast Refresh] done in 246ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  930269ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  930479ms] [LOG] [Fast Refresh] done in 311ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  938563ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  938976ms] [LOG] [Fast Refresh] done in 516ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  943876ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  944338ms] [LOG] [Fast Refresh] done in 565ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  955249ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  955788ms] [LOG] [Fast Refresh] done in 641ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  968974ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  969661ms] [LOG] [Fast Refresh] done in 788ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  970211ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  970666ms] [LOG] [Fast Refresh] done in 555ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  984815ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  985874ms] [LOG] [Fast Refresh] done in 1160ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  994416ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[  995162ms] [LOG] [Fast Refresh] done in 848ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1029361ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1030270ms] [LOG] [Fast Refresh] done in 1011ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1084728ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1084901ms] [LOG] [Fast Refresh] done in 274ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1089319ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1089873ms] [LOG] [Fast Refresh] done in 656ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1094638ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1095057ms] [LOG] [Fast Refresh] done in 520ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1129518ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1133556ms] [LOG] [Fast Refresh] done in 4145ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1170551ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1173402ms] [LOG] [Fast Refresh] done in 2953ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1178737ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1179261ms] [LOG] [Fast Refresh] done in 626ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1218634ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1219202ms] [LOG] [Fast Refresh] done in 671ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1229840ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1230038ms] [LOG] [Fast Refresh] done in 300ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1230386ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1230664ms] [LOG] [Fast Refresh] done in 380ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1234553ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1234777ms] [LOG] [Fast Refresh] done in 326ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1244429ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1244909ms] [LOG] [Fast Refresh] done in 584ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1247142ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1248512ms] [LOG] [Fast Refresh] done in 1471ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1248670ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1248819ms] [LOG] [Fast Refresh] done in 250ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1251600ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1251723ms] [LOG] [Fast Refresh] done in 225ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1254446ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1254498ms] [LOG] [Fast Refresh] done in 154ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1257557ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1257673ms] [LOG] [Fast Refresh] done in 217ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1269822ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1270571ms] [LOG] [Fast Refresh] done in 851ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1270872ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1271238ms] [LOG] [Fast Refresh] done in 176ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1271375ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1271547ms] [LOG] [Fast Refresh] done in 273ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1272260ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1272327ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1272550ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:5744:40)
+    at _assert (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:5748:15)
+    at Component.instanceFactory (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:15591:9)
+    at Provider.getOrInitializeService (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:3295:39)
+    at Provider.initialize (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:3243:31)
+    at initializeAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:8731:27)
+    at getAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:15673:18)
+    at getFirebaseAuth (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:657:297)
+    at FirebaseAuthProvider.useEffect (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:790:179)
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:14877:22)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:966:74)
+    at commitHookEffectListMount (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7267:167)
+    at commitHookPassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7302:60)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8697:33)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+[ 1272527ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1272577ms] [LOG] [Fast Refresh] done in 152ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1272590ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/messages/threads?limit=100:0
+[ 1273182ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1273345ms] [LOG] [Fast Refresh] done in 265ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1279719ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1279939ms] [LOG] [Fast Refresh] done in 321ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1286436ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1286555ms] [LOG] [Fast Refresh] done in 220ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1288835ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1289006ms] [LOG] [Fast Refresh] done in 272ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1300238ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1300366ms] [LOG] [Fast Refresh] done in 230ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1300452ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1300860ms] [LOG] [Fast Refresh] done in 86ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1303121ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1303165ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1303324ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:5744:40)
+    at _assert (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:5748:15)
+    at Component.instanceFactory (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:15591:9)
+    at Provider.getOrInitializeService (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:3295:39)
+    at Provider.initialize (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:3243:31)
+    at initializeAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:8731:27)
+    at getAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:15673:18)
+    at getFirebaseAuth (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:657:297)
+    at FirebaseAuthProvider.useEffect (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:790:179)
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:14877:22)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:966:74)
+    at commitHookEffectListMount (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7267:167)
+    at commitHookPassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7302:60)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8697:33)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+[ 1303439ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1303442ms] [LOG] [Fast Refresh] done in 106ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1303446ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/messages/threads?limit=100:0
+[ 1318478ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1318786ms] [LOG] [Fast Refresh] done in 411ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1320992ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1321114ms] [LOG] [Fast Refresh] done in 223ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1326607ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1326704ms] [LOG] [Fast Refresh] done in 198ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1340881ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1340937ms] [LOG] [Fast Refresh] done in 157ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1349284ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1349335ms] [LOG] [Fast Refresh] done in 153ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1355805ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1356024ms] [LOG] [Fast Refresh] done in 321ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1362449ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1362651ms] [LOG] [Fast Refresh] done in 302ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1366196ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1366288ms] [LOG] [Fast Refresh] done in 193ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1371216ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1371270ms] [LOG] [Fast Refresh] done in 154ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1371625ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1371694ms] [LOG] [Fast Refresh] done in 170ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1393851ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1394152ms] [LOG] [Fast Refresh] done in 404ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1421334ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1421517ms] [LOG] [Fast Refresh] done in 284ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1448564ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1448875ms] [LOG] [Fast Refresh] done in 413ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1469116ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1469280ms] [LOG] [Fast Refresh] done in 267ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1494765ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1494875ms] [LOG] [Fast Refresh] done in 213ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1505376ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1505567ms] [LOG] [Fast Refresh] done in 292ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1517665ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1517692ms] [LOG] [Fast Refresh] done in 128ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1535986ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1536137ms] [LOG] [Fast Refresh] done in 252ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1562644ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1562684ms] [LOG] [Fast Refresh] done in 141ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1566998ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1567050ms] [LOG] [Fast Refresh] done in 155ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1606818ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1607094ms] [LOG] [Fast Refresh] done in 378ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1654533ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1654691ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1654805ms] [LOG] [Fast Refresh] done in 254ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1654937ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1654991ms] [LOG] [Fast Refresh] done in 155ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1655243ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1655255ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1655294ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:5744:40)
+    at _assert (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:5748:15)
+    at Component.instanceFactory (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:15591:9)
+    at Provider.getOrInitializeService (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:3295:39)
+    at Provider.initialize (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:3243:31)
+    at initializeAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:8731:27)
+    at getAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:15673:18)
+    at getFirebaseAuth (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:657:297)
+    at FirebaseAuthProvider.useEffect (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:790:179)
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:14877:22)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:966:74)
+    at commitHookEffectListMount (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7267:167)
+    at commitHookPassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7302:60)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8697:33)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+[ 1655304ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/messages/threads?limit=100:0
+[ 1658618ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1658656ms] [LOG] [Fast Refresh] done in 139ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1671076ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1671221ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1671403ms] [LOG] [Fast Refresh] done in 234ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1671947ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1671966ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 1672153ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:5744:40)
+    at _assert (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:5748:15)
+    at Component.instanceFactory (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:15591:9)
+    at Provider.getOrInitializeService (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:3295:39)
+    at Provider.initialize (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:3243:31)
+    at initializeAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:8731:27)
+    at getAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:15673:18)
+    at getFirebaseAuth (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:657:297)
+    at FirebaseAuthProvider.useEffect (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:790:179)
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:14877:22)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:966:74)
+    at commitHookEffectListMount (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7267:167)
+    at commitHookPassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7302:60)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8697:33)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+[ 1672099ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/messages/threads?limit=100:0
+[ 2032125ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2032346ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2032448ms] [LOG] [Fast Refresh] done in 321ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2032567ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2032707ms] [LOG] [Fast Refresh] done in 240ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2032995ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2033019ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2033087ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:5744:40)
+    at _assert (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:5748:15)
+    at Component.instanceFactory (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:15591:9)
+    at Provider.getOrInitializeService (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:3295:39)
+    at Provider.initialize (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:3243:31)
+    at initializeAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:8731:27)
+    at getAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:15673:18)
+    at getFirebaseAuth (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:657:297)
+    at FirebaseAuthProvider.useEffect (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:790:179)
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:14877:22)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:966:74)
+    at commitHookEffectListMount (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7267:167)
+    at commitHookPassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7302:60)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8697:33)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+[ 2033106ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/messages/threads?limit=100:0
+[ 2145866ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2145975ms] [LOG] [Fast Refresh] done in 211ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2168075ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2168150ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2168168ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2168299ms] [LOG] [Fast Refresh] done in 193ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2168512ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2168543ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2168589ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:5744:40)
+    at _assert (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:5748:15)
+    at Component.instanceFactory (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:15591:9)
+    at Provider.getOrInitializeService (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:3295:39)
+    at Provider.initialize (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:3243:31)
+    at initializeAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:8731:27)
+    at getAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:15673:18)
+    at getFirebaseAuth (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:657:297)
+    at FirebaseAuthProvider.useEffect (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:790:179)
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:14877:22)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:966:74)
+    at commitHookEffectListMount (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7267:167)
+    at commitHookPassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7302:60)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8697:33)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+[ 2168603ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/messages/threads?limit=100:0
+[ 2310694ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2310814ms] [LOG] [Fast Refresh] done in 222ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2319473ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2319473ms] [LOG] [Fast Refresh] done in 101ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2323775ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2323776ms] [LOG] [Fast Refresh] done in 102ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2390867ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2390907ms] [LOG] [Fast Refresh] done in 142ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2398449ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2398450ms] [LOG] [Fast Refresh] done in 101ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2431674ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2431679ms] [LOG] [Fast Refresh] done in 107ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2451970ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2451974ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2451999ms] [LOG] [Fast Refresh] done in 104ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2452274ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2452283ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2452317ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:5744:40)
+    at _assert (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:5748:15)
+    at Component.instanceFactory (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:15591:9)
+    at Provider.getOrInitializeService (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:3295:39)
+    at Provider.initialize (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:3243:31)
+    at initializeAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:8731:27)
+    at getAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:15673:18)
+    at getFirebaseAuth (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:657:297)
+    at FirebaseAuthProvider.useEffect (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:790:179)
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:14877:22)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:966:74)
+    at commitHookEffectListMount (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7267:167)
+    at commitHookPassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7302:60)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8697:33)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+[ 2452334ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/messages/threads?limit=100:0
+[ 2580100ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2580122ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2580153ms] [LOG] [Fast Refresh] done in 124ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2580405ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2580416ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2580446ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:5744:40)
+    at _assert (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:5748:15)
+    at Component.instanceFactory (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:15591:9)
+    at Provider.getOrInitializeService (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:3295:39)
+    at Provider.initialize (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:3243:31)
+    at initializeAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:8731:27)
+    at getAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:15673:18)
+    at getFirebaseAuth (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:657:297)
+    at FirebaseAuthProvider.useEffect (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:790:179)
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:14877:22)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:966:74)
+    at commitHookEffectListMount (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7267:167)
+    at commitHookPassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7302:60)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8697:33)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+[ 2580456ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/messages/threads?limit=100:0
+[ 2598888ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2598902ms] [LOG] [Fast Refresh] done in 114ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2636340ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2636361ms] [LOG] [Fast Refresh] done in 121ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2650451ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2650451ms] [LOG] [Fast Refresh] done in 102ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2722897ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2722904ms] [LOG] [Fast Refresh] done in 108ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2950440ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 2950449ms] [LOG] [Fast Refresh] done in 111ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 3004652ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 3004672ms] [LOG] [Fast Refresh] done in 123ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 3397364ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 3397371ms] [LOG] [Fast Refresh] done in 110ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 3528694ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 3528733ms] [LOG] [Fast Refresh] done in 141ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 3611957ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 3611959ms] [LOG] [Fast Refresh] done in 103ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 3670494ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 3670495ms] [LOG] [Fast Refresh] done in 102ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 3675661ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 3675667ms] [LOG] [Fast Refresh] done in 108ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 3684759ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 3684787ms] [LOG] [Fast Refresh] done in 130ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 3928025ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 3928041ms] [LOG] [Fast Refresh] done in 118ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 3972172ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 3972174ms] [LOG] [Fast Refresh] done in 105ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4029750ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4029776ms] [LOG] [Fast Refresh] done in 128ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4098703ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4098746ms] [LOG] [Fast Refresh] done in 147ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4111897ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4111947ms] [LOG] [Fast Refresh] done in 151ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4131479ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4131482ms] [LOG] [Fast Refresh] done in 105ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4182513ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4182514ms] [LOG] [Fast Refresh] done in 105ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4336127ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4336131ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4336161ms] [LOG] [Fast Refresh] done in 104ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4336278ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4336303ms] [LOG] [Fast Refresh] done in 125ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4336509ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4336532ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4336574ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:5744:40)
+    at _assert (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:5748:15)
+    at Component.instanceFactory (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:15591:9)
+    at Provider.getOrInitializeService (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:3295:39)
+    at Provider.initialize (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:3243:31)
+    at initializeAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:8731:27)
+    at getAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_92e70279._.js:15673:18)
+    at getFirebaseAuth (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:657:297)
+    at FirebaseAuthProvider.useEffect (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:790:179)
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:14877:22)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:966:74)
+    at commitHookEffectListMount (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7267:167)
+    at commitHookPassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7302:60)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8697:33)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+[ 4336612ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/messages/threads?limit=100:0
+[ 4351613ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4351620ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4351662ms] [LOG] [Fast Refresh] done in 108ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4351953ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4351964ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4352021ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:5744:40)
+    at _assert (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:5748:15)
+    at Component.instanceFactory (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:15591:9)
+    at Provider.getOrInitializeService (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:3295:39)
+    at Provider.initialize (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:3243:31)
+    at initializeAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:8731:27)
+    at getAuth (http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:15673:18)
+    at getFirebaseAuth (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:657:297)
+    at FirebaseAuthProvider.useEffect (http://localhost:3000/_next/static/chunks/src_8b5cd026._.js:790:179)
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:14877:22)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:966:74)
+    at commitHookEffectListMount (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7267:167)
+    at commitHookPassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:7302:60)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8697:33)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8701:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8696:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8684:316)
+    at commitPassiveMountOnFiber (http://localhost:3000/_next/static/chunks/bb0e6_next_dist_compiled_react-dom_3c12eb69._.js:8758:17)
+[ 4352045ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/messages/threads?limit=100:0
+[ 4459301ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4459317ms] [LOG] [Fast Refresh] done in 119ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4540771ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4540775ms] [LOG] [Fast Refresh] done in 108ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4699011ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[ 4699019ms] [LOG] [Fast Refresh] done in 108ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298

@@ -26,6 +26,10 @@ export type SseEventType =
   | 'opportunity.created'
   | 'opportunity.updated'
   | 'alert.high-value'
+  | 'listing.sold'
+  | 'listing.price_changed'
+  | 'listing.expiring'
+  | 'listing.unavailable'
   | 'ping';
 
 export interface SseEvent<T = unknown> {

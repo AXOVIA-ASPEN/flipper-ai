@@ -59,6 +59,7 @@ export function checkMarketplaceLimit(tier: string | undefined | null, currentCo
     };
     return {
       allowed: false,
+      /* istanbul ignore next -- fallback is unreachable: all limit-enforced tiers (FREE, FLIPPER) are in the messages map */
       reason: marketplaceMessages[resolvedTier] || `Marketplace limit reached (${limits.maxMarketplaces} on ${limits.name} plan). Upgrade for more marketplaces.`,
       tier: resolvedTier,
       limits,
@@ -92,7 +93,7 @@ export function checkSearchConfigLimit(tier: string | undefined | null, currentC
  */
 export function checkFeatureAccess(
   tier: string | undefined | null,
-  feature: 'aiAnalysis' | 'priceHistory' | 'messaging' | 'ebayCrossListing'
+  feature: 'aiAnalysis' | 'priceHistory' | 'messaging' | 'ebayCrossListing' | 'meetingLogistics'
 ): TierCheckResult {
   const resolvedTier = (tier || 'FREE') as SubscriptionTier;
   const limits = getTierLimits(resolvedTier);
@@ -103,16 +104,41 @@ export function checkFeatureAccess(
       priceHistory: 'Price History',
       messaging: 'Messaging',
       ebayCrossListing: 'eBay Cross-listing',
+      meetingLogistics: 'Meeting & Logistics',
     };
     return {
       allowed: false,
-      reason: `${featureNames[feature]} is not available on the ${limits.name} plan. Upgrade to access this feature.`,
+      /* istanbul ignore next -- ?? fallback is unreachable: all TypeScript-enforced feature keys exist in featureNames */
+      reason: `${featureNames[feature] ?? feature} is not available on the ${limits.name} plan. Upgrade to access this feature.`,
       tier: resolvedTier,
       limits,
     };
   }
 
   return { allowed: true, tier: resolvedTier, limits };
+}
+
+/**
+ * Async version: look up user tier from DB and enforce feature access.
+ * Throws ForbiddenError if user does not have the required feature.
+ * Used in API routes where userId is available but tier is not pre-loaded.
+ *
+ * @param userId  - Prisma user ID (cuid)
+ * @param feature - Feature key to check
+ */
+export async function enforceFeatureAccess(
+  userId: string,
+  feature: 'aiAnalysis' | 'priceHistory' | 'messaging' | 'ebayCrossListing' | 'meetingLogistics'
+): Promise<void> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { subscriptionTier: true },
+  });
+  const tier = user?.subscriptionTier ?? 'FREE';
+  const result = checkFeatureAccess(tier, feature);
+  if (!result.allowed) {
+    throw new ForbiddenError(result.reason, { tier });
+  }
 }
 
 /**

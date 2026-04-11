@@ -36,6 +36,14 @@ jest.mock('@/lib/tier-enforcement', () => ({
 jest.mock('@/lib/message-dispatcher', () => ({
   dispatchMessage: jest.fn(() => Promise.resolve({ success: true, stub: true })),
 }));
+// Mock communication notifications (Story 10.4) — isolate from email side-effects
+jest.mock('@/lib/communication-notification', () => ({
+  communicationNotificationService: {
+    notifyMessageReceived: jest.fn().mockResolvedValue(undefined),
+    notifyDraftReady: jest.fn().mockResolvedValue(undefined),
+    notifyMessageSent: jest.fn().mockResolvedValue(undefined),
+  },
+}));
 
 const mockGetAuthUserId = getAuthUserId as jest.MockedFunction<typeof getAuthUserId>;
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
@@ -354,6 +362,36 @@ describe('/api/messages/[id]', () => {
       (mockPrisma.message.delete as jest.Mock).mockRejectedValue(new Error('DB error'));
       const res = await DELETE(makeRequest('DELETE') as any, makeParams('msg-1'));
       expect(res.status).toBe(500);
+    });
+  });
+
+  // Story 10.4: notification hook assertions (Task 7.4)
+  describe('notification hooks', () => {
+    it('fires notifyMessageSent when confirm action transitions status to SENT', async () => {
+      const { communicationNotificationService } = require('@/lib/communication-notification');
+      (communicationNotificationService.notifyMessageSent as jest.Mock).mockClear();
+
+      (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue({ ...mockMessage, status: 'PENDING_APPROVAL', listingId: 'l-1' });
+      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({ ...mockMessage, status: 'SENT', listingId: 'l-1', sentAt: new Date() });
+
+      await PATCH(makeRequest('PATCH', { action: 'confirm' }) as any, makeParams('msg-1'));
+
+      expect(communicationNotificationService.notifyMessageSent).toHaveBeenCalledTimes(1);
+      expect(communicationNotificationService.notifyMessageSent).toHaveBeenCalledWith(
+        expect.objectContaining({ userId: 'user-1' })
+      );
+    });
+
+    it('does NOT fire notifyMessageSent for edit or reject actions', async () => {
+      const { communicationNotificationService } = require('@/lib/communication-notification');
+      (communicationNotificationService.notifyMessageSent as jest.Mock).mockClear();
+
+      (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue(mockMessage);
+      // findUnique must return DRAFT so the SENT check does not fire
+      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({ ...mockMessage, status: 'DRAFT' });
+      await PATCH(makeRequest('PATCH', { action: 'edit', body: 'updated body' }) as any, makeParams('msg-1'));
+
+      expect(communicationNotificationService.notifyMessageSent).not.toHaveBeenCalled();
     });
   });
 });

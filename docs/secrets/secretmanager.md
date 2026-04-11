@@ -57,9 +57,13 @@ Resource path: `projects/axovia-flipper/secrets/{NAME}/versions/latest`
 |---------|------------------------|---------------------|----------|
 | `FIREBASE_CLIENT_EMAIL` | `PRODUCTION_FIREBASE_CLIENT_EMAIL` | `STAGING_FIREBASE_CLIENT_EMAIL` | No |
 | `FIREBASE_PRIVATE_KEY` | `PRODUCTION_FIREBASE_PRIVATE_KEY` | `STAGING_FIREBASE_PRIVATE_KEY` | No |
+| `NEXT_PUBLIC_FIREBASE_API_KEY` | `PRODUCTION_NEXT_PUBLIC_FIREBASE_API_KEY` | `STAGING_NEXT_PUBLIC_FIREBASE_API_KEY` | No |
+| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | `PRODUCTION_NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | `STAGING_NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | No |
+| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | `PRODUCTION_NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | `STAGING_NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | No |
+| `NEXT_PUBLIC_FIREBASE_APP_ID` | `PRODUCTION_NEXT_PUBLIC_FIREBASE_APP_ID` | `STAGING_NEXT_PUBLIC_FIREBASE_APP_ID` | No |
 | `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | `PRODUCTION_NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | `STAGING_NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | No |
 
-> **Note:** `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` has a `NEXT_PUBLIC_` prefix, meaning it is exposed in the client bundle. Consider setting it as a non-secret Cloud Run env var instead.
+> **Note:** The `NEXT_PUBLIC_*` Firebase values are public client config (exposed in the client bundle), not true secrets. They are stored in Secret Manager for centralized management and consistency with the rest of the config.
 
 ### ApiKeySecrets
 
@@ -69,8 +73,38 @@ Resource path: `projects/axovia-flipper/secrets/{NAME}/versions/latest`
 | `ANTHROPIC_API_KEY` | `PRODUCTION_ANTHROPIC_API_KEY` | `STAGING_ANTHROPIC_API_KEY` | No |
 | `CLAUDE_API_KEY` | `PRODUCTION_CLAUDE_API_KEY` | `STAGING_CLAUDE_API_KEY` | No |
 | `GOOGLE_API_KEY` | `PRODUCTION_GOOGLE_API_KEY` | `STAGING_GOOGLE_API_KEY` | No |
+| `GOOGLE_MAPS_API_KEY` | `PRODUCTION_GOOGLE_MAPS_API_KEY` | `STAGING_GOOGLE_MAPS_API_KEY` | No |
 | `FLIPPER_API_KEYS` | `PRODUCTION_FLIPPER_API_KEYS` | `STAGING_FLIPPER_API_KEYS` | No |
 | `EBAY_OAUTH_TOKEN` | `PRODUCTION_EBAY_OAUTH_TOKEN` | `STAGING_EBAY_OAUTH_TOKEN` | No |
+
+### Google Maps API Key — Provisioning SOP (Story 12.2)
+
+**Purpose**: Server-side Directions API calls for driving route calculation in meetup departure reminders. Never exposed to the client bundle.
+
+**Provisioning steps**:
+
+1. Open [GCP Console → APIs & Services → Credentials](https://console.cloud.google.com/apis/credentials) in the `axovia-flipper` project.
+2. Create a new **API key** (or use an existing server-side key).
+3. Under **API restrictions** → **Restrict key** → select **Directions API** only.
+4. Under **Application restrictions** → **IP addresses** → add the Cloud Run egress NAT IPs for `us-central1`. (Find them in Cloud Run → Service → Network tab, or use a static IP reserved via Cloud NAT.)
+5. Copy the key value and store it in GCP Secret Manager:
+   ```bash
+   echo -n "AIza..." | gcloud secrets create PRODUCTION_GOOGLE_MAPS_API_KEY \
+     --project=axovia-flipper --replication-policy=automatic --data-file=-
+   ```
+6. For staging, repeat with `STAGING_GOOGLE_MAPS_API_KEY`.
+7. Ensure `helpers/secrets.py` loads `GOOGLE_MAPS_API_KEY` (it is already included in the `ApiKeySecrets` dataclass if listed in the table above).
+8. Redeploy the Cloud Run service to pick up the new secret version.
+
+**Key rotation SOP**:
+
+1. Create a new key in GCP Console (do not delete the old one yet).
+2. Add a new secret version: `echo -n "AIza-NEW..." | gcloud secrets versions add PRODUCTION_GOOGLE_MAPS_API_KEY --data-file=-`
+3. Test by deploying to staging and verifying departure route cards load correctly.
+4. After 30 minutes of clean prod traffic, disable the old key version in GCP Console.
+5. Delete the old key from GCP Console after 24 hours of confirmed clean operation.
+
+**Cost note**: The Directions API charges per request after the $200/month free tier. The LRU cache in `src/lib/maps-service.ts` (6h TTL, max 200 entries) amortizes repeated requests for the same origin-destination pair. Do NOT pass `departure_time=now` — this upgrades to a Premium (billed) request tier.
 
 ### PaymentSecrets
 

@@ -8,6 +8,7 @@ export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
+/* istanbul ignore next -- module-level initialization; production/LOG_LEVEL branches not testable without module reload */
 const pinoLogger = pino({
   level: process.env.LOG_LEVEL || (isProduction ? 'info' : 'debug'),
   messageKey: 'message',

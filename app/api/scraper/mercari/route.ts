@@ -25,6 +25,8 @@ import { enrichOpportunitiesWithClaudeTier2, enrichWithCompletenessAndReputation
 import { analyzeLogistics } from '@/lib/logistics-analyzer';
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import { enforceTierLimits } from '@/lib/tier-enforcement';
+import { computeEstimatedExpiry } from '@/lib/listing-expiry';
+import { emitOpportunityFoundEvent } from '@/lib/notification-events';
 // Mercari API configuration
 const MERCARI_API_BASE_URL = 'https://www.mercari.com/v1/api';
 const MERCARI_SEARCH_URL = 'https://www.mercari.com/search/';
@@ -577,6 +579,7 @@ async function saveListingFromMercariItem(
       imageUrls: serializedImages,
       category,
       postedAt,
+      estimatedExpiresAt: computeEstimatedExpiry('MERCARI', postedAt),
       estimatedValue: estimation.estimatedValue,
       estimatedLow: estimation.estimatedLow,
       estimatedHigh: estimation.estimatedHigh,
@@ -642,6 +645,7 @@ async function saveListingFromMercariItem(
       sellerName,
       imageUrls: serializedImages,
       category,
+      estimatedExpiresAt: computeEstimatedExpiry('MERCARI', postedAt),
       estimatedValue: estimation.estimatedValue,
       estimatedLow: estimation.estimatedLow,
       estimatedHigh: estimation.estimatedHigh,
@@ -730,6 +734,11 @@ async function saveListingFromMercariItem(
       location: formatLocation(item),
     },
   });
+
+  // Story 10.3: Emit opportunity.found notification event (fire-and-forget).
+  // emitOpportunityFoundEvent handles its own errors internally — void ensures
+  // a failure here can never propagate and fail the item save.
+  void emitOpportunityFoundEvent(savedListing, userId);
 
   return savedListing;
 }

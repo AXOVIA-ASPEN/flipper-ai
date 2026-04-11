@@ -12,6 +12,7 @@ import { getPlatformFeeRate } from '@/lib/marketplace-scanner';
 import { analyzeListingData } from '@/lib/claude-analyzer';
 import { lookupVerifiedMarketPrice } from '@/lib/market-value-calculator';
 import { closeBrowser } from '@/lib/market-price';
+import { emitOpportunityFoundEvent } from '@/lib/notification-events';
 
 // POST /api/scraper/craigslist - Run scraper via Cloud Function
 export async function POST(request: NextRequest) {
@@ -195,6 +196,9 @@ export async function POST(request: NextRequest) {
             console.error(`Failed to cache Claude analysis for ${item.externalId}:`, cacheErr);
           }
         }
+
+        // Story 10.3: Emit opportunity.found notification event (fire-and-forget).
+        void emitOpportunityFoundEvent(savedListing, userId);
 
         savedCount++;
       } catch (error) {

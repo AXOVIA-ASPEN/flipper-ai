@@ -155,7 +155,7 @@ export async function GET(request: NextRequest) {
     );
 
     // Build thread summaries
-    let threads: ThreadSummary[] = latestMessages.map((msg) => ({
+    const threads: ThreadSummary[] = latestMessages.map((msg) => ({
       listingId: msg.listingId!,
       listing: msg.listing
         ? {

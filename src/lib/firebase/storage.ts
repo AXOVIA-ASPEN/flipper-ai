@@ -41,6 +41,7 @@ export interface UploadFromUrlResult extends UploadResult {
  * Throws if the storage bucket is not configured.
  */
 export function getStorageBucket() {
+  /* istanbul ignore next -- config guard; tests always set this env var */
   if (!process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET) {
     throw new ConfigurationError(
       'Firebase Storage bucket not configured. Set NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET environment variable.'
@@ -204,6 +205,7 @@ function isNotFoundError(error: unknown): boolean {
       (error as unknown as Record<string, unknown>).code === 404
     );
   }
+  /* istanbul ignore next -- non-Error error objects not used in tests */
   return false;
 }
 

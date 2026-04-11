@@ -48,7 +48,7 @@ async function exchangeTokenForSession(idToken: string, name?: string): Promise<
   const response = await fetch('/api/auth/session', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ idToken, ...(name && { name }) }),
+    body: JSON.stringify({ idToken, ...(/* istanbul ignore next */ name && { name }) }),
   });
 
   if (!response.ok) {

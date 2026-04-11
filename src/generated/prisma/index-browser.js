@@ -138,6 +138,8 @@ exports.Prisma.ListingScalarFieldEnum = {
   postedAt: 'postedAt',
   scrapedAt: 'scrapedAt',
   updatedAt: 'updatedAt',
+  lastMonitoredAt: 'lastMonitoredAt',
+  estimatedExpiresAt: 'estimatedExpiresAt',
   estimatedValue: 'estimatedValue',
   estimatedLow: 'estimatedLow',
   estimatedHigh: 'estimatedHigh',
@@ -210,6 +212,10 @@ exports.Prisma.OpportunityScalarFieldEnum = {
   fees: 'fees',
   status: 'status',
   notes: 'notes',
+  meetingTime: 'meetingTime',
+  meetingLocation: 'meetingLocation',
+  meetingType: 'meetingType',
+  calendarEventId: 'calendarEventId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -324,6 +330,58 @@ exports.Prisma.UserSettingsScalarFieldEnum = {
   homeLocation: 'homeLocation',
   holdingCostDailyRate: 'holdingCostDailyRate',
   messageApprovalRequired: 'messageApprovalRequired',
+  pushNotifications: 'pushNotifications',
+  phoneNumber: 'phoneNumber',
+  phoneVerified: 'phoneVerified',
+  phoneVerificationCode: 'phoneVerificationCode',
+  phoneVerificationExpiry: 'phoneVerificationExpiry',
+  phoneVerificationSentAt: 'phoneVerificationSentAt',
+  smsNotifications: 'smsNotifications',
+  notifyMessageReceived: 'notifyMessageReceived',
+  notifyDraftReady: 'notifyDraftReady',
+  notifyMessageSent: 'notifyMessageSent',
+  notifyReviewReceived: 'notifyReviewReceived',
+  notifyFlipGoneCold: 'notifyFlipGoneCold',
+  notifyFlipTurnedHot: 'notifyFlipTurnedHot',
+  notifyPriceChanges: 'notifyPriceChanges',
+  flipGoneColdHours: 'flipGoneColdHours',
+  flipTurnedHotCount: 'flipTurnedHotCount',
+  notifyListingUnavailable: 'notifyListingUnavailable',
+  pushNotifyNewDeals: 'pushNotifyNewDeals',
+  pushNotifySoldItems: 'pushNotifySoldItems',
+  pushNotifyMessageReceived: 'pushNotifyMessageReceived',
+  pushNotifyDraftReady: 'pushNotifyDraftReady',
+  pushNotifyMessageSent: 'pushNotifyMessageSent',
+  pushNotifyReviewReceived: 'pushNotifyReviewReceived',
+  pushNotifyFlipGoneCold: 'pushNotifyFlipGoneCold',
+  pushNotifyFlipTurnedHot: 'pushNotifyFlipTurnedHot',
+  pushNotifyPriceDrops: 'pushNotifyPriceDrops',
+  pushNotifyExpiring: 'pushNotifyExpiring',
+  pushNotifyListingUnavailable: 'pushNotifyListingUnavailable',
+  pushNotifyWeeklyDigest: 'pushNotifyWeeklyDigest',
+  smsNotifyNewDeals: 'smsNotifyNewDeals',
+  smsNotifySoldItems: 'smsNotifySoldItems',
+  smsNotifyMessageReceived: 'smsNotifyMessageReceived',
+  smsNotifyDraftReady: 'smsNotifyDraftReady',
+  smsNotifyMessageSent: 'smsNotifyMessageSent',
+  smsNotifyReviewReceived: 'smsNotifyReviewReceived',
+  smsNotifyFlipGoneCold: 'smsNotifyFlipGoneCold',
+  smsNotifyFlipTurnedHot: 'smsNotifyFlipTurnedHot',
+  smsNotifyPriceDrops: 'smsNotifyPriceDrops',
+  smsNotifyExpiring: 'smsNotifyExpiring',
+  smsNotifyListingUnavailable: 'smsNotifyListingUnavailable',
+  smsNotifyWeeklyDigest: 'smsNotifyWeeklyDigest',
+  meetingDepartureBufferMinutes: 'meetingDepartureBufferMinutes',
+  notifyMeetingReminder: 'notifyMeetingReminder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DeviceTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  token: 'token',
+  userAgent: 'userAgent',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -333,6 +391,17 @@ exports.Prisma.FacebookTokenScalarFieldEnum = {
   userId: 'userId',
   accessToken: 'accessToken',
   expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.GoogleCalendarTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  expiresAt: 'expiresAt',
+  calendarEmail: 'calendarEmail',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -416,9 +485,51 @@ exports.Prisma.PasswordResetTokenScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.MonitoringJobScalarFieldEnum = {
+  id: 'id',
+  status: 'status',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  listingsChecked: 'listingsChecked',
+  eventsCreated: 'eventsCreated',
+  errorsEncountered: 'errorsEncountered',
+  totalListings: 'totalListings',
+  platformStats: 'platformStats',
+  skippedPlatforms: 'skippedPlatforms',
+  completedEarly: 'completedEarly',
+  canaryWarning: 'canaryWarning',
+  errorMessage: 'errorMessage',
+  retryCount: 'retryCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.NotificationEventScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  listingId: 'listingId',
+  eventType: 'eventType',
+  payload: 'payload',
+  deduplicationKey: 'deduplicationKey',
+  status: 'status',
+  retryCount: 'retryCount',
+  errorMessage: 'errorMessage',
+  processedAt: 'processedAt',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -429,6 +540,12 @@ exports.Prisma.QueryMode = {
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
+};
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
 };
 
 
@@ -443,13 +560,17 @@ exports.Prisma.ModelName = {
   Session: 'Session',
   VerificationToken: 'VerificationToken',
   UserSettings: 'UserSettings',
+  DeviceToken: 'DeviceToken',
   FacebookToken: 'FacebookToken',
+  GoogleCalendarToken: 'GoogleCalendarToken',
   Message: 'Message',
   AiAnalysisCache: 'AiAnalysisCache',
   PostingQueueItem: 'PostingQueueItem',
   ListingImage: 'ListingImage',
   UsageRecord: 'UsageRecord',
-  PasswordResetToken: 'PasswordResetToken'
+  PasswordResetToken: 'PasswordResetToken',
+  MonitoringJob: 'MonitoringJob',
+  NotificationEvent: 'NotificationEvent'
 };
 
 /**

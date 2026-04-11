@@ -4,6 +4,7 @@ import { estimateValue, detectCategory, generatePurchaseMessage } from '@/lib/va
 import { getAuthUserId } from '@/lib/auth-middleware';
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 import { enforceTierLimits } from '@/lib/tier-enforcement';
+import { computeEstimatedExpiry } from '@/lib/listing-expiry';
 import {
   processListings,
   formatForStorage,
@@ -20,6 +21,7 @@ import {
   type AnalyzedListing,
   type RawListing,
 } from '@/lib/marketplace-scanner';
+import { emitOpportunityFoundEvent } from '@/lib/notification-events';
 
 const EBAY_API_BASE_URL =
   process.env.EBAY_BROWSE_API_BASE_URL || 'https://api.ebay.com/buy/browse/v1';
@@ -369,6 +371,7 @@ export async function POST(request: NextRequest) {
       const savedListings = [];
       for (const analyzed of enrichedListings) {
         const storageData = formatForStorage(analyzed);
+        const estimatedExpiresAt = computeEstimatedExpiry('EBAY', (storageData as { postedAt?: Date | null }).postedAt ?? null);
         try {
           const listing = await prisma.listing.upsert({
             where: {
@@ -381,9 +384,11 @@ export async function POST(request: NextRequest) {
             create: {
               userId,
               ...storageData,
+              estimatedExpiresAt,
             } as Parameters<typeof prisma.listing.create>[0]['data'],
             update: {
               ...storageData,
+              estimatedExpiresAt,
               scrapedAt: new Date(),
             } as Parameters<typeof prisma.listing.update>[0]['data'],
           });
@@ -403,6 +408,9 @@ export async function POST(request: NextRequest) {
               console.error(`Failed to cache Claude analysis for ${analyzed.externalId}:`, cacheErr);
             }
           }
+          // Story 10.3: Emit opportunity.found notification event (fire-and-forget).
+          void emitOpportunityFoundEvent(listing, userId);
+
           savedListings.push(listing);
         } catch (err) {
           console.error(`Error saving listing ${analyzed.externalId}:`, err);

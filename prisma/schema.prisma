@@ -26,6 +26,8 @@ model Listing {
   postedAt            DateTime?
   scrapedAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
+  lastMonitoredAt     DateTime?          // Story 10.1: round-robin fairness for monitoring
+  estimatedExpiresAt  DateTime?          // Story 10.2: computed expiry (postedAt + platform default)
   estimatedValue      Float?
   estimatedLow        Float?
   estimatedHigh       Float?
@@ -84,6 +86,7 @@ model Listing {
   user                User?              @relation(fields: [userId], references: [id])
   images              ListingImage[]
   messages            Message[]
+  notificationEvents  NotificationEvent[]
   opportunity         Opportunity?
   postingQueue        PostingQueueItem[]
 
@@ -96,6 +99,7 @@ model Listing {
   @@index([llmAnalyzed])
   @@index([trueDiscountPercent])
   @@index([conversationStatus])
+  @@index([estimatedExpiresAt])
 }
 
 model Opportunity {
@@ -113,6 +117,11 @@ model Opportunity {
   fees           Float?
   status         String    @default("IDENTIFIED")
   notes          String?
+  // Story 12.1: Meeting scheduling fields
+  meetingTime     DateTime?  // Scheduled meeting date and time
+  meetingLocation String?    // Meeting address or description
+  meetingType     String?    // 'buy' | 'sell'
+  calendarEventId String?    // Google Calendar event ID for update/delete
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   listing        Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
@@ -121,6 +130,7 @@ model Opportunity {
   @@index([userId])
   @@index([status])
   @@index([createdAt])
+  @@index([meetingTime, meetingLocation])  // Story 12.2: Efficient meeting reminder scheduler query
 }
 
 model ScraperJob {
@@ -192,8 +202,11 @@ model User {
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
   accounts           Account[]          // Deprecated: NextAuth — removal in future cleanup story
+  deviceTokens       DeviceToken[]      // Story 11.1: FCM push notification device tokens
+  googleCalendarToken GoogleCalendarToken?  // Story 12.1: Google Calendar OAuth token
   listings           Listing[]
   messages           Message[]
+  notificationEvents NotificationEvent[]
   opportunities      Opportunity[]
   postingQueue       PostingQueueItem[]
   scraperJobs        ScraperJob[]
@@ -272,9 +285,74 @@ model UserSettings {
   homeLocation          String?                  // Story 5.5: User's home location for distance calculation
   holdingCostDailyRate  Float    @default(2.0)   // Story 6.6: Daily cost to hold purchased inventory ($/day)
   messageApprovalRequired Boolean @default(false)  // Story 8.4: Two-step send confirmation
+  pushNotifications  Boolean  @default(true)        // Story 11.1: Global push notification enable/disable
+  // Phone verification — Story 11.2: Twilio SMS Integration
+  phoneNumber              String?    // E.164 format: +12025551234
+  phoneVerified            Boolean    @default(false)
+  phoneVerificationCode    String?    // Bcrypt-hashed 6-digit OTP
+  phoneVerificationExpiry  DateTime?  // OTP TTL: 10 minutes from send time
+  phoneVerificationSentAt  DateTime?  // Timestamp of last OTP send — used for 60-s resend rate limit
+  smsNotifications         Boolean    @default(false)  // Master SMS toggle; requires verified phone
+  // Story 10.4: Per-event communication notification toggles
+  notifyMessageReceived    Boolean    @default(true)   // Toggle for inbound message alerts
+  notifyDraftReady         Boolean    @default(true)   // Toggle for AI draft ready alerts
+  notifyMessageSent        Boolean    @default(false)  // Toggle for sent message confirmations (default OFF — low urgency)
+  // Story 10.5: Smart alert notification toggles
+  notifyReviewReceived     Boolean    @default(true)   // Toggle for review received alerts
+  notifyFlipGoneCold       Boolean    @default(true)   // Toggle for cold flip alerts
+  notifyFlipTurnedHot      Boolean    @default(true)   // Toggle for hot flip alerts
+  notifyPriceChanges       Boolean    @default(true)   // Toggle for monitoring-triggered price change alerts (separate from notifyPriceDrops)
+  flipGoneColdHours        Int        @default(24)     // Configurable threshold: hours without response (1-168)
+  flipTurnedHotCount       Int        @default(3)      // Configurable threshold: consecutive unread inbound messages (1-20)
+  // Story 10.6: Notification preferences UI — remaining toggle fields
+  notifyListingUnavailable Boolean    @default(true)   // Toggle for listing removed/unavailable alerts (FR-MONITOR-04)
+  // Story 11.3: Per-event push notification toggles (requires pushNotifications master ON + browser permission)
+  pushNotifyNewDeals           Boolean  @default(true)   // Push for new opportunity found
+  pushNotifySoldItems          Boolean  @default(true)   // Push for flip lifecycle (purchased/shipped/sold)
+  pushNotifyMessageReceived    Boolean  @default(true)   // Push for seller reply received
+  pushNotifyDraftReady         Boolean  @default(true)   // Push for AI draft ready
+  pushNotifyMessageSent        Boolean  @default(false)  // Push for message sent (default OFF — low urgency)
+  pushNotifyReviewReceived     Boolean  @default(true)   // Push for review received
+  pushNotifyFlipGoneCold       Boolean  @default(true)   // Push for flip gone cold
+  pushNotifyFlipTurnedHot      Boolean  @default(true)   // Push for flip turned hot
+  pushNotifyPriceDrops         Boolean  @default(true)   // Push for price change alert
+  pushNotifyExpiring           Boolean  @default(true)   // Push for listing expiring
+  pushNotifyListingUnavailable Boolean  @default(true)   // Push for listing unavailable
+  pushNotifyWeeklyDigest       Boolean  @default(false)  // Push for weekly digest (default OFF — digest is better as email)
+  // Story 11.3: Per-event SMS notification toggles (requires smsNotifications master ON + verified phone)
+  smsNotifyNewDeals            Boolean  @default(true)   // SMS for new opportunity found
+  smsNotifySoldItems           Boolean  @default(true)   // SMS for flip lifecycle
+  smsNotifyMessageReceived     Boolean  @default(true)   // SMS for seller reply received
+  smsNotifyDraftReady          Boolean  @default(false)  // SMS for AI draft ready (default OFF — too frequent)
+  smsNotifyMessageSent         Boolean  @default(false)  // SMS for message sent (default OFF)
+  smsNotifyReviewReceived      Boolean  @default(true)   // SMS for review received
+  smsNotifyFlipGoneCold        Boolean  @default(true)   // SMS for flip gone cold
+  smsNotifyFlipTurnedHot       Boolean  @default(true)   // SMS for flip turned hot
+  smsNotifyPriceDrops          Boolean  @default(false)  // SMS for price change (default OFF — too frequent)
+  smsNotifyExpiring            Boolean  @default(false)  // SMS for listing expiring (default OFF — low urgency)
+  smsNotifyListingUnavailable  Boolean  @default(false)  // SMS for listing unavailable (default OFF)
+  smsNotifyWeeklyDigest        Boolean  @default(false)  // SMS for weekly digest (default OFF — digest is email-only by default)
+  // Story 12.2: Meeting route & departure reminder settings
+  meetingDepartureBufferMinutes Int     @default(10)     // Story 12.2: Buffer minutes added before travel time for departure calc
+  notifyMeetingReminder         Boolean @default(true)   // Story 12.2: "Time to leave" departure alert for scheduled meetups
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
   user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Story 11.1: FCM device tokens for push notifications
+model DeviceToken {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token      String
+  userAgent  String?  // Browser/OS identification for display in Settings
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, token])  // One token entry per user-device pair
+  @@index([userId])
+  @@index([token])
 }
 
 model FacebookToken {
@@ -284,6 +362,23 @@ model FacebookToken {
   expiresAt   DateTime
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// Story 12.1: Google Calendar OAuth tokens — stores encrypted access + refresh tokens
+model GoogleCalendarToken {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  accessToken   String   // AES-256 encrypted
+  refreshToken  String   // AES-256 encrypted
+  expiresAt     DateTime
+  calendarEmail String?  // Google account email for display in Settings
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([expiresAt])
@@ -314,6 +409,8 @@ model Message {
   @@index([direction])
   @@index([createdAt])
   @@index([userId, status, direction])  // Story 8.4: Compound index for approval queue queries
+  @@index([listingId, createdAt])       // Story 10.5: Cold detection — find most recent message per listing
+  @@index([listingId, direction, createdAt])  // Story 10.5: Hot detection — count consecutive inbound messages
 }
 
 model AiAnalysisCache {
@@ -399,4 +496,51 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
 
   @@index([userId])
+}
+
+// Story 10.1: Background job scheduler — tracks monitoring run lifecycle
+model MonitoringJob {
+  id                String    @id @default(cuid())
+  status            String    @default("PENDING") // PENDING, RUNNING, COMPLETED, FAILED
+  startedAt         DateTime?
+  completedAt       DateTime?
+  listingsChecked   Int       @default(0)
+  eventsCreated     Int       @default(0)
+  errorsEncountered Int       @default(0)
+  totalListings     Int       @default(0)     // Expected total for progress reporting
+  platformStats     Json?                     // { craigslist: { checked: 40, parsed: 38, events: 2 }, ... }
+  skippedPlatforms  Json?                     // Platforms skipped and why (circuit breaker, budget)
+  completedEarly    Boolean   @default(false) // True if terminated by max duration cap
+  canaryWarning     Boolean   @default(false) // True if any platform failed parse canary
+  errorMessage      String?
+  retryCount        Int       @default(0)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([status])
+  // Partial unique index enforced via raw SQL migration:
+  // CREATE UNIQUE INDEX monitoring_job_running_unique ON "MonitoringJob" (status) WHERE status = 'RUNNING'
+}
+
+// Story 10.1: Notification events — DB event queue for downstream processors (Stories 10.3–10.5)
+model NotificationEvent {
+  id               String    @id @default(cuid())
+  userId           String
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId        String?
+  listing          Listing?  @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  eventType        String    // listing.sold, listing.price_changed, listing.expiring, listing.unavailable, opportunity.found, flip.purchased, flip.listed, flip.sold
+  payload          Json      // { oldPrice?, newPrice?, expiryDate?, listingTitle, listingUrl, platform }
+  deduplicationKey String?   // ${listingId}:${eventType}:${hourBucket} — idempotency key
+  status           String    @default("PENDING") // PENDING, PROCESSING, PROCESSED, FAILED
+  retryCount       Int       @default(0)
+  errorMessage     String?
+  processedAt      DateTime?
+  createdAt        DateTime  @default(now())
+
+  @@unique([userId, listingId, eventType, deduplicationKey])
+  @@index([userId, status])
+  @@index([status, createdAt])  // Primary query path for downstream consumers
+  @@index([eventType, status])
+  @@index([createdAt])
 }

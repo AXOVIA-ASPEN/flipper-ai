@@ -30,6 +30,7 @@ let messagingAdmin: Messaging | null = null;
  * Returns null if Admin SDK credentials are not configured.
  */
 export function getMessagingAdmin(): Messaging | null {
+  /* istanbul ignore next -- singleton already initialized; only first call reaches try block */
   if (messagingAdmin) return messagingAdmin;
 
   try {

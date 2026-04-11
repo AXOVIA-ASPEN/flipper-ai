@@ -31,6 +31,10 @@ jest.mock('@/components/BillingSettings', () => {
     return <div data-testid="billing-settings">Billing Settings</div>;
   };
 });
+// Stub useToast so NotificationSettings renders without ToastProvider
+jest.mock('@/components/ToastContainer', () => ({
+  useToast: () => ({ showToast: jest.fn() }),
+}));
 
 // Mock ThemeContext
 const mockTheme = {
@@ -150,7 +154,7 @@ describe('SettingsPage', () => {
   it('renders Notification Settings section', async () => {
     render(<SettingsPage />);
     await waitFor(() => {
-      expect(screen.getByText('Notification Settings')).toBeInTheDocument();
+      expect(screen.getByText('Notification Preferences')).toBeInTheDocument();
     });
   });
 
@@ -185,8 +189,8 @@ describe('SettingsPage', () => {
     render(<SettingsPage />);
     await waitFor(() => {
       expect(screen.getByText('Email Notifications')).toBeInTheDocument();
-      expect(screen.getByText('New Deal Alerts')).toBeInTheDocument();
-      expect(screen.getByText('Price Drop Alerts')).toBeInTheDocument();
+      expect(screen.getByText('New Opportunity Found')).toBeInTheDocument();
+      expect(screen.getByText('Flip Lifecycle Updates')).toBeInTheDocument();
     });
   });
 

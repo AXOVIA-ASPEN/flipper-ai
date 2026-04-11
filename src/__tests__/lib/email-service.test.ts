@@ -531,3 +531,474 @@ describe('ResendProvider - data with no id branch', () => {
     expect(result.messageId).toBeUndefined(); // data.id is undefined → data?.id = undefined
   });
 });
+
+// ---------------------------------------------------------------------------
+// Flip lifecycle senders (Story 10.3)
+// ---------------------------------------------------------------------------
+
+describe('EmailService.sendOpportunityFound()', () => {
+  const baseData = {
+    platform: 'Craigslist',
+    buyPrice: 120,
+    estimatedProfit: 180,
+    flippabilityScore: 87,
+    flippabilityLabel: 'Great Deal',
+    itemTitle: 'Vintage Polaroid SX-70 Camera',
+    imageUrl: 'https://example.com/polaroid.jpg',
+    eventCreatedAt: new Date('2026-04-09T12:00:00Z'),
+  };
+
+  it('sends with the correct subject format', async () => {
+    const result = await service.sendOpportunityFound('buyer@example.com', {
+      ...baseData,
+      name: 'Grace',
+    });
+
+    expect(result.success).toBe(true);
+    const email = mockProvider.lastEmail!;
+    expect(email.subject).toBe(`🔥 New Flip Opportunity: ${baseData.itemTitle}`);
+    expect(email.to).toBe('buyer@example.com');
+  });
+
+  it('truncates long item titles in the subject to 60 chars', async () => {
+    const longTitle = 'A'.repeat(100);
+    await service.sendOpportunityFound('buyer@example.com', {
+      ...baseData,
+      itemTitle: longTitle,
+    });
+
+    const email = mockProvider.lastEmail!;
+    expect(email.subject).toBe(`🔥 New Flip Opportunity: ${'A'.repeat(60)}`);
+  });
+
+  it('includes List-Unsubscribe and List-Unsubscribe-Post headers', async () => {
+    await service.sendOpportunityFound('buyer@example.com', baseData);
+
+    const email = mockProvider.lastEmail!;
+    expect(email.headers).toBeDefined();
+    expect(email.headers!['List-Unsubscribe']).toMatch(/^<https:\/\/.+\/api\/user\/unsubscribe\?token=.+>$/);
+    expect(email.headers!['List-Unsubscribe-Post']).toBe('List-Unsubscribe=One-Click');
+  });
+
+  it('constructs opportunityUrl from opportunityId when provided', async () => {
+    await service.sendOpportunityFound('buyer@example.com', {
+      ...baseData,
+      opportunityId: 'opp-abc-123',
+    });
+
+    const email = mockProvider.lastEmail!;
+    expect(email.html).toContain(`${APP_URL}/opportunities?id=opp-abc-123`);
+  });
+
+  it('omits opportunityUrl when opportunityId is missing', async () => {
+    await service.sendOpportunityFound('buyer@example.com', baseData);
+
+    const email = mockProvider.lastEmail!;
+    // When opportunityUrl is undefined it should not be constructed
+    expect(email.html).not.toContain('/opportunities?id=');
+  });
+
+  it('passes data fields through to the template', async () => {
+    await service.sendOpportunityFound('buyer@example.com', {
+      ...baseData,
+      name: 'Grace',
+    });
+
+    const email = mockProvider.lastEmail!;
+    expect(email.html).toContain('Vintage Polaroid SX-70 Camera');
+    expect(email.html).toContain('Craigslist');
+    expect(email.text).toBeDefined();
+    expect(email.text).toContain('Vintage Polaroid SX-70 Camera');
+  });
+});
+
+describe('EmailService.sendFlipPurchased()', () => {
+  const baseData = {
+    itemTitle: 'DeWalt 20V Impact Driver',
+    purchasePrice: 65,
+    estimatedProfit: 95,
+    platform: 'Facebook Marketplace',
+    eventCreatedAt: new Date('2026-04-09T12:00:00Z'),
+  };
+
+  it('sends with the correct subject format', async () => {
+    const result = await service.sendFlipPurchased('flipper@example.com', {
+      ...baseData,
+      name: 'Henry',
+    });
+
+    expect(result.success).toBe(true);
+    const email = mockProvider.lastEmail!;
+    expect(email.subject).toBe(`🛒 Flip Purchased: ${baseData.itemTitle}`);
+    expect(email.to).toBe('flipper@example.com');
+  });
+
+  it('includes List-Unsubscribe headers', async () => {
+    await service.sendFlipPurchased('flipper@example.com', baseData);
+
+    const email = mockProvider.lastEmail!;
+    expect(email.headers).toBeDefined();
+    expect(email.headers!['List-Unsubscribe']).toContain('/api/user/unsubscribe?token=');
+    expect(email.headers!['List-Unsubscribe']).toMatch(/^<.*>$/);
+    expect(email.headers!['List-Unsubscribe-Post']).toBe('List-Unsubscribe=One-Click');
+  });
+
+  it('constructs opportunityUrl when opportunityId is provided', async () => {
+    await service.sendFlipPurchased('flipper@example.com', {
+      ...baseData,
+      opportunityId: 'opp-purchased-1',
+    });
+
+    const email = mockProvider.lastEmail!;
+    expect(email.html).toContain(`${APP_URL}/opportunities?id=opp-purchased-1`);
+  });
+
+  it('omits opportunityUrl when opportunityId is missing', async () => {
+    await service.sendFlipPurchased('flipper@example.com', baseData);
+
+    const email = mockProvider.lastEmail!;
+    expect(email.html).not.toContain('/opportunities?id=');
+  });
+
+  it('includes purchase price and item title in content', async () => {
+    await service.sendFlipPurchased('flipper@example.com', baseData);
+
+    const email = mockProvider.lastEmail!;
+    expect(email.html).toContain('DeWalt 20V Impact Driver');
+    expect(email.text).toContain('DeWalt 20V Impact Driver');
+  });
+});
+
+describe('EmailService.sendFlipListed()', () => {
+  const baseData = {
+    itemTitle: 'Herman Miller Aeron Chair',
+    destinationPlatform: 'eBay',
+    listingUrl: 'https://ebay.com/itm/999',
+    eventCreatedAt: new Date('2026-04-09T12:00:00Z'),
+  };
+
+  it('sends with the correct subject format', async () => {
+    const result = await service.sendFlipListed('seller@example.com', {
+      ...baseData,
+      name: 'Iris',
+    });
+
+    expect(result.success).toBe(true);
+    const email = mockProvider.lastEmail!;
+    expect(email.subject).toBe(`📦 Flip Listed: ${baseData.itemTitle}`);
+    expect(email.to).toBe('seller@example.com');
+  });
+
+  it('includes List-Unsubscribe headers', async () => {
+    await service.sendFlipListed('seller@example.com', baseData);
+
+    const email = mockProvider.lastEmail!;
+    expect(email.headers).toBeDefined();
+    expect(email.headers!['List-Unsubscribe']).toMatch(/^<https:\/\/.+>$/);
+    expect(email.headers!['List-Unsubscribe-Post']).toBe('List-Unsubscribe=One-Click');
+  });
+
+  it('handles missing listingUrl gracefully', async () => {
+    const result = await service.sendFlipListed('seller@example.com', {
+      itemTitle: 'Herman Miller Aeron Chair',
+      destinationPlatform: 'eBay',
+    });
+
+    expect(result.success).toBe(true);
+    const email = mockProvider.lastEmail!;
+    expect(email.subject).toContain('Herman Miller Aeron Chair');
+    expect(email.html).toBeTruthy();
+  });
+
+  it('constructs opportunityUrl when opportunityId is provided', async () => {
+    await service.sendFlipListed('seller@example.com', {
+      ...baseData,
+      opportunityId: 'opp-listed-42',
+    });
+
+    const email = mockProvider.lastEmail!;
+    expect(email.html).toContain(`${APP_URL}/opportunities?id=opp-listed-42`);
+  });
+
+  it('omits opportunityUrl when opportunityId is missing', async () => {
+    await service.sendFlipListed('seller@example.com', baseData);
+
+    const email = mockProvider.lastEmail!;
+    expect(email.html).not.toContain('/opportunities?id=');
+  });
+});
+
+describe('EmailService.sendFlipSold()', () => {
+  const baseData = {
+    itemTitle: 'Nintendo Switch OLED',
+    salePrice: 280,
+    actualProfit: 125,
+    roiPercent: 80,
+    daysToFlip: 7,
+    platform: 'eBay',
+    purchasePrice: 155,
+    eventCreatedAt: new Date('2026-04-09T12:00:00Z'),
+  };
+
+  it('sends with subject including profit amount rounded via toFixed(0)', async () => {
+    const result = await service.sendFlipSold('seller@example.com', {
+      ...baseData,
+      name: 'Jack',
+    });
+
+    expect(result.success).toBe(true);
+    const email = mockProvider.lastEmail!;
+    expect(email.subject).toBe(`🎉 Flip Sold: ${baseData.itemTitle} — +$125 profit`);
+  });
+
+  it('rounds fractional profit in subject', async () => {
+    await service.sendFlipSold('seller@example.com', {
+      ...baseData,
+      actualProfit: 125.73,
+    });
+
+    const email = mockProvider.lastEmail!;
+    // toFixed(0) on 125.73 → "126"
+    expect(email.subject).toContain('+$126 profit');
+  });
+
+  it('uses $0 when actualProfit is null', async () => {
+    await service.sendFlipSold('seller@example.com', {
+      ...baseData,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      actualProfit: null as any,
+    });
+
+    const email = mockProvider.lastEmail!;
+    expect(email.subject).toContain('+$0 profit');
+  });
+
+  it('uses $0 when actualProfit is undefined', async () => {
+    await service.sendFlipSold('seller@example.com', {
+      ...baseData,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      actualProfit: undefined as any,
+    });
+
+    const email = mockProvider.lastEmail!;
+    expect(email.subject).toContain('+$0 profit');
+  });
+
+  it('includes List-Unsubscribe headers', async () => {
+    await service.sendFlipSold('seller@example.com', baseData);
+
+    const email = mockProvider.lastEmail!;
+    expect(email.headers).toBeDefined();
+    expect(email.headers!['List-Unsubscribe']).toMatch(/^<https:\/\/.+\/api\/user\/unsubscribe\?token=.+>$/);
+    expect(email.headers!['List-Unsubscribe-Post']).toBe('List-Unsubscribe=One-Click');
+  });
+
+  it('accepts opportunityId and sends successfully (opportunityUrl constructed)', async () => {
+    // Note: flipSold template links to /dashboard rather than embedding
+    // opportunityUrl, so we verify the branch is exercised without crashing.
+    const result = await service.sendFlipSold('seller@example.com', {
+      ...baseData,
+      opportunityId: 'opp-sold-77',
+    });
+
+    expect(result.success).toBe(true);
+    const email = mockProvider.lastEmail!;
+    expect(email.subject).toContain('Nintendo Switch OLED');
+    expect(email.html).toBeTruthy();
+  });
+
+  it('works when opportunityId is missing (opportunityUrl undefined branch)', async () => {
+    const result = await service.sendFlipSold('seller@example.com', baseData);
+
+    expect(result.success).toBe(true);
+    const email = mockProvider.lastEmail!;
+    // Sold template never embeds the opportunity URL, so we just verify no crash
+    expect(email.subject).toContain('Nintendo Switch OLED');
+  });
+
+  it('handles missing daysToFlip gracefully', async () => {
+    const { daysToFlip: _drop, ...noDays } = baseData;
+    const result = await service.sendFlipSold('seller@example.com', noDays);
+
+    expect(result.success).toBe(true);
+    const email = mockProvider.lastEmail!;
+    expect(email.subject).toContain('Nintendo Switch OLED');
+    expect(email.html).toBeTruthy();
+  });
+
+  it('passes sale price and profit fields through to template', async () => {
+    await service.sendFlipSold('seller@example.com', baseData);
+
+    const email = mockProvider.lastEmail!;
+    expect(email.html).toContain('Nintendo Switch OLED');
+    expect(email.text).toContain('Nintendo Switch OLED');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// listUnsubscribeHeaders (indirect coverage)
+// ---------------------------------------------------------------------------
+
+describe('listUnsubscribeHeaders (indirect coverage via flip senders)', () => {
+  it('wraps the unsubscribe URL in angle brackets', async () => {
+    await service.sendOpportunityFound('wrap@example.com', {
+      platform: 'eBay',
+      buyPrice: 50,
+      estimatedProfit: 40,
+      flippabilityScore: 75,
+      flippabilityLabel: 'Good',
+      itemTitle: 'Test Item',
+    });
+
+    const email = mockProvider.lastEmail!;
+    const header = email.headers!['List-Unsubscribe'];
+    expect(header.startsWith('<')).toBe(true);
+    expect(header.endsWith('>')).toBe(true);
+
+    // Extract the URL and verify it's the actual unsubscribe URL
+    const url = header.slice(1, -1);
+    const encoded = Buffer.from('wrap@example.com').toString('base64url');
+    expect(url).toBe(`${APP_URL}/api/user/unsubscribe?token=${encoded}`);
+  });
+
+  it('includes List-Unsubscribe-Post set to One-Click (RFC 8058)', async () => {
+    await service.sendFlipPurchased('oneclick@example.com', {
+      itemTitle: 'Widget',
+      purchasePrice: 10,
+      estimatedProfit: 20,
+      platform: 'Mercari',
+    });
+
+    const email = mockProvider.lastEmail!;
+    expect(email.headers!['List-Unsubscribe-Post']).toBe('List-Unsubscribe=One-Click');
+  });
+
+  it('uses a per-recipient token (different emails → different tokens)', async () => {
+    await service.sendFlipListed('alice@example.com', {
+      itemTitle: 'Chair',
+      destinationPlatform: 'eBay',
+    });
+    const aliceHeader = mockProvider.lastEmail!.headers!['List-Unsubscribe'];
+
+    mockProvider.reset();
+    service = new EmailService(mockProvider, APP_URL, FROM);
+
+    await service.sendFlipListed('bob@example.com', {
+      itemTitle: 'Chair',
+      destinationPlatform: 'eBay',
+    });
+    const bobHeader = mockProvider.lastEmail!.headers!['List-Unsubscribe'];
+
+    expect(aliceHeader).not.toBe(bobHeader);
+    expect(aliceHeader).toContain(Buffer.from('alice@example.com').toString('base64url'));
+    expect(bobHeader).toContain(Buffer.from('bob@example.com').toString('base64url'));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Story 10.5: Smart alert senders
+// ---------------------------------------------------------------------------
+
+describe('sendReviewReceived', () => {
+  it('sends email with correct subject and contains platform/rating', async () => {
+    await service.sendReviewReceived({
+      email: 'user@example.com',
+      platform: 'eBay',
+      rating: 4,
+      reviewText: 'Great transaction!',
+      reviewUrl: 'https://ebay.com/feedback/123',
+    });
+    expect(mockProvider.sent).toHaveLength(1);
+    const email = mockProvider.lastEmail!;
+    expect(email.subject).toContain('4-star');
+    expect(email.subject).toContain('eBay');
+    expect(email.html).toContain('eBay');
+    expect(email.html).toContain('&#9733;');
+    expect(email.text).toContain('4/5 stars');
+  });
+
+  it('generates correct unsubscribeUrl', async () => {
+    await service.sendReviewReceived({
+      email: 'test@example.com',
+      platform: 'Mercari',
+      rating: 5,
+      reviewText: 'Perfect!',
+      reviewUrl: 'https://mercari.com/review/1',
+    });
+    const email = mockProvider.lastEmail!;
+    expect(email.html).toContain(Buffer.from('test@example.com').toString('base64url'));
+  });
+});
+
+describe('sendFlipGoneCold', () => {
+  it('sends email with correct subject', async () => {
+    await service.sendFlipGoneCold({
+      email: 'user@example.com',
+      listingTitle: 'PS5 Console',
+      hoursSinceLastResponse: 30,
+      coldReason: 'user_not_replied',
+      threadUrl: 'https://app.flipper.ai/messages/listing-1',
+    });
+    expect(mockProvider.sent).toHaveLength(1);
+    const email = mockProvider.lastEmail!;
+    expect(email.subject).toContain('PS5 Console');
+    expect(email.subject).toContain('30h');
+    expect(email.html).toContain("You haven't responded");
+    expect(email.text).toContain("You haven't responded");
+  });
+});
+
+describe('sendFlipTurnedHot', () => {
+  it('sends email with correct subject', async () => {
+    await service.sendFlipTurnedHot({
+      email: 'user@example.com',
+      listingTitle: 'Switch OLED',
+      unreadCount: 4,
+      latestMessagePreview: 'Is this still available?',
+      threadUrl: 'https://app.flipper.ai/messages/listing-2',
+    });
+    expect(mockProvider.sent).toHaveLength(1);
+    const email = mockProvider.lastEmail!;
+    expect(email.subject).toContain('4');
+    expect(email.subject).toContain('Switch OLED');
+    expect(email.html).toContain('Flip Is Hot!');
+    expect(email.text).toContain('Flip Is Hot!');
+  });
+});
+
+describe('sendPriceChangeAlert', () => {
+  it('sends email with correct subject and content (decrease)', async () => {
+    await service.sendPriceChangeAlert({
+      email: 'user@example.com',
+      listingTitle: 'MacBook Air M2',
+      platform: 'eBay',
+      oldPrice: 900,
+      newPrice: 750,
+      changePercent: 16.67,
+      direction: 'decrease',
+      listingUrl: 'https://app.flipper.ai/opportunities/listing-3',
+    });
+    expect(mockProvider.sent).toHaveLength(1);
+    const email = mockProvider.lastEmail!;
+    expect(email.subject).toContain('decrease');
+    expect(email.subject).toContain('MacBook Air M2');
+    expect(email.html).toContain('$900.00');
+    expect(email.html).toContain('$750.00');
+    expect(email.text).toContain('decreased');
+  });
+
+  it('sends email with "increase" in subject for price increase', async () => {
+    await service.sendPriceChangeAlert({
+      email: 'user@example.com',
+      listingTitle: 'GPU RTX 4090',
+      platform: 'eBay',
+      oldPrice: 1200,
+      newPrice: 1400,
+      changePercent: 16.67,
+      direction: 'increase',
+      listingUrl: 'https://app.flipper.ai/opportunities/listing-4',
+    });
+    const email = mockProvider.lastEmail!;
+    expect(email.subject).toContain('increase');
+  });
+});

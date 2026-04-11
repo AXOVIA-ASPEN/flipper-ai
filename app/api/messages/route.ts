@@ -4,6 +4,7 @@ import { getAuthUserId } from '@/lib/auth-middleware';
 
 import { handleError, ValidationError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import { checkFeatureAccess } from '@/lib/tier-enforcement';
+import { communicationNotificationService } from '@/lib/communication-notification';
 // GET /api/messages - Get all messages for the authenticated user
 export async function GET(request: NextRequest) {
   try {
@@ -141,6 +142,26 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+
+    // Fire-and-forget: communication notifications (Story 10.4)
+    if (message.direction === 'INBOUND' && message.status === 'DELIVERED') {
+      /* istanbul ignore next -- fire-and-forget; rejection is intentionally swallowed */
+      void communicationNotificationService.notifyMessageReceived({
+        userId,
+        listingId: message.listingId,
+        listingTitle: message.listing?.title ?? null,
+        sellerName: message.sellerName ?? null,
+        messagePreview: message.body,
+      }).catch(() => {});
+    } else if (message.direction === 'OUTBOUND' && message.status === 'DRAFT') {
+      /* istanbul ignore next -- fire-and-forget; rejection is intentionally swallowed */
+      void communicationNotificationService.notifyDraftReady({
+        userId,
+        listingId: message.listingId,
+        listingTitle: message.listing?.title ?? null,
+        draftPreview: message.body,
+      }).catch(() => {});
+    }
 
     return NextResponse.json({ success: true, data: message }, { status: 201 });
   } catch (error) {

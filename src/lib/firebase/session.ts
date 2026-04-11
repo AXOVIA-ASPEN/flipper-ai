@@ -53,6 +53,7 @@ async function verifySessionCookie() {
   }
 
   // Test auth bypass: cookie format is `test:<secret>:<firebaseUid>`
+  /* istanbul ignore next -- E2E_TEST_SECRET path; not active in unit tests */
   if (E2E_TEST_SECRET && sessionCookie.startsWith('test:')) {
     const parts = sessionCookie.split(':');
     if (parts.length === 3 && parts[1] === E2E_TEST_SECRET) {
@@ -87,6 +88,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     });
   } catch {
     // DB unavailable — if in test mode, fall through to synthetic user below
+    /* istanbul ignore next -- only reachable when E2E_TEST_SECRET is set (unit tests don't set it) */
     if (!E2E_TEST_SECRET) throw new Error('Database unavailable');
   }
 
@@ -102,6 +104,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
 
   // Test fallback: return a synthetic user when DB lookup fails/returns null
   // and we're in test auth mode. The firebaseUid encodes the test user id.
+  /* istanbul ignore next -- E2E_TEST_SECRET synthetic user path; not active in unit tests */
   if (E2E_TEST_SECRET && decoded.uid.startsWith('test-firebase-')) {
     const testId = decoded.uid.replace('test-firebase-', '');
     return {

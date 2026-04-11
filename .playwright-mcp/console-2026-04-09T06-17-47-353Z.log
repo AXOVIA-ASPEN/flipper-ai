@@ -1,0 +1,9 @@
+[     348ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[     416ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[     446ms] [ERROR] Loading the script 'https://va.vercel-scripts.com/v1/script.debug.js' violates the following Content Security Policy directive: "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://www.gstatic.com". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked. @ http://localhost:3000/_next/static/chunks/node_modules__pnpm_dc96fe41._.js:17570
+[     450ms] [LOG] [Vercel Web Analytics] Failed to load script from https://va.vercel-scripts.com/v1/script.debug.js. Please check if any ad blockers are enabled and try again. @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[    1416ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/messages/threads?limit=100:0
+[    5988ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[    6038ms] [LOG] [Fast Refresh] done in 151ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[   16965ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298
+[   17012ms] [LOG] [Fast Refresh] done in 148ms @ http://localhost:3000/_next/static/chunks/bb0e6_next_dist_e3ee776f._.js:2298

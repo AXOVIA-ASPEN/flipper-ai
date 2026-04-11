@@ -13,18 +13,19 @@
 importScripts('https://www.gstatic.com/firebasejs/12.10.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/12.10.0/firebase-messaging-compat.js');
 
-// Firebase config — public values, safe to include in client bundle.
-// TODO: Fill in apiKey, authDomain, messagingSenderId, and appId from
-// Firebase Console > Project Settings > General > Your apps after
-// completing Task 1 manual setup.
+// Firebase config — public values, safe to hardcode in service worker.
+// NOTE: Service workers cannot access process.env at runtime. These values
+// must be literal strings. Replace the TODO strings with values from:
+// Firebase Console → Project Settings → General → Your apps → Web App → Config
+// (matches NEXT_PUBLIC_FIREBASE_API_KEY, _MESSAGING_SENDER_ID, _APP_ID in .env.local)
 try {
   firebase.initializeApp({
-    apiKey: 'TODO_FIREBASE_API_KEY',
+    apiKey: 'AIzaSyDUbLTQogeNg5YZzrIF0ATZJ_YvBbtF3Ls',
     authDomain: 'axovia-flipper.firebaseapp.com',
     projectId: 'axovia-flipper',
     storageBucket: 'axovia-flipper.firebasestorage.app',
-    messagingSenderId: 'TODO_MESSAGING_SENDER_ID',
-    appId: 'TODO_FIREBASE_APP_ID',
+    messagingSenderId: '45047000631',
+    appId: '1:45047000631:web:56aa94d525f688245599b2',
   });
 
   const messaging = firebase.messaging();
@@ -39,5 +40,5 @@ try {
     self.registration.showNotification(title, options);
   });
 } catch (e) {
-  console.warn('[FCM SW] Firebase initialization failed — fill in config values after Task 1:', e.message || e);
+  console.warn('[FCM SW] Firebase initialization failed:', e.message || e);
 }

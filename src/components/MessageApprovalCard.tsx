@@ -79,7 +79,7 @@ export default function MessageApprovalCard({
   const actionGuard = useRef(false);
   const rejectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const pendingEditAfterReject = useRef(false);
+  const [pendingEditAfterReject, setPendingEditAfterReject] = useState(false);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -98,13 +98,13 @@ export default function MessageApprovalCard({
 
   // Auto-enter edit mode after reject-from-PENDING_APPROVAL returns to DRAFT
   useEffect(() => {
-    if (pendingEditAfterReject.current && message.status === 'DRAFT') {
-      pendingEditAfterReject.current = false;
+    if (pendingEditAfterReject && message.status === 'DRAFT') {
+      setPendingEditAfterReject(false);
       setEditBody(message.body);
       setEditSubject(message.subject || '');
       setIsEditing(true);
     }
-  }, [message.status, message.body, message.subject]);
+  }, [pendingEditAfterReject, message.status, message.body, message.subject]);
 
   const guardAction = useCallback((fn: () => void) => {
     if (actionGuard.current || loadingAction) return;
@@ -167,7 +167,7 @@ export default function MessageApprovalCard({
   const isActionDisabled = !!loadingAction || disabled;
 
   const handleEditFromPending = () => {
-    pendingEditAfterReject.current = true;
+    setPendingEditAfterReject(true);
     guardAction(() => onReject(message.id));
   };
 
@@ -338,7 +338,7 @@ export default function MessageApprovalCard({
               disabled={isActionDisabled}
               className="min-h-[44px] px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loadingAction === 'reject' && pendingEditAfterReject.current && <span className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full inline-block mr-1" />}
+              {loadingAction === 'reject' && pendingEditAfterReject && <span className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full inline-block mr-1" />}
               Edit
             </button>
             <button
@@ -350,7 +350,7 @@ export default function MessageApprovalCard({
                   : 'border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:border-red-300 dark:hover:border-red-600'
               }`}
             >
-              {loadingAction === 'reject' && !pendingEditAfterReject.current && <span className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full inline-block mr-1" />}
+              {loadingAction === 'reject' && !pendingEditAfterReject && <span className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full inline-block mr-1" />}
               {rejectConfirm ? 'Confirm Reject?' : 'Reject'}
             </button>
           </>

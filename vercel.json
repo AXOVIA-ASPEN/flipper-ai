@@ -3,10 +3,14 @@
   "installCommand": "npm ci --legacy-peer-deps",
   "regions": ["iad1"],
   "functions": {
-    "src/app/api/**/*.ts": {
+    "app/api/**/*.ts": {
       "maxDuration": 30
+    },
+    "app/api/monitoring/**/*.ts": {
+      "maxDuration": 300
     }
   },
+  "_comment_monitoring": "The monitoring endpoint should only be triggered from Cloud Run (Cloud Scheduler). The 300s maxDuration here is a safety net only — Vercel is not the intended execution environment for this endpoint.",
   "headers": [
     {
       "source": "/(.*)",

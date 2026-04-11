@@ -491,4 +491,105 @@ describe('edge case coverage', () => {
     expect(result.marketDataAvailable).toBe(false);
     expect(result.priceBreakdown.cappedByMarket).toBe(false);
   });
+
+  // Regression: free item with no verified market data must NOT silently
+  // return $0. Instead the calculator should flag insufficientData with a
+  // human-readable fallbackMessage so the UI can prompt the user to verify
+  // the market value before continuing.
+  test('free item with no verifiedMarketValue flags insufficientData (H3 regression)', async () => {
+    mockListing({
+      verifiedMarketValue: null,
+      estimatedShippingCost: 0,
+      opportunity: { purchasePrice: 0, status: 'PURCHASED' },
+    });
+    const result = await calculateOptimalListingPrice({
+      listingId: 'listing-1',
+      userId: 'user-1',
+      targetPlatform: 'ebay',
+      targetMarginPercent: 30,
+    });
+    expect(result.priceBreakdown.insufficientData).toBe(true);
+    expect(result.priceBreakdown.fallbackMessage).toMatch(/verified market data/i);
+    expect(result.recommendedPrice).toBe(0);
+    expect(result.estimatedFees).toBe(0);
+    expect(result.estimatedProfit).toBe(0);
+    expect(result.priceBreakdown.freeItemPricing).toBe(true);
+    expect(result.marketDataAvailable).toBe(false);
+  });
+
+  test('free item with no verifiedMarketValue still flags insufficientData even with shipping', async () => {
+    mockListing({
+      verifiedMarketValue: null,
+      estimatedShippingCost: 12,
+      opportunity: { purchasePrice: 0, status: 'PURCHASED' },
+    });
+    const result = await calculateOptimalListingPrice({
+      listingId: 'listing-1',
+      userId: 'user-1',
+      targetPlatform: 'ebay',
+      targetMarginPercent: 30,
+    });
+    expect(result.priceBreakdown.insufficientData).toBe(true);
+    expect(result.recommendedPrice).toBe(0);
+  });
+
+  // Regression: free item with shipping > net proceeds was previously
+  // returning a profit-negative price with no warning. The calculator now
+  // emits lossWarning + lossAmount so the UI can flag the row red.
+  test('free item with high shipping emits lossWarning (M3 regression)', async () => {
+    mockListing({
+      // verifiedMarketValue $20 → after eBay 13% fee + 0.85 discount = $14.79
+      // shipping $30 → profit = 14.79 - 1.92 - 0 - 30 = -$17.13 (loss)
+      verifiedMarketValue: 20,
+      estimatedShippingCost: 30,
+      opportunity: { purchasePrice: 0, status: 'PURCHASED' },
+    });
+    const result = await calculateOptimalListingPrice({
+      listingId: 'listing-1',
+      userId: 'user-1',
+      targetPlatform: 'ebay',
+      targetMarginPercent: 30,
+    });
+    expect(result.priceBreakdown.freeItemPricing).toBe(true);
+    expect(result.lossWarning).toBe(true);
+    expect(result.priceBreakdown.lossAmount).toBeGreaterThan(0);
+    expect(result.estimatedProfit).toBeLessThan(0);
+  });
+
+  test('free item with shipping that nets a profit does NOT emit lossWarning', async () => {
+    mockListing({
+      verifiedMarketValue: 100,
+      estimatedShippingCost: 5,
+      opportunity: { purchasePrice: 0, status: 'PURCHASED' },
+    });
+    const result = await calculateOptimalListingPrice({
+      listingId: 'listing-1',
+      userId: 'user-1',
+      targetPlatform: 'ebay',
+      targetMarginPercent: 30,
+    });
+    expect(result.priceBreakdown.freeItemPricing).toBe(true);
+    expect(result.lossWarning).toBe(false);
+    expect(result.estimatedProfit).toBeGreaterThan(0);
+  });
+
+  // Per task 1.7: opportunity with purchasePrice === null must NOT be
+  // treated as a $0 free item — it falls back through the chain to
+  // listing.askingPrice and reports projected pricing.
+  test('opportunity.purchasePrice null falls back to askingPrice (not free-item pricing)', async () => {
+    mockListing({
+      opportunity: { purchasePrice: null, status: 'PURCHASED' },
+    });
+    const result = await calculateOptimalListingPrice({
+      listingId: 'listing-1',
+      userId: 'user-1',
+      targetPlatform: 'ebay',
+      targetMarginPercent: 30,
+    });
+    // Falls back to askingPrice ($60) + shipping ($8) = $68 cost basis
+    expect(result.costBasis).toBe(68);
+    expect(result.isProjected).toBe(true);
+    expect(result.priceBreakdown.freeItemPricing).toBe(false);
+    expect(result.priceBreakdown.insufficientData).toBeFalsy();
+  });
 });

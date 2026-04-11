@@ -96,6 +96,8 @@ import { analyzeSellability, quickDiscountCheck } from '@/lib/llm-analyzer';
 import { analyzeDemandTrend } from '@/lib/demand-analyzer';
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import { enforceTierLimits } from '@/lib/tier-enforcement';
+import { computeEstimatedExpiry } from '@/lib/listing-expiry';
+import { emitOpportunityFoundEvent } from '@/lib/notification-events';
 // Retry wrapper for browser operations
 async function withRetry<T>(
   operation: () => Promise<T>,
@@ -591,6 +593,7 @@ export async function POST(request: NextRequest) {
           imageUrls: cachedImageUrls.length > 0 ? JSON.stringify(cachedImageUrls) : null,
           category: detectedCategory,
           postedAt: item.postedAt || null,
+          estimatedExpiresAt: computeEstimatedExpiry('OFFERUP', item.postedAt || null),
 
           // Value estimation
           estimatedValue: estimation.estimatedValue,
@@ -699,6 +702,9 @@ export async function POST(request: NextRequest) {
             location: normalizedLoc.normalized,
           },
         });
+
+        // Story 10.3: Emit opportunity.found notification event (fire-and-forget).
+        void emitOpportunityFoundEvent(savedListing, userId);
 
         savedCount++;
         if (status === 'OPPORTUNITY') {

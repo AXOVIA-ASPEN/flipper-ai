@@ -42,3 +42,14 @@ const handler: ProxyHandler<object> = {
 export const prisma = new Proxy({}, handler) as PrismaClient;
 
 export default prisma;
+
+/**
+ * For testing only: directly override the prisma singleton inside this module's
+ * globalForPrisma closure. This is the only reliable way to stub prisma in
+ * service-level Cucumber tests that run in the same process as the module.
+ *
+ * @internal Do NOT use in production code.
+ */
+export function _overridePrismaForTesting(mock: unknown): void {
+  globalForPrisma.prisma = mock as PrismaClient;
+}

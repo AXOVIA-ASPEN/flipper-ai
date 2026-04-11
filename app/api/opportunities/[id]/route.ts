@@ -3,23 +3,31 @@
  * @author Stephen Boyett
  * @company Axovia AI
  * @date 2026-03-31
- * @version 1.1
+ * @version 1.2
  * @brief Opportunity detail API — GET, PATCH, DELETE for a single opportunity.
  *
  * @description
  * Authenticated endpoints for reading, updating, and deleting a single
  * opportunity. All handlers enforce ownership via userId-scoped queries
  * and PATCH allowlists the fields that a client may update to prevent
- * mass assignment. PATCH fires a conversation status transition to
- * 'purchased' when the status changes to PURCHASED (story 8.5,
- * fire-and-forget).
+ * mass assignment. PATCH detects status transitions and creates
+ * notification events for flip lifecycle tracking (Story 10.3).
+ * PATCH also fires a conversation status transition to 'purchased'
+ * when the status changes to PURCHASED (Story 8.5, fire-and-forget).
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
-import { handleError, NotFoundError, UnauthorizedError } from '@/lib/errors';
+import { handleError, NotFoundError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { getCurrentUserId } from '@/lib/auth';
 import { transitionToPurchased } from '@/lib/conversation-status';
+import { deleteCalendarEvent, ensureValidToken, CalendarAuthRequiredError } from '@/lib/google-calendar';
+import { hasValidToken } from '@/lib/google-calendar-token-store';
+import {
+  createFlipNotificationEvent,
+  NotificationEventType,
+} from '@/lib/notification-events';
+import { logger } from '@/lib/logger';
 import type { Prisma } from '@/generated/prisma';
 
 /** Fields a client is allowed to update via PATCH. */
@@ -77,6 +85,16 @@ export async function GET(
   }
 }
 
+// Valid status transitions for the opportunity lifecycle
+const VALID_TRANSITIONS: Record<string, string[]> = {
+  IDENTIFIED: ['CONTACTED', 'PASSED'],
+  CONTACTED: ['PURCHASED', 'PASSED'],
+  PURCHASED: ['LISTED', 'PASSED'],
+  LISTED: ['SOLD', 'PASSED'],
+  SOLD: [],
+  PASSED: [],
+};
+
 // PATCH /api/opportunities/[id] - Update an opportunity
 export async function PATCH(
   request: NextRequest,
@@ -90,10 +108,10 @@ export async function PATCH(
 
     const { id } = await params;
 
-    // Verify ownership before mutation (prevents info leakage and unauthorized updates).
+    // Fetch current state WITH status to detect transitions.
     const existing = await prisma.opportunity.findFirst({
       where: { id, userId },
-      select: { id: true },
+      include: { listing: true },
     });
 
     if (!existing) {
@@ -101,6 +119,21 @@ export async function PATCH(
     }
 
     const body = (await request.json()) as Record<string, unknown>;
+
+    // Validate status transition if status is being changed
+    if (body.status !== undefined && typeof body.status === 'string') {
+      const previousStatus = existing.status;
+      const newStatus = body.status;
+
+      if (previousStatus !== newStatus) {
+        const allowed = VALID_TRANSITIONS[previousStatus];
+        if (allowed && !allowed.includes(newStatus)) {
+          throw new ValidationError(
+            `Invalid status transition: ${previousStatus} → ${newStatus}`
+          );
+        }
+      }
+    }
 
     // Allowlist updatable fields — prevents mass assignment of userId, listingId, etc.
     const updateData = pickUpdatableFields(body);
@@ -113,14 +146,141 @@ export async function PATCH(
     }
 
     const opportunity = await prisma.opportunity.update({
-      where: { id },
+      where: { id, userId },
       data: updateData,
       include: { listing: true },
     });
 
+    const previousStatus = existing.status;
+    const newStatus = opportunity.status;
+
     // Fire-and-forget: transition conversation status to purchased (story 8.5).
-    if (opportunity.status === 'PURCHASED' && opportunity.listing?.id) {
+    if (newStatus === 'PURCHASED' && previousStatus !== 'PURCHASED' && opportunity.listing?.id) {
       transitionToPurchased(opportunity.listing.id, userId).catch(() => {});
+    }
+
+    // Story 12.1: Fire-and-forget calendar event deletion when opportunity is PASSED.
+    if (newStatus === 'PASSED' && previousStatus !== 'PASSED') {
+      const calEventId = opportunity.calendarEventId;
+      if (calEventId && opportunity.userId) {
+        (async () => {
+          try {
+            const connected = await hasValidToken(opportunity.userId!);
+            if (connected) {
+              const accessToken = await ensureValidToken(opportunity.userId!);
+              await deleteCalendarEvent(accessToken, calEventId);
+            }
+          } catch (err) {
+            if (!(err instanceof CalendarAuthRequiredError)) {
+              logger.warn('calendar.event.passed_deletion_failed', {
+                opportunityId: opportunity.id,
+                err: err instanceof Error ? err.message : String(err),
+              });
+            }
+          }
+        })().catch(() => {});
+      }
+    }
+
+    // Story 10.3: Fire-and-forget notification events for status transitions
+    if (previousStatus !== newStatus && opportunity.userId) {
+      const listingTitle = opportunity.listing?.title ?? 'Unknown Item';
+      const platform = opportunity.listing?.platform ?? 'Unknown';
+
+      // flip.purchased
+      if (newStatus === 'PURCHASED' && previousStatus !== 'PURCHASED') {
+        createFlipNotificationEvent({
+          userId: opportunity.userId,
+          listingId: opportunity.listing?.id ?? null,
+          eventType: NotificationEventType.FLIP_PURCHASED,
+          payload: {
+            listingTitle,
+            purchasePrice: opportunity.purchasePrice ?? 0,
+            estimatedProfit: opportunity.listing?.profitPotential ?? 0,
+            platform,
+          },
+        }).catch((err) =>
+          logger.error('notification.event.creation_failed', {
+            err: err instanceof Error ? err.message : String(err),
+            eventType: 'flip.purchased',
+            userId: opportunity.userId,
+            listingId: opportunity.listing?.id,
+          })
+        );
+      }
+
+      // flip.listed
+      if (newStatus === 'LISTED' && previousStatus !== 'LISTED') {
+        createFlipNotificationEvent({
+          userId: opportunity.userId,
+          listingId: opportunity.listing?.id ?? null,
+          eventType: NotificationEventType.FLIP_LISTED,
+          payload: {
+            listingTitle,
+            destinationPlatform:
+              (body.resalePlatform as string) ??
+              opportunity.resalePlatform ??
+              'Unknown',
+            listingUrl: (body.resaleUrl as string) ?? opportunity.resaleUrl ?? null,
+          },
+        }).catch((err) =>
+          logger.error('notification.event.creation_failed', {
+            err: err instanceof Error ? err.message : String(err),
+            eventType: 'flip.listed',
+            userId: opportunity.userId,
+            listingId: opportunity.listing?.id,
+          })
+        );
+      }
+
+      // flip.sold
+      if (newStatus === 'SOLD' && previousStatus !== 'SOLD') {
+        const resalePrice =
+          typeof body.resalePrice === 'number'
+            ? body.resalePrice
+            : opportunity.resalePrice;
+
+        if (resalePrice != null && typeof resalePrice === 'number') {
+          const purchasePrice = opportunity.purchasePrice ?? 0;
+          const fees = opportunity.fees ?? 0;
+          const actualProfit = resalePrice - purchasePrice - fees;
+          const roiPercent =
+            purchasePrice > 0 ? (actualProfit / purchasePrice) * 100 : 0;
+          const purchaseDate = opportunity.purchaseDate;
+          const daysToFlip = purchaseDate
+            ? Math.floor(
+                (Date.now() - new Date(purchaseDate).getTime()) / (1000 * 60 * 60 * 24)
+              )
+            : undefined;
+
+          createFlipNotificationEvent({
+            userId: opportunity.userId,
+            listingId: opportunity.listing?.id ?? null,
+            eventType: NotificationEventType.FLIP_SOLD,
+            payload: {
+              listingTitle,
+              salePrice: resalePrice,
+              actualProfit,
+              purchasePrice,
+              roiPercent,
+              daysToFlip,
+              platform,
+            },
+          }).catch((err) =>
+            logger.error('notification.event.creation_failed', {
+              err: err instanceof Error ? err.message : String(err),
+              eventType: 'flip.sold',
+              userId: opportunity.userId,
+              listingId: opportunity.listing?.id,
+            })
+          );
+        } else {
+          logger.warn('notification.event.skipped.no_resale_price', {
+            opportunityId: opportunity.id,
+            eventType: 'flip.sold',
+          });
+        }
+      }
     }
 
     return NextResponse.json(opportunity);

@@ -1,6 +1,6 @@
 # Story 9.3: Cross-Platform Posting Queue
 
-Status: ready-for-dev
+Status: done
 Blocked: false
 Blocked-Reason:
 Trello-Card-ID: 69cb881fd20fde65961f7403
@@ -82,26 +82,26 @@ Implement in order: **Phase 1 (backend: Tasks 3-4)** then **Phase 2 (frontend: T
 
 ### What This Story MUST Build
 
-- [ ] **Task 1: Cross-Posts Dashboard Page** (AC: #1)
-  - [ ] 1.1 Create `app/posting-queue/page.tsx` as a `'use client'` component directly (NOT a server component shell — match the pattern in `app/messages/page.tsx` which is `'use client'` at the page level)
-  - [ ] 1.2 Build the dashboard in `app/posting-queue/page.tsx` (or extract to `src/components/posting-queue/PostingQueueDashboard.tsx` if it exceeds ~200 lines). Fetch from `/api/posting-queue` and `/api/posting-queue/stats` using `useState` + `useEffect` + `fetch` pattern (same as `app/messages/page.tsx`). Display stats summary at top (pending, in-progress, posted, failed, total) using small stat cards. **REQUIRED STATES**: (a) Auth redirect if unauthenticated, (b) Loading skeleton (5 placeholder cards), (c) Error banner with retry button, (d) Empty state: "No cross-posts yet. Go to Opportunities to cross-list items." with link to `/opportunities`, (e) Loaded state with items and stats
-  - [ ] 1.3 Create `src/components/posting-queue/QueueItemCard.tsx` — renders one PostingQueueItem. Show: listing title, target platform badge, status pill (color-coded: PENDING=yellow, IN_PROGRESS=blue, POSTED=green, FAILED=red, CANCELLED=gray), askingPrice, listing thumbnail (first imageUrl — **IMPORTANT**: `imageUrls` is stored as a JSON string, not an array. Use `JSON.parse()` with try/catch to extract the first URL, following the same pattern as `getFirstImage()` in `KanbanBoard.tsx`), createdAt relative time. Actions: Retry button (for FAILED, show toast on success/failure), Cancel button (for PENDING, show confirmation dialog before DELETE), View URL link (for POSTED with `externalPostUrl`). **SECURITY**: For POSTED items, validate `externalPostUrl` scheme before rendering as `<a href>` — only allow `https://` and `http://` schemes. Reject `javascript:`, `data:`, `file:`, etc. For FAILED items: display `errorMessage` truncated to 2 lines with "Show more" expand toggle
-  - [ ] 1.4 Inline filters directly in the dashboard component (do NOT create a separate QueueFilters file — two `<select>` dropdowns do not warrant their own component): status dropdown (all from `PostingStatusEnum`) and targetPlatform dropdown (all from `PlatformEnum`). Use URL search params for filter state via `useFilterParams` hook
-  - [ ] 1.5 Pagination: reuse existing offset-based pattern. Default limit=50. Show total count
-  - [ ] 1.6 "Process Queue" button at top of dashboard (next to stats) — calls `POST /api/posting-queue/process`. Show spinner during processing. On completion, display toast with results breakdown ("Processed 5 items: 3 posted, 2 failed"). Refresh queue list and stats. Disable button when no PENDING items exist
+- [x] **Task 1: Cross-Posts Dashboard Page** (AC: #1)
+  - [x] 1.1 Create `app/posting-queue/page.tsx` as a `'use client'` component directly (NOT a server component shell — match the pattern in `app/messages/page.tsx` which is `'use client'` at the page level)
+  - [x] 1.2 Build the dashboard in `app/posting-queue/page.tsx` (or extract to `src/components/posting-queue/PostingQueueDashboard.tsx` if it exceeds ~200 lines). Fetch from `/api/posting-queue` and `/api/posting-queue/stats` using `useState` + `useEffect` + `fetch` pattern (same as `app/messages/page.tsx`). Display stats summary at top (pending, in-progress, posted, failed, total) using small stat cards. **REQUIRED STATES**: (a) Auth redirect if unauthenticated, (b) Loading skeleton (5 placeholder cards), (c) Error banner with retry button, (d) Empty state: "No cross-posts yet. Go to Opportunities to cross-list items." with link to `/opportunities`, (e) Loaded state with items and stats
+  - [x] 1.3 Create `src/components/posting-queue/QueueItemCard.tsx` — renders one PostingQueueItem. Show: listing title, target platform badge, status pill (color-coded: PENDING=yellow, IN_PROGRESS=blue, POSTED=green, FAILED=red, CANCELLED=gray), askingPrice, listing thumbnail (first imageUrl — **IMPORTANT**: `imageUrls` is stored as a JSON string, not an array. Use `JSON.parse()` with try/catch to extract the first URL, following the same pattern as `getFirstImage()` in `KanbanBoard.tsx`), createdAt relative time. Actions: Retry button (for FAILED, show toast on success/failure), Cancel button (for PENDING, show confirmation dialog before DELETE), View URL link (for POSTED with `externalPostUrl`). **SECURITY**: For POSTED items, validate `externalPostUrl` scheme before rendering as `<a href>` — only allow `https://` and `http://` schemes. Reject `javascript:`, `data:`, `file:`, etc. For FAILED items: display `errorMessage` truncated to 2 lines with "Show more" expand toggle
+  - [x] 1.4 Inline filters directly in the dashboard component (do NOT create a separate QueueFilters file — two `<select>` dropdowns do not warrant their own component): status dropdown (all from `PostingStatusEnum`) and targetPlatform dropdown (all from `PlatformEnum`). Use URL search params for filter state via `useFilterParams` hook
+  - [x] 1.5 Pagination: reuse existing offset-based pattern. Default limit=50. Show total count
+  - [x] 1.6 "Process Queue" button at top of dashboard (next to stats) — calls `POST /api/posting-queue/process`. Show spinner during processing. On completion, display toast with results breakdown ("Processed 5 items: 3 posted, 2 failed"). Refresh queue list and stats. Disable button when no PENDING items exist
 
-- [ ] **Task 2: Cross-Post Action from KanbanBoard** (AC: #1)
-  - [ ] 2.1 Create `src/components/posting-queue/CrossPostModal.tsx` — `'use client'` modal. Props: `listingId: string`, `sourcePlatform: string`, `listingTitle: string`, `askingPrice?: number`, `onClose: () => void`, `onSuccess: () => void`
-  - [ ] 2.2 Modal content: On mount, fetch `GET /api/posting-queue?listingId={listingId}` to determine which platforms already have queue items. Display checkboxes for each platform (EBAY, FACEBOOK_MARKETPLACE, OFFERUP, MERCARI) EXCEPT the source platform (hidden). Platforms with existing queue items show as disabled with "Already queued" note. Optional askingPrice field pre-populated from `askingPrice` prop. Submit calls `POST /api/posting-queue` with batch payload `{ listingId, platforms: [...selected], askingPrice }`. **EDGE CASES**: (a) If ALL non-source platforms already queued, show "This listing is already queued for all available platforms" with no submit button. (b) Disable submit button during API call (prevent double-click). (c) Show loading spinner on submit
-  - [ ] 2.3 Show toast on success: "Queued for X platforms" with a link text "View in Cross-Posts" pointing to `/posting-queue`. Show error toast on failure. Use existing `useToast()` from `ToastProvider`
-  - [ ] 2.4 Add "Cross-Post" button to KanbanBoard opportunity cards — **THIS REQUIRES MODIFYING `KanbanBoardProps`**: Add a new optional prop `onCrossPost?: (opportunity: Opportunity) => void`. The KanbanBoard calls `onCrossPost(opportunity)` when the button is clicked. Only show the button on PURCHASED and LISTED column cards. The PARENT component (`app/opportunities/page.tsx`) manages modal state: `const [crossPostTarget, setCrossPostTarget] = useState<Opportunity | null>(null)` and renders `<CrossPostModal>` when non-null. Pass the opportunity's listing data (id, platform, title, askingPrice) to the modal
-  - [ ] 2.5 Feature gate: Create `GET /api/user/tier` lightweight endpoint returning `{ tier: string }`. The opportunities page fetches this on mount and only passes `onCrossPost` to KanbanBoard when tier is PRO+. This avoids the problem that the client-side session (Firebase) does not include `subscriptionTier` — it must come from the server. **IMPORTANT**: The existing `SessionProvider`/`getCurrentUser()` returns Firebase user data, NOT Prisma user data with `subscriptionTier`. There is no existing client-side mechanism for tier checks.
+- [x] **Task 2: Cross-Post Action from KanbanBoard** (AC: #1)
+  - [x] 2.1 Create `src/components/posting-queue/CrossPostModal.tsx` — `'use client'` modal. Props: `listingId: string`, `sourcePlatform: string`, `listingTitle: string`, `askingPrice?: number`, `onClose: () => void`, `onSuccess: () => void`
+  - [x] 2.2 Modal content: On mount, fetch `GET /api/posting-queue?listingId={listingId}` to determine which platforms already have queue items. Display checkboxes for each platform (EBAY, FACEBOOK_MARKETPLACE, OFFERUP, MERCARI) EXCEPT the source platform (hidden). Platforms with existing queue items show as disabled with "Already queued" note. Optional askingPrice field pre-populated from `askingPrice` prop. Submit calls `POST /api/posting-queue` with batch payload `{ listingId, platforms: [...selected], askingPrice }`. **EDGE CASES**: (a) If ALL non-source platforms already queued, show "This listing is already queued for all available platforms" with no submit button. (b) Disable submit button during API call (prevent double-click). (c) Show loading spinner on submit
+  - [x] 2.3 Show toast on success: "Queued for X platforms" with a link text "View in Cross-Posts" pointing to `/posting-queue`. Show error toast on failure. Use existing `useToast()` from `ToastProvider`
+  - [x] 2.4 Add "Cross-Post" button to KanbanBoard opportunity cards — **THIS REQUIRES MODIFYING `KanbanBoardProps`**: Add a new optional prop `onCrossPost?: (opportunity: Opportunity) => void`. The KanbanBoard calls `onCrossPost(opportunity)` when the button is clicked. Only show the button on PURCHASED and LISTED column cards. The PARENT component (`app/opportunities/page.tsx`) manages modal state: `const [crossPostTarget, setCrossPostTarget] = useState<Opportunity | null>(null)` and renders `<CrossPostModal>` when non-null. Pass the opportunity's listing data (id, platform, title, askingPrice) to the modal
+  - [x] 2.5 Feature gate: Create `GET /api/user/tier` lightweight endpoint returning `{ tier: string }`. The opportunities page fetches this on mount and only passes `onCrossPost` to KanbanBoard when tier is PRO+. This avoids the problem that the client-side session (Firebase) does not include `subscriptionTier` — it must come from the server. **IMPORTANT**: The existing `SessionProvider`/`getCurrentUser()` returns Firebase user data, NOT Prisma user data with `subscriptionTier`. There is no existing client-side mechanism for tier checks.
 
-- [ ] **Task 3: Queue Processing — Backend Fixes + API Trigger** (AC: #2, #3, #4)
+- [x] **Task 3: Queue Processing — Backend Fixes + API Trigger** (AC: #2, #3, #4)
 
   **CRITICAL SECURITY FIX**: The existing `processQueue()` in `src/lib/posting-queue-processor.ts` fetches ALL pending items globally (no `userId` filter). This means any authenticated user calling the process endpoint would trigger processing of EVERY user's queue items. This MUST be fixed.
 
-  - [ ] 3.1 **Modify `src/lib/posting-queue-processor.ts`** — Add `userId` parameter to `processQueue()`:
+  - [x] 3.1 **Modify `src/lib/posting-queue-processor.ts`** — Add `userId` parameter to `processQueue()`:
     ```typescript
     export async function processQueue(userId: string, batchSize = 10): Promise<ProcessResult>
     ```
@@ -111,14 +111,14 @@ Implement in order: **Phase 1 (backend: Tasks 3-4)** then **Phase 2 (frontend: T
     ```
     Track posted/failed counts during the processing loop and return the breakdown.
 
-  - [ ] 3.2 **Add concurrency guard**: Before calling the poster, re-check the item status:
+  - [x] 3.2 **Add concurrency guard**: Before calling the poster, re-check the item status:
     ```typescript
     const current = await prisma.postingQueueItem.findUnique({ where: { id: item.id } });
     if (!current || current.status !== 'IN_PROGRESS') return; // Already processed by another call
     ```
     This prevents two concurrent `processQueue()` calls from double-processing the same item.
 
-  - [ ] 3.3 **Add per-item timeout**: Wrap the poster call with `Promise.race()`:
+  - [x] 3.3 **Add per-item timeout**: Wrap the poster call with `Promise.race()`:
     ```typescript
     const POSTER_TIMEOUT_MS = 30_000; // 30 seconds
     const result = await Promise.race([
@@ -130,7 +130,7 @@ Implement in order: **Phase 1 (backend: Tasks 3-4)** then **Phase 2 (frontend: T
     ```
     This prevents a hung poster from blocking the entire queue run.
 
-  - [ ] 3.4 **Add stuck item recovery**: At the start of `processQueue()`, reset any items stuck in IN_PROGRESS for > 5 minutes (stale from crashes/timeouts):
+  - [x] 3.4 **Add stuck item recovery**: At the start of `processQueue()`, reset any items stuck in IN_PROGRESS for > 5 minutes (stale from crashes/timeouts):
     ```typescript
     await prisma.postingQueueItem.updateMany({
       where: { userId, status: 'IN_PROGRESS', updatedAt: { lt: fiveMinutesAgo } },
@@ -138,21 +138,21 @@ Implement in order: **Phase 1 (backend: Tasks 3-4)** then **Phase 2 (frontend: T
     });
     ```
 
-  - [ ] 3.5 Create `app/api/posting-queue/process/route.ts` — POST endpoint:
+  - [x] 3.5 Create `app/api/posting-queue/process/route.ts` — POST endpoint:
     - Auth required via `getAuthUserId()`
     - Feature gate: check `ebayCrossListing` access (same as POST /api/posting-queue)
     - Call `ensurePostersRegistered()` (see Task 4) before `processQueue(userId)`
     - Rate limit: implement inline in the handler using a simple timestamp check against the user's last process time. The existing `rate-limiter.ts` uses IP+pathname keying and middleware — it does NOT support per-user keying needed here. Do NOT try to reuse it. Instead, add a `lastProcessedAt` check: query the user's most recent IN_PROGRESS or recently updated queue item. If a process ran within the last 60 seconds, return 429
     - Return `{ success: true, data: { processed: N, posted: N, failed: N } }`
 
-  - [ ] 3.6 Update `src/__tests__/lib/posting-queue-processor.test.ts` — update tests for the new `userId` parameter, `ProcessResult` return type, concurrency guard, timeout, and stuck item recovery
-  - [ ] 3.7 Create `src/__tests__/api/posting-queue-process.test.ts` — tests for: auth (401), feature gate (403), successful processing with result breakdown, rate limiting (429), empty queue (processed: 0)
+  - [x] 3.6 Update `src/__tests__/lib/posting-queue-processor.test.ts` — update tests for the new `userId` parameter, `ProcessResult` return type, concurrency guard, timeout, and stuck item recovery
+  - [x] 3.7 Create `src/__tests__/api/posting-queue-process.test.ts` — tests for: auth (401), feature gate (403), successful processing with result breakdown, rate limiting (429), empty queue (processed: 0)
 
-- [ ] **Task 4: Platform Posting Handlers — Stub Registration** (AC: #2, #3, #4)
+- [x] **Task 4: Platform Posting Handlers — Stub Registration** (AC: #2, #3, #4)
 
   **IMPORTANT**: Stubs return `{ success: false }` which triggers retry logic. With default maxRetries=3, every `processQueue()` call will cycle stubs through retries until permanently FAILED. This is expected behavior for stubs — users will see items fail with a clear "not yet implemented" message.
 
-  - [ ] 4.1 Create `src/lib/platform-posters/index.ts` — single file containing ALL stub registrations using a factory pattern. Do NOT create 4 separate files for identical stubs:
+  - [x] 4.1 Create `src/lib/platform-posters/index.ts` — single file containing ALL stub registrations using a factory pattern. Do NOT create 4 separate files for identical stubs:
     ```typescript
     import { registerPoster, type PlatformPoster } from '@/lib/posting-queue-processor';
 
@@ -176,27 +176,27 @@ Implement in order: **Phase 1 (backend: Tasks 3-4)** then **Phase 2 (frontend: T
     ```
     **WHY `ensurePostersRegistered()` instead of import side-effect**: In Next.js on Vercel (serverless), module-level state can be cleared between Lambda invocations. An import side-effect that mutates the `platformPosters` registry in `posting-queue-processor.ts` may not survive cold starts. The explicit `ensurePostersRegistered()` function is called at the top of the process route handler, guaranteeing registration before every `processQueue()` call. The `registered` flag prevents redundant re-registration in hot Lambda instances.
 
-  - [ ] 4.2 Create `src/__tests__/lib/platform-posters.test.ts` — test: `ensurePostersRegistered()` registers all 4 platforms, calling it twice is idempotent, each stub returns `{ success: false }` with descriptive error message
+  - [x] 4.2 Create `src/__tests__/lib/platform-posters.test.ts` — test: `ensurePostersRegistered()` registers all 4 platforms, calling it twice is idempotent, each stub returns `{ success: false }` with descriptive error message
 
-- [ ] **Task 5: Navigation Integration** (AC: #1)
-  - [ ] 5.1 Add "Cross-Posts" link to `src/components/Navigation.tsx` — position after Messages (or after Opportunities if Messages link doesn't exist yet). Use `Send` or `ArrowUpFromLine` icon from `lucide-react`. **NO badge count** — the Navigation component currently has zero data fetching and zero `useEffect`/`useState`. Adding a fetch for badge count would fire a network request on every page navigation across the entire app. Just add the link with icon, matching the exact pattern of the other nav items. Badge can be added in a future story when a proper notification system exists
-  - [ ] 5.2 User-facing label: "Cross-Posts" (NOT "Posting Queue" — users think "cross-post this item", not "manage my posting queue")
+- [x] **Task 5: Navigation Integration** (AC: #1)
+  - [x] 5.1 Add "Cross-Posts" link to `src/components/Navigation.tsx` — position after Messages (or after Opportunities if Messages link doesn't exist yet). Use `Send` or `ArrowUpFromLine` icon from `lucide-react`. **NO badge count** — the Navigation component currently has zero data fetching and zero `useEffect`/`useState`. Adding a fetch for badge count would fire a network request on every page navigation across the entire app. Just add the link with icon, matching the exact pattern of the other nav items. Badge can be added in a future story when a proper notification system exists
+  - [x] 5.2 User-facing label: "Cross-Posts" (NOT "Posting Queue" — users think "cross-post this item", not "manage my posting queue")
 
-- [ ] **Task 6: Acceptance Tests** (AC: #1-5)
-  - [ ] 6.1 Create (or append to) `test/acceptance/features/E-009-cross-platform-resale-listing.feature` with scenarios for Story 9.3. Continue `@E-009-S-<N>` numbering from Stories 9.1 and 9.2 scenarios (check existing file for last number, or start after those stories' counts)
-  - [ ] 6.2 Required scenarios (minimum — add more if ACs warrant):
+- [x] **Task 6: Acceptance Tests** (AC: #1-5)
+  - [x] 6.1 Create (or append to) `test/acceptance/features/E-009-cross-platform-resale-listing.feature` with scenarios for Story 9.3. Continue `@E-009-S-<N>` numbering from Stories 9.1 and 9.2 scenarios (check existing file for last number, or start after those stories' counts)
+  - [x] 6.2 Required scenarios (minimum — add more if ACs warrant):
     - `@E-009-S-<N> @story-9-3 @FR-RELIST-04` — Platform selection creates PostingQueueItems
     - `@E-009-S-<N+1> @story-9-3 @FR-RELIST-05` — Queue processing transitions PENDING to IN_PROGRESS to POSTED
     - `@E-009-S-<N+2> @story-9-3 @FR-RELIST-05` — Failed posting triggers retry, eventually FAILED after max retries
     - `@E-009-S-<N+3> @story-9-3 @FR-RELIST-06` — Duplicate posting prevention via unique constraint
     - `@E-009-S-<N+4> @story-9-3 @FR-RELIST-05` — User-scoped processing (only processes authenticated user's items)
-  - [ ] 6.3 Create step definitions in `test/acceptance/step_definitions/E-009-cross-platform-resale-listing.steps.ts` (or append to existing)
-  - [ ] 6.4 Update RTM at `_bmad-output/test-artifacts/requirement-traceability-matrix.md`
+  - [x] 6.3 Create step definitions in `test/acceptance/step_definitions/E-009-cross-platform-resale-listing.steps.ts` (or append to existing)
+  - [x] 6.4 Update RTM at `_bmad-output/test-artifacts/requirement-traceability-matrix.md`
 
-- [ ] **Task 7: Unit Tests for New Code** (AC: #1-5)
-  - [ ] 7.1 Create `src/__tests__/components/PostingQueueDashboard.test.tsx` — test rendering, stats display, filter interaction, empty state, loading state, error state. **CRITICAL**: Add `/** @jest-environment jsdom */` pragma at the top of this file. The project's `jest.config.js` defaults to `testEnvironment: 'node'`, which does not provide a DOM. Component tests using `@testing-library/react` require jsdom. Without this pragma, all React component tests will fail with `document is not defined`
-  - [ ] 7.2 Create `src/__tests__/components/CrossPostModal.test.tsx` — test platform selection, source platform exclusion, already-queued platform detection, batch submission, error handling, loading state. **CRITICAL**: Add `/** @jest-environment jsdom */` pragma
-  - [ ] 7.3 Ensure all new code in `src/lib/` and `app/api/` meets coverage thresholds: branches 96%, functions 98%, lines 99%, statements 99%
+- [x] **Task 7: Unit Tests for New Code** (AC: #1-5)
+  - [x] 7.1 Create `src/__tests__/components/PostingQueueDashboard.test.tsx` — test rendering, stats display, filter interaction, empty state, loading state, error state. **CRITICAL**: Add `/** @jest-environment jsdom */` pragma at the top of this file. The project's `jest.config.js` defaults to `testEnvironment: 'node'`, which does not provide a DOM. Component tests using `@testing-library/react` require jsdom. Without this pragma, all React component tests will fail with `document is not defined`
+  - [x] 7.2 Create `src/__tests__/components/CrossPostModal.test.tsx` — test platform selection, source platform exclusion, already-queued platform detection, batch submission, error handling, loading state. **CRITICAL**: Add `/** @jest-environment jsdom */` pragma
+  - [x] 7.3 Ensure all new code in `src/lib/` and `app/api/` meets coverage thresholds: branches 96%, functions 98%, lines 99%, statements 99%
 
 ## Dev Notes
 
@@ -371,8 +371,63 @@ model PostingQueueItem {
 
 ### Agent Model Used
 
+claude-opus-4-6[1m] via Claude Code (dev-story workflow)
+
 ### Debug Log References
+
+- Backend unit tests: `src/__tests__/lib/posting-queue-processor.test.ts` (18 tests, 100% pass)
+- Platform posters: `src/__tests__/lib/platform-posters.test.ts` (4 tests, 100% pass)
+- Process route: `src/__tests__/api/posting-queue-process.test.ts` (6 tests, 100% pass)
+- /api/user/tier: `src/__tests__/api/user-tier.test.ts` (4 tests, 100% pass)
+- Dashboard/modal/card: PostingQueueDashboard (6), CrossPostModal (6), QueueItemCard (8) — all pass under jsdom
+- Full Story 9.3 scoped run: `npx jest --testPathPatterns="posting-queue|platform-posters|user-tier|CrossPostModal|PostingQueueDashboard|QueueItemCard|KanbanBoard|OpportunitiesPage"` → 181/181 pass, no regressions in touched areas
+- Acceptance tests: `npx cucumber-js --profile acceptance --tags "@story-9-3"` → 7 scenarios, 30 steps, all pass
 
 ### Completion Notes List
 
+- **Backend security fix (Task 3.1-3.4)**: `processQueue()` now takes a required `userId` parameter and filters `findMany` by it — the previous global-scope implementation was an IDOR risk. Added concurrency guard (re-reads item status after marking IN_PROGRESS so parallel workers cannot double-post), per-item 30s timeout via `Promise.race`, and stuck-item recovery that resets IN_PROGRESS items older than 5 minutes back to PENDING at the top of every run.
+- **Return type change**: `processQueue()` now returns `ProcessResult { processed, posted, failed }` instead of a bare count. The process API route uses this breakdown to render a user-facing "Processed N items: X posted, Y failed" toast.
+- **Platform poster stubs (Task 4)**: `src/lib/platform-posters/index.ts` registers factory-built stubs for EBAY, FACEBOOK_MARKETPLACE, MERCARI, and OFFERUP. `ensurePostersRegistered()` is explicit (not a module side-effect) to survive serverless cold starts and is idempotent for hot Lambda instances. Each stub returns `{ success: false, errorMessage: "<Platform> posting not yet implemented" }` so the full retry pipeline and user-facing error display work end-to-end before real posters land.
+- **Process API route (Task 3.5)**: POST `/api/posting-queue/process` auth-checks via `getAuthUserId()`, re-runs the `ebayCrossListing` feature gate, calls `ensurePostersRegistered()` before every run, and implements per-user rate limiting inline (60s window) by inspecting the most recently touched queue item — the shared `rate-limiter.ts` only supports IP+pathname keying.
+- **Tier endpoint (Task 2.5)**: Created `GET /api/user/tier` as a lightweight lookup so the client can gate the Cross-Post CTA. The Firebase session is intentionally not enriched with Prisma tier data, so this endpoint bridges the gap.
+- **Frontend dashboard (Task 1)**: `app/posting-queue/page.tsx` is a `'use client'` page with all five required states (auth redirect, loading skeleton, error banner with retry, empty state linking to /opportunities, loaded state). Stats cards, inline status/platform filters via `useFilterParams`, offset pagination, and a "Process Queue" button that disables when no PENDING items exist.
+- **QueueItemCard (Task 1.3)**: Color-coded status pill, JSON-decoded thumbnail, relative timestamp, and contextual actions. Critical security guard: `externalPostUrl` is rendered as a link only after `new URL(...).protocol` is verified against a `['https:', 'http:']` whitelist — javascript:, data:, and file: URIs are blocked. FAILED items get a 2-line clamped error with Show more / Show less toggle.
+- **CrossPostModal (Task 2)**: Fetches existing queue items on mount to disable already-queued platforms, excludes the source platform from the list, and shows a friendly "This listing is already queued for all available platforms" message with no submit button in the edge case where nothing is selectable. Submit is debounced via `submitting` state.
+- **KanbanBoard wiring (Task 2.4)**: Added `onCrossPost?: (opportunity: KanbanOpportunity) => void` optional prop. The button renders only on PURCHASED and LISTED columns when the handler is present. `app/opportunities/page.tsx` fetches `/api/user/tier` on mount and only passes the handler when the tier is not FREE. Modal state is owned by the page, not the board.
+- **Navigation (Task 5)**: Added a "Cross-Posts" link after Messages using the `Send` icon. No badge count — the nav component still does not fire network requests on every route change.
+- **Acceptance tests (Task 6)**: Seven new scenarios (@E-009-S-21 through @E-009-S-27) cover platform selection, the PENDING → IN_PROGRESS → POSTED happy path, retry exhaustion leading to FAILED, duplicate prevention, user-scoped processing, and structural checks on the process route and platform posters module. Step definitions drive the real `processQueue` with an in-memory Prisma stub and per-scenario platform poster registrations.
+- **Coexistence with Story 9.4 WIP**: During this story, parallel work on 9.4 (image reuse) was modifying `src/lib/posting-queue-processor.ts` to eager-load `ListingImage[]` and swap `PlatformPoster` to take `ListingWithImages`. The 9.3 work adapted to this — my unit-test factory mocks now include `listing.images: []` and `listing.imageUrls: null`, and the processor's type signatures flow `ListingWithImages` end-to-end. Pre-existing failures in unrelated 9.4 WIP files (`ListingDetail.test.tsx` — Prisma `TextEncoder` issue, `ListingImage` not yet exported from the generated client) are not in scope for 9.3 and must be completed as part of 9.4.
+
 ### File List
+
+**Created:**
+- `app/posting-queue/page.tsx` — Cross-Posts dashboard ('use client')
+- `app/api/posting-queue/process/route.ts` — POST processing trigger
+- `app/api/user/tier/route.ts` — Client-side tier lookup
+- `src/components/posting-queue/QueueItemCard.tsx` — Single queue item display
+- `src/components/posting-queue/CrossPostModal.tsx` — Platform selection modal
+- `src/lib/platform-posters/index.ts` — Stub factory + ensurePostersRegistered
+- `src/__tests__/lib/platform-posters.test.ts`
+- `src/__tests__/api/posting-queue-process.test.ts`
+- `src/__tests__/api/user-tier.test.ts`
+- `src/__tests__/components/PostingQueueDashboard.test.tsx`
+- `src/__tests__/components/CrossPostModal.test.tsx`
+- `src/__tests__/components/QueueItemCard.test.tsx`
+- `test/acceptance/step_definitions/E-009-posting-queue.steps.ts`
+
+**Modified:**
+- `src/lib/posting-queue-processor.ts` — userId-scoped processQueue, ProcessResult return type, concurrency guard, 30s timeout, stuck-item recovery
+- `src/__tests__/lib/posting-queue-processor.test.ts` — Updated for the new signature and new behaviours
+- `src/components/KanbanBoard.tsx` — Added `onCrossPost` prop, Cross-Post button on PURCHASED/LISTED cards, renamed internal Opportunity type to KanbanOpportunity
+- `src/components/Navigation.tsx` — Added Cross-Posts nav link
+- `app/opportunities/page.tsx` — Fetches `/api/user/tier`, owns CrossPostModal state, passes `onCrossPost` to KanbanBoard when tier is PRO+
+- `test/acceptance/features/E-009-cross-platform-resale-listing.feature` — Appended Story 9.3 scenarios (@E-009-S-21 through @E-009-S-27)
+- `_bmad-output/test-artifacts/requirements-traceability-matrix.md` — FR-RELIST-04/05/06 marked Covered with scenario IDs
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` — Story status ready-for-dev → in-progress → review
+
+### Change Log
+
+| Date | Version | Summary |
+|---|---|---|
+| 2026-04-08 | 1.0 | Initial Story 9.3 implementation: user-scoped queue processing, platform poster stubs, Cross-Posts dashboard, CrossPostModal from KanbanBoard, process API route, tier endpoint, nav link, acceptance tests |
+| 2026-04-08 | 1.1 | Code review fixes: standardized file header on platform-posters/index.ts (@file format), memoized onCrossPost handler in opportunities/page.tsx via useCallback, added aria-expanded to QueueItemCard error toggle, added aria-label to dashboard filter selects |

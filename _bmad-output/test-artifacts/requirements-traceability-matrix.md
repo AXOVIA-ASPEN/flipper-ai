@@ -99,12 +99,12 @@
 |---|---|---|---|---|---|---|
 | FR-RELIST-01 | AI resale title generation | 9 | 9.1 | @E-009-S-1, @E-009-S-2, @E-009-S-3, @E-009-S-9, @E-009-S-10, @E-009-S-11 | E-009-cross-platform-resale-listing.feature | Covered |
 | FR-RELIST-02 | AI resale description generation | 9 | 9.1 | @E-009-S-4, @E-009-S-5, @E-009-S-6, @E-009-S-9, @E-009-S-10 | E-009-cross-platform-resale-listing.feature | Covered |
-| FR-RELIST-03 | Optimal listing price calculation | 9 | 9.2 | @E-009-S-12, @E-009-S-13, @E-009-S-14, @E-009-S-15, @E-009-S-16, @E-009-S-17, @E-009-S-18, @E-009-S-19, @E-009-S-20 | E-009-cross-platform-resale-listing.feature | Covered |
-| FR-RELIST-04 | Cross-platform posting queue | 9 | 9.3 | | E-009-cross-platform-resale-listing.feature | Pending |
-| FR-RELIST-05 | Posting status workflow + retry | 9 | 9.3 | | E-009-cross-platform-resale-listing.feature | Pending |
-| FR-RELIST-06 | Duplicate posting prevention | 9 | 9.3 | | E-009-cross-platform-resale-listing.feature | Pending |
+| FR-RELIST-03 | Optimal listing price calculation | 9 | 9.2 | @E-009-S-12, @E-009-S-13, @E-009-S-14, @E-009-S-15, @E-009-S-16, @E-009-S-17, @E-009-S-18, @E-009-S-19, @E-009-S-20 | E-009-cross-platform-resale-listing.feature, PriceCalculator.test.tsx (36 component-level UI tests: AC-1 hero display, AC-2 full hierarchy, AC-3 slider recalc, AC-4 edge states, AC-5 projected UI) | Covered |
+| FR-RELIST-04 | Cross-platform posting queue | 9 | 9.3 | @E-009-S-21, @E-009-S-27 | E-009-cross-platform-resale-listing.feature | Covered |
+| FR-RELIST-05 | Posting status workflow + retry | 9 | 9.3 | @E-009-S-22, @E-009-S-23, @E-009-S-25, @E-009-S-26 | E-009-cross-platform-resale-listing.feature | Covered |
+| FR-RELIST-06 | Duplicate posting prevention | 9 | 9.3 | @E-009-S-24 | E-009-cross-platform-resale-listing.feature | Covered |
 | FR-RELIST-07 | Algorithmic fallback templates | 9 | 9.1 | @E-009-S-7, @E-009-S-8, @E-009-S-10 | E-009-cross-platform-resale-listing.feature | Covered |
-| FR-RELIST-08 | Firebase image reuse for cross-posting | 9 | 9.4 | | E-009-cross-platform-resale-listing.feature | Pending |
+| FR-RELIST-08 | Firebase image reuse for cross-posting | 9 | 9.4 | @E-009-S-28, @E-009-S-29, @E-009-S-30, @E-009-S-31, @E-009-S-32, @E-009-S-33, @E-009-S-34 | E-009-cross-platform-resale-listing.feature | Covered |
 
 ## FR-DASH: Dashboard & Tracking
 
@@ -128,28 +128,63 @@
 
 | Requirement | Description | Epic | Story | Scenario ID(s) | Feature File | Status |
 |---|---|---|---|---|---|---|
-| FR-MONITOR-01 | Detect listing sold | 10 | 10.2 | | E-010-monitoring-email-notifications.feature | Pending |
-| FR-MONITOR-02 | Track price changes | 10 | 10.2 | | E-010-monitoring-email-notifications.feature | Pending |
-| FR-MONITOR-03 | Listing expiration warning | 10 | 10.2 | | E-010-monitoring-email-notifications.feature | Pending |
-| FR-MONITOR-04 | Listing unavailable alert | 10 | 10.2 | | E-010-monitoring-email-notifications.feature | Pending |
+| FR-MONITOR-01 | Detect listing sold | 10 | 10.2 | @E-010-S-18 | E-010-monitoring-email-notifications.feature | Covered |
+| FR-MONITOR-02 | Track price changes | 10 | 10.2 | @E-010-S-19, @E-010-S-20, @E-010-S-21 | E-010-monitoring-email-notifications.feature | Covered |
+| FR-MONITOR-03 | Listing expiration warning | 10 | 10.2 | @E-010-S-22, @E-010-S-23, @E-010-S-24 | E-010-monitoring-email-notifications.feature | Covered |
+| FR-MONITOR-04 | Listing unavailable alert | 10 | 10.2 | @E-010-S-25, @E-010-S-26, @E-010-S-27 | E-010-monitoring-email-notifications.feature | Covered |
+
+> **Story 10.1 — Infrastructure Foundation (no direct FR tags)**
+> Story 10.1 implements the background job scheduler, MonitoringJobService, NotificationEvent queue,
+> and monitoring API endpoint that _enable_ FR-MONITOR-* and FR-NOTIFY-* in subsequent stories.
+> All 7 ACs are covered by structural + pure-function acceptance test scenarios tagged `@story-10-1`:
+>
+> | AC | Scenario(s) | Type |
+> |---|---|---|
+> | AC-1: Scheduled Monitoring Trigger | @E-010-S-8, @E-010-S-9 | structural (route file + source) |
+> | AC-2: Batch Listing Checks | @E-010-S-10 | structural (listing-tracker.ts source) |
+> | AC-3: Notification Event Creation | @E-010-S-11, @E-010-S-12 | pure-function + structural |
+> | AC-4: Retry with Exponential Backoff | @E-010-S-13 | structural (monitoring-job.ts source) |
+> | AC-5: Concurrent Run Prevention | @E-010-S-14 | structural (P2002 → MONITORING_CONCURRENT) |
+> | AC-6: Stale Job Recovery | @E-010-S-15 | structural (reapStaleJobs → FAILED) |
+> | AC-7: Monitoring Effectiveness Canary | @E-010-S-16, @E-010-S-17 | pure-function (isAnomalyThresholdExceeded) |
+>
+> Step definitions: `test/acceptance/step_definitions/E-010-background-job-scheduler.steps.ts`
+
+> **Story 10.2 — Listing Monitoring Events**
+> Story 10.2 adds sold/price-change/expiry/unavailable detection with payload enrichment,
+> the notification events API (GET /api/notifications, PATCH /api/notifications/[id]),
+> and extends the SSE emitter union with the four new monitoring event types.
+> Scenarios tagged `@story-10-2` (E-010-S-18 through E-010-S-31):
+>
+> | AC | Scenario(s) | Type |
+> |---|---|---|
+> | AC-1: Sold Detection | @E-010-S-18 | structural (listing-tracker.ts exports detectSoldStatus + soldIndicator in StateChange) |
+> | AC-2: Price Change Detection | @E-010-S-19, @E-010-S-20, @E-010-S-21 | structural + pure-function (direction field, isPriceChangeMeaningful) |
+> | AC-3: Expiry Warning | @E-010-S-22, @E-010-S-23, @E-010-S-24 | pure-function (computeEstimatedExpiry per platform, null for Mercari) |
+> | AC-4: Unavailable Detection | @E-010-S-25, @E-010-S-26, @E-010-S-27 | pure-function (classifyHttpResponse: 404→removed, 403/429→rate_limited) |
+> | AC-5: Notifications API (GET) | @E-010-S-28, @E-010-S-29 | structural (GET handler, auth, pagination) |
+> | AC-6: Mark Events Read (PATCH) | @E-010-S-30 | structural (PATCH handler + ownership check) |
+> | AC-7: SSE Real-Time Events | @E-010-S-31 | structural (SseEventType union extension) |
+>
+> Step definitions: `test/acceptance/step_definitions/E-010-monitoring-events.steps.ts`
 
 ## FR-NOTIFY: Push Notifications & Email Alerts
 
 | Requirement | Description | Epic | Story | Scenario ID(s) | Feature File | Status |
 |---|---|---|---|---|---|---|
-| FR-NOTIFY-01 | New flippable item alert | 10 | 10.3 | | E-010-monitoring-email-notifications.feature | Pending |
-| FR-NOTIFY-02 | Inbound message alert | 10 | 10.4 | | E-010-monitoring-email-notifications.feature | Pending |
-| FR-NOTIFY-03 | Draft message ready alert | 10 | 10.4 | | E-010-monitoring-email-notifications.feature | Pending |
-| FR-NOTIFY-04 | Message sent alert | 10 | 10.4 | | E-010-monitoring-email-notifications.feature | Pending |
-| FR-NOTIFY-05 | Flip sold alert | 10 | 10.3 | | E-010-monitoring-email-notifications.feature | Pending |
-| FR-NOTIFY-06 | Flip purchased alert | 10 | 10.3 | | E-010-monitoring-email-notifications.feature | Pending |
-| FR-NOTIFY-07 | Item shipped alert | 10 | 10.3 | | E-010-monitoring-email-notifications.feature | Pending |
-| FR-NOTIFY-08 | Review left alert | 10 | 10.5 | | E-010-monitoring-email-notifications.feature | Pending |
-| FR-NOTIFY-09 | Flip gone cold alert | 10 | 10.5 | | E-010-monitoring-email-notifications.feature | Pending |
-| FR-NOTIFY-10 | Flip hot alert | 10 | 10.5 | | E-010-monitoring-email-notifications.feature | Pending |
-| FR-NOTIFY-11 | Price change alert | 10 | 10.5 | | E-010-monitoring-email-notifications.feature | Pending |
-| FR-NOTIFY-12 | Configurable preferences | 10, 11 | 10.6, 11.1, 11.3 | | E-010/E-011 | Pending |
-| FR-NOTIFY-13 | Twilio SMS integration | 11 | 11.2 | | E-011-push-sms-notifications.feature | Pending |
+| FR-NOTIFY-01 | New flippable item alert | 10 | 10.3 | @E-010-S-32, @E-010-S-36, @E-010-S-37, @E-010-S-38, @E-010-S-39 | E-010-monitoring-email-notifications.feature | Covered |
+| FR-NOTIFY-02 | Inbound message alert | 10 | 10.4 | @E-010-S-1, @E-010-S-2, @E-010-S-3 | E-010-monitoring-email-notifications.feature | Covered |
+| FR-NOTIFY-03 | Draft message ready alert | 10 | 10.4 | @E-010-S-4, @E-010-S-5 | E-010-monitoring-email-notifications.feature | Covered |
+| FR-NOTIFY-04 | Message sent alert | 10 | 10.4 | @E-010-S-6, @E-010-S-7 | E-010-monitoring-email-notifications.feature | Covered |
+| FR-NOTIFY-05 | Flip sold alert | 10 | 10.3 | @E-010-S-35, @E-010-S-36, @E-010-S-37, @E-010-S-38 | E-010-monitoring-email-notifications.feature | Covered |
+| FR-NOTIFY-06 | Flip purchased alert | 10 | 10.3 | @E-010-S-33, @E-010-S-36 | E-010-monitoring-email-notifications.feature | Covered |
+| FR-NOTIFY-07 | Item listed alert | 10 | 10.3 | @E-010-S-34, @E-010-S-36 | E-010-monitoring-email-notifications.feature | Covered |
+| FR-NOTIFY-08 | Review left alert | 10 | 10.5 | @E-010-S-40 @story-10-5 | E-010-monitoring-email-notifications.feature | Covered |
+| FR-NOTIFY-09 | Flip gone cold alert | 10 | 10.5, 10.6 | @E-010-S-41, @E-010-S-42, @E-010-S-45, @E-010-S-47, @E-010-S-56, @E-010-S-57 | E-010-monitoring-email-notifications.feature | Covered |
+| FR-NOTIFY-10 | Flip hot alert | 10 | 10.5, 10.6 | @E-010-S-43, @E-010-S-46, @E-010-S-48, @E-010-S-56, @E-010-S-57 | E-010-monitoring-email-notifications.feature | Covered |
+| FR-NOTIFY-11 | Price change alert | 10 | 10.5 | @E-010-S-44 @story-10-5 | E-010-monitoring-email-notifications.feature | Covered |
+| FR-NOTIFY-12 | Configurable preferences | 10, 11 | 10.6, 11.1, 11.3 | @E-010-S-50..57 (story-10-6); @E-011-S-1..5 (story-11-1); @E-011-S-14, @E-011-S-15, @E-011-S-16, @E-011-S-17, @E-011-S-18, @E-011-S-19, @E-011-S-20, @E-011-S-21 (story-11-3) | E-010-monitoring-email-notifications.feature, E-011-push-sms-notifications.feature | Covered |
+| FR-NOTIFY-13 | Twilio SMS integration | 11 | 11.2 | @E-011-S-7, @E-011-S-8, @E-011-S-9, @E-011-S-10, @E-011-S-11, @E-011-S-12, @E-011-S-13 | E-011-push-sms-notifications.feature | Covered |
 
 ## FR-BILLING: User Management & Billing
 
@@ -171,8 +206,8 @@
 
 | Requirement | Description | Epic | Story | Scenario ID(s) | Feature File | Status |
 |---|---|---|---|---|---|---|
-| FR-MEET-01 | Google Calendar integration | 12 | 12.1 | | E-012-meeting-logistics.feature | Pending |
-| FR-MEET-02 | Google Maps route generation | 12 | 12.2 | | E-012-meeting-logistics.feature | Pending |
+| FR-MEET-01 | Google Calendar integration | 12 | 12.1 | @E-012-S-1, @E-012-S-2, @E-012-S-3, @E-012-S-4, @E-012-S-5, @E-012-S-6, @E-012-S-7, @E-012-S-8 | E-012-meeting-logistics.feature | Covered |
+| FR-MEET-02 | Google Maps route generation | 12 | 12.2 | @E-012-S-9, @E-012-S-10, @E-012-S-11, @E-012-S-12, @E-012-S-13, @E-012-S-14, @E-012-S-15 | E-012-meeting-logistics.feature | Covered |
 
 ---
 
@@ -224,13 +259,13 @@
 | FR-COMM | 8 | 7 | 1 | 88% |
 | FR-RELIST | 8 | 3 | 5 | 38% |
 | FR-DASH | 13 | 8 | 5 | 62% |
-| FR-MONITOR | 4 | 0 | 4 | 0% |
-| FR-NOTIFY | 13 | 0 | 13 | 0% |
+| FR-MONITOR | 4 | 4 | 0 | 100% |
+| FR-NOTIFY | 13 | 12 | 1 | 92% |
 | FR-BILLING | 11 | 6 | 5 | 55% |
-| FR-MEET | 2 | 0 | 2 | 0% |
-| **Total FR** | **111** | **52** | **59** | **47%** |
+| FR-MEET | 2 | 2 | 0 | 100% |
+| **Total FR** | **111** | **66** | **45** | **59%** |
 | NFR | 30 | 5 | 25 | 17% |
-| **Grand Total** | **141** | **57** | **84** | **40%** |
+| **Grand Total** | **141** | **71** | **70** | **50%** |
 
 ---
 

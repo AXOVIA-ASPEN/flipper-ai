@@ -173,6 +173,16 @@ describe('conversation-status', () => {
         updateConversationStatus('bad-id', 'user-1', 'pending')
       ).rejects.toThrow('Listing not found');
     });
+
+    it('rejects unrecognized current status (defensive fallback for unexpected DB data)', async () => {
+      // Covers the isValidTransition ternary else branch: when the current status
+      // is not in VALID_TRANSITIONS (e.g., stale/corrupt DB data), allowed is
+      // undefined (falsy) → returns false → transition is invalid.
+      mockListingFindFirst.mockResolvedValue({ conversationStatus: 'unknown_state' });
+      await expect(
+        updateConversationStatus('listing-1', 'user-1', 'pending')
+      ).rejects.toThrow('Invalid conversation status transition: unknown_state → pending');
+    });
   });
 
   // ── transitionToPending ────────────────────────────────────────────────

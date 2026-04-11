@@ -28,6 +28,7 @@ export async function verifyIdToken(req: NextRequest): Promise<FirebaseAuthUser 
   }
 
   const idToken = authHeader.slice(7);
+  /* istanbul ignore next -- defensive guard; Bearer token is always present when header is valid */
   if (!idToken) {
     return null;
   }

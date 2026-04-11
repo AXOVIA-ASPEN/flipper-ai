@@ -1,106 +1,88 @@
 <?xml version="1.0"?>
-<testsuite name="Cucumber" time="0.027" tests="16" skipped="0" failures="0" errors="0" timestamp="2026-03-31T02:49:53.924Z">
-  <testcase classname="Seller Communication &amp; Negotiation" name="AI generates casual tone message for Craigslist listing" time="0.002">
-    <system-out><![CDATA[Given a listing on "CRAIGSLIST" with title "Vintage Record Player" priced at 75..passed
-When the message generator creates a purchase message.......................passed
-Then the generated message has a "casual" tone..............................passed
-And the generated message platform is "CRAIGSLIST"..........................passed]]></system-out>
+<testsuite name="Cucumber" time="3.283" tests="8" skipped="0" failures="8" errors="0" timestamp="2026-04-11T05:19:55.050Z">
+  <testcase classname="Google Calendar Integration" name="User connects Google Calendar via OAuth" time="0.132">
+    <failure/>
+    <system-out><![CDATA[Given the user is authenticated with a PRO subscription.....................undefined
+Given the user navigates to Settings and the Integrations section...........undefined
+And Google Calendar is not connected........................................undefined
+When the user clicks "Connect Google Calendar" in the Integrations section..undefined
+Then the user is redirected to the Google OAuth consent screen requesting the "calendar.events" scope..undefined
+When the user grants consent and is redirected back to the app..............undefined
+Then the Settings Integrations section shows "Connected" with the user's Google account email..undefined
+And no "Connect Google Calendar" button is visible..........................undefined]]></system-out>
   </testcase>
-  <testcase classname="Seller Communication &amp; Negotiation" name="AI generates professional tone message for eBay listing" time="0">
-    <system-out><![CDATA[Given a listing on "EBAY" with title "Sony WH-1000XM5 Headphones" priced at 200..passed
-When the message generator creates a purchase message.......................passed
-Then the generated message has a "professional" tone........................passed
-And the generated message platform is "EBAY"................................passed]]></system-out>
+  <testcase classname="Google Calendar Integration" name="Calendar event created when meeting is scheduled with time and location" time="0.068">
+    <failure/>
+    <system-out><![CDATA[Given the user is authenticated with a PRO subscription.....................undefined
+Given the user has Google Calendar connected................................undefined
+And an opportunity exists with status "IDENTIFIED"..........................undefined
+When the user opens the Schedule Meeting modal on the listing detail page...undefined
+And enters meetingTime "2026-05-01T14:00:00" and meetingLocation "456 Oak Ave, Seattle, WA"..undefined
+And the browser timezone is "America/Los_Angeles"...........................undefined
+And submits the form........................................................undefined
+Then the listing detail page displays the meeting date, time, and location..undefined
+And a Google Calendar event exists with title containing the listing title..undefined
+And the event start time is 2:00 PM and end time is 3:00 PM in the America/Los_Angeles timezone..undefined
+And the event location is "456 Oak Ave, Seattle, WA"........................undefined]]></system-out>
   </testcase>
-  <testcase classname="Seller Communication &amp; Negotiation" name="AI generates friendly tone message for Facebook listing" time="0.001">
-    <system-out><![CDATA[Given a listing on "FACEBOOK" with title "IKEA Standing Desk" priced at 150..passed
-When the message generator creates a purchase message.......................passed
-Then the generated message has a "friendly" tone............................passed
-And the generated message platform is "FACEBOOK"............................passed]]></system-out>
+  <testcase classname="Google Calendar Integration" name="Calendar event updated when meeting is rescheduled" time="0.061">
+    <failure/>
+    <system-out><![CDATA[Given the user is authenticated with a PRO subscription.....................undefined
+Given the user has Google Calendar connected................................undefined
+And an opportunity has a scheduled meeting with a valid calendarEventId.....undefined
+When the user opens the Schedule Meeting modal and updates the meetingTime to "2026-05-02T10:00:00"..undefined
+And submits the form........................................................undefined
+Then the listing detail page shows the updated meeting date and time........undefined
+And the original Google Calendar event is updated in place (same event ID)..undefined
+And no duplicate calendar event is created..................................undefined]]></system-out>
   </testcase>
-  <testcase classname="Seller Communication &amp; Negotiation" name="Generated message includes seller name when available" time="0">
-    <system-out><![CDATA[Given a listing on "CRAIGSLIST" with title "Leather Couch" priced at 300....passed
-And the seller name is "Mike"...............................................passed
-When the message generator creates a purchase message.......................passed
-Then the generated message body references the seller "Mike"................passed]]></system-out>
+  <testcase classname="Google Calendar Integration" name="Calendar event deleted when meeting is cancelled" time="0.057">
+    <failure/>
+    <system-out><![CDATA[Given the user is authenticated with a PRO subscription.....................undefined
+Given the user has Google Calendar connected................................undefined
+And an opportunity has a scheduled meeting with a valid calendarEventId.....undefined
+When the user clicks "Cancel meeting" on the listing detail page and confirms..undefined
+Then the listing detail page no longer shows any meeting information........undefined
+And the Google Calendar event is deleted....................................undefined
+And the opportunity record has null meetingTime, meetingLocation, and calendarEventId..undefined]]></system-out>
   </testcase>
-  <testcase classname="Seller Communication &amp; Negotiation" name="AI generates professional tone message for Mercari listing" time="0">
-    <system-out><![CDATA[Given a listing on "MERCARI" with title "Nintendo Switch OLED" priced at 250..passed
-When the message generator creates a purchase message.......................passed
-Then the generated message has a "professional" tone........................passed]]></system-out>
+  <testcase classname="Google Calendar Integration" name="Calendar event deleted in background when opportunity transitions to PASSED" time="0.071">
+    <failure/>
+    <system-out><![CDATA[Given the user is authenticated with a PRO subscription.....................undefined
+Given the user has Google Calendar connected................................undefined
+And an opportunity has a scheduled meeting with a valid calendarEventId.....undefined
+When the user marks the opportunity as PASSED via the API...................undefined
+Then the PATCH response returns successfully without delay..................undefined
+And the associated Google Calendar event is deleted in the background.......undefined
+And no error is surfaced to the user........................................undefined]]></system-out>
   </testcase>
-  <testcase classname="Seller Communication &amp; Negotiation" name="AI generates casual tone message for OfferUp listing" time="0">
-    <system-out><![CDATA[Given a listing on "OFFERUP" with title "Mountain Bike 26 inch" priced at 180..passed
-When the message generator creates a purchase message.......................passed
-Then the generated message has a "casual" tone..............................passed]]></system-out>
+  <testcase classname="Google Calendar Integration" name="Re-authentication prompt shown when Calendar token cannot be refreshed" time="0.069">
+    <failure/>
+    <system-out><![CDATA[Given the user is authenticated with a PRO subscription.....................undefined
+Given the user has Google Calendar connected with a revoked refresh token...undefined
+When the user schedules a meeting via the API with valid meetingTime and meetingLocation..undefined
+Then the meeting data is saved to the database..............................undefined
+And the response contains error code "CALENDAR_AUTH_REQUIRED"...............undefined
+And the response status is 401..............................................undefined]]></system-out>
   </testcase>
-  <testcase classname="Seller Communication &amp; Negotiation" name="AI generates inquiry message type" time="0.001">
-    <system-out><![CDATA[Given a listing on "EBAY" with title "Canon EOS R5 Camera" priced at 2500...passed
-When the message generator creates a "inquiry" message......................passed
-Then the generated message type is "inquiry"................................passed
-And the generated message contains a subject line...........................passed
-And the generated message contains a body...................................passed]]></system-out>
+  <testcase classname="Google Calendar Integration" name="Disconnect removes token from DB regardless of Google revoke outcome" time="0.063">
+    <failure/>
+    <system-out><![CDATA[Given the user is authenticated with a PRO subscription.....................undefined
+Given the user has Google Calendar connected................................undefined
+When the user disconnects Google Calendar via the API.......................undefined
+Then the response indicates success.........................................undefined
+And the GoogleCalendarToken row is removed from the database................undefined
+And the integration status endpoint shows connected as false................undefined]]></system-out>
   </testcase>
-  <testcase classname="Seller Communication &amp; Negotiation" name="AI generates negotiation message type" time="0.001">
-    <system-out><![CDATA[Given a listing on "MERCARI" with title "Air Jordan 1 Retro" priced at 300..passed
-And the buyer offers 250....................................................passed
-When the message generator creates a "negotiation" message..................passed
-Then the generated message type is "negotiation"............................passed
-And the generated message contains a subject line...........................passed]]></system-out>
-  </testcase>
-  <testcase classname="Seller Communication &amp; Negotiation" name="AI generates follow-up message type" time="0">
-    <system-out><![CDATA[Given a listing on "FACEBOOK" with title "KitchenAid Mixer" priced at 150...passed
-When the message generator creates a "follow-up" message....................passed
-Then the generated message type is "follow-up"..............................passed
-And the generated message contains a subject line...........................passed]]></system-out>
-  </testcase>
-  <testcase classname="Seller Communication &amp; Negotiation" name="AI generates offer message type with price" time="0">
-    <system-out><![CDATA[Given a listing on "CRAIGSLIST" with title "MacBook Pro M3" priced at 1200..passed
-And the buyer offers 1000...................................................passed
-When the message generator creates a "offer" message........................passed
-Then the generated message type is "offer"..................................passed
-And the generated message contains a subject line...........................passed
-And the generated message contains a body...................................passed]]></system-out>
-  </testcase>
-  <testcase classname="Seller Communication &amp; Negotiation" name="Template fallback when AI API is unavailable" time="0.001">
-    <system-out><![CDATA[Given a listing on "CRAIGSLIST" with title "Vintage Turntable" priced at 100..passed
-And the AI API is unavailable...............................................passed
-When the message generator creates a purchase message.......................passed
-Then the generated message is a fallback template...........................passed
-And the generated message contains a subject line...........................passed
-And the generated message contains a body...................................passed]]></system-out>
-  </testcase>
-  <testcase classname="Seller Communication &amp; Negotiation" name="Generated message is returned as editable draft" time="0">
-    <system-out><![CDATA[Given a listing on "EBAY" with title "Bose QuietComfort Ultra" priced at 280..passed
-When the message generator creates a purchase message.......................passed
-Then the generated message has a non-empty subject..........................passed
-And the generated message has a non-empty body..............................passed
-And the generated message can be edited before sending......................passed]]></system-out>
-  </testcase>
-  <testcase classname="Seller Communication &amp; Negotiation" name="API creates message record with DRAFT status" time="0">
-    <system-out><![CDATA[Given the message generation API endpoint exists at "app/api/messages/generate/route.ts"..passed
-Then the route creates messages with initial status "DRAFT".................passed
-And the route sets direction to "OUTBOUND"..................................passed]]></system-out>
-  </testcase>
-  <testcase classname="Seller Communication &amp; Negotiation" name="Template fallback includes placeholder fields for offer price" time="0">
-    <system-out><![CDATA[Given a listing on "OFFERUP" with title "iPad Pro 12.9" priced at 600.......passed
-And the AI API is unavailable...............................................passed
-When the message generator creates a "offer" message........................passed
-Then the generated message is a fallback template...........................passed
-And the generated message body contains a price placeholder.................passed]]></system-out>
-  </testcase>
-  <testcase classname="Seller Communication &amp; Negotiation" name="Template fallback produces platform-appropriate tone" time="0">
-    <system-out><![CDATA[Given a listing on "EBAY" with title "Dyson V15 Vacuum" priced at 400.......passed
-And the AI API is unavailable...............................................passed
-When the message generator creates a purchase message.......................passed
-Then the generated message is a fallback template...........................passed
-And the generated message has a "professional" tone.........................passed]]></system-out>
-  </testcase>
-  <testcase classname="Seller Communication &amp; Negotiation" name="Template fallback supports all message types" time="0">
-    <system-out><![CDATA[Given a listing on "FACEBOOK" with title "Herman Miller Chair" priced at 500..passed
-And the AI API is unavailable...............................................passed
-When the message generator creates a "offer" message........................passed
-Then the generated message is a fallback template...........................passed
-And the generated message type is "offer"...................................passed]]></system-out>
+  <testcase classname="Google Calendar Integration" name="Meeting fields saved without error when Google Calendar is not connected" time="0.061">
+    <failure/>
+    <system-out><![CDATA[Given the user is authenticated with a PRO subscription.....................undefined
+Given the user does not have Google Calendar connected......................undefined
+And an opportunity exists...................................................undefined
+When the user schedules a meeting via the API with valid meetingTime and meetingLocation..undefined
+Then the API responds with success..........................................undefined
+And the opportunity record has meetingTime and meetingLocation saved to the database..undefined
+And calendarEventId remains null............................................undefined
+And no Google Calendar API call is made.....................................undefined]]></system-out>
   </testcase>
 </testsuite>

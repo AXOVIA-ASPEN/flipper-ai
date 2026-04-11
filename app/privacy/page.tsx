@@ -100,6 +100,7 @@ export default function PrivacyPolicyPage() {
               <li><strong>AI Analysis:</strong> Google Gemini API (for marketplace insights)</li>
               <li><strong>Error Monitoring:</strong> Sentry (for bug tracking and performance)</li>
               <li><strong>Analytics:</strong> Vercel Analytics (aggregated, non-identifiable data)</li>
+              <li><strong>Google Calendar:</strong> When you connect Google Calendar, Flipper AI writes, updates, and deletes calendar events on your behalf using the <code>calendar.events</code> scope. No calendar data is read or stored by Flipper AI — we only create/modify events for your scheduled buy/sell meetups. You can revoke access at any time via Settings → Integrations → Disconnect, or directly through your <a href="https://myaccount.google.com/permissions" className="text-blue-600 hover:text-blue-800 underline" target="_blank" rel="noopener noreferrer">Google Account permissions page</a>. Revoking access removes your tokens from our database immediately.</li>
             </ul>
 
             <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">4.2 Legal Requirements</h3>

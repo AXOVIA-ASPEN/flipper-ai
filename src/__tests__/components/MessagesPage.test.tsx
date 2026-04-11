@@ -26,8 +26,10 @@ jest.mock('next/navigation', () => ({
 
 // Mock next/link
 jest.mock('next/link', () => {
-  return ({ children, href, ...props }: any) =>
+  const MockLink = ({ children, href, ...props }: any) =>
     React.createElement('a', { href, ...props }, children);
+  MockLink.displayName = 'MockLink';
+  return MockLink;
 });
 
 // Mock date-fns (avoid flaky relative times)

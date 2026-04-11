@@ -8,6 +8,9 @@ import { getListingImageUrl, getAllListingImageUrls } from '@/lib/image-helpers'
 import type { ListingWithImages } from '@/lib/image-helpers';
 import ResaleContentEditor from '@/components/ResaleContentEditor';
 import PriceCalculator from '@/components/PriceCalculator';
+import MeetingModal from '@/components/MeetingModal';
+import MeetingRouteCard from '@/components/MeetingRouteCard';
+import { useToast } from '@/components/ToastContainer';
 
 interface ListingImage {
   id: string;
@@ -21,6 +24,11 @@ interface Opportunity {
   purchasePrice: number | null;
   resalePrice: number | null;
   actualProfit: number | null;
+  // Story 12.1: Meeting scheduling fields
+  meetingTime: string | null;
+  meetingLocation: string | null;
+  meetingType: string | null;
+  calendarEventId: string | null;
 }
 
 interface ListingDetail {
@@ -61,10 +69,14 @@ export default function ListingDetailPage() {
 function ListingDetail() {
   const params = useParams<{ id: string }>();
   const id = params?.id;
+  const { showToast } = useToast();
 
   const [listing, setListing] = useState<ListingDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Story 12.1: Meeting scheduling state
+  const [showMeetingModal, setShowMeetingModal] = useState(false);
+  const [cancellingMeeting, setCancellingMeeting] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -122,6 +134,7 @@ function ListingDetail() {
   }
 
   return (
+    <>
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
         {/* Back link */}
@@ -270,7 +283,8 @@ function ListingDetail() {
               <h2 className="text-lg font-semibold text-gray-900 mb-3">Price & List</h2>
               <PriceCalculator
                 listingId={listing.id}
-                onListPlatform={async (platform, recommendedPrice) => {
+                sourcePlatform={listing.platform}
+                onListPlatform={async (platform, finalPrice) => {
                   const platformMap: Record<string, string> = {
                     ebay: 'EBAY',
                     mercari: 'MERCARI',
@@ -278,18 +292,50 @@ function ListingDetail() {
                     offerup: 'OFFERUP',
                     craigslist: 'CRAIGSLIST',
                   };
+                  const platformLabel: Record<string, string> = {
+                    ebay: 'eBay',
+                    mercari: 'Mercari',
+                    facebook: 'Facebook Marketplace',
+                    offerup: 'OfferUp',
+                    craigslist: 'Craigslist',
+                  };
                   try {
-                    await fetch('/api/posting-queue', {
+                    const res = await fetch('/api/posting-queue', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
                         listingId: listing.id,
                         targetPlatform: platformMap[platform] ?? 'EBAY',
-                        askingPrice: recommendedPrice,
+                        askingPrice: finalPrice,
                       }),
+                    });
+                    if (!res.ok) {
+                      const data = (await res.json().catch(() => ({}))) as {
+                        error?: { detail?: string } | string;
+                      };
+                      const detail =
+                        typeof data.error === 'object'
+                          ? data.error?.detail
+                          : data.error;
+                      throw new Error(detail || `Request failed (${res.status})`);
+                    }
+                    showToast({
+                      type: 'success',
+                      title: 'Added to posting queue',
+                      message: `Queued for ${platformLabel[platform] ?? platform} at $${finalPrice.toFixed(2)}.`,
+                      duration: 4000,
                     });
                   } catch (err) {
                     console.error('Failed to add to posting queue', err);
+                    showToast({
+                      type: 'error',
+                      title: 'Could not queue listing',
+                      message:
+                        err instanceof Error
+                          ? err.message
+                          : 'Unable to add this listing to the posting queue.',
+                      duration: 5000,
+                    });
                   }
                 }}
               />
@@ -371,9 +417,136 @@ function ListingDetail() {
                 </Link>
               </div>
             )}
+
+            {/* Story 12.1: Meeting scheduling */}
+            {listing.opportunity && !['SOLD', 'PASSED'].includes(listing.opportunity.status) && (
+              <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                  Meeting
+                </h2>
+
+                {listing.opportunity.meetingTime ? (
+                  <>
+                    <div className="space-y-1 text-sm text-gray-700 dark:text-gray-300 mb-4">
+                      <p>
+                        <span className="font-medium">Date:</span>{' '}
+                        {new Date(listing.opportunity.meetingTime).toLocaleString()}
+                      </p>
+                      {listing.opportunity.meetingLocation && (
+                        <p>
+                          <span className="font-medium">Location:</span>{' '}
+                          {listing.opportunity.meetingLocation}
+                        </p>
+                      )}
+                      {listing.opportunity.meetingType && (
+                        <p>
+                          <span className="font-medium">Type:</span>{' '}
+                          {listing.opportunity.meetingType === 'sell' ? 'Sell' : 'Buy'}
+                        </p>
+                      )}
+                    </div>
+                    {/* Story 12.2: Driving route card — only when meetingLocation is set */}
+                    {listing.opportunity.meetingLocation && (
+                      <div className="mb-4">
+                        <MeetingRouteCard opportunityId={listing.opportunity.id} />
+                      </div>
+                    )}
+
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setShowMeetingModal(true)}
+                        className="px-4 py-2 text-sm font-medium text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors"
+                      >
+                        Update
+                      </button>
+                      <button
+                        onClick={async () => {
+                          if (!confirm('Cancel this meeting?')) return;
+                          setCancellingMeeting(true);
+                          try {
+                            const res = await fetch(
+                              `/api/opportunities/${listing.opportunity!.id}/meeting`,
+                              { method: 'DELETE' }
+                            );
+                            if (res.ok) {
+                              setListing((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      opportunity: prev.opportunity
+                                        ? {
+                                            ...prev.opportunity,
+                                            meetingTime: null,
+                                            meetingLocation: null,
+                                            meetingType: null,
+                                            calendarEventId: null,
+                                          }
+                                        : null,
+                                    }
+                                  : prev
+                              );
+                              showToast({ type: 'info', title: 'Cancelled', message: 'Meeting cancelled.' });
+                            } else {
+                              showToast({ type: 'error', title: 'Error', message: 'Failed to cancel meeting.' });
+                            }
+                          } catch {
+                            showToast({ type: 'error', title: 'Error', message: 'Failed to cancel meeting.' });
+                          } finally {
+                            setCancellingMeeting(false);
+                          }
+                        }}
+                        disabled={cancellingMeeting}
+                        className="px-4 py-2 text-sm font-medium text-red-600 border border-red-300 rounded-lg hover:bg-red-50 disabled:opacity-50 transition-colors"
+                      >
+                        {cancellingMeeting ? 'Cancelling…' : 'Cancel meeting'}
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => setShowMeetingModal(true)}
+                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+                  >
+                    Schedule Meeting
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
+
+    {/* Meeting Modal */}
+    {showMeetingModal && listing.opportunity && (
+      <MeetingModal
+        opportunityId={listing.opportunity.id}
+        opportunityStatus={listing.opportunity.status}
+        initialMeeting={
+          listing.opportunity.meetingTime
+            ? {
+                meetingTime: listing.opportunity.meetingTime,
+                meetingLocation: listing.opportunity.meetingLocation,
+                meetingType: listing.opportunity.meetingType,
+                calendarEventId: listing.opportunity.calendarEventId,
+              }
+            : null
+        }
+        onClose={() => setShowMeetingModal(false)}
+        onSaved={(meeting) => {
+          setListing((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  opportunity: prev.opportunity
+                    ? { ...prev.opportunity, ...meeting }
+                    : null,
+                }
+              : prev
+          );
+        }}
+      />
+    )}
+    </>
   );
 }

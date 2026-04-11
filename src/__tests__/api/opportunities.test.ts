@@ -43,6 +43,29 @@ jest.mock('@/lib/conversation-status', () => ({
   transitionToPurchased: (...args: unknown[]) => mockTransitionToPurchased(...args),
 }));
 
+// Mock notification events (Story 10.3)
+const mockCreateFlipNotificationEvent = jest.fn();
+jest.mock('@/lib/notification-events', () => ({
+  createFlipNotificationEvent: (...args: unknown[]) =>
+    mockCreateFlipNotificationEvent(...args),
+  NotificationEventType: {
+    OPPORTUNITY_FOUND: 'opportunity.found',
+    FLIP_PURCHASED: 'flip.purchased',
+    FLIP_LISTED: 'flip.listed',
+    FLIP_SOLD: 'flip.sold',
+  },
+}));
+
+// Mock logger
+jest.mock('@/lib/logger', () => ({
+  logger: {
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    debug: jest.fn(),
+  },
+}));
+
 // Helper: set up GET /api/opportunities mocks
 // GET uses: findMany (paginated), count, findMany (all matching for stats)
 function setupOpportunityGetMocks(opts: {
@@ -75,6 +98,7 @@ describe('Opportunities API', () => {
     jest.clearAllMocks();
     mockGetCurrentUserId.mockResolvedValue('test-user-id');
     mockTransitionToPurchased.mockResolvedValue(undefined);
+    mockCreateFlipNotificationEvent.mockResolvedValue(undefined);
   });
 
   // ──────────────────────────────────────────────────────────────────────────
@@ -588,7 +612,7 @@ describe('Opportunities API', () => {
       expect(response.status).toBe(200);
       expect(data).toEqual(mockUpdated);
       expect(mockUpdate).toHaveBeenCalledWith({
-        where: { id: 'opp1' },
+        where: { id: 'opp1', userId: 'test-user-id' },
         data: { status: 'PURCHASED', purchasePrice: 100 },
         include: { listing: true },
       });
@@ -663,7 +687,7 @@ describe('Opportunities API', () => {
       await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
 
       expect(mockUpdate).toHaveBeenCalledWith({
-        where: { id: 'opp1' },
+        where: { id: 'opp1', userId: 'test-user-id' },
         data: { purchasePrice: 100 },
         include: { listing: true },
       });
@@ -682,7 +706,7 @@ describe('Opportunities API', () => {
       await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
 
       expect(mockUpdate).toHaveBeenCalledWith({
-        where: { id: 'opp1' },
+        where: { id: 'opp1', userId: 'test-user-id' },
         data: { resalePrice: 200 },
         include: { listing: true },
       });
@@ -819,6 +843,580 @@ describe('Opportunities API', () => {
       const response = await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
 
       expect(response.status).toBe(200);
+    });
+
+    // ── Story 10.3: Flip lifecycle notification hooks ──────────────────────
+
+    describe('Flip lifecycle notification events (Story 10.3)', () => {
+      beforeEach(() => {
+        mockCreateFlipNotificationEvent.mockResolvedValue(undefined);
+      });
+
+      it('creates flip.purchased event when status transitions to PURCHASED', async () => {
+        // Existing opportunity state (fetched before update)
+        mockFindFirst.mockResolvedValue({
+          id: 'opp1',
+          status: 'CONTACTED',
+          userId: 'test-user-id',
+          listing: { id: 'listing1', title: 'Vintage Lamp', platform: 'CRAIGSLIST', profitPotential: 80 },
+        });
+        mockUpdate.mockResolvedValue({
+          id: 'opp1',
+          status: 'PURCHASED',
+          userId: 'test-user-id',
+          purchasePrice: 50,
+          listing: { id: 'listing1', title: 'Vintage Lamp', platform: 'CRAIGSLIST', profitPotential: 80 },
+        });
+
+        const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+          status: 'PURCHASED',
+          purchasePrice: 50,
+        });
+        await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+        await new Promise((resolve) => setImmediate(resolve));
+
+        expect(mockCreateFlipNotificationEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            userId: 'test-user-id',
+            listingId: 'listing1',
+            eventType: 'flip.purchased',
+            payload: expect.objectContaining({
+              listingTitle: 'Vintage Lamp',
+              purchasePrice: 50,
+              estimatedProfit: 80,
+              platform: 'CRAIGSLIST',
+            }),
+          })
+        );
+      });
+
+      it('creates flip.listed event when status transitions to LISTED', async () => {
+        mockFindFirst.mockResolvedValue({
+          id: 'opp1',
+          status: 'PURCHASED',
+          userId: 'test-user-id',
+          listing: { id: 'listing1', title: 'Rare Book', platform: 'EBAY' },
+        });
+        mockUpdate.mockResolvedValue({
+          id: 'opp1',
+          status: 'LISTED',
+          userId: 'test-user-id',
+          resalePlatform: 'FACEBOOK',
+          resaleUrl: 'https://fb.me/listing/123',
+          listing: { id: 'listing1', title: 'Rare Book', platform: 'EBAY' },
+        });
+
+        const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+          status: 'LISTED',
+          resalePlatform: 'FACEBOOK',
+          resaleUrl: 'https://fb.me/listing/123',
+        });
+        await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+        await new Promise((resolve) => setImmediate(resolve));
+
+        expect(mockCreateFlipNotificationEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            eventType: 'flip.listed',
+            payload: expect.objectContaining({
+              listingTitle: 'Rare Book',
+              destinationPlatform: 'FACEBOOK',
+              listingUrl: 'https://fb.me/listing/123',
+            }),
+          })
+        );
+      });
+
+      it('creates flip.sold event when status transitions to SOLD with resalePrice', async () => {
+        const purchaseDate = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000); // 10 days ago
+        mockFindFirst.mockResolvedValue({
+          id: 'opp1',
+          status: 'LISTED',
+          userId: 'test-user-id',
+          purchasePrice: 100,
+          fees: 10,
+          purchaseDate,
+          listing: { id: 'listing1', title: 'Cool Item', platform: 'MERCARI' },
+        });
+        mockUpdate.mockResolvedValue({
+          id: 'opp1',
+          status: 'SOLD',
+          userId: 'test-user-id',
+          purchasePrice: 100,
+          resalePrice: 200,
+          fees: 10,
+          purchaseDate,
+          listing: { id: 'listing1', title: 'Cool Item', platform: 'MERCARI' },
+        });
+
+        const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+          status: 'SOLD',
+          resalePrice: 200,
+        });
+        await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+        await new Promise((resolve) => setImmediate(resolve));
+
+        expect(mockCreateFlipNotificationEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            eventType: 'flip.sold',
+            payload: expect.objectContaining({
+              listingTitle: 'Cool Item',
+              salePrice: 200,
+              actualProfit: 90, // 200 - 100 - 10
+              purchasePrice: 100,
+              roiPercent: 90, // 90 / 100 * 100
+              daysToFlip: 10,
+              platform: 'MERCARI',
+            }),
+          })
+        );
+      });
+
+      it('skips flip.sold event when resalePrice is missing', async () => {
+        mockFindFirst.mockResolvedValue({
+          id: 'opp1',
+          status: 'LISTED',
+          userId: 'test-user-id',
+          purchasePrice: 100,
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+        mockUpdate.mockResolvedValue({
+          id: 'opp1',
+          status: 'SOLD',
+          userId: 'test-user-id',
+          purchasePrice: 100,
+          resalePrice: null,
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+
+        const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+          status: 'SOLD',
+        });
+        await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+
+        const soldCalls = mockCreateFlipNotificationEvent.mock.calls.filter(
+          (c) => c[0]?.eventType === 'flip.sold'
+        );
+        expect(soldCalls).toHaveLength(0);
+      });
+
+      it('rejects invalid status transitions with ValidationError', async () => {
+        mockFindFirst.mockResolvedValue({
+          id: 'opp1',
+          status: 'IDENTIFIED',
+          userId: 'test-user-id',
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+
+        // IDENTIFIED → PURCHASED is invalid (must go through CONTACTED)
+        const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+          status: 'PURCHASED',
+        });
+        const response = await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+        const data = await response.json();
+
+        expect(response.status).toBe(422);
+        expect(data.error.code).toBe('VALIDATION_ERROR');
+        expect(mockUpdate).not.toHaveBeenCalled();
+      });
+
+      it('allows status transition to PASSED from any state', async () => {
+        mockFindFirst.mockResolvedValue({
+          id: 'opp1',
+          status: 'IDENTIFIED',
+          userId: 'test-user-id',
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+        mockUpdate.mockResolvedValue({
+          id: 'opp1',
+          status: 'PASSED',
+          userId: 'test-user-id',
+          listing: { id: 'listing1' },
+        });
+
+        const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+          status: 'PASSED',
+        });
+        const response = await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+
+        expect(response.status).toBe(200);
+      });
+
+      it('does not create events when status does not change', async () => {
+        mockFindFirst.mockResolvedValue({
+          id: 'opp1',
+          status: 'PURCHASED',
+          userId: 'test-user-id',
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+        mockUpdate.mockResolvedValue({
+          id: 'opp1',
+          status: 'PURCHASED',
+          userId: 'test-user-id',
+          listing: { id: 'listing1' },
+        });
+
+        // Update purchasePrice but not status
+        const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+          purchasePrice: 150,
+        });
+        await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+
+        expect(mockCreateFlipNotificationEvent).not.toHaveBeenCalled();
+      });
+
+      it('swallows flip.purchased event creation failures', async () => {
+        mockCreateFlipNotificationEvent.mockRejectedValue(new Error('DB error'));
+        mockFindFirst.mockResolvedValue({
+          id: 'opp1',
+          status: 'CONTACTED',
+          userId: 'test-user-id',
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+        mockUpdate.mockResolvedValue({
+          id: 'opp1',
+          status: 'PURCHASED',
+          userId: 'test-user-id',
+          purchasePrice: 50,
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+
+        const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+          status: 'PURCHASED',
+          purchasePrice: 50,
+        });
+        const response = await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+        await new Promise((resolve) => setImmediate(resolve));
+
+        // Response should still succeed — event failure is fire-and-forget
+        expect(response.status).toBe(200);
+      });
+
+      it('swallows flip.listed event creation failures', async () => {
+        mockCreateFlipNotificationEvent.mockRejectedValue(new Error('DB error'));
+        mockFindFirst.mockResolvedValue({
+          id: 'opp1',
+          status: 'PURCHASED',
+          userId: 'test-user-id',
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+        mockUpdate.mockResolvedValue({
+          id: 'opp1',
+          status: 'LISTED',
+          userId: 'test-user-id',
+          resalePlatform: 'FACEBOOK',
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+
+        const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+          status: 'LISTED',
+          resalePlatform: 'FACEBOOK',
+        });
+        const response = await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+        await new Promise((resolve) => setImmediate(resolve));
+
+        expect(response.status).toBe(200);
+      });
+
+      it('swallows flip.sold event creation failures', async () => {
+        mockCreateFlipNotificationEvent.mockRejectedValue(new Error('DB error'));
+        mockFindFirst.mockResolvedValue({
+          id: 'opp1',
+          status: 'LISTED',
+          userId: 'test-user-id',
+          purchasePrice: 100,
+          purchaseDate: new Date(),
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+        mockUpdate.mockResolvedValue({
+          id: 'opp1',
+          status: 'SOLD',
+          userId: 'test-user-id',
+          purchasePrice: 100,
+          resalePrice: 200,
+          purchaseDate: new Date(),
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+
+        const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+          status: 'SOLD',
+          resalePrice: 200,
+        });
+        const response = await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+        await new Promise((resolve) => setImmediate(resolve));
+
+        expect(response.status).toBe(200);
+      });
+
+      it('does not create events when userId is null', async () => {
+        mockFindFirst.mockResolvedValue({
+          id: 'opp1',
+          status: 'CONTACTED',
+          userId: null,
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+        mockUpdate.mockResolvedValue({
+          id: 'opp1',
+          status: 'PURCHASED',
+          userId: null,
+          listing: { id: 'listing1' },
+        });
+
+        const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+          status: 'PURCHASED',
+        });
+        await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+
+        expect(mockCreateFlipNotificationEvent).not.toHaveBeenCalled();
+      });
+
+      it('uses fallback defaults when opportunity listing is null', async () => {
+        mockFindFirst.mockResolvedValue({
+          id: 'opp1',
+          status: 'CONTACTED',
+          userId: 'test-user-id',
+          listing: null,
+        });
+        mockUpdate.mockResolvedValue({
+          id: 'opp1',
+          status: 'PURCHASED',
+          userId: 'test-user-id',
+          listing: null,
+        });
+
+        const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+          status: 'PURCHASED',
+        });
+        await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+        await new Promise((resolve) => setImmediate(resolve));
+
+        expect(mockCreateFlipNotificationEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            eventType: 'flip.purchased',
+            listingId: null,
+            payload: expect.objectContaining({
+              listingTitle: 'Unknown Item',
+              purchasePrice: 0,
+              estimatedProfit: 0,
+              platform: 'Unknown',
+            }),
+          })
+        );
+      });
+
+      it('uses body.resalePlatform fallback for flip.listed when body has no resalePlatform', async () => {
+        mockFindFirst.mockResolvedValue({
+          id: 'opp1',
+          status: 'PURCHASED',
+          userId: 'test-user-id',
+          resalePlatform: 'EBAY_STORED',
+          resaleUrl: 'https://ebay.com/stored',
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+        mockUpdate.mockResolvedValue({
+          id: 'opp1',
+          status: 'LISTED',
+          userId: 'test-user-id',
+          resalePlatform: 'EBAY_STORED',
+          resaleUrl: 'https://ebay.com/stored',
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+
+        // No resalePlatform in body — should fall back to stored value
+        const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+          status: 'LISTED',
+        });
+        await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+        await new Promise((resolve) => setImmediate(resolve));
+
+        expect(mockCreateFlipNotificationEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            eventType: 'flip.listed',
+            payload: expect.objectContaining({
+              destinationPlatform: 'EBAY_STORED',
+              listingUrl: 'https://ebay.com/stored',
+            }),
+          })
+        );
+      });
+
+      it('uses "Unknown" fallback for flip.listed when both body and stored resalePlatform are missing', async () => {
+        mockFindFirst.mockResolvedValue({
+          id: 'opp1',
+          status: 'PURCHASED',
+          userId: 'test-user-id',
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+        mockUpdate.mockResolvedValue({
+          id: 'opp1',
+          status: 'LISTED',
+          userId: 'test-user-id',
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+
+        const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+          status: 'LISTED',
+        });
+        await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+        await new Promise((resolve) => setImmediate(resolve));
+
+        expect(mockCreateFlipNotificationEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            eventType: 'flip.listed',
+            payload: expect.objectContaining({
+              destinationPlatform: 'Unknown',
+              listingUrl: null,
+            }),
+          })
+        );
+      });
+
+      it('computes roiPercent=0 when purchasePrice=0 for flip.sold', async () => {
+        mockFindFirst.mockResolvedValue({
+          id: 'opp1',
+          status: 'LISTED',
+          userId: 'test-user-id',
+          purchasePrice: 0,
+          listing: { id: 'listing1', title: 'Gift', platform: 'EBAY' },
+        });
+        mockUpdate.mockResolvedValue({
+          id: 'opp1',
+          status: 'SOLD',
+          userId: 'test-user-id',
+          purchasePrice: 0,
+          resalePrice: 50,
+          listing: { id: 'listing1', title: 'Gift', platform: 'EBAY' },
+        });
+
+        const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+          status: 'SOLD',
+          resalePrice: 50,
+        });
+        await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+        await new Promise((resolve) => setImmediate(resolve));
+
+        expect(mockCreateFlipNotificationEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            eventType: 'flip.sold',
+            payload: expect.objectContaining({
+              roiPercent: 0, // purchasePrice=0 → roi=0
+              daysToFlip: undefined, // no purchaseDate
+            }),
+          })
+        );
+      });
+
+      it('handles non-Error rejection for flip.purchased creation', async () => {
+        mockCreateFlipNotificationEvent.mockRejectedValue('string error');
+        mockFindFirst.mockResolvedValue({
+          id: 'opp1',
+          status: 'CONTACTED',
+          userId: 'test-user-id',
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+        mockUpdate.mockResolvedValue({
+          id: 'opp1',
+          status: 'PURCHASED',
+          userId: 'test-user-id',
+          purchasePrice: 50,
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+
+        const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+          status: 'PURCHASED',
+          purchasePrice: 50,
+        });
+        const response = await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+        await new Promise((resolve) => setImmediate(resolve));
+
+        expect(response.status).toBe(200);
+      });
+
+      it('handles non-Error rejection for flip.listed creation', async () => {
+        mockCreateFlipNotificationEvent.mockRejectedValue('string error');
+        mockFindFirst.mockResolvedValue({
+          id: 'opp1',
+          status: 'PURCHASED',
+          userId: 'test-user-id',
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+        mockUpdate.mockResolvedValue({
+          id: 'opp1',
+          status: 'LISTED',
+          userId: 'test-user-id',
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+
+        const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+          status: 'LISTED',
+        });
+        const response = await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+        await new Promise((resolve) => setImmediate(resolve));
+
+        expect(response.status).toBe(200);
+      });
+
+      it('handles non-Error rejection for flip.sold creation', async () => {
+        mockCreateFlipNotificationEvent.mockRejectedValue('string error');
+        mockFindFirst.mockResolvedValue({
+          id: 'opp1',
+          status: 'LISTED',
+          userId: 'test-user-id',
+          purchasePrice: 100,
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+        mockUpdate.mockResolvedValue({
+          id: 'opp1',
+          status: 'SOLD',
+          userId: 'test-user-id',
+          purchasePrice: 100,
+          resalePrice: 200,
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+
+        const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+          status: 'SOLD',
+          resalePrice: 200,
+        });
+        const response = await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+        await new Promise((resolve) => setImmediate(resolve));
+
+        expect(response.status).toBe(200);
+      });
+
+      it('uses stored resalePrice for flip.sold when body omits it', async () => {
+        mockFindFirst.mockResolvedValue({
+          id: 'opp1',
+          status: 'LISTED',
+          userId: 'test-user-id',
+          purchasePrice: 100,
+          resalePrice: 250,
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+        mockUpdate.mockResolvedValue({
+          id: 'opp1',
+          status: 'SOLD',
+          userId: 'test-user-id',
+          purchasePrice: 100,
+          resalePrice: 250,
+          listing: { id: 'listing1', title: 'Item', platform: 'EBAY' },
+        });
+
+        // No resalePrice in body — should use stored value from update result
+        const request = createMockRequest('PATCH', '/api/opportunities/opp1', {
+          status: 'SOLD',
+        });
+        await PATCH(request, { params: Promise.resolve({ id: 'opp1' }) });
+        await new Promise((resolve) => setImmediate(resolve));
+
+        expect(mockCreateFlipNotificationEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            eventType: 'flip.sold',
+            payload: expect.objectContaining({
+              salePrice: 250,
+            }),
+          })
+        );
+      });
     });
   });
 

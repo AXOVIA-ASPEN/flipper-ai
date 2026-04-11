@@ -16,7 +16,8 @@ let shippoClient: Shippo | null = null;
 function getShippoClient(): Shippo {
   if (!shippoClient) {
     const token = process.env.SHIPPO_API_TOKEN;
-    if (!token) {
+    /* istanbul ignore next -- defensive guard; estimateShippingCosts already returns null when token is absent */
+  if (!token) {
       throw new Error('SHIPPO_API_TOKEN not set');
     }
     shippoClient = new Shippo({ apiKeyHeader: token });

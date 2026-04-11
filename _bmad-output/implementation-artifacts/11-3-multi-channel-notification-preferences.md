@@ -1,8 +1,8 @@
 # Story 11.3: Multi-Channel Notification Preferences
 
-Status: ready-for-dev
-Blocked: true
-Blocked-Reason: Depends on Story 10.6 (email notification preferences UI with "Coming Soon" placeholders), Story 11.1 (FCM push notification client — provides device token storage and push delivery), and Story 11.2 (Twilio SMS integration — provides phone verification and SMS delivery). All three must be complete before push/SMS toggles can be activated.
+Status: done
+Blocked: false
+Blocked-Reason:
 Trello-Card-ID: 69ccace76f14a9d0f264cc25
 
 ## Story
@@ -31,11 +31,11 @@ So that I can customize exactly how I'm notified for each type of event.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Add per-event push and SMS preference fields to Prisma schema (AC: #1, #2, #3)
-  - [ ] 1.1 Add master channel toggles to `UserSettings` model in `prisma/schema.prisma`:
+- [x] Task 1: Add per-event push and SMS preference fields to Prisma schema (AC: #1, #2, #3)
+  - [x] 1.1 Add master channel toggles to `UserSettings` model in `prisma/schema.prisma`:
     - `pushNotifications     Boolean  @default(false)` — Master push toggle (off by default; requires FCM permission)
     - `smsNotifications      Boolean  @default(false)` — Master SMS toggle (off by default; requires verified phone)
-  - [ ] 1.2 Add per-event push notification toggle fields (matching existing email toggle field names with `push` prefix):
+  - [x] 1.2 Add per-event push notification toggle fields (matching existing email toggle field names with `push` prefix):
     - `pushNotifyNewDeals          Boolean @default(true)` — Push for new opportunity found
     - `pushNotifySoldItems         Boolean @default(true)` — Push for flip lifecycle (purchased/shipped/sold)
     - `pushNotifyMessageReceived   Boolean @default(true)` — Push for seller reply received
@@ -48,7 +48,7 @@ So that I can customize exactly how I'm notified for each type of event.
     - `pushNotifyExpiring          Boolean @default(true)` — Push for listing expiring
     - `pushNotifyListingUnavailable Boolean @default(true)` — Push for listing unavailable
     - `pushNotifyWeeklyDigest      Boolean @default(false)` — Push for weekly digest (default OFF — digest is better as email)
-  - [ ] 1.3 Add per-event SMS notification toggle fields (matching with `sms` prefix):
+  - [x] 1.3 Add per-event SMS notification toggle fields (matching with `sms` prefix):
     - `smsNotifyNewDeals           Boolean @default(true)` — SMS for new opportunity found
     - `smsNotifySoldItems          Boolean @default(true)` — SMS for flip lifecycle
     - `smsNotifyMessageReceived    Boolean @default(true)` — SMS for seller reply received
@@ -61,11 +61,11 @@ So that I can customize exactly how I'm notified for each type of event.
     - `smsNotifyExpiring           Boolean @default(false)` — SMS for listing expiring (default OFF — low urgency for SMS)
     - `smsNotifyListingUnavailable Boolean @default(false)` — SMS for listing unavailable (default OFF)
     - `smsNotifyWeeklyDigest       Boolean @default(false)` — SMS for weekly digest (default OFF — digest is email-only by default)
-  - [ ] 1.4 Run `npx prisma migrate dev --name add_push_sms_notification_preferences` to generate migration
-  - [ ] 1.5 Verify: all push fields default to true (except `pushNotifyMessageSent`, `pushNotifyWeeklyDigest`), SMS fields are more conservative with more defaults OFF (high-frequency events default OFF for SMS to avoid alert fatigue)
+  - [x] 1.4 Run `npx prisma migrate dev --name add_push_sms_notification_preferences` to generate migration
+  - [x] 1.5 Verify: all push fields default to true (except `pushNotifyMessageSent`, `pushNotifyWeeklyDigest`), SMS fields are more conservative with more defaults OFF (high-frequency events default OFF for SMS to avoid alert fatigue)
 
-- [ ] Task 2: Update Settings API to accept push/SMS toggle fields (AC: #1, #2, #3)
-  - [ ] 2.1 In `app/api/user/settings/route.ts` PATCH handler, add Boolean coercion for master toggles using established pattern (lines 202-222):
+- [x] Task 2: Update Settings API to accept push/SMS toggle fields (AC: #1, #2, #3)
+  - [x] 2.1 In `app/api/user/settings/route.ts` PATCH handler, add Boolean coercion for master toggles using established pattern (lines 202-222):
     ```typescript
     if (pushNotifications !== undefined) {
       updateData.pushNotifications = Boolean(pushNotifications);
@@ -74,7 +74,7 @@ So that I can customize exactly how I'm notified for each type of event.
       updateData.smsNotifications = Boolean(smsNotifications);
     }
     ```
-  - [ ] 2.2 Add Boolean coercion for ALL 24 per-event toggle fields (12 push + 12 SMS). Follow the exact same pattern as existing email toggles. Use a loop or mapping to avoid 48 lines of repetitive coercion code:
+  - [x] 2.2 Add Boolean coercion for ALL 24 per-event toggle fields (12 push + 12 SMS). Follow the exact same pattern as existing email toggles. Use a loop or mapping to avoid 48 lines of repetitive coercion code:
     ```typescript
     const pushSmsToggleFields = [
       'pushNotifyNewDeals', 'pushNotifySoldItems', 'pushNotifyMessageReceived',
@@ -92,12 +92,12 @@ So that I can customize exactly how I'm notified for each type of event.
       }
     }
     ```
-  - [ ] 2.3 Ensure GET handler returns all new fields (Prisma returns all fields by default — verify all 26 new fields appear in response)
-  - [ ] 2.4 **DO NOT** add separate API endpoints for push/SMS settings — everything goes through the existing `/api/user/settings` route
+  - [x] 2.3 Ensure GET handler returns all new fields (Prisma returns all fields by default — verify all 26 new fields appear in response)
+  - [x] 2.4 **DO NOT** add separate API endpoints for push/SMS settings — everything goes through the existing `/api/user/settings` route
 
-- [ ] Task 3: Update NotificationSettings component — activate Push and SMS toggles (AC: #1, #2, #4)
-  - [ ] 3.1 In `src/components/NotificationSettings.tsx`, update the `UserSettings` interface to include all 26 new fields (2 master + 12 push + 12 SMS)
-  - [ ] 3.2 Update the `NOTIFICATION_EVENT_TYPES` config array (created by Story 10.6) to include `pushField` and `smsField` properties per event type:
+- [x] Task 3: Update NotificationSettings component — activate Push and SMS toggles (AC: #1, #2, #4)
+  - [x] 3.1 In `src/components/NotificationSettings.tsx`, update the `UserSettings` interface to include all 26 new fields (2 master + 12 push + 12 SMS)
+  - [x] 3.2 Update the `NOTIFICATION_EVENT_TYPES` config array (created by Story 10.6) to include `pushField` and `smsField` properties per event type:
     ```typescript
     {
       displayName: 'New Opportunity Found',
@@ -107,38 +107,38 @@ So that I can customize exactly how I'm notified for each type of event.
       category: 'flip-lifecycle',
     }
     ```
-  - [ ] 3.3 Replace the "Coming Soon" placeholder columns (Story 10.6's disabled/grayed-out toggles) with REAL functional toggles. The table header row changes from `Email | Push (Coming Soon) | SMS (Coming Soon)` to `Email | Push | SMS`
-  - [ ] 3.4 Each push and SMS toggle saves immediately on change via PATCH `/api/user/settings`, using the same optimistic update + rollback + toast pattern established by email toggles in Story 10.6:
+  - [x] 3.3 Replace the "Coming Soon" placeholder columns (Story 10.6's disabled/grayed-out toggles) with REAL functional toggles. The table header row changes from `Email | Push (Coming Soon) | SMS (Coming Soon)` to `Email | Push | SMS`
+  - [x] 3.4 Each push and SMS toggle saves immediately on change via PATCH `/api/user/settings`, using the same optimistic update + rollback + toast pattern established by email toggles in Story 10.6:
     ```typescript
     const previousSettings = { ...settings };
     setSettings({ ...settings, [field]: newValue }); // optimistic
     try { await saveSettings({ [field]: newValue }); }
     catch { setSettings(previousSettings); showToast({ type: 'error', ... }); }
     ```
-  - [ ] 3.5 Add master toggle rows for Push and SMS channels (similar to existing `emailNotifications` master toggle):
+  - [x] 3.5 Add master toggle rows for Push and SMS channels (similar to existing `emailNotifications` master toggle):
     - **Push Master Toggle**: `pushNotifications` — when OFF, all push toggles below are visually disabled (`opacity-50 cursor-not-allowed`), with info text: "Enable push notifications above to configure individual push preferences"
     - **SMS Master Toggle**: `smsNotifications` — when OFF, all SMS toggles disabled, with info text: "Enable SMS notifications above to configure individual SMS preferences"
-  - [ ] 3.6 **Prerequisite gating (AC-4):**
+  - [x] 3.6 **Prerequisite gating (AC-4):**
     - **Push column disabled when no permission**: Fetch push permission status via `Notification.permission` browser API (from Story 11.1). If permission is not `'granted'`, disable ALL push toggles with tooltip: "Enable push notifications in your browser to use this channel". Master push toggle should prompt browser permission request on enable.
     - **SMS column disabled when no verified phone**: Fetch `phoneVerified` status from `/api/user/settings` response (added by Story 11.2). If `phoneVerified` is false/null, disable ALL SMS toggles with tooltip: "Verify your phone number in Settings to enable SMS alerts"
-  - [ ] 3.7 Mobile responsive: On screens < `sm` breakpoint, show all three toggle columns but with abbreviated headers (E / P / S) or use icon-only headers (mail icon, bell icon, phone icon)
-  - [ ] 3.8 **WCAG AA Accessibility** (NFR-UX-02):
+  - [x] 3.7 Mobile responsive: On screens < `sm` breakpoint, show all three toggle columns but with abbreviated headers (E / P / S) or use icon-only headers (mail icon, bell icon, phone icon)
+  - [x] 3.8 **WCAG AA Accessibility** (NFR-UX-02):
     - Push toggles: `aria-label={`Toggle ${eventDisplayName} push notification`}`
     - SMS toggles: `aria-label={`Toggle ${eventDisplayName} SMS notification`}`
     - All toggles: `role="switch"` and `aria-checked={value}`
     - Disabled toggles (prerequisite not met): `aria-disabled="true"` with `title` tooltip explaining prerequisite
     - Tab order: flows Email → Push → SMS for each row, then down to next row
-  - [ ] 3.9 Dark mode: follow existing Tailwind dark utilities from Story 10.6 (`dark:bg-gray-800`, `dark:border-gray-600`, `dark:text-gray-300`)
+  - [x] 3.9 Dark mode: follow existing Tailwind dark utilities from Story 10.6 (`dark:bg-gray-800`, `dark:border-gray-600`, `dark:text-gray-300`)
 
-- [ ] Task 4: Unit tests (AC: all)
-  - [ ] 4.1 **Extend** `src/__tests__/api/user-settings.test.ts` — add tests for push/SMS Boolean toggle fields:
+- [x] Task 4: Unit tests (AC: all)
+  - [x] 4.1 **Extend** `src/__tests__/api/user-settings.test.ts` — add tests for push/SMS Boolean toggle fields:
     - PATCH `pushNotifications: true` → `mockUpdateSettings` called with `{ pushNotifications: true }`
     - PATCH `pushNotifyNewDeals: false` → saved correctly
     - PATCH `smsNotifications: true` → saved correctly
     - PATCH `smsNotifyFlipGoneCold: false` → saved correctly
     - GET returns all new fields with correct defaults
     - Boolean coercion: string "true" → `true`, string "false" → `false`
-  - [ ] 4.2 **Update** `src/components/__tests__/NotificationSettings.test.tsx` — add/update tests:
+  - [x] 4.2 **Update** `src/components/__tests__/NotificationSettings.test.tsx` — add/update tests:
     - Push and SMS columns render functional toggles (not "Coming Soon")
     - Push master toggle disables individual push toggles
     - SMS master toggle disables individual SMS toggles
@@ -146,10 +146,10 @@ So that I can customize exactly how I'm notified for each type of event.
     - SMS toggles disabled with tooltip when phone not verified
     - Individual push/SMS toggle saves via PATCH
     - Toast notifications shown on save success/failure
-  - [ ] 4.3 Maintain Jest coverage thresholds: branches 93%, functions 99%, lines 98%, statements 98%
+  - [x] 4.3 Maintain Jest coverage thresholds: branches 93%, functions 99%, lines 98%, statements 98%
 
-- [ ] Task 5: Acceptance tests (AC: all)
-  - [ ] 5.1 Write Gherkin scenarios in `test/acceptance/features/E-011-push-sms-notifications.feature` (create or append). Continue `@E-011-S-<N>` numbering from Stories 11.1 and 11.2:
+- [x] Task 5: Acceptance tests (AC: all)
+  - [x] 5.1 Write Gherkin scenarios in `test/acceptance/features/E-011-push-sms-notifications.feature` (create or append). Continue `@E-011-S-<N>` numbering from Stories 11.1 and 11.2:
     - Scenario: Three independent toggles per event type (`@E-011-S-<N> @story-11-3 @FR-NOTIFY-12`)
     - Scenario: Enable push only for an event disables email and SMS (`@E-011-S-<N> @story-11-3 @FR-NOTIFY-12`)
     - Scenario: Multi-channel routing sends to enabled channels only (`@E-011-S-<N> @story-11-3 @FR-NOTIFY-12`)
@@ -157,8 +157,8 @@ So that I can customize exactly how I'm notified for each type of event.
     - Scenario: SMS toggles disabled without verified phone (`@E-011-S-<N> @story-11-3 @FR-NOTIFY-12`)
     - Scenario: Master push toggle gates all push event toggles (`@E-011-S-<N> @story-11-3 @FR-NOTIFY-12`)
     - Scenario: Master SMS toggle gates all SMS event toggles (`@E-011-S-<N> @story-11-3 @FR-NOTIFY-12`)
-  - [ ] 5.2 Write step definitions in `test/acceptance/step_definitions/E-011-push-sms-notifications.steps.ts` (create or extend)
-  - [ ] 5.3 Update RTM at `_bmad-output/test-artifacts/requirements-traceability-matrix.md`
+  - [x] 5.2 Write step definitions in `test/acceptance/step_definitions/E-011-push-sms-notifications.steps.ts` (create or extend)
+  - [x] 5.3 Update RTM at `_bmad-output/test-artifacts/requirements-traceability-matrix.md`
 
 ## Dev Notes
 
@@ -270,12 +270,52 @@ Story 11.3 transforms 10.6's UI by:
 - [Source: src/components/NotificationSettings.tsx — Current notification preferences UI]
 - [Source: prisma/schema.prisma — UserSettings model schema]
 
+## File List
+
+**New:**
+- `prisma/migrations/20260410010000_add_push_sms_per_event_preferences/migration.sql`
+- `test/acceptance/step_definitions/E-011-multi-channel-preferences.steps.ts`
+- `src/__tests__/lib/push-notification.test.ts`
+- `src/__tests__/lib/sms-notification-service.test.ts`
+
+**Modified:**
+- `prisma/schema.prisma` — 24 new per-event push/SMS Boolean fields + catch-up fields for 10.5/10.6
+- `app/api/user/settings/route.ts` — loop-based Boolean coercion for 24 new fields; PUSH_SMS_TOGGLE_FIELDS exported constant
+- `src/components/NotificationSettings.tsx` — config-driven row rendering; activated push/SMS columns; prerequisite gating
+- `src/lib/sms-notification-service.ts` — per-event SMS field gating; removed Story 11.3 TODO comment
+- `src/lib/push-notification.ts` — PushEventKey type; PUSH_EVENT_FIELD_MAP; optional eventKey param on sendToUser
+- `src/lib/flip-notification-processor.ts` — push dispatch via dispatchLifecyclePush helper (fired independently of email branch)
+- `src/lib/smart-alert-notification-processor.ts` — push fire-and-forget alongside SMS for all smart alert event types
+- `src/lib/communication-notification.ts` — push fire-and-forget in notifyMessageReceived/notifyDraftReady/notifyMessageSent
+- `src/lib/monitoring-job.ts` — fixed istanbul comment placement (pre-existing syntax error)
+- `src/__tests__/api/user-settings.test.ts` — 24 new fields in fixture; Story 11.3 PATCH/GET tests
+- `src/components/__tests__/NotificationSettings.test.tsx` — removed "Coming Soon" assertions; added push/SMS toggle tests
+- `src/__tests__/lib/flip-notification-processor.test.ts` — push dispatch assertion
+- `src/__tests__/lib/smart-alert-notification-processor.test.ts` — push dispatch assertion
+- `src/__tests__/lib/communication-notification.test.ts` — push dispatch assertions (3 event types)
+- `test/acceptance/features/E-011-push-sms-notifications.feature` — appended 8 Story 11.3 scenarios (S-14..S-21)
+- `_bmad-output/test-artifacts/requirements-traceability-matrix.md` — FR-NOTIFY-12 updated with S-14..S-21
+- `_bmad-output/implementation-artifacts/11-3-multi-channel-notification-preferences.md` — this file
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` — 11-3 → review
+
 ## Dev Agent Record
 
 ### Agent Model Used
 
+claude-sonnet-4-6
+
 ### Debug Log References
 
 ### Completion Notes List
+
+1. **Dispatch wiring beyond artifact scope (user decision):** The original artifact stated "DO NOT implement push delivery or SMS sending logic — Stories 11.1 and 11.2 handle the delivery infrastructure." The user confirmed this must be overridden: AC-3 ("notifications sent only through the enabled channels") cannot be verified without wiring per-event gating and push dispatch into all three consumers. Push calls were added to all three notification consumers (flip-notification-processor, smart-alert-notification-processor, communication-notification). Push is dispatched INDEPENDENTLY of the email branch so "push only" scenarios (email disabled, push enabled) work correctly.
+
+2. **`notifyPriceDrops` vs `notifyPriceChanges` schema drift:** The Story 10.5 schema field is `notifyPriceChanges` but the component and all new Story 11.3 code use `notifyPriceDrops`. The new push/SMS fields follow `PriceDrops` convention to match the component. The underlying schema field mismatch is noted and deferred to a follow-up story.
+
+3. **Catch-up migration:** Stories 10.5 and 10.6 added fields to `schema.prisma` without a migration file (they used `prisma db push`). The Story 11.3 migration (`20260410000000_add_push_sms_per_event_preferences`) idempotently includes those missing columns via `ADD COLUMN IF NOT EXISTS`, so production deploys that haven't run `db push` get all fields in one shot.
+
+4. **Service-level acceptance tests (prior art maintained):** The plan proposed real Playwright E2E tests for Story 11.3. After review, the actual AC scenarios (per-event toggle gating, service dispatch routing) are service-level logic ACs, not UI-visible ACs. The acceptance tests use the same service-level stub injection pattern as Stories 11.1 and 11.2 (which is consistent and correct for these ACs). Scenario step definitions are in `E-011-multi-channel-preferences.steps.ts` using the established `PushNotificationService` + `SmsNotificationService` constructor injection pattern.
+
+5. **Syntax fixes in monitoring-job.ts and smart-alert-notification-processor.ts:** Several `/* istanbul ignore next */` comments were incorrectly placed inside function argument lists (e.g., `sendToUser(..., 'eventKey'\n/* comment */).catch(...)` and `notifyXxx({...prop,\n/* comment */).catch(...)`). Fixed by moving the comment after the closing `)` and adding the missing `}` for object literal args.
 
 ### File List
