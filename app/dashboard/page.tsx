@@ -53,15 +53,10 @@ interface PaginationData {
   totalPages: number;
 }
 
-const LISTING_STATUS_COLORS: Record<string, string> = {
-  NEW: 'bg-gray-100 text-gray-700',
-  ANALYZED: 'bg-blue-100 text-blue-700',
-  OPPORTUNITY: 'bg-purple-100 text-purple-700',
-};
 
 export default function DashboardPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center">Loading dashboard...</div>}>
+    <Suspense fallback={<div style={{ padding: 32, textAlign: 'center', color: '#94a3b8' }}>Loading dashboard…</div>}>
       <Dashboard />
     </Suspense>
   );
@@ -174,69 +169,74 @@ function Dashboard() {
     }
   }
 
-  function getPlatformBadgeColor(platform: string) {
-    const colors: Record<string, string> = {
-      EBAY: 'bg-yellow-500',
-      CRAIGSLIST: 'bg-blue-500',
-      FACEBOOK: 'bg-blue-600',
-      OFFERUP: 'bg-green-500',
-      MERCARI: 'bg-orange-500',
+  function getPlatformBadgeClass(platform: string) {
+    const map: Record<string, string> = {
+      EBAY:       'fp-badge fp-badge-yellow',
+      CRAIGSLIST: 'fp-badge fp-badge-blue',
+      FACEBOOK:   'fp-badge fp-badge-blue',
+      OFFERUP:    'fp-badge fp-badge-green',
+      MERCARI:    'fp-badge fp-badge-orange',
     };
-    return colors[platform] || 'bg-gray-500';
+    return map[platform] ?? 'fp-badge fp-badge-gray';
   }
 
   function getStatusBadgeClass(status: string) {
-    return LISTING_STATUS_COLORS[status] || 'bg-gray-100 text-gray-700';
+    const map: Record<string, string> = {
+      NEW:         'fp-badge fp-badge-gray',
+      ANALYZED:    'fp-badge fp-badge-blue',
+      OPPORTUNITY: 'fp-badge fp-badge-purple',
+    };
+    return map[status] ?? 'fp-badge fp-badge-gray';
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl text-gray-600">Loading listings...</div>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ fontSize: 18, color: '#94a3b8' }}>Loading listings…</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl text-red-600">{error}</div>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ fontSize: 18, color: '#f87171' }}>{error}</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto">
+    <div style={{ minHeight: '100vh', padding: '32px 24px' }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-3xl font-bold text-gray-900">Flipper Dashboard</h1>
+        <div style={{ marginBottom: 32 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <h1 style={{ fontSize: 28, fontWeight: 800, color: '#e2e8f0', letterSpacing: '-0.02em' }}>Flipper Dashboard</h1>
             {/* SSE connection status indicator */}
             <div className="flex items-center gap-1.5 text-sm" data-testid="sse-status">
               {isConnected ? (
                 <>
-                  <span className="w-2 h-2 rounded-full bg-green-500" />
-                  <span className="text-green-600 font-medium">Live</span>
+                  <span className="fp-pulse" style={{ width: 7, height: 7, borderRadius: '50%', background: '#34d399', display: 'inline-block' }} />
+                  <span style={{ color: '#34d399', fontWeight: 600, fontSize: 13 }}>Live</span>
                 </>
               ) : (
                 <>
-                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                  <span className="text-amber-600 font-medium">Reconnecting…</span>
+                  <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#fbbf24', display: 'inline-block', animation: 'fp-pulse 2s ease-in-out infinite' }} />
+                  <span style={{ color: '#fbbf24', fontWeight: 600, fontSize: 13 }}>Reconnecting…</span>
                 </>
               )}
             </div>
           </div>
-          <p className="text-gray-600">Find and track profitable flipping opportunities</p>
+          <p style={{ color: '#94a3b8', fontSize: 14 }}>Find and track profitable flipping opportunities</p>
         </div>
 
         {/* SSE error banner */}
         {lastError && !sseErrorDismissed && (
-          <div className="mb-6 flex items-center justify-between gap-3 px-4 py-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm" data-testid="sse-error-banner">
+          <div className="fp-alert-warn" style={{ marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 16px', fontSize: 13, color: '#fcd34d' }} data-testid="sse-error-banner">
             <span>Real-time updates: {lastError}. Data will refresh when connection is restored.</span>
             <button
               onClick={() => setSseErrorDismissed(true)}
-              className="shrink-0 p-1 hover:bg-amber-100 rounded"
+              style={{ flexShrink: 0, padding: 4, background: 'none', border: 'none', cursor: 'pointer', color: '#fbbf24', borderRadius: 4 }}
               aria-label="Dismiss"
             >
               <X className="w-4 h-4" />
@@ -245,29 +245,27 @@ function Dashboard() {
         )}
 
         {/* Stats Cards — 4-column grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-sm text-gray-600 mb-1">Total Listings</div>
-            <div className="text-3xl font-bold text-gray-900">{stats.totalListings}</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" style={{ marginBottom: 32 }}>
+          <div className="fp-stat-card">
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#475569', marginBottom: 8 }}>Total Listings</div>
+            <div style={{ fontSize: 32, fontWeight: 800, color: '#e2e8f0' }}>{stats.totalListings}</div>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-sm text-gray-600 mb-1">Opportunities Found</div>
-            <div className="text-3xl font-bold text-purple-600">{stats.opportunitiesFound}</div>
+          <div className="fp-stat-card">
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#475569', marginBottom: 8 }}>Opportunities</div>
+            <div className="fp-grad-purple" style={{ fontSize: 32, fontWeight: 800 }}>{stats.opportunitiesFound}</div>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-sm text-gray-600 mb-1">Active Flips</div>
-            <div className="text-3xl font-bold text-blue-600">{stats.activeFlips}</div>
+          <div className="fp-stat-card">
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#475569', marginBottom: 8 }}>Active Flips</div>
+            <div style={{ fontSize: 32, fontWeight: 800, color: '#8b5cf6' }}>{stats.activeFlips}</div>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-sm text-gray-600 mb-1">Total Profit</div>
-            <div className="text-3xl font-bold text-green-600">
-              ${stats.totalProfit.toFixed(0)}
-            </div>
+          <div className="fp-stat-card">
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#475569', marginBottom: 8 }}>Total Profit</div>
+            <div className="fp-grad-green" style={{ fontSize: 32, fontWeight: 800 }}>${stats.totalProfit.toFixed(0)}</div>
           </div>
         </div>
 
         {/* Filter Panel */}
-        <div className="mb-6">
+        <div style={{ marginBottom: 24 }}>
           <FilterPanel
             filters={filters}
             setFilter={setFilter}
@@ -283,7 +281,7 @@ function Dashboard() {
 
         {/* Page size selector */}
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-sm text-gray-600">Show:</span>
+          <span style={{ fontSize: 13, color: '#94a3b8' }}>Show:</span>
           {([10, 20, 50] as const).map((size) => (
             <button
               key={size}
@@ -291,23 +289,20 @@ function Dashboard() {
                 setFilter('limit', String(size));
                 setFilter('page', '1');
               }}
-              className={`px-3 py-1 rounded text-sm border ${
-                filters.limit === String(size)
-                  ? 'bg-purple-600 text-white border-purple-600'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-              }`}
+              className={filters.limit === String(size) ? 'fp-btn-primary' : 'fp-btn-ghost'}
+              style={{ padding: '5px 14px', fontSize: 13 }}
             >
               {size}
             </button>
           ))}
-          <span className="text-sm text-gray-600">per page</span>
+          <span style={{ fontSize: 13, color: '#94a3b8' }}>per page</span>
         </div>
 
         {/* Listings Grid */}
         {listings.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <div className="text-xl text-gray-600">No listings found</div>
-            <p className="text-gray-500 mt-2">Try adjusting your filters or running a new scan</p>
+          <div className="fp-glass" style={{ padding: '48px 24px', textAlign: 'center' }}>
+            <div style={{ fontSize: 18, color: '#94a3b8', marginBottom: 8 }}>No listings found</div>
+            <p style={{ color: '#475569', fontSize: 14 }}>Try adjusting your filters or running a new scan</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -317,11 +312,12 @@ function Dashboard() {
                 <Link
                   key={listing.id}
                   href={`/listings/${listing.id}`}
-                  className="block bg-white rounded-lg shadow hover:shadow-lg transition-shadow"
+                  className="block fp-glass fp-glow-card"
+                  style={{ textDecoration: 'none', overflow: 'hidden' }}
                 >
                   {/* Image */}
                   {imageUrl && (
-                    <div className="h-48 bg-gray-200 rounded-t-lg overflow-hidden">
+                    <div style={{ height: 192, background: 'rgba(255,255,255,0.04)', borderRadius: '15px 15px 0 0', overflow: 'hidden' }}>
                       <img
                         src={imageUrl}
                         alt={listing.title}
@@ -334,44 +330,40 @@ function Dashboard() {
                     {/* Platform Badge + Status Badge + Star */}
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <span
-                          className={`px-2 py-1 rounded text-xs font-semibold text-white ${getPlatformBadgeColor(listing.platform)}`}
-                        >
+                        <span className={getPlatformBadgeClass(listing.platform)}>
                           {listing.platform}
                         </span>
-                        <span
-                          className={`px-2 py-1 rounded text-xs font-semibold ${getStatusBadgeClass(listing.status)}`}
-                        >
+                        <span className={getStatusBadgeClass(listing.status)}>
                           {listing.status}
                         </span>
                       </div>
                       <button
                         onClick={(e) => handleCreateOpportunity(e, listing.id)}
-                        className="p-1 hover:bg-gray-100 rounded"
+                        style={{ padding: 4, background: 'none', border: 'none', cursor: 'pointer', borderRadius: 4 }}
                         disabled={!!listing.opportunity}
                       >
                         <Star
-                          className={`w-5 h-5 ${listing.opportunity ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'}`}
+                          className={`w-5 h-5 ${listing.opportunity ? 'fill-yellow-400 text-yellow-400' : 'text-slate-500'}`}
                         />
                       </button>
                     </div>
 
                     {/* Title */}
-                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
+                    <h3 style={{ fontWeight: 600, color: '#e2e8f0', marginBottom: 8, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {listing.title}
                     </h3>
 
                     {/* Price & Value */}
                     <div className="flex justify-between items-center mb-2">
                       <div>
-                        <div className="text-sm text-gray-600">Asking</div>
-                        <div className="text-lg font-bold text-gray-900">${listing.askingPrice}</div>
+                        <div style={{ fontSize: 12, color: '#94a3b8' }}>Asking</div>
+                        <div style={{ fontSize: 18, fontWeight: 700, color: '#e2e8f0' }}>${listing.askingPrice}</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm text-gray-600">
+                        <div style={{ fontSize: 12, color: '#94a3b8' }}>
                           {listing.verifiedMarketValue !== null ? 'Verified Value' : 'Est. Value'}
                         </div>
-                        <div className="text-lg font-bold text-green-600">
+                        <div style={{ fontSize: 18, fontWeight: 700, color: '#34d399' }}>
                           $
                           {listing.verifiedMarketValue !== null
                             ? listing.verifiedMarketValue
@@ -383,88 +375,70 @@ function Dashboard() {
                     {/* Value Score */}
                     {listing.valueScore !== null && (
                       <div className="mb-2 text-sm">
-                        <span className="text-gray-500">Score: </span>
-                        <span className="font-semibold text-blue-600">{listing.valueScore}/100</span>
+                        <span style={{ color: '#94a3b8' }}>Score: </span>
+                        <span style={{ fontWeight: 600, color: '#8b5cf6' }}>{listing.valueScore}/100</span>
                       </div>
                     )}
 
                     {/* Profit Badge */}
                     {listing.profitPotential !== null && listing.profitPotential !== undefined && (
                       <div className="mb-2">
-                        <div className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
+                        <span className="fp-badge fp-badge-green">
                           +${listing.profitPotential} profit (
                           {(listing.trueDiscountPercent ?? listing.discountPercent ?? 0).toFixed(0)}
                           % off)
-                        </div>
+                        </span>
                       </div>
                     )}
 
                     {/* Demand Badge (Story 5.3) */}
                     {listing.demandLevel && (
-                      <div className="mb-2">
-                        <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                            listing.demandLevel === 'rising'
-                              ? 'bg-green-100 text-green-700'
-                              : listing.demandLevel === 'stable'
-                                ? 'bg-blue-100 text-blue-700'
-                                : listing.demandLevel === 'declining'
-                                  ? 'bg-orange-100 text-orange-700'
-                                  : listing.demandLevel === 'low_liquidity'
-                                    ? 'bg-red-100 text-red-700'
-                                    : 'bg-gray-100 text-gray-700'
-                          }`}
-                        >
-                          {listing.demandLevel === 'rising'
-                            ? '↑ Rising demand'
-                            : listing.demandLevel === 'stable'
-                              ? '→ Stable demand'
-                              : listing.demandLevel === 'declining'
-                                ? '↓ Declining demand'
-                                : listing.demandLevel === 'low_liquidity'
-                                  ? '⚠ Low liquidity'
-                                  : listing.demandLevel}
+                      <div style={{ marginBottom: 8 }}>
+                        <span className={`fp-badge ${
+                          listing.demandLevel === 'rising'        ? 'fp-badge-green'  :
+                          listing.demandLevel === 'stable'        ? 'fp-badge-blue'   :
+                          listing.demandLevel === 'declining'     ? 'fp-badge-orange' :
+                          listing.demandLevel === 'low_liquidity' ? 'fp-badge-red'    :
+                                                                     'fp-badge-gray'
+                        }`}>
+                          {listing.demandLevel === 'rising'        ? '↑ Rising demand'  :
+                           listing.demandLevel === 'stable'        ? '→ Stable demand'  :
+                           listing.demandLevel === 'declining'     ? '↓ Declining'      :
+                           listing.demandLevel === 'low_liquidity' ? '⚠ Low liquidity'  :
+                           listing.demandLevel}
                         </span>
                       </div>
                     )}
 
                     {/* Logistics Badges (Story 5.5) */}
                     {(listing.sizeCategory || listing.outsidePickupRadius) && (
-                      <div className="mb-3 flex flex-wrap gap-1" data-testid="logistics-badges">
+                      <div style={{ marginBottom: 12, display: 'flex', flexWrap: 'wrap', gap: 4 }} data-testid="logistics-badges">
                         {listing.sizeCategory && (
-                          <span
-                            className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                              listing.sizeCategory === 'large_local_only'
-                                ? 'bg-yellow-100 text-yellow-700'
-                                : listing.sizeCategory === 'fragile_special_handling'
-                                  ? 'bg-purple-100 text-purple-700'
-                                  : 'bg-gray-100 text-gray-600'
-                            }`}
-                          >
-                            {listing.sizeCategory === 'large_local_only'
-                              ? '🚚 Local pickup only'
-                              : listing.sizeCategory === 'fragile_special_handling'
-                                ? '⚠ Fragile'
-                                : '📦 Shippable'}
+                          <span className={`fp-badge ${
+                            listing.sizeCategory === 'large_local_only'         ? 'fp-badge-yellow'  :
+                            listing.sizeCategory === 'fragile_special_handling' ? 'fp-badge-purple'  :
+                                                                                   'fp-badge-gray'
+                          }`}>
+                            {listing.sizeCategory === 'large_local_only'         ? '🚚 Local only'  :
+                             listing.sizeCategory === 'fragile_special_handling' ? '⚠ Fragile'      :
+                             '📦 Shippable'}
                           </span>
                         )}
                         {listing.outsidePickupRadius && (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-700">
-                            📍 Outside radius
-                          </span>
+                          <span className="fp-badge fp-badge-orange">📍 Outside radius</span>
                         )}
                       </div>
                     )}
 
                     {/* Location & External Link */}
-                    <div className="flex items-center justify-between text-sm text-gray-600">
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, color: '#64748b' }}>
                       <span>{listing.location}</span>
                       <a
                         href={listing.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="flex items-center gap-1 text-purple-600 hover:text-purple-800"
+                        style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#8b5cf6', textDecoration: 'none' }}
                       >
                         View <ExternalLink className="w-4 h-4" />
                       </a>
@@ -478,16 +452,13 @@ function Dashboard() {
 
         {/* Pagination */}
         {pagination.totalPages > 1 && (
-          <div className="mt-8 flex justify-center gap-2">
+          <div style={{ marginTop: 32, display: 'flex', justifyContent: 'center', gap: 8 }}>
             {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((p) => (
               <button
                 key={p}
                 onClick={() => setFilter('page', String(p))}
-                className={`px-4 py-2 rounded ${
-                  p === pagination.page
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
-                }`}
+                className={p === pagination.page ? 'fp-btn-primary' : 'fp-btn-ghost'}
+                style={{ padding: '6px 16px' }}
               >
                 {p}
               </button>
