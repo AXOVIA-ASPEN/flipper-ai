@@ -41,7 +41,10 @@ export default function UserMenu() {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+        className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors"
+        style={{ color: '#e2e8f0' }}
+        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.08)'; }}
+        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
         aria-expanded={open}
         aria-haspopup="true"
         aria-label="User menu"
@@ -53,13 +56,15 @@ export default function UserMenu() {
           {name}
         </span>
         <ChevronDown
-          className={`w-4 h-4 text-gray-500 transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`}
+          style={{ color: '#94a3b8' }}
         />
       </button>
 
       {open && (
         <div
-          className="absolute right-0 mt-1 w-48 py-1 bg-white rounded-lg border border-gray-200 shadow-lg z-50"
+          className="fp-glass-sm"
+          style={{ position: 'absolute', right: 0, top: '100%', marginTop: 8, minWidth: 200, padding: '8px 0', zIndex: 100 }}
           role="menu"
         >
           <button
@@ -68,10 +73,13 @@ export default function UserMenu() {
               setOpen(false);
               handleLogout();
             }}
-            className="w-full flex items-center gap-2 px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+            className="w-full text-left"
+            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', fontSize: 13, color: '#94a3b8', cursor: 'pointer', transition: 'background 0.15s, color 0.15s', borderRadius: 8 }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = '#e2e8f0'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#94a3b8'; }}
             role="menuitem"
           >
-            <LogOut className="w-4 h-4 text-gray-500" />
+            <LogOut className="w-4 h-4" style={{ color: 'inherit' }} />
             Log out
           </button>
         </div>
