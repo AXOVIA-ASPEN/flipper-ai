@@ -73,24 +73,24 @@ export const TIER_META: Record<
 > = {
   FREE: {
     icon: Shield,
-    gradient: 'from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900',
-    border: 'border-gray-200 dark:border-gray-700',
+    gradient: '',
+    border: '',
     badge: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
     tagline: 'Get started free',
     daily: '',
   },
   FLIPPER: {
     icon: Zap,
-    gradient: 'from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950 dark:via-indigo-950 dark:to-purple-950',
-    border: 'border-blue-300 dark:border-blue-600',
+    gradient: '',
+    border: '',
     badge: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
     tagline: 'Most popular for flippers',
     daily: 'Less than a coffee/day',
   },
   PRO: {
     icon: Crown,
-    gradient: 'from-purple-50 via-pink-50 to-amber-50 dark:from-purple-950 dark:via-pink-950 dark:to-amber-950',
-    border: 'border-purple-300 dark:border-purple-600',
+    gradient: '',
+    border: '',
     badge: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
     tagline: 'Maximum earning power',
     daily: 'Pays for itself in one flip',
@@ -346,8 +346,8 @@ export default function BillingSettings() {
               key={tier}
               className={`
                 relative rounded-2xl border-2 p-6 transition-all duration-300
-                bg-gradient-to-br ${meta.gradient}
-                ${isCurrentTier ? `${meta.border} ring-2 ring-offset-2 ring-indigo-500 dark:ring-offset-gray-800` : `${meta.border} hover:scale-[1.02]`}
+                fp-glass-sm
+                ${isCurrentTier ? 'ring-2 ring-offset-2 ring-indigo-500 dark:ring-offset-gray-800' : 'hover:scale-[1.02]'}
                 ${isPopular && !isCurrentTier ? 'shimmer-border glow-card' : ''}
               `}
             >
@@ -363,13 +363,16 @@ export default function BillingSettings() {
 
               {/* Tier header */}
               <div className="text-center mb-6 pt-2">
-                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl mb-3 ${
-                  tier === 'FREE'
-                    ? 'bg-gray-200 dark:bg-gray-700'
-                    : tier === 'FLIPPER'
-                    ? 'bg-indigo-100 dark:bg-indigo-900'
-                    : 'bg-purple-100 dark:bg-purple-900'
-                }`}>
+                <div
+                  className={`inline-flex items-center justify-center w-12 h-12 rounded-xl mb-3 ${
+                    tier === 'FLIPPER'
+                      ? 'bg-indigo-100 dark:bg-indigo-900'
+                      : tier === 'PRO'
+                      ? 'bg-purple-100 dark:bg-purple-900'
+                      : ''
+                  }`}
+                  style={tier === 'FREE' ? { background: 'rgba(148,163,184,0.15)', borderRadius: 8 } : undefined}
+                >
                   <Icon className={`w-6 h-6 ${
                     tier === 'FREE'
                       ? 'text-gray-500'
@@ -457,7 +460,7 @@ export default function BillingSettings() {
                     )}
                   </button>
                 ) : (
-                  <div className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 text-center text-sm text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-600">
+                  <div className="fp-glass-sm w-full rounded-xl py-3 text-center text-sm" style={{ color: '#94a3b8' }}>
                     Included in your plan
                   </div>
                 )}
