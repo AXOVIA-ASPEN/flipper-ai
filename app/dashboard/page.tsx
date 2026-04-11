@@ -213,7 +213,7 @@ function Dashboard() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
             <h1 style={{ fontSize: 28, fontWeight: 800, color: '#e2e8f0', letterSpacing: '-0.02em' }}>Flipper Dashboard</h1>
             {/* SSE connection status indicator */}
-            <div className="flex items-center gap-1.5 text-sm" data-testid="sse-status">
+            <div className="flex items-center gap-1.5 text-sm" aria-live="polite" data-testid="sse-status">
               {isConnected ? (
                 <>
                   <span className="fp-pulse" style={{ width: 7, height: 7, borderRadius: '50%', background: '#34d399', display: 'inline-block' }} />
@@ -341,6 +341,7 @@ function Dashboard() {
                         onClick={(e) => handleCreateOpportunity(e, listing.id)}
                         style={{ padding: 4, background: 'none', border: 'none', cursor: 'pointer', borderRadius: 4 }}
                         disabled={!!listing.opportunity}
+                        aria-label={listing.opportunity ? 'Already tracked as opportunity' : 'Track as opportunity'}
                       >
                         <Star
                           className={`w-5 h-5 ${listing.opportunity ? 'fill-yellow-400 text-yellow-400' : 'text-slate-500'}`}
