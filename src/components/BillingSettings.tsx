@@ -196,7 +196,7 @@ export default function BillingSettings() {
   return (
     <div
       id="billing"
-      className="rounded-2xl border border-gray-200 bg-white p-8 dark:border-gray-700 dark:bg-gray-800"
+      style={{ padding: 8 }}
     >
       {/* Shimmer keyframes */}
       <style>{`
@@ -267,7 +267,7 @@ export default function BillingSettings() {
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
           <Sparkles className="w-6 h-6 text-indigo-500" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h2 className="text-2xl font-bold" style={{ color: '#e2e8f0' }}>
             Subscription & Billing
           </h2>
         </div>
@@ -285,12 +285,12 @@ export default function BillingSettings() {
       {/* Current plan summary with scan progress */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-3">
-          <span className="text-sm text-gray-500 dark:text-gray-400">Current plan:</span>
+          <span className="text-sm" style={{ color: '#94a3b8' }}>Current plan:</span>
           <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${TIER_META[data.tier].badge}`}>
             {limits.name}
           </span>
           {data.tier !== 'FREE' && (
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+            <span className="text-sm" style={{ color: '#94a3b8' }}>
               {TIER_PRICING[data.tier].label}
             </span>
           )}
@@ -300,7 +300,7 @@ export default function BillingSettings() {
         {limits.scansPerDay && (
           <div className="max-w-md" data-testid="scan-progress">
             <div className="flex items-center justify-between text-xs mb-1">
-              <span className="text-gray-500 dark:text-gray-400">
+              <span style={{ color: '#94a3b8' }}>
                 {data.scansToday} of {limits.scansPerDay} daily scans used
               </span>
               {data.scansToday >= limits.scansPerDay * 0.8 && (
@@ -378,10 +378,10 @@ export default function BillingSettings() {
                       : 'text-purple-600 dark:text-purple-400'
                   }`} />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                <h3 className="text-xl font-bold" style={{ color: '#e2e8f0' }}>
                   {tierLimits.name}
                 </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-xs mt-1" style={{ color: '#94a3b8' }}>
                   {meta.tagline}
                 </p>
               </div>
@@ -389,10 +389,10 @@ export default function BillingSettings() {
               {/* Price */}
               <div className="text-center mb-6">
                 <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-4xl font-extrabold text-gray-900 dark:text-white">
+                  <span className="text-4xl font-extrabold" style={{ color: '#e2e8f0' }}>
                     {pricing.monthly === 0 ? '$0' : `$${pricing.monthly / 100}`}
                   </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">/mo</span>
+                  <span className="text-sm" style={{ color: '#94a3b8' }}>/mo</span>
                 </div>
                 {meta.daily && (
                   <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium mt-1">
@@ -408,9 +408,7 @@ export default function BillingSettings() {
                   const hasFeature = value !== false;
 
                   return (
-                    <li key={feature.label} className={`flex items-center gap-2 text-sm ${
-                      hasFeature ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-600'
-                    }`}>
+                    <li key={feature.label} className="flex items-center gap-2 text-sm" style={{ color: hasFeature ? '#94a3b8' : '#475569' }}>
                       {hasFeature ? (
                         <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
                       ) : (
@@ -418,7 +416,7 @@ export default function BillingSettings() {
                       )}
                       <span>{feature.label}</span>
                       {typeof value === 'string' && (
-                        <span className="ml-auto font-medium text-gray-900 dark:text-white">
+                        <span className="ml-auto font-medium" style={{ color: '#e2e8f0' }}>
                           {value}
                         </span>
                       )}
@@ -473,16 +471,16 @@ export default function BillingSettings() {
       {data.tier === 'FREE' && (
         <div className="space-y-4">
           <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-[1px]">
-            <div className="rounded-xl bg-white px-6 py-5 dark:bg-gray-800">
+            <div className="fp-glass-sm rounded-xl px-6 py-5">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 p-2.5 dark:from-indigo-900 dark:to-purple-900">
                   <TrendingUp className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 dark:text-white">
+                  <h3 className="font-bold" style={{ color: '#e2e8f0' }}>
                     One good flip pays for a year of Flipper
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-sm mt-1" style={{ color: '#94a3b8' }}>
                     The average flipper finds deals worth $100+ in profit. At just{' '}
                     {TIER_PRICING.FLIPPER.label}, Flipper pays for itself on your very
                     first find. Stop scrolling marketplace listings for hours — let AI
@@ -494,7 +492,7 @@ export default function BillingSettings() {
           </div>
 
           {/* Trust signals */}
-          <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-gray-400 dark:text-gray-500" data-testid="trust-signals">
+          <div className="flex flex-wrap items-center justify-center gap-6 text-xs" style={{ color: '#64748b' }} data-testid="trust-signals">
             <span className="flex items-center gap-1.5">
               <Lock className="w-3.5 h-3.5" />
               Secure checkout via Stripe
@@ -516,14 +514,14 @@ export default function BillingSettings() {
 
 export function BillingSettingsSkeleton() {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-8 dark:border-gray-700 dark:bg-gray-800" data-testid="billing-skeleton">
+    <div style={{ padding: 8 }} data-testid="billing-skeleton">
       <div className="flex items-center gap-3 mb-8">
         <div className="h-6 w-6 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
         <div className="h-7 w-48 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="rounded-2xl border border-gray-200 p-6 dark:border-gray-700">
+          <div key={i} className="fp-glass-sm rounded-2xl p-6">
             <div className="space-y-4 animate-pulse">
               <div className="h-12 w-12 rounded-xl bg-gray-200 dark:bg-gray-700 mx-auto" />
               <div className="h-5 w-20 rounded bg-gray-200 dark:bg-gray-700 mx-auto" />

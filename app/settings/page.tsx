@@ -21,23 +21,45 @@ import MessagingSettings from '@/components/MessagingSettings';
 import BillingSettings from '@/components/BillingSettings';
 import UsageDisplay from '@/components/UsageDisplay';
 import CheckoutResultBanner from '@/components/CheckoutResultBanner';
+import IntegrationsSettings from '@/components/IntegrationsSettings';
 
 export default function SettingsPage() {
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      <Suspense>
-        <CheckoutResultBanner />
-      </Suspense>
-      <h1 className="text-3xl font-bold mb-8">Settings</h1>
+    <div style={{ minHeight: '100vh', padding: '32px 24px' }}>
+      <div style={{ maxWidth: 1152, margin: '0 auto' }}>
+        <Suspense>
+          <CheckoutResultBanner />
+        </Suspense>
+        <h1 style={{ fontSize: 28, fontWeight: 800, color: '#e2e8f0', letterSpacing: '-0.02em', marginBottom: 4 }}>Settings</h1>
+        <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 32 }}>Configure your Flipper.ai experience</p>
 
-      <div className="space-y-8">
-        <BillingSettings />
-        <UsageDisplay />
-        <ThemeSettings />
-        <NotificationSettings />
-        <ScoringSettings />
-        <LogisticsSettings />
-        <MessagingSettings />
+        <div className="fp-glass" style={{ padding: 24, marginBottom: 16 }}>
+          <BillingSettings />
+        </div>
+        <div className="fp-glass" style={{ padding: 24, marginBottom: 16 }}>
+          <UsageDisplay />
+        </div>
+        <div className="fp-glass" style={{ padding: 24, marginBottom: 16 }}>
+          <ThemeSettings />
+        </div>
+        <div className="fp-glass" style={{ padding: 24, marginBottom: 16 }}>
+          <NotificationSettings />
+        </div>
+        <div className="fp-glass" style={{ padding: 24, marginBottom: 16 }}>
+          <ScoringSettings />
+        </div>
+        <div className="fp-glass" style={{ padding: 24, marginBottom: 16 }}>
+          <LogisticsSettings />
+        </div>
+        <div className="fp-glass" style={{ padding: 24, marginBottom: 16 }}>
+          <MessagingSettings />
+        </div>
+        {/* Story 12.1: Google Calendar and other integrations */}
+        <div className="fp-glass" style={{ padding: 24, marginBottom: 16 }}>
+          <Suspense>
+            <IntegrationsSettings />
+          </Suspense>
+        </div>
       </div>
     </div>
   );
