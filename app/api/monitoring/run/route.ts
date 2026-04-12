@@ -15,8 +15,7 @@
  * Rate limiting: rejects requests made within half the monitoring interval of the last
  * completed run (prevents accidental double-triggers).
  *
- * This endpoint MUST run on Cloud Run (timeout 300s). It must NOT be on Vercel
- * because Vercel's max function duration (30s) is insufficient for a full monitoring run.
+ * This endpoint runs on Cloud Run (timeout 300s) to allow for full monitoring runs.
  */
 
 import { NextRequest, NextResponse } from 'next/server';

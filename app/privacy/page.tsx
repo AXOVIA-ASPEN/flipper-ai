@@ -96,10 +96,10 @@ export default function PrivacyPolicyPage() {
             <p className="text-gray-700 leading-relaxed mb-3">We share data with trusted service providers:</p>
             <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
               <li><strong>Payment Processing:</strong> Stripe (PCI-DSS compliant)</li>
-              <li><strong>Cloud Hosting:</strong> Vercel, PrismaPostgres</li>
+              <li><strong>Cloud Hosting:</strong> Google Cloud (Firebase Hosting, Cloud Run), PostgreSQL</li>
               <li><strong>AI Analysis:</strong> Google Gemini API (for marketplace insights)</li>
               <li><strong>Error Monitoring:</strong> Sentry (for bug tracking and performance)</li>
-              <li><strong>Analytics:</strong> Vercel Analytics (aggregated, non-identifiable data)</li>
+              <li><strong>Analytics:</strong> Firebase Analytics (aggregated, non-identifiable data)</li>
               <li><strong>Google Calendar:</strong> When you connect Google Calendar, Flipper AI writes, updates, and deletes calendar events on your behalf using the <code>calendar.events</code> scope. No calendar data is read or stored by Flipper AI — we only create/modify events for your scheduled buy/sell meetups. You can revoke access at any time via Settings → Integrations → Disconnect, or directly through your <a href="https://myaccount.google.com/permissions" className="text-blue-600 hover:text-blue-800 underline" target="_blank" rel="noopener noreferrer">Google Account permissions page</a>. Revoking access removes your tokens from our database immediately.</li>
             </ul>
 
@@ -160,7 +160,7 @@ export default function PrivacyPolicyPage() {
             <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
               <li><strong>Essential Cookies:</strong> Required for authentication and basic functionality</li>
               <li><strong>Preference Cookies:</strong> Remember your settings and preferences</li>
-              <li><strong>Analytics Cookies:</strong> Understand how you use the Service (Vercel Analytics)</li>
+              <li><strong>Analytics Cookies:</strong> Understand how you use the Service (Firebase Analytics)</li>
               <li><strong>Marketing Cookies:</strong> Deliver relevant ads (with your consent)</li>
             </ul>
             <p className="text-gray-700 leading-relaxed mt-4">

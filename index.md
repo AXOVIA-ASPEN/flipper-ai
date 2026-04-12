@@ -83,7 +83,7 @@ flipper-ai/
 | [config/pm2/](config/pm2/) | ecosystem.config.js |
 | [config/railway/](config/railway/) | railway.json |
 
-**Vercel** and **Firebase** configs stay at repo root for CLI. Use from root: `docker compose -f config/docker/docker-compose.prod.yml up`, `pm2 start config/pm2/ecosystem.config.js`.
+**Firebase** configs (`firebase.json`, `.firebaserc`) stay at repo root for CLI. Use from root: `docker compose -f config/docker/docker-compose.prod.yml up`, `pm2 start config/pm2/ecosystem.config.js`.
 
 ## App & source
 

@@ -1,7 +1,7 @@
 /**
  * Sentry Edge Configuration
  * 
- * Runs on Edge Runtime (Vercel Edge Functions, Middleware) to capture errors.
+ * Runs on Edge Runtime (Middleware) to capture errors.
  */
 
 import * as Sentry from '@sentry/nextjs';

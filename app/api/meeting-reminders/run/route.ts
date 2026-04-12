@@ -13,7 +13,7 @@
  * Auth: Bearer token validated via timing-safe comparison against MONITORING_API_KEY.
  * (Reuses the same API key as the monitoring endpoint for operational simplicity.)
  *
- * This endpoint MUST run on Cloud Run. It must NOT be on Vercel.
+ * This endpoint runs on Cloud Run (requires extended timeout).
  */
 
 import { NextRequest, NextResponse } from 'next/server';
