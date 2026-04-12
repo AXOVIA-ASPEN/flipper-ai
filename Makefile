@@ -125,22 +125,12 @@ test-e2e:
 test-e2e-ui:
 	pnpm test:e2e:ui
 
-# BDD acceptance tests (Cucumber). Gherkin printed in real time (green=pass, red=fail).
-# --parallel 0 avoids ERR_IPC_CHANNEL_CLOSED by running in main process only.
+# BDD acceptance tests (Cucumber + Playwright). Gherkin printed in real time (green=pass, red=fail).
 # Uses dev server because output: 'standalone' in next.config.js breaks `next start`.
-# Optional: make test-acceptance TAGS=@smoke  or  TAGS="@critical and not @slow"
+# Filter by story:  make test-acceptance STORY=9.2      (converts to --tags "@story-9-2")
+# Filter by feature: make test-acceptance FEATURE=F012  (runs all scenarios in E-012-*.feature)
+# Filter by tags:   make test-acceptance TAGS=@FR-RELIST-01  or  TAGS="@story-9-2 and @FR-RELIST-03"
 test-acceptance:
-	@if [ -n "$(TAGS)" ]; then \
-		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3000 'pnpm exec cucumber-js test/features --profile pretty --parallel 0 --tags "$(TAGS)"'; \
-	else \
-		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3000 'pnpm exec cucumber-js test/features --profile pretty --parallel 0'; \
-	fi
-
-# Epic-organized acceptance tests (test/acceptance/features/).
-# Filter by story:  make test-ac STORY=9.2      (converts to --tags "@story-9-2")
-# Filter by feature: make test-ac FEATURE=F012  (runs all scenarios in E-012-*.feature)
-# Filter by tags:   make test-ac TAGS=@FR-RELIST-01  or  TAGS="@story-9-2 and @FR-RELIST-03"
-test-ac:
 	@if [ -n "$(STORY)" ]; then \
 		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3000 'pnpm exec cucumber-js --profile acceptance --tags "@story-$(subst .,-,$(STORY))"'; \
 	elif [ -n "$(FEATURE)" ]; then \
@@ -151,6 +141,9 @@ test-ac:
 	else \
 		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3000 'pnpm exec cucumber-js --profile acceptance'; \
 	fi
+
+# Alias for test-acceptance.
+test-ac: test-acceptance
 
 # All tests (unit + BDD + E2E)
 test-all:

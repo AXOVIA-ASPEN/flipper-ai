@@ -1,7 +1,7 @@
 # Requirements Traceability Matrix
 
 **Project:** Flipper AI
-**Generated:** 2026-03-01
+**Last Updated:** 2026-04-12
 **Purpose:** Maps every Functional Requirement (FR) and Non-Functional Requirement (NFR) to its corresponding Gherkin acceptance test scenarios, ensuring 100% coverage.
 
 **Convention:** Each scenario is tagged with:
@@ -36,35 +36,35 @@
 
 | Requirement | Description | Epic | Story | Scenario ID(s) | Feature File | Status |
 |---|---|---|---|---|---|---|
-| FR-SCAN-01 | Craigslist Playwright scraper | 3 | 3.1 | | E-003-multi-marketplace-scanning.feature | Pending |
-| FR-SCAN-02 | eBay Browse API v1 | 3 | 3.2 | | E-003-multi-marketplace-scanning.feature | Pending |
-| FR-SCAN-03 | Facebook Graph API + Stagehand | 3 | 3.3 | | E-003-multi-marketplace-scanning.feature | Pending |
-| FR-SCAN-04 | Mercari reverse-engineered API | 3 | 3.4 | | E-003-multi-marketplace-scanning.feature | Pending |
-| FR-SCAN-05 | OfferUp Playwright scraper | 3 | 3.5 | | E-003-multi-marketplace-scanning.feature | Pending |
+| FR-SCAN-01 | Craigslist Playwright scraper | 3 | 3.1 | @E-003-S-001, @E-003-S-002, @E-003-S-004, @E-003-S-006, @E-003-S-007, @E-003-S-008, @E-003-S-009 | E-003-multi-marketplace-scanning.feature | Covered |
+| FR-SCAN-02 | eBay Browse API v1 | 3 | 3.2 | @E-003-S-010, @E-003-S-011, @E-003-S-012, @E-003-S-013, @E-003-S-014, @E-003-S-015 | E-003-multi-marketplace-scanning.feature | Covered |
+| FR-SCAN-03 | Facebook Graph API + Stagehand | 3 | 3.3 | @E-003-S-016, @E-003-S-017, @E-003-S-018, @E-003-S-019, @E-003-S-023, @E-003-S-024 | E-003-multi-marketplace-scanning.feature | Covered |
+| FR-SCAN-04 | Mercari reverse-engineered API | 3 | 3.4 | @E-003-S-026, @E-003-S-027, @E-003-S-028, @E-003-S-031, @E-003-S-032, @E-003-S-033 | E-003-multi-marketplace-scanning.feature | Covered |
+| FR-SCAN-05 | OfferUp Playwright scraper | 3 | 3.5 | @E-003-S-034, @E-003-S-035, @E-003-S-036, @E-003-S-039, @E-003-S-040, @E-003-S-041, @E-003-S-043 | E-003-multi-marketplace-scanning.feature | Covered |
 | FR-SCAN-06 | Configurable search filters | 3 | 3.6 | | E-003-multi-marketplace-scanning.feature | Pending |
 | FR-SCAN-07 | Saved search configurations | 3 | 3.6 | | E-003-multi-marketplace-scanning.feature | Pending |
-| FR-SCAN-08 | ScraperJob status tracking | 3 | 3.7 | | E-003-multi-marketplace-scanning.feature | Pending |
-| FR-SCAN-09 | SSE real-time events | 3 | 3.7 | | E-003-multi-marketplace-scanning.feature | Pending |
-| FR-SCAN-10 | Anti-detection measures | 3 | 3.1, 3.3, 3.4, 3.5 | | E-003-multi-marketplace-scanning.feature | Pending |
-| FR-SCAN-11 | Listing data extraction | 3 | 3.1 | | E-003-multi-marketplace-scanning.feature | Pending |
-| FR-SCAN-12 | Deduplication | 3 | 3.8 | | E-003-multi-marketplace-scanning.feature | Pending |
-| FR-SCAN-13 | Pre-filtering + free item handling | 3 | 3.8 | | E-003-multi-marketplace-scanning.feature | Pending |
-| FR-SCAN-14 | Image download to Firebase Storage | 3 | 3.9 | | E-003-multi-marketplace-scanning.feature | Pending |
-| FR-SCAN-15 | Image metadata in Cloud SQL | 3 | 3.9 | | E-003-multi-marketplace-scanning.feature | Pending |
-| FR-SCAN-16 | Serve images in UI | 3 | 3.9 | | E-003-multi-marketplace-scanning.feature | Pending |
+| FR-SCAN-08 | ScraperJob status tracking | 3 | 3.7 | @E-003-S-061, @E-003-S-062, @E-003-S-065, @E-003-S-066, @E-003-S-067, @E-003-S-069, @E-003-S-070, @E-003-S-071 | E-003-multi-marketplace-scanning.feature | WIP — 8 scenarios written but all tagged @wip, not yet executing in test runs |
+| FR-SCAN-09 | SSE real-time events | 3 | 3.7 | @E-003-S-063, @E-003-S-064, @E-003-S-068 | E-003-multi-marketplace-scanning.feature | WIP — 3 scenarios written but all tagged @wip, not yet executing in test runs |
+| FR-SCAN-10 | Anti-detection measures | 3 | 3.1, 3.3, 3.4, 3.5 | @E-003-S-005, @E-003-S-020, @E-003-S-021, @E-003-S-022, @E-003-S-025, @E-003-S-029, @E-003-S-030, @E-003-S-037, @E-003-S-038, @E-003-S-042 | E-003-multi-marketplace-scanning.feature | Covered |
+| FR-SCAN-11 | Listing data extraction | 3 | 3.1 | @E-003-S-003 | E-003-multi-marketplace-scanning.feature | Covered |
+| FR-SCAN-12 | Deduplication | 3 | 3.8 | @E-003-S-072, @E-003-S-073 | E-003-multi-marketplace-scanning.feature | Covered |
+| FR-SCAN-13 | Pre-filtering + free item handling | 3 | 3.8 | @E-003-S-074, @E-003-S-075, @E-003-S-076, @E-003-S-077, @E-003-S-078 | E-003-multi-marketplace-scanning.feature | Covered |
+| FR-SCAN-14 | Image download to Firebase Storage | 3 | 3.9 | @E-003-S-056, @E-003-S-059, @E-003-S-060 | E-003-multi-marketplace-scanning.feature | Covered |
+| FR-SCAN-15 | Image metadata in Cloud SQL | 3 | 3.9 | @E-003-S-057 | E-003-multi-marketplace-scanning.feature | Covered |
+| FR-SCAN-16 | Serve images in UI | 3 | 3.9 | @E-003-S-058 | E-003-multi-marketplace-scanning.feature | Covered |
 
 ## FR-SCORE: AI Flippability Score Engine
 
 | Requirement | Description | Epic | Story | Scenario ID(s) | Feature File | Status |
 |---|---|---|---|---|---|---|
-| FR-SCORE-01 | Algorithmic value score (0-100) | 4 | 4.1 | | E-004-core-scoring-deal-evaluation.feature | Pending |
-| FR-SCORE-02 | Category detection | 4 | 4.1 | | E-004-core-scoring-deal-evaluation.feature | Pending |
-| FR-SCORE-03 | Brand boost keywords | 4 | 4.1 | | E-004-core-scoring-deal-evaluation.feature | Pending |
-| FR-SCORE-04 | Risk penalty keywords | 4 | 4.1 | | E-004-core-scoring-deal-evaluation.feature | Pending |
-| FR-SCORE-05 | Estimated market value calculation | 4 | 4.1 | | E-004-core-scoring-deal-evaluation.feature | Pending |
-| FR-SCORE-06 | Platform-specific fee rates | 4 | 4.2 | | E-004-core-scoring-deal-evaluation.feature | Pending |
-| FR-SCORE-07 | Configurable opportunity threshold | 4 | 4.2 | | E-004-core-scoring-deal-evaluation.feature | Pending |
-| FR-SCORE-08 | LLM item identification | 4 | 4.3 | | E-004-core-scoring-deal-evaluation.feature | Pending |
+| FR-SCORE-01 | Algorithmic value score (0-100) | 4 | 4.1 | @E-004-S-001, @E-004-S-007 | E-004-scoring-and-deal-evaluation.feature | Covered |
+| FR-SCORE-02 | Category detection | 4 | 4.1 | @E-004-S-002, @E-004-S-003 | E-004-scoring-and-deal-evaluation.feature | Covered |
+| FR-SCORE-03 | Brand boost keywords | 4 | 4.1 | @E-004-S-004 | E-004-scoring-and-deal-evaluation.feature | Covered |
+| FR-SCORE-04 | Risk penalty keywords | 4 | 4.1 | @E-004-S-005 | E-004-scoring-and-deal-evaluation.feature | Covered |
+| FR-SCORE-05 | Estimated market value calculation | 4 | 4.1 | @E-004-S-006 | E-004-scoring-and-deal-evaluation.feature | Covered |
+| FR-SCORE-06 | Platform-specific fee rates | 4 | 4.2 | @E-004-S-008, @E-004-S-009, @E-004-S-011 | E-004-scoring-and-deal-evaluation.feature | Covered |
+| FR-SCORE-07 | Configurable opportunity threshold | 4 | 4.2 | @E-004-S-010, @E-004-S-011, @E-004-S-012 | E-004-scoring-and-deal-evaluation.feature | Covered |
+| FR-SCORE-08 | LLM item identification | 4 | 4.3 | @E-004-S-013, @E-004-S-014, @E-004-S-015 | E-004-scoring-and-deal-evaluation.feature | Covered |
 | FR-SCORE-09 | Verified market prices from eBay sold | 4 | 4.4 | @E-004-S-016, @E-004-S-017, @E-004-S-018, @E-004-S-020, @E-004-S-021 | E-004-scoring-and-deal-evaluation.feature | Covered |
 | FR-SCORE-10 | True discount percentage | 4 | 4.4 | @E-004-S-019, @E-004-S-022, @E-004-S-023 | E-004-scoring-and-deal-evaluation.feature | Covered |
 | FR-SCORE-11 | LLM sellability assessment | 4 | 4.5 | @E-004-S-024, @E-004-S-026, @E-004-S-027, @E-004-S-028 | E-004-scoring-and-deal-evaluation.feature | Covered |
@@ -118,10 +118,10 @@
 | FR-DASH-06 | Advanced filtering | 6 | 6.3 | @E-006-S-16, @E-006-S-17, @E-006-S-18, @E-006-S-19, @E-006-S-20 | E-006-flip-lifecycle-management-analytics.feature | Covered |
 | FR-DASH-07 | Analytics display | 6 | 6.4 | @E-006-S-21, @E-006-S-22, @E-006-S-23, @E-006-S-24 | E-006-flip-lifecycle-management-analytics.feature | Covered |
 | FR-DASH-08 | CSV/PDF export | 6 | 6.5 | @E-006-S-25, @E-006-S-26, @E-006-S-27, @E-006-S-28, @E-006-S-29 | E-006-flip-lifecycle-management-analytics.feature | Covered |
-| FR-DASH-09 | Inventory view with holding costs | 6 | 6.6 | | E-006-flip-lifecycle-management-analytics.feature | Pending |
-| FR-DASH-10 | Real-time SSE dashboard updates | 6 | 6.6 | | E-006-flip-lifecycle-management-analytics.feature | Pending |
-| FR-DASH-11 | Onboarding wizard | 2 | 2.5 | | E-002-user-registration-auth-onboarding.feature | Pending |
-| FR-DASH-12 | Persist onboarding progress | 2 | 2.5 | | E-002-user-registration-auth-onboarding.feature | Pending |
+| FR-DASH-09 | Inventory view with holding costs | 6 | 6.6 | @E-006-S-30, @E-006-S-31 | E-006-flip-lifecycle-management-analytics.feature | Covered |
+| FR-DASH-10 | Real-time SSE dashboard updates | 6 | 6.6 | @E-006-S-32, @E-006-S-33 | E-006-flip-lifecycle-management-analytics.feature | Covered |
+| FR-DASH-11 | Onboarding wizard | 2 | 2.5 | @E-002-S-31, @E-002-S-32, @E-002-S-35, @E-002-S-36, @E-002-S-37, @E-002-S-38, @E-002-S-39 | E-002-user-registration-auth-onboarding.feature | WIP — 7 scenarios written but all tagged @wip, not yet executing in test runs |
+| FR-DASH-12 | Persist onboarding progress | 2 | 2.5 | @E-002-S-33, @E-002-S-34 | E-002-user-registration-auth-onboarding.feature | WIP — 2 scenarios written but all tagged @wip, not yet executing in test runs |
 | FR-DASH-13 | Landing page | 2 | 2.1 | | E-002-user-registration-auth-onboarding.feature | Pending |
 
 ## FR-MONITOR: Listing Monitoring
@@ -190,17 +190,17 @@
 
 | Requirement | Description | Epic | Story | Scenario ID(s) | Feature File | Status |
 |---|---|---|---|---|---|---|
-| FR-BILLING-01 | NextAuth email/password auth | 2 | 2.2 | | E-002-user-registration-auth-onboarding.feature | Pending |
-| FR-BILLING-02 | OAuth login (Google, GitHub, Facebook) | 2 | 2.3 | | E-002-user-registration-auth-onboarding.feature | Pending |
-| FR-BILLING-03 | Subscription tier enforcement | 7 | 7.1 | @E-007-S-1, @E-007-S-2, @E-007-S-3, @E-007-S-4, @E-007-S-5, @E-007-S-6, @E-007-S-9, @E-007-S-10 | E-007-subscription-billing.feature | Covered |
+| FR-BILLING-01 | NextAuth email/password auth | 2 | 2.2 | @E-002-S-10 | E-002-user-registration-auth-onboarding.feature | WIP — 1 scenario written but tagged @wip, not yet executing in test runs |
+| FR-BILLING-02 | OAuth login (Google, GitHub, Facebook) | 2 | 2.3 | @E-002-S-16, @E-002-S-17, @E-002-S-18, @E-002-S-19 | E-002-user-registration-auth-onboarding.feature | WIP — 4 scenarios written but all tagged @wip, not yet executing in test runs |
+| FR-BILLING-03 | Subscription tier enforcement | 7 | 7.1 | @E-007-S-1, @E-007-S-2, @E-007-S-3, @E-007-S-4, @E-007-S-5, @E-007-S-6, @E-007-S-9, @E-007-S-10 | E-007-subscription-billing.feature | WIP — 8 scenarios written but all tagged @wip, not yet executing in test runs. HIGH PRIORITY: implement and remove @wip tags ASAP |
 | FR-BILLING-04 | Stripe Checkout | 7 | 7.2 | @E-007-S-11, @E-007-S-12, @E-007-S-13, @E-007-S-16, @E-007-S-17 | E-007-subscription-billing.feature | Covered |
 | FR-BILLING-05 | Stripe Customer Portal | 7 | 7.2 | @E-007-S-14, @E-007-S-15, @E-007-S-18 | E-007-subscription-billing.feature | Covered |
 | FR-BILLING-06 | Stripe webhooks | 7 | 7.3 | @E-007-S-19, @E-007-S-20, @E-007-S-21, @E-007-S-22, @E-007-S-23, @E-007-S-27 | E-007-subscription-billing.feature | Covered |
-| FR-BILLING-07 | Feature gating by tier | 7 | 7.1 | @E-007-S-7, @E-007-S-8 | E-007-subscription-billing.feature | Covered |
-| FR-BILLING-08 | API usage tracking | 7 | 7.4 | @E-007-S-28, @E-007-S-29, @E-007-S-30, @E-007-S-31, @E-007-S-32 | E-007-subscription-billing.feature | Covered |
-| FR-BILLING-09 | User settings management | 2 | 2.6 | | E-002-user-registration-auth-onboarding.feature | Pending |
-| FR-BILLING-10 | hCaptcha login protection | 2 | 2.2 | | E-002-user-registration-auth-onboarding.feature | Pending |
-| FR-BILLING-11 | Password reset via Resend | 2 | 2.4 | | E-002-user-registration-auth-onboarding.feature | Pending |
+| FR-BILLING-07 | Feature gating by tier | 7 | 7.1 | @E-007-S-7, @E-007-S-8 | E-007-subscription-billing.feature | WIP — 2 scenarios written but all tagged @wip, not yet executing in test runs |
+| FR-BILLING-08 | API usage tracking | 7 | 7.4 | @E-007-S-28, @E-007-S-29, @E-007-S-30, @E-007-S-31, @E-007-S-32 | E-007-subscription-billing.feature | WIP — 5 scenarios written but all tagged @wip, not yet executing in test runs |
+| FR-BILLING-09 | User settings management | 2 | 2.6 | @E-002-S-40, @E-002-S-41, @E-002-S-42, @E-002-S-44, @E-002-S-45 | E-002-user-registration-auth-onboarding.feature | WIP — 5 scenarios written but all tagged @wip, not yet executing in test runs |
+| FR-BILLING-10 | hCaptcha login protection | 2 | 2.2 | @E-002-S-12 | E-002-user-registration-auth-onboarding.feature | WIP — 1 scenario written but tagged @wip, not yet executing in test runs |
+| FR-BILLING-11 | Password reset via Resend | 2 | 2.4 | @E-002-S-21, @E-002-S-22, @E-002-S-23, @E-002-S-24, @E-002-S-25, @E-002-S-26, @E-002-S-27, @E-002-S-28, @E-002-S-29, @E-002-S-30 | E-002-user-registration-auth-onboarding.feature | WIP — 10 scenarios written but all tagged @wip, not yet executing in test runs |
 
 ## FR-MEET: Meeting & Logistics
 
@@ -220,14 +220,14 @@
 | NFR-PERF-03 | AI analysis < 10s per listing | 4 | | | Pending |
 | NFR-PERF-04 | SSE events < 1s delivery | 3 | | | Pending |
 | NFR-SEC-01 | All traffic HTTPS | 1 | | | Pending |
-| NFR-SEC-02 | Passwords hashed bcryptjs (12 rounds) | 2 | | | Pending |
-| NFR-SEC-03 | Rate limiting on auth endpoints | 2 | | | Pending |
-| NFR-SEC-04 | Secure session management (JWT HttpOnly) | 2 | | | Pending |
-| NFR-SEC-05 | Input validation (Zod) all endpoints | 2 | | | Pending |
-| NFR-SEC-06 | API key encryption at rest | 2 | | | Pending |
+| NFR-SEC-02 | Passwords hashed bcryptjs (12 rounds) | 2 | @E-002-S-13, @E-002-S-14 | E-002-user-registration-auth-onboarding.feature | WIP — 2 scenarios written but all tagged @wip |
+| NFR-SEC-03 | Rate limiting on auth endpoints | 2 | @E-002-S-15 | E-002-user-registration-auth-onboarding.feature | WIP — 1 scenario written but tagged @wip |
+| NFR-SEC-04 | Secure session management (JWT HttpOnly) | 2 | @E-002-S-20 | E-002-user-registration-auth-onboarding.feature | WIP — 1 scenario written but tagged @wip |
+| NFR-SEC-05 | Input validation (Zod) all endpoints | 2 | @E-002-S-43, @E-002-S-46, @E-002-S-47 | E-002-user-registration-auth-onboarding.feature | Partial (@wip) — 3 scenarios written; S-47 is live, S-43 and S-46 tagged @wip |
+| NFR-SEC-06 | API key encryption at rest | 2 | @E-002-S-42, @E-002-S-43, @E-002-S-48 | E-002-user-registration-auth-onboarding.feature | WIP — 3 scenarios written but all tagged @wip |
 | NFR-SEC-07 | Security headers (CSP, HSTS, etc.) | 2 | | | Pending |
 | NFR-SEC-08 | Stripe webhook signature verification | 7 | @E-007-S-24, @E-007-S-25, @E-007-S-26 | E-007-subscription-billing.feature | Covered |
-| NFR-SEC-09 | hCaptcha on login | 2 | | | Pending |
+| NFR-SEC-09 | hCaptcha on login | 2 | @E-002-S-11 | E-002-user-registration-auth-onboarding.feature | WIP — 1 scenario written but tagged @wip |
 | NFR-SEC-10 | No critical/high vulns in deps | All | | | Pending |
 | NFR-SCALE-01 | Cloud Run auto-scaling (0-N) | 1 | | | Pending |
 | NFR-SCALE-02 | Database connection pooling | 1 | @E-001-S-52 | E-001-production-infrastructure.feature | Covered |
@@ -251,22 +251,24 @@
 
 ## Coverage Summary
 
-| Category | Total Requirements | Covered | Pending | Coverage % |
-|---|---|---|---|---|
-| FR-INFRA | 14 | 14 | 0 | 100% |
-| FR-SCAN | 16 | 0 | 16 | 0% |
-| FR-SCORE | 22 | 14 | 8 | 64% |
-| FR-COMM | 8 | 7 | 1 | 88% |
-| FR-RELIST | 8 | 3 | 5 | 38% |
-| FR-DASH | 13 | 8 | 5 | 62% |
-| FR-MONITOR | 4 | 4 | 0 | 100% |
-| FR-NOTIFY | 13 | 12 | 1 | 92% |
-| FR-BILLING | 11 | 6 | 5 | 55% |
-| FR-MEET | 2 | 2 | 0 | 100% |
-| **Total FR** | **111** | **66** | **45** | **59%** |
-| NFR | 30 | 5 | 25 | 17% |
-| **Grand Total** | **141** | **71** | **70** | **50%** |
+> **Status key:** Covered = scenarios executing in test runs. WIP = scenarios written but tagged @wip (not yet executing). Partial = mix of live and @wip scenarios. Pending = no scenarios written.
+
+| Category | Total Requirements | Covered | WIP | Pending | Coverage % (Covered only) |
+|---|---|---|---|---|---|
+| FR-INFRA | 14 | 14 | 0 | 0 | 100% |
+| FR-SCAN | 16 | 12 | 2 | 2 | 75% |
+| FR-SCORE | 22 | 14 | 0 | 8 | 64% |
+| FR-COMM | 8 | 7 | 0 | 1 | 88% |
+| FR-RELIST | 8 | 3 | 0 | 5 | 38% |
+| FR-DASH | 13 | 10 | 2 | 1 | 77% |
+| FR-MONITOR | 4 | 4 | 0 | 0 | 100% |
+| FR-NOTIFY | 13 | 12 | 0 | 1 | 92% |
+| FR-BILLING | 11 | 3 | 8 | 0 | 27% |
+| FR-MEET | 2 | 2 | 0 | 0 | 100% |
+| **Total FR** | **111** | **81** | **12** | **18** | **73%** |
+| NFR | 30 | 6 | 5 | 19 | 20% |
+| **Grand Total** | **141** | **87** | **17** | **37** | **62%** |
 
 ---
 
-*This matrix is updated as stories are completed and acceptance test scenarios are written. The "Scenario ID(s)" column is populated when the Gherkin scenarios are created in the corresponding `.feature` file.*
+*This matrix is updated as stories are completed and acceptance test scenarios are written. The "Scenario ID(s)" column is populated when the Gherkin scenarios are created in the corresponding `.feature` file. Requirements marked "WIP" have scenarios written but tagged `@wip` -- they are excluded from test runs until step definitions are implemented and the `@wip` tag is removed.*

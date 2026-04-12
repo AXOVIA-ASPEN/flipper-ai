@@ -94,9 +94,9 @@ else
 fi
 echo ""
 
-echo "🔐 4. Testing Login Flow (TODO - requires NextAuth session)"
+echo "🔐 4. Testing Login Flow (TODO - requires Firebase Auth session)"
 echo "-------------------------------------------------------------"
-echo -e "${YELLOW}⚠ Login flow requires NextAuth credentials provider setup${NC}"
+echo -e "${YELLOW}⚠ Login flow requires Firebase Auth session cookie setup${NC}"
 echo ""
 
 echo "📊 5. Testing Protected Routes (TODO)"

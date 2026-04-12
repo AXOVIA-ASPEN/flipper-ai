@@ -73,7 +73,7 @@ git push origin vX.Y.Z
 - **Styling**: Tailwind CSS 4
 - **Database**: PostgreSQL with Prisma ORM + `PrismaPg` driver adapter (pool: 2 connections per Cloud Run instance)
 - **Auth**: Firebase Auth (client-side sign-in → server session cookie). Legacy NextAuth models exist in schema but are deprecated.
-- **AI**: OpenAI (LLM analysis), Google Gemini via Stagehand (browser automation), Anthropic Claude
+- **AI**: Claude/Anthropic SDK (primary — listing analysis, negotiation, messages, descriptions), OpenAI GPT-4o-mini (secondary — LLM analysis with two-layer cache), Google Gemini via Stagehand (Facebook Marketplace browser automation only). See [docs/AI-Agents/README.md](docs/AI-Agents/README.md) for full design decisions.
 - **Payments**: Stripe (checkout, subscriptions, webhooks)
 - **Email**: Resend
 - **CAPTCHA**: hCaptcha
@@ -165,7 +165,7 @@ export async function GET(request: NextRequest) {
 
 **Database**: `src/lib/db.ts` exports a Prisma singleton on `globalThis` (standard Next.js hot-reload pattern). Uses `PrismaPg` driver adapter with 2-connection pool per instance. Schema uses `cuid()` IDs, `@updatedAt` timestamps. Deduplication key: `@@unique([platform, externalId, userId])`.
 
-**Provider Stack**: Root layout wraps the app in `SessionProvider` → `ThemeProvider` → `ToastProvider`.
+**Provider Stack**: Root layout wraps the app in `FirebaseAuthProvider` → `ThemeProvider` → `ToastProvider`.
 
 ### Scraper Architecture
 
@@ -187,7 +187,7 @@ Key patterns: `hasRunningJob()` check prevents duplicate concurrent jobs, `Promi
 ### Testing Architecture
 
 - **Jest** (`jest.config.js`): Tests in `src/__tests__/`. `testEnvironment: 'node'` (not jsdom), `maxWorkers: 1` (prevents resource conflicts), `forceExit: true`. Coverage collected from `src/lib/`, `app/api/`, `src/scrapers/` only. `src/lib/db.ts` and `src/generated/` excluded from coverage. Integration tests excluded by default (run via `pnpm test:integration`).
-- **Cucumber BDD**: Two test directories — `test/features/` (legacy) and `test/acceptance/features/` (epic-organized). Step definitions follow `E-{epic}-{descriptor}.steps.ts` naming. Runs against production build via `start-server-and-test`.
+- **Cucumber BDD**: Tests in `test/acceptance/features/` (epic-organized). Step definitions follow `E-{epic}-{descriptor}.steps.ts` naming. Runs against dev server via `start-server-and-test`.
 - **Playwright** (`playwright.config.ts`): Tests in `e2e/`. 5 browser projects. Locally defaults to port 3001, CI uses port 3000.
 
 ### Story Definition of Done — Quality Gate

@@ -74,9 +74,11 @@ PLAYWRIGHT_TEST_BASE_URL=http://localhost:3000
 # Database
 DATABASE_URL=postgresql://localhost/flipper_ai_test
 
-# NextAuth
-NEXTAUTH_SECRET=test-secret-$(openssl rand -base64 32)
-NEXTAUTH_URL=http://localhost:3000
+# App URL
+APP_URL=http://localhost:3000
+
+# Encryption
+ENCRYPTION_SECRET=test-secret-$(openssl rand -base64 32)
 
 # OAuth (optional - uncomment and fill in to test OAuth)
 # GOOGLE_CLIENT_ID=

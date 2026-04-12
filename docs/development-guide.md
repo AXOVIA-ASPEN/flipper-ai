@@ -6,7 +6,7 @@
 
 - **Node.js** v20+ (for Next.js 16 compatibility)
 - **pnpm** (primary package manager)
-- **PostgreSQL** (or SQLite for local dev via `dev.db`)
+- **PostgreSQL** (required even for local dev — use Cloud SQL Auth Proxy or a local instance)
 - **Playwright browsers** (installed via `npx playwright install`)
 
 ### Optional
@@ -98,7 +98,7 @@ pnpm format           # Prettier formatting
 
 ### Required
 ```bash
-DATABASE_URL=              # PostgreSQL connection string (or file:./dev.db for SQLite)
+DATABASE_URL=              # PostgreSQL connection string (PostgreSQL is required — SQLite is not supported)
 FIREBASE_CLIENT_EMAIL=     # Firebase Admin SDK service account email
 FIREBASE_PRIVATE_KEY=      # Firebase Admin SDK private key
 APP_URL=                   # App base URL (http://localhost:3000 for dev)

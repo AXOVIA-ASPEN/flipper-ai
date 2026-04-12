@@ -2,8 +2,8 @@
 
 [![CI/CD Pipeline](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml)
 [![Health Check](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/health-check.yml/badge.svg)](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/health-check.yml)
-[![Tests](https://img.shields.io/badge/tests-4824-brightgreen)](.)
-[![Test Suites](https://img.shields.io/badge/test%20suites-218-brightgreen)](.)
+[![Tests](https://img.shields.io/badge/tests-4545-brightgreen)](.)
+[![Test Suites](https://img.shields.io/badge/test%20suites-193-brightgreen)](.)
 [![Coverage](https://img.shields.io/badge/coverage-99.41%25-brightgreen)](.)
 [![Branches](https://img.shields.io/badge/branches-96.01%25-brightgreen)](.)
 [![Functions](https://img.shields.io/badge/functions-99.42%25-brightgreen)](.)
@@ -16,7 +16,7 @@ AI-powered marketplace flipping tool. Automatically scans Craigslist, Facebook M
 ## ✨ Features
 
 - **Multi-Platform Scanning** — Scrapes 5 marketplaces simultaneously
-- **AI-Powered Analysis** — Uses Stagehand + Google Gemini for intelligent pricing and demand analysis
+- **AI-Powered Analysis** — Uses Claude (Anthropic) for listing analysis, negotiation, and message generation; Stagehand + Gemini for Facebook Marketplace browser automation
 - **Value Scoring** — Automatic 0-100 scoring with brand detection, category multipliers, and condition analysis
 - **Seller Communication** — In-app messaging with AI-suggested negotiation templates
 - **Resale Listing Generator** — Auto-generates optimized listings with AI-enhanced descriptions
@@ -29,7 +29,8 @@ AI-powered marketplace flipping tool. Automatically scans Craigslist, Facebook M
 
 - **Node.js** 20+ (recommended: use [nvm](https://github.com/nvm-sh/nvm))
 - **pnpm** 9+ (`npm install -g pnpm`)
-- **Google API Key** (for Gemini AI analysis — optional but recommended)
+- **Anthropic API Key** (for Claude AI analysis — primary AI engine)
+- **Google API Key** (for Gemini via Stagehand — Facebook Marketplace scraping only, optional)
 
 ### Setup
 
@@ -61,7 +62,13 @@ Create a `.env` file in the project root:
 # Database (PostgreSQL)
 DATABASE_URL="postgresql://user:password@localhost:5432/flipper_dev"
 
-# Google Gemini API (for AI analysis)
+# Anthropic Claude API (primary AI — listing analysis, negotiation, messages)
+ANTHROPIC_API_KEY="your-anthropic-api-key"
+
+# OpenAI API (secondary AI — LLM analysis with caching)
+OPENAI_API_KEY="your-openai-api-key"
+
+# Google Gemini API (Facebook Marketplace browser automation via Stagehand)
 GOOGLE_API_KEY="your-google-api-key"
 
 # eBay Browse API (for eBay scraping)
@@ -77,7 +84,7 @@ EBAY_MARKETPLACE_ID="EBAY_US"
 make help              # Show all commands
 make dev               # Start dev server
 make build             # Production build (strict TypeScript)
-make test              # Run 4824 tests (218 suites)
+make test              # Run 4545 tests (193 suites)
 make test-acceptance   # Run BDD acceptance tests (Cucumber/Gherkin)
 make test-e2e          # Run E2E tests (Playwright)
 make test-all          # Run all test suites
@@ -91,8 +98,8 @@ make clean             # Remove build artifacts
 
 | Suite          | Tool               | Count                    | Coverage       |
 | -------------- | ------------------ | ------------------------ | -------------- |
-| Unit           | Jest               | 4824 tests (218 suites) | 99.41% stmts / 96.01% branches / 99.42% funcs |
-| BDD Acceptance | Cucumber + Gherkin | 70 scenarios / 572 steps | Core flows     |
+| Unit           | Jest               | 4545 tests (193 suites) | 99.41% stmts / 96.01% branches / 99.42% funcs |
+| BDD Acceptance | Cucumber + Gherkin | 477 scenarios across 12 feature files | Core flows     |
 | E2E            | Playwright         | Browser automation       | Critical paths |
 
 ```bash
@@ -133,7 +140,7 @@ pnpm test -- --watch
 | **Language**  | TypeScript (strict mode)     |
 | **UI**        | React, Tailwind CSS          |
 | **Database**  | PostgreSQL + Prisma ORM      |
-| **AI**        | Google Gemini via Stagehand  |
+| **AI**        | Claude (Anthropic), OpenAI GPT-4o-mini, Gemini via Stagehand ([details](docs/AI-Agents/README.md)) |
 | **Testing**   | Jest, Cucumber, Playwright   |
 | **CI/CD**     | GitHub Actions               |
 | **Hosting**   | Firebase Hosting + Cloud Run |
@@ -172,46 +179,205 @@ flipper-ai/
 
 **Full layout:** [index.md](index.md)
 
-## 🔌 API Endpoints
+## 🔌 API Endpoints (81 routes)
 
 > **Interactive Docs:** Visit `/docs` for the full Swagger UI (OpenAPI 3.0).
 > The machine-readable spec is available at `GET /api/docs`.
 
+### Health
+
+| Method | Endpoint              | Description                  |
+| ------ | --------------------- | ---------------------------- |
+| `GET`  | `/api/health`         | Health check                 |
+| `GET`  | `/api/health/ready`   | Readiness probe              |
+| `GET`  | `/api/health/metrics` | Runtime metrics              |
+| `GET`  | `/api/diagnostics`    | System diagnostics           |
+
+### Auth
+
+| Method | Endpoint                          | Description                        |
+| ------ | --------------------------------- | ---------------------------------- |
+| `POST` | `/api/auth/session`               | Create session cookie from Firebase ID token |
+| `POST` | `/api/auth/register`              | Register new user                  |
+| `POST` | `/api/auth/signout`               | Sign out (clear session)           |
+| `POST` | `/api/auth/forgot-password`       | Send password reset email          |
+| `POST` | `/api/auth/reset-password`        | Reset password with token          |
+| `POST` | `/api/auth/captcha-required`      | Check if CAPTCHA is required       |
+| `GET`  | `/api/auth/facebook/authorize`    | Start Facebook OAuth flow          |
+| `GET`  | `/api/auth/facebook/callback`     | Facebook OAuth callback            |
+| `GET`  | `/api/auth/facebook/status`       | Facebook connection status         |
+| `POST` | `/api/auth/facebook/token`        | Exchange Facebook token            |
+| `POST` | `/api/auth/facebook/disconnect`   | Disconnect Facebook account        |
+
 ### Listings
 
-| Method   | Endpoint                          | Description                                  |
-| -------- | --------------------------------- | -------------------------------------------- |
-| `GET`    | `/api/listings`                   | List all (supports `?status=`, `?minScore=`) |
-| `POST`   | `/api/listings`                   | Create from scraper data                     |
-| `GET`    | `/api/listings/[id]`              | Get single listing                           |
-| `PATCH`  | `/api/listings/[id]`              | Update listing                               |
-| `DELETE` | `/api/listings/[id]`              | Delete listing                               |
-| `GET`    | `/api/listings/[id]/market-value` | Get AI market analysis                       |
+| Method   | Endpoint                                    | Description                                  |
+| -------- | ------------------------------------------- | -------------------------------------------- |
+| `GET`    | `/api/listings`                             | List all (supports `?status=`, `?minScore=`) |
+| `POST`   | `/api/listings`                             | Create from scraper data                     |
+| `GET`    | `/api/listings/[id]`                        | Get single listing                           |
+| `PATCH`  | `/api/listings/[id]`                        | Update listing                               |
+| `DELETE` | `/api/listings/[id]`                        | Delete listing                               |
+| `POST`   | `/api/listings/[id]/market-value`           | AI market analysis                           |
+| `GET`    | `/api/listings/[id]/conversation-status`    | Conversation status for listing              |
+| `POST`   | `/api/listings/[id]/counter-offer-analysis` | Analyze a counter-offer                      |
+| `POST`   | `/api/listings/[id]/negotiation-strategy`   | Generate negotiation strategy (Claude AI)    |
+| `POST`   | `/api/listings/[id]/description`            | Generate listing description (Claude AI)     |
+| `POST`   | `/api/listings/[id]/generate-resale-content`| Generate resale listing content              |
+| `GET`    | `/api/listings/[id]/optimal-price`          | Get optimal resale price                     |
+| `POST`   | `/api/listings/[id]/optimal-price`          | Calculate optimal resale price               |
+| `GET`    | `/api/listings/ebay`                        | List eBay listings                           |
+| `POST`   | `/api/listings/ebay`                        | Import eBay listings                         |
+| `GET`    | `/api/listings/track`                       | Get tracked listings                         |
+| `POST`   | `/api/listings/track`                       | Track a listing                              |
+| `GET`    | `/api/analyze/[listingId]`                  | Get AI analysis for listing                  |
+| `DELETE` | `/api/analyze/[listingId]`                  | Clear cached AI analysis                     |
+| `POST`   | `/api/descriptions`                         | Generate description (standalone)            |
 
 ### Opportunities
 
-| Method | Endpoint                  | Description            |
-| ------ | ------------------------- | ---------------------- |
-| `GET`  | `/api/opportunities`      | List opportunities     |
-| `POST` | `/api/opportunities`      | Create from listing    |
-| `GET`  | `/api/opportunities/[id]` | Get opportunity detail |
+| Method   | Endpoint                              | Description                        |
+| -------- | ------------------------------------- | ---------------------------------- |
+| `GET`    | `/api/opportunities`                  | List opportunities                 |
+| `GET`    | `/api/opportunities/[id]`             | Get opportunity detail             |
+| `PATCH`  | `/api/opportunities/[id]`             | Update opportunity                 |
+| `DELETE` | `/api/opportunities/[id]`             | Delete opportunity                 |
+| `POST`   | `/api/opportunities/[id]/meeting`     | Schedule meeting for opportunity   |
+| `DELETE` | `/api/opportunities/[id]/meeting`     | Cancel meeting                     |
+| `GET`    | `/api/opportunities/[id]/maps-route`  | Get Google Maps route to seller    |
+
+### Messages
+
+| Method   | Endpoint                             | Description                        |
+| -------- | ------------------------------------ | ---------------------------------- |
+| `GET`    | `/api/messages`                      | List messages                      |
+| `POST`   | `/api/messages`                      | Send a message                     |
+| `GET`    | `/api/messages/[id]`                 | Get single message                 |
+| `PATCH`  | `/api/messages/[id]`                 | Update message                     |
+| `DELETE` | `/api/messages/[id]`                 | Delete message                     |
+| `POST`   | `/api/messages/generate`             | AI-generate message draft          |
+| `GET`    | `/api/messages/threads`              | List message threads               |
+| `GET`    | `/api/messages/threads/[listingId]`  | Get thread for a listing           |
+| `POST`   | `/api/messages/check-replies`        | Check for new replies              |
+
+### Search Configs
+
+| Method   | Endpoint                  | Description                |
+| -------- | ------------------------- | -------------------------- |
+| `GET`    | `/api/search-configs`     | List saved searches        |
+| `POST`   | `/api/search-configs`     | Create saved search        |
+| `GET`    | `/api/search-configs/[id]`| Get single search config   |
+| `PATCH`  | `/api/search-configs/[id]`| Update search config       |
+| `DELETE` | `/api/search-configs/[id]`| Delete search config       |
+
+### Scraper Jobs
+
+| Method   | Endpoint                | Description                 |
+| -------- | ----------------------- | --------------------------- |
+| `GET`    | `/api/scraper-jobs`     | List scraper run history    |
+| `POST`   | `/api/scraper-jobs`     | Create scraper job          |
+| `GET`    | `/api/scraper-jobs/[id]`| Get single job              |
+| `PATCH`  | `/api/scraper-jobs/[id]`| Update job                  |
+| `DELETE` | `/api/scraper-jobs/[id]`| Delete job                  |
 
 ### Scrapers
 
-| Method | Endpoint                  | Description                 |
-| ------ | ------------------------- | --------------------------- |
-| `POST` | `/api/scraper/craigslist` | Scrape Craigslist listings  |
-| `POST` | `/api/scraper/ebay`       | Search eBay Browse API      |
-| `POST` | `/api/scraper/facebook`   | Scrape Facebook Marketplace |
-| `POST` | `/api/scraper/offerup`    | Scrape OfferUp              |
-| `POST` | `/api/scraper/mercari`    | Scrape Mercari              |
+| Method | Endpoint                  | Description                        |
+| ------ | ------------------------- | ---------------------------------- |
+| `GET`  | `/api/scraper/craigslist` | Craigslist scraper status          |
+| `POST` | `/api/scraper/craigslist` | Run Craigslist scrape              |
+| `GET`  | `/api/scraper/ebay`       | eBay scraper status                |
+| `POST` | `/api/scraper/ebay`       | Run eBay Browse API search         |
+| `GET`  | `/api/scraper/facebook`   | Facebook scraper status            |
+| `POST` | `/api/scraper/facebook`   | Run Facebook Marketplace scrape (Stagehand + Gemini) |
+| `GET`  | `/api/scraper/mercari`    | Mercari scraper status             |
+| `POST` | `/api/scraper/mercari`    | Run Mercari scrape                 |
+| `GET`  | `/api/scraper/offerup`    | OfferUp scraper status             |
+| `POST` | `/api/scraper/offerup`    | Run OfferUp scrape                 |
 
-### Search & Jobs
+### Posting Queue
 
-| Method     | Endpoint              | Description              |
-| ---------- | --------------------- | ------------------------ |
-| `GET/POST` | `/api/search-configs` | Manage saved searches    |
-| `GET`      | `/api/scraper-jobs`   | View scraper run history |
+| Method   | Endpoint                        | Description                  |
+| -------- | ------------------------------- | ---------------------------- |
+| `GET`    | `/api/posting-queue`            | List queued postings         |
+| `POST`   | `/api/posting-queue`            | Add item to posting queue    |
+| `GET`    | `/api/posting-queue/[id]`       | Get single queued item       |
+| `PATCH`  | `/api/posting-queue/[id]`       | Update queued item           |
+| `DELETE` | `/api/posting-queue/[id]`       | Remove from queue            |
+| `POST`   | `/api/posting-queue/[id]/retry` | Retry failed posting         |
+| `POST`   | `/api/posting-queue/process`    | Process queued postings      |
+| `GET`    | `/api/posting-queue/stats`      | Queue statistics             |
+
+### Analytics
+
+| Method | Endpoint                    | Description                   |
+| ------ | --------------------------- | ----------------------------- |
+| `GET`  | `/api/analytics/profit-loss`| Profit/loss analytics         |
+| `GET`  | `/api/analytics/export`     | Export analytics data         |
+| `GET`  | `/api/inventory/roi`        | Inventory ROI report          |
+| `GET`  | `/api/price-history`        | Get price history             |
+| `POST` | `/api/price-history`        | Record price data point       |
+| `GET`  | `/api/reports/generate`     | Get generated report          |
+| `POST` | `/api/reports/generate`     | Generate analytics report     |
+| `GET`  | `/api/usage`                | API usage statistics          |
+
+### User & Settings
+
+| Method   | Endpoint                            | Description                   |
+| -------- | ----------------------------------- | ----------------------------- |
+| `GET`    | `/api/user/settings`                | Get user settings             |
+| `PATCH`  | `/api/user/settings`                | Update user settings          |
+| `POST`   | `/api/user/settings/validate-key`   | Validate API key              |
+| `GET`    | `/api/user/tier`                    | Get subscription tier         |
+| `GET`    | `/api/user/onboarding`              | Get onboarding status         |
+| `POST`   | `/api/user/onboarding`              | Update onboarding progress    |
+| `POST`   | `/api/user/device-token`            | Register push notification token |
+| `DELETE` | `/api/user/device-token`            | Remove device token           |
+| `POST`   | `/api/user/phone/send-code`         | Send phone verification code  |
+| `POST`   | `/api/user/phone/verify`            | Verify phone number           |
+| `GET`    | `/api/user/unsubscribe`             | Unsubscribe page (token-based)|
+| `POST`   | `/api/user/unsubscribe`             | Process unsubscribe           |
+
+### Notifications
+
+| Method  | Endpoint                      | Description                   |
+| ------- | ----------------------------- | ----------------------------- |
+| `GET`   | `/api/notifications`          | List notifications            |
+| `PATCH` | `/api/notifications/[id]`     | Mark notification read/unread |
+| `POST`  | `/api/notifications/process`  | Process pending notifications |
+
+### Integrations
+
+| Method   | Endpoint                                         | Description                     |
+| -------- | ------------------------------------------------ | ------------------------------- |
+| `GET`    | `/api/integrations/google-calendar`              | Get calendar connection status  |
+| `DELETE` | `/api/integrations/google-calendar`              | Disconnect Google Calendar      |
+| `GET`    | `/api/integrations/google-calendar/connect`      | Start Google Calendar OAuth     |
+| `GET`    | `/api/integrations/google-calendar/callback`     | Google Calendar OAuth callback  |
+
+### Webhooks
+
+| Method | Endpoint                | Description               |
+| ------ | ----------------------- | ------------------------- |
+| `POST` | `/api/webhooks/stripe`  | Stripe webhook handler    |
+
+### Checkout (Stripe)
+
+| Method | Endpoint                | Description                   |
+| ------ | ----------------------- | ----------------------------- |
+| `POST` | `/api/checkout`         | Create Stripe checkout session|
+| `POST` | `/api/checkout/portal`  | Create Stripe billing portal  |
+
+### Internal / Cron
+
+| Method | Endpoint                    | Description                     |
+| ------ | --------------------------- | ------------------------------- |
+| `POST` | `/api/meeting-reminders/run`| Process meeting reminders       |
+| `POST` | `/api/monitoring/run`       | Run monitoring checks           |
+| `GET`  | `/api/events`               | Server-sent events stream       |
+| `GET`  | `/api/images/proxy`         | Proxy external images           |
+| `GET`  | `/api/docs`                 | OpenAPI spec (JSON)             |
+| `POST` | `/api/test/seed-user`       | Seed test user (dev/test only)  |
 
 ## 📊 Value Scoring Algorithm
 
@@ -301,11 +467,11 @@ HEALTH_URL=https://prod.app/api/health ./scripts/health/health-monitor.sh
 | Milestone                      | Status |
 | ------------------------------ | ------ |
 | Core feature implementation    | ✅ Complete |
-| Unit tests (Jest)              | ✅ 4824 tests, 218 suites |
+| Unit tests (Jest)              | ✅ 4545 tests, 193 suites |
 | Statement coverage             | ✅ 99.41% |
 | Branch coverage                | ✅ 96.01% |
 | Function coverage              | ✅ 99.42% |
-| BDD acceptance tests           | ✅ 70 scenarios / 572 steps |
+| BDD acceptance tests           | ✅ 477 scenarios across 12 feature files |
 | E2E Playwright tests           | ✅ Critical paths + user journeys |
 | GitHub Actions CI/CD           | ✅ lint → typecheck → test → build |
 | GitHub Actions health check    | ✅ Configured (needs PRODUCTION_URL secret) |

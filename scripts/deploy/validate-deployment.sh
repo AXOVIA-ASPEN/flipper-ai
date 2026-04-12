@@ -96,9 +96,10 @@ check_url() {
 # ─────────────────────────────────────────────────────────────
 
 echo -e "${BLUE}🔐 Auth Configuration${NC}"
-check_required "NEXTAUTH_SECRET"
-check_url "NEXTAUTH_URL"
 check_required "AUTH_SECRET"
+check_url "APP_URL"
+check_required "FIREBASE_CLIENT_EMAIL"
+check_required "FIREBASE_PRIVATE_KEY"
 
 # ─────────────────────────────────────────────────────────────
 # Section 2: Database

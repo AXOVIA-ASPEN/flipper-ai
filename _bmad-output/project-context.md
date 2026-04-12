@@ -137,6 +137,7 @@ Every story MUST pass ALL items before status changes to `review`. This is a har
 - **Styling:** Tailwind CSS 4.x
 - **Database:** PostgreSQL (production); Prisma 7.x ORM. Client generated to `src/generated/prisma/`
 - **Auth:** Firebase Auth (client-side sign-in → server session cookie via `__session`). Legacy NextAuth models exist in Prisma schema but are deprecated and unused.
+- **AI:** Claude/Anthropic SDK (primary), OpenAI GPT-4o-mini (secondary, cached), Gemini via Stagehand (Facebook scraping only). Full details: `docs/AI-Agents/README.md`
 - **Scraping:** Playwright
 - **Validation:** Zod
 - **Testing:** Jest 30 (unit/integration), Playwright (E2E), Cucumber (BDD)

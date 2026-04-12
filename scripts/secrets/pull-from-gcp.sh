@@ -2,6 +2,48 @@
 # pull-from-gcp.sh — Fetch Flipper AI secrets from GCP Secret Manager and merge into .env.
 # Requires: gcloud CLI, GCP_PROJECT_ID (env or first argument).
 # See docs/secrets/secretmanager.md for secret names.
+#
+# ── Secrets stored in GCP Secret Manager ──────────────────────────────────────
+#   DATABASE_URL               PostgreSQL connection string (Cloud SQL)
+#   AUTH_SECRET                Session encryption secret
+#   ENCRYPTION_SECRET          General-purpose encryption key
+#   APP_URL                    Canonical app URL (emails, redirects, etc.)
+#   FIREBASE_CLIENT_EMAIL      Firebase Admin SDK service account email
+#   FIREBASE_PRIVATE_KEY       Firebase Admin SDK private key (PEM)
+#   GOOGLE_CLIENT_ID           OAuth — Google
+#   GOOGLE_CLIENT_SECRET       OAuth — Google
+#   GITHUB_CLIENT_ID           OAuth — GitHub
+#   GITHUB_CLIENT_SECRET       OAuth — GitHub
+#   FACEBOOK_APP_ID            OAuth — Facebook
+#   FACEBOOK_APP_SECRET        OAuth — Facebook
+#   FACEBOOK_REDIRECT_URI      OAuth — Facebook callback URL
+#   OPENAI_API_KEY             OpenAI LLM API key
+#   GOOGLE_API_KEY             Google AI (Gemini) API key
+#   GOOGLE_MAPS_API_KEY        Google Maps Directions API key
+#   FLIPPER_API_KEYS           Internal API keys (comma-separated)
+#   STRIPE_SECRET_KEY          Stripe secret key
+#   STRIPE_WEBHOOK_SECRET      Stripe webhook signing secret
+#   NEXT_PUBLIC_FIREBASE_API_KEY              Firebase client config
+#   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN          Firebase client config
+#   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID  Firebase client config
+#   NEXT_PUBLIC_FIREBASE_APP_ID               Firebase client config
+#   NEXT_PUBLIC_HCAPTCHA_SITE_KEY             hCaptcha site key (public)
+#   HCAPTCHA_SECRET_KEY                       hCaptcha server secret
+#   RESEND_API_KEY             Resend email API key
+#   EMAIL_FROM                 Default From address for outbound email
+#   SENTRY_DSN                 Sentry error tracking DSN (server)
+#   NEXT_PUBLIC_SENTRY_DSN     Sentry DSN (client bundle)
+#   SENTRY_ORG                 Sentry org slug (source map uploads)
+#   SENTRY_PROJECT             Sentry project slug
+#   SENTRY_AUTH_TOKEN          Sentry auth token (source map uploads)
+#   MONITORING_API_KEY         Cloud Scheduler → monitoring endpoint
+#   NOTIFICATION_PROCESSOR_API_KEY  Cloud Scheduler → notification endpoint
+#   TWILIO_ACCOUNT_SID         Twilio SMS account SID
+#   TWILIO_AUTH_TOKEN          Twilio SMS auth token
+#   TWILIO_FROM_NUMBER         Twilio sender phone number (E.164)
+#   GOOGLE_CALENDAR_CLIENT_ID       Google Calendar OAuth client ID
+#   GOOGLE_CALENDAR_CLIENT_SECRET   Google Calendar OAuth client secret
+# ──────────────────────────────────────────────────────────────────────────────
 
 set -e
 
@@ -14,8 +56,10 @@ PROJECT_ID="${GCP_PROJECT_ID:-$1}"
 SECRET_NAMES=(
   DATABASE_URL
   AUTH_SECRET
-  NEXTAUTH_URL
   ENCRYPTION_SECRET
+  APP_URL
+  FIREBASE_CLIENT_EMAIL
+  FIREBASE_PRIVATE_KEY
   GOOGLE_CLIENT_ID
   GOOGLE_CLIENT_SECRET
   ENABLE_OAUTH_GOOGLE
@@ -28,7 +72,10 @@ SECRET_NAMES=(
   ENABLE_OAUTH_FACEBOOK
   OPENAI_API_KEY
   GOOGLE_API_KEY
+  GOOGLE_MAPS_API_KEY
   FLIPPER_API_KEYS
+  STRIPE_SECRET_KEY
+  STRIPE_WEBHOOK_SECRET
   NEXT_PUBLIC_FIREBASE_API_KEY
   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
@@ -37,12 +84,18 @@ SECRET_NAMES=(
   HCAPTCHA_SECRET_KEY
   RESEND_API_KEY
   EMAIL_FROM
-  APP_URL
   SENTRY_DSN
   NEXT_PUBLIC_SENTRY_DSN
   SENTRY_ORG
   SENTRY_PROJECT
   SENTRY_AUTH_TOKEN
+  MONITORING_API_KEY
+  NOTIFICATION_PROCESSOR_API_KEY
+  TWILIO_ACCOUNT_SID
+  TWILIO_AUTH_TOKEN
+  TWILIO_FROM_NUMBER
+  GOOGLE_CALENDAR_CLIENT_ID
+  GOOGLE_CALENDAR_CLIENT_SECRET
 )
 
 if [ -z "$PROJECT_ID" ]; then
