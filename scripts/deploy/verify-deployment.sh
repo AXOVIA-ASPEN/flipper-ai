@@ -9,8 +9,8 @@ echo ""
 
 # Check if URL is provided
 if [ -z "$1" ]; then
-  echo "Usage: ./scripts/deploy/verify-deployment.sh <your-vercel-url>"
-  echo "Example: ./scripts/deploy/verify-deployment.sh https://flipper-ai-abc123.vercel.app"
+  echo "Usage: ./scripts/deploy/verify-deployment.sh <your-deployment-url>"
+  echo "Example: ./scripts/deploy/verify-deployment.sh https://axovia-flipper.web.app"
   exit 1
 fi
 
@@ -110,8 +110,8 @@ echo "3. Try logging in"
 echo "4. Check browser console for errors"
 echo ""
 echo "If you see errors, check:"
-echo "- Vercel logs: vercel logs $URL"
-echo "- Environment variables: https://vercel.com/your-project/settings/environment-variables"
+echo "- Cloud Run logs: gcloud run services logs read flipper-ai"
+echo "- Environment variables: GCP Secret Manager or Cloud Run console"
 echo "- Database connection (Prisma Postgres integration)"
 echo ""
 echo "🐧 Happy flipping!"

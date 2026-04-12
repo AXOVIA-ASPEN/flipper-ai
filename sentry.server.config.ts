@@ -20,7 +20,7 @@ Sentry.init({
   environment: process.env.NODE_ENV || 'development',
 
   // Release tracking
-  release: process.env.VERCEL_GIT_COMMIT_SHA,
+  release: process.env.GIT_COMMIT_SHA || process.env.K_REVISION,
 
   // Performance Monitoring
   integrations: [

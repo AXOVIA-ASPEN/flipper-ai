@@ -7,7 +7,7 @@ import type { NextRequest } from 'next/server';
 
 /**
  * Security headers applied to all responses.
- * These mirror vercel.json headers for non-Vercel deployments (Docker/Railway).
+ * Security headers applied via middleware for all deployments.
  */
 const SECURITY_HEADERS: Record<string, string> = {
   'X-Content-Type-Options': 'nosniff',

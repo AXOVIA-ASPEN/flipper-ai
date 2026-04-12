@@ -1,7 +1,7 @@
 #!/bin/bash
 # Comprehensive production testing script for Flipper AI
 
-BASE_URL="https://flipper-ai-ten.vercel.app"
+BASE_URL="https://axovia-flipper.web.app"
 
 echo "🐧 Flipper AI - Production Testing"
 echo "===================================="

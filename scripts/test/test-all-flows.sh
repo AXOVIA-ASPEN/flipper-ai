@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-BASE_URL="${BASE_URL:-https://flipper-ai-ten.vercel.app}"
+BASE_URL="${BASE_URL:-https://axovia-flipper.web.app}"
 TEST_EMAIL="test-$(date +%s)@example.com"
 TEST_PASSWORD="Test1234!"
 TEST_NAME="Test User"

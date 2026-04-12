@@ -1,9 +1,9 @@
 #!/bin/bash
-# Migrate environment variables from Vercel to Firebase
+# Migrate environment variables to Firebase/GCP Secret Manager
 
 set -e
 
-echo "🔐 Migrating Environment Variables from Vercel to Firebase"
+echo "🔐 Migrating Environment Variables to Firebase/GCP"
 echo "=========================================================="
 
 PROJECT_ID="axovia-flipper"
@@ -11,7 +11,7 @@ PROJECT_ID="axovia-flipper"
 # Check if .env file exists
 if [ ! -f .env ]; then
     echo "❌ .env file not found"
-    echo "   Run: vercel env pull .env"
+    echo "   Create a .env file with your environment variables"
     exit 1
 fi
 
