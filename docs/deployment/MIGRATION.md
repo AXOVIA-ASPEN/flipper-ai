@@ -241,12 +241,10 @@ Once Firebase is stable:
 
 ## Rollback Plan
 
-If issues arise:
-
-1. Re-enable Vercel deployment
-2. Point DNS back to Vercel
-3. Debug Firebase issues
-4. Retry migration
+> **Note:** Migration is complete. Vercel has been decommissioned. For rollbacks, use Cloud Run revision management:
+```bash
+gcloud run services update-traffic flipper-web --to-revisions=PREVIOUS_REVISION=100 --region=us-east1
+```
 
 ## Cost Comparison
 
