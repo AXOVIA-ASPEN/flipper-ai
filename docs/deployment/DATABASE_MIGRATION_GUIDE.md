@@ -49,7 +49,7 @@ curl -X POST http://localhost:3000/api/auth/register \
 # Expected: HTTP 200 with success:true
 
 # Then test production
-curl -X POST https://flipper-ai-ten.vercel.app/api/auth/register \
+curl -X POST https://axovia-flipper.web.app/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"TestPass123","name":"Test User"}'
 ```
@@ -136,20 +136,19 @@ it('returns 500 when UserSettings creation fails', async () => {
 - [ ] Test registration API in production
 - [ ] Monitor Sentry/logs for errors
 
-## Vercel Deployment Notes
+## Cloud Run Deployment Notes
 
-If using Vercel Postgres (Neon/PlanetScale):
+Using PostgreSQL via Cloud SQL:
 
-1. Go to Vercel project settings → Environment Variables
-2. Verify `DATABASE_URL` is set correctly
-3. Trigger new deployment to run migrations:
+1. Verify `DATABASE_URL` is set in GCP Secret Manager
+2. Trigger new deployment to run migrations:
    ```bash
    git push origin main
    ```
-4. Or manually run migrations via Vercel CLI:
+3. Or manually run migrations:
    ```bash
-   vercel env pull .env.production
-   npx prisma migrate deploy --env-file .env.production
+   gcloud secrets versions access latest --secret=DATABASE_URL
+   DATABASE_URL="<value>" npx prisma migrate deploy
    ```
 
 ## Rollback Plan

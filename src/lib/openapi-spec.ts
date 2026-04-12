@@ -28,7 +28,7 @@ export const openApiSpec = {
       description: 'Current environment',
     },
     {
-      url: 'https://flipper-ai.vercel.app/api',
+      url: 'https://axovia-flipper.web.app/api',
       description: 'Production',
     },
   ],

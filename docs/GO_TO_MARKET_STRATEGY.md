@@ -238,7 +238,7 @@
 - [ ] 10 beta testers lined up for testimonials
 - [ ] Reddit posts pre-written
 - [ ] Twitter account active with 100+ followers
-- [ ] Analytics installed (Vercel, Mixpanel)
+- [ ] Analytics installed (Firebase Analytics, Mixpanel)
 
 ### Launch Day
 - [ ] Product Hunt posted at 12:01 AM PST
@@ -313,8 +313,8 @@
 - MicroConf - Slack community
 
 ### Tools
-- Vercel - Hosting (free tier)
-- Vercel Analytics - User tracking
+- Firebase Hosting + Cloud Run - Hosting
+- Firebase Analytics - User tracking
 - ConvertKit - Email marketing
 - Stripe - Payments
 - Intercom - Customer support chat

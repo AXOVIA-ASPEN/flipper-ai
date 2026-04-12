@@ -6,7 +6,6 @@ import { ThemeStyles } from '@/components/ThemeStyles';
 import { FirebaseAuthProvider } from '@/components/providers/FirebaseAuthProvider';
 import { WebVitals } from '@/components/WebVitals';
 import Navigation from '@/components/Navigation';
-import { Analytics } from '@vercel/analytics/next';
 import { ToastProvider } from '@/components/ToastContainer';
 
 const geistSans = Geist({
@@ -48,7 +47,6 @@ export default function RootLayout({
               <div className="fp-content">
                 {children}
               </div>
-              <Analytics />
             </ToastProvider>
           </ThemeProvider>
         </FirebaseAuthProvider>

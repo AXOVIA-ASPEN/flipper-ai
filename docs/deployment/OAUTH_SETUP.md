@@ -19,7 +19,7 @@ Or follow the manual steps below.
 
 ## 📋 Prerequisites
 
-1. **Vercel deployment** (or know your production URL)
+1. **Production deployment** (Firebase Hosting at `axovia-flipper.web.app`)
 2. **Google Cloud account** (for Google OAuth)
 3. **GitHub account** (for GitHub OAuth)
 
@@ -56,13 +56,13 @@ Or follow the manual steps below.
 6. **Authorized JavaScript origins:**
    ```
    http://localhost:3000
-   https://your-app.vercel.app
+   https://axovia-flipper.web.app
    ```
 
 7. **Authorized redirect URIs:**
    ```
    http://localhost:3000/api/auth/callback/google
-   https://your-app.vercel.app/api/auth/callback/google
+   https://axovia-flipper.web.app/api/auth/callback/google
    ```
 
 8. Click **"Create"**
@@ -76,15 +76,10 @@ GOOGLE_CLIENT_ID=your_google_client_id_here
 GOOGLE_CLIENT_SECRET=your_google_client_secret_here
 ```
 
-**Vercel production:**
+**Production (GCP Secret Manager):**
 ```bash
-# Option A: CLI
-vercel env add GOOGLE_CLIENT_ID
-vercel env add GOOGLE_CLIENT_SECRET
-
-# Option B: Dashboard
-# Go to: https://vercel.com/your-project/settings/environment-variables
-# Add both variables for "Production" environment
+echo -n "your_google_client_id_here" | gcloud secrets create GOOGLE_CLIENT_ID --data-file=-
+echo -n "your_google_client_secret_here" | gcloud secrets create GOOGLE_CLIENT_SECRET --data-file=-
 ```
 
 ---
@@ -99,11 +94,11 @@ vercel env add GOOGLE_CLIENT_SECRET
    - **Application name:** Flipper AI
    - **Homepage URL:** 
      - Dev: `http://localhost:3000`
-     - Prod: `https://your-app.vercel.app`
+     - Prod: `https://axovia-flipper.web.app`
    - **Application description:** AI-powered marketplace flipping tool
    - **Authorization callback URL:**
      - Dev: `http://localhost:3000/api/auth/callback/github`
-     - Prod: `https://your-app.vercel.app/api/auth/callback/github`
+     - Prod: `https://axovia-flipper.web.app/api/auth/callback/github`
 
 4. Click **"Register application"**
 
@@ -121,28 +116,24 @@ GITHUB_CLIENT_ID=your_github_client_id_here
 GITHUB_CLIENT_SECRET=your_github_client_secret_here
 ```
 
-**Vercel production:**
+**Production (GCP Secret Manager):**
 ```bash
-# Option A: CLI
-vercel env add GITHUB_CLIENT_ID
-vercel env add GITHUB_CLIENT_SECRET
-
-# Option B: Dashboard
-# Add both variables for "Production" environment
+echo -n "your_github_client_id_here" | gcloud secrets create GITHUB_CLIENT_ID --data-file=-
+echo -n "your_github_client_secret_here" | gcloud secrets create GITHUB_CLIENT_SECRET --data-file=-
 ```
 
 ---
 
 ## 3️⃣ Update Production URLs
 
-After deploying to Vercel, update your OAuth callback URLs:
+After deploying to Firebase Hosting + Cloud Run, update your OAuth callback URLs:
 
 ### Google Console
 1. Go to: https://console.developers.google.com
 2. Navigate to **Credentials** → your OAuth client
-3. Add your Vercel URL to **Authorized redirect URIs**:
+3. Add your production URL to **Authorized redirect URIs**:
    ```
-   https://flipper-ai-abc123.vercel.app/api/auth/callback/google
+   https://axovia-flipper.web.app/api/auth/callback/google
    ```
 
 ### GitHub Settings
@@ -150,7 +141,7 @@ After deploying to Vercel, update your OAuth callback URLs:
 2. Click on your OAuth app
 3. Update **Authorization callback URL**:
    ```
-   https://flipper-ai-abc123.vercel.app/api/auth/callback/github
+   https://axovia-flipper.web.app/api/auth/callback/github
    ```
 
 ---
@@ -172,12 +163,12 @@ After deploying to Vercel, update your OAuth callback URLs:
 
 ### Production Testing
 
-1. Deploy to Vercel:
+1. Deploy to production:
    ```bash
-   vercel --prod
+   firebase deploy --only hosting
    ```
 
-2. Open your Vercel URL: `https://your-app.vercel.app/auth/login`
+2. Open your production URL: `https://axovia-flipper.web.app/auth/login`
 
 3. Test both OAuth providers
 
@@ -235,8 +226,8 @@ npx playwright test e2e/acceptance/auth-oauth.spec.ts --headed
    # In .env.local (dev)
    NEXTAUTH_URL=http://localhost:3000
    
-   # In Vercel (production)
-   NEXTAUTH_URL=https://your-app.vercel.app
+   # In production
+   NEXTAUTH_URL=https://axovia-flipper.web.app
    ```
 
 ### "redirect_uri_mismatch" Error
@@ -290,9 +281,9 @@ npx playwright test e2e/acceptance/auth-oauth.spec.ts --headed
 ✅ GITHUB_CLIENT_SECRET=your_github_client_secret
 ```
 
-**Verify Vercel env vars:**
+**Verify production secrets:**
 ```bash
-vercel env ls
+gcloud secrets list --project=axovia-flipper
 ```
 
 ---
@@ -325,7 +316,7 @@ OAuth is working correctly when:
 - [NextAuth.js Docs](https://next-auth.js.org)
 - [Google OAuth Setup](https://developers.google.com/identity/protocols/oauth2)
 - [GitHub OAuth Apps](https://docs.github.com/en/apps/oauth-apps)
-- [Vercel Environment Variables](https://vercel.com/docs/environment-variables)
+- [GCP Secret Manager](https://cloud.google.com/secret-manager/docs)
 
 ---
 

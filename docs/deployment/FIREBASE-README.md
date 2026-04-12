@@ -145,10 +145,9 @@ gcloud functions logs read scrapeCraigslist --region=us-east1
 - GCP: https://console.cloud.google.com/home/dashboard?project=axovia-flipper
 
 ### Emergency Rollback
-Keep Vercel active for 1 week. If issues:
+If issues arise, roll back Cloud Run to a previous revision:
 ```bash
-# Point DNS back to Vercel
-# Revert Next.js routes
+gcloud run services update-traffic flipper-web --to-revisions=PREVIOUS_REVISION=100 --region=us-east1
 ```
 
 ---

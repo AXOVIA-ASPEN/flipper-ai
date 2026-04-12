@@ -14,7 +14,7 @@ Flipper AI uses [Sentry](https://sentry.io/) for real-time error tracking and pe
 
 ### 2. Set Environment Variables
 
-Add the following to your Vercel environment variables (or `.env.local` for local testing):
+Add the following to your GCP Secret Manager (or `.env.local` for local testing):
 
 ```bash
 # Required: Sentry DSN for error tracking
@@ -27,12 +27,14 @@ SENTRY_PROJECT="flipper-ai"
 SENTRY_AUTH_TOKEN="your-auth-token"
 ```
 
-#### Where to add these in Vercel:
+#### Where to add these in production:
 
-1. Go to your Vercel project dashboard
-2. Navigate to **Settings** → **Environment Variables**
-3. Add each variable for **Production**, **Preview**, and **Development**
-4. Redeploy your app
+1. Add secrets via GCP Secret Manager:
+   ```bash
+   echo -n "your-dsn" | gcloud secrets create SENTRY_DSN --data-file=-
+   echo -n "your-auth-token" | gcloud secrets create SENTRY_AUTH_TOKEN --data-file=-
+   ```
+2. Redeploy your Cloud Run service to pick up the new secrets
 
 ### 3. Verify Integration
 
@@ -108,13 +110,13 @@ Adjust these in `sentry.client.config.ts` and `sentry.server.config.ts`.
 ### Source maps not working
 
 1. **Verify auth token** - `SENTRY_AUTH_TOKEN` must have `project:write` scope
-2. **Check build logs** - Vercel should show "Uploading source maps to Sentry"
+2. **Check build logs** - CI should show "Uploading source maps to Sentry"
 3. **Manual upload** - Run `npx @sentry/wizard@latest` for troubleshooting
 
 ## Resources
 
 - [Sentry Next.js Docs](https://docs.sentry.io/platforms/javascript/guides/nextjs/)
-- [Vercel + Sentry Integration](https://vercel.com/integrations/sentry)
+- [Sentry GCP Integration](https://docs.sentry.io/platforms/javascript/guides/nextjs/)
 - [Sentry Error Monitoring Best Practices](https://docs.sentry.io/product/issues/)
 
 ---

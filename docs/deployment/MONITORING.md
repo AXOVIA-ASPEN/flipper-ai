@@ -27,7 +27,7 @@ UptimeRobot's free tier checks every 5 minutes and sends alerts via email/Slack.
 2. **Add new monitor:**
    - Monitor Type: `HTTPS`
    - Friendly Name: `Flipper AI — Production`
-   - URL: `https://your-app.vercel.app/api/health`
+   - URL: `https://axovia-flipper.web.app/api/health`
    - Monitoring Interval: `5 minutes`
 3. **Alert contacts:** Add your email (`stephen.boyett@silverlinesoftware.co`)
 4. **Keyword check (optional):** Set keyword `"status":"ok"` to validate response body, not just HTTP 200
@@ -51,7 +51,7 @@ BetterStack checks every 30 seconds and provides incident timelines and on-call 
 
 1. **Create account:** https://betterstack.com/
 2. **Add monitor:**
-   - URL: `https://your-app.vercel.app/api/health`
+   - URL: `https://axovia-flipper.web.app/api/health`
    - Check frequency: `30 seconds` (free tier)
    - Check type: `HTTP/HTTPS`
 3. **Advanced config:**
@@ -87,7 +87,7 @@ jobs:
     steps:
       - name: Check /api/health
         run: |
-          STATUS=$(curl -sf https://your-app.vercel.app/api/health | jq -r '.status')
+          STATUS=$(curl -sf https://axovia-flipper.web.app/api/health | jq -r '.status')
           if [ "$STATUS" != "ok" ]; then
             echo "Health check FAILED: $STATUS"
             exit 1
@@ -129,7 +129,7 @@ Example response:
 | HTTP 5xx from `/api/health` | P0 | Check Sentry for exceptions, restart PM2/container |
 | Response time > 2s | P1 | Check DB connections, scale horizontally |
 | `"status": "degraded"` | P1 | Investigate specific failing service in response |
-| SSL certificate expiring | P2 | Renew via Vercel (auto-managed) or Let's Encrypt |
+| SSL certificate expiring | P2 | Renew via Firebase Hosting (auto-managed) or Let's Encrypt |
 
 ---
 

@@ -12,7 +12,7 @@
 
 Flipper AI currently uses **SQLite** for local development and staging. The production deployment requires **PostgreSQL** for:
 - Concurrent user support (SQLite has write locking)
-- Cloud-native hosting (Vercel Postgres, Supabase, Neon)
+- Cloud-native hosting (Cloud SQL, Supabase, Neon)
 - Connection pooling via PgBouncer/Prisma Accelerate
 - Point-in-time recovery and automated backups
 
@@ -215,9 +215,9 @@ importAll().catch(console.error);
 
 ### Why PgBouncer / Prisma Accelerate?
 
-Serverless environments (Vercel, Railway) create a new database connection per request. PostgreSQL has a hard connection limit (~100 by default). Without pooling, you'll get `ECONNREFUSED` under load.
+Serverless environments (Cloud Run, Railway) create a new database connection per request. PostgreSQL has a hard connection limit (~100 by default). Without pooling, you'll get `ECONNREFUSED` under load.
 
-### Option A: Prisma Accelerate (Recommended for Vercel)
+### Option A: Prisma Accelerate (Recommended for serverless)
 
 1. Sign up at https://www.prisma.io/accelerate
 2. Create a project and connect your PostgreSQL
@@ -292,7 +292,7 @@ DATABASE_URL="postgresql://..." npm start
 
 | Provider | Free Tier | Connection Pooling | Best For |
 |----------|-----------|-------------------|---------|
-| **Vercel Postgres** (Neon) | 256MB / 60hr | Serverless-native | Vercel deploy |
+| **Cloud SQL** (GCP) | Pay-as-you-go | Cloud SQL Proxy | Cloud Run deploy |
 | **Supabase** | 500MB / 2 projects | Built-in PgBouncer | Full-stack |
 | **Neon** | 0.5GB / 3 projects | Serverless branches | Dev/test isolation |
 | **Railway** | $5 credit/mo | PgBouncer included | Simple deploy |

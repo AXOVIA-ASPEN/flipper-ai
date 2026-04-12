@@ -184,29 +184,6 @@ describe('CI Workflow Validation', () => {
     });
   });
 
-  describe('vercel-deploy.yml', () => {
-    let vercel: Record<string, unknown>;
-
-    beforeAll(() => {
-      vercel = loadWorkflow('vercel-deploy.yml');
-    });
-
-    it('should be deprecated with workflow_dispatch trigger only', () => {
-      const on = vercel.on as Record<string, unknown>;
-      expect(on.workflow_dispatch).toBeDefined();
-      expect(on.push).toBeUndefined();
-      expect(on.pull_request).toBeUndefined();
-    });
-
-    it('should contain deprecation notice', () => {
-      const raw = readFileSync(
-        join(workflowsDir, 'vercel-deploy.yml'),
-        'utf-8'
-      );
-      expect(raw.toLowerCase()).toContain('deprecated');
-    });
-  });
-
   describe('deploy-firebase.yml', () => {
     let firebase: Record<string, unknown>;
 

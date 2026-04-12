@@ -134,7 +134,7 @@ pnpm test -- --watch
 | **AI**        | Google Gemini via Stagehand  |
 | **Testing**   | Jest, Cucumber, Playwright   |
 | **CI/CD**     | GitHub Actions               |
-| **Hosting**   | Vercel                       |
+| **Hosting**   | Firebase Hosting + Cloud Run |
 | **Linting**   | ESLint, Prettier, Husky      |
 
 ## 📁 Project Structure
@@ -162,9 +162,8 @@ flipper-ai/
 │   └── schema.prisma           # Database schema
 ├── test/                       # E2E and BDD tests (Playwright, Cucumber)
 ├── scripts/                    # Scripts by purpose (deploy/, setup/, test/, health/, db/)
-├── config/                     # Docker, PM2, Railway configs (Vercel/Firebase at root)
-├── .github/workflows/ci.yml    # CI/CD pipeline
-├── vercel.json                 # Vercel deployment config
+├── config/                     # Docker, PM2, Firebase configs
+├── .github/workflows/ci.yml    # CI/CD pipeline (deploys to Cloud Run)
 ├── Makefile                    # Build commands
 └── docs/                       # Documentation (see docs/README.md)
 ```
@@ -226,25 +225,21 @@ Items scoring **70+** are automatically flagged as opportunities.
 
 ## 🚢 Deployment
 
-### Vercel (Recommended)
+### Firebase Hosting + Cloud Run (Production)
 
 **Automated CI/CD (GitHub Actions):**
 
-The CI pipeline automatically deploys to Vercel on every push to `main` (after tests pass).
+The CI pipeline automatically deploys to Cloud Run on every push to `main` (after tests pass). Firebase Hosting serves the frontend at `axovia-flipper.web.app`.
 
 **Required GitHub Secrets** (Settings → Secrets → Actions):
-- `VERCEL_TOKEN` — from https://vercel.com/account/tokens
-- `VERCEL_ORG_ID` — from `.vercel/project.json` after first `vercel link`
-- `VERCEL_PROJECT_ID` — from `.vercel/project.json` after first `vercel link`
+- GCP service account credentials for Cloud Run deployment
+- Firebase project configuration
 
 **Manual deploy:**
 ```bash
-npm i -g vercel
-vercel link        # Links to Vercel project (generates .vercel/project.json)
-vercel --prod      # Deploy to production
+gcloud run deploy flipper-ai --source .
+firebase deploy --only hosting
 ```
-
-Set environment variables in the [Vercel Dashboard](https://vercel.com/dashboard). Configuration is in `vercel.json` (security headers, API function timeouts, health endpoint rewrite).
 
 ### Docker
 
@@ -258,7 +253,7 @@ docker run -p 3000:3000 flipper-ai
 - **ESLint** — Strict TypeScript rules
 - **Prettier** — Consistent formatting
 - **Husky** — Pre-commit hooks prevent bad commits
-- **CI/CD** — GitHub Actions: lint → typecheck → test (coverage gated) → build → E2E → deploy to Vercel
+- **CI/CD** — GitHub Actions: lint → typecheck → test (coverage gated) → build → E2E → deploy to Cloud Run
 - **TypeScript** — Strict mode, `ignoreBuildErrors: false`
 
 ```bash
@@ -317,7 +312,7 @@ HEALTH_URL=https://prod.app/api/health ./scripts/health/health-monitor.sh
 | ESLint / Prettier              | ✅ Clean |
 | API documentation              | ✅ Full endpoint coverage |
 | Sentry error tracking          | ✅ Configured |
-| Production deployment (Vercel) | ⏳ Awaiting Vercel credentials |
+| Production deployment          | ✅ Firebase Hosting + Cloud Run |
 | PostgreSQL                     | ✅ Primary database (local + production) |
 
 ## 📄 License

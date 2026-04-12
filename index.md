@@ -34,8 +34,7 @@ flipper-ai/
 ├── eslint.config.mjs
 ├── playwright.config.ts    # E2E (testDir: ./e2e)
 ├── jest.config.js
-├── vercel.json             # Vercel (kept at root for CLI)
-├── firebase.json           # Firebase (kept at root for CLI)
+├── firebase.json           # Firebase Hosting config
 └── .firebaserc
 ```
 

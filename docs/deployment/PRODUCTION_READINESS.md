@@ -1,19 +1,19 @@
 # 🚀 Flipper AI - Production Readiness Checklist
 
 **Status:** February 19, 2026 - 2:30 AM UTC
-**Deployment:** Vercel (https://flipper-ai-ten.vercel.app/)
+**Deployment:** Firebase Hosting + Cloud Run (https://axovia-flipper.web.app/)
 
 ---
 
 ## ✅ COMPLETED
 
 ### Infrastructure
-- [x] Deployed to Vercel production
+- [x] Deployed to Firebase Hosting + Cloud Run
 - [x] PostgreSQL database via PrismaPostgres configured
 - [x] GitHub Actions CI/CD pipeline fully operational
 - [x] Monitoring stack implemented (Sentry, health checks)
 - [x] Docker containerization ready
-- [x] Environment variables configured in Vercel
+- [x] Environment variables configured in GCP Secret Manager
 
 ### Testing & Quality
 - [x] Unit test coverage: 97.5%+ (Jest)
@@ -31,7 +31,7 @@
 - [x] Security audit complete (✅ [Security] Auth Hardening - Trello)
 - [x] Auth routes return proper 401 (not 500) when unauthorized
 - [x] CSRF protection enabled
-- [x] Environment secrets secured in Vercel
+- [x] Environment secrets secured in GCP Secret Manager
 - [x] API rate limiting implemented
 - [x] Input validation on all forms
 - [x] SQL injection protection (Prisma ORM)
@@ -73,8 +73,8 @@
 ### Domain & DNS
 - [ ] Purchase production domain (flipper-ai.com or alternative)
 - [ ] Configure DNS records
-- [ ] Set up SSL certificate (handled by Vercel)
-- [ ] Configure custom domain in Vercel
+- [ ] Set up SSL certificate (handled by Firebase Hosting)
+- [ ] Configure custom domain in Firebase Hosting
 - [ ] Update NEXTAUTH_URL to production domain
 
 ### Database
@@ -124,7 +124,7 @@
 - Watch database performance (query times, connection pool)
 - Track registration/login success rates
 - Monitor API response times
-- Check Vercel analytics for traffic patterns
+- Check Cloud Run metrics for traffic patterns
 
 ### First Week
 - Review user feedback
@@ -136,7 +136,7 @@
 ### First Month
 - Performance optimization pass
 - Feature usage analytics
-- Cost analysis (Vercel, DB, API usage)
+- Cost analysis (Cloud Run, Firebase Hosting, DB, API usage)
 - User retention metrics
 - Plan next feature releases
 
@@ -145,15 +145,15 @@
 ## 📞 SUPPORT CONTACTS
 
 **Production Issues:**
-- Vercel Dashboard: https://vercel.com/dashboard
-- Database Admin: PrismaPostgres console
+- Firebase Console: https://console.firebase.google.com/project/axovia-flipper
+- GCP Console: https://console.cloud.google.com/home/dashboard?project=axovia-flipper
 - Error Tracking: Sentry dashboard
 - GitHub Issues: https://github.com/AXOVIA-ASPEN/flipper-ai/issues
 
 **Escalation Path:**
 1. Check Sentry for error details
 2. Review GitHub Actions CI/CD logs
-3. Inspect Vercel deployment logs
+3. Inspect Cloud Run deployment logs
 4. Check database query logs
 5. Contact Stephen Boyett (stephen.boyett@silverlinesoftware.co)
 
@@ -188,20 +188,20 @@ pnpm build
 # Run production preview
 pnpm start
 
-# Deploy to Vercel (automated via GitHub push to main)
+# Deploy to Cloud Run (automated via GitHub Actions push to main)
 git push origin main
 
-# Manual Vercel deployment (if needed)
-vercel --prod
+# Manual Cloud Run deployment (if needed)
+gcloud run deploy flipper-web --image gcr.io/axovia-flipper/flipper-web --region us-east1
 
 # Database migration (production)
 npx prisma migrate deploy
 
 # Verify production health
-curl https://flipper-ai-ten.vercel.app/health
+curl https://axovia-flipper.web.app/health
 
-# Check Vercel logs
-vercel logs --follow
+# Check Cloud Run logs
+gcloud run services logs read flipper-web --region us-east1 --limit=100
 ```
 
 ---

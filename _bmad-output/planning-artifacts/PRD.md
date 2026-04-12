@@ -275,7 +275,7 @@ The current algorithmic scoring has critical accuracy issues:
 ### Gaps vs PRD
 
 **Infrastructure:**
-- No GCP infrastructure (still local/Vercel — Cloud Run, Cloud SQL, Firebase Auth planned)
+- GCP infrastructure deployed (Cloud Run, Cloud SQL, Firebase Auth, Firebase Hosting)
 
 **Scoring Accuracy:**
 - Algorithmic scoring uses circular logic (no verified market prices)
@@ -425,8 +425,7 @@ All 5 primary user journeys have E2E test coverage:
 
 1. `ci.yml` — Lint + unit tests + integration tests on every push/PR
 2. `playwright-tests.yml` — Full E2E suite across Chromium/Firefox/WebKit
-3. `vercel-deploy.yml` — Auto-deploy to Vercel
-4. `deploy-firebase.yml` — Firebase Hosting backup deployment
+3. `deploy-firebase.yml` — Firebase Hosting deployment
 5. `health-check.yml` — Periodic production health checks
 
 ---

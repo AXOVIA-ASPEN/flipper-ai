@@ -36,10 +36,8 @@ gcloud config set project axovia-flipper
 ### 3. Migrate Environment Variables
 
 ```bash
-# Pull from Vercel (if still connected)
-vercel env pull .env
-
-# OR manually edit .env with your variables
+# Manually edit .env with your variables from GCP Secret Manager
+# OR pull from Secret Manager
 
 # Migrate to Firebase
 chmod +x scripts/migrate-env-to-firebase.sh
@@ -205,14 +203,13 @@ gcloud functions logs read scrapeCraigslist --region=us-east1 --limit=50
 If something breaks:
 
 ```bash
-# Re-point DNS to Vercel (if you changed it)
-# OR: Revert Next.js routes
+# Roll back Cloud Run to a previous revision
+gcloud run services update-traffic flipper-web --to-revisions=PREVIOUS_REVISION=100 --region=us-east1
+
+# Or revert Next.js routes if the scraper delegation is the issue
 for dir in src/app/api/scraper/*/; do
   [ -f "$dir/route.old.ts" ] && mv "$dir/route.ts" "$dir/route.v2.ts" && mv "$dir/route.old.ts" "$dir/route.ts"
 done
-
-# Redeploy to Vercel
-vercel --prod
 ```
 
 ---
@@ -261,7 +258,7 @@ gcloud alpha monitoring policies create \
 
 3. **Monitor closely**: Check logs every hour for first day
 
-4. **Keep Vercel alive**: Don't delete Vercel project for 1 week (safety net)
+4. **Keep previous revision**: Cloud Run retains previous revisions for quick rollback
 
 5. **Budget alerts**: Set up billing alerts at $25, $50, $100
    ```bash

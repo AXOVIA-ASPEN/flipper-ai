@@ -55,11 +55,10 @@ Landing Page (/)
 ### Provider Hierarchy
 ```
 RootLayout
-├── SessionProvider (NextAuth)
+├── FirebaseAuthProvider
 │   └── ThemeProvider (color themes)
 │       └── ToastProvider (notifications)
 │           ├── WebVitals (performance monitoring)
-│           ├── Analytics (Vercel analytics)
 │           └── {children}
 ```
 

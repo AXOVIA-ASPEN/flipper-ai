@@ -136,16 +136,11 @@ Cucumber/Gherkin feature files in `features/`:
 - Uploads test artifacts
 - Visual regression testing
 
-#### `vercel-deploy.yml` - Vercel Deployment
-- Auto-deploy to Vercel preview on PRs
-- Production deployment on main branch
-- Environment variable management
-- Build optimization
-
-#### `deploy-firebase.yml` - Firebase Hosting (Backup)
-- Alternative deployment target
-- Static asset hosting
-- CDN distribution
+#### `deploy-firebase.yml` - Firebase Hosting + Cloud Run Deployment
+- Auto-deploy to Cloud Run on push to main
+- Firebase Hosting for static frontend
+- Environment variable management via GCP Secret Manager
+- CDN distribution via Firebase Hosting
 
 #### `health-check.yml` - Production Monitoring
 - Periodic health checks
@@ -189,8 +184,8 @@ e2e/
 ## 5. Deployment Readiness
 
 ### 5.1 Configuration Files
-- ✅ `vercel.json` - Vercel deployment config
-- ✅ `Dockerfile` - Containerization for alternative deployment
+- ✅ `firebase.json` - Firebase Hosting config
+- ✅ `Dockerfile` - Containerization for Cloud Run deployment
 - ✅ `.env.example` - Environment variable template
 - ✅ `next.config.js` - Next.js production optimizations
 

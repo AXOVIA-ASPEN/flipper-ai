@@ -80,7 +80,7 @@ git push origin vX.Y.Z
 - **Error Tracking**: Sentry
 - **Scraping**: Playwright for browser automation, eBay Browse API (REST, not scraped)
 - **Testing**: Jest (unit), Cucumber/Gherkin (BDD), Playwright (E2E)
-- **CI/CD**: GitHub Actions → Vercel
+- **CI/CD**: GitHub Actions → Cloud Run (backend) + Firebase Hosting (frontend)
 - **Infrastructure**: Cloud Run (backend), Firebase Hosting, GCP Secret Manager (production secrets)
 
 ### Project Layout

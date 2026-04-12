@@ -2,9 +2,8 @@
 
 ## Pre-Deployment
 
-- [ ] **Backup Vercel Database**
+- [ ] **Backup Database**
   ```bash
-  vercel env pull .env.vercel
   pg_dump $DATABASE_URL > backup-$(date +%Y%m%d).sql
   ```
 
@@ -286,26 +285,12 @@
 
 ## Phase 7: Cutover (Week 3-4)
 
-- [ ] **Final data sync**
-  ```bash
-  # Export from Vercel DB
-  pg_dump $VERCEL_DATABASE_URL > final-sync.sql
-  
-  # Import to Cloud SQL
-  gcloud sql import sql flipper-db gs://backup-bucket/final-sync.sql
-  ```
-
 - [ ] **Update all DNS to point to Firebase/Cloud Run**
 
 - [ ] **Monitor for 24 hours**
   - [ ] Check error logs
   - [ ] Verify functionality
   - [ ] Monitor performance
-
-- [ ] **Archive Vercel project**
-  ```bash
-  vercel projects remove flipper-ai
-  ```
 
 ## Post-Migration
 

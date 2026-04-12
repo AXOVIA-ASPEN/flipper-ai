@@ -339,10 +339,10 @@ Compare to Vercel Pro: $20/mo (but limited)
 - [ ] Team successfully trained on new platform
 
 ### Post-Migration
-- [ ] 1 week stable operation
-- [ ] Performance metrics improved
-- [ ] Vercel project decommissioned
-- [ ] Documentation complete
+- [x] 1 week stable operation
+- [x] Performance metrics improved
+- [x] Vercel project decommissioned
+- [x] Documentation complete
 
 ---
 

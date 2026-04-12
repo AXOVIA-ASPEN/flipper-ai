@@ -47,10 +47,6 @@ jest.mock('@/components/ToastContainer', () => ({
   ),
 }));
 
-jest.mock('@vercel/analytics/next', () => ({
-  Analytics: () => null,
-}));
-
 import RootLayout from '@/app/layout';
 
 describe('RootLayout', () => {
