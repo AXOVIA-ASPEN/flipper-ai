@@ -17,7 +17,6 @@ describe('Environment Configuration', () => {
 
   it('should parse valid environment variables', () => {
     process.env.DATABASE_URL = 'file:./dev.db';
-    process.env.AUTH_SECRET = 'test-auth-secret-minimum-16-chars';
     process.env.ENCRYPTION_SECRET = 'test-encryption-secret-min16';
 
     const { env } = require('@/lib/env');
@@ -28,13 +27,11 @@ describe('Environment Configuration', () => {
 
   it('should provide test defaults when NODE_ENV=test', () => {
     delete process.env.DATABASE_URL;
-    delete process.env.AUTH_SECRET;
     delete process.env.ENCRYPTION_SECRET;
 
     const { env } = require('@/lib/env');
 
     expect(env.DATABASE_URL).toBeTruthy();
-    // AUTH_SECRET is now optional (Firebase Auth replaced NextAuth)
     expect(env.ENCRYPTION_SECRET).toBeTruthy();
   });
 
@@ -121,7 +118,6 @@ describe('Environment Configuration', () => {
     it('should throw in non-test env when required vars missing', () => {
       process.env.NODE_ENV = 'production';
       delete process.env.DATABASE_URL;
-      delete process.env.AUTH_SECRET;
       delete process.env.ENCRYPTION_SECRET;
 
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();

@@ -19,9 +19,9 @@ const config = {
   // Set test database URL
   globalSetup: undefined,
   globalTeardown: undefined,
-  // Transform ESM-only packages including next-auth, @auth/core, and Prisma
+  // Transform ESM-only packages (Prisma adapters)
   transformIgnorePatterns: [
-    '/node_modules/(?!(@auth/prisma-adapter|@auth/core|next-auth|@prisma/adapter-libsql|@libsql)/)'],
+    '/node_modules/(?!(@prisma/adapter-libsql|@libsql)/)'],
   // Use experimental ESM support for import.meta
   extensionsToTreatAsEsm: [],
 };

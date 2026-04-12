@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
 }
 
 function unsubscribeHtml(success: boolean): string {
-  const appUrl = process.env.NEXTAUTH_URL || process.env.APP_URL || 'https://flipper-ai.app';
+  const appUrl = process.env.APP_URL || 'https://flipper-ai.app';
   const title = success ? 'Unsubscribed Successfully' : 'Something Went Wrong';
   const message = success
     ? 'You\'ve been unsubscribed from all Flipper AI email notifications. You can re-enable them at any time in your account settings.'

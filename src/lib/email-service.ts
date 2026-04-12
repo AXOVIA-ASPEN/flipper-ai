@@ -594,7 +594,7 @@ export class EmailService {
 
 function createEmailService(): EmailService {
   const resendApiKey = process.env.RESEND_API_KEY;
-  const appUrl = process.env.NEXTAUTH_URL || process.env.APP_URL || 'http://localhost:3000';
+  const appUrl = process.env.APP_URL || 'http://localhost:3000';
   const fromAddress =
     process.env.EMAIL_FROM || 'Flipper AI <notifications@flipper-ai.app>';
 

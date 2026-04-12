@@ -35,9 +35,8 @@ const envSchema = z.object({
   FIREBASE_CLIENT_EMAIL: z.string().optional(),
   FIREBASE_PRIVATE_KEY: z.string().optional(),
 
-  // Auth (Legacy NextAuth — deprecated, will be removed)
-  AUTH_SECRET: z.string().optional(),
-  NEXTAUTH_URL: z.string().url().optional(),
+  // App URL
+  APP_URL: z.string().url().optional(),
 
   // OAuth Providers (optional)
   GOOGLE_CLIENT_ID: z.string().optional(),

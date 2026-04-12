@@ -29,8 +29,8 @@ describe('GET /api/diagnostics', () => {
       ...original,
       NODE_ENV: 'test',
       DATABASE_URL: 'postgresql://test',
-      NEXTAUTH_URL: 'http://localhost:3000',
-      NEXTAUTH_SECRET: 'test-secret',
+      APP_URL: 'http://localhost:3000',
+      FIREBASE_CLIENT_EMAIL: 'test@test.iam.gserviceaccount.com',
       ...overrides,
     };
     return () => {
@@ -56,8 +56,8 @@ describe('GET /api/diagnostics', () => {
 
       expect(data.checks.envVars).toEqual({
         DATABASE_URL: '✅ Set',
-        NEXTAUTH_URL: '✅ Set',
-        NEXTAUTH_SECRET: '✅ Set',
+        APP_URL: '✅ Set',
+        FIREBASE_CLIENT_EMAIL: '✅ Set',
       });
 
       restore();
@@ -79,8 +79,8 @@ describe('GET /api/diagnostics', () => {
       restore();
     });
 
-    it('reports missing NEXTAUTH_URL', async () => {
-      const restore = mockEnv({ NEXTAUTH_URL: undefined });
+    it('reports missing APP_URL', async () => {
+      const restore = mockEnv({ APP_URL: undefined });
 
       (prisma.$queryRaw as jest.Mock).mockResolvedValue([{ test: 1 }]);
       (prisma.user.count as jest.Mock).mockResolvedValue(0);
@@ -90,13 +90,13 @@ describe('GET /api/diagnostics', () => {
       const response = await GET();
       const data = await response.json();
 
-      expect(data.checks.envVars.NEXTAUTH_URL).toBe('❌ Missing');
+      expect(data.checks.envVars.APP_URL).toBe('❌ Missing');
 
       restore();
     });
 
-    it('reports missing NEXTAUTH_SECRET', async () => {
-      const restore = mockEnv({ NEXTAUTH_SECRET: undefined });
+    it('reports missing FIREBASE_CLIENT_EMAIL', async () => {
+      const restore = mockEnv({ FIREBASE_CLIENT_EMAIL: undefined });
 
       (prisma.$queryRaw as jest.Mock).mockResolvedValue([{ test: 1 }]);
       (prisma.user.count as jest.Mock).mockResolvedValue(0);
@@ -106,7 +106,7 @@ describe('GET /api/diagnostics', () => {
       const response = await GET();
       const data = await response.json();
 
-      expect(data.checks.envVars.NEXTAUTH_SECRET).toBe('❌ Missing');
+      expect(data.checks.envVars.FIREBASE_CLIENT_EMAIL).toBe('❌ Missing');
 
       restore();
     });
@@ -386,8 +386,8 @@ describe('GET /api/diagnostics', () => {
     it('handles all env vars missing', async () => {
       const restore = mockEnv({
         DATABASE_URL: undefined,
-        NEXTAUTH_URL: undefined,
-        NEXTAUTH_SECRET: undefined,
+        APP_URL: undefined,
+        FIREBASE_CLIENT_EMAIL: undefined,
       });
 
       (prisma.$queryRaw as jest.Mock).mockResolvedValue([{ test: 1 }]);
@@ -399,8 +399,8 @@ describe('GET /api/diagnostics', () => {
       const data = await response.json();
 
       expect(data.checks.envVars.DATABASE_URL).toBe('❌ Missing');
-      expect(data.checks.envVars.NEXTAUTH_URL).toBe('❌ Missing');
-      expect(data.checks.envVars.NEXTAUTH_SECRET).toBe('❌ Missing');
+      expect(data.checks.envVars.APP_URL).toBe('❌ Missing');
+      expect(data.checks.envVars.FIREBASE_CLIENT_EMAIL).toBe('❌ Missing');
 
       restore();
     });
@@ -408,8 +408,8 @@ describe('GET /api/diagnostics', () => {
     it('handles empty string env vars (treated as set)', async () => {
       const restore = mockEnv({
         DATABASE_URL: '',
-        NEXTAUTH_URL: '',
-        NEXTAUTH_SECRET: '',
+        APP_URL: '',
+        FIREBASE_CLIENT_EMAIL: '',
       });
 
       (prisma.$queryRaw as jest.Mock).mockResolvedValue([{ test: 1 }]);
@@ -422,8 +422,8 @@ describe('GET /api/diagnostics', () => {
 
       // Empty strings are falsy, so they should be reported as missing
       expect(data.checks.envVars.DATABASE_URL).toBe('❌ Missing');
-      expect(data.checks.envVars.NEXTAUTH_URL).toBe('❌ Missing');
-      expect(data.checks.envVars.NEXTAUTH_SECRET).toBe('❌ Missing');
+      expect(data.checks.envVars.APP_URL).toBe('❌ Missing');
+      expect(data.checks.envVars.FIREBASE_CLIENT_EMAIL).toBe('❌ Missing');
 
       restore();
     });

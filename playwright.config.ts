@@ -41,8 +41,7 @@ export default defineConfig({
         timeout: 120_000,
         env: {
           DATABASE_URL: process.env.DATABASE_URL || 'file:./dev.db',
-          AUTH_SECRET: process.env.AUTH_SECRET || 'playwright-test-secret',
-          NEXTAUTH_URL: 'http://localhost:3000',
+          APP_URL: 'http://localhost:3000',
         },
       }
     : undefined,

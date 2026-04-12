@@ -75,7 +75,7 @@ export interface MessageSentParams {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const APP_URL = (process.env.NEXTAUTH_URL || process.env.APP_URL || 'http://localhost:3000').replace(/\/$/, '');
+const APP_URL = (process.env.APP_URL || 'http://localhost:3000').replace(/\/$/, '');
 
 function unsubscribeUrl(email: string): string {
   const encoded = Buffer.from(email).toString('base64url');

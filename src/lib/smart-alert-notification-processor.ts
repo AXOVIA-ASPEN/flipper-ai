@@ -322,7 +322,7 @@ async function phase1(result: SmartAlertProcessorResult): Promise<void> {
       }
 
       const user = event.user;
-      const appUrl = process.env.NEXTAUTH_URL || process.env.APP_URL || 'http://localhost:3000';
+      const appUrl = process.env.APP_URL || 'http://localhost:3000';
 
       // Validate payload + send
       let sendResult: { success: boolean; error?: string };
@@ -519,7 +519,7 @@ async function phase2(result: SmartAlertProcessorResult): Promise<void> {
   const phase2Start = Date.now();
   let consecutiveDbErrors = 0;
   let cursor: string | undefined;
-  const appUrl = process.env.NEXTAUTH_URL || process.env.APP_URL || 'http://localhost:3000';
+  const appUrl = process.env.APP_URL || 'http://localhost:3000';
 
   while (true) {
     // Check global timeout

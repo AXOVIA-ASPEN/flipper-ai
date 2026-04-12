@@ -5,7 +5,7 @@ import { MetadataRoute } from 'next';
  * Only includes publicly accessible pages (auth-gated pages omitted)
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXTAUTH_URL ?? 'https://flipper-ai.axovia.ai';
+  const baseUrl = process.env.APP_URL ?? 'https://flipper-ai.axovia.ai';
 
   return [
     {

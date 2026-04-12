@@ -22,8 +22,8 @@ export async function GET() {
   // Check 1: Environment variables
   checks.envVars = {
     DATABASE_URL: process.env.DATABASE_URL ? '✅ Set' : '❌ Missing',
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL ? '✅ Set' : '❌ Missing',
-    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET ? '✅ Set' : '❌ Missing',
+    APP_URL: process.env.APP_URL ? '✅ Set' : '❌ Missing',
+    FIREBASE_CLIENT_EMAIL: process.env.FIREBASE_CLIENT_EMAIL ? '✅ Set' : '❌ Missing',
   };
 
   // Check 2: Prisma client

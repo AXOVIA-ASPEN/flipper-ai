@@ -46,7 +46,7 @@
 
 ### Architecture & Design
 - [Architecture (Original)](./architecture/ARCHITECTURE.md) — Original system architecture with Mermaid diagrams
-- [PRD](./PRD.md) — Product Requirements Document
+- PRD — see `_bmad-output/planning-artifacts/prd/PRD.md`
 - [Go-to-Market Strategy](./GO_TO_MARKET_STRATEGY.md) — Launch strategy
 
 ### API & Technical
@@ -75,8 +75,7 @@
 - [OAuth Setup](./deployment/OAUTH_SETUP.md) — OAuth configuration
 - [Sentry Setup](./deployment/SENTRY_SETUP.md) — Error tracking setup
 - [Monitoring](./deployment/MONITORING.md) — Monitoring & alerting
-- [Production Database Migration Fix](./deployment/PRODUCTION_DATABASE_MIGRATION_FIX.md) — One-off migration fix notes
-- Deployment checklists & history: [DEPLOYMENT_READY](./deployment/DEPLOYMENT_READY.md), [DEPLOYMENT_STATUS](./deployment/DEPLOYMENT_STATUS.md), [QUICK-START-DEPLOYMENT](./deployment/QUICK-START-DEPLOYMENT.md), [Firebase](./deployment/FIREBASE-README.md), [MIGRATION](./deployment/MIGRATION.md)
+- Deployment checklists & history: [QUICK-START-DEPLOYMENT](./deployment/QUICK-START-DEPLOYMENT.md), [Firebase](./deployment/FIREBASE-README.md), [MIGRATION](./deployment/MIGRATION.md)
 
 ### Planning
 - [Implementation Plan](./planning/IMPLEMENTATION-PLAN.md) — High-level implementation roadmap
@@ -96,7 +95,7 @@
 ### Archive
 - [Worker Sprint 2026-02-13](./archive/WORKER_SPRINT_2026-02-13.md) — Sprint notes
 - [SSE Investigation 2026-02-19](./archive/sse-investigation-2026-02-19.md) — Investigation notes
-- [CI Fix Summary](./archive/CI_FIX_SUMMARY.md), [Testing Reports](./archive/TESTING_REPORT.md), [Worker Report](./archive/WORKER_REPORT_2026-02-19_04-00.md), [Theme Test Manual](./archive/THEME_TEST_MANUAL.md)
+- [Worker Report](./archive/WORKER_REPORT_2026-02-19_04-00.md)
 
 ### Reports
 - [VALUE-REPORT-001](./reports/VALUE-REPORT-001.json) — Sample value report

@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+    const baseUrl = process.env.APP_URL || 'http://localhost:3000';
 
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
