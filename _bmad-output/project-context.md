@@ -140,7 +140,7 @@ Every story MUST pass ALL items before status changes to `review`. This is a har
 - **Scraping:** Playwright
 - **Validation:** Zod
 - **Testing:** Jest 30 (unit/integration), Playwright (E2E), Cucumber (BDD)
-- **Lint/Format:** ESLint 4 (eslint-config-next), Prettier, lint-staged, Husky
+- **Lint/Format:** ESLint 9 (eslint-config-next 16), Prettier, lint-staged, Husky
 
 ---
 

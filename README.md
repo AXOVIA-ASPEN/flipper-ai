@@ -2,16 +2,14 @@
 
 [![CI/CD Pipeline](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/ci.yml)
 [![Health Check](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/health-check.yml/badge.svg)](https://github.com/AXOVIA-ASPEN/flipper-ai/actions/workflows/health-check.yml)
-[![Tests](https://img.shields.io/badge/tests-2378-brightgreen)](.)
-[![Test Suites](https://img.shields.io/badge/test%20suites-116-brightgreen)](.)
-[![Coverage](https://img.shields.io/badge/coverage-99.14%25-brightgreen)](.)
-[![Branches](https://img.shields.io/badge/branches-98.83%25-brightgreen)](.)
-[![Functions](https://img.shields.io/badge/functions-100%25-brightgreen)](.)
+[![Tests](https://img.shields.io/badge/tests-4824-brightgreen)](.)
+[![Test Suites](https://img.shields.io/badge/test%20suites-218-brightgreen)](.)
+[![Coverage](https://img.shields.io/badge/coverage-99.41%25-brightgreen)](.)
+[![Branches](https://img.shields.io/badge/branches-96.01%25-brightgreen)](.)
+[![Functions](https://img.shields.io/badge/functions-99.42%25-brightgreen)](.)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](.)
 [![Version](https://img.shields.io/badge/version-1.0.1-blue)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https://github.com/AXOVIA-ASPEN/flipper-ai)
 
 AI-powered marketplace flipping tool. Automatically scans Craigslist, Facebook Marketplace, eBay, OfferUp, and Mercari to find underpriced items, analyze profit potential with AI, and manage your flipping workflow from discovery to sale.
 
@@ -79,7 +77,7 @@ EBAY_MARKETPLACE_ID="EBAY_US"
 make help              # Show all commands
 make dev               # Start dev server
 make build             # Production build (strict TypeScript)
-make test              # Run 2297 unit tests + 77 integration tests
+make test              # Run 4824 tests (218 suites)
 make test-acceptance   # Run BDD acceptance tests (Cucumber/Gherkin)
 make test-e2e          # Run E2E tests (Playwright)
 make test-all          # Run all test suites
@@ -93,7 +91,7 @@ make clean             # Remove build artifacts
 
 | Suite          | Tool               | Count                    | Coverage       |
 | -------------- | ------------------ | ------------------------ | -------------- |
-| Unit           | Jest               | 2300 unit + 77 integration (111 suites total) | 99.66% stmts / 99.24% branches / 99.79% funcs |
+| Unit           | Jest               | 4824 tests (218 suites) | 99.41% stmts / 96.01% branches / 99.42% funcs |
 | BDD Acceptance | Cucumber + Gherkin | 70 scenarios / 572 steps | Core flows     |
 | E2E            | Playwright         | Browser automation       | Critical paths |
 
@@ -112,16 +110,20 @@ make test-acceptance
 pnpm test -- --watch
 ```
 
-### BDD Feature Coverage
+### BDD Feature Coverage (`test/acceptance/features/`)
 
-- `01-marketplace-scanning` — Multi-platform search and filtering
-- `02-ai-analysis` — AI pricing analysis and demand scoring
-- `03-seller-communication` — Messaging and negotiation flows
-- `04-resale-listing` — Listing generation and optimization
-- `05-dashboard-tracking` — Portfolio and profit tracking
-- `06-user-auth-billing` — Authentication and subscription management
-- `07-notifications-monitoring` — Alerts and monitoring
-- `08-complete-flip-journey` — End-to-end user journey
+- `E-001` — Production Infrastructure
+- `E-002` — User Registration, Auth & Onboarding
+- `E-003` — Marketplace Scanning (Multi-platform)
+- `E-004` — Scoring & Deal Evaluation
+- `E-005` — Advanced Market Intelligence
+- `E-006` — Flip Lifecycle Management & Analytics
+- `E-007` — Subscription & Billing
+- `E-008` — Seller Communication & Negotiation
+- `E-009` — Cross-Platform Resale Listing
+- `E-010` — Monitoring & Email Notifications
+- `E-011` — Push & SMS Notifications
+- `E-012` — Meeting Logistics
 
 ## 🏗 Tech Stack
 
@@ -294,15 +296,15 @@ HEALTH_URL=https://prod.app/api/health ./scripts/health/health-monitor.sh
 
 ## 📊 Project Status
 
-**Current State: Production Ready (Pending Deployment Credentials)**
+**Current State: Production Ready**
 
 | Milestone                      | Status |
 | ------------------------------ | ------ |
 | Core feature implementation    | ✅ Complete |
-| Unit tests (Jest)              | ✅ 2378 tests, 116 suites |
-| Statement coverage             | ✅ 99.46% |
-| Branch coverage                | ✅ 99.07% |
-| Function coverage              | ✅ 99.80% |
+| Unit tests (Jest)              | ✅ 4824 tests, 218 suites |
+| Statement coverage             | ✅ 99.41% |
+| Branch coverage                | ✅ 96.01% |
+| Function coverage              | ✅ 99.42% |
 | BDD acceptance tests           | ✅ 70 scenarios / 572 steps |
 | E2E Playwright tests           | ✅ Critical paths + user journeys |
 | GitHub Actions CI/CD           | ✅ lint → typecheck → test → build |
