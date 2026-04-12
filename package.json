@@ -36,6 +36,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",
     "@browserbasehq/stagehand": "^3.0.6",
+    "@google/generative-ai": "^0.24.1",
     "@hcaptcha/react-hcaptcha": "^2.0.2",
     "@hello-pangea/dnd": "^18.0.1",
     "@prisma/adapter-pg": "^7.4.2",

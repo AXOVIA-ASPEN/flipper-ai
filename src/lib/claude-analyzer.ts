@@ -11,6 +11,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import prisma from '@/lib/db';
 import { analysisCache } from '@/lib/cache';
 import { recordUsage } from '@/lib/usage-tracker';
+import { isGeminiFallbackAvailable, geminiGenerateText } from '@/lib/gemini-client';
 
 const getClaudeApiKey = () => process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
 const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-5-20250929';
@@ -178,12 +179,17 @@ function parseClaudeResponse(text: string): ClaudeAnalysisResult {
 }
 
 /**
- * Call Claude API for listing analysis
+ * Call Claude API for listing analysis, falling back to Gemini if Claude keys are unavailable.
  */
 async function callClaudeAPI(prompt: string): Promise<string> {
   const apiKey = getClaudeApiKey();
+
+  // Fallback to Gemini when Claude keys are not configured
   if (!apiKey) {
-    throw new Error('ANTHROPIC_API_KEY or CLAUDE_API_KEY not configured');
+    if (isGeminiFallbackAvailable()) {
+      return geminiGenerateText(prompt, 'You are a resale market expert. Always respond with valid JSON only, no markdown formatting.');
+    }
+    throw new Error('No AI provider configured — set ANTHROPIC_API_KEY, CLAUDE_API_KEY, or GOOGLE_API_KEY');
   }
 
   const client = new Anthropic({

@@ -1217,11 +1217,12 @@ describe('Claude Analyzer', () => {
       delete process.env.CLAUDE_API_KEY;
     });
 
-    test('throws when neither ANTHROPIC_API_KEY nor CLAUDE_API_KEY is set', async () => {
+    test('throws when no AI provider key is set', async () => {
       delete process.env.ANTHROPIC_API_KEY;
       delete process.env.CLAUDE_API_KEY;
+      delete process.env.GOOGLE_API_KEY;
       await expect(analyzeListingData('Test', 'desc', 100)).rejects.toThrow(
-        'ANTHROPIC_API_KEY or CLAUDE_API_KEY not configured'
+        'No AI provider configured'
       );
     });
   });
