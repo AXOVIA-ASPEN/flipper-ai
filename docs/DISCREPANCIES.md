@@ -28,14 +28,8 @@ Expanded the `app/` directory listing from 5 to 15 directories including analyti
 
 ## OPEN — Requires Decision
 
-### 3. .env.example documents services that are only partially implemented
-
-- **File:** `.env.example`
-- **Partially implemented services:**
-  - `SHIPPO_API_TOKEN` — `shippo` is in package.json but Story 5.5 (Logistics) is incomplete per sprint-status
-  - `GEOAPIFY_API_KEY` — not in package.json at all, referenced in env only
-  - `GOOGLE_MAPS_API_KEY` — Story 12.2 in progress
-- **Decision needed:** Keep env vars for services you plan to complete soon? Or remove them until the stories are actually implemented to avoid developer confusion?
+### ~~3. .env.example documents services that are only partially implemented~~ — KEPT INTENTIONALLY
+Env vars for Shippo, Geoapify, and Google Maps kept as-is. These stories are on the roadmap and the vars serve as documentation of what services to configure.
 
 ### 5. README.md BDD feature list uses legacy naming convention
 
