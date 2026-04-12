@@ -91,10 +91,19 @@ The project uses a **split directory structure** — pages live in `app/` at the
 app/                            # Next.js App Router (pages + API routes)
 ├── api/                        # API route handlers (thin controllers)
 ├── (auth)/login|register/      # Auth pages (route group, no /auth prefix in URL)
+├── analytics/                  # Analytics dashboard
 ├── dashboard/                  # Main dashboard
+├��─ docs/                       # In-app documentation
+├── health/                     # Health check endpoint
+├── listings/[id]/              # Individual listing detail pages
+├── messages/                   # Buyer/seller messaging
+├── onboarding/                 # New user wizard
 ├── opportunities/              # Opportunity tracking
+├── posting-queue/              # Resale listing queue
+├── privacy/                    # Privacy policy
+├── scraper/                    # Scraper management UI
 ├── settings/                   # User settings
-└── onboarding/                 # New user wizard
+└── terms/                      # Terms of service
 
 src/
 ├── components/                 # React components

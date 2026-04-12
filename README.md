@@ -60,8 +60,8 @@ Open [http://localhost:3000](http://localhost:3000) to view the dashboard.
 Create a `.env` file in the project root:
 
 ```env
-# Database (SQLite — works out of the box)
-DATABASE_URL="file:./dev.db"
+# Database (PostgreSQL)
+DATABASE_URL="postgresql://user:password@localhost:5432/flipper_dev"
 
 # Google Gemini API (for AI analysis)
 GOOGLE_API_KEY="your-google-api-key"
@@ -130,7 +130,7 @@ pnpm test -- --watch
 | **Framework** | Next.js 16 (App Router)      |
 | **Language**  | TypeScript (strict mode)     |
 | **UI**        | React, Tailwind CSS          |
-| **Database**  | SQLite (libSQL) + Prisma ORM |
+| **Database**  | PostgreSQL + Prisma ORM      |
 | **AI**        | Google Gemini via Stagehand  |
 | **Testing**   | Jest, Cucumber, Playwright   |
 | **CI/CD**     | GitHub Actions               |
@@ -318,9 +318,7 @@ HEALTH_URL=https://prod.app/api/health ./scripts/health/health-monitor.sh
 | API documentation              | ✅ Full endpoint coverage |
 | Sentry error tracking          | ✅ Configured |
 | Production deployment (Vercel) | ⏳ Awaiting Vercel credentials |
-| PostgreSQL migration           | ⏳ Awaiting production DB setup |
-
-> **Note:** The app runs fully on SQLite (libSQL) for local and dev environments. Vercel + PostgreSQL credentials are required for production deployment. See [BLOCKED cards on Trello](https://trello.com/b/SvVRLeS5/flipper-ai) for details.
+| PostgreSQL                     | ✅ Primary database (local + production) |
 
 ## 📄 License
 

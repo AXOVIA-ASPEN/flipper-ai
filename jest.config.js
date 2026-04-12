@@ -9,17 +9,9 @@ const config = {
     '**/*.test.tsx',
   ],
   // Exclude integration tests from default run (use pnpm test:integration)
-  // Also exclude Epic 12 test files (google-calendar, maps-service) — these are unfinished
-  // Epic 12 work that have failing tests due to mismatched implementation/test expectations.
-  // They will be fixed and re-enabled in Epic 12 stories.
   testPathIgnorePatterns: [
     '/node_modules/',
     '\\.integration\\.test\\.ts$',
-    'src/lib/__tests__/maps-service\\.test\\.ts$',
-    'src/__tests__/google-calendar-token-store\\.test\\.ts$',
-    'src/__tests__/google-calendar\\.test\\.ts$',
-    'src/__tests__/google-calendar-meeting-route\\.test\\.ts$',
-    'src/__tests__/google-calendar-passed-hook\\.test\\.ts$',
   ],
   moduleNameMapper: {
     '^@/app/(.*)$': '<rootDir>/app/$1',
