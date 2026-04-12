@@ -28,7 +28,8 @@ pnpm install
 # 3. Set up environment
 cp .env.production.example .env.local
 # Edit .env.local — at minimum set:
-#   AUTH_SECRET (run: openssl rand -base64 32)
+#   FIREBASE_CLIENT_EMAIL (from Firebase service account)
+#   FIREBASE_PRIVATE_KEY (from Firebase service account)
 #   ENCRYPTION_SECRET (run: openssl rand -base64 32)
 
 # 4. Set up the database
@@ -49,12 +50,11 @@ See `.env.production.example` for all variables. Key ones:
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `DATABASE_URL` | Yes | `file:./dev.db` for local SQLite |
-| `AUTH_SECRET` | Yes | NextAuth session secret |
+| `FIREBASE_CLIENT_EMAIL` | Yes | Firebase Admin SDK service account email |
+| `FIREBASE_PRIVATE_KEY` | Yes | Firebase Admin SDK private key |
 | `ENCRYPTION_SECRET` | Yes | Data encryption key |
-| `NEXTAUTH_URL` | Yes | `http://localhost:3000` for dev |
+| `APP_URL` | Yes | `http://localhost:3000` for dev |
 | `OPENAI_API_KEY` | Optional | For AI analysis features |
-| `GOOGLE_CLIENT_ID` | Optional | OAuth login |
-| `GITHUB_CLIENT_ID` | Optional | OAuth login |
 
 ---
 

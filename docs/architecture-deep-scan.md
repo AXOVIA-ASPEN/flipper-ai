@@ -19,7 +19,7 @@ Built as a Next.js 16 full-stack monolith with React 19, Prisma ORM (PostgreSQL)
 │  SSE Real-Time Events ─ Theme System ─ Kanban Board │
 ├─────────────────────────────────────────────────────┤
 │        API Layer (Next.js App Router)                │
-│  80+ Endpoints ─ NextAuth ─ Rate Limiting           │
+│  80+ Endpoints ─ Firebase Auth ─ Rate Limiting       │
 │  SSE Streaming ─ Stripe Webhooks ─ Image Proxy      │
 ├─────────────────────────────────────────────────────┤
 │        Business Logic (src/lib/ ─ 40+ files)         │
@@ -50,7 +50,7 @@ Built as a Next.js 16 full-stack monolith with React 19, Prisma ORM (PostgreSQL)
 | Styling | Tailwind CSS | ^4 | Utility-first CSS |
 | ORM | Prisma | ^7.4.0 | Database access layer |
 | Database | PostgreSQL | - | Primary data store |
-| Auth | NextAuth | ^5.0.0-beta.30 | Authentication (credentials + OAuth) |
+| Auth | Firebase Auth | firebase ^12.10.0, firebase-admin ^13.7.0 | Authentication (session cookies + OAuth) |
 | Payments | Stripe | ^20.3.1 | Subscription billing |
 | AI (Primary) | OpenAI SDK | ^4.73.0 | GPT-4o-mini for identification, analysis, descriptions |
 | AI (Secondary) | Anthropic SDK | ^0.74.0 | Claude Sonnet for item analysis |
@@ -154,7 +154,7 @@ IDENTIFIED → CONTACTED → PURCHASED → LISTED → SOLD
 
 ## Authentication & Authorization
 
-- **NextAuth v5** with credential provider (email/password)
+- **Firebase Auth** with session cookies (client-side sign-in, server `__session` cookie with 5-day TTL)
 - **bcryptjs** (12 rounds) for password hashing
 - **Facebook OAuth** for marketplace token acquisition
 - **Subscription tiers**: FREE → FLIPPER → PRO
@@ -168,7 +168,7 @@ IDENTIFIED → CONTACTED → PURCHASED → LISTED → SOLD
 ### PostgreSQL via Prisma ORM — 13 Models
 
 **Core Business:** Listing, Opportunity, ScraperJob, SearchConfig, PriceHistory
-**User & Auth:** User, Account, Session, VerificationToken, UserSettings, FacebookToken
+**User & Auth:** User, UserSettings, FacebookToken
 **Features:** Message, AiAnalysisCache, PostingQueueItem
 
 ### Key Relationships
@@ -177,7 +177,6 @@ User 1──* Listing 1──1 Opportunity
   │          ├──* Message
   │          └──* PostingQueueItem
   ├──1 UserSettings
-  ├──* Account (OAuth)
   ├──* ScraperJob
   └──* SearchConfig
 ```

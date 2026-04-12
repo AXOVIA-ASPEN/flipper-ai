@@ -7,8 +7,7 @@
 Flipper.ai exposes ~80+ API endpoints via Next.js App Router conventions. All routes live under `app/api/` and export HTTP method handlers (GET, POST, PATCH, DELETE). Responses follow a consistent `{ success, data/message }` shape.
 
 **Authentication Types:**
-- Session-based (NextAuth) — most endpoints
-- Firebase Bearer Token — listings, opportunities
+- Firebase Auth (session cookie) — most endpoints
 - Public — health, docs, unsubscribe
 - Stripe webhook signature — billing webhooks
 
@@ -160,8 +159,8 @@ Create account. Body: `{ email, password, name }`. Hashes with bcryptjs (12 roun
 ### `POST /api/auth/captcha-required`
 Check if CAPTCHA required for login.
 
-### `GET|POST /api/auth/[...nextauth]`
-NextAuth.js credential handling.
+### `POST /api/auth/session`
+Firebase Auth session cookie creation. Client sends Firebase ID token, server creates `__session` cookie (5-day TTL).
 
 ### Facebook OAuth
 - `POST /api/auth/facebook/authorize` — Initiate OAuth flow

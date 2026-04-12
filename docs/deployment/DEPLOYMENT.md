@@ -30,9 +30,10 @@ Create environment-specific files:
 # Database
 DATABASE_URL="postgresql://..."
 
-# Auth
-NEXTAUTH_URL="https://staging.flipper.axovia.ai"
-NEXTAUTH_SECRET="generate-with-openssl-rand-base64-32"
+# Auth (Firebase Auth)
+APP_URL="https://staging.flipper.axovia.ai"
+FIREBASE_CLIENT_EMAIL="firebase-adminsdk-xxxxx@axovia-flipper.iam.gserviceaccount.com"
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
 
 # AI
 ANTHROPIC_API_KEY="sk-ant-..."
@@ -50,8 +51,8 @@ RESEND_API_KEY="re_..."
 ```bash
 # Same structure as staging, but with production keys
 DATABASE_URL="postgresql://..."
-NEXTAUTH_URL="https://flipper.axovia.ai"
-# ... etc
+APP_URL="https://flipper.axovia.ai"
+# Firebase Auth + other service keys (see staging example)
 ```
 
 ## Deployment Process

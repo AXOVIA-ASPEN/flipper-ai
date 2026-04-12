@@ -98,9 +98,10 @@ pnpm format           # Prettier formatting
 
 ### Required
 ```bash
-DATABASE_URL=          # PostgreSQL connection string (or file:./dev.db for SQLite)
-NEXTAUTH_SECRET=       # NextAuth session encryption key
-NEXTAUTH_URL=          # App base URL (http://localhost:3000 for dev)
+DATABASE_URL=              # PostgreSQL connection string (or file:./dev.db for SQLite)
+FIREBASE_CLIENT_EMAIL=     # Firebase Admin SDK service account email
+FIREBASE_PRIVATE_KEY=      # Firebase Admin SDK private key
+APP_URL=                   # App base URL (http://localhost:3000 for dev)
 ```
 
 ### AI Integration (Optional)

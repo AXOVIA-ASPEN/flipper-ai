@@ -9,24 +9,24 @@
 | **.bmad/project.yaml** | Project name, type, tech stack, key dirs, commands, doc pointers |
 | **.bmad/conventions.md** | Coding style, testing, git/PRs, security, BMAD workflow |
 | **.bmad/templates/** | PRD, technical spec, and user story templates |
-| **docs/prd/** | Product requirements (main PRD is docs/PRD.md) |
-| **docs/architecture/** | Technical specs (main doc is docs/ARCHITECTURE.md) |
-| **docs/stories/** | User stories and acceptance criteria |
+| **_bmad-output/planning-artifacts/prd/** | Product requirements (PRD.md) |
+| **docs/architecture/** | Technical specs (ARCHITECTURE.md) |
+| **_bmad-output/implementation-artifacts/** | User stories organized by epic |
 
 ## Quick reference
 
-- **Product context:** Read `.bmad/project.yaml` and `docs/PRD.md`.
+- **Product context:** Read `.bmad/project.yaml` and `_bmad-output/planning-artifacts/prd/PRD.md`.
 - **How to work here:** `.bmad/conventions.md` and repo `AGENTS.md` / `CLAUDE.md`.
-- **New feature:** Start from `.bmad/templates/prd.md` or a user story in `docs/stories/`, then add a technical spec in `docs/architecture/` if needed.
+- **New feature:** Start from `.bmad/templates/prd.md` or create a story in `_bmad-output/implementation-artifacts/`, then add a technical spec in `docs/architecture/` if needed.
 
 ## Suggested next steps
 
 1. **Sprint 0 (optional)**  
-   - Add 2–3 user stories in `docs/stories/` for the next epic (e.g. Facebook scraper, opportunities dashboard).  
+   - Add 2–3 user stories in `_bmad-output/implementation-artifacts/` for the next epic.  
    - Reference them from your project board or backlog.
 
 2. **First sprint**  
-   - Pick a story from `docs/stories/`.  
+   - Pick a story from `_bmad-output/implementation-artifacts/`.  
    - If it’s non-trivial, add a short technical spec under `docs/architecture/` using `.bmad/templates/technical-spec.md`.  
    - Implement, test, and link PRs to the story.
 

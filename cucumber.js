@@ -1,18 +1,16 @@
 /**
  * Cucumber.js Configuration
- * Feature files and steps live under test/features/ (legacy BDD)
  * Acceptance tests live under test/acceptance/ (organized by epic)
  * Tags: make test-acceptance TAGS=@smoke  (optional)
  */
 
-const FEATURES_DIR = 'test/features';
 const ACCEPTANCE_DIR = 'test/acceptance';
 
 module.exports = {
   default: {
-    features: [`${FEATURES_DIR}/**/*.feature`],
+    features: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
     require: [
-      `${FEATURES_DIR}/step_definitions/**/*.ts`,
+      `${ACCEPTANCE_DIR}/step_definitions/**/*.ts`,
       `${ACCEPTANCE_DIR}/support/**/*.ts`,
     ],
     requireModule: ['tsx/cjs'],
@@ -34,9 +32,9 @@ module.exports = {
   // Pretty: Gherkin in real time, passing steps green, failing steps red (for make test-acceptance).
   // parallel: 0 = run in main process only (avoids ERR_IPC_CHANNEL_CLOSED with workers).
   pretty: {
-    features: [`${FEATURES_DIR}/**/*.feature`],
+    features: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
     require: [
-      `${FEATURES_DIR}/step_definitions/**/*.ts`,
+      `${ACCEPTANCE_DIR}/step_definitions/**/*.ts`,
       `${ACCEPTANCE_DIR}/support/**/*.ts`,
     ],
     requireModule: ['tsx/cjs'],
@@ -55,9 +53,9 @@ module.exports = {
   },
 
   ci: {
-    features: [`${FEATURES_DIR}/**/*.feature`],
+    features: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
     require: [
-      `${FEATURES_DIR}/step_definitions/**/*.ts`,
+      `${ACCEPTANCE_DIR}/step_definitions/**/*.ts`,
       `${ACCEPTANCE_DIR}/support/**/*.ts`,
     ],
     requireModule: ['tsx/cjs'],
@@ -68,9 +66,9 @@ module.exports = {
   },
 
   dev: {
-    features: [`${FEATURES_DIR}/**/*.feature`],
+    features: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
     require: [
-      `${FEATURES_DIR}/step_definitions/**/*.ts`,
+      `${ACCEPTANCE_DIR}/step_definitions/**/*.ts`,
       `${ACCEPTANCE_DIR}/support/**/*.ts`,
     ],
     requireModule: ['tsx/cjs'],
@@ -85,13 +83,15 @@ module.exports = {
   },
 
   // Acceptance tests organized by epic (test/acceptance/features/)
+  // @wip scenarios are excluded by default — run `make test-ac TAGS=@wip` to run them explicitly.
   acceptance: {
-    paths: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
+    features: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
     require: [
       `${ACCEPTANCE_DIR}/step_definitions/**/*.ts`,
       `${ACCEPTANCE_DIR}/support/**/*.ts`,
     ],
     requireModule: ['tsx/cjs'],
+    tags: 'not @wip',
     format: [
       'pretty',
       'html:reports/acceptance-report.html',

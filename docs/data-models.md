@@ -124,14 +124,14 @@ Core user model with subscription tracking.
 | onboardingComplete | Boolean | Onboarding status |
 | onboardingStep | Int | Current onboarding step (0-6) |
 
-### Account
-OAuth provider accounts (NextAuth adapter pattern).
+### Account (Deprecated)
+Legacy OAuth provider accounts from the former NextAuth adapter. These models have been removed from the Prisma schema. Authentication is now handled by Firebase Auth with session cookies (see `src/lib/firebase/session.ts`).
 
-### Session
-Active user sessions (NextAuth).
+### Session (Deprecated)
+Legacy NextAuth session model. Removed from Prisma schema. Sessions are now managed via Firebase Auth `__session` cookies with 5-day TTL.
 
-### VerificationToken
-Email verification tokens (NextAuth).
+### VerificationToken (Deprecated)
+Legacy NextAuth email verification tokens. Removed from Prisma schema. Email verification is now handled by Firebase Auth.
 
 ### UserSettings
 User preferences and API key storage.
@@ -194,13 +194,13 @@ User 1──* Listing 1──1 Opportunity
   │          └──* PostingQueueItem
   │
   ├──1 UserSettings
-  ├──* Account (OAuth)
-  ├──* Session
   ├──* ScraperJob
   ├──* SearchConfig
   └──1 FacebookToken
 
 Listing *──* AiAnalysisCache (cache layer)
 PriceHistory (standalone market reference)
-VerificationToken (standalone auth)
+
+Note: Account, Session, and VerificationToken models (legacy NextAuth)
+have been removed. Auth is handled by Firebase Auth with session cookies.
 ```

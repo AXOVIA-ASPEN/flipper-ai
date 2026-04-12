@@ -60,9 +60,9 @@ Or follow the manual steps below.
    ```
 
 7. **Authorized redirect URIs:**
+   Firebase Auth handles OAuth callbacks automatically. Add your Firebase Auth domain:
    ```
-   http://localhost:3000/api/auth/callback/google
-   https://axovia-flipper.web.app/api/auth/callback/google
+   https://axovia-flipper.firebaseapp.com/__/auth/handler
    ```
 
 8. Click **"Create"**
@@ -97,8 +97,8 @@ echo -n "your_google_client_secret_here" | gcloud secrets create GOOGLE_CLIENT_S
      - Prod: `https://axovia-flipper.web.app`
    - **Application description:** AI-powered marketplace flipping tool
    - **Authorization callback URL:**
-     - Dev: `http://localhost:3000/api/auth/callback/github`
-     - Prod: `https://axovia-flipper.web.app/api/auth/callback/github`
+     Firebase Auth handles OAuth callbacks. Use:
+     `https://axovia-flipper.firebaseapp.com/__/auth/handler`
 
 4. Click **"Register application"**
 
@@ -131,17 +131,17 @@ After deploying to Firebase Hosting + Cloud Run, update your OAuth callback URLs
 ### Google Console
 1. Go to: https://console.developers.google.com
 2. Navigate to **Credentials** → your OAuth client
-3. Add your production URL to **Authorized redirect URIs**:
+3. Ensure the Firebase Auth handler is in **Authorized redirect URIs**:
    ```
-   https://axovia-flipper.web.app/api/auth/callback/google
+   https://axovia-flipper.firebaseapp.com/__/auth/handler
    ```
 
 ### GitHub Settings
 1. Go to: https://github.com/settings/developers
 2. Click on your OAuth app
-3. Update **Authorization callback URL**:
+3. Update **Authorization callback URL** to the Firebase Auth handler:
    ```
-   https://axovia-flipper.web.app/api/auth/callback/github
+   https://axovia-flipper.firebaseapp.com/__/auth/handler
    ```
 
 ---
@@ -221,13 +221,13 @@ npx playwright test e2e/acceptance/auth-oauth.spec.ts --headed
    - Go to Google Console → OAuth consent screen
    - Click **"Publish App"** (for external users)
 
-4. **NEXTAUTH_URL mismatch**
+4. **APP_URL mismatch**
    ```bash
    # In .env.local (dev)
-   NEXTAUTH_URL=http://localhost:3000
+   APP_URL=http://localhost:3000
    
    # In production
-   NEXTAUTH_URL=https://axovia-flipper.web.app
+   APP_URL=https://axovia-flipper.web.app
    ```
 
 ### "redirect_uri_mismatch" Error
@@ -237,7 +237,7 @@ npx playwright test e2e/acceptance/auth-oauth.spec.ts --headed
 1. Check the error message for the actual redirect URI being used
 2. Add that **exact** URI to Google Console:
    - Go to Credentials → OAuth 2.0 Client → Authorized redirect URIs
-   - Add: `http://localhost:3000/api/auth/callback/google`
+   - Ensure the Firebase Auth handler URL is listed
 
 ### GitHub OAuth Error
 
@@ -245,9 +245,9 @@ npx playwright test e2e/acceptance/auth-oauth.spec.ts --headed
 
 1. Go to: https://github.com/settings/developers
 2. Select your OAuth app
-3. Verify **Authorization callback URL** matches:
+3. Verify **Authorization callback URL** matches the Firebase Auth handler:
    ```
-   http://localhost:3000/api/auth/callback/github
+   https://axovia-flipper.firebaseapp.com/__/auth/handler
    ```
 
 ### Tests Failing
@@ -268,15 +268,16 @@ npx playwright test e2e/acceptance/auth-oauth.spec.ts --headed
 **Required for OAuth:**
 
 ```bash
-# NextAuth
-✅ NEXTAUTH_SECRET=your-secret-here
-✅ NEXTAUTH_URL=http://localhost:3000  # or production URL
+# Firebase Auth
+✅ FIREBASE_CLIENT_EMAIL=your-service-account@project.iam.gserviceaccount.com
+✅ FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
+✅ APP_URL=http://localhost:3000  # or production URL
 
-# Google OAuth (optional)
+# Google OAuth (configured in Firebase Console)
 ✅ GOOGLE_CLIENT_ID=your_google_client_id
 ✅ GOOGLE_CLIENT_SECRET=your_google_client_secret
 
-# GitHub OAuth (optional)
+# GitHub OAuth (configured in Firebase Console)
 ✅ GITHUB_CLIENT_ID=your_github_client_id
 ✅ GITHUB_CLIENT_SECRET=your_github_client_secret
 ```
@@ -313,7 +314,7 @@ OAuth is working correctly when:
 
 ## 📚 Additional Resources
 
-- [NextAuth.js Docs](https://next-auth.js.org)
+- [Firebase Auth Docs](https://firebase.google.com/docs/auth)
 - [Google OAuth Setup](https://developers.google.com/identity/protocols/oauth2)
 - [GitHub OAuth Apps](https://docs.github.com/en/apps/oauth-apps)
 - [GCP Secret Manager](https://cloud.google.com/secret-manager/docs)

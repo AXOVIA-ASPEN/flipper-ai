@@ -29,7 +29,7 @@ Flipper.ai is an AI-powered marketplace arbitrage platform that helps users find
 | Database | PostgreSQL via Prisma ORM (13 models) |
 | AI | OpenAI GPT-4o-mini + Anthropic Claude Sonnet |
 | Scraping | Playwright + Stagehand (AI browser automation) |
-| Auth | NextAuth v5 (credentials + Facebook OAuth) |
+| Auth | Firebase Auth (session cookies + Facebook OAuth) |
 | Payments | Stripe (FREE/FLIPPER/PRO tiers) |
 | Monitoring | Sentry + Firebase Analytics |
 | Testing | Jest + Playwright + Cucumber (full pyramid) |

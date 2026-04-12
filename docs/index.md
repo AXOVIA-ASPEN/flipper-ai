@@ -93,9 +93,7 @@
 - [User Flows](./prd/user-flows.md) — User interaction flows
 
 ### Archive
-- [Worker Sprint 2026-02-13](./archive/WORKER_SPRINT_2026-02-13.md) — Sprint notes
-- [SSE Investigation 2026-02-19](./archive/sse-investigation-2026-02-19.md) — Investigation notes
-- [Worker Report](./archive/WORKER_REPORT_2026-02-19_04-00.md)
+- [Firebase Migration Tracker](./archive/FIREBASE_MIGRATION_TRACKER.md) — Migration tracking notes
 
 ### Reports
 - [VALUE-REPORT-001](./reports/VALUE-REPORT-001.json) — Sample value report
