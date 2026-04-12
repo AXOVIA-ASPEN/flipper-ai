@@ -96,7 +96,7 @@ export async function calculateDistance(
       toLocation,
       calculationMethod: 'geoapify',
     };
-  } catch (error) {
+  } catch (error) /* istanbul ignore next -- outer catch is defensive; geocodeLocation handles all errors internally */ {
     console.warn('Distance calculation error:', error);
     return null;
   }

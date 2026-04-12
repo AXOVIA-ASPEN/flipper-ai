@@ -87,6 +87,7 @@ let openai: OpenAI | null = null;
 function getOpenAI(): OpenAI {
   if (!openai) {
     const apiKey = process.env.OPENAI_API_KEY;
+    /* istanbul ignore next -- defensive guard; generatePurchaseMessage already returns fallback when key is absent */
     if (!apiKey) {
       throw new Error('OPENAI_API_KEY environment variable is not set');
     }

@@ -23,6 +23,49 @@ export interface MarketPrice {
   avgDaysToSell: number | null;
   searchQuery: string;
   fetchedAt: Date;
+  /** Number of price outliers removed by IQR filtering (0 if no filtering applied) */
+  outliersRemoved?: number;
+  /** True if insufficient data remained after filtering (fewer than 4 prices) */
+  lowSampleSize?: boolean;
+}
+
+/**
+ * IQR-based outlier filtering for price arrays.
+ * Uses the 1.5×IQR fencing method with nearest-rank percentiles
+ * to match the existing implementation in market-value-calculator.ts.
+ *
+ * Returns the original prices unfiltered if fewer than 4 remain
+ * after filtering (insufficient sample for meaningful IQR).
+ */
+export interface OutlierFilterResult {
+  filteredPrices: number[];
+  outliersRemoved: number;
+  lowSampleSize: boolean;
+}
+
+export function filterOutliers(prices: number[]): OutlierFilterResult {
+  if (prices.length < 4) {
+    return { filteredPrices: prices, outliersRemoved: 0, lowSampleSize: true };
+  }
+
+  const sorted = [...prices].sort((a, b) => a - b);
+  const q1Index = Math.floor(sorted.length * 0.25);
+  const q3Index = Math.floor(sorted.length * 0.75);
+  const q1 = sorted[q1Index];
+  const q3 = sorted[q3Index];
+  const iqr = q3 - q1;
+  const lowerFence = q1 - 1.5 * iqr;
+  const upperFence = q3 + 1.5 * iqr;
+
+  const filteredPrices = sorted.filter((p) => p >= lowerFence && p <= upperFence);
+  const outliersRemoved = prices.length - filteredPrices.length;
+
+  // If filtering leaves fewer than 4 prices, fall back to unfiltered
+  if (filteredPrices.length < 4) {
+    return { filteredPrices: sorted, outliersRemoved: 0, lowSampleSize: true };
+  }
+
+  return { filteredPrices, outliersRemoved, lowSampleSize: false };
 }
 
 // Parse price string from eBay
@@ -218,7 +261,7 @@ export async function fetchMarketPrice(
       };
     });
 
-    // Calculate statistics
+    // Calculate statistics with IQR outlier filtering
     const prices = soldListings.map((l) => l.price + l.shippingCost);
     const validPrices = prices.filter((p) => p > 0);
 
@@ -226,17 +269,21 @@ export async function fetchMarketPrice(
       return null;
     }
 
+    const { filteredPrices, outliersRemoved, lowSampleSize } = filterOutliers(validPrices);
+
     return {
       source: 'ebay_scrape',
       soldListings,
-      medianPrice: Math.round(median(validPrices)),
-      lowPrice: Math.round(Math.min(...validPrices)),
-      highPrice: Math.round(Math.max(...validPrices)),
-      avgPrice: Math.round(validPrices.reduce((a, b) => a + b, 0) / validPrices.length),
+      medianPrice: Math.round(median(filteredPrices)),
+      lowPrice: Math.round(Math.min(...filteredPrices)),
+      highPrice: Math.round(Math.max(...filteredPrices)),
+      avgPrice: Math.round(filteredPrices.reduce((a, b) => a + b, 0) / filteredPrices.length),
       salesCount: soldListings.length,
       avgDaysToSell: null, // Would need sold dates to calculate
       searchQuery,
       fetchedAt: new Date(),
+      outliersRemoved,
+      lowSampleSize,
     };
   } catch (error) {
     console.error('Error fetching market price:', error);

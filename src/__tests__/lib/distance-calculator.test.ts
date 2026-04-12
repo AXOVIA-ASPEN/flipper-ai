@@ -113,6 +113,45 @@ describe('calculateDistance()', () => {
       // Value should equal its own 1-decimal rounded form
       expect(result!.distanceMiles).toBe(Math.round(result!.distanceMiles * 10) / 10);
     });
+
+    it('returns null when feature exists but has no geometry coordinates', async () => {
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      mockFetch
+        .mockResolvedValueOnce(makeGeoapifyResponse(27.9506, -82.4572))
+        .mockResolvedValueOnce({
+          ok: true,
+          // feature exists but geometry.coordinates is absent — hits the !feature?.geometry?.coordinates branch
+          json: async () => ({ features: [{ geometry: {} }] }),
+        });
+
+      const result = await calculateDistance('Tampa, FL', 'Nowhere');
+      expect(result).toBeNull();
+      consoleSpy.mockRestore();
+    });
+
+    it('returns null when both geocode results are null', async () => {
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      // Both calls return non-ok so both coords are null — exercises the !fromCoords || !toCoords branch with fromCoords null
+      mockFetch
+        .mockResolvedValueOnce({ ok: false, status: 404 })
+        .mockResolvedValueOnce({ ok: false, status: 404 });
+
+      const result = await calculateDistance('Bad place 1', 'Bad place 2');
+      expect(result).toBeNull();
+      consoleSpy.mockRestore();
+    });
+
+    it('returns null when geocoding API response body is null', async () => {
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      // response.json() returns null — exercises the data?.features?.[0] optional-chain branch (data is null)
+      mockFetch
+        .mockResolvedValueOnce(makeGeoapifyResponse(27.9506, -82.4572))
+        .mockResolvedValueOnce({ ok: true, json: async () => null });
+
+      const result = await calculateDistance('Tampa, FL', 'Null response place');
+      expect(result).toBeNull();
+      consoleSpy.mockRestore();
+    });
   });
 
   describe('clearGeocodeCache()', () => {

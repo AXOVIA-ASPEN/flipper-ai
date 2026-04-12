@@ -44,11 +44,11 @@ So that I maximize profit while remaining competitive.
 
 | FR | AC | Test Tag |
 |---|---|---|
-| FR-RELIST-03 | AC-1 | @E-009-S-TBD @story-9-2 @FR-RELIST-03 |
-| FR-RELIST-03 | AC-2 | @E-009-S-TBD @story-9-2 @FR-RELIST-03 |
-| FR-RELIST-03 | AC-3 | @E-009-S-TBD @story-9-2 @FR-RELIST-03 |
-| FR-RELIST-03 | AC-4 | @E-009-S-TBD @story-9-2 @FR-RELIST-03 |
-| FR-RELIST-03 | AC-5 | @E-009-S-TBD @story-9-2 @FR-RELIST-03 |
+| FR-RELIST-03 | AC-1 (optimal price formula, market cap) | @E-009-S-12 @E-009-S-13 @story-9-2 @FR-RELIST-03 |
+| FR-RELIST-03 | AC-2 (price breakdown display) | @E-009-S-14 @story-9-2 @FR-RELIST-03 |
+| FR-RELIST-03 | AC-3 (real-time margin adjustment) | @E-009-S-15 @story-9-2 @FR-RELIST-03 |
+| FR-RELIST-03 | AC-4 (edge case handling) | @E-009-S-16 @E-009-S-17 @E-009-S-18 @story-9-2 @FR-RELIST-03 |
+| FR-RELIST-03 | AC-5 (pre-purchase projection) | @E-009-S-19 @story-9-2 @FR-RELIST-03 |
 
 ## Tasks / Subtasks
 

@@ -70,8 +70,21 @@ export async function GET(
     const listingTitle: string = opportunity.listing?.title ?? 'Unknown Item';
     const mapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(meetingLocation)}`;
 
+    // Guard: no meetingTime set — cannot compute departure, return degraded
+    if (!opportunity.meetingTime) {
+      return NextResponse.json({
+        success: true,
+        data: {
+          state: 'degraded',
+          location: meetingLocation,
+          listingTitle,
+          mapsSearchUrl,
+        },
+      });
+    }
+
     // AC-2: meeting already in the past → return past_meeting state
-    if (opportunity.meetingTime && opportunity.meetingTime < new Date()) {
+    if (opportunity.meetingTime < new Date()) {
       return NextResponse.json({
         success: true,
         data: {
@@ -132,25 +145,20 @@ export async function GET(
       });
     }
 
-    // Compute departure time using buffer
-    let departureTime: Date | null = null;
-    let departureIsPast = false;
-
-    if (opportunity.meetingTime) {
-      departureTime = new Date(
-        opportunity.meetingTime.getTime()
-          - route.durationSeconds * 1000
-          - bufferMinutes * 60 * 1000
-      );
-      departureIsPast = departureTime < new Date();
-    }
+    // Compute departure time using buffer (meetingTime is guaranteed non-null after the guard above)
+    const departureTime = new Date(
+      opportunity.meetingTime.getTime()
+        - route.durationSeconds * 1000
+        - bufferMinutes * 60 * 1000
+    );
+    const departureIsPast = departureTime < new Date();
 
     return NextResponse.json({
       success: true,
       data: {
         state: 'ok',
         route,
-        departureTime: departureTime?.toISOString() ?? null,
+        departureTime: departureTime.toISOString(),
         departureIsPast,
         deepLinkUrl: route.deepLinkUrl,
         mapsSearchUrl: route.mapsSearchUrl,

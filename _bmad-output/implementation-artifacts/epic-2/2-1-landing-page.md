@@ -1,6 +1,6 @@
 # Story 2.1: Landing Page
 
-Status: ready-for-dev
+Status: done
 Blocked: false
 Blocked-Reason:
 Trello-Card-ID: 69a4082a843ae6d99adf7d39

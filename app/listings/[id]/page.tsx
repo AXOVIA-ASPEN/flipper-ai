@@ -448,7 +448,7 @@ function ListingDetail() {
                     {/* Story 12.2: Driving route card — only when meetingLocation is set */}
                     {listing.opportunity.meetingLocation && (
                       <div className="mb-4">
-                        <MeetingRouteCard opportunityId={listing.opportunity.id} />
+                        <MeetingRouteCard opportunityId={listing.opportunity.id} meetingLocation={listing.opportunity.meetingLocation} />
                       </div>
                     )}
 

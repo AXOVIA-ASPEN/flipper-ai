@@ -281,6 +281,9 @@ When('a customer.subscription.deleted webhook fires', async function () {
   userTier = 'FREE';
 });
 
-Then('the user\'s subscription tier is updated to {string} in the database', function (expectedTier: string) {
-  assert.strictEqual(userTier, expectedTier, `Expected tier ${expectedTier} but got ${userTier}`);
+Then('the user\'s subscription tier is updated to {string} in the database', function (this: { testData?: Record<string, unknown> }, expectedTier: string) {
+  // Prefer cross-step World testData when set by checkout scenarios (story 7.2),
+  // fall back to local userTier for billing/webhook scenarios (story 7.1).
+  const actualTier = this.testData?.subscriptionTier ?? userTier;
+  assert.strictEqual(actualTier, expectedTier, `Expected tier ${expectedTier} but got ${actualTier}`);
 });

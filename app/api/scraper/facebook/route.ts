@@ -10,6 +10,7 @@ import { analyzeDemandTrend } from '@/lib/demand-analyzer';
 import { enrichOpportunitiesWithClaudeTier2, enrichWithCompletenessAndReputation, getPlatformFeeRate } from '@/lib/marketplace-scanner';
 import { analyzeLogistics } from '@/lib/logistics-analyzer';
 import { getAuthUserId } from '@/lib/auth-middleware';
+import { decrypt } from '@/lib/crypto';
 
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import { enforceTierLimits } from '@/lib/tier-enforcement';
@@ -138,8 +139,7 @@ async function getUserFacebookToken(userId: string): Promise<string | null> {
     return null;
   }
 
-  // TODO: Decrypt token (if encryption is implemented)
-  return tokenRecord.accessToken;
+  return decrypt(tokenRecord.accessToken);
 }
 
 /**

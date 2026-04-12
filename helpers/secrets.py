@@ -97,6 +97,24 @@ class IntegrationSecrets:
     # Story 12.1: Google Calendar OAuth credentials (FR-INFRA-11)
     GOOGLE_CALENDAR_CLIENT_ID: Optional[str] = None
     GOOGLE_CALENDAR_CLIENT_SECRET: Optional[str] = None
+    # Story 12.2: Google Maps Directions API key (route generation)
+    GOOGLE_MAPS_API_KEY: Optional[str] = None
+
+
+@dataclass
+class SchedulerSecrets:
+    # Story 10.1: Background monitoring scheduler auth key
+    MONITORING_API_KEY: Optional[str] = None
+    # Story 10.x: Notification processing scheduler auth key
+    NOTIFICATIONS_PROCESS_API_KEY: Optional[str] = None
+
+
+@dataclass
+class SmsSecrets:
+    # Story 11.2: Twilio SMS integration
+    TWILIO_ACCOUNT_SID: Optional[str] = None
+    TWILIO_AUTH_TOKEN: Optional[str] = None
+    TWILIO_FROM_NUMBER: Optional[str] = None
 
 
 # All dataclass types in loading order
@@ -109,6 +127,8 @@ _SECRET_CLASSES = (
     EmailSecrets,
     MonitoringSecrets,
     IntegrationSecrets,
+    SchedulerSecrets,
+    SmsSecrets,
 )
 
 # Pre-computed list of (field_name, is_required) for every secret field.

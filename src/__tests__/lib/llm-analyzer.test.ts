@@ -22,6 +22,10 @@ jest.mock('openai', () => ({
   })),
 }));
 
+jest.mock('@sentry/nextjs', () => ({
+  captureException: jest.fn(),
+}));
+
 jest.mock('@/lib/db', () => ({
   __esModule: true,
   default: {
@@ -85,6 +89,8 @@ const MOCK_MARKET_DATA: MarketPrice = {
   avgDaysToSell: 7,
   searchQuery: 'Apple iPhone 12 128GB',
   fetchedAt: new Date(),
+  outliersRemoved: 0,
+  lowSampleSize: false,
 };
 
 const MOCK_ANALYSIS_RESULT: SellabilityAnalysis = {
@@ -137,12 +143,13 @@ describe('LLM Analyzer', () => {
   // ==========================================================
 
   describe('getCachedSellabilityAnalysis', () => {
-    test('should return L1 cached result without DB call', async () => {
+    test('should return L1 cached result without DB call (no price provided)', async () => {
       mockCacheGet.mockReturnValue(MOCK_ANALYSIS_RESULT);
 
       const result = await getCachedSellabilityAnalysis('listing-123');
 
-      expect(result).toEqual(MOCK_ANALYSIS_RESULT);
+      expect(result.analysis).toEqual(MOCK_ANALYSIS_RESULT);
+      expect(result.staleAnalysis).toBe(false);
       expect(prisma.aiAnalysisCache.findFirst).not.toHaveBeenCalled();
     });
 
@@ -151,38 +158,38 @@ describe('LLM Analyzer', () => {
         id: 'cache-id',
         listingId: 'listing-456',
         analysisResult: JSON.stringify(MOCK_ANALYSIS_RESULT),
+        analyzedAtPrice: 200,
         expiresAt: new Date(Date.now() + 1000 * 60 * 60),
       });
 
       const result = await getCachedSellabilityAnalysis('listing-456');
 
-      // Dates are serialized to strings during JSON.stringify/parse round-trip
-      expect(result).not.toBeNull();
-      expect(result!.sellabilityScore).toBe(MOCK_ANALYSIS_RESULT.sellabilityScore);
-      expect(result!.demandLevel).toBe(MOCK_ANALYSIS_RESULT.demandLevel);
-      expect(result!.meetsThreshold).toBe(MOCK_ANALYSIS_RESULT.meetsThreshold);
+      expect(result.analysis).not.toBeNull();
+      expect(result.analysis!.sellabilityScore).toBe(MOCK_ANALYSIS_RESULT.sellabilityScore);
+      expect(result.analysis!.demandLevel).toBe(MOCK_ANALYSIS_RESULT.demandLevel);
+      expect(result.staleAnalysis).toBe(false);
       expect(mockCacheSet).toHaveBeenCalledWith(
         'openai:listing-456',
         expect.objectContaining({ sellabilityScore: 80, demandLevel: 'high' })
       );
     });
 
-    test('should return null when L1 and L2 both miss', async () => {
+    test('should return null analysis when L1 and L2 both miss', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
 
       const result = await getCachedSellabilityAnalysis('listing-miss');
 
-      expect(result).toBeNull();
+      expect(result.analysis).toBeNull();
     });
 
-    test('should return null and log error when DB throws', async () => {
+    test('should return null analysis and log error when DB throws', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockRejectedValue(
         new Error('DB connection error')
       );
 
       const result = await getCachedSellabilityAnalysis('listing-dberr');
 
-      expect(result).toBeNull();
+      expect(result.analysis).toBeNull();
     });
 
     test('should query DB with correct analysisType filter', async () => {
@@ -199,6 +206,82 @@ describe('LLM Analyzer', () => {
         })
       );
     });
+
+    test('should invalidate cache when price changed >15%', async () => {
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue({
+        id: 'cache-id',
+        listingId: 'listing-price-drop',
+        analysisResult: JSON.stringify(MOCK_ANALYSIS_RESULT),
+        analyzedAtPrice: 200,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+      });
+
+      // Price dropped from 200 to 160 = 20% change → invalidate
+      const result = await getCachedSellabilityAnalysis('listing-price-drop', 160);
+
+      expect(result.analysis).toBeNull();
+      expect(result.staleAnalysis).toBe(false);
+    });
+
+    test('should return stale flag when price changed 5-15%', async () => {
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue({
+        id: 'cache-id',
+        listingId: 'listing-price-bump',
+        analysisResult: JSON.stringify(MOCK_ANALYSIS_RESULT),
+        analyzedAtPrice: 200,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+      });
+
+      // Price changed from 200 to 220 = 10% change → stale
+      const result = await getCachedSellabilityAnalysis('listing-price-bump', 220);
+
+      expect(result.analysis).not.toBeNull();
+      expect(result.staleAnalysis).toBe(true);
+    });
+
+    test('should return fresh hit when price changed <5%', async () => {
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue({
+        id: 'cache-id',
+        listingId: 'listing-stable',
+        analysisResult: JSON.stringify(MOCK_ANALYSIS_RESULT),
+        analyzedAtPrice: 200,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+      });
+
+      // Price changed from 200 to 205 = 2.5% change → fresh hit
+      const result = await getCachedSellabilityAnalysis('listing-stable', 205);
+
+      expect(result.analysis).not.toBeNull();
+      expect(result.staleAnalysis).toBe(false);
+    });
+
+    test('should treat null analyzedAtPrice as expired (legacy entry)', async () => {
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue({
+        id: 'cache-id',
+        listingId: 'listing-legacy',
+        analysisResult: JSON.stringify(MOCK_ANALYSIS_RESULT),
+        analyzedAtPrice: null, // legacy entry
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+      });
+
+      const result = await getCachedSellabilityAnalysis('listing-legacy', 200);
+
+      expect(result.analysis).toBeNull(); // treated as expired
+    });
+
+    test('should treat zero analyzedAtPrice as always-invalidate', async () => {
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue({
+        id: 'cache-id',
+        listingId: 'listing-free',
+        analysisResult: JSON.stringify(MOCK_ANALYSIS_RESULT),
+        analyzedAtPrice: 0,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+      });
+
+      const result = await getCachedSellabilityAnalysis('listing-free', 50);
+
+      expect(result.analysis).toBeNull(); // division by zero guard
+    });
   });
 
   // ==========================================================
@@ -206,10 +289,10 @@ describe('LLM Analyzer', () => {
   // ==========================================================
 
   describe('cacheSellabilityAnalysis', () => {
-    test('should upsert DB and populate L1 cache', async () => {
+    test('should upsert DB with analyzedAtPrice and populate L1 cache', async () => {
       (prisma.aiAnalysisCache.upsert as jest.Mock).mockResolvedValue({});
 
-      await cacheSellabilityAnalysis('listing-789', MOCK_ANALYSIS_RESULT);
+      await cacheSellabilityAnalysis('listing-789', MOCK_ANALYSIS_RESULT, 200);
 
       expect(prisma.aiAnalysisCache.upsert).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -218,6 +301,7 @@ describe('LLM Analyzer', () => {
             listingId: 'listing-789',
             analysisType: 'openai',
             analysisResult: JSON.stringify(MOCK_ANALYSIS_RESULT),
+            analyzedAtPrice: 200,
             expiresAt: expect.any(Date),
           }),
           update: expect.objectContaining({
@@ -289,11 +373,11 @@ describe('LLM Analyzer', () => {
       expect(mockCreate).not.toHaveBeenCalled();
     });
 
-    test('should call OpenAI when no cache hit and return parsed result', async () => {
+    test('should call OpenAI with response_format json_object and return parsed result', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
       (prisma.aiAnalysisCache.upsert as jest.Mock).mockResolvedValue({});
       mockCreate.mockResolvedValue({
-        choices: [{ message: { content: MOCK_OPENAI_JSON } }],
+        choices: [{ message: { content: MOCK_OPENAI_JSON }, finish_reason: 'stop' }],
       });
 
       const result = await analyzeSellability(
@@ -311,13 +395,17 @@ describe('LLM Analyzer', () => {
       expect(result!.demandLevel).toBe('high');
       expect(result!.meetsThreshold).toBe(true);
       expect(mockCreate).toHaveBeenCalledTimes(1);
+
+      // Verify response_format is passed
+      const callArgs = mockCreate.mock.calls[0][0];
+      expect(callArgs.response_format).toEqual({ type: 'json_object' });
     });
 
     test('should cache result when listingId is provided', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
       (prisma.aiAnalysisCache.upsert as jest.Mock).mockResolvedValue({});
       mockCreate.mockResolvedValue({
-        choices: [{ message: { content: MOCK_OPENAI_JSON } }],
+        choices: [{ message: { content: MOCK_OPENAI_JSON }, finish_reason: 'stop' }],
       });
 
       await analyzeSellability(
@@ -339,7 +427,7 @@ describe('LLM Analyzer', () => {
 
     test('should not cache result when no listingId provided', async () => {
       mockCreate.mockResolvedValue({
-        choices: [{ message: { content: MOCK_OPENAI_JSON } }],
+        choices: [{ message: { content: MOCK_OPENAI_JSON }, finish_reason: 'stop' }],
       });
 
       await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
@@ -348,9 +436,40 @@ describe('LLM Analyzer', () => {
       expect(mockCacheSet).not.toHaveBeenCalled();
     });
 
-    test('should return null when JSON match fails', async () => {
+    test('should retry with simplified prompt when JSON parse fails', async () => {
+      // First call returns invalid JSON, retry returns valid JSON
+      mockCreate
+        .mockResolvedValueOnce({
+          choices: [{ message: { content: 'Not valid JSON at all' }, finish_reason: 'stop' }],
+        })
+        .mockResolvedValueOnce({
+          choices: [{ message: { content: MOCK_OPENAI_JSON }, finish_reason: 'stop' }],
+        });
+
+      const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
+
+      expect(result).not.toBeNull();
+      expect(result!.sellabilityScore).toBe(80);
+      expect(mockCreate).toHaveBeenCalledTimes(2);
+    });
+
+    test('should return null when both parse attempts fail', async () => {
+      mockCreate
+        .mockResolvedValueOnce({
+          choices: [{ message: { content: 'Not valid JSON' }, finish_reason: 'stop' }],
+        })
+        .mockResolvedValueOnce({
+          choices: [{ message: { content: 'Still not JSON' }, finish_reason: 'stop' }],
+        });
+
+      const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
+
+      expect(result).toBeNull();
+    });
+
+    test('should return null when response content is null', async () => {
       mockCreate.mockResolvedValue({
-        choices: [{ message: { content: 'No JSON here at all' } }],
+        choices: [{ message: { content: null }, finish_reason: 'stop' }],
       });
 
       const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
@@ -369,7 +488,7 @@ describe('LLM Analyzer', () => {
 
     test('should use default discountThreshold of 50 when not provided', async () => {
       mockCreate.mockResolvedValue({
-        choices: [{ message: { content: MOCK_OPENAI_JSON } }],
+        choices: [{ message: { content: MOCK_OPENAI_JSON }, finish_reason: 'stop' }],
       });
 
       await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
@@ -385,6 +504,7 @@ describe('LLM Analyzer', () => {
           message: {
             content: JSON.stringify({ ...JSON.parse(MOCK_OPENAI_JSON), demandLevel: 'invalid' }),
           },
+          finish_reason: 'stop',
         }],
       });
 
@@ -400,6 +520,7 @@ describe('LLM Analyzer', () => {
           message: {
             content: JSON.stringify({ ...JSON.parse(MOCK_OPENAI_JSON), authenticityRisk: 'extreme' }),
           },
+          finish_reason: 'stop',
         }],
       });
 
@@ -415,6 +536,7 @@ describe('LLM Analyzer', () => {
           message: {
             content: JSON.stringify({ ...JSON.parse(MOCK_OPENAI_JSON), sellabilityScore: 150 }),
           },
+          finish_reason: 'stop',
         }],
       });
 
@@ -430,6 +552,7 @@ describe('LLM Analyzer', () => {
           message: {
             content: JSON.stringify({ ...JSON.parse(MOCK_OPENAI_JSON), verifiedMarketValue: null }),
           },
+          finish_reason: 'stop',
         }],
       });
 
@@ -445,6 +568,7 @@ describe('LLM Analyzer', () => {
           message: {
             content: JSON.stringify({ ...JSON.parse(MOCK_OPENAI_JSON), meetsThreshold: false }),
           },
+          finish_reason: 'stop',
         }],
       });
 
@@ -516,7 +640,7 @@ describe('LLM Analyzer', () => {
 
     test('should return full analysis result when analyzeSellability succeeds', async () => {
       mockCreate.mockResolvedValue({
-        choices: [{ message: { content: MOCK_OPENAI_JSON } }],
+        choices: [{ message: { content: MOCK_OPENAI_JSON }, finish_reason: 'stop' }],
       });
 
       const result = await runFullAnalysis(

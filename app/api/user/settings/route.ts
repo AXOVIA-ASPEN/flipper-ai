@@ -3,6 +3,7 @@ import prisma from '@/lib/db';
 import { encrypt, decrypt, maskApiKey } from '@/lib/crypto';
 import { getAuthUserId } from '@/lib/auth-middleware';
 import { logger } from '@/lib/logger';
+import { invalidateUserRouteCache } from '@/lib/maps-service';
 
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 // Story 12.1: Google Calendar integration status
@@ -338,6 +339,8 @@ export async function PATCH(request: NextRequest) {
     // Logistics settings (Story 5.5)
     if (homeLocation !== undefined) {
       updateData.homeLocation = homeLocation === '' ? null : homeLocation;
+      // Story 12.2: Invalidate route cache so next request recalculates from new address
+      invalidateUserRouteCache(user.id);
     }
     if (maxPickupRadiusMiles !== undefined) {
       const radius = Math.round(Number(maxPickupRadiusMiles));

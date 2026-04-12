@@ -165,5 +165,53 @@ describe('classifyItemLogistics()', () => {
       const result = await classifyItemLogistics('Tiny item', null, 'electronics');
       expect(result.estimatedWeightLbs).toBe(0.1);
     });
+
+    it('returns empty string for classificationReasoning when LLM omits it', async () => {
+      mockCreate.mockResolvedValue(makeOpenAIResponse({
+        sizeCategory: 'small_shippable',
+        estimatedWeightLbs: 2,
+        estimatedDimensionsInches: { length: 8, width: 6, height: 3 },
+        // classificationReasoning intentionally omitted — hits the || '' branch
+        confidence: 'medium',
+      }));
+
+      const result = await classifyItemLogistics('Widget', 'A small widget', 'electronics');
+      expect(result.classificationReasoning).toBe('');
+    });
+
+    it('falls back to weight default of 5 when LLM returns zero for estimatedWeightLbs', async () => {
+      // 0 is falsy, so `Number(0) || 5` evaluates to 5
+      mockCreate.mockResolvedValue(makeOpenAIResponse({
+        sizeCategory: 'small_shippable',
+        estimatedWeightLbs: 0,
+        estimatedDimensionsInches: { length: 8, width: 6, height: 3 },
+        classificationReasoning: 'Zero weight',
+        confidence: 'low',
+      }));
+
+      const result = await classifyItemLogistics('Weightless thing', null, 'electronics');
+      // 0 || 5 = 5, then Math.max(0.1, Math.min(200, 5)) = 5
+      expect(result.estimatedWeightLbs).toBe(5);
+    });
+
+    it('falls back to category default when LLM returns null message content', async () => {
+      // response.choices[0]?.message?.content is null — the `|| ''` branch — JSON.parse('') throws
+      mockCreate.mockResolvedValue({ choices: [{ message: { content: null } }] });
+
+      const result = await classifyItemLogistics('Item', null, 'electronics');
+      // Falls back to category-based classification since JSON.parse('') throws
+      expect(result.sizeCategory).toBe('small_shippable');
+      expect(result.confidence).toBe('low');
+    });
+
+    it('falls back when response choices array is empty', async () => {
+      // Exercises the choices[0]?.message?.content optional-chain short-circuit when choices[0] is undefined
+      mockCreate.mockResolvedValue({ choices: [] });
+
+      const result = await classifyItemLogistics('Item', null, 'electronics');
+      // JSON.parse('') throws → fallback
+      expect(result.sizeCategory).toBe('small_shippable');
+      expect(result.confidence).toBe('low');
+    });
   });
 });

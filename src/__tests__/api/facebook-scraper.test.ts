@@ -26,6 +26,13 @@ jest.mock('@/lib/auth-middleware', () => ({
   getAuthUserId: jest.fn(),
 }));
 
+jest.mock('@/lib/crypto', () => ({
+  encrypt: jest.fn((v: string) => v),
+  decrypt: jest.fn((v: string) => v),
+  maskApiKey: jest.fn((v: string) => v),
+  isEncrypted: jest.fn(() => false),
+}));
+
 jest.mock('@/lib/value-estimator', () => ({
   estimateValue: jest.fn(() => ({
     estimatedValue: 150,

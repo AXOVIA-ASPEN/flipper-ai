@@ -24,12 +24,16 @@ jest.mock('@/lib/db', () => ({
   },
 }));
 
-// Mock market-price for lookupVerifiedMarketPrice tests
+// Mock market-price for lookupVerifiedMarketPrice tests — pass through real filterOutliers
 const mockFetchMarketPrice = jest.fn();
-jest.mock('@/lib/market-price', () => ({
-  fetchMarketPrice: (...args: unknown[]) => mockFetchMarketPrice(...args),
-  closeBrowser: jest.fn().mockResolvedValue(undefined),
-}));
+jest.mock('@/lib/market-price', () => {
+  const actual = jest.requireActual('@/lib/market-price') as Record<string, unknown>;
+  return {
+    ...actual,
+    fetchMarketPrice: (...args: unknown[]) => mockFetchMarketPrice(...args),
+    closeBrowser: jest.fn().mockResolvedValue(undefined),
+  };
+});
 
 import { describe, test, expect, beforeEach } from '@jest/globals';
 import {

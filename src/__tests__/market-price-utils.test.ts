@@ -1,7 +1,7 @@
 // Tests for market-price.ts utility functions (parseEbayPrice, median, parseSoldDate, buildEbaySoldUrl)
 // These are pure functions that don't need Playwright mocking
 
-import { parseEbayPrice, median, parseSoldDate, buildEbaySoldUrl } from '../lib/market-price';
+import { parseEbayPrice, median, parseSoldDate, buildEbaySoldUrl, filterOutliers } from '../lib/market-price';
 
 describe('parseEbayPrice', () => {
   it('parses standard dollar price', () => {
@@ -208,5 +208,127 @@ describe('buildEbaySoldUrl', () => {
   it('encodes special characters in query', () => {
     const url = buildEbaySoldUrl('iPhone 14 Pro & Max');
     expect(url).toContain('iPhone+14+Pro+%26+Max');
+  });
+});
+
+describe('filterOutliers', () => {
+  it('removes extreme outliers from a normal distribution', () => {
+    // Dataset: most items around $100, one at $1000 (outlier)
+    const prices = [95, 100, 105, 110, 90, 1000, 98, 102];
+    const result = filterOutliers(prices);
+
+    expect(result.filteredPrices).not.toContain(1000);
+    expect(result.outliersRemoved).toBe(1);
+    expect(result.lowSampleSize).toBe(false);
+  });
+
+  it('returns all prices when no outliers exist', () => {
+    const prices = [100, 105, 110, 115, 120];
+    const result = filterOutliers(prices);
+
+    expect(result.filteredPrices).toHaveLength(5);
+    expect(result.outliersRemoved).toBe(0);
+    expect(result.lowSampleSize).toBe(false);
+  });
+
+  it('returns sorted filtered prices', () => {
+    const prices = [300, 100, 200, 150, 250];
+    const result = filterOutliers(prices);
+
+    for (let i = 1; i < result.filteredPrices.length; i++) {
+      expect(result.filteredPrices[i]).toBeGreaterThanOrEqual(result.filteredPrices[i - 1]);
+    }
+  });
+
+  it('handles all identical prices (IQR = 0)', () => {
+    const prices = [50, 50, 50, 50, 50];
+    const result = filterOutliers(prices);
+
+    expect(result.filteredPrices).toHaveLength(5);
+    expect(result.outliersRemoved).toBe(0);
+    expect(result.lowSampleSize).toBe(false);
+  });
+
+  it('falls back to unfiltered when fewer than 4 prices input', () => {
+    const prices = [100, 200, 300];
+    const result = filterOutliers(prices);
+
+    expect(result.filteredPrices).toHaveLength(3);
+    expect(result.outliersRemoved).toBe(0);
+    expect(result.lowSampleSize).toBe(true);
+  });
+
+  it('falls back to unfiltered when filtering leaves fewer than 4 prices', () => {
+    // 5 prices with 2 extreme outliers → after filtering, only 3 remain → below minimum → fallback
+    const prices = [100, 105, 110, 1, 10000];
+    const result = filterOutliers(prices);
+
+    // Q1 index=1→1, Q3 index=3→105, IQR=104, fences=[-155, 261]
+    // 10000 > 261 → outlier. 1 >= -155 → kept. So only 10000 removed, leaving 4.
+    // Actually need to design a case where filtering truly leaves <4.
+    // With 4 items and no outliers possible (IQR too wide), use 5+ items
+    // where multiple are outliers.
+    // Re-check: [1, 100, 105, 110, 10000] sorted. Q1=idx1=100, Q3=idx3=110, IQR=10
+    // Fences: 100-15=85, 110+15=125. Items outside: 1 and 10000.
+    // Filtered = [100, 105, 110] = 3 items → below 4 → fallback!
+    expect(result.filteredPrices).toHaveLength(5); // all original prices returned (sorted)
+    expect(result.outliersRemoved).toBe(0);
+    expect(result.lowSampleSize).toBe(true);
+  });
+
+  it('handles single element array', () => {
+    const result = filterOutliers([500]);
+    expect(result.filteredPrices).toEqual([500]);
+    expect(result.lowSampleSize).toBe(true);
+  });
+
+  it('handles empty array', () => {
+    const result = filterOutliers([]);
+    expect(result.filteredPrices).toEqual([]);
+    expect(result.lowSampleSize).toBe(true);
+  });
+
+  it('removes both low and high outliers', () => {
+    // Core cluster around 100, outliers at 1 and 500
+    const prices = [1, 95, 100, 105, 110, 98, 102, 500];
+    const result = filterOutliers(prices);
+
+    expect(result.filteredPrices).not.toContain(1);
+    expect(result.filteredPrices).not.toContain(500);
+    expect(result.outliersRemoved).toBe(2);
+    expect(result.lowSampleSize).toBe(false);
+  });
+
+  it('works with max scraper output (20 items) without being overly aggressive', () => {
+    // Realistic eBay data: mostly $80-120, one collector premium at $250
+    const prices = [80, 85, 90, 92, 95, 98, 100, 102, 105, 108, 110, 112, 115, 118, 120, 122, 125, 130, 140, 250];
+    const result = filterOutliers(prices);
+
+    // The $250 should be removed as outlier, rest should stay
+    expect(result.filteredPrices).not.toContain(250);
+    expect(result.filteredPrices.length).toBeGreaterThanOrEqual(15);
+    expect(result.lowSampleSize).toBe(false);
+  });
+
+  it('uses nearest-rank percentile method matching market-value-calculator', () => {
+    // Verify Q1 and Q3 are calculated with Math.floor(n * 0.25) / Math.floor(n * 0.75)
+    // For 8 items: Q1 index = floor(8*0.25) = 2, Q3 index = floor(8*0.75) = 6
+    const prices = [10, 20, 30, 40, 50, 60, 70, 80];
+    const result = filterOutliers(prices);
+    // Q1 = 30, Q3 = 70, IQR = 40, fences = [-30, 130]
+    // All prices within fences
+    expect(result.filteredPrices).toHaveLength(8);
+    expect(result.outliersRemoved).toBe(0);
+  });
+
+  it('correctly calculates with skewed distribution', () => {
+    // Cluster at low end with one moderate high value
+    const prices = [10, 12, 14, 15, 16, 18, 20, 100];
+    const result = filterOutliers(prices);
+
+    // Q1=12, Q3=20, IQR=8, upper fence=20+12=32
+    // 100 > 32 → outlier
+    expect(result.filteredPrices).not.toContain(100);
+    expect(result.outliersRemoved).toBe(1);
   });
 });

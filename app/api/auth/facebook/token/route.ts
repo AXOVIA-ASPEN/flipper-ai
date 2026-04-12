@@ -10,6 +10,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/firebase/session';
 import { handleError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import { encrypt } from '@/lib/crypto';
 import prisma from '@/lib/db';
 
 export async function POST(req: NextRequest) {
@@ -50,11 +51,11 @@ export async function POST(req: NextRequest) {
         where: { userId: sessionUser.id },
         create: {
           userId: sessionUser.id,
-          accessToken: accessToken,
+          accessToken: encrypt(accessToken),
           expiresAt,
         },
         update: {
-          accessToken: accessToken,
+          accessToken: encrypt(accessToken),
           expiresAt,
         },
       });
@@ -70,11 +71,11 @@ export async function POST(req: NextRequest) {
       where: { userId: sessionUser.id },
       create: {
         userId: sessionUser.id,
-        accessToken: exchangeData.access_token,
+        accessToken: encrypt(exchangeData.access_token),
         expiresAt,
       },
       update: {
-        accessToken: exchangeData.access_token,
+        accessToken: encrypt(exchangeData.access_token),
         expiresAt,
       },
     });

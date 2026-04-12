@@ -226,4 +226,36 @@ describe('POST /api/listings/[id]/negotiation-strategy', () => {
     const json = await res.json();
     expect(json.data.isFallback).toBe(true);
   });
+
+  // ── Null user (optional chaining on subscriptionTier) ────────────────────
+
+  it('uses undefined subscriptionTier when user record is null', async () => {
+    mockUserFindUnique.mockResolvedValue(null);
+    // checkFeatureAccess is still allowed — verifies the undefined tier is passed through
+    await POST(createRequest(), makeParams('listing-1'));
+    expect(mockCheckFeatureAccess).toHaveBeenCalledWith(undefined, 'messaging');
+  });
+
+  // ── Non-null marketDataDate ──────────────────────────────────────────────
+
+  it('passes marketDataDate when it is non-null', async () => {
+    const marketDate = new Date('2026-01-15T00:00:00.000Z');
+    mockListingFindFirst.mockResolvedValue({
+      ...sampleListing,
+      marketDataDate: marketDate,
+    });
+    await POST(createRequest(), makeParams('listing-1'));
+    expect(mockGenerateNegotiationStrategy).toHaveBeenCalledWith(
+      expect.objectContaining({ marketDataDate: marketDate })
+    );
+  });
+
+  // ── Missing listing ID ───────────────────────────────────────────────────
+
+  it('returns 422 when listing ID param is empty string', async () => {
+    const res = await POST(createRequest(), makeParams(''));
+    expect(res.status).toBe(422);
+    const json = await res.json();
+    expect(json.success).toBe(false);
+  });
 });

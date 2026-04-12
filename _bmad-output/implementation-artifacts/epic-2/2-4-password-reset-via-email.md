@@ -1,6 +1,6 @@
 # Story 2.4: Password Reset via Email
 
-Status: ready-for-dev
+Status: done
 Blocked: false
 Blocked-Reason:
 Trello-Card-ID: 69a41e9daef377f007f0e2c6

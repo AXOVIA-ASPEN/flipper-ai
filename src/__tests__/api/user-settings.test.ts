@@ -21,6 +21,11 @@ jest.mock('@/lib/logger', () => ({
   logger: { info: jest.fn(), warn: jest.fn(), error: jest.fn() },
 }));
 
+// Mock maps-service — settings PATCH calls invalidateUserRouteCache when homeLocation changes
+jest.mock('@/lib/maps-service', () => ({
+  invalidateUserRouteCache: jest.fn(),
+}));
+
 // Mock Prisma
 const mockFindUnique = jest.fn();
 const mockCreateSettings = jest.fn();

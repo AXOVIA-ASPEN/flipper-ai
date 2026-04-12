@@ -1,6 +1,6 @@
 # Story 2.2: User Registration with Email
 
-Status: ready-for-dev
+Status: done
 Blocked: false
 Blocked-Reason:
 Trello-Card-ID: 69a40fb46e39b500adc59fb1

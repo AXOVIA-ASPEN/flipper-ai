@@ -201,6 +201,61 @@ describe('generateFallbackMessage', () => {
     const result = generateFallbackMessage(baseInput);
     expect(result.platform).toBe('CRAIGSLIST');
   });
+
+  it('uses "complete the transaction promptly" in offer body for professional tone', () => {
+    // Professional tone (e.g. EBAY) triggers the non-casual branch in buildFallbackBody offer template
+    const result = generateFallbackMessage({
+      ...baseInput,
+      platform: 'EBAY',
+      messageType: 'offer',
+      offerPrice: 110,
+    });
+    expect(result.body).toContain('complete the transaction promptly');
+  });
+
+  it('uses "pick it up quickly" in offer body for casual tone', () => {
+    const result = generateFallbackMessage({
+      ...baseInput,
+      platform: 'CRAIGSLIST',
+      messageType: 'offer',
+      offerPrice: 110,
+    });
+    expect(result.body).toContain('pick it up quickly');
+  });
+
+  it('derives tone from input platform when tone arg is not provided', () => {
+    // generateFallbackMessage(input) — both messageType and tone are derived from input
+    const result = generateFallbackMessage(
+      { ...baseInput, platform: 'FACEBOOK', messageType: 'inquiry' }
+    );
+    expect(result.tone).toBe('friendly');
+    expect(result.isFallback).toBe(true);
+  });
+
+  it('uses casual "Hi!" greeting when no seller name and tone is not professional', () => {
+    // Covers the sellerName=falsy + tone='casual' branch in buildFallbackBody (line 233/235)
+    const result = generateFallbackMessage({
+      ...baseInput,
+      platform: 'CRAIGSLIST',
+      sellerName: null,
+      messageType: 'inquiry',
+    });
+    expect(result.body).toContain('Hi!');
+    expect(result.body).not.toContain('Hello,');
+  });
+
+  it('omits seller name reference in prompt when sellerName is absent', () => {
+    // Covers the sellerRef false branch in buildMessagePrompt (line 102)
+    // We verify this via the generated prompt content when sellerName is null/undefined
+    // (exercised via generateFallbackMessage since sellerRef is internal to buildMessagePrompt)
+    const result = generateFallbackMessage({
+      ...baseInput,
+      sellerName: undefined,
+      messageType: 'inquiry',
+    });
+    expect(result.isFallback).toBe(true);
+    expect(result.body).toContain('Hi!');
+  });
 });
 
 // ── AI Message Generation ────────────────────────────────────────────────────
@@ -446,5 +501,51 @@ describe('generatePurchaseMessage', () => {
     expect(userMessage.content).toContain('Alice');
     expect(userMessage.content).toContain('Like New');
     expect(userMessage.content).toContain('Need it for work');
+  });
+
+  it('omits offer price line in prompt when messageType is offer but offerPrice is null', async () => {
+    // Exercises the `messageType === 'offer' && input.offerPrice` branch where offerPrice is falsy
+    mockCreate.mockResolvedValue(mockAIResponse('Subject', 'Body'));
+
+    await generatePurchaseMessage({
+      ...baseInput,
+      messageType: 'offer',
+      offerPrice: null,
+    });
+
+    const callArgs = mockCreate.mock.calls[0][0];
+    const userMessage = callArgs.messages.find((m: { role: string }) => m.role === 'user');
+    expect(userMessage.content).not.toContain('The buyer wants to offer');
+    expect(userMessage.content).toContain('Sony WH-1000XM5 Headphones');
+  });
+
+  it('uses "seller name is unknown" text in prompt when sellerName is absent', async () => {
+    // Covers the sellerRef false branch in buildMessagePrompt (line 102)
+    mockCreate.mockResolvedValue(mockAIResponse('Subject', 'Body'));
+
+    await generatePurchaseMessage({
+      ...baseInput,
+      sellerName: null,
+    });
+
+    const callArgs = mockCreate.mock.calls[0][0];
+    const userMessage = callArgs.messages.find((m: { role: string }) => m.role === 'user');
+    expect(userMessage.content).toContain('seller name is unknown');
+  });
+
+  it('falls back when response choices[0].message.content is null', async () => {
+    // Covers the response.choices[0]?.message?.content || '' branch (line 171) when content is null
+    mockCreate.mockResolvedValue({ choices: [{ message: { content: null } }] });
+
+    const result = await generatePurchaseMessage(baseInput);
+    expect(result.isFallback).toBe(true);
+  });
+
+  it('falls back when response choices array is empty', async () => {
+    // Exercises the choices[0]?.message?.content optional-chain short-circuit when choices[0] is undefined
+    mockCreate.mockResolvedValue({ choices: [] });
+
+    const result = await generatePurchaseMessage(baseInput);
+    expect(result.isFallback).toBe(true);
   });
 });

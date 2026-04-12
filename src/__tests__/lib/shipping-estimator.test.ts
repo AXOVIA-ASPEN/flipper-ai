@@ -138,5 +138,60 @@ describe('estimateShippingCosts()', () => {
         })
       );
     });
+
+    it('treats a rate with null amount as invalid (skips it)', async () => {
+      mockShipmentsCreate.mockResolvedValue({
+        rates: [
+          { provider: 'USPS', amount: null },
+          { provider: 'FedEx', amount: '11.00' },
+        ],
+      });
+
+      const result = await estimateShippingCosts(3, DIMS, '10001');
+      // null amount → ?? '0' → parseFloat('0') = 0 → skipped (amount <= 0)
+      expect(result!.usps).toBeNull();
+      expect(result!.fedex).toBe(11.0);
+    });
+
+    it('treats a rate with null provider as an unknown carrier (not counted)', async () => {
+      mockShipmentsCreate.mockResolvedValue({
+        rates: [
+          { provider: null, amount: '5.00' },
+          { provider: 'USPS', amount: '8.00' },
+        ],
+      });
+
+      const result = await estimateShippingCosts(2, DIMS, '10001');
+      // null provider → ?? '' → ''.toLowerCase() = '' → includes none of usps/ups/fedex
+      expect(result!.usps).toBe(8.0);
+      expect(result!.ups).toBeNull();
+      expect(result!.fedex).toBeNull();
+    });
+
+    it('keeps existing UPS rate when a later UPS rate is higher', async () => {
+      mockShipmentsCreate.mockResolvedValue({
+        rates: [
+          { provider: 'UPS', amount: '10.00' },
+          { provider: 'UPS', amount: '15.00' }, // higher — should NOT replace 10.00
+        ],
+      });
+
+      const result = await estimateShippingCosts(4, DIMS, '10001');
+      expect(result!.ups).toBe(10.0);
+    });
+
+    it('keeps lowest FedEx rate when multiple FedEx rates exist', async () => {
+      // Exercises the `fedex === null || amount < fedex` branch — specifically `amount < fedex` (fedex is non-null)
+      mockShipmentsCreate.mockResolvedValue({
+        rates: [
+          { provider: 'FedEx', amount: '15.00' },
+          { provider: 'FedEx', amount: '12.50' }, // lower — should replace 15.00
+          { provider: 'FedEx', amount: '18.00' }, // higher — should NOT replace 12.50
+        ],
+      });
+
+      const result = await estimateShippingCosts(3, DIMS, '10001');
+      expect(result!.fedex).toBe(12.5);
+    });
   });
 });

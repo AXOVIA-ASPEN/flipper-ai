@@ -5,6 +5,76 @@ Feature: AI Scoring, Deal Evaluation & Verified Market Price
   So that I can make confident buying decisions based on real sold data
 
   # =====================================================================
+  # Story 4.1: Algorithmic Value Score
+  # AC #1: Score 0–100 for every scraped listing
+  # AC #2: Category detection (10 categories + other)
+  # AC #3: Brand boost keywords applied
+  # AC #4: Risk penalty keywords applied
+  # AC #5: Estimated market value > asking price for good deals
+  # =====================================================================
+
+  # S-001: Value score is in the 0-100 range for a standard good-condition listing
+  @E-004-S-001 @FR-SCORE-01 @story-4-1
+  Scenario: Algorithmic value score is bounded between 0 and 100
+    Given a listing titled "Sony 55 inch 4K TV" priced at 200 in "good" condition
+    When the algorithmic scoring engine evaluates the listing
+    Then the value score should be between 0 and 100
+
+  # S-002: Electronics are correctly detected as the "electronics" category
+  @E-004-S-002 @FR-SCORE-02 @story-4-1
+  Scenario: Category detector classifies an electronics listing correctly
+    Given a listing titled "laptop computer Dell XPS 15" with description "great condition"
+    When the value score category detector runs
+    Then the detected category should be "electronics"
+
+  # S-003: Tools category is detected and furniture category is detected
+  @E-004-S-003 @FR-SCORE-02 @story-4-1
+  Scenario Outline: Category detector classifies multiple categories correctly
+    Given a listing titled <title> with description <description>
+    When the value score category detector runs
+    Then the detected category should be <category>
+
+    Examples:
+      | title                                      | description             | category       |
+      | "DeWalt power drill set"                   | "barely used"           | "tools"        |
+      | "couch sectional sofa living room"         | "great shape"           | "furniture"    |
+      | "Nintendo Switch OLED console"             | "like new"              | "video games"  |
+      | "vintage antique dresser 1920s"            | "solid wood"            | "collectibles" |
+
+  # S-004: Apple brand keyword triggers a score boost
+  @E-004-S-004 @FR-SCORE-03 @story-4-1
+  Scenario: Brand boost keyword raises the result tags for a recognizable brand
+    Given a listing titled "Apple MacBook Pro 2021" priced at 500 in "good" condition
+    When the algorithmic scoring engine evaluates the listing
+    Then the result tags should include "apple"
+    And the estimated value should be greater than the asking price of 500
+
+  # S-005: Risk penalty keyword (broken/for-parts) reduces estimated value
+  @E-004-S-005 @FR-SCORE-04 @story-4-1
+  Scenario: Risk penalty keyword lowers the estimated value for a broken item
+    Given a listing titled "iPhone broken for parts only" priced at 50 in "poor" condition
+    When the algorithmic scoring engine evaluates the listing
+    Then the result tags should include "for-parts"
+    And the estimated value should be at most 100
+
+  # S-006: Estimated market value exceeds asking price on a high-multiplier brand + category
+  @E-004-S-006 @FR-SCORE-05 @story-4-1
+  Scenario: Estimated market value is computed as a markup above asking price
+    Given a listing titled "Nintendo Switch new sealed in box" priced at 150 in "new" condition
+    When the algorithmic scoring engine evaluates the listing
+    Then the estimated value should be greater than the asking price of 150
+    And the estimated low value should be at least 150
+    And the estimated high value should be at least 200
+
+  # S-007: Extreme high-value item with multiple boosts caps value score at 100
+  @E-004-S-007 @FR-SCORE-01 @story-4-1
+  Scenario: Value score is capped at 100 even for extremely profitable listings
+    Given a listing titled "Dyson vacuum rare limited edition sealed new in box" priced at 50 in "new" condition
+    When the algorithmic scoring engine evaluates the listing
+    Then the value score should be between 0 and 100
+    And the estimated value should be greater than the asking price of 50
+
+  # =====================================================================
   # Story 4.2: Platform-Specific Fees & Opportunity Threshold
   # AC #1: Platform fees applied to profit calculation
   # AC #2: Fee rates editable via Settings API
@@ -65,6 +135,41 @@ Feature: AI Scoring, Deal Evaluation & Verified Market Price
     And the Craigslist v2 route at "app/api/scraper/craigslist/route.v2.ts" uses opportunityThreshold for the same guard
     And the Facebook scraper route at "app/api/scraper/facebook/route.ts" uses opportunityThreshold for the same guard
     And the Mercari scraper route at "app/api/scraper/mercari/route.ts" uses opportunityThreshold for the same guard
+
+  # =====================================================================
+  # Story 4.3: LLM Item Identification
+  # AC #1: enrichOpportunitiesWithLLM integrates identifyItem for opportunity listings
+  # AC #2: Identified fields (brand, model, variant, year, condition) stored on Listing
+  # AC #3: identifiedSearchQuery stored on Listing
+  # AC #4: Graceful fallback when LLM API is unavailable (null llmIdentification, llmAnalyzed false)
+  # =====================================================================
+
+  # S-013: marketplace-scanner exports enrichOpportunitiesWithLLM and imports identifyItem
+  @E-004-S-013 @FR-SCORE-08 @story-4-3
+  Scenario: marketplace-scanner exports enrichOpportunitiesWithLLM and integrates identifyItem
+    Given the llm-identifier module is integrated in "src/lib/marketplace-scanner.ts"
+    When I inspect the marketplace-scanner exported functions
+    Then "enrichOpportunitiesWithLLM" is exported as an async function
+    And the module imports identifyItem from llm-identifier
+
+  # S-014: formatForStorage maps all LLM identification fields including searchQuery
+  @E-004-S-014 @FR-SCORE-08 @story-4-3
+  Scenario: formatForStorage maps all LLM identification fields to database columns
+    Given the llm-identifier module is integrated in "src/lib/marketplace-scanner.ts"
+    When I inspect the formatForStorage function body
+    Then it maps identifiedBrand from llmIdentification
+    And it maps identifiedModel from llmIdentification
+    And it maps identifiedYear from llmIdentification
+    And it maps identifiedSearchQuery from llmIdentification
+    And it sets llmAnalyzed based on llmIdentification presence
+
+  # S-015: enrichOpportunitiesWithLLM handles LLM API errors gracefully
+  @E-004-S-015 @FR-SCORE-08 @story-4-3
+  Scenario: enrichOpportunitiesWithLLM falls back gracefully when LLM API is unavailable
+    Given the llm-identifier module is integrated in "src/lib/marketplace-scanner.ts"
+    When I inspect the enrichOpportunitiesWithLLM function body
+    Then it has a try-catch block around the identifyItem call
+    And on error the listing is returned with null llmIdentification
 
   # =====================================================================
   # Story 4.4: Verified Market Price Lookup

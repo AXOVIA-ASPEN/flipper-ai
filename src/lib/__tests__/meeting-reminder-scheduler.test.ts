@@ -22,7 +22,7 @@ import { NotificationEventType } from '@/lib/notification-events';
 jest.mock('@/lib/db', () => ({
   __esModule: true,
   default: {
-    opportunity: { findMany: jest.fn() },
+    opportunity: { findMany: jest.fn(), findUnique: jest.fn() },
     notificationEvent: { findFirst: jest.fn(), create: jest.fn() },
   },
 }));
@@ -115,7 +115,7 @@ beforeEach(() => {
   (getRoute as jest.Mock).mockResolvedValue(MOCK_ROUTE);
   (prisma.notificationEvent.findFirst as jest.Mock).mockResolvedValue(null);
   (prisma.notificationEvent.create as jest.Mock).mockResolvedValue({ id: 'evt_1' });
-  (prisma.opportunity.findUnique as jest.Mock) = jest.fn().mockResolvedValue({
+  (prisma.opportunity.findUnique as jest.Mock).mockResolvedValue({
     meetingLocation: '456 Oak Ave, Bellevue, WA',
   });
 });
@@ -149,7 +149,7 @@ describe('runMeetingReminderScheduler', () => {
     // The WHERE clause filters out null meetingLocation, but simulate a race condition
     // where meetingLocation is cleared between query and processing by mocking findUnique
     (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([makeOpportunity()]);
-    (prisma.opportunity.findUnique as jest.Mock) = jest.fn().mockResolvedValue({
+    (prisma.opportunity.findUnique as jest.Mock).mockResolvedValue({
       meetingLocation: null,
     });
 
@@ -164,7 +164,7 @@ describe('runMeetingReminderScheduler', () => {
     (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([makeOpportunity()]);
     // Simulate existing event (already created in first run)
     (prisma.notificationEvent.findFirst as jest.Mock).mockResolvedValue({ id: 'existing_evt' });
-    (prisma.opportunity.findUnique as jest.Mock) = jest.fn().mockResolvedValue({
+    (prisma.opportunity.findUnique as jest.Mock).mockResolvedValue({
       meetingLocation: '456 Oak Ave, Bellevue, WA',
     });
 

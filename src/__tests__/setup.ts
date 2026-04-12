@@ -106,10 +106,6 @@ jest.mock('@/generated/prisma/client', () => ({
   Prisma: { JsonNull: null },
 }));
 
-jest.mock('@prisma/adapter-libsql', () => ({
-  PrismaLibSql: jest.fn(),
-}));
-
 // Individual test files mock @/lib/db themselves if needed
 
 // Extend Jest matchers if needed

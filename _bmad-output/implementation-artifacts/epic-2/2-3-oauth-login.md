@@ -1,6 +1,6 @@
 # Story 2.3: OAuth Login (Google, GitHub, Facebook)
 
-Status: ready-for-dev
+Status: done
 Blocked: false
 Blocked-Reason:
 Trello-Card-ID: 69a41978e88fd8b6308fcc8f

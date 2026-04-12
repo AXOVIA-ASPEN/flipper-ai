@@ -369,12 +369,13 @@ model Message {
 }
 
 model AiAnalysisCache {
-  id             String   @id @default(cuid())
-  listingId      String
-  analysisType   String   @default("claude") // "claude" | "openai"
-  analysisResult String
-  createdAt      DateTime @default(now())
-  expiresAt      DateTime
+  id              String   @id @default(cuid())
+  listingId       String
+  analysisType    String   @default("claude") // "claude" | "openai"
+  analysisResult  String
+  analyzedAtPrice Float?   // Asking price at analysis time; null for legacy entries (treat as expired)
+  createdAt       DateTime @default(now())
+  expiresAt       DateTime
 
   @@unique([listingId, analysisType])
   @@index([listingId])

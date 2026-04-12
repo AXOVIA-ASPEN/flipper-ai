@@ -54,6 +54,8 @@ interface MapsRouteData {
 
 interface MeetingRouteCardProps {
   opportunityId: string;
+  /** meetingLocation is passed as a prop so the error fallback can build a valid Maps search URL */
+  meetingLocation?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -111,7 +113,7 @@ function RouteCardSkeleton(): React.JSX.Element {
 // Main component
 // ---------------------------------------------------------------------------
 
-export default function MeetingRouteCard({ opportunityId }: MeetingRouteCardProps): React.JSX.Element {
+export default function MeetingRouteCard({ opportunityId, meetingLocation }: MeetingRouteCardProps): React.JSX.Element {
   const [data, setData] = useState<MapsRouteData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -142,12 +144,15 @@ export default function MeetingRouteCard({ opportunityId }: MeetingRouteCardProp
 
   // Fetch error fallback
   if (error || !data) {
+    const fallbackSearchUrl = meetingLocation
+      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(meetingLocation)}`
+      : 'https://www.google.com/maps';
     return (
       <div className="border border-gray-200 rounded-lg p-4 bg-gray-50" data-testid="route-card-error">
         <p className="text-sm text-gray-600">
           Could not load route.{' '}
           <a
-            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(opportunityId)}`}
+            href={fallbackSearchUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-600 hover:underline inline-flex items-center gap-1"
@@ -263,7 +268,7 @@ export default function MeetingRouteCard({ opportunityId }: MeetingRouteCardProp
 
       {/* Traffic disclaimer (AC-2) */}
       <p className="text-xs text-gray-500 mb-3">
-        Estimates based on typical traffic. Add extra time during rush hour.
+        Estimate based on typical traffic conditions — add extra time during peak hours.
         Driving directions shown — tap Open in Maps to switch to transit or walking.
       </p>
 

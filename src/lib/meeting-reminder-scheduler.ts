@@ -100,7 +100,7 @@ export async function runMeetingReminderScheduler(): Promise<MeetingReminderRunS
       },
     },
     include: {
-      listing: { select: { id: true, title: true } },
+      listing: { select: { id: true, title: true, sellerName: true } },
       user: {
         select: {
           id: true,
@@ -234,6 +234,7 @@ export async function runMeetingReminderScheduler(): Promise<MeetingReminderRunS
         opportunityId: opp.id,
         listingId: opp.listing?.id ?? '',
         listingTitle,
+        sellerName: opp.listing?.sellerName ?? undefined,
         meetingTime: meetingTime.toISOString(),
         meetingLocation,
         deepLinkUrl,

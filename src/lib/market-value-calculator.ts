@@ -8,7 +8,7 @@
  */
 
 import prisma from '@/lib/db';
-import { fetchMarketPrice } from './market-price';
+import { fetchMarketPrice, filterOutliers } from './market-price';
 
 export interface VerifiedPriceLookupResult {
   verifiedMarketValue: number;
@@ -153,23 +153,9 @@ export async function calculateVerifiedMarketValue(
     return null;
   }
 
-  // Extract prices
+  // Extract prices and filter outliers using shared IQR utility
   const prices = soldListings.map((listing) => listing.soldPrice);
-  const originalCount = prices.length;
-
-  // Remove outliers using IQR method
-  prices.sort((a, b) => a - b);
-  const q1Index = Math.floor(prices.length * 0.25);
-  const q3Index = Math.floor(prices.length * 0.75);
-  const q1 = prices[q1Index];
-  const q3 = prices[q3Index];
-  const iqr = q3 - q1;
-  const lowerBound = q1 - 1.5 * iqr;
-  const upperBound = q3 + 1.5 * iqr;
-
-  // Filter outliers
-  const filteredPrices = prices.filter((p) => p >= lowerBound && p <= upperBound);
-  const outliersRemoved = originalCount - filteredPrices.length;
+  const { filteredPrices, outliersRemoved } = filterOutliers(prices);
 
   // Calculate statistics
   const min = filteredPrices[0];

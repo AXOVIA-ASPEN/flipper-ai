@@ -1,7 +1,7 @@
 ---
 Story: 12.2
 Title: Google Maps Route Generation
-Status: review
+Status: done
 Blocked: false
 Blocked-Reason: ""
 Trello-Card-ID: "69d964f52c84d93fd87a7693"
@@ -11,7 +11,7 @@ Sprint: Phase 2
 
 # Story 12.2: Google Maps Route Generation
 
-Status: review
+Status: done
 
 <!-- Elicitation complete — 15 methods applied 2026-04-10. See Dev Notes for full rationale. -->
 
@@ -196,7 +196,8 @@ so that I leave at the right time, arrive on schedule, and never lose a deal by 
     5. If `now >= meetingTime` → skip (meeting started); log warning
   - Deduplication: before creating `NotificationEvent`, check for existing with matching `{ listingId, eventType: 'meeting.departure_reminder' }` where `createdAt > meetingTime - 2h` — skip if found
   - **Before dispatching**: re-check `opportunity.meetingLocation IS NOT NULL` (meeting may have been cancelled since scheduling)
-- [x] 4.3 Register `meeting-reminder-scheduler` in the existing background job runner (from Story 10.1) — run every 5 minutes; cap execution at 90 seconds max to stay within Cloud Run timeout budget
+- [x] 4.3 Register `meeting-reminder-scheduler` as a scheduled endpoint — run every 5 minutes; cap execution at 90 seconds max to stay within Cloud Run timeout budget
+  > **Architecture note (code review):** Story 10.1's monitoring endpoint runs on a 30-minute Cloud Scheduler cadence with rate-limiting guards that would prevent the required 5-minute cadence for departure alerts. A dedicated `app/api/meeting-reminders/run/route.ts` endpoint was created instead, requiring a separate Cloud Scheduler job (reuses `MONITORING_API_KEY` for simplicity). This is the correct architecture for independent scheduling intervals.
 - [x] 4.4 Implement notification dispatch for `meeting.departure_reminder`:
   - Payload:
     ```typescript
@@ -664,18 +665,27 @@ claude-sonnet-4-6
 - `app/api/meeting-reminders/run/route.ts`
 - `src/components/MeetingRouteCard.tsx`
 
+**New files created (code review additions):**
+- `prisma/migrations/20260411000000_add_meeting_route_settings/migration.sql` — missing migration for UserSettings fields + Opportunity index
+
 **Modified files:**
 - `prisma/schema.prisma` — added `meetingDepartureBufferMinutes`, `notifyMeetingReminder` to UserSettings; added `@@index([meetingTime, meetingLocation])` to Opportunity
 - `src/lib/subscription-tiers.ts` — added `meetingLogistics` feature flag
 - `src/lib/tier-enforcement.ts` — added `enforceFeatureAccess()` async function
 - `src/lib/notification-events.ts` — added `MEETING_DEPARTURE_REMINDER` event type
-- `app/api/user/settings/route.ts` — GET/PATCH support for new fields
-- `app/listings/[id]/page.tsx` — imported and rendered MeetingRouteCard
+- `src/lib/maps-service.ts` — (code review) no scheduler query now fetches `sellerName` for payload
+- `src/lib/meeting-reminder-scheduler.ts` — (code review) added `sellerName` to listing select and payload
+- `src/lib/__tests__/meeting-reminder-scheduler.test.ts` — (code review) fixed mock factory to include `findUnique`; replaced direct property assignments with `.mockResolvedValue()`
+- `src/lib/__tests__/maps-service.test.ts` — (code review) added `OVER_QUERY_LIMIT` test case
+- `app/api/user/settings/route.ts` — GET/PATCH support for new fields; (code review) added `invalidateUserRouteCache` call on homeLocation change
+- `app/api/opportunities/[id]/maps-route/route.ts` — (code review) added guard for null meetingTime; simplified departureTime as non-nullable
+- `app/listings/[id]/page.tsx` — imported and rendered MeetingRouteCard; (code review) passes `meetingLocation` prop
+- `src/components/MeetingRouteCard.tsx` — added meeting route card UI; (code review) fixed error fallback URL to use meetingLocation prop; fixed disclaimer text; added meetingLocation prop
 - `src/components/NotificationSettings.tsx` — added meeting reminder toggle and buffer input
 - `src/components/IntegrationsSettings.tsx` — fixed pre-existing TS type error
 - `.env.example` — added `GOOGLE_MAPS_API_KEY`
 - `docs/secrets/secretmanager.md` — documented GOOGLE_MAPS_API_KEY provisioning + rotation SOP
 - `test/acceptance/features/E-012-meeting-logistics.feature` — added S-9 through S-15 scenarios
-- `test/acceptance/step_definitions/E-012-meeting-logistics.steps.ts` — added S-9 through S-15 step definitions
+- `test/acceptance/step_definitions/E-012-meeting-logistics.steps.ts` — (code review) rewrote S-9 through S-15 as real Playwright E2E tests
 - `_bmad-output/test-artifacts/requirements-traceability-matrix.md` — updated FR-MEET-02 row
 - `_bmad-output/implementation-artifacts/sprint-status.yaml` — updated story status

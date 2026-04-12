@@ -12,7 +12,7 @@
  * valid route → correct RouteResult, privacy (no raw addresses in logs).
  */
 
-import { getRoute } from '@/lib/maps-service';
+import { getRoute, invalidateUserRouteCache } from '@/lib/maps-service';
 import { ConfigurationError, ExternalServiceError } from '@/lib/errors';
 
 // ---------------------------------------------------------------------------
@@ -84,6 +84,8 @@ beforeEach(() => {
 afterEach(() => {
   logSpy.mockRestore();
   delete process.env.GOOGLE_MAPS_API_KEY;
+  // Clear route cache between tests to prevent cache hits from polluting subsequent tests
+  invalidateUserRouteCache(USER_ID);
 });
 
 // ---------------------------------------------------------------------------
@@ -161,10 +163,18 @@ describe('getRoute', () => {
     expect(result!.durationSeconds).toBe(1800);
     expect(result!.durationText).toBe('30 mins');
     expect(result!.distanceText).toBe('15.0 mi');
-    expect(result!.deepLinkUrl).toContain('maps.google.com/maps/dir/');
+    expect(result!.deepLinkUrl).toContain('www.google.com/maps/dir/');
     expect(result!.deepLinkUrl).toContain(encodeURIComponent(ORIG));
     expect(result!.deepLinkUrl).toContain(encodeURIComponent(DEST));
     expect(result!.mapsSearchUrl).toContain(encodeURIComponent(DEST));
+    fetchSpy.mockRestore();
+  });
+
+  test('throws ExternalServiceError on OVER_QUERY_LIMIT (same path as OVER_DAILY_LIMIT)', async () => {
+    process.env.GOOGLE_MAPS_API_KEY = 'test-key';
+    const fetchSpy = mockFetchWith([{ status: 200, body: { status: 'OVER_QUERY_LIMIT' } }]);
+
+    await expect(getRoute(ORIG, DEST, USER_ID)).rejects.toBeInstanceOf(ExternalServiceError);
     fetchSpy.mockRestore();
   });
 
