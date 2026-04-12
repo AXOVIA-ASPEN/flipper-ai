@@ -188,9 +188,9 @@ User 1──* Listing 1──1 Opportunity
 
 | Platform | Purpose | Config |
 |----------|---------|--------|
-| Vercel | Primary hosting (Next.js edge) | `vercel.json` |
+| Firebase Hosting | Frontend static hosting | `firebase.json` |
+| Cloud Run | Backend (Next.js server) | `Dockerfile`, `docker-compose.prod.yml` |
 | Docker | Containerized deployment | `Dockerfile`, `docker-compose.prod.yml` |
-| Firebase/GCP | Cloud Functions (scrapers) | `functions/`, `firebase.json` |
 | GitHub Actions | CI/CD (5 workflows) | `.github/workflows/` |
 
 ---
@@ -200,7 +200,7 @@ User 1──* Listing 1──1 Opportunity
 | Tool | Purpose |
 |------|---------|
 | Sentry | Error tracking, performance, source maps |
-| Vercel Analytics | Web analytics, Core Web Vitals |
+| Firebase Analytics | Web analytics, Core Web Vitals |
 | Custom Metrics | `/api/health/metrics` |
 | Health Probes | `/api/health`, `/api/health/ready` |
 | Structured Logging | pino via `logger.ts` |

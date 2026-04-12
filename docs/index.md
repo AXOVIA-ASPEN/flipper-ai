@@ -19,7 +19,7 @@
 - **Scraping:** Playwright + Stagehand (5 marketplaces)
 - **Auth:** NextAuth v5 (credentials + Facebook OAuth)
 - **Billing:** Stripe (FREE/FLIPPER/PRO tiers)
-- **Monitoring:** Sentry + Vercel Analytics
+- **Monitoring:** Sentry + Firebase Analytics
 
 ---
 
@@ -58,7 +58,6 @@
 ### Development & Operations
 - [Developer Setup](./dev/DEVELOPER_SETUP.md) — Local development environment setup
 - [Troubleshooting](./dev/TROUBLESHOOTING.md) — Common issues and solutions
-- [Admin Runbook](./dev/ADMIN_RUNBOOK.md) — Administrative procedures
 - [Operations Runbook](./dev/OPERATIONS_RUNBOOK.md) — Operational procedures
 
 ### Security & Secrets

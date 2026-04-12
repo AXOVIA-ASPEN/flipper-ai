@@ -208,12 +208,14 @@ All API routes follow Next.js App Router pattern:
 
 ## Deployment
 
-### Vercel (Primary)
+### Firebase Hosting + Cloud Run (Primary)
 ```bash
-vercel deploy          # Deploy to Vercel
-vercel deploy --prod   # Production deployment
+firebase deploy --only hosting   # Deploy frontend to Firebase Hosting
+gcloud run deploy flipper-web \  # Deploy backend to Cloud Run
+  --image gcr.io/axovia-flipper/flipper-web \
+  --region us-east1
 ```
-See `vercel.json` for configuration.
+See `firebase.json` and Cloud Run configuration for details.
 
 ### Docker
 ```bash
@@ -225,8 +227,7 @@ docker compose -f config/docker/docker-compose.prod.yml up  # Production
 ### CI/CD
 GitHub Actions workflows in `.github/workflows/`:
 - `ci.yml` — Lint, test, build on every PR
-- `vercel-deploy.yml` — Vercel deployment
-- `deploy-firebase.yml` — Firebase Cloud Functions
+- `deploy-firebase.yml` — Firebase Hosting + Cloud Run deployment
 - `playwright-tests.yml` — E2E test pipeline
 - `health-check.yml` — Scheduled health monitoring
 

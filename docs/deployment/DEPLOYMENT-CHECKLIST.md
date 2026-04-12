@@ -317,8 +317,8 @@
 
 If critical issues occur:
 
-1. [ ] **Re-point DNS to Vercel**
-2. [ ] **Investigate Firebase issues**
+1. [ ] **Roll back Cloud Run to previous revision**
+2. [ ] **Investigate Firebase/Cloud Run issues**
 3. [ ] **Fix and re-test**
 4. [ ] **Retry cutover**
 

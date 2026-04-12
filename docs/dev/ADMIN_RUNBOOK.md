@@ -26,9 +26,9 @@
 - **Database:** PostgreSQL (PrismaPostgres)
 - **ORM:** Prisma
 - **Auth:** NextAuth.js
-- **Hosting:** Vercel
-- **CI/CD:** GitHub Actions
-- **Monitoring:** Sentry, Vercel Analytics
+- **Hosting:** Firebase Hosting (frontend) + Cloud Run (backend)
+- **CI/CD:** GitHub Actions → Cloud Run
+- **Monitoring:** Sentry, GCP Cloud Monitoring
 - **Testing:** Jest (unit), Playwright (E2E)
 
 ### Infrastructure
@@ -42,20 +42,20 @@ GitHub Actions CI/CD
     ├─ Integration Tests
     ├─ Build
     ├─ E2E Tests (Playwright)
-    └─ Deploy → Vercel
+    └─ Deploy → Cloud Run
          ↓
-    Production (flipper-ai-ten.vercel.app)
+    Production (axovia-flipper.web.app)
          ↓
-    PrismaPostgres (PostgreSQL)
+    Cloud SQL (PostgreSQL)
 ```
 
 ### Environment Variables
 
-**Production (Vercel):**
+**Production (GCP Secret Manager):**
 ```bash
-DATABASE_URL=postgresql://...  # PrismaPostgres connection string
-AUTH_SECRET=***                # NextAuth secret (32+ chars)
-NEXTAUTH_URL=https://...       # Production domain
+DATABASE_URL=postgresql://...  # Cloud SQL connection string
+AUTH_SECRET=***                # Auth secret (32+ chars)
+NEXTAUTH_URL=https://...       # Production domain (axovia-flipper.web.app)
 ANTHROPIC_API_KEY=***          # Claude API key
 OPENAI_API_KEY=***             # OpenAI API key (optional)
 STRIPE_SECRET_KEY=***          # Stripe payment key
@@ -94,14 +94,14 @@ GitHub Actions automatically:
 3. Runs integration tests
 4. Builds Next.js production bundle
 5. Runs E2E tests (Playwright)
-6. Deploys to Vercel
+6. Deploys to Cloud Run
 7. Reports status to GitHub
 
 **Success:** ✅ Green checkmark on GitHub commit
 **Failure:** ❌ Red X on GitHub commit (check Actions tab)
 
 **Deployment Time:** ~8-12 minutes
-**Zero Downtime:** Vercel atomic deployments
+**Zero Downtime:** Cloud Run revision-based deployments
 
 ---
 
@@ -120,11 +120,11 @@ pnpm install
 # 3. Build locally
 pnpm build
 
-# 4. Deploy via Vercel CLI
-npx vercel --prod
+# 4. Deploy via Cloud Run
+gcloud run deploy flipper-web --image gcr.io/axovia-flipper/flipper-web --region us-east1
 
 # 5. Verify deployment
-curl https://flipper-ai-ten.vercel.app/health
+curl https://axovia-flipper.web.app/health
 ```
 
 **Risks:**
@@ -136,19 +136,18 @@ curl https://flipper-ai-ten.vercel.app/health
 
 ---
 
-### Vercel Dashboard
+### Firebase / GCP Console
 
-**URL:** https://vercel.com/dashboard
+**Firebase Console:** https://console.firebase.google.com/project/axovia-flipper
+**GCP Console:** https://console.cloud.google.com/home/dashboard?project=axovia-flipper
 
 **Key Actions:**
-- View deployments
-- Check build logs
-- Monitor performance
-- Manage environment variables
-- Roll back to previous deployment
-- Promote preview deployment
-
-**Access:** Requires Vercel account with project permissions
+- View Cloud Run revisions and deployments
+- Check build logs in Cloud Build
+- Monitor performance via Cloud Monitoring
+- Manage secrets in GCP Secret Manager
+- Roll back to previous Cloud Run revision
+- View Firebase Hosting release history
 
 ---
 
@@ -186,11 +185,11 @@ git commit -m "db: add new migration"
 # 3. Push to trigger deployment
 git push origin main
 
-# 4. Vercel build automatically runs:
+# 4. Cloud Run build automatically runs:
 npx prisma migrate deploy
 ```
 
-**Migration fails?** Check Vercel deployment logs for errors.
+**Migration fails?** Check Cloud Build deployment logs for errors.
 
 ---
 
@@ -246,7 +245,7 @@ npx prisma db execute --stdin <<< "SELECT pg_size_pretty(pg_database_size(curren
 
 ### Health Check Endpoint
 
-**URL:** `https://flipper-ai-ten.vercel.app/health`
+**URL:** `https://axovia-flipper.web.app/health`
 
 **Response (Healthy):**
 ```json
@@ -298,17 +297,15 @@ npx prisma db execute --stdin <<< "SELECT pg_size_pretty(pg_database_size(curren
 
 ---
 
-### Vercel Analytics
+### GCP Cloud Monitoring
 
-**Dashboard:** Vercel → Analytics tab
+**Dashboard:** https://console.cloud.google.com/monitoring?project=axovia-flipper
 
 **Metrics:**
-- Page views
-- Unique visitors
-- Bounce rate
-- Top pages
-- Geographic distribution
-- Device breakdown (desktop/mobile)
+- Cloud Run request count and latency
+- Container instance count
+- Memory and CPU utilization
+- Error rates
 
 **Performance:**
 - First Contentful Paint (FCP) <1.8s
@@ -361,15 +358,15 @@ npx prisma db execute --stdin <<< "SELECT 1"
 ```
 
 **Common Causes:**
-- ❌ DATABASE_URL incorrect → Verify in Vercel dashboard
-- ❌ Connection pool exhausted → Restart Vercel deployment
-- ❌ Database down → Check PrismaPostgres status page
-- ❌ Firewall rules → Verify Vercel IPs whitelisted
+- ❌ DATABASE_URL incorrect → Verify in GCP Secret Manager
+- ❌ Connection pool exhausted → Restart Cloud Run service
+- ❌ Database down → Check Cloud SQL status in GCP Console
+- ❌ Firewall rules → Verify Cloud Run service account has Cloud SQL access
 
 **Resolution:**
-1. Check DATABASE_URL in Vercel → Settings → Environment Variables
-2. Redeploy to refresh connections: `vercel --prod`
-3. Contact PrismaPostgres support if database is down
+1. Check DATABASE_URL in GCP Secret Manager
+2. Redeploy to refresh connections: `gcloud run deploy flipper-web ...`
+3. Check Cloud SQL instance status in GCP Console
 
 ---
 
@@ -403,7 +400,7 @@ npx prisma db execute --stdin <<< "SELECT 1"
 **Symptoms:** Page load >5s, timeout errors
 
 **Diagnosis:**
-1. Check Vercel Analytics → Performance tab
+1. Check Cloud Run metrics in GCP Console
 2. Identify slow routes/components
 
 **Common Causes:**
@@ -428,14 +425,14 @@ pnpm build --analyze
 
 ## ⏪ Rollback Procedures
 
-### Instant Rollback (Vercel Dashboard)
+### Instant Rollback (Cloud Run)
 
 **When to use:** Recent deployment caused critical issues
 
-1. Go to Vercel dashboard
-2. Click **Deployments** tab
-3. Find previous stable deployment (green ✅)
-4. Click **⋯** → **Promote to Production**
+1. Go to GCP Console → Cloud Run → flipper-web
+2. Click **Revisions** tab
+3. Find previous stable revision
+4. Route 100% traffic to the stable revision
 5. Confirm rollback
 
 **Rollback Time:** <30 seconds
@@ -492,7 +489,7 @@ npx prisma migrate deploy
 **Never commit secrets to Git!**
 
 **Storage:**
-- ✅ Vercel dashboard → Settings → Environment Variables
+- ✅ GCP Secret Manager (production secrets)
 - ✅ GitHub Actions secrets → Settings → Secrets and variables
 - ❌ `.env` files in repo (use `.env.example` instead)
 
@@ -510,13 +507,13 @@ npx prisma migrate deploy
 - Write: Trusted contributors
 - Read: Open source (if public repo)
 
-**Vercel Project:**
+**GCP Project (axovia-flipper):**
 - Owner: Stephen Boyett
-- Admin: ASPEN
+- Editor: ASPEN
 - Viewer: Team members
 
 **Database:**
-- Admin: Stephen Boyett (via PrismaPostgres dashboard)
+- Admin: Stephen Boyett (via GCP Console / Cloud SQL)
 - App access: Via DATABASE_URL (read/write)
 
 ---
@@ -545,8 +542,8 @@ npx prisma migrate deploy
 
 **Actions:**
 1. **Acknowledge:** Post in Slack: "#incident P0: Production down"
-2. **Investigate:** Check Vercel status, Sentry errors, health check
-3. **Mitigate:** Rollback to last stable deployment if recent change
+2. **Investigate:** Check Cloud Run status, Sentry errors, health check
+3. **Mitigate:** Rollback to last stable Cloud Run revision if recent change
 4. **Communicate:** Update status page, notify users
 5. **Resolve:** Fix root cause, redeploy
 6. **Post-Mortem:** Document incident, implement safeguards
@@ -560,7 +557,7 @@ npx prisma migrate deploy
 **Response Time:** <1 hour
 
 **Actions:**
-1. **Investigate:** Check Vercel analytics, database performance
+1. **Investigate:** Check Cloud Run metrics, database performance
 2. **Mitigate:** Scale database, optimize slow queries
 3. **Monitor:** Watch error rates, performance metrics
 4. **Resolve:** Deploy performance improvements
@@ -598,8 +595,8 @@ npx prisma migrate deploy
 
 ## 📞 Support Contacts
 
-**Vercel Support:** support@vercel.com (Enterprise plan)
-**PrismaPostgres:** support@prisma.io
+**GCP Support:** https://cloud.google.com/support
+**Firebase Support:** https://firebase.google.com/support
 **Sentry:** support@sentry.io
 **GitHub:** support@github.com
 

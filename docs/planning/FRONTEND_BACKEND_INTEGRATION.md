@@ -9,7 +9,7 @@
 ```
 ┌─────────────────────────────────────────┐
 │     Next.js Static Frontend             │
-│     (Firebase Hosting / Vercel)         │
+│     (Firebase Hosting)                  │
 │     - Landing page                      │
 │     - Auth pages (login/signup)         │
 │     - Dashboard, Listings, Scraper UI   │
@@ -166,11 +166,6 @@ npm install -g firebase-tools
 firebase init hosting
 npm run build
 firebase deploy
-```
-
-**Option B: Vercel (Static)**
-```bash
-vercel --prod
 ```
 
 ---

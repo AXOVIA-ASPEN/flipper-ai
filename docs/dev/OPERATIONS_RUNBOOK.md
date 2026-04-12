@@ -8,24 +8,21 @@
 
 ## 1. Deployment Options
 
-### Option A: Vercel (Recommended for MVP)
+### Option A: Firebase Hosting + Cloud Run (Production)
 
 ```bash
-# Install Vercel CLI
-npm i -g vercel
+# Deploy frontend
+firebase deploy --only hosting
 
-# Link project
-cd flipper-ai && vercel link
-
-# Deploy preview
-vercel
-
-# Deploy production
-vercel --prod
+# Deploy backend
+gcloud run deploy flipper-web \
+  --image gcr.io/axovia-flipper/flipper-web \
+  --region us-east1 \
+  --allow-unauthenticated
 ```
 
-**Pros:** Zero-config Next.js, auto-scaling, preview deployments  
-**Cons:** Serverless limits, cold starts
+**Pros:** Full GCP integration, auto-scaling, 300s+ timeout for scrapers, GCP Secret Manager  
+**Cons:** Slightly more setup than PaaS
 
 ### Option B: Docker (Self-Hosted / Railway / Fly.io)
 
@@ -143,8 +140,8 @@ psql $DATABASE_URL < backup_20260215.sql
 # Check logs (Docker)
 docker compose -f config/docker/docker-compose.prod.yml logs -f app
 
-# Check logs (Vercel)
-vercel logs your-domain.com
+# Check logs (Cloud Run)
+gcloud run services logs read flipper-web --region us-east1 --limit=100
 
 # DB status
 npx prisma migrate status
@@ -157,11 +154,11 @@ docker compose -f config/docker/docker-compose.prod.yml build --no-cache
 
 ## 6. Scaling
 
-### Vercel
+### Cloud Run
 
-- Automatic (serverless)
-- Edge functions for API routes (optional)
-- ISR for static pages
+- Automatic (container-based auto-scaling)
+- Configurable min/max instances
+- ISR for static pages via Firebase Hosting CDN
 
 ### Docker
 
@@ -173,11 +170,11 @@ docker compose -f config/docker/docker-compose.prod.yml build --no-cache
 
 ## 7. Security Checklist
 
-- [x] Security headers (vercel.json)
+- [x] Security headers (next.config.js / middleware)
 - [x] Rate limiting on API routes
 - [x] Input validation (Zod)
-- [x] CSRF protection (NextAuth)
+- [x] CSRF protection (Firebase Auth)
 - [x] SQL injection prevention (Prisma parameterized queries)
-- [x] Content Security Policy (CSP) header (added to vercel.json)
-- [x] CORS configuration for API (Access-Control headers in vercel.json)
+- [x] Content Security Policy (CSP) header (next.config.js / middleware)
+- [x] CORS configuration for API (next.config.js / middleware)
 - [ ] WAF (if self-hosted)

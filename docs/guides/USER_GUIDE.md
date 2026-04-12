@@ -8,7 +8,7 @@
 
 ### 1. Create Your Account
 
-1. Visit [Flipper AI](https://flipper-ai-ten.vercel.app/)
+1. Visit [Flipper AI](https://axovia-flipper.web.app/)
 2. Click **Sign Up** in the top right
 3. Enter your email and create a password
 4. Verify your email (check spam folder if needed)

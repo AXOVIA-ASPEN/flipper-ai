@@ -118,4 +118,4 @@ graph LR
 - **CI/CD:** GitHub Actions (lint, test, build, deploy)
 - **Container:** Docker multi-stage build
 - **Database:** PostgreSQL (Cloud SQL or managed)
-- **Hosting:** Vercel / Docker deployment
+- **Hosting:** Firebase Hosting + Cloud Run

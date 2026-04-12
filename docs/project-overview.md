@@ -31,9 +31,9 @@ Flipper.ai is an AI-powered marketplace arbitrage platform that helps users find
 | Scraping | Playwright + Stagehand (AI browser automation) |
 | Auth | NextAuth v5 (credentials + Facebook OAuth) |
 | Payments | Stripe (FREE/FLIPPER/PRO tiers) |
-| Monitoring | Sentry + Vercel Analytics |
+| Monitoring | Sentry + Firebase Analytics |
 | Testing | Jest + Playwright + Cucumber (full pyramid) |
-| Deployment | Vercel + Docker + Firebase Cloud Functions |
+| Deployment | Firebase Hosting + Cloud Run |
 
 ---
 

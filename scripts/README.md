@@ -15,6 +15,6 @@ Root: `refactor-error-handling.ts` (dev refactor helper).
 **Examples (from repo root):**
 ```bash
 ./scripts/setup/setup-oauth.sh
-./scripts/deploy/verify-deployment.sh https://your-app.vercel.app
+./scripts/deploy/verify-deployment.sh https://axovia-flipper.web.app
 ./scripts/health/health-monitor.sh
 ```

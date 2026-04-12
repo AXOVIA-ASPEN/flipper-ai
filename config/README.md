@@ -8,7 +8,7 @@ Configuration files by tool or platform. Reference from repo root.
 | [pm2/](./pm2/) | `ecosystem.config.js` — PM2 process manager |
 | [railway/](./railway/) | `railway.json` — Railway deployment |
 
-**Vercel** (`vercel.json`) and **Firebase** (`firebase.json`, `.firebaserc`) remain at repo root for CLI compatibility.
+**Firebase** (`firebase.json`, `.firebaserc`) remains at repo root for CLI compatibility.
 
 **Examples (from repo root):**
 ```bash

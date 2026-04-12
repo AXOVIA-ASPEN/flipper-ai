@@ -42,11 +42,11 @@ nosniff
 ### 5. **Content-Security-Policy (CSP)** ✅
 ```
 default-src 'self';
-script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live;
+script-src 'self' 'unsafe-eval' 'unsafe-inline';
 style-src 'self' 'unsafe-inline';
 img-src 'self' data: blob: https:;
 font-src 'self' data:;
-connect-src 'self' https://vercel.live wss://ws.pusherapp.com https:;
+connect-src 'self' wss://ws.pusherapp.com https:;
 frame-ancestors 'self';
 base-uri 'self';
 form-action 'self';
@@ -54,10 +54,10 @@ form-action 'self';
 
 **Directives:**
 - `default-src 'self'` - Only load resources from same origin by default
-- `script-src` - Allows scripts from self + Vercel Live (for dev toolbar)
+- `script-src` - Allows scripts from self
 - `style-src 'self' 'unsafe-inline'` - Allows inline styles (required for styled-components/CSS-in-JS)
 - `img-src` - Allows images from various sources (data URIs, blobs, HTTPS)
-- `connect-src` - Allows API calls to self + Vercel + WebSocket connections
+- `connect-src` - Allows API calls to self + WebSocket connections
 - `frame-ancestors 'self'` - Prevents clickjacking (modern alternative to X-Frame-Options)
 
 **Note:** `unsafe-inline` and `unsafe-eval` are necessary for:

@@ -246,7 +246,7 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Vite default
     "http://localhost:3000",
-    "https://flipper-ai.vercel.app",  # Production
+    "https://axovia-flipper.web.app",  # Production
 ]
 
 # PostgreSQL
@@ -519,7 +519,7 @@ railway up
 - ECS/Cloud Run for Django
 - RDS/Cloud SQL for PostgreSQL
 - ElastiCache/Memorystore for Redis
-- Vercel for React frontend
+- Firebase Hosting for React frontend
 
 ---
 
@@ -536,7 +536,7 @@ railway up
 - Next.js framework code
 - Prisma schema/migrations
 - NextAuth config
-- Vercel-specific optimizations
+- Platform-specific deployment optimizations
 
 ---
 

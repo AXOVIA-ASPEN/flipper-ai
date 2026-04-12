@@ -64,9 +64,9 @@ They do **not affect the production runtime** of Flipper AI.
 
 | Control | Status |
 |---------|--------|
-| CSP headers | ✅ Enforced in vercel.json + middleware |
+| CSP headers | ✅ Enforced in next.config.js + middleware |
 | HSTS headers | ✅ Strict-Transport-Security set |
-| CORS | ✅ Configured in vercel.json |
+| CORS | ✅ Configured in next.config.js + firebase.json |
 | Rate limiting | ✅ Per-IP + per-user, endpoint-specific |
 | Input validation | ✅ Zod schemas on all API inputs |
 | Auth hardening | ✅ All routes return 401 (not 500) when unauth |

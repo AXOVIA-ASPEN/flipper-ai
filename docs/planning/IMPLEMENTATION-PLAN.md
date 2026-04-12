@@ -623,7 +623,7 @@
 
 #### 3.1.1 Job Queue Infrastructure
 
-- [ ] Evaluate options: cron jobs, Vercel cron, external queue (BullMQ, Inngest)
+- [ ] Evaluate options: cron jobs, Cloud Scheduler, external queue (BullMQ, Inngest)
 - [ ] Implement job queue for scraping tasks
 - [ ] Add job retry logic with backoff
 - [ ] Handle concurrent job limits
@@ -853,7 +853,7 @@
 
 #### 6.3.1 Deployment
 
-- [ ] Deploy to Vercel
+- [ ] Deploy to Cloud Run
 - [ ] Configure environment variables
 - [ ] Set up custom domain
 - [ ] Implement CI/CD pipeline

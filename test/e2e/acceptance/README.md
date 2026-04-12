@@ -327,8 +327,8 @@ npx playwright test e2e/acceptance/auth-oauth.spec.ts --headed
 4. **NEXTAUTH_URL wrong** → Must match deployment URL
 
 **Fix:**
-1. Check Vercel env vars have GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET
-2. Verify redirect URI: `https://your-app.vercel.app/api/auth/callback/google`
+1. Check Cloud Run env vars have GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET
+2. Verify redirect URI: `https://axovia-flipper.web.app/api/auth/callback/google`
 3. Check Google Console → OAuth consent screen → Publishing status
 
 ---
