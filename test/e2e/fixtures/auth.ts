@@ -18,7 +18,7 @@ export async function loginAsTestUser(page: Page) {
 }
 
 /**
- * Mock NextAuth session so tests don't need real credentials.
+ * Mock auth session so tests don't need real credentials.
  */
 export async function mockAuthSession(page: Page) {
   await page.route('**/api/auth/session', async (route) => {
@@ -38,10 +38,10 @@ export async function createAuthenticatedContext(browser: {
   newContext: () => Promise<BrowserContext>;
 }): Promise<BrowserContext> {
   const context = await browser.newContext();
-  // Add session cookie for NextAuth
+  // Add session cookie for Firebase Auth
   await context.addCookies([
     {
-      name: 'next-auth.session-token',
+      name: '__session',
       value: 'test-session-token',
       domain: 'localhost',
       path: '/',

@@ -63,11 +63,11 @@ graph TB
 - **Framework:** Next.js 16 with App Router & Turbopack
 - **Styling:** Tailwind CSS + shadcn/ui components
 - **State:** React hooks + server components
-- **Auth UI:** NextAuth.js with credential provider
+- **Auth UI:** Firebase Auth (client-side sign-in + server session cookies)
 
 ### API Layer
 - **Pattern:** Next.js Route Handlers (`app/api/`)
-- **Auth:** NextAuth.js session-based authentication
+- **Auth:** Firebase Auth with `__session` cookie (5-day TTL)
 - **Validation:** Zod schemas for input validation
 
 ### Service Layer

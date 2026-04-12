@@ -59,7 +59,7 @@ export const openApiSpec = {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
-        description: 'NextAuth session JWT',
+        description: 'Firebase Auth session cookie',
       },
       ApiKey: {
         type: 'apiKey',

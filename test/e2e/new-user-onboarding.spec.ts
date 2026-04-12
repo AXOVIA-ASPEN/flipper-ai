@@ -30,7 +30,7 @@ test.describe('Feature: New User Onboarding Journey', () => {
         });
       });
 
-      // Mock NextAuth session to return null initially (not logged in)
+      // Mock auth session to return null initially (not logged in)
       await page.route('**/api/auth/session', async (route) => {
         await route.fulfill({
           json: {},

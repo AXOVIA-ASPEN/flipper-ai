@@ -60,7 +60,7 @@ test.describe('Feature: API Documentation Page (/docs)', () => {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
-          description: 'NextAuth session JWT',
+          description: 'Firebase Auth session cookie',
         },
       },
     },

@@ -75,7 +75,7 @@
 - [ ] Configure DNS records
 - [ ] Set up SSL certificate (handled by Firebase Hosting)
 - [ ] Configure custom domain in Firebase Hosting
-- [ ] Update NEXTAUTH_URL to production domain
+- [ ] Update APP_URL to production domain
 
 ### Database
 - [x] Production database provisioned (PrismaPostgres)

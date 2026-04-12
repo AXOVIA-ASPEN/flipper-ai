@@ -445,15 +445,15 @@
 
 **Goal**: Enable user accounts with secure storage of personal API keys for LLM-powered analysis.
 
-#### 1.4.1 Authentication Setup
+#### 1.4.1 Authentication Setup (Completed — migrated to Firebase Auth)
 
-- [ ] Install and configure NextAuth.js
-- [ ] Add User model to Prisma schema (id, email, name, image, createdAt)
-- [ ] Implement OAuth providers (Google, GitHub)
-- [ ] Add email/password authentication option
-- [ ] Create login/register pages
-- [ ] Add session provider to app layout
-- [ ] Protect API routes with authentication middleware
+- [x] Install and configure Firebase Auth (client-side sign-in + server session cookies)
+- [x] Add User model to Prisma schema (id, email, name, image, firebaseUid, createdAt)
+- [x] Implement OAuth providers (Google, GitHub, Facebook)
+- [x] Add email/password authentication option
+- [x] Create login/register pages
+- [x] Add session provider to app layout
+- [x] Protect API routes with authentication middleware
 
 #### 1.4.2 User Settings Model
 
@@ -835,12 +835,12 @@
 
 ### 6.2 Authentication & Multi-tenancy
 
-#### 6.2.1 User Authentication
+#### 6.2.1 User Authentication (Completed — Firebase Auth)
 
-- [ ] Add authentication (NextAuth.js or Clerk)
-- [ ] Implement user registration/login
-- [ ] Add OAuth providers (Google, GitHub)
-- [ ] Session management
+- [x] Add authentication (Firebase Auth with session cookies)
+- [x] Implement user registration/login
+- [x] Add OAuth providers (Google, GitHub, Facebook)
+- [x] Session management (Firebase `__session` cookie, 5-day TTL)
 
 #### 6.2.2 Multi-user Support
 

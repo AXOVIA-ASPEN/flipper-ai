@@ -41,15 +41,15 @@ tags:
   - name: Scrapers
     description: Direct marketplace scraper endpoints
   - name: Auth
-    description: Authentication (NextAuth + Facebook OAuth)
+    description: Authentication (Firebase Auth + Facebook OAuth)
 
 components:
   securitySchemes:
     session:
       type: apiKey
       in: cookie
-      name: next-auth.session-token
-      description: NextAuth session cookie
+      name: __session
+      description: Firebase Auth session cookie (5-day TTL)
 
   schemas:
     Platform:

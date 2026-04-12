@@ -133,21 +133,13 @@ cd node_modules/.pnpm/better-sqlite3@12.5.0/node_modules/better-sqlite3 && npm r
 **Problem:** `test.db` existed but had no tables.  
 **Fix:** Extracted schema from `dev.db` (which has migrations applied) and applied to `test.db` via Python script.
 
-### 3. ESM Transformation for `next-auth`
-**Problem:** `jest.integration.config.js` had a narrow `transformIgnorePatterns` that excluded `next-auth` from transpilation.  
-**Fix:** Updated to:
-```js
-transformIgnorePatterns: ['/node_modules/(?!(@auth/prisma-adapter|@auth/core|next-auth|@prisma/adapter-libsql|@libsql)/)']
-```
+### 3. ESM Transformation for auth packages (historical, pre-Firebase Auth migration)
+**Problem:** `jest.integration.config.js` had a narrow `transformIgnorePatterns` that excluded auth packages from transpilation.  
+**Fix:** Updated transform patterns. (This issue is no longer relevant — the project has since migrated to Firebase Auth.)
 
 ### 4. Auth Mock for Integration Tests
-**Problem:** Tests calling auth-protected endpoints returned 401 because the `next-auth` mock returned `undefined` from `auth()`.  
-**Fix:** Added to `integration/setup.ts`:
-```ts
-jest.mock('@/lib/auth', () => ({
-  auth: jest.fn().mockResolvedValue({ user: { id: 'test-user-id', email: 'test@example.com' } })
-}));
-```
+**Problem:** Tests calling auth-protected endpoints returned 401 because the auth mock returned `undefined`.  
+**Fix:** Added auth mock to `integration/setup.ts`. (Auth is now Firebase Auth; mocks target `src/lib/firebase/session.ts`.)
 
 ### 5. Value Estimator Business Logic Bypass
 **Problem:** The POST `/api/listings` route enforces a 70% discount threshold. Test data with asking prices ~$100 wouldn't pass, returning 200 "skipped" instead of 201.  

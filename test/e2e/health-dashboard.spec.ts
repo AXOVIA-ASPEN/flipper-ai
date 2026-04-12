@@ -28,7 +28,7 @@ test.describe('/health page', () => {
     const services = [
       'API Server',
       'Database (SQLite/Postgres)',
-      'Authentication (NextAuth)',
+      'Authentication (Firebase)',
       'AI Analysis (LLM)',
       'Real-time SSE',
       'Rate Limiter',

@@ -133,7 +133,7 @@ export default function HealthPage() {
   const [services, setServices] = useState<ServiceCheck[]>([
     { name: 'API Server', status: 'loading' },
     { name: 'Database (SQLite/Postgres)', status: 'loading' },
-    { name: 'Authentication (NextAuth)', status: 'loading' },
+    { name: 'Authentication (Firebase)', status: 'loading' },
     { name: 'AI Analysis (LLM)', status: 'loading' },
     { name: 'Real-time SSE', status: 'loading' },
     { name: 'Rate Limiter', status: 'loading' },
@@ -188,7 +188,7 @@ export default function HealthPage() {
       const latency = Date.now() - t;
       setServices((prev) =>
         prev.map((s) =>
-          s.name === 'Authentication (NextAuth)'
+          s.name === 'Authentication (Firebase)'
             ? {
                 ...s,
                 status: res.status < 500 ? 'online' : 'degraded',
@@ -201,7 +201,7 @@ export default function HealthPage() {
     } catch {
       setServices((prev) =>
         prev.map((s) =>
-          s.name === 'Authentication (NextAuth)'
+          s.name === 'Authentication (Firebase)'
             ? { ...s, status: 'offline', message: 'error' }
             : s
         )

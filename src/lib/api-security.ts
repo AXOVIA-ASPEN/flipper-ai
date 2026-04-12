@@ -83,7 +83,7 @@ export function validateApiKey(request: NextRequest): boolean {
 
 /**
  * Validate CSRF token for state-changing requests.
- * In Next.js with NextAuth, the session cookie + same-origin checks provide
+ * In Next.js with Firebase Auth, the session cookie + same-origin checks provide
  * baseline CSRF protection. This adds an explicit token header check for
  * extra safety on mutation endpoints.
  */

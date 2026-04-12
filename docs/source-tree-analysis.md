@@ -26,7 +26,7 @@ flipper-ai/
 │   ├── docs/page.tsx                       #   Documentation viewer
 │   ├── health/page.tsx                     #   System health
 │   └── api/                                #   REST API (~80+ endpoints)
-│       ├── auth/                            #     Authentication (NextAuth, Facebook OAuth)
+│       ├── auth/                            #     Authentication (Firebase Auth, Facebook OAuth)
 │       ├── checkout/                        #     Stripe billing
 │       ├── descriptions/                    #     AI description generator
 │       ├── events/                          #     SSE real-time stream
@@ -57,7 +57,7 @@ flipper-ai/
 │   │   ├── NotificationSettings.tsx        #     Email notification prefs
 │   │   ├── WebVitals.tsx                   #     Core Web Vitals reporter
 │   │   ├── Onboarding/                     #     6-step onboarding wizard
-│   │   └── providers/SessionProvider.tsx    #     NextAuth session wrapper
+│   │   └── providers/SessionProvider.tsx    #     Firebase Auth session wrapper
 │   │
 │   ├── contexts/ThemeContext.tsx            #   Theme state management
 │   ├── hooks/                              #   Custom React hooks (3)
@@ -76,7 +76,7 @@ flipper-ai/
 │   │   ├── market-value-calculator.ts      #     Statistical market value calculator
 │   │   ├── marketplace-scanner.ts          #     Multi-platform scan orchestrator
 │   │   ├── db.ts                           #     Prisma client singleton
-│   │   ├── auth.ts                         #     NextAuth configuration
+│   │   ├── auth.ts                         #     Firebase Auth configuration
 │   │   ├── stripe.ts                       #     Stripe SDK setup
 │   │   ├── rate-limiter.ts                 #     Request rate limiting
 │   │   ├── sse-emitter.ts                  #     Server-Sent Events emitter

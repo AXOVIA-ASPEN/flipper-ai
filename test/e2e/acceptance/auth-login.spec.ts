@@ -50,7 +50,7 @@ test.describe('Login - Acceptance Tests', () => {
     const hasSession = cookies.some(
       (c) =>
         c.name.includes('session') ||
-        c.name.includes('next-auth') ||
+        c.name.includes('__session') ||
         c.name.includes('token')
     );
 

@@ -71,7 +71,7 @@ They do **not affect the production runtime** of Flipper AI.
 | Input validation | ✅ Zod schemas on all API inputs |
 | Auth hardening | ✅ All routes return 401 (not 500) when unauth |
 | API key validation | ✅ Constant-time comparison |
-| Session security | ✅ NextAuth + JWT |
+| Session security | ✅ Firebase Auth session cookies (5-day TTL) |
 | Env var validation | ✅ Validated on startup |
 | CSRF protection | ✅ SameSite cookies + middleware |
 | Next.js updated | ✅ 16.1.6 (DoS patches applied) |

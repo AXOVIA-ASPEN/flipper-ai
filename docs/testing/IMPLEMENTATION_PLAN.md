@@ -19,7 +19,7 @@
 - Dashboard with listings, filters, bulk actions
 - Opportunities tracking page
 - Settings page with API key management
-- User authentication (NextAuth.js)
+- User authentication (Firebase Auth)
 - Search configurations API
 - Integration & unit tests
 

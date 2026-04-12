@@ -52,8 +52,8 @@ jobs:
     env:
       DATABASE_URL: 'file:./dev.db'
       CI: 'true'
-      AUTH_SECRET: 'ci-test-secret'
-      NEXTAUTH_URL: 'http://localhost:3000'
+      ENCRYPTION_SECRET: 'ci-test-secret-min16chars'
+      APP_URL: 'http://localhost:3000'
 
     steps:
       - uses: actions/checkout@v4
@@ -87,8 +87,8 @@ jobs:
     env:
       DATABASE_URL: 'file:./dev.db'
       CI: 'true'
-      AUTH_SECRET: 'ci-test-secret'
-      NEXTAUTH_URL: 'http://localhost:3000'
+      ENCRYPTION_SECRET: 'ci-test-secret-min16chars'
+      APP_URL: 'http://localhost:3000'
 
     steps:
       - uses: actions/checkout@v4
@@ -152,8 +152,8 @@ jobs:
     env:
       DATABASE_URL: 'file:./dev.db'
       CI: 'true'
-      AUTH_SECRET: 'ci-test-secret'
-      NEXTAUTH_URL: 'http://localhost:3000'
+      ENCRYPTION_SECRET: 'ci-test-secret-min16chars'
+      APP_URL: 'http://localhost:3000'
 
     steps:
       - uses: actions/checkout@v4
@@ -222,8 +222,8 @@ jobs:
     env:
       DATABASE_URL: 'file:./dev.db'
       CI: 'true'
-      AUTH_SECRET: 'ci-test-secret'
-      NEXTAUTH_URL: 'http://localhost:3000'
+      ENCRYPTION_SECRET: 'ci-test-secret-min16chars'
+      APP_URL: 'http://localhost:3000'
 
     steps:
       - uses: actions/checkout@v4
@@ -258,8 +258,8 @@ jobs:
     env:
       DATABASE_URL: 'file:./dev.db'
       CI: 'true'
-      AUTH_SECRET: 'ci-test-secret'
-      NEXTAUTH_URL: 'http://localhost:3000'
+      ENCRYPTION_SECRET: 'ci-test-secret-min16chars'
+      APP_URL: 'http://localhost:3000'
 
     steps:
       - uses: actions/checkout@v4
@@ -311,8 +311,8 @@ jobs:
     env:
       DATABASE_URL: 'file:./dev.db'
       CI: 'true'
-      AUTH_SECRET: 'ci-test-secret'
-      NEXTAUTH_URL: 'http://localhost:3000'
+      ENCRYPTION_SECRET: 'ci-test-secret-min16chars'
+      APP_URL: 'http://localhost:3000'
 
     steps:
       - uses: actions/checkout@v4

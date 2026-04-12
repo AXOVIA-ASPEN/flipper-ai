@@ -14,7 +14,7 @@ test.describe('OAuth Authentication - Acceptance Tests', () => {
       // Wait for either:
       // 1. Redirect to Google OAuth (accounts.google.com)
       // 2. Error message (OAuth not configured)
-      // 3. NextAuth error page
+      // 3. Auth error page
 
       await page.waitForTimeout(2000);
 

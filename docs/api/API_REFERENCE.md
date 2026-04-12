@@ -9,7 +9,7 @@
 
 ## Overview
 
-Flipper AI exposes a RESTful API built on Next.js App Router. All endpoints (except `/api/health` and `/api/auth`) require authentication via NextAuth.js session cookies.
+Flipper AI exposes a RESTful API built on Next.js App Router. All endpoints (except `/api/health` and `/api/auth`) require authentication via Firebase Auth session cookies.
 
 **Base URL:** `https://your-domain.com/api`
 
@@ -17,7 +17,7 @@ Flipper AI exposes a RESTful API built on Next.js App Router. All endpoints (exc
 
 ## Authentication
 
-All protected endpoints use session-based auth (NextAuth.js). Include session cookies with requests.
+All protected endpoints use session-based auth (Firebase Auth). Include the `__session` cookie with requests. The auth flow is: client-side Firebase sign-in, then `POST /api/auth/session` with the Firebase ID token to create a server-side session cookie (5-day TTL).
 
 ### `POST /api/auth/register`
 Create a new user account.
@@ -28,8 +28,8 @@ Create a new user account.
 | `password` | string | ✅ | Password (min 8 chars) |
 | `name` | string | ❌ | Display name |
 
-### `GET/POST /api/auth/[...nextauth]`
-NextAuth.js catch-all route. Handles sign-in, sign-out, session, and OAuth callbacks.
+### `POST /api/auth/session`
+Create a server-side session cookie from a Firebase ID token. Called after client-side Firebase sign-in.
 
 ### Facebook OAuth
 | Endpoint | Method | Description |

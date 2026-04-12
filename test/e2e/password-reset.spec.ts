@@ -59,7 +59,7 @@ test.describe('Password Reset', () => {
         });
       });
 
-      // Also mock generic NextAuth CSRF
+      // Also mock CSRF endpoint
       await page.route('**/api/auth/csrf', async (route) => {
         await route.fulfill({
           json: { csrfToken: 'test-csrf-token' },

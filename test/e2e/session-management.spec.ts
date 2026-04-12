@@ -113,7 +113,7 @@ test.describe('Session Management', () => {
       await page.goto('/');
       await page.waitForLoadState('networkidle');
 
-      // Then: page should still render (NextAuth client checks vary)
+      // Then: page should still render (auth client checks vary)
       // At minimum the page shouldn't crash
       const hasError = await page.locator('text=Application error').isVisible().catch(() => false);
       expect(hasError).toBeFalsy();

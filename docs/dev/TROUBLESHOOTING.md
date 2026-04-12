@@ -66,16 +66,16 @@ curl http://localhost:3000/api/health
 
 ### Authentication Issues
 
-**Problem:** NextAuth session not persisting
-- Check `NEXTAUTH_SECRET` is set in `.env`
-- Check `NEXTAUTH_URL` matches your dev URL
-- Clear browser cookies and retry
+**Problem:** Firebase Auth session not persisting
+- Check Firebase config env vars are set in `.env` (`NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, etc.)
+- Check `APP_URL` matches your dev URL
+- Clear browser cookies (especially `__session`) and retry
 
 ### API Issues
 
 **Problem:** 401 on all API routes
-- Ensure you're authenticated (session cookie present)
-- Check NextAuth configuration in `app/api/auth/[...nextauth]/route.ts`
+- Ensure you're authenticated (`__session` cookie present)
+- Check Firebase Auth configuration in `src/lib/firebase/session.ts`
 
 **Problem:** Claude API errors
 - Verify `ANTHROPIC_API_KEY` in `.env`

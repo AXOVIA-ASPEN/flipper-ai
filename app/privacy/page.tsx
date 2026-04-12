@@ -127,7 +127,7 @@ export default function PrivacyPolicyPage() {
               <li>Bcrypt password hashing (never stored in plain text)</li>
               <li>Secure database connections with PrismaPostgres</li>
               <li>Regular security audits and vulnerability scans</li>
-              <li>Access controls and authentication via NextAuth.js</li>
+              <li>Access controls and authentication via Firebase Auth</li>
             </ul>
             <p className="text-gray-700 leading-relaxed mt-4">
               However, no method of transmission over the Internet is 100% secure. While we strive to 

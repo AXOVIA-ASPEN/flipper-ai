@@ -57,7 +57,7 @@ DATABASE_URL="postgresql://flipper:${POSTGRES_PASSWORD}@host:5432/flipper_ai"
 
 # App
 NODE_ENV=production
-NEXTAUTH_URL=https://your-domain.com
+APP_URL=https://your-domain.com
 ```
 
 ### Database Options
@@ -130,7 +130,7 @@ psql $DATABASE_URL < backup_20260215.sql
 | -------------- | ------------------------- | ---------------------------------------------------- |
 | 500 errors     | Logs, Sentry              | Check env vars, DB connection                        |
 | Slow responses | Network tab, DB queries   | Add indexes, optimize queries                        |
-| Auth failures  | AUTH_SECRET, NEXTAUTH_URL | Regenerate secret, check URL                         |
+| Auth failures  | AUTH_SECRET, APP_URL      | Regenerate secret, check URL                         |
 | Build failures | CI logs                   | `pnpm install --frozen-lockfile`, check Node version |
 | DB connection  | `prisma db pull`          | Check DATABASE_URL, firewall rules                   |
 
