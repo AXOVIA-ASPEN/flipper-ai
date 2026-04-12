@@ -16,7 +16,6 @@ Start at **[index.md](./index.md)** for the full documentation map.
 | [security/](./security/) | Security audit, headers, cleanup |
 | [testing/](./testing/) | BDD plan, coverage, integration results |
 | [tools/](./tools/) | Prisma and other tool docs |
-| [stories/](./stories/) | User stories (BMAD) |
 | [bmad/](./bmad/) | BMAD workflow |
 | [archive/](./archive/) | Older sprint notes and investigations |
 | [planning/](./planning/) | Implementation, hybrid architecture, migration plans |

@@ -17,7 +17,7 @@
 - **Entry Point:** `app/layout.tsx` (root layout), `Makefile` (developer commands)
 - **Architecture Pattern:** Full-stack monolith with App Router API routes
 - **Scraping:** Playwright + Stagehand (5 marketplaces)
-- **Auth:** NextAuth v5 (credentials + Facebook OAuth)
+- **Auth:** Firebase Auth (email/password + Facebook OAuth)
 - **Billing:** Stripe (FREE/FLIPPER/PRO tiers)
 - **Monitoring:** Sentry + Firebase Analytics
 
@@ -35,7 +35,7 @@
 - [Data Models](./data-models.md) — 13 database models with relationships
 
 ### UI & Components
-- [Component Inventory](./component-inventory.md) — 15+ components, 3 hooks, contexts, pages
+- ~~Component Inventory~~ — *(not yet generated; run `document-project` workflow to create)*
 
 ### Development
 - [Development Guide](./development-guide.md) — Setup, commands, testing, deployment
@@ -80,8 +80,6 @@
 
 ### Planning
 - [Implementation Plan](./planning/IMPLEMENTATION-PLAN.md) — High-level implementation roadmap
-- [Hybrid Architecture Plan](./planning/HYBRID_ARCHITECTURE_PLAN.md) — Hybrid architecture design
-- [Django Migration Plan](./planning/DJANGO_MIGRATION_PLAN.md) — Django migration notes
 
 ### Testing
 - [BDD Test Plan](./testing/BDD_TEST_PLAN.md) — Behavior-driven test plan
@@ -119,7 +117,7 @@ When creating a brownfield PRD or planning new features, reference:
 2. [Architecture](./architecture-deep-scan.md) for system design context
 3. [API Contracts](./api-contracts.md) for existing endpoint inventory
 4. [Data Models](./data-models.md) for database schema
-5. [Component Inventory](./component-inventory.md) for reusable UI elements
+5. Component Inventory *(not yet generated)* for reusable UI elements
 
 ### Key Commands
 ```bash
