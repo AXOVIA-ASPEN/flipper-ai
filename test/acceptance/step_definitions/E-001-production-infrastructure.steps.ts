@@ -274,7 +274,7 @@ Then(
 
     const secrets = setSecretsMatch![1];
     expect(secrets).toContain('DATABASE_URL');
-    expect(secrets).toContain('AUTH_SECRET');
+    expect(secrets).toContain('ENCRYPTION_SECRET');
 
     console.log(`✅ Deploy script uses ${flag} for: ${secrets}`);
   }

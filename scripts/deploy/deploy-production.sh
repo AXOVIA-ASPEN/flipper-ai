@@ -290,7 +290,7 @@ deploy_cloud_run() {
         --max-instances=10 \
         --min-instances=$([ "$ENVIRONMENT" == "production" ] && echo "1" || echo "0") \
         --set-env-vars="NODE_ENV=production,BUILD_ENV=${ENVIRONMENT},NEXT_TELEMETRY_DISABLED=1,GIT_COMMIT=$GIT_COMMIT" \
-        --set-secrets="DATABASE_URL=DATABASE_URL:latest,AUTH_SECRET=AUTH_SECRET:latest,ENCRYPTION_SECRET=ENCRYPTION_SECRET:latest,APP_URL=APP_URL:latest" \
+        --set-secrets="DATABASE_URL=DATABASE_URL:latest,ENCRYPTION_SECRET=ENCRYPTION_SECRET:latest,APP_URL=APP_URL:latest" \
         --add-cloudsql-instances="axovia-flipper:${REGION}:flipper-db" \
         --startup-cpu-boost \
         --timeout=300s \

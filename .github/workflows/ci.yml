@@ -510,7 +510,6 @@ jobs:
           image: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/flipper-ai/app:${{ github.sha }}
           secrets: |
             DATABASE_URL=${{ steps.target.outputs.secret_prefix }}_DATABASE_URL:latest
-            AUTH_SECRET=${{ steps.target.outputs.secret_prefix }}_AUTH_SECRET:latest
             ENCRYPTION_SECRET=${{ steps.target.outputs.secret_prefix }}_ENCRYPTION_SECRET:latest
             STRIPE_SECRET_KEY=${{ steps.target.outputs.secret_prefix }}_STRIPE_SECRET_KEY:latest
             STRIPE_WEBHOOK_SECRET=${{ steps.target.outputs.secret_prefix }}_STRIPE_WEBHOOK_SECRET:latest

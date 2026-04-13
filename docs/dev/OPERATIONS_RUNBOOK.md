@@ -48,7 +48,6 @@ curl http://localhost:3000/api/health
 
 ```bash
 # Generate secrets
-AUTH_SECRET=$(openssl rand -base64 32)
 ENCRYPTION_SECRET=$(openssl rand -base64 32)
 POSTGRES_PASSWORD=$(openssl rand -hex 16)
 
@@ -130,7 +129,7 @@ psql $DATABASE_URL < backup_20260215.sql
 | -------------- | ------------------------- | ---------------------------------------------------- |
 | 500 errors     | Logs, Sentry              | Check env vars, DB connection                        |
 | Slow responses | Network tab, DB queries   | Add indexes, optimize queries                        |
-| Auth failures  | AUTH_SECRET, APP_URL      | Regenerate secret, check URL                         |
+| Auth failures  | ENCRYPTION_SECRET, APP_URL | Regenerate secret, check URL                         |
 | Build failures | CI logs                   | `pnpm install --frozen-lockfile`, check Node version |
 | DB connection  | `prisma db pull`          | Check DATABASE_URL, firewall rules                   |
 

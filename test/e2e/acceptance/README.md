@@ -149,9 +149,9 @@ PLAYWRIGHT_TEST_BASE_URL=http://localhost:3000
 # Database (for test user creation)
 DATABASE_URL=postgresql://...
 
-# NextAuth (for session tests)
-NEXTAUTH_SECRET=your-test-secret
-NEXTAUTH_URL=http://localhost:3000
+# Auth (Firebase Auth session tests)
+ENCRYPTION_SECRET=your-test-secret
+APP_URL=http://localhost:3000
 
 # OAuth (optional - for OAuth tests)
 GOOGLE_CLIENT_ID=your_google_client_id

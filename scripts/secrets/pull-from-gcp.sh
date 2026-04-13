@@ -10,8 +10,7 @@
 #
 # ── Secrets stored in GCP Secret Manager ──────────────────────────────────────
 #   DATABASE_URL               PostgreSQL connection string (Cloud SQL)
-#   AUTH_SECRET                Session encryption secret
-#   ENCRYPTION_SECRET          General-purpose encryption key
+#   ENCRYPTION_SECRET          Encryption key for sensitive data at rest
 #   APP_URL                    Canonical app URL (emails, redirects, etc.)
 #   FIREBASE_CLIENT_EMAIL      Firebase Admin SDK service account email
 #   FIREBASE_PRIVATE_KEY       Firebase Admin SDK private key (PEM)
@@ -60,7 +59,6 @@ PROJECT_ID="${GCP_PROJECT_ID:-$1}"
 # Ordered list of secret names (must match docs/secrets/secretmanager.md)
 SECRET_NAMES=(
   DATABASE_URL
-  AUTH_SECRET
   ENCRYPTION_SECRET
   APP_URL
   FIREBASE_CLIENT_EMAIL
