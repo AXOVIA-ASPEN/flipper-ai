@@ -1,3 +1,0 @@
-google-cloud-secret-manager==2.26.0
-pytest>=7.0
-pytest-mock>=3.0

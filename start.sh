@@ -4,5 +4,5 @@
 # Used as CMD in Dockerfile (created in Story 1.3).
 
 set -e
-python3 helpers/secrets.py
+python3 scripts/secretmanager.py load --env "$BUILD_ENV"
 exec node_modules/.bin/next start

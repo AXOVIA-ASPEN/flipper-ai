@@ -42,10 +42,10 @@ jobs:
           python-version: '3.11'
 
       - name: Install Python Dependencies
-        run: pip install -r helpers/requirements.txt
+        run: pip install -r scripts/requirements.txt
 
       - name: Run Python Tests (Secret Manager Module)
-        run: cd helpers && python -m pytest test_secrets.py -v
+        run: cd scripts && python -m pytest test_secretmanager.py -v
 
   lint-and-typecheck:
     runs-on: ubuntu-latest
