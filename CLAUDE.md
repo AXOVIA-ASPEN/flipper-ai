@@ -73,7 +73,7 @@ git push origin vX.Y.Z
 - **Styling**: Tailwind CSS 4
 - **Database**: PostgreSQL with Prisma ORM + `PrismaPg` driver adapter (pool: 2 connections per Cloud Run instance)
 - **Auth**: Firebase Auth (client-side sign-in → server session cookie). Legacy NextAuth models exist in schema but are deprecated.
-- **AI**: Claude/Anthropic SDK (primary — listing analysis, negotiation, messages, descriptions), OpenAI GPT-4o-mini (secondary — LLM analysis with two-layer cache), Google Gemini via Stagehand (Facebook Marketplace browser automation only). See [docs/AI-Agents/README.md](docs/AI-Agents/README.md) for full design decisions.
+- **AI**: Multi-provider via `src/lib/ai/` — Gemini (primary, free), Groq (fast, free), OpenAI, Anthropic Claude. Per-task routing with automatic fallback. 12 prompts centralized in `src/lib/ai/prompts/`. Stagehand + Gemini for Facebook browser automation.
 - **Payments**: Stripe (checkout, subscriptions, webhooks)
 - **Email**: Resend
 - **CAPTCHA**: hCaptcha
