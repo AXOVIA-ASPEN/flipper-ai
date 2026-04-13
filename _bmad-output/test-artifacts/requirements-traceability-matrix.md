@@ -55,30 +55,37 @@
 
 ## FR-SCORE: AI Flippability Score Engine
 
-| Requirement | Description | Epic | Story | Scenario ID(s) | Feature File | Status |
-|---|---|---|---|---|---|---|
-| FR-SCORE-01 | Algorithmic value score (0-100) | 4 | 4.1 | @E-004-S-001, @E-004-S-007 | E-004-scoring-and-deal-evaluation.feature | Covered |
-| FR-SCORE-02 | Category detection | 4 | 4.1 | @E-004-S-002, @E-004-S-003 | E-004-scoring-and-deal-evaluation.feature | Covered |
-| FR-SCORE-03 | Brand boost keywords | 4 | 4.1 | @E-004-S-004 | E-004-scoring-and-deal-evaluation.feature | Covered |
-| FR-SCORE-04 | Risk penalty keywords | 4 | 4.1 | @E-004-S-005 | E-004-scoring-and-deal-evaluation.feature | Covered |
-| FR-SCORE-05 | Estimated market value calculation | 4 | 4.1 | @E-004-S-006 | E-004-scoring-and-deal-evaluation.feature | Covered |
-| FR-SCORE-06 | Platform-specific fee rates | 4 | 4.2 | @E-004-S-008, @E-004-S-009, @E-004-S-011 | E-004-scoring-and-deal-evaluation.feature | Covered |
-| FR-SCORE-07 | Configurable opportunity threshold | 4 | 4.2 | @E-004-S-010, @E-004-S-011, @E-004-S-012 | E-004-scoring-and-deal-evaluation.feature | Covered |
-| FR-SCORE-08 | LLM item identification | 4 | 4.3 | @E-004-S-013, @E-004-S-014, @E-004-S-015 | E-004-scoring-and-deal-evaluation.feature | Covered |
-| FR-SCORE-09 | Verified market prices from eBay sold | 4 | 4.4 | @E-004-S-016, @E-004-S-017, @E-004-S-018, @E-004-S-020, @E-004-S-021 | E-004-scoring-and-deal-evaluation.feature | Covered |
-| FR-SCORE-10 | True discount percentage | 4 | 4.4 | @E-004-S-019, @E-004-S-022, @E-004-S-023 | E-004-scoring-and-deal-evaluation.feature | Covered |
-| FR-SCORE-11 | LLM sellability assessment | 4 | 4.5 | @E-004-S-024, @E-004-S-026, @E-004-S-027, @E-004-S-028 | E-004-scoring-and-deal-evaluation.feature | Covered |
-| FR-SCORE-12 | Offer/listing price recommendations | 4 | 4.5 | @E-004-S-024, @E-004-S-025, @E-004-S-027 | E-004-scoring-and-deal-evaluation.feature | Covered |
-| FR-SCORE-13 | Undervalue threshold filtering | 4 | 4.5 | @E-004-S-025, @E-004-S-026, @E-004-S-028 | E-004-scoring-and-deal-evaluation.feature | Covered |
-| FR-SCORE-14 | AI analysis caching (24h TTL) | 4 | 4.6 | @E-004-S-029, @E-004-S-030, @E-004-S-031, @E-004-S-032 | E-004-scoring-and-deal-evaluation.feature | Covered |
-| FR-SCORE-15 | Algorithmic fallback | 4 | 4.6 | @E-004-S-030, @E-004-S-033 | E-004-scoring-and-deal-evaluation.feature | Covered |
-| FR-SCORE-16 | Claude Sonnet structural analysis | 5 | 5.1 | @E-005-S-1, @E-005-S-2, @E-005-S-3 | E-005-advanced-market-intelligence.feature | Covered |
-| FR-SCORE-17 | Comparable sold item matching | 5 | 5.2 | @E-005-S-9, @E-005-S-10, @E-005-S-11, @E-005-S-12 | E-005-advanced-market-intelligence.feature | Covered |
-| FR-SCORE-18 | Sold volume / demand trend analysis | 5 | 5.3 | @E-005-S-13, @E-005-S-14, @E-005-S-15, @E-005-S-16, @E-005-S-17 | E-005-advanced-market-intelligence.feature | Covered |
-| FR-SCORE-19 | Item completeness / physical state | 5 | 5.4 | @E-005-S-4, @E-005-S-5 | E-005-advanced-market-intelligence.feature | Covered |
-| FR-SCORE-20 | Seller reputation analysis | 5 | 5.4 | @E-005-S-6, @E-005-S-7, @E-005-S-8 | E-005-advanced-market-intelligence.feature | Covered |
-| FR-SCORE-21 | Logistics difficulty analysis | 5 | 5.5 | @E-005-S-18, @E-005-S-20, @E-005-S-21, @E-005-S-22, @E-005-S-23 | E-005-advanced-market-intelligence.feature | Covered |
-| FR-SCORE-22 | Shipping cost impact on profit | 5 | 5.5 | @E-005-S-19, @E-005-S-21, @E-005-S-23 | E-005-advanced-market-intelligence.feature | Covered |
+| Requirement | Description | Epic | Story | Scenario ID(s) | Feature File | Step Definition File | Status |
+|---|---|---|---|---|---|---|---|
+| FR-SCORE-01 | Algorithmic value score (0-100) | 4 | 4.1 | @E-004-S-001, @E-004-S-007 | E-004-scoring-and-deal-evaluation.feature | E-004-algorithmic-value-score.steps.ts | Covered |
+| FR-SCORE-02 | Category detection | 4 | 4.1 | @E-004-S-002, @E-004-S-003 | E-004-scoring-and-deal-evaluation.feature | E-004-algorithmic-value-score.steps.ts | Covered |
+| FR-SCORE-03 | Brand boost keywords | 4 | 4.1 | @E-004-S-004 | E-004-scoring-and-deal-evaluation.feature | E-004-algorithmic-value-score.steps.ts | Covered |
+| FR-SCORE-04 | Risk penalty keywords | 4 | 4.1 | @E-004-S-005 | E-004-scoring-and-deal-evaluation.feature | E-004-algorithmic-value-score.steps.ts | Covered |
+| FR-SCORE-05 | Estimated market value calculation | 4 | 4.1 | @E-004-S-006 | E-004-scoring-and-deal-evaluation.feature | E-004-algorithmic-value-score.steps.ts | Covered |
+| FR-SCORE-06 | Platform-specific fee rates | 4 | 4.2 | @E-004-S-008, @E-004-S-009, @E-004-S-011 | E-004-scoring-and-deal-evaluation.feature | E-004-platform-fees-threshold.steps.ts | Covered |
+| FR-SCORE-07 | Configurable opportunity threshold | 4 | 4.2 | @E-004-S-010, @E-004-S-011, @E-004-S-012 | E-004-scoring-and-deal-evaluation.feature | E-004-platform-fees-threshold.steps.ts | Covered |
+| FR-SCORE-08 | LLM item identification | 4 | 4.3 | @E-004-S-013, @E-004-S-014, @E-004-S-015 | E-004-scoring-and-deal-evaluation.feature | E-004-llm-item-identification.steps.ts | Covered |
+| FR-SCORE-09 | Verified market prices from eBay sold | 4 | 4.4 | @E-004-S-016, @E-004-S-017, @E-004-S-018, @E-004-S-020, @E-004-S-021 | E-004-scoring-and-deal-evaluation.feature | E-004-verified-market-price.steps.ts | Covered |
+| FR-SCORE-10 | True discount percentage | 4 | 4.4 | @E-004-S-019, @E-004-S-022, @E-004-S-023 | E-004-scoring-and-deal-evaluation.feature | E-004-verified-market-price.steps.ts | Covered |
+| FR-SCORE-11 | LLM sellability assessment | 4 | 4.5 | @E-004-S-024, @E-004-S-026, @E-004-S-027, @E-004-S-028 | E-004-scoring-and-deal-evaluation.feature | E-004-llm-sellability.steps.ts | Covered |
+| FR-SCORE-12 | Offer/listing price recommendations | 4 | 4.5 | @E-004-S-024, @E-004-S-025, @E-004-S-027 | E-004-scoring-and-deal-evaluation.feature | E-004-llm-sellability.steps.ts | Covered |
+| FR-SCORE-13 | Undervalue threshold filtering | 4 | 4.5 | @E-004-S-025, @E-004-S-026, @E-004-S-028 | E-004-scoring-and-deal-evaluation.feature | E-004-llm-sellability.steps.ts | Covered |
+| FR-SCORE-14 | AI analysis caching (24h TTL) | 4 | 4.6 | @E-004-S-029, @E-004-S-030, @E-004-S-031, @E-004-S-032 | E-004-scoring-and-deal-evaluation.feature | E-004-ai-caching.steps.ts | Covered |
+| FR-SCORE-15 | Algorithmic fallback | 4 | 4.6 | @E-004-S-030, @E-004-S-033 | E-004-scoring-and-deal-evaluation.feature | E-004-ai-caching.steps.ts | Covered |
+| FR-SCORE-16 | Claude Sonnet structural analysis | 5 | 5.1 | @E-005-S-1, @E-005-S-2, @E-005-S-3 | E-005-advanced-market-intelligence.feature | E-005-claude-analyzer.steps.ts | Covered |
+| FR-SCORE-17 | Comparable sold item matching | 5 | 5.2 | @E-005-S-9, @E-005-S-10, @E-005-S-11, @E-005-S-12 | E-005-advanced-market-intelligence.feature | E-005-comparable-sold-items.steps.ts | Covered |
+| FR-SCORE-18 | Sold volume / demand trend analysis | 5 | 5.3 | @E-005-S-13, @E-005-S-14, @E-005-S-15, @E-005-S-16, @E-005-S-17 | E-005-advanced-market-intelligence.feature | E-005-sold-volume-demand.steps.ts | Covered |
+| FR-SCORE-19 | Item completeness / physical state | 5 | 5.4 | @E-005-S-4, @E-005-S-5 | E-005-advanced-market-intelligence.feature | E-005-completeness-reputation.steps.ts | Covered |
+| FR-SCORE-20 | Seller reputation analysis | 5 | 5.4 | @E-005-S-6, @E-005-S-7, @E-005-S-8 | E-005-advanced-market-intelligence.feature | E-005-completeness-reputation.steps.ts | Covered |
+| FR-SCORE-21 | Logistics difficulty analysis | 5 | 5.5 | @E-005-S-18, @E-005-S-20, @E-005-S-21, @E-005-S-22, @E-005-S-23 | E-005-advanced-market-intelligence.feature | E-005-logistics-shipping.steps.ts | Covered |
+| FR-SCORE-22 | Shipping cost impact on profit | 5 | 5.5 | @E-005-S-19, @E-005-S-21, @E-005-S-23 | E-005-advanced-market-intelligence.feature | E-005-logistics-shipping.steps.ts | Covered |
+| FR-SCORE-23 | IQR outlier filtering on eBay sold prices | 13 | 13.1 | @E-013-S-001, @E-013-S-002, @E-013-S-003, @E-013-S-004, @E-013-S-005, @E-013-S-006, @E-013-S-007, @E-013-S-008 | E-013-scoring-algorithm-improvements.feature | E-013-iqr-outlier-filtering.steps.ts | Covered |
+| FR-SCORE-24 | Structured JSON LLM response format | 13 | 13.2 | @E-013-S-009, @E-013-S-010, @E-013-S-011, @E-013-S-012, @E-013-S-013 | E-013-scoring-algorithm-improvements.feature | E-013-structured-json.steps.ts | Covered |
+| FR-SCORE-25 | Cache invalidation on price changes | 13 | 13.3 | @E-013-S-039, @E-013-S-040, @E-013-S-041, @E-013-S-042, @E-013-S-043, @E-013-S-044, @E-013-S-045 | E-013-scoring-algorithm-improvements.feature | E-013-cache-invalidation.steps.ts | Covered |
+| FR-SCORE-26 | Weighted scoring (margin + absolute profit) | 13 | 13.4 | @E-013-S-030, @E-013-S-031, @E-013-S-032, @E-013-S-033, @E-013-S-034, @E-013-S-035, @E-013-S-036, @E-013-S-037, @E-013-S-038 | E-013-scoring-algorithm-improvements.feature | E-013-weighted-scoring.steps.ts | Covered |
+| FR-SCORE-27 | Brand regex refinement — title-only + negative patterns | 13 | 13.5 | @E-013-S-014, @E-013-S-015, @E-013-S-016, @E-013-S-017, @E-013-S-018 | E-013-scoring-algorithm-improvements.feature | E-013-brand-regex.steps.ts | Covered |
+| FR-SCORE-28 | Demand velocity integration into Tier 1 score | 13 | 13.6 | @E-013-S-019, @E-013-S-020, @E-013-S-021, @E-013-S-022, @E-013-S-023, @E-013-S-024, @E-013-S-025, @E-013-S-026, @E-013-S-027, @E-013-S-028, @E-013-S-029 | E-013-scoring-algorithm-improvements.feature | E-013-demand-velocity.steps.ts | Covered |
+| FR-SCORE-30 | Cross-platform price intelligence — verified market values from multiple platforms | 13 | 13.8 | @E-013-S-046, @E-013-S-047, @E-013-S-048, @E-013-S-049, @E-013-S-050, @E-013-S-051, @E-013-S-052, @E-013-S-053, @E-013-S-054, @E-013-S-055, @E-013-S-056, @E-013-S-057, @E-013-S-058 | E-013-scoring-algorithm-improvements.feature | E-013-cross-platform-price.steps.ts | Covered |
 
 ## FR-COMM: Seller Communication
 
@@ -257,7 +264,7 @@
 |---|---|---|---|---|---|
 | FR-INFRA | 14 | 14 | 0 | 0 | 100% |
 | FR-SCAN | 16 | 12 | 2 | 2 | 75% |
-| FR-SCORE | 22 | 14 | 0 | 8 | 64% |
+| FR-SCORE | 26 | 18 | 0 | 8 | 69% |
 | FR-COMM | 8 | 7 | 0 | 1 | 88% |
 | FR-RELIST | 8 | 3 | 0 | 5 | 38% |
 | FR-DASH | 13 | 10 | 2 | 1 | 77% |
@@ -265,9 +272,9 @@
 | FR-NOTIFY | 13 | 12 | 0 | 1 | 92% |
 | FR-BILLING | 11 | 3 | 8 | 0 | 27% |
 | FR-MEET | 2 | 2 | 0 | 0 | 100% |
-| **Total FR** | **111** | **81** | **12** | **18** | **73%** |
+| **Total FR** | **112** | **82** | **12** | **18** | **73%** |
 | NFR | 30 | 6 | 5 | 19 | 20% |
-| **Grand Total** | **141** | **87** | **17** | **37** | **62%** |
+| **Grand Total** | **142** | **88** | **17** | **37** | **62%** |
 
 ---
 

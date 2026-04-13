@@ -6,7 +6,15 @@ import {
   detectCategory,
   generatePurchaseMessage,
   EstimationResult,
+  applyDemandAdjustment,
 } from './value-estimator';
+import {
+  fetchCrossPlatformPrice,
+  applyPriceIntelligenceOverride,
+  shouldRescueItem,
+  type CrossPlatformPriceResult,
+  type CrossPlatformFetchers,
+} from './cross-platform-price';
 import { sseEmitter } from './sse-emitter';
 import prisma from '@/lib/db';
 import { lookupVerifiedMarketPrice } from './market-value-calculator';
@@ -79,6 +87,10 @@ export interface AnalyzedListing extends RawListing {
   sellerReputation?: SellerReputationResult | null;
   // Story 5.5: Logistics and shipping analysis
   logisticsAnalysis?: LogisticsAnalysisResult | null;
+  // Story 13.8: Cross-platform price intelligence
+  crossPlatformPrice?: CrossPlatformPriceResult | null;
+  /** True if this item was rescued by second-pass market data verification */
+  rescuedByMarketData?: boolean;
 }
 
 // Viability criteria for filtering opportunities
@@ -699,6 +711,51 @@ export async function enrichWithDemandAnalysis(
   return enriched;
 }
 
+// ─── Story 13.6: Demand velocity score adjustment (post-processing) ─────────
+
+/**
+ * Applies demand velocity adjustments to valueScore as a post-processing step.
+ * Must be called AFTER enrichWithDemandAnalysis() so demandAnalysis is populated.
+ * Priority: demand analyzer demandTrend > LLM sellabilityAnalysis.demandLevel.
+ * When no demand data is available, adds "demand_unknown" tag.
+ */
+export function applyDemandScoreAdjustments(
+  listings: AnalyzedListing[]
+): AnalyzedListing[] {
+  return listings.map((listing) => {
+    // Resolve demand trend: demand analyzer (primary) > LLM demandLevel (fallback)
+    const demandTrend: string | null =
+      listing.demandAnalysis?.demandTrend ??
+      listing.sellabilityAnalysis?.demandLevel ??
+      null;
+
+    const expectedDaysToSell = listing.sellabilityAnalysis?.expectedDaysToSell ?? null;
+    const discountPercent = listing.estimation.discountPercent;
+
+    const adjustedScore = applyDemandAdjustment(
+      listing.estimation.valueScore,
+      demandTrend,
+      expectedDaysToSell,
+      discountPercent
+    );
+
+    // Build updated tags
+    const existingTags = [...listing.estimation.tags];
+    if (!demandTrend) {
+      existingTags.push('demand_unknown');
+    }
+
+    return {
+      ...listing,
+      estimation: {
+        ...listing.estimation,
+        valueScore: adjustedScore,
+        tags: existingTags,
+      },
+    };
+  });
+}
+
 // ─── Story 5.1: Claude Sonnet Tier 2 structural analysis ─────────────────────
 
 /**
@@ -857,6 +914,168 @@ export async function enrichWithLogisticsAnalysis(
     }
   }
   return enriched;
+}
+
+// ─── Story 13.8: Cross-Platform Price Intelligence ──────────────────────────
+
+/**
+ * Enriches analyzed listings with cross-platform verified market values.
+ * When verified data is available with medium+ confidence, overrides the
+ * Tier 1 algorithmic score with a recalculated score based on real market data.
+ * Processes listings sequentially to limit concurrent Playwright browser sessions.
+ */
+export async function enrichWithCrossPlatformPrice(
+  listings: AnalyzedListing[],
+  fetchers?: CrossPlatformFetchers,
+  feeRate?: number
+): Promise<AnalyzedListing[]> {
+  const enriched: AnalyzedListing[] = [];
+  for (const listing of listings) {
+    try {
+      const searchQuery = listing.llmIdentification?.searchQuery || listing.title;
+      const category = listing.llmIdentification?.category || listing.category;
+      const crossPlatformPrice = await fetchCrossPlatformPrice(
+        searchQuery,
+        category,
+        fetchers
+      );
+
+      if (!crossPlatformPrice) {
+        enriched.push({ ...listing, crossPlatformPrice: null });
+        continue;
+      }
+
+      // Apply score override when verified data is available
+      const effectiveFeeRate = feeRate ?? PLATFORM_FEE_DEFAULTS[listing.platform] ?? 0.13;
+      const { valueScore, overridden, verifiedMarketValue } =
+        applyPriceIntelligenceOverride(
+          listing.estimation.valueScore,
+          listing.askingPrice,
+          crossPlatformPrice,
+          effectiveFeeRate
+        );
+
+      const updatedTags = [...listing.estimation.tags];
+      if (overridden) updatedTags.push('price_intelligence_override');
+
+      const updatedEstimation: EstimationResult = {
+        ...listing.estimation,
+        valueScore,
+        tags: updatedTags,
+      };
+
+      enriched.push({
+        ...listing,
+        crossPlatformPrice,
+        estimation: updatedEstimation,
+        isOpportunity: valueScore >= 70,
+        verifiedPrice: overridden && verifiedMarketValue
+          ? {
+              ...(listing.verifiedPrice ?? {} as VerifiedPriceLookupResult),
+              verifiedMarketValue,
+              marketDataSource: 'cross_platform',
+              marketDataDate: crossPlatformPrice.fetchedAt,
+              trueDiscountPercent:
+                verifiedMarketValue > 0
+                  ? Math.round(((verifiedMarketValue - listing.askingPrice) / verifiedMarketValue) * 100)
+                  : 0,
+            }
+          : listing.verifiedPrice,
+      });
+    } catch (err) {
+      console.error(
+        `[enrichWithCrossPlatformPrice] Failed for listing ${listing.externalId}:`,
+        err
+      );
+      enriched.push({ ...listing, crossPlatformPrice: null });
+    }
+  }
+  return enriched;
+}
+
+/**
+ * Second-pass rescue: re-evaluates items that scored below the opportunity
+ * threshold (70) on Tier 1 but may be underpriced according to cross-platform
+ * verified market data. Items with a verified discount >= 40% are re-scored
+ * and promoted to opportunity status with the `rescued_by_market_data` tag.
+ *
+ * Only runs cross-platform lookups on non-opportunity items — opportunities
+ * already have sufficient data from Tier 1.
+ */
+export async function rescueUndervaluedItems(
+  listings: AnalyzedListing[],
+  fetchers?: CrossPlatformFetchers,
+  feeRate?: number,
+  rescueThreshold: number = 40
+): Promise<AnalyzedListing[]> {
+  const result: AnalyzedListing[] = [];
+
+  for (const listing of listings) {
+    // Skip items that are already opportunities — no rescue needed
+    if (listing.isOpportunity) {
+      result.push(listing);
+      continue;
+    }
+
+    try {
+      const searchQuery = listing.llmIdentification?.searchQuery || listing.title;
+      const category = listing.llmIdentification?.category || listing.category;
+      const crossPlatformPrice = await fetchCrossPlatformPrice(
+        searchQuery,
+        category,
+        fetchers
+      );
+
+      if (!crossPlatformPrice || !shouldRescueItem(listing.askingPrice, crossPlatformPrice, rescueThreshold)) {
+        result.push({ ...listing, crossPlatformPrice: crossPlatformPrice ?? listing.crossPlatformPrice });
+        continue;
+      }
+
+      // Re-score with verified data
+      const effectiveFeeRate = feeRate ?? PLATFORM_FEE_DEFAULTS[listing.platform] ?? 0.13;
+      const { valueScore, verifiedMarketValue } =
+        applyPriceIntelligenceOverride(
+          listing.estimation.valueScore,
+          listing.askingPrice,
+          crossPlatformPrice,
+          effectiveFeeRate
+        );
+
+      const updatedTags = [...listing.estimation.tags, 'rescued_by_market_data', 'price_intelligence_override'];
+
+      result.push({
+        ...listing,
+        crossPlatformPrice,
+        rescuedByMarketData: true,
+        isOpportunity: true,
+        estimation: {
+          ...listing.estimation,
+          valueScore,
+          tags: updatedTags,
+        },
+        verifiedPrice: verifiedMarketValue
+          ? {
+              ...(listing.verifiedPrice ?? {} as VerifiedPriceLookupResult),
+              verifiedMarketValue,
+              marketDataSource: 'cross_platform_rescue',
+              marketDataDate: crossPlatformPrice.fetchedAt,
+              trueDiscountPercent:
+                verifiedMarketValue > 0
+                  ? Math.round(((verifiedMarketValue - listing.askingPrice) / verifiedMarketValue) * 100)
+                  : 0,
+            }
+          : listing.verifiedPrice,
+      });
+    } catch (err) {
+      console.error(
+        `[rescueUndervaluedItems] Failed for listing ${listing.externalId}:`,
+        err
+      );
+      result.push(listing);
+    }
+  }
+
+  return result;
 }
 
 /**

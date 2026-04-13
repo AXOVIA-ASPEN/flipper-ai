@@ -511,6 +511,7 @@ async function saveListingFromFacebookItem(
         data: {
           listingId: savedListing.id,
           analysisResult: JSON.stringify(claudeAnalysis),
+          analyzedAtPrice: price,
           expiresAt,
         },
       });

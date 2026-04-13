@@ -134,6 +134,24 @@ describe('Market Value Calculator', () => {
       expect(result!.dataPoints).toBeLessThan(5);
     });
 
+    test('forces low confidence when IQR filtering triggers low sample size fallback', async () => {
+      // Only 3 prices → filterOutliers returns lowSampleSize: true → confidence must be 'low'
+      const prices = [100, 200, 300];
+      mockPriceHistoryFindMany.mockResolvedValue(
+        prices.map((p) => ({
+          soldPrice: p,
+          soldAt: new Date(),
+          productName: 'Widget',
+          platform: 'EBAY',
+        }))
+      );
+
+      const result = await calculateVerifiedMarketValue('Widget', 'EBAY');
+
+      expect(result).not.toBeNull();
+      expect(result!.confidence).toBe('low');
+    });
+
     test('filters by age (maxAge parameter)', async () => {
       // Mock returns only recent sales (DB handles filtering)
       const recentPrices = [150, 155, 160];
@@ -379,10 +397,19 @@ describe('lookupVerifiedMarketPrice', () => {
     // DB returns null (< 3 data points)
     mockPriceHistoryFindMany.mockResolvedValue([{ soldPrice: 300 }, { soldPrice: 320 }]);
 
-    // Playwright returns sold listings
+    // Playwright returns sold listings (with IQR-filtered stats)
     mockFetchMarketPrice.mockResolvedValue({
+      source: 'ebay_scrape',
       salesCount: 5,
       medianPrice: 350,
+      avgPrice: 344,
+      lowPrice: 300,
+      highPrice: 370,
+      avgDaysToSell: null,
+      searchQuery: 'iPhone 14 Pro',
+      fetchedAt: new Date(),
+      outliersRemoved: 0,
+      lowSampleSize: false,
       soldListings: [
         { title: 'iPhone 14 Pro', price: 300, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },
         { title: 'iPhone 14 Pro', price: 350, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },
@@ -410,8 +437,17 @@ describe('lookupVerifiedMarketPrice', () => {
   it('passes category to fetchMarketPrice when provided', async () => {
     mockPriceHistoryFindMany.mockResolvedValue([]);
     mockFetchMarketPrice.mockResolvedValue({
+      source: 'ebay_scrape',
       salesCount: 3,
       medianPrice: 200,
+      avgPrice: 200,
+      lowPrice: 180,
+      highPrice: 220,
+      avgDaysToSell: null,
+      searchQuery: 'Widget',
+      fetchedAt: new Date(),
+      outliersRemoved: 0,
+      lowSampleSize: false,
       soldListings: [
         { title: 'Widget A', price: 180, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },
         { title: 'Widget B', price: 200, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },

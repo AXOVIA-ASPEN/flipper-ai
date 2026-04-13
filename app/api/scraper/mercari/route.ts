@@ -712,6 +712,7 @@ async function saveListingFromMercariItem(
         data: {
           listingId: savedListing.id,
           analysisResult: JSON.stringify(claudeAnalysis),
+          analyzedAtPrice: item.price,
           expiresAt,
         },
       });

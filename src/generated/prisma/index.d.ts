@@ -8601,6 +8601,7 @@ export namespace Prisma {
     platform: string | null
     soldPrice: number | null
     condition: string | null
+    dataType: string | null
     soldAt: Date | null
     createdAt: Date | null
   }
@@ -8612,6 +8613,7 @@ export namespace Prisma {
     platform: string | null
     soldPrice: number | null
     condition: string | null
+    dataType: string | null
     soldAt: Date | null
     createdAt: Date | null
   }
@@ -8623,6 +8625,7 @@ export namespace Prisma {
     platform: number
     soldPrice: number
     condition: number
+    dataType: number
     soldAt: number
     createdAt: number
     _all: number
@@ -8644,6 +8647,7 @@ export namespace Prisma {
     platform?: true
     soldPrice?: true
     condition?: true
+    dataType?: true
     soldAt?: true
     createdAt?: true
   }
@@ -8655,6 +8659,7 @@ export namespace Prisma {
     platform?: true
     soldPrice?: true
     condition?: true
+    dataType?: true
     soldAt?: true
     createdAt?: true
   }
@@ -8666,6 +8671,7 @@ export namespace Prisma {
     platform?: true
     soldPrice?: true
     condition?: true
+    dataType?: true
     soldAt?: true
     createdAt?: true
     _all?: true
@@ -8764,6 +8770,7 @@ export namespace Prisma {
     platform: string
     soldPrice: number
     condition: string | null
+    dataType: string
     soldAt: Date
     createdAt: Date
     _count: PriceHistoryCountAggregateOutputType | null
@@ -8794,6 +8801,7 @@ export namespace Prisma {
     platform?: boolean
     soldPrice?: boolean
     condition?: boolean
+    dataType?: boolean
     soldAt?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["priceHistory"]>
@@ -8805,6 +8813,7 @@ export namespace Prisma {
     platform?: boolean
     soldPrice?: boolean
     condition?: boolean
+    dataType?: boolean
     soldAt?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["priceHistory"]>
@@ -8816,6 +8825,7 @@ export namespace Prisma {
     platform?: boolean
     soldPrice?: boolean
     condition?: boolean
+    dataType?: boolean
     soldAt?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["priceHistory"]>
@@ -8827,11 +8837,12 @@ export namespace Prisma {
     platform?: boolean
     soldPrice?: boolean
     condition?: boolean
+    dataType?: boolean
     soldAt?: boolean
     createdAt?: boolean
   }
 
-  export type PriceHistoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "productName" | "category" | "platform" | "soldPrice" | "condition" | "soldAt" | "createdAt", ExtArgs["result"]["priceHistory"]>
+  export type PriceHistoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "productName" | "category" | "platform" | "soldPrice" | "condition" | "dataType" | "soldAt" | "createdAt", ExtArgs["result"]["priceHistory"]>
 
   export type $PriceHistoryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "PriceHistory"
@@ -8843,6 +8854,7 @@ export namespace Prisma {
       platform: string
       soldPrice: number
       condition: string | null
+      dataType: string
       soldAt: Date
       createdAt: Date
     }, ExtArgs["result"]["priceHistory"]>
@@ -9274,6 +9286,7 @@ export namespace Prisma {
     readonly platform: FieldRef<"PriceHistory", 'String'>
     readonly soldPrice: FieldRef<"PriceHistory", 'Float'>
     readonly condition: FieldRef<"PriceHistory", 'String'>
+    readonly dataType: FieldRef<"PriceHistory", 'String'>
     readonly soldAt: FieldRef<"PriceHistory", 'DateTime'>
     readonly createdAt: FieldRef<"PriceHistory", 'DateTime'>
   }
@@ -17500,8 +17513,18 @@ export namespace Prisma {
 
   export type AggregateAiAnalysisCache = {
     _count: AiAnalysisCacheCountAggregateOutputType | null
+    _avg: AiAnalysisCacheAvgAggregateOutputType | null
+    _sum: AiAnalysisCacheSumAggregateOutputType | null
     _min: AiAnalysisCacheMinAggregateOutputType | null
     _max: AiAnalysisCacheMaxAggregateOutputType | null
+  }
+
+  export type AiAnalysisCacheAvgAggregateOutputType = {
+    analyzedAtPrice: number | null
+  }
+
+  export type AiAnalysisCacheSumAggregateOutputType = {
+    analyzedAtPrice: number | null
   }
 
   export type AiAnalysisCacheMinAggregateOutputType = {
@@ -17509,6 +17532,7 @@ export namespace Prisma {
     listingId: string | null
     analysisType: string | null
     analysisResult: string | null
+    analyzedAtPrice: number | null
     createdAt: Date | null
     expiresAt: Date | null
   }
@@ -17518,6 +17542,7 @@ export namespace Prisma {
     listingId: string | null
     analysisType: string | null
     analysisResult: string | null
+    analyzedAtPrice: number | null
     createdAt: Date | null
     expiresAt: Date | null
   }
@@ -17527,17 +17552,27 @@ export namespace Prisma {
     listingId: number
     analysisType: number
     analysisResult: number
+    analyzedAtPrice: number
     createdAt: number
     expiresAt: number
     _all: number
   }
 
 
+  export type AiAnalysisCacheAvgAggregateInputType = {
+    analyzedAtPrice?: true
+  }
+
+  export type AiAnalysisCacheSumAggregateInputType = {
+    analyzedAtPrice?: true
+  }
+
   export type AiAnalysisCacheMinAggregateInputType = {
     id?: true
     listingId?: true
     analysisType?: true
     analysisResult?: true
+    analyzedAtPrice?: true
     createdAt?: true
     expiresAt?: true
   }
@@ -17547,6 +17582,7 @@ export namespace Prisma {
     listingId?: true
     analysisType?: true
     analysisResult?: true
+    analyzedAtPrice?: true
     createdAt?: true
     expiresAt?: true
   }
@@ -17556,6 +17592,7 @@ export namespace Prisma {
     listingId?: true
     analysisType?: true
     analysisResult?: true
+    analyzedAtPrice?: true
     createdAt?: true
     expiresAt?: true
     _all?: true
@@ -17599,6 +17636,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: AiAnalysisCacheAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: AiAnalysisCacheSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: AiAnalysisCacheMinAggregateInputType
@@ -17629,6 +17678,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: AiAnalysisCacheCountAggregateInputType | true
+    _avg?: AiAnalysisCacheAvgAggregateInputType
+    _sum?: AiAnalysisCacheSumAggregateInputType
     _min?: AiAnalysisCacheMinAggregateInputType
     _max?: AiAnalysisCacheMaxAggregateInputType
   }
@@ -17638,9 +17689,12 @@ export namespace Prisma {
     listingId: string
     analysisType: string
     analysisResult: string
+    analyzedAtPrice: number | null
     createdAt: Date
     expiresAt: Date
     _count: AiAnalysisCacheCountAggregateOutputType | null
+    _avg: AiAnalysisCacheAvgAggregateOutputType | null
+    _sum: AiAnalysisCacheSumAggregateOutputType | null
     _min: AiAnalysisCacheMinAggregateOutputType | null
     _max: AiAnalysisCacheMaxAggregateOutputType | null
   }
@@ -17664,6 +17718,7 @@ export namespace Prisma {
     listingId?: boolean
     analysisType?: boolean
     analysisResult?: boolean
+    analyzedAtPrice?: boolean
     createdAt?: boolean
     expiresAt?: boolean
   }, ExtArgs["result"]["aiAnalysisCache"]>
@@ -17673,6 +17728,7 @@ export namespace Prisma {
     listingId?: boolean
     analysisType?: boolean
     analysisResult?: boolean
+    analyzedAtPrice?: boolean
     createdAt?: boolean
     expiresAt?: boolean
   }, ExtArgs["result"]["aiAnalysisCache"]>
@@ -17682,6 +17738,7 @@ export namespace Prisma {
     listingId?: boolean
     analysisType?: boolean
     analysisResult?: boolean
+    analyzedAtPrice?: boolean
     createdAt?: boolean
     expiresAt?: boolean
   }, ExtArgs["result"]["aiAnalysisCache"]>
@@ -17691,11 +17748,12 @@ export namespace Prisma {
     listingId?: boolean
     analysisType?: boolean
     analysisResult?: boolean
+    analyzedAtPrice?: boolean
     createdAt?: boolean
     expiresAt?: boolean
   }
 
-  export type AiAnalysisCacheOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "listingId" | "analysisType" | "analysisResult" | "createdAt" | "expiresAt", ExtArgs["result"]["aiAnalysisCache"]>
+  export type AiAnalysisCacheOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "listingId" | "analysisType" | "analysisResult" | "analyzedAtPrice" | "createdAt" | "expiresAt", ExtArgs["result"]["aiAnalysisCache"]>
 
   export type $AiAnalysisCachePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "AiAnalysisCache"
@@ -17705,6 +17763,7 @@ export namespace Prisma {
       listingId: string
       analysisType: string
       analysisResult: string
+      analyzedAtPrice: number | null
       createdAt: Date
       expiresAt: Date
     }, ExtArgs["result"]["aiAnalysisCache"]>
@@ -18134,6 +18193,7 @@ export namespace Prisma {
     readonly listingId: FieldRef<"AiAnalysisCache", 'String'>
     readonly analysisType: FieldRef<"AiAnalysisCache", 'String'>
     readonly analysisResult: FieldRef<"AiAnalysisCache", 'String'>
+    readonly analyzedAtPrice: FieldRef<"AiAnalysisCache", 'Float'>
     readonly createdAt: FieldRef<"AiAnalysisCache", 'DateTime'>
     readonly expiresAt: FieldRef<"AiAnalysisCache", 'DateTime'>
   }
@@ -25661,6 +25721,7 @@ export namespace Prisma {
     platform: 'platform',
     soldPrice: 'soldPrice',
     condition: 'condition',
+    dataType: 'dataType',
     soldAt: 'soldAt',
     createdAt: 'createdAt'
   };
@@ -25825,6 +25886,7 @@ export namespace Prisma {
     listingId: 'listingId',
     analysisType: 'analysisType',
     analysisResult: 'analysisResult',
+    analyzedAtPrice: 'analyzedAtPrice',
     createdAt: 'createdAt',
     expiresAt: 'expiresAt'
   };
@@ -26820,6 +26882,7 @@ export namespace Prisma {
     platform?: StringFilter<"PriceHistory"> | string
     soldPrice?: FloatFilter<"PriceHistory"> | number
     condition?: StringNullableFilter<"PriceHistory"> | string | null
+    dataType?: StringFilter<"PriceHistory"> | string
     soldAt?: DateTimeFilter<"PriceHistory"> | Date | string
     createdAt?: DateTimeFilter<"PriceHistory"> | Date | string
   }
@@ -26831,6 +26894,7 @@ export namespace Prisma {
     platform?: SortOrder
     soldPrice?: SortOrder
     condition?: SortOrderInput | SortOrder
+    dataType?: SortOrder
     soldAt?: SortOrder
     createdAt?: SortOrder
   }
@@ -26845,6 +26909,7 @@ export namespace Prisma {
     platform?: StringFilter<"PriceHistory"> | string
     soldPrice?: FloatFilter<"PriceHistory"> | number
     condition?: StringNullableFilter<"PriceHistory"> | string | null
+    dataType?: StringFilter<"PriceHistory"> | string
     soldAt?: DateTimeFilter<"PriceHistory"> | Date | string
     createdAt?: DateTimeFilter<"PriceHistory"> | Date | string
   }, "id">
@@ -26856,6 +26921,7 @@ export namespace Prisma {
     platform?: SortOrder
     soldPrice?: SortOrder
     condition?: SortOrderInput | SortOrder
+    dataType?: SortOrder
     soldAt?: SortOrder
     createdAt?: SortOrder
     _count?: PriceHistoryCountOrderByAggregateInput
@@ -26875,6 +26941,7 @@ export namespace Prisma {
     platform?: StringWithAggregatesFilter<"PriceHistory"> | string
     soldPrice?: FloatWithAggregatesFilter<"PriceHistory"> | number
     condition?: StringNullableWithAggregatesFilter<"PriceHistory"> | string | null
+    dataType?: StringWithAggregatesFilter<"PriceHistory"> | string
     soldAt?: DateTimeWithAggregatesFilter<"PriceHistory"> | Date | string
     createdAt?: DateTimeWithAggregatesFilter<"PriceHistory"> | Date | string
   }
@@ -27685,6 +27752,7 @@ export namespace Prisma {
     listingId?: StringFilter<"AiAnalysisCache"> | string
     analysisType?: StringFilter<"AiAnalysisCache"> | string
     analysisResult?: StringFilter<"AiAnalysisCache"> | string
+    analyzedAtPrice?: FloatNullableFilter<"AiAnalysisCache"> | number | null
     createdAt?: DateTimeFilter<"AiAnalysisCache"> | Date | string
     expiresAt?: DateTimeFilter<"AiAnalysisCache"> | Date | string
   }
@@ -27694,6 +27762,7 @@ export namespace Prisma {
     listingId?: SortOrder
     analysisType?: SortOrder
     analysisResult?: SortOrder
+    analyzedAtPrice?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     expiresAt?: SortOrder
   }
@@ -27707,6 +27776,7 @@ export namespace Prisma {
     listingId?: StringFilter<"AiAnalysisCache"> | string
     analysisType?: StringFilter<"AiAnalysisCache"> | string
     analysisResult?: StringFilter<"AiAnalysisCache"> | string
+    analyzedAtPrice?: FloatNullableFilter<"AiAnalysisCache"> | number | null
     createdAt?: DateTimeFilter<"AiAnalysisCache"> | Date | string
     expiresAt?: DateTimeFilter<"AiAnalysisCache"> | Date | string
   }, "id" | "listingId_analysisType">
@@ -27716,11 +27786,14 @@ export namespace Prisma {
     listingId?: SortOrder
     analysisType?: SortOrder
     analysisResult?: SortOrder
+    analyzedAtPrice?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     expiresAt?: SortOrder
     _count?: AiAnalysisCacheCountOrderByAggregateInput
+    _avg?: AiAnalysisCacheAvgOrderByAggregateInput
     _max?: AiAnalysisCacheMaxOrderByAggregateInput
     _min?: AiAnalysisCacheMinOrderByAggregateInput
+    _sum?: AiAnalysisCacheSumOrderByAggregateInput
   }
 
   export type AiAnalysisCacheScalarWhereWithAggregatesInput = {
@@ -27731,6 +27804,7 @@ export namespace Prisma {
     listingId?: StringWithAggregatesFilter<"AiAnalysisCache"> | string
     analysisType?: StringWithAggregatesFilter<"AiAnalysisCache"> | string
     analysisResult?: StringWithAggregatesFilter<"AiAnalysisCache"> | string
+    analyzedAtPrice?: FloatNullableWithAggregatesFilter<"AiAnalysisCache"> | number | null
     createdAt?: DateTimeWithAggregatesFilter<"AiAnalysisCache"> | Date | string
     expiresAt?: DateTimeWithAggregatesFilter<"AiAnalysisCache"> | Date | string
   }
@@ -29206,6 +29280,7 @@ export namespace Prisma {
     platform: string
     soldPrice: number
     condition?: string | null
+    dataType?: string
     soldAt: Date | string
     createdAt?: Date | string
   }
@@ -29217,6 +29292,7 @@ export namespace Prisma {
     platform: string
     soldPrice: number
     condition?: string | null
+    dataType?: string
     soldAt: Date | string
     createdAt?: Date | string
   }
@@ -29228,6 +29304,7 @@ export namespace Prisma {
     platform?: StringFieldUpdateOperationsInput | string
     soldPrice?: FloatFieldUpdateOperationsInput | number
     condition?: NullableStringFieldUpdateOperationsInput | string | null
+    dataType?: StringFieldUpdateOperationsInput | string
     soldAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29239,6 +29316,7 @@ export namespace Prisma {
     platform?: StringFieldUpdateOperationsInput | string
     soldPrice?: FloatFieldUpdateOperationsInput | number
     condition?: NullableStringFieldUpdateOperationsInput | string | null
+    dataType?: StringFieldUpdateOperationsInput | string
     soldAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29250,6 +29328,7 @@ export namespace Prisma {
     platform: string
     soldPrice: number
     condition?: string | null
+    dataType?: string
     soldAt: Date | string
     createdAt?: Date | string
   }
@@ -29261,6 +29340,7 @@ export namespace Prisma {
     platform?: StringFieldUpdateOperationsInput | string
     soldPrice?: FloatFieldUpdateOperationsInput | number
     condition?: NullableStringFieldUpdateOperationsInput | string | null
+    dataType?: StringFieldUpdateOperationsInput | string
     soldAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29272,6 +29352,7 @@ export namespace Prisma {
     platform?: StringFieldUpdateOperationsInput | string
     soldPrice?: FloatFieldUpdateOperationsInput | number
     condition?: NullableStringFieldUpdateOperationsInput | string | null
+    dataType?: StringFieldUpdateOperationsInput | string
     soldAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30262,6 +30343,7 @@ export namespace Prisma {
     listingId: string
     analysisType?: string
     analysisResult: string
+    analyzedAtPrice?: number | null
     createdAt?: Date | string
     expiresAt: Date | string
   }
@@ -30271,6 +30353,7 @@ export namespace Prisma {
     listingId: string
     analysisType?: string
     analysisResult: string
+    analyzedAtPrice?: number | null
     createdAt?: Date | string
     expiresAt: Date | string
   }
@@ -30280,6 +30363,7 @@ export namespace Prisma {
     listingId?: StringFieldUpdateOperationsInput | string
     analysisType?: StringFieldUpdateOperationsInput | string
     analysisResult?: StringFieldUpdateOperationsInput | string
+    analyzedAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30289,6 +30373,7 @@ export namespace Prisma {
     listingId?: StringFieldUpdateOperationsInput | string
     analysisType?: StringFieldUpdateOperationsInput | string
     analysisResult?: StringFieldUpdateOperationsInput | string
+    analyzedAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30298,6 +30383,7 @@ export namespace Prisma {
     listingId: string
     analysisType?: string
     analysisResult: string
+    analyzedAtPrice?: number | null
     createdAt?: Date | string
     expiresAt: Date | string
   }
@@ -30307,6 +30393,7 @@ export namespace Prisma {
     listingId?: StringFieldUpdateOperationsInput | string
     analysisType?: StringFieldUpdateOperationsInput | string
     analysisResult?: StringFieldUpdateOperationsInput | string
+    analyzedAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30316,6 +30403,7 @@ export namespace Prisma {
     listingId?: StringFieldUpdateOperationsInput | string
     analysisType?: StringFieldUpdateOperationsInput | string
     analysisResult?: StringFieldUpdateOperationsInput | string
+    analyzedAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -31716,6 +31804,7 @@ export namespace Prisma {
     platform?: SortOrder
     soldPrice?: SortOrder
     condition?: SortOrder
+    dataType?: SortOrder
     soldAt?: SortOrder
     createdAt?: SortOrder
   }
@@ -31731,6 +31820,7 @@ export namespace Prisma {
     platform?: SortOrder
     soldPrice?: SortOrder
     condition?: SortOrder
+    dataType?: SortOrder
     soldAt?: SortOrder
     createdAt?: SortOrder
   }
@@ -31742,6 +31832,7 @@ export namespace Prisma {
     platform?: SortOrder
     soldPrice?: SortOrder
     condition?: SortOrder
+    dataType?: SortOrder
     soldAt?: SortOrder
     createdAt?: SortOrder
   }
@@ -32295,8 +32386,13 @@ export namespace Prisma {
     listingId?: SortOrder
     analysisType?: SortOrder
     analysisResult?: SortOrder
+    analyzedAtPrice?: SortOrder
     createdAt?: SortOrder
     expiresAt?: SortOrder
+  }
+
+  export type AiAnalysisCacheAvgOrderByAggregateInput = {
+    analyzedAtPrice?: SortOrder
   }
 
   export type AiAnalysisCacheMaxOrderByAggregateInput = {
@@ -32304,6 +32400,7 @@ export namespace Prisma {
     listingId?: SortOrder
     analysisType?: SortOrder
     analysisResult?: SortOrder
+    analyzedAtPrice?: SortOrder
     createdAt?: SortOrder
     expiresAt?: SortOrder
   }
@@ -32313,8 +32410,13 @@ export namespace Prisma {
     listingId?: SortOrder
     analysisType?: SortOrder
     analysisResult?: SortOrder
+    analyzedAtPrice?: SortOrder
     createdAt?: SortOrder
     expiresAt?: SortOrder
+  }
+
+  export type AiAnalysisCacheSumOrderByAggregateInput = {
+    analyzedAtPrice?: SortOrder
   }
 
   export type PostingQueueItemListingIdTargetPlatformUserIdCompoundUniqueInput = {

@@ -1,5 +1,26 @@
-// Value estimation logic for flip opportunities
-// Uses keyword matching, category-based multipliers, and generates reference links
+/**
+ * @file src/lib/value-estimator.ts
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-03-15
+ * @version 2.0
+ * @brief Algorithmic value estimation engine for flip opportunity scoring.
+ *
+ * @description
+ * Core scoring module that evaluates marketplace listings for resale potential.
+ * Uses keyword matching (brand boosts with negative pattern suppression, risk
+ * penalties), category-based multipliers, condition factors, and a weighted
+ * margin + absolute profit formula to produce a 0-100 value score.
+ *
+ * Brand/value keywords match against listing TITLES ONLY (not descriptions)
+ * to prevent false positives (e.g., "vintage-style" triggering vintage boost).
+ * Risk/condition keywords match full text (title + description) since damage
+ * disclosures often appear only in descriptions. Sealed/NIB keywords use a
+ * hybrid approach: title OR first 100 chars of description.
+ *
+ * Also provides demand velocity adjustment (post-processing step), demand
+ * badge mapping, category detection, and purchase message generation.
+ */
 
 export interface EstimationResult {
   estimatedValue: number;
@@ -42,17 +63,47 @@ const CATEGORY_MULTIPLIERS: Record<string, { low: number; high: number; difficul
   default: { low: 1.2, high: 1.5, difficulty: 3 },
 };
 
-// Keywords that indicate higher value items
-const VALUE_KEYWORDS = [
+// Keywords that indicate higher value items — matched against TITLE ONLY (not description)
+// Each entry may have negativePatterns that suppress the boost when matched in the same title
+interface ValueKeyword {
+  pattern: RegExp;
+  boost: number;
+  label: string;
+  tag: string;
+  negativePatterns?: RegExp[];
+  /** If true, match title OR first 100 chars of description (used for sealed/NIB) */
+  matchLeadDescription?: boolean;
+}
+
+const VALUE_KEYWORDS: ValueKeyword[] = [
   {
     pattern: /apple|iphone|ipad|macbook|airpods/i,
     boost: 1.2,
     label: 'Apple product',
     tag: 'apple',
+    negativePatterns: [/apple compatible|case for iphone|charger for|apple cider|apple pie|apple tree|apple sauce/i],
   },
-  { pattern: /samsung|galaxy/i, boost: 1.15, label: 'Samsung', tag: 'samsung' },
-  { pattern: /sony|playstation|ps5|ps4/i, boost: 1.2, label: 'Sony/PlayStation', tag: 'sony' },
-  { pattern: /nintendo|switch/i, boost: 1.25, label: 'Nintendo', tag: 'nintendo' },
+  {
+    pattern: /samsung|galaxy/i,
+    boost: 1.15,
+    label: 'Samsung',
+    tag: 'samsung',
+    negativePatterns: [/compatible with samsung|case for samsung|charger for samsung/i],
+  },
+  {
+    pattern: /sony|playstation|ps5|ps4/i,
+    boost: 1.2,
+    label: 'Sony/PlayStation',
+    tag: 'sony',
+    negativePatterns: [/compatible with playstation|case for ps5|case for ps4|controller for ps/i],
+  },
+  {
+    pattern: /nintendo|switch/i,
+    boost: 1.25,
+    label: 'Nintendo',
+    tag: 'nintendo',
+    negativePatterns: [/compatible with|case for|controller for|charger for|screen protector|light switch|network switch|switch plate/i],
+  },
   { pattern: /xbox|microsoft/i, boost: 1.15, label: 'Xbox/Microsoft', tag: 'xbox' },
   { pattern: /dyson/i, boost: 1.3, label: 'Dyson', tag: 'dyson' },
   {
@@ -68,14 +119,28 @@ const VALUE_KEYWORDS = [
     tag: 'premium-furniture',
   },
   { pattern: /pioneer|ddj/i, boost: 1.2, label: 'DJ equipment', tag: 'dj-equipment' },
-  { pattern: /vintage|antique|retro/i, boost: 1.4, label: 'Vintage/collectible', tag: 'vintage' },
+  {
+    pattern: /vintage|antique|retro/i,
+    boost: 1.4,
+    label: 'Vintage/collectible',
+    tag: 'vintage',
+    negativePatterns: [/vintage-style|vintage-inspired|vintage look|retro style|retro-fit|retro-inspired/i],
+  },
   {
     pattern: /sealed|new in box|nib|bnib/i,
     boost: 1.3,
     label: 'New/sealed condition',
     tag: 'sealed',
+    negativePatterns: [/resealed|seal broken|seal damaged/i],
+    matchLeadDescription: true,
   },
-  { pattern: /rare|limited edition/i, boost: 1.4, label: 'Rare/limited', tag: 'rare' },
+  {
+    pattern: /rare|limited edition/i,
+    boost: 1.4,
+    label: 'Rare/limited',
+    tag: 'rare',
+    negativePatterns: [/rarely used|rare occasion/i],
+  },
 ];
 
 // Keywords that indicate lower value or risk
@@ -174,7 +239,10 @@ export function estimateValue(
   category: string | null,
   feeRate?: number
 ): EstimationResult {
-  const fullText = `${title} ${description || ''}`.toLowerCase();
+  const titleLower = title.toLowerCase();
+  const descLower = (description || '').toLowerCase();
+  const fullText = `${titleLower} ${descLower}`;
+  const leadDescription = descLower.slice(0, 100);
 
   // Get category multiplier range
   const categoryKey = category?.toLowerCase() || 'default';
@@ -184,20 +252,26 @@ export function estimateValue(
   const conditionKey = condition?.toLowerCase() || 'good';
   const conditionMultiplier = CONDITION_MULTIPLIERS[conditionKey] || 0.75;
 
-  // Check for value-adding keywords
+  // Check for value-adding keywords (TITLE ONLY, with negative pattern suppression)
   let valueBoost = 1.0;
   const valueMatches: string[] = [];
   const tags: string[] = [categoryKey];
 
-  for (const { pattern, boost, label, tag } of VALUE_KEYWORDS) {
-    if (pattern.test(fullText)) {
-      valueBoost *= boost;
-      valueMatches.push(label);
-      tags.push(tag);
+  for (const kw of VALUE_KEYWORDS) {
+    // Determine match text: title-only by default, title+leadDescription for sealed/NIB
+    const matchText = kw.matchLeadDescription ? `${titleLower} ${leadDescription}` : titleLower;
+    if (kw.pattern.test(matchText)) {
+      // Check negative patterns — skip boost if any negative matches
+      const negated = kw.negativePatterns?.some((neg) => neg.test(matchText));
+      if (!negated) {
+        valueBoost *= kw.boost;
+        valueMatches.push(kw.label);
+        tags.push(kw.tag);
+      }
     }
   }
 
-  // Check for risk keywords
+  // Check for risk keywords (full text — title + description, since risks are often in description)
   let riskPenalty = 1.0;
   const riskMatches: string[] = [];
   let difficultyAdjust = 0;
@@ -241,15 +315,26 @@ export function estimateValue(
   const profitHigh = Math.round(estimatedHigh * (1 - effectiveFeeRate) - askingPrice);
   const profitPotential = Math.round((profitLow + profitHigh) / 2);
 
-  // Calculate value score (0-100)
+  // Calculate value score (0-100) using weighted margin + absolute profit formula
+  // Old linear formula (preserved for reference):
+  //   valueScore = Math.min(100, Math.max(0, Math.round(profitMargin * 100 + 50)))
+  //   + cumulative boosts: >$100 → +10, >$200 → +10
   const profitMargin = profitPotential / askingPrice;
-  let valueScore = Math.min(100, Math.max(0, Math.round(profitMargin * 100 + 50)));
+  const marginScore = Math.min(100, Math.max(0, Math.round(profitMargin * 100 + 50)));
+  const absoluteProfitScore = Math.min(100, Math.round(
+    Math.log10(Math.max(1, profitPotential)) * 33.33
+  ));
+  let valueScore = Math.round(marginScore * 0.4 + absoluteProfitScore * 0.6);
+  valueScore = Math.min(100, Math.max(0, valueScore));
 
-  // Adjust score based on absolute profit
-  if (profitPotential < 10) valueScore = Math.min(valueScore, 30);
+  // Apply caps based on absolute profit thresholds
   if (profitPotential < 0) valueScore = Math.min(valueScore, 10);
-  if (profitPotential > 100) valueScore = Math.min(100, valueScore + 10);
-  if (profitPotential > 200) valueScore = Math.min(100, valueScore + 10);
+  else if (profitPotential === 0) valueScore = Math.min(valueScore, 15);
+  else if (profitPotential < 15) valueScore = Math.min(valueScore, 40);
+
+  // Apply exclusive high-value boosts (highest tier only, not cumulative)
+  if (profitPotential > 300) valueScore = Math.min(100, valueScore + 10);
+  else if (profitPotential > 100) valueScore = Math.min(100, valueScore + 5);
 
   // Calculate resale difficulty
   let difficultyLevel = categoryData.difficulty + difficultyAdjust;
@@ -414,4 +499,87 @@ export function detectCategory(title: string, description: string | null): strin
   }
 
   return 'other';
+}
+
+// --- Demand Velocity Adjustment (Story 13.6) ---
+// Applied as a POST-PROCESSING step after demand enrichment completes,
+// avoiding the chicken-and-egg problem with Tier 1 scoring.
+
+/** Demand analyzer output (primary data source) */
+const DEMAND_ANALYZER_MULTIPLIERS: Record<string, number> = {
+  rising: 1.15,
+  stable: 1.0,
+  declining: 0.85,
+  low_liquidity: 0.70,
+};
+
+/** LLM demandLevel output (fallback when demand analyzer unavailable) */
+const LLM_DEMAND_MULTIPLIERS: Record<string, number> = {
+  very_high: 1.15,
+  high: 1.05,
+  medium: 1.0,
+  low: 0.85,
+};
+
+export type DemandBadge = { label: string; color: 'red' | 'green' | 'blue' | 'gray' | 'warning' };
+
+/** Map demand trend to a UI badge */
+export function getDemandBadge(demandTrend: string | null): DemandBadge {
+  const badges: Record<string, DemandBadge> = {
+    // Demand analyzer types
+    rising: { label: 'Hot', color: 'red' },
+    stable: { label: 'Steady', color: 'blue' },
+    declining: { label: 'Slow', color: 'gray' },
+    low_liquidity: { label: 'Dead', color: 'warning' },
+    // LLM fallback types
+    very_high: { label: 'Hot', color: 'red' },
+    high: { label: 'Active', color: 'green' },
+    medium: { label: 'Steady', color: 'blue' },
+    low: { label: 'Slow', color: 'gray' },
+  };
+  return badges[demandTrend || ''] || { label: 'Unknown', color: 'gray' };
+}
+
+/**
+ * Apply demand velocity adjustment to a pre-computed valueScore.
+ * Call AFTER enrichWithDemandAnalysis() completes to avoid chicken-and-egg timing.
+ *
+ * @param valueScore - The Tier 1 value score (0-100)
+ * @param demandTrend - From demand analyzer ('rising'|'stable'|'declining'|'low_liquidity')
+ *                      or LLM demandLevel ('very_high'|'high'|'medium'|'low') or null
+ * @param expectedDaysToSell - From LLM sellability analysis, or null
+ * @param discountPercent - The discount percentage (positive = below market). Demand boost
+ *                          >1.0 only applies when discountPercent > 0 (item is underpriced).
+ * @returns Adjusted score clamped 0-100
+ */
+export function applyDemandAdjustment(
+  valueScore: number,
+  demandTrend: string | null,
+  expectedDaysToSell: number | null,
+  discountPercent: number = 0
+): number {
+  let adjusted = valueScore;
+
+  // Resolve demand multiplier (demand analyzer types take priority over LLM types)
+  const multiplier = demandTrend
+    ? (DEMAND_ANALYZER_MULTIPLIERS[demandTrend] ?? LLM_DEMAND_MULTIPLIERS[demandTrend] ?? 1.0)
+    : 1.0;
+
+  // Guard: only apply boost (>1.0) when item is actually below market value
+  if (multiplier > 1.0 && discountPercent <= 0) {
+    // Overpriced item — high demand doesn't help
+  } else {
+    adjusted = Math.round(adjusted * multiplier);
+  }
+
+  // Days-to-sell penalty (exclusive, not cumulative)
+  if (expectedDaysToSell !== null) {
+    if (expectedDaysToSell > 60) {
+      adjusted -= 10;
+    } else if (expectedDaysToSell > 30) {
+      adjusted -= 5;
+    }
+  }
+
+  return Math.min(100, Math.max(0, adjusted));
 }

@@ -1,6 +1,6 @@
 # Story 13.7: Collaborative AI Scoring Algorithm Refinement Session
 
-Status: ready-for-dev
+Status: in-progress
 Blocked: false
 Blocked-Reason:
 Trello-Card-ID:

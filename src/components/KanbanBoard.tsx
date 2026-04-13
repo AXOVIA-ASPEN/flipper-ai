@@ -26,10 +26,25 @@ interface Listing {
   askingPrice: number;
   profitPotential: number | null;
   valueScore: number | null;
+  demandLevel: string | null;
   platform: string;
   url: string;
   imageUrls: string | null;
 }
+
+/** Map demand trend to a UI badge label and color */
+const DEMAND_BADGES: Record<string, { label: string; className: string }> = {
+  // Demand analyzer types (primary)
+  rising: { label: 'Hot', className: 'bg-red-500/20 text-red-300 border-red-500/30' },
+  stable: { label: 'Steady', className: 'bg-blue-500/20 text-blue-300 border-blue-500/30' },
+  declining: { label: 'Slow', className: 'bg-slate-500/20 text-slate-400 border-slate-500/30' },
+  low_liquidity: { label: 'Dead', className: 'bg-amber-600/20 text-amber-400 border-amber-600/30' },
+  // LLM demandLevel types (fallback)
+  very_high: { label: 'Hot', className: 'bg-red-500/20 text-red-300 border-red-500/30' },
+  high: { label: 'Active', className: 'bg-green-500/20 text-green-300 border-green-500/30' },
+  medium: { label: 'Steady', className: 'bg-blue-500/20 text-blue-300 border-blue-500/30' },
+  low: { label: 'Slow', className: 'bg-slate-500/20 text-slate-400 border-slate-500/30' },
+};
 
 export interface KanbanOpportunity {
   id: string;
@@ -240,6 +255,14 @@ export default function KanbanBoard({
                                     <span style={{ fontWeight: 600, fontSize: 13, color: '#8b5cf6' }}>
                                       {opp.listing.valueScore.toFixed(0)}
                                     </span>
+                                    {opp.listing.demandLevel && DEMAND_BADGES[opp.listing.demandLevel] && (
+                                      <span
+                                        className={`inline-flex items-center rounded-full border px-1.5 py-0 text-[9px] font-semibold leading-4 ${DEMAND_BADGES[opp.listing.demandLevel].className}`}
+                                        data-testid="demand-badge"
+                                      >
+                                        {DEMAND_BADGES[opp.listing.demandLevel].label}
+                                      </span>
+                                    )}
                                   </div>
                                 )}
                               </div>

@@ -1,5 +1,18 @@
-// Market price fetcher - Gets actual sold prices from eBay
-// Uses Playwright to scrape eBay completed/sold listings
+/**
+ * @file src/lib/market-price.ts
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2025-12-22
+ * @version 1.1
+ * @brief eBay sold-price market data fetcher with IQR outlier filtering.
+ *
+ * @description
+ * Scrapes eBay completed/sold listings via Playwright to gather real market
+ * price data. Includes IQR-based outlier filtering (1.5x fencing method) to
+ * exclude extreme prices before calculating median, average, low, and high
+ * statistics. Falls back to unfiltered prices when fewer than 4 data points
+ * remain after filtering, flagging lowSampleSize for downstream consumers.
+ */
 
 import { chromium, Browser } from 'playwright';
 
@@ -24,9 +37,9 @@ export interface MarketPrice {
   searchQuery: string;
   fetchedAt: Date;
   /** Number of price outliers removed by IQR filtering (0 if no filtering applied) */
-  outliersRemoved?: number;
+  outliersRemoved: number;
   /** True if insufficient data remained after filtering (fewer than 4 prices) */
-  lowSampleSize?: boolean;
+  lowSampleSize: boolean;
 }
 
 /**

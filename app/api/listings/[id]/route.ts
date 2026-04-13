@@ -10,6 +10,10 @@ import prisma from '@/lib/db';
 import { handleError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import { getCurrentUserId } from '@/lib/auth';
 
+// Price delta threshold constants (shared with llm-analyzer.ts logic)
+const STALE_THRESHOLD = 0.05; // 5% change → stale
+const INVALIDATION_THRESHOLD = 0.15; // 15% change → fully invalidated
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -34,7 +38,24 @@ export async function GET(
       throw new ForbiddenError('Forbidden');
     }
 
-    return NextResponse.json({ success: true, listing });
+    // Story 13.3: Check if cached analysis is stale due to price change
+    let staleAnalysis = false;
+    try {
+      const latestCache = await prisma.aiAnalysisCache.findFirst({
+        where: { listingId: id, expiresAt: { gt: new Date() } },
+        orderBy: { createdAt: 'desc' },
+        select: { analyzedAtPrice: true },
+      });
+      if (latestCache && latestCache.analyzedAtPrice != null) {
+        const cached = latestCache.analyzedAtPrice;
+        const delta = cached === 0 ? Infinity : Math.abs(listing.askingPrice - cached) / cached;
+        staleAnalysis = delta > STALE_THRESHOLD && delta <= INVALIDATION_THRESHOLD;
+      }
+    } catch {
+      // Non-critical — if cache check fails, just don't flag staleness
+    }
+
+    return NextResponse.json({ success: true, listing, staleAnalysis });
   } catch (error) {
     return handleError(error);
   }

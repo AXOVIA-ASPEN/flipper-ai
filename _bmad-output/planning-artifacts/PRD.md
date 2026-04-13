@@ -111,6 +111,18 @@ The current algorithmic scoring has critical accuracy issues:
 - Score = profitMargin * 100 + 50 (capped 0-100)
 - OPPORTUNITY status if valueScore >= 70
 
+**Scoring Algorithm Refinements (Epic 13):**
+
+| ID | Requirement | Description |
+|---|---|---|
+| FR-SCORE-23 | IQR outlier filtering on eBay sold prices | Apply 1.5x IQR fencing to exclude extreme outlier prices from eBay sold data before computing market statistics. Falls back to unfiltered prices when fewer than 4 data points remain. Exposes `outliersRemoved` count for downstream consumers. |
+| FR-SCORE-24 | Structured JSON LLM response format | Use OpenAI's native `response_format: json_object` mode instead of regex extraction. Retry with simplified prompt on parse failure, log to Sentry. |
+| FR-SCORE-25 | Cache invalidation on price changes | Invalidate or flag stale cached LLM analyses when a listing's asking price changes by >5%. Full eviction at >15% delta. |
+| FR-SCORE-26 | Weighted scoring (margin + absolute profit) | Replace pure margin-based scoring with weighted blend: 40% profit margin + 60% absolute profit (log-scaled). Profit caps prevent unprofitable items from scoring high. |
+| FR-SCORE-27 | Brand regex refinement — title-only matching | Apply brand boost patterns to listing title only (not description). Add negative patterns to suppress false-positive brand boosts (e.g., "compatible with Nintendo" should not boost as Nintendo). |
+| FR-SCORE-28 | Demand velocity integration into Tier 1 score | Apply demand-based multipliers to value score: rising 1.15x, stable 1.0x, declining 0.85x, low_liquidity 0.70x. Days-to-sell penalties for slow-moving items. |
+| FR-SCORE-30 | Cross-platform price intelligence | Aggregate verified market values from multiple marketplace platforms beyond eBay. |
+
 ### FR-COMM: Automated Seller Communication
 
 - **Message Drafting:** AI generates personalized outreach messages

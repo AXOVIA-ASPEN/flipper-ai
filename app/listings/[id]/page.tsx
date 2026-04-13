@@ -74,6 +74,8 @@ function ListingDetail() {
   const [listing, setListing] = useState<ListingDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Story 13.3: Stale analysis indicator
+  const [staleAnalysis, setStaleAnalysis] = useState(false);
   // Story 12.1: Meeting scheduling state
   const [showMeetingModal, setShowMeetingModal] = useState(false);
   const [cancellingMeeting, setCancellingMeeting] = useState(false);
@@ -94,6 +96,8 @@ function ListingDetail() {
       }
       const data = await response.json();
       setListing(data.listing);
+      // Story 13.3: Track stale analysis flag from API
+      setStaleAnalysis(data.staleAnalysis === true);
     } catch (err) {
       console.error('Failed to fetch listing:', err);
       setError(err instanceof Error ? err.message : 'Failed to load listing');
@@ -227,6 +231,18 @@ function ListingDetail() {
                 </div>
               </div>
             </div>
+
+            {/* Story 13.3: Stale analysis banner */}
+            {staleAnalysis && (
+              <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2" data-testid="stale-analysis-banner">
+                <svg className="w-5 h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                </svg>
+                <span className="text-sm text-amber-800">
+                  Analysis may be outdated — the asking price has changed since the last AI analysis. A fresh analysis is being generated.
+                </span>
+              </div>
+            )}
 
             {/* AI analysis */}
             {(listing.identifiedBrand ||

@@ -1,0 +1,28 @@
+# Local development database for Flipper.ai
+# Usage: make db-up  (start)  /  make db-down  (stop)
+#
+# Container name: flipper-ai-db
+# Port: 5433 (host) -> 5432 (container)
+# Credentials match .env DATABASE_URL
+
+services:
+  db:
+    image: postgres:16
+    container_name: flipper-ai-db
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_USER: flipper
+      POSTGRES_PASSWORD: Fl1pp3rA1SecureDb_P4ss2026
+      POSTGRES_DB: flipper_ai
+    volumes:
+      - flipper-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U flipper -d flipper_ai']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  flipper-pg-data:

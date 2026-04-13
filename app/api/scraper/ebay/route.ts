@@ -13,9 +13,12 @@ import {
   enrichWithSellabilityAnalysis,
   enrichOpportunitiesWithClaudeTier2,
   enrichWithDemandAnalysis,
+  applyDemandScoreAdjustments,
   enrichWithCompMatches,
   enrichWithCompletenessAndReputation,
   enrichWithLogisticsAnalysis,
+  enrichWithCrossPlatformPrice,
+  rescueUndervaluedItems,
   getPlatformFeeRate,
   ViabilityCriteria,
   type AnalyzedListing,
@@ -336,12 +339,19 @@ export async function POST(request: NextRequest) {
         { emitEvents: true, userId, feeRate, opportunityThreshold }
       );
 
+      // Step 1.5: Cross-Platform Price Intelligence (Story 13.8)
+      // Override Tier 1 multiplier-based scores with verified market data before Tier 2
+      let enrichedListings = await enrichWithCrossPlatformPrice(processedResults.all);
+
+      // Step 1.6: Second-pass rescue (Story 13.8)
+      // Promote items scored below threshold by Tier 1 when verified data shows 40%+ discount
+      enrichedListings = await rescueUndervaluedItems(enrichedListings);
+
       // Enrich listings with market data (LLM path or verified price path)
-      let enrichedListings: AnalyzedListing[];
       if (hasLLM) {
-        enrichedListings = await enrichWithSellabilityAnalysis(processedResults.all, discountThreshold, feeRate);
+        enrichedListings = await enrichWithSellabilityAnalysis(enrichedListings, discountThreshold, feeRate);
       } else {
-        enrichedListings = await enrichWithVerifiedMarketPrice(processedResults.all);
+        enrichedListings = await enrichWithVerifiedMarketPrice(enrichedListings);
       }
 
       // Tier 2: Claude Sonnet structural analysis on enriched opportunities (Story 5.1)
@@ -351,6 +361,9 @@ export async function POST(request: NextRequest) {
       enrichedListings = await enrichWithDemandAnalysis(
         enrichedListings.filter((l) => l.isOpportunity)
       );
+
+      // Step 4b: Apply demand velocity score adjustments (Story 13.6)
+      enrichedListings = applyDemandScoreAdjustments(enrichedListings);
 
       // Step 5: Comparable sold item matching (Story 5.2)
       enrichedListings = await enrichWithCompMatches(enrichedListings);
@@ -401,6 +414,7 @@ export async function POST(request: NextRequest) {
                 data: {
                   listingId: listing.id,
                   analysisResult: JSON.stringify(analyzed.claudeAnalysis),
+                  analyzedAtPrice: listing.askingPrice,
                   expiresAt,
                 },
               });

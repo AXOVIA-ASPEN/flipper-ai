@@ -1,88 +1,40 @@
 <?xml version="1.0"?>
-<testsuite name="Cucumber" time="3.283" tests="8" skipped="0" failures="8" errors="0" timestamp="2026-04-11T05:19:55.050Z">
-  <testcase classname="Google Calendar Integration" name="User connects Google Calendar via OAuth" time="0.132">
-    <failure/>
-    <system-out><![CDATA[Given the user is authenticated with a PRO subscription.....................undefined
-Given the user navigates to Settings and the Integrations section...........undefined
-And Google Calendar is not connected........................................undefined
-When the user clicks "Connect Google Calendar" in the Integrations section..undefined
-Then the user is redirected to the Google OAuth consent screen requesting the "calendar.events" scope..undefined
-When the user grants consent and is redirected back to the app..............undefined
-Then the Settings Integrations section shows "Connected" with the user's Google account email..undefined
-And no "Connect Google Calendar" button is visible..........................undefined]]></system-out>
+<testsuite name="Cucumber" time="2.826" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-04-13T01:52:52.882Z">
+  <testcase classname="Scoring Algorithm Improvements — IQR Outlier Filtering" name="Cache hit when price changes less than 5%" time="0.183">
+    <system-out><![CDATA[Given a cached AI analysis for listing "listing-stable" at price 200........passed
+When the listing is re-checked with current price 205.......................passed
+Then the cached analysis should be returned.................................passed
+And the stale analysis flag should be false.................................passed]]></system-out>
   </testcase>
-  <testcase classname="Google Calendar Integration" name="Calendar event created when meeting is scheduled with time and location" time="0.068">
-    <failure/>
-    <system-out><![CDATA[Given the user is authenticated with a PRO subscription.....................undefined
-Given the user has Google Calendar connected................................undefined
-And an opportunity exists with status "IDENTIFIED"..........................undefined
-When the user opens the Schedule Meeting modal on the listing detail page...undefined
-And enters meetingTime "2026-05-01T14:00:00" and meetingLocation "456 Oak Ave, Seattle, WA"..undefined
-And the browser timezone is "America/Los_Angeles"...........................undefined
-And submits the form........................................................undefined
-Then the listing detail page displays the meeting date, time, and location..undefined
-And a Google Calendar event exists with title containing the listing title..undefined
-And the event start time is 2:00 PM and end time is 3:00 PM in the America/Los_Angeles timezone..undefined
-And the event location is "456 Oak Ave, Seattle, WA"........................undefined]]></system-out>
+  <testcase classname="Scoring Algorithm Improvements — IQR Outlier Filtering" name="Full cache invalidation when price drops more than 15%" time="0.038">
+    <system-out><![CDATA[Given a cached AI analysis for listing "listing-price-drop" at price 200....passed
+When the listing is re-checked with current price 160.......................passed
+Then no cached analysis should be returned..................................passed
+And the stale analysis flag should be false.................................passed]]></system-out>
   </testcase>
-  <testcase classname="Google Calendar Integration" name="Calendar event updated when meeting is rescheduled" time="0.061">
-    <failure/>
-    <system-out><![CDATA[Given the user is authenticated with a PRO subscription.....................undefined
-Given the user has Google Calendar connected................................undefined
-And an opportunity has a scheduled meeting with a valid calendarEventId.....undefined
-When the user opens the Schedule Meeting modal and updates the meetingTime to "2026-05-02T10:00:00"..undefined
-And submits the form........................................................undefined
-Then the listing detail page shows the updated meeting date and time........undefined
-And the original Google Calendar event is updated in place (same event ID)..undefined
-And no duplicate calendar event is created..................................undefined]]></system-out>
+  <testcase classname="Scoring Algorithm Improvements — IQR Outlier Filtering" name="Stale flag when price changes between 5% and 15%" time="0.04">
+    <system-out><![CDATA[Given a cached AI analysis for listing "listing-stale" at price 200.........passed
+When the listing is re-checked with current price 220.......................passed
+Then the cached analysis should be returned.................................passed
+And the stale analysis flag should be true..................................passed]]></system-out>
   </testcase>
-  <testcase classname="Google Calendar Integration" name="Calendar event deleted when meeting is cancelled" time="0.057">
-    <failure/>
-    <system-out><![CDATA[Given the user is authenticated with a PRO subscription.....................undefined
-Given the user has Google Calendar connected................................undefined
-And an opportunity has a scheduled meeting with a valid calendarEventId.....undefined
-When the user clicks "Cancel meeting" on the listing detail page and confirms..undefined
-Then the listing detail page no longer shows any meeting information........undefined
-And the Google Calendar event is deleted....................................undefined
-And the opportunity record has null meetingTime, meetingLocation, and calendarEventId..undefined]]></system-out>
+  <testcase classname="Scoring Algorithm Improvements — IQR Outlier Filtering" name="Legacy cache entry with null analyzedAtPrice is treated as expired" time="0.039">
+    <system-out><![CDATA[Given a cached AI analysis for listing "listing-legacy" with null analyzedAtPrice..passed
+When the listing is re-checked with current price 200.......................passed
+Then no cached analysis should be returned..................................passed]]></system-out>
   </testcase>
-  <testcase classname="Google Calendar Integration" name="Calendar event deleted in background when opportunity transitions to PASSED" time="0.071">
-    <failure/>
-    <system-out><![CDATA[Given the user is authenticated with a PRO subscription.....................undefined
-Given the user has Google Calendar connected................................undefined
-And an opportunity has a scheduled meeting with a valid calendarEventId.....undefined
-When the user marks the opportunity as PASSED via the API...................undefined
-Then the PATCH response returns successfully without delay..................undefined
-And the associated Google Calendar event is deleted in the background.......undefined
-And no error is surfaced to the user........................................undefined]]></system-out>
+  <testcase classname="Scoring Algorithm Improvements — IQR Outlier Filtering" name="Cache entry with zero analyzedAtPrice always invalidates" time="0.039">
+    <system-out><![CDATA[Given a cached AI analysis for listing "listing-free" at price 0............passed
+When the listing is re-checked with current price 50........................passed
+Then no cached analysis should be returned..................................passed]]></system-out>
   </testcase>
-  <testcase classname="Google Calendar Integration" name="Re-authentication prompt shown when Calendar token cannot be refreshed" time="0.069">
-    <failure/>
-    <system-out><![CDATA[Given the user is authenticated with a PRO subscription.....................undefined
-Given the user has Google Calendar connected with a revoked refresh token...undefined
-When the user schedules a meeting via the API with valid meetingTime and meetingLocation..undefined
-Then the meeting data is saved to the database..............................undefined
-And the response contains error code "CALENDAR_AUTH_REQUIRED"...............undefined
-And the response status is 401..............................................undefined]]></system-out>
+  <testcase classname="Scoring Algorithm Improvements — IQR Outlier Filtering" name="Cache write includes analyzedAtPrice" time="0.04">
+    <system-out><![CDATA[Given a fresh AI analysis is cached for listing "listing-new" at price 300..passed
+Then the cache entry should have analyzedAtPrice set to 300.................passed]]></system-out>
   </testcase>
-  <testcase classname="Google Calendar Integration" name="Disconnect removes token from DB regardless of Google revoke outcome" time="0.063">
-    <failure/>
-    <system-out><![CDATA[Given the user is authenticated with a PRO subscription.....................undefined
-Given the user has Google Calendar connected................................undefined
-When the user disconnects Google Calendar via the API.......................undefined
-Then the response indicates success.........................................undefined
-And the GoogleCalendarToken row is removed from the database................undefined
-And the integration status endpoint shows connected as false................undefined]]></system-out>
-  </testcase>
-  <testcase classname="Google Calendar Integration" name="Meeting fields saved without error when Google Calendar is not connected" time="0.061">
-    <failure/>
-    <system-out><![CDATA[Given the user is authenticated with a PRO subscription.....................undefined
-Given the user does not have Google Calendar connected......................undefined
-And an opportunity exists...................................................undefined
-When the user schedules a meeting via the API with valid meetingTime and meetingLocation..undefined
-Then the API responds with success..........................................undefined
-And the opportunity record has meetingTime and meetingLocation saved to the database..undefined
-And calendarEventId remains null............................................undefined
-And no Google Calendar API call is made.....................................undefined]]></system-out>
+  <testcase classname="Scoring Algorithm Improvements — IQR Outlier Filtering" name="Deduplication lock prevents concurrent refresh storms" time="0.039">
+    <system-out><![CDATA[Given listing "listing-dedup" is marked as refreshing.......................passed
+When another refresh is attempted for listing "listing-dedup"...............passed
+Then the refresh should be skipped because it is already in progress........passed]]></system-out>
   </testcase>
 </testsuite>

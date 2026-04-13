@@ -1,10 +1,16 @@
 /**
- * Market Value Calculator
- * Author: Stephen Boyett
- * Company: Axovia AI
+ * @file src/lib/market-value-calculator.ts
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2025-12-22
+ * @version 1.1
+ * @brief Calculates verified market value from sold listing data with IQR outlier handling.
  *
- * Calculates verified market value from sold listing data.
- * Implements outlier handling and statistical analysis.
+ * @description
+ * Two-step verified price lookup: database price history first, then
+ * Playwright eBay scrape fallback. Uses shared IQR-based outlier filtering
+ * to remove extreme prices before computing statistics. Provides confidence
+ * levels, discount calculations, and batch update capabilities.
  */
 
 import prisma from '@/lib/db';
@@ -59,16 +65,20 @@ export async function lookupVerifiedMarketPrice(
     if (!marketPrice || marketPrice.soldListings.length < 3) return null;
 
     const soldListings = marketPrice.soldListings;
-    const prices = soldListings.map((s) => s.price).sort((a, b) => a - b);
-    const median = prices[Math.floor(prices.length / 2)];
-    const average = Math.round(prices.reduce((sum, p) => sum + p, 0) / prices.length);
-    const min = prices[0];
-    const max = prices[prices.length - 1];
+
+    // Use pre-filtered stats from fetchMarketPrice (IQR filtering already applied)
+    const median = marketPrice.medianPrice;
+    const average = marketPrice.avgPrice;
+    const min = marketPrice.lowPrice;
+    const max = marketPrice.highPrice;
     const priceRange = max - min;
     const variance = average > 0 ? priceRange / average : 1;
 
+    // If IQR filtering fell back due to insufficient sample, force confidence to 'low'
     let confidence: 'low' | 'medium' | 'high' = 'medium';
-    if (soldListings.length >= 10 && variance < 0.3) {
+    if (marketPrice.lowSampleSize) {
+      confidence = 'low';
+    } else if (soldListings.length >= 10 && variance < 0.3) {
       confidence = 'high';
     } else if (soldListings.length < 5 || variance > 0.5) {
       confidence = 'low';
@@ -155,7 +165,7 @@ export async function calculateVerifiedMarketValue(
 
   // Extract prices and filter outliers using shared IQR utility
   const prices = soldListings.map((listing) => listing.soldPrice);
-  const { filteredPrices, outliersRemoved } = filterOutliers(prices);
+  const { filteredPrices, outliersRemoved, lowSampleSize } = filterOutliers(prices);
 
   // Calculate statistics
   const min = filteredPrices[0];
@@ -167,14 +177,19 @@ export async function calculateVerifiedMarketValue(
   const verifiedMarketValue = Math.round(median);
 
   // Determine confidence based on data points and price variance
+  // If IQR filtering fell back due to insufficient sample, force confidence to 'low'
   let confidence: 'low' | 'medium' | 'high' = 'medium';
-  const priceRange = max - min;
-  const variance = priceRange / average;
-
-  if (filteredPrices.length >= 10 && variance < 0.3) {
-    confidence = 'high';
-  } else if (filteredPrices.length < 5 || variance > 0.5) {
+  if (lowSampleSize) {
     confidence = 'low';
+  } else {
+    const priceRange = max - min;
+    const variance = priceRange / average;
+
+    if (filteredPrices.length >= 10 && variance < 0.3) {
+      confidence = 'high';
+    } else if (filteredPrices.length < 5 || variance > 0.5) {
+      confidence = 'low';
+    }
   }
 
   const result: MarketValueResult = {

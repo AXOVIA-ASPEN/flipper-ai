@@ -180,11 +180,13 @@ model PriceHistory {
   platform    String
   soldPrice   Float
   condition   String?
+  dataType    String   @default("sold") // "sold" or "active" — Story 13.8
   soldAt      DateTime
   createdAt   DateTime @default(now())
 
   @@index([productName])
   @@index([category])
+  @@index([productName, platform, dataType, createdAt]) // Story 13.8: cache lookup
 }
 
 model User {
@@ -369,12 +371,13 @@ model Message {
 }
 
 model AiAnalysisCache {
-  id             String   @id @default(cuid())
-  listingId      String
-  analysisType   String   @default("claude") // "claude" | "openai"
-  analysisResult String
-  createdAt      DateTime @default(now())
-  expiresAt      DateTime
+  id              String   @id @default(cuid())
+  listingId       String
+  analysisType    String   @default("claude") // "claude" | "openai"
+  analysisResult  String
+  analyzedAtPrice Float? // Asking price at analysis time; null for legacy entries (treat as expired)
+  createdAt       DateTime @default(now())
+  expiresAt       DateTime
 
   @@unique([listingId, analysisType])
   @@index([listingId])

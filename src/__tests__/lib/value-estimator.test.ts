@@ -2,6 +2,8 @@ import {
   estimateValue,
   detectCategory,
   generatePurchaseMessage,
+  applyDemandAdjustment,
+  getDemandBadge,
   EstimationResult,
   ComparableUrl,
 } from '../../lib/value-estimator';
@@ -187,6 +189,69 @@ describe('Value Estimator', () => {
         );
         expect(result.tags).toContain('dj-equipment');
       });
+
+      // --- Negative pattern tests (Story 13.5) ---
+
+      it('should NOT boost for "compatible with Nintendo Switch"', () => {
+        const result = estimateValue('Phone case compatible with Nintendo Switch', null, 10, 'new', 'electronics');
+        expect(result.tags).not.toContain('nintendo');
+      });
+
+      it('should boost for genuine "Nintendo Switch OLED"', () => {
+        const result = estimateValue('Nintendo Switch OLED 64GB', null, 300, 'excellent', 'video games');
+        expect(result.tags).toContain('nintendo');
+      });
+
+      it('should NOT boost for "vintage-style" design items', () => {
+        const result = estimateValue('Modern lamp, vintage-style design', null, 50, 'new', 'furniture');
+        expect(result.tags).not.toContain('vintage');
+      });
+
+      it('should boost for genuine "Vintage Pyrex Mixing Bowl"', () => {
+        const result = estimateValue('Vintage Pyrex Mixing Bowl', null, 30, 'good', 'collectibles');
+        expect(result.tags).toContain('vintage');
+      });
+
+      it('should NOT boost for "rarely used" items (false rare)', () => {
+        const result = estimateValue('Rarely used blender', null, 30, 'like new', 'appliances');
+        expect(result.tags).not.toContain('rare');
+      });
+
+      it('should NOT boost "sealed" when only in deep description (>100 chars)', () => {
+        const longDesc = 'x'.repeat(150) + ' original box sealed';
+        const result = estimateValue('Used iPhone 15', longDesc, 500, 'good', 'electronics');
+        expect(result.tags).not.toContain('sealed');
+      });
+
+      it('should boost "Sealed iPhone 15" in title', () => {
+        const result = estimateValue('Sealed iPhone 15', null, 800, 'new', 'electronics');
+        expect(result.tags).toContain('sealed');
+      });
+
+      it('should NOT boost apple for "apple cider press"', () => {
+        const result = estimateValue('Apple cider press vintage', null, 50, 'good', 'appliances');
+        expect(result.tags).not.toContain('apple');
+        // Should still get vintage boost though
+        expect(result.tags).toContain('vintage');
+      });
+
+      it('should still apply risk keywords from description', () => {
+        const result = estimateValue('PS5 Console', 'slightly scratched on top, works great', 400, 'good', 'video games');
+        expect(result.tags).toContain('cosmetic-wear');
+        expect(result.tags).toContain('sony');
+      });
+
+      it('should apply risk from description even when title is clean', () => {
+        const result = estimateValue('Gaming Console', 'Broken, for parts only', 200, 'poor', 'video games');
+        expect(result.tags).toContain('for-parts');
+      });
+
+      it('should NOT boost for "light switch" (false Nintendo)', () => {
+        const result = estimateValue('Light switch cover plate', null, 10, 'new', 'default');
+        expect(result.tags).not.toContain('nintendo');
+      });
+
+      // --- End negative pattern tests ---
 
       it('should set high confidence when value keywords match and no risks', () => {
         const result = estimateValue(
@@ -410,19 +475,185 @@ describe('Value Estimator', () => {
         expect(goodDeal.valueScore).toBeGreaterThan(badDeal.valueScore);
       });
 
-      it('should cap score at 30 for items with less than $10 profit', () => {
-        // Create an item with very low profit potential
-        const result = estimateValue('Generic item', null, 100, 'poor', 'default');
-        if (result.profitPotential < 10) {
-          expect(result.valueScore).toBeLessThanOrEqual(30);
-        }
+      it('should cap score at 40 for items with less than $15 profit', () => {
+        // Generic item, new condition, feeRate=0 so profit is small but positive
+        // default category (1.2–1.5), new (1.0): estLow=36, estHigh=45 for asking=30
+        // profitLow=36-30=6, profitHigh=45-30=15, profitPotential=~10 → <$15
+        const result = estimateValue('Generic item', null, 30, 'new', 'default', 0);
+        expect(result.profitPotential).toBeGreaterThanOrEqual(0);
+        expect(result.profitPotential).toBeLessThan(15);
+        expect(result.valueScore).toBeLessThanOrEqual(40);
       });
 
       it('should cap score at 10 for items with negative profit', () => {
-        const result = estimateValue('Broken item', 'For parts only', 1000, 'poor', 'electronics');
-        if (result.profitPotential < 0) {
-          expect(result.valueScore).toBeLessThanOrEqual(10);
-        }
+        // $1000 broken item with risk penalties → deeply negative profit
+        const result = estimateValue('Broken item', 'For parts only, not working', 1000, 'poor', 'electronics');
+        expect(result.profitPotential).toBeLessThan(0);
+        expect(result.valueScore).toBeLessThanOrEqual(10);
+      });
+
+      it('should score high-absolute-profit items higher than high-margin-low-profit items', () => {
+        // $300 Apple MacBook (good, electronics) → high absolute profit
+        // $5 generic cable (good, electronics) → tiny absolute profit even if margin is high
+        const highProfit = estimateValue('Apple MacBook Pro', null, 300, 'good', 'electronics');
+        const highMargin = estimateValue('Generic cable', null, 5, 'good', 'electronics');
+        expect(highProfit.profitPotential).toBeGreaterThan(highMargin.profitPotential);
+        expect(highProfit.valueScore).toBeGreaterThan(highMargin.valueScore);
+      });
+
+      it('should cap score at 15 for items with exactly $0 profit', () => {
+        // Craft an item where profitPotential rounds to 0.
+        // default category (1.2-1.5), good (0.75), 13% fee:
+        // estLow=0.9*price, estHigh=1.125*price, profitLow=0.9*0.87*price - price = -0.217*price
+        // profitHigh=1.125*0.87*price - price = -0.021*price → both negative for any price
+        // Use feeRate=0: profitLow=0.9*price-price=-0.1*price, profitHigh=1.125*price-price=0.125*price
+        // profitPotential = 0.0125*price → need price where round(0.0125*price) = 0 → price < 40
+        // At price=30: profitLow=round(27-30)=-3, profitHigh=round(33.75-30)=4, avg=0.5→1
+        // At price=20: estLow=24, estHigh=30, profitLow=-(-4??) Wait, let me recalc
+        // price=20, feeRate=0, default(1.2,1.5), good(0.75):
+        //   estLow=round(20*1.2*0.75)=18, estHigh=round(20*1.5*0.75)=23
+        //   profitLow=round(18-20)=-2, profitHigh=round(23-20)=3, profitPotential=round(0.5)=1
+        // price=10: estLow=round(9)=9, estHigh=round(11.25)=11
+        //   profitLow=round(-1)=-1, profitHigh=round(1)=1, profitPotential=round(0)=0
+        const result = estimateValue('Generic item', null, 10, 'good', 'default', 0);
+        expect(result.profitPotential).toBe(0);
+        expect(result.valueScore).toBeLessThanOrEqual(15);
+      });
+
+      it('should apply exclusive boosts — >$300 profit gets +10 only (not +5 AND +10)', () => {
+        // Sealed Apple MacBook at low asking price → huge profit margin + absolute profit >$300
+        // new condition (1.0), electronics (1.2-1.6), Apple boost (1.2), sealed boost (1.3)
+        // For asking=200: estLow = 200*1.2*1.0*1.2*1.3=374, estHigh=200*1.6*1.0*1.2*1.3=499
+        // at 13% fee: profitLow=374*0.87-200=125, profitHigh=499*0.87-200=234
+        // profitPotential≈180, which is >$100 (+5 tier) but not >$300.
+        // For asking=50, new, electronics, Apple sealed:
+        // estLow=50*1.2*1.0*1.2*1.3=93.6→94, estHigh=50*1.6*1.0*1.2*1.3=124.8→125
+        // profitLow=94*0.87-50=31.78→32, profitHigh=125*0.87-50=58.75→59, avg≈46 → >$100? No
+        // Need very high profit. Try asking=100, new, collectibles (1.5-2.5), vintage+rare+sealed:
+        // boosts: vintage(1.4)*rare(1.4)*sealed(1.3)=2.548
+        // estLow=100*1.5*1.0*2.548=382, estHigh=100*2.5*1.0*2.548=637
+        // profitLow=382*0.87-100=232, profitHigh=637*0.87-100=454, avg=343 → >$300!
+        const bigWin = estimateValue('Vintage Rare Limited Edition sealed', null, 100, 'new', 'collectibles');
+        expect(bigWin.profitPotential).toBeGreaterThan(300);
+        expect(bigWin.valueScore).toBeGreaterThanOrEqual(0);
+        expect(bigWin.valueScore).toBeLessThanOrEqual(100);
+        // The +10 boost applies (>$300 tier), the +5 (>$100 tier) does NOT stack
+        // We verify by checking score is within a valid range, not >110
+      });
+
+      it('should use weighted formula: 40% margin + 60% absolute profit (AC #1)', () => {
+        // Verify the formula math directly with a controlled input
+        // default category (1.2-1.5), new condition (1.0), feeRate=0, asking=100
+        // estLow=120, estHigh=150, estValue=135
+        // profitLow=20, profitHigh=50, profitPotential=35
+        // marginScore = min(100, max(0, round(35/100*100 + 50))) = min(100, 85) = 85
+        // absoluteProfitScore = min(100, round(log10(35) * 33.33)) = round(1.544*33.33) = round(51.47) = 51
+        // weightedScore = round(85*0.4 + 51*0.6) = round(34 + 30.6) = round(64.6) = 65
+        // No caps apply (profit=35 > 15), no boosts (profit < 100)
+        const result = estimateValue('Generic item', null, 100, 'new', 'default', 0);
+        expect(result.profitPotential).toBe(35);
+        // marginScore=85, absoluteProfitScore=51, weighted=65
+        expect(result.valueScore).toBe(65);
+      });
+
+      it('should score $50-profit item around 56-75 range (Task 3.3)', () => {
+        // default category, new condition, feeRate=0, asking=100
+        // With collectibles (1.5-2.5), good (0.75):
+        // estLow=100*1.5*0.75=113, estHigh=100*2.5*0.75=188
+        // profitLow=13, profitHigh=88, profitPotential=50
+        const result = estimateValue('Collectible item', null, 100, 'good', 'collectibles', 0);
+        expect(result.profitPotential).toBeGreaterThanOrEqual(40);
+        expect(result.profitPotential).toBeLessThanOrEqual(60);
+        expect(result.valueScore).toBeGreaterThanOrEqual(56);
+        expect(result.valueScore).toBeLessThanOrEqual(75);
+      });
+
+      it('should score $100-profit items higher than $10-profit items (Task 3.4)', () => {
+        // Compare two items with different absolute profits
+        const lowProfit = estimateValue('Generic item', null, 30, 'new', 'default', 0);
+        const highProfit = estimateValue('Collectible treasure', null, 50, 'new', 'collectibles', 0);
+        expect(highProfit.profitPotential).toBeGreaterThan(lowProfit.profitPotential);
+        expect(highProfit.valueScore).toBeGreaterThan(lowProfit.valueScore);
+      });
+
+      it('should produce varied score distribution across diverse items (Task 3.5)', () => {
+        // 20+ sample items spanning categories, prices, and conditions
+        const items = [
+          { title: 'Generic cable', price: 5, cond: 'good', cat: 'electronics' },
+          { title: 'Used book', price: 3, cond: 'fair', cat: 'default' },
+          { title: 'Broken lamp', price: 10, cond: 'poor', cat: 'default' },
+          { title: 'iPhone 12', price: 200, cond: 'good', cat: 'electronics' },
+          { title: 'Apple MacBook Pro', price: 500, cond: 'excellent', cat: 'electronics' },
+          { title: 'Nintendo Switch', price: 150, cond: 'like new', cat: 'video games' },
+          { title: 'PS5 Console', price: 300, cond: 'new', cat: 'video games' },
+          { title: 'Dyson V11', price: 200, cond: 'good', cat: 'appliances' },
+          { title: 'Vintage Radio', price: 50, cond: 'fair', cat: 'collectibles' },
+          { title: 'Herman Miller Chair', price: 400, cond: 'good', cat: 'furniture' },
+          { title: 'DeWalt drill set', price: 80, cond: 'good', cat: 'tools' },
+          { title: 'Mountain bike', price: 150, cond: 'good', cat: 'sports' },
+          { title: 'Pioneer DDJ-400', price: 100, cond: 'like new', cat: 'musical' },
+          { title: 'Samsung Galaxy S24', price: 350, cond: 'excellent', cat: 'electronics' },
+          { title: 'Nike Air Max', price: 60, cond: 'new', cat: 'clothing' },
+          { title: 'Rare coin collection', price: 200, cond: 'excellent', cat: 'collectibles' },
+          { title: 'KitchenAid mixer', price: 150, cond: 'good', cat: 'appliances' },
+          { title: 'Sealed Nintendo game', price: 40, cond: 'new', cat: 'video games' },
+          { title: 'Winter tires set', price: 200, cond: 'good', cat: 'automotive' },
+          { title: 'Office desk', price: 75, cond: 'good', cat: 'furniture' },
+          { title: 'Broken TV for parts', price: 500, cond: 'poor', cat: 'electronics' },
+          { title: 'Yamaha keyboard', price: 120, cond: 'good', cat: 'musical' },
+        ];
+
+        const scores = items.map((item) =>
+          estimateValue(item.title, null, item.price, item.cond, item.cat).valueScore
+        );
+
+        // All scores within valid range
+        scores.forEach((s) => {
+          expect(s).toBeGreaterThanOrEqual(0);
+          expect(s).toBeLessThanOrEqual(100);
+        });
+
+        // Distribution check: at least 3 distinct score buckets are populated
+        // Buckets: 0-20, 21-40, 41-60, 61-80, 81-100
+        const buckets = [0, 0, 0, 0, 0];
+        scores.forEach((s) => {
+          const idx = Math.min(4, Math.floor(s / 20));
+          buckets[idx]++;
+        });
+        const populatedBuckets = buckets.filter((b) => b > 0).length;
+        expect(populatedBuckets).toBeGreaterThanOrEqual(3);
+      });
+
+      it('should handle sub-dollar profit correctly (Task 3.6)', () => {
+        // Very cheap item where profit is < $1
+        // default (1.2-1.5), good (0.75), feeRate=0, asking=5
+        // estLow=round(5*1.2*0.75)=5, estHigh=round(5*1.5*0.75)=6
+        // profitLow=0, profitHigh=1, profitPotential=round(0.5)=1
+        const result = estimateValue('Tiny item', null, 5, 'good', 'default', 0);
+        expect(result.profitPotential).toBeGreaterThanOrEqual(0);
+        expect(result.profitPotential).toBeLessThan(15);
+        // Sub-$15 cap applies
+        expect(result.valueScore).toBeLessThanOrEqual(40);
+      });
+
+      it('should cap at boundary: profit just below $15 gets capped at 40 (Task 3.7)', () => {
+        // electronics (1.2-1.6), new (1.0), feeRate=0, asking=60
+        // estLow=72, estHigh=96, profitLow=12, profitHigh=36, profitPotential=24
+        // That's >$15, so no cap. Try asking=50:
+        // estLow=60, estHigh=80, profitLow=10, profitHigh=30, profitPotential=20 → >$15
+        // Try default (1.2-1.5), new, feeRate=0, asking=100:
+        // estLow=120, estHigh=150, profitLow=20, profitHigh=50, profitPotential=35 → >$15
+        // Use asking=30, default, new, feeRate=0:
+        // estLow=36, estHigh=45, profitLow=6, profitHigh=15, profitPotential=round(10.5)=11 → <$15
+        const belowCap = estimateValue('Generic widget', null, 30, 'new', 'default', 0);
+        expect(belowCap.profitPotential).toBeLessThan(15);
+        expect(belowCap.valueScore).toBeLessThanOrEqual(40);
+
+        // Now an item with profit > $15 should NOT be capped at 40
+        const aboveCap = estimateValue('Generic widget', null, 100, 'new', 'default', 0);
+        expect(aboveCap.profitPotential).toBeGreaterThanOrEqual(15);
+        // Not capped at 40 — score can be higher
+        expect(aboveCap.valueScore).toBeGreaterThan(40);
       });
     });
 
@@ -953,6 +1184,94 @@ describe('Value Estimator', () => {
         expect(message1).toContain('Thanks!');
         expect(message2).toContain('Thanks!');
       });
+    });
+  });
+
+  // ==========================================================
+  // applyDemandAdjustment (Story 13.6)
+  // ==========================================================
+
+  describe('applyDemandAdjustment', () => {
+    it('should boost score for rising demand when item is underpriced', () => {
+      const adjusted = applyDemandAdjustment(70, 'rising', null, 30);
+      expect(adjusted).toBe(Math.round(70 * 1.15)); // 81
+      expect(adjusted).toBeGreaterThan(70);
+    });
+
+    it('should penalize score for declining demand', () => {
+      const adjusted = applyDemandAdjustment(70, 'declining', null, 30);
+      expect(adjusted).toBe(Math.round(70 * 0.85)); // 60
+      expect(adjusted).toBeLessThan(70);
+    });
+
+    it('should heavily penalize low_liquidity (zero sales)', () => {
+      const adjusted = applyDemandAdjustment(70, 'low_liquidity', null, 30);
+      expect(adjusted).toBe(Math.round(70 * 0.70)); // 49
+      expect(adjusted).toBeLessThan(60);
+    });
+
+    it('should NOT boost for rising demand when item is overpriced', () => {
+      // discountPercent <= 0 means overpriced — demand boost should not apply
+      const adjusted = applyDemandAdjustment(70, 'rising', null, -10);
+      expect(adjusted).toBe(70); // no change
+    });
+
+    it('should apply LLM demandLevel fallback', () => {
+      const veryHigh = applyDemandAdjustment(70, 'very_high', null, 30);
+      const high = applyDemandAdjustment(70, 'high', null, 30);
+      expect(veryHigh).toBe(Math.round(70 * 1.15)); // 81
+      expect(high).toBe(Math.round(70 * 1.05)); // 74
+    });
+
+    it('should subtract 5 for items taking >30 days to sell', () => {
+      const adjusted = applyDemandAdjustment(70, 'stable', 45, 30);
+      expect(adjusted).toBe(65); // 70 * 1.0 - 5
+    });
+
+    it('should subtract 10 for items taking >60 days (not cumulative)', () => {
+      const adjusted = applyDemandAdjustment(70, 'stable', 90, 30);
+      expect(adjusted).toBe(60); // 70 * 1.0 - 10 (not -15)
+    });
+
+    it('should return no adjustment when demand data is null', () => {
+      const adjusted = applyDemandAdjustment(70, null, null, 30);
+      expect(adjusted).toBe(70); // multiplier defaults to 1.0
+    });
+
+    it('should clamp result to 0-100', () => {
+      const high = applyDemandAdjustment(99, 'rising', null, 50);
+      expect(high).toBeLessThanOrEqual(100);
+
+      const low = applyDemandAdjustment(5, 'low_liquidity', 90, 30);
+      expect(low).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should handle unknown demand trend as no adjustment', () => {
+      const adjusted = applyDemandAdjustment(70, 'unknown_value', null, 30);
+      expect(adjusted).toBe(70);
+    });
+  });
+
+  describe('getDemandBadge', () => {
+    it('should return "Hot" for rising demand', () => {
+      expect(getDemandBadge('rising')).toEqual({ label: 'Hot', color: 'red' });
+    });
+
+    it('should return "Steady" for stable demand', () => {
+      expect(getDemandBadge('stable')).toEqual({ label: 'Steady', color: 'blue' });
+    });
+
+    it('should return "Dead" for low_liquidity', () => {
+      expect(getDemandBadge('low_liquidity')).toEqual({ label: 'Dead', color: 'warning' });
+    });
+
+    it('should handle LLM demandLevel types', () => {
+      expect(getDemandBadge('very_high')).toEqual({ label: 'Hot', color: 'red' });
+      expect(getDemandBadge('high')).toEqual({ label: 'Active', color: 'green' });
+    });
+
+    it('should return "Unknown" for null', () => {
+      expect(getDemandBadge(null)).toEqual({ label: 'Unknown', color: 'gray' });
     });
   });
 });

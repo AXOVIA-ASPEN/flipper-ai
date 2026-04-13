@@ -1,7 +1,7 @@
 # Flipper.ai Makefile
 # ====================
 
-.PHONY: help install dev preview build build-hosting start lint claude-code ensure-env db-setup db-migrate migrate migrate-dev db-sync db-studio studio db-reset clean test test-acceptance test-e2e test-e2e-ui test-all secrets-pull deploy-hosting
+.PHONY: help install dev preview build build-hosting start lint claude-code ensure-env db-up db-down db-setup db-migrate migrate migrate-dev db-sync db-studio studio db-reset clean test test-acceptance test-e2e test-e2e-ui test-all secrets-pull deploy-hosting
 
 # Default target
 help:
@@ -37,6 +37,10 @@ help:
 	@echo "                       - Filter by tags:    make test-ac TAGS=@FR-RELIST-01"
 	@echo "  make test-all   - Run all tests (unit + BDD + E2E)"
 	@echo ""
+	@echo "Database:"
+	@echo "  make db-up      - Start local PostgreSQL (Docker, port 5433)"
+	@echo "  make db-down    - Stop local PostgreSQL"
+	@echo ""
 	@echo "Setup:"
 	@echo "  make ensure-env - Create .env from .env.example if missing; set default DATABASE_URL"
 	@echo "  make db-setup   - ensure-env + run migrations (deploy + push)"
@@ -54,6 +58,15 @@ dev:
 # Ensure .env exists and DATABASE_URL is set for local dev (creates .env from .env.example if missing)
 ensure-env:
 	@node scripts/setup/ensure-dev-env.js
+
+# Start local PostgreSQL via Docker Compose
+db-up:
+	docker compose -f docker-compose.dev.yml up -d
+	@echo "PostgreSQL running on localhost:5433"
+
+# Stop local PostgreSQL
+db-down:
+	docker compose -f docker-compose.dev.yml down
 
 # Database setup: ensure env, then run migrations so DB schema is ready
 db-setup: ensure-env

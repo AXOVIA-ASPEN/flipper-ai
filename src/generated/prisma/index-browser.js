@@ -258,6 +258,7 @@ exports.Prisma.PriceHistoryScalarFieldEnum = {
   platform: 'platform',
   soldPrice: 'soldPrice',
   condition: 'condition',
+  dataType: 'dataType',
   soldAt: 'soldAt',
   createdAt: 'createdAt'
 };
@@ -401,6 +402,7 @@ exports.Prisma.AiAnalysisCacheScalarFieldEnum = {
   listingId: 'listingId',
   analysisType: 'analysisType',
   analysisResult: 'analysisResult',
+  analyzedAtPrice: 'analyzedAtPrice',
   createdAt: 'createdAt',
   expiresAt: 'expiresAt'
 };

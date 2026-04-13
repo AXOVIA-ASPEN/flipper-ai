@@ -583,6 +583,7 @@ export async function POST(request: NextRequest) {
               data: {
                 listingId: savedListing.id,
                 analysisResult: JSON.stringify(claudeAnalysis),
+                analyzedAtPrice: item.price,
                 expiresAt,
               },
             });
