@@ -159,6 +159,15 @@ Every story MUST pass ALL items before status changes to `review`. This is a har
 - Use Prisma singleton from `@/lib/db`. Do not instantiate new `PrismaClient` in route handlers.
 - Schema: `prisma/schema.prisma`. After editing, run `npx prisma migrate dev`.
 
+**Secrets Management**
+
+- Single source of truth: `config/secretmanager.yaml` — defines ALL secrets by environment scope (all, production, staging, dev).
+- CLI tool: `scripts/secretmanager.py` — `EnvSecretManager` class with validate, populate, audit, load commands.
+- GCP naming convention: `{SCOPE}_{SECRET_NAME}` (e.g., `PRODUCTION_DATABASE_URL`, `STAGING_STRIPE_SECRET_KEY`).
+- When adding a new secret: (1) add to `config/secretmanager.yaml` under correct scope, (2) add to `.env.example` with description, (3) provision in GCP via `gcloud secrets create`.
+- Container startup: `start.sh` runs `python3 scripts/secretmanager.py load --env $BUILD_ENV` to pull secrets from GCP into `os.environ` before Next.js starts.
+- Never hardcode secrets. Always read from `process.env`.
+
 **API routes**
 
 - Next.js App Router: `app/api/.../route.ts` exporting HTTP method handlers.

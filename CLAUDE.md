@@ -83,6 +83,25 @@ git push origin vX.Y.Z
 - **CI/CD**: GitHub Actions → Cloud Run (backend) + Firebase Hosting (frontend)
 - **Infrastructure**: Cloud Run (backend), Firebase Hosting, GCP Secret Manager (production secrets)
 
+### Secrets Management
+
+**Single source of truth:** `config/secretmanager.yaml` defines ALL secrets organized by environment scope (all, production, staging, dev). This YAML file is the canonical reference for what secrets exist and where they're used.
+
+**CLI tool:** `scripts/secretmanager.py` provides the `EnvSecretManager` class and CLI commands:
+```bash
+python scripts/secretmanager.py validate --env production  # Check secrets exist in GCP
+python scripts/secretmanager.py populate --env staging      # Generate .env from GCP
+python scripts/secretmanager.py audit                       # Detect drift (YAML vs GCP)
+python scripts/secretmanager.py load --env production       # Container startup loader
+```
+
+**Rules:**
+- When adding a new secret, ALWAYS add it to `config/secretmanager.yaml` first under the correct scope
+- GCP naming convention: `{SCOPE}_{SECRET_NAME}` (e.g., `PRODUCTION_DATABASE_URL`)
+- Also add to `.env.example` with a description comment
+- Never hardcode secrets in source. Always read from `process.env` on the Node.js side
+- Container startup: `start.sh` calls `scripts/secretmanager.py load` to pull from GCP into env vars
+
 ### Project Layout
 
 The project uses a **split directory structure** — pages live in `app/` at the project root while source code lives in `src/`:
