@@ -1,6 +1,16 @@
 /**
- * Step Definitions for Story 1.1: GCP Project Setup & Secret Manager Module
- * Validates helpers/secrets.py structure, naming convention, and error handling.
+ * @file test/acceptance/step_definitions/E-001-S22-secrets-module.steps.ts
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-04-12
+ * @version 2.0
+ * @brief Step definitions for Story 1.1 secret management acceptance tests.
+ *
+ * @description
+ * Validates the YAML-driven secret management system:
+ *   - config/secretmanager.yaml structure and environment scopes
+ *   - scripts/secretmanager.py EnvSecretManager class and CLI
+ *   - Single source of truth (no legacy helpers/secrets.py)
  *
  * Covers scenarios: @E-001-S-22 through @E-001-S-27
  */
@@ -10,6 +20,7 @@ import { expect } from '@playwright/test';
 import { CustomWorld } from '../support/world';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as yaml from 'js-yaml';
 
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 
@@ -21,255 +32,301 @@ function readProjectFile(relativePath: string): string {
   return fs.readFileSync(fullPath, 'utf-8');
 }
 
-/**
- * Recursively find .py files matching a content pattern, excluding specified paths.
- */
-function findPyFilesWithPattern(
-  dir: string,
-  pattern: RegExp,
-  excludePaths: string[]
-): string[] {
-  const results: string[] = [];
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-    const relativePath = path.relative(PROJECT_ROOT, fullPath);
-    if (excludePaths.some((ex) => relativePath.includes(ex))) continue;
-    if (entry.isDirectory()) {
-      results.push(...findPyFilesWithPattern(fullPath, pattern, excludePaths));
-    } else if (entry.name.endsWith('.py')) {
-      const content = fs.readFileSync(fullPath, 'utf-8');
-      if (pattern.test(content)) {
-        results.push(relativePath);
-      }
-    }
-  }
-  return results;
+interface SecretEntry {
+  name: string;
+  description?: string;
 }
 
-let secretsModuleContent: string;
+interface YamlConfig {
+  'stored-secrets': {
+    environments: Record<string, Record<string, SecretEntry> | null>;
+  };
+}
 
-// ==================== S-22: GCP Secret Manager naming convention ====================
+let yamlContent: string;
+let yamlConfig: YamlConfig;
+let secretManagerContent: string;
+
+// ==================== S-22: YAML config structure ====================
 
 Given(
-  'the secrets module at {string}',
-  async function (this: CustomWorld, modulePath: string) {
-    secretsModuleContent = readProjectFile(modulePath);
-    console.log(`✅ Loaded secrets module from ${modulePath}`);
+  'the secrets config at {string}',
+  async function (this: CustomWorld, configPath: string) {
+    yamlContent = readProjectFile(configPath);
+    yamlConfig = yaml.load(yamlContent) as YamlConfig;
+    console.log(`Loaded secrets config from ${configPath}`);
   }
 );
 
 When(
-  'I inspect the secret name construction logic',
+  'I inspect the YAML structure',
   async function (this: CustomWorld) {
-    console.log('✅ Inspecting secret name construction logic...');
+    console.log('Inspecting YAML structure...');
   }
 );
 
 Then(
-  'each secret should be looked up as {string}',
-  async function (this: CustomWorld, _pattern: string) {
-    expect(secretsModuleContent).toContain('prefix = build_env.upper()');
-    expect(secretsModuleContent).toMatch(/secret_name\s*=\s*f"{prefix}_{field_name}"/);
-    console.log('✅ Secret lookup follows {BUILD_ENV_UPPER}_{FIELD_NAME} pattern');
+  'the config should have environment scopes {string}, {string}, {string}, and {string}',
+  async function (this: CustomWorld, scope1: string, scope2: string, scope3: string, scope4: string) {
+    const environments = yamlConfig['stored-secrets'].environments;
+    const envKeys = Object.keys(environments);
+    for (const scope of [scope1, scope2, scope3, scope4]) {
+      expect(envKeys).toContain(scope);
+    }
+    console.log(`Config has environment scopes: ${[scope1, scope2, scope3, scope4].join(', ')}`);
   }
 );
 
 Then(
-  'the resource path should follow {string}',
-  async function (this: CustomWorld, _pattern: string) {
-    expect(secretsModuleContent).toContain('projects/');
-    expect(secretsModuleContent).toContain('/secrets/');
-    expect(secretsModuleContent).toContain('/versions/latest');
-    expect(secretsModuleContent).toMatch(
-      /f"projects\/.*\/secrets\/\{secret_name\}\/versions\/latest"/
-    );
-    console.log('✅ Resource path follows projects/{id}/secrets/{name}/versions/latest');
+  'the {string} scope should include critical secret {string}',
+  async function (this: CustomWorld, scope: string, secretName: string) {
+    const environments = yamlConfig['stored-secrets'].environments;
+    const scopeEntries = environments[scope];
+    expect(scopeEntries).toBeTruthy();
+    const names = Object.values(scopeEntries!).map((e: SecretEntry) => e.name);
+    expect(names).toContain(secretName);
+    console.log(`${scope} scope includes critical secret: ${secretName}`);
   }
 );
 
 Then(
-  'the GCP project ID should be hardcoded as {string}',
+  'the GCP project ID should be hardcoded as {string} in scripts\\/secretmanager.py',
   async function (this: CustomWorld, projectId: string) {
-    expect(secretsModuleContent).toContain(`GCP_PROJECT_ID = "${projectId}"`);
-    console.log(`✅ GCP project ID hardcoded as: ${projectId}`);
+    const content = readProjectFile('scripts/secretmanager.py');
+    expect(content).toContain(`GCP_PROJECT_ID = "${projectId}"`);
+    console.log(`GCP project ID hardcoded as: ${projectId}`);
   }
 );
 
-// ==================== S-23 & S-24: Environment prefix retrieval ====================
+// ==================== S-23: EnvSecretManager class ====================
+
+Given(
+  'the secrets manager module at {string}',
+  async function (this: CustomWorld, modulePath: string) {
+    secretManagerContent = readProjectFile(modulePath);
+    console.log(`Loaded secrets manager module from ${modulePath}`);
+  }
+);
 
 When(
-  'BUILD_ENV is set to {string}',
-  async function (this: CustomWorld, buildEnv: string) {
-    (this as any).buildEnv = buildEnv;
-    console.log(`✅ BUILD_ENV set to: ${buildEnv}`);
-  }
-);
-
-Then(
-  'load_secrets should call Secret Manager with {string} prefixed secret names',
-  async function (this: CustomWorld, prefix: string) {
-    expect(secretsModuleContent).toContain('prefix = build_env.upper()');
-    expect(secretsModuleContent).toContain('f"{prefix}_{field_name}"');
-    const buildEnv = (this as any).buildEnv;
-    expect(secretsModuleContent).toContain(`"${buildEnv}"`);
-    console.log(`✅ load_secrets uses ${prefix} prefix for secret lookups`);
-  }
-);
-
-Then(
-  'all retrieved values should be set as environment variables',
+  'I inspect the EnvSecretManager class',
   async function (this: CustomWorld) {
-    expect(secretsModuleContent).toContain('os.environ[field_name] = value');
-    console.log('✅ Retrieved values are injected into os.environ');
-  }
-);
-
-// ==================== S-25: Dataclass organization ====================
-
-When('I inspect the module structure', async function (this: CustomWorld) {
-  console.log('✅ Inspecting module structure...');
-});
-
-Then(
-  'a {string} dataclass should exist with required field {string}',
-  async function (this: CustomWorld, className: string, fieldName: string) {
-    const classRegex = new RegExp(`@dataclass\\s+class ${className}:`);
-    expect(secretsModuleContent).toMatch(classRegex);
-    const fieldRegex = new RegExp(`${fieldName}:\\s*str\\b`);
-    expect(secretsModuleContent).toMatch(fieldRegex);
-    console.log(`✅ ${className} dataclass exists with required field ${fieldName}`);
+    console.log('Inspecting EnvSecretManager class...');
   }
 );
 
 Then(
-  'an {string} dataclass should exist with required fields {string} and {string}',
-  async function (this: CustomWorld, className: string, field1: string, field2: string) {
-    const classRegex = new RegExp(`@dataclass\\s+class ${className}:`);
-    expect(secretsModuleContent).toMatch(classRegex);
-    const field1Regex = new RegExp(`${field1}:\\s*str\\b`);
-    const field2Regex = new RegExp(`${field2}:\\s*str\\b`);
-    expect(secretsModuleContent).toMatch(field1Regex);
-    expect(secretsModuleContent).toMatch(field2Regex);
-    console.log(`✅ ${className} dataclass exists with required fields ${field1}, ${field2}`);
+  'it should define an EnvSecretManager class',
+  async function (this: CustomWorld) {
+    expect(secretManagerContent).toContain('class EnvSecretManager');
+    console.log('EnvSecretManager class found');
   }
 );
 
 Then(
-  'an {string} dataclass should exist with optional API key fields',
-  async function (this: CustomWorld, className: string) {
-    const classRegex = new RegExp(`@dataclass\\s+class ${className}:`);
-    expect(secretsModuleContent).toMatch(classRegex);
-    expect(secretsModuleContent).toMatch(/OPENAI_API_KEY:.*Optional/);
-    expect(secretsModuleContent).toMatch(/ANTHROPIC_API_KEY:.*Optional/);
-    console.log(`✅ ${className} dataclass exists with optional API key fields`);
+  'it should have a load_into_environ method for container startup',
+  async function (this: CustomWorld) {
+    expect(secretManagerContent).toContain('def load_into_environ');
+    console.log('load_into_environ method found');
   }
 );
 
 Then(
-  'a {string} dataclass should exist with optional Stripe fields',
-  async function (this: CustomWorld, className: string) {
-    const classRegex = new RegExp(`@dataclass\\s+class ${className}:`);
-    expect(secretsModuleContent).toMatch(classRegex);
-    expect(secretsModuleContent).toMatch(/STRIPE_SECRET_KEY:.*Optional/);
-    expect(secretsModuleContent).toMatch(/STRIPE_WEBHOOK_SECRET:.*Optional/);
-    console.log(`✅ ${className} dataclass exists with optional Stripe fields`);
+  'it should have a get_secrets_by_scope method for filtering by environment',
+  async function (this: CustomWorld) {
+    expect(secretManagerContent).toContain('def get_secrets_by_scope');
+    console.log('get_secrets_by_scope method found');
+  }
+);
+
+// ==================== S-24: SecretScope enum ====================
+
+When(
+  'I inspect the SecretScope enum',
+  async function (this: CustomWorld) {
+    console.log('Inspecting SecretScope enum...');
   }
 );
 
 Then(
-  'an {string} dataclass should exist with optional {string}',
-  async function (this: CustomWorld, className: string, fieldName: string) {
-    const classRegex = new RegExp(`@dataclass\\s+class ${className}:`);
-    expect(secretsModuleContent).toMatch(classRegex);
-    expect(secretsModuleContent).toMatch(new RegExp(`${fieldName}:.*Optional`));
-    console.log(`✅ ${className} dataclass exists with optional ${fieldName}`);
+  'it should define values ALL, DEV, PROD, and STAGING',
+  async function (this: CustomWorld) {
+    expect(secretManagerContent).toContain('class SecretScope');
+    expect(secretManagerContent).toMatch(/ALL\s*=\s*"ALL"/);
+    expect(secretManagerContent).toMatch(/DEV\s*=\s*"DEV"/);
+    expect(secretManagerContent).toMatch(/PROD\s*=\s*"PROD"/);
+    expect(secretManagerContent).toMatch(/STAGING\s*=\s*"STAGING"/);
+    console.log('SecretScope enum defines ALL, DEV, PROD, STAGING');
+  }
+);
+
+// ==================== S-25: YAML secret entries ====================
+
+When(
+  'I inspect the secret entries',
+  async function (this: CustomWorld) {
+    console.log('Inspecting secret entries...');
   }
 );
 
 Then(
-  'a {string} dataclass should exist with optional Sentry and metrics fields',
-  async function (this: CustomWorld, className: string) {
-    const classRegex = new RegExp(`@dataclass\\s+class ${className}:`);
-    expect(secretsModuleContent).toMatch(classRegex);
-    expect(secretsModuleContent).toMatch(/SENTRY_DSN:.*Optional/);
-    expect(secretsModuleContent).toMatch(/SENTRY_AUTH_TOKEN:.*Optional/);
-    expect(secretsModuleContent).toMatch(/METRICS_TOKEN:.*Optional/);
-    console.log(`✅ ${className} dataclass exists with optional Sentry and metrics fields`);
+  'each entry should have a {string} field for the environment variable name',
+  async function (this: CustomWorld, fieldName: string) {
+    const environments = yamlConfig['stored-secrets'].environments;
+    for (const [envName, entries] of Object.entries(environments)) {
+      if (entries === null) continue;
+      for (const [slug, config] of Object.entries(entries)) {
+        expect(config).toHaveProperty(fieldName);
+      }
+    }
+    console.log(`All entries have "${fieldName}" field`);
+  }
+);
+
+Then(
+  'each entry should have a {string} field',
+  async function (this: CustomWorld, fieldName: string) {
+    const environments = yamlConfig['stored-secrets'].environments;
+    for (const [envName, entries] of Object.entries(environments)) {
+      if (entries === null) continue;
+      for (const [slug, config] of Object.entries(entries)) {
+        expect(config).toHaveProperty(fieldName);
+      }
+    }
+    console.log(`All entries have "${fieldName}" field`);
+  }
+);
+
+Then(
+  'the {string} scope should include Firebase public config secrets',
+  async function (this: CustomWorld, scope: string) {
+    const environments = yamlConfig['stored-secrets'].environments;
+    const scopeEntries = environments[scope];
+    expect(scopeEntries).toBeTruthy();
+    const names = Object.values(scopeEntries!).map((e: SecretEntry) => e.name);
+    expect(names).toContain('NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN');
+    console.log(`${scope} scope includes Firebase public config secrets`);
   }
 );
 
 // ==================== S-26: Single source of truth ====================
 
 Given('the project codebase', async function (this: CustomWorld) {
-  console.log('✅ Project codebase context loaded');
+  console.log('Project codebase context loaded');
 });
 
 When(
-  'I search for GCP Secret Manager name patterns outside {string}',
-  async function (this: CustomWorld, excludeFile: string) {
-    const excludePaths = [
-      excludeFile,
-      '__pycache__',
-      '.venv',
-      'test_',
-      'node_modules',
-      '_bmad',
-    ];
-    const matches = findPyFilesWithPattern(
-      PROJECT_ROOT,
-      /class\s+\w+Secrets[\s(:].*@dataclass/s,
-      excludePaths
-    );
-    (this as any).secretPatternFiles = matches;
-    console.log(`✅ Searched for secret patterns outside ${excludeFile}`);
-  }
-);
-
-Then(
-  'no other source file should contain secret name-to-env-var mappings',
+  'I search for secret configuration files',
   async function (this: CustomWorld) {
-    const files: string[] = (this as any).secretPatternFiles || [];
-    expect(files.length).toBe(0);
-    console.log('✅ No other source files contain secret name-to-env-var mappings');
+    console.log('Searching for secret configuration files...');
   }
 );
 
 Then(
-  '{string} should be the only file defining secret category dataclasses',
-  async function (this: CustomWorld, expectedFile: string) {
-    const content = readProjectFile(expectedFile);
-    expect(content).toContain('@dataclass');
-    expect(content).toContain('class DatabaseSecrets');
-    expect(content).toContain('class AuthSecrets');
-    console.log(`✅ ${expectedFile} is the sole source of secret dataclass definitions`);
+  '{string} should be the canonical secret config',
+  async function (this: CustomWorld, configPath: string) {
+    const fullPath = path.join(PROJECT_ROOT, configPath);
+    expect(fs.existsSync(fullPath)).toBe(true);
+    const content = readProjectFile(configPath);
+    expect(content).toContain('stored-secrets');
+    expect(content).toContain('environments');
+    console.log(`${configPath} is the canonical secret config`);
   }
 );
 
-// ==================== S-27: Invalid BUILD_ENV error ====================
+Then(
+  '{string} should read from {string}',
+  async function (this: CustomWorld, modulePath: string, configPath: string) {
+    const content = readProjectFile(modulePath);
+    expect(content).toContain('secretmanager.yaml');
+    console.log(`${modulePath} reads from ${configPath}`);
+  }
+);
+
+Then(
+  'no legacy {string} file should exist',
+  async function (this: CustomWorld, legacyPath: string) {
+    const fullPath = path.join(PROJECT_ROOT, legacyPath);
+    expect(fs.existsSync(fullPath)).toBe(false);
+    console.log(`Legacy file does not exist: ${legacyPath}`);
+  }
+);
+
+// ==================== S-27: CLI subcommands ====================
 
 When(
-  'BUILD_ENV is not set or is an invalid value like {string} or {string}',
-  async function (this: CustomWorld, _val1: string, _val2: string) {
-    console.log('✅ Testing invalid BUILD_ENV scenarios...');
-  }
-);
-
-Then(
-  'load_secrets should raise a ValueError',
+  'I inspect the CLI entry point',
   async function (this: CustomWorld) {
-    expect(secretsModuleContent).toContain('raise ValueError');
-    expect(secretsModuleContent).toMatch(/if not build_env or build_env not in VALID_ENVS/);
-    console.log('✅ load_secrets raises ValueError for invalid BUILD_ENV');
+    console.log('Inspecting CLI entry point...');
   }
 );
 
 Then(
-  'the error message should indicate valid values are {string} and {string}',
-  async function (this: CustomWorld, val1: string, val2: string) {
-    expect(secretsModuleContent).toContain('VALID_ENVS');
-    expect(secretsModuleContent).toContain(`"${val1}"`);
-    expect(secretsModuleContent).toContain(`"${val2}"`);
-    console.log(`✅ Error message indicates valid values: ${val1}, ${val2}`);
+  'the module should support {string} subcommand',
+  async function (this: CustomWorld, subcommand: string) {
+    expect(secretManagerContent).toContain(`"${subcommand}"`);
+    console.log(`Module supports "${subcommand}" subcommand`);
+  }
+);
+
+// ==================== S-16 & S-45: Firebase secrets config (updated) ====================
+
+Given(
+  'the secrets configuration at {string}',
+  async function (this: CustomWorld, configPath: string) {
+    yamlContent = readProjectFile(configPath);
+    yamlConfig = yaml.load(yamlContent) as YamlConfig;
+    console.log(`Loaded secrets configuration from ${configPath}`);
+  }
+);
+
+When(
+  'I inspect the Firebase secret entries',
+  async function (this: CustomWorld) {
+    console.log('Inspecting Firebase secret entries...');
+  }
+);
+
+Then(
+  'it should include {string}',
+  async function (this: CustomWorld, secretName: string) {
+    const environments = yamlConfig['stored-secrets'].environments;
+    const allNames: string[] = [];
+    for (const [, entries] of Object.entries(environments)) {
+      if (entries === null) continue;
+      for (const config of Object.values(entries)) {
+        allNames.push((config as SecretEntry).name);
+      }
+    }
+    expect(allNames).toContain(secretName);
+    console.log(`Config includes secret: ${secretName}`);
+  }
+);
+
+// ==================== S-16: Firebase secrets in Secret Manager (updated ref) ====================
+
+Given(
+  'the secrets configuration',
+  async function (this: CustomWorld) {
+    yamlContent = readProjectFile('config/secretmanager.yaml');
+    yamlConfig = yaml.load(yamlContent) as YamlConfig;
+    console.log('Loaded secrets configuration from config/secretmanager.yaml');
+  }
+);
+
+When(
+  'I inspect the secret storage for Firebase credentials',
+  async function (this: CustomWorld) {
+    console.log('Inspecting secret storage for Firebase credentials...');
+  }
+);
+
+Then(
+  '{string} should include Firebase admin credentials in its secret entries',
+  async function (this: CustomWorld, configPath: string) {
+    const content = readProjectFile(configPath);
+    expect(content).toContain('FIREBASE_CLIENT_EMAIL');
+    expect(content).toContain('FIREBASE_PRIVATE_KEY');
+    console.log(`${configPath} includes Firebase admin credentials`);
   }
 );

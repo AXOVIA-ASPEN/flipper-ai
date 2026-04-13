@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# DEPRECATED: Use the new YAML-driven secret manager CLI instead:
+#   python scripts/secretmanager.py populate --env production
+#   python scripts/secretmanager.py populate --env staging
+# See config/secretmanager.yaml for the single source of truth.
+#
 # pull-from-gcp.sh — Fetch Flipper AI secrets from GCP Secret Manager and merge into .env.
 # Requires: gcloud CLI, GCP_PROJECT_ID (env or first argument).
 # See docs/secrets/secretmanager.md for secret names.

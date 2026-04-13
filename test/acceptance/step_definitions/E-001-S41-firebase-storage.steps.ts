@@ -190,30 +190,9 @@ Then(
 );
 
 // ==================== S-45: Firebase Storage credentials & Secret Manager ====================
-
-Given(
-  'the secrets configuration at {string}',
-  async function (this: CustomWorld, secretsPath: string) {
-    secretsPyContent = readProjectFile(secretsPath);
-    console.log(`✅ Loaded secrets config from ${secretsPath}`);
-  }
-);
-
-When(
-  'I inspect the FirebaseSecrets dataclass',
-  async function (this: CustomWorld) {
-    expect(secretsPyContent).toContain('class FirebaseSecrets');
-    console.log('✅ Inspecting FirebaseSecrets dataclass...');
-  }
-);
-
-Then(
-  'it should include {string}',
-  async function (this: CustomWorld, fieldName: string) {
-    expect(secretsPyContent).toContain(fieldName);
-    console.log(`✅ FirebaseSecrets includes ${fieldName}`);
-  }
-);
+// NOTE: "the secrets configuration at {string}", "I inspect the Firebase secret entries",
+// and "it should include {string}" steps are now defined in E-001-S22-secrets-module.steps.ts,
+// which reads from config/secretmanager.yaml instead of the deleted helpers/secrets.py.
 
 // '{string} should read credentials from environment variables' defined in E-001-S14-firebase-auth.steps.ts
 

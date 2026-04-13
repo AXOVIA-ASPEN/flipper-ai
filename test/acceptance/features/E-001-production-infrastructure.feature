@@ -142,7 +142,7 @@ Feature: Production Infrastructure & Secure Deployment
   Scenario: Firebase secrets are integrated with Secret Manager
     Given the secrets configuration
     When I inspect the secret storage for Firebase credentials
-    Then "helpers/secrets.py" should include Firebase admin credentials in its dataclass
+    Then "config/secretmanager.yaml" should include Firebase admin credentials in its secret entries
     And ".env.example" should include "FIREBASE_CLIENT_EMAIL" and "FIREBASE_PRIVATE_KEY"
     And "src/lib/firebase/admin.ts" should read credentials from environment variables
 
@@ -199,51 +199,52 @@ Feature: Production Infrastructure & Secure Deployment
   # Story 1.1: GCP Project Setup & Secret Manager Module
 
   @E-001-S-22 @story-1-1 @FR-INFRA-11
-  Scenario: GCP Secret Manager naming convention uses ENV prefix
-    Given the secrets module at "helpers/secrets.py"
-    When I inspect the secret name construction logic
-    Then each secret should be looked up as "{BUILD_ENV_UPPER}_{FIELD_NAME}"
-    And the resource path should follow "projects/axovia-flipper/secrets/{NAME}/versions/latest"
-    And the GCP project ID should be hardcoded as "axovia-flipper"
+  Scenario: YAML config defines secrets with environment scopes
+    Given the secrets config at "config/secretmanager.yaml"
+    When I inspect the YAML structure
+    Then the config should have environment scopes "all", "production", "staging", and "dev"
+    And the "production" scope should include critical secret "DATABASE_URL"
+    And the "production" scope should include critical secret "ENCRYPTION_SECRET"
+    And the GCP project ID should be hardcoded as "axovia-flipper" in scripts/secretmanager.py
 
   @E-001-S-23 @story-1-1 @FR-INFRA-12
-  Scenario: Production environment retrieves secrets with PRODUCTION prefix
-    Given the secrets module at "helpers/secrets.py"
-    When BUILD_ENV is set to "production"
-    Then load_secrets should call Secret Manager with "PRODUCTION_" prefixed secret names
-    And all retrieved values should be set as environment variables
+  Scenario: EnvSecretManager class loads secrets from YAML config
+    Given the secrets manager module at "scripts/secretmanager.py"
+    When I inspect the EnvSecretManager class
+    Then it should define an EnvSecretManager class
+    And it should have a load_into_environ method for container startup
+    And it should have a get_secrets_by_scope method for filtering by environment
 
   @E-001-S-24 @story-1-1 @FR-INFRA-12
-  Scenario: Staging environment retrieves secrets with STAGING prefix
-    Given the secrets module at "helpers/secrets.py"
-    When BUILD_ENV is set to "staging"
-    Then load_secrets should call Secret Manager with "STAGING_" prefixed secret names
-    And all retrieved values should be set as environment variables
+  Scenario: SecretScope enum defines valid environment scopes
+    Given the secrets manager module at "scripts/secretmanager.py"
+    When I inspect the SecretScope enum
+    Then it should define values ALL, DEV, PROD, and STAGING
 
   @E-001-S-25 @story-1-1 @FR-INFRA-12
-  Scenario: Secrets are organized by category using Python dataclasses
-    Given the secrets module at "helpers/secrets.py"
-    When I inspect the module structure
-    Then a "DatabaseSecrets" dataclass should exist with required field "DATABASE_URL"
-    And an "AuthSecrets" dataclass should exist with required fields "AUTH_SECRET" and "ENCRYPTION_SECRET"
-    And an "ApiKeySecrets" dataclass should exist with optional API key fields
-    And a "PaymentSecrets" dataclass should exist with optional Stripe fields
-    And an "EmailSecrets" dataclass should exist with optional "RESEND_API_KEY"
-    And a "MonitoringSecrets" dataclass should exist with optional Sentry and metrics fields
+  Scenario: YAML config organises secrets by environment with name and description
+    Given the secrets config at "config/secretmanager.yaml"
+    When I inspect the secret entries
+    Then each entry should have a "name" field for the environment variable name
+    And each entry should have a "description" field
+    And the "all" scope should include Firebase public config secrets
 
   @E-001-S-26 @story-1-1 @FR-INFRA-11
-  Scenario: helpers/secrets.py is the single source of truth for secret references
+  Scenario: config/secretmanager.yaml is the single source of truth for secret references
     Given the project codebase
-    When I search for GCP Secret Manager name patterns outside "helpers/secrets.py"
-    Then no other source file should contain secret name-to-env-var mappings
-    And "helpers/secrets.py" should be the only file defining secret category dataclasses
+    When I search for secret configuration files
+    Then "config/secretmanager.yaml" should be the canonical secret config
+    And "scripts/secretmanager.py" should read from "config/secretmanager.yaml"
+    And no legacy "helpers/secrets.py" file should exist
 
   @E-001-S-27 @story-1-1 @FR-INFRA-12
-  Scenario: Invalid or missing BUILD_ENV raises a clear error
-    Given the secrets module at "helpers/secrets.py"
-    When BUILD_ENV is not set or is an invalid value like "dev" or "local"
-    Then load_secrets should raise a ValueError
-    And the error message should indicate valid values are "staging" and "production"
+  Scenario: CLI supports validate, populate, audit, and load subcommands
+    Given the secrets manager module at "scripts/secretmanager.py"
+    When I inspect the CLI entry point
+    Then the module should support "validate" subcommand
+    And the module should support "populate" subcommand
+    And the module should support "audit" subcommand
+    And the module should support "load" subcommand
 
   # Story 1.6: Firebase Storage Configuration
 
@@ -282,8 +283,8 @@ Feature: Production Infrastructure & Secure Deployment
 
   @E-001-S-45 @story-1-6 @FR-INFRA-13
   Scenario: Firebase Storage credentials are integrated with Secret Manager
-    Given the secrets configuration at "helpers/secrets.py"
-    When I inspect the FirebaseSecrets dataclass
+    Given the secrets configuration at "config/secretmanager.yaml"
+    When I inspect the Firebase secret entries
     Then it should include "FIREBASE_CLIENT_EMAIL"
     And it should include "FIREBASE_PRIVATE_KEY"
     And "src/lib/firebase/admin.ts" should read credentials from environment variables

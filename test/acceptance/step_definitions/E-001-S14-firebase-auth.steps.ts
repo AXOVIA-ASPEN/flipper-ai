@@ -311,29 +311,9 @@ Then(
 );
 
 // ==================== AC-6: Secret Manager Integration ====================
-
-Given('the secrets configuration', async function (this: CustomWorld) {
-  secretsContent = readProjectFile('helpers/secrets.py');
-  envExampleContent = readProjectFile('.env.example');
-  firebaseAdminContent = readProjectFile('src/lib/firebase/admin.ts');
-  console.log('✅ Loaded secrets configuration');
-});
-
-When(
-  'I inspect the secret storage for Firebase credentials',
-  async function (this: CustomWorld) {
-    console.log('✅ Inspecting secret storage...');
-  }
-);
-
-Then(
-  '{string} should include Firebase admin credentials in its dataclass',
-  async function (this: CustomWorld, _filePath: string) {
-    expect(secretsContent).toContain('FIREBASE_CLIENT_EMAIL');
-    expect(secretsContent).toContain('FIREBASE_PRIVATE_KEY');
-    console.log('✅ secrets.py includes Firebase admin credentials');
-  }
-);
+// NOTE: "the secrets configuration" and "I inspect the secret storage for Firebase credentials"
+// steps are now defined in E-001-S22-secrets-module.steps.ts, which reads from
+// config/secretmanager.yaml instead of the deleted helpers/secrets.py.
 
 Then(
   '{string} should include {string} and {string}',
