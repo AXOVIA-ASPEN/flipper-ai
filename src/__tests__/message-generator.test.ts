@@ -20,17 +20,14 @@ import {
 } from '../lib/message-generator';
 import type { MessageGeneratorInput } from '../lib/message-generator';
 
-// Mock OpenAI
-const mockCreate = jest.fn();
-jest.mock('openai', () => {
-  return jest.fn().mockImplementation(() => ({
-    chat: {
-      completions: {
-        create: mockCreate,
-      },
-    },
-  }));
-});
+// Mock centralized AI module
+const mockCompleteAI = jest.fn();
+jest.mock('@/lib/ai', () => ({
+  completeAI: (...args: unknown[]) => mockCompleteAI(...args),
+  AIProviderUnavailableError: class extends Error {
+    constructor() { super('No AI provider available'); this.name = 'AIProviderUnavailableError'; }
+  },
+}));
 
 // ── Test Data ────────────────────────────────────────────────────────────────
 
@@ -43,14 +40,15 @@ const baseInput: MessageGeneratorInput = {
 };
 
 const mockAIResponse = (subject: string, body: string) => ({
-  choices: [
-    {
-      message: {
-        content: JSON.stringify({ subject, body }),
-      },
-    },
-  ],
+  content: JSON.stringify({ subject, body }),
+  provider: 'gemini',
+  model: 'gemini-2.0-flash',
 });
+
+// Get the AIProviderUnavailableError class for test assertions
+const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as {
+  AIProviderUnavailableError: new () => Error;
+};
 
 // ── Platform Tone Mapping ────────────────────────────────────────────────────
 
@@ -261,20 +259,12 @@ describe('generateFallbackMessage', () => {
 // ── AI Message Generation ────────────────────────────────────────────────────
 
 describe('generatePurchaseMessage', () => {
-  const originalEnv = process.env;
-
   beforeEach(() => {
-    jest.resetModules();
-    process.env = { ...originalEnv, OPENAI_API_KEY: 'test-key-123' };
-    mockCreate.mockReset();
-  });
-
-  afterAll(() => {
-    process.env = originalEnv;
+    mockCompleteAI.mockReset();
   });
 
   it('generates AI-powered message for inquiry', async () => {
-    mockCreate.mockResolvedValue(
+    mockCompleteAI.mockResolvedValue(
       mockAIResponse('Is this still available?', 'Hey, love the headphones! Are they still up for grabs?')
     );
 
@@ -284,11 +274,11 @@ describe('generatePurchaseMessage', () => {
     expect(result.isFallback).toBe(false);
     expect(result.messageType).toBe('inquiry');
     expect(result.tone).toBe('casual');
-    expect(mockCreate).toHaveBeenCalledTimes(1);
+    expect(mockCompleteAI).toHaveBeenCalledTimes(1);
   });
 
   it('generates AI-powered message for offer type', async () => {
-    mockCreate.mockResolvedValue(
+    mockCompleteAI.mockResolvedValue(
       mockAIResponse('Offer: $120 for headphones', 'I would like to offer $120 for your headphones.')
     );
 
@@ -302,7 +292,7 @@ describe('generatePurchaseMessage', () => {
   });
 
   it('generates AI-powered message for follow-up type', async () => {
-    mockCreate.mockResolvedValue(
+    mockCompleteAI.mockResolvedValue(
       mockAIResponse('Following up', 'Just checking in on the headphones.')
     );
 
@@ -315,7 +305,7 @@ describe('generatePurchaseMessage', () => {
   });
 
   it('generates AI-powered message for negotiation type', async () => {
-    mockCreate.mockResolvedValue(
+    mockCompleteAI.mockResolvedValue(
       mockAIResponse('Counter-offer', 'Would you consider $130?')
     );
 
@@ -329,7 +319,7 @@ describe('generatePurchaseMessage', () => {
   });
 
   it('uses professional tone for eBay platform', async () => {
-    mockCreate.mockResolvedValue(
+    mockCompleteAI.mockResolvedValue(
       mockAIResponse('Inquiry about listing', 'Dear seller, I am inquiring about your item.')
     );
 
@@ -341,7 +331,7 @@ describe('generatePurchaseMessage', () => {
   });
 
   it('uses friendly tone for Facebook platform', async () => {
-    mockCreate.mockResolvedValue(
+    mockCompleteAI.mockResolvedValue(
       mockAIResponse('Hey!', 'Hey there, love this listing!')
     );
 
@@ -353,7 +343,7 @@ describe('generatePurchaseMessage', () => {
   });
 
   it('defaults to inquiry when messageType not specified', async () => {
-    mockCreate.mockResolvedValue(
+    mockCompleteAI.mockResolvedValue(
       mockAIResponse('Question', 'Is this available?')
     );
 
@@ -363,17 +353,16 @@ describe('generatePurchaseMessage', () => {
     expect(result.messageType).toBe('inquiry');
   });
 
-  it('falls back to template when API key is missing', async () => {
-    delete process.env.OPENAI_API_KEY;
+  it('falls back to template when no AI provider is available', async () => {
+    mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
 
     const result = await generatePurchaseMessage(baseInput);
     expect(result.isFallback).toBe(true);
     expect(result.subject).toContain('Question about');
-    expect(mockCreate).not.toHaveBeenCalled();
   });
 
-  it('falls back to template when OpenAI call throws', async () => {
-    mockCreate.mockRejectedValue(new Error('API error'));
+  it('falls back to template when AI call throws', async () => {
+    mockCompleteAI.mockRejectedValue(new Error('API error'));
 
     const result = await generatePurchaseMessage(baseInput);
     expect(result.isFallback).toBe(true);
@@ -381,33 +370,21 @@ describe('generatePurchaseMessage', () => {
   });
 
   it('falls back when response contains no JSON', async () => {
-    mockCreate.mockResolvedValue({
-      choices: [{ message: { content: 'not json at all' } }],
-    });
+    mockCompleteAI.mockResolvedValue({ content: 'not json at all', provider: 'gemini', model: 'gemini-2.0-flash' });
 
     const result = await generatePurchaseMessage(baseInput);
     expect(result.isFallback).toBe(true);
   });
 
   it('falls back when response has empty content', async () => {
-    mockCreate.mockResolvedValue({
-      choices: [{ message: { content: '' } }],
-    });
+    mockCompleteAI.mockResolvedValue({ content: '', provider: 'gemini', model: 'gemini-2.0-flash' });
 
     const result = await generatePurchaseMessage(baseInput);
     expect(result.isFallback).toBe(true);
   });
 
   it('uses fallback subject when AI returns empty subject', async () => {
-    mockCreate.mockResolvedValue({
-      choices: [
-        {
-          message: {
-            content: JSON.stringify({ subject: '', body: 'Hello there!' }),
-          },
-        },
-      ],
-    });
+    mockCompleteAI.mockResolvedValue({ content: JSON.stringify({ subject: '', body: 'Hello there!' }), provider: 'gemini', model: 'gemini-2.0-flash' });
 
     const result = await generatePurchaseMessage(baseInput);
     expect(result.subject).toContain('Question about');
@@ -416,15 +393,7 @@ describe('generatePurchaseMessage', () => {
   });
 
   it('uses fallback body when AI returns empty body', async () => {
-    mockCreate.mockResolvedValue({
-      choices: [
-        {
-          message: {
-            content: JSON.stringify({ subject: 'Hi', body: '' }),
-          },
-        },
-      ],
-    });
+    mockCompleteAI.mockResolvedValue({ content: JSON.stringify({ subject: 'Hi', body: '' }), provider: 'gemini', model: 'gemini-2.0-flash' });
 
     const result = await generatePurchaseMessage(baseInput);
     expect(result.subject).toBe('Hi');
@@ -462,30 +431,22 @@ describe('generatePurchaseMessage', () => {
     ).rejects.toThrow('Missing required fields');
   });
 
-  it('passes correct parameters to OpenAI', async () => {
-    mockCreate.mockResolvedValue(
+  it('passes correct parameters to completeAI', async () => {
+    mockCompleteAI.mockResolvedValue(
       mockAIResponse('Subject', 'Body')
     );
 
     await generatePurchaseMessage(baseInput);
 
-    expect(mockCreate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        model: 'gpt-4o-mini',
-        temperature: 0.3,
-        max_tokens: 400,
-        messages: expect.arrayContaining([
-          expect.objectContaining({ role: 'system' }),
-          expect.objectContaining({ role: 'user' }),
-        ]),
-      })
-    );
+    expect(mockCompleteAI).toHaveBeenCalledWith('purchaseMessage', expect.objectContaining({
+      listingTitle: 'Sony WH-1000XM5 Headphones',
+      askingPrice: 150,
+      platform: 'CRAIGSLIST',
+    }));
   });
 
-  it('includes listing details in the prompt sent to OpenAI', async () => {
-    mockCreate.mockResolvedValue(
-      mockAIResponse('Subject', 'Body')
-    );
+  it('includes listing details in the context passed to completeAI', async () => {
+    mockCompleteAI.mockResolvedValue(mockAIResponse('Subject', 'Body'));
 
     await generatePurchaseMessage({
       ...baseInput,
@@ -494,18 +455,17 @@ describe('generatePurchaseMessage', () => {
       additionalContext: 'Need it for work',
     });
 
-    const callArgs = mockCreate.mock.calls[0][0];
-    const userMessage = callArgs.messages.find((m: { role: string }) => m.role === 'user');
-    expect(userMessage.content).toContain('Sony WH-1000XM5 Headphones');
-    expect(userMessage.content).toContain('150');
-    expect(userMessage.content).toContain('Alice');
-    expect(userMessage.content).toContain('Like New');
-    expect(userMessage.content).toContain('Need it for work');
+    expect(mockCompleteAI).toHaveBeenCalledWith('purchaseMessage', expect.objectContaining({
+      listingTitle: 'Sony WH-1000XM5 Headphones',
+      askingPrice: 150,
+      sellerName: 'Alice',
+      itemCondition: 'Like New',
+      additionalContext: 'Need it for work',
+    }));
   });
 
-  it('omits offer price line in prompt when messageType is offer but offerPrice is null', async () => {
-    // Exercises the `messageType === 'offer' && input.offerPrice` branch where offerPrice is falsy
-    mockCreate.mockResolvedValue(mockAIResponse('Subject', 'Body'));
+  it('passes null offerPrice when messageType is offer but offerPrice is null', async () => {
+    mockCompleteAI.mockResolvedValue(mockAIResponse('Subject', 'Body'));
 
     await generatePurchaseMessage({
       ...baseInput,
@@ -513,37 +473,34 @@ describe('generatePurchaseMessage', () => {
       offerPrice: null,
     });
 
-    const callArgs = mockCreate.mock.calls[0][0];
-    const userMessage = callArgs.messages.find((m: { role: string }) => m.role === 'user');
-    expect(userMessage.content).not.toContain('The buyer wants to offer');
-    expect(userMessage.content).toContain('Sony WH-1000XM5 Headphones');
+    expect(mockCompleteAI).toHaveBeenCalledWith('purchaseMessage', expect.objectContaining({
+      messageType: 'offer',
+      offerPrice: null,
+    }));
   });
 
-  it('uses "seller name is unknown" text in prompt when sellerName is absent', async () => {
-    // Covers the sellerRef false branch in buildMessagePrompt (line 102)
-    mockCreate.mockResolvedValue(mockAIResponse('Subject', 'Body'));
+  it('passes null sellerName when sellerName is absent', async () => {
+    mockCompleteAI.mockResolvedValue(mockAIResponse('Subject', 'Body'));
 
     await generatePurchaseMessage({
       ...baseInput,
       sellerName: null,
     });
 
-    const callArgs = mockCreate.mock.calls[0][0];
-    const userMessage = callArgs.messages.find((m: { role: string }) => m.role === 'user');
-    expect(userMessage.content).toContain('seller name is unknown');
+    expect(mockCompleteAI).toHaveBeenCalledWith('purchaseMessage', expect.objectContaining({
+      sellerName: null,
+    }));
   });
 
-  it('falls back when response choices[0].message.content is null', async () => {
-    // Covers the response.choices[0]?.message?.content || '' branch (line 171) when content is null
-    mockCreate.mockResolvedValue({ choices: [{ message: { content: null } }] });
+  it('falls back when response content is null-like', async () => {
+    mockCompleteAI.mockResolvedValue({ content: '', provider: 'gemini', model: 'gemini-2.0-flash' });
 
     const result = await generatePurchaseMessage(baseInput);
     expect(result.isFallback).toBe(true);
   });
 
-  it('falls back when response choices array is empty', async () => {
-    // Exercises the choices[0]?.message?.content optional-chain short-circuit when choices[0] is undefined
-    mockCreate.mockResolvedValue({ choices: [] });
+  it('falls back when response content has no JSON object', async () => {
+    mockCompleteAI.mockResolvedValue({ content: 'just text, no JSON', provider: 'gemini', model: 'gemini-2.0-flash' });
 
     const result = await generatePurchaseMessage(baseInput);
     expect(result.isFallback).toBe(true);

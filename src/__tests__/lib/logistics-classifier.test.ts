@@ -3,33 +3,34 @@
  * Story 5.5: Logistics & Shipping Cost Analysis (FR-SCORE-21)
  */
 
-// Hoist the mock create function so it can be used in the jest.mock factory
-const mockCreate = jest.fn();
+const mockCompleteAI = jest.fn();
 
-jest.mock('openai', () => ({
-  __esModule: true,
-  default: jest.fn().mockImplementation(() => ({
-    chat: {
-      completions: {
-        create: (...args: unknown[]) => mockCreate(...args),
-      },
-    },
-  })),
+jest.mock('@/lib/ai', () => ({
+  completeAI: (...args: unknown[]) => mockCompleteAI(...args),
+  AIProviderUnavailableError: class extends Error {
+    constructor() { super('No AI provider available'); this.name = 'AIProviderUnavailableError'; }
+  },
 }));
 
 import { classifyItemLogistics } from '@/lib/logistics-classifier';
 
-function makeOpenAIResponse(data: object) {
-  return { choices: [{ message: { content: JSON.stringify(data) } }] };
+function makeAIResponse(data: object) {
+  return { content: JSON.stringify(data), provider: 'gemini' as const, model: 'gemini-2.0-flash' };
 }
+
+const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as {
+  AIProviderUnavailableError: new () => Error;
+};
 
 describe('classifyItemLogistics()', () => {
   afterEach(() => {
     jest.clearAllMocks();
-    delete process.env.OPENAI_API_KEY;
   });
 
-  describe('fallback path — no OPENAI_API_KEY', () => {
+  describe('fallback path — no AI provider', () => {
+    beforeEach(() => {
+      mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
+    });
     it('returns small_shippable for electronics category', async () => {
       const result = await classifyItemLogistics('iPhone 13', null, 'electronics');
       expect(result.sizeCategory).toBe('small_shippable');
@@ -71,13 +72,9 @@ describe('classifyItemLogistics()', () => {
     });
   });
 
-  describe('LLM path — with OPENAI_API_KEY', () => {
-    beforeEach(() => {
-      process.env.OPENAI_API_KEY = 'test-key';
-    });
-
+  describe('LLM path — with AI provider', () => {
     it('returns classification from LLM response', async () => {
-      mockCreate.mockResolvedValue(makeOpenAIResponse({
+      mockCompleteAI.mockResolvedValue(makeAIResponse({
         sizeCategory: 'small_shippable',
         estimatedWeightLbs: 3.5,
         estimatedDimensionsInches: { length: 10, width: 8, height: 4 },
@@ -92,14 +89,14 @@ describe('classifyItemLogistics()', () => {
     });
 
     it('falls back gracefully when LLM throws', async () => {
-      mockCreate.mockRejectedValue(new Error('API error'));
+      mockCompleteAI.mockRejectedValue(new Error('API error'));
       const result = await classifyItemLogistics('Camera', null, 'electronics');
       expect(result.sizeCategory).toBe('small_shippable');
       expect(result.confidence).toBe('low');
     });
 
     it('clamps estimatedWeightLbs to 200 when LLM returns huge value', async () => {
-      mockCreate.mockResolvedValue(makeOpenAIResponse({
+      mockCompleteAI.mockResolvedValue(makeAIResponse({
         sizeCategory: 'large_local_only',
         estimatedWeightLbs: 9999,
         estimatedDimensionsInches: { length: 100, width: 50, height: 50 },
@@ -112,7 +109,7 @@ describe('classifyItemLogistics()', () => {
     });
 
     it('coerces invalid sizeCategory to small_shippable', async () => {
-      mockCreate.mockResolvedValue(makeOpenAIResponse({
+      mockCompleteAI.mockResolvedValue(makeAIResponse({
         sizeCategory: 'invalid_category',
         estimatedWeightLbs: 2,
         estimatedDimensionsInches: { length: 10, width: 8, height: 4 },
@@ -125,7 +122,7 @@ describe('classifyItemLogistics()', () => {
     });
 
     it('coerces invalid confidence to medium', async () => {
-      mockCreate.mockResolvedValue(makeOpenAIResponse({
+      mockCompleteAI.mockResolvedValue(makeAIResponse({
         sizeCategory: 'small_shippable',
         estimatedWeightLbs: 2,
         estimatedDimensionsInches: { length: 10, width: 8, height: 4 },
@@ -138,7 +135,7 @@ describe('classifyItemLogistics()', () => {
     });
 
     it('defaults dimensions to minimum of 1 when missing from response', async () => {
-      mockCreate.mockResolvedValue(makeOpenAIResponse({
+      mockCompleteAI.mockResolvedValue(makeAIResponse({
         sizeCategory: 'small_shippable',
         estimatedWeightLbs: 1,
         estimatedDimensionsInches: null,
@@ -154,7 +151,7 @@ describe('classifyItemLogistics()', () => {
 
     it('clamps estimatedWeightLbs to 0.1 minimum for sub-minimum values', async () => {
       // Use 0.05 — non-zero (won't trigger the || 5 fallback) but below the 0.1 minimum clamp
-      mockCreate.mockResolvedValue(makeOpenAIResponse({
+      mockCompleteAI.mockResolvedValue(makeAIResponse({
         sizeCategory: 'small_shippable',
         estimatedWeightLbs: 0.05,
         estimatedDimensionsInches: { length: 5, width: 3, height: 1 },
@@ -167,7 +164,7 @@ describe('classifyItemLogistics()', () => {
     });
 
     it('returns empty string for classificationReasoning when LLM omits it', async () => {
-      mockCreate.mockResolvedValue(makeOpenAIResponse({
+      mockCompleteAI.mockResolvedValue(makeAIResponse({
         sizeCategory: 'small_shippable',
         estimatedWeightLbs: 2,
         estimatedDimensionsInches: { length: 8, width: 6, height: 3 },
@@ -181,7 +178,7 @@ describe('classifyItemLogistics()', () => {
 
     it('falls back to weight default of 5 when LLM returns zero for estimatedWeightLbs', async () => {
       // 0 is falsy, so `Number(0) || 5` evaluates to 5
-      mockCreate.mockResolvedValue(makeOpenAIResponse({
+      mockCompleteAI.mockResolvedValue(makeAIResponse({
         sizeCategory: 'small_shippable',
         estimatedWeightLbs: 0,
         estimatedDimensionsInches: { length: 8, width: 6, height: 3 },
@@ -196,7 +193,7 @@ describe('classifyItemLogistics()', () => {
 
     it('falls back to category default when LLM returns null message content', async () => {
       // response.choices[0]?.message?.content is null — the `|| ''` branch — JSON.parse('') throws
-      mockCreate.mockResolvedValue({ choices: [{ message: { content: null } }] });
+      mockCompleteAI.mockResolvedValue({ choices: [{ message: { content: null } }] });
 
       const result = await classifyItemLogistics('Item', null, 'electronics');
       // Falls back to category-based classification since JSON.parse('') throws
@@ -206,7 +203,7 @@ describe('classifyItemLogistics()', () => {
 
     it('falls back when response choices array is empty', async () => {
       // Exercises the choices[0]?.message?.content optional-chain short-circuit when choices[0] is undefined
-      mockCreate.mockResolvedValue({ choices: [] });
+      mockCompleteAI.mockResolvedValue({ choices: [] });
 
       const result = await classifyItemLogistics('Item', null, 'electronics');
       // JSON.parse('') throws → fallback

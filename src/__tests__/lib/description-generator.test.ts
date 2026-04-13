@@ -6,18 +6,14 @@ import {
   type DescriptionGeneratorInput,
 } from '@/lib/description-generator';
 
-// Mock OpenAI
-jest.mock('openai', () => {
-  return jest.fn().mockImplementation(() => ({
-    chat: {
-      completions: {
-        create: jest.fn(),
-      },
-    },
-  }));
-});
-
-import OpenAI from 'openai';
+// Mock centralized AI module
+const mockCompleteAI = jest.fn();
+jest.mock('@/lib/ai', () => ({
+  completeAI: (...args: unknown[]) => mockCompleteAI(...args),
+  AIProviderUnavailableError: class extends Error {
+    constructor() { super('No AI provider available'); this.name = 'AIProviderUnavailableError'; }
+  },
+}));
 
 const baseInput: DescriptionGeneratorInput = {
   brand: 'Sony',
@@ -185,33 +181,25 @@ describe('description-generator', () => {
   });
 
   describe('generateLLMDescription', () => {
-    const originalEnv = process.env;
-
     beforeEach(() => {
-      process.env = { ...originalEnv };
-      jest.clearAllMocks();
+      mockCompleteAI.mockReset();
     });
 
-    afterAll(() => {
-      process.env = originalEnv;
-    });
-
-    it('falls back to algorithmic when no OPENAI_API_KEY', async () => {
-      delete process.env.OPENAI_API_KEY;
+    it('falls back to algorithmic when no AI provider available', async () => {
+      const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as { AIProviderUnavailableError: new () => Error };
+      mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
       const result = await generateLLMDescription(baseInput, 'ebay');
       expect(result.description).toContain('Sony WH-1000XM5 Black');
       expect(result.platform).toBe('ebay');
       expect(result.hasConditionDetails).toBe(true);
     });
 
-    it('calls OpenAI and returns LLM description when API key set', async () => {
-      process.env.OPENAI_API_KEY = 'test-key';
-      const mockCreate = jest.fn().mockResolvedValue({
-        choices: [{ message: { content: 'Sony WH-1000XM5 in excellent like new condition. Ships fast with tracking.' } }],
+    it('calls completeAI and returns LLM description', async () => {
+      mockCompleteAI.mockResolvedValue({
+        content: 'Sony WH-1000XM5 in excellent like new condition. Ships fast with tracking.',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
-      (OpenAI as unknown as jest.Mock).mockImplementation(() => ({
-        chat: { completions: { create: mockCreate } },
-      }));
 
       const result = await generateLLMDescription(baseInput, 'ebay');
       expect(result.description).toContain('Sony WH-1000XM5');
@@ -219,16 +207,15 @@ describe('description-generator', () => {
       expect(result.wordCount).toBeGreaterThan(0);
       expect(result.hasConditionDetails).toBe(true);
       expect(result.hasShippingNote).toBe(true);
-      expect(mockCreate).toHaveBeenCalledTimes(1);
+      expect(mockCompleteAI).toHaveBeenCalledTimes(1);
     });
 
     it('detects condition details in LLM response', async () => {
-      process.env.OPENAI_API_KEY = 'test-key';
-      (OpenAI as unknown as jest.Mock).mockImplementation(() => ({
-        chat: { completions: { create: jest.fn().mockResolvedValue({
-          choices: [{ message: { content: 'Great item available now. Grab it before it is gone!' } }],
-        }) } },
-      }));
+      mockCompleteAI.mockResolvedValue({
+        content: 'Great item available now. Grab it before it is gone!',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
+      });
 
       const result = await generateLLMDescription(baseInput, 'mercari');
       expect(result.hasConditionDetails).toBe(false);
@@ -236,56 +223,34 @@ describe('description-generator', () => {
     });
 
     it('handles empty LLM response', async () => {
-      process.env.OPENAI_API_KEY = 'test-key';
-      (OpenAI as unknown as jest.Mock).mockImplementation(() => ({
-        chat: { completions: { create: jest.fn().mockResolvedValue({
-          choices: [{ message: { content: '' } }],
-        }) } },
-      }));
+      mockCompleteAI.mockResolvedValue({ content: '', provider: 'gemini', model: 'gemini-2.0-flash' });
 
       const result = await generateLLMDescription(baseInput, 'ebay');
       expect(result.description).toBe('');
       expect(result.wordCount).toBe(1); // ''.split(/\s+/) returns ['']
     });
 
-    it('handles null content from LLM', async () => {
-      process.env.OPENAI_API_KEY = 'test-key';
-      (OpenAI as unknown as jest.Mock).mockImplementation(() => ({
-        chat: { completions: { create: jest.fn().mockResolvedValue({
-          choices: [{ message: { content: null } }],
-        }) } },
-      }));
+    it('falls back to algorithmic on AI API error', async () => {
+      mockCompleteAI.mockRejectedValue(new Error('API rate limit'));
 
       const result = await generateLLMDescription(baseInput, 'ebay');
-      expect(result.description).toBe('');
-    });
-
-    it('falls back to algorithmic on OpenAI API error', async () => {
-      process.env.OPENAI_API_KEY = 'test-key';
-      (OpenAI as unknown as jest.Mock).mockImplementation(() => ({
-        chat: { completions: { create: jest.fn().mockRejectedValue(new Error('API rate limit')) } },
-      }));
-
-      const result = await generateLLMDescription(baseInput, 'ebay');
-      // Should fall back to algorithmic
       expect(result.description).toContain('Sony WH-1000XM5 Black');
       expect(result.platform).toBe('ebay');
     });
 
-    it('uses generic style for unknown platform', async () => {
-      delete process.env.OPENAI_API_KEY;
+    it('uses generic style for unknown platform (falls back)', async () => {
+      const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as { AIProviderUnavailableError: new () => Error };
+      mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
       const result = await generateLLMDescription(baseInput, 'unknown-platform');
       expect(result.description).toContain('Sony WH-1000XM5 Black');
     });
 
-    it('includes defects and features in LLM prompt', async () => {
-      process.env.OPENAI_API_KEY = 'test-key';
-      const mockCreate = jest.fn().mockResolvedValue({
-        choices: [{ message: { content: 'Test description with condition details and shipping info.' } }],
+    it('includes defects and features in context', async () => {
+      mockCompleteAI.mockResolvedValue({
+        content: 'Test description with condition details and shipping info.',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
-      (OpenAI as unknown as jest.Mock).mockImplementation(() => ({
-        chat: { completions: { create: mockCreate } },
-      }));
 
       const input = {
         ...baseInput,
@@ -295,21 +260,20 @@ describe('description-generator', () => {
         sellerNotes: 'Barely used',
       };
       await generateLLMDescription(input, 'ebay');
-      const prompt = mockCreate.mock.calls[0][0].messages[1].content;
-      expect(prompt).toContain('Minor scratch');
-      expect(prompt).toContain('Bluetooth 5.3');
-      expect(prompt).toContain('Case');
-      expect(prompt).toContain('Barely used');
+      expect(mockCompleteAI).toHaveBeenCalledWith('listingDescription', expect.objectContaining({
+        defects: ['Minor scratch'],
+        features: ['Bluetooth 5.3'],
+        includesAccessories: ['Case'],
+        sellerNotes: 'Barely used',
+      }));
     });
 
     it('handles input with no brand/model/variant', async () => {
-      process.env.OPENAI_API_KEY = 'test-key';
-      const mockCreate = jest.fn().mockResolvedValue({
-        choices: [{ message: { content: 'Item for sale in used condition.' } }],
+      mockCompleteAI.mockResolvedValue({
+        content: 'Item for sale in used condition.',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
-      (OpenAI as unknown as jest.Mock).mockImplementation(() => ({
-        chat: { completions: { create: mockCreate } },
-      }));
 
       const input: DescriptionGeneratorInput = {
         brand: null,
@@ -320,9 +284,9 @@ describe('description-generator', () => {
         askingPrice: 25,
       };
       await generateLLMDescription(input, 'facebook');
-      const prompt = mockCreate.mock.calls[0][0].messages[1].content;
-      expect(prompt).toContain('Item');
-      expect(prompt).toContain('facebook');
+      expect(mockCompleteAI).toHaveBeenCalledWith('listingDescription', expect.objectContaining({
+        platform: 'facebook',
+      }));
     });
   });
 });
@@ -376,24 +340,12 @@ describe('generateDescriptionsForAllPlatforms - branch coverage', () => {
 });
 
 describe('generateLLMDescription - branch coverage', () => {
-  const OpenAI = require('openai');
-  const origKey = process.env.OPENAI_API_KEY;
-
-  afterEach(() => {
-    if (origKey !== undefined) {
-      process.env.OPENAI_API_KEY = origKey;
-    } else {
-      delete process.env.OPENAI_API_KEY;
-    }
+  beforeEach(() => {
+    mockCompleteAI.mockReset();
   });
 
   it('detects condition details in LLM response', async () => {
-    process.env.OPENAI_API_KEY = 'test-key';
-    (OpenAI as unknown as jest.Mock).mockImplementation(() => ({
-      chat: { completions: { create: jest.fn().mockResolvedValue({
-        choices: [{ message: { content: 'Item in excellent used condition, ships quickly.' } }],
-      }) } },
-    }));
+    mockCompleteAI.mockResolvedValue({ content: 'Item in excellent used condition, ships quickly.', provider: 'gemini', model: 'gemini-2.0-flash' });
     const result = await generateLLMDescription(
       { brand: 'Sony', model: 'TV', variant: null, condition: 'good', category: null, askingPrice: 100 },
       'ebay'
@@ -404,7 +356,7 @@ describe('generateLLMDescription - branch coverage', () => {
 });
 
 describe('description-generator - default parameter branches', () => {
-  const baseInput = {
+  const baseInput2 = {
     brand: 'Sony',
     model: 'WH-1000XM5',
     variant: 'Black',
@@ -413,76 +365,45 @@ describe('description-generator - default parameter branches', () => {
     askingPrice: 200,
   };
 
+  beforeEach(() => {
+    mockCompleteAI.mockReset();
+  });
+
   it('uses "generic" platform when called without platform arg', () => {
-    // Tests default parameter branch for generateAlgorithmicDescription
-    const result = generateAlgorithmicDescription(baseInput);
+    const result = generateAlgorithmicDescription(baseInput2);
     expect(result.description).toBeTruthy();
     expect(result.platform).toBe('generic');
   });
 
   it('generateLLMDescription uses "ebay" default when no platform arg', async () => {
-    delete process.env.OPENAI_API_KEY;
-    // Will fall back to algorithmic since no key
-    const result = await generateLLMDescription(baseInput);
+    mockCompleteAI.mockResolvedValue({ content: 'Test description.', provider: 'gemini', model: 'gemini-2.0-flash' });
+    const result = await generateLLMDescription(baseInput2);
     expect(result.platform).toBe('ebay');
   });
 
-  it('generateLLMDescription handles choices[0] being undefined', async () => {
-    const OpenAI = require('openai');
-    process.env.OPENAI_API_KEY = 'test-key';
-    (OpenAI as jest.Mock).mockImplementation(() => ({
-      chat: {
-        completions: {
-          create: jest.fn().mockResolvedValue({
-            choices: [], // empty choices array
-          }),
-        },
-      },
-    }));
-
-    const result = await generateLLMDescription(baseInput, 'ebay');
+  it('generateLLMDescription handles empty content', async () => {
+    mockCompleteAI.mockResolvedValue({ content: '', provider: 'gemini', model: 'gemini-2.0-flash' });
+    const result = await generateLLMDescription(baseInput2, 'ebay');
     expect(result.description).toBe('');
   });
 
-  it('generateLLMDescription includes originalPrice in prompt (truthy branch)', async () => {
-    const OpenAI = require('openai');
-    process.env.OPENAI_API_KEY = 'test-key';
-    const mockCreate = jest.fn().mockResolvedValue({
-      choices: [{ message: { content: 'Great headphones retailing for $350.' } }],
-    });
-    (OpenAI as jest.Mock).mockImplementation(() => ({
-      chat: { completions: { create: mockCreate } },
-    }));
-    const result = await generateLLMDescription({ ...baseInput, originalPrice: 350 }, 'ebay');
-    const prompt = mockCreate.mock.calls[0][0].messages[1].content;
-    expect(prompt).toContain('Retail: $350');
+  it('generateLLMDescription includes originalPrice in context', async () => {
+    mockCompleteAI.mockResolvedValue({ content: 'Great headphones retailing for $350.', provider: 'gemini', model: 'gemini-2.0-flash' });
+    const result = await generateLLMDescription({ ...baseInput2, originalPrice: 350 }, 'ebay');
     expect(result.description).toContain('headphones');
+    expect(mockCompleteAI).toHaveBeenCalledWith('listingDescription', expect.objectContaining({
+      originalPrice: 350,
+    }));
   });
 
   it('generateLLMDescription uses PLATFORM_STYLES.generic for unknown platform', async () => {
-    const OpenAI = require('openai');
-    process.env.OPENAI_API_KEY = 'test-key';
-    const mockCreate = jest.fn().mockResolvedValue({
-      choices: [{ message: { content: 'Item available for sale with quick shipping.' } }],
-    });
-    (OpenAI as jest.Mock).mockImplementation(() => ({
-      chat: { completions: { create: mockCreate } },
-    }));
-    // 'custom-platform' is not in PLATFORM_STYLES → falls back to generic
-    const result = await generateLLMDescription(baseInput, 'custom-platform');
+    mockCompleteAI.mockResolvedValue({ content: 'Item available for sale with quick shipping.', provider: 'gemini', model: 'gemini-2.0-flash' });
+    const result = await generateLLMDescription(baseInput2, 'custom-platform');
     expect(result.description).toBeTruthy();
   });
 
-  it('generateLLMDescription: optional fields undefined → empty template lines', async () => {
-    const OpenAI = require('openai');
-    process.env.OPENAI_API_KEY = 'test-key';
-    const mockCreate = jest.fn().mockResolvedValue({
-      choices: [{ message: { content: 'Generic item for sale.' } }],
-    });
-    (OpenAI as jest.Mock).mockImplementation(() => ({
-      chat: { completions: { create: mockCreate } },
-    }));
-    // All optional fields undefined — covers falsy branches for defects/features/accessories/notes
+  it('generateLLMDescription: optional fields undefined → passes through to context', async () => {
+    mockCompleteAI.mockResolvedValue({ content: 'Generic item for sale.', provider: 'gemini', model: 'gemini-2.0-flash' });
     const minimalInput: import('@/lib/description-generator').DescriptionGeneratorInput = {
       brand: null,
       model: null,
@@ -498,9 +419,8 @@ describe('description-generator - default parameter branches', () => {
     };
     const result = await generateLLMDescription(minimalInput, 'ebay');
     expect(result.description).toBe('Generic item for sale.');
-    const prompt = mockCreate.mock.calls[0][0].messages[1].content;
-    expect(prompt).toContain('Item'); // brand/model/variant all null → 'Item'
-    expect(prompt).toContain('General'); // category null → 'General'
-    expect(prompt).not.toContain('Retail:'); // no originalPrice
+    expect(mockCompleteAI).toHaveBeenCalledWith('listingDescription', expect.objectContaining({
+      category: 'General',
+    }));
   });
 });

@@ -1,54 +1,46 @@
 // Tests for llm-identifier.ts
 import { identifyItem, identifyItemsBatch } from '../lib/llm-identifier';
 
-jest.mock('openai', () => {
-  return jest.fn().mockImplementation(() => ({
-    chat: {
-      completions: {
-        create: jest.fn().mockResolvedValue({
-          choices: [
-            {
-              message: {
-                content: JSON.stringify({
-                  brand: 'Apple',
-                  model: 'iPhone 14 Pro',
-                  variant: '256GB',
-                  year: 2022,
-                  condition: 'good',
-                  conditionNotes: 'Minor scratches on screen',
-                  searchQuery: 'Apple iPhone 14 Pro 256GB',
-                  category: 'cell phones',
-                  worthInvestigating: true,
-                  reasoning: 'High-demand smartphone with strong resale value',
-                }),
-              },
-            },
-          ],
-        }),
-      },
-    },
-  }));
-});
+const mockCompleteAI = jest.fn();
+jest.mock('@/lib/ai', () => ({
+  completeAI: (...args: unknown[]) => mockCompleteAI(...args),
+  AIProviderUnavailableError: class extends Error {
+    constructor() { super('No AI provider available'); this.name = 'AIProviderUnavailableError'; }
+  },
+}));
+
+const defaultResponse = {
+  content: JSON.stringify({
+    brand: 'Apple',
+    model: 'iPhone 14 Pro',
+    variant: '256GB',
+    year: 2022,
+    condition: 'good',
+    conditionNotes: 'Minor scratches on screen',
+    searchQuery: 'Apple iPhone 14 Pro 256GB',
+    category: 'cell phones',
+    worthInvestigating: true,
+    reasoning: 'High-demand smartphone with strong resale value',
+  }),
+  provider: 'gemini',
+  model: 'gemini-2.0-flash',
+};
 
 describe('llm-identifier', () => {
-  const originalEnv = process.env;
-
   beforeEach(() => {
-    process.env = { ...originalEnv, OPENAI_API_KEY: 'test-key' };
-  });
-
-  afterEach(() => {
-    process.env = originalEnv;
+    mockCompleteAI.mockReset();
+    mockCompleteAI.mockResolvedValue(defaultResponse);
   });
 
   describe('identifyItem', () => {
-    it('returns null when OPENAI_API_KEY not set', async () => {
-      delete process.env.OPENAI_API_KEY;
+    it('returns null when no AI provider available', async () => {
+      const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as { AIProviderUnavailableError: new () => Error };
+      mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
       const result = await identifyItem('iPhone 14 Pro', 'Good condition', 200, 'electronics');
       expect(result).toBeNull();
     });
 
-    it('returns identification when API key is set', async () => {
+    it('returns identification when AI provider is available', async () => {
       const result = await identifyItem(
         'iPhone 14 Pro 256GB',
         'Minor scratches',
@@ -71,86 +63,41 @@ describe('llm-identifier', () => {
 
   describe('identifyItem edge cases', () => {
     it('returns null when LLM response has no JSON', async () => {
-      const OpenAI = require('openai');
-      const mockCreate = jest.fn().mockResolvedValue({
-        choices: [{ message: { content: 'No JSON here, just text' } }],
-      });
-      OpenAI.mockImplementation(() => ({
-        chat: { completions: { create: mockCreate } },
-      }));
+      mockCompleteAI.mockResolvedValue({ content: 'No JSON here, just text', provider: 'gemini', model: 'gemini-2.0-flash' });
 
-      // Reset the cached openai instance by re-importing
-      jest.resetModules();
-      jest.mock('openai', () => OpenAI);
-      process.env.OPENAI_API_KEY = 'test-key';
-      const { identifyItem: freshIdentify } = require('../lib/llm-identifier');
-
-      const result = await freshIdentify('Test Item', null, 100, null);
+      const result = await identifyItem('Test Item', null, 100, null);
       expect(result).toBeNull();
     });
 
     it('returns null when API call throws', async () => {
-      const OpenAI = require('openai');
-      const mockCreate = jest.fn().mockRejectedValue(new Error('API rate limited'));
-      OpenAI.mockImplementation(() => ({
-        chat: { completions: { create: mockCreate } },
-      }));
+      mockCompleteAI.mockRejectedValue(new Error('API rate limited'));
 
-      jest.resetModules();
-      jest.mock('openai', () => OpenAI);
-      process.env.OPENAI_API_KEY = 'test-key';
-      const { identifyItem: freshIdentify } = require('../lib/llm-identifier');
-
-      const result = await freshIdentify('Test Item', null, 100, null);
+      const result = await identifyItem('Test Item', null, 100, null);
       expect(result).toBeNull();
     });
 
     it('returns null when response content is empty', async () => {
-      const OpenAI = require('openai');
-      const mockCreate = jest.fn().mockResolvedValue({
-        choices: [{ message: { content: '' } }],
-      });
-      OpenAI.mockImplementation(() => ({
-        chat: { completions: { create: mockCreate } },
-      }));
+      mockCompleteAI.mockResolvedValue({ content: '', provider: 'gemini', model: 'gemini-2.0-flash' });
 
-      jest.resetModules();
-      jest.mock('openai', () => OpenAI);
-      process.env.OPENAI_API_KEY = 'test-key';
-      const { identifyItem: freshIdentify } = require('../lib/llm-identifier');
-
-      const result = await freshIdentify('Test Item', null, 100, null);
+      const result = await identifyItem('Test Item', null, 100, null);
       expect(result).toBeNull();
     });
   });
 
   describe('identifyItem field defaults', () => {
     it('handles missing optional fields in parsed JSON', async () => {
-      const OpenAI = require('openai');
-      const mockCreate = jest.fn().mockResolvedValue({
-        choices: [
-          {
-            message: {
-              content: JSON.stringify({
-                brand: null,
-                model: null,
-                condition: 'unknown_condition',
-                worthInvestigating: false,
-              }),
-            },
-          },
-        ],
+      mockCompleteAI.mockResolvedValue({
+        content: JSON.stringify({
+          brand: null,
+          model: null,
+          condition: 'unknown_condition',
+          worthInvestigating: false,
+        }),
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
-      OpenAI.mockImplementation(() => ({
-        chat: { completions: { create: mockCreate } },
-      }));
 
-      jest.resetModules();
-      jest.mock('openai', () => OpenAI);
-      process.env.OPENAI_API_KEY = 'test-key';
-      const { identifyItem: freshIdentify } = require('../lib/llm-identifier');
-
-      const result = await freshIdentify('Mystery Item', 'desc', 50, 'other');
+      const result = await identifyItem('Mystery Item', 'desc', 50, 'other');
       expect(result).not.toBeNull();
       expect(result?.brand).toBeNull();
       expect(result?.model).toBeNull();
@@ -165,113 +112,43 @@ describe('llm-identifier', () => {
 
     it('handles all valid condition values', async () => {
       for (const cond of ['new', 'like_new', 'good', 'fair', 'poor']) {
-        const OpenAI = require('openai');
-        const mockCreate = jest.fn().mockResolvedValue({
-          choices: [
-            {
-              message: {
-                content: JSON.stringify({
-                  brand: 'Test',
-                  condition: cond,
-                  searchQuery: 'test',
-                  category: 'test',
-                }),
-              },
-            },
-          ],
+        mockCompleteAI.mockResolvedValue({
+          content: JSON.stringify({ brand: 'Test', condition: cond, searchQuery: 'test', category: 'test' }),
+          provider: 'gemini',
+          model: 'gemini-2.0-flash',
         });
-        OpenAI.mockImplementation(() => ({
-          chat: { completions: { create: mockCreate } },
-        }));
-
-        jest.resetModules();
-        jest.mock('openai', () => OpenAI);
-        process.env.OPENAI_API_KEY = 'test-key';
-        const { identifyItem: freshIdentify } = require('../lib/llm-identifier');
-
-        const result = await freshIdentify('Test', null, 100, null);
+        const result = await identifyItem('Test', null, 100, null);
         expect(result?.condition).toBe(cond);
       }
     });
 
     it('handles condition with spaces (like new -> like_new)', async () => {
-      const OpenAI = require('openai');
-      const mockCreate = jest.fn().mockResolvedValue({
-        choices: [
-          {
-            message: {
-              content: JSON.stringify({
-                brand: 'Test',
-                condition: 'like new',
-                searchQuery: 'test',
-              }),
-            },
-          },
-        ],
+      mockCompleteAI.mockResolvedValue({
+        content: JSON.stringify({ brand: 'Test', condition: 'like new', searchQuery: 'test' }),
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
-      OpenAI.mockImplementation(() => ({
-        chat: { completions: { create: mockCreate } },
-      }));
-
-      jest.resetModules();
-      jest.mock('openai', () => OpenAI);
-      process.env.OPENAI_API_KEY = 'test-key';
-      const { identifyItem: freshIdentify } = require('../lib/llm-identifier');
-
-      const result = await freshIdentify('Test', null, 100, null);
+      const result = await identifyItem('Test', null, 100, null);
       expect(result?.condition).toBe('like_new');
     });
 
     it('handles year as string number', async () => {
-      const OpenAI = require('openai');
-      const mockCreate = jest.fn().mockResolvedValue({
-        choices: [
-          {
-            message: {
-              content: JSON.stringify({
-                brand: 'Sony',
-                year: '2023',
-                condition: 'good',
-                searchQuery: 'Sony TV',
-              }),
-            },
-          },
-        ],
+      mockCompleteAI.mockResolvedValue({
+        content: JSON.stringify({ brand: 'Sony', year: '2023', condition: 'good', searchQuery: 'Sony TV' }),
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
-      OpenAI.mockImplementation(() => ({
-        chat: { completions: { create: mockCreate } },
-      }));
-
-      jest.resetModules();
-      jest.mock('openai', () => OpenAI);
-      process.env.OPENAI_API_KEY = 'test-key';
-      const { identifyItem: freshIdentify } = require('../lib/llm-identifier');
-
-      const result = await freshIdentify('Sony TV', null, 300, null);
+      const result = await identifyItem('Sony TV', null, 300, null);
       expect(result?.year).toBe(2023);
     });
 
     it('handles markdown-wrapped JSON response', async () => {
-      const OpenAI = require('openai');
-      const mockCreate = jest.fn().mockResolvedValue({
-        choices: [
-          {
-            message: {
-              content: '```json\n{"brand":"Test","condition":"good","searchQuery":"test"}\n```',
-            },
-          },
-        ],
+      mockCompleteAI.mockResolvedValue({
+        content: '```json\n{"brand":"Test","condition":"good","searchQuery":"test"}\n```',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
-      OpenAI.mockImplementation(() => ({
-        chat: { completions: { create: mockCreate } },
-      }));
-
-      jest.resetModules();
-      jest.mock('openai', () => OpenAI);
-      process.env.OPENAI_API_KEY = 'test-key';
-      const { identifyItem: freshIdentify } = require('../lib/llm-identifier');
-
-      const result = await freshIdentify('Test', null, 100, null);
+      const result = await identifyItem('Test', null, 100, null);
       expect(result).not.toBeNull();
       expect(result?.brand).toBe('Test');
     });

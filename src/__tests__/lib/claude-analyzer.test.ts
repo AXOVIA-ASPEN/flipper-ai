@@ -8,19 +8,14 @@
 
 import { describe, test, expect, jest, beforeEach } from '@jest/globals';
 
-// Mock Anthropic SDK
-jest.mock('@anthropic-ai/sdk', () => {
-  return {
-    __esModule: true,
-    default: jest.fn().mockImplementation(() => ({
-      messages: {
-        create: jest.fn(),
-      },
-    })),
-    RateLimitError: class RateLimitError extends Error {},
-    APIError: class APIError extends Error {},
-  };
-});
+// Mock centralized AI module
+const mockCompleteAI = jest.fn();
+jest.mock('@/lib/ai', () => ({
+  completeAI: (...args: unknown[]) => mockCompleteAI(...args),
+  AIProviderUnavailableError: class extends Error {
+    constructor() { super('No AI provider available'); this.name = 'AIProviderUnavailableError'; }
+  },
+}));
 
 // Mock Prisma
 jest.mock('@/lib/db', () => ({
@@ -52,7 +47,6 @@ jest.mock('@/lib/usage-tracker', () => ({
   recordUsage: jest.fn().mockResolvedValue(undefined),
 }));
 
-import Anthropic from '@anthropic-ai/sdk';
 import {
   analyzeListingData,
   analyzeListing,
@@ -62,11 +56,20 @@ import {
 import prisma from '@/lib/db';
 import { recordUsage } from '@/lib/usage-tracker';
 
+// Helper to create mock AI response from claude-like text content
+function makeAIResponse(textContent: string) {
+  return {
+    content: textContent,
+    provider: 'anthropic' as const,
+    model: 'claude-sonnet-4-5-20250929',
+  };
+}
+
 describe('Claude Analyzer', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.resetModules();
-    process.env.ANTHROPIC_API_KEY = 'test-key';
+    mockCompleteAI.mockReset();
     // Default: L1 cache miss
     mockCacheGet.mockReturnValue(undefined);
     mockCacheSet.mockReturnValue(undefined);
@@ -96,17 +99,8 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      // Mock the Anthropic client's create method directly
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      // Mock the completeAI method
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       const result = await analyzeListingData(
         'iPhone 12 128GB',
@@ -141,16 +135,7 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       await analyzeListingData('Item', 'Desc', 100, undefined, 'user-meter-1');
 
@@ -175,16 +160,7 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       const result = await analyzeListingData('DeWalt Drill', 'Used but works', 50);
 
@@ -210,16 +186,7 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       const result = await analyzeListingData('Old Couch', null, 20);
 
@@ -246,16 +213,7 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       const result = await analyzeListingData('Road Bike', 'Good shape', 200);
 
@@ -269,56 +227,23 @@ describe('Claude Analyzer', () => {
       // Note: This test can't work properly because CLAUDE_API_KEY is evaluated at module load time
       // In a real scenario, the API would fail with auth error which is caught in callClaudeAPI
       // For now, we'll test that the mock framework works with auth failures
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockImplementation(() => {
-        const error: any = new Error('Invalid API key');
-        error.status = 401;
-        throw error;
-      });
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      const error: any = new Error('Invalid API key');
+      error.status = 401;
+      mockCompleteAI.mockRejectedValue(error);
 
       await expect(analyzeListingData('Test Item', null, 100)).rejects.toThrow();
     });
 
     test('should throw error on rate limit', async () => {
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest
-        .fn()
-        .mockRejectedValue(Object.assign(new Error('Rate limit exceeded'), { status: 429 }));
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockRejectedValue(new Error('Rate limit exceeded'));
 
-      await expect(analyzeListingData('Test Item', null, 100)).rejects.toThrow('rate limit');
+      await expect(analyzeListingData('Test Item', null, 100)).rejects.toThrow('Rate limit exceeded');
     });
 
     test('should throw error on API error', async () => {
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest
-        .fn()
-        .mockRejectedValue(
+      mockCompleteAI.mockRejectedValue(
           Object.assign(new Error('Something went wrong'), { message: 'Something went wrong' })
         );
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
 
       await expect(analyzeListingData('Test Item', null, 100)).rejects.toThrow();
     });
@@ -341,16 +266,7 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       const result = await analyzeListingData('Mystery Item', null, 50);
 
@@ -376,16 +292,7 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       const result = await analyzeListingData('T-Shirt', 'Gently used', 5);
 
@@ -396,11 +303,7 @@ describe('Claude Analyzer', () => {
     });
 
     test('should include price context in analysis', async () => {
-      const mockCreate = jest.fn().mockResolvedValue({
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify({
+      mockCompleteAI.mockResolvedValue(makeAIResponse(JSON.stringify({
               category: 'electronics',
               condition: 'new',
               keyFeatures: [],
@@ -408,28 +311,13 @@ describe('Claude Analyzer', () => {
               flippabilityScore: 90,
               confidence: 'high',
               reasoning: 'Great deal',
-            }),
-          },
-        ],
-      });
-
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
-
+            })));
       await analyzeListingData('iPhone 15 Pro', 'Brand new sealed', 800, ['image1.jpg']);
 
-      const callArgs = mockCreate.mock.calls[0][0];
-      const promptMessage = callArgs.messages[0].content;
-
-      expect(promptMessage).toContain('$800');
-      expect(promptMessage).toContain('1 images available');
+      expect(mockCompleteAI).toHaveBeenCalledWith('claudeAnalysis', expect.objectContaining({
+        askingPrice: 800,
+        imageCount: 1,
+      }));
     });
   });
 
@@ -465,7 +353,7 @@ describe('Claude Analyzer', () => {
       expect(result.reasoning).toBe('Cached result');
       expect(prisma.aiAnalysisCache.findFirst).toHaveBeenCalled();
       // Should NOT call Claude API when cached
-      expect(Anthropic).not.toHaveBeenCalled();
+      expect(mockCompleteAI).not.toHaveBeenCalled();
     });
 
     test('should call Claude API when cache is not found', async () => {
@@ -495,21 +383,12 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       const result = await analyzeListing('listing-789');
 
       expect(result.reasoning).toBe('Fresh analysis');
-      expect(mockCreate).toHaveBeenCalled();
+      expect(mockCompleteAI).toHaveBeenCalled();
     });
 
     test('should cache new analysis after Claude API call', async () => {
@@ -540,16 +419,7 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       await analyzeListing('listing-cache-test');
 
@@ -594,21 +464,12 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       const result = await analyzeListing('listing-error-test');
 
       expect(result.reasoning).toBe('Fallback');
-      expect(mockCreate).toHaveBeenCalled();
+      expect(mockCompleteAI).toHaveBeenCalled();
     });
 
     test('should handle cache storage errors gracefully', async () => {
@@ -641,16 +502,7 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       // Should not throw even if caching fails
       const result = await analyzeListing('listing-write-error');
@@ -682,8 +534,7 @@ describe('Claude Analyzer', () => {
           flippabilityScore: 70, confidence: 'medium', reasoning: 'No images',
         }) }],
       };
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      AnthropicMock.mockImplementation(() => ({ messages: { create: jest.fn().mockResolvedValue(mockResponse) } }) as any);
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       const result = await analyzeListing('listing-no-images');
       expect(result.reasoning).toBe('No images');
@@ -716,16 +567,7 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       const result = await analyzeListing('listing-bad-json');
 
@@ -749,7 +591,7 @@ describe('Claude Analyzer', () => {
 
       expect(result.reasoning).toBe('From L1 memory cache');
       expect(prisma.aiAnalysisCache.findFirst).not.toHaveBeenCalled();
-      expect(Anthropic).not.toHaveBeenCalled();
+      expect(mockCompleteAI).not.toHaveBeenCalled();
     });
 
     test('should populate L1 cache after L2 database cache hit', async () => {
@@ -775,7 +617,7 @@ describe('Claude Analyzer', () => {
         'claude:listing-l2-pop',
         expect.objectContaining({ reasoning: 'From L2 database cache' })
       );
-      expect(Anthropic).not.toHaveBeenCalled();
+      expect(mockCompleteAI).not.toHaveBeenCalled();
     });
 
     test('should populate L1 cache after successful API call', async () => {
@@ -804,10 +646,7 @@ describe('Claude Analyzer', () => {
         }],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      AnthropicMock.mockImplementation(() => ({
-        messages: { create: jest.fn().mockResolvedValue(mockResponse) },
-      }) as any);
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       await analyzeListing('listing-api-l1');
 
@@ -863,23 +702,14 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       const results = await batchAnalyzeListings(['list-1', 'list-2', 'list-3']);
 
       expect(results.successful).toBe(3);
       expect(results.failed).toBe(0);
       expect(results.errors).toHaveLength(0);
-      expect(mockCreate).toHaveBeenCalledTimes(3);
+      expect(mockCompleteAI).toHaveBeenCalledTimes(3);
     });
 
     test('should handle partial failures in batch', async () => {
@@ -922,16 +752,7 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       const results = await batchAnalyzeListings([
         'list-success',
@@ -992,16 +813,7 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       const results = await batchAnalyzeListings(['list-cached', 'list-fresh']);
 
@@ -1009,7 +821,7 @@ describe('Claude Analyzer', () => {
       expect(results.cached).toBe(1);
       expect(results.failed).toBe(0);
       // Only 1 API call (cached result doesn't call API)
-      expect(mockCreate).toHaveBeenCalledTimes(1);
+      expect(mockCompleteAI).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -1024,16 +836,7 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       await expect(analyzeListingData('Item', 'Desc', 50)).rejects.toThrow();
     });
@@ -1058,21 +861,12 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       const result = await analyzeListingData('Item', null, 50);
 
       expect(result.potentialIssues).toContain('No description provided');
-      expect(mockCreate).toHaveBeenCalled();
+      expect(mockCompleteAI).toHaveBeenCalled();
     });
 
     test('should handle zero price', async () => {
@@ -1095,21 +889,12 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       const result = await analyzeListingData('Free Couch', 'Come pick it up', 0);
 
       expect(result.flippabilityScore).toBeLessThan(50);
-      expect(mockCreate).toHaveBeenCalled();
+      expect(mockCompleteAI).toHaveBeenCalled();
     });
 
     test('should handle very long descriptions', async () => {
@@ -1134,21 +919,12 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       const result = await analyzeListingData('Item', longDescription, 100);
 
       expect(result).toBeDefined();
-      expect(mockCreate).toHaveBeenCalled();
+      expect(mockCompleteAI).toHaveBeenCalled();
     });
 
     test('should handle multiple images', async () => {
@@ -1171,16 +947,7 @@ describe('Claude Analyzer', () => {
         ],
       };
 
-      const AnthropicMock = Anthropic as jest.MockedClass<typeof Anthropic>;
-      const mockCreate = jest.fn().mockResolvedValue(mockResponse);
-      AnthropicMock.mockImplementation(
-        () =>
-          ({
-            messages: {
-              create: mockCreate,
-            },
-          }) as any
-      );
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
       const result = await analyzeListingData('Laptop', 'Used laptop', 500, [
         'img1.jpg',
@@ -1188,10 +955,9 @@ describe('Claude Analyzer', () => {
         'img3.jpg',
       ]);
 
-      const callArgs = mockCreate.mock.calls[0][0];
-      const promptMessage = callArgs.messages[0].content;
-
-      expect(promptMessage).toContain('3 images available');
+      expect(mockCompleteAI).toHaveBeenCalledWith('claudeAnalysis', expect.objectContaining({
+        imageCount: 3,
+      }));
       expect(result.confidence).toBe('high');
     });
   });
@@ -1201,28 +967,22 @@ describe('Claude Analyzer', () => {
       delete process.env.ANTHROPIC_API_KEY;
       process.env.CLAUDE_API_KEY = 'claude-fallback-key';
       // analyzeListingData should use CLAUDE_API_KEY (not throw)
-      const mockCreate = jest.fn().mockResolvedValue({
-        content: [{ type: 'text', text: JSON.stringify({
+      mockCompleteAI.mockResolvedValue(makeAIResponse(JSON.stringify({
           category: 'Electronics', condition: 'good', brand: 'Apple', model: 'Test',
           estimatedValue: 100, estimatedLow: 80, estimatedHigh: 120,
           profitPotential: 50, isFairDeal: true, isGoodDeal: false, isExcellentDeal: false,
           confidence: 0.8, reasoning: 'test', tags: [], keywords: [],
-        }) }],
-      });
-      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
-        messages: { create: mockCreate },
-      }));
+        })));
       const result = await analyzeListingData('Test', 'desc', 100);
       expect(result).toBeDefined();
       delete process.env.CLAUDE_API_KEY;
     });
 
-    test('throws when no AI provider key is set', async () => {
-      delete process.env.ANTHROPIC_API_KEY;
-      delete process.env.CLAUDE_API_KEY;
-      delete process.env.GOOGLE_API_KEY;
+    test('throws when no AI provider is available', async () => {
+      const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as { AIProviderUnavailableError: new () => Error };
+      mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
       await expect(analyzeListingData('Test', 'desc', 100)).rejects.toThrow(
-        'No AI provider configured'
+        'No AI provider available'
       );
     });
   });
@@ -1232,74 +992,43 @@ describe('Claude Analyzer', () => {
       const errorObj = Object.assign(new Error(), { status: 400 });
       // Remove message property so apiError.message is falsy
       delete (errorObj as Record<string, unknown>).message;
-      const mockCreate = jest.fn().mockRejectedValue(errorObj);
-      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
-        messages: { create: mockCreate },
-      }));
+      mockCompleteAI.mockRejectedValue(errorObj);
       // Should fall through to "Handle other errors" block and rethrow as-is
       await expect(analyzeListingData('Test Item', 'desc', 100)).rejects.toThrow();
     });
 
-    test('should handle API error with status and message (non-429)', async () => {
-      const mockCreate = jest
-        .fn()
-        .mockRejectedValue(
-          Object.assign(new Error('Bad request'), { status: 400, message: 'Invalid model' })
+    test('should propagate API error with status and message', async () => {
+      mockCompleteAI.mockRejectedValue(
+          Object.assign(new Error('Invalid model'), { status: 400 })
         );
-      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
-        messages: { create: mockCreate },
-      }));
-
       await expect(analyzeListingData('Test Item', 'desc', 100)).rejects.toThrow(
-        'Claude API error: Invalid model'
+        'Invalid model'
       );
     });
 
-    test('should handle non-Error thrown object (unknown error)', async () => {
-      const mockCreate = jest.fn().mockRejectedValue('string error');
-      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
-        messages: { create: mockCreate },
-      }));
+    test('should propagate non-Error thrown object', async () => {
+      mockCompleteAI.mockRejectedValue('string error');
+      await expect(analyzeListingData('Test Item', 'desc', 100)).rejects.toBe('string error');
+    });
 
+    test('should propagate rate limit errors', async () => {
+      mockCompleteAI.mockRejectedValue(new Error('rate limit reached for this model'));
       await expect(analyzeListingData('Test Item', 'desc', 100)).rejects.toThrow(
-        'Unknown error calling Claude API'
+        'rate limit reached for this model'
       );
     });
 
-    test('should handle error with rate limit in message but not status', async () => {
-      const mockCreate = jest
-        .fn()
-        .mockRejectedValue(new Error('rate limit reached for this model'));
-      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
-        messages: { create: mockCreate },
-      }));
-
+    test('should propagate 429 errors', async () => {
+      mockCompleteAI.mockRejectedValue(new Error('Error 429: too many requests'));
       await expect(analyzeListingData('Test Item', 'desc', 100)).rejects.toThrow(
-        'Claude API rate limit exceeded'
+        'Error 429: too many requests'
       );
     });
 
-    test('should handle error with 429 in message string', async () => {
-      const mockCreate = jest.fn().mockRejectedValue(new Error('Error 429: too many requests'));
-      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
-        messages: { create: mockCreate },
-      }));
-
+    test('should throw when AI response has no JSON', async () => {
+      mockCompleteAI.mockResolvedValue(makeAIResponse('No JSON here at all'));
       await expect(analyzeListingData('Test Item', 'desc', 100)).rejects.toThrow(
-        'Claude API rate limit exceeded'
-      );
-    });
-
-    test('should handle no text content in Claude response', async () => {
-      const mockCreate = jest.fn().mockResolvedValue({
-        content: [{ type: 'tool_use', id: '123', name: 'test', input: {} }],
-      });
-      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
-        messages: { create: mockCreate },
-      }));
-
-      await expect(analyzeListingData('Test Item', 'desc', 100)).rejects.toThrow(
-        'No text response from Claude'
+        'No JSON found in response'
       );
     });
   });
@@ -1318,11 +1047,7 @@ describe('Claude Analyzer', () => {
     };
 
     test('should default missing fields in parsed response', async () => {
-      const mockCreate = jest.fn().mockResolvedValue({
-        content: [
-          {
-            type: 'text',
-            text: mockValidResponse({
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockValidResponse({
               category: null,
               condition: null,
               keyFeatures: 'not-an-array',
@@ -1330,14 +1055,7 @@ describe('Claude Analyzer', () => {
               flippabilityScore: null,
               confidence: 'invalid-value',
               reasoning: null,
-            }),
-          },
-        ],
-      });
-      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
-        messages: { create: mockCreate },
-      }));
-
+            })));
       const result = await analyzeListingData('Test', 'desc', 50);
       expect(result.category).toBe('other');
       expect(result.condition).toBe('good');
@@ -1349,37 +1067,19 @@ describe('Claude Analyzer', () => {
     });
 
     test('should clamp flippabilityScore to 0-100 range', async () => {
-      const mockCreate = jest.fn().mockResolvedValue({
-        content: [{ type: 'text', text: mockValidResponse({ flippabilityScore: 150 }) }],
-      });
-      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
-        messages: { create: mockCreate },
-      }));
-
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockValidResponse({ flippabilityScore: 150 })));
       const result = await analyzeListingData('Test', 'desc', 50);
       expect(result.flippabilityScore).toBe(100);
     });
 
     test('should clamp negative flippabilityScore to 0', async () => {
-      const mockCreate = jest.fn().mockResolvedValue({
-        content: [{ type: 'text', text: mockValidResponse({ flippabilityScore: -10 }) }],
-      });
-      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
-        messages: { create: mockCreate },
-      }));
-
+      mockCompleteAI.mockResolvedValue(makeAIResponse(mockValidResponse({ flippabilityScore: -10 })));
       const result = await analyzeListingData('Test', 'desc', 50);
       expect(result.flippabilityScore).toBe(0);
     });
 
     test('should throw when response has no JSON', async () => {
-      const mockCreate = jest.fn().mockResolvedValue({
-        content: [{ type: 'text', text: 'This is just plain text with no JSON at all' }],
-      });
-      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
-        messages: { create: mockCreate },
-      }));
-
+      mockCompleteAI.mockResolvedValue(makeAIResponse('This is just plain text with no JSON at all'));
       await expect(analyzeListingData('Test', 'desc', 50)).rejects.toThrow(
         'Failed to parse Claude response'
       );
@@ -1436,15 +1136,11 @@ describe('Claude Analyzer', () => {
       });
 
       // Make the API call throw a non-Error
-      const mockCreate = jest.fn().mockRejectedValue('string error');
-      (Anthropic as unknown as jest.Mock).mockImplementation(() => ({
-        messages: { create: mockCreate },
-      }));
-
+      mockCompleteAI.mockRejectedValue('string error');
       const result = await batchAnalyzeListings(['bad-id']);
 
       expect(result.failed).toBe(1);
-      expect(result.errors[0].error).toBe('Unknown error calling Claude API');
+      expect(result.errors[0].error).toBe('Unknown error');
     });
   });
 });

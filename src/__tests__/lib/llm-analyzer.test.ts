@@ -1,7 +1,7 @@
 /**
  * LLM Analyzer Unit Tests
  *
- * Tests for OpenAI-based sellability analysis, including L1/L2 caching,
+ * Tests for AI-based sellability analysis, including L1/L2 caching,
  * cache helpers, quick discount check, and full analysis pipeline.
  */
 
@@ -9,17 +9,13 @@ import { describe, test, expect, jest, beforeEach } from '@jest/globals';
 
 // --- Module mocks (must be declared before imports) ---
 
-const mockCreate = jest.fn();
+const mockCompleteAI = jest.fn();
 
-jest.mock('openai', () => ({
-  __esModule: true,
-  default: jest.fn().mockImplementation(() => ({
-    chat: {
-      completions: {
-        create: mockCreate,
-      },
-    },
-  })),
+jest.mock('@/lib/ai', () => ({
+  completeAI: (...args: unknown[]) => mockCompleteAI(...args),
+  AIProviderUnavailableError: class extends Error {
+    constructor() { super('No AI provider available'); this.name = 'AIProviderUnavailableError'; }
+  },
 }));
 
 jest.mock('@sentry/nextjs', () => ({
@@ -54,11 +50,18 @@ import {
   analyzeSellability,
   quickDiscountCheck,
   runFullAnalysis,
+  isRefreshing,
+  setRefreshing,
   SellabilityAnalysis,
 } from '@/lib/llm-analyzer';
 import prisma from '@/lib/db';
 import type { ItemIdentification } from '@/lib/llm-identifier';
 import type { MarketPrice } from '@/lib/market-price';
+
+// Get the AIProviderUnavailableError class for test assertions
+const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as {
+  AIProviderUnavailableError: new () => Error;
+};
 
 // --- Test fixtures ---
 
@@ -111,7 +114,7 @@ const MOCK_ANALYSIS_RESULT: SellabilityAnalysis = {
   meetsThreshold: true,
 };
 
-const MOCK_OPENAI_JSON = JSON.stringify({
+const MOCK_AI_JSON = JSON.stringify({
   verifiedMarketValue: 335,
   trueDiscountPercent: 40,
   sellabilityScore: 80,
@@ -133,9 +136,8 @@ const MOCK_OPENAI_JSON = JSON.stringify({
 describe('LLM Analyzer', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCreate.mockReset();
+    mockCompleteAI.mockReset();
     mockCacheGet.mockReturnValue(undefined);
-    process.env.OPENAI_API_KEY = 'test-openai-key';
   });
 
   // ==========================================================
@@ -282,6 +284,65 @@ describe('LLM Analyzer', () => {
 
       expect(result.analysis).toBeNull(); // division by zero guard
     });
+
+    test('should bypass L1 and check L2 for price delta when currentAskingPrice is provided', async () => {
+      // L1 has a cached result
+      mockCacheGet.mockReturnValue(MOCK_ANALYSIS_RESULT);
+
+      // L2 has the entry with a different price
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue({
+        id: 'cache-id',
+        listingId: 'listing-l1-bypass',
+        analysisResult: JSON.stringify(MOCK_ANALYSIS_RESULT),
+        analyzedAtPrice: 200,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+      });
+
+      // Price dropped 20% from 200 to 160 → should invalidate despite L1 hit
+      const result = await getCachedSellabilityAnalysis('listing-l1-bypass', 160);
+
+      // Should have gone to L2 and detected the price change
+      expect(prisma.aiAnalysisCache.findFirst).toHaveBeenCalled();
+      expect(result.analysis).toBeNull();
+    });
+  });
+
+  // ==========================================================
+  // isRefreshing / setRefreshing deduplication lock
+  // ==========================================================
+
+  describe('isRefreshing / setRefreshing', () => {
+    test('should return false for a listing not being refreshed', () => {
+      expect(isRefreshing('listing-not-refreshing')).toBe(false);
+    });
+
+    test('should return true after marking a listing as refreshing', () => {
+      setRefreshing('listing-refresh-test', true);
+      expect(isRefreshing('listing-refresh-test')).toBe(true);
+      // Clean up
+      setRefreshing('listing-refresh-test', false);
+    });
+
+    test('should return false after clearing the refreshing flag', () => {
+      setRefreshing('listing-refresh-clear', true);
+      setRefreshing('listing-refresh-clear', false);
+      expect(isRefreshing('listing-refresh-clear')).toBe(false);
+    });
+
+    test('should track multiple listings independently', () => {
+      setRefreshing('listing-a', true);
+      setRefreshing('listing-b', true);
+
+      expect(isRefreshing('listing-a')).toBe(true);
+      expect(isRefreshing('listing-b')).toBe(true);
+
+      setRefreshing('listing-a', false);
+      expect(isRefreshing('listing-a')).toBe(false);
+      expect(isRefreshing('listing-b')).toBe(true);
+
+      // Clean up
+      setRefreshing('listing-b', false);
+    });
   });
 
   // ==========================================================
@@ -343,8 +404,8 @@ describe('LLM Analyzer', () => {
   // ==========================================================
 
   describe('analyzeSellability', () => {
-    test('should return null when OPENAI_API_KEY is not set', async () => {
-      delete process.env.OPENAI_API_KEY;
+    test('should return null when no AI provider is available', async () => {
+      mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
 
       const result = await analyzeSellability(
         'iPhone 12',
@@ -356,8 +417,14 @@ describe('LLM Analyzer', () => {
       expect(result).toBeNull();
     });
 
-    test('should return cached result when listingId and cache hit', async () => {
-      mockCacheGet.mockReturnValue(MOCK_ANALYSIS_RESULT);
+    test('should return cached result when listingId and L2 cache hit with matching price', async () => {
+      (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue({
+        id: 'cache-id',
+        listingId: 'listing-cached',
+        analysisResult: JSON.stringify(MOCK_ANALYSIS_RESULT),
+        analyzedAtPrice: 200,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+      });
 
       const result = await analyzeSellability(
         'iPhone 12',
@@ -369,15 +436,18 @@ describe('LLM Analyzer', () => {
         'listing-cached'
       );
 
-      expect(result).toEqual(MOCK_ANALYSIS_RESULT);
-      expect(mockCreate).not.toHaveBeenCalled();
+      expect(result).not.toBeNull();
+      expect(result!.sellabilityScore).toBe(MOCK_ANALYSIS_RESULT.sellabilityScore);
+      expect(mockCompleteAI).not.toHaveBeenCalled();
     });
 
-    test('should call OpenAI with response_format json_object and return parsed result', async () => {
+    test('should call completeAI with flipAnalysis and return parsed result', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
       (prisma.aiAnalysisCache.upsert as jest.Mock).mockResolvedValue({});
-      mockCreate.mockResolvedValue({
-        choices: [{ message: { content: MOCK_OPENAI_JSON }, finish_reason: 'stop' }],
+      mockCompleteAI.mockResolvedValue({
+        content: MOCK_AI_JSON,
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
 
       const result = await analyzeSellability(
@@ -394,18 +464,20 @@ describe('LLM Analyzer', () => {
       expect(result!.sellabilityScore).toBe(80);
       expect(result!.demandLevel).toBe('high');
       expect(result!.meetsThreshold).toBe(true);
-      expect(mockCreate).toHaveBeenCalledTimes(1);
-
-      // Verify response_format is passed
-      const callArgs = mockCreate.mock.calls[0][0];
-      expect(callArgs.response_format).toEqual({ type: 'json_object' });
+      expect(mockCompleteAI).toHaveBeenCalledTimes(1);
+      expect(mockCompleteAI).toHaveBeenCalledWith('flipAnalysis', expect.objectContaining({
+        title: 'iPhone 12',
+        askingPrice: 200,
+      }));
     });
 
     test('should cache result when listingId is provided', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
       (prisma.aiAnalysisCache.upsert as jest.Mock).mockResolvedValue({});
-      mockCreate.mockResolvedValue({
-        choices: [{ message: { content: MOCK_OPENAI_JSON }, finish_reason: 'stop' }],
+      mockCompleteAI.mockResolvedValue({
+        content: MOCK_AI_JSON,
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
 
       await analyzeSellability(
@@ -423,11 +495,17 @@ describe('LLM Analyzer', () => {
         'openai:listing-to-cache',
         expect.any(Object)
       );
+      // Verify askingPrice is passed to cache for price-delta invalidation
+      const upsertArgs = (prisma.aiAnalysisCache.upsert as jest.Mock).mock.calls[0][0];
+      expect(upsertArgs.create.analyzedAtPrice).toBe(200);
+      expect(upsertArgs.update.analyzedAtPrice).toBe(200);
     });
 
     test('should not cache result when no listingId provided', async () => {
-      mockCreate.mockResolvedValue({
-        choices: [{ message: { content: MOCK_OPENAI_JSON }, finish_reason: 'stop' }],
+      mockCompleteAI.mockResolvedValue({
+        content: MOCK_AI_JSON,
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
 
       await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
@@ -436,40 +514,58 @@ describe('LLM Analyzer', () => {
       expect(mockCacheSet).not.toHaveBeenCalled();
     });
 
-    test('should retry with simplified prompt when JSON parse fails', async () => {
+    test('should retry with quickDiscountCheck prompt when JSON parse fails', async () => {
       // First call returns invalid JSON, retry returns valid JSON
-      mockCreate
+      mockCompleteAI
         .mockResolvedValueOnce({
-          choices: [{ message: { content: 'Not valid JSON at all' }, finish_reason: 'stop' }],
+          content: 'Not valid JSON at all',
+          provider: 'gemini',
+          model: 'gemini-2.0-flash',
         })
         .mockResolvedValueOnce({
-          choices: [{ message: { content: MOCK_OPENAI_JSON }, finish_reason: 'stop' }],
+          content: MOCK_AI_JSON,
+          provider: 'gemini',
+          model: 'gemini-2.0-flash',
         });
 
       const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
 
       expect(result).not.toBeNull();
       expect(result!.sellabilityScore).toBe(80);
-      expect(mockCreate).toHaveBeenCalledTimes(2);
+      expect(mockCompleteAI).toHaveBeenCalledTimes(2);
+      expect(mockCompleteAI).toHaveBeenCalledWith('quickDiscountCheck', expect.any(Object));
     });
 
-    test('should return null when both parse attempts fail', async () => {
-      mockCreate
+    test('should return null and call Sentry.captureException when both parse attempts fail', async () => {
+      const Sentry = require('@sentry/nextjs');
+      mockCompleteAI
         .mockResolvedValueOnce({
-          choices: [{ message: { content: 'Not valid JSON' }, finish_reason: 'stop' }],
+          content: 'Not valid JSON',
+          provider: 'gemini',
+          model: 'gemini-2.0-flash',
         })
         .mockResolvedValueOnce({
-          choices: [{ message: { content: 'Still not JSON' }, finish_reason: 'stop' }],
+          content: 'Still not JSON',
+          provider: 'gemini',
+          model: 'gemini-2.0-flash',
         });
 
       const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
 
       expect(result).toBeNull();
+      expect(Sentry.captureException).toHaveBeenCalledWith(
+        expect.any(Error),
+        expect.objectContaining({
+          extra: expect.objectContaining({ originalResponse: 'Not valid JSON' }),
+        })
+      );
     });
 
-    test('should return null when response content is null', async () => {
-      mockCreate.mockResolvedValue({
-        choices: [{ message: { content: null }, finish_reason: 'stop' }],
+    test('should return null when response content is empty', async () => {
+      mockCompleteAI.mockResolvedValue({
+        content: '',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
 
       const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
@@ -477,9 +573,9 @@ describe('LLM Analyzer', () => {
       expect(result).toBeNull();
     });
 
-    test('should return null when OpenAI throws', async () => {
+    test('should return null when AI throws', async () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
-      mockCreate.mockRejectedValue(new Error('OpenAI API error'));
+      mockCompleteAI.mockRejectedValue(new Error('AI API error'));
 
       const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
 
@@ -487,25 +583,24 @@ describe('LLM Analyzer', () => {
     });
 
     test('should use default discountThreshold of 50 when not provided', async () => {
-      mockCreate.mockResolvedValue({
-        choices: [{ message: { content: MOCK_OPENAI_JSON }, finish_reason: 'stop' }],
+      mockCompleteAI.mockResolvedValue({
+        content: MOCK_AI_JSON,
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
 
       await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
 
-      const callArgs = mockCreate.mock.calls[0][0] as { messages: Array<{ content: string }> };
-      const userMessage = callArgs.messages[1].content;
-      expect(userMessage).toContain('50');
+      expect(mockCompleteAI).toHaveBeenCalledWith('flipAnalysis', expect.objectContaining({
+        discountThreshold: 50,
+      }));
     });
 
     test('should validate and default invalid demandLevel', async () => {
-      mockCreate.mockResolvedValue({
-        choices: [{
-          message: {
-            content: JSON.stringify({ ...JSON.parse(MOCK_OPENAI_JSON), demandLevel: 'invalid' }),
-          },
-          finish_reason: 'stop',
-        }],
+      mockCompleteAI.mockResolvedValue({
+        content: JSON.stringify({ ...JSON.parse(MOCK_AI_JSON), demandLevel: 'invalid' }),
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
 
       const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
@@ -515,13 +610,10 @@ describe('LLM Analyzer', () => {
     });
 
     test('should validate and default invalid authenticityRisk', async () => {
-      mockCreate.mockResolvedValue({
-        choices: [{
-          message: {
-            content: JSON.stringify({ ...JSON.parse(MOCK_OPENAI_JSON), authenticityRisk: 'extreme' }),
-          },
-          finish_reason: 'stop',
-        }],
+      mockCompleteAI.mockResolvedValue({
+        content: JSON.stringify({ ...JSON.parse(MOCK_AI_JSON), authenticityRisk: 'extreme' }),
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
 
       const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
@@ -531,13 +623,10 @@ describe('LLM Analyzer', () => {
     });
 
     test('should clamp sellabilityScore to 0-100', async () => {
-      mockCreate.mockResolvedValue({
-        choices: [{
-          message: {
-            content: JSON.stringify({ ...JSON.parse(MOCK_OPENAI_JSON), sellabilityScore: 150 }),
-          },
-          finish_reason: 'stop',
-        }],
+      mockCompleteAI.mockResolvedValue({
+        content: JSON.stringify({ ...JSON.parse(MOCK_AI_JSON), sellabilityScore: 150 }),
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
 
       const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
@@ -547,13 +636,10 @@ describe('LLM Analyzer', () => {
     });
 
     test('should use medianPrice as verifiedMarketValue fallback', async () => {
-      mockCreate.mockResolvedValue({
-        choices: [{
-          message: {
-            content: JSON.stringify({ ...JSON.parse(MOCK_OPENAI_JSON), verifiedMarketValue: null }),
-          },
-          finish_reason: 'stop',
-        }],
+      mockCompleteAI.mockResolvedValue({
+        content: JSON.stringify({ ...JSON.parse(MOCK_AI_JSON), verifiedMarketValue: null }),
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
 
       const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
@@ -563,13 +649,10 @@ describe('LLM Analyzer', () => {
     });
 
     test('meetsThreshold is false when not explicitly true', async () => {
-      mockCreate.mockResolvedValue({
-        choices: [{
-          message: {
-            content: JSON.stringify({ ...JSON.parse(MOCK_OPENAI_JSON), meetsThreshold: false }),
-          },
-          finish_reason: 'stop',
-        }],
+      mockCompleteAI.mockResolvedValue({
+        content: JSON.stringify({ ...JSON.parse(MOCK_AI_JSON), meetsThreshold: false }),
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
 
       const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
@@ -623,8 +706,8 @@ describe('LLM Analyzer', () => {
 
   describe('runFullAnalysis', () => {
     test('should return null when analyzeSellability returns null', async () => {
-      // No API key → analyzeSellability returns null
-      delete process.env.OPENAI_API_KEY;
+      // No AI provider → analyzeSellability returns null
+      mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
 
       const result = await runFullAnalysis(
         'iPhone 12',
@@ -639,8 +722,10 @@ describe('LLM Analyzer', () => {
     });
 
     test('should return full analysis result when analyzeSellability succeeds', async () => {
-      mockCreate.mockResolvedValue({
-        choices: [{ message: { content: MOCK_OPENAI_JSON }, finish_reason: 'stop' }],
+      mockCompleteAI.mockResolvedValue({
+        content: MOCK_AI_JSON,
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
 
       const result = await runFullAnalysis(

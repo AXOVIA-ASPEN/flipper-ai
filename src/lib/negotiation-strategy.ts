@@ -15,12 +15,12 @@
  * a 4-hour TTL. Follows the same patterns as message-generator.ts and llm-analyzer.ts.
  */
 
-import OpenAI from 'openai';
 import prisma from '@/lib/db';
 import { analysisCache } from '@/lib/cache';
 import { logger } from '@/lib/logger';
 import { metrics } from '@/lib/metrics';
 import { captureError } from '@/lib/error-tracker';
+import { completeAI, AIProviderUnavailableError } from '@/lib/ai';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -86,22 +86,6 @@ const PLATFORM_FEE_RATES: Record<string, number> = {
 
 const DEFAULT_FEE_RATE = 0.13;
 
-// ── OpenAI Singleton ─────────────────────────────────────────────────────────
-
-let openai: OpenAI | null = null;
-
-function getOpenAI(): OpenAI {
-  if (!openai) {
-    const apiKey = process.env.OPENAI_API_KEY;
-    /* istanbul ignore next -- callers guard this with process.env.OPENAI_API_KEY check */
-    if (!apiKey) {
-      throw new Error('OPENAI_API_KEY environment variable is not set');
-    }
-    openai = new OpenAI({ apiKey });
-  }
-  return openai;
-}
-
 // ── Cache ────────────────────────────────────────────────────────────────────
 
 export async function getCachedStrategy(
@@ -144,7 +128,8 @@ export async function getCachedStrategy(
 
 export async function cacheStrategy(
   listingId: string,
-  result: NegotiationStrategy
+  result: NegotiationStrategy,
+  askingPrice?: number
 ): Promise<void> {
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + NEGOTIATION_CACHE_TTL_HOURS);
@@ -156,10 +141,12 @@ export async function cacheStrategy(
         listingId,
         analysisType: 'negotiation',
         analysisResult: JSON.stringify(result),
+        analyzedAtPrice: askingPrice ?? null,
         expiresAt,
       },
       update: {
         analysisResult: JSON.stringify(result),
+        analyzedAtPrice: askingPrice ?? null,
         expiresAt,
       },
     });
@@ -194,90 +181,6 @@ function validateRecommendation(rec: unknown): 'accept' | 'counter' | 'walkaway'
   return typeof rec === 'string' && valid.includes(rec)
     ? (rec as 'accept' | 'counter' | 'walkaway')
     : 'counter';
-}
-
-// ── LLM Prompt ───────────────────────────────────────────────────────────────
-
-function buildNegotiationPrompt(input: NegotiationStrategyInput): string {
-  const marketValue = getMarketValue(input);
-  const feeRate = getFeeRate(input.platform);
-  const feePercent = Math.round(feeRate * 100);
-  const discountPercent =
-    marketValue > 0
-      ? Math.round(((marketValue - input.askingPrice) / marketValue) * 100)
-      : 0;
-
-  return `Analyze this marketplace listing and recommend an optimal negotiation strategy.
-
-LISTING ECONOMICS:
-- Asking Price: $${input.askingPrice}
-- Verified Market Value: ${input.verifiedMarketValue != null ? `$${input.verifiedMarketValue}` : 'N/A'}
-- Estimated Value: ${input.estimatedValue != null ? `$${input.estimatedValue}` : 'N/A'}
-- Discount from Market: ${discountPercent}%
-- Platform: ${input.platform} (${feePercent}% selling fees)
-
-ITEM SIGNALS:
-- Condition: ${input.condition || 'Unknown'}
-- Days Listed: ${input.daysListed != null ? input.daysListed : 'Unknown'}
-- Seller Says Negotiable: ${input.negotiable === true ? 'Yes' : input.negotiable === false ? 'No (firm price)' : 'Unknown'}
-- Demand Level: ${input.demandLevel || 'Unknown'}
-- Sellability Score: ${input.sellabilityScore != null ? `${input.sellabilityScore}/100` : 'Unknown'}
-
-CONSTRAINTS:
-- Platform fees: ${feePercent}%
-- Minimum profit target: $10 after fees
-- Walk-away price must ensure positive profit after resale fees
-
-Respond with ONLY valid JSON:
-{
-  "initialOfferPrice": <number>,
-  "walkAwayPrice": <number>,
-  "negotiationTactics": ["<tactic1>", "<tactic2>"],
-  "counterOfferSuggestions": [
-    {
-      "roundNumber": 1,
-      "ifSellerCountersAt": "<scenario description>",
-      "suggestedResponse": <number>,
-      "reasoning": "<why>"
-    }
-  ],
-  "confidence": "low|medium|high",
-  "reasoning": "<2-3 sentence explanation>"
-}`;
-}
-
-function buildCounterOfferPrompt(
-  input: NegotiationStrategyInput,
-  counterOfferPrice: number,
-  ourPreviousOffer: number
-): string {
-  const marketValue = getMarketValue(input);
-  const feeRate = getFeeRate(input.platform);
-  const feePercent = Math.round(feeRate * 100);
-  const profitAtCounter = Math.round(marketValue * (1 - feeRate) - counterOfferPrice);
-
-  return `Analyze this seller counter-offer and recommend whether to accept, counter, or walk away.
-
-CONTEXT:
-- Asking Price: $${input.askingPrice}
-- Our Previous Offer: $${ourPreviousOffer}
-- Seller Counter-Offer: $${counterOfferPrice}
-- Verified Market Value: ${input.verifiedMarketValue != null ? `$${input.verifiedMarketValue}` : 'N/A'}
-- Estimated Value: ${input.estimatedValue != null ? `$${input.estimatedValue}` : 'N/A'}
-- Platform Fees: ${feePercent}%
-- Estimated Profit at Counter Price: $${profitAtCounter}
-- Demand Level: ${input.demandLevel || 'Unknown'}
-- Days Listed: ${input.daysListed != null ? input.daysListed : 'Unknown'}
-- Negotiable: ${input.negotiable === true ? 'Yes' : input.negotiable === false ? 'No' : 'Unknown'}
-
-Respond with ONLY valid JSON:
-{
-  "recommendation": "accept|counter|walkaway",
-  "suggestedCounterPrice": <number or null>,
-  "reasoning": "<2-3 sentence explanation>",
-  "confidence": "low|medium|high",
-  "profitAtThisPrice": <number>
-}`;
 }
 
 // ── LLM Response Validation ──────────────────────────────────────────────────
@@ -569,39 +472,32 @@ export async function generateNegotiationStrategy(
   const cached = await getCachedStrategy(input.listingId);
   if (cached) return cached;
 
-  // No API key → fallback immediately
-  if (!process.env.OPENAI_API_KEY) {
-    metrics.increment('negotiation_fallback_used');
-    const fallback = applyMarketDataFreshnessCheck(
-      generateFallbackStrategy(input),
-      input.marketDataDate
-    );
-    await cacheStrategy(input.listingId, fallback);
-    return fallback;
-  }
-
   const end = logger.timed('negotiation_strategy_generation');
 
   try {
-    const client = getOpenAI();
-    const prompt = buildNegotiationPrompt(input);
+    const marketValue = getMarketValue(input);
+    const feeRate = getFeeRate(input.platform);
+    const feePercent = Math.round(feeRate * 100);
+    const discountPercent =
+      marketValue > 0
+        ? Math.round(((marketValue - input.askingPrice) / marketValue) * 100)
+        : 0;
 
-    const response = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You are an expert marketplace negotiation strategist. Analyze the listing economics and seller signals to recommend an optimal offer strategy. Base your recommendations on verified market data, item condition, and listing age. Always respond with valid JSON only. Be conservative — it is better to offer slightly too low than overpay.',
-        },
-        { role: 'user', content: prompt },
-      ],
-      temperature: 0.3,
-      max_tokens: 600,
+    const response = await completeAI('negotiationStrategy', {
+      askingPrice: input.askingPrice,
+      verifiedMarketValue: input.verifiedMarketValue,
+      estimatedValue: input.estimatedValue,
+      platform: input.platform,
+      feePercent,
+      discountPercent,
+      condition: input.condition,
+      daysListed: input.daysListed,
+      negotiable: input.negotiable,
+      demandLevel: input.demandLevel,
+      sellabilityScore: input.sellabilityScore,
     });
 
-    /* istanbul ignore next -- ?.content short-circuit only if API returns malformed structure */
-    const responseText = response.choices[0]?.message?.content || '';
+    const responseText = response.content;
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       logger.warn('Failed to extract JSON from negotiation strategy response', {
@@ -613,7 +509,7 @@ export async function generateNegotiationStrategy(
         generateFallbackStrategy(input),
         input.marketDataDate
       );
-      await cacheStrategy(input.listingId, fallback);
+      await cacheStrategy(input.listingId, fallback, input.askingPrice);
       end();
       return fallback;
     }
@@ -625,10 +521,20 @@ export async function generateNegotiationStrategy(
     );
 
     metrics.increment('negotiation_strategy_generated');
-    await cacheStrategy(input.listingId, strategy);
+    await cacheStrategy(input.listingId, strategy, input.askingPrice);
     end();
     return strategy;
   } catch (error) {
+    if (error instanceof AIProviderUnavailableError) {
+      metrics.increment('negotiation_fallback_used');
+      const fallback = applyMarketDataFreshnessCheck(
+        generateFallbackStrategy(input),
+        input.marketDataDate
+      );
+      await cacheStrategy(input.listingId, fallback, input.askingPrice);
+      end();
+      return fallback;
+    }
     logger.error('Negotiation strategy generation failed, using fallback', {
       listingId: input.listingId,
       /* istanbul ignore next -- tests always throw Error instances */
@@ -647,7 +553,7 @@ export async function generateNegotiationStrategy(
       generateFallbackStrategy(input),
       input.marketDataDate
     );
-    await cacheStrategy(input.listingId, fallback);
+    await cacheStrategy(input.listingId, fallback, input.askingPrice);
     end();
     return fallback;
   }
@@ -658,34 +564,28 @@ export async function analyzeCounterOffer(
   counterOfferPrice: number,
   ourPreviousOffer: number
 ): Promise<CounterOfferAnalysis> {
-  // No API key → fallback immediately
-  if (!process.env.OPENAI_API_KEY) {
-    metrics.increment('negotiation_counter_offer_analyzed');
-    return generateFallbackCounterAnalysis(input, counterOfferPrice, ourPreviousOffer);
-  }
-
   const end = logger.timed('negotiation_counter_offer_analysis');
 
   try {
-    const client = getOpenAI();
-    const prompt = buildCounterOfferPrompt(input, counterOfferPrice, ourPreviousOffer);
+    const marketValue = getMarketValue(input);
+    const feeRate = getFeeRate(input.platform);
+    const feePercent = Math.round(feeRate * 100);
+    const profitAtCounter = Math.round(marketValue * (1 - feeRate) - counterOfferPrice);
 
-    const response = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You are an expert marketplace negotiation strategist. Analyze counter-offers and recommend whether to accept, counter, or walk away. Always respond with valid JSON only. Be conservative.',
-        },
-        { role: 'user', content: prompt },
-      ],
-      temperature: 0.3,
-      max_tokens: 400,
+    const response = await completeAI('counterOfferAnalysis', {
+      askingPrice: input.askingPrice,
+      ourPreviousOffer,
+      counterOfferPrice,
+      verifiedMarketValue: input.verifiedMarketValue,
+      estimatedValue: input.estimatedValue,
+      feePercent,
+      profitAtCounter,
+      demandLevel: input.demandLevel,
+      daysListed: input.daysListed,
+      negotiable: input.negotiable,
     });
 
-    /* istanbul ignore next -- ?.content short-circuit only if API returns malformed structure */
-    const responseText = response.choices[0]?.message?.content || '';
+    const responseText = response.content;
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       logger.warn('Failed to extract JSON from counter-offer analysis response', {
@@ -703,6 +603,11 @@ export async function analyzeCounterOffer(
     end();
     return analysis;
   } catch (error) {
+    if (error instanceof AIProviderUnavailableError) {
+      metrics.increment('negotiation_counter_offer_analyzed');
+      end();
+      return generateFallbackCounterAnalysis(input, counterOfferPrice, ourPreviousOffer);
+    }
     logger.error('Counter-offer analysis failed, using fallback', {
       listingId: input.listingId,
       /* istanbul ignore next -- tests always throw Error instances */

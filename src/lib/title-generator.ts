@@ -2,7 +2,7 @@
 // Generates SEO-optimized resale listing titles from item data
 // Supports multiple marketplace formats with character limits
 
-import OpenAI from 'openai';
+import { completeAI, AIProviderUnavailableError } from '@/lib/ai';
 import type { ItemIdentification } from './llm-identifier';
 
 export interface TitleGeneratorInput {
@@ -134,47 +134,18 @@ export async function generateLLMTitle(
 ): Promise<GeneratedTitle> {
   const limit = PLATFORM_LIMITS[platform] || 80;
 
-  if (!process.env.OPENAI_API_KEY) {
-    return generateAlgorithmicTitle(input, platform);
-  }
-
   try {
-    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-    const prompt = `Generate a single SEO-optimized resale listing title for ${platform}.
-
-Item Details:
-- Brand: ${input.brand || 'Unknown'}
-- Model: ${input.model || 'Unknown'}
-- Variant: ${input.variant || 'N/A'}
-- Condition: ${input.condition}
-- Category: ${input.category || 'General'}
-
-Rules:
-- MUST be ${limit} characters or fewer
-- Include brand and model prominently
-- Use keywords buyers search for
-- Include condition indicator
-- No emojis, no ALL CAPS (except brand acronyms)
-- No clickbait or misleading terms
-
-Respond with ONLY the title text, nothing else.`;
-
-    const response = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You are an expert eBay/marketplace seller who writes high-converting listing titles.',
-        },
-        { role: 'user', content: prompt },
-      ],
-      temperature: 0.4,
-      max_tokens: 100,
+    const response = await completeAI('listingTitle', {
+      platform,
+      brand: input.brand || 'Unknown',
+      model: input.model || 'Unknown',
+      variant: input.variant || 'N/A',
+      condition: input.condition,
+      category: input.category || 'General',
+      charLimit: limit,
     });
 
-    let title = (response.choices[0]?.message?.content || '').trim();
+    let title = response.content.trim();
 
     // Strip quotes if the LLM wrapped it
     title = title.replace(/^["']|["']$/g, '');
@@ -197,6 +168,9 @@ Respond with ONLY the title text, nothing else.`;
       keywords,
     };
   } catch (error) {
+    if (error instanceof AIProviderUnavailableError) {
+      return generateAlgorithmicTitle(input, platform);
+    }
     console.error('LLM title generation failed, using algorithmic:', error);
     return generateAlgorithmicTitle(input, platform);
   }

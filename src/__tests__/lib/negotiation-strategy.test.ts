@@ -13,15 +13,18 @@
 // factory callbacks even though jest.mock is hoisted to the top of the file.
 // ---------------------------------------------------------------------------
 
-const mockCreate = jest.fn();
-const mockOpenAIConstructor = jest.fn().mockImplementation(() => ({
-  chat: { completions: { create: mockCreate } },
+const mockCompleteAI = jest.fn();
+
+jest.mock('@/lib/ai', () => ({
+  completeAI: (...args: unknown[]) => mockCompleteAI(...args),
+  AIProviderUnavailableError: class extends Error {
+    constructor() { super('No AI provider available'); this.name = 'AIProviderUnavailableError'; }
+  },
 }));
 
-jest.mock('openai', () => ({
-  __esModule: true,
-  default: mockOpenAIConstructor,
-}));
+const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as {
+  AIProviderUnavailableError: new () => Error;
+};
 
 jest.mock('@/lib/db', () => ({
   __esModule: true,
@@ -287,15 +290,14 @@ describe('negotiation-strategy', () => {
   // generateNegotiationStrategy — no API key (fallback path)
   // -------------------------------------------------------------------------
 
-  describe('generateNegotiationStrategy() — no OPENAI_API_KEY', () => {
+  describe('generateNegotiationStrategy() — no AI provider', () => {
     beforeEach(() => {
-      delete process.env.OPENAI_API_KEY;
+      mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
     });
 
-    it('returns fallback strategy without calling OpenAI', async () => {
+    it('returns fallback strategy when no AI provider is available', async () => {
       const result = await generateNegotiationStrategy(makeInput({ listingId: 'fallback-1' }));
       expect(result.isFallback).toBe(true);
-      expect(mockOpenAIConstructor).not.toHaveBeenCalled();
     });
 
     it('returns cached strategy from L1 cache when available', async () => {
@@ -304,7 +306,7 @@ describe('negotiation-strategy', () => {
 
       const result = await generateNegotiationStrategy(makeInput({ listingId: 'cached-1' }));
       expect(result).toBe(cached);
-      expect(mockOpenAIConstructor).not.toHaveBeenCalled();
+      expect(mockCompleteAI).not.toHaveBeenCalled();
     });
 
     it('applies market data freshness downgrade for old data (>14 days)', async () => {
@@ -324,37 +326,13 @@ describe('negotiation-strategy', () => {
   // generateNegotiationStrategy — with API key (OpenAI singleton + error paths)
   // -------------------------------------------------------------------------
 
-  describe('generateNegotiationStrategy() — with OPENAI_API_KEY', () => {
-    const API_KEY = 'test-openai-key-xyz';
-
-    beforeEach(() => {
-      process.env.OPENAI_API_KEY = API_KEY;
-    });
-
-    afterEach(() => {
-      delete process.env.OPENAI_API_KEY;
-    });
-
-    it('creates OpenAI singleton on first call and returns fallback when API throws', async () => {
-      mockCreate.mockRejectedValueOnce(new Error('OpenAI API error'));
+  describe('generateNegotiationStrategy() — with AI available', () => {
+    it('returns fallback when AI call throws generic error', async () => {
+      mockCompleteAI.mockRejectedValueOnce(new Error('AI API error'));
 
       const result = await generateNegotiationStrategy(makeInput({ listingId: 'api-create-1' }));
 
       expect(result.isFallback).toBe(true);
-      expect(mockOpenAIConstructor).toHaveBeenCalledWith({ apiKey: API_KEY });
-    });
-
-    it('reuses OpenAI singleton on subsequent call without calling constructor again', async () => {
-      // After the previous test created the singleton, clearAllMocks() resets
-      // call counts but the module-level 'openai' variable persists.
-      // This test verifies the constructor is NOT called a second time.
-      mockCreate.mockRejectedValueOnce(new Error('OpenAI API error 2'));
-
-      const result = await generateNegotiationStrategy(makeInput({ listingId: 'api-create-2' }));
-
-      expect(result.isFallback).toBe(true);
-      // Constructor NOT called — singleton from previous test was reused
-      expect(mockOpenAIConstructor).not.toHaveBeenCalled();
     });
 
     it('parses valid JSON LLM response and returns non-fallback strategy', async () => {
@@ -373,8 +351,10 @@ describe('negotiation-strategy', () => {
         confidence: 'high',
         reasoning: 'Strong deal based on market data.',
       };
-      mockCreate.mockResolvedValueOnce({
-        choices: [{ message: { content: JSON.stringify(llmPayload) } }],
+      mockCompleteAI.mockResolvedValueOnce({
+        content: JSON.stringify(llmPayload),
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
 
       const result = await generateNegotiationStrategy(makeInput({ listingId: 'api-create-3' }));
@@ -385,8 +365,10 @@ describe('negotiation-strategy', () => {
     });
 
     it('falls back when LLM response contains no JSON block', async () => {
-      mockCreate.mockResolvedValueOnce({
-        choices: [{ message: { content: 'Sorry, I cannot help with that.' } }],
+      mockCompleteAI.mockResolvedValueOnce({
+        content: 'Sorry, I cannot help with that.',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
 
       const result = await generateNegotiationStrategy(makeInput({ listingId: 'api-create-4' }));
@@ -394,11 +376,11 @@ describe('negotiation-strategy', () => {
       expect(result.isFallback).toBe(true);
     });
 
-    it('builds prompt with all-null optional fields (N/A and Unknown branches)', async () => {
-      // Input with no verifiedMarketValue, estimatedValue, daysListed, sellabilityScore, negotiable
-      // This exercises the null/undefined branches in buildNegotiationPrompt template
-      mockCreate.mockResolvedValueOnce({
-        choices: [{ message: { content: '{ "bad": true }' } }],
+    it('handles all-null optional fields (N/A and Unknown branches)', async () => {
+      mockCompleteAI.mockResolvedValueOnce({
+        content: '{ "bad": true }',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
 
       const result = await generateNegotiationStrategy(
@@ -414,13 +396,14 @@ describe('negotiation-strategy', () => {
         })
       );
 
-      // Prompt was built (strategy returned) — we don't assert exact content, just that it ran
       expect(result).toBeDefined();
     });
 
-    it('builds prompt with negotiable=false and daysListed=0 (edge branches)', async () => {
-      mockCreate.mockResolvedValueOnce({
-        choices: [{ message: { content: '{ "bad": true }' } }],
+    it('handles negotiable=false and daysListed=0 (edge branches)', async () => {
+      mockCompleteAI.mockResolvedValueOnce({
+        content: '{ "bad": true }',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
 
       const result = await generateNegotiationStrategy(
@@ -444,8 +427,10 @@ describe('negotiation-strategy', () => {
         confidence: 'high',
         profitAtThisPrice: 20,
       };
-      mockCreate.mockResolvedValueOnce({
-        choices: [{ message: { content: JSON.stringify(payload) } }],
+      mockCompleteAI.mockResolvedValueOnce({
+        content: JSON.stringify(payload),
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
 
       const result = await analyzeCounterOffer(makeInput({ listingId: 'counter-llm-1' }), 90, 70);
@@ -454,8 +439,10 @@ describe('negotiation-strategy', () => {
     });
 
     it('falls back when analyzeCounterOffer LLM response has no JSON', async () => {
-      mockCreate.mockResolvedValueOnce({
-        choices: [{ message: { content: 'No JSON here.' } }],
+      mockCompleteAI.mockResolvedValueOnce({
+        content: 'No JSON here.',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
 
       const result = await analyzeCounterOffer(makeInput({ listingId: 'counter-llm-2' }), 90, 70);
@@ -463,13 +450,13 @@ describe('negotiation-strategy', () => {
     });
 
     it('falls back when analyzeCounterOffer LLM call throws', async () => {
-      mockCreate.mockRejectedValueOnce(new Error('Counter API error'));
+      mockCompleteAI.mockRejectedValueOnce(new Error('Counter API error'));
 
       const result = await analyzeCounterOffer(makeInput({ listingId: 'counter-llm-3' }), 90, 70);
       expect(['accept', 'counter', 'walkaway']).toContain(result.recommendation);
     });
 
-    it('analyzeCounterOffer builds prompt with null optional fields', async () => {
+    it('analyzeCounterOffer handles null optional fields', async () => {
       const payload = {
         recommendation: 'accept',
         suggestedCounterPrice: null,
@@ -477,8 +464,10 @@ describe('negotiation-strategy', () => {
         confidence: 'low',
         profitAtThisPrice: 5,
       };
-      mockCreate.mockResolvedValueOnce({
-        choices: [{ message: { content: JSON.stringify(payload) } }],
+      mockCompleteAI.mockResolvedValueOnce({
+        content: JSON.stringify(payload),
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
 
       const result = await analyzeCounterOffer(
@@ -492,7 +481,6 @@ describe('negotiation-strategy', () => {
         }),
         90, 70
       );
-      // recommendation='accept' means suggestedCounterPrice stays null (else branch)
       expect(result.recommendation).toBe('accept');
       expect(result.suggestedCounterPrice).toBeNull();
     });
@@ -508,16 +496,18 @@ describe('negotiation-strategy', () => {
         confidence: 'medium',
         reasoning: '',
       };
-      mockCreate.mockResolvedValueOnce({
-        choices: [{ message: { content: JSON.stringify(payload) } }],
+      mockCompleteAI.mockResolvedValueOnce({
+        content: JSON.stringify(payload),
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
       });
 
       const result = await generateNegotiationStrategy(
         makeInput({ listingId: 'sparse-suggestions-1' })
       );
       expect(result.counterOfferSuggestions).toHaveLength(1);
-      expect(result.counterOfferSuggestions[0].roundNumber).toBe(1); // fallback: 0 || i+1
-      expect(result.counterOfferSuggestions[0].ifSellerCountersAt).toBe(''); // fallback: null || ''
+      expect(result.counterOfferSuggestions[0].roundNumber).toBe(1);
+      expect(result.counterOfferSuggestions[0].ifSellerCountersAt).toBe('');
     });
   });
 
@@ -569,15 +559,11 @@ describe('negotiation-strategy', () => {
   // analyzeCounterOffer — no API key
   // -------------------------------------------------------------------------
 
-  describe('analyzeCounterOffer() — no OPENAI_API_KEY', () => {
-    beforeEach(() => {
-      delete process.env.OPENAI_API_KEY;
-    });
-
-    it('returns fallback analysis immediately without calling OpenAI', async () => {
+  describe('analyzeCounterOffer() — no AI provider', () => {
+    it('returns fallback analysis immediately when no AI provider is available', async () => {
+      mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
       const result = await analyzeCounterOffer(makeInput(), 90, 70);
       expect(['accept', 'counter', 'walkaway']).toContain(result.recommendation);
-      expect(mockOpenAIConstructor).not.toHaveBeenCalled();
     });
   });
 });

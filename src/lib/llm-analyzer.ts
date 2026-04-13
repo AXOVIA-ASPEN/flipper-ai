@@ -1,11 +1,23 @@
-// LLM-powered sellability analysis
-// Given item identification and market data, assess flip potential using OpenAI ChatGPT
+/**
+ * @file src/lib/llm-analyzer.ts
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2025-12-22
+ * @version 1.2
+ * @brief LLM-powered sellability analysis for marketplace listings.
+ *
+ * @description
+ * Given item identification and market data, assesses flip potential using
+ * OpenAI GPT-4o-mini (primary) or Google Gemini (fallback). Implements
+ * two-layer caching (L1 in-memory LRU, L2 database with 24h TTL),
+ * price-delta cache invalidation, background refresh for stale entries,
+ * and truncation-aware retry logic with Sentry error reporting.
+ */
 
-import OpenAI from 'openai';
 import * as Sentry from '@sentry/nextjs';
 import prisma from '@/lib/db';
 import { analysisCache } from '@/lib/cache';
-import { isGeminiFallbackAvailable, geminiGenerateJSON } from '@/lib/gemini-client';
+import { completeAI, AIProviderUnavailableError } from '@/lib/ai';
 import type { ItemIdentification } from './llm-identifier';
 import type { MarketPrice, SoldListing } from './market-price';
 
@@ -41,54 +53,6 @@ export interface SellabilityAnalysis {
   meetsThreshold: boolean; // True if listing meets the configured discount threshold
 }
 
-function buildAnalysisPrompt(discountThreshold: number, feeRate: number = 0.13): string {
-  const feePercent = Math.round(feeRate * 100);
-  return `You are an expert reseller analyzing a marketplace listing for flip potential.
-
-LISTING DETAILS:
-- Title: {title}
-- Asking Price: ${'{askingPrice}'}
-- Identified as: {brand} {model} {variant}
-- Condition: {condition} ({conditionNotes})
-
-MARKET DATA (from eBay sold listings, outliers removed via IQR filtering):
-- Median Sold Price: ${'{medianPrice}'}
-- Price Range: ${'{lowPrice}'} - ${'{highPrice}'}
-- Recent Sales Count: {salesCount}
-- Outliers Removed: {outliersRemoved}
-- Sample Sold Listings:
-{soldListingsText}
-
-TASK:
-Analyze this opportunity and provide a detailed assessment. The listing must be at least ${discountThreshold}% below market value to be considered a good opportunity.
-
-RESPOND WITH ONLY VALID JSON:
-{
-  "verifiedMarketValue": <number - your estimate of true market value based on sold data>,
-  "trueDiscountPercent": <number - percentage below market value>,
-  "sellabilityScore": <0-100 - how easily this will sell>,
-  "demandLevel": "low|medium|high|very_high",
-  "expectedDaysToSell": <number - estimated days to sell>,
-  "authenticityRisk": "low|medium|high",
-  "conditionRisk": "low|medium|high",
-  "recommendedOfferPrice": <number - what to offer the seller>,
-  "recommendedListPrice": <number - what to list it for on eBay/Mercari>,
-  "resaleStrategy": "<brief strategy - where and how to sell>",
-  "resalePlatform": "ebay|mercari|facebook|offerup",
-  "confidence": "low|medium|high",
-  "reasoning": "<2-3 sentence explanation of your assessment>",
-  "meetsThreshold": <true if ${discountThreshold}%+ undervalued, false otherwise>
-}
-
-GUIDELINES:
-- verifiedMarketValue should be based on the median sold price, adjusted for condition
-- trueDiscountPercent = ((verifiedMarketValue - askingPrice) / verifiedMarketValue) * 100
-- meetsThreshold = true ONLY if trueDiscountPercent >= ${discountThreshold}
-- Be conservative with value estimates - use lower end for worn items
-- Factor in ${feePercent}% platform fees when recommending list price
-- Consider shipping costs for large/heavy items`;
-}
-
 export interface CacheResult {
   analysis: SellabilityAnalysis | null;
   staleAnalysis: boolean;
@@ -118,11 +82,13 @@ export async function getCachedSellabilityAnalysis(
   listingId: string,
   currentAskingPrice?: number
 ): Promise<CacheResult> {
-  // L1: in-memory LRU cache — L1 has a short TTL so if it's there, serve it
-  // (L1 doesn't store analyzedAtPrice, so we can't do delta check from L1 alone;
-  //  the L2 delta check runs on the next L1 miss, keeping staleness bounded)
-  const l1 = analysisCache.get(L1_KEY(listingId)) as SellabilityAnalysis | undefined;
-  if (l1) return { analysis: l1, staleAnalysis: false };
+  // L1: in-memory LRU cache — only use L1 shortcut when no price delta check needed.
+  // When currentAskingPrice is provided, skip L1 and go to L2 where analyzedAtPrice is stored
+  // so we can properly detect price changes and invalidate/flag stale entries.
+  if (currentAskingPrice === undefined) {
+    const l1 = analysisCache.get(L1_KEY(listingId)) as SellabilityAnalysis | undefined;
+    if (l1) return { analysis: l1, staleAnalysis: false };
+  }
 
   // L2: database cache
   try {
@@ -219,20 +185,6 @@ export async function cacheSellabilityAnalysis(
   }
 }
 
-let openai: OpenAI | null = null;
-
-function getOpenAI(): OpenAI {
-  if (!openai) {
-    const apiKey = process.env.OPENAI_API_KEY;
-    /* istanbul ignore next -- defensive guard; singleton already set before key-deletion tests */
-    if (!apiKey) {
-      throw new Error('OPENAI_API_KEY environment variable is not set');
-    }
-    openai = new OpenAI({ apiKey });
-  }
-  return openai;
-}
-
 /**
  * Run the LLM analysis without checking cache first. Used for background refresh
  * when a stale cache result was already served to the caller.
@@ -257,10 +209,11 @@ export async function analyzeSellability(
   discountThreshold?: number,
   feeRate?: number,
   listingId?: string,
-  _skipCacheCheck = false
+  /** @internal Used by background refresh to skip cache check and avoid recursion. */
+  skipCacheCheck = false
 ): Promise<SellabilityAnalysis | null> {
   // Check cache FIRST — cached results are valid regardless of which provider generated them
-  if (listingId && !_skipCacheCheck) {
+  if (listingId && !skipCacheCheck) {
     const { analysis: cached, staleAnalysis } = await getCachedSellabilityAnalysis(listingId, askingPrice);
     if (cached && !staleAnalysis) return cached;
     if (cached && staleAnalysis) {
@@ -275,14 +228,6 @@ export async function analyzeSellability(
     }
   }
 
-  // Determine provider: OpenAI (primary) → Gemini (fallback) → null (skip)
-  const useGeminiFallback = !process.env.OPENAI_API_KEY && isGeminiFallbackAvailable();
-
-  if (!process.env.OPENAI_API_KEY && !useGeminiFallback) {
-    console.log('Neither OPENAI_API_KEY nor GOOGLE_API_KEY set, skipping LLM analysis');
-    return null;
-  }
-
   const effectiveThreshold = discountThreshold ?? 50;
 
   try {
@@ -292,78 +237,26 @@ export async function analyzeSellability(
       .map((l) => `  - "${l.title}" sold for $${l.price} (${l.condition})`)
       .join('\n');
 
-    const prompt = buildAnalysisPrompt(effectiveThreshold, feeRate ?? 0.13).replace('{title}', title)
-      .replace('{askingPrice}', askingPrice.toString())
-      .replace('{brand}', identification.brand || 'Unknown')
-      .replace('{model}', identification.model || 'Unknown')
-      .replace('{variant}', identification.variant || '')
-      .replace('{condition}', identification.condition)
-      .replace('{conditionNotes}', identification.conditionNotes)
-      .replace('{medianPrice}', marketData.medianPrice.toString())
-      .replace('{lowPrice}', marketData.lowPrice.toString())
-      .replace('{highPrice}', marketData.highPrice.toString())
-      .replace('{salesCount}', marketData.salesCount.toString())
-      .replace('{outliersRemoved}', (marketData.outliersRemoved ?? 0).toString())
-      .replace('{soldListingsText}', soldListingsText);
-
-    // Gemini fallback path — use Gemini when OpenAI key is unavailable
-    if (useGeminiFallback) {
-      const parsed = await geminiGenerateJSON<Record<string, unknown>>(
-        prompt,
-        'You are a resale market expert. Always respond with valid JSON only, no markdown formatting.'
-      );
-      return buildResult(parsed, askingPrice, marketData, listingId);
-    }
-
-    // Primary path — OpenAI
-    const client = getOpenAI();
-
-    const messages: OpenAI.ChatCompletionMessageParam[] = [
-      {
-        role: 'system',
-        content:
-          'You are a resale market expert. Always respond with valid JSON only, no markdown formatting.',
-      },
-      {
-        role: 'user',
-        content: prompt,
-      },
-    ];
-
-    const response = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages,
-      temperature: 0.3,
-      max_tokens: 800,
-      response_format: { type: 'json_object' },
+    const response = await completeAI('flipAnalysis', {
+      title,
+      askingPrice,
+      brand: identification.brand || 'Unknown',
+      model: identification.model || 'Unknown',
+      variant: identification.variant || '',
+      condition: identification.condition,
+      conditionNotes: identification.conditionNotes,
+      medianPrice: marketData.medianPrice,
+      lowPrice: marketData.lowPrice,
+      highPrice: marketData.highPrice,
+      salesCount: marketData.salesCount,
+      outliersRemoved: marketData.outliersRemoved,
+      lowSampleSize: marketData.lowSampleSize,
+      soldListingsText,
+      discountThreshold: effectiveThreshold,
+      feeRate: feeRate ?? 0.13,
     });
 
-    // Check for truncation (finish_reason: 'length' means max_tokens was hit)
-    const finishReason = response.choices[0]?.finish_reason;
-    if (finishReason === 'length') {
-      console.warn('LLM analysis response truncated (max_tokens reached). Retrying with higher limit.');
-      const retryResponse = await client.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages,
-        temperature: 0.3,
-        max_tokens: 1200,
-        response_format: { type: 'json_object' },
-      });
-      const retryText = retryResponse.choices[0]?.message?.content;
-      if (!retryText) return null;
-      try {
-        const retryParsed = JSON.parse(retryText);
-        return buildResult(retryParsed, askingPrice, marketData, listingId);
-      } catch {
-        Sentry.captureException(new Error('LLM analysis JSON parse failed after truncation retry'), {
-          extra: { responseText: retryText, listingId },
-        });
-        return null;
-      }
-    }
-
-    /* istanbul ignore next -- defensive fallback for empty/null API response content */
-    const responseText = response.choices[0]?.message?.content;
+    const responseText = response.content;
     if (!responseText) {
       return null;
     }
@@ -375,17 +268,12 @@ export async function analyzeSellability(
       // Retry once with simplified prompt
       console.warn('LLM analysis JSON parse failed, retrying with simplified prompt');
       try {
-        const retryResponse = await client.chat.completions.create({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: 'You are a resale market expert. Respond with valid JSON only.' },
-            { role: 'user', content: `Analyze this listing and return ONLY a JSON object: "${title}" at $${askingPrice}. Market median: $${marketData.medianPrice}. Include fields: verifiedMarketValue, trueDiscountPercent, sellabilityScore (0-100), demandLevel, expectedDaysToSell, authenticityRisk, conditionRisk, recommendedOfferPrice, recommendedListPrice, resaleStrategy, resalePlatform, confidence, reasoning, meetsThreshold.` },
-          ],
-          temperature: 0.3,
-          max_tokens: 800,
-          response_format: { type: 'json_object' },
+        const retryResponse = await completeAI('quickDiscountCheck', {
+          title,
+          askingPrice,
+          medianPrice: marketData.medianPrice,
         });
-        const retryText = retryResponse.choices[0]?.message?.content;
+        const retryText = retryResponse.content;
         if (!retryText) return null;
         parsed = JSON.parse(retryText);
       } catch (retryError) {
@@ -398,6 +286,10 @@ export async function analyzeSellability(
 
     return buildResult(parsed, askingPrice, marketData, listingId);
   } catch (error) {
+    if (error instanceof AIProviderUnavailableError) {
+      console.log('No AI provider available, skipping LLM analysis');
+      return null;
+    }
     console.error('LLM analysis error:', error);
     return null;
   }
@@ -429,7 +321,7 @@ async function buildResult(
 
   // Cache the result when listingId is provided
   if (listingId) {
-    await cacheSellabilityAnalysis(listingId, result);
+    await cacheSellabilityAnalysis(listingId, result, askingPrice);
   }
 
   return result;

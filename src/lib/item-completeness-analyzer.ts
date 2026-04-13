@@ -1,7 +1,7 @@
 // Story 5.4: Item completeness analysis via GPT-4o Vision
-// Uses OpenAI Vision API to assess item completeness from listing images and description.
+// Uses centralized AI module to assess item completeness from listing images and description.
 
-import OpenAI from 'openai';
+import { completeAI } from '@/lib/ai';
 
 export interface CompletenessAnalysisResult {
   completenessLabel: string;       // Human-readable: "Complete with box", "Missing charger", etc.
@@ -10,25 +10,6 @@ export interface CompletenessAnalysisResult {
   cosmeticDamage: string | null;   // e.g., "Screen crack", null if none
   functionalDamage: string | null; // e.g., "Button not responsive", null if none
   analysisConfidence: 'low' | 'medium' | 'high';
-}
-
-function buildCompletenessPrompt(title: string, description: string | null, category: string): string {
-  const descText = description ? description.slice(0, 500) : 'No description provided.';
-  return `You are an expert reseller assessing marketplace listing condition and completeness.
-
-Item: ${title}
-Category: ${category}
-Description: ${descText}
-
-Analyze the provided images and description. Respond ONLY with valid JSON:
-{
-  "completenessLabel": "<concise label: Complete with box | Missing charger | Cosmetic damage - scratches | etc.>",
-  "hasOriginalPackaging": true or false,
-  "missingParts": ["<part>"],
-  "cosmeticDamage": "<description or null>",
-  "functionalDamage": "<description or null>",
-  "analysisConfidence": "low or medium or high"
-}`;
 }
 
 /**
@@ -47,28 +28,14 @@ export async function analyzeItemCompleteness(
   }
 
   try {
-    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const prompt = buildCompletenessPrompt(title, description, category);
-
-    const userContent: OpenAI.Chat.ChatCompletionContentPart[] = [
-      { type: 'text', text: prompt },
-      // Include up to 3 images to control token usage
-      ...imageUrls.slice(0, 3).map(
-        (url): OpenAI.Chat.ChatCompletionContentPartImage => ({
-          type: 'image_url',
-          image_url: { url, detail: 'low' }, // 'low' detail reduces cost
-        })
-      ),
-    ];
-
-    const response = await client.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [{ role: 'user', content: userContent }],
-      max_tokens: 500,
-      response_format: { type: 'json_object' },
+    const response = await completeAI('itemCompleteness', {
+      title,
+      description,
+      category,
+      imageUrls: imageUrls.slice(0, 3),
     });
 
-    const raw = response.choices[0].message.content ?? '{}';
+    const raw = response.content || '{}';
     const parsed = JSON.parse(raw);
 
     // Validate all required fields are present

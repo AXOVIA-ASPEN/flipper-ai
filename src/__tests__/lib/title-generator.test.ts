@@ -6,24 +6,18 @@ import {
   type TitleGeneratorInput,
 } from '../../lib/title-generator';
 
-// Mock OpenAI
-jest.mock('openai', () => {
-  return jest.fn().mockImplementation(() => ({
-    chat: {
-      completions: {
-        create: jest.fn().mockResolvedValue({
-          choices: [
-            {
-              message: {
-                content: 'Apple iPhone 15 Pro Max 256GB - Excellent Condition',
-              },
-            },
-          ],
-        }),
-      },
-    },
-  }));
+// Mock centralized AI module
+const mockCompleteAI = jest.fn().mockResolvedValue({
+  content: 'Apple iPhone 15 Pro Max 256GB - Excellent Condition',
+  provider: 'gemini',
+  model: 'gemini-2.0-flash',
 });
+jest.mock('@/lib/ai', () => ({
+  completeAI: (...args: unknown[]) => mockCompleteAI(...args),
+  AIProviderUnavailableError: class extends Error {
+    constructor() { super('No AI provider available'); this.name = 'AIProviderUnavailableError'; }
+  },
+}));
 
 describe('title-generator', () => {
   const sampleInput: TitleGeneratorInput = {
@@ -235,419 +229,97 @@ describe('title-generator', () => {
   });
 
   describe('generateLLMTitle', () => {
-    it('falls back to algorithmic when no API key', async () => {
-      const origKey = process.env.OPENAI_API_KEY;
-      delete process.env.OPENAI_API_KEY;
+    beforeEach(() => {
+      mockCompleteAI.mockReset();
+      mockCompleteAI.mockResolvedValue({
+        content: 'Apple iPhone 15 Pro Max 256GB - Excellent Condition',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
+      });
+    });
+
+    it('falls back to algorithmic when no AI provider available', async () => {
+      const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as { AIProviderUnavailableError: new () => Error };
+      mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
 
       const result = await generateLLMTitle(sampleInput, 'ebay');
       expect(result.title).toContain('Apple');
       expect(result.platform).toBe('ebay');
-
-      if (origKey) process.env.OPENAI_API_KEY = origKey;
     });
 
-    it('uses LLM when API key is set', async () => {
-      const origKey = process.env.OPENAI_API_KEY;
-      process.env.OPENAI_API_KEY = 'test-key';
-
+    it('uses LLM when AI provider is available', async () => {
       const result = await generateLLMTitle(sampleInput, 'ebay');
       expect(result.title).toBe('Apple iPhone 15 Pro Max 256GB - Excellent Condition');
       expect(result.platform).toBe('ebay');
       expect(result.keywords.length).toBeGreaterThan(0);
-
-      if (origKey) {
-        process.env.OPENAI_API_KEY = origKey;
-      } else {
-        delete process.env.OPENAI_API_KEY;
-      }
     });
 
     it('strips quotes from LLM response', async () => {
-      const OpenAI = require('openai');
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockResolvedValue({
-              choices: [{ message: { content: '"Quoted Title Here"' } }],
-            }),
-          },
-        },
-      }));
-
-      const origKey = process.env.OPENAI_API_KEY;
-      process.env.OPENAI_API_KEY = 'test-key';
+      mockCompleteAI.mockResolvedValue({ content: '"Quoted Title Here"', provider: 'gemini', model: 'gemini-2.0-flash' });
 
       const result = await generateLLMTitle(sampleInput, 'ebay');
       expect(result.title).toBe('Quoted Title Here');
-
-      // Restore mock
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockResolvedValue({
-              choices: [
-                {
-                  message: {
-                    content: 'Apple iPhone 15 Pro Max 256GB - Excellent Condition',
-                  },
-                },
-              ],
-            }),
-          },
-        },
-      }));
-
-      if (origKey) {
-        process.env.OPENAI_API_KEY = origKey;
-      } else {
-        delete process.env.OPENAI_API_KEY;
-      }
     });
 
     it('truncates LLM title that exceeds platform limit', async () => {
-      const OpenAI = require('openai');
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockResolvedValue({
-              choices: [
-                {
-                  message: {
-                    content:
-                      'This is an extremely long title that definitely exceeds the forty character limit for Mercari listings and should be truncated',
-                  },
-                },
-              ],
-            }),
-          },
-        },
-      }));
-
-      const origKey = process.env.OPENAI_API_KEY;
-      process.env.OPENAI_API_KEY = 'test-key';
+      mockCompleteAI.mockResolvedValue({
+        content: 'This is an extremely long title that definitely exceeds the forty character limit for Mercari listings and should be truncated',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
+      });
 
       const result = await generateLLMTitle(sampleInput, 'mercari');
       expect(result.charCount).toBeLessThanOrEqual(40);
       expect(result.title).toMatch(/\.\.\.$/);
-
-      // Restore mock
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockResolvedValue({
-              choices: [
-                {
-                  message: {
-                    content: 'Apple iPhone 15 Pro Max 256GB - Excellent Condition',
-                  },
-                },
-              ],
-            }),
-          },
-        },
-      }));
-
-      if (origKey) {
-        process.env.OPENAI_API_KEY = origKey;
-      } else {
-        delete process.env.OPENAI_API_KEY;
-      }
     });
 
     it('falls back to algorithmic on LLM error', async () => {
-      const OpenAI = require('openai');
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockRejectedValue(new Error('API Error')),
-          },
-        },
-      }));
-
-      const origKey = process.env.OPENAI_API_KEY;
-      process.env.OPENAI_API_KEY = 'test-key';
+      mockCompleteAI.mockRejectedValue(new Error('API Error'));
 
       const result = await generateLLMTitle(sampleInput, 'ebay');
       expect(result.title).toContain('Apple');
       expect(result.platform).toBe('ebay');
-
-      // Restore mock
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockResolvedValue({
-              choices: [
-                {
-                  message: {
-                    content: 'Apple iPhone 15 Pro Max 256GB - Excellent Condition',
-                  },
-                },
-              ],
-            }),
-          },
-        },
-      }));
-
-      if (origKey) {
-        process.env.OPENAI_API_KEY = origKey;
-      } else {
-        delete process.env.OPENAI_API_KEY;
-      }
     });
 
     it('handles empty LLM response', async () => {
-      const OpenAI = require('openai');
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockResolvedValue({
-              choices: [{ message: { content: '' } }],
-            }),
-          },
-        },
-      }));
-
-      const origKey = process.env.OPENAI_API_KEY;
-      process.env.OPENAI_API_KEY = 'test-key';
+      mockCompleteAI.mockResolvedValue({ content: '', provider: 'gemini', model: 'gemini-2.0-flash' });
 
       const result = await generateLLMTitle(sampleInput, 'ebay');
       expect(result.platform).toBe('ebay');
-
-      // Restore mock
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockResolvedValue({
-              choices: [
-                {
-                  message: {
-                    content: 'Apple iPhone 15 Pro Max 256GB - Excellent Condition',
-                  },
-                },
-              ],
-            }),
-          },
-        },
-      }));
-
-      if (origKey) {
-        process.env.OPENAI_API_KEY = origKey;
-      } else {
-        delete process.env.OPENAI_API_KEY;
-      }
     });
 
     it('uses default platform limit for unknown platform', async () => {
-      const origKey = process.env.OPENAI_API_KEY;
-      delete process.env.OPENAI_API_KEY;
+      const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as { AIProviderUnavailableError: new () => Error };
+      mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
 
       const result = await generateLLMTitle(sampleInput, 'amazon');
       expect(result.charCount).toBeLessThanOrEqual(80);
-
-      if (origKey) process.env.OPENAI_API_KEY = origKey;
     });
   });
 
   describe('generateLLMTitle - additional branch coverage', () => {
-    it('handles null choices array from LLM', async () => {
-      const OpenAI = require('openai');
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockResolvedValue({
-              choices: [],
-            }),
-          },
-        },
-      }));
-
-      const origKey = process.env.OPENAI_API_KEY;
-      process.env.OPENAI_API_KEY = 'test-key';
-
-      const result = await generateLLMTitle(sampleInput, 'ebay');
-      // Empty choices[0] means content is undefined, falls through to empty string
-      expect(result.platform).toBe('ebay');
-      expect(result.title).toBe('');
-
-      // Restore
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockResolvedValue({
-              choices: [{ message: { content: 'Apple iPhone 15 Pro Max 256GB - Excellent Condition' } }],
-            }),
-          },
-        },
-      }));
-
-      if (origKey) {
-        process.env.OPENAI_API_KEY = origKey;
-      } else {
-        delete process.env.OPENAI_API_KEY;
-      }
-    });
-
-    it('handles null message in choices', async () => {
-      const OpenAI = require('openai');
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockResolvedValue({
-              choices: [{ message: null }],
-            }),
-          },
-        },
-      }));
-
-      const origKey = process.env.OPENAI_API_KEY;
-      process.env.OPENAI_API_KEY = 'test-key';
-
+    it('handles empty content from LLM', async () => {
+      mockCompleteAI.mockResolvedValue({ content: '', provider: 'gemini', model: 'gemini-2.0-flash' });
       const result = await generateLLMTitle(sampleInput, 'ebay');
       expect(result.platform).toBe('ebay');
       expect(result.title).toBe('');
-
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockResolvedValue({
-              choices: [{ message: { content: 'Apple iPhone 15 Pro Max 256GB - Excellent Condition' } }],
-            }),
-          },
-        },
-      }));
-
-      if (origKey) {
-        process.env.OPENAI_API_KEY = origKey;
-      } else {
-        delete process.env.OPENAI_API_KEY;
-      }
-    });
-
-    it('handles null content in message', async () => {
-      const OpenAI = require('openai');
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockResolvedValue({
-              choices: [{ message: { content: null } }],
-            }),
-          },
-        },
-      }));
-
-      const origKey = process.env.OPENAI_API_KEY;
-      process.env.OPENAI_API_KEY = 'test-key';
-
-      const result = await generateLLMTitle(sampleInput, 'ebay');
-      expect(result.platform).toBe('ebay');
-      expect(result.title).toBe('');
-
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockResolvedValue({
-              choices: [{ message: { content: 'Apple iPhone 15 Pro Max 256GB - Excellent Condition' } }],
-            }),
-          },
-        },
-      }));
-
-      if (origKey) {
-        process.env.OPENAI_API_KEY = origKey;
-      } else {
-        delete process.env.OPENAI_API_KEY;
-      }
     });
 
     it('strips single quotes from LLM response', async () => {
-      const OpenAI = require('openai');
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockResolvedValue({
-              choices: [{ message: { content: "'Single Quoted Title'" } }],
-            }),
-          },
-        },
-      }));
-
-      const origKey = process.env.OPENAI_API_KEY;
-      process.env.OPENAI_API_KEY = 'test-key';
-
+      mockCompleteAI.mockResolvedValue({ content: "'Single Quoted Title'", provider: 'gemini', model: 'gemini-2.0-flash' });
       const result = await generateLLMTitle(sampleInput, 'ebay');
       expect(result.title).toBe('Single Quoted Title');
-
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockResolvedValue({
-              choices: [{ message: { content: 'Apple iPhone 15 Pro Max 256GB - Excellent Condition' } }],
-            }),
-          },
-        },
-      }));
-
-      if (origKey) {
-        process.env.OPENAI_API_KEY = origKey;
-      } else {
-        delete process.env.OPENAI_API_KEY;
-      }
     });
 
     it('uses default 80 limit for unknown platform with LLM', async () => {
-      const OpenAI = require('openai');
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockResolvedValue({
-              choices: [{ message: { content: 'Short Title' } }],
-            }),
-          },
-        },
-      }));
-
-      const origKey = process.env.OPENAI_API_KEY;
-      process.env.OPENAI_API_KEY = 'test-key';
-
+      mockCompleteAI.mockResolvedValue({ content: 'Short Title', provider: 'gemini', model: 'gemini-2.0-flash' });
       const result = await generateLLMTitle(sampleInput, 'unknown_platform');
       expect(result.title).toBe('Short Title');
       expect(result.charCount).toBeLessThanOrEqual(80);
-
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockResolvedValue({
-              choices: [{ message: { content: 'Apple iPhone 15 Pro Max 256GB - Excellent Condition' } }],
-            }),
-          },
-        },
-      }));
-
-      if (origKey) {
-        process.env.OPENAI_API_KEY = origKey;
-      } else {
-        delete process.env.OPENAI_API_KEY;
-      }
     });
 
-    it('uses fallback values in prompt when input fields are null', async () => {
-      const OpenAI = require('openai');
-      let capturedPrompt = '';
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockImplementation(async (opts: { messages: Array<{ content: string }> }) => {
-              capturedPrompt = opts.messages[1].content;
-              return {
-                choices: [{ message: { content: 'Generic Item - Good Condition' } }],
-              };
-            }),
-          },
-        },
-      }));
-
-      const origKey = process.env.OPENAI_API_KEY;
-      process.env.OPENAI_API_KEY = 'test-key';
+    it('passes fallback values in context when input fields are null', async () => {
+      mockCompleteAI.mockResolvedValue({ content: 'Generic Item - Good Condition', provider: 'gemini', model: 'gemini-2.0-flash' });
 
       const nullInput: TitleGeneratorInput = {
         brand: null,
@@ -659,26 +331,12 @@ describe('title-generator', () => {
 
       const result = await generateLLMTitle(nullInput, 'ebay');
       expect(result.title).toBe('Generic Item - Good Condition');
-      expect(capturedPrompt).toContain('Brand: Unknown');
-      expect(capturedPrompt).toContain('Model: Unknown');
-      expect(capturedPrompt).toContain('Variant: N/A');
-      expect(capturedPrompt).toContain('Category: General');
-
-      OpenAI.mockImplementation(() => ({
-        chat: {
-          completions: {
-            create: jest.fn().mockResolvedValue({
-              choices: [{ message: { content: 'Apple iPhone 15 Pro Max 256GB - Excellent Condition' } }],
-            }),
-          },
-        },
+      expect(mockCompleteAI).toHaveBeenCalledWith('listingTitle', expect.objectContaining({
+        brand: 'Unknown',
+        model: 'Unknown',
+        variant: 'N/A',
+        category: 'General',
       }));
-
-      if (origKey) {
-        process.env.OPENAI_API_KEY = origKey;
-      } else {
-        delete process.env.OPENAI_API_KEY;
-      }
     });
   });
 
@@ -727,18 +385,7 @@ describe('title-generator', () => {
 // ── Additional branch coverage for generateLLMTitle ────────────────────────
 
 describe('generateLLMTitle - branch coverage', () => {
-  const OpenAI = require('openai');
-  const origKey = process.env.OPENAI_API_KEY;
-
-  afterEach(() => {
-    if (origKey !== undefined) {
-      process.env.OPENAI_API_KEY = origKey;
-    } else {
-      delete process.env.OPENAI_API_KEY;
-    }
-  });
-
-  const baseInput: TitleGeneratorInput = {
+  const baseInput2: TitleGeneratorInput = {
     brand: 'Sony',
     model: 'WH-1000XM5',
     variant: 'Black',
@@ -746,56 +393,42 @@ describe('generateLLMTitle - branch coverage', () => {
     category: 'Electronics',
   };
 
-  it('falls back to algorithmic when OPENAI_API_KEY is not set', async () => {
-    delete process.env.OPENAI_API_KEY;
-    const result = await generateLLMTitle(baseInput, 'ebay');
+  beforeEach(() => {
+    mockCompleteAI.mockReset();
+  });
+
+  it('falls back to algorithmic when no AI provider', async () => {
+    const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as { AIProviderUnavailableError: new () => Error };
+    mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
+    const result = await generateLLMTitle(baseInput2, 'ebay');
     expect(result.title).toContain('Sony');
     expect(result.platform).toBe('ebay');
   });
 
   it('truncates title exceeding platform character limit', async () => {
-    process.env.OPENAI_API_KEY = 'test-key';
     const longTitle = 'A'.repeat(200);
-    OpenAI.mockImplementation(() => ({
-      chat: { completions: { create: jest.fn().mockResolvedValue({
-        choices: [{ message: { content: longTitle } }],
-      }) } },
-    }));
-    const result = await generateLLMTitle(baseInput, 'ebay');
-    // ebay limit is 80 chars
+    mockCompleteAI.mockResolvedValue({ content: longTitle, provider: 'gemini', model: 'gemini-2.0-flash' });
+    const result = await generateLLMTitle(baseInput2, 'ebay');
     expect(result.title.length).toBeLessThanOrEqual(80);
     expect(result.title).toMatch(/\.\.\.$/);
   });
 
   it('strips surrounding quotes from LLM response', async () => {
-    process.env.OPENAI_API_KEY = 'test-key';
-    OpenAI.mockImplementation(() => ({
-      chat: { completions: { create: jest.fn().mockResolvedValue({
-        choices: [{ message: { content: '"Sony WH-1000XM5 Black"' } }],
-      }) } },
-    }));
-    const result = await generateLLMTitle(baseInput, 'ebay');
+    mockCompleteAI.mockResolvedValue({ content: '"Sony WH-1000XM5 Black"', provider: 'gemini', model: 'gemini-2.0-flash' });
+    const result = await generateLLMTitle(baseInput2, 'ebay');
     expect(result.title).not.toMatch(/^"/);
     expect(result.title).not.toMatch(/"$/);
   });
 
   it('falls back to algorithmic on LLM API error', async () => {
-    process.env.OPENAI_API_KEY = 'test-key';
-    OpenAI.mockImplementation(() => ({
-      chat: { completions: { create: jest.fn().mockRejectedValue(new Error('Rate limit')) } },
-    }));
-    const result = await generateLLMTitle(baseInput, 'ebay');
+    mockCompleteAI.mockRejectedValue(new Error('Rate limit'));
+    const result = await generateLLMTitle(baseInput2, 'ebay');
     expect(result.title).toContain('Sony');
   });
 
   it('uses generic platform limit for unknown platform', async () => {
-    process.env.OPENAI_API_KEY = 'test-key';
-    OpenAI.mockImplementation(() => ({
-      chat: { completions: { create: jest.fn().mockResolvedValue({
-        choices: [{ message: { content: 'Sony WH-1000XM5' } }],
-      }) } },
-    }));
-    const result = await generateLLMTitle(baseInput, 'unknown-platform');
+    mockCompleteAI.mockResolvedValue({ content: 'Sony WH-1000XM5', provider: 'gemini', model: 'gemini-2.0-flash' });
+    const result = await generateLLMTitle(baseInput2, 'unknown-platform');
     expect(result.title).toBeTruthy();
   });
 });

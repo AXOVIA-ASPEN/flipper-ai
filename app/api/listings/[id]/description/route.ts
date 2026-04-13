@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
-import OpenAI from 'openai';
+import { completeAI, AIProviderUnavailableError } from '@/lib/ai';
 
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, AppError, ErrorCode } from '@/lib/errors';
 interface RouteParams {
@@ -52,80 +52,45 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       priceReasoning: listing.priceReasoning,
     };
 
-    const platformGuidelines: Record<string, string> = {
-      ebay: 'eBay: Use item specifics format, mention condition accurately, include measurements/specs, use keywords for search. Max ~4000 chars.',
-      mercari: 'Mercari: Concise and friendly, highlight condition clearly, mention shipping. Max ~1000 chars.',
-      facebook: 'Facebook Marketplace: Casual tone, mention local pickup, highlight key features. Max ~4000 chars.',
-      offerup: 'OfferUp: Short and punchy, condition-focused, price justification. Max ~3000 chars.',
-      craigslist: 'Craigslist: Detailed, include all specs, mention firm/OBO, describe condition honestly. No limit.',
-    };
+    try {
+      const response = await completeAI('apiDescription', {
+        platform,
+        tone,
+        includeSpecs,
+        itemContext,
+      });
 
-    const prompt = `Generate an optimized resale listing description for the following item.
+      const content = response.content;
+      if (!content) {
+        throw new AppError(ErrorCode.EXTERNAL_SERVICE_ERROR, 'AI failed to generate description');
+      }
 
-Platform: ${platformGuidelines[platform]}
-Tone: ${tone}
-Include specs: ${includeSpecs}
+      const generated = JSON.parse(content);
 
-Item Details:
-${JSON.stringify(itemContext, null, 2)}
-
-Generate a compelling description that:
-1. Highlights the item's value and condition
-2. Uses platform-appropriate formatting
-3. Includes relevant keywords for discoverability
-4. Mentions key specs/features
-5. Is honest about condition
-
-Return ONLY a JSON object with these fields:
-{
-  "title": "optimized listing title",
-  "description": "the full listing description",
-  "highlights": ["key selling point 1", "key selling point 2", ...],
-  "suggestedPrice": <number or null>,
-  "keywords": ["keyword1", "keyword2", ...]
-}`;
-
-    const apiKey = process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      // Fallback: generate a basic description without AI
-      const fallbackDescription = generateFallbackDescription(listing, platform);
       return NextResponse.json({
         success: true,
-        data: fallbackDescription,
-        source: 'template',
+        data: {
+          title: generated.title || listing.title,
+          description: generated.description,
+          highlights: generated.highlights || [],
+          suggestedPrice: generated.suggestedPrice || listing.estimatedValue,
+          keywords: generated.keywords || [],
+          platform,
+        },
+        source: 'ai',
       });
+    } catch (aiError) {
+      if (aiError instanceof AIProviderUnavailableError) {
+        // Fallback: generate a basic description without AI
+        const fallbackDescription = generateFallbackDescription(listing, platform);
+        return NextResponse.json({
+          success: true,
+          data: fallbackDescription,
+          source: 'template',
+        });
+      }
+      throw aiError;
     }
-
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
-      max_tokens: 1500,
-      response_format: { type: 'json_object' },
-    });
-
-    /* istanbul ignore next -- optional chain null branch is a defensive guard for malformed API response */
-    const content = completion.choices[0]?.message?.content;
-    if (!content) {
-      throw new AppError(ErrorCode.EXTERNAL_SERVICE_ERROR, 'AI failed to generate description');
-    }
-
-    const generated = JSON.parse(content);
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        title: generated.title || listing.title,
-        description: generated.description,
-        highlights: generated.highlights || [],
-        suggestedPrice: generated.suggestedPrice || listing.estimatedValue,
-        keywords: generated.keywords || [],
-        platform,
-      },
-      source: 'ai',
-    });
   } catch (error) {
     return handleError(error, request.url);
   }

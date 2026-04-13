@@ -2,7 +2,7 @@
 // Generates compelling marketplace descriptions from item data
 // Supports multiple platforms with format-specific templates
 
-import OpenAI from 'openai';
+import { completeAI, AIProviderUnavailableError } from '@/lib/ai';
 import type { ItemIdentification } from './llm-identifier';
 
 export interface DescriptionGeneratorInput {
@@ -158,53 +158,26 @@ export async function generateLLMDescription(
 ): Promise<GeneratedDescription> {
   const style = PLATFORM_STYLES[platform] || PLATFORM_STYLES.generic;
 
-  if (!process.env.OPENAI_API_KEY) {
-    return generateAlgorithmicDescription(input, platform);
-  }
-
   try {
-    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-    const itemName = [input.brand, input.model, input.variant].filter(Boolean).join(' ') || 'Item';
-
-    const prompt = `Write a ${platform} marketplace listing description for: ${itemName}
-
-Item Details:
-- Condition: ${input.condition}${input.defects?.length ? ` (Defects: ${input.defects.join(', ')})` : ''}
-- Category: ${input.category || 'General'}
-- Asking Price: $${input.askingPrice}${input.originalPrice ? ` (Retail: $${input.originalPrice})` : ''}
-${input.features?.length ? `- Features: ${input.features.join(', ')}` : ''}
-${input.includesAccessories?.length ? `- Includes: ${input.includesAccessories.join(', ')}` : ''}
-${input.sellerNotes ? `- Notes: ${input.sellerNotes}` : ''}
-
-Writing Style: ${style.tone}
-Format: ${style.format}
-Max Words: ${style.maxWords}
-
-Rules:
-- Be honest about condition — never mislead
-- Include relevant keywords buyers search for
-- Mention what's included and any defects
-- Add shipping/pickup info
-- No ALL CAPS paragraphs
-- Sound like a real person, not a bot
-
-Write ONLY the description text.`;
-
-    const response = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an experienced online reseller who writes descriptions that sell items quickly while being honest about condition.',
-        },
-        { role: 'user', content: prompt },
-      ],
-      temperature: 0.6,
-      max_tokens: 800,
+    const response = await completeAI('listingDescription', {
+      platform,
+      brand: input.brand,
+      model: input.model,
+      variant: input.variant,
+      condition: input.condition,
+      category: input.category || 'General',
+      askingPrice: input.askingPrice,
+      originalPrice: input.originalPrice,
+      defects: input.defects,
+      features: input.features,
+      includesAccessories: input.includesAccessories,
+      sellerNotes: input.sellerNotes,
+      tone: style.tone,
+      format: style.format,
+      maxWords: style.maxWords,
     });
 
-    const description = (response.choices[0]?.message?.content || '').trim();
+    const description = response.content.trim();
     const wordCount = description.split(/\s+/).length;
 
     return {
@@ -215,6 +188,9 @@ Write ONLY the description text.`;
       hasShippingNote: /ship|pickup|deliver/i.test(description),
     };
   } catch (error) {
+    if (error instanceof AIProviderUnavailableError) {
+      return generateAlgorithmicDescription(input, platform);
+    }
     console.error('LLM description generation failed, using algorithmic:', error);
     return generateAlgorithmicDescription(input, platform);
   }

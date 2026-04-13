@@ -7,14 +7,10 @@
  * Provides structured analysis of item category, condition, brand, and flippability.
  */
 
-import Anthropic from '@anthropic-ai/sdk';
 import prisma from '@/lib/db';
 import { analysisCache } from '@/lib/cache';
 import { recordUsage } from '@/lib/usage-tracker';
-import { isGeminiFallbackAvailable, geminiGenerateText } from '@/lib/gemini-client';
-
-const getClaudeApiKey = () => process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
-const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-5-20250929';
+import { completeAI, AIProviderUnavailableError } from '@/lib/ai';
 const CACHE_DURATION_HOURS = 24;
 
 export interface ClaudeAnalysisResult {
@@ -72,7 +68,7 @@ async function getCachedAnalysis(listingId: string): Promise<ClaudeAnalysisResul
 /**
  * Store analysis result in cache (L2 DB then L1 in-memory)
  */
-async function cacheAnalysis(listingId: string, result: ClaudeAnalysisResult): Promise<void> {
+async function cacheAnalysis(listingId: string, result: ClaudeAnalysisResult, askingPrice?: number): Promise<void> {
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + CACHE_DURATION_HOURS);
 
@@ -83,10 +79,12 @@ async function cacheAnalysis(listingId: string, result: ClaudeAnalysisResult): P
         listingId,
         analysisType: 'claude',
         analysisResult: JSON.stringify(result),
+        analyzedAtPrice: askingPrice ?? null,
         expiresAt,
       },
       update: {
         analysisResult: JSON.stringify(result),
+        analyzedAtPrice: askingPrice ?? null,
         expiresAt,
       },
     });
@@ -97,57 +95,11 @@ async function cacheAnalysis(listingId: string, result: ClaudeAnalysisResult): P
 }
 
 /**
- * Build the prompt for Claude to analyze a listing
- */
-function buildAnalysisPrompt(
-  title: string,
-  description: string | null,
-  askingPrice: number,
-  imageUrls?: string[]
-): string {
-  return `Analyze this marketplace listing and provide a structured assessment:
-
-**Title:** ${title}
-
-**Description:** ${description || 'No description provided'}
-
-**Asking Price:** $${askingPrice}
-
-${imageUrls && imageUrls.length > 0 ? `**Images:** ${imageUrls.length} images available` : '**Images:** None'}
-
-Please provide a JSON response with the following structure:
-{
-  "category": "main category (electronics, furniture, tools, etc.)",
-  "subcategory": "more specific category if applicable",
-  "brand": "brand name if identifiable",
-  "condition": "estimated condition (new, like new, excellent, good, fair, poor)",
-  "estimatedAge": "approximate age (e.g., '1-2 years', '5+ years')",
-  "keyFeatures": ["list", "of", "notable", "features"],
-  "potentialIssues": ["list", "of", "concerns", "or", "red flags"],
-  "flippabilityScore": 0-100,
-  "confidence": "low/medium/high",
-  "reasoning": "brief explanation of the flippability score",
-  "marketTrends": "relevant market context (demand, trends)",
-  "targetBuyer": "who would buy this item"
-}
-
-Consider:
-- Brand value and reputation
-- Condition indicators from description
-- Price relative to typical market value
-- Resale demand and liquidity
-- Shipping/handling complexity
-- Red flags (damage, missing parts, outdated tech)
-
-Be realistic and conservative in your assessment.`;
-}
-
-/**
- * Parse Claude's response into structured format
+ * Parse AI response into structured format
  */
 function parseClaudeResponse(text: string): ClaudeAnalysisResult {
   try {
-    // Extract JSON from response (Claude sometimes wraps it in markdown)
+    // Extract JSON from response (AI sometimes wraps it in markdown)
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new Error('No JSON found in response');
@@ -179,63 +131,21 @@ function parseClaudeResponse(text: string): ClaudeAnalysisResult {
 }
 
 /**
- * Call Claude API for listing analysis, falling back to Gemini if Claude keys are unavailable.
+ * Call the centralized AI module for listing analysis.
  */
-async function callClaudeAPI(prompt: string): Promise<string> {
-  const apiKey = getClaudeApiKey();
-
-  // Fallback to Gemini when Claude keys are not configured
-  if (!apiKey) {
-    if (isGeminiFallbackAvailable()) {
-      return geminiGenerateText(prompt, 'You are a resale market expert. Always respond with valid JSON only, no markdown formatting.');
-    }
-    throw new Error('No AI provider configured — set ANTHROPIC_API_KEY, CLAUDE_API_KEY, or GOOGLE_API_KEY');
-  }
-
-  const client = new Anthropic({
-    apiKey,
+async function callClaudeAPI(
+  title: string,
+  description: string | null,
+  askingPrice: number,
+  imageUrls?: string[]
+): Promise<string> {
+  const response = await completeAI('claudeAnalysis', {
+    title,
+    description,
+    askingPrice,
+    imageCount: imageUrls?.length ?? 0,
   });
-
-  try {
-    const message = await client.messages.create({
-      model: CLAUDE_MODEL,
-      max_tokens: 1500,
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-    });
-
-    const textContent = message.content.find((block) => block.type === 'text');
-    if (!textContent || textContent.type !== 'text') {
-      throw new Error('No text response from Claude');
-    }
-
-    return textContent.text;
-  } catch (error: unknown) {
-    // Handle rate limiting
-    if (error && typeof error === 'object' && 'status' in error) {
-      const apiError = error as { status?: number; message?: string };
-      if (apiError.status === 429) {
-        throw new Error('Claude API rate limit exceeded. Please try again later.');
-      }
-      if (apiError.message) {
-        throw new Error(`Claude API error: ${apiError.message}`);
-      }
-    }
-
-    // Handle other errors
-    if (error instanceof Error) {
-      if (error.message.includes('rate limit') || error.message.includes('429')) {
-        throw new Error('Claude API rate limit exceeded. Please try again later.');
-      }
-      throw error;
-    }
-
-    throw new Error('Unknown error calling Claude API');
-  }
+  return response.content;
 }
 
 /**
@@ -268,19 +178,17 @@ export async function analyzeListing(listingId: string): Promise<ClaudeAnalysisR
     }
   }
 
-  // Build prompt and call API
-  const prompt = buildAnalysisPrompt(
+  // Call centralized AI module
+  const responseText = await callClaudeAPI(
     listing.title,
     listing.description,
     listing.askingPrice,
     imageUrls
   );
-
-  const responseText = await callClaudeAPI(prompt);
   const result = parseClaudeResponse(responseText);
 
   // Cache the result
-  await cacheAnalysis(listingId, result);
+  await cacheAnalysis(listingId, result, listing.askingPrice);
 
   return result;
 }
@@ -296,8 +204,7 @@ export async function analyzeListingData(
   imageUrls?: string[],
   userId?: string
 ): Promise<ClaudeAnalysisResult> {
-  const prompt = buildAnalysisPrompt(title, description, askingPrice, imageUrls);
-  const responseText = await callClaudeAPI(prompt);
+  const responseText = await callClaudeAPI(title, description, askingPrice, imageUrls);
   const result = parseClaudeResponse(responseText);
   if (userId) {
     try {

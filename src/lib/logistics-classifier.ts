@@ -1,7 +1,7 @@
 // Story 5.5: LLM-based size/weight classification for logistics analysis
-// Uses GPT-4o-mini for item size categorization (following llm-identifier.ts pattern)
+// Uses centralized AI module for item size categorization
 
-import OpenAI from 'openai';
+import { completeAI, AIProviderUnavailableError } from '@/lib/ai';
 
 export interface LogisticsClassification {
   sizeCategory: 'small_shippable' | 'large_local_only' | 'fragile_special_handling';
@@ -39,24 +39,6 @@ const SIZE_CATEGORY_DEFAULTS: Record<LogisticsClassification['sizeCategory'], {
   fragile_special_handling: { weightLbs: 15, dimensions: { length: 24, width: 18, height: 12 } },
 };
 
-const CLASSIFICATION_SYSTEM_PROMPT = `You are a logistics expert. Classify items for shipping/pickup difficulty.
-Return JSON: { "sizeCategory": "small_shippable"|"large_local_only"|"fragile_special_handling",
-               "estimatedWeightLbs": number, "estimatedDimensionsInches": {"length": number, "width": number, "height": number},
-               "classificationReasoning": "brief explanation", "confidence": "low"|"medium"|"high" }`;
-
-function buildUserPrompt(title: string, description: string | null, category: string): string {
-  return `Item: "${title}"
-Description: "${description || 'none'}"
-Category: "${category}"
-
-Guidelines:
-- small_shippable: fits in standard box, under 70 lbs (electronics, clothing, small tools, books)
-- large_local_only: too large/heavy for standard shipping (furniture, appliances, large power tools, vehicles)
-- fragile_special_handling: breakable/requires special packing (musical instruments, artwork, mirrors, ceramics)
-
-Estimate realistic weight and box dimensions for shipping this item.`;
-}
-
 function getFallbackClassification(category: string): LogisticsClassification {
   const normalizedCategory = category.toLowerCase();
   const sizeCategory = CATEGORY_SIZE_DEFAULTS[normalizedCategory] ?? 'small_shippable';
@@ -89,47 +71,19 @@ function validateConfidence(value: string): LogisticsClassification['confidence'
     : 'medium';
 }
 
-let openai: OpenAI | null = null;
-
-function getOpenAI(): OpenAI {
-  if (!openai) {
-    const apiKey = process.env.OPENAI_API_KEY;
-    /* istanbul ignore next -- defensive guard; classifyItemLogistics already returns fallback when key is absent */
-    if (!apiKey) {
-      throw new Error('OPENAI_API_KEY environment variable is not set');
-    }
-    openai = new OpenAI({ apiKey });
-  }
-  return openai;
-}
-
 export async function classifyItemLogistics(
   title: string,
   description: string | null,
   category: string
 ): Promise<LogisticsClassification> {
-  // No API key → return category-based default
-  if (!process.env.OPENAI_API_KEY) {
-    console.warn('OPENAI_API_KEY not set, using fallback logistics classification');
-    return getFallbackClassification(category);
-  }
-
   try {
-    const client = getOpenAI();
-    const userPrompt = buildUserPrompt(title, description, category);
-
-    const response = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: CLASSIFICATION_SYSTEM_PROMPT },
-        { role: 'user', content: userPrompt },
-      ],
-      temperature: 0.3,
-      max_tokens: 300,
-      response_format: { type: 'json_object' },
+    const response = await completeAI('logisticsClassification', {
+      title,
+      description,
+      category,
     });
 
-    const responseText = response.choices[0]?.message?.content || '';
+    const responseText = response.content;
     const parsed = JSON.parse(responseText);
 
     return {
@@ -144,6 +98,10 @@ export async function classifyItemLogistics(
       confidence: validateConfidence(parsed.confidence),
     };
   } catch (error) {
+    if (error instanceof AIProviderUnavailableError) {
+      console.warn('No AI provider available, using fallback logistics classification');
+      return getFallbackClassification(category);
+    }
     console.error('Logistics classification LLM error, using fallback:', error);
     return getFallbackClassification(category);
   }

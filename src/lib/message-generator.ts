@@ -14,7 +14,7 @@
  * for OpenAI integration (lazy singleton, JSON-only responses, null on error).
  */
 
-import OpenAI from 'openai';
+import { completeAI, AIProviderUnavailableError } from '@/lib/ai';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -56,82 +56,6 @@ export function getPlatformTone(platform: string): PlatformTone {
   return PLATFORM_TONES[platform.toUpperCase()] || 'professional';
 }
 
-// ── Tone Descriptions (for LLM prompt) ──────────────────────────────────────
-
-const TONE_DESCRIPTIONS: Record<PlatformTone, string> = {
-  casual:
-    'Keep it short and casual, like texting a neighbor. Use simple language, mention local pickup if relevant. No formal greetings.',
-  friendly:
-    'Be warm and conversational, like messaging a friend of a friend. Use a friendly greeting, show genuine interest.',
-  professional:
-    'Be professional and courteous. Use proper grammar, a polite greeting, and clear structure. Mention shipping if relevant.',
-};
-
-// ── Message Type Descriptions (for LLM prompt) ──────────────────────────────
-
-const MESSAGE_TYPE_INSTRUCTIONS: Record<MessageType, string> = {
-  inquiry:
-    'Write a message asking about the item. Express interest, ask relevant questions about condition, availability, or details not in the listing.',
-  offer:
-    'Write a message making a purchase offer. State the offer price clearly, explain why it is fair, and express readiness to complete the transaction quickly.',
-  'follow-up':
-    'Write a polite follow-up message to a previous inquiry that received no response. Reference the original interest without being pushy.',
-  negotiation:
-    'Write a counter-offer or negotiation message. Acknowledge the seller\'s position, propose a compromise price, and provide reasoning.',
-};
-
-// ── OpenAI Singleton ─────────────────────────────────────────────────────────
-
-let openai: OpenAI | null = null;
-
-function getOpenAI(): OpenAI {
-  if (!openai) {
-    const apiKey = process.env.OPENAI_API_KEY;
-    /* istanbul ignore next -- defensive guard; generatePurchaseMessage already returns fallback when key is absent */
-    if (!apiKey) {
-      throw new Error('OPENAI_API_KEY environment variable is not set');
-    }
-    openai = new OpenAI({ apiKey });
-  }
-  return openai;
-}
-
-// ── LLM Prompt Builder ──────────────────────────────────────────────────────
-
-function buildMessagePrompt(input: MessageGeneratorInput, tone: PlatformTone): string {
-  const sellerRef = input.sellerName ? `The seller's name is "${input.sellerName}".` : 'The seller name is unknown.';
-  const offerLine =
-    input.messageType === 'offer' && input.offerPrice
-      ? `The buyer wants to offer $${input.offerPrice}.`
-      : '';
-  const conditionLine = input.itemCondition
-    ? `Listed condition: ${input.itemCondition}.`
-    : '';
-  const contextLine = input.additionalContext
-    ? `Additional context from the buyer: ${input.additionalContext}`
-    : '';
-
-  return `You are writing a purchase message from a buyer to a seller on ${input.platform}.
-
-LISTING:
-- Title: "${input.listingTitle}"
-- Asking Price: $${input.askingPrice}
-${conditionLine}
-${sellerRef}
-${offerLine}
-${contextLine}
-
-TONE: ${TONE_DESCRIPTIONS[tone]}
-
-MESSAGE TYPE: ${MESSAGE_TYPE_INSTRUCTIONS[input.messageType || 'inquiry']}
-
-RESPOND WITH ONLY VALID JSON:
-{
-  "subject": "<short subject line, max 60 chars>",
-  "body": "<the message body, 2-4 sentences>"
-}`;
-}
-
 // ── AI Message Generation ────────────────────────────────────────────────────
 
 export async function generatePurchaseMessage(
@@ -145,30 +69,20 @@ export async function generatePurchaseMessage(
     throw new Error('Missing required fields: listingTitle, askingPrice, platform');
   }
 
-  // If no API key, use fallback immediately
-  if (!process.env.OPENAI_API_KEY) {
-    return generateFallbackMessage(input, messageType, tone);
-  }
-
   try {
-    const client = getOpenAI();
-    const prompt = buildMessagePrompt(input, tone);
-
-    const response = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You are an expert marketplace buyer writing purchase messages to sellers. Always respond with valid JSON only, no markdown formatting.',
-        },
-        { role: 'user', content: prompt },
-      ],
-      temperature: 0.3,
-      max_tokens: 400,
+    const response = await completeAI('purchaseMessage', {
+      listingTitle: input.listingTitle,
+      askingPrice: input.askingPrice,
+      platform: input.platform,
+      sellerName: input.sellerName,
+      messageType,
+      offerPrice: input.offerPrice,
+      itemCondition: input.itemCondition,
+      additionalContext: input.additionalContext,
+      tone,
     });
 
-    const responseText = response.choices[0]?.message?.content || '';
+    const responseText = response.content;
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       console.error('Failed to extract JSON from message generation response:', responseText);
@@ -186,6 +100,9 @@ export async function generatePurchaseMessage(
       isFallback: false,
     };
   } catch (error) {
+    if (error instanceof AIProviderUnavailableError) {
+      return generateFallbackMessage(input, messageType, tone);
+    }
     console.error('AI message generation error:', error);
     return generateFallbackMessage(input, messageType, tone);
   }
