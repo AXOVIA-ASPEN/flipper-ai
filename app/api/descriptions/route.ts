@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
+import { getCurrentUserId } from '@/lib/auth';
 import {
   generateAlgorithmicDescription,
   generateLLMDescription,
@@ -19,6 +20,9 @@ import {
  */
 export async function POST(request: NextRequest) {
   try {
+    const userId = await getCurrentUserId();
+    if (!userId) throw new UnauthorizedError('Unauthorized');
+
     const body = await request.json();
 
     const { platform = 'all', useLLM = false, ...itemData } = body;

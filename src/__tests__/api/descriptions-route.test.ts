@@ -3,8 +3,15 @@
  * Covers: validation, platform routing, LLM vs algorithmic, error handling
  */
 
-import { POST } from '@/app/api/descriptions/route';
 import { NextRequest } from 'next/server';
+
+const mockGetCurrentUserId = jest.fn().mockResolvedValue('test-user');
+jest.mock('@/lib/auth', () => ({
+  __esModule: true,
+  getCurrentUserId: (...args: unknown[]) => mockGetCurrentUserId(...args),
+}));
+
+import { POST } from '@/app/api/descriptions/route';
 import * as descGen from '@/lib/description-generator';
 
 jest.mock('@/lib/description-generator');
@@ -30,6 +37,13 @@ const validBody = {
 describe('POST /api/descriptions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGetCurrentUserId.mockResolvedValue('test-user');
+  });
+
+  it('returns 401 when unauthenticated', async () => {
+    mockGetCurrentUserId.mockResolvedValue(null);
+    const res = await POST(makeRequest(validBody));
+    expect(res.status).toBe(401);
   });
 
   it('returns 422 when condition is missing', async () => {
@@ -158,6 +172,10 @@ describe('POST /api/descriptions', () => {
 
 // ── Additional branch coverage ────────────────────────────────────────────────
 describe('POST /api/descriptions - branch coverage', () => {
+  beforeEach(() => {
+    mockGetCurrentUserId.mockResolvedValue('test-user');
+  });
+
   it('uses includeSpecs=false branch when explicitly set to false', async () => {
     mockDescGen.generateAlgorithmicDescription.mockReturnValue({
       description: 'Test description',
