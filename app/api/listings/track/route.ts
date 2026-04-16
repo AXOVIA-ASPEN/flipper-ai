@@ -1,11 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runTrackingCycle, getTrackableListings } from '@/lib/listing-tracker';
+import { getCurrentUserId } from '@/lib/auth';
+import prisma from '@/lib/db';
 
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
-// GET /api/listings/track - Get trackable listings count
+// GET /api/listings/track - Get trackable listings count (scoped to the caller)
 export async function GET() {
   try {
-    const listings = await getTrackableListings();
+    const userId = await getCurrentUserId();
+    if (!userId) throw new UnauthorizedError('Unauthorized');
+
+    // Scope trackable listings to the authenticated user so callers never see
+    // other users' listings.
+    const listings = await getTrackableListings({ userId });
     return NextResponse.json({
       trackableCount: listings.length,
       listings: listings.map((l) => ({
@@ -25,11 +32,32 @@ export async function GET() {
 // POST /api/listings/track - Run a tracking cycle
 export async function POST(request: NextRequest) {
   try {
+    const userId = await getCurrentUserId();
+    if (!userId) throw new UnauthorizedError('Unauthorized');
+
     const body = await request.json().catch(() => ({}));
     const dryRun = body.dryRun === true;
+    const listingId = typeof body.listingId === 'string' ? body.listingId : null;
+
+    // If the caller targeted a specific listingId, verify they own it before
+    // doing anything else. Prevents cross-user tracking triggers.
+    if (listingId) {
+      const listing = await prisma.listing.findUnique({
+        where: { id: listingId },
+        select: { userId: true },
+      });
+
+      if (!listing) {
+        throw new NotFoundError('Listing not found');
+      }
+
+      if (listing.userId !== userId) {
+        throw new ForbiddenError('You do not have permission to track this listing');
+      }
+    }
 
     if (dryRun) {
-      const listings = await getTrackableListings();
+      const listings = await getTrackableListings({ userId });
       return NextResponse.json({
         dryRun: true,
         wouldCheck: listings.length,

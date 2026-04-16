@@ -7,6 +7,22 @@ jest.mock('@/lib/listing-tracker', () => ({
   runTrackingCycle: jest.fn(),
 }));
 
+const mockGetCurrentUserId = jest.fn().mockResolvedValue('test-user');
+jest.mock('@/lib/auth', () => ({
+  __esModule: true,
+  getCurrentUserId: (...args: unknown[]) => mockGetCurrentUserId(...args),
+}));
+
+const mockListingFindUnique = jest.fn();
+jest.mock('@/lib/db', () => ({
+  __esModule: true,
+  default: {
+    listing: {
+      findUnique: (...args: unknown[]) => mockListingFindUnique(...args),
+    },
+  },
+}));
+
 import { GET, POST } from '@/app/api/listings/track/route';
 import { getTrackableListings, runTrackingCycle } from '@/lib/listing-tracker';
 
@@ -22,7 +38,26 @@ function makeRequest(body?: object): NextRequest {
 }
 
 describe('GET /api/listings/track', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockGetCurrentUserId.mockResolvedValue('test-user');
+  });
+
+  it('returns 401 when unauthenticated', async () => {
+    mockGetCurrentUserId.mockResolvedValue(null);
+
+    const res = await GET();
+    expect(res.status).toBe(401);
+    expect(mockGetTrackable).not.toHaveBeenCalled();
+  });
+
+  it('scopes trackable listings to the authenticated user', async () => {
+    mockGetTrackable.mockResolvedValue([]);
+
+    await GET();
+
+    expect(mockGetTrackable).toHaveBeenCalledWith({ userId: 'test-user' });
+  });
 
   it('returns trackable listings with count', async () => {
     mockGetTrackable.mockResolvedValue([
@@ -68,7 +103,44 @@ describe('GET /api/listings/track', () => {
 });
 
 describe('POST /api/listings/track', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockGetCurrentUserId.mockResolvedValue('test-user');
+  });
+
+  it('returns 401 when unauthenticated', async () => {
+    mockGetCurrentUserId.mockResolvedValue(null);
+
+    const res = await POST(makeRequest({}));
+    expect(res.status).toBe(401);
+    expect(mockRunCycle).not.toHaveBeenCalled();
+  });
+
+  it('returns 404 when targeting a listingId that does not exist', async () => {
+    mockListingFindUnique.mockResolvedValue(null);
+
+    const res = await POST(makeRequest({ listingId: 'missing' }));
+    expect(res.status).toBe(404);
+    expect(mockRunCycle).not.toHaveBeenCalled();
+  });
+
+  it('returns 403 when targeting a listingId owned by another user', async () => {
+    mockListingFindUnique.mockResolvedValue({ userId: 'other-user' });
+
+    const res = await POST(makeRequest({ listingId: 'other-listing' }));
+    expect(res.status).toBe(403);
+    expect(mockRunCycle).not.toHaveBeenCalled();
+  });
+
+  it('runs tracking cycle when the caller owns the targeted listingId', async () => {
+    mockListingFindUnique.mockResolvedValue({ userId: 'test-user' });
+    const cycleResult = { checked: 1, updated: 0, sold: 0, errors: 0 };
+    mockRunCycle.mockResolvedValue(cycleResult as any);
+
+    const res = await POST(makeRequest({ listingId: 'my-listing' }));
+    expect(res.status).toBe(200);
+    expect(mockRunCycle).toHaveBeenCalled();
+  });
 
   it('runs tracking cycle and returns result', async () => {
     const cycleResult = { checked: 3, updated: 1, sold: 1, errors: 0 };
