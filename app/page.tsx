@@ -1,16 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { DollarSign, TrendingUp, Zap, Shield, Search, BarChart } from 'lucide-react';
+import { useAuthContext } from '@/components/providers/FirebaseAuthProvider';
 
 export default function LandingPage() {
   const router = useRouter();
+  const { user, loading } = useAuthContext();
   const [email, setEmail] = useState('');
 
+  // FR-AUTH-ACCESS-04: authenticated users on landing are redirected to dashboard
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace('/dashboard');
+    }
+  }, [user, loading, router]);
+
   const handleGetStarted = () => {
-    router.push('/auth/signup');
+    router.push('/register');
   };
 
   return (
@@ -31,7 +40,7 @@ export default function LandingPage() {
             </div>
             <div className="flex gap-4">
               <Link
-                href="/auth/login"
+                href="/login"
                 className="px-4 py-2 text-white hover:text-purple-300 transition-colors"
               >
                 Log In

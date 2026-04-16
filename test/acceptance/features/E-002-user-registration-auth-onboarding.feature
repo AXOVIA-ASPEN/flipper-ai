@@ -346,3 +346,110 @@ Feature: User Registration with Email
     When I send a GET to "/api/user/settings"
     Then the response body should not contain "sk-proj-abcdefghijklmnop"
     And the openaiApiKey field should contain bullet characters
+
+  # ─── Authenticated Access Control (FR-AUTH-ACCESS-01..06) ──────────────────
+
+  @E-002-S-49 @story-2-auth-access @FR-AUTH-ACCESS-01
+  Scenario Outline: Unauthenticated user redirected to login for protected routes
+    Given I am not logged in
+    When I navigate to "<path>"
+    Then I should be redirected to "/login" with a "callbackUrl" of "<path>"
+
+    Examples:
+      | path            |
+      | /dashboard      |
+      | /opportunities  |
+      | /messages       |
+      | /posting-queue  |
+      | /settings       |
+      | /analytics      |
+      | /scraper        |
+      | /onboarding     |
+
+  @E-002-S-50 @story-2-auth-access @FR-AUTH-ACCESS-02
+  Scenario Outline: Navigation bar is hidden on public routes for unauthenticated users
+    Given I am not logged in
+    When I navigate to "<path>"
+    Then I should not see the authenticated navigation bar
+    And I should not see a link to "/dashboard"
+    And I should not see a link to "/opportunities"
+    And I should not see a link to "/messages"
+    And I should not see a link to "/posting-queue"
+    And I should not see a link to "/settings"
+
+    Examples:
+      | path              |
+      | /                 |
+      | /privacy          |
+      | /terms            |
+      | /login            |
+      | /register         |
+      | /forgot-password  |
+
+  @E-002-S-51 @story-2-auth-access @FR-AUTH-ACCESS-02 @wip
+  # Requires real Firebase Auth session (client-side). Covered by unit test
+  # src/__tests__/components/Navigation.test.tsx until a full login helper exists.
+  Scenario: Navigation bar is visible on dashboard for authenticated users
+    Given I am logged in
+    When I navigate to "/dashboard"
+    Then I should see the authenticated navigation bar
+    And I should see a link labeled "Dashboard" pointing to "/dashboard"
+    And I should see a link labeled "Opportunities" pointing to "/opportunities"
+    And I should see a link labeled "Messages" pointing to "/messages"
+    And I should see a link labeled "Cross-Posts" pointing to "/posting-queue"
+    And I should see a link labeled "Settings" pointing to "/settings"
+
+  @E-002-S-52 @story-2-auth-access @FR-AUTH-ACCESS-03
+  Scenario: Expired session cookie is cleared and user is redirected to login
+    Given I have an expired session cookie
+    When I navigate to "/dashboard"
+    Then I should be redirected to "/login"
+    And the "__session" cookie should be cleared
+
+  @E-002-S-53 @story-2-auth-access @FR-AUTH-ACCESS-04 @wip
+  # Client-side redirect via useEffect — requires real Firebase Auth session.
+  Scenario: Authenticated user on landing page is redirected to dashboard
+    Given I am logged in
+    When I navigate to "/"
+    Then I should be redirected to "/dashboard"
+
+  @E-002-S-54 @story-2-auth-access @FR-AUTH-ACCESS-05
+  Scenario Outline: Only whitelisted routes are reachable without authentication
+    Given I am not logged in
+    When I navigate to "<path>"
+    Then the response status code should be 200
+
+    Examples:
+      | path             |
+      | /                |
+      | /login           |
+      | /register        |
+      | /forgot-password |
+      | /privacy         |
+      | /terms           |
+
+  @E-002-S-55 @story-2-auth-access @FR-AUTH-ACCESS-06
+  Scenario: Privacy policy page does not link to any protected route
+    Given I am not logged in
+    When I navigate to "/privacy"
+    Then the page should not contain a link to any of:
+      | /dashboard     |
+      | /opportunities |
+      | /messages      |
+      | /posting-queue |
+      | /settings      |
+      | /analytics     |
+      | /scraper       |
+
+  @E-002-S-56 @story-2-auth-access @FR-AUTH-ACCESS-06
+  Scenario: Terms of service page does not link to any protected route
+    Given I am not logged in
+    When I navigate to "/terms"
+    Then the page should not contain a link to any of:
+      | /dashboard     |
+      | /opportunities |
+      | /messages      |
+      | /posting-queue |
+      | /settings      |
+      | /analytics     |
+      | /scraper       |

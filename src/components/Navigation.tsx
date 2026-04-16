@@ -5,12 +5,16 @@
  * @author Stephen Boyett
  * @company Axovia AI
  * @date 2026-04-11
- * @version 2.0
+ * @version 2.1
  * @brief Top navigation bar with glassmorphism design.
  *
  * @description
  * Sticky top nav using fp-glass-nav. Active links use purple tint.
  * Shows an unread message badge. Fetches unread count on every route change.
+ *
+ * Auth gating (FR-AUTH-ACCESS-02): Returns null for unauthenticated users
+ * and on public routes (landing, privacy, terms, auth pages) so protected
+ * navigation never leaks to users without a session.
  */
 
 import { useState, useEffect } from 'react';
@@ -18,12 +22,33 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Settings, Home, TrendingUp, MessageSquare, Send } from 'lucide-react';
 import UserMenu from '@/components/UserMenu';
+import { useAuthContext } from '@/components/providers/FirebaseAuthProvider';
+
+// Routes where Navigation must never render — public-facing or auth-specific
+const PUBLIC_ROUTE_PREFIXES = [
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/privacy',
+  '/terms',
+];
+
+function isPublicRoute(pathname: string): boolean {
+  if (pathname === '/') return true;
+  return PUBLIC_ROUTE_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+}
 
 export default function Navigation() {
   const pathname = usePathname();
+  const { user, loading } = useAuthContext();
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const authed = !loading && !!user;
+  const onPublicRoute = isPublicRoute(pathname);
+
   useEffect(() => {
+    if (!authed) return;
     let cancelled = false;
     fetch('/api/messages/threads?limit=100')
       .then((res) => (res.ok ? res.json() : null))
@@ -38,14 +63,20 @@ export default function Navigation() {
       })
       .catch(() => {});
     return () => { cancelled = true; };
-  }, [pathname]);
+  }, [pathname, authed]);
+
+  // Hide navigation on public routes and for unauthenticated users
+  // (FR-AUTH-ACCESS-02: protected navigation must not appear to unauthenticated users)
+  if (onPublicRoute || !authed) {
+    return null;
+  }
 
   const navItems = [
-    { href: '/',              label: 'Dashboard',    icon: Home },
+    { href: '/dashboard',     label: 'Dashboard',     icon: Home },
     { href: '/opportunities', label: 'Opportunities', icon: TrendingUp },
-    { href: '/messages',      label: 'Messages',     icon: MessageSquare },
-    { href: '/posting-queue', label: 'Cross-Posts',  icon: Send },
-    { href: '/settings',      label: 'Settings',     icon: Settings },
+    { href: '/messages',      label: 'Messages',      icon: MessageSquare },
+    { href: '/posting-queue', label: 'Cross-Posts',   icon: Send },
+    { href: '/settings',      label: 'Settings',      icon: Settings },
   ];
 
   return (

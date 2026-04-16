@@ -159,6 +159,24 @@ The current algorithmic scoring has critical accuracy issues:
 - **Feature Gating:** Tier-based access controls
 - **Usage Metering:** Track scans/analyses per user
 
+### FR-AUTH-ACCESS: Authenticated Access Control
+
+The application MUST enforce strict authentication boundaries so that no app
+functionality, data, or navigation chrome leaks to unauthenticated users.
+
+| ID | Requirement |
+|---|---|
+| FR-AUTH-ACCESS-01 | Unauthenticated requests to any protected route (`/dashboard`, `/opportunities`, `/messages`, `/posting-queue`, `/settings`, `/listings/*`, `/analytics`, `/scraper`, `/onboarding`, `/api/*` except auth/health/webhooks) MUST receive a redirect to `/login` with a `callbackUrl` query parameter preserving the original path. Enforced server-side in `middleware.ts`. |
+| FR-AUTH-ACCESS-02 | The authenticated navigation bar (Dashboard/Opportunities/Messages/Cross-Posts/Settings) MUST NOT render for unauthenticated users or on public routes (`/`, `/login`, `/register`, `/forgot-password`, `/reset-password`, `/privacy`, `/terms`). |
+| FR-AUTH-ACCESS-03 | Expired session cookies (JWT `exp` claim in the past) MUST be cleared and the user MUST be redirected to `/login`. Enforced in `middleware.ts`. |
+| FR-AUTH-ACCESS-04 | Authenticated users on the landing page (`/`) MUST be redirected to `/dashboard`. |
+| FR-AUTH-ACCESS-05 | The only routes reachable without authentication are: `/`, `/login`, `/register`, `/forgot-password`, `/reset-password`, `/privacy`, `/terms`, `/api/auth/*`, `/api/health*`, `/api/webhooks/*`. Every other path requires a valid session. |
+| FR-AUTH-ACCESS-06 | Public routes (landing, privacy, terms, auth pages) MUST NOT emit or reference protected route URLs via navigation UI rendered to unauthenticated users. |
+
+**Rationale:** Prevents accidental leakage of product features to visitors who
+have not registered/paid, and gives legal/compliance pages (`/privacy`, `/terms`)
+a clean, public-facing chrome free of authenticated-app navigation.
+
 ### FR-INFRA: GCP Infrastructure
 
 - **Containerized Deployment:** Next.js on Cloud Run

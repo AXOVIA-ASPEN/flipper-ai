@@ -1,7 +1,7 @@
 # Requirements Traceability Matrix
 
 **Project:** Flipper AI
-**Last Updated:** 2026-04-12
+**Last Updated:** 2026-04-15
 **Purpose:** Maps every Functional Requirement (FR) and Non-Functional Requirement (NFR) to its corresponding Gherkin acceptance test scenarios, ensuring 100% coverage.
 
 **Convention:** Each scenario is tagged with:
@@ -31,6 +31,25 @@
 | FR-INFRA-12 | helpers/secrets.py module | 1 | 1.1 | @E-001-S-23, @E-001-S-24, @E-001-S-25, @E-001-S-27 | E-001-production-infrastructure.feature | Covered |
 | FR-INFRA-13 | Firebase Storage for images | 1 | 1.6 | @E-001-S-41, @E-001-S-42, @E-001-S-43, @E-001-S-44, @E-001-S-45, @E-001-S-46, @E-001-S-47 | E-001-production-infrastructure.feature | Covered |
 | FR-INFRA-14 | Firebase Cloud Messaging | 1 | 1.7 | @E-001-S-36, @E-001-S-37, @E-001-S-38, @E-001-S-39, @E-001-S-40 | E-001-production-infrastructure.feature | Covered |
+
+## FR-AUTH-ACCESS: Authenticated Access Control
+
+| Requirement | Description | Epic | Story | Scenario ID(s) | Feature File | Status |
+|---|---|---|---|---|---|---|
+| FR-AUTH-ACCESS-01 | Protected routes redirect unauthenticated users to /login with callbackUrl | 2 | 2-auth-access | @E-002-S-49 | E-002-user-registration-auth-onboarding.feature | Covered |
+| FR-AUTH-ACCESS-02 | Authenticated nav bar never renders for unauthenticated users or on public routes | 2 | 2-auth-access | @E-002-S-50, @E-002-S-51 | E-002-user-registration-auth-onboarding.feature | Covered (S-50) + WIP (S-51 — see note) |
+| FR-AUTH-ACCESS-03 | Expired session cookies cleared and user redirected to /login | 2 | 2-auth-access | @E-002-S-52 | E-002-user-registration-auth-onboarding.feature | Covered |
+| FR-AUTH-ACCESS-04 | Authenticated users on landing page redirected to /dashboard | 2 | 2-auth-access | @E-002-S-53 | E-002-user-registration-auth-onboarding.feature | WIP — client-side redirect needs real Firebase session |
+| FR-AUTH-ACCESS-05 | Only whitelisted public routes reachable without auth | 2 | 2-auth-access | @E-002-S-54 | E-002-user-registration-auth-onboarding.feature | Covered |
+| FR-AUTH-ACCESS-06 | Public pages must not link to protected routes | 2 | 2-auth-access | @E-002-S-55, @E-002-S-56 | E-002-user-registration-auth-onboarding.feature | Covered |
+
+**Note on S-51:** The "Navigation visible for authenticated users" scenario is
+tagged `@wip` because it requires a real Firebase Auth session (the client-side
+`useAuthContext` cannot be satisfied by a synthesized JWT cookie). Client-side
+rendering behavior is fully covered by the Jest unit test at
+`src/__tests__/components/Navigation.test.tsx` (23 tests, all passing), which
+exhaustively verifies the Navigation component's auth-gated render logic across
+every public and protected route combination.
 
 ## FR-SCAN: Multi-Marketplace Scanner
 
