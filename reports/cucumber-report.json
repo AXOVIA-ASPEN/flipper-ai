@@ -1,20 +1,20 @@
 [
   {
-    "description": "  As a Flipper.ai user\n  I want market price calculations to exclude extreme outlier prices\n  So that AI scores reflect realistic resale values",
+    "description": "  As a new user\n  I want to register with my email and password\n  So that I can create an account and start using Flipper AI",
     "elements": [
       {
         "description": "",
-        "id": "scoring-algorithm-improvements-—-iqr-outlier-filtering;cache-hit-when-price-changes-less-than-5%",
-        "keyword": "Scenario",
-        "line": 386,
-        "name": "Cache hit when price changes less than 5%",
+        "id": "user-registration-with-email;unauthenticated-user-redirected-to-login-for-protected-routes",
+        "keyword": "Scenario Outline",
+        "line": 360,
+        "name": "Unauthenticated user redirected to login for protected routes",
         "steps": [
           {
             "keyword": "Before",
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 140916
+              "duration": 689875
             }
           },
           {
@@ -22,67 +22,59 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 64416
-            }
-          },
-          {
-            "keyword": "Before",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 166517792
+              "duration": 193266959
             }
           },
           {
             "arguments": [],
             "keyword": "Given ",
-            "line": 387,
-            "name": "a cached AI analysis for listing \"listing-stable\" at price 200",
+            "line": 8,
+            "name": "the application is running",
             "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:95"
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
             },
             "result": {
               "status": "passed",
-              "duration": 3532791
+              "duration": 46037084
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 354,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 4495249
             }
           },
           {
             "arguments": [],
             "keyword": "When ",
-            "line": 388,
-            "name": "the listing is re-checked with current price 205",
+            "line": 355,
+            "name": "I navigate to \"/dashboard\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:153"
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
             },
             "result": {
               "status": "passed",
-              "duration": 615083
+              "duration": 323880708
             }
           },
           {
             "arguments": [],
             "keyword": "Then ",
-            "line": 389,
-            "name": "the cached analysis should be returned",
+            "line": 356,
+            "name": "I should be redirected to \"/login\" with a \"callbackUrl\" of \"/dashboard\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:169"
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:61"
             },
             "result": {
               "status": "passed",
-              "duration": 414958
-            }
-          },
-          {
-            "arguments": [],
-            "keyword": "And ",
-            "line": 390,
-            "name": "the stale analysis flag should be false",
-            "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:190"
-            },
-            "result": {
-              "status": "passed",
-              "duration": 411624
+              "duration": 25681792
             }
           },
           {
@@ -90,7 +82,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 10118167
+              "duration": 44019833
             }
           },
           {
@@ -98,51 +90,43 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 44791
-            }
-          },
-          {
-            "keyword": "After",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 17166
+              "duration": 83083
             }
           }
         ],
         "tags": [
           {
-            "name": "@epic-13",
+            "name": "@epic-2",
             "line": 1
           },
           {
-            "name": "@E-013-S-039",
-            "line": 385
+            "name": "@E-002-S-49",
+            "line": 352
           },
           {
-            "name": "@FR-SCORE-25",
-            "line": 385
+            "name": "@story-2-auth-access",
+            "line": 352
           },
           {
-            "name": "@story-13-3",
-            "line": 385
+            "name": "@FR-AUTH-ACCESS-01",
+            "line": 352
           }
         ],
         "type": "scenario"
       },
       {
         "description": "",
-        "id": "scoring-algorithm-improvements-—-iqr-outlier-filtering;full-cache-invalidation-when-price-drops-more-than-15%",
-        "keyword": "Scenario",
-        "line": 394,
-        "name": "Full cache invalidation when price drops more than 15%",
+        "id": "user-registration-with-email;unauthenticated-user-redirected-to-login-for-protected-routes",
+        "keyword": "Scenario Outline",
+        "line": 361,
+        "name": "Unauthenticated user redirected to login for protected routes",
         "steps": [
           {
             "keyword": "Before",
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 12167
+              "duration": 150624
             }
           },
           {
@@ -150,67 +134,59 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 16834
-            }
-          },
-          {
-            "keyword": "Before",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 34631624
+              "duration": 45739125
             }
           },
           {
             "arguments": [],
             "keyword": "Given ",
-            "line": 395,
-            "name": "a cached AI analysis for listing \"listing-price-drop\" at price 200",
+            "line": 8,
+            "name": "the application is running",
             "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:95"
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
             },
             "result": {
               "status": "passed",
-              "duration": 285875
+              "duration": 8072083
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 354,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 668499
             }
           },
           {
             "arguments": [],
             "keyword": "When ",
-            "line": 396,
-            "name": "the listing is re-checked with current price 160",
+            "line": 355,
+            "name": "I navigate to \"/opportunities\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:153"
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
             },
             "result": {
               "status": "passed",
-              "duration": 101333
+              "duration": 272155207
             }
           },
           {
             "arguments": [],
             "keyword": "Then ",
-            "line": 397,
-            "name": "no cached analysis should be returned",
+            "line": 356,
+            "name": "I should be redirected to \"/login\" with a \"callbackUrl\" of \"/opportunities\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:182"
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:61"
             },
             "result": {
               "status": "passed",
-              "duration": 223499
-            }
-          },
-          {
-            "arguments": [],
-            "keyword": "And ",
-            "line": 398,
-            "name": "the stale analysis flag should be false",
-            "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:190"
-            },
-            "result": {
-              "status": "passed",
-              "duration": 11667
+              "duration": 3808207
             }
           },
           {
@@ -218,7 +194,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 2592042
+              "duration": 13098666
             }
           },
           {
@@ -226,51 +202,43 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 14666
-            }
-          },
-          {
-            "keyword": "After",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 3582
+              "duration": 22249
             }
           }
         ],
         "tags": [
           {
-            "name": "@epic-13",
+            "name": "@epic-2",
             "line": 1
           },
           {
-            "name": "@E-013-S-040",
-            "line": 393
+            "name": "@E-002-S-49",
+            "line": 352
           },
           {
-            "name": "@FR-SCORE-25",
-            "line": 393
+            "name": "@story-2-auth-access",
+            "line": 352
           },
           {
-            "name": "@story-13-3",
-            "line": 393
+            "name": "@FR-AUTH-ACCESS-01",
+            "line": 352
           }
         ],
         "type": "scenario"
       },
       {
         "description": "",
-        "id": "scoring-algorithm-improvements-—-iqr-outlier-filtering;stale-flag-when-price-changes-between-5%-and-15%",
-        "keyword": "Scenario",
-        "line": 402,
-        "name": "Stale flag when price changes between 5% and 15%",
+        "id": "user-registration-with-email;unauthenticated-user-redirected-to-login-for-protected-routes",
+        "keyword": "Scenario Outline",
+        "line": 362,
+        "name": "Unauthenticated user redirected to login for protected routes",
         "steps": [
           {
             "keyword": "Before",
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 11624
+              "duration": 29915
             }
           },
           {
@@ -278,182 +246,59 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 11415
-            }
-          },
-          {
-            "keyword": "Before",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 36171125
+              "duration": 46782666
             }
           },
           {
             "arguments": [],
             "keyword": "Given ",
-            "line": 403,
-            "name": "a cached AI analysis for listing \"listing-stale\" at price 200",
+            "line": 8,
+            "name": "the application is running",
             "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:95"
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
             },
             "result": {
               "status": "passed",
-              "duration": 79459
-            }
-          },
-          {
-            "arguments": [],
-            "keyword": "When ",
-            "line": 404,
-            "name": "the listing is re-checked with current price 220",
-            "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:153"
-            },
-            "result": {
-              "status": "passed",
-              "duration": 69290
-            }
-          },
-          {
-            "arguments": [],
-            "keyword": "Then ",
-            "line": 405,
-            "name": "the cached analysis should be returned",
-            "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:169"
-            },
-            "result": {
-              "status": "passed",
-              "duration": 14208
-            }
-          },
-          {
-            "arguments": [],
-            "keyword": "And ",
-            "line": 406,
-            "name": "the stale analysis flag should be true",
-            "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:198"
-            },
-            "result": {
-              "status": "passed",
-              "duration": 241500
-            }
-          },
-          {
-            "keyword": "After",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 2935749
-            }
-          },
-          {
-            "keyword": "After",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 17291
-            }
-          },
-          {
-            "keyword": "After",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 3541
-            }
-          }
-        ],
-        "tags": [
-          {
-            "name": "@epic-13",
-            "line": 1
-          },
-          {
-            "name": "@E-013-S-041",
-            "line": 401
-          },
-          {
-            "name": "@FR-SCORE-25",
-            "line": 401
-          },
-          {
-            "name": "@story-13-3",
-            "line": 401
-          }
-        ],
-        "type": "scenario"
-      },
-      {
-        "description": "",
-        "id": "scoring-algorithm-improvements-—-iqr-outlier-filtering;legacy-cache-entry-with-null-analyzedatprice-is-treated-as-expired",
-        "keyword": "Scenario",
-        "line": 410,
-        "name": "Legacy cache entry with null analyzedAtPrice is treated as expired",
-        "steps": [
-          {
-            "keyword": "Before",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 21708
-            }
-          },
-          {
-            "keyword": "Before",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 14250
-            }
-          },
-          {
-            "keyword": "Before",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 34683583
+              "duration": 10484958
             }
           },
           {
             "arguments": [],
             "keyword": "Given ",
-            "line": 411,
-            "name": "a cached AI analysis for listing \"listing-legacy\" with null analyzedAtPrice",
+            "line": 354,
+            "name": "I am not logged in",
             "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:114"
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
             },
             "result": {
               "status": "passed",
-              "duration": 653375
+              "duration": 773958
             }
           },
           {
             "arguments": [],
             "keyword": "When ",
-            "line": 412,
-            "name": "the listing is re-checked with current price 200",
+            "line": 355,
+            "name": "I navigate to \"/messages\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:153"
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
             },
             "result": {
               "status": "passed",
-              "duration": 56084
+              "duration": 291860290
             }
           },
           {
             "arguments": [],
             "keyword": "Then ",
-            "line": 413,
-            "name": "no cached analysis should be returned",
+            "line": 356,
+            "name": "I should be redirected to \"/login\" with a \"callbackUrl\" of \"/messages\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:182"
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:61"
             },
             "result": {
               "status": "passed",
-              "duration": 10291
+              "duration": 3963958
             }
           },
           {
@@ -461,122 +306,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 2618082
-            }
-          },
-          {
-            "keyword": "After",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 13500
-            }
-          },
-          {
-            "keyword": "After",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 3583
-            }
-          }
-        ],
-        "tags": [
-          {
-            "name": "@epic-13",
-            "line": 1
-          },
-          {
-            "name": "@E-013-S-042",
-            "line": 409
-          },
-          {
-            "name": "@FR-SCORE-25",
-            "line": 409
-          },
-          {
-            "name": "@story-13-3",
-            "line": 409
-          }
-        ],
-        "type": "scenario"
-      },
-      {
-        "description": "",
-        "id": "scoring-algorithm-improvements-—-iqr-outlier-filtering;cache-entry-with-zero-analyzedatprice-always-invalidates",
-        "keyword": "Scenario",
-        "line": 417,
-        "name": "Cache entry with zero analyzedAtPrice always invalidates",
-        "steps": [
-          {
-            "keyword": "Before",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 15084
-            }
-          },
-          {
-            "keyword": "Before",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 11916
-            }
-          },
-          {
-            "keyword": "Before",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 35340874
-            }
-          },
-          {
-            "arguments": [],
-            "keyword": "Given ",
-            "line": 418,
-            "name": "a cached AI analysis for listing \"listing-free\" at price 0",
-            "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:95"
-            },
-            "result": {
-              "status": "passed",
-              "duration": 72541
-            }
-          },
-          {
-            "arguments": [],
-            "keyword": "When ",
-            "line": 419,
-            "name": "the listing is re-checked with current price 50",
-            "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:153"
-            },
-            "result": {
-              "status": "passed",
-              "duration": 53999
-            }
-          },
-          {
-            "arguments": [],
-            "keyword": "Then ",
-            "line": 420,
-            "name": "no cached analysis should be returned",
-            "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:182"
-            },
-            "result": {
-              "status": "passed",
-              "duration": 10541
-            }
-          },
-          {
-            "keyword": "After",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 2821124
+              "duration": 7004207
             }
           },
           {
@@ -586,49 +316,41 @@
               "status": "passed",
               "duration": 13750
             }
-          },
-          {
-            "keyword": "After",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 3874
-            }
           }
         ],
         "tags": [
           {
-            "name": "@epic-13",
+            "name": "@epic-2",
             "line": 1
           },
           {
-            "name": "@E-013-S-043",
-            "line": 416
+            "name": "@E-002-S-49",
+            "line": 352
           },
           {
-            "name": "@FR-SCORE-25",
-            "line": 416
+            "name": "@story-2-auth-access",
+            "line": 352
           },
           {
-            "name": "@story-13-3",
-            "line": 416
+            "name": "@FR-AUTH-ACCESS-01",
+            "line": 352
           }
         ],
         "type": "scenario"
       },
       {
         "description": "",
-        "id": "scoring-algorithm-improvements-—-iqr-outlier-filtering;cache-write-includes-analyzedatprice",
-        "keyword": "Scenario",
-        "line": 424,
-        "name": "Cache write includes analyzedAtPrice",
+        "id": "user-registration-with-email;unauthenticated-user-redirected-to-login-for-protected-routes",
+        "keyword": "Scenario Outline",
+        "line": 363,
+        "name": "Unauthenticated user redirected to login for protected routes",
         "steps": [
           {
             "keyword": "Before",
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 14333
+              "duration": 313791
             }
           },
           {
@@ -636,156 +358,59 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 9958
-            }
-          },
-          {
-            "keyword": "Before",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 35533582
+              "duration": 49583875
             }
           },
           {
             "arguments": [],
             "keyword": "Given ",
-            "line": 425,
-            "name": "a fresh AI analysis is cached for listing \"listing-new\" at price 300",
+            "line": 8,
+            "name": "the application is running",
             "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:133"
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
             },
             "result": {
               "status": "passed",
-              "duration": 910457
-            }
-          },
-          {
-            "arguments": [],
-            "keyword": "Then ",
-            "line": 426,
-            "name": "the cache entry should have analyzedAtPrice set to 300",
-            "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:206"
-            },
-            "result": {
-              "status": "passed",
-              "duration": 440583
-            }
-          },
-          {
-            "keyword": "After",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 2794874
-            }
-          },
-          {
-            "keyword": "After",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 13042
-            }
-          },
-          {
-            "keyword": "After",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 3124
-            }
-          }
-        ],
-        "tags": [
-          {
-            "name": "@epic-13",
-            "line": 1
-          },
-          {
-            "name": "@E-013-S-044",
-            "line": 423
-          },
-          {
-            "name": "@FR-SCORE-25",
-            "line": 423
-          },
-          {
-            "name": "@story-13-3",
-            "line": 423
-          }
-        ],
-        "type": "scenario"
-      },
-      {
-        "description": "",
-        "id": "scoring-algorithm-improvements-—-iqr-outlier-filtering;deduplication-lock-prevents-concurrent-refresh-storms",
-        "keyword": "Scenario",
-        "line": 430,
-        "name": "Deduplication lock prevents concurrent refresh storms",
-        "steps": [
-          {
-            "keyword": "Before",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 7708
-            }
-          },
-          {
-            "keyword": "Before",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 10499
-            }
-          },
-          {
-            "keyword": "Before",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 34947707
+              "duration": 11687084
             }
           },
           {
             "arguments": [],
             "keyword": "Given ",
-            "line": 431,
-            "name": "listing \"listing-dedup\" is marked as refreshing",
+            "line": 354,
+            "name": "I am not logged in",
             "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:143"
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
             },
             "result": {
               "status": "passed",
-              "duration": 634417
+              "duration": 1468582
             }
           },
           {
             "arguments": [],
             "keyword": "When ",
-            "line": 432,
-            "name": "another refresh is attempted for listing \"listing-dedup\"",
+            "line": 355,
+            "name": "I navigate to \"/posting-queue\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:160"
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
             },
             "result": {
               "status": "passed",
-              "duration": 399625
+              "duration": 201543499
             }
           },
           {
             "arguments": [],
             "keyword": "Then ",
-            "line": 433,
-            "name": "the refresh should be skipped because it is already in progress",
+            "line": 356,
+            "name": "I should be redirected to \"/login\" with a \"callbackUrl\" of \"/posting-queue\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-013-cache-invalidation.steps.ts:220"
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:61"
             },
             "result": {
               "status": "passed",
-              "duration": 207000
+              "duration": 1403458
             }
           },
           {
@@ -793,7 +418,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 2656124
+              "duration": 9315874
             }
           },
           {
@@ -801,49 +426,2652 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 32875
-            }
-          },
-          {
-            "keyword": "After",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 12208
+              "duration": 18708
             }
           }
         ],
         "tags": [
           {
-            "name": "@epic-13",
+            "name": "@epic-2",
             "line": 1
           },
           {
-            "name": "@E-013-S-045",
-            "line": 429
+            "name": "@E-002-S-49",
+            "line": 352
           },
           {
-            "name": "@FR-SCORE-25",
-            "line": 429
+            "name": "@story-2-auth-access",
+            "line": 352
           },
           {
-            "name": "@story-13-3",
-            "line": 429
+            "name": "@FR-AUTH-ACCESS-01",
+            "line": 352
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-registration-with-email;unauthenticated-user-redirected-to-login-for-protected-routes",
+        "keyword": "Scenario Outline",
+        "line": 364,
+        "name": "Unauthenticated user redirected to login for protected routes",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 14708
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 48318332
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 8,
+            "name": "the application is running",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 27473167
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 354,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1493000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 355,
+            "name": "I navigate to \"/settings\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 247250042
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 356,
+            "name": "I should be redirected to \"/login\" with a \"callbackUrl\" of \"/settings\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:61"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 793208
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 18911165
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 60499
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-2",
+            "line": 1
+          },
+          {
+            "name": "@E-002-S-49",
+            "line": 352
+          },
+          {
+            "name": "@story-2-auth-access",
+            "line": 352
+          },
+          {
+            "name": "@FR-AUTH-ACCESS-01",
+            "line": 352
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-registration-with-email;unauthenticated-user-redirected-to-login-for-protected-routes",
+        "keyword": "Scenario Outline",
+        "line": 365,
+        "name": "Unauthenticated user redirected to login for protected routes",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 24666
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 38890541
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 8,
+            "name": "the application is running",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 13017540
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 354,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1208999
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 355,
+            "name": "I navigate to \"/analytics\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 232701250
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 356,
+            "name": "I should be redirected to \"/login\" with a \"callbackUrl\" of \"/analytics\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:61"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2097541
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 7031584
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 28250
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-2",
+            "line": 1
+          },
+          {
+            "name": "@E-002-S-49",
+            "line": 352
+          },
+          {
+            "name": "@story-2-auth-access",
+            "line": 352
+          },
+          {
+            "name": "@FR-AUTH-ACCESS-01",
+            "line": 352
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-registration-with-email;unauthenticated-user-redirected-to-login-for-protected-routes",
+        "keyword": "Scenario Outline",
+        "line": 366,
+        "name": "Unauthenticated user redirected to login for protected routes",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 31167
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 35223582
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 8,
+            "name": "the application is running",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 5919707
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 354,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 601125
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 355,
+            "name": "I navigate to \"/scraper\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 190876041
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 356,
+            "name": "I should be redirected to \"/login\" with a \"callbackUrl\" of \"/scraper\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:61"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1181540
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 4107874
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 12708
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-2",
+            "line": 1
+          },
+          {
+            "name": "@E-002-S-49",
+            "line": 352
+          },
+          {
+            "name": "@story-2-auth-access",
+            "line": 352
+          },
+          {
+            "name": "@FR-AUTH-ACCESS-01",
+            "line": 352
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-registration-with-email;unauthenticated-user-redirected-to-login-for-protected-routes",
+        "keyword": "Scenario Outline",
+        "line": 367,
+        "name": "Unauthenticated user redirected to login for protected routes",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 17042
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 36764333
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 8,
+            "name": "the application is running",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 7344999
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 354,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 633417
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 355,
+            "name": "I navigate to \"/onboarding\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 188782250
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 356,
+            "name": "I should be redirected to \"/login\" with a \"callbackUrl\" of \"/onboarding\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:61"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1759791
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 5346083
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 15416
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-2",
+            "line": 1
+          },
+          {
+            "name": "@E-002-S-49",
+            "line": 352
+          },
+          {
+            "name": "@story-2-auth-access",
+            "line": 352
+          },
+          {
+            "name": "@FR-AUTH-ACCESS-01",
+            "line": 352
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-registration-with-email;navigation-bar-is-hidden-on-public-routes-for-unauthenticated-users",
+        "keyword": "Scenario Outline",
+        "line": 382,
+        "name": "Navigation bar is hidden on public routes for unauthenticated users",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 15249
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 36804291
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 8,
+            "name": "the application is running",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 5754208
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 371,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 605458
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 372,
+            "name": "I navigate to \"/\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 175825915
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 373,
+            "name": "I should not see the authenticated navigation bar",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:73"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 31417333
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 374,
+            "name": "I should not see a link to \"/dashboard\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3790791
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 375,
+            "name": "I should not see a link to \"/opportunities\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1272667
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 376,
+            "name": "I should not see a link to \"/messages\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1072584
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 377,
+            "name": "I should not see a link to \"/posting-queue\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1119041
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 378,
+            "name": "I should not see a link to \"/settings\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 914040
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3902208
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 13958
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-2",
+            "line": 1
+          },
+          {
+            "name": "@E-002-S-50",
+            "line": 369
+          },
+          {
+            "name": "@story-2-auth-access",
+            "line": 369
+          },
+          {
+            "name": "@FR-AUTH-ACCESS-02",
+            "line": 369
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-registration-with-email;navigation-bar-is-hidden-on-public-routes-for-unauthenticated-users",
+        "keyword": "Scenario Outline",
+        "line": 383,
+        "name": "Navigation bar is hidden on public routes for unauthenticated users",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 24999
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 39779291
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 8,
+            "name": "the application is running",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 8345666
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 371,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 970583
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 372,
+            "name": "I navigate to \"/privacy\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 226050957
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 373,
+            "name": "I should not see the authenticated navigation bar",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:73"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 22437208
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 374,
+            "name": "I should not see a link to \"/dashboard\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3148124
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 375,
+            "name": "I should not see a link to \"/opportunities\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1114915
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 376,
+            "name": "I should not see a link to \"/messages\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 833499
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 377,
+            "name": "I should not see a link to \"/posting-queue\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 708665
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 378,
+            "name": "I should not see a link to \"/settings\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 757625
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3051333
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 11875
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-2",
+            "line": 1
+          },
+          {
+            "name": "@E-002-S-50",
+            "line": 369
+          },
+          {
+            "name": "@story-2-auth-access",
+            "line": 369
+          },
+          {
+            "name": "@FR-AUTH-ACCESS-02",
+            "line": 369
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-registration-with-email;navigation-bar-is-hidden-on-public-routes-for-unauthenticated-users",
+        "keyword": "Scenario Outline",
+        "line": 384,
+        "name": "Navigation bar is hidden on public routes for unauthenticated users",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 9125
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 34974709
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 8,
+            "name": "the application is running",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 8298458
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 371,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 691125
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 372,
+            "name": "I navigate to \"/terms\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 173901417
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 373,
+            "name": "I should not see the authenticated navigation bar",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:73"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 23727958
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 374,
+            "name": "I should not see a link to \"/dashboard\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1706167
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 375,
+            "name": "I should not see a link to \"/opportunities\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1088125
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 376,
+            "name": "I should not see a link to \"/messages\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 844000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 377,
+            "name": "I should not see a link to \"/posting-queue\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 698834
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 378,
+            "name": "I should not see a link to \"/settings\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1008208
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 2751333
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 8708
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-2",
+            "line": 1
+          },
+          {
+            "name": "@E-002-S-50",
+            "line": 369
+          },
+          {
+            "name": "@story-2-auth-access",
+            "line": 369
+          },
+          {
+            "name": "@FR-AUTH-ACCESS-02",
+            "line": 369
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-registration-with-email;navigation-bar-is-hidden-on-public-routes-for-unauthenticated-users",
+        "keyword": "Scenario Outline",
+        "line": 385,
+        "name": "Navigation bar is hidden on public routes for unauthenticated users",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 6792
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 46414917
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 8,
+            "name": "the application is running",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 5855083
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 371,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1309750
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 372,
+            "name": "I navigate to \"/login\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 179517249
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 373,
+            "name": "I should not see the authenticated navigation bar",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:73"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 24873292
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 374,
+            "name": "I should not see a link to \"/dashboard\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 4467249
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 375,
+            "name": "I should not see a link to \"/opportunities\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 5033916
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 376,
+            "name": "I should not see a link to \"/messages\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1366832
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 377,
+            "name": "I should not see a link to \"/posting-queue\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1171583
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 378,
+            "name": "I should not see a link to \"/settings\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1816583
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3621708
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 10958
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-2",
+            "line": 1
+          },
+          {
+            "name": "@E-002-S-50",
+            "line": 369
+          },
+          {
+            "name": "@story-2-auth-access",
+            "line": 369
+          },
+          {
+            "name": "@FR-AUTH-ACCESS-02",
+            "line": 369
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-registration-with-email;navigation-bar-is-hidden-on-public-routes-for-unauthenticated-users",
+        "keyword": "Scenario Outline",
+        "line": 386,
+        "name": "Navigation bar is hidden on public routes for unauthenticated users",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 11166
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 39558957
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 8,
+            "name": "the application is running",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 7236540
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 371,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 609207
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 372,
+            "name": "I navigate to \"/register\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 183090834
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 373,
+            "name": "I should not see the authenticated navigation bar",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:73"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 24980875
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 374,
+            "name": "I should not see a link to \"/dashboard\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 8252667
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 375,
+            "name": "I should not see a link to \"/opportunities\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 6890875
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 376,
+            "name": "I should not see a link to \"/messages\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3002959
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 377,
+            "name": "I should not see a link to \"/posting-queue\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3983250
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 378,
+            "name": "I should not see a link to \"/settings\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1510750
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3765082
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 12541
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-2",
+            "line": 1
+          },
+          {
+            "name": "@E-002-S-50",
+            "line": 369
+          },
+          {
+            "name": "@story-2-auth-access",
+            "line": 369
+          },
+          {
+            "name": "@FR-AUTH-ACCESS-02",
+            "line": 369
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-registration-with-email;navigation-bar-is-hidden-on-public-routes-for-unauthenticated-users",
+        "keyword": "Scenario Outline",
+        "line": 387,
+        "name": "Navigation bar is hidden on public routes for unauthenticated users",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 11542
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 42110792
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 8,
+            "name": "the application is running",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 9844208
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 371,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 653792
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 372,
+            "name": "I navigate to \"/forgot-password\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 176529833
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 373,
+            "name": "I should not see the authenticated navigation bar",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:73"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 21693041
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 374,
+            "name": "I should not see a link to \"/dashboard\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2147249
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 375,
+            "name": "I should not see a link to \"/opportunities\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1043833
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 376,
+            "name": "I should not see a link to \"/messages\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 910917
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 377,
+            "name": "I should not see a link to \"/posting-queue\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2391958
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 378,
+            "name": "I should not see a link to \"/settings\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1025208
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 2965874
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 12374
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-2",
+            "line": 1
+          },
+          {
+            "name": "@E-002-S-50",
+            "line": 369
+          },
+          {
+            "name": "@story-2-auth-access",
+            "line": 369
+          },
+          {
+            "name": "@FR-AUTH-ACCESS-02",
+            "line": 369
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-registration-with-email;expired-session-cookie-is-cleared-and-user-is-redirected-to-login",
+        "keyword": "Scenario",
+        "line": 403,
+        "name": "Expired session cookie is cleared and user is redirected to login",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 6916
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 41348291
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 8,
+            "name": "the application is running",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 6803750
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 404,
+            "name": "I have an expired session cookie",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:98"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 868332
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 405,
+            "name": "I navigate to \"/dashboard\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 178593291
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 406,
+            "name": "I should be redirected to \"/login\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:126"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3216083
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 407,
+            "name": "the \"__session\" cookie should be cleared",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:131"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2329625
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3649083
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 11709
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-2",
+            "line": 1
+          },
+          {
+            "name": "@E-002-S-52",
+            "line": 402
+          },
+          {
+            "name": "@story-2-auth-access",
+            "line": 402
+          },
+          {
+            "name": "@FR-AUTH-ACCESS-03",
+            "line": 402
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-registration-with-email;only-whitelisted-routes-are-reachable-without-authentication",
+        "keyword": "Scenario Outline",
+        "line": 424,
+        "name": "Only whitelisted routes are reachable without authentication",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 10667
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 36288709
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 8,
+            "name": "the application is running",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 7075834
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 418,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 583708
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 419,
+            "name": "I navigate to \"/\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 172160915
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 420,
+            "name": "the response status code should be 200",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:144"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 36198542
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 5417832
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 12792
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-2",
+            "line": 1
+          },
+          {
+            "name": "@E-002-S-54",
+            "line": 416
+          },
+          {
+            "name": "@story-2-auth-access",
+            "line": 416
+          },
+          {
+            "name": "@FR-AUTH-ACCESS-05",
+            "line": 416
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-registration-with-email;only-whitelisted-routes-are-reachable-without-authentication",
+        "keyword": "Scenario Outline",
+        "line": 425,
+        "name": "Only whitelisted routes are reachable without authentication",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 11124
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 37921957
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 8,
+            "name": "the application is running",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 8783792
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 418,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 871041
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 419,
+            "name": "I navigate to \"/login\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 173855332
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 420,
+            "name": "the response status code should be 200",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:144"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 54893874
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 4662083
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 12999
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-2",
+            "line": 1
+          },
+          {
+            "name": "@E-002-S-54",
+            "line": 416
+          },
+          {
+            "name": "@story-2-auth-access",
+            "line": 416
+          },
+          {
+            "name": "@FR-AUTH-ACCESS-05",
+            "line": 416
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-registration-with-email;only-whitelisted-routes-are-reachable-without-authentication",
+        "keyword": "Scenario Outline",
+        "line": 426,
+        "name": "Only whitelisted routes are reachable without authentication",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 21375
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 47157750
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 8,
+            "name": "the application is running",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 6342833
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 418,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 574832
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 419,
+            "name": "I navigate to \"/register\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 200426416
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 420,
+            "name": "the response status code should be 200",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:144"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 47682084
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3994624
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 11290
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-2",
+            "line": 1
+          },
+          {
+            "name": "@E-002-S-54",
+            "line": 416
+          },
+          {
+            "name": "@story-2-auth-access",
+            "line": 416
+          },
+          {
+            "name": "@FR-AUTH-ACCESS-05",
+            "line": 416
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-registration-with-email;only-whitelisted-routes-are-reachable-without-authentication",
+        "keyword": "Scenario Outline",
+        "line": 427,
+        "name": "Only whitelisted routes are reachable without authentication",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 8166
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 36275208
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 8,
+            "name": "the application is running",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 6007834
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 418,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 612125
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 419,
+            "name": "I navigate to \"/forgot-password\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 166328083
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 420,
+            "name": "the response status code should be 200",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:144"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 36142041
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 6755875
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 13750
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-2",
+            "line": 1
+          },
+          {
+            "name": "@E-002-S-54",
+            "line": 416
+          },
+          {
+            "name": "@story-2-auth-access",
+            "line": 416
+          },
+          {
+            "name": "@FR-AUTH-ACCESS-05",
+            "line": 416
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-registration-with-email;only-whitelisted-routes-are-reachable-without-authentication",
+        "keyword": "Scenario Outline",
+        "line": 428,
+        "name": "Only whitelisted routes are reachable without authentication",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 76457
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 35271167
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 8,
+            "name": "the application is running",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 5779583
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 418,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 674459
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 419,
+            "name": "I navigate to \"/privacy\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 172894833
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 420,
+            "name": "the response status code should be 200",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:144"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 37785332
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 2754833
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 10000
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-2",
+            "line": 1
+          },
+          {
+            "name": "@E-002-S-54",
+            "line": 416
+          },
+          {
+            "name": "@story-2-auth-access",
+            "line": 416
+          },
+          {
+            "name": "@FR-AUTH-ACCESS-05",
+            "line": 416
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-registration-with-email;only-whitelisted-routes-are-reachable-without-authentication",
+        "keyword": "Scenario Outline",
+        "line": 429,
+        "name": "Only whitelisted routes are reachable without authentication",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 10875
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 35651834
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 8,
+            "name": "the application is running",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 6904290
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 418,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1325041
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 419,
+            "name": "I navigate to \"/terms\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 200465458
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 420,
+            "name": "the response status code should be 200",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:144"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 41262125
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 2982292
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 11167
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-2",
+            "line": 1
+          },
+          {
+            "name": "@E-002-S-54",
+            "line": 416
+          },
+          {
+            "name": "@story-2-auth-access",
+            "line": 416
+          },
+          {
+            "name": "@FR-AUTH-ACCESS-05",
+            "line": 416
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-registration-with-email;privacy-policy-page-does-not-link-to-any-protected-route",
+        "keyword": "Scenario",
+        "line": 432,
+        "name": "Privacy policy page does not link to any protected route",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 9500
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 36066542
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 8,
+            "name": "the application is running",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 5765457
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 433,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 581416
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 434,
+            "name": "I navigate to \"/privacy\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 178161125
+            }
+          },
+          {
+            "arguments": [
+              {
+                "rows": [
+                  {
+                    "cells": [
+                      "/dashboard"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "/opportunities"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "/messages"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "/posting-queue"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "/settings"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "/analytics"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "/scraper"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "keyword": "Then ",
+            "line": 435,
+            "name": "the page should not contain a link to any of:",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:152"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 26563624
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 2379417
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 10833
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-2",
+            "line": 1
+          },
+          {
+            "name": "@E-002-S-55",
+            "line": 431
+          },
+          {
+            "name": "@story-2-auth-access",
+            "line": 431
+          },
+          {
+            "name": "@FR-AUTH-ACCESS-06",
+            "line": 431
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-registration-with-email;terms-of-service-page-does-not-link-to-any-protected-route",
+        "keyword": "Scenario",
+        "line": 445,
+        "name": "Terms of service page does not link to any protected route",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 7832
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 37931082
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 8,
+            "name": "the application is running",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-001-production-infrastructure.steps.ts:308"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 5849249
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 446,
+            "name": "I am not logged in",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:156"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 626582
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 447,
+            "name": "I navigate to \"/terms\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-settings.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 160200500
+            }
+          },
+          {
+            "arguments": [
+              {
+                "rows": [
+                  {
+                    "cells": [
+                      "/dashboard"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "/opportunities"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "/messages"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "/posting-queue"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "/settings"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "/analytics"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "/scraper"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "keyword": "Then ",
+            "line": 448,
+            "name": "the page should not contain a link to any of:",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:152"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 27110333
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3548667
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 18292
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-2",
+            "line": 1
+          },
+          {
+            "name": "@E-002-S-56",
+            "line": 444
+          },
+          {
+            "name": "@story-2-auth-access",
+            "line": 444
+          },
+          {
+            "name": "@FR-AUTH-ACCESS-06",
+            "line": 444
           }
         ],
         "type": "scenario"
       }
     ],
-    "id": "scoring-algorithm-improvements-—-iqr-outlier-filtering",
+    "id": "user-registration-with-email",
     "line": 2,
     "keyword": "Feature",
-    "name": "Scoring Algorithm Improvements — IQR Outlier Filtering",
+    "name": "User Registration with Email",
     "tags": [
       {
-        "name": "@epic-13",
+        "name": "@epic-2",
         "line": 1
       }
     ],
-    "uri": "test/acceptance/features/E-013-scoring-algorithm-improvements.feature"
+    "uri": "test/acceptance/features/E-002-user-registration-auth-onboarding.feature"
   }
 ]

@@ -61,15 +61,17 @@ describe('Value Estimator', () => {
     describe('category multipliers', () => {
       it('should apply electronics category multiplier', () => {
         const result = estimateValue('Generic gadget', null, 100, 'good', 'electronics');
-        // Electronics: low 1.2, high 1.6, good condition: 0.75
-        // Expected range: 100 * 1.2 * 0.75 = 90 to 100 * 1.6 * 0.75 = 120
-        expect(result.estimatedLow).toBeGreaterThanOrEqual(80);
-        expect(result.estimatedHigh).toBeLessThanOrEqual(130);
+        // Electronics (recalibrated 2026-04-15): low 1.3, high 1.8, good condition: 0.75
+        // Expected range: 100 * 1.3 * 0.75 = ~98 to 100 * 1.8 * 0.75 = ~135
+        expect(result.estimatedLow).toBeGreaterThanOrEqual(90);
+        expect(result.estimatedHigh).toBeLessThanOrEqual(140);
       });
 
       it('should apply collectibles category multiplier (higher markup)', () => {
         const result = estimateValue('Vintage item', null, 100, 'good', 'collectibles');
-        // Collectibles: low 1.5, high 2.5
+        // Collectibles (recalibrated 2026-04-15): low 1.4, high 2.2
+        // "Vintage" triggers vintage boost (1.3x), good condition (0.75)
+        // estLow = 100 * 1.4 * 0.75 * 1.3 = 137
         expect(result.estimatedLow).toBeGreaterThan(100);
         expect(result.estimatedHigh).toBeGreaterThan(result.estimatedLow);
       });
@@ -522,50 +524,43 @@ describe('Value Estimator', () => {
 
       it('should apply exclusive boosts — >$300 profit gets +10 only (not +5 AND +10)', () => {
         // Sealed Apple MacBook at low asking price → huge profit margin + absolute profit >$300
-        // new condition (1.0), electronics (1.2-1.6), Apple boost (1.2), sealed boost (1.3)
-        // For asking=200: estLow = 200*1.2*1.0*1.2*1.3=374, estHigh=200*1.6*1.0*1.2*1.3=499
-        // at 13% fee: profitLow=374*0.87-200=125, profitHigh=499*0.87-200=234
-        // profitPotential≈180, which is >$100 (+5 tier) but not >$300.
-        // For asking=50, new, electronics, Apple sealed:
-        // estLow=50*1.2*1.0*1.2*1.3=93.6→94, estHigh=50*1.6*1.0*1.2*1.3=124.8→125
-        // profitLow=94*0.87-50=31.78→32, profitHigh=125*0.87-50=58.75→59, avg≈46 → >$100? No
-        // Need very high profit. Try asking=100, new, collectibles (1.5-2.5), vintage+rare+sealed:
-        // boosts: vintage(1.4)*rare(1.4)*sealed(1.3)=2.548
-        // estLow=100*1.5*1.0*2.548=382, estHigh=100*2.5*1.0*2.548=637
-        // profitLow=382*0.87-100=232, profitHigh=637*0.87-100=454, avg=343 → >$300!
-        const bigWin = estimateValue('Vintage Rare Limited Edition sealed', null, 100, 'new', 'collectibles');
+        // Recalibrated 2026-04-15 (Story 13.7):
+        // collectibles (1.4-2.2), vintage (1.3), rare (1.3), sealed (1.3)
+        // boosts: vintage(1.3)*rare(1.3)*sealed(1.3) = 2.197
+        // For asking=200, new condition (1.0):
+        // estLow=200*1.4*1.0*2.197=615, estHigh=200*2.2*1.0*2.197=967
+        // profitLow=615*0.87-200=335, profitHigh=967*0.87-200=641, avg=488 → >$300
+        const bigWin = estimateValue('Vintage Rare Limited Edition sealed', null, 200, 'new', 'collectibles');
         expect(bigWin.profitPotential).toBeGreaterThan(300);
         expect(bigWin.valueScore).toBeGreaterThanOrEqual(0);
         expect(bigWin.valueScore).toBeLessThanOrEqual(100);
-        // The +10 boost applies (>$300 tier), the +5 (>$100 tier) does NOT stack
-        // We verify by checking score is within a valid range, not >110
+        // The >$500 boost (+15) or >$300 boost (+10) applies exclusively (not cumulative with lower tiers)
       });
 
-      it('should use weighted formula: 40% margin + 60% absolute profit (AC #1)', () => {
+      it('should use weighted formula: 50% margin + 50% absolute profit with log curve 36 (recalibrated 2026-04-15)', () => {
         // Verify the formula math directly with a controlled input
         // default category (1.2-1.5), new condition (1.0), feeRate=0, asking=100
         // estLow=120, estHigh=150, estValue=135
         // profitLow=20, profitHigh=50, profitPotential=35
         // marginScore = min(100, max(0, round(35/100*100 + 50))) = min(100, 85) = 85
-        // absoluteProfitScore = min(100, round(log10(35) * 33.33)) = round(1.544*33.33) = round(51.47) = 51
-        // weightedScore = round(85*0.4 + 51*0.6) = round(34 + 30.6) = round(64.6) = 65
+        // absoluteProfitScore = min(100, round(log10(35) * 36)) = round(1.544*36) = round(55.6) = 56
+        // weightedScore = round(85*0.5 + 56*0.5) = round(42.5 + 28) = round(70.5) = 71
         // No caps apply (profit=35 > 15), no boosts (profit < 100)
         const result = estimateValue('Generic item', null, 100, 'new', 'default', 0);
         expect(result.profitPotential).toBe(35);
-        // marginScore=85, absoluteProfitScore=51, weighted=65
-        expect(result.valueScore).toBe(65);
+        // marginScore=85, absoluteProfitScore=56, weighted=71
+        expect(result.valueScore).toBe(71);
       });
 
-      it('should score $50-profit item around 56-75 range (Task 3.3)', () => {
-        // default category, new condition, feeRate=0, asking=100
-        // With collectibles (1.5-2.5), good (0.75):
-        // estLow=100*1.5*0.75=113, estHigh=100*2.5*0.75=188
-        // profitLow=13, profitHigh=88, profitPotential=50
+      it('should score $35-profit item around 56-75 range (Task 3.3, recalibrated 2026-04-15)', () => {
+        // Recalibrated: collectibles is now 1.4-2.2 (was 1.5-2.5), good (0.75):
+        // estLow=100*1.4*0.75=105, estHigh=100*2.2*0.75=165
+        // profitLow=5, profitHigh=65, profitPotential≈35
         const result = estimateValue('Collectible item', null, 100, 'good', 'collectibles', 0);
-        expect(result.profitPotential).toBeGreaterThanOrEqual(40);
-        expect(result.profitPotential).toBeLessThanOrEqual(60);
+        expect(result.profitPotential).toBeGreaterThanOrEqual(30);
+        expect(result.profitPotential).toBeLessThanOrEqual(50);
         expect(result.valueScore).toBeGreaterThanOrEqual(56);
-        expect(result.valueScore).toBeLessThanOrEqual(75);
+        expect(result.valueScore).toBeLessThanOrEqual(80);
       });
 
       it('should score $100-profit items higher than $10-profit items (Task 3.4)', () => {

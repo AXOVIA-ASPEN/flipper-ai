@@ -302,13 +302,14 @@ Feature: Scoring Algorithm Improvements — IQR Outlier Filtering
   # =====================================================================
 
   # S-030: Weighted formula combines margin and absolute profit (AC #1)
+  # NOTE: Weights recalibrated 2026-04-15 via Story 13.7 refinement session from 0.4/0.6 to 0.5/0.5
   @E-013-S-030 @FR-SCORE-26 @story-13-4
-  Scenario: Value score uses weighted formula with 40% margin + 60% absolute profit
+  Scenario: Value score uses weighted formula with 50% margin + 50% absolute profit
     Given the value-estimator source file at "src/lib/value-estimator.ts"
     When I inspect the estimateValue function scoring logic
     Then the formula should compute marginScore from profitMargin
     And the formula should compute absoluteProfitScore using a logarithmic curve
-    And the final weighted score should use 0.4 weight for margin and 0.6 for absolute profit
+    And the final weighted score should use 0.5 weight for margin and 0.5 for absolute profit
 
   # S-031: Negative profit capped at score 10 (AC #2)
   @E-013-S-031 @FR-SCORE-26 @story-13-4
@@ -550,3 +551,106 @@ Feature: Scoring Algorithm Improvements — IQR Outlier Filtering
     When cross-platform price intelligence is fetched for "Resilient Item"
     Then the result should still contain eBay data
     And the result should not be null
+
+  # ─────────────────────────────────────────────────────────────
+  # Story 13.7 — Collaborative Scoring Algorithm Refinement
+  # FR-SCORE-29: Scoring algorithm calibrated against real-world
+  # resale data via interactive refinement process.
+  # ─────────────────────────────────────────────────────────────
+
+  # S-059: Electronics category uses recalibrated 1.3-1.8 multiplier (AC #2)
+  @E-013-S-059 @FR-SCORE-29 @story-13-7
+  Scenario: Electronics category multiplier applies refined 1.3-1.8 range
+    Given an electronics listing priced at 100 with good condition
+    When the scoring algorithm runs
+    Then the estimated low should be at least 95
+    And the estimated high should be at most 140
+
+  # S-060: Musical category uses recalibrated 1.4-2.0 multiplier (AC #2)
+  @E-013-S-060 @FR-SCORE-29 @story-13-7
+  Scenario: Musical category multiplier applies refined 1.4-2.0 range with easier resale
+    Given a musical listing priced at 100 with new condition
+    When the scoring algorithm runs
+    Then the estimated value should reflect a 1.4x-2.0x markup
+    And the resale difficulty should be EASY or VERY_EASY
+
+  # S-061: Collectibles category reduced to prevent runaway stacking (AC #2)
+  @E-013-S-061 @FR-SCORE-29 @story-13-7
+  Scenario: Collectibles multiplier reduced from 1.5-2.5 to 1.4-2.2
+    Given a generic collectibles listing priced at 100 with good condition
+    When the scoring algorithm runs
+    Then the estimated high should be at most 180
+
+  # S-062: Milwaukee/DeWalt/Makita power tools receive 1.25x boost (AC #3)
+  @E-013-S-062 @FR-SCORE-29 @story-13-7
+  Scenario: New power-tool brand boost applies to Milwaukee/DeWalt/Makita
+    Given a "Milwaukee Drill" listing priced at 100
+    When the scoring algorithm runs
+    Then the tags should include "power-tools"
+    And a generic drill at the same price should score lower
+
+  # S-063: Fender/Gibson/Martin guitars receive 1.3x premium-guitar boost (AC #3)
+  @E-013-S-063 @FR-SCORE-29 @story-13-7
+  Scenario: Premium-guitar brand boost applies to Fender/Gibson/Martin
+    Given a "Fender Telecaster" listing priced at 500
+    When the scoring algorithm runs
+    Then the tags should include "premium-guitar"
+
+  # S-064: Moog/Roland/Korg/Akai receive 1.25x synth-keys boost (AC #3)
+  @E-013-S-064 @FR-SCORE-29 @story-13-7
+  Scenario: Synth-keys brand boost applies to Moog/Roland/Korg/Akai
+    Given a "Moog Sub 37 synthesizer" listing priced at 500
+    When the scoring algorithm runs
+    Then the tags should include "synth-keys"
+
+  # S-065: Vintage boost reduced from 1.4 to 1.3 (AC #3)
+  @E-013-S-065 @FR-SCORE-29 @story-13-7
+  Scenario: Vintage boost applies at reduced 1.3x multiplier
+    Given a "Vintage lamp" listing priced at 100 in default category
+    When the scoring algorithm runs
+    Then the vintage tag should be applied
+    And the estimated value should reflect a 1.3x boost, not 1.4x
+
+  # S-066: Formula uses 50/50 weights with log curve 36 (AC #4)
+  @E-013-S-066 @FR-SCORE-29 @story-13-7
+  Scenario: Weighted formula uses 50% margin + 50% absolute profit
+    Given a default-category listing with asking price 100, new condition, 0% fee
+    And the item has $35 profit potential
+    When the scoring algorithm runs
+    Then the value score should be 71
+
+  # S-067: Profit > $500 boost tier adds +15 (AC #4)
+  @E-013-S-067 @FR-SCORE-29 @story-13-7
+  Scenario: High-profit items above $500 receive +15 boost
+    Given a collectibles listing priced at 250 with new condition and vintage/rare/sealed tags
+    When the scoring algorithm runs
+    Then the profit potential should exceed 500
+    And the value score should be 100 (capped)
+
+  # S-068: Opportunity requires score >= 70 AND profit >= $25 (AC #5)
+  @E-013-S-068 @FR-SCORE-29 @story-13-7
+  Scenario: Opportunity-minimum-profit floor rejects high-score low-profit items
+    Given analyzeListing is called with a listing producing valueScore 75 and profitPotential 20
+    Then the analyzed listing isOpportunity should be false
+
+  # S-069: Opportunity requires score >= 70 AND profit >= $25 (AC #5)
+  @E-013-S-069 @FR-SCORE-29 @story-13-7
+  Scenario: Opportunity-minimum-profit floor passes high-score high-profit items
+    Given analyzeListing is called with a listing producing valueScore 75 and profitPotential 50
+    Then the analyzed listing isOpportunity should be true
+
+  # S-070: Scoring refinement log exists (AC #8)
+  @E-013-S-070 @FR-SCORE-29 @story-13-7
+  Scenario: Scoring refinement decision log documents all session decisions
+    Given the scoring refinement session has been completed
+    When the refinement log is inspected
+    Then docs/scoring-refinement-log.md should exist
+    And it should contain sections for category multipliers, brand boosts, formula tuning, and threshold calibration
+    And it should document the before/after backtesting comparison
+
+  # S-071: Detection patterns catch Apple Watch / Galaxy / ThinkPad (AC #2 partial)
+  @E-013-S-071 @FR-SCORE-29 @story-13-7
+  Scenario: Expanded detectCategory patterns catch previously-missed product types
+    Given listings titled "Apple Watch SE", "Samsung Galaxy S25", "Lenovo ThinkPad", "Google Pixel 8"
+    When category detection runs on each
+    Then each should be categorized as electronics, not other

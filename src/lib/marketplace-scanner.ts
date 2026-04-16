@@ -104,10 +104,10 @@ export interface ViabilityCriteria {
   maxResaleDifficulty?: 'VERY_EASY' | 'EASY' | 'MODERATE' | 'HARD' | 'VERY_HARD';
 }
 
-// Default viability criteria
+// Default viability criteria (aligned with opportunityMinProfit=$25 from Story 13.7)
 const DEFAULT_CRITERIA: ViabilityCriteria = {
   minValueScore: 70,
-  minProfitPotential: 20,
+  minProfitPotential: 25,
 };
 
 // Difficulty ordering for comparison
@@ -126,7 +126,7 @@ const DIFFICULTY_ORDER = {
 export function analyzeListing(
   platform: MarketplacePlatform,
   listing: RawListing,
-  options?: { emitEvents?: boolean; userId?: string; feeRate?: number; opportunityThreshold?: number }
+  options?: { emitEvents?: boolean; userId?: string; feeRate?: number; opportunityThreshold?: number; opportunityMinProfit?: number }
 ): AnalyzedListing {
   // Detect category if not provided
   const detectedCategory =
@@ -152,8 +152,14 @@ export function analyzeListing(
     listing.sellerName
   );
 
-  // Determine if this is an opportunity based on configurable threshold
-  const isOpportunity = estimation.valueScore >= opportunityThreshold;
+  // Determine if this is an opportunity based on configurable threshold.
+  // Minimum absolute profit floor added 2026-04-15 (Story 13.7):
+  // Items scoring 70+ but with <$25 profit are marginal flips that don't justify
+  // seller outreach time. Configurable via opportunityMinProfit option.
+  const opportunityMinProfit = options?.opportunityMinProfit ?? 25;
+  const isOpportunity =
+    estimation.valueScore >= opportunityThreshold &&
+    estimation.profitPotential >= opportunityMinProfit;
 
   const analyzed: AnalyzedListing = {
     ...listing,
@@ -248,7 +254,7 @@ export function processListings(
   platform: MarketplacePlatform,
   listings: RawListing[],
   criteria?: ViabilityCriteria,
-  options?: { emitEvents?: boolean; userId?: string; feeRate?: number; opportunityThreshold?: number }
+  options?: { emitEvents?: boolean; userId?: string; feeRate?: number; opportunityThreshold?: number; opportunityMinProfit?: number }
 ): {
   all: AnalyzedListing[];
   opportunities: AnalyzedListing[];
@@ -257,7 +263,7 @@ export function processListings(
   // Analyze all listings (with optional event emission)
   const analyzed = listings.map((listing) => analyzeListing(platform, listing, options));
 
-  // Separate opportunities (score >= 70)
+  // Separate opportunities (score >= threshold AND profit >= min floor)
   const opportunities = analyzed.filter((l) => l.isOpportunity);
 
   // Apply additional filtering if criteria provided

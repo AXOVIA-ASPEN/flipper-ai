@@ -16,7 +16,7 @@
 
 import 'dotenv/config';
 import { chromium } from 'playwright';
-import { PrismaClient as PrismaClientBase } from '@prisma/client';
+import { PrismaClient as PrismaClientBase, Prisma } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { estimateValue, detectCategory } from '../../src/lib/value-estimator';
 
@@ -166,6 +166,7 @@ async function scrapeCategory(category: string, path: string): Promise<ScrapedIt
 }
 
 async function main() {
+  try {
   console.log('=== Flipper.ai Backtesting Data Seeder ===\n');
   console.log(`Location: ${LOCATION}.craigslist.org`);
   console.log(`Categories: ${Object.keys(CATEGORIES).join(', ')}\n`);
@@ -174,10 +175,10 @@ async function main() {
   const userExists = await (prisma as any).user.findUnique({ where: { id: BACKTEST_USER_ID } });
   if (!userExists) {
     console.log('Creating backtest user...');
-    const now = new Date().toISOString();
-    await (prisma as any).$executeRawUnsafe(`
+    const now = new Date();
+    await (prisma as any).$executeRaw(Prisma.sql`
       INSERT INTO "User" ("id", "email", "name", "firebaseUid", "subscriptionTier", "onboardingComplete", "onboardingStep", "createdAt", "updatedAt")
-      VALUES ('${BACKTEST_USER_ID}', 'backtest@flipper.local', 'Backtest Seed', 'backtest-firebase-uid', 'FREE', false, 0, '${now}', '${now}')
+      VALUES (${BACKTEST_USER_ID}, 'backtest@flipper.local', 'Backtest Seed', 'backtest-firebase-uid', 'FREE', false, 0, ${now}, ${now})
       ON CONFLICT ("id") DO NOTHING
     `);
   }
@@ -201,13 +202,15 @@ async function main() {
           detectedCategory
         );
 
-        // Raw SQL insert (PrismaPg adapter doesn't handle @updatedAt)
-        const now = new Date().toISOString();
+        // Parameterized SQL insert (PrismaPg adapter doesn't handle @updatedAt)
+        const now = new Date();
         const id = 'cl' + Math.random().toString(36).slice(2, 15);
-        const esc = (s: string | null) =>
-          s === null ? 'NULL' : `'${s.replace(/'/g, "''")}'`;
+        const status = estimation.valueScore >= 70 ? 'OPPORTUNITY' : 'NEW';
+        const comparableUrlsJson = JSON.stringify(estimation.comparableUrls);
+        const tagsJson = JSON.stringify(estimation.tags);
+        const imageUrl = item.imageUrl || null;
 
-        await (prisma as any).$executeRawUnsafe(`
+        await (prisma as any).$executeRaw(Prisma.sql`
           INSERT INTO "Listing" (
             "id", "userId", "externalId", "platform", "url", "title",
             "askingPrice", "location", "category", "imageUrls",
@@ -218,19 +221,19 @@ async function main() {
             "shippable", "negotiable", "tags",
             "status", "scrapedAt", "updatedAt"
           ) VALUES (
-            ${esc(id)}, ${esc(BACKTEST_USER_ID)}, ${esc(item.externalId)},
-            'craigslist', ${esc(item.url)}, ${esc(item.title)},
-            ${item.price}, ${esc(item.location)}, ${esc(detectedCategory)},
-            ${esc(item.imageUrl || null)},
-            ${estimation.estimatedValue}, ${estimation.estimatedLow}, ${estimation.estimatedHigh},
-            ${estimation.profitPotential}, ${estimation.profitLow}, ${estimation.profitHigh},
-            ${estimation.valueScore}, ${estimation.discountPercent}, ${esc(estimation.resaleDifficulty)},
-            ${esc(JSON.stringify(estimation.comparableUrls))},
-            ${esc(estimation.reasoning)}, ${esc(estimation.notes)},
+            ${id}, ${BACKTEST_USER_ID}, ${item.externalId},
+            'craigslist', ${item.url}, ${item.title},
+            ${item.price}::float8, ${item.location}, ${detectedCategory},
+            ${imageUrl},
+            ${estimation.estimatedValue}::float8, ${estimation.estimatedLow}::float8, ${estimation.estimatedHigh}::float8,
+            ${estimation.profitPotential}::float8, ${estimation.profitLow}::float8, ${estimation.profitHigh}::float8,
+            ${estimation.valueScore}::float8, ${estimation.discountPercent}::float8, ${estimation.resaleDifficulty},
+            ${comparableUrlsJson},
+            ${estimation.reasoning}, ${estimation.notes},
             ${estimation.shippable}, ${estimation.negotiable},
-            ${esc(JSON.stringify(estimation.tags))},
-            ${esc(estimation.valueScore >= 70 ? 'OPPORTUNITY' : 'NEW')},
-            '${now}', '${now}'
+            ${tagsJson},
+            ${status},
+            ${now}, ${now}
           )
           ON CONFLICT ("platform", "externalId", "userId") DO UPDATE SET
             "title" = EXCLUDED."title",
@@ -290,7 +293,9 @@ async function main() {
     );
   }
 
-  await (prisma as any).$disconnect();
+  } finally {
+    await (prisma as any).$disconnect();
+  }
 }
 
 main().catch((e) => {
