@@ -10,8 +10,17 @@
 
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
+import { getCurrentUserId } from '@/lib/auth';
+import { handleError, UnauthorizedError } from '@/lib/errors';
 
 export async function GET() {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) throw new UnauthorizedError('Unauthorized');
+  } catch (error) {
+    return handleError(error);
+  }
+
   const checks: Record<string, unknown> = {};
   const diagnostics: Record<string, unknown> = {
     timestamp: new Date().toISOString(),

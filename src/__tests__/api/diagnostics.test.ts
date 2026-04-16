@@ -3,6 +3,12 @@
  * Diagnostics endpoint for checking system health
  */
 
+const mockGetCurrentUserId = jest.fn().mockResolvedValue('test-user');
+jest.mock('@/lib/auth', () => ({
+  __esModule: true,
+  getCurrentUserId: (...args: unknown[]) => mockGetCurrentUserId(...args),
+}));
+
 import { GET } from '../../../app/api/diagnostics/route';
 import prisma from '@/lib/db';
 
@@ -40,6 +46,16 @@ describe('GET /api/diagnostics', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGetCurrentUserId.mockResolvedValue('test-user');
+  });
+
+  describe('auth', () => {
+    it('returns 401 when unauthenticated', async () => {
+      mockGetCurrentUserId.mockResolvedValue(null);
+
+      const response = await GET();
+      expect(response.status).toBe(401);
+    });
   });
 
   describe('environment variables check', () => {
