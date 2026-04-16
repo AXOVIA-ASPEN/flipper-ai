@@ -285,8 +285,9 @@ describe('Auth Middleware (Firebase)', () => {
       await expect(getUserIdOrDefault()).rejects.toThrow('Unauthorized');
     });
 
-    test('should return default user in development when not authenticated', async () => {
+    test('should return default user when ENABLE_DEV_AUTH_BYPASS=true in dev', async () => {
       process.env.NODE_ENV = 'development';
+      process.env.ENABLE_DEV_AUTH_BYPASS = 'true';
       mockGetCurrentUserId.mockResolvedValue(null);
       mockVerifyIdToken.mockResolvedValue(null);
 
@@ -298,15 +299,44 @@ describe('Auth Middleware (Firebase)', () => {
       expect(prisma.user.findFirst).toHaveBeenCalledWith({
         where: { email: 'default@flipper.ai' },
       });
+
+      delete process.env.ENABLE_DEV_AUTH_BYPASS;
     });
 
-    test('should throw error in development when no default user exists', async () => {
+    test('should NOT activate bypass when flag missing even in development', async () => {
       process.env.NODE_ENV = 'development';
+      delete process.env.ENABLE_DEV_AUTH_BYPASS;
+      mockGetCurrentUserId.mockResolvedValue(null);
+      mockVerifyIdToken.mockResolvedValue(null);
+
+      await expect(getUserIdOrDefault()).rejects.toThrow('Unauthorized');
+      expect(prisma.user.findFirst).not.toHaveBeenCalled();
+    });
+
+    test('should REFUSE to activate bypass in production even if flag is set', async () => {
+      process.env.NODE_ENV = 'production';
+      process.env.ENABLE_DEV_AUTH_BYPASS = 'true';
+      mockGetCurrentUserId.mockResolvedValue(null);
+      mockVerifyIdToken.mockResolvedValue(null);
+      const errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      await expect(getUserIdOrDefault()).rejects.toThrow('Unauthorized');
+      expect(errSpy).toHaveBeenCalledWith(expect.stringContaining('[SECURITY]'));
+      expect(prisma.user.findFirst).not.toHaveBeenCalled();
+
+      errSpy.mockRestore();
+      delete process.env.ENABLE_DEV_AUTH_BYPASS;
+    });
+
+    test('should throw error when bypass active but no default user exists', async () => {
+      process.env.NODE_ENV = 'development';
+      process.env.ENABLE_DEV_AUTH_BYPASS = 'true';
       mockGetCurrentUserId.mockResolvedValue(null);
       mockVerifyIdToken.mockResolvedValue(null);
       (prisma.user.findFirst as jest.Mock).mockResolvedValue(null);
 
       await expect(getUserIdOrDefault()).rejects.toThrow('Unauthorized');
+      delete process.env.ENABLE_DEV_AUTH_BYPASS;
     });
 
     test('should return authenticated user ID in development mode', async () => {

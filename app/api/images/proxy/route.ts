@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { downloadAndCacheImage, generateImageHash, isImageCached } from '@/lib/image-service';
+import { getCurrentUserId } from '@/lib/auth';
 
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 // Configuration
@@ -15,6 +16,11 @@ const CACHE_CONTROL_HEADER = 'public, max-age=86400, s-maxage=604800'; // 1 day 
 
 export async function GET(request: NextRequest) {
   try {
+    // Auth required — image proxy can be abused for bandwidth or to exfiltrate
+    // arbitrary URLs. Restrict to authenticated users only (FR-AUTH-ACCESS-01).
+    const userId = await getCurrentUserId();
+    if (!userId) throw new UnauthorizedError('Unauthorized');
+
     const searchParams = request.nextUrl.searchParams;
     const imageUrl = searchParams.get('url');
 

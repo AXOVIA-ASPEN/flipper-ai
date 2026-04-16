@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { getCurrentUserId } from '@/lib/auth';
 
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 // POST /api/user/settings/validate-key - Test if an OpenAI API key is valid
 export async function POST(request: NextRequest) {
   try {
+    // Auth required — validating arbitrary OpenAI keys is an
+    // account-scoped operation. (FR-AUTH-ACCESS-01)
+    const userId = await getCurrentUserId();
+    if (!userId) throw new UnauthorizedError('Unauthorized');
+
     const body = await request.json();
     const { apiKey } = body;
 

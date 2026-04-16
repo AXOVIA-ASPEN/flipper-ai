@@ -6,6 +6,11 @@
 
 import { NextRequest } from 'next/server';
 
+// Mock auth — default authenticated
+jest.mock('@/lib/auth', () => ({
+  getCurrentUserId: jest.fn().mockResolvedValue('test-user-id'),
+}));
+
 // Mock OpenAI before importing route
 const mockModelsList = jest.fn();
 jest.mock('openai', () => {
@@ -15,6 +20,7 @@ jest.mock('openai', () => {
 });
 
 import { POST } from '@/app/api/user/settings/validate-key/route';
+import { getCurrentUserId } from '@/lib/auth';
 
 function makeRequest(body: unknown): NextRequest {
   return new NextRequest('http://localhost:3000/api/user/settings/validate-key', {
@@ -107,5 +113,11 @@ describe('POST /api/user/settings/validate-key', () => {
     expect(res.status).toBe(400);
     const data = await res.json();
     expect(data.valid).toBe(false);
+  });
+
+  it('returns 401 when unauthenticated', async () => {
+    (getCurrentUserId as jest.Mock).mockResolvedValueOnce(null);
+    const res = await POST(makeRequest({ apiKey: 'sk-test' }));
+    expect(res.status).toBe(401);
   });
 });

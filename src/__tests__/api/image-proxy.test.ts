@@ -3,8 +3,12 @@
  * Tests for GET /api/images/proxy
  */
 
-import { GET } from '@/app/api/images/proxy/route';
 import { NextRequest } from 'next/server';
+
+// Mock auth — default to authenticated user
+jest.mock('@/lib/auth', () => ({
+  getCurrentUserId: jest.fn().mockResolvedValue('test-user-id'),
+}));
 
 // Mock the image service
 jest.mock('@/lib/image-service', () => ({
@@ -12,6 +16,9 @@ jest.mock('@/lib/image-service', () => ({
   isImageCached: jest.fn().mockResolvedValue(null),
   downloadAndCacheImage: jest.fn().mockResolvedValue({ success: false }),
 }));
+
+import { GET } from '@/app/api/images/proxy/route';
+import { getCurrentUserId } from '@/lib/auth';
 
 // Mock global fetch for proxy fallback
 const mockFetch = jest.fn();
@@ -158,6 +165,14 @@ describe('GET /api/images/proxy', () => {
       expect(res.status).toBe(500);
       const body = await res.json();
       expect(body.error.code).toBeDefined();
+    });
+  });
+
+  describe('authentication', () => {
+    it('returns 401 when unauthenticated', async () => {
+      (getCurrentUserId as jest.Mock).mockResolvedValueOnce(null);
+      const res = await GET(makeRequest('/api/images/proxy?url=https://example.com/a.jpg'));
+      expect(res.status).toBe(401);
     });
   });
 });

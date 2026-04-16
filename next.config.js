@@ -57,11 +57,35 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
+              // TODO: replace 'unsafe-eval' and 'unsafe-inline' with nonces in a
+              // follow-up — Next.js currently needs them for client hydration.
               "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com",
               "style-src 'self' 'unsafe-inline'",
+              // img-src stays permissive because marketplace image URLs span many
+              // domains (ebay, craigslist, mercari, facebook, offerup, etc.).
+              // Images can't execute code, so the blast radius is small.
               "img-src 'self' data: blob: https:",
               "font-src 'self' data:",
-              "connect-src 'self' wss://ws.pusherapp.com https:",
+              // connect-src is tightened — explicit allowlist of every backend
+              // the app talks to. Adding a new service requires updating this list.
+              [
+                "connect-src 'self'",
+                'https://api.stripe.com',
+                'https://*.firebaseio.com',
+                'https://*.googleapis.com',
+                'https://identitytoolkit.googleapis.com',
+                'https://securetoken.googleapis.com',
+                'https://firestore.googleapis.com',
+                'https://firebasestorage.googleapis.com',
+                'https://*.sentry.io',
+                'https://*.ingest.sentry.io',
+                'https://api.openai.com',
+                'https://api.anthropic.com',
+                'https://api.groq.com',
+                'https://generativelanguage.googleapis.com',
+                'https://maps.googleapis.com',
+                'wss://ws.pusherapp.com',
+              ].join(' '),
               "frame-ancestors 'self'",
               "base-uri 'self'",
               "form-action 'self'",

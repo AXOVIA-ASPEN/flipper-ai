@@ -88,14 +88,24 @@ export async function isAuthenticated(): Promise<boolean> {
 
 /**
  * For development/migration: Get user ID or fall back to default user.
- * This allows the app to work without authentication during development.
+ *
+ * The dev bypass ONLY activates when BOTH conditions are met:
+ *   1. `ENABLE_DEV_AUTH_BYPASS === 'true'` — explicit opt-in, never default
+ *   2. `NODE_ENV !== 'production'` — hard production guard, even if the flag leaks
+ *
+ * This defense-in-depth prevents a misconfigured env from silently logging in
+ * as the default user in production (historic FR-AUTH-ACCESS risk).
  */
 export async function getUserIdOrDefault(req?: NextRequest): Promise<string> {
-  if (process.env.NODE_ENV === 'development') {
+  const bypassEnabled =
+    process.env.ENABLE_DEV_AUTH_BYPASS === 'true' &&
+    process.env.NODE_ENV !== 'production';
+
+  if (bypassEnabled) {
     const userId = await getAuthUserId(req);
     if (userId) return userId;
 
-    // Return default dev user for local dev without Firebase
+    // Fall back to default dev user for local dev without Firebase
     const prisma = (await import('@/lib/db')).default;
     const defaultUser = await prisma.user.findFirst({
       where: { email: 'default@flipper.ai' },
@@ -103,9 +113,14 @@ export async function getUserIdOrDefault(req?: NextRequest): Promise<string> {
     if (defaultUser) {
       return defaultUser.id;
     }
+  } else if (process.env.ENABLE_DEV_AUTH_BYPASS === 'true') {
+    // Flag set in production — refuse to activate and log loudly
+    console.error(
+      '[SECURITY] ENABLE_DEV_AUTH_BYPASS=true in NODE_ENV=production — refusing to activate dev bypass.'
+    );
   }
 
-  // In production, require proper authentication
+  // Require proper authentication
   const userId = await getAuthUserId(req);
   if (userId) return userId;
 
