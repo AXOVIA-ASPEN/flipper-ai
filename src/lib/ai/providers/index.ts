@@ -23,17 +23,17 @@ import { AnthropicProvider } from './anthropic';
 // Re-export types for convenient single-import usage
 export type { AIProvider, AIMessage, AIResponse, ModelConfig, ProviderName } from './types';
 
-/**
- * Error thrown when no AI provider is available from the given preferences.
- */
-export class AIProviderUnavailableError extends Error {
-  constructor(tried: ProviderName[]) {
-    super(
-      `No AI provider available. Tried: ${tried.join(', ')}. Configure at least one API key.`,
-    );
-    this.name = 'AIProviderUnavailableError';
-  }
-}
+// Re-export error taxonomy so consumers can `import from '@/lib/ai'` without
+// reaching into providers/errors directly.
+export {
+  AIProviderError,
+  AIRateLimitError,
+  AITimeoutError,
+  AIMalformedResponseError,
+  AIProviderUnavailableError,
+} from './errors';
+
+import { AIProviderUnavailableError } from './errors';
 
 const ALL_PROVIDER_NAMES: ProviderName[] = ['gemini', 'groq', 'openai', 'anthropic'];
 

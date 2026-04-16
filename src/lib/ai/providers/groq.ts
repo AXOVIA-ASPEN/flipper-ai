@@ -15,6 +15,7 @@
 
 import OpenAI from 'openai';
 import type { AIProvider, AIMessage, ModelConfig, AIResponse } from './types';
+import { mapSdkError, assertJsonParseable } from './error-mapping';
 
 export class GroqProvider implements AIProvider {
   readonly name = 'groq' as const;
@@ -45,11 +46,18 @@ export class GroqProvider implements AIProvider {
       requestParams.response_format = { type: 'json_object' };
     }
 
-    const response = await client.chat.completions.create(
-      requestParams as OpenAI.ChatCompletionCreateParamsNonStreaming,
-    );
+    let response: OpenAI.ChatCompletion;
+    try {
+      response = await client.chat.completions.create(
+        requestParams as OpenAI.ChatCompletionCreateParamsNonStreaming,
+      );
+    } catch (err) {
+      throw mapSdkError(err, 'groq');
+    }
 
     const content = response.choices[0]?.message?.content ?? '';
+    assertJsonParseable(content, 'groq', config.responseFormat);
+
     const usage = response.usage;
 
     return {

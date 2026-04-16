@@ -15,6 +15,7 @@
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { AIProvider, AIMessage, ModelConfig, AIResponse } from './types';
+import { mapSdkError, assertJsonParseable } from './error-mapping';
 
 export class GeminiProvider implements AIProvider {
   readonly name = 'gemini' as const;
@@ -63,9 +64,16 @@ export class GeminiProvider implements AIProvider {
       parts: [{ text: m.content }],
     }));
 
-    const result = await model.generateContent({ contents });
+    let result;
+    try {
+      result = await model.generateContent({ contents });
+    } catch (err) {
+      throw mapSdkError(err, 'gemini');
+    }
     const response = result.response;
     const text = response.text();
+    assertJsonParseable(text, 'gemini', config.responseFormat);
+
     const metadata = response.usageMetadata;
 
     return {

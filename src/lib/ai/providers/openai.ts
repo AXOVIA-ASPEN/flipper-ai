@@ -14,6 +14,7 @@
 
 import OpenAI from 'openai';
 import type { AIProvider, AIMessage, ModelConfig, AIResponse } from './types';
+import { mapSdkError, assertJsonParseable } from './error-mapping';
 
 export class OpenAIProvider implements AIProvider {
   readonly name = 'openai' as const;
@@ -41,13 +42,19 @@ export class OpenAIProvider implements AIProvider {
       requestParams.response_format = { type: 'json_object' };
     }
 
-    const response = await client.chat.completions.create(
-      requestParams as OpenAI.ChatCompletionCreateParamsNonStreaming,
-    );
+    let response: OpenAI.ChatCompletion;
+    try {
+      response = await client.chat.completions.create(
+        requestParams as OpenAI.ChatCompletionCreateParamsNonStreaming,
+      );
+    } catch (err) {
+      throw mapSdkError(err, 'openai');
+    }
 
     const content = response.choices[0]?.message?.content ?? '';
-    const usage = response.usage;
+    assertJsonParseable(content, 'openai', config.responseFormat);
 
+    const usage = response.usage;
     return {
       content,
       model: response.model ?? config.model,

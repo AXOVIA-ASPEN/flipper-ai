@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
-import { completeAI, AIProviderUnavailableError } from '@/lib/ai';
+import { completeAI, AIProviderUnavailableError, AIProviderError } from '@/lib/ai';
 
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, AppError, ErrorCode } from '@/lib/errors';
 interface RouteParams {
@@ -88,6 +88,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           data: fallbackDescription,
           source: 'template',
         });
+      }
+      // Malformed or failed responses from every provider → 502 Bad Gateway
+      if (aiError instanceof AIProviderError) {
+        throw new AppError(ErrorCode.EXTERNAL_SERVICE_ERROR, 'AI failed to generate description');
       }
       throw aiError;
     }

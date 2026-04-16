@@ -22,23 +22,20 @@ jest.mock('@/lib/ai/prompts', () => ({
   getPrompt: jest.fn(),
 }));
 
-jest.mock('@/lib/ai/providers', () => ({
-  resolveProvider: jest.fn(),
-  getAvailableProviders: jest.fn(),
-  AIProviderUnavailableError: class AIProviderUnavailableError extends Error {
-    constructor(tried: string[]) {
-      super(`No AI provider available. Tried: ${tried.join(', ')}. Configure at least one API key.`);
-      this.name = 'AIProviderUnavailableError';
-    }
-  },
-}));
+jest.mock('@/lib/ai/providers', () => {
+  const actual = jest.requireActual('@/lib/ai/providers');
+  return {
+    ...actual,
+    getProvider: jest.fn(),
+  };
+});
 
 import { completeAI } from '@/lib/ai';
 import { getPrompt } from '@/lib/ai/prompts';
-import { resolveProvider, AIProviderUnavailableError } from '@/lib/ai/providers';
+import { getProvider, AIProviderUnavailableError } from '@/lib/ai/providers';
 
 const mockGetPrompt = getPrompt as jest.MockedFunction<typeof getPrompt>;
-const mockResolveProvider = resolveProvider as jest.MockedFunction<typeof resolveProvider>;
+const mockGetProvider = getProvider as jest.MockedFunction<typeof getProvider>;
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -80,17 +77,33 @@ describe('completeAI', () => {
     jest.clearAllMocks();
   });
 
+  // Helper: make getProvider return a given provider for each name it receives.
+  function setupProviders(providerByName: Partial<Record<string, AIProvider>>) {
+    mockGetProvider.mockImplementation((name) => {
+      const p = providerByName[name];
+      if (!p) {
+        // Unconfigured — return an "unavailable" stub
+        return {
+          name,
+          isAvailable: () => false,
+          complete: jest.fn(),
+        } as unknown as AIProvider;
+      }
+      return p;
+    });
+  }
+
   it('resolves prompt, selects provider, calls complete(), and returns AIResponse', async () => {
     const prompt = makePromptConfig();
     const provider = makeProvider();
     mockGetPrompt.mockReturnValue(prompt);
-    mockResolveProvider.mockReturnValue(provider);
+    setupProviders({ openai: provider });
 
     const context = { title: 'iPhone 14', price: 400 };
     const result = await completeAI('flipAnalysis', context);
 
     expect(mockGetPrompt).toHaveBeenCalledWith('flipAnalysis');
-    expect(mockResolveProvider).toHaveBeenCalledWith(['openai', 'gemini', 'anthropic']);
+    expect(mockGetProvider).toHaveBeenCalledWith('openai');
     expect(result).toEqual({
       content: '{"score": 85}',
       model: 'gpt-4o',
@@ -103,20 +116,20 @@ describe('completeAI', () => {
     const prompt = makePromptConfig({ provider: 'groq', fallbacks: ['openai'] });
     const fallbackProvider = makeProvider({ name: 'openai' });
     mockGetPrompt.mockReturnValue(prompt);
-    mockResolveProvider.mockReturnValue(fallbackProvider);
+    // groq is unavailable, openai is the configured fallback
+    setupProviders({ openai: fallbackProvider });
 
-    await completeAI('flipAnalysis', { title: 'Test', price: 10 });
+    const result = await completeAI('flipAnalysis', { title: 'Test', price: 10 });
 
-    // resolveProvider receives the full preference list
-    expect(mockResolveProvider).toHaveBeenCalledWith(['groq', 'openai']);
+    expect(result.provider).toBe('openai');
+    expect(mockGetProvider).toHaveBeenCalledWith('groq');
+    expect(mockGetProvider).toHaveBeenCalledWith('openai');
   });
 
   it('throws AIProviderUnavailableError when no providers configured', async () => {
     const prompt = makePromptConfig();
     mockGetPrompt.mockReturnValue(prompt);
-    mockResolveProvider.mockImplementation(() => {
-      throw new AIProviderUnavailableError(['openai', 'gemini', 'anthropic']);
-    });
+    setupProviders({}); // nothing available
 
     await expect(completeAI('flipAnalysis', {})).rejects.toThrow(AIProviderUnavailableError);
   });
@@ -133,7 +146,7 @@ describe('completeAI', () => {
     const prompt = makePromptConfig();
     const provider = makeProvider();
     mockGetPrompt.mockReturnValue(prompt);
-    mockResolveProvider.mockReturnValue(provider);
+    setupProviders({ openai: provider });
 
     await completeAI('flipAnalysis', { title: 'PS5', price: 300 });
 
@@ -155,7 +168,7 @@ describe('completeAI', () => {
     });
     const provider = makeProvider();
     mockGetPrompt.mockReturnValue(prompt);
-    mockResolveProvider.mockReturnValue(provider);
+    setupProviders({ openai: provider });
 
     await completeAI('flipAnalysis', { title: 'Test', price: 1 });
 
@@ -174,7 +187,7 @@ describe('completeAI', () => {
     const prompt = makePromptConfig({ systemPrompt: '' });
     const provider = makeProvider();
     mockGetPrompt.mockReturnValue(prompt);
-    mockResolveProvider.mockReturnValue(provider);
+    setupProviders({ openai: provider });
 
     await completeAI('flipAnalysis', { title: 'Lamp', price: 20 });
 

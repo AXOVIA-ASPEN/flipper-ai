@@ -15,6 +15,7 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import type { AIProvider, AIMessage, ModelConfig, AIResponse } from './types';
+import { mapSdkError, assertJsonParseable } from './error-mapping';
 
 const DEFAULT_MODEL = 'claude-sonnet-4-5-20250929';
 
@@ -53,12 +54,19 @@ export class AnthropicProvider implements AIProvider {
       requestParams.system = systemMessage.content;
     }
 
-    const response = await client.messages.create(
-      requestParams as Anthropic.MessageCreateParamsNonStreaming,
-    );
+    let response: Anthropic.Message;
+    try {
+      response = await client.messages.create(
+        requestParams as Anthropic.MessageCreateParamsNonStreaming,
+      );
+    } catch (err) {
+      throw mapSdkError(err, 'anthropic');
+    }
 
     const content =
       response.content[0]?.type === 'text' ? response.content[0].text : '';
+    assertJsonParseable(content, 'anthropic', config.responseFormat);
+
     const usage = response.usage;
 
     return {
