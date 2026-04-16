@@ -306,7 +306,8 @@ Then(
 let healthResponse: Record<string, unknown>;
 
 Given('the application is running', async function (this: CustomWorld) {
-  const res = await fetch('http://localhost:3000/api/health');
+  const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+  const res = await fetch(`${baseUrl}/api/health`);
   expect(res.ok).toBe(true);
   console.log('✅ Application is running');
 });

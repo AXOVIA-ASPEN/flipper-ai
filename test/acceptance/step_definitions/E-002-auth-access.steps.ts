@@ -53,15 +53,8 @@ Given('I am logged in', async function (this: CustomWorld) {
   ]);
 });
 
-// ─── Navigation-agnostic navigation helpers ──────────────────────────────────
-
-When('I navigate to {string}', async function (this: CustomWorld, path: string) {
-  const response = await this.page.goto(`${BASE_URL}${path}`, {
-    waitUntil: 'domcontentloaded',
-  });
-  // Store last response for status-code assertions
-  (this as unknown as { lastResponse?: unknown }).lastResponse = response;
-});
+// `When I navigate to {string}` is provided by E-002-settings.steps.ts.
+// For status-code assertions we use an out-of-band fetch below.
 
 // ─── FR-AUTH-ACCESS-01: protected routes redirect to login ───────────────────
 
@@ -145,11 +138,13 @@ Then('the {string} cookie should be cleared', async function (this: CustomWorld,
 });
 
 // ─── FR-AUTH-ACCESS-05: whitelisted public routes return 200 ─────────────────
+// Status code is asserted by issuing a direct fetch so we don't have to rely
+// on Playwright's goto() response (which follows middleware redirects).
 
 Then('the response status code should be {int}', async function (this: CustomWorld, expected: number) {
-  const response = (this as unknown as { lastResponse?: { status: () => number } }).lastResponse;
-  expect(response).toBeDefined();
-  expect(response!.status()).toBe(expected);
+  const currentUrl = new URL(this.page.url());
+  const response = await fetch(currentUrl.toString(), { redirect: 'manual' });
+  expect(response.status).toBe(expected);
 });
 
 // ─── FR-AUTH-ACCESS-06: no protected links on public pages ───────────────────
