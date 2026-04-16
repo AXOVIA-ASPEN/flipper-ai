@@ -1,19 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
+import { getCurrentUserId } from '@/lib/auth';
 
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
+
+/**
+ * Fetch a search config, asserting auth and ownership.
+ *
+ * To prevent resource enumeration, we return NotFoundError for both
+ * "does not exist" and "exists but owned by another user". Legacy configs
+ * with userId === null are treated as not owned by anyone.
+ */
+async function loadOwnedConfig(id: string) {
+  const userId = await getCurrentUserId();
+  if (!userId) throw new UnauthorizedError('Unauthorized');
+
+  const config = await prisma.searchConfig.findUnique({
+    where: { id },
+  });
+
+  if (!config || config.userId !== userId) {
+    throw new NotFoundError('Search configuration not found');
+  }
+
+  return config;
+}
+
 // GET /api/search-configs/[id] - Get a single search configuration
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const config = await prisma.searchConfig.findUnique({
-      where: { id },
-    });
-
-    if (!config) {
-      throw new NotFoundError('Search configuration not found');
-    }
-
+    const config = await loadOwnedConfig(id);
     return NextResponse.json(config);
   } catch (error) {
     console.error('Error fetching search config:', error);
@@ -25,6 +42,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
+    await loadOwnedConfig(id);
     const body = await request.json();
 
     // Build update data, only including fields that were provided
@@ -70,6 +88,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
+    await loadOwnedConfig(id);
     await prisma.searchConfig.delete({
       where: { id },
     });

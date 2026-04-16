@@ -17,6 +17,12 @@ jest.mock('@/lib/auth-middleware', () => ({
   getAuthUserId: (...args: unknown[]) => mockGetAuthUserId(...args),
 }));
 
+const mockGetCurrentUserId = jest.fn().mockResolvedValue('test-owner');
+jest.mock('@/lib/auth', () => ({
+  __esModule: true,
+  getCurrentUserId: (...args: unknown[]) => mockGetCurrentUserId(...args),
+}));
+
 jest.mock('@/lib/db', () => ({
   __esModule: true,
   default: {
@@ -299,12 +305,35 @@ describe('Search Configs API', () => {
   });
 
   describe('GET /api/search-configs/[id]', () => {
+    beforeEach(() => {
+      mockGetCurrentUserId.mockResolvedValue('test-owner');
+    });
+
+    it('should return 401 when unauthenticated', async () => {
+      mockGetCurrentUserId.mockResolvedValue(null);
+
+      const request = createMockRequest('GET', '/api/search-configs/config-1');
+      const response = await GET_BY_ID(request, { params: Promise.resolve({ id: 'config-1' }) });
+
+      expect(response.status).toBe(401);
+    });
+
+    it('should return 404 when config exists but is owned by another user', async () => {
+      mockFindUnique.mockResolvedValue({ id: 'config-1', userId: 'other-user' });
+
+      const request = createMockRequest('GET', '/api/search-configs/config-1');
+      const response = await GET_BY_ID(request, { params: Promise.resolve({ id: 'config-1' }) });
+
+      expect(response.status).toBe(404);
+    });
+
     it('should return a single search config', async () => {
       const mockConfig = {
         id: 'config-1',
         name: 'Electronics Tampa',
         platform: 'CRAIGSLIST',
         location: 'tampa',
+        userId: 'test-owner',
       };
       mockFindUnique.mockResolvedValue(mockConfig);
 
@@ -341,6 +370,33 @@ describe('Search Configs API', () => {
   });
 
   describe('PATCH /api/search-configs/[id]', () => {
+    beforeEach(() => {
+      mockGetCurrentUserId.mockResolvedValue('test-owner');
+      mockFindUnique.mockResolvedValue({ id: 'config-1', userId: 'test-owner' });
+    });
+
+    it('should return 401 when unauthenticated', async () => {
+      mockGetCurrentUserId.mockResolvedValue(null);
+
+      const request = createMockRequest('PATCH', '/api/search-configs/config-1', {
+        name: 'Updated',
+      });
+      const response = await PATCH(request, { params: Promise.resolve({ id: 'config-1' }) });
+
+      expect(response.status).toBe(401);
+    });
+
+    it('should return 404 when updating a config owned by another user', async () => {
+      mockFindUnique.mockResolvedValue({ id: 'config-1', userId: 'other-user' });
+
+      const request = createMockRequest('PATCH', '/api/search-configs/config-1', {
+        name: 'Updated',
+      });
+      const response = await PATCH(request, { params: Promise.resolve({ id: 'config-1' }) });
+
+      expect(response.status).toBe(404);
+    });
+
     it('should update a search config', async () => {
       const updatedConfig = {
         id: 'config-1',
@@ -485,6 +541,29 @@ describe('Search Configs API', () => {
   });
 
   describe('DELETE /api/search-configs/[id]', () => {
+    beforeEach(() => {
+      mockGetCurrentUserId.mockResolvedValue('test-owner');
+      mockFindUnique.mockResolvedValue({ id: 'config-1', userId: 'test-owner' });
+    });
+
+    it('should return 401 when unauthenticated', async () => {
+      mockGetCurrentUserId.mockResolvedValue(null);
+
+      const request = createMockRequest('DELETE', '/api/search-configs/config-1');
+      const response = await DELETE(request, { params: Promise.resolve({ id: 'config-1' }) });
+
+      expect(response.status).toBe(401);
+    });
+
+    it('should return 404 when deleting a config owned by another user', async () => {
+      mockFindUnique.mockResolvedValue({ id: 'config-1', userId: 'other-user' });
+
+      const request = createMockRequest('DELETE', '/api/search-configs/config-1');
+      const response = await DELETE(request, { params: Promise.resolve({ id: 'config-1' }) });
+
+      expect(response.status).toBe(404);
+    });
+
     it('should delete a search config', async () => {
       mockDelete.mockResolvedValue({ id: 'config-1' });
 
