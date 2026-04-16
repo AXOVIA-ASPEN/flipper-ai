@@ -15,11 +15,14 @@ import { getCorsHeaders } from '@/lib/api-security';
 
 const SESSION_COOKIE_NAME = '__session';
 
-// Routes that don't require authentication
+// Routes that don't require authentication.
+// Must stay in sync with FR-AUTH-ACCESS-05 (PRD) and the PUBLIC_ROUTE_PREFIXES
+// list in src/components/Navigation.tsx.
 const PUBLIC_PATHS = [
   '/login',
   '/register',
   '/forgot-password',
+  '/reset-password',
   '/api/auth/',
   '/api/health',
   '/api/webhooks/',

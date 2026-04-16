@@ -37,7 +37,13 @@ export default function LoginPage() {
 function LoginPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/';
+  // Validate callbackUrl is a same-origin relative path to prevent open-redirect
+  // attacks (FR-AUTH-ACCESS — never redirect to untrusted external URLs).
+  const rawCallback = searchParams.get('callbackUrl');
+  const callbackUrl =
+    rawCallback && rawCallback.startsWith('/') && !rawCallback.startsWith('//')
+      ? rawCallback
+      : '/';
   const loggedOut = searchParams.get('loggedOut') === 'true' || searchParams.get('loggedOut') === '1';
 
   const { signIn, signInWithGoogle, signInWithGitHub } = useFirebaseAuth();
