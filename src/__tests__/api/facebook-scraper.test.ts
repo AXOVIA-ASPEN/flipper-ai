@@ -12,6 +12,7 @@ jest.mock('@/lib/db', () => ({
     scraperJob: {
       create: jest.fn(),
       update: jest.fn(),
+      findFirst: jest.fn().mockResolvedValue(null),
     },
     facebookToken: {
       findUnique: jest.fn(),
@@ -19,7 +20,45 @@ jest.mock('@/lib/db', () => ({
     userSettings: {
       findUnique: jest.fn().mockResolvedValue(null),
     },
+    aiAnalysisCache: { create: jest.fn().mockResolvedValue({}) },
+    listingImage: {
+      count: jest.fn().mockResolvedValue(0),
+      createMany: jest.fn().mockResolvedValue({ count: 0 }),
+    },
   },
+}));
+
+// Mock image-capture to avoid Firebase Storage calls
+jest.mock('@/lib/image-capture', () => ({
+  captureListingImages: jest.fn().mockResolvedValue({ captured: [], failed: [] }),
+  hasExistingImages: jest.fn().mockResolvedValue(false),
+  saveImageMetadata: jest.fn().mockResolvedValue(undefined),
+}));
+
+// Mock Stagehand scraper to avoid real browser launches
+jest.mock('@/scrapers/facebook/scraper', () => ({
+  scrapeAndConvert: jest.fn().mockResolvedValue({ success: true, listings: [], totalFound: 0 }),
+  convertGraphApiToRawListing: jest.fn((item: any) => ({
+    externalId: item.id,
+    url: item.marketplace_listing_url || `https://www.facebook.com/marketplace/item/${item.id}`,
+    title: item.name || '',
+    description: item.description || null,
+    askingPrice: parseFloat(item.price || '0'),
+    condition: item.condition || null,
+    location: item.location
+      ? [item.location.city, item.location.state, item.location.zip].filter(Boolean).join(', ') || null
+      : null,
+    sellerName: item.seller?.name || null,
+    sellerContact: null,
+    imageUrls: item.images?.map((img: any) => img.url) ?? [],
+    category: item.category || null,
+    postedAt: item.created_time ? new Date(item.created_time) : null,
+  })),
+  jitterMs: jest.fn(() => 0),
+}));
+
+jest.mock('@/scrapers/facebook/token-store', () => ({
+  getToken: jest.fn().mockResolvedValue(null),
 }));
 
 jest.mock('@/lib/auth-middleware', () => ({

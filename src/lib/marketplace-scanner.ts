@@ -1085,6 +1085,21 @@ export async function rescueUndervaluedItems(
 }
 
 /**
+ * Returns true when the user already has a RUNNING ScraperJob for the given platform.
+ * Used by all platform scraper routes to prevent duplicate concurrent jobs.
+ */
+export async function hasRunningJob(userId: string, platform: string): Promise<boolean> {
+  const result = await prisma.scraperJob.findFirst({
+    where: {
+      userId,
+      platform,
+      status: 'RUNNING',
+    },
+  });
+  return !!result;
+}
+
+/**
  * Checks a batch of raw listings against the database to identify duplicates
  * (same platform + userId + externalId already exists).
  */

@@ -15,10 +15,31 @@ import { downloadAndCacheImages, normalizeLocation } from '@/lib/image-service';
 jest.mock('@/lib/db', () => ({
   __esModule: true,
   default: {
-    scraperJob: { create: jest.fn(), update: jest.fn() },
+    scraperJob: {
+      create: jest.fn(),
+      update: jest.fn(),
+      findFirst: jest.fn().mockResolvedValue(null),
+    },
     listing: { upsert: jest.fn() },
     userSettings: { findUnique: jest.fn().mockResolvedValue(null) },
+    aiAnalysisCache: { create: jest.fn().mockResolvedValue({}) },
+    listingImage: {
+      count: jest.fn().mockResolvedValue(0),
+      createMany: jest.fn().mockResolvedValue({ count: 0 }),
+    },
   },
+}));
+
+// Mock image-capture to avoid actual Firebase Storage calls
+jest.mock('@/lib/image-capture', () => ({
+  captureListingImages: jest.fn().mockResolvedValue({ captured: [], failed: [] }),
+  hasExistingImages: jest.fn().mockResolvedValue(false),
+  saveImageMetadata: jest.fn().mockResolvedValue(undefined),
+}));
+
+// Mock logger
+jest.mock('@/lib/logger', () => ({
+  logger: { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn(), fatal: jest.fn() },
 }));
 
 jest.mock('@/lib/auth-middleware', () => ({

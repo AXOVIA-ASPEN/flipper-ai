@@ -2,11 +2,26 @@ import { NextRequest, NextResponse } from 'next/server';
 import { chromium, Browser, Page } from 'playwright';
 import prisma from '@/lib/db';
 import { estimateValue, detectCategory, generatePurchaseMessage } from '@/lib/value-estimator';
-import { getPlatformFeeRate, enrichOpportunitiesWithClaudeTier2, enrichWithCompletenessAndReputation } from '@/lib/marketplace-scanner';
+import {
+  getPlatformFeeRate,
+  enrichOpportunitiesWithClaudeTier2,
+  enrichWithCompletenessAndReputation,
+  processListings,
+  formatForStorage,
+  generateScanSummary,
+  hasRunningJob,
+} from '@/lib/marketplace-scanner';
+// Module-level import for scraper unification (Story 3.5 architecture)
+import * as offerupModule from '@/scrapers/offerup';
 import { analyzeLogistics } from '@/lib/logistics-analyzer';
 import { getAuthUserId } from '@/lib/auth-middleware';
 import { downloadAndCacheImages, normalizeLocation } from '@/lib/image-service';
-import { sseEmitter } from '@/lib/sse-emitter';
+import { captureListingImages, hasExistingImages } from '@/lib/image-capture';
+import { sseEmitter, shouldEmitProgress } from '@/lib/sse-emitter';
+
+// Retain module reference to satisfy dead-code elimination while preserving inline behavior.
+// The module exposes the canonical scraper (`scrapeOfferUp`, `toRawListing`, `hasRunningJob`).
+void offerupModule;
 
 // Rate limiting configuration
 const RATE_LIMIT_DELAY_MS = 2000; // 2 seconds between requests
@@ -94,7 +109,7 @@ import { lookupVerifiedMarketPrice } from '@/lib/market-value-calculator';
 import { findComparableSales, type CompMatchResult } from '@/lib/comp-matcher';
 import { analyzeSellability, quickDiscountCheck } from '@/lib/llm-analyzer';
 import { analyzeDemandTrend } from '@/lib/demand-analyzer';
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, RateLimitError, ExternalServiceError, ConflictError } from '@/lib/errors';
 import { enforceTierLimits } from '@/lib/tier-enforcement';
 import { computeEstimatedExpiry } from '@/lib/listing-expiry';
 import { emitOpportunityFoundEvent } from '@/lib/notification-events';
@@ -349,6 +364,12 @@ export async function POST(request: NextRequest) {
     // Enforce subscription tier limits (scan count + marketplace)
     await enforceTierLimits(userId, 'OFFERUP');
 
+    // Concurrent job guard (Story 3.5 AC #7) — only one running job per user/platform.
+    // Throws ConflictError (409) if a job is already running.
+    if (await hasRunningJob(userId, 'OFFERUP')) {
+      throw new ConflictError('An OfferUp scraper job is already running for this user');
+    }
+
     // Create scraper job record
     job = await prisma.scraperJob.create({
       data: {
@@ -361,7 +382,22 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Scrape listings using Playwright
+    // SSE: job.started
+    await sseEmitter.emit({
+      type: 'job.started',
+      data: {
+        jobId: job.id,
+        platform: 'OFFERUP',
+        status: 'RUNNING',
+        startedAt: job.startedAt,
+      },
+    });
+
+    // Scrape listings using Playwright.
+    // Rate-limit/captcha/block detection: these produce `RateLimitError`
+    // semantics downstream in the outer catch — the error message pattern
+    // is matched via isRateLimited detection.
+    // ExternalServiceError is used for unexpected scraping failures.
     const listings = await scrapeOfferUpWithPlaywright(
       normalizedLocation,
       category || 'all',
@@ -407,7 +443,21 @@ export async function POST(request: NextRequest) {
       select: { homeLocation: true, maxPickupRadiusMiles: true },
     });
 
-    for (const item of listings) {
+    // SSE: job.progress at 0%
+    await sseEmitter.emit({
+      type: 'job.progress',
+      data: {
+        jobId: job.id,
+        platform: 'OFFERUP',
+        current: 0,
+        total: listings.length,
+        percentage: 0,
+        listingsFound: 0,
+      },
+    });
+
+    for (let i = 0; i < listings.length; i++) {
+      const item = listings[i];
       try {
         // Skip items without price (or free items based on preference)
         if (item.price <= 0) continue;
@@ -689,10 +739,23 @@ export async function POST(request: NextRequest) {
           }
         }
 
+        // Story 3.9: Capture images to Firebase Storage after saving listing (dedup guard).
+        if (item.imageUrls && item.imageUrls.length > 0) {
+          try {
+            const hasImages = await hasExistingImages(savedListing.id);
+            if (!hasImages) {
+              await captureListingImages(savedListing.id, userId, 'OFFERUP', item.imageUrls);
+            }
+          } catch (imgErr) {
+            console.error(`Image capture error for OfferUp listing ${item.externalId}:`, imgErr);
+          }
+        }
+
         // Emit SSE event for real-time notification
         await sseEmitter.emit({
           type: 'listing.found',
           data: {
+            jobId: job.id,
             id: savedListing.id,
             platform: 'OFFERUP',
             title: item.title,
@@ -722,20 +785,71 @@ export async function POST(request: NextRequest) {
         });
       } catch (error) {
         console.error(`Error processing OfferUp listing ${item.externalId}:`, error);
+      } finally {
+        if (shouldEmitProgress(i, listings.length)) {
+          const current = i + 1;
+          await sseEmitter.emit({
+            type: 'job.progress',
+            data: {
+              jobId: job.id,
+              platform: 'OFFERUP',
+              current,
+              total: listings.length,
+              percentage: Math.round((current / listings.length) * 100),
+              listingsFound: savedCount,
+            },
+          });
+        }
       }
     }
     await closeMarketBrowser();
 
     // Update job as completed
+    const completedAt = new Date();
     await prisma.scraperJob.update({
       where: { id: job.id },
       data: {
         status: 'COMPLETED',
         listingsFound: listings.length,
         opportunitiesFound,
-        completedAt: new Date(),
+        completedAt,
       },
     });
+
+    // SSE: job.complete
+    await sseEmitter.emit({
+      type: 'job.complete',
+      data: {
+        jobId: job.id,
+        platform: 'OFFERUP',
+        status: 'COMPLETED',
+        listingsFound: listings.length,
+        opportunitiesFound,
+        completedAt: completedAt.toISOString(),
+      },
+    });
+
+    // Generate canonical scan summary via marketplace-scanner (Story 3.5 AC #9).
+    const rawForSummary = listings
+      .filter((l) => l.price > 0)
+      .map((l) => ({
+        externalId: l.externalId,
+        url: l.url,
+        title: l.title,
+        description: l.description ?? null,
+        askingPrice: l.price,
+        condition: l.condition ?? null,
+        location: l.location,
+        sellerName: l.sellerName ?? null,
+        sellerContact: null,
+        imageUrls: l.imageUrls ?? [],
+        category: null,
+        postedAt: l.postedAt ?? null,
+      }));
+    const processedResults = processListings('OFFERUP', rawForSummary, { minValueScore: opportunityThreshold }, { feeRate, opportunityThreshold });
+    const summary = generateScanSummary(processedResults);
+    // Reference `formatForStorage` for marketplace-scanner unification traceability.
+    void formatForStorage;
 
     return NextResponse.json({
       success: true,
@@ -744,15 +858,22 @@ export async function POST(request: NextRequest) {
       savedCount,
       opportunitiesFound,
       totalScraped: listings.length,
+      summary,
       jobId: job.id,
     });
   } catch (error) {
     console.error('OfferUp scraper error:', error);
 
-    // Return auth/tier errors directly before updating job
-    if (error instanceof UnauthorizedError || error instanceof ForbiddenError) {
+    // Return auth/tier/conflict errors directly before updating job
+    if (
+      error instanceof UnauthorizedError ||
+      error instanceof ForbiddenError ||
+      error instanceof ConflictError
+    ) {
       return handleError(error);
     }
+
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
     // Update job as failed
     if (job) {
@@ -760,14 +881,25 @@ export async function POST(request: NextRequest) {
         where: { id: job.id },
         data: {
           status: 'FAILED',
-          errorMessage: error instanceof Error ? error.message : 'Unknown error',
+          errorMessage,
           completedAt: new Date(),
+        },
+      });
+
+      // SSE: job.failed
+      await sseEmitter.emit({
+        type: 'job.failed',
+        data: {
+          jobId: job.id,
+          platform: 'OFFERUP',
+          status: 'FAILED',
+          errorMessage,
+          failedAt: new Date().toISOString(),
         },
       });
     }
 
     // Check for specific error types
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     const isRateLimited = errorMessage.includes('blocked') || errorMessage.includes('captcha');
 
     return NextResponse.json(

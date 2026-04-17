@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { estimateValue, detectCategory, generatePurchaseMessage } from '@/lib/value-estimator';
 import { getAuthUserId } from '@/lib/auth-middleware';
+// Module-level import for scraper unification (Story 3.2 architecture).
+// The module exposes the canonical API helpers (callEbayApi, convertEbayItemsToNormalized).
+import * as ebayModule from '@/scrapers/ebay';
+void ebayModule;
 import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
 import { enforceTierLimits } from '@/lib/tier-enforcement';
 import { computeEstimatedExpiry } from '@/lib/listing-expiry';

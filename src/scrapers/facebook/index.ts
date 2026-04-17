@@ -1,7 +1,13 @@
 // Facebook Marketplace Scraper Module
 // Exports the scraper and related types
 
-export { scrapeFacebookMarketplace, scrapeAndConvert, convertToRawListing } from './scraper';
+export {
+  scrapeFacebookMarketplace,
+  scrapeAndConvert,
+  convertToRawListing,
+  convertGraphApiToRawListing,
+  jitterMs,
+} from './scraper';
 
 export type {
   FacebookScraperConfig,
@@ -9,6 +15,8 @@ export type {
   FacebookListingPreview,
   FacebookScrapeResult,
 } from './types';
+
+export type { GraphApiMarketplaceListing } from './scraper';
 
 export {
   FACEBOOK_CATEGORIES,

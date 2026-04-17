@@ -99,6 +99,15 @@ function buildSearchUrl(config: FacebookScraperConfig): string {
 }
 
 /**
+ * Randomized jitter delay in milliseconds, used between detail page fetches
+ * to reduce Stagehand/browser-automation detectability on Facebook.
+ * Returns a value in the range [minMs, maxMs).
+ */
+export function jitterMs(minMs: number = 500, maxMs: number = 1500): number {
+  return Math.floor(Math.random() * (maxMs - minMs)) + minMs;
+}
+
+/**
  * Parses a price string to a number
  */
 function parsePrice(priceStr: string): number {
@@ -109,10 +118,14 @@ function parsePrice(priceStr: string): number {
 }
 
 /**
- * Generates a unique external ID from the listing URL or title
+ * Generates a unique external ID from the listing URL or title.
+ *
+ * Extracts numeric IDs from marketplace URL patterns of the form "/item/(\d+)"
+ * (e.g. facebook.com/marketplace/item/123456), falling back to a title+price
+ * hash with a "fb-" prefix when no URL match is available.
  */
 function generateExternalId(listing: FacebookListingDetail, index: number): string {
-  // Try to extract ID from URL if available
+  // Try to extract ID from URL if available — expected pattern: /item/(\d+)
   const titleStr = listing.title !== undefined ? listing.title : /* istanbul ignore next */ '';
   const urlMatch = titleStr.match(/\/item\/(\d+)/);
   if (urlMatch) {
@@ -128,6 +141,75 @@ function generateExternalId(listing: FacebookListingDetail, index: number): stri
     hash = hash & hash; // Convert to 32-bit integer
   }
   return `fb-${Math.abs(hash)}`;
+}
+
+/**
+ * Facebook Graph API v19.0 marketplace_search item shape
+ */
+export interface GraphApiMarketplaceListing {
+  id: string;
+  name?: string;
+  description?: string;
+  price?: string;
+  currency?: string;
+  availability?: string;
+  condition?: string;
+  category?: string;
+  location?: {
+    city?: string;
+    state?: string;
+    zip?: string;
+    latitude?: number;
+    longitude?: number;
+  };
+  images?: Array<{ url: string }>;
+  marketplace_listing_url?: string;
+  created_time?: string;
+  seller?: { id: string; name?: string };
+}
+
+/**
+ * Format a Graph API location object as `city, state zip`.
+ */
+function formatLocation(location?: GraphApiMarketplaceListing['location']): string | null {
+  if (!location) return null;
+  const parts = [location.city, location.state, location.zip].filter(Boolean);
+  return parts.length > 0 ? parts.join(', ') : null;
+}
+
+/**
+ * Convert a Facebook Graph API v19.0 marketplace_search result into the
+ * canonical RawListing format consumed by marketplace-scanner.
+ *
+ * Maps:
+ *   id → externalId
+ *   name → title
+ *   price (string) → askingPrice (number, via parsePrice)
+ *   images[].url → imageUrls
+ *   location {city,state,zip} → location string
+ */
+export function convertGraphApiToRawListing(
+  item: GraphApiMarketplaceListing,
+  keywords?: string
+): RawListing {
+  const _kw = keywords; // accepted for caller convenience; Graph API already filters by query
+  void _kw;
+  return {
+    externalId: item.id,
+    url:
+      item.marketplace_listing_url ||
+      `https://www.facebook.com/marketplace/item/${item.id}`,
+    title: item.name || '',
+    description: item.description || null,
+    askingPrice: parsePrice(item.price || '0'),
+    condition: item.condition || null,
+    location: formatLocation(item.location),
+    sellerName: item.seller?.name || null,
+    sellerContact: null,
+    imageUrls: item.images?.map((img) => img.url) ?? [],
+    category: item.category || null,
+    postedAt: item.created_time ? new Date(item.created_time) : null,
+  };
 }
 
 /**
@@ -228,7 +310,8 @@ export async function scrapeFacebookMarketplace(
             action: `Click on the listing with title "${preview.title}" to view its details`,
           });
 
-          await page.waitForTimeout(2000);
+          // Randomized jitter between detail fetches to avoid detection
+          await page.waitForTimeout(2000 + jitterMs(200, 1200));
 
           // Extract full details
           const details = await page.extract({

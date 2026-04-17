@@ -15,6 +15,7 @@ jest.mock('@/lib/db', () => ({
     scraperJob: {
       create: jest.fn().mockResolvedValue({ id: 'job-123' }),
       update: jest.fn().mockResolvedValue({}),
+      findFirst: jest.fn().mockResolvedValue(null),
     },
     listing: {
       upsert: jest.fn().mockResolvedValue({
@@ -31,7 +32,22 @@ jest.mock('@/lib/db', () => ({
     userSettings: {
       findUnique: jest.fn().mockResolvedValue(null),
     },
+    aiAnalysisCache: { create: jest.fn().mockResolvedValue({}) },
+    listingImage: {
+      count: jest.fn().mockResolvedValue(0),
+      createMany: jest.fn().mockResolvedValue({ count: 0 }),
+    },
+    facebookToken: {
+      findUnique: jest.fn().mockResolvedValue(null),
+    },
   },
+}));
+
+// Mock image-capture to avoid Firebase Storage calls
+jest.mock('@/lib/image-capture', () => ({
+  captureListingImages: jest.fn().mockResolvedValue({ captured: [], failed: [] }),
+  hasExistingImages: jest.fn().mockResolvedValue(false),
+  saveImageMetadata: jest.fn().mockResolvedValue(undefined),
 }));
 
 // Mock auth middleware

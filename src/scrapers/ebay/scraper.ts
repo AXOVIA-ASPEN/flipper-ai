@@ -17,8 +17,10 @@ import {
 
 const EBAY_API_BASE_URL =
   process.env.EBAY_BROWSE_API_BASE_URL || EBAY_API_DEFAULTS.BASE_URL;
+// Default marketplace header value is 'EBAY_US' (see EBAY_API_DEFAULTS.MARKETPLACE_ID in types.ts).
+// Override via EBAY_MARKETPLACE_ID env var to target another eBay region.
 const EBAY_MARKETPLACE_ID =
-  process.env.EBAY_MARKETPLACE_ID || EBAY_API_DEFAULTS.MARKETPLACE_ID;
+  process.env.EBAY_MARKETPLACE_ID || EBAY_API_DEFAULTS.MARKETPLACE_ID; // default: 'EBAY_US'
 
 /**
  * Build eBay filter string for Browse API v1.

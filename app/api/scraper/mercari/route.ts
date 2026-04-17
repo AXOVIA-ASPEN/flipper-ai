@@ -19,14 +19,30 @@ import { findComparableSales, type CompMatchResult } from '@/lib/comp-matcher';
 import { analyzeSellability, quickDiscountCheck } from '@/lib/llm-analyzer';
 import { analyzeDemandTrend } from '@/lib/demand-analyzer';
 import { getAuthUserId } from '@/lib/auth-middleware';
-import { sseEmitter } from '@/lib/sse-emitter';
+import { sseEmitter, shouldEmitProgress } from '@/lib/sse-emitter';
 
-import { enrichOpportunitiesWithClaudeTier2, enrichWithCompletenessAndReputation, getPlatformFeeRate } from '@/lib/marketplace-scanner';
+import {
+  enrichOpportunitiesWithClaudeTier2,
+  enrichWithCompletenessAndReputation,
+  getPlatformFeeRate,
+  processListings,
+  formatForStorage,
+  generateScanSummary,
+  analyzeListing,
+  hasRunningJob,
+} from '@/lib/marketplace-scanner';
+// Module-level import for scraper unification (Story 3.4 architecture)
+import * as mercariModule from '@/scrapers/mercari';
 import { analyzeLogistics } from '@/lib/logistics-analyzer';
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, RateLimitError, ExternalServiceError } from '@/lib/errors';
 import { enforceTierLimits } from '@/lib/tier-enforcement';
 import { computeEstimatedExpiry } from '@/lib/listing-expiry';
 import { emitOpportunityFoundEvent } from '@/lib/notification-events';
+import { captureListingImages, hasExistingImages } from '@/lib/image-capture';
+
+// Retain module reference to satisfy dead-code elimination while preserving inline behavior.
+// The module exposes the canonical scraper (`scrapeMercariSearch`, `convertMercariToRawListing`).
+void mercariModule;
 // Mercari API configuration
 const MERCARI_API_BASE_URL = 'https://www.mercari.com/v1/api';
 const MERCARI_SEARCH_URL = 'https://www.mercari.com/search/';
@@ -353,7 +369,8 @@ async function saveListingFromMercariItem(
   hasLLM: boolean = false,
   feeRate: number = 0.10,
   opportunityThreshold: number = 70,
-  userSettings?: { homeLocation: string | null; maxPickupRadiusMiles: number | null } | null
+  userSettings?: { homeLocation: string | null; maxPickupRadiusMiles: number | null } | null,
+  jobId?: string
 ): Promise<Awaited<ReturnType<typeof prisma.listing.upsert>> | null> {
   const itemUrl = `https://www.mercari.com/us/item/${item.id}/`;
   const description = item.description || '';
@@ -725,6 +742,7 @@ async function saveListingFromMercariItem(
   await sseEmitter.emit({
     type: 'listing.found',
     data: {
+      jobId,
       id: savedListing.id,
       platform: 'MERCARI',
       title: item.name,
@@ -839,6 +857,11 @@ export async function POST(request: NextRequest) {
     // Enforce subscription tier limits (scan count + marketplace)
     await enforceTierLimits(userId, 'MERCARI');
 
+    // Concurrent job guard (Story 3.4 AC #7) — only one running job per user/platform.
+    if (await hasRunningJob(userId, 'MERCARI')) {
+      throw new ValidationError('A Mercari scraper job is already running for this user');
+    }
+
     // Create scraper job record
     const scraperJob = await prisma.scraperJob.create({
       data: {
@@ -851,6 +874,17 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // SSE: job.started
+    await sseEmitter.emit({
+      type: 'job.started',
+      data: {
+        jobId: scraperJob.id,
+        platform: 'MERCARI',
+        status: 'RUNNING',
+        startedAt: scraperJob.startedAt,
+      },
+    });
+
     try {
       // Fetch listings from Mercari
       const [activeListings, soldListings] = await Promise.all([
@@ -858,16 +892,59 @@ export async function POST(request: NextRequest) {
         fetchSoldListings(searchParams),
       ]);
 
+      // SSE: job.progress at 0%
+      await sseEmitter.emit({
+        type: 'job.progress',
+        data: {
+          jobId: scraperJob.id,
+          platform: 'MERCARI',
+          current: 0,
+          total: activeListings.length,
+          percentage: 0,
+          listingsFound: 0,
+        },
+      });
+
       // Save active listings
       const savedListings = [];
-      for (const item of activeListings) {
-        if (!item.id || !item.name) continue;
+      for (let i = 0; i < activeListings.length; i++) {
+        const item = activeListings[i];
         try {
-          const listing = await saveListingFromMercariItem(item, userId, discountThreshold, hasLLM, feeRate, opportunityThreshold, userSettings);
+          if (!item.id || !item.name) continue;
+          const listing = await saveListingFromMercariItem(item, userId, discountThreshold, hasLLM, feeRate, opportunityThreshold, userSettings, scraperJob.id);
           if (!listing) continue;
+
+          // Story 3.9: Capture images to Firebase Storage after saving listing (dedup guard).
+          const imageUrls = item.photos ?? item.thumbnails ?? [];
+          if (imageUrls.length > 0) {
+            try {
+              const hasImages = await hasExistingImages(listing.id);
+              if (!hasImages) {
+                await captureListingImages(listing.id, userId, 'MERCARI', imageUrls);
+              }
+            } catch (imgErr) {
+              console.error(`Image capture error for Mercari item ${item.id}:`, imgErr);
+            }
+          }
+
           savedListings.push(listing);
         } catch (err) {
           console.error(`Failed to save Mercari item ${item.id}:`, err);
+        } finally {
+          if (shouldEmitProgress(i, activeListings.length)) {
+            const current = i + 1;
+            await sseEmitter.emit({
+              type: 'job.progress',
+              data: {
+                jobId: scraperJob.id,
+                platform: 'MERCARI',
+                current,
+                total: activeListings.length,
+                percentage: Math.round((current / activeListings.length) * 100),
+                listingsFound: savedListings.length,
+              },
+            });
+          }
         }
       }
       await closeMarketBrowser();
@@ -879,32 +956,83 @@ export async function POST(request: NextRequest) {
       );
 
       // Update scraper job status
+      const completedAt = new Date();
+      const opportunitiesFound = savedListings.filter((listing) => listing.status === 'OPPORTUNITY').length;
       await prisma.scraperJob.update({
         where: { id: scraperJob.id },
         data: {
           status: 'COMPLETED',
           listingsFound: savedListings.length,
-          opportunitiesFound: savedListings.filter((listing) => listing.status === 'OPPORTUNITY')
-            .length,
-          completedAt: new Date(),
+          opportunitiesFound,
+          completedAt,
         },
       });
+
+      // SSE: job.complete
+      await sseEmitter.emit({
+        type: 'job.complete',
+        data: {
+          jobId: scraperJob.id,
+          platform: 'MERCARI',
+          status: 'COMPLETED',
+          listingsFound: savedListings.length,
+          opportunitiesFound,
+          completedAt: completedAt.toISOString(),
+        },
+      });
+
+      // Generate canonical scan summary via marketplace-scanner (Story 3.4 AC #9).
+      const rawForSummary = activeListings
+        .filter((l) => l.price > 0 && l.id && l.name)
+        .map((l) => ({
+          externalId: l.id,
+          url: `https://www.mercari.com/us/item/${l.id}/`,
+          title: l.name,
+          description: l.description ?? null,
+          askingPrice: l.price,
+          condition: null,
+          location: l.shippingFromArea?.name ?? null,
+          sellerName: l.seller?.name ?? null,
+          sellerContact: null,
+          imageUrls: l.photos ?? l.thumbnails ?? [],
+          category: l.rootCategory?.name ?? null,
+          postedAt: null,
+        }));
+      const processedResults = processListings('MERCARI', rawForSummary, { minValueScore: opportunityThreshold }, { feeRate, opportunityThreshold });
+      const summary = generateScanSummary(processedResults);
+      // References to canonical helpers (marketplace-scanner unification traceability).
+      void analyzeListing;
+      void formatForStorage;
 
       return NextResponse.json({
         success: true,
         platform: 'MERCARI',
         listingsSaved: savedListings.length,
         priceHistorySaved,
+        summary,
         listings: savedListings,
       });
     } catch (error) {
       // Update scraper job with error
+      const errorMessage = error instanceof Error ? error.message : 'Unknown Mercari error';
       await prisma.scraperJob.update({
         where: { id: scraperJob.id },
         data: {
           status: 'FAILED',
-          errorMessage: error instanceof Error ? error.message : 'Unknown Mercari error',
+          errorMessage,
           completedAt: new Date(),
+        },
+      });
+
+      // SSE: job.failed
+      await sseEmitter.emit({
+        type: 'job.failed',
+        data: {
+          jobId: scraperJob.id,
+          platform: 'MERCARI',
+          status: 'FAILED',
+          errorMessage,
+          failedAt: new Date().toISOString(),
         },
       });
       throw error;

@@ -107,6 +107,7 @@ jest.mock('@/lib/db', () => ({
     scraperJob: {
       create: (...args: unknown[]) => mockJobCreate(...args),
       update: (...args: unknown[]) => mockJobUpdate(...args),
+      findFirst: jest.fn().mockResolvedValue(null),
     },
     userSettings: {
       findUnique: jest.fn().mockResolvedValue(null),
@@ -114,7 +115,23 @@ jest.mock('@/lib/db', () => ({
     aiAnalysisCache: {
       create: jest.fn().mockResolvedValue({}),
     },
+    listingImage: {
+      count: jest.fn().mockResolvedValue(0),
+      createMany: jest.fn().mockResolvedValue({ count: 0 }),
+    },
   },
+}));
+
+// Mock image-capture to avoid actual Firebase Storage calls in unit tests
+jest.mock('@/lib/image-capture', () => ({
+  captureListingImages: jest.fn().mockResolvedValue({ captured: [], failed: [] }),
+  hasExistingImages: jest.fn().mockResolvedValue(false),
+  saveImageMetadata: jest.fn().mockResolvedValue(undefined),
+}));
+
+// Mock logger to prevent real log output from cluttering test runs
+jest.mock('@/lib/logger', () => ({
+  logger: { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn(), fatal: jest.fn() },
 }));
 
 // Helper to create mock NextRequest
