@@ -8,7 +8,7 @@ const ACCEPTANCE_DIR = 'test/acceptance';
 
 module.exports = {
   default: {
-    features: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
+    paths: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
     require: [
       `${ACCEPTANCE_DIR}/step_definitions/**/*.ts`,
       `${ACCEPTANCE_DIR}/support/**/*.ts`,
@@ -32,7 +32,7 @@ module.exports = {
   // Pretty: Gherkin in real time, passing steps green, failing steps red (for make test-acceptance).
   // parallel: 0 = run in main process only (avoids ERR_IPC_CHANNEL_CLOSED with workers).
   pretty: {
-    features: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
+    paths: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
     require: [
       `${ACCEPTANCE_DIR}/step_definitions/**/*.ts`,
       `${ACCEPTANCE_DIR}/support/**/*.ts`,
@@ -53,7 +53,7 @@ module.exports = {
   },
 
   ci: {
-    features: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
+    paths: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
     require: [
       `${ACCEPTANCE_DIR}/step_definitions/**/*.ts`,
       `${ACCEPTANCE_DIR}/support/**/*.ts`,
@@ -66,7 +66,7 @@ module.exports = {
   },
 
   dev: {
-    features: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
+    paths: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
     require: [
       `${ACCEPTANCE_DIR}/step_definitions/**/*.ts`,
       `${ACCEPTANCE_DIR}/support/**/*.ts`,
@@ -85,7 +85,7 @@ module.exports = {
   // Acceptance tests organized by epic (test/acceptance/features/)
   // @wip scenarios are excluded by default — run `make test-ac TAGS=@wip` to run them explicitly.
   acceptance: {
-    features: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
+    paths: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
     require: [
       `${ACCEPTANCE_DIR}/step_definitions/**/*.ts`,
       `${ACCEPTANCE_DIR}/support/**/*.ts`,
