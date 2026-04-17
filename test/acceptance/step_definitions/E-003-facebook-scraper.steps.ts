@@ -30,10 +30,6 @@ Given('the Facebook scraper module at {string}', function (filePath: string) {
   this.fileContent = readFile(filePath);
 });
 
-Given('the scraper module directory at {string}', function (modulePath: string) {
-  this.moduleDir = modulePath;
-});
-
 // ==================== AC #1: Graph API primary path ====================
 
 When('I inspect the Facebook Graph API integration', function () {
@@ -131,8 +127,9 @@ Then('it should generate external IDs from URL patterns or title-price hashes', 
 
 Then('it should handle price strings like {string} and {string}', function (_price1: string, _price2: string) {
   expect(this.fileContent).toContain('parsePrice');
-  // Verify the price parsing strips non-numeric characters
-  expect(this.fileContent).toMatch(/replace\([^)]*\[^0-9\.\]/);
+  // Verify the price parsing strips non-numeric characters.
+  // Escape the caret — otherwise JS parses it as an anchor and the regex can never match.
+  expect(this.fileContent).toMatch(/replace\([^)]*\[\^0-9\.\]/);
 });
 
 // ==================== AC #4: Rate limiting ====================

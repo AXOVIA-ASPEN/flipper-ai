@@ -31,7 +31,9 @@ Given('the Mercari types at {string}', function (filePath: string) {
 });
 
 Given('the Mercari route at {string}', function (filePath: string) {
-  this.fileContent = readFile(filePath);
+  const content = readFile(filePath);
+  this.fileContent = content;
+  this.routeContent = content;
 });
 
 // ==================== AC #1: Internal API Primary Method ====================
@@ -207,14 +209,6 @@ When('I inspect the Mercari analysis pipeline', function () {
 });
 
 Then('it should use {string} from marketplace-scanner', function (fnName: string) {
-  expect(this.fileContent).toContain(fnName);
-});
-
-Then('it should use {string} for database-ready format', function (fnName: string) {
-  expect(this.fileContent).toContain(fnName);
-});
-
-Then('it should use {string} for consistent response format', function (fnName: string) {
   expect(this.fileContent).toContain(fnName);
 });
 
