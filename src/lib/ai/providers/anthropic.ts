@@ -40,10 +40,10 @@ export class AnthropicProvider implements AIProvider {
 
     const model = process.env.CLAUDE_MODEL || config.model || DEFAULT_MODEL;
 
-    const requestParams: Record<string, unknown> = {
+    const requestParams: Anthropic.MessageCreateParamsNonStreaming = {
       model,
       messages: nonSystemMessages.map((m) => ({
-        role: m.role,
+        role: m.role as 'user' | 'assistant',
         content: m.content,
       })),
       max_tokens: config.maxTokens,
@@ -56,9 +56,7 @@ export class AnthropicProvider implements AIProvider {
 
     let response: Anthropic.Message;
     try {
-      response = await client.messages.create(
-        requestParams as Anthropic.MessageCreateParamsNonStreaming,
-      );
+      response = await client.messages.create(requestParams);
     } catch (err) {
       throw mapSdkError(err, 'anthropic');
     }

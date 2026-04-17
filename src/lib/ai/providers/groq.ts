@@ -52,9 +52,9 @@ export class GroqProvider implements AIProvider {
     });
 
     const groqModel = mapToGroqModel(config.model);
-    const requestParams: Record<string, unknown> = {
+    const requestParams: OpenAI.ChatCompletionCreateParamsNonStreaming = {
       model: groqModel,
-      messages: messages.map((m) => ({ role: m.role, content: m.content })),
+      messages: messages.map((m) => ({ role: m.role as 'system' | 'user' | 'assistant', content: m.content })),
       temperature: config.temperature,
       max_tokens: config.maxTokens,
     };
@@ -65,9 +65,7 @@ export class GroqProvider implements AIProvider {
 
     let response: OpenAI.ChatCompletion;
     try {
-      response = await client.chat.completions.create(
-        requestParams as OpenAI.ChatCompletionCreateParamsNonStreaming,
-      );
+      response = await client.chat.completions.create(requestParams);
     } catch (err) {
       throw mapSdkError(err, 'groq');
     }

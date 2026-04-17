@@ -13,9 +13,26 @@
  * supports JSON response format via responseMimeType.
  */
 
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, type ModelParams } from '@google/generative-ai';
 import type { AIProvider, AIMessage, ModelConfig, AIResponse } from './types';
 import { mapSdkError, assertJsonParseable } from './error-mapping';
+
+// Map non-Gemini model names (used in shared prompt configs) to Gemini equivalents.
+// Keeps prompt configs provider-agnostic at the model-name level while still allowing
+// Gemini to be selected as primary or fallback. Unknown model names pass through unchanged.
+const GEMINI_MODEL_MAPPINGS: Record<string, string> = {
+  'gpt-4o-mini': 'gemini-2.0-flash',
+  'gpt-4o': 'gemini-2.0-flash',
+  'gpt-4': 'gemini-2.0-flash',
+  'gpt-3.5-turbo': 'gemini-2.0-flash',
+  'claude-sonnet-4-5-20250929': 'gemini-2.0-flash',
+  'claude-3-5-sonnet': 'gemini-2.0-flash',
+  'claude-3-opus': 'gemini-2.0-flash',
+};
+
+function mapToGeminiModel(model: string): string {
+  return GEMINI_MODEL_MAPPINGS[model] ?? model;
+}
 
 export class GeminiProvider implements AIProvider {
   readonly name = 'gemini' as const;
@@ -46,9 +63,10 @@ export class GeminiProvider implements AIProvider {
       generationConfig.responseMimeType = 'application/json';
     }
 
-    // Build model options
-    const modelOptions: Record<string, unknown> = {
-      model: config.model,
+    // Build model options (map OpenAI/Claude model names → Gemini equivalents)
+    const geminiModel = mapToGeminiModel(config.model);
+    const modelOptions: ModelParams = {
+      model: geminiModel,
       generationConfig,
     };
 
@@ -78,7 +96,7 @@ export class GeminiProvider implements AIProvider {
 
     return {
       content: text,
-      model: config.model,
+      model: geminiModel,
       provider: 'gemini',
       usage: metadata
         ? {
