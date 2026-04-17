@@ -47,6 +47,7 @@
 #   TWILIO_FROM_NUMBER         Twilio sender phone number (E.164)
 #   GOOGLE_CALENDAR_CLIENT_ID       Google Calendar OAuth client ID
 #   GOOGLE_CALENDAR_CLIENT_SECRET   Google Calendar OAuth client secret
+#   GROQ_API_KEY                    Groq AI API key (free tier, Llama models)
 # ──────────────────────────────────────────────────────────────────────────────
 
 set -e
@@ -99,6 +100,7 @@ SECRET_NAMES=(
   TWILIO_FROM_NUMBER
   GOOGLE_CALENDAR_CLIENT_ID
   GOOGLE_CALENDAR_CLIENT_SECRET
+  GROQ_API_KEY
 )
 
 if [ -z "$PROJECT_ID" ]; then

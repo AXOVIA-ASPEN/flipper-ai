@@ -1,172 +1,51 @@
 <?xml version="1.0"?>
-<testsuite name="Cucumber" time="9.361" tests="23" skipped="0" failures="0" errors="0" timestamp="2026-04-16T08:39:55.518Z">
-  <testcase classname="User Registration with Email" name="Unauthenticated user redirected to login for protected routes - #1.1" time="0.641">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/dashboard".............................................passed
-Then I should be redirected to "/login" with a "callbackUrl" of "/dashboard"..passed]]></system-out>
+<testsuite name="Cucumber" time="8.184" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-04-17T11:31:06.095Z">
+  <testcase classname="Frontend Design System Migration" name="PriceCalculator root container uses canonical fp-glass surface" time="0.146">
+    <system-out><![CDATA[Given the source file "src/components/PriceCalculator.tsx" exists...........passed
+When I read the source of "src/components/PriceCalculator.tsx"..............passed
+Then the source should contain the pattern "fp-glass p-6 rounded-lg"........passed]]></system-out>
   </testcase>
-  <testcase classname="User Registration with Email" name="Unauthenticated user redirected to login for protected routes - #1.2" time="0.346">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/opportunities".........................................passed
-Then I should be redirected to "/login" with a "callbackUrl" of "/opportunities"..passed]]></system-out>
+  <testcase classname="Frontend Design System Migration" name="PriceCalculator source has zero raw Tailwind palette classes" time="0.059">
+    <system-out><![CDATA[Given the source file "src/components/PriceCalculator.tsx" exists...........passed
+When I read the source of "src/components/PriceCalculator.tsx"..............passed
+Then the raw Tailwind palette class count should equal 0....................passed]]></system-out>
   </testcase>
-  <testcase classname="User Registration with Email" name="Unauthenticated user redirected to login for protected routes - #1.3" time="0.362">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/messages"..............................................passed
-Then I should be redirected to "/login" with a "callbackUrl" of "/messages"..passed]]></system-out>
+  <testcase classname="Frontend Design System Migration" name="PriceCalculator numeric inputs use canonical fp-input class" time="0.056">
+    <system-out><![CDATA[Given the source file "src/components/PriceCalculator.tsx" exists...........passed
+When I read the source of "src/components/PriceCalculator.tsx"..............passed
+Then the source should contain the pattern "fp-input w-28 text-right".......passed
+And the source should contain the pattern "fp-input w-20 text-right"........passed
+And the source should contain the pattern "fp-input w-24 text-right"........passed]]></system-out>
   </testcase>
-  <testcase classname="User Registration with Email" name="Unauthenticated user redirected to login for protected routes - #1.4" time="0.276">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/posting-queue".........................................passed
-Then I should be redirected to "/login" with a "callbackUrl" of "/posting-queue"..passed]]></system-out>
+  <testcase classname="Frontend Design System Migration" name="PriceCalculator action buttons use canonical fp-btn-* variants" time="0.054">
+    <system-out><![CDATA[Given the source file "src/components/PriceCalculator.tsx" exists...........passed
+When I read the source of "src/components/PriceCalculator.tsx"..............passed
+Then the source should contain the pattern "fp-btn-primary text-xs px-3 py-1.5"..passed
+And the source should contain the pattern "fp-btn-ghost text-xs px-3 py-1.5"..passed]]></system-out>
   </testcase>
-  <testcase classname="User Registration with Email" name="Unauthenticated user redirected to login for protected routes - #1.5" time="0.345">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/settings"..............................................passed
-Then I should be redirected to "/login" with a "callbackUrl" of "/settings"..passed]]></system-out>
+  <testcase classname="Frontend Design System Migration" name="PriceCalculator alert banners use canonical fp-alert-* variants" time="0.05">
+    <system-out><![CDATA[Given the source file "src/components/PriceCalculator.tsx" exists...........passed
+When I read the source of "src/components/PriceCalculator.tsx"..............passed
+Then the source should contain the pattern "fp-alert-warn px-4 py-3"........passed
+And the source should contain the pattern "fp-alert-danger px-4 py-3".......passed]]></system-out>
   </testcase>
-  <testcase classname="User Registration with Email" name="Unauthenticated user redirected to login for protected routes - #1.6" time="0.295">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/analytics".............................................passed
-Then I should be redirected to "/login" with a "callbackUrl" of "/analytics"..passed]]></system-out>
+  <testcase classname="Frontend Design System Migration" name="Range slider uses canonical accent-color without palette class" time="0.051">
+    <system-out><![CDATA[Given the source file "src/components/PriceCalculator.tsx" exists...........passed
+When I read the source of "src/components/PriceCalculator.tsx"..............passed
+Then the source should contain the pattern "accentColor: '#7c3aed'".........passed
+And the source should not contain the pattern "accent-purple-"..............passed]]></system-out>
   </testcase>
-  <testcase classname="User Registration with Email" name="Unauthenticated user redirected to login for protected routes - #1.7" time="0.238">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/scraper"...............................................passed
-Then I should be redirected to "/login" with a "callbackUrl" of "/scraper"..passed]]></system-out>
+  <testcase classname="Frontend Design System Migration" name="Listing detail page renders PriceCalculator on a canonical glass surface" time="1.688">
+    <system-out><![CDATA[Given I am logged in........................................................passed
+And the "/api/listings/mock-listing-14-6" route returns a mocked listing with optimal pricing..passed
+When I load the "/listings/mock-listing-14-6" route in the browser..........passed
+Then an element matching "[data-testid='price-calculator']" with class "fp-glass" is visible..passed
+And the element "[data-testid='price-calculator-hero']" has aria-live "polite"..passed
+And the slider "#price-calc-margin-slider" has aria-valuemin, aria-valuemax, aria-valuenow, and aria-valuetext populated..passed]]></system-out>
   </testcase>
-  <testcase classname="User Registration with Email" name="Unauthenticated user redirected to login for protected routes - #1.8" time="0.241">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/onboarding"............................................passed
-Then I should be redirected to "/login" with a "callbackUrl" of "/onboarding"..passed]]></system-out>
-  </testcase>
-  <testcase classname="User Registration with Email" name="Navigation bar is hidden on public routes for unauthenticated users - #1.1" time="0.263">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/"......................................................passed
-Then I should not see the authenticated navigation bar......................passed
-And I should not see a link to "/dashboard".................................passed
-And I should not see a link to "/opportunities".............................passed
-And I should not see a link to "/messages"..................................passed
-And I should not see a link to "/posting-queue".............................passed
-And I should not see a link to "/settings"..................................passed]]></system-out>
-  </testcase>
-  <testcase classname="User Registration with Email" name="Navigation bar is hidden on public routes for unauthenticated users - #1.2" time="0.308">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/privacy"...............................................passed
-Then I should not see the authenticated navigation bar......................passed
-And I should not see a link to "/dashboard".................................passed
-And I should not see a link to "/opportunities".............................passed
-And I should not see a link to "/messages"..................................passed
-And I should not see a link to "/posting-queue".............................passed
-And I should not see a link to "/settings"..................................passed]]></system-out>
-  </testcase>
-  <testcase classname="User Registration with Email" name="Navigation bar is hidden on public routes for unauthenticated users - #1.3" time="0.25">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/terms".................................................passed
-Then I should not see the authenticated navigation bar......................passed
-And I should not see a link to "/dashboard".................................passed
-And I should not see a link to "/opportunities".............................passed
-And I should not see a link to "/messages"..................................passed
-And I should not see a link to "/posting-queue".............................passed
-And I should not see a link to "/settings"..................................passed]]></system-out>
-  </testcase>
-  <testcase classname="User Registration with Email" name="Navigation bar is hidden on public routes for unauthenticated users - #1.4" time="0.276">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/login".................................................passed
-Then I should not see the authenticated navigation bar......................passed
-And I should not see a link to "/dashboard".................................passed
-And I should not see a link to "/opportunities".............................passed
-And I should not see a link to "/messages"..................................passed
-And I should not see a link to "/posting-queue".............................passed
-And I should not see a link to "/settings"..................................passed]]></system-out>
-  </testcase>
-  <testcase classname="User Registration with Email" name="Navigation bar is hidden on public routes for unauthenticated users - #1.5" time="0.284">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/register"..............................................passed
-Then I should not see the authenticated navigation bar......................passed
-And I should not see a link to "/dashboard".................................passed
-And I should not see a link to "/opportunities".............................passed
-And I should not see a link to "/messages"..................................passed
-And I should not see a link to "/posting-queue".............................passed
-And I should not see a link to "/settings"..................................passed]]></system-out>
-  </testcase>
-  <testcase classname="User Registration with Email" name="Navigation bar is hidden on public routes for unauthenticated users - #1.6" time="0.262">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/forgot-password".......................................passed
-Then I should not see the authenticated navigation bar......................passed
-And I should not see a link to "/dashboard".................................passed
-And I should not see a link to "/opportunities".............................passed
-And I should not see a link to "/messages"..................................passed
-And I should not see a link to "/posting-queue".............................passed
-And I should not see a link to "/settings"..................................passed]]></system-out>
-  </testcase>
-  <testcase classname="User Registration with Email" name="Expired session cookie is cleared and user is redirected to login" time="0.237">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I have an expired session cookie......................................passed
-When I navigate to "/dashboard".............................................passed
-Then I should be redirected to "/login".....................................passed
-And the "__session" cookie should be cleared................................passed]]></system-out>
-  </testcase>
-  <testcase classname="User Registration with Email" name="Only whitelisted routes are reachable without authentication - #1.1" time="0.258">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/"......................................................passed
-Then the response status code should be 200.................................passed]]></system-out>
-  </testcase>
-  <testcase classname="User Registration with Email" name="Only whitelisted routes are reachable without authentication - #1.2" time="0.281">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/login".................................................passed
-Then the response status code should be 200.................................passed]]></system-out>
-  </testcase>
-  <testcase classname="User Registration with Email" name="Only whitelisted routes are reachable without authentication - #1.3" time="0.307">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/register"..............................................passed
-Then the response status code should be 200.................................passed]]></system-out>
-  </testcase>
-  <testcase classname="User Registration with Email" name="Only whitelisted routes are reachable without authentication - #1.4" time="0.253">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/forgot-password".......................................passed
-Then the response status code should be 200.................................passed]]></system-out>
-  </testcase>
-  <testcase classname="User Registration with Email" name="Only whitelisted routes are reachable without authentication - #1.5" time="0.256">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/privacy"...............................................passed
-Then the response status code should be 200.................................passed]]></system-out>
-  </testcase>
-  <testcase classname="User Registration with Email" name="Only whitelisted routes are reachable without authentication - #1.6" time="0.289">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/terms".................................................passed
-Then the response status code should be 200.................................passed]]></system-out>
-  </testcase>
-  <testcase classname="User Registration with Email" name="Privacy policy page does not link to any protected route" time="0.25">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/privacy"...............................................passed
-Then the page should not contain a link to any of:..........................passed]]></system-out>
-  </testcase>
-  <testcase classname="User Registration with Email" name="Terms of service page does not link to any protected route" time="0.236">
-    <system-out><![CDATA[Given the application is running............................................passed
-Given I am not logged in....................................................passed
-When I navigate to "/terms".................................................passed
-Then the page should not contain a link to any of:..........................passed]]></system-out>
+  <testcase classname="Frontend Design System Migration" name="PriceCalculator best-platform badge uses canonical fp-badge-purple" time="0.104">
+    <system-out><![CDATA[Given the source file "src/components/PriceCalculator.tsx" exists...........passed
+When I read the source of "src/components/PriceCalculator.tsx"..............passed
+Then the source should contain the pattern "fp-badge fp-badge-purple".......passed]]></system-out>
   </testcase>
 </testsuite>
