@@ -57,6 +57,8 @@ export async function analyzeItemCompleteness(
       analysisConfidence: parsed.analysisConfidence as 'low' | 'medium' | 'high',
     };
   } catch (err) {
+    // Graceful degrade for both provider unavailability and runtime AI errors.
+    // Vision analysis is supplementary — the app works without it.
     console.error('[analyzeItemCompleteness] Analysis failed:', err);
     return null;
   }
