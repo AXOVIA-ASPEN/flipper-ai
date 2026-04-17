@@ -1,7 +1,16 @@
 /**
- * KanbanBoard.tsx - Drag-and-drop Kanban board for opportunities
+ * @file src/components/KanbanBoard.tsx
  * @author Stephen Boyett
  * @company Axovia AI
+ * @date 2026-04-17
+ * @version 1.1
+ * @brief Drag-and-drop Kanban board for opportunities.
+ *
+ * @description
+ * Renders the lifecycle-status Kanban (Identified → Contacted → Purchased
+ * → Listed → Sold → Passed) with @hello-pangea/dnd. Cards carry image,
+ * title, asking price, profit, score, and demand badge. DEMAND_BADGES is
+ * canonicalized to .fp-badge-* classes per ADR-14.7-A (Story 14.7).
  */
 'use client';
 
@@ -32,18 +41,26 @@ interface Listing {
   imageUrls: string | null;
 }
 
-/** Map demand trend to a UI badge label and color */
-const DEMAND_BADGES: Record<string, { label: string; className: string }> = {
+/**
+ * Map demand trend to a UI badge label and canonical .fp-badge-* class.
+ *
+ * Per ADR-14.7-A: green is reserved for profit/financial signals
+ * (FR-UI-DESIGN-04). "high" is a non-financial success signal, so it maps
+ * to purple — not green. rising/very_high map to red (trend warnings —
+ * "act fast"), stable/medium to blue (neutral info), declining/low to
+ * gray, low_liquidity to yellow (caution).
+ */
+export const DEMAND_BADGES: Record<string, { label: string; className: string }> = {
   // Demand analyzer types (primary)
-  rising: { label: 'Hot', className: 'bg-red-500/20 text-red-300 border-red-500/30' },
-  stable: { label: 'Steady', className: 'bg-blue-500/20 text-blue-300 border-blue-500/30' },
-  declining: { label: 'Slow', className: 'bg-slate-500/20 text-slate-400 border-slate-500/30' },
-  low_liquidity: { label: 'Dead', className: 'bg-amber-600/20 text-amber-400 border-amber-600/30' },
+  rising: { label: 'Hot', className: 'fp-badge fp-badge-red' },
+  stable: { label: 'Steady', className: 'fp-badge fp-badge-blue' },
+  declining: { label: 'Slow', className: 'fp-badge fp-badge-gray' },
+  low_liquidity: { label: 'Dead', className: 'fp-badge fp-badge-yellow' },
   // LLM demandLevel types (fallback)
-  very_high: { label: 'Hot', className: 'bg-red-500/20 text-red-300 border-red-500/30' },
-  high: { label: 'Active', className: 'bg-green-500/20 text-green-300 border-green-500/30' },
-  medium: { label: 'Steady', className: 'bg-blue-500/20 text-blue-300 border-blue-500/30' },
-  low: { label: 'Slow', className: 'bg-slate-500/20 text-slate-400 border-slate-500/30' },
+  very_high: { label: 'Hot', className: 'fp-badge fp-badge-red' },
+  high: { label: 'Active', className: 'fp-badge fp-badge-purple' },
+  medium: { label: 'Steady', className: 'fp-badge fp-badge-blue' },
+  low: { label: 'Slow', className: 'fp-badge fp-badge-gray' },
 };
 
 export interface KanbanOpportunity {
@@ -257,7 +274,8 @@ export default function KanbanBoard({
                                     </span>
                                     {opp.listing.demandLevel && DEMAND_BADGES[opp.listing.demandLevel] && (
                                       <span
-                                        className={`inline-flex items-center rounded-full border px-1.5 py-0 text-[9px] font-semibold leading-4 ${DEMAND_BADGES[opp.listing.demandLevel].className}`}
+                                        className={DEMAND_BADGES[opp.listing.demandLevel].className}
+                                        style={{ fontSize: 9 }}
                                         data-testid="demand-badge"
                                       >
                                         {DEMAND_BADGES[opp.listing.demandLevel].label}
@@ -286,7 +304,15 @@ export default function KanbanBoard({
                                       e.stopPropagation();
                                       onCrossPost?.(opp);
                                     }}
-                                    className="flex items-center gap-1 rounded border border-blue-400/40 bg-blue-500/20 px-2 py-0.5 text-xs text-blue-200 hover:bg-blue-500/40 hover:text-white transition-colors"
+                                    className="fp-btn-ghost"
+                                    style={{
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: 4,
+                                      padding: '2px 8px',
+                                      fontSize: 12,
+                                      color: '#c4b5fd',
+                                    }}
                                     data-testid="kanban-cross-post-button"
                                     aria-label={`Cross-post ${opp.listing.title}`}
                                   >

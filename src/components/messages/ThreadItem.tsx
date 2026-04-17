@@ -3,14 +3,16 @@
  * @author Stephen Boyett
  * @company Axovia AI
  * @date 2026-03-31
- * @version 1.0
+ * @version 1.1
  * @brief Single conversation thread row for the message inbox.
  *
  * @description
  * Renders a thread summary showing listing thumbnail, seller name,
  * last message preview, relative timestamp, unread badge, and message
- * count. Uses Next.js Link for keyboard accessibility. Supports dark
- * mode and responsive layout (stacks vertically on mobile).
+ * count. Uses Next.js Link for keyboard accessibility. Story 14.7
+ * migration: wrapper uses `.fp-glass-sm` with purple accent on hover,
+ * unread state uses canonical purple dot/badge, legacy light/dark
+ * prefixes removed.
  */
 
 import Link from 'next/link';
@@ -53,11 +55,15 @@ export default function ThreadItem({
   return (
     <Link
       href={`/messages/${listingId}`}
-      className="block border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+      className="fp-glass-sm block rounded-lg p-4 transition-colors"
+      style={{ textDecoration: 'none' }}
     >
       <div className="flex flex-col sm:flex-row gap-3">
         {/* Listing thumbnail */}
-        <div className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+        <div
+          className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden"
+          style={{ background: 'rgba(255,255,255,0.04)' }}
+        >
           {imageUrl ? (
             <img
               src={imageUrl}
@@ -65,7 +71,10 @@ export default function ThreadItem({
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500 text-lg">
+            <div
+              className="w-full h-full flex items-center justify-center text-lg"
+              style={{ color: '#64748b' }}
+            >
               {listing ? '📦' : '🚫'}
             </div>
           )}
@@ -78,20 +87,19 @@ export default function ThreadItem({
               {/* Title + platform badge */}
               <div className="flex items-center gap-2 mb-0.5">
                 <h3
-                  className={`text-sm truncate ${
-                    isUnread
-                      ? 'font-bold text-gray-900 dark:text-gray-100'
-                      : 'font-medium text-gray-700 dark:text-gray-300'
-                  }`}
+                  className="text-sm truncate"
+                  style={{
+                    color: '#e2e8f0',
+                    fontWeight: isUnread ? 700 : 500,
+                  }}
                 >
                   {listing?.title || 'Listing removed'}
                 </h3>
                 {listing && (
                   <span
-                    className={`text-xs px-1.5 py-0.5 rounded font-medium flex-shrink-0 ${
-                      PLATFORM_COLORS[listing.platform] ||
-                      'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
-                    }`}
+                    className={
+                      PLATFORM_COLORS[listing.platform] || 'fp-badge fp-badge-gray'
+                    }
                   >
                     {listing.platform}
                   </span>
@@ -99,7 +107,10 @@ export default function ThreadItem({
               </div>
 
               {/* Seller name + price */}
-              <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-1">
+              <div
+                className="flex items-center gap-2 text-xs mb-1"
+                style={{ color: '#94a3b8' }}
+              >
                 {sellerName && <span>{sellerName}</span>}
                 {sellerName && listing && <span>·</span>}
                 {listing && <span>${listing.askingPrice.toLocaleString()}</span>}
@@ -107,14 +118,11 @@ export default function ThreadItem({
 
               {/* Last message preview */}
               <p
-                className={`text-sm truncate ${
-                  isUnread
-                    ? 'text-gray-800 dark:text-gray-200'
-                    : 'text-gray-500 dark:text-gray-400'
-                }`}
+                className="text-sm truncate"
+                style={{ color: isUnread ? '#e2e8f0' : '#94a3b8' }}
               >
                 {lastMessage.direction === 'OUTBOUND' && (
-                  <span className="text-gray-400 dark:text-gray-500">You: </span>
+                  <span style={{ color: '#64748b' }}>You: </span>
                 )}
                 {lastMessage.body}
               </p>
@@ -122,19 +130,23 @@ export default function ThreadItem({
 
             {/* Right side: timestamp + badges */}
             <div className="flex flex-col items-end gap-1 flex-shrink-0">
-              <span className="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">
+              <span
+                className="text-xs whitespace-nowrap"
+                style={{ color: '#64748b' }}
+              >
                 {formatDistanceToNow(new Date(lastMessageAt), { addSuffix: true })}
               </span>
               <div className="flex items-center gap-1.5">
                 {isUnread && (
                   <span
-                    className="flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-blue-600 rounded-full"
+                    className="flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold rounded-full"
+                    style={{ background: '#8b5cf6', color: '#ffffff' }}
                     aria-label={`${unreadCount} unread message${unreadCount !== 1 ? 's' : ''}`}
                   >
                     {unreadCount}
                   </span>
                 )}
-                <span className="text-xs text-gray-400 dark:text-gray-500">
+                <span className="text-xs" style={{ color: '#64748b' }}>
                   {messageCount} msg{messageCount !== 1 ? 's' : ''}
                 </span>
               </div>

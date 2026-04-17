@@ -1,10 +1,19 @@
 'use client';
 
 /**
- * WizardLayout — Shared layout for the onboarding wizard.
- * Shows progress bar + step navigation.
- * Author: ASPEN
- * Company: Axovia AI
+ * @file src/components/Onboarding/WizardLayout.tsx
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-04-17
+ * @version 1.1
+ * @brief Shared onboarding wizard layout — dark-migrated to canonical .fp-* in Story 14.5.
+ *
+ * @description
+ * Renders the onboarding wizard shell: progress bar, title, step content, and
+ * Back/Next navigation. Story 14.5 replaced the light blue/white palette with
+ * the canonical dark glassmorphism system: .fp-glass card, .fp-prog-track /
+ * .fp-prog-fill progress bar, .fp-btn-primary / .fp-btn-ghost buttons. No
+ * business-logic changes.
  */
 
 import React from 'react';
@@ -37,19 +46,20 @@ export default function WizardLayout({
   const progress = Math.round((currentStep / totalSteps) * 100);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="fp-glass w-full max-w-lg p-8">
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-500">
+            <span className="text-sm font-medium" style={{ color: '#94a3b8' }}>
               Step {currentStep} of {totalSteps}
             </span>
             {onSkip && (
               <button
                 type="button"
                 onClick={onSkip}
-                className="text-sm text-gray-400 hover:text-gray-600 underline"
+                className="text-sm underline"
+                style={{ color: '#94a3b8' }}
                 aria-label="Skip onboarding"
               >
                 Skip setup
@@ -64,17 +74,22 @@ export default function WizardLayout({
             aria-valuemin={0}
             aria-valuemax={100}
             aria-label="Onboarding progress"
-            className="w-full bg-gray-200 rounded-full h-2"
+            className="fp-prog-track w-full"
           >
             <div
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${progress}%` }}
+              className="fp-prog-fill"
+              style={{
+                width: `${progress}%`,
+                background: 'linear-gradient(90deg, #7c3aed, #8b5cf6)',
+              }}
             />
           </div>
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">{title}</h1>
+        <h1 className="text-2xl font-bold mb-6" style={{ color: '#e2e8f0' }}>
+          {title}
+        </h1>
 
         {/* Content */}
         <div className="mb-8">{children}</div>
@@ -82,11 +97,7 @@ export default function WizardLayout({
         {/* Navigation */}
         <div className="flex justify-between items-center">
           {showBack && onBack ? (
-            <button
-              type="button"
-              onClick={onBack}
-              className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
+            <button type="button" onClick={onBack} className="fp-btn-ghost text-sm">
               ← Back
             </button>
           ) : (
@@ -98,7 +109,7 @@ export default function WizardLayout({
               type="button"
               onClick={onNext}
               disabled={nextDisabled}
-              className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="fp-btn-primary text-sm"
             >
               {nextLabel}
             </button>

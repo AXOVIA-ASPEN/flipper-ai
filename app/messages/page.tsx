@@ -21,6 +21,7 @@ import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import { useRouter } from 'next/navigation';
 import ThreadItem from '@/components/messages/ThreadItem';
 import ApprovalQueue from '@/components/ApprovalQueue';
+import { LoadingSkeleton, EmptyState } from '@/components/ui';
 
 interface ThreadListing {
   id: string;
@@ -258,37 +259,14 @@ export default function MessagesPage() {
 
       {/* Thread list */}
       {loading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {[...Array(5)].map((_, i) => (
-            <div
-              key={i}
-              style={{ height: 80, background: 'rgba(255,255,255,0.04)', borderRadius: 10, animation: 'pulse 2s ease-in-out infinite' }}
-            />
-          ))}
-        </div>
+        <LoadingSkeleton variant="list" rows={5} />
       ) : filteredThreads.length === 0 ? (
-        <div className="fp-glass" style={{ textAlign: 'center', padding: '64px 24px' }}>
-          <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(139,92,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-            <span style={{ fontSize: 40 }}>💬</span>
-          </div>
-          <h3 style={{ fontSize: 20, fontWeight: 600, color: '#e2e8f0', marginBottom: 8 }}>
-            {search ? 'No matching threads' : 'No messages yet'}
-          </h3>
-          <p style={{ color: '#64748b', marginBottom: 24, maxWidth: 340, margin: '0 auto 24px' }}>
-            {search
-              ? 'Try a different search term.'
-              : 'When you contact sellers about listings, your conversation threads will appear here.'}
-          </p>
-          {!search && (
-            <a
-              href="/opportunities"
-              className="fp-btn-primary"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 13, textDecoration: 'none' }}
-            >
-              Browse Opportunities
-            </a>
-          )}
-        </div>
+        <EmptyState
+          icon={<div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(139,92,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}><span style={{ fontSize: 40 }}>💬</span></div>}
+          title={search ? 'No matching threads' : 'No messages yet'}
+          message={search ? 'Try a different search term.' : 'When you contact sellers about listings, your conversation threads will appear here.'}
+          action={!search ? { label: 'Browse Opportunities', href: '/opportunities' } : undefined}
+        />
       ) : (
         <div className="fp-glass" style={{ display: 'flex', flexDirection: 'column', gap: 0, overflow: 'hidden' }}>
           {filteredThreads.map((thread) => (

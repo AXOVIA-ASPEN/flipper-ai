@@ -3,7 +3,7 @@
  * @author Stephen Boyett
  * @company Axovia AI
  * @date 2026-03-31
- * @version 1.0
+ * @version 1.1
  * @brief Cross-Posts dashboard — user view of the posting queue.
  *
  * @description
@@ -19,7 +19,6 @@
 'use client';
 
 import { Suspense, useCallback, useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Play, RefreshCw } from 'lucide-react';
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
@@ -28,6 +27,7 @@ import { useFilterParams } from '@/hooks/useFilterParams';
 import QueueItemCard, {
   type QueueItem,
 } from '@/components/posting-queue/QueueItemCard';
+import { LoadingSkeleton, ErrorBanner, EmptyState } from '@/components/ui';
 
 interface Stats {
   pending: number;
@@ -308,44 +308,19 @@ function PostingQueueContent() {
 
       {/* Error banner */}
       {error && (
-        <div style={{ marginBottom: 16, padding: '12px 16px', border: '1px solid rgba(248,113,113,0.3)', borderRadius: 10, background: 'rgba(248,113,113,0.08)', fontSize: 13, color: '#f87171' }}>
-          {error}
-          <button
-            type="button"
-            onClick={fetchItems}
-            style={{ marginLeft: 8, textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', color: '#f87171', fontSize: 13 }}
-          >
-            Retry
-          </button>
-        </div>
+        <ErrorBanner message={error} onRetry={fetchItems} />
       )}
 
       {/* Loading skeleton */}
       {loading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }} data-testid="loading-skeleton">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div
-              key={i}
-              style={{ height: 96, borderRadius: 10, background: 'rgba(255,255,255,0.04)', animation: 'pulse 2s ease-in-out infinite' }}
-            />
-          ))}
-        </div>
+        <LoadingSkeleton variant="list" rows={5} data-testid="loading-skeleton" />
       ) : items.length === 0 ? (
-        <div
-          className="fp-glass"
-          style={{ padding: 32, textAlign: 'center' }}
+        <EmptyState
           data-testid="empty-state"
-        >
-          <p style={{ color: '#94a3b8', marginBottom: 12 }}>
-            No cross-posts yet. Go to Opportunities to cross-list items.
-          </p>
-          <Link
-            href="/opportunities"
-            style={{ fontSize: 13, color: '#8b5cf6', textDecoration: 'none' }}
-          >
-            Browse opportunities &rarr;
-          </Link>
-        </div>
+          title="No cross-posts yet"
+          message="Go to Opportunities to cross-list items."
+          action={{ label: 'Browse opportunities →', href: '/opportunities', variant: 'ghost' }}
+        />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {items.map((item) => (

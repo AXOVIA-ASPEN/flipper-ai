@@ -3,22 +3,30 @@
  * @author Stephen Boyett
  * @company Axovia AI
  * @date 2026-03-31
- * @version 1.0
+ * @version 1.1
  * @brief Shared utilities for message components.
  *
  * @description
  * Provides PLATFORM_COLORS map and getImageUrl helper used by ThreadItem
- * and ThreadHeader components. The getImageUrl function parses the legacy
+ * and ThreadHeader components. Story 14.7 migration: PLATFORM_COLORS now
+ * returns canonical `.fp-badge fp-badge-<color>` class strings; legacy
+ * light/dark prefixes removed. The getImageUrl function parses the legacy
  * imageUrls JSON column. When the API includes the images relation,
  * components should migrate to getListingImageUrl from src/lib/image-helpers.ts.
  */
 
+/**
+ * Maps a platform identifier to a canonical fp-badge class string.
+ * The mapping uses neutral/info colors (blue, gray, purple) because the
+ * platform label is non-financial — per FR-UI-DESIGN-04, green is reserved
+ * for profit. Unknown platforms fall back to fp-badge-gray at the call site.
+ */
 export const PLATFORM_COLORS: Record<string, string> = {
-  CRAIGSLIST: 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300',
-  EBAY: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
-  FACEBOOK: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300',
-  MERCARI: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
-  OFFERUP: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
+  CRAIGSLIST: 'fp-badge fp-badge-orange',
+  EBAY: 'fp-badge fp-badge-blue',
+  FACEBOOK: 'fp-badge fp-badge-purple',
+  MERCARI: 'fp-badge fp-badge-red',
+  OFFERUP: 'fp-badge fp-badge-yellow',
 };
 
 /**

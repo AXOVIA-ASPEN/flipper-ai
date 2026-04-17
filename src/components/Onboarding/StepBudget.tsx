@@ -1,9 +1,19 @@
 'use client';
 
 /**
- * StepBudget — Budget range slider for item flipping.
- * Author: ASPEN
- * Company: Axovia AI
+ * @file src/components/Onboarding/StepBudget.tsx
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-04-17
+ * @version 1.1
+ * @brief Onboarding step 4 (Budget) — dark-migrated to canonical .fp-* in Story 14.5.
+ *
+ * @description
+ * Single-select radio list of typical per-item budget ranges (micro → premium).
+ * Each row renders as an .fp-glass-sm card with purple selection affordance
+ * and a custom radio dot. Story 14.5 replaced the blue/gray selection palette
+ * with canonical dark tokens (#7c3aed for the filled dot, rgba(109,40,217,*)
+ * for the card border/bg).
  */
 
 export const BUDGET_RANGES = [
@@ -24,7 +34,7 @@ interface Props {
 export default function StepBudget({ selected, onChange }: Props) {
   return (
     <div className="space-y-4">
-      <p className="text-gray-600 text-sm">
+      <p className="text-sm" style={{ color: '#94a3b8' }}>
         What&apos;s your typical budget per item? This helps Flipper AI surface the right
         opportunities.
       </p>
@@ -34,11 +44,12 @@ export default function StepBudget({ selected, onChange }: Props) {
           return (
             <label
               key={id}
-              className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-colors ${
+              className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors fp-glass-sm"
+              style={
                 isSelected
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 bg-white hover:border-gray-300'
-              }`}
+                  ? { border: '2px solid rgba(109,40,217,0.5)', background: 'rgba(109,40,217,0.1)' }
+                  : { border: '2px solid rgba(255,255,255,0.06)' }
+              }
             >
               <input
                 type="radio"
@@ -50,11 +61,16 @@ export default function StepBudget({ selected, onChange }: Props) {
                 aria-label={label}
               />
               <div
-                className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${
-                  isSelected ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
-                }`}
+                className="w-4 h-4 rounded-full border-2 flex-shrink-0"
+                style={
+                  isSelected
+                    ? { borderColor: '#7c3aed', background: '#7c3aed' }
+                    : { borderColor: 'rgba(255,255,255,0.15)', background: 'transparent' }
+                }
               />
-              <span className="font-medium text-gray-800">{label}</span>
+              <span className="font-medium" style={{ color: '#e2e8f0' }}>
+                {label}
+              </span>
             </label>
           );
         })}

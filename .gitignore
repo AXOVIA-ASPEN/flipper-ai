@@ -55,3 +55,6 @@ helpers/__pycache__/
 *.pyc
 helpers/.pytest_cache/
 helpers/.venv/
+
+# Claude Code runtime artifacts
+.claude/scheduled_tasks.lock

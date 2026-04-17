@@ -134,10 +134,12 @@ describe('AC-2: price breakdown display hierarchy', () => {
 
     const hero = await screen.findByTestId('price-calculator-hero');
     expect(within(hero).getByText('Estimated Profit')).toBeInTheDocument();
-    // Profit hero's parent container has the green background
-    const greenSection = within(hero).getByText('Estimated Profit')
-      .closest('.bg-green-50');
-    expect(greenSection).toBeTruthy();
+    // Story 14.6: profit hero container uses the canonical .fp-glass-sm
+    // surface; the profit number itself uses inline #34d399 (canonical
+    // green reserved for financial profit indicators — FR-UI-DESIGN-04).
+    const glassCard = within(hero).getByText('Estimated Profit')
+      .closest('.fp-glass-sm');
+    expect(glassCard).toBeTruthy();
   });
 
   it('renders recommended list price below the profit hero', async () => {
@@ -675,5 +677,85 @@ describe('Market value comparison bar', () => {
     expect(
       screen.queryByText('Market Value Comparison')
     ).not.toBeInTheDocument();
+  });
+});
+
+// ── Story 14.6 — canonical design system migration ───────────────────────────
+
+describe('Story 14.6 — canonical design system migration', () => {
+  it('root container has fp-glass class', async () => {
+    mockFetchOnce(makeApiResponse());
+    render(<PriceCalculator listingId="lst-1" />);
+
+    const root = await screen.findByTestId('price-calculator');
+    expect(root.className).toMatch(/\bfp-glass\b/);
+  });
+
+  it('hero wrapper preserves aria-live="polite"', async () => {
+    mockFetchOnce(makeApiResponse());
+    render(<PriceCalculator listingId="lst-1" />);
+
+    const hero = await screen.findByTestId('price-calculator-hero');
+    expect(hero.getAttribute('aria-live')).toBe('polite');
+  });
+
+  it('range slider exposes aria-valuemin, aria-valuemax, aria-valuenow, aria-valuetext', async () => {
+    mockFetchOnce(makeApiResponse());
+    render(<PriceCalculator listingId="lst-1" />);
+
+    const slider = await screen.findByLabelText('Target profit margin');
+    expect(slider.getAttribute('aria-valuemin')).toBeTruthy();
+    expect(slider.getAttribute('aria-valuemax')).toBeTruthy();
+    expect(slider.getAttribute('aria-valuenow')).toBeTruthy();
+    expect(slider.getAttribute('aria-valuetext')).toBe('30 percent');
+
+    fireEvent.change(slider, { target: { value: '50' } });
+    expect(slider.getAttribute('aria-valuenow')).toBe('50');
+    expect(slider.getAttribute('aria-valuetext')).toBe('50 percent');
+  });
+
+  it('slider changes do not trigger additional fetches — Real-Time Data Pattern', async () => {
+    mockFetchOnce(makeApiResponse());
+    render(<PriceCalculator listingId="lst-1" />);
+
+    const slider = await screen.findByLabelText('Target profit margin');
+    // Initial mount fetch has completed. Move the slider four times.
+    fireEvent.change(slider, { target: { value: '50' } });
+    fireEvent.change(slider, { target: { value: '10' } });
+    fireEvent.change(slider, { target: { value: '75' } });
+    fireEvent.change(slider, { target: { value: '20' } });
+
+    // Only the mount fetch should have happened.
+    expect((global.fetch as jest.Mock).mock.calls).toHaveLength(1);
+  });
+
+  it('profit hero number uses fp-metric-num class', async () => {
+    mockFetchOnce(makeApiResponse());
+    render(<PriceCalculator listingId="lst-1" />);
+
+    const hero = await screen.findByTestId('price-calculator-hero');
+    const metricNums = hero.querySelectorAll('.fp-metric-num');
+    expect(metricNums.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('margin numeric input uses fp-input class', async () => {
+    mockFetchOnce(makeApiResponse());
+    render(<PriceCalculator listingId="lst-1" />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('price-calculator')).toBeInTheDocument();
+    });
+    const input = document.getElementById('price-calc-margin-input');
+    expect(input?.className).toMatch(/\bfp-input\b/);
+  });
+
+  it('range slider drops accent-purple class and sets inline accentColor', async () => {
+    mockFetchOnce(makeApiResponse());
+    render(<PriceCalculator listingId="lst-1" />);
+
+    const slider = await screen.findByLabelText('Target profit margin') as HTMLInputElement;
+    expect(slider.className).not.toMatch(/accent-[a-z]+-\d+/);
+    expect(slider.className).not.toMatch(/focus:ring-/);
+    expect(slider.style.accentColor).toBe('#7c3aed');
   });
 });

@@ -1,21 +1,19 @@
 'use client';
 
 /**
- * Onboarding Wizard Page — /onboarding
+ * @file app/onboarding/page.tsx
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-04-17
+ * @version 1.1
+ * @brief Onboarding wizard page — dark-migrated to canonical .fp-* in Story 14.5.
  *
- * Multi-step wizard that guides new users through initial setup.
- * Progress is persisted to the API so refreshes don't lose state.
- *
- * Steps:
- *   1. Welcome
- *   2. Marketplaces
- *   3. Categories
- *   4. Budget
- *   5. Location
- *   6. Complete
- *
- * Author: ASPEN
- * Company: Axovia AI
+ * @description
+ * Multi-step wizard guiding new users through initial setup (6 steps: Welcome,
+ * Marketplaces, Categories, Budget, Location, Complete). Progress is persisted
+ * to /api/user/onboarding so refreshes resume at the saved step. Story 14.5
+ * rebuilt the loading screen to remove the light-mode gradient so the root
+ * layout's .fp-bg-mesh shows through; all business logic is unchanged.
  */
 
 import { useEffect, useState, useCallback } from 'react';
@@ -111,10 +109,10 @@ export default function OnboardingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-4 animate-spin">🐧</div>
-          <p className="text-gray-600">Loading...</p>
+          <p style={{ color: '#94a3b8' }}>Loading...</p>
         </div>
       </div>
     );

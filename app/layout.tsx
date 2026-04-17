@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import { ThemeProvider } from '@/contexts/ThemeContext';
-import { ThemeStyles } from '@/components/ThemeStyles';
 import { FirebaseAuthProvider } from '@/components/providers/FirebaseAuthProvider';
 import { WebVitals } from '@/components/WebVitals';
 import Navigation from '@/components/Navigation';
@@ -32,23 +30,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        style={{ background: '#080b14', color: '#e2e8f0', minHeight: '100vh' }}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <div className="fp-bg-mesh" aria-hidden="true" />
         <div className="fp-bg-grid" aria-hidden="true" />
         <FirebaseAuthProvider>
-          <ThemeProvider>
-            <ToastProvider>
-              <ThemeStyles />
-              <WebVitals />
-              <Navigation />
-              <div className="fp-content">
-                {children}
-              </div>
-            </ToastProvider>
-          </ThemeProvider>
+          <ToastProvider>
+            <WebVitals />
+            <Navigation />
+            <div className="fp-content">
+              {children}
+            </div>
+          </ToastProvider>
         </FirebaseAuthProvider>
       </body>
     </html>

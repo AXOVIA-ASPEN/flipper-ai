@@ -3,13 +3,20 @@
  * @author Stephen Boyett
  * @company Axovia AI
  * @date 2026-04-08
- * @version 1.1
+ * @version 1.2
  * @brief PriceCalculator client component (Story 9.2 / FR-RELIST-03).
  *
  * @description
  * Renders the optimal listing price hero (estimated profit + recommended
  * price), best-platform badge, target margin slider+input, per-platform
  * fee/profit table, and a market value comparison bar.
+ *
+ * Story 14.6 (Frontend Design Migration): visual rebuild using canonical
+ * .fp-glass root surface, .fp-input numeric fields, .fp-btn-primary /
+ * .fp-btn-ghost buttons, .fp-alert-warn / .fp-alert-danger banners,
+ * .fp-badge-purple best-platform chip, and .fp-metric-num hero numbers.
+ * Range slider now inherits the canonical purple gradient thumb defined
+ * in app/globals.css:565-602 (no local accent-* class). No logic change.
  *
  * Recalculation strategy: the component fetches `data.prices` ONCE from
  * `/api/listings/[id]/optimal-price` (GET) and stores the per-platform
@@ -40,6 +47,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { FREE_ITEM_DISCOUNT_FACTOR } from '@/lib/listing-price-constants';
+import { LoadingSkeleton, EmptyState } from '@/components/ui';
 
 const PLATFORM_LABELS: Record<string, string> = {
   ebay: 'eBay',
@@ -433,22 +441,22 @@ export default function PriceCalculator({
   );
 
   if (loading && !serverPrices) {
-    return (
-      <div className="p-6 bg-white rounded-lg shadow">
-        <p className="text-gray-600">Loading optimal pricing…</p>
-      </div>
-    );
+    return <LoadingSkeleton variant="card" data-testid="price-calculator-loading" />;
   }
 
   if (error) {
     return (
-      <div className="p-6 bg-white rounded-lg shadow">
+      <div
+        className="fp-glass p-6 rounded-lg"
+        role="alert"
+        data-testid="price-calculator-error"
+      >
         <div className="flex items-start justify-between gap-3">
-          <p className="text-red-600">{error}</p>
+          <p style={{ color: '#fca5a5' }}>{error}</p>
           <button
             type="button"
             onClick={fetchPrices}
-            className="px-3 py-1.5 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            className="fp-btn-primary text-xs px-3 py-1.5"
           >
             Retry
           </button>
@@ -459,9 +467,11 @@ export default function PriceCalculator({
 
   if (!visibleRecalculated.length) {
     return (
-      <div className="p-6 bg-white rounded-lg shadow">
-        <p className="text-gray-600">No pricing data available for this listing.</p>
-      </div>
+      <EmptyState
+        title="No pricing data"
+        message="No pricing data available for this listing."
+        data-testid="price-calculator-empty"
+      />
     );
   }
 
@@ -469,10 +479,14 @@ export default function PriceCalculator({
   // Surface a single banner instead of pretending the table has prices.
   if (insufficientData) {
     return (
-      <div className="p-6 bg-white rounded-lg shadow space-y-4" data-testid="price-calculator">
+      <div
+        className="fp-glass p-6 rounded-lg space-y-4"
+        data-testid="price-calculator"
+      >
         <div
-          className="px-4 py-3 bg-amber-50 border border-amber-200 rounded text-amber-900 text-sm"
+          className="fp-alert-warn px-4 py-3"
           role="alert"
+          style={{ color: '#fcd34d' }}
         >
           <strong className="block mb-1">⚠ Cannot recommend a price yet</strong>
           {visibleRecalculated[0]?.priceBreakdown.fallbackMessage ??
@@ -481,7 +495,7 @@ export default function PriceCalculator({
         <button
           type="button"
           onClick={fetchPrices}
-          className="px-3 py-1.5 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-400"
+          className="fp-btn-ghost text-xs px-3 py-1.5"
         >
           Verify Market Value
         </button>
@@ -490,18 +504,22 @@ export default function PriceCalculator({
   }
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow space-y-6" data-testid="price-calculator">
+    <div
+      className="fp-glass p-6 rounded-lg space-y-6"
+      data-testid="price-calculator"
+    >
       {/* Projected banner — pre-purchase mode (AC-5) */}
       {isProjected && (
-        <div className="px-4 py-3 bg-amber-50 border border-amber-200 rounded space-y-2">
+        <div className="fp-alert-warn px-4 py-3 space-y-2" style={{ color: '#fcd34d' }}>
           <div>
             <span
-              className="inline-block px-2 py-0.5 mr-2 text-xs font-semibold text-amber-900 bg-amber-200 rounded"
+              className="inline-block px-2 py-0.5 mr-2 text-xs font-semibold rounded"
+              style={{ color: '#fcd34d', background: 'rgba(251,191,36,0.2)' }}
               aria-label="Projected pricing mode"
             >
               ◇ Projected
             </span>
-            <span className="text-sm text-amber-900">
+            <span className="text-sm" style={{ color: '#fcd34d' }}>
               This listing has not been purchased yet. Pricing uses a hypothetical
               cost basis you can override below.
             </span>
@@ -509,11 +527,12 @@ export default function PriceCalculator({
           <div className="flex items-center gap-2">
             <label
               htmlFor="price-calc-hypothetical"
-              className="text-xs font-semibold text-amber-900"
+              className="text-xs font-semibold"
+              style={{ color: '#fcd34d' }}
             >
               Hypothetical purchase price:
             </label>
-            <span className="text-amber-900">$</span>
+            <span style={{ color: '#fcd34d' }}>$</span>
             <input
               id="price-calc-hypothetical"
               type="number"
@@ -522,7 +541,7 @@ export default function PriceCalculator({
               value={hypotheticalInputValue}
               onChange={(e) => handleHypotheticalChange(e.target.value)}
               aria-label="Hypothetical purchase price"
-              className="w-28 px-2 py-1 text-right border border-amber-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-purple-400"
+              className="fp-input w-28 text-right"
             />
           </div>
         </div>
@@ -530,8 +549,11 @@ export default function PriceCalculator({
 
       {/* Estimated market data warning (AC-2 / Task 4.7) */}
       {showEstimatedBanner && (
-        <div className="px-4 py-3 bg-yellow-50 border border-yellow-200 rounded flex items-start justify-between gap-3">
-          <div className="text-sm text-yellow-900">
+        <div
+          className="fp-alert-warn px-4 py-3 flex items-start justify-between gap-3"
+          style={{ color: '#fcd34d' }}
+        >
+          <div className="text-sm">
             <strong className="block mb-0.5">Market value is estimated</strong>
             Pricing is based on algorithmic estimates rather than verified sold-comparable
             data. Verify the market value for the most accurate recommendation.
@@ -539,7 +561,7 @@ export default function PriceCalculator({
           <button
             type="button"
             onClick={fetchPrices}
-            className="px-3 py-1.5 text-xs bg-yellow-600 text-white rounded hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-purple-400 whitespace-nowrap"
+            className="fp-btn-ghost text-xs px-3 py-1.5 whitespace-nowrap"
           >
             Verify Market Value
           </button>
@@ -552,25 +574,37 @@ export default function PriceCalculator({
         aria-live="polite"
         data-testid="price-calculator-hero"
       >
-        <div className="p-4 bg-green-50 border border-green-100 rounded-lg">
-          <div className="text-xs font-semibold text-green-700 uppercase tracking-wide">
+        <div className="fp-glass-sm p-4 rounded-lg">
+          <div
+            className="text-xs font-semibold uppercase tracking-wide"
+            style={{ color: '#6ee7b7' }}
+          >
             Estimated Profit
           </div>
-          <div className="mt-1 text-4xl font-extrabold text-green-700">
+          <div
+            className="fp-metric-num mt-1 text-4xl font-extrabold"
+            style={{ color: '#34d399' }}
+          >
             {formatUsd(heroProfit)}
           </div>
-          <div className="mt-1 text-xs text-gray-600">
+          <div className="mt-1 text-xs" style={{ color: '#94a3b8' }}>
             After fees and shipping on {PLATFORM_LABELS[bestPlatform ?? ''] ?? bestPlatform}
           </div>
         </div>
-        <div className="p-4 bg-purple-50 border border-purple-100 rounded-lg">
-          <div className="text-xs font-semibold text-purple-700 uppercase tracking-wide">
+        <div className="fp-glass-sm p-4 rounded-lg">
+          <div
+            className="text-xs font-semibold uppercase tracking-wide"
+            style={{ color: '#c4b5fd' }}
+          >
             Recommended {isProjected ? 'Projected' : 'List'} Price
           </div>
-          <div className="mt-1 text-3xl font-bold text-purple-900">
+          <div
+            className="fp-metric-num mt-1 text-3xl font-bold"
+            style={{ color: '#c4b5fd' }}
+          >
             {formatUsd(heroPrice)}
           </div>
-          <div className="mt-1 text-xs text-gray-600">
+          <div className="mt-1 text-xs" style={{ color: '#94a3b8' }}>
             Target margin: {marginPercent}%
           </div>
         </div>
@@ -579,19 +613,20 @@ export default function PriceCalculator({
       {/* Best platform badge — text + icon (never color alone) */}
       {bestPlatform && (
         <div className="flex items-center gap-2">
-          <span aria-hidden="true">★</span>
-          <span className="text-sm font-semibold text-gray-900">
-            Best platform:&nbsp;
-            <span className="text-purple-700">
-              {PLATFORM_LABELS[bestPlatform] ?? bestPlatform}
-            </span>
+          <span className="fp-badge fp-badge-purple">
+            <span aria-hidden="true">★</span>
+            &nbsp;Best platform: {PLATFORM_LABELS[bestPlatform] ?? bestPlatform}
           </span>
         </div>
       )}
 
       {/* Margin control */}
       <div className="space-y-2">
-        <label htmlFor="price-calc-margin-input" className="block text-sm font-semibold text-gray-900">
+        <label
+          htmlFor="price-calc-margin-input"
+          className="block text-sm font-semibold"
+          style={{ color: '#e2e8f0' }}
+        >
           Target Profit Margin
         </label>
         <div className="flex items-center gap-3">
@@ -608,8 +643,8 @@ export default function PriceCalculator({
             aria-valuemax={dynamicMaxMargin}
             aria-valuenow={marginPercent}
             aria-valuetext={`${marginPercent} percent`}
-            className="flex-1 h-11 accent-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400"
-            style={{ minHeight: 44 }}
+            className="flex-1 h-11"
+            style={{ minHeight: 44, accentColor: '#7c3aed' }}
           />
           <input
             id="price-calc-margin-input"
@@ -621,24 +656,30 @@ export default function PriceCalculator({
             onChange={(e) => handleInputChange(e.target.value)}
             onBlur={handleInputBlur}
             aria-label="Target profit margin (numeric)"
-            className="w-20 px-2 py-2 text-right border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-400"
+            className="fp-input w-20 text-right"
           />
-          <span className="text-gray-700">%</span>
+          <span style={{ color: '#e2e8f0' }}>%</span>
         </div>
-        <div className="text-xs text-gray-500">
+        <div className="text-xs" style={{ color: '#94a3b8' }}>
           Range automatically capped at {dynamicMaxMargin}% based on platform fees.
         </div>
       </div>
 
       {/* Per-platform table */}
       <div>
-        <h3 className="text-sm font-semibold text-gray-900 mb-2">
+        <h3
+          className="text-sm font-semibold mb-2"
+          style={{ color: '#e2e8f0' }}
+        >
           Platform Comparison
         </h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs text-gray-500 uppercase">
+              <tr
+                className="text-left text-xs uppercase"
+                style={{ color: '#94a3b8' }}
+              >
                 <th className="py-2 pr-4">Platform</th>
                 <th className="py-2 pr-4 text-right">List Price</th>
                 <th className="py-2 pr-4 text-right">Fees</th>
@@ -656,22 +697,31 @@ export default function PriceCalculator({
                 return (
                   <tr
                     key={p.targetPlatform}
-                    className={`border-t border-gray-100 ${
-                      p.impossible ? 'opacity-50 bg-gray-50' : ''
-                    }`}
+                    style={{
+                      borderTop: '1px solid rgba(255,255,255,0.06)',
+                      ...(p.impossible
+                        ? { opacity: 0.5, background: 'rgba(255,255,255,0.03)' }
+                        : {}),
+                    }}
                   >
-                    <td className="py-3 pr-4 font-medium text-gray-900">
+                    <td
+                      className="py-3 pr-4 font-medium"
+                      style={{ color: '#e2e8f0' }}
+                    >
                       {PLATFORM_LABELS[p.targetPlatform] ?? p.targetPlatform}
                       {p.targetPlatform === bestPlatform && !p.impossible && (
                         <span
-                          className="ml-2 inline-block px-1.5 py-0.5 text-xs bg-purple-100 text-purple-700 rounded"
+                          className="fp-badge fp-badge-purple ml-2 text-[10px]"
                           aria-label="Best platform"
                         >
                           ★ Best
                         </span>
                       )}
                     </td>
-                    <td className="py-3 pr-4 text-right text-gray-900">
+                    <td
+                      className="py-3 pr-4 text-right"
+                      style={{ color: '#e2e8f0' }}
+                    >
                       {p.impossible ? (
                         '—'
                       ) : (
@@ -684,27 +734,30 @@ export default function PriceCalculator({
                             handleOverrideChange(p.targetPlatform, e.target.value)
                           }
                           aria-label={`Override list price for ${PLATFORM_LABELS[p.targetPlatform] ?? p.targetPlatform}`}
-                          className="w-24 px-2 py-1 text-right border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-purple-400"
+                          className="fp-input w-24 text-right"
                         />
                       )}
                     </td>
-                    <td className="py-3 pr-4 text-right text-gray-700">
+                    <td
+                      className="py-3 pr-4 text-right"
+                      style={{ color: '#94a3b8' }}
+                    >
                       {p.impossible
                         ? '—'
                         : `${formatUsd(p.estimatedFees)} (${p.feeRatePercent}%)`}
                     </td>
                     <td className="py-3 pr-4 text-right">
                       {p.impossible ? (
-                        <span className="text-gray-400" title={p.priceBreakdown.impossibleReason}>
+                        <span
+                          style={{ color: '#64748b' }}
+                          title={p.priceBreakdown.impossibleReason}
+                        >
                           Impossible
                         </span>
                       ) : (
                         <span
-                          className={
-                            p.lossWarning
-                              ? 'text-red-600 font-semibold'
-                              : 'text-green-700 font-semibold'
-                          }
+                          className="font-semibold"
+                          style={{ color: p.lossWarning ? '#f87171' : '#34d399' }}
                         >
                           {formatUsd(p.estimatedProfit)}
                         </span>
@@ -717,7 +770,7 @@ export default function PriceCalculator({
                           handleListClick(p.targetPlatform, p.recommendedPrice)
                         }
                         disabled={p.impossible || submitting !== null}
-                        className="px-3 py-1.5 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="fp-btn-primary text-xs px-3 py-1.5"
                       >
                         {submitting === p.targetPlatform
                           ? 'Listing…'
@@ -730,14 +783,17 @@ export default function PriceCalculator({
             </tbody>
           </table>
         </div>
-        <p className="mt-2 text-xs text-gray-500">
+        <p className="mt-2 text-xs" style={{ color: '#475569' }}>
           Edit any list price before clicking &ldquo;List on …&rdquo; to override the recommendation.
         </p>
       </div>
 
       {/* Loss warning (AC-4) */}
       {visibleRecalculated.some((p) => p.lossWarning) && (
-        <div className="px-4 py-3 bg-red-50 border border-red-200 rounded text-red-900 text-sm">
+        <div
+          className="fp-alert-danger px-4 py-3 text-sm"
+          style={{ color: '#fca5a5' }}
+        >
           <strong className="block mb-1">⚠ Selling at competitive price results in a loss.</strong>
           {visibleRecalculated
             .filter((p) => p.lossWarning && p.priceBreakdown.lossAmount !== undefined)
@@ -747,7 +803,10 @@ export default function PriceCalculator({
                 loss of {formatUsd(p.priceBreakdown.lossAmount as number)} at competitive price.
               </div>
             ))}
-          <div className="mt-1 text-xs text-red-700">
+          <div
+            className="mt-1 text-xs"
+            style={{ color: '#fca5a5', opacity: 0.8 }}
+          >
             Consider listing at a higher price (above market) or accepting the loss.
           </div>
         </div>
@@ -758,7 +817,10 @@ export default function PriceCalculator({
         possible.verifiedMarketValue !== null &&
         possible.verifiedMarketValue > 0 && (
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-2">
+            <h3
+              className="text-sm font-semibold mb-2"
+              style={{ color: '#e2e8f0' }}
+            >
               Market Value Comparison
             </h3>
             {(() => {
@@ -778,39 +840,46 @@ export default function PriceCalculator({
                 at: 'At market value',
                 above: 'Above market — may be hard to sell',
               }[state];
-              const barColor = {
-                below: 'bg-green-400',
-                at: 'bg-yellow-400',
-                above: 'bg-red-400',
+              const barFill = {
+                below: '#34d399',
+                at: '#fbbf24',
+                above: '#f87171',
               }[state];
               const stateTextColor = {
-                below: 'text-green-700',
-                at: 'text-yellow-700',
-                above: 'text-red-700',
+                below: '#6ee7b7',
+                at: '#fcd34d',
+                above: '#fca5a5',
               }[state];
               return (
                 <>
                   <div
-                    className="relative h-6 bg-gray-100 rounded overflow-hidden"
+                    className="relative h-6 rounded overflow-hidden"
+                    style={{ background: 'rgba(255,255,255,0.06)' }}
                     role="img"
                     aria-label={`Your price ${formatUsd(heroPrice)} is ${stateLabel.toLowerCase()} (verified market value ${formatUsd(market)})`}
                   >
-                    {/* Market reference line at 100% of bar width */}
+                    {/* Market reference line at 95% of bar width */}
                     <div
-                      className="absolute top-0 h-full w-0.5 bg-gray-700 z-10"
-                      style={{ left: '95%' }}
+                      className="absolute top-0 h-full w-0.5 z-10"
+                      style={{ left: '95%', background: 'rgba(255,255,255,0.4)' }}
                       aria-hidden="true"
                       title="Verified market value"
                     />
                     <div
-                      className={`absolute top-0 left-0 h-full ${barColor}`}
-                      style={{ width: `${positionPct}%` }}
+                      className="absolute top-0 left-0 h-full"
+                      style={{ width: `${positionPct}%`, background: barFill }}
                       aria-hidden="true"
                     />
                   </div>
-                  <div className="mt-1 flex justify-between text-xs text-gray-600">
+                  <div
+                    className="mt-1 flex justify-between text-xs"
+                    style={{ color: '#94a3b8' }}
+                  >
                     <span>Your: {formatUsd(heroPrice)}</span>
-                    <span className={`font-semibold ${stateTextColor}`}>
+                    <span
+                      className="font-semibold"
+                      style={{ color: stateTextColor }}
+                    >
                       {stateLabel}
                     </span>
                     <span>Market: {formatUsd(market)}</span>
@@ -823,21 +892,27 @@ export default function PriceCalculator({
 
       {/* AI vs formula discrepancy */}
       {possible?.priceBreakdown.priceDiscrepancyNote && (
-        <div className="px-4 py-3 bg-blue-50 border border-blue-200 rounded text-blue-900 text-sm">
+        <div
+          className="fp-alert-warn px-4 py-3 text-sm"
+          style={{ color: '#fcd34d' }}
+        >
           <strong className="block mb-1">AI suggestion differs from formula</strong>
           {possible.priceBreakdown.priceDiscrepancyNote}
         </div>
       )}
 
       {/* Refresh control */}
-      <div className="flex items-center justify-between text-xs text-gray-500">
+      <div
+        className="flex items-center justify-between text-xs"
+        style={{ color: '#94a3b8' }}
+      >
         <span>
           {lastUpdated ? `Last updated ${lastUpdated.toLocaleTimeString()}` : ''}
         </span>
         <button
           type="button"
           onClick={fetchPrices}
-          className="px-3 py-1.5 text-xs bg-gray-100 text-gray-800 rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
+          className="fp-btn-ghost text-xs px-3 py-1.5"
         >
           Refresh
         </button>

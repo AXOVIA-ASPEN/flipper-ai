@@ -37,6 +37,7 @@ import {
   toggleMultiSelectValue,
   isMultiSelectActive,
 } from '@/hooks/useFilterParams';
+import { LoadingSkeleton, EmptyState, ScoreRing } from '@/components/ui';
 
 interface Listing {
   id: string;
@@ -251,8 +252,8 @@ export default function OpportunitiesPage() {
   return (
     <Suspense
       fallback={
-        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <p style={{ color: '#e2e8f0' }}>Loading opportunities...</p>
+        <div style={{ minHeight: '100vh', padding: '32px 24px' }}>
+          <LoadingSkeleton variant="list" rows={6} />
         </div>
       }
     >
@@ -522,20 +523,23 @@ function OpportunitiesContent() {
     { value: 'SOLD', label: 'Sold', icon: Trophy },
   ];
 
-  const getStatusColor = (status: string) => {
+  // Map lifecycle status to a canonical .fp-badge-* class. Per ADR-14.7-A:
+  // green is reserved for profit-positive states (SOLD with profit), so SOLD
+  // maps to green. Non-financial lifecycle states use blue/yellow/purple/orange.
+  const getStatusBadgeClass = (status: string): string => {
     switch (status) {
       case 'IDENTIFIED':
-        return 'bg-gradient-to-r from-blue-400 to-blue-600 text-white border-blue-400 shadow-blue-500/50';
+        return 'fp-badge fp-badge-blue';
       case 'CONTACTED':
-        return 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-yellow-400 shadow-yellow-500/50';
+        return 'fp-badge fp-badge-yellow';
       case 'PURCHASED':
-        return 'bg-gradient-to-r from-purple-400 to-purple-600 text-white border-purple-400 shadow-purple-500/50';
+        return 'fp-badge fp-badge-purple';
       case 'LISTED':
-        return 'bg-gradient-to-r from-orange-400 to-pink-500 text-white border-orange-400 shadow-orange-500/50';
+        return 'fp-badge fp-badge-orange';
       case 'SOLD':
-        return 'bg-gradient-to-r from-green-400 to-emerald-600 text-white border-green-400 shadow-green-500/50 animate-pulse-slow';
+        return 'fp-badge fp-badge-green';
       default:
-        return 'bg-gradient-to-r from-gray-400 to-gray-600 text-white border-gray-400 shadow-gray-500/50';
+        return 'fp-badge fp-badge-gray';
     }
   };
 
@@ -558,26 +562,22 @@ function OpportunitiesContent() {
 
   return (
     <div style={{ minHeight: '100vh' }} className="relative overflow-hidden">
-      {/* Animated background gradient orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 -left-4 w-96 h-96 bg-theme-orb-1 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div className="absolute top-0 -right-4 w-96 h-96 bg-theme-orb-2 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-20 w-96 h-96 bg-theme-orb-3 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
-      </div>
-
-      {/* Header with frosted glass */}
-      <header className="relative backdrop-blur-xl bg-white/10 border-b border-white/20 shadow-2xl sticky top-0 z-10">
+      {/* Header — canonical glass navigation surface */}
+      <header className="fp-glass-nav sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-16 gap-4">
             <Link
               href="/"
-              className="p-2 hover:bg-white/20 rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-purple-500/50 group"
+              className="fp-btn-ghost group"
+              style={{ padding: 8, display: 'inline-flex', alignItems: 'center' }}
             >
-              <ArrowLeft className="w-5 h-5 text-white group-hover:text-purple-200 transition-colors" />
+              <ArrowLeft className="w-5 h-5" style={{ color: '#c4b5fd' }} />
             </Link>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 via-orange-500 to-pink-500 rounded-lg flex items-center justify-center shadow-lg shadow-orange-500/50 animate-pulse-slow">
-                <Trophy className="w-6 h-6 text-white" />
+              <div
+                className="fp-glass-sm w-10 h-10 rounded-lg flex items-center justify-center"
+              >
+                <Trophy className="w-6 h-6" style={{ color: '#8b5cf6' }} />
               </div>
               <div>
                 <h1 style={{ fontSize: 28, fontWeight: 800, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
@@ -591,114 +591,131 @@ function OpportunitiesContent() {
       </header>
 
       <main className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards with frosted glass */}
+        {/* Stats Cards — canonical .fp-glow-card, single purple accent per ADR-14.7-C */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="group backdrop-blur-xl bg-white/10 rounded-xl p-6 border border-white/20 shadow-xl hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 hover:scale-105 hover:bg-white/15">
+          <div className="fp-glow-card p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-blue-200/80 mb-1">Total Opportunities</p>
-                <p className="text-3xl font-bold text-white">{stats.totalOpportunities}</p>
+                <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 4 }}>Total Opportunities</p>
+                <p className="fp-metric-num" style={{ fontSize: 30, fontWeight: 700, color: '#e2e8f0' }}>{stats.totalOpportunities}</p>
               </div>
-              <div className="w-12 h-12 bg-theme-accent-blue rounded-xl flex items-center justify-center shadow-theme-accent-blue group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110">
-                <Package className="w-6 h-6 text-white" />
+              <div className="fp-glass-sm w-12 h-12 rounded-xl flex items-center justify-center">
+                <Package className="w-6 h-6" style={{ color: '#8b5cf6' }} />
               </div>
             </div>
           </div>
 
-          <div className="group backdrop-blur-xl bg-white/10 rounded-xl p-6 border border-white/20 shadow-xl hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 hover:scale-105 hover:bg-white/15">
+          <div className="fp-glow-card p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-purple-200/80 mb-1">Total Invested</p>
-                <p className="text-3xl font-bold text-white">${stats.totalInvested.toFixed(0)}</p>
+                <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 4 }}>Total Invested</p>
+                <p className="fp-metric-num" style={{ fontSize: 30, fontWeight: 700, color: '#e2e8f0' }}>${stats.totalInvested.toFixed(0)}</p>
               </div>
-              <div className="w-12 h-12 bg-theme-accent-purple rounded-xl flex items-center justify-center shadow-theme-accent-purple group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110">
-                <ShoppingCart className="w-6 h-6 text-white" />
+              <div className="fp-glass-sm w-12 h-12 rounded-xl flex items-center justify-center">
+                <ShoppingCart className="w-6 h-6" style={{ color: '#8b5cf6' }} />
               </div>
             </div>
           </div>
 
-          <div className="group backdrop-blur-xl bg-white/10 rounded-xl p-6 border border-white/20 shadow-xl hover:shadow-2xl hover:shadow-orange-500/20 transition-all duration-300 hover:scale-105 hover:bg-white/15">
+          <div className="fp-glow-card p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-orange-200/80 mb-1">Total Revenue</p>
-                <p className="text-3xl font-bold text-white">${stats.totalRevenue.toFixed(0)}</p>
+                <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 4 }}>Total Revenue</p>
+                <p className="fp-metric-num" style={{ fontSize: 30, fontWeight: 700, color: '#e2e8f0' }}>${stats.totalRevenue.toFixed(0)}</p>
               </div>
-              <div className="w-12 h-12 bg-theme-accent-orange rounded-xl flex items-center justify-center shadow-theme-accent-orange group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110">
-                <Store className="w-6 h-6 text-white" />
+              <div className="fp-glass-sm w-12 h-12 rounded-xl flex items-center justify-center">
+                <Store className="w-6 h-6" style={{ color: '#8b5cf6' }} />
               </div>
             </div>
           </div>
 
-          <div className="group backdrop-blur-xl bg-white/10 rounded-xl p-6 border border-white/20 shadow-xl hover:shadow-2xl hover:shadow-green-500/20 transition-all duration-300 hover:scale-105 hover:bg-white/15">
+          <div className="fp-glow-card p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-green-200/80 mb-1">Total Profit</p>
-                <p className="text-3xl font-bold bg-gradient-to-r from-green-300 to-emerald-300 bg-clip-text text-transparent">
+                <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 4 }}>Total Profit</p>
+                <p className="fp-metric-num" style={{ fontSize: 30, fontWeight: 700, color: '#34d399' }}>
                   ${stats.totalProfit.toFixed(0)}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-theme-accent-green rounded-xl flex items-center justify-center shadow-theme-accent-green group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110 animate-pulse-slow">
-                <DollarSign className="w-6 h-6 text-white" />
+              <div className="fp-glass-sm w-12 h-12 rounded-xl flex items-center justify-center">
+                <DollarSign className="w-6 h-6" style={{ color: '#8b5cf6' }} />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Filters with frosted glass */}
-        <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-6 mb-6 shadow-xl">
+        {/* Filters — canonical .fp-glass panel */}
+        <div className="fp-glass p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             {/* Search */}
             <div className="flex-1">
               <div className="relative group">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-blue-300 group-focus-within:text-blue-200 transition-colors" />
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5"
+                  style={{ color: '#94a3b8' }}
+                />
                 <input
                   type="text"
                   placeholder="Search opportunities..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50 text-white placeholder-blue-200/50 transition-all duration-300 hover:bg-white/15"
+                  className="fp-input w-full pl-10 pr-4"
                 />
               </div>
             </div>
 
-            {/* View Toggle */}
-            <div className="flex gap-1 border border-white/20 rounded-lg p-1">
+            {/* View Toggle — aria-pressed idiom for toggle group */}
+            <div
+              className="flex gap-1 rounded-lg p-1"
+              style={{ border: '1px solid rgba(255,255,255,0.1)' }}
+              role="group"
+              aria-label="View mode"
+            >
               <button
                 onClick={() => setViewMode('list')}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-sm transition-all duration-200 ${
-                  viewMode === 'list'
-                    ? 'bg-white/20 text-white shadow-sm'
-                    : 'text-white/60 hover:text-white hover:bg-white/10'
-                }`}
+                className="fp-btn-ghost flex items-center gap-1"
+                style={{
+                  padding: '6px 12px',
+                  fontSize: 14,
+                  background: viewMode === 'list' ? 'rgba(124,58,237,0.15)' : undefined,
+                  color: viewMode === 'list' ? '#c4b5fd' : '#94a3b8',
+                }}
+                aria-pressed={viewMode === 'list'}
                 title="List view"
               >
                 <List className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode('kanban')}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-sm transition-all duration-200 ${
-                  viewMode === 'kanban'
-                    ? 'bg-white/20 text-white shadow-sm'
-                    : 'text-white/60 hover:text-white hover:bg-white/10'
-                }`}
+                className="fp-btn-ghost flex items-center gap-1"
+                style={{
+                  padding: '6px 12px',
+                  fontSize: 14,
+                  background: viewMode === 'kanban' ? 'rgba(124,58,237,0.15)' : undefined,
+                  color: viewMode === 'kanban' ? '#c4b5fd' : '#94a3b8',
+                }}
+                aria-pressed={viewMode === 'kanban'}
                 title="Kanban view"
               >
                 <LayoutGrid className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode('inventory')}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-sm transition-all duration-200 ${
-                  viewMode === 'inventory'
-                    ? 'bg-white/20 text-white shadow-sm'
-                    : 'text-white/60 hover:text-white hover:bg-white/10'
-                }`}
+                className="fp-btn-ghost flex items-center gap-1"
+                style={{
+                  padding: '6px 12px',
+                  fontSize: 14,
+                  background: viewMode === 'inventory' ? 'rgba(124,58,237,0.15)' : undefined,
+                  color: viewMode === 'inventory' ? '#c4b5fd' : '#94a3b8',
+                }}
+                aria-pressed={viewMode === 'inventory'}
                 title="Inventory view"
               >
                 <Warehouse className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Status Filter */}
+            {/* Status Filter — canonical .fp-btn-ghost with purple active state */}
             <div className="flex gap-2 flex-wrap">
               {statusOptions.map((option) => {
                 const Icon = option.icon;
@@ -719,11 +736,13 @@ function OpportunitiesContent() {
                         );
                       }
                     }}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${
-                      isActive
-                        ? 'bg-theme-primary text-white border-blue-400 shadow-theme-primary scale-105'
-                        : 'bg-white/10 text-white border-white/20 hover:bg-white/20 hover:scale-105 hover:shadow-lg'
-                    }`}
+                    className="fp-btn-ghost flex items-center gap-2"
+                    style={{
+                      background: isActive ? 'rgba(124,58,237,0.15)' : undefined,
+                      color: isActive ? '#c4b5fd' : '#e2e8f0',
+                      padding: '8px 16px',
+                    }}
+                    aria-pressed={isActive}
                   >
                     <Icon className="w-4 h-4" />
                     <span className="text-sm font-medium">{option.label}</span>
@@ -735,7 +754,8 @@ function OpportunitiesContent() {
             {/* Advanced Filters Toggle */}
             <button
               onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 bg-white/10 text-white hover:bg-white/20 transition-all duration-300 text-sm"
+              className="fp-btn-ghost flex items-center gap-2"
+              style={{ padding: '8px 16px', fontSize: 14 }}
             >
               <TagIcon className="w-4 h-4" />
               {showAdvancedFilters ? 'Hide Filters' : 'More Filters'}
@@ -744,7 +764,7 @@ function OpportunitiesContent() {
 
           {/* Advanced Filters Panel */}
           {showAdvancedFilters && (
-            <div className="mt-4 pt-4 border-t border-white/10">
+            <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
               <FilterPanel
                 filters={filters}
                 setFilter={setFilter}
@@ -795,15 +815,26 @@ function OpportunitiesContent() {
           const purchasedItems = opportunities.filter((opp) => opp.status === 'PURCHASED');
           if (purchasedItems.length === 0) {
             return (
-              <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-12 text-center shadow-xl">
-                <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-orange-500/50 animate-pulse-slow">
-                  <Warehouse className="w-10 h-10 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">No inventory yet</h3>
-                <p className="text-blue-200/80">
-                  Mark an opportunity as Purchased to track holding costs here.
-                </p>
-              </div>
+              <EmptyState
+                icon={
+                  <div
+                    className="fp-glass-sm"
+                    style={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: '0 auto 16px',
+                    }}
+                  >
+                    <Warehouse className="w-10 h-10" style={{ color: '#8b5cf6' }} />
+                  </div>
+                }
+                title="No inventory yet"
+                message="Mark an opportunity as Purchased to track holding costs here."
+              />
             );
           }
           return (
@@ -818,46 +849,45 @@ function OpportunitiesContent() {
                 return (
                   <div
                     key={opp.id}
-                    className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-5 shadow-xl"
+                    className="fp-glass p-5"
                     data-testid="inventory-card"
                   >
                     {aging && (
-                      <div className="mb-3 inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/20 border border-amber-400/40 rounded-full text-amber-300 text-xs font-semibold">
-                        ⚠️ Aging Inventory
+                      <div style={{ marginBottom: 12 }}>
+                        <span className="fp-badge fp-badge-yellow">⚠️ Aging Inventory</span>
                       </div>
                     )}
-                    <h3 className="font-semibold text-white mb-3 line-clamp-2">
+                    <h3 style={{ fontWeight: 600, color: '#e2e8f0', marginBottom: 12 }} className="line-clamp-2">
                       {opp.listing.title}
                     </h3>
                     <div className="space-y-1.5 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-blue-200/70">Purchase Price</span>
-                        <span className="text-white font-medium">
+                        <span style={{ color: '#94a3b8' }}>Purchase Price</span>
+                        <span style={{ color: '#e2e8f0', fontWeight: 500 }}>
                           {opp.purchasePrice != null ? `$${opp.purchasePrice.toFixed(2)}` : '—'}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-blue-200/70">Market Value</span>
-                        <span className="text-white font-medium">
+                        <span style={{ color: '#94a3b8' }}>Market Value</span>
+                        <span style={{ color: '#e2e8f0', fontWeight: 500 }}>
                           {opp.listing.estimatedValue != null
                             ? `$${opp.listing.estimatedValue.toFixed(2)}`
                             : '—'}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-blue-200/70">Days Held</span>
-                        <span className="text-white font-medium">
+                        <span style={{ color: '#94a3b8' }}>Days Held</span>
+                        <span style={{ color: '#e2e8f0', fontWeight: 500 }}>
                           {daysHeld !== null ? `${daysHeld} days` : 'N/A'}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-blue-200/70">Carrying Cost</span>
+                        <span style={{ color: '#94a3b8' }}>Carrying Cost</span>
                         <span
-                          className={
-                            aging
-                              ? 'font-bold text-red-400'
-                              : 'text-white font-medium'
-                          }
+                          style={{
+                            color: aging ? '#f87171' : '#e2e8f0',
+                            fontWeight: aging ? 700 : 500,
+                          }}
                         >
                           {carryingCost !== null ? `$${carryingCost.toFixed(2)}` : 'N/A'}
                         </span>
@@ -872,29 +902,13 @@ function OpportunitiesContent() {
 
         {/* List View */}
         {loading ? (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-400/30 border-t-blue-400"></div>
-            <p className="mt-4 text-blue-200 font-medium animate-pulse">Loading opportunities...</p>
-          </div>
+          <LoadingSkeleton variant="list" rows={6} />
         ) : viewMode === 'kanban' || viewMode === 'inventory' ? null : filteredOpportunities.length === 0 ? (
-          <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-12 text-center shadow-xl">
-            <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-purple-500/50 animate-pulse-slow">
-              <Package className="w-10 h-10 text-white" />
-            </div>
-            <h3 className="text-xl font-semibold text-white mb-2">No opportunities found</h3>
-            <p className="text-blue-200/80 mb-6">
-              {searchTerm
-                ? 'Try adjusting your search or filters'
-                : 'Start by marking high-value listings as opportunities'}
-            </p>
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg shadow-blue-500/50 hover:shadow-blue-500/80 hover:scale-105"
-            >
-              <Search className="w-5 h-5" />
-              Browse Listings
-            </Link>
-          </div>
+          <EmptyState
+            title="No opportunities found"
+            message={searchTerm ? 'Try adjusting your search or filters' : 'Start by marking high-value listings as opportunities'}
+            action={{ label: 'Run a scrape', href: '/scraper' }}
+          />
         ) : (
           <div className="space-y-4">
             {filteredOpportunities.map((opp) => {
@@ -1079,23 +1093,26 @@ function OpportunitiesContent() {
               return (
                 <div
                   key={opp.id}
-                  className="group backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 overflow-hidden hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02] hover:bg-white/15"
+                  className="fp-glow-card group"
+                  style={{ overflow: 'hidden' }}
                 >
                   <div className="p-6">
                     <div className="flex items-start gap-4">
-                      {/* Image with glow effect */}
+                      {/* Image */}
                       {primaryImage ? (
                         <div className="relative">
                           <img
                             src={primaryImage}
                             alt={opp.listing.title}
-                            className="w-24 h-24 object-cover rounded-lg flex-shrink-0 ring-2 ring-white/20 group-hover:ring-purple-400/50 transition-all duration-300"
+                            className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
+                            style={{ border: '1px solid rgba(255,255,255,0.1)' }}
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-purple-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         </div>
                       ) : (
-                        <div className="w-24 h-24 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0 ring-2 ring-white/20">
-                          <Package className="w-8 h-8 text-purple-300" />
+                        <div
+                          className="w-24 h-24 rounded-lg flex items-center justify-center flex-shrink-0 fp-glass-sm"
+                        >
+                          <Package className="w-8 h-8" style={{ color: '#c4b5fd' }} />
                         </div>
                       )}
 
@@ -1103,10 +1120,13 @@ function OpportunitiesContent() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-4 mb-2">
                           <div className="flex-1">
-                            <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-purple-200 transition-colors">
+                            <h3
+                              className="text-lg font-semibold mb-1 transition-colors"
+                              style={{ color: '#e2e8f0' }}
+                            >
                               {opp.listing.title}
                             </h3>
-                            <div className="flex items-center gap-2 text-sm text-blue-200/70">
+                            <div className="flex items-center gap-2 text-sm" style={{ color: '#94a3b8' }}>
                               <span className="capitalize">
                                 {opp.listing.platform.toLowerCase()}
                               </span>
@@ -1125,44 +1145,41 @@ function OpportunitiesContent() {
                             </div>
                           </div>
 
-                          {/* Status Badge with glow */}
+                          {/* Status Badge — canonical .fp-badge-* */}
                           <div
-                            className={`flex items-center gap-2 px-3 py-1 rounded-full border text-sm font-medium shadow-lg transition-all duration-300 ${getStatusColor(
-                              opp.status
-                            )}`}
+                            className={getStatusBadgeClass(opp.status)}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
                           >
                             {getStatusIcon(opp.status)}
                             <span>{opp.status}</span>
                           </div>
                         </div>
 
-                        {/* Pricing Info with gradient backgrounds */}
+                        {/* Pricing Info — canonical .fp-glass-sm tiles */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                          <div className="backdrop-blur-sm bg-white/5 rounded-lg p-3 border border-white/10 hover:bg-white/10 transition-all duration-300">
-                            <p className="text-xs text-blue-200/70 mb-1">Asking Price</p>
-                            <p className="text-lg font-bold text-white">
+                          <div className="fp-glass-sm p-3">
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Asking Price</p>
+                            <p style={{ fontSize: 18, fontWeight: 700, color: '#e2e8f0' }}>
                               ${opp.listing.askingPrice.toFixed(0)}
                             </p>
                           </div>
-                          <div className="backdrop-blur-sm bg-white/5 rounded-lg p-3 border border-white/10 hover:bg-white/10 transition-all duration-300">
-                            <p className="text-xs text-blue-200/70 mb-1">
+                          <div className="fp-glass-sm p-3">
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>
                               {opp.listing.verifiedMarketValue !== null ? 'Verified Value' : 'Est. Value'}
                             </p>
-                            <p className="text-lg font-bold bg-gradient-to-r from-blue-300 to-cyan-300 bg-clip-text text-transparent">
+                            <p style={{ fontSize: 18, fontWeight: 700, color: '#e2e8f0' }}>
                               ${(opp.listing.verifiedMarketValue ?? opp.listing.estimatedValue)?.toFixed(0) || '—'}
                             </p>
                           </div>
-                          <div className="backdrop-blur-sm bg-white/5 rounded-lg p-3 border border-white/10 hover:bg-white/10 transition-all duration-300">
-                            <p className="text-xs text-blue-200/70 mb-1">Potential Profit</p>
-                            <p className="text-lg font-bold bg-gradient-to-r from-green-300 to-emerald-300 bg-clip-text text-transparent">
+                          <div className="fp-glass-sm p-3">
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Potential Profit</p>
+                            <p style={{ fontSize: 18, fontWeight: 700, color: '#34d399' }}>
                               ${opp.listing.profitPotential?.toFixed(0) || '—'}
                             </p>
                           </div>
-                          <div className="backdrop-blur-sm bg-white/5 rounded-lg p-3 border border-white/10 hover:bg-white/10 transition-all duration-300">
-                            <p className="text-xs text-blue-200/70 mb-1">Value Score</p>
-                            <p className="text-lg font-bold bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">
-                              {opp.listing.valueScore?.toFixed(0) || '—'}
-                            </p>
+                          <div className="fp-glass-sm p-3" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Value Score</p>
+                            <ScoreRing score={opp.listing.valueScore ?? 0} size={40} />
                           </div>
                         </div>
 
@@ -1171,25 +1188,25 @@ function OpportunitiesContent() {
                           {metadataItems.map((item) => (
                             <div
                               key={`${opp.id}-${item.label}`}
-                              className="backdrop-blur-sm bg-white/5 rounded-lg p-3 border border-white/10 hover:bg-white/10 transition-all duration-300"
+                              className="fp-glass-sm p-3"
                             >
-                              <p className="text-xs text-blue-200/70 mb-1">{item.label}</p>
-                              <p className="text-sm font-semibold text-white">{item.value}</p>
+                              <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>{item.label}</p>
+                              <p style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}>{item.value}</p>
                             </div>
                           ))}
                         </div>
 
                         {displayedLLMDetails.length > 0 && (
                           <div
-                            className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10"
+                            className="fp-glass-sm p-4 mb-4"
                             data-testid="llm-identification"
                           >
-                            <p className="text-xs text-blue-200/70 mb-2">LLM Identification</p>
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>LLM Identification</p>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                               {displayedLLMDetails.map((detail) => (
                                 <div key={`${opp.id}-${detail.label}`}>
-                                  <p className="text-xs text-blue-200/60 mb-1">{detail.label}</p>
-                                  <p className="text-sm text-white font-medium">{detail.value}</p>
+                                  <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>{detail.label}</p>
+                                  <p style={{ fontSize: 14, color: '#e2e8f0', fontWeight: 500 }}>{detail.value}</p>
                                 </div>
                               ))}
                             </div>
@@ -1199,11 +1216,11 @@ function OpportunitiesContent() {
                         {/* Low-liquidity warning (Story 5.3) */}
                         {opp.listing.demandLevel === 'low_liquidity' && (
                           <div
-                            className="backdrop-blur-sm bg-red-500/20 rounded-lg p-4 mb-4 border border-red-400/30"
+                            className="fp-alert-danger mb-4"
                             data-testid="low-liquidity-warning"
                           >
-                            <p className="text-sm font-semibold text-red-200">⚠ Low Liquidity Warning</p>
-                            <p className="text-xs text-red-200/80 mt-1">
+                            <p style={{ fontSize: 14, fontWeight: 600, color: '#fca5a5' }}>⚠ Low Liquidity Warning</p>
+                            <p style={{ fontSize: 12, color: '#fca5a5', marginTop: 4, opacity: 0.9 }}>
                               No verified sales found in the past 90 days. Resale may take significantly longer than expected.
                             </p>
                           </div>
@@ -1212,11 +1229,11 @@ function OpportunitiesContent() {
                         {/* Outside pickup radius warning (Story 5.5) */}
                         {opp.listing.outsidePickupRadius && (
                           <div
-                            className="backdrop-blur-sm bg-orange-500/20 rounded-lg p-4 mb-4 border border-orange-400/30"
+                            className="fp-alert-warn mb-4"
                             data-testid="outside-pickup-radius-warning"
                           >
-                            <p className="text-sm font-semibold text-orange-200">⚠ Outside Pickup Radius</p>
-                            <p className="text-xs text-orange-200/80 mt-1">
+                            <p style={{ fontSize: 14, fontWeight: 600, color: '#fcd34d' }}>⚠ Outside Pickup Radius</p>
+                            <p style={{ fontSize: 12, color: '#fcd34d', marginTop: 4, opacity: 0.9 }}>
                               This local-only item is beyond your configured pickup radius.
                               {opp.listing.pickupDistanceMiles !== null &&
                                 ` Estimated distance: ${opp.listing.pickupDistanceMiles} miles.`}
@@ -1226,15 +1243,15 @@ function OpportunitiesContent() {
 
                         {displayedMarketDetails.length > 0 && (
                           <div
-                            className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10"
+                            className="fp-glass-sm p-4 mb-4"
                             data-testid="market-insights"
                           >
-                            <p className="text-xs text-blue-200/70 mb-2">Market Insights</p>
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>Market Insights</p>
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                               {displayedMarketDetails.map((detail) => (
                                 <div key={`${opp.id}-market-${detail.label}`}>
-                                  <p className="text-xs text-blue-200/60 mb-1">{detail.label}</p>
-                                  <p className="text-sm text-white font-medium">{detail.value}</p>
+                                  <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>{detail.label}</p>
+                                  <p style={{ fontSize: 14, color: '#e2e8f0', fontWeight: 500 }}>{detail.value}</p>
                                 </div>
                               ))}
                             </div>
@@ -1245,10 +1262,13 @@ function OpportunitiesContent() {
                                 (opp.listing.platform === 'MERCARI' &&
                                   opp.listing.sellerRating < 4.0)) && (
                                 <div
-                                  className="mt-3 rounded-md bg-yellow-500/10 border border-yellow-400/30 px-3 py-2 text-sm text-yellow-300"
+                                  className="fp-alert-warn"
+                                  style={{ marginTop: 12 }}
                                   data-testid="low-seller-rating-warning"
                                 >
-                                  ⚠️ Low Seller Rating — Below-average feedback. Verify item condition carefully before purchasing.
+                                  <span style={{ fontSize: 13, color: '#fcd34d' }}>
+                                    ⚠️ Low Seller Rating — Below-average feedback. Verify item condition carefully before purchasing.
+                                  </span>
                                 </div>
                               )}
                           </div>
@@ -1258,34 +1278,34 @@ function OpportunitiesContent() {
                           opp.listing.resaleStrategy ||
                           opp.listing.analysisReasoning) && (
                           <div
-                            className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10"
+                            className="fp-glass-sm p-4 mb-4"
                             data-testid="recommendation-details"
                           >
-                            <p className="text-xs text-blue-200/70 mb-2">
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>
                               Strategy & Recommendations
                             </p>
                             {displayedRecommendationDetails.length > 0 && (
                               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                                 {displayedRecommendationDetails.map((detail) => (
                                   <div key={`${opp.id}-rec-${detail.label}`}>
-                                    <p className="text-xs text-blue-200/60 mb-1">{detail.label}</p>
-                                    <p className="text-sm text-white font-medium">{detail.value}</p>
+                                    <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>{detail.label}</p>
+                                    <p style={{ fontSize: 14, color: '#e2e8f0', fontWeight: 500 }}>{detail.value}</p>
                                   </div>
                                 ))}
                               </div>
                             )}
                             {opp.listing.resaleStrategy && (
                               <div className="mb-3">
-                                <p className="text-xs text-blue-200/70 mb-1">Resale Strategy</p>
-                                <p className="text-sm text-white whitespace-pre-line">
+                                <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Resale Strategy</p>
+                                <p style={{ fontSize: 14, color: '#e2e8f0', whiteSpace: 'pre-line' }}>
                                   {opp.listing.resaleStrategy}
                                 </p>
                               </div>
                             )}
                             {opp.listing.analysisReasoning && (
                               <div>
-                                <p className="text-xs text-blue-200/70 mb-1">Analysis Reasoning</p>
-                                <p className="text-sm text-white whitespace-pre-line">
+                                <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Analysis Reasoning</p>
+                                <p style={{ fontSize: 14, color: '#e2e8f0', whiteSpace: 'pre-line' }}>
                                   {opp.listing.analysisReasoning}
                                 </p>
                               </div>
@@ -1295,14 +1315,15 @@ function OpportunitiesContent() {
 
                         {listingTags.length > 0 && (
                           <div className="mb-4">
-                            <p className="text-xs text-blue-200/70 mb-2">Detected Tags</p>
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>Detected Tags</p>
                             <div className="flex flex-wrap gap-2">
                               {listingTags.map((tag) => (
                                 <span
                                   key={`${opp.id}-${tag}`}
-                                  className="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-white flex items-center gap-1"
+                                  className="fp-badge fp-badge-gray"
+                                  style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
                                 >
-                                  <TagIcon className="w-3 h-3 text-purple-200" />#{tag}
+                                  <TagIcon className="w-3 h-3" style={{ color: '#c4b5fd' }} />#{tag}
                                 </span>
                               ))}
                             </div>
@@ -1310,39 +1331,39 @@ function OpportunitiesContent() {
                         )}
 
                         {opp.listing.description && (
-                          <div className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10">
-                            <p className="text-xs text-blue-200/70 mb-2">Listing Description</p>
-                            <p className="text-sm text-white whitespace-pre-line">
+                          <div className="fp-glass-sm p-4 mb-4">
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>Listing Description</p>
+                            <p style={{ fontSize: 14, color: '#e2e8f0', whiteSpace: 'pre-line' }}>
                               {opp.listing.description}
                             </p>
                           </div>
                         )}
 
                         {opp.listing.priceReasoning && (
-                          <div className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10">
-                            <p className="text-xs text-blue-200/70 mb-2">Pricing Reasoning</p>
-                            <p className="text-sm text-white whitespace-pre-line">
+                          <div className="fp-glass-sm p-4 mb-4">
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>Pricing Reasoning</p>
+                            <p style={{ fontSize: 14, color: '#e2e8f0', whiteSpace: 'pre-line' }}>
                               {opp.listing.priceReasoning}
                             </p>
                           </div>
                         )}
 
                         {hasSellerDetails && (
-                          <div className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10">
-                            <p className="text-xs text-blue-200/70 mb-2">Seller Details</p>
-                            <div className="flex flex-col gap-2 text-sm text-white">
+                          <div className="fp-glass-sm p-4 mb-4">
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>Seller Details</p>
+                            <div className="flex flex-col gap-2" style={{ fontSize: 14, color: '#e2e8f0' }}>
                               {opp.listing.sellerName && (
                                 <span className="flex items-center gap-2">
-                                  <User className="w-4 h-4 text-blue-200" />
+                                  <User className="w-4 h-4" style={{ color: '#c4b5fd' }} />
                                   {opp.listing.sellerName}
                                 </span>
                               )}
                               {opp.listing.sellerContact && (
                                 <span className="flex items-center gap-2 break-all">
                                   {opp.listing.sellerContact.includes('@') ? (
-                                    <Mail className="w-4 h-4 text-blue-200" />
+                                    <Mail className="w-4 h-4" style={{ color: '#c4b5fd' }} />
                                   ) : (
-                                    <Phone className="w-4 h-4 text-blue-200" />
+                                    <Phone className="w-4 h-4" style={{ color: '#c4b5fd' }} />
                                   )}
                                   {opp.listing.sellerContact}
                                 </span>
@@ -1353,14 +1374,17 @@ function OpportunitiesContent() {
 
                         {opp.listing.requestToBuy !== null &&
                           opp.listing.requestToBuy !== undefined && (
-                            <div className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10">
+                            <div className="fp-glass-sm p-4 mb-4">
                               <div className="flex items-center justify-between gap-4">
                                 <div>
-                                  <p className="text-xs text-blue-200/70 mb-2 flex items-center gap-2">
-                                    <MessageSquare className="w-4 h-4 text-blue-200" />
+                                  <p
+                                    className="flex items-center gap-2"
+                                    style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}
+                                  >
+                                    <MessageSquare className="w-4 h-4" style={{ color: '#c4b5fd' }} />
                                     Purchase Message
                                   </p>
-                                  <p className="text-sm text-white whitespace-pre-line">
+                                  <p style={{ fontSize: 14, color: '#e2e8f0', whiteSpace: 'pre-line' }}>
                                     {opp.listing.requestToBuy}
                                   </p>
                                 </div>
@@ -1368,7 +1392,8 @@ function OpportunitiesContent() {
                                   onClick={() =>
                                     handleCopyMessage(opp.id, opp.listing.requestToBuy || '')
                                   }
-                                  className="flex items-center gap-2 px-3 py-1.5 text-xs bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 transition-all duration-300"
+                                  className="fp-btn-ghost flex items-center gap-2"
+                                  style={{ fontSize: 12, padding: '6px 12px' }}
                                 >
                                   <Copy className="w-3.5 h-3.5" />
                                   {copiedMessageId === opp.id ? 'Copied' : 'Copy'}
@@ -1378,8 +1403,8 @@ function OpportunitiesContent() {
                           )}
 
                         {comparableUrls.length > 0 && (
-                          <div className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10">
-                            <p className="text-xs text-blue-200/70 mb-2">Comparable Listings</p>
+                          <div className="fp-glass-sm p-4 mb-4">
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>Comparable Listings</p>
                             <div className="flex flex-col gap-2">
                               {comparableUrls.map((comp, index) => (
                                 <a
@@ -1387,12 +1412,13 @@ function OpportunitiesContent() {
                                   href={comp.url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="flex flex-col rounded-lg border border-white/10 bg-white/5 px-3 py-2 hover:bg-white/10 transition-all duration-300"
+                                  className="fp-glass-sm flex flex-col transition-all"
+                                  style={{ padding: '8px 12px', textDecoration: 'none' }}
                                 >
-                                  <span className="text-sm font-semibold text-white">
+                                  <span style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}>
                                     {comp.label}
                                   </span>
-                                  <span className="text-xs text-blue-200/70">
+                                  <span style={{ fontSize: 12, color: '#94a3b8' }}>
                                     {comp.platform} • {comp.type}
                                   </span>
                                 </a>
@@ -1402,21 +1428,24 @@ function OpportunitiesContent() {
                         )}
 
                         {(comparableSales.length > 0 || opp.listing.compMatchConfidence === 'insufficient') && (
-                          <div className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10">
+                          <div className="fp-glass-sm p-4 mb-4">
                             <div className="flex items-center justify-between mb-2">
-                              <p className="text-xs text-blue-200/70">
-                                Comparable Sold Listings
-                              </p>
+                              <p style={{ fontSize: 12, color: '#94a3b8' }}>Comparable Sold Listings</p>
                               {opp.listing.compMatchConfidence && (
-                                <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${
-                                  opp.listing.compMatchConfidence === 'high'
-                                    ? 'bg-green-500/20 border-green-400/40 text-green-300'
-                                    : opp.listing.compMatchConfidence === 'medium'
-                                    ? 'bg-yellow-500/20 border-yellow-400/40 text-yellow-300'
-                                    : opp.listing.compMatchConfidence === 'low'
-                                    ? 'bg-orange-500/20 border-orange-400/40 text-orange-300'
-                                    : 'bg-slate-500/20 border-slate-400/40 text-slate-300'
-                                }`}>
+                                <span
+                                  className={(() => {
+                                    switch (opp.listing.compMatchConfidence) {
+                                      case 'high':
+                                        return 'fp-badge fp-badge-green';
+                                      case 'medium':
+                                        return 'fp-badge fp-badge-yellow';
+                                      case 'low':
+                                        return 'fp-badge fp-badge-orange';
+                                      default:
+                                        return 'fp-badge fp-badge-gray';
+                                    }
+                                  })()}
+                                >
                                   {opp.listing.compMatchConfidence === 'insufficient'
                                     ? 'Insufficient Market Data'
                                     : `${opp.listing.compMatchConfidence.charAt(0).toUpperCase() + opp.listing.compMatchConfidence.slice(1)} Confidence`}
@@ -1424,7 +1453,7 @@ function OpportunitiesContent() {
                               )}
                             </div>
                             {comparableSales.length === 0 && opp.listing.compMatchConfidence === 'insufficient' && (
-                              <p className="text-sm text-blue-200/50 italic">
+                              <p style={{ fontSize: 14, color: '#64748b', fontStyle: 'italic' }}>
                                 No comparable sold listings found for this item.
                               </p>
                             )}
@@ -1432,18 +1461,19 @@ function OpportunitiesContent() {
                               {comparableSales.map((sale, index) => (
                                 <div
                                   key={`${opp.id}-sale-${index}`}
-                                  className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2"
+                                  className="fp-glass-sm flex flex-col md:flex-row md:items-center md:justify-between gap-2"
+                                  style={{ padding: '8px 12px' }}
                                 >
                                   <div>
-                                    <p className="text-sm text-white font-medium">{sale.title}</p>
+                                    <p style={{ fontSize: 14, color: '#e2e8f0', fontWeight: 500 }}>{sale.title}</p>
                                     {sale.soldAt && (
-                                      <p className="text-xs text-blue-200/60">
+                                      <p style={{ fontSize: 12, color: '#94a3b8' }}>
                                         Sold {formatDateTime(sale.soldAt)}
                                       </p>
                                     )}
                                   </div>
                                   <div className="flex items-center gap-3">
-                                    <span className="text-sm text-green-200 font-semibold">
+                                    <span style={{ fontSize: 14, fontWeight: 600, color: '#34d399' }}>
                                       {sale.price ? formatCurrency(sale.price) : '—'}
                                     </span>
                                     {sale.url && (
@@ -1451,7 +1481,8 @@ function OpportunitiesContent() {
                                         href={sale.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-1 text-xs text-blue-200 hover:text-white transition-colors"
+                                        className="inline-flex items-center gap-1 transition-colors"
+                                        style={{ fontSize: 12, color: '#c4b5fd', textDecoration: 'none' }}
                                       >
                                         <ExternalLink className="w-3.5 h-3.5" />
                                         View
@@ -1465,19 +1496,19 @@ function OpportunitiesContent() {
                         )}
 
                         {(opp.listing.priceReasoning || opp.listing.notes) && (
-                          <div className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10 space-y-4">
+                          <div className="fp-glass-sm p-4 mb-4 space-y-4">
                             {opp.listing.priceReasoning && (
                               <div>
-                                <p className="text-xs text-blue-200/70 mb-2">Value Reasoning</p>
-                                <p className="text-sm text-white whitespace-pre-line">
+                                <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>Value Reasoning</p>
+                                <p style={{ fontSize: 14, color: '#e2e8f0', whiteSpace: 'pre-line' }}>
                                   {opp.listing.priceReasoning}
                                 </p>
                               </div>
                             )}
                             {opp.listing.notes && (
                               <div>
-                                <p className="text-xs text-blue-200/70 mb-2">Listing Notes</p>
-                                <p className="text-sm text-white whitespace-pre-line">
+                                <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>Listing Notes</p>
+                                <p style={{ fontSize: 14, color: '#e2e8f0', whiteSpace: 'pre-line' }}>
                                   {opp.listing.notes}
                                 </p>
                               </div>
@@ -1487,10 +1518,13 @@ function OpportunitiesContent() {
 
                         {/* Editing Form or Display */}
                         {editingId === opp.id ? (
-                          <div className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10">
+                          <div className="fp-glass-sm p-4 mb-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                               <div>
-                                <label className="block text-sm font-medium text-blue-200 mb-2">
+                                <label
+                                  className="block text-sm font-medium mb-2"
+                                  style={{ color: '#c4b5fd' }}
+                                >
                                   Status
                                 </label>
                                 <select
@@ -1498,28 +1532,31 @@ function OpportunitiesContent() {
                                   onChange={(e) =>
                                     setEditForm({ ...editForm, status: e.target.value })
                                   }
-                                  className="w-full px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white transition-all duration-300"
+                                  className="fp-input w-full"
                                 >
-                                  <option value="IDENTIFIED" className="bg-slate-800">
+                                  <option value="IDENTIFIED" style={{ background: '#1e293b' }}>
                                     Identified
                                   </option>
-                                  <option value="CONTACTED" className="bg-slate-800">
+                                  <option value="CONTACTED" style={{ background: '#1e293b' }}>
                                     Contacted
                                   </option>
-                                  <option value="PURCHASED" className="bg-slate-800">
+                                  <option value="PURCHASED" style={{ background: '#1e293b' }}>
                                     Purchased
                                   </option>
-                                  <option value="LISTED" className="bg-slate-800">
+                                  <option value="LISTED" style={{ background: '#1e293b' }}>
                                     Listed
                                   </option>
-                                  <option value="SOLD" className="bg-slate-800">
+                                  <option value="SOLD" style={{ background: '#1e293b' }}>
                                     Sold
                                   </option>
                                 </select>
                               </div>
 
                               <div>
-                                <label className="block text-sm font-medium text-blue-200 mb-2">
+                                <label
+                                  className="block text-sm font-medium mb-2"
+                                  style={{ color: '#c4b5fd' }}
+                                >
                                   Purchase Price
                                 </label>
                                 <input
@@ -1532,13 +1569,16 @@ function OpportunitiesContent() {
                                       purchasePrice: parseFloat(e.target.value) || null,
                                     })
                                   }
-                                  className="w-full px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white placeholder-blue-200/50 transition-all duration-300"
+                                  className="fp-input w-full"
                                   placeholder="0.00"
                                 />
                               </div>
 
                               <div>
-                                <label className="block text-sm font-medium text-blue-200 mb-2">
+                                <label
+                                  className="block text-sm font-medium mb-2"
+                                  style={{ color: '#c4b5fd' }}
+                                >
                                   Resale Price
                                 </label>
                                 <input
@@ -1551,13 +1591,16 @@ function OpportunitiesContent() {
                                       resalePrice: parseFloat(e.target.value) || null,
                                     })
                                   }
-                                  className="w-full px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white placeholder-blue-200/50 transition-all duration-300"
+                                  className="fp-input w-full"
                                   placeholder="0.00"
                                 />
                               </div>
 
                               <div>
-                                <label className="block text-sm font-medium text-blue-200 mb-2">
+                                <label
+                                  className="block text-sm font-medium mb-2"
+                                  style={{ color: '#c4b5fd' }}
+                                >
                                   Fees
                                 </label>
                                 <input
@@ -1570,13 +1613,16 @@ function OpportunitiesContent() {
                                       fees: parseFloat(e.target.value) || null,
                                     })
                                   }
-                                  className="w-full px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white placeholder-blue-200/50 transition-all duration-300"
+                                  className="fp-input w-full"
                                   placeholder="0.00"
                                 />
                               </div>
 
                               <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-blue-200 mb-2">
+                                <label
+                                  className="block text-sm font-medium mb-2"
+                                  style={{ color: '#c4b5fd' }}
+                                >
                                   Resale Platform
                                 </label>
                                 <input
@@ -1588,13 +1634,16 @@ function OpportunitiesContent() {
                                       resalePlatform: e.target.value,
                                     })
                                   }
-                                  className="w-full px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white placeholder-blue-200/50 transition-all duration-300"
+                                  className="fp-input w-full"
                                   placeholder="e.g., eBay, Facebook Marketplace"
                                 />
                               </div>
 
                               <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-blue-200 mb-2">
+                                <label
+                                  className="block text-sm font-medium mb-2"
+                                  style={{ color: '#c4b5fd' }}
+                                >
                                   Notes
                                 </label>
                                 <textarea
@@ -1603,7 +1652,7 @@ function OpportunitiesContent() {
                                     setEditForm({ ...editForm, notes: e.target.value })
                                   }
                                   rows={3}
-                                  className="w-full px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white placeholder-blue-200/50 transition-all duration-300"
+                                  className="fp-input w-full"
                                   placeholder="Add notes about this opportunity..."
                                 />
                               </div>
@@ -1612,14 +1661,14 @@ function OpportunitiesContent() {
                             <div className="flex gap-2">
                               <button
                                 onClick={() => saveEditing(opp.id)}
-                                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg shadow-green-500/50 hover:shadow-green-500/80 hover:scale-105"
+                                className="fp-btn-primary flex items-center gap-2"
                               >
                                 <Save className="w-4 h-4" />
                                 Save Changes
                               </button>
                               <button
                                 onClick={cancelEditing}
-                                className="flex items-center gap-2 px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all duration-300 border border-white/20 hover:scale-105"
+                                className="fp-btn-ghost flex items-center gap-2"
                               >
                                 <X className="w-4 h-4" />
                                 Cancel
@@ -1633,43 +1682,43 @@ function OpportunitiesContent() {
                               opp.resalePrice ||
                               opp.actualProfit ||
                               opp.notes) && (
-                              <div className="backdrop-blur-sm bg-white/5 rounded-lg p-4 mb-4 border border-white/10">
+                              <div className="fp-glass-sm p-4 mb-4">
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                   {opp.purchasePrice && (
                                     <div>
-                                      <p className="text-xs text-blue-200/70 mb-1">
+                                      <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>
                                         Purchase Price
                                       </p>
-                                      <p className="text-sm font-semibold text-white">
+                                      <p style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}>
                                         ${opp.purchasePrice.toFixed(2)}
                                       </p>
                                     </div>
                                   )}
                                   {opp.resalePrice && (
                                     <div>
-                                      <p className="text-xs text-blue-200/70 mb-1">Resale Price</p>
-                                      <p className="text-sm font-semibold text-white">
+                                      <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Resale Price</p>
+                                      <p style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}>
                                         ${opp.resalePrice.toFixed(2)}
                                       </p>
                                     </div>
                                   )}
                                   {opp.fees && (
                                     <div>
-                                      <p className="text-xs text-blue-200/70 mb-1">Fees</p>
-                                      <p className="text-sm font-semibold text-white">
+                                      <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Fees</p>
+                                      <p style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}>
                                         ${opp.fees.toFixed(2)}
                                       </p>
                                     </div>
                                   )}
                                   {opp.actualProfit !== null && (
                                     <div>
-                                      <p className="text-xs text-blue-200/70 mb-1">Actual Profit</p>
+                                      <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Actual Profit</p>
                                       <p
-                                        className={`text-sm font-semibold ${
-                                          opp.actualProfit >= 0
-                                            ? 'bg-gradient-to-r from-green-300 to-emerald-300 bg-clip-text text-transparent'
-                                            : 'bg-gradient-to-r from-red-300 to-pink-300 bg-clip-text text-transparent'
-                                        }`}
+                                        style={{
+                                          fontSize: 14,
+                                          fontWeight: 600,
+                                          color: opp.actualProfit >= 0 ? '#34d399' : '#f87171',
+                                        }}
                                       >
                                         ${opp.actualProfit.toFixed(2)}
                                       </p>
@@ -1677,9 +1726,12 @@ function OpportunitiesContent() {
                                   )}
                                 </div>
                                 {opp.notes && (
-                                  <div className="mt-3 pt-3 border-t border-white/10">
-                                    <p className="text-xs text-blue-200/70 mb-1">Notes</p>
-                                    <p className="text-sm text-white">{opp.notes}</p>
+                                  <div
+                                    className="mt-3 pt-3"
+                                    style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                                  >
+                                    <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Notes</p>
+                                    <p style={{ fontSize: 14, color: '#e2e8f0' }}>{opp.notes}</p>
                                   </div>
                                 )}
                               </div>
@@ -1687,13 +1739,13 @@ function OpportunitiesContent() {
                           </>
                         )}
 
-                        {/* Actions with glow effects */}
+                        {/* Actions */}
                         <div className="flex items-center gap-2">
                           <a
                             href={opp.listing.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 text-sm shadow-lg shadow-blue-500/50 hover:shadow-blue-500/80 hover:scale-105"
+                            className="fp-btn-primary flex items-center gap-2"
                           >
                             <ExternalLink className="w-4 h-4" />
                             View Listing
@@ -1702,14 +1754,15 @@ function OpportunitiesContent() {
                             <>
                               <button
                                 onClick={() => startEditing(opp)}
-                                className="flex items-center gap-2 px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all duration-300 text-sm border border-white/20 hover:scale-105"
+                                className="fp-btn-ghost flex items-center gap-2"
                               >
                                 <Edit className="w-4 h-4" />
                                 Edit
                               </button>
                               <button
                                 onClick={() => deleteOpportunity(opp.id)}
-                                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-lg hover:from-red-600 hover:to-pink-700 transition-all duration-300 text-sm shadow-lg shadow-red-500/50 hover:shadow-red-500/80 hover:scale-105"
+                                className="fp-btn-ghost flex items-center gap-2"
+                                style={{ color: '#f87171' }}
                               >
                                 <Trash2 className="w-4 h-4" />
                                 Delete
@@ -1731,15 +1784,22 @@ function OpportunitiesContent() {
 
       {/* PURCHASED Modal */}
       {pendingKanbanMove?.targetStatus === 'PURCHASED' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-xl bg-black/60">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}
+        >
           <div
             role="dialog"
             aria-label="Mark as Purchased"
-            className="max-w-md w-full mx-4 backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-6 shadow-2xl"
+            className="fp-glass max-w-md w-full mx-4 p-6"
           >
-            <h2 className="text-lg font-semibold text-white mb-4">Mark as Purchased</h2>
+            <h2 style={{ fontSize: 18, fontWeight: 600, color: '#e2e8f0', marginBottom: 16 }}>Mark as Purchased</h2>
             <div className="mb-5">
-              <label htmlFor="modal-purchase-price" className="block text-sm text-blue-200/80 mb-1">
+              <label
+                htmlFor="modal-purchase-price"
+                className="block text-sm mb-1"
+                style={{ color: '#c4b5fd' }}
+              >
                 Purchase Price *
               </label>
               <input
@@ -1749,7 +1809,7 @@ function OpportunitiesContent() {
                 step="0.01"
                 value={modalPurchasePrice}
                 onChange={(e) => setModalPurchasePrice(e.target.value)}
-                className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                className="fp-input w-full"
                 placeholder="0.00"
                 autoFocus
               />
@@ -1757,14 +1817,16 @@ function OpportunitiesContent() {
             <div className="flex gap-3 justify-end">
               <button
                 onClick={cancelKanbanModal}
-                className="px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all text-sm border border-white/20"
+                className="fp-btn-ghost"
+                style={{ fontSize: 14 }}
               >
                 Cancel
               </button>
               <button
                 onClick={confirmPurchasedModal}
                 disabled={!modalPurchasePrice}
-                className="px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-700 text-white rounded-lg hover:from-purple-600 hover:to-purple-800 transition-all text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                className="fp-btn-primary"
+                style={{ fontSize: 14, opacity: !modalPurchasePrice ? 0.4 : 1 }}
               >
                 Confirm
               </button>
@@ -1775,15 +1837,22 @@ function OpportunitiesContent() {
 
       {/* LISTED Modal */}
       {pendingKanbanMove?.targetStatus === 'LISTED' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-xl bg-black/60">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}
+        >
           <div
             role="dialog"
             aria-label="Mark as Listed"
-            className="max-w-md w-full mx-4 backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-6 shadow-2xl"
+            className="fp-glass max-w-md w-full mx-4 p-6"
           >
-            <h2 className="text-lg font-semibold text-white mb-4">Mark as Listed</h2>
+            <h2 style={{ fontSize: 18, fontWeight: 600, color: '#e2e8f0', marginBottom: 16 }}>Mark as Listed</h2>
             <div className="mb-5">
-              <label htmlFor="modal-resale-url" className="block text-sm text-blue-200/80 mb-1">
+              <label
+                htmlFor="modal-resale-url"
+                className="block text-sm mb-1"
+                style={{ color: '#c4b5fd' }}
+              >
                 Resale URL *
               </label>
               <input
@@ -1791,7 +1860,7 @@ function OpportunitiesContent() {
                 type="url"
                 value={modalResaleUrl}
                 onChange={(e) => setModalResaleUrl(e.target.value)}
-                className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                className="fp-input w-full"
                 placeholder="https://ebay.com/..."
                 autoFocus
               />
@@ -1799,14 +1868,16 @@ function OpportunitiesContent() {
             <div className="flex gap-3 justify-end">
               <button
                 onClick={cancelKanbanModal}
-                className="px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all text-sm border border-white/20"
+                className="fp-btn-ghost"
+                style={{ fontSize: 14 }}
               >
                 Cancel
               </button>
               <button
                 onClick={confirmListedModal}
                 disabled={!modalResaleUrl}
-                className="px-4 py-2 bg-gradient-to-r from-orange-500 to-pink-600 text-white rounded-lg hover:from-orange-600 hover:to-pink-700 transition-all text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                className="fp-btn-primary"
+                style={{ fontSize: 14, opacity: !modalResaleUrl ? 0.4 : 1 }}
               >
                 Confirm
               </button>
@@ -1817,15 +1888,22 @@ function OpportunitiesContent() {
 
       {/* SOLD Modal */}
       {pendingKanbanMove?.targetStatus === 'SOLD' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-xl bg-black/60">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}
+        >
           <div
             role="dialog"
             aria-label="Mark as Sold"
-            className="max-w-md w-full mx-4 backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-6 shadow-2xl"
+            className="fp-glass max-w-md w-full mx-4 p-6"
           >
-            <h2 className="text-lg font-semibold text-white mb-4">Mark as Sold</h2>
+            <h2 style={{ fontSize: 18, fontWeight: 600, color: '#e2e8f0', marginBottom: 16 }}>Mark as Sold</h2>
             <div className="mb-4">
-              <label htmlFor="modal-sale-price" className="block text-sm text-blue-200/80 mb-1">
+              <label
+                htmlFor="modal-sale-price"
+                className="block text-sm mb-1"
+                style={{ color: '#c4b5fd' }}
+              >
                 Sale Price *
               </label>
               <input
@@ -1835,13 +1913,17 @@ function OpportunitiesContent() {
                 step="0.01"
                 value={modalSalePrice}
                 onChange={(e) => setModalSalePrice(e.target.value)}
-                className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-green-400"
+                className="fp-input w-full"
                 placeholder="0.00"
                 autoFocus
               />
             </div>
             <div className="mb-5">
-              <label htmlFor="modal-fees" className="block text-sm text-blue-200/80 mb-1">
+              <label
+                htmlFor="modal-fees"
+                className="block text-sm mb-1"
+                style={{ color: '#c4b5fd' }}
+              >
                 Fees (optional)
               </label>
               <input
@@ -1851,21 +1933,23 @@ function OpportunitiesContent() {
                 step="0.01"
                 value={modalFees}
                 onChange={(e) => setModalFees(e.target.value)}
-                className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-green-400"
+                className="fp-input w-full"
                 placeholder="0.00"
               />
             </div>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={cancelKanbanModal}
-                className="px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all text-sm border border-white/20"
+                className="fp-btn-ghost"
+                style={{ fontSize: 14 }}
               >
                 Cancel
               </button>
               <button
                 onClick={confirmSoldModal}
                 disabled={!modalSalePrice}
-                className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-700 text-white rounded-lg hover:from-green-600 hover:to-emerald-800 transition-all text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                className="fp-btn-primary"
+                style={{ fontSize: 14, opacity: !modalSalePrice ? 0.4 : 1 }}
               >
                 Confirm
               </button>

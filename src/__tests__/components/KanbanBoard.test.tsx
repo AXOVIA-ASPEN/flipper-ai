@@ -169,4 +169,35 @@ describe('KanbanBoard', () => {
     expect(passedColumn).toBeInTheDocument();
     expect(screen.getByText('Passed Item')).toBeInTheDocument();
   });
+
+  describe('Story 14.7 — demand-badge canonical mapping', () => {
+    // Re-import to access the exported DEMAND_BADGES dict. The dict export
+    // was added in Story 14.7 (Task 11.1) to make shape-level assertions
+    // possible without rendering a card.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { DEMAND_BADGES } = require('@/components/KanbanBoard') as {
+      DEMAND_BADGES: Record<string, { label: string; className: string }>;
+    };
+
+    it('maps each demand key to the canonical .fp-badge combination per ADR-14.7-A', () => {
+      expect(DEMAND_BADGES.rising.className).toBe('fp-badge fp-badge-red');
+      expect(DEMAND_BADGES.stable.className).toBe('fp-badge fp-badge-blue');
+      expect(DEMAND_BADGES.declining.className).toBe('fp-badge fp-badge-gray');
+      expect(DEMAND_BADGES.low_liquidity.className).toBe('fp-badge fp-badge-yellow');
+      expect(DEMAND_BADGES.very_high.className).toBe('fp-badge fp-badge-red');
+      // "high" is non-financial success → purple per FR-UI-DESIGN-04, NOT green.
+      expect(DEMAND_BADGES.high.className).toBe('fp-badge fp-badge-purple');
+      expect(DEMAND_BADGES.medium.className).toBe('fp-badge fp-badge-blue');
+      expect(DEMAND_BADGES.low.className).toBe('fp-badge fp-badge-gray');
+    });
+
+    it('contains no raw Tailwind palette classes', () => {
+      const paletteRe = /(bg|text|border|from|to|via|ring)-(red|blue|slate|amber|green|gray)-\d+/;
+      const canonicalRe = /^fp-badge fp-badge-(red|blue|gray|yellow|green|purple|orange)$/;
+      for (const entry of Object.values(DEMAND_BADGES)) {
+        expect(entry.className).toMatch(canonicalRe);
+        expect(entry.className).not.toMatch(paletteRe);
+      }
+    });
+  });
 });

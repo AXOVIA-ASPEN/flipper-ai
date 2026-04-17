@@ -198,8 +198,8 @@ export default function MessageApprovalCard({
           )}
         </div>
 
-        {/* Status badge */}
-        <span className={`text-xs px-2 py-0.5 rounded font-medium flex-shrink-0 ${STATUS_COLORS[message.status] || STATUS_COLORS.DRAFT}`}>
+        {/* Status badge — STATUS_COLORS values already carry .fp-badge padding/font */}
+        <span className={`flex-shrink-0 ${STATUS_COLORS[message.status] || STATUS_COLORS.DRAFT}`}>
           {message.status === 'PENDING_APPROVAL' ? 'PENDING' : message.status}
         </span>
       </div>

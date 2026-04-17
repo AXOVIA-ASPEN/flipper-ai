@@ -1,9 +1,18 @@
 'use client';
 
 /**
- * StepComplete — Success screen at end of onboarding.
- * Author: ASPEN
- * Company: Axovia AI
+ * @file src/components/Onboarding/StepComplete.tsx
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-04-17
+ * @version 1.1
+ * @brief Onboarding step 6 (Complete) — dark-migrated to canonical .fp-* in Story 14.5.
+ *
+ * @description
+ * Final "You're all set!" screen with a Go-to-Dashboard primary CTA and a
+ * secondary link to Settings. Story 14.5 replaced the legacy light-mode button
+ * background with .fp-btn-primary and switched the body copy and secondary
+ * link to the canonical dark text palette.
  */
 
 import Link from 'next/link';
@@ -19,8 +28,10 @@ export default function StepComplete({ onGoToDashboard }: Props) {
         🎉
       </div>
       <div>
-        <h2 className="text-xl font-bold text-gray-900 mb-2">You&apos;re all set!</h2>
-        <p className="text-gray-600">
+        <h2 className="text-xl font-bold mb-2" style={{ color: '#e2e8f0' }}>
+          You&apos;re all set!
+        </h2>
+        <p style={{ color: '#94a3b8' }}>
           Flipper AI is configured and ready to find deals for you. Head to your dashboard to run
           your first scan.
         </p>
@@ -29,13 +40,14 @@ export default function StepComplete({ onGoToDashboard }: Props) {
         <button
           type="button"
           onClick={onGoToDashboard}
-          className="w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors"
+          className="fp-btn-primary w-full py-3 px-6 font-semibold"
         >
           Go to Dashboard →
         </button>
         <Link
           href="/settings"
-          className="block text-sm text-gray-500 hover:text-gray-700 underline"
+          className="block text-sm underline transition-colors"
+          style={{ color: '#475569' }}
         >
           Adjust settings later
         </Link>

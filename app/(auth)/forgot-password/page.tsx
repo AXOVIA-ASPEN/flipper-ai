@@ -1,3 +1,17 @@
+/**
+ * @file app/(auth)/forgot-password/page.tsx
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-04-17
+ * @version 1.0
+ * @brief Forgot-password page — sends Firebase password reset email.
+ *
+ * @description
+ * Public page that accepts an email address and calls Firebase resetPassword().
+ * auth/user-not-found is treated as success to avoid leaking whether an account
+ * exists. All visuals use canonical .fp-* classes; replaces raw purple/pink gradients
+ * that existed before Epic 14 (this page was not on the legacy theme-class system).
+ */
 'use client';
 
 import { useState } from 'react';
@@ -42,29 +56,21 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 -left-4 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
-        <div className="absolute top-0 -right-4 w-96 h-96 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
-      </div>
-
-      <div className="w-full max-w-md relative z-10">
-        <div className="backdrop-blur-xl bg-white/10 rounded-2xl border border-white/20 shadow-2xl overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="w-full max-w-md relative z-10" role="main">
+        <div className="fp-glass rounded-2xl overflow-hidden">
           {/* Header */}
           <div className="px-8 pt-8 pb-6 text-center">
             <Link href="/" className="inline-block mb-6 group">
               <div className="flex items-center justify-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/50 group-hover:shadow-purple-500/80 transition-shadow">
-                  <Sparkles className="w-6 h-6 text-white" />
+                <div className="fp-glass-sm w-12 h-12 rounded-xl flex items-center justify-center">
+                  <Sparkles className="w-6 h-6" style={{ color: '#8b5cf6' }} />
                 </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-purple-200 via-pink-200 to-blue-200 bg-clip-text text-transparent">
-                  Flipper.ai
-                </span>
+                <span className="text-2xl font-bold fp-grad-purple">Flipper.ai</span>
               </div>
             </Link>
-            <h1 className="text-2xl font-bold text-white mb-2">Reset your password</h1>
-            <p className="text-blue-200/70">
+            <h1 className="text-2xl font-bold mb-2" style={{ color: '#e2e8f0' }}>Reset your password</h1>
+            <p style={{ color: '#94a3b8' }}>
               {success
                 ? 'Check your email for a reset link'
                 : "Enter your email and we'll send you a reset link"}
@@ -73,17 +79,21 @@ export default function ForgotPasswordPage() {
 
           {/* Error message */}
           {errorMessage && (
-            <div className="mx-8 mb-4 p-3 rounded-lg bg-red-500/20 border border-red-500/30 flex items-center gap-2 text-red-200">
-              <AlertCircle className="w-5 h-5 flex-shrink-0" />
-              <span className="text-sm">{errorMessage}</span>
+            <div className="fp-alert-danger mx-8 mb-4 p-3 flex items-center gap-2" role="alert">
+              <AlertCircle className="w-5 h-5 flex-shrink-0" style={{ color: '#f87171' }} />
+              <span className="text-sm" style={{ color: '#fca5a5' }}>{errorMessage}</span>
             </div>
           )}
 
           {/* Success message */}
           {success && (
-            <div className="mx-8 mb-4 p-3 rounded-lg bg-green-500/20 border border-green-500/30 flex items-center gap-2 text-green-200">
-              <CheckCircle className="w-5 h-5 flex-shrink-0" />
-              <span className="text-sm">
+            <div
+              className="fp-alert-success mx-8 mb-4 p-3 flex items-center gap-2"
+              role="status"
+              aria-live="polite"
+            >
+              <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: '#34d399' }} />
+              <span className="text-sm" style={{ color: '#6ee7b7' }}>
                 If an account exists with this email, you&apos;ll receive a password reset link shortly.
               </span>
             </div>
@@ -92,12 +102,12 @@ export default function ForgotPasswordPage() {
           {!success ? (
             <form onSubmit={handleSubmit} className="px-8 pb-8 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-blue-200/90 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#e2e8f0' }}>
                   Email address
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-blue-300/50" />
+                    <Mail className="h-5 w-5" style={{ color: '#475569' }} />
                   </div>
                   <input
                     type="email"
@@ -105,7 +115,7 @@ export default function ForgotPasswordPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     placeholder="you@example.com"
-                    className="w-full pl-10 pr-4 py-3 bg-white/10 rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white placeholder-blue-200/30 transition-all duration-300"
+                    className="fp-input w-full pl-10 pr-4 py-3"
                   />
                 </div>
               </div>
@@ -113,7 +123,7 @@ export default function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-600 hover:to-pink-700 transition-all duration-300 shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="fp-btn-primary w-full flex items-center justify-center gap-2"
               >
                 {isLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -124,10 +134,7 @@ export default function ForgotPasswordPage() {
             </form>
           ) : (
             <div className="px-8 pb-8">
-              <Link
-                href="/login"
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-600 hover:to-pink-700 transition-all duration-300 shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50"
-              >
+              <Link href="/login" className="fp-btn-primary w-full flex items-center justify-center gap-2">
                 <span>Back to sign in</span>
               </Link>
             </div>
@@ -137,7 +144,8 @@ export default function ForgotPasswordPage() {
           <div className="px-8 pb-8 text-center">
             <Link
               href="/login"
-              className="inline-flex items-center gap-1 text-sm text-purple-300/80 hover:text-purple-200 transition-colors"
+              className="inline-flex items-center gap-1 text-sm hover:underline"
+              style={{ color: '#a78bfa' }}
             >
               <ArrowLeft className="w-4 h-4" />
               Back to sign in

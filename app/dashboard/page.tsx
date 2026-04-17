@@ -8,6 +8,7 @@ import FilterPanel from '@/components/FilterPanel';
 import { getListingImageUrl } from '@/lib/image-helpers';
 import type { ListingWithImages } from '@/lib/image-helpers';
 import { useSseEvents } from '@/hooks/useSseEvents';
+import { LoadingSkeleton, ErrorBanner } from '@/components/ui';
 
 interface ListingImage {
   id: string;
@@ -191,16 +192,16 @@ function Dashboard() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontSize: 18, color: '#94a3b8' }}>Loading listings…</div>
+      <div style={{ minHeight: '100vh', padding: '32px 24px' }}>
+        <LoadingSkeleton variant="list" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontSize: 18, color: '#f87171' }}>{error}</div>
+      <div style={{ padding: '32px 24px' }}>
+        <ErrorBanner message={error} />
       </div>
     );
   }

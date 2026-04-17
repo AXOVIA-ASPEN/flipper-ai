@@ -3,8 +3,8 @@
  * @author Stephen Boyett
  * @company Axovia AI
  * @date 2026-03-01
- * @version 2.0
- * @brief Settings page — billing, usage, theme, notifications, scoring, logistics.
+ * @version 2.1
+ * @brief Settings page — billing, usage, notifications, scoring, logistics.
  *
  * @description
  * Server Component that renders all user settings sections. Wraps the
@@ -13,7 +13,6 @@
  */
 
 import { Suspense } from 'react';
-import ThemeSettings from '@/components/ThemeSettings';
 import NotificationSettings from '@/components/NotificationSettings';
 import ScoringSettings from '@/components/ScoringSettings';
 import LogisticsSettings from '@/components/LogisticsSettings';
@@ -38,9 +37,6 @@ export default function SettingsPage() {
         </div>
         <div className="fp-glass" style={{ padding: 24, marginBottom: 16 }}>
           <UsageDisplay />
-        </div>
-        <div className="fp-glass" style={{ padding: 24, marginBottom: 16 }}>
-          <ThemeSettings />
         </div>
         <div className="fp-glass" style={{ padding: 24, marginBottom: 16 }}>
           <NotificationSettings />

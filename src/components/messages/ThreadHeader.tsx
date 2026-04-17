@@ -3,13 +3,15 @@
  * @author Stephen Boyett
  * @company Axovia AI
  * @date 2026-03-31
- * @version 1.0
+ * @version 1.1
  * @brief Listing info banner for the thread detail view.
  *
  * @description
  * Displays the listing's image, title, price, platform badge, and seller
  * name at the top of a conversation thread. Handles null listings (deleted)
- * with a "Listing removed" placeholder. Supports dark mode.
+ * with a "Listing removed" placeholder. Story 14.7 migration: uses
+ * `.fp-glass p-4` wrapper, canonical inline hex copy colors, legacy
+ * light/dark prefixes removed.
  */
 
 import { PLATFORM_COLORS, getImageUrl } from './utils';
@@ -28,15 +30,18 @@ interface ThreadHeaderProps {
 export default function ThreadHeader({ listing, sellerName }: ThreadHeaderProps) {
   if (!listing) {
     return (
-      <div className="flex items-center gap-4 p-4 border rounded-lg bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-        <div className="w-14 h-14 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-2xl">
+      <div className="fp-glass flex items-center gap-4 p-4 rounded-lg">
+        <div
+          className="w-14 h-14 rounded-lg flex items-center justify-center text-2xl"
+          style={{ background: 'rgba(255,255,255,0.04)' }}
+        >
           🚫
         </div>
         <div>
-          <h2 className="text-lg font-semibold text-gray-500 dark:text-gray-400">
+          <h2 className="text-lg font-semibold" style={{ color: '#94a3b8' }}>
             Listing removed
           </h2>
-          <p className="text-sm text-gray-400 dark:text-gray-500">
+          <p className="text-sm" style={{ color: '#64748b' }}>
             This listing is no longer available
           </p>
         </div>
@@ -47,8 +52,11 @@ export default function ThreadHeader({ listing, sellerName }: ThreadHeaderProps)
   const imageUrl = getImageUrl(listing.imageUrls);
 
   return (
-    <div className="flex items-center gap-4 p-4 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-      <div className="w-14 h-14 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex-shrink-0">
+    <div className="fp-glass flex items-center gap-4 p-4 rounded-lg">
+      <div
+        className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0"
+        style={{ background: 'rgba(255,255,255,0.04)' }}
+      >
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -56,26 +64,32 @@ export default function ThreadHeader({ listing, sellerName }: ThreadHeaderProps)
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400 text-2xl">
+          <div
+            className="w-full h-full flex items-center justify-center text-2xl"
+            style={{ color: '#64748b' }}
+          >
             📦
           </div>
         )}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 mb-0.5">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
+          <h2
+            className="text-lg font-semibold truncate"
+            style={{ color: '#e2e8f0' }}
+          >
             {listing.title}
           </h2>
           <span
-            className={`text-xs px-1.5 py-0.5 rounded font-medium flex-shrink-0 ${
-              PLATFORM_COLORS[listing.platform] ||
-              'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
-            }`}
+            className={PLATFORM_COLORS[listing.platform] || 'fp-badge fp-badge-gray'}
           >
             {listing.platform}
           </span>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+        <div
+          className="flex items-center gap-2 text-sm"
+          style={{ color: '#94a3b8' }}
+        >
           <span className="font-medium">${listing.askingPrice.toLocaleString()}</span>
           {sellerName && (
             <>
