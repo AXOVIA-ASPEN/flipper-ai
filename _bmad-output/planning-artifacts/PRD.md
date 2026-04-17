@@ -2,10 +2,12 @@
 
 **Author:** Stephen Boyett
 **Company:** Axovia AI
-**Version:** 3.0
-**Date:** February 27, 2026
+**Version:** 3.2
+**Date:** April 17, 2026
 **Original Version:** 2.0 (February 3, 2026)
 
+> v3.2 updates: Added FR-UI-DESIGN-01 through 08 — canonical dark-glassmorphism design system, removal of competing multi-theme system, shared state components, accessibility enforcement, and mandatory file headers. Drives Epic 14 (Frontend Design System Migration). Source of gap analysis: `docs/frontend-design-gaps.md`.
+> v3.1 updates: Added FR-INFRA-TEST (Firebase Emulator test infrastructure), FR-AUTH-ACCESS-07 (emulator-backed auth tests), NFR-TEST-05/06/07 (emulator mandate, fixture coverage, zero-wip policy). Added FR-AUTH-ACCESS-01 through 06 and FR-SCORE-23 through 30 in prior edits.
 > v3.0 updates: Corrected technical architecture to match actual implementation. Added current state analysis. Preserved all original requirements.
 
 ---
@@ -172,10 +174,13 @@ functionality, data, or navigation chrome leaks to unauthenticated users.
 | FR-AUTH-ACCESS-04 | Authenticated users on the landing page (`/`) MUST be redirected to `/dashboard`. |
 | FR-AUTH-ACCESS-05 | The only routes reachable without authentication are: `/`, `/login`, `/register`, `/forgot-password`, `/reset-password`, `/privacy`, `/terms`, `/api/auth/*`, `/api/health*`, `/api/webhooks/*`. Every other path requires a valid session. |
 | FR-AUTH-ACCESS-06 | Public routes (landing, privacy, terms, auth pages) MUST NOT emit or reference protected route URLs via navigation UI rendered to unauthenticated users. |
+| FR-AUTH-ACCESS-07 | Acceptance test scenarios that verify authenticated user behavior (e.g., Navigation visible when logged in, landing page redirect, session-gated page content) MUST use the Firebase Auth Emulator to create real sessions — not synthetic JWT cookies. This ensures tests exercise the same `verifySessionCookie()` code path as production. |
 
 **Rationale:** Prevents accidental leakage of product features to visitors who
 have not registered/paid, and gives legal/compliance pages (`/privacy`, `/terms`)
 a clean, public-facing chrome free of authenticated-app navigation.
+FR-AUTH-ACCESS-07 ensures auth-boundary tests are not weakened by test-only
+bypasses that diverge from the production verification path.
 
 ### FR-INFRA: GCP Infrastructure
 
@@ -184,6 +189,57 @@ a clean, public-facing chrome free of authenticated-app navigation.
 - **Authentication:** Firebase Auth integration
 - **Auto-scaling:** 0 to N instances on Cloud Run
 - **CI/CD:** GitHub Actions deployment pipeline
+
+### FR-INFRA-TEST: Firebase Emulator Test Infrastructure
+
+The application MUST provide a Firebase Auth Emulator integration that enables
+acceptance tests to create real authenticated sessions without touching production
+Firebase or requiring real user credentials.
+
+| ID | Requirement |
+|---|---|
+| FR-INFRA-TEST-01 | The Firebase Auth Emulator MUST be started automatically before acceptance test suites run. The emulator lifecycle (start/stop/reset) MUST be managed by the test support hooks in `test/acceptance/support/hooks.ts`. |
+| FR-INFRA-TEST-02 | Test user provisioning: the test framework MUST create Firebase Auth users programmatically via the emulator Admin SDK and mint valid session cookies (`__session`) for use in Playwright browser contexts. User fixtures are defined in `test/acceptance/support/fixtures/users.json`. |
+| FR-INFRA-TEST-03 | The Firebase Admin SDK (`src/lib/firebase/admin.ts`) and session module (`src/lib/firebase/session.ts`) MUST respect `FIREBASE_AUTH_EMULATOR_HOST` when set. When the env var is present, all `verifySessionCookie()` and `createSessionCookie()` calls MUST route to the emulator instead of production Firebase. |
+| FR-INFRA-TEST-04 | CI/CD acceptance test jobs (`make test-ac`) MUST set `FIREBASE_AUTH_EMULATOR_HOST=localhost:9099` and start the emulator before running Cucumber scenarios. The emulator MUST be torn down after the test run completes. |
+
+**Rationale:** 40 acceptance test scenarios in E-002 (registration, OAuth, password
+reset, onboarding, settings) are currently blocked (`@wip`) because they require
+real Firebase Auth sessions. The emulator enables these tests to execute with zero
+external dependencies, removing the single largest test coverage gap.
+
+### FR-UI-DESIGN: Canonical Frontend Design System
+
+The frontend MUST conform to a single, canonical dark-glassmorphism design language
+defined in the `flipper-frontend` skill (`~/.claude/skills/flipper-frontend/SKILL.md`)
+and implemented as `.fp-*` utility classes in `app/globals.css`. The current codebase
+has ~15% compliance (135 canonical uses vs. 742 non-canonical palette and light-mode
+violations across 44 files per `docs/frontend-design-gaps.md`), and Epic 14 drives
+this to 100%.
+
+| ID | Requirement |
+|---|---|
+| FR-UI-DESIGN-01 | The `:root` CSS defaults MUST be dark-first: page background `#080b14`, primary accent `#7c3aed` (purple), primary text `#e2e8f0`, secondary text `#94a3b8`. The legacy light defaults (`--color-background: #ffffff`, `--color-primary: #3b82f6`) MUST be replaced. All missing canonical animations (`slideUp`, `toastIn`, `shimmer`, `fp-border-spin`, `fp-metric-num`) and utility classes (`.fp-btn-hot`, `.fp-hot-card`, themed `input[type=range]`) MUST be added to `app/globals.css`. |
+| FR-UI-DESIGN-02 | All pages in `app/**/page.tsx` and all components in `src/components/**/*.tsx` MUST use the canonical `.fp-*` utility classes for glassmorphism surfaces (`.fp-glass`, `.fp-glass-sm`, `.fp-glass-nav`, `.fp-glow-card`, `.fp-hot-card`), buttons (`.fp-btn-primary`, `.fp-btn-ghost`, `.fp-btn-hot`), inputs (`.fp-input`), badges (`.fp-badge-*`), gradients (`.fp-grad-*`), and alert banners (`.fp-alert-*`). Raw Tailwind palette tokens for non-purple colors (e.g. `bg-blue-*`, `from-pink-*`, `bg-cyan-*`, `bg-emerald-*`, `bg-amber-*`, `bg-rose-*`, `bg-indigo-*`) and light-mode surfaces (`bg-white`, `bg-gray-50..900`) are PROHIBITED in production TSX. |
+| FR-UI-DESIGN-03 | The competing `.bg-theme-*` / `.text-theme-*` / `.shadow-theme-*` multi-theme system (lines 162–278 of `app/globals.css`), the `ThemeStyles.tsx` dynamic CSS-var injector, and the multi-theme color map in `src/lib/theme-config.ts` MUST be removed. The product has a single design language; `ThemeContext` may only persist a user-visible motion/density preference if retained. |
+| FR-UI-DESIGN-04 | The green accent (`#34d399`) is RESERVED for financial/profit indicators only (profit amounts, gain percentages, positive P&L, "money made"). Non-financial success states (selections, confirmations, active states, high-demand signals) MUST use purple (`#7c3aed` / `#8b5cf6`). |
+| FR-UI-DESIGN-05 | Every page MUST render over the root layout's `.fp-bg-mesh` + `.fp-bg-grid` background layers, with content wrapped in `.fp-content`. Pages MUST NOT apply their own page-level `background:` inline styles or full-viewport Tailwind gradients that obscure the root layers. |
+| FR-UI-DESIGN-06 | Shared state components MUST exist under `src/components/ui/`: `LoadingSkeleton` (uses `.shimmer` animation), `ErrorBanner` (uses `.fp-alert-danger`), `EmptyState` (uses `.fp-glass`), and `ScoreRing` (SVG score ring per skill §Score Ring). Pages MUST use these components rather than inline one-off loading/error/empty markup. |
+| FR-UI-DESIGN-07 | Accessibility is enforced: (a) every interactive element (buttons, links, inputs, sliders, `.fp-nav-link`) MUST have a visible focus ring; (b) mobile touch targets MUST be ≥44×44 pixels; (c) sliders MUST include the complete ARIA quartet (`aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext`); (d) dynamic regions that update without navigation MUST use `aria-live="polite"` or `aria-live="assertive"`; (e) `app/layout.tsx` MUST wrap page children in a `<main>` landmark; (f) icon-only buttons MUST have an `aria-label`. |
+| FR-UI-DESIGN-08 | Every TSX file in `src/components/` and `app/` MUST begin with a canonical JSDoc file header containing `@file`, `@author` (Stephen Boyett), `@company` (Axovia AI), `@date` (ISO 8601), `@version`, `@brief` (≤120 chars), and `@description` (multi-line) per the File Header Standard in the repo's `CLAUDE.md`. 23 components currently lack this header; all MUST be brought into compliance. |
+
+**Rationale:** The `flipper-frontend` skill defines a distinctive, production-grade
+visual language that differentiates Flipper.ai from generic SaaS tooling. The current
+frontend mixes three incompatible systems (light-mode defaults, a `.bg-theme-*`
+multi-theme layer, and ad-hoc Tailwind gradients) which produces an inconsistent user
+experience — the landing page reads as a different product than the dashboard, and
+the onboarding wizard is visually unrelated to both. Unifying on the canonical system
+yields a coherent product, removes ~277 lines of redundant CSS, and eliminates the
+maintenance burden of a second design system that only one component actually uses.
+
+**Source of analysis:** `docs/frontend-design-gaps.md` (audit conducted 2026-04-17,
+464 palette violations + 278 light-mode violations documented with file:line
+references and phased remediation plan).
 
 ---
 
@@ -376,6 +432,9 @@ a clean, public-facing chrome free of authenticated-app navigation.
 - NFR-TEST-02: E2E tests for all critical user flows
 - NFR-TEST-03: BDD acceptance tests for all functional requirements
 - NFR-TEST-04: Requirements traceability matrix with 100% FR/NFR coverage
+- NFR-TEST-05: Acceptance tests requiring authenticated sessions MUST use Firebase Auth Emulator (`FIREBASE_AUTH_EMULATOR_HOST`). Synthetic JWT cookies are prohibited for session-dependent scenarios.
+- NFR-TEST-06: Test user fixtures (`test/acceptance/support/fixtures/users.json`) MUST cover all subscription tiers (free, flipper, pro) and include at least one user per OAuth provider (Google, GitHub).
+- NFR-TEST-07: Completed epics MUST have zero `@wip`-tagged acceptance scenarios. Any scenario that cannot be executed due to missing infrastructure MUST be tracked as a blocker in the story file, and the infrastructure gap documented as a separate story.
 
 ### NFR-UX: Usability
 - NFR-UX-01: Mobile-responsive UI

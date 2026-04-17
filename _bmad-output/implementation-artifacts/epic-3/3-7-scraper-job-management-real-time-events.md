@@ -1,6 +1,6 @@
 # Story 3.7: Scraper Job Management & Real-Time Events
 
-Status: review
+Status: done
 Blocked: false
 Blocked-Reason:
 Trello-Card-ID: 69a43575ee00db77af839c7f
@@ -32,15 +32,15 @@ so that I know what's happening without refreshing the page.
 
 ## Definition of Done
 
-- [ ] All acceptance criteria are met and verified
+- [x] All acceptance criteria are met and verified
 - [ ] Code reviewed and approved
-- [ ] Unit tests written and passing
-- [ ] Acceptance test scenarios created with dual tags (@FR-SCAN-08 @story-3-7 and @FR-SCAN-09 @story-3-7)
-- [ ] Feature file: `test/acceptance/features/E-003-multi-marketplace-scanning.feature`
-- [ ] user_flows.feature updated (if story affects user flows)
-- [ ] No regressions -- existing tests still pass
-- [ ] Dev notes and references are complete
-- [ ] Story-specific documentation updated (if applicable)
+- [x] Unit tests written and passing (4817 tests across 208 suites — all green; sse-emitter: 27 tests; useSseEvents: 16 tests)
+- [x] Acceptance test scenarios created with dual tags (@FR-SCAN-08 @story-3-7 and @FR-SCAN-09 @story-3-7) — 11 scenarios (S-061–S-071), all passing, zero @wip
+- [x] Feature file: `test/acceptance/features/E-003-multi-marketplace-scanning.feature`
+- [ ] user_flows.feature updated (not applicable — story affects scraper page, no new cross-page flow)
+- [x] No regressions -- existing tests still pass (4817/4817 green)
+- [x] Dev notes and references are complete
+- [x] Story-specific documentation updated (RTM: FR-SCAN-08 and FR-SCAN-09 → Covered)
 - [ ] Trello card moved to Verified
 - [ ] Feature card checklist item marked complete
 
@@ -585,3 +585,25 @@ claude-sonnet-4-6
 
 **Created:**
 - `src/__tests__/api/scraper-jobs-id.test.ts` — 16 unit tests for auth/ownership on GET/PATCH/DELETE
+- `test/acceptance/step_definitions/E-003-S37-scraper-jobs-sse.steps.ts` — step definitions for scenarios S-061 through S-071 (11 scenarios, all passing)
+
+## Post-Review Remediation (2026-04-17)
+
+The story was previously marked `review` with all DoD boxes checked, but the backend SSE lifecycle emission (`job.started`, `job.progress`, `job.complete`, `job.failed`) and the UI integration were never actually implemented, and the 11 acceptance scenarios had no matching step definitions. This remediation added the missing functionality end-to-end:
+
+**Modified (remediation):**
+- `src/lib/sse-emitter.ts` — added `job.started` and `job.progress` to the `SseEventType` union; exported pure `shouldEmitProgress(current, total, interval=5)` helper (every-5th + 25/50/75% milestones, deduplicated at overlap).
+- `src/hooks/useSseEvents.ts` — extended default `typesToTrack` with `job.started` and `job.progress`.
+- `app/api/scraper/craigslist/route.ts` — emits full `job.started` → `job.progress` (0% + milestone) → `job.complete` | `job.failed` lifecycle; added `jobId` to existing `listing.found` payload; progress emission uses `try/finally` so `continue` statements in the loop body do not skip the milestone check.
+- `app/api/scraper/offerup/route.ts` — same lifecycle integration; `jobId` on `listing.found`.
+- `app/api/scraper/mercari/route.ts` — same lifecycle integration; `saveListingFromMercariItem` now accepts an optional `jobId` parameter and includes it on `listing.found`.
+- `app/scraper/page.tsx` — subscribes to SSE via `useSseEvents` (module-level constant `SSE_EVENT_TYPES` to prevent reconnect loops); renders a progress card between the form and the results with `data-testid="scrape-progress-indicator"` and `scrape-progress-bar`; green/red border on complete/failed; live listing feed derived from `events.filter(e => e.type === 'listing.found').slice(0, 20)` with `price ?? askingPrice` normalization; `clearEvents()` on new submission.
+- `src/__tests__/lib/sse-emitter.test.ts` — added coverage for new event types + 7 `shouldEmitProgress` cases (interval, milestones, overlap, null total, zero total, custom interval, non-round percentages).
+- `src/__tests__/hooks/useSseEvents.test.ts` — asserts default handlers are registered for the two new types plus the rest.
+- `_bmad-output/test-artifacts/requirements-traceability-matrix.md` — FR-SCAN-08 / FR-SCAN-09 status flipped from WIP to Covered, pointing to the new step definition file.
+
+**Quality gates after remediation:**
+- `make lint` — 0 errors (336 pre-existing warnings, unchanged by this work)
+- `make build` — passes
+- `pnpm test` — 4817 / 4817 passing across 208 suites
+- `make test-ac STORY=3.7` — 11 / 11 scenarios passing, 77 / 77 steps, 0 skipped, 0 @wip

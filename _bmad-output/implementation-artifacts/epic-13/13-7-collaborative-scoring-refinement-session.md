@@ -1,6 +1,6 @@
 # Story 13.7: Collaborative AI Scoring Algorithm Refinement Session
 
-Status: review
+Status: done
 Blocked: false
 Blocked-Reason:
 Trello-Card-ID:
@@ -45,7 +45,7 @@ so that the scoring formula is calibrated against real-world flipping knowledge 
 - [x] `docs/scoring-refinement-log.md` created with all decisions documented
 - [x] No regressions — existing tests still pass
 - [x] No lint errors (`pnpm lint`)
-- [x] Build passes (`pnpm build`)
+- [x] Build passes (`pnpm build`) — fixed: created `src/lib/analytics-pdf-export.ts`, fixed `Record<string, unknown>` type casts in anthropic/groq/openai providers
 - [x] Before/after backtesting comparison generated. False positive and false negative rates must not increase by more than 5 percentage points vs. pre-session baseline. Any regression must be acknowledged and documented with Stephen's explicit sign-off.
 - [x] Stephen explicitly confirms each section is finalized (category multipliers, brand boosts, formula weights, threshold). The refinement log contains Stephen's sign-off statement per section.
 
@@ -199,6 +199,18 @@ Session executed 2026-04-15 via `/bmad-bmm-dev-story` workflow.
 | `Makefile` | Modified — added `db-up` / `db-down` targets |
 | `docs/guides/API-KEYS-SETUP.md` | Created — step-by-step API key acquisition guide |
 | `docs/scoring-refinement-log.md` | Created — decision log per story AC #8 |
+| `src/lib/ai/providers/gemini.ts` | Modified (Session 2) — added GEMINI_MODEL_MAPPINGS + mapToGeminiModel() for OpenAI→Gemini model translation |
+| `scripts/backtest/enrich-with-ai.ts` | Created (Session 2) — LLM identification backtest script (Groq/Llama 3.3) |
+| `scripts/backtest/enrich-full-pipeline.ts` | Created (Session 2) — full pipeline enrichment (LLM + eBay + sellability) |
+| `scripts/secrets/pull-from-gcp.sh` | Modified (Session 2) — added GROQ_API_KEY to secret list |
+| `src/__tests__/lib/value-estimator.test.ts` | Modified (Review) — added 8 tests for Session 2 brand patterns |
+| `src/__tests__/marketplace-scanner.test.ts` | Modified (Review) — added 4 tests for opportunityMinProfit profit floor |
+| `cucumber.js` | Modified (Review) — fixed `features` → `paths` for Cucumber.js v12 compatibility |
+| `src/lib/analytics-pdf-export.ts` | Created (Review) — PDF export module for analytics dashboard (was missing, breaking build) |
+| `src/lib/ai/providers/anthropic.ts` | Modified (Review) — fixed `Record<string, unknown>` → proper SDK type for strict TS build |
+| `src/lib/ai/providers/groq.ts` | Modified (Review) — same type fix as anthropic |
+| `src/lib/ai/providers/openai.ts` | Modified (Review) — same type fix as anthropic |
+| `prisma.config.ts` | Identified as untracked — Prisma 7 config, should be committed |
 
 ---
 
@@ -207,3 +219,5 @@ Session executed 2026-04-15 via `/bmad-bmm-dev-story` workflow.
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-04-15 | Stephen Boyett (via Claude Opus 4.6) | Story 13.7 implementation complete. 300-item backtesting dataset seeded, 8 decisions documented, all refinements applied. Tests passing (4,739/4,739). Status → review. |
+| 2026-04-17 | Stephen Boyett (via Claude Opus 4.6) | Code review round 1: (1) Added re-scoring results section to refinement log (AC #6). (2) Flagged false DoD build claim. (3) Added Session 2 files to File List. (4) Added 8 unit tests for Session 2 brand patterns. (5) Added 4 unit tests for `opportunityMinProfit` profit floor logic. (6) Fixed cucumber.js config `features` → `paths` (Cucumber v12 breaking change — all profiles were finding 0 scenarios). |
+| 2026-04-17 | Stephen Boyett (via Claude Opus 4.6) | Code review round 2: (7) Created `src/lib/analytics-pdf-export.ts` — PDF export for analytics dashboard. (8) Fixed `Record<string, unknown>` → proper SDK types in anthropic/groq/openai providers (strict TS build). (9) Updated stale line references in scoring-refinement-log.md. (10) Identified `prisma.config.ts` as valid Prisma 7 config needing commit. Build now passes. Tests: 4,843/4,843 passing. Status → done. |

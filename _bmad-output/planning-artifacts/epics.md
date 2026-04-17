@@ -264,6 +264,17 @@ FR-INFRA-12: The helpers/secrets.py module shall use Python dataclasses to organ
 FR-INFRA-13: System shall use Firebase Storage for listing image binary storage with Cloud SQL storing image metadata (path, original URL, dimensions, file size, content type)
 FR-INFRA-14: System shall integrate Firebase Cloud Messaging (FCM) for push notifications to web and mobile clients
 
+**FR-UI-DESIGN: Canonical Frontend Design System**
+
+FR-UI-DESIGN-01: The `:root` CSS defaults shall be dark-first — background `#080b14`, primary accent `#7c3aed` (purple), primary text `#e2e8f0`, secondary text `#94a3b8` — and all missing canonical animation keyframes (`slideUp`, `toastIn`, `shimmer`, `fp-border-spin`, `fp-metric-num`) plus utility classes (`.fp-btn-hot`, `.fp-hot-card`, purple-themed `input[type=range]`) shall be present in `app/globals.css`
+FR-UI-DESIGN-02: All pages in `app/**/page.tsx` and all components in `src/components/**/*.tsx` shall use the canonical `.fp-*` utility classes (`.fp-glass`, `.fp-glass-sm`, `.fp-glass-nav`, `.fp-glow-card`, `.fp-hot-card`, `.fp-btn-primary`, `.fp-btn-ghost`, `.fp-btn-hot`, `.fp-input`, `.fp-badge-*`, `.fp-grad-*`, `.fp-alert-*`). Raw Tailwind non-purple palette tokens (`bg-blue-*`, `from-pink-*`, `bg-cyan-*`, `bg-emerald-*`, `bg-amber-*`, `bg-rose-*`, `bg-indigo-*`) and light-mode surface tokens (`bg-white`, `bg-gray-50..900` on page/card surfaces) shall be prohibited in production TSX
+FR-UI-DESIGN-03: The competing `.bg-theme-*` / `.text-theme-*` / `.shadow-theme-*` multi-theme CSS system (lines 162–278 of `app/globals.css`), the `ThemeStyles.tsx` dynamic CSS-var injector, and the multi-theme color map (`src/lib/theme-config.ts`) shall be removed or reduced to a motion/density preference only
+FR-UI-DESIGN-04: The green accent `#34d399` shall be reserved for financial/profit indicators only. Non-financial success states (selection, confirmation, active state, high-demand signal) shall use purple (`#7c3aed` / `#8b5cf6`)
+FR-UI-DESIGN-05: Every page shall render over the root layout's `.fp-bg-mesh` + `.fp-bg-grid` background layers with content wrapped in `.fp-content`. Pages shall not apply their own full-viewport backgrounds or Tailwind gradients that obscure the root layers
+FR-UI-DESIGN-06: Shared state components shall exist under `src/components/ui/`: `LoadingSkeleton` (uses `.shimmer`), `ErrorBanner` (uses `.fp-alert-danger`), `EmptyState` (uses `.fp-glass`), `ScoreRing` (SVG score ring per skill spec). Pages shall consume these components instead of inline one-off loading/error/empty markup
+FR-UI-DESIGN-07: Accessibility shall be enforced — visible focus rings on all interactive elements (buttons, links, inputs, sliders, `.fp-nav-link`); mobile touch targets ≥44×44 pixels; sliders include `aria-valuemin/valuemax/valuenow/valuetext`; dynamic regions use `aria-live="polite"` or `aria-live="assertive"`; `app/layout.tsx` wraps page children in a `<main>` landmark; icon-only buttons include `aria-label`
+FR-UI-DESIGN-08: Every TSX file in `src/components/` and `app/` shall begin with the canonical JSDoc file header (`@file`, `@author` Stephen Boyett, `@company` Axovia AI, `@date`, `@version`, `@brief` ≤120 chars, `@description` multi-line) per the project File Header Standard
+
 ### Non-Functional Requirements
 
 NFR-PERF-01: Page loads < 2 seconds
@@ -447,6 +458,14 @@ NFR-UX-05: Global error boundary with retry logic
 | FR-INFRA-12 | Epic 1 | helpers/secrets.py module |
 | FR-INFRA-13 | Epic 1 | Firebase Storage for images |
 | FR-INFRA-14 | Epic 1 | Firebase Cloud Messaging |
+| FR-UI-DESIGN-01 | Epic 14 | Dark-first `:root` + canonical animation/utility tokens |
+| FR-UI-DESIGN-02 | Epic 14 | `.fp-*` canonical utility classes on every page/component; raw Tailwind palette banned |
+| FR-UI-DESIGN-03 | Epic 14 | Remove competing `.bg-theme-*` multi-theme system |
+| FR-UI-DESIGN-04 | Epic 14 | Green accent reserved for profit/financial indicators only |
+| FR-UI-DESIGN-05 | Epic 14 | Root `.fp-bg-mesh` + `.fp-bg-grid` + `.fp-content` on every page |
+| FR-UI-DESIGN-06 | Epic 14 | Shared `LoadingSkeleton` / `ErrorBanner` / `EmptyState` / `ScoreRing` |
+| FR-UI-DESIGN-07 | Epic 14 | Accessibility enforcement (focus rings, touch targets, ARIA, `aria-live`, landmarks) |
+| FR-UI-DESIGN-08 | Epic 14 | Canonical file headers on all TSX files |
 
 ## Epic List
 
@@ -515,6 +534,14 @@ Users can receive push notifications and SMS text alerts for all flip events, wi
 Users can schedule buy/sell meetups with automatic Google Calendar events and get driving directions via Google Maps, timed to arrive on schedule.
 **FRs covered:** FR-MEET-01, FR-MEET-02
 **Implementation notes:** Google Calendar API via OAuth configured in Settings. Google Maps SDK for route generation. Both require Google Cloud API keys and user OAuth consent.
+
+### Epic 14: Frontend Design System Migration
+The entire Flipper.ai frontend is migrated to the canonical dark-glassmorphism design language defined in the `flipper-frontend` skill and implemented as `.fp-*` utility classes in `app/globals.css`. Competing systems (light-mode `:root` defaults, `.bg-theme-*` multi-theme layer, ad-hoc Tailwind gradients) are removed. Every page and component uses canonical glass surfaces, purple accent, shared state components, enforced accessibility, and canonical file headers.
+**FRs covered:** FR-UI-DESIGN-01, FR-UI-DESIGN-02, FR-UI-DESIGN-03, FR-UI-DESIGN-04, FR-UI-DESIGN-05, FR-UI-DESIGN-06, FR-UI-DESIGN-07, FR-UI-DESIGN-08
+**NFRs addressed:** NFR-UX-01 (mobile-responsive), NFR-UX-02 (WCAG AA), NFR-UX-03 (consistent design system — single source of truth), NFR-UX-04 (toast system already compliant)
+**Implementation notes:** Audit documented in `docs/frontend-design-gaps.md`. Current state: ~15% compliance (135 canonical uses vs. 742 non-canonical palette+light-mode violations across 44 files). Target: 100% compliance. Epic is sequenced foundation → shared components → public-facing pages (landing, auth, onboarding) → core app surfaces (opportunities, listings, messaging) → settings & component polish → peripheral pages → final accessibility + file-header sweep. Two exemplar files already comply and serve as reference implementations: `app/dashboard/page.tsx` and `src/components/Navigation.tsx`.
+
+> **Note:** Epic 13 (AI Scoring Algorithm Improvements) exists in `_bmad-output/implementation-artifacts/sprint-status.yaml` and has story artifacts under `_bmad-output/implementation-artifacts/epic-13/`, but is not currently documented in this `epics.md` epic list. This is a pre-existing inconsistency noted here for awareness; Epic 14 is numbered after Epic 13 to avoid renumbering.
 
 ---
 
@@ -2711,3 +2738,431 @@ So that I leave at the right time and arrive on schedule.
 
 **DoD — Acceptance Tests Required:**
 Write Gherkin scenarios in `test/acceptance/features/E-012-meeting-logistics.feature` covering ALL acceptance criteria above. Tag each scenario with `@E-012-S-<N>` (sequential within Epic 12, continuing from previous stories), `@story-12-2`, and `@FR-MEET-02` as applicable. Update the requirements traceability matrix at `_bmad-output/test-artifacts/requirements-traceability-matrix.md`. See "Definition of Done (DoD) — All Stories" at the top of this file for full tagging rules and examples.
+
+---
+
+## Epic 14 Stories: Frontend Design System Migration
+
+**Source of analysis:** `docs/frontend-design-gaps.md` (audit conducted 2026-04-17).
+
+**Sequencing rationale:** Story 14.1 (foundation) blocks every other story in this epic because it establishes the canonical `:root` tokens and adds missing utility classes. Story 14.2 (shared state components) is sequenced early because every later page/component migration consumes them. Stories 14.3–14.9 are independently shippable and may run in parallel once 14.1 and 14.2 are complete. Story 14.10 is the final enforcement gate.
+
+**Verification commands per story** (every story DoD ends with these):
+```bash
+make lint                                   # zero ESLint errors
+make build                                  # strict TypeScript; no `any`, no unused imports
+make test                                   # all Jest unit tests green
+make test-ac STORY=14.<n>                   # Playwright-backed acceptance scenarios for this story pass, zero skipped
+rg -c "(bg|text|border|from|to|via|ring)-(blue|cyan|teal|sky|indigo|violet|fuchsia|pink|rose|emerald|green|amber|yellow|red|orange)-[0-9]" <files-in-story-scope>   # must trend toward zero
+rg -c "bg-(white|gray-[0-9])" <files-in-story-scope>    # must trend toward zero on TSX
+```
+
+---
+
+### Story 14.1: Design Tokens and Base Style Unification
+
+As a **developer**,
+I want the `:root` CSS defaults and all canonical animation/utility tokens to reflect the dark-glassmorphism design system,
+So that every downstream page and component has a single source of truth for color, motion, and surface style.
+
+**Acceptance Criteria:**
+
+**Given** the current `app/globals.css`
+**When** the file is edited
+**Then** `:root` defines `--color-background: #080b14`, `--color-primary: #7c3aed`, `--color-text: #e2e8f0`, `--color-text-secondary: #94a3b8`, and the legacy blue `--color-primary: #3b82f6` is removed
+
+**Given** the canonical design system requires animations `slideUp`, `toastIn`, `shimmer`, `fp-border-spin`, and `.fp-metric-num` glow
+**When** `app/globals.css` is updated
+**Then** `@keyframes` declarations exist for each, and utility classes `.slide-up`, `.toast-in`, `.shimmer`, `.fp-metric-num` are exported
+
+**Given** the skill defines `.fp-btn-hot`, `.fp-hot-card` (cycling purple border), and purple `input[type=range]` thumb styling
+**When** `app/globals.css` is updated
+**Then** these classes exist with the exact values specified in `~/.claude/skills/flipper-frontend/SKILL.md` (§Buttons, §HOT card, §Inputs)
+
+**Given** the inline `<body style={{ background: '#080b14', ... }}>` in `app/layout.tsx`
+**When** `:root` is properly dark-first (above)
+**Then** the inline body style is removed and the background comes from `:root` + `.fp-bg-mesh`
+
+**Given** the completed token unification
+**When** the dashboard page loads in a browser
+**Then** no visual regression occurs — dashboard, navigation, toast, kanban, and posting-queue continue to render correctly
+
+**Given** the updated tokens
+**When** `make lint`, `make build`, `make test` run
+**Then** all pass with zero errors
+
+**FRs fulfilled:** FR-UI-DESIGN-01
+
+**DoD — Acceptance Tests Required:**
+Write Gherkin scenarios in `test/acceptance/features/E-014-frontend-design-migration.feature` covering ALL acceptance criteria above. Tag each scenario with `@E-014-S-<N>` (sequential within Epic 14), `@story-14-1`, and `@FR-UI-DESIGN-01`. Update the requirements traceability matrix at `_bmad-output/test-artifacts/requirements-traceability-matrix.md`. See "Definition of Done (DoD) — All Stories" at the top of this file for full tagging rules and examples.
+
+---
+
+### Story 14.2: Remove Competing Multi-Theme System
+
+As a **developer**,
+I want the parallel `.bg-theme-*` multi-theme CSS layer and its supporting machinery removed,
+So that the codebase has exactly one design system and new code cannot accidentally reach for the wrong one.
+
+**Acceptance Criteria:**
+
+**Given** `app/globals.css` contains `.bg-theme-*`, `.text-theme-*`, `.shadow-theme-*`, `.ring-theme-focus`, `.bg-theme-nav-active`, `.text-theme-nav-active`, `.bg-theme-page` classes (lines 162–278)
+**When** Story 14.2 is complete
+**Then** all 47 lines are removed from `app/globals.css`
+
+**Given** `src/components/ThemeStyles.tsx` exists
+**When** Story 14.2 is complete
+**Then** the file is deleted and `<ThemeStyles />` is removed from `app/layout.tsx`
+
+**Given** `src/contexts/ThemeContext.tsx` currently switches multi-color themes
+**When** Story 14.2 is complete
+**Then** the context is either deleted entirely, or reduced to a boolean user-preference flag (e.g. `prefersReducedMotion`) with no color mapping
+
+**Given** `src/lib/theme-config.ts` defines a multi-theme color map
+**When** Story 14.2 is complete
+**Then** the file is deleted (if `ThemeContext` is deleted) or reduced to the retained preference
+
+**Given** `src/components/ThemeSettings.tsx` currently uses `bg-theme-page`
+**When** Story 14.2 is complete
+**Then** either the file is deleted, or it is rewritten to use canonical `.fp-glass` surfaces and no longer references any `bg-theme-*` class
+
+**Given** the cleanup is complete
+**When** `make lint`, `make build`, `make test`, `make test-e2e` all run
+**Then** all pass with zero errors and no unused-import warnings
+
+**Given** the cleanup is complete
+**When** `rg "bg-theme-|text-theme-|shadow-theme-" app src` is run
+**Then** zero matches are returned
+
+**FRs fulfilled:** FR-UI-DESIGN-03
+
+**DoD — Acceptance Tests Required:**
+Write Gherkin scenarios in `test/acceptance/features/E-014-frontend-design-migration.feature` covering ALL acceptance criteria above. Tag each scenario with `@E-014-S-<N>` (sequential within Epic 14, continuing from previous stories), `@story-14-2`, and `@FR-UI-DESIGN-03`. Update the requirements traceability matrix at `_bmad-output/test-artifacts/requirements-traceability-matrix.md`. See "Definition of Done (DoD) — All Stories" at the top of this file for full tagging rules and examples.
+
+---
+
+### Story 14.3: Shared UI State Components
+
+As a **developer**,
+I want shared `LoadingSkeleton`, `ErrorBanner`, `EmptyState`, and `ScoreRing` components,
+So that every page stops hand-rolling its own loading/error/empty markup and the visual language is consistent.
+
+**Acceptance Criteria:**
+
+**Given** the `src/components/ui/` directory does not exist
+**When** Story 14.3 is complete
+**Then** the directory exists and contains `LoadingSkeleton.tsx`, `ErrorBanner.tsx`, `EmptyState.tsx`, `ScoreRing.tsx`, each with a canonical JSDoc file header
+
+**Given** a page is in a loading state
+**When** it renders `<LoadingSkeleton variant="card" />` or `<LoadingSkeleton variant="list" />`
+**Then** a glass-surfaced skeleton with `.shimmer` animation renders
+
+**Given** a page encounters an error
+**When** it renders `<ErrorBanner message={...} onRetry={...} />`
+**Then** a `.fp-alert-danger` surface shows the message, a retry button (`.fp-btn-ghost`), and uses red accent from `#f87171`
+
+**Given** a page has no data to display
+**When** it renders `<EmptyState title={...} message={...} action={...} />`
+**Then** a centered `.fp-glass` card shows the title in `#e2e8f0`, the message in `#94a3b8`, and an optional action button
+
+**Given** a listing has an AI confidence score
+**When** a card renders `<ScoreRing score={score} size={48} />`
+**Then** an SVG ring displays with the score value and color: green (`#34d399`) if ≥80, yellow (`#fbbf24`) if 60–79, red (`#f87171`) if <60
+
+**Given** the shared components exist
+**When** `app/dashboard/page.tsx`, `app/opportunities/page.tsx`, `app/listings/[id]/page.tsx`, `app/messages/page.tsx`, and `app/posting-queue/page.tsx` render their loading, error, and empty states
+**Then** they use these shared components and have no inline `<div className="min-h-screen flex items-center justify-center">Loading…</div>`-style blocks
+
+**Given** the shared components exist
+**When** `make test` runs
+**Then** Jest unit tests for `LoadingSkeleton`, `ErrorBanner`, `EmptyState`, and `ScoreRing` pass and cover color-by-score logic for `ScoreRing`
+
+**FRs fulfilled:** FR-UI-DESIGN-06
+
+**DoD — Acceptance Tests Required:**
+Write Gherkin scenarios in `test/acceptance/features/E-014-frontend-design-migration.feature` covering ALL acceptance criteria above. Tag each scenario with `@E-014-S-<N>` (sequential within Epic 14, continuing from previous stories), `@story-14-3`, and `@FR-UI-DESIGN-06`. Update the requirements traceability matrix at `_bmad-output/test-artifacts/requirements-traceability-matrix.md`. See "Definition of Done (DoD) — All Stories" at the top of this file for full tagging rules and examples.
+
+---
+
+### Story 14.4: Landing Page and Auth Pages Rebuild
+
+As a **visitor**,
+I want the landing page and auth pages (login, register, forgot-password, reset-password) to use the canonical dark glassmorphism design,
+So that my first impression of Flipper.ai matches the product's visual identity inside the authenticated app.
+
+**Acceptance Criteria:**
+
+**Given** the current `app/page.tsx` uses `bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900`, `animate-blob` orbs, and multicolor feature-icon gradients (`from-blue-500 to-cyan-500`, `from-green-500 to-emerald-500`, etc.)
+**When** Story 14.4 is complete
+**Then** the landing page renders over the root `.fp-bg-mesh` + `.fp-bg-grid` with no page-level background override, no `animate-blob` orbs, and all feature icons are monochrome purple (`#8b5cf6`) inside plain `.fp-glass-sm` circles
+
+**Given** the landing page hero
+**When** it renders
+**Then** the headline gradient uses `.fp-grad-purple` (no pink), primary CTA uses `.fp-btn-primary` or `.fp-btn-hot`, secondary CTA uses `.fp-btn-ghost`
+
+**Given** the landing-page pricing tier cards
+**When** they render
+**Then** the Free tier uses `.fp-glass`, the Pro tier uses `.fp-hot-card` (cycling purple border), the Business tier uses `.fp-glass`, and no tier uses pink/rose gradients
+
+**Given** the auth pages (`login`, `register`, `forgot-password`, `reset-password`)
+**When** they render
+**Then** each is a centered `.fp-glass` card over the root grid background, with `.fp-input` form fields, `.fp-btn-primary` submit buttons, and `.fp-alert-danger` for error states
+
+**Given** the rebuilt pages
+**When** `rg "(bg|text|border|from|to|via|ring)-(blue|cyan|teal|sky|indigo|pink|rose|emerald|green|amber|yellow|red|orange)-[0-9]" app/page.tsx "app/(auth)/"` is run
+**Then** zero non-purple palette matches are returned (green may appear only on financial indicators — none on these pages)
+
+**Given** the landing page
+**When** a Playwright E2E scenario navigates to `/` and clicks "Get Started Free"
+**Then** it redirects to `/register` and the register page renders the canonical design
+
+**FRs fulfilled:** FR-UI-DESIGN-02, FR-UI-DESIGN-05
+
+**DoD — Acceptance Tests Required:**
+Write Gherkin scenarios in `test/acceptance/features/E-014-frontend-design-migration.feature` covering ALL acceptance criteria above, executed as real Playwright E2E journeys (UI-visible ACs). Tag each scenario with `@E-014-S-<N>` (sequential within Epic 14, continuing from previous stories), `@story-14-4`, and `@FR-UI-DESIGN-02` / `@FR-UI-DESIGN-05` as applicable. Update the requirements traceability matrix. See "Definition of Done (DoD) — All Stories" at the top of this file for full tagging rules.
+
+---
+
+### Story 14.5: Onboarding Wizard Dark Migration
+
+As a **new user**,
+I want the onboarding wizard to use the same dark glassmorphism design as the rest of the app,
+So that my first in-product experience is visually coherent and doesn't feel like a separate product.
+
+**Acceptance Criteria:**
+
+**Given** `src/components/Onboarding/WizardLayout.tsx` currently uses `bg-gradient-to-br from-blue-50 to-indigo-100`, `bg-white rounded-2xl shadow-xl`, `bg-blue-600` buttons, `bg-gray-200` progress track, `bg-blue-600` progress fill, `text-gray-900` / `text-gray-600` copy
+**When** Story 14.5 is complete
+**Then** `WizardLayout` uses `.fp-glass` card container over the root grid, `.fp-prog-track` + `.fp-prog-fill` (purple gradient) progress bar, `.fp-btn-primary` continue button, `.fp-btn-ghost` back button, and canonical `#e2e8f0` / `#94a3b8` text colors
+
+**Given** the six step components (`StepWelcome`, `StepBudget`, `StepCategories`, `StepLocation`, `StepMarketplaces`, `StepComplete`)
+**When** Story 14.5 is complete
+**Then** each renders its selection cards as `.fp-glass-sm` with a purple selected-state border (`rgba(109,40,217,0.5)`) and purple-tinted fill (`rgba(109,40,217,0.1)`) — no `bg-blue-50`, `border-blue-500`, or `text-blue-700` remains
+
+**Given** the onboarding form inputs
+**When** the user types or interacts
+**Then** all inputs use `.fp-input` with purple focus ring (`box-shadow: 0 0 0 3px rgba(109,40,217,0.12)`)
+
+**Given** the onboarding green "selected" accent for marketplace checkboxes (currently green in some places)
+**When** Story 14.5 is complete
+**Then** selection indicators are purple (FR-UI-DESIGN-04 — green reserved for profit)
+
+**Given** the rebuilt onboarding folder
+**When** `rg "(bg|text|border|from|to|via|ring)-(blue|cyan|teal|sky|indigo|pink|rose|emerald|amber|yellow|red|orange)-[0-9]" src/components/Onboarding` and `rg "bg-(white|gray-[0-9])" src/components/Onboarding` are run
+**Then** both return zero matches
+
+**Given** a new-user session
+**When** a Playwright E2E scenario completes the full onboarding wizard (6 steps)
+**Then** every step renders the canonical design, the progress bar advances with purple fill, and the user lands on `/dashboard`
+
+**FRs fulfilled:** FR-UI-DESIGN-02, FR-UI-DESIGN-04
+
+**DoD — Acceptance Tests Required:**
+Write Gherkin scenarios in `test/acceptance/features/E-014-frontend-design-migration.feature` covering ALL acceptance criteria above, executed as real Playwright E2E journeys (UI-visible ACs). Tag each scenario with `@E-014-S-<N>` (sequential within Epic 14, continuing from previous stories), `@story-14-5`, and `@FR-UI-DESIGN-02` / `@FR-UI-DESIGN-04` as applicable. Update the requirements traceability matrix.
+
+---
+
+### Story 14.6: PriceCalculator Canonical Reference Implementation
+
+As a **developer**,
+I want `PriceCalculator.tsx` to be the canonical reference implementation of the design system's "Real-Time Data Pattern",
+So that new components have a concrete example to follow and the spec example in the skill matches real code.
+
+**Acceptance Criteria:**
+
+**Given** `src/components/PriceCalculator.tsx` currently contains `bg-blue-50 border border-blue-200` info cards, raw browser-default `input[type=range]`, `bg-gray-100 / bg-white` surfaces, and `text-blue-700` emphasis text
+**When** Story 14.6 is complete
+**Then** the component is wrapped in `.fp-glass`, uses `.fp-input` for number fields, the range slider uses the canonical purple thumb styling defined in Story 14.1, and all copy uses `#e2e8f0` / `#94a3b8`
+
+**Given** the slider is a purchasing interface
+**When** the user drags the thumb
+**Then** the slider has `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext` (all four) populated correctly
+
+**Given** the slider updates the displayed price
+**When** the price recalculates
+**Then** the output region is wrapped in `aria-live="polite"` so screen readers announce the change
+
+**Given** the canonical design system's "Real-Time Data Pattern" rule (fetch once, recalculate client-side)
+**When** the user moves the slider
+**Then** no network request is issued per slider change — only an initial `useEffect` fetch to `/api/listings/[id]/market-data`
+
+**Given** the component has been migrated
+**When** `make test` runs
+**Then** the existing Jest unit test suite for `PriceCalculator` passes, extended to cover the ARIA attributes and the "no fetch per slider change" constraint
+
+**Given** the listing detail page embeds `PriceCalculator`
+**When** a Playwright E2E scenario loads `/listings/[id]`, drags the margin slider, and checks the displayed price
+**Then** the displayed price updates live without navigation, and the visible region matches the canonical glass design
+
+**FRs fulfilled:** FR-UI-DESIGN-02, FR-UI-DESIGN-07
+
+**DoD — Acceptance Tests Required:**
+Write Gherkin scenarios in `test/acceptance/features/E-014-frontend-design-migration.feature` covering ALL acceptance criteria above, executed as real Playwright E2E journeys for UI-visible ACs. Tag each scenario with `@E-014-S-<N>` (sequential within Epic 14, continuing from previous stories), `@story-14-6`, and `@FR-UI-DESIGN-02` / `@FR-UI-DESIGN-07` as applicable. Update the requirements traceability matrix.
+
+---
+
+### Story 14.7: Opportunities + Listings Detail + Messaging Migration
+
+As a **user**,
+I want the product's main working surfaces (opportunities page, listing detail, messaging UI) to use the canonical design system,
+So that day-to-day use of Flipper.ai is visually consistent with the dashboard and navigation.
+
+**Acceptance Criteria:**
+
+**Given** `app/opportunities/page.tsx` currently has 96 non-purple palette violations and 59 light-mode surface violations
+**When** Story 14.7 is complete
+**Then** the file has zero non-purple palette violations and zero light-mode surface violations (`bg-white`, `bg-gray-*` removed), all surfaces use `.fp-glass`, all buttons use `.fp-btn-*`, all badges use `.fp-badge-*`, all gradients use `.fp-grad-purple`
+
+**Given** the Kanban board inside the opportunities page
+**When** it renders
+**Then** demand badges (`rising`, `stable`, `declining`, `low_liquidity`, `very_high`, `high`, `medium`, `low` in `KanbanBoard.tsx:38–47`) use `.fp-badge-red` / `.fp-badge-blue` / `.fp-badge-gray` / `.fp-badge-yellow` / `.fp-badge-green` (green ONLY for rising/high demand as a financial proxy — if disputed, use purple per FR-UI-DESIGN-04 spirit) instead of raw `bg-red-500/20 text-red-300` classes
+
+**Given** `app/listings/[id]/page.tsx` currently uses `text-gray-600` loading and `text-red-600` error states
+**When** Story 14.7 is complete
+**Then** loading uses `<LoadingSkeleton />` from Story 14.3, error uses `<ErrorBanner />`, empty uses `<EmptyState />`, and all surrounding surfaces use `.fp-glass` / `.fp-glass-sm`
+
+**Given** the messaging components (`MessageBubble`, `ThreadHeader`, `ThreadItem` in `src/components/messages/`)
+**When** Story 14.7 is complete
+**Then** they use `.fp-glass-sm` surfaces, purple accents for active/selected states, and no `bg-gray-50 dark:bg-gray-800 border rounded-lg` patterns remain
+
+**Given** the drag-and-drop Kanban behavior
+**When** a Playwright E2E scenario drags a card from "Identified" to "Purchased"
+**Then** the drag visual uses the canonical drop shadow and the card retains its `.fp-glass` style during drag
+
+**Given** the migrated files
+**When** `rg "(bg|text|border|from|to|via|ring)-(blue|cyan|teal|sky|indigo|pink|rose|emerald|amber|yellow|red|orange)-[0-9]" app/opportunities app/listings src/components/messages src/components/KanbanBoard.tsx` runs
+**Then** zero matches are returned (green allowed only on profit indicators)
+
+**FRs fulfilled:** FR-UI-DESIGN-02, FR-UI-DESIGN-04
+
+**DoD — Acceptance Tests Required:**
+Write Gherkin scenarios in `test/acceptance/features/E-014-frontend-design-migration.feature` covering ALL acceptance criteria above, executed as real Playwright E2E journeys (UI-visible ACs, especially Kanban drag+drop). Tag each scenario with `@E-014-S-<N>` (sequential within Epic 14, continuing from previous stories), `@story-14-7`, and `@FR-UI-DESIGN-02` / `@FR-UI-DESIGN-04` as applicable. Update the requirements traceability matrix.
+
+---
+
+### Story 14.8: Settings and Component-Level Polish
+
+As a **user**,
+I want every settings panel, modal, and secondary component to use the canonical design system,
+So that deep-dive views (billing, notifications, integrations, meetings, approval queue) feel like the same product as the dashboard.
+
+**Acceptance Criteria:**
+
+**Given** the settings component stack (`NotificationSettings`, `BillingSettings`, `IntegrationsSettings`, `MessagingSettings`, `ScoringSettings`, `LogisticsSettings`, `UsageDisplay`)
+**When** Story 14.8 is complete
+**Then** each uses `.fp-glass` / `.fp-glass-sm` surfaces, `.fp-input` inputs, `.fp-btn-*` buttons, `.fp-badge-*` badges, and `.fp-alert-*` banners — and none contain `bg-white dark:bg-gray-800 rounded-lg shadow` patterns or `bg-blue-*` / `bg-indigo-*` palette tokens
+
+**Given** the modal/card component stack (`MeetingModal`, `MeetingRouteCard`, `ResaleContentEditor`, `ApprovalQueue`, `MessageApprovalCard`, `UpgradePrompt`, `CrossPostModal`, `FilterPanel`, `QueueItemCard`)
+**When** Story 14.8 is complete
+**Then** each uses canonical classes and all form inputs are `.fp-input`
+
+**Given** any toggle switch in settings
+**When** it renders
+**Then** the active state uses purple (`#7c3aed`), not blue (`#3b82f6`)
+
+**Given** `ThemeSettings.tsx` currently uses `bg-theme-page` from the deleted multi-theme system (Story 14.2)
+**When** Story 14.8 is complete
+**Then** `ThemeSettings.tsx` either does not exist (preferred — deleted alongside `ThemeContext`) or has been rewritten to use `.fp-glass` and reference only the retained user preference (e.g. reduced motion)
+
+**Given** the migrated components
+**When** `rg "bg-white dark:bg-gray-800" src/components` runs
+**Then** zero matches are returned
+
+**Given** the migrated components
+**When** a Playwright E2E scenario opens the Settings page and navigates through each panel
+**Then** every panel renders the canonical design with no visual regression
+
+**FRs fulfilled:** FR-UI-DESIGN-02
+
+**DoD — Acceptance Tests Required:**
+Write Gherkin scenarios in `test/acceptance/features/E-014-frontend-design-migration.feature` covering ALL acceptance criteria above, executed as real Playwright E2E journeys (UI-visible ACs). Tag each scenario with `@E-014-S-<N>` (sequential within Epic 14, continuing from previous stories), `@story-14-8`, and `@FR-UI-DESIGN-02`. Update the requirements traceability matrix.
+
+---
+
+### Story 14.9: Analytics, Scraper, Health, and Static Pages
+
+As a **user**,
+I want peripheral pages (analytics dashboard, scraper management UI, health status, privacy, terms) to match the canonical design,
+So that the *entire* frontend is consistent — not just the high-traffic surfaces.
+
+**Acceptance Criteria:**
+
+**Given** `app/analytics/page.tsx` currently uses chart stroke/fill `#3b82f6` (blue) and 22 palette + 14 light-mode violations
+**When** Story 14.9 is complete
+**Then** chart line colors are `#7c3aed` / `#8b5cf6`, bar fill is `#7c3aed`, all surrounding cards use `.fp-glass`, and all buttons use `.fp-btn-*`
+
+**Given** `app/scraper/page.tsx` currently has 46 palette + 30 light-mode violations (the second-worst page)
+**When** Story 14.9 is complete
+**Then** the page has zero non-purple palette hits and zero light-mode surface hits; job cards are `.fp-glass`, status badges are `.fp-badge-*`, run/pause buttons are `.fp-btn-*`
+
+**Given** `app/health/page.tsx`
+**When** Story 14.9 is complete
+**Then** it uses `.fp-glass` cards for each service status and `.fp-badge-green` / `.fp-badge-yellow` / `.fp-badge-red` for health indicators
+
+**Given** `app/privacy/page.tsx` and `app/terms/page.tsx`
+**When** Story 14.9 is complete
+**Then** they use canonical text colors (`#e2e8f0` / `#94a3b8`), `.fp-divider` for section separators, and no light-mode surfaces or non-purple palette
+
+**Given** the migrated pages
+**When** a Playwright E2E scenario loads each page
+**Then** each renders the canonical design and is keyboard-navigable
+
+**FRs fulfilled:** FR-UI-DESIGN-02, FR-UI-DESIGN-05
+
+**DoD — Acceptance Tests Required:**
+Write Gherkin scenarios in `test/acceptance/features/E-014-frontend-design-migration.feature` covering ALL acceptance criteria above, executed as real Playwright E2E journeys (UI-visible ACs). Tag each scenario with `@E-014-S-<N>` (sequential within Epic 14, continuing from previous stories), `@story-14-9`, and `@FR-UI-DESIGN-02` / `@FR-UI-DESIGN-05` as applicable. Update the requirements traceability matrix.
+
+---
+
+### Story 14.10: Accessibility Sweep and File-Header Compliance (Final Gate)
+
+As a **user with accessibility needs** *and* a **developer reading any TSX file in the repo**,
+I want every interactive element to meet WCAG AA, and every TSX file to declare its provenance via a canonical JSDoc header,
+So that the frontend is usable to assistive technology and traceable to author/version/date.
+
+**Acceptance Criteria:**
+
+**Given** `app/layout.tsx` currently wraps `{children}` in a plain `<div className="fp-content">`
+**When** Story 14.10 is complete
+**Then** it wraps children in `<main className="fp-content" id="main">` so screen readers have a landmark and a skip-link target exists
+
+**Given** `.fp-nav-link` in `app/globals.css` currently has no `:focus-visible` style
+**When** Story 14.10 is complete
+**Then** `.fp-nav-link:focus-visible` renders a visible purple outline (`outline: 2px solid rgba(139,92,246,0.6); outline-offset: 2px`)
+
+**Given** all sliders in the codebase (e.g. `PriceCalculator`, any range inputs in settings)
+**When** Story 14.10 is complete
+**Then** each slider has `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, and `aria-valuetext` populated with meaningful values
+
+**Given** all icon-only buttons (identified by `<button>` with only an SVG child, no text)
+**When** Story 14.10 is complete
+**Then** each has a non-empty `aria-label` describing its action
+
+**Given** mobile touch targets on navigation links, icon buttons, and toggle controls
+**When** Story 14.10 is complete
+**Then** each has `min-height: 44px; min-width: 44px` applied (via Tailwind `min-h-[44px] min-w-[44px]` or inline `style`)
+
+**Given** dynamic regions that update without navigation (SSE status, PriceCalculator output, toast stack, filter result counts)
+**When** Story 14.10 is complete
+**Then** each has `aria-live="polite"` (or `aria-live="assertive"` for toasts and errors)
+
+**Given** 23 components currently lack a canonical JSDoc file header (enumerated in `docs/frontend-design-gaps.md` §4.1)
+**When** Story 14.10 is complete
+**Then** every file in `src/components/` and every page in `app/` begins with a JSDoc block containing `@file`, `@author` "Stephen Boyett", `@company` "Axovia AI", `@date`, `@version`, `@brief`, `@description`
+
+**Given** the full Epic 14 migration is complete
+**When** the final violation audit runs:
+```
+rg -c "(bg|text|border|from|to|via|ring)-(blue|cyan|teal|sky|indigo|violet|fuchsia|pink|rose|emerald|amber|yellow|red|orange)-[0-9]" app src/components
+rg -c "bg-(white|gray-[0-9])" app src/components
+```
+**Then** both counts return zero (green `emerald`/`green-*` may appear only on financial/profit indicators — verified manually for those contexts)
+
+**Given** the completed migration
+**When** `make lint`, `make build`, `make test`, and `make test-ac FEATURE=F14` all run
+**Then** all pass with zero errors, zero warnings, zero skipped scenarios
+
+**FRs fulfilled:** FR-UI-DESIGN-02, FR-UI-DESIGN-07, FR-UI-DESIGN-08
+
+**DoD — Acceptance Tests Required:**
+Write Gherkin scenarios in `test/acceptance/features/E-014-frontend-design-migration.feature` covering ALL acceptance criteria above, including at least one axe-core / keyboard-only / screen-reader-traversal scenario per accessibility AC. Tag each scenario with `@E-014-S-<N>` (sequential within Epic 14, continuing from previous stories), `@story-14-10`, and `@FR-UI-DESIGN-07` / `@FR-UI-DESIGN-08` as applicable. Update the requirements traceability matrix. This story is the final gate — Epic 14 cannot be marked `done` until this story is `done`.

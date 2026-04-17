@@ -1,7 +1,7 @@
 # Requirements Traceability Matrix
 
 **Project:** Flipper AI
-**Last Updated:** 2026-04-15
+**Last Updated:** 2026-04-17 (Story 14.4)
 **Purpose:** Maps every Functional Requirement (FR) and Non-Functional Requirement (NFR) to its corresponding Gherkin acceptance test scenarios, ensuring 100% coverage.
 
 **Convention:** Each scenario is tagged with:
@@ -62,8 +62,8 @@ every public and protected route combination.
 | FR-SCAN-05 | OfferUp Playwright scraper | 3 | 3.5 | @E-003-S-034, @E-003-S-035, @E-003-S-036, @E-003-S-039, @E-003-S-040, @E-003-S-041, @E-003-S-043 | E-003-multi-marketplace-scanning.feature | Covered |
 | FR-SCAN-06 | Configurable search filters | 3 | 3.6 | | E-003-multi-marketplace-scanning.feature | Pending |
 | FR-SCAN-07 | Saved search configurations | 3 | 3.6 | | E-003-multi-marketplace-scanning.feature | Pending |
-| FR-SCAN-08 | ScraperJob status tracking | 3 | 3.7 | @E-003-S-061, @E-003-S-062, @E-003-S-065, @E-003-S-066, @E-003-S-067, @E-003-S-069, @E-003-S-070, @E-003-S-071 | E-003-multi-marketplace-scanning.feature | WIP — 8 scenarios written but all tagged @wip, not yet executing in test runs |
-| FR-SCAN-09 | SSE real-time events | 3 | 3.7 | @E-003-S-063, @E-003-S-064, @E-003-S-068 | E-003-multi-marketplace-scanning.feature | WIP — 3 scenarios written but all tagged @wip, not yet executing in test runs |
+| FR-SCAN-08 | ScraperJob status tracking | 3 | 3.7 | @E-003-S-061, @E-003-S-062, @E-003-S-065, @E-003-S-066, @E-003-S-067, @E-003-S-069, @E-003-S-070, @E-003-S-071 | E-003-multi-marketplace-scanning.feature / E-003-S37-scraper-jobs-sse.steps.ts | Covered |
+| FR-SCAN-09 | SSE real-time events | 3 | 3.7 | @E-003-S-063, @E-003-S-064, @E-003-S-068 | E-003-multi-marketplace-scanning.feature / E-003-S37-scraper-jobs-sse.steps.ts | Covered |
 | FR-SCAN-10 | Anti-detection measures | 3 | 3.1, 3.3, 3.4, 3.5 | @E-003-S-005, @E-003-S-020, @E-003-S-021, @E-003-S-022, @E-003-S-025, @E-003-S-029, @E-003-S-030, @E-003-S-037, @E-003-S-038, @E-003-S-042 | E-003-multi-marketplace-scanning.feature | Covered |
 | FR-SCAN-11 | Listing data extraction | 3 | 3.1 | @E-003-S-003 | E-003-multi-marketplace-scanning.feature | Covered |
 | FR-SCAN-12 | Deduplication | 3 | 3.8 | @E-003-S-072, @E-003-S-073 | E-003-multi-marketplace-scanning.feature | Covered |
@@ -236,6 +236,18 @@ every public and protected route combination.
 | FR-MEET-01 | Google Calendar integration | 12 | 12.1 | @E-012-S-1, @E-012-S-2, @E-012-S-3, @E-012-S-4, @E-012-S-5, @E-012-S-6, @E-012-S-7, @E-012-S-8 | E-012-meeting-logistics.feature | Covered |
 | FR-MEET-02 | Google Maps route generation | 12 | 12.2 | @E-012-S-9, @E-012-S-10, @E-012-S-11, @E-012-S-12, @E-012-S-13, @E-012-S-14, @E-012-S-15 | E-012-meeting-logistics.feature | Covered |
 
+## FR-UI-DESIGN: Frontend Design System Migration
+
+| Requirement | Description | Epic | Story | Scenario ID(s) | Feature File | Status |
+|---|---|---|---|---|---|---|
+| FR-UI-DESIGN-01 | Canonical dark-first design tokens (root palette, fp-* animations, hot card, range slider) | 14 | 14.1 | @E-014-S-1, @E-014-S-2, @E-014-S-3, @E-014-S-4, @E-014-S-5, @E-014-S-15, @E-014-S-16, @E-014-S-17, @E-014-S-18, @E-014-S-19 | E-014-frontend-design-migration.feature | Covered |
+| FR-UI-DESIGN-02 | Canonical fp-* design-system classes on landing and auth pages (no raw palette, no orbs, fp-glass/btn/input/alert/grad/hot-card) | 14 | 14.4, 14.6 | @E-014-S-37, @E-014-S-38, @E-014-S-39, @E-014-S-40, @E-014-S-41, @E-014-S-42, @E-014-S-43, @E-014-S-44, @E-014-S-45, @E-014-S-47, @E-014-S-48, @E-014-S-49, @E-014-S-29, @E-014-S-30, @E-014-S-31, @E-014-S-32, @E-014-S-33, @E-014-S-35, @E-014-S-36 | E-014-frontend-design-migration.feature | Covered — E-014-landing-auth-rebuild.steps.ts, E-014-price-calculator.steps.ts |
+| FR-UI-DESIGN-03 | Remove competing multi-theme system (bg-theme-*, var(--theme-*), FLIPPER-14-2 interim placeholders) | 14 | 14.2, 14.4 | @E-014-S-6, @E-014-S-7, @E-014-S-8, @E-014-S-9, @E-014-S-10, @E-014-S-11, @E-014-S-12, @E-014-S-13, @E-014-S-14, @E-014-S-45, @E-014-S-46 | E-014-frontend-design-migration.feature | Covered |
+| FR-UI-DESIGN-04 | Zero non-purple palette matches on rebuilt pages (green reserved for profit, pink/fuchsia/rose banned) | 14 | 14.4, 14.6 | @E-014-S-44, @E-014-S-30 | E-014-frontend-design-migration.feature | Covered — E-014-landing-auth-rebuild.steps.ts, E-014-price-calculator.steps.ts |
+| FR-UI-DESIGN-05 | No competing ambient background systems (no animate-blob orbs, no page-level bg-gradient override) | 14 | 14.4 | @E-014-S-37, @E-014-S-41, @E-014-S-47 | E-014-frontend-design-migration.feature | Covered — E-014-landing-auth-rebuild.steps.ts |
+| FR-UI-DESIGN-06 | Shared UI state components (LoadingSkeleton, ErrorBanner, EmptyState, ScoreRing) | 14 | 14.3 | @E-014-S-20, @E-014-S-21, @E-014-S-22, @E-014-S-23, @E-014-S-24, @E-014-S-25, @E-014-S-26, @E-014-S-27, @E-014-S-28 | E-014-frontend-design-migration.feature | Covered — E-014-shared-ui-state.steps.ts |
+| FR-UI-DESIGN-07 | Accessibility not regressed on rebuilt pages (axe-core zero critical/serious, aria-labels on icon-only buttons) | 14 | 14.4, 14.6 | @E-014-S-49, @E-014-S-50, @E-014-S-34, @E-014-S-35 | E-014-frontend-design-migration.feature | Covered — E-014-landing-auth-rebuild.steps.ts, E-014-price-calculator.steps.ts |
+
 ---
 
 ## Non-Functional Requirements
@@ -292,9 +304,10 @@ every public and protected route combination.
 | FR-NOTIFY | 13 | 12 | 0 | 1 | 92% |
 | FR-BILLING | 11 | 3 | 8 | 0 | 27% |
 | FR-MEET | 2 | 2 | 0 | 0 | 100% |
-| **Total FR** | **112** | **82** | **12** | **18** | **73%** |
+| FR-UI-DESIGN | 1 | 1 | 0 | 0 | 100% |
+| **Total FR** | **113** | **83** | **12** | **18** | **73%** |
 | NFR | 30 | 6 | 5 | 19 | 20% |
-| **Grand Total** | **142** | **88** | **17** | **37** | **62%** |
+| **Grand Total** | **143** | **89** | **17** | **37** | **62%** |
 
 ---
 

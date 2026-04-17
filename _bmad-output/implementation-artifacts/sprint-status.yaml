@@ -54,7 +54,7 @@ development_status:
   epic-1-retrospective: optional
 
   # Epic 2: User Registration, Auth & Onboarding
-  epic-2: in-progress
+  epic-2: done
   2-1-landing-page: done
   2-2-user-registration-with-email: done
   2-3-oauth-login: done
@@ -64,20 +64,20 @@ development_status:
   epic-2-retrospective: optional
 
   # Epic 3: Multi-Marketplace Scanning & Image Capture
-  epic-3: in-progress
+  epic-3: done
   3-1-craigslist-scraper: done
   3-2-ebay-browse-api-integration: done
   3-3-facebook-marketplace-scraper: done
-  3-4-mercari-scraper: review
+  3-4-mercari-scraper: done
   3-5-offerup-scraper: done
   3-6-search-configuration-filters: done
-  3-7-scraper-job-management-real-time-events: review
+  3-7-scraper-job-management-real-time-events: done
   3-8-listing-data-processing-deduplication: done
   3-9-image-capture-storage: done
   epic-3-retrospective: optional
 
   # Epic 4: Core Scoring & Deal Evaluation
-  epic-4: in-progress
+  epic-4: done
   4-1-algorithmic-value-score: done
   4-2-platform-specific-fees-opportunity-threshold: done
   4-3-llm-item-identification: done
@@ -87,7 +87,7 @@ development_status:
   epic-4-retrospective: optional
 
   # Epic 5: Advanced Market Intelligence
-  epic-5: in-progress
+  epic-5: done
   5-1-claude-sonnet-structural-analysis: done
   5-2-comparable-sold-item-matching: done
   5-3-sold-volume-demand-trend-analysis: done
@@ -96,7 +96,7 @@ development_status:
   epic-5-retrospective: optional
 
   # Epic 6: Flip Lifecycle Management & Analytics
-  epic-6: in-progress
+  epic-6: done
   6-1-dashboard-with-listings-stats: done
   6-2-kanban-board-with-lifecycle-tracking: done
   6-3-advanced-filtering: done
@@ -106,7 +106,7 @@ development_status:
   epic-6-retrospective: optional
 
   # Epic 7: Subscription & Billing
-  epic-7: in-progress
+  epic-7: done
   7-1-subscription-tier-enforcement-feature-gating: done
   7-2-stripe-checkout-customer-portal: done
   7-3-stripe-webhook-handling: done
@@ -114,7 +114,7 @@ development_status:
   epic-7-retrospective: optional
 
   # Epic 8: Seller Communication & Negotiation
-  epic-8: in-progress
+  epic-8: done
   8-1-ai-message-generation: done
   8-2-ai-negotiation-strategy: done
   8-3-message-inbox-thread-history: done
@@ -131,7 +131,7 @@ development_status:
   epic-9-retrospective: optional
 
   # Epic 10: Monitoring & Email Notifications
-  epic-10: in-progress
+  epic-10: done
   10-1-background-job-scheduler: done
   10-2-listing-monitoring-events: done
   10-3-flip-lifecycle-email-notifications: done
@@ -141,26 +141,45 @@ development_status:
   epic-10-retrospective: optional
 
   # Epic 11: Push & SMS Notifications (Phase 2)
-  epic-11: in-progress
+  epic-11: done
   11-1-fcm-push-notification-client: done
   11-2-twilio-sms-integration: done
   11-3-multi-channel-notification-preferences: done
   epic-11-retrospective: optional
 
   # Epic 12: Meeting & Logistics (Phase 2)
-  epic-12: in-progress
+  epic-12: done
   12-1-google-calendar-integration: done
   12-2-google-maps-route-generation: done
   epic-12-retrospective: optional
 
   # Epic 13: AI Scoring Algorithm Improvements
-  epic-13: in-progress
+  epic-13: done
   13-1-iqr-outlier-filtering-ebay-sold-prices: done
   13-2-structured-json-llm-response: done
   13-3-cache-invalidation-price-changes: done
   13-4-weighted-scoring-margin-plus-absolute-profit: done
   13-5-brand-regex-refinement: done
   13-6-demand-velocity-tier1-integration: done
-  13-7-collaborative-scoring-refinement-session: review
+  13-7-collaborative-scoring-refinement-session: done
   13-8-cross-platform-price-intelligence: done
   epic-13-retrospective: optional
+
+  # Epic 14: Frontend Design System Migration
+  # Source audit: docs/frontend-design-gaps.md (2026-04-17)
+  # Target: 100% canonical .fp-* compliance, eliminate competing theme system,
+  #         dark-first :root, shared state components, accessibility, file headers.
+  # Story 14.1 (foundation) blocks all others; 14.3 blocks pages consuming shared state;
+  # 14.10 is the final enforcement gate.
+  epic-14: in-progress
+  14-1-design-tokens-base-style-unification: done
+  14-2-remove-competing-multi-theme-system: done
+  14-3-shared-ui-state-components: done
+  14-4-landing-page-auth-pages-rebuild: review
+  14-5-onboarding-wizard-dark-migration: in-progress
+  14-6-pricecalculator-canonical-reference: review
+  14-7-opportunities-listings-messaging-migration: ready-for-dev
+  14-8-settings-component-polish: ready-for-dev
+  14-9-analytics-scraper-health-static-pages: backlog
+  14-10-accessibility-file-header-sweep: backlog
+  epic-14-retrospective: optional

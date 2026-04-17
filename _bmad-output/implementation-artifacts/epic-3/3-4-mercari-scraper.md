@@ -1,6 +1,6 @@
 # Story 3.4: Mercari Scraper
 
-Status: review
+Status: done
 Blocked: false
 Blocked-Reason:
 Trello-Card-ID: 69a42dca24e423a5ff1c029d
