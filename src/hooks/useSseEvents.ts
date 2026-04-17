@@ -110,6 +110,8 @@ export function useSseEvents<T = unknown>(
     // Register handlers for all tracked event types
     const typesToTrack: SseEventType[] = eventTypes ?? [
       'listing.found',
+      'job.started',
+      'job.progress',
       'job.complete',
       'job.failed',
       'opportunity.created',

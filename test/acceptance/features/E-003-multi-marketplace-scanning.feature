@@ -525,7 +525,7 @@ Feature: Multi-Marketplace Scanning & Image Capture
   # =================================================================
 
   # AC #1/#4: ScraperJob lifecycle (PENDING/RUNNING -> COMPLETED/FAILED)
-  @E-003-S-061 @FR-SCAN-08 @story-3-7 @wip
+  @E-003-S-061 @FR-SCAN-08 @story-3-7
   Scenario: ScraperJob is created and transitions through lifecycle states
     Given I am an authenticated user
     When I POST to "/api/scraper/craigslist" with a valid location and category
@@ -536,7 +536,7 @@ Feature: Multi-Marketplace Scanning & Image Capture
     And the job record should have a non-null "completedAt" timestamp
 
   # AC #4: Job transitions to FAILED on error
-  @E-003-S-062 @FR-SCAN-08 @story-3-7 @wip
+  @E-003-S-062 @FR-SCAN-08 @story-3-7
   Scenario: ScraperJob transitions to FAILED when an error occurs
     Given I am an authenticated user
     And the Craigslist page returns zero listings
@@ -546,7 +546,7 @@ Feature: Multi-Marketplace Scanning & Image Capture
     And the job record should include a non-null "errorMessage"
 
   # AC #2: SSE listing.found event emitted per listing
-  @E-003-S-063 @FR-SCAN-09 @story-3-7 @wip
+  @E-003-S-063 @FR-SCAN-09 @story-3-7
   Scenario: SSE listing.found events are emitted for each discovered listing
     Given I am an authenticated user connected to the SSE events stream
     When a scraping job is running on "CRAIGSLIST"
@@ -555,7 +555,7 @@ Feature: Multi-Marketplace Scanning & Image Capture
     And each "listing.found" event payload should include "jobId"
 
   # AC #3: SSE job.progress events at milestones
-  @E-003-S-064 @FR-SCAN-09 @story-3-7 @wip
+  @E-003-S-064 @FR-SCAN-09 @story-3-7
   Scenario: SSE job.progress events are emitted at progress milestones
     Given I am an authenticated user connected to the SSE events stream
     And a scraping job finds 20 total listings on "CRAIGSLIST"
@@ -566,7 +566,7 @@ Feature: Multi-Marketplace Scanning & Image Capture
     And duplicate events should not fire at milestones that overlap with interval checkpoints
 
   # AC #1: SSE job.started event emitted after job creation
-  @E-003-S-065 @FR-SCAN-08 @story-3-7 @wip
+  @E-003-S-065 @FR-SCAN-08 @story-3-7
   Scenario: SSE job.started event is emitted when a scrape begins
     Given I am an authenticated user connected to the SSE events stream
     When I initiate a scrape on "CRAIGSLIST"
@@ -575,7 +575,7 @@ Feature: Multi-Marketplace Scanning & Image Capture
     And the "status" field should be "RUNNING"
 
   # AC #4: SSE job.complete event emitted on success
-  @E-003-S-066 @FR-SCAN-08 @story-3-7 @wip
+  @E-003-S-066 @FR-SCAN-08 @story-3-7
   Scenario: SSE job.complete event is emitted when a scrape finishes successfully
     Given I am an authenticated user connected to the SSE events stream
     When a scraping job completes successfully on "CRAIGSLIST"
@@ -584,7 +584,7 @@ Feature: Multi-Marketplace Scanning & Image Capture
     And the "status" field should be "COMPLETED"
 
   # AC #4: SSE job.failed event emitted on failure
-  @E-003-S-067 @FR-SCAN-08 @story-3-7 @wip
+  @E-003-S-067 @FR-SCAN-08 @story-3-7
   Scenario: SSE job.failed event is emitted when a scrape fails
     Given I am an authenticated user connected to the SSE events stream
     When a scraping job fails due to a selector breakage on "CRAIGSLIST"
@@ -593,7 +593,7 @@ Feature: Multi-Marketplace Scanning & Image Capture
     And the "status" field should be "FAILED"
 
   # AC #5: Real-time progress indicator in scraper UI
-  @E-003-S-068 @FR-SCAN-09 @story-3-7 @wip
+  @E-003-S-068 @FR-SCAN-09 @story-3-7
   Scenario: Scraper page displays live progress indicator during scan
     Given I am authenticated and on the scraper page at "/scraper"
     When I submit a scrape request
@@ -604,7 +604,7 @@ Feature: Multi-Marketplace Scanning & Image Capture
     And the indicator border should change to green upon completion
 
   # Auth: Ownership validation on scraper-jobs [id] API
-  @E-003-S-069 @FR-SCAN-08 @story-3-7 @wip
+  @E-003-S-069 @FR-SCAN-08 @story-3-7
   Scenario: Unauthenticated requests to scraper-jobs [id] API are rejected
     Given I am not authenticated
     When I GET "/api/scraper-jobs/some-job-id"
@@ -615,7 +615,7 @@ Feature: Multi-Marketplace Scanning & Image Capture
     Then the response status should be 401
 
   # Auth: Cross-user job access prevention
-  @E-003-S-070 @FR-SCAN-08 @story-3-7 @wip
+  @E-003-S-070 @FR-SCAN-08 @story-3-7
   Scenario: Users cannot access scraper jobs belonging to other users
     Given I am authenticated as user "alice"
     And a scraper job exists belonging to user "bob"
@@ -627,7 +627,7 @@ Feature: Multi-Marketplace Scanning & Image Capture
     Then the response status should be 403
 
   # Auth: Legacy null-userId jobs remain accessible
-  @E-003-S-071 @FR-SCAN-08 @story-3-7 @wip
+  @E-003-S-071 @FR-SCAN-08 @story-3-7
   Scenario: Legacy scraper jobs with null userId are accessible by any authenticated user
     Given I am authenticated
     And a scraper job exists with a null userId (legacy record)

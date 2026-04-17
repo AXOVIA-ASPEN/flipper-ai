@@ -249,4 +249,21 @@ describe('useSseEvents', () => {
     unmount();
     expect(es.readyState).toBe(2); // CLOSED
   });
+
+  // Story 3.7: Verify the default typesToTrack includes job.started and job.progress.
+  // Without this, components calling useSseEvents() without explicit eventTypes
+  // would silently drop the new lifecycle events.
+  it('registers default handlers for job.started and job.progress', () => {
+    renderHook(() => useSseEvents());
+    const handlers = (
+      MockEventSource.instances[0] as unknown as {
+        listeners: Map<string, ESListener[]>;
+      }
+    ).listeners;
+    expect(handlers.has('job.started')).toBe(true);
+    expect(handlers.has('job.progress')).toBe(true);
+    expect(handlers.has('job.complete')).toBe(true);
+    expect(handlers.has('job.failed')).toBe(true);
+    expect(handlers.has('listing.found')).toBe(true);
+  });
 });

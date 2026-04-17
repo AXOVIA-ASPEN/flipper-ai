@@ -26,6 +26,41 @@ import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import UpgradePrompt from '@/components/UpgradePrompt';
 import type { SubscriptionTier } from '@/lib/subscription-tiers';
+import { useSseEvents } from '@/hooks/useSseEvents';
+import type { SseEventType } from '@/lib/sse-emitter';
+
+// Story 3.7: Stable reference outside component prevents EventSource reconnect loops.
+const SSE_EVENT_TYPES: SseEventType[] = [
+  'job.started',
+  'job.progress',
+  'job.complete',
+  'job.failed',
+  'listing.found',
+];
+
+interface SseListingFoundData {
+  jobId?: string;
+  platform?: string;
+  title?: string;
+  price?: number;
+  askingPrice?: number;
+  discount?: number;
+}
+
+interface SseJobProgressData {
+  jobId?: string;
+  platform?: string;
+  current?: number;
+  total?: number | null;
+  percentage?: number | null;
+  listingsFound?: number;
+}
+
+interface SseJobFailedData {
+  jobId?: string;
+  platform?: string;
+  errorMessage?: string;
+}
 
 interface ScrapedListing {
   title: string;
@@ -100,6 +135,11 @@ export default function ScraperPage() {
   const [maxPrice, setMaxPrice] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ScrapeResult | null>(null);
+
+  // Story 3.7: Real-time SSE subscription for job lifecycle events.
+  const { events: sseEvents, clearEvents: clearSseEvents } = useSseEvents({
+    eventTypes: SSE_EVENT_TYPES,
+  });
   const [tierLimitError, setTierLimitError] = useState<{
     message: string;
     currentTier: SubscriptionTier;
@@ -307,6 +347,7 @@ export default function ScraperPage() {
     setLoading(true);
     setResult(null);
     setTierLimitError(null);
+    clearSseEvents();
 
     // Determine API endpoint based on platform
     const apiEndpoint = platform === 'offerup' ? '/api/scraper/offerup' : '/api/scraper/craigslist';
@@ -407,12 +448,7 @@ export default function ScraperPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Animated background gradient orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 -left-4 w-96 h-96 bg-theme-orb-1 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div className="absolute top-0 -right-4 w-96 h-96 bg-theme-orb-2 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-20 w-96 h-96 bg-theme-orb-3 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
-      </div>
+      {/* FLIPPER-14-2 interim — theme orb divs deleted; fp-bg-mesh provides ambient glow. Replace during Story 14.9 rebuild */}
 
       {/* Header */}
       <header className="relative backdrop-blur-xl bg-white/10 border-b border-white/20 shadow-2xl sticky top-0 z-10">
@@ -656,6 +692,114 @@ export default function ScraperPage() {
             </button>
           </div>
         </form>
+
+        {/* Story 3.7: Real-time scrape progress indicator (SSE-driven) */}
+        {loading && (() => {
+          const platformUpper = platform.toUpperCase();
+          const platformEvents = sseEvents.filter(
+            (e) => {
+              const d = (e.data as { platform?: string })?.platform;
+              return !d || d === platformUpper;
+            }
+          );
+          const latestProgress = platformEvents.find((e) => e.type === 'job.progress');
+          const progressData = (latestProgress?.data as SseJobProgressData) || {};
+          const percentage = progressData.percentage ?? 0;
+          const current = progressData.current ?? 0;
+          const total = progressData.total ?? null;
+          const listingsFound = progressData.listingsFound ?? 0;
+          const complete = platformEvents.find((e) => e.type === 'job.complete');
+          const failed = platformEvents.find((e) => e.type === 'job.failed');
+          const liveListings = platformEvents
+            .filter((e) => e.type === 'listing.found')
+            .slice(0, 20);
+
+          let borderClass = 'border-white/20';
+          if (complete) borderClass = 'border-green-400/50';
+          else if (failed) borderClass = 'border-red-400/50';
+
+          const effectivePercentage = complete ? 100 : percentage;
+          const phaseLabel = platformEvents.length === 0
+            ? `Connecting to ${platformUpper}...`
+            : failed
+              ? 'Scan Failed'
+              : complete
+                ? 'Scan Complete!'
+                : `Scanning ${platformUpper}...`;
+
+          return (
+            <div
+              data-testid="scrape-progress-indicator"
+              className={`mt-6 backdrop-blur-xl bg-white/10 rounded-xl border ${borderClass} p-6 shadow-xl transition-colors duration-500`}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                {failed ? (
+                  <AlertCircle className="w-5 h-5 text-red-300" />
+                ) : complete ? (
+                  <CheckCircle className="w-5 h-5 text-green-300" />
+                ) : (
+                  <Loader2 className="w-5 h-5 animate-spin text-blue-300" />
+                )}
+                <span
+                  data-testid="scrape-progress-platform"
+                  className="font-medium text-white"
+                >
+                  {phaseLabel}
+                </span>
+              </div>
+
+              <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
+                <div
+                  data-testid="scrape-progress-bar"
+                  className={`h-full rounded-full transition-all duration-500 ease-out ${
+                    failed
+                      ? 'bg-gradient-to-r from-red-500 to-pink-500'
+                      : 'bg-gradient-to-r from-blue-500 to-cyan-400'
+                  }`}
+                  style={{ width: `${effectivePercentage}%` }}
+                />
+              </div>
+
+              <div className="mt-3 text-sm text-blue-200/70 flex flex-wrap gap-4">
+                <span data-testid="scrape-progress-percentage">
+                  {effectivePercentage}%
+                </span>
+                {total !== null && (
+                  <span>
+                    {current}/{total} processed
+                  </span>
+                )}
+                <span>{listingsFound} opportunities</span>
+              </div>
+
+              {failed && (
+                <p className="mt-3 text-sm text-red-300" data-testid="scrape-progress-error">
+                  {(failed.data as SseJobFailedData).errorMessage ?? 'Scrape failed'}
+                </p>
+              )}
+
+              {liveListings.length > 0 && (
+                <div className="mt-4 space-y-1" data-testid="scrape-progress-listings">
+                  <p className="text-xs uppercase tracking-wide text-blue-200/60 mb-2">
+                    Latest finds:
+                  </p>
+                  {liveListings.map((ev, idx) => {
+                    const d = ev.data as SseListingFoundData;
+                    const price = d.price ?? d.askingPrice;
+                    return (
+                      <div
+                        key={idx}
+                        className="text-sm text-white/90 truncate"
+                      >
+                        • {d.title ?? 'Listing'} {price !== undefined && `— $${price}`}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Save Config Dialog */}
         {showSaveDialog && (

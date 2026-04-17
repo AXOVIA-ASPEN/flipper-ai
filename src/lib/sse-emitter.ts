@@ -8,6 +8,8 @@
  *
  * Event types:
  *  - 'listing.found'       → New high-value listing discovered by a scraper
+ *  - 'job.started'         → Scraper job entered RUNNING state
+ *  - 'job.progress'        → Scraper job progress milestone (25/50/75% or every 5 items)
  *  - 'job.complete'        → Scraper job finished
  *  - 'job.failed'          → Scraper job failed
  *  - 'opportunity.created' → New flip opportunity identified
@@ -21,6 +23,8 @@
 
 export type SseEventType =
   | 'listing.found'
+  | 'job.started'
+  | 'job.progress'
   | 'job.complete'
   | 'job.failed'
   | 'opportunity.created'
@@ -31,6 +35,29 @@ export type SseEventType =
   | 'listing.expiring'
   | 'listing.unavailable'
   | 'ping';
+
+/**
+ * Returns true when a scraper processing-loop index should trigger a `job.progress`
+ * SSE emission. Fires every `interval` items (default 5) and at the 25/50/75% marks.
+ * Same index that hits both the interval and a percentage milestone still returns
+ * true only once — callers emit once per true value.
+ *
+ * @param current zero-based index of the just-processed listing
+ * @param total   total count of listings in the batch, or null when unknown
+ * @param interval emit-every-N interval (default 5)
+ */
+export function shouldEmitProgress(
+  current: number,
+  total: number | null,
+  interval: number = 5
+): boolean {
+  if ((current + 1) % interval === 0) return true;
+  if (total && total > 0) {
+    const pct = Math.round(((current + 1) / total) * 100);
+    if ([25, 50, 75].includes(pct)) return true;
+  }
+  return false;
+}
 
 export interface SseEvent<T = unknown> {
   type: SseEventType;
