@@ -184,6 +184,50 @@ const VALUE_KEYWORDS: ValueKeyword[] = [
     label: 'Premium outdoor apparel',
     tag: 'outdoor-apparel',
   },
+  // NEW BRANDS — added 2026-04-17 from Groq/Llama backtest (session #2 false negatives)
+  {
+    pattern: /\b(taylor|ovation|squier|epiphone|prs|ibanez)\b/i,
+    boost: 1.25,
+    label: 'Guitar brand',
+    tag: 'guitar-brand',
+    negativePatterns: [/taylor swift|taylor made|taylor series/i],
+  },
+  {
+    pattern: /\b(dbx|drawmer|panamax|furman)\b/i,
+    boost: 1.2,
+    label: 'Pro audio gear',
+    tag: 'pro-audio',
+  },
+  {
+    pattern: /\b(rtx|geforce|radeon|ryzen)\b/i,
+    boost: 1.2,
+    label: 'Gaming PC components',
+    tag: 'gaming-pc',
+  },
+  {
+    pattern: /\b(ping|cobra|taylormade|callaway|titleist)\b/i,
+    boost: 1.2,
+    label: 'Premium golf brand',
+    tag: 'premium-golf',
+  },
+  {
+    pattern: /\b(ubiquiti|unifi|amplifi)\b|netgear\s*nighthawk|\basus\s*zen\s*wifi/i,
+    boost: 1.15,
+    label: 'Premium network gear',
+    tag: 'premium-network',
+  },
+  {
+    pattern: /mid.?century|chippendale|eames|\bkartell\b|room\s*&?\s*board/i,
+    boost: 1.25,
+    label: 'Designer furniture style',
+    tag: 'designer-furniture',
+  },
+  {
+    pattern: /\b(greenlee|klein)\b/i,
+    boost: 1.2,
+    label: 'Professional trade tools',
+    tag: 'trade-tools',
+  },
   {
     pattern: /vintage|antique|retro/i,
     boost: 1.3, // Reduced from 1.4 — avoid runaway stacking with collectibles category
@@ -547,20 +591,20 @@ export function detectCategory(title: string, description: string | null): strin
   // (was ~36% of items landing in default — now catches phones by brand, watches, chromebooks, etc.)
   const categoryPatterns: [string, RegExp][] = [
     // Musical first - DJ equipment and instruments (before video games due to "controller")
-    ['musical', /guitar|piano|keyboard|drum|amplifier|instrument|\bdj\b|ddj|pioneer\s*ddj|saxophone|trumpet|violin|cello|\bbass\b|synth|synthesizer|\bmoog\b|\broland\b|\bkorg\b|\bakai\b|\bfender\b|\bgibson\b|\bmartin\b(?!\s+luther)|\bmarshall\b|mesa.?boogie|effects pedal|microphone|\bmic\b/],
+    ['musical', /guitar|piano|keyboard|drum|amplifier|instrument|\bdj\b|ddj|pioneer\s*ddj|saxophone|trumpet|violin|cello|\bbass\b|synth|synthesizer|\bmoog\b|\broland\b|\bkorg\b|\bakai\b|\bfender\b|\bgibson\b|\bmartin\b(?!\s+luther)|\bmarshall\b|mesa.?boogie|effects pedal|microphone|\bmic\b|\btaylor\b(?!\s+(swift|made))|\bovation\b|\bsquier\b|\bepiphone\b|\bibanez\b|\bprs\b|\bdbx\b|\bdrawmer\b|cajon|\bconga\b|pedals?\b/],
     // Video games next - consoles and gaming (before electronics due to "console", "controller")
     ['video games', /playstation|xbox|nintendo|\bgame\b|ps5|ps4|ps3|switch\b|\bwii\b|gamecube|atari|sega|retro console|arcade|joy-?con/],
     // Electronics - general tech items (expanded with brands + product types)
     [
       'electronics',
-      /phone|iphone|ipad|airpods|galaxy|pixel\b|oneplus|laptop|computer|chromebook|thinkpad|macbook|tablet|\btv\b|monitor|camera|dslr|speaker|headphone|earbud|sound ?bar|\bwatch\b|smartwatch|apple watch|tv mount|projector|printer|\bram\b|\bssd\b|hard drive|router|modem|wifi|keyboard\s+(mechanical|gaming|wireless)|mouse\s+(wireless|gaming)|beats|bose|sonos|jbl|canon|nikon|sony\b/,
+      /phone|iphone|ipad|airpods|galaxy|pixel\b|oneplus|laptop|computer|chromebook|thinkpad|macbook|tablet|\btv\b|monitor|camera|dslr|speaker|headphone|earbud|sound ?bar|\bwatch\b|smartwatch|apple watch|tv mount|projector|printer|\bram\b|\bssd\b|hard drive|router|modem|wifi|keyboard\s+(mechanical|gaming|wireless)|mouse\s+(wireless|gaming)|beats|bose|sonos|jbl|canon|nikon|sony\b|\brtx\b|\bgtx\b|geforce|radeon|\bimac\b|nighthawk|ubiquiti|unifi/,
     ],
-    ['furniture', /couch|sofa|table|chair|desk|\bbed\b|dresser|cabinet|shelf|bookcase|nightstand|ottoman|stool|bench\b|wardrobe|armoire|aeron|herman miller|steelcase|restoration hardware|pottery barn|west elm/],
+    ['furniture', /couch|sofa|table|chair|desk|\bbed\b|dresser|cabinet|shelf|bookcase|nightstand|ottoman|stool|bench\b|wardrobe|armoire|aeron|herman miller|steelcase|restoration hardware|pottery barn|west elm|mid.?century|chippendale|eames|\bkartell\b|room\s*&?\s*board/],
     ['appliances', /washer|dryer|refrigerator|fridge|dishwasher|microwave|oven|vacuum|blender|mixer|kitchenaid|vitamix|dyson|toaster|coffee ?maker|espresso|juicer|freezer|range\b|cooktop|stove|hood\b/],
-    ['tools', /drill|saw\b|wrench|hammer|power tool|dewalt|milwaukee|makita|snap.?on|ridgid|\brigid\b|craftsman|bosch|\bryobi\b|impact driver|miter|compressor|table saw|band saw|shop vac|tool set|tool box/],
+    ['tools', /drill|saw\b|wrench|hammer|power tool|dewalt|milwaukee|makita|snap.?on|ridgid|\brigid\b|craftsman|bosch|\bryobi\b|impact driver|miter|compressor|table saw|band saw|shop vac|tool set|tool box|greenlee|\bklein\b|chainsaw|generator|welder|grinder/],
     ['collectibles', /vintage|antique|collectible|rare|limited|comic|\bcard\b|coin|stamp\b|\btoy\b|figurine|statue|memorabilia|signed\b|autograph|baseball\s+card/],
     ['clothing', /shirt|pants|dress\b|shoes|jacket|coat\b|clothing|fashion|hoodie|sweater|boots?\b|sneakers|\bnike\b|adidas|north face|patagonia|\blevi\b/],
-    ['sports', /\bbike\b|bicycle|golf|tennis|fitness|\bgym\b|weights|treadmill|peloton|rowing|elliptical|kayak|\bski\b|snowboard|surfboard|helmet|football|basketball|soccer|baseball\s+(bat|glove)/],
+    ['sports', /\bbike\b|bicycle|golf|tennis|fitness|\bgym\b|weights|treadmill|peloton|rowing|elliptical|kayak|\bski\b|snowboard|surfboard|helmet|football|basketball|soccer|baseball\s+(bat|glove)|\bping\b\s*(zing|anser|g\d|i\d)|cobra\s*king|taylormade|callaway|titleist|\bbow\b\s*(hunting|compound|archery)/],
     ['automotive', /\bcar\b|truck|motorcycle|auto ?parts|\btire\b|wheel\b|engine\b|brake\b|exhaust|muffler|battery charger|floor jack/],
   ];
 

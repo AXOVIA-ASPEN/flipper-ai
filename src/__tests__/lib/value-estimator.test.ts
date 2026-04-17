@@ -255,6 +255,57 @@ describe('Value Estimator', () => {
 
       // --- End negative pattern tests ---
 
+      // --- Session 2 brand boost tests (Story 13.7, 2026-04-17) ---
+
+      it('should boost for Taylor guitar (not Taylor Swift)', () => {
+        const guitarResult = estimateValue('Taylor 214ce Acoustic Guitar', null, 500, 'good', 'musical');
+        expect(guitarResult.tags).toContain('guitar-brand');
+
+        const swiftResult = estimateValue('Taylor Swift concert tickets', null, 200, 'new', 'default');
+        expect(swiftResult.tags).not.toContain('guitar-brand');
+      });
+
+      it('should boost for Ibanez/Squier/Epiphone/PRS guitars', () => {
+        expect(estimateValue('Ibanez RG550', null, 400, 'good', 'musical').tags).toContain('guitar-brand');
+        expect(estimateValue('Squier Stratocaster', null, 200, 'good', 'musical').tags).toContain('guitar-brand');
+        expect(estimateValue('Epiphone Les Paul', null, 300, 'good', 'musical').tags).toContain('guitar-brand');
+        expect(estimateValue('PRS Custom 24', null, 1000, 'excellent', 'musical').tags).toContain('guitar-brand');
+      });
+
+      it('should boost for pro audio gear (DBX, Drawmer, Panamax, Furman)', () => {
+        expect(estimateValue('DBX 166XL Compressor', null, 200, 'good', 'musical').tags).toContain('pro-audio');
+        expect(estimateValue('Furman power conditioner', null, 100, 'good', 'musical').tags).toContain('pro-audio');
+      });
+
+      it('should boost for gaming PC components (RTX, Radeon, Ryzen)', () => {
+        expect(estimateValue('RTX 4070 graphics card', null, 400, 'good', 'electronics').tags).toContain('gaming-pc');
+        expect(estimateValue('Ryzen 7 7800X3D processor', null, 300, 'new', 'electronics').tags).toContain('gaming-pc');
+        expect(estimateValue('Radeon RX 7900 XTX', null, 600, 'good', 'electronics').tags).toContain('gaming-pc');
+      });
+
+      it('should boost for premium golf brands (PING, Cobra, TaylorMade, Callaway, Titleist)', () => {
+        expect(estimateValue('PING G430 driver', null, 300, 'good', 'sports').tags).toContain('premium-golf');
+        expect(estimateValue('Callaway Paradym irons', null, 500, 'good', 'sports').tags).toContain('premium-golf');
+        expect(estimateValue('Titleist Pro V1 golf balls', null, 40, 'new', 'sports').tags).toContain('premium-golf');
+      });
+
+      it('should boost for premium network gear (Ubiquiti, UniFi, Nighthawk)', () => {
+        expect(estimateValue('Ubiquiti UniFi AP', null, 150, 'good', 'electronics').tags).toContain('premium-network');
+        expect(estimateValue('Netgear Nighthawk router', null, 200, 'good', 'electronics').tags).toContain('premium-network');
+      });
+
+      it('should boost for designer furniture (mid-century, Eames, Kartell)', () => {
+        expect(estimateValue('Mid-century modern credenza', null, 400, 'good', 'furniture').tags).toContain('designer-furniture');
+        expect(estimateValue('Eames lounge chair replica', null, 800, 'good', 'furniture').tags).toContain('designer-furniture');
+      });
+
+      it('should boost for professional trade tools (Greenlee, Klein)', () => {
+        expect(estimateValue('Greenlee wire puller', null, 150, 'good', 'tools').tags).toContain('trade-tools');
+        expect(estimateValue('Klein pliers set', null, 80, 'good', 'tools').tags).toContain('trade-tools');
+      });
+
+      // --- End Session 2 brand boost tests ---
+
       it('should set high confidence when value keywords match and no risks', () => {
         const result = estimateValue(
           'Apple MacBook Pro',
