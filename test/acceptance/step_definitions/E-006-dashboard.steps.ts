@@ -236,8 +236,12 @@ Then('it renders a Total Listings stat card', function () {
 
 Then('it renders an Opportunities Found stat card', function () {
   const content: string = this.fileContent;
-  if (!content.includes('Opportunities Found')) {
-    throw new Error('Expected "Opportunities Found" stat card in dashboard');
+  // Accept either the literal label "Opportunities Found" or the canonical
+  // shortened label "Opportunities" backed by the opportunitiesFound stat field.
+  const hasLabel = content.includes('Opportunities Found') ||
+    (content.includes('>Opportunities<') && content.includes('opportunitiesFound'));
+  if (!hasLabel) {
+    throw new Error('Expected "Opportunities Found" (or "Opportunities" + opportunitiesFound stat) in dashboard');
   }
 });
 

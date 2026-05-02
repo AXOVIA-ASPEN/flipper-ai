@@ -302,7 +302,7 @@ export function sortByOpportunity(listings: AnalyzedListing[]): AnalyzedListing[
  * Formats an analyzed listing for API response/database storage
  */
 export function formatForStorage(listing: AnalyzedListing): Record<string, unknown> {
-  const { sellabilityAnalysis, verifiedPrice } = listing;
+  const { sellabilityAnalysis, verifiedPrice, llmIdentification } = listing;
 
   return {
     // Basic info
@@ -395,7 +395,12 @@ export function formatForStorage(listing: AnalyzedListing): Record<string, unkno
     // Claude Tier 2 takes priority; fall back to sellability confidence/reasoning (Story 5.1)
     analysisConfidence: listing.claudeAnalysis?.confidence ?? sellabilityAnalysis?.confidence ?? null,
     analysisReasoning: listing.claudeAnalysis?.reasoning ?? sellabilityAnalysis?.reasoning ?? null,
-    llmAnalyzed: sellabilityAnalysis != null,
+    // Story 4.3: LLM-derived identification fields persisted from llmIdentification
+    identifiedBrand: llmIdentification?.brand ?? null,
+    identifiedModel: llmIdentification?.model ?? null,
+    identifiedVariant: llmIdentification?.variant ?? null,
+    identifiedCondition: llmIdentification?.condition ?? null,
+    llmAnalyzed: sellabilityAnalysis != null || llmIdentification != null,
     analysisDate: sellabilityAnalysis ? new Date() : null,
   };
 }

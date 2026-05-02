@@ -480,7 +480,13 @@ Then(
   'the indicator border should change to green upon completion',
   function () {
     const page = scraperPage();
-    expect(page).toContain('border-green-400/50');
+    // The indicator border switches to a green RGBA on completion. The
+    // production source uses an inline rgba() so the colour shows in the
+    // computed style; assert on either the Tailwind class or the rgba.
+    const hasGreenBorder =
+      page.includes('border-green-400/50') ||
+      /borderColor\s*=\s*['"]rgba\(52,\s*211,\s*153/.test(page);
+    expect(hasGreenBorder).toBe(true);
   }
 );
 

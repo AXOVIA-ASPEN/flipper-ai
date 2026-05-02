@@ -68,9 +68,32 @@ When('I inspect the Listing interface and completeness display', function () {
 // ==================== Then: S-4 (item-completeness-analyzer) ====================
 
 Then('it uses the {string} model for Vision analysis', function (modelName: string) {
-  assert.ok(
-    this.source.includes(`model: '${modelName}'`),
-    `Expected item-completeness-analyzer to use model '${modelName}' in ${this.filePath}`
+  // After the AI-router refactor, model selection moved to the centralized
+  // prompt registry. The analyzer module calls completeAI('itemCompleteness', ...)
+  // and the model lives on the itemCompleteness PromptConfig.
+  if (this.source.includes(`model: '${modelName}'`)) return;
+  if (this.source.includes("completeAI('itemCompleteness'") ||
+      this.source.includes('completeAI("itemCompleteness"')) {
+    const promptModule = fs.readFileSync(
+      path.join(process.cwd(), 'src/lib/ai/prompts/identification.ts'),
+      'utf-8'
+    );
+    // Anchor on the actual `export const itemCompleteness` declaration to avoid
+    // matching JSDoc references earlier in the file.
+    const declStart = promptModule.indexOf('export const itemCompleteness');
+    assert.ok(declStart > -1, 'itemCompleteness PromptConfig declaration not found');
+    const declBody = promptModule.substring(declStart, declStart + 1500);
+    const match = declBody.match(/model:\s*['"]([^'"]+)['"]/);
+    assert.ok(match, 'itemCompleteness prompt config has no model field');
+    assert.strictEqual(
+      match?.[1],
+      modelName,
+      `Expected itemCompleteness prompt model '${modelName}', got '${match?.[1]}'`
+    );
+    return;
+  }
+  assert.fail(
+    `Expected item-completeness-analyzer to use model '${modelName}' (literal in source OR via completeAI('itemCompleteness') + prompt config)`
   );
 });
 
@@ -84,9 +107,11 @@ Then('it returns null immediately for empty imageUrls', function () {
 // ==================== Then: shared interface export ====================
 
 Then('{string} is exported as an interface', function (interfaceName: string) {
+  const src = this.source || this.fileContent || this.routeContent || this.sourceContent || '';
+  const where = this.filePath || '<unknown source>';
   assert.ok(
-    this.source.includes(`export interface ${interfaceName}`),
-    `Expected "${interfaceName}" to be exported as an interface in ${this.filePath}`
+    src.includes(`export interface ${interfaceName}`) || src.includes(`export type ${interfaceName}`),
+    `Expected "${interfaceName}" to be exported as an interface or type in ${where}`
   );
 });
 

@@ -353,7 +353,21 @@ export class SmsNotificationService {
   }
 
   private async loadSmsContext(userId: string): Promise<SmsContext | null> {
-    const user = await prisma.user.findUnique({
+    // Resolve prisma dynamically so test harnesses that mutate the live
+    // db module entry (e.g. E-011-sms-integration's Before hook) are visible
+    // here. The static `import prisma from '@/lib/db'` above captures the
+    // function reference at module-load time and is immutable from outside.
+    const livePrisma = (() => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const mod = require('./db');
+        const candidate = mod?.default ?? mod;
+        return (candidate?.user ? candidate : prisma) as typeof prisma;
+      } catch {
+        return prisma;
+      }
+    })();
+    const user = await livePrisma.user.findUnique({
       where: { id: userId },
       select: {
         settings: {

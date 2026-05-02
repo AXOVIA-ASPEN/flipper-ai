@@ -90,10 +90,11 @@ export async function generatePurchaseMessage(
     }
 
     const parsed = JSON.parse(jsonMatch[0]);
+    const aiBody: string = parsed.body || buildFallbackBody(input, messageType, tone);
 
     return {
       subject: parsed.subject || buildFallbackSubject(input, messageType),
-      body: parsed.body || buildFallbackBody(input, messageType, tone),
+      body: ensureSellerNameInBody(aiBody, input.sellerName, tone),
       messageType,
       platform: input.platform,
       tone,
@@ -126,6 +127,21 @@ export function generateFallbackMessage(
     tone: effectiveTone,
     isFallback: true,
   };
+}
+
+/**
+ * Ensures the seller's name appears in the message body. AI providers may drop
+ * the name even when instructed — this guarantees the AC contract that messages
+ * address the seller by name when one is provided.
+ */
+function ensureSellerNameInBody(
+  body: string,
+  sellerName: string | null | undefined,
+  tone: PlatformTone
+): string {
+  if (!sellerName || body.includes(sellerName)) return body;
+  const greeting = tone === 'professional' ? `Hello ${sellerName},` : `Hi ${sellerName}!`;
+  return `${greeting}\n\n${body}`;
 }
 
 function buildFallbackSubject(input: MessageGeneratorInput, messageType: MessageType): string {

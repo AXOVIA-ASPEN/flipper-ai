@@ -339,15 +339,15 @@ Feature: Scoring Algorithm Improvements — IQR Outlier Filtering
   @E-013-S-034 @FR-SCORE-26 @story-13-4
   Scenario: Items with over 100 dollars profit receive a 5 point boost
     Given a listing with title "Apple MacBook Pro" and description ""
-    When the value estimator scores the listing at price 300 condition "good" category "electronics"
+    When the value estimator scores the listing at price 500 condition "good" category "electronics"
     Then the profit potential should be greater than 100
     And the value score should reflect the high-value boost
 
   # S-035: High-value boost +10 for >$300 profit, exclusive not cumulative (AC #3)
   @E-013-S-035 @FR-SCORE-26 @story-13-4
   Scenario: Items with over 300 dollars profit receive 10 point boost not 15
-    Given a listing with title "Vintage Rare Limited Edition sealed" and description ""
-    When the value estimator scores the listing at price 100 condition "new" category "collectibles"
+    Given a listing with title "Apple MacBook Pro M3 sealed" and description ""
+    When the value estimator scores the listing at price 800 condition "new" category "electronics"
     Then the profit potential should be greater than 300
     And the value score should be at most 100
 

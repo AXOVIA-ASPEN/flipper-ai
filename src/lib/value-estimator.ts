@@ -587,6 +587,15 @@ Thanks!`;
 export function detectCategory(title: string, description: string | null): string {
   const fullText = `${title} ${description || ''}`.toLowerCase();
 
+  // Priority override: an explicit "vintage|antique|collectible" marker
+  // promotes the listing to "collectibles" even when a category-specific
+  // noun (e.g. "dresser", "lamp") would otherwise match furniture/etc.
+  // Real antique furniture is sold as collectibles, not generic furniture.
+  if (/\b(antique|collectible|memorabilia|figurine)\b/i.test(fullText) ||
+      (/\bvintage\b/i.test(fullText) && /\b(19\d{0,2}0s?|antique|rare|limited|signed|autograph)\b/i.test(fullText))) {
+    return 'collectibles';
+  }
+
   // Patterns expanded 2026-04-15 via Story 13.7 refinement to reduce "other" misclassification
   // (was ~36% of items landing in default — now catches phones by brand, watches, chromebooks, etc.)
   const categoryPatterns: [string, RegExp][] = [

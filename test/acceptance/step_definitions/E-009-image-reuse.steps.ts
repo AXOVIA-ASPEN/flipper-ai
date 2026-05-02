@@ -22,6 +22,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import {
   registerPoster,
+  imageCaptureOverrides,
   type PlatformPoster,
   type PostingResult,
   type ListingWithImages,
@@ -162,10 +163,12 @@ function installPrismaStubs(): void {
         where,
         take,
         orderBy,
+        include,
       }: {
         where: Record<string, unknown>;
         take?: number;
         orderBy?: { createdAt: 'asc' | 'desc' };
+        include?: { listing?: { include?: { images?: { orderBy?: { imageIndex?: 'asc' | 'desc' } } } } };
       }) => {
         s94.findManyCallCount += 1;
         let results = s94.items.filter((i) => matchesWhere(i, where));
@@ -175,6 +178,20 @@ function installPrismaStubs(): void {
           );
         }
         if (take !== undefined) results = results.slice(0, take);
+        // Honor the eager-load contract: when callers ask for
+        // `include: { listing: { include: { images: { orderBy: { imageIndex: 'asc' } } } } }`
+        // we must return the listing.images sorted by imageIndex (matching real Prisma).
+        const imagesOrder = include?.listing?.include?.images?.orderBy?.imageIndex;
+        if (imagesOrder) {
+          const dir = imagesOrder === 'asc' ? 1 : -1;
+          results = results.map((item) => ({
+            ...item,
+            listing: {
+              ...item.listing,
+              images: [...item.listing.images].sort((a, b) => (a.imageIndex - b.imageIndex) * dir),
+            },
+          }));
+        }
         return results;
       },
       findUnique: async ({ where: { id } }: { where: { id: string } }) =>
@@ -233,35 +250,36 @@ function stubImageCapture(
   behavior: 'ok' | 'throw' = 'ok'
 ): void {
   // Preserve originals only once so a subsequent scenario can re-install.
+  // We override via the processor's `imageCaptureOverrides` indirection layer
+  // because tsx/cjs creates immutable getter-defined namespace exports — direct
+  // mutation of the `imageCapture.*` namespace silently fails.
   if (!s94.originalCaptureListingImages) {
-    s94.originalCaptureListingImages = imageCapture.captureListingImages;
-    s94.originalSaveImageMetadata = imageCapture.saveImageMetadata;
+    s94.originalCaptureListingImages = imageCaptureOverrides.captureListingImages;
+    s94.originalSaveImageMetadata = imageCaptureOverrides.saveImageMetadata;
   }
-  (imageCapture as unknown as Record<string, unknown>).captureListingImages =
-    async (
-      listingId: string,
-      userId: string,
-      platform: string,
-      urls: string[]
-    ) => {
-      s94.captureCallCount += 1;
-      if (behavior === 'throw') {
-        throw new Error('Legacy CDN returned 404');
-      }
-      return {
-        captured: Array.from({ length: capturedCount }, (_, i) => ({
-          originalUrl: urls[i] ?? `https://orig/${i}.jpg`,
-          storagePath: `${userId}/${platform}/${listingId}/${i}.jpg`,
-          storageUrl: `https://fb.storage/${userId}/${platform}/${listingId}/${i}.jpg`,
-          fileSize: 1024,
-          contentType: 'image/jpeg',
-          imageIndex: i,
-        })),
-        failed: [],
-      };
+  imageCaptureOverrides.captureListingImages = (async (
+    listingId: string,
+    userId: string,
+    platform: string,
+    urls: string[]
+  ) => {
+    s94.captureCallCount += 1;
+    if (behavior === 'throw') {
+      throw new Error('Legacy CDN returned 404');
+    }
+    return {
+      captured: Array.from({ length: capturedCount }, (_, i) => ({
+        originalUrl: urls[i] ?? `https://orig/${i}.jpg`,
+        storagePath: `${userId}/${platform}/${listingId}/${i}.jpg`,
+        storageUrl: `https://fb.storage/${userId}/${platform}/${listingId}/${i}.jpg`,
+        fileSize: 1024,
+        contentType: 'image/jpeg',
+        imageIndex: i,
+      })),
+      failed: [],
     };
-  (imageCapture as unknown as Record<string, unknown>).saveImageMetadata =
-    async () => undefined;
+  }) as unknown as typeof imageCapture.captureListingImages;
+  imageCaptureOverrides.saveImageMetadata = (async () => undefined) as unknown as typeof imageCapture.saveImageMetadata;
 }
 
 // ── Given steps ──────────────────────────────────────────────────────────────

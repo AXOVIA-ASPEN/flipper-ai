@@ -35,11 +35,15 @@ export function applySecurityHeaders(response: NextResponse): NextResponse {
 /* istanbul ignore next -- module-level env var; ?? branch depends on runtime env */
 const ALLOWED_ORIGINS = new Set((process.env.ALLOWED_ORIGINS ?? '').split(',').filter(Boolean));
 
-// Always allow same-origin and localhost in dev
+// Always allow same-origin and localhost in dev. The project standard dev port
+// is 3200 (next dev -p 3200) — keep 3000 listed for backwards compatibility
+// with any tooling that still defaults to it.
 /* istanbul ignore next -- production branch not exercised in test environment */
 if (process.env.NODE_ENV !== 'production') {
   ALLOWED_ORIGINS.add('http://localhost:3000');
   ALLOWED_ORIGINS.add('http://127.0.0.1:3000');
+  ALLOWED_ORIGINS.add('http://localhost:3200');
+  ALLOWED_ORIGINS.add('http://127.0.0.1:3200');
 }
 
 export function getCorsHeaders(origin: string | null): Record<string, string> {

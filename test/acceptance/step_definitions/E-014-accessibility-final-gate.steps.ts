@@ -305,13 +305,12 @@ Then(
     attr: string,
     expected: string
   ) {
-    const value = await this.page.evaluate(
-      ([t, a]) => {
-        const el = document.querySelector(`[data-testid="${t}"]`);
-        return el?.getAttribute(a) ?? null;
-      },
-      [testid, attr]
-    );
+    // Wait for the element to appear — pages that gate render on Firebase auth
+    // briefly show only a loading spinner before hydration. Without this wait,
+    // the querySelector below returns null and the assertion fires "null !== polite".
+    const locator = this.page.locator(`[data-testid="${testid}"]`).first();
+    await expect(locator).toBeVisible({ timeout: 15000 });
+    const value = await locator.getAttribute(attr);
     expect(value).toBe(expected);
   }
 );
@@ -489,14 +488,51 @@ Then(
 When(
   'I press Tab repeatedly until a button receives focus',
   async function (this: CustomWorld) {
+    // Wait for the wizard layout to be hydrated before tabbing — pages gated
+    // on a fetch (e.g. /onboarding loads /api/user/onboarding before rendering
+    // the wizard) initially show only a loading spinner with no focusable
+    // buttons, so tabs would just cycle through the auth nav.
+    const wizardReady = this.page.locator('button, [role="button"]').first();
+    await wizardReady.waitFor({ state: 'attached', timeout: 15000 }).catch(() => undefined);
+
+    // A real keyboard user activates the skip-link if focus lands on it first,
+    // jumping straight into the main content. Without that step, the loop can
+    // burn its budget on the auth nav links.
+    const firstTag = await this.page.evaluate(() => document.activeElement?.tagName ?? null);
+    if (firstTag === 'A') {
+      const isSkipLink = await this.page.evaluate(() => {
+        const el = document.activeElement as HTMLAnchorElement | null;
+        if (!el) return false;
+        const text = (el.textContent || '').toLowerCase();
+        const href = el.getAttribute('href') || '';
+        return /skip\s+to/.test(text) || href.startsWith('#main') || href.startsWith('#content');
+      });
+      if (isSkipLink) {
+        await this.page.keyboard.press('Enter');
+        await this.page.keyboard.press('Tab');
+      }
+    }
     // Bound the loop so a misconfigured page can't hang the suite.
-    for (let i = 0; i < 20; i++) {
-      const tag = await this.page.evaluate(() => document.activeElement?.tagName ?? null);
-      if (tag === 'BUTTON') return;
+    // Accept anything semantically interactive as a button: <button>, role=button,
+    // or input type=button/submit — the wizard uses native buttons today, but the
+    // contract is "a button receives focus", not specifically a <button> tag.
+    for (let i = 0; i < 30; i++) {
+      const interactive = await this.page.evaluate(() => {
+        const el = document.activeElement as HTMLElement | null;
+        if (!el) return false;
+        if (el.tagName === 'BUTTON') return true;
+        if (el.getAttribute('role') === 'button') return true;
+        if (el.tagName === 'INPUT') {
+          const t = (el as HTMLInputElement).type;
+          return t === 'button' || t === 'submit';
+        }
+        return false;
+      });
+      if (interactive) return;
       await this.page.keyboard.press('Tab');
     }
     const finalTag = await this.page.evaluate(() => document.activeElement?.tagName ?? null);
-    throw new Error(`No <button> received focus after 20 Tab presses (last: ${finalTag})`);
+    throw new Error(`No <button> received focus after 30 Tab presses (last: ${finalTag})`);
   }
 );
 

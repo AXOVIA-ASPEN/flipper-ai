@@ -73,9 +73,31 @@ When('I inspect the logistics display implementation', function () {
 // ==================== Then: S-18 (logistics-classifier) ====================
 
 Then('it uses the {string} model for logistics classification', function (modelName: string) {
-  assert.ok(
-    this.source.includes(`'${modelName}'`),
-    `Expected logistics-classifier to use model '${modelName}' in ${this.filePath}`
+  // After the AI-router refactor, the logistics-classifier delegates model
+  // selection to the centralized prompt registry. Accept either a literal
+  // model string in the source or the prompt-config model declared in
+  // src/lib/ai/prompts/identification.ts under `logisticsClassification`.
+  if (this.source.includes(`'${modelName}'`)) return;
+  if (this.source.includes("completeAI('logisticsClassification'") ||
+      this.source.includes('completeAI("logisticsClassification"')) {
+    const promptModule = fs.readFileSync(
+      path.join(process.cwd(), 'src/lib/ai/prompts/identification.ts'),
+      'utf-8'
+    );
+    const declStart = promptModule.indexOf('export const logisticsClassification');
+    assert.ok(declStart > -1, 'logisticsClassification PromptConfig declaration not found');
+    const declBody = promptModule.substring(declStart, declStart + 1500);
+    const match = declBody.match(/model:\s*['"]([^'"]+)['"]/);
+    assert.ok(match, 'logisticsClassification prompt config has no model field');
+    assert.strictEqual(
+      match?.[1],
+      modelName,
+      `Expected logisticsClassification prompt model '${modelName}', got '${match?.[1]}'`
+    );
+    return;
+  }
+  assert.fail(
+    `Expected logistics-classifier to use model '${modelName}' (literal in source OR via completeAI('logisticsClassification') + prompt config)`
   );
 });
 
@@ -174,45 +196,10 @@ Then('it has a safe default fallback that never throws', function () {
 });
 
 // ==================== Then: S-22 (scraper routes wiring) ====================
-
-Then('the eBay route calls {string}', function (fnName: string) {
-  assert.ok(
-    this.source.includes(fnName),
-    `Expected eBay route to call "${fnName}"`
-  );
-});
-
-Then('the Craigslist route at {string} calls {string}', function (filePath: string, fnName: string) {
-  const src = readSource(filePath);
-  assert.ok(
-    src.includes(fnName),
-    `Expected Craigslist route to call "${fnName}" in ${filePath}`
-  );
-});
-
-Then('the Facebook route at {string} calls {string}', function (filePath: string, fnName: string) {
-  const src = readSource(filePath);
-  assert.ok(
-    src.includes(fnName),
-    `Expected Facebook route to call "${fnName}" in ${filePath}`
-  );
-});
-
-Then('the Mercari route at {string} calls {string}', function (filePath: string, fnName: string) {
-  const src = readSource(filePath);
-  assert.ok(
-    src.includes(fnName),
-    `Expected Mercari route to call "${fnName}" in ${filePath}`
-  );
-});
-
-Then('the OfferUp route at {string} calls {string}', function (filePath: string, fnName: string) {
-  const src = readSource(filePath);
-  assert.ok(
-    src.includes(fnName),
-    `Expected OfferUp route to call "${fnName}" in ${filePath}`
-  );
-});
+// Note: Then('the {Platform} route at/calls {string}') for eBay/Craigslist/
+// Facebook/Mercari/OfferUp are owned by E-005-claude-analyzer.steps.ts.
+// They read source from path parameter or `this.ebaySource`, which is set
+// by Given('the eBay scraper route at {string}') in claude-analyzer.
 
 // ==================== Then: S-23 (UI logistics display) ====================
 

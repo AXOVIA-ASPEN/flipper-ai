@@ -192,6 +192,29 @@ Before({ tags: '@story-11-2' }, async function () {
   state.notifyThrew = fresh.notifyThrew;
   state.lastPlaintextCode = fresh.lastPlaintextCode;
 
+  // Defense-in-depth: an earlier step file (E-007 stripe webhook) injects its
+  // own narrow `prisma` mock into the require cache that only exposes
+  // `user.updateMany`. If sms-notification-service captured THAT module
+  // reference at first import, our @story-11-2 mock here would be unreachable.
+  // Mutate the live module exports so `prisma.user.findUnique` is wired to our
+  // state-backed stub regardless of which mock the consumer captured first.
+  /* eslint-disable @typescript-eslint/no-require-imports */
+  try {
+    const dbModule = require('../../../src/lib/db');
+    const liveDb = dbModule.default ?? dbModule;
+    liveDb.user = liveDb.user ?? {};
+    liveDb.user.findUnique = async () => ({ settings: { ...state.settings } });
+    liveDb.userSettings = liveDb.userSettings ?? {};
+    liveDb.userSettings.findUnique = async () => ({ ...state.settings });
+    liveDb.userSettings.update = async (args: { data: Partial<typeof state.settings> }) => {
+      Object.assign(state.settings, args.data);
+      return { ...state.settings };
+    };
+  } catch {
+    // If the module isn't cached yet, the original injectMockModule above is sufficient.
+  }
+  /* eslint-enable @typescript-eslint/no-require-imports */
+
   stubSmsService = buildStubSmsService();
   service = new SmsNotificationService(stubSmsService);
 });

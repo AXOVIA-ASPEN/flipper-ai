@@ -154,10 +154,12 @@ Then('it renders guidance text directing the user to the Opportunities page', fu
 });
 
 Then('it renders a link to {string} labelled {string}', function (href: string, label: string) {
-  assert.ok(
-    currentFileContent.includes(`href="${href}"`),
-    `Expected href="${href}" link in analytics page`
-  );
+  // Accept either a literal `<a href="..."` element or a component prop
+  // wiring like `href: '...'` (used by shared EmptyState action prop).
+  const hasHref = currentFileContent.includes(`href="${href}"`) ||
+    currentFileContent.includes(`href: '${href}'`) ||
+    currentFileContent.includes(`href: "${href}"`);
+  assert.ok(hasHref, `Expected href="${href}" (or href: '${href}') in analytics page`);
   assert.ok(
     currentFileContent.includes(label),
     `Expected link label "${label}" in analytics page`

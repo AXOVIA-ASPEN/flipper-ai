@@ -156,12 +156,21 @@ Then('the error code should be {string}', async function (this: CustomWorld, cod
 Given('I am not logged in', async function (this: CustomWorld) {
   // Clear any session cookies
   await this.page.context().clearCookies();
+  // Navigate to a same-origin public page so subsequent page.evaluate(fetch())
+  // runs in a real document context (otherwise about:blank → "Failed to fetch").
+  await this.page.goto(`${BASE_URL}/login`).catch(() => undefined);
 });
 
 When('I send a GET to {string}', async function (this: CustomWorld, endpoint: string) {
+  // Ensure the page is on a same-origin document before issuing fetch from it.
+  if (this.page.url() === 'about:blank' || !this.page.url().startsWith(BASE_URL)) {
+    await this.page.goto(`${BASE_URL}/login`).catch(() => undefined);
+  }
   const response = await this.page.evaluate(async (url: string) => {
     const res = await fetch(url);
-    return { status: res.status, body: await res.json() };
+    let body: unknown = null;
+    try { body = await res.json(); } catch { body = null; }
+    return { status: res.status, body };
   }, `${BASE_URL}${endpoint}`);
   this.lastResponse = response;
 });

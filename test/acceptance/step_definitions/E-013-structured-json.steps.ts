@@ -41,10 +41,16 @@ Given(
 When(
   'I inspect the analyzeSellability OpenAI call configuration',
   function () {
-    // Extract the analyzeSellability function body
+    // After the AI-router refactor, analyzeSellability calls completeAI('flipAnalysis', ...)
+    // and JSON mode is configured by the prompt registry + threaded through providers.
+    // Verify both layers: the prompt config marks the task as JSON, and the OpenAI
+    // provider translates that to native response_format.
     const fnStart = this.sourceContent.indexOf('export async function analyzeSellability');
     assert(fnStart > -1, 'analyzeSellability function not found');
     this.fnBody = this.sourceContent.substring(fnStart);
+
+    this.flipAnalysisPromptSource = readSourceFile('src/lib/ai/prompts/flip-analysis.ts');
+    this.openaiProviderSource = readSourceFile('src/lib/ai/providers/openai.ts');
   }
 );
 
@@ -53,9 +59,20 @@ When(
 Then(
   'it should include response_format with type {string}',
   function (formatType: string) {
+    // analyzeSellability must route through completeAI('flipAnalysis', ...)
     assert(
-      this.fnBody.includes(`response_format: { type: '${formatType}' }`),
-      `Expected response_format: { type: '${formatType}' } in analyzeSellability`
+      this.fnBody.includes("completeAI('flipAnalysis'"),
+      'Expected analyzeSellability to call completeAI(\'flipAnalysis\', ...) — refactored AI router'
+    );
+    // The flipAnalysis prompt config must declare JSON response format
+    assert(
+      /flipAnalysis[\s\S]*?responseFormat:\s*'json'/.test(this.flipAnalysisPromptSource as string),
+      'Expected flipAnalysis prompt config to set responseFormat: \'json\''
+    );
+    // The OpenAI provider must translate that config to native response_format
+    assert(
+      (this.openaiProviderSource as string).includes(`response_format = { type: '${formatType}' }`),
+      `Expected OpenAI provider to set response_format = { type: '${formatType}' } when responseFormat === 'json'`
     );
   }
 );
@@ -63,14 +80,30 @@ Then(
 Then(
   'the system prompt should contain the word {string}',
   function (keyword: string) {
-    // Check system message in the messages array
-    const systemMsgMatch = this.fnBody.match(
-      /role:\s*'system'[\s\S]*?content:\s*[\s\S]*?['"`]([^'"`]+)['"`]/
+    // After the AI-router refactor, the system prompt lives on the
+    // flipAnalysis PromptConfig.systemPrompt — not inline in analyzeSellability.
+    // Try inline first (legacy shape), then fall back to the prompt config.
+    const inlineMatch = this.fnBody.match(
+      /role:\s*['"]system['"][\s\S]*?content:\s*[\s\S]*?['"`]([^'"`]+)['"`]/
     );
-    assert(systemMsgMatch, 'System message not found in analyzeSellability');
+    if (inlineMatch) {
+      assert(
+        inlineMatch[1].includes(keyword),
+        `System prompt does not contain "${keyword}": ${inlineMatch[1]}`
+      );
+      return;
+    }
+    const promptModule = readSourceFile('src/lib/ai/prompts/flip-analysis.ts');
+    const systemPromptMatch = promptModule.match(
+      /flipAnalysis[\s\S]*?systemPrompt:\s*\n?\s*['"`]([^'"`]+)['"`]/
+    );
     assert(
-      systemMsgMatch[1].includes(keyword),
-      `System prompt does not contain "${keyword}": ${systemMsgMatch[1]}`
+      systemPromptMatch,
+      'flipAnalysis.systemPrompt not found — neither inline analyzeSellability nor prompt config has it'
+    );
+    assert(
+      systemPromptMatch[1].includes(keyword),
+      `flipAnalysis system prompt does not contain "${keyword}": ${systemPromptMatch[1]}`
     );
   }
 );
@@ -129,17 +162,21 @@ When(
 Then(
   'there should be a retry with a simplified prompt on parse failure',
   function () {
-    // Check for the retry pattern: catch block that makes a second OpenAI call
+    // Check for the retry pattern: catch block that runs a fallback path on JSON.parse failure
     assert(
       this.fnBody.includes('retrying with simplified prompt') ||
         this.fnBody.includes('simplified prompt'),
       'No retry with simplified prompt found in parse error handling'
     );
-    // Verify the retry actually makes another API call
-    const retryCallCount = (this.fnBody.match(/client\.chat\.completions\.create/g) || []).length;
+    // After the AI-router refactor, retries route through completeAI() with a
+    // simpler task ("quickDiscountCheck"). Verify there are at least 2 AI invocations.
+    const completeAiCalls = (this.fnBody.match(/completeAI\(/g) || []).length;
+    const legacyCalls = (this.fnBody.match(/client\.chat\.completions\.create/g) || []).length;
+    const totalCalls = completeAiCalls + legacyCalls;
     assert(
-      retryCallCount >= 2,
-      `Expected at least 2 OpenAI API calls (primary + retry), found ${retryCallCount}`
+      totalCalls >= 2,
+      `Expected at least 2 AI invocations (primary + retry), found ${totalCalls} ` +
+        `(completeAI: ${completeAiCalls}, legacy: ${legacyCalls})`
     );
   }
 );

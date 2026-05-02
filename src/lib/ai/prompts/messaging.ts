@@ -58,7 +58,9 @@ export const purchaseMessage: PromptConfig = {
     const additionalContext = context.additionalContext as string | null | undefined;
     const tone = String(context.tone ?? 'professional');
 
-    const sellerRef = sellerName ? `The seller's name is "${sellerName}".` : 'The seller name is unknown.';
+    const sellerRef = sellerName
+      ? `The seller's name is "${sellerName}". You MUST address them by this exact name in the greeting (e.g. "Hi ${sellerName}," or "Hello ${sellerName},").`
+      : 'The seller name is unknown — open with a simple greeting like "Hi" or "Hello".';
     const offerLine =
       messageType === 'offer' && offerPrice
         ? `The buyer wants to offer $${offerPrice}.`

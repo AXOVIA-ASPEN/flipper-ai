@@ -250,10 +250,18 @@ When(
     // Some buttons on the scraper page are icon-only with descriptive aria-label; others have text.
     const ariaLabelMatch = this.page.locator(`button[aria-label="${label}"]`).first();
     if ((await ariaLabelMatch.count()) > 0) {
+      // Wait until the button is actually clickable (page hydrated, not covered).
+      // Without this, hydration-mid-DOMContentLoaded can swallow the click in React's
+      // event delegation and the resulting modal never opens.
+      await expect(ariaLabelMatch).toBeVisible({ timeout: 10000 });
+      await ariaLabelMatch.scrollIntoViewIfNeeded().catch(() => undefined);
       await ariaLabelMatch.click();
       return;
     }
-    await this.page.getByRole('button', { name: label, exact: false }).first().click();
+    const byRole = this.page.getByRole('button', { name: label, exact: false }).first();
+    await expect(byRole).toBeVisible({ timeout: 10000 });
+    await byRole.scrollIntoViewIfNeeded().catch(() => undefined);
+    await byRole.click();
   }
 );
 

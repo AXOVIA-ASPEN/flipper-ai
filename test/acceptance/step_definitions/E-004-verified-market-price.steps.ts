@@ -101,9 +101,8 @@ Then('"lookupVerifiedMarketPrice" is exported as an async function', function ()
   );
 });
 
-Then('"VerifiedPriceLookupResult" is exported as an interface', function () {
-  expect(this.fileContent).toContain('export interface VerifiedPriceLookupResult');
-});
+// Note: '"VerifiedPriceLookupResult" is exported as an interface' is matched by the
+// generic '{string} is exported as an interface' in E-005-completeness-reputation.steps.ts.
 
 // ==================== Then: S-17 (two-step lookup implementation) ====================
 
@@ -210,7 +209,15 @@ Then('it imports closeBrowser from market-price', function () {
 });
 
 Then('it calls closeBrowser after the listings processing loop', function () {
-  expect(this.fnBody).toContain('closeBrowser()');
+  // Routes may import closeBrowser under an alias (e.g. `closeBrowser as
+  // closeMarketBrowser` in the Facebook route to disambiguate from the
+  // Stagehand browser cleanup). Accept either name as evidence the cleanup
+  // hook ran after the listings loop.
+  const fnBody: string = this.fnBody;
+  const callsCleanup =
+    fnBody.includes('closeBrowser()') ||
+    fnBody.includes('closeMarketBrowser()');
+  expect(callsCleanup).toBe(true);
 });
 
 // ==================== Then: S-22 (Dashboard UI shows "Verified Value") ====================

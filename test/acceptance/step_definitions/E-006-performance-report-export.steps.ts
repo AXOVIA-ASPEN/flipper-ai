@@ -131,7 +131,11 @@ Then(
   /^the Export CSV button triggers a fetch to \/api\/analytics\/export\?format=csv$/,
   function () {
     assert.ok(this.fileContent.includes('/api/analytics/export'), 'Expected fetch to analytics export endpoint');
-    assert.ok(this.fileContent.includes('format=csv'), 'Expected format=csv parameter');
+    // Accept literal `format=csv` in a string OR a URLSearchParams call passing
+    // `format: 'csv'` (the canonical pattern after the URLSearchParams refactor).
+    const hasCsvParam = this.fileContent.includes('format=csv') ||
+      /URLSearchParams\([\s\S]*?format:\s*['"]csv['"]/.test(this.fileContent);
+    assert.ok(hasCsvParam, 'Expected format=csv parameter (literal or URLSearchParams field)');
   }
 );
 

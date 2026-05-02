@@ -39,11 +39,9 @@ Given('the message dispatcher at {string}', function (filePath: string) {
   this.fileContent = fs.readFileSync(fullPath, 'utf-8');
 });
 
-Given('the user settings API route at {string}', function (routePath: string) {
-  const fullPath = path.join(projectRoot, routePath);
-  assert.ok(fs.existsSync(fullPath), `Route file not found: ${routePath}`);
-  this.routeContent = fs.readFileSync(fullPath, 'utf-8');
-});
+// Note: Given('the user settings API route at {string}') is owned by
+// E-004-platform-fees-threshold.steps.ts (sets this.fileContent). We reuse it here
+// and treat fileContent as the route source in downstream Then steps below.
 
 // ── AC1: Draft Status on Creation ──
 
@@ -153,16 +151,18 @@ Then('reject action on DRAFT sets status to {string}', function (expectedStatus:
 // ── Settings API ──
 
 Then('GET response includes messageApprovalRequired field', function () {
+  const src = this.fileContent || this.routeContent || '';
   assert.ok(
-    this.routeContent.includes('messageApprovalRequired: settings.messageApprovalRequired'),
+    src.includes('messageApprovalRequired: settings.messageApprovalRequired'),
     'GET response should include messageApprovalRequired'
   );
 });
 
 Then('PATCH accepts and persists messageApprovalRequired boolean', function () {
+  const src = this.fileContent || this.routeContent || '';
   assert.ok(
-    this.routeContent.includes('messageApprovalRequired') &&
-    this.routeContent.includes('Boolean(messageApprovalRequired)'),
+    src.includes('messageApprovalRequired') &&
+    src.includes('Boolean(messageApprovalRequired)'),
     'PATCH should accept and persist messageApprovalRequired as boolean'
   );
 });

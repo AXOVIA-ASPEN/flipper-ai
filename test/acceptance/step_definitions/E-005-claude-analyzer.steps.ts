@@ -44,10 +44,12 @@ When('I inspect the scraper POST handlers', function () {
 // ==================== Then ====================
 
 Then('{string} is exported as a function', function (fnName: string) {
+  const src = this.source || this.fileContent || this.routeContent || this.sourceContent || '';
+  const where = this.filePath || '<unknown source>';
   assert.ok(
-    this.source.includes(`export async function ${fnName}`) ||
-      this.source.includes(`export function ${fnName}`),
-    `Expected "${fnName}" to be exported as a function in ${this.filePath}`
+    src.includes(`export async function ${fnName}`) ||
+      src.includes(`export function ${fnName}`),
+    `Expected "${fnName}" to be exported as a function in ${where}`
   );
 });
 

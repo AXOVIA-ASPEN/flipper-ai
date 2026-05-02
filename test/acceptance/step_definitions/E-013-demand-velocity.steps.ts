@@ -204,18 +204,15 @@ Then(
 );
 
 // ==================== Given/When/Then: Badge Mapping (AC #5) ====================
+// Note: Given('the value-estimator module at {string}') is owned by
+// E-004-platform-fees-threshold.steps.ts (sets this.fileContent). We reuse it here.
 
-Given(
-  'the value-estimator module at {string}',
-  function (this: DemandScenarioState, filePath: string) {
-    const fullPath = path.resolve(process.cwd(), filePath);
-    this.sourceContent = fs.readFileSync(fullPath, 'utf-8');
-  }
-);
-
-When('I inspect the getDemandBadge function', function (this: DemandScenarioState) {
+When('I inspect the getDemandBadge function', function (this: DemandScenarioState & { fileContent?: string }) {
+  const src = (this as { fileContent?: string; sourceContent?: string }).fileContent
+    || this.sourceContent
+    || '';
   assert.ok(
-    this.sourceContent.includes('getDemandBadge'),
+    src.includes('getDemandBadge'),
     'getDemandBadge function not found in source'
   );
 });

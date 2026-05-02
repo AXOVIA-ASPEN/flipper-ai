@@ -27,7 +27,23 @@ import type {
   ListingImage,
 } from '@/generated/prisma';
 import type { ListingWithImages } from '@/lib/image-helpers';
-import { captureListingImages, saveImageMetadata } from '@/lib/image-capture';
+import {
+  captureListingImages as captureListingImagesImpl,
+  saveImageMetadata as saveImageMetadataImpl,
+} from '@/lib/image-capture';
+
+// Indirection layer for testability: the bare imports above are bound at
+// require time (tsx/cjs creates immutable getter-defined namespace properties),
+// so test harnesses cannot mutate them. Re-exporting through these mutable
+// variables lets the dedicated test file `E-009-image-reuse.steps.ts` install
+// per-scenario stubs by `Object.assign(imageCaptureOverrides, { capture, save })`.
+export const imageCaptureOverrides: {
+  captureListingImages: typeof captureListingImagesImpl;
+  saveImageMetadata: typeof saveImageMetadataImpl;
+} = {
+  captureListingImages: captureListingImagesImpl,
+  saveImageMetadata: saveImageMetadataImpl,
+};
 
 // Re-export ListingWithImages so poster implementations can import from this
 // module alongside the PlatformPoster type.
@@ -146,9 +162,9 @@ async function hydrateLegacyImages(
 
   try {
     const capture = await Promise.race<
-      Awaited<ReturnType<typeof captureListingImages>>
+      Awaited<ReturnType<typeof captureListingImagesImpl>>
     >([
-      captureListingImages(listing.id, listing.userId, listing.platform, legacyUrls),
+      imageCaptureOverrides.captureListingImages(listing.id, listing.userId, listing.platform, legacyUrls),
       new Promise((_, reject) => {
         timer = setTimeout(
           () =>
@@ -163,7 +179,7 @@ async function hydrateLegacyImages(
 
     if (capture.captured.length === 0) return listing;
 
-    await saveImageMetadata(listing.id, capture.captured);
+    await imageCaptureOverrides.saveImageMetadata(listing.id, capture.captured);
 
     const hydratedImages: ListingImage[] = capture.captured.map((img) => ({
       id: `legacy-${listing.id}-${img.imageIndex}`,

@@ -21,6 +21,8 @@ import {
   buildPlatformData,
   applyPriceIntelligenceOverride,
   shouldRescueItem,
+  weightedMedian,
+  calculateConfidence,
   type CrossPlatformPriceResult,
   type CrossPlatformFetchers,
 } from '../../../src/lib/cross-platform-price';
@@ -197,10 +199,8 @@ When(
 
       // Replicate aggregatePlatformData logic (same as buildResultFromCache)
       const wPrices = pd.netPrices.map((p) => ({ price: p, weight: 2 })); // sold = 2x
-      const { weightedMedian: wm, calculateConfidence: cc } =
-        await import('../../../src/lib/cross-platform-price');
-      const vmv = wm(wPrices);
-      const confidence = cc(pd.compCount, 1);
+      const vmv = weightedMedian(wPrices);
+      const confidence = calculateConfidence(pd.compCount, 1);
 
       state.result = {
         verifiedMarketValue: vmv,
@@ -264,7 +264,6 @@ When(
       else totalActiveComps += pd.compCount;
     }
 
-    const { weightedMedian, calculateConfidence } = await import('../../../src/lib/cross-platform-price');
     const vmv = weightedMedian(weightedPrices);
     const platformCount = new Set(allPlatformData.map((pd) => pd.platform)).size;
     const confidence = calculateConfidence(totalSoldComps, platformCount);

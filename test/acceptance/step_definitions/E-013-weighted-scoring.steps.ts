@@ -155,57 +155,72 @@ Then(
 );
 
 // ==================== Then: Score assertions ====================
+// `this.result` may be set by the local When (with fee rate) OR `this.lastResult`
+// may be set by E-013-brand-regex.steps.ts When (without fee rate). Read either.
+
+function currentResult(world: { result?: EstimationResult; lastResult?: EstimationResult }): EstimationResult {
+  const r = world.result ?? world.lastResult;
+  assert(r, 'No estimation result on world — check that a When step ran first');
+  return r;
+}
 
 Then(
   'the profit potential should be negative',
   function () {
-    assert(this.result.profitPotential < 0, `Expected negative profit, got ${this.result.profitPotential}`);
+    const r = currentResult(this);
+    assert(r.profitPotential < 0, `Expected negative profit, got ${r.profitPotential}`);
   }
 );
 
 Then(
   'the profit potential should be {int}',
   function (expected: number) {
-    assert.strictEqual(this.result.profitPotential, expected, `Expected profit ${expected}, got ${this.result.profitPotential}`);
+    const r = currentResult(this);
+    assert.strictEqual(r.profitPotential, expected, `Expected profit ${expected}, got ${r.profitPotential}`);
   }
 );
 
 Then(
   /^the profit potential should be less than (\d+)$/,
   function (threshold: number) {
-    assert(this.result.profitPotential < threshold, `Expected profit < ${threshold}, got ${this.result.profitPotential}`);
+    const r = currentResult(this);
+    assert(r.profitPotential < threshold, `Expected profit < ${threshold}, got ${r.profitPotential}`);
   }
 );
 
 Then(
   /^the profit potential should be greater than (\d+)$/,
   function (threshold: number) {
-    assert(this.result.profitPotential > threshold, `Expected profit > ${threshold}, got ${this.result.profitPotential}`);
+    const r = currentResult(this);
+    assert(r.profitPotential > threshold, `Expected profit > ${threshold}, got ${r.profitPotential}`);
   }
 );
 
 Then(
   /^the value score should be at most (\d+)$/,
   function (max: number) {
-    assert(this.result.valueScore <= max, `Expected score <= ${max}, got ${this.result.valueScore}`);
+    const r = currentResult(this);
+    assert(r.valueScore <= max, `Expected score <= ${max}, got ${r.valueScore}`);
   }
 );
 
 Then(
   'the value score should reflect the high-value boost',
   function () {
+    const r = currentResult(this);
     // The score should incorporate the +5 or +10 boost for high absolute profit.
     // We verify by checking that the score is reasonable (> baseline for that profit level).
-    assert(this.result.valueScore > 50, `Expected boosted score > 50, got ${this.result.valueScore}`);
+    assert(r.valueScore > 50, `Expected boosted score > 50, got ${r.valueScore}`);
   }
 );
 
 Then(
   /^the value score should be an integer between (\d+) and (\d+)$/,
   function (min: number, max: number) {
-    assert(Number.isInteger(this.result.valueScore), `valueScore should be integer, got ${this.result.valueScore}`);
-    assert(this.result.valueScore >= min, `valueScore should be >= ${min}, got ${this.result.valueScore}`);
-    assert(this.result.valueScore <= max, `valueScore should be <= ${max}, got ${this.result.valueScore}`);
+    const r = currentResult(this);
+    assert(Number.isInteger(r.valueScore), `valueScore should be integer, got ${r.valueScore}`);
+    assert(r.valueScore >= min, `valueScore should be >= ${min}, got ${r.valueScore}`);
+    assert(r.valueScore <= max, `valueScore should be <= ${max}, got ${r.valueScore}`);
   }
 );
 

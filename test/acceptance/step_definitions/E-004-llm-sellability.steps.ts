@@ -79,22 +79,37 @@ Then('it accepts discountThreshold as an optional 5th parameter', function () {
 Then(
   'the buildAnalysisPrompt function embeds discountThreshold in the prompt text',
   function () {
-    const fnStart = this.fileContent.indexOf('function buildAnalysisPrompt');
-    expect(fnStart).toBeGreaterThan(-1);
-    const fnBody = this.fileContent.substring(fnStart, fnStart + 1000);
-    expect(fnBody).toContain('discountThreshold');
-    expect(fnBody).toContain('${discountThreshold}');
+    // After the AI-router refactor, the prompt builder lives in
+    // `src/lib/ai/prompts/flip-analysis.ts` as `flipAnalysis.buildUserPrompt`,
+    // and the discountThreshold value is threaded through `completeAI`'s
+    // context. Verify either the legacy local function OR the canonical
+    // prompt-config entrypoint embeds discountThreshold via a template literal.
+    let bodyToCheck: string;
+    const localStart = this.fileContent.indexOf('function buildAnalysisPrompt');
+    if (localStart > -1) {
+      bodyToCheck = this.fileContent.substring(localStart, localStart + 1500);
+    } else {
+      const promptModule = readSourceFile('src/lib/ai/prompts/flip-analysis.ts');
+      const builderStart = promptModule.indexOf('flipAnalysis');
+      bodyToCheck = builderStart > -1 ? promptModule.substring(builderStart) : promptModule;
+    }
+    expect(bodyToCheck).toContain('discountThreshold');
+    expect(bodyToCheck).toContain('${discountThreshold}');
   }
 );
 
 Then(
   'the meetsThreshold field in the prompt uses the configured threshold not a hardcoded value',
   function () {
-    const fnStart = this.fileContent.indexOf('function buildAnalysisPrompt');
-    expect(fnStart).toBeGreaterThan(-1);
-    const fnBody = this.fileContent.substring(fnStart, fnStart + 1000);
+    let bodyToCheck: string;
+    const localStart = this.fileContent.indexOf('function buildAnalysisPrompt');
+    if (localStart > -1) {
+      bodyToCheck = this.fileContent.substring(localStart, localStart + 1500);
+    } else {
+      bodyToCheck = readSourceFile('src/lib/ai/prompts/flip-analysis.ts');
+    }
     // Threshold must be a template literal interpolation, not the hardcoded string "50"
-    expect(fnBody).toContain('${discountThreshold}');
+    expect(bodyToCheck).toContain('${discountThreshold}');
   }
 );
 

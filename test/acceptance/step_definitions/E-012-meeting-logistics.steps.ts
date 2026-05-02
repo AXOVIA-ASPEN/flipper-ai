@@ -42,6 +42,43 @@ import type { PrismaClient } from '../../../src/generated/prisma';
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 
 // ---------------------------------------------------------------------------
+// Lightweight mock-fn helper (cucumber runs without jest globals)
+// ---------------------------------------------------------------------------
+
+interface MockFn<TReturn = unknown> extends Function {
+  (...args: unknown[]): TReturn;
+  mockResolvedValue(v: TReturn): MockFn<TReturn>;
+  mockRejectedValue(err: unknown): MockFn<TReturn>;
+  mockReturnValue(v: TReturn): MockFn<TReturn>;
+  mockImplementation(impl: (...args: unknown[]) => TReturn): MockFn<TReturn>;
+  calls: unknown[][];
+}
+
+function mockFn<TReturn = unknown>(initialImpl?: (...args: unknown[]) => TReturn): MockFn<TReturn> {
+  let impl: (...args: unknown[]) => unknown = initialImpl ?? (() => undefined);
+  // Use a real `function` (not arrow) so callers can `new fn(...)` — the
+  // googleapis OAuth2 stub depends on `new google.auth.OAuth2(...)` syntax.
+  const fn = function (this: unknown, ...args: unknown[]) {
+    (fn as unknown as { calls: unknown[][] }).calls.push(args);
+    const result = impl(...args);
+    // When invoked via `new fn(...)`, return the implementation's return
+    // value if it's an object so the constructor expression yields the
+    // mocked instance. (Constructors that return primitives ignore the
+    // return value, so this is safe for both call patterns.)
+    if (this !== undefined && result && typeof result === 'object') {
+      return result;
+    }
+    return result;
+  } as unknown as MockFn<TReturn>;
+  fn.calls = [];
+  fn.mockResolvedValue = (v) => { impl = () => Promise.resolve(v); return fn; };
+  fn.mockRejectedValue = (err) => { impl = () => Promise.reject(err); return fn; };
+  fn.mockReturnValue = (v) => { impl = () => v; return fn; };
+  fn.mockImplementation = (newImpl) => { impl = newImpl as (...args: unknown[]) => unknown; return fn; };
+  return fn;
+}
+
+// ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
@@ -193,6 +230,12 @@ Given('the user is authenticated with a PRO subscription', function (this: Custo
   svcState = { tokens: new Map(), capturedMeetingRequest: null };
   savedPrisma = globalForPrisma.prisma;
   globalForPrisma.prisma = buildServicePrismaStub() as unknown as PrismaClient;
+  // Service-level steps that hit getOAuthClient() require these env vars to be set,
+  // otherwise the helper throws before the mock can intercept. Provide test stubs
+  // — the actual values don't matter because googleapis is mocked downstream.
+  process.env.GOOGLE_CALENDAR_CLIENT_ID ??= 'test-client-id';
+  process.env.GOOGLE_CALENDAR_CLIENT_SECRET ??= 'test-client-secret';
+  process.env.GOOGLE_CALENDAR_REDIRECT_URI ??= 'http://localhost:3200/api/auth/google-calendar/callback';
 });
 
 After(function () {
@@ -520,7 +563,7 @@ Then('the associated Google Calendar event is deleted in the background', async 
   const origCalendar = (google as Record<string, unknown>).calendar;
   (google as Record<string, unknown>).calendar = () => ({
     events: {
-      delete: jest.fn().mockRejectedValue(Object.assign(new Error('Not Found'), { code: 404 })),
+      delete: mockFn().mockRejectedValue(Object.assign(new Error('Not Found'), { code: 404 })),
     },
     auth: {
       OAuth2: (google.auth as Record<string, unknown>).OAuth2,
@@ -569,11 +612,11 @@ When(
     const { google } = await import('googleapis');
     const OrigOAuth2 = (google.auth as Record<string, unknown>).OAuth2 as new (...args: unknown[]) => unknown;
 
-    (google.auth as Record<string, unknown>).OAuth2 = jest.fn().mockImplementation(() => ({
-      generateAuthUrl: jest.fn(),
-      getToken: jest.fn(),
-      setCredentials: jest.fn(),
-      refreshAccessToken: jest.fn().mockRejectedValue(new Error('Token has been revoked')),
+    (google.auth as Record<string, unknown>).OAuth2 = mockFn().mockImplementation(() => ({
+      generateAuthUrl: mockFn(),
+      getToken: mockFn(),
+      setCredentials: mockFn(),
+      refreshAccessToken: mockFn().mockRejectedValue(new Error('Token has been revoked')),
     }));
 
     let caughtError: unknown = null;
@@ -828,21 +871,19 @@ Given('the meeting reminder scheduler module exists', function (this: CustomWorl
   expect(fs.existsSync(schedulerPath)).toBe(true);
 });
 
-Then('the scheduler uses a 1-hour fallback buffer when route calculation returns null', async function (this: CustomWorld) {
-  // Import the module constant to verify the fallback value is exactly 1 hour (3 600 000 ms)
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { MAX_RUN_DURATION_MS } = await import('../../../src/lib/meeting-reminder-scheduler');
-  // MAX_RUN_DURATION_MS is 90 s — proves the module loaded. The FALLBACK_BUFFER_MS (1h)
-  // is verified in the unit test suite; we verify the exported contract here.
-  expect(typeof MAX_RUN_DURATION_MS).toBe('number');
-  expect(MAX_RUN_DURATION_MS).toBe(90 * 1000);
-  // Verify FALLBACK_BUFFER_MS constant is declared as 1 hour in source
+Then('the scheduler uses a 1-hour fallback buffer when route calculation returns null', function (this: CustomWorld) {
+  // Source-level verification: confirm FALLBACK_BUFFER_MS is declared as exactly
+  // 1 hour and MAX_RUN_DURATION_MS is exported as a numeric constant. We avoid
+  // dynamic import() here because cucumber-js runs step files via tsx/cjs (CJS
+  // loader), and `await import('../../../src/lib/meeting-reminder-scheduler')`
+  // routes through Node's ESM resolver which can't load .ts source.
   const content = fs.readFileSync(
     path.join(PROJECT_ROOT, 'src/lib/meeting-reminder-scheduler.ts'),
     'utf-8'
   );
   expect(content).toContain('FALLBACK_BUFFER_MS');
   expect(content).toContain('60 * 60 * 1000');
+  expect(content).toMatch(/export const MAX_RUN_DURATION_MS\s*=\s*90\s*\*\s*1000/);
 });
 
 Then('the scheduler endpoint exists at the expected API path', function (this: CustomWorld) {
@@ -915,9 +956,12 @@ Given('the maps route API endpoint exists', async function (this: CustomWorld) {
 Then('the endpoint returns degraded state when getRoute returns null', async function (this: CustomWorld) {
   // The degraded card must be visible — confirming the endpoint returned state='degraded'
   // and MeetingRouteCard rendered accordingly (no travel time, no departure time)
-  await expect(this.page.locator('[data-testid="route-card-degraded"]')).toBeVisible({ timeout: 8000 });
-  // Confirm the address text is shown (AC-5: "shows the meetingLocation address as plain text")
-  await expect(this.page.locator(`text=${TEST_MEETING_LOCATION}`)).toBeVisible({ timeout: 5000 });
+  const degradedCard = this.page.getByTestId('route-card-degraded');
+  await expect(degradedCard).toBeVisible({ timeout: 8000 });
+  // Confirm the address text is shown WITHIN the degraded card (AC-5: "shows the
+  // meetingLocation address as plain text"). Scoping to the card avoids strict-mode
+  // collisions with the surrounding "Location:" label that also contains the address.
+  await expect(degradedCard.getByText(TEST_MEETING_LOCATION)).toBeVisible({ timeout: 5000 });
   // Confirm travel time and departure time are NOT present
   await expect(this.page.locator('text=Travel time')).not.toBeVisible();
   await expect(this.page.locator('text=Leave by')).not.toBeVisible();
@@ -929,7 +973,12 @@ Then('the MeetingRouteCard component renders a View on Maps link in degraded sta
   await expect(link).toBeVisible({ timeout: 5000 });
   const href = await link.getAttribute('href');
   expect(href).toBeTruthy();
-  expect(href).toContain('maps.google.com');
+  // Accept either the legacy `maps.google.com` host or the canonical
+  // `google.com/maps/search/?api=1` form (Google's recommended Maps URL scheme).
+  const isGoogleMaps =
+    (href ?? '').includes('maps.google.com') ||
+    (href ?? '').includes('google.com/maps');
+  expect(isGoogleMaps).toBe(true);
   expect(href).toContain(encodeURIComponent(TEST_MEETING_LOCATION));
 });
 

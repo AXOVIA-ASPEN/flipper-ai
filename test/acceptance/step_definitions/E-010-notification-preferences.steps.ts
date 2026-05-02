@@ -100,19 +100,29 @@ Then('the source uses the PATCH method for saving toggles', () => {
 // ---------------------------------------------------------------------------
 
 Then('the source renders disabled push toggle buttons for each event row', () => {
-  // Component should have disabled push column buttons with "Coming Soon" title
+  // Story 11.3 replaces literal "Coming Soon" placeholders with a real ToggleButton
+  // wired to a `channel="Push"` prop and disabled via `pushDisabled`/`disabled`. Accept
+  // either the legacy phrasing or the canonical channel="Push" + disabled wiring.
+  const src = state.sourceText;
+  const hasPushChannel = src.includes('channel="Push"') || src.includes("channel='Push'");
+  const hasPushDisabled = src.includes('pushDisabled') || src.includes('pushColumnDisabled');
+  const hasLegacyPhrasing =
+    src.includes('Push notifications for') || src.includes('push notification');
   assert.ok(
-    state.sourceText.includes('Push notifications for') ||
-      state.sourceText.includes('push notification'),
-    'Expected source to render disabled push toggle buttons'
+    hasLegacyPhrasing || (hasPushChannel && hasPushDisabled),
+    'Expected source to render disabled push toggle buttons (legacy phrasing OR ToggleButton channel="Push" + pushDisabled)'
   );
 });
 
 Then('the source renders disabled SMS toggle buttons for each event row', () => {
+  const src = state.sourceText;
+  const hasSmsChannel = src.includes('channel="SMS"') || src.includes("channel='SMS'");
+  const hasSmsDisabled = src.includes('smsDisabled') || src.includes('smsColumnDisabled');
+  const hasLegacyPhrasing =
+    src.includes('SMS notifications for') || src.includes('sms notification');
   assert.ok(
-    state.sourceText.includes('SMS notifications for') ||
-      state.sourceText.includes('sms notification'),
-    'Expected source to render disabled SMS toggle buttons'
+    hasLegacyPhrasing || (hasSmsChannel && hasSmsDisabled),
+    'Expected source to render disabled SMS toggle buttons (legacy phrasing OR ToggleButton channel="SMS" + smsDisabled)'
   );
 });
 

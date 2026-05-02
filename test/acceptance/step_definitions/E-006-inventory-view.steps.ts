@@ -133,8 +133,15 @@ Then('the opportunities page applies an {string} badge when isAgingInventory ret
 
 Then('the carrying cost is rendered with bold red styling when the item is aging', function () {
   const content = readSourceFile('app/opportunities/page.tsx');
-  if (!content.includes('text-red-') || !content.includes('font-bold')) {
-    throw new Error('Expected aging inventory to render carrying cost with bold red styling');
+  // Accept either Tailwind classes (text-red-* + font-bold) or inline style with
+  // a red color and bold weight gated on the `aging` flag (the Epic-14 dark-design
+  // refactor replaced classes with inline styles).
+  const hasTwClasses = content.includes('text-red-') && content.includes('font-bold');
+  const hasInlineRedBold =
+    /aging\s*\?\s*['"]#(f87171|ef4444|dc2626|b91c1c|fb7185|f43f5e)['"]/i.test(content) &&
+    /aging\s*\?\s*7\d\d/.test(content);
+  if (!hasTwClasses && !hasInlineRedBold) {
+    throw new Error('Expected aging inventory carrying cost to be rendered red + bold (Tailwind classes OR inline style)');
   }
 });
 
@@ -179,15 +186,29 @@ Then('it renders a {string} indicator when isConnected is false', function (labe
 
 Then('it renders a non-blocking amber banner when lastError is not null', function () {
   const content: string = this.fileContent;
-  if (!content.includes('lastError') || !content.includes('amber')) {
-    throw new Error('Expected dashboard to render an amber banner when lastError is not null');
+  // Banner can be expressed as Tailwind `bg-amber-*` / `text-amber-*` classes,
+  // the canonical Epic-14 design-system class `fp-alert-warn`, or an inline
+  // amber color hex (#fcd34d, #fbbf24, #f59e0b). The lastError gate must be present.
+  if (!content.includes('lastError')) {
+    throw new Error('Expected dashboard to gate the SSE banner on lastError');
+  }
+  const hasAmberCue = content.includes('amber') ||
+    content.includes('fp-alert-warn') ||
+    /#(fcd34d|fbbf24|f59e0b|d97706)/i.test(content);
+  if (!hasAmberCue) {
+    throw new Error('Expected dashboard SSE banner to use an amber styling cue (Tailwind, fp-alert-warn, or amber color hex)');
   }
 });
 
 Then('the banner includes a dismiss button that hides the banner', function () {
   const content: string = this.fileContent;
-  if (!content.includes('Dismiss') && !content.includes('dismiss')) {
-    throw new Error('Expected SSE error banner to include a dismiss button');
+  // Accept literal "Dismiss" / "dismiss" or the conventional state setter
+  // `setSseErrorDismissed(true)` used by the dashboard banner.
+  const hasDismiss = content.includes('Dismiss') ||
+    content.includes('dismiss') ||
+    content.includes('SseErrorDismissed');
+  if (!hasDismiss) {
+    throw new Error('Expected SSE error banner to include a dismiss affordance');
   }
 });
 

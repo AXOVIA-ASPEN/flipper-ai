@@ -67,11 +67,20 @@ function freshState(): ScenarioState {
 // ---------------------------------------------------------------------------
 
 function installPrismaStub(state: ScenarioState): void {
-  // Replace prisma.user.findUnique with an in-memory stub
+  // Replace prisma.user.findUnique with an in-memory stub.
+  // CommunicationNotificationService.loadUserContext defaults the per-event
+  // notify* flags (notifyMessageReceived/notifyDraftReady/notifyMessageSent)
+  // when they are absent — notifyMessageSent defaults to FALSE, so we must
+  // populate the full settings shape to keep these scenarios deterministic.
   (prisma.user as unknown as Record<string, unknown>).findUnique = async () => {
     return {
       email: 'testuser@example.com',
-      settings: { emailNotifications: state.emailNotifications },
+      settings: {
+        emailNotifications: state.emailNotifications,
+        notifyMessageReceived: true,
+        notifyDraftReady: true,
+        notifyMessageSent: true,
+      },
     };
   };
 }
