@@ -413,7 +413,8 @@ Given(
 // ── Then steps ───────────────────────────────────────────────────────────────
 
 Then(
-  'the platform poster receives a listing with {int} images',
+  // Use a regex so both the singular "1 image" and plural "N images" forms match.
+  /^the platform poster receives a listing with (\d+) images?$/,
   function (expected: number) {
     assert.ok(s94.receivedListing, 'platform poster was never invoked');
     assert.strictEqual(s94.receivedListing.images.length, expected);

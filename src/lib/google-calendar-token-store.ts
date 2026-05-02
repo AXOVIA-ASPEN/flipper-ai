@@ -13,7 +13,27 @@
  * Facebook token-store pattern from src/scrapers/facebook/token-store.ts.
  */
 
-import prisma from '@/lib/db';
+import prismaStatic from '@/lib/db';
+
+/**
+ * Lazy prisma resolver. The static `import prismaStatic` above is bound at
+ * require-time, which becomes immutable from outside under tsx/cjs. Some
+ * acceptance-test step files swap the underlying `src/lib/db` module entry in
+ * `require.cache` to install per-scenario stubs (see E-007 stripe-webhook,
+ * E-012 calendar). Resolving `prisma` lazily on every call ensures token-store
+ * always picks up the live mock instead of the snapshot taken at first load.
+ */
+function prisma(): typeof prismaStatic {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require('./db');
+    const candidate = mod?.default ?? mod;
+    if (candidate?.googleCalendarToken) return candidate as typeof prismaStatic;
+  } catch {
+    // fall through
+  }
+  return prismaStatic;
+}
 import { encrypt, decrypt } from '@/lib/crypto';
 
 export interface StoredGoogleCalendarToken {
@@ -38,7 +58,7 @@ export async function storeToken(
   const encryptedAccess = encrypt(accessToken);
   const encryptedRefresh = encrypt(refreshToken);
 
-  await prisma.googleCalendarToken.upsert({
+  await prisma().googleCalendarToken.upsert({
     where: { userId },
     update: {
       accessToken: encryptedAccess,
@@ -65,7 +85,7 @@ export async function updateAccessToken(
   accessToken: string,
   expiresAt: Date
 ): Promise<void> {
-  await prisma.googleCalendarToken.update({
+  await prisma().googleCalendarToken.update({
     where: { userId },
     data: {
       accessToken: encrypt(accessToken),
@@ -80,7 +100,7 @@ export async function updateAccessToken(
  * Returns null if no token exists for the user.
  */
 export async function getToken(userId: string): Promise<StoredGoogleCalendarToken | null> {
-  const record = await prisma.googleCalendarToken.findUnique({
+  const record = await prisma().googleCalendarToken.findUnique({
     where: { userId },
   });
 
@@ -104,7 +124,7 @@ const REFRESH_BUFFER_MS = 5 * 60 * 1000;
  * don't trip over a token that will expire mid-request.
  */
 export async function hasValidToken(userId: string): Promise<boolean> {
-  const record = await prisma.googleCalendarToken.findUnique({
+  const record = await prisma().googleCalendarToken.findUnique({
     where: { userId },
     select: { expiresAt: true },
   });
@@ -119,7 +139,7 @@ export async function hasValidToken(userId: string): Promise<boolean> {
  * (same idempotent pattern as Facebook token-store.deleteToken).
  */
 export async function deleteToken(userId: string): Promise<void> {
-  await prisma.googleCalendarToken
+  await prisma().googleCalendarToken
     .delete({ where: { userId } })
     .catch(() => {});
 }

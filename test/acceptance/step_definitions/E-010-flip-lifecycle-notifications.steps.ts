@@ -439,6 +439,18 @@ Then('the result shows {int} emails sent and {int} skipped', function (sentCount
   );
 });
 
+// Standalone form (no "and N skipped" suffix) — used by scenarios that only
+// care about the email count, e.g. concurrency/duplicate-claim scenarios where
+// the entire batch is short-circuited before any email goes out.
+Then('the result shows {int} emails sent', function (sentCount: number) {
+  assert.ok(state.processingResult, 'Processing result is null');
+  assert.strictEqual(
+    state.processingResult.sent,
+    sentCount,
+    `Expected ${sentCount} sent but got ${state.processingResult.sent}`
+  );
+});
+
 Then(
   'the result shows {int} emails sent and {int} skipped due to preference disabled',
   function (sentCount: number, skippedCount: number) {

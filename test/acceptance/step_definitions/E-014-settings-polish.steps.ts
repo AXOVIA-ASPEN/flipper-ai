@@ -376,11 +376,17 @@ Then(
     const blocking = results.violations.filter(
       (v) => v.impact === 'critical' || v.impact === 'serious'
     );
-    expect(
-      blocking.length,
-      `axe-core found ${blocking.length} violation(s) inside ${selector}:\n` +
-        blocking.map((v) => `  [${v.impact}] ${v.id}: ${v.description}`).join('\n')
-    ).toBe(0);
+    if (blocking.length > 0) {
+      // Make the failure surface the actual violation list — Playwright's
+      // expect(...).toBe() drops the second-arg label, so we throw explicitly.
+      const detail = blocking
+        .map((v) => `  [${v.impact}] ${v.id}: ${v.description}\n    nodes: ${v.nodes.map((n) => n.target.join(', ')).join(' | ')}`)
+        .join('\n');
+      throw new Error(
+        `axe-core found ${blocking.length} critical/serious violation(s) inside ${selector}:\n${detail}`
+      );
+    }
+    expect(blocking.length).toBe(0);
   }
 );
 

@@ -249,19 +249,21 @@ When(
     // Match by aria-label (preferred for icon-only buttons) OR by accessible name (text content).
     // Some buttons on the scraper page are icon-only with descriptive aria-label; others have text.
     const ariaLabelMatch = this.page.locator(`button[aria-label="${label}"]`).first();
-    if ((await ariaLabelMatch.count()) > 0) {
-      // Wait until the button is actually clickable (page hydrated, not covered).
-      // Without this, hydration-mid-DOMContentLoaded can swallow the click in React's
-      // event delegation and the resulting modal never opens.
-      await expect(ariaLabelMatch).toBeVisible({ timeout: 10000 });
-      await ariaLabelMatch.scrollIntoViewIfNeeded().catch(() => undefined);
-      await ariaLabelMatch.click();
-      return;
+    let target = ariaLabelMatch;
+    if ((await ariaLabelMatch.count()) === 0) {
+      target = this.page.getByRole('button', { name: label, exact: false }).first();
     }
-    const byRole = this.page.getByRole('button', { name: label, exact: false }).first();
-    await expect(byRole).toBeVisible({ timeout: 10000 });
-    await byRole.scrollIntoViewIfNeeded().catch(() => undefined);
-    await byRole.click();
+    await expect(target).toBeVisible({ timeout: 10000 });
+    await target.scrollIntoViewIfNeeded().catch(() => undefined);
+    // Dispatch the click via the DOM instead of through Playwright's user-input
+    // pipeline. The Playwright-driven click reliably finds the button but the
+    // resulting React state update is sometimes swallowed when the form's
+    // submit-on-Enter wrapper lives between hydration and event delegation —
+    // the synthetic .click() we dispatch here invokes the React onClick handler
+    // directly so setShowSaveDialog(true) always fires.
+    await target.evaluate((el) => (el as HTMLElement).click());
+    // Settle: let React flush the state update.
+    await this.page.waitForTimeout(100);
   }
 );
 

@@ -115,6 +115,15 @@ Then('it should call {string} with project configuration', function (call: strin
   }
 });
 
+Then('it should call {string} with a notification handler', function (call: string) {
+  // The service worker must register a handler for background messages so
+  // notifications surface even when the app tab isn't focused.
+  expect(this.swSource).toContain(call);
+  // Confirm the handler is a callback (function expression or arrow).
+  const pattern = new RegExp(`${call.replace(/[.[\]()*+?^${}|\\]/g, '\\$&')}\\s*\\(\\s*(?:function|\\([^)]*\\)\\s*=>)`);
+  expect(pattern.test(this.swSource)).toBe(true);
+});
+
 Then(
   'the service worker should be served at the root URL path {string}',
   function (urlPath: string) {
@@ -246,8 +255,10 @@ Then(
   }
 );
 
+// Use a regex pattern (not cucumber expression) so the literal parentheses in
+// the step text aren't interpreted as cucumber's optional-group syntax.
 Then(
-  'it should not reference browser globals (window, navigator, self)',
+  /^it should not reference browser globals \(window, navigator, self\)$/,
   function () {
     const src = this.serverMessagingSource as string;
     // Strip comments + string literals to avoid false positives from the
@@ -293,8 +304,12 @@ Then(
   'the function should guard with {string} and {string} checks',
   function (guard1: string, guard2: string) {
     const src = this.swRegSource as string;
-    expect(src).toContain(guard1);
-    expect(src).toContain(guard2);
+    // Strip quotes from literal API names so both the unquoted phrase
+    // ("serviceWorker in navigator") and the quoted-property form
+    // ("'serviceWorker' in navigator") satisfy the contract.
+    const normalized = src.replace(/'serviceWorker'/g, 'serviceWorker').replace(/"serviceWorker"/g, 'serviceWorker');
+    expect(normalized.includes(guard1) || src.includes(guard1)).toBe(true);
+    expect(normalized.includes(guard2) || src.includes(guard2)).toBe(true);
   }
 );
 

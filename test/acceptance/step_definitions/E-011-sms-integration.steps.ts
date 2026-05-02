@@ -37,6 +37,20 @@ interface SettingsRow {
   phoneVerificationExpiry: Date | null;
   phoneVerificationSentAt: Date | null;
   smsNotifications: boolean;
+  // Story 11.3 per-event SMS toggles. SmsNotificationService.dispatch() gates
+  // each event behind the matching flag — a falsy value short-circuits the send
+  // even when the master smsNotifications toggle is on.
+  smsNotifyNewDeals: boolean;
+  smsNotifySoldItems: boolean;
+  smsNotifyMessageReceived: boolean;
+  smsNotifyDraftReady: boolean;
+  smsNotifyMessageSent: boolean;
+  smsNotifyReviewReceived: boolean;
+  smsNotifyFlipGoneCold: boolean;
+  smsNotifyFlipTurnedHot: boolean;
+  smsNotifyPriceDrops: boolean;
+  smsNotifyExpiring: boolean;
+  smsNotifyListingUnavailable: boolean;
 }
 
 interface SmsDispatch {
@@ -68,6 +82,20 @@ function freshState(): ScenarioState {
       phoneVerificationExpiry: null,
       phoneVerificationSentAt: null,
       smsNotifications: false,
+      // Per-event flags default to ON so the master `smsNotifications` toggle is
+      // the single switch under test. Individual scenarios that exercise per-event
+      // gating override the relevant flag explicitly.
+      smsNotifyNewDeals: true,
+      smsNotifySoldItems: true,
+      smsNotifyMessageReceived: true,
+      smsNotifyDraftReady: true,
+      smsNotifyMessageSent: true,
+      smsNotifyReviewReceived: true,
+      smsNotifyFlipGoneCold: true,
+      smsNotifyFlipTurnedHot: true,
+      smsNotifyPriceDrops: true,
+      smsNotifyExpiring: true,
+      smsNotifyListingUnavailable: true,
     },
     sentSms: [],
     forceSmsFailure: false,
