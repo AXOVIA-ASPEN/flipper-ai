@@ -42,7 +42,7 @@ npx prisma db execute --stdin <<< "SELECT column_name, data_type FROM informatio
 
 ```bash
 # Test locally first
-curl -X POST http://localhost:3000/api/auth/register \
+curl -X POST http://localhost:3200/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"TestPass123","name":"Test User"}'
 

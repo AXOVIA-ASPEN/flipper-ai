@@ -4,17 +4,17 @@
     "elements": [
       {
         "description": "",
-        "id": "frontend-design-system-migration;pricecalculator-root-container-uses-canonical-fp-glass-surface",
+        "id": "frontend-design-system-migration;kanbanboard-demand_badges-maps-every-key-to-canonical-fp-badge-*",
         "keyword": "Scenario",
-        "line": 289,
-        "name": "PriceCalculator root container uses canonical fp-glass surface",
+        "line": 640,
+        "name": "KanbanBoard DEMAND_BADGES maps every key to canonical fp-badge-*",
         "steps": [
           {
             "keyword": "Before",
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 118333
+              "duration": 88374
             }
           },
           {
@@ -22,145 +22,98 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 125024417
+              "duration": 56839249
             }
           },
           {
             "arguments": [],
             "keyword": "Given ",
-            "line": 290,
-            "name": "the source file \"src/components/PriceCalculator.tsx\" exists",
+            "line": 641,
+            "name": "the source file \"src/components/KanbanBoard.tsx\" exists",
             "match": {
               "location": "test/acceptance/step_definitions/E-014-shared-ui-state.steps.ts:51"
             },
             "result": {
               "status": "passed",
-              "duration": 5372542
+              "duration": 4398166
             }
           },
           {
             "arguments": [],
             "keyword": "When ",
-            "line": 291,
-            "name": "I read the source of \"src/components/PriceCalculator.tsx\"",
+            "line": 642,
+            "name": "I read the source of \"src/components/KanbanBoard.tsx\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:34"
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:39"
             },
             "result": {
               "status": "passed",
-              "duration": 1909458
+              "duration": 1469333
             }
           },
           {
             "arguments": [],
             "keyword": "Then ",
-            "line": 292,
-            "name": "the source should contain the pattern \"fp-glass p-6 rounded-lg\"",
+            "line": 643,
+            "name": "the source should contain the pattern \"rising: { label: 'Hot', className: 'fp-badge fp-badge-red' }\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:43"
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
             },
             "result": {
               "status": "passed",
-              "duration": 861291
-            }
-          },
-          {
-            "keyword": "After",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 11284958
-            }
-          },
-          {
-            "keyword": "After",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 48958
-            }
-          }
-        ],
-        "tags": [
-          {
-            "name": "@epic-14",
-            "line": 1
-          },
-          {
-            "name": "@E-014-S-29",
-            "line": 288
-          },
-          {
-            "name": "@FR-UI-DESIGN-02",
-            "line": 288
-          },
-          {
-            "name": "@story-14-6",
-            "line": 288
-          }
-        ],
-        "type": "scenario"
-      },
-      {
-        "description": "",
-        "id": "frontend-design-system-migration;pricecalculator-source-has-zero-raw-tailwind-palette-classes",
-        "keyword": "Scenario",
-        "line": 296,
-        "name": "PriceCalculator source has zero raw Tailwind palette classes",
-        "steps": [
-          {
-            "keyword": "Before",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 79874
-            }
-          },
-          {
-            "keyword": "Before",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 49438457
+              "duration": 1980833
             }
           },
           {
             "arguments": [],
-            "keyword": "Given ",
-            "line": 297,
-            "name": "the source file \"src/components/PriceCalculator.tsx\" exists",
+            "keyword": "And ",
+            "line": 644,
+            "name": "the source should contain the pattern \"high: { label: 'Active', className: 'fp-badge fp-badge-purple' }\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-014-shared-ui-state.steps.ts:51"
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
             },
             "result": {
               "status": "passed",
-              "duration": 477167
+              "duration": 547916
             }
           },
           {
             "arguments": [],
-            "keyword": "When ",
-            "line": 298,
-            "name": "I read the source of \"src/components/PriceCalculator.tsx\"",
+            "keyword": "And ",
+            "line": 645,
+            "name": "the source should contain the pattern \"stable: { label: 'Steady', className: 'fp-badge fp-badge-blue' }\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:34"
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
             },
             "result": {
               "status": "passed",
-              "duration": 432124
+              "duration": 115584
             }
           },
           {
             "arguments": [],
-            "keyword": "Then ",
-            "line": 299,
+            "keyword": "And ",
+            "line": 646,
+            "name": "the source should contain the pattern \"low_liquidity: { label: 'Dead', className: 'fp-badge fp-badge-yellow' }\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 86707
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 647,
             "name": "the raw Tailwind palette class count should equal 0",
             "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:65"
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:70"
             },
             "result": {
               "status": "passed",
-              "duration": 1216166
+              "duration": 747374
             }
           },
           {
@@ -168,7 +121,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 6449750
+              "duration": 5871417
             }
           },
           {
@@ -176,7 +129,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 26292
+              "duration": 27541
             }
           }
         ],
@@ -186,33 +139,37 @@
             "line": 1
           },
           {
-            "name": "@E-014-S-30",
-            "line": 295
+            "name": "@E-014-S-58",
+            "line": 639
           },
           {
             "name": "@FR-UI-DESIGN-02",
-            "line": 295
+            "line": 639
           },
           {
-            "name": "@story-14-6",
-            "line": 295
+            "name": "@FR-UI-DESIGN-04",
+            "line": 639
+          },
+          {
+            "name": "@story-14-7",
+            "line": 639
           }
         ],
         "type": "scenario"
       },
       {
         "description": "",
-        "id": "frontend-design-system-migration;pricecalculator-numeric-inputs-use-canonical-fp-input-class",
+        "id": "frontend-design-system-migration;opportunities-page-header-uses-canonical-fp-glass-nav-surface",
         "keyword": "Scenario",
-        "line": 303,
-        "name": "PriceCalculator numeric inputs use canonical fp-input class",
+        "line": 651,
+        "name": "Opportunities page header uses canonical fp-glass-nav surface",
         "steps": [
           {
             "keyword": "Before",
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 32624
+              "duration": 22416
             }
           },
           {
@@ -220,72 +177,59 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 50554291
+              "duration": 32552207
             }
           },
           {
             "arguments": [],
             "keyword": "Given ",
-            "line": 304,
-            "name": "the source file \"src/components/PriceCalculator.tsx\" exists",
+            "line": 652,
+            "name": "the source file \"app/opportunities/page.tsx\" exists",
             "match": {
               "location": "test/acceptance/step_definitions/E-014-shared-ui-state.steps.ts:51"
             },
             "result": {
               "status": "passed",
-              "duration": 269458
+              "duration": 300665
             }
           },
           {
             "arguments": [],
             "keyword": "When ",
-            "line": 305,
-            "name": "I read the source of \"src/components/PriceCalculator.tsx\"",
+            "line": 653,
+            "name": "I read the source of \"app/opportunities/page.tsx\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:34"
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:39"
             },
             "result": {
               "status": "passed",
-              "duration": 147750
+              "duration": 1061708
             }
           },
           {
             "arguments": [],
             "keyword": "Then ",
-            "line": 306,
-            "name": "the source should contain the pattern \"fp-input w-28 text-right\"",
+            "line": 654,
+            "name": "the source should contain the pattern \"fp-glass-nav\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:43"
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
             },
             "result": {
               "status": "passed",
-              "duration": 256791
+              "duration": 118375
             }
           },
           {
             "arguments": [],
             "keyword": "And ",
-            "line": 307,
-            "name": "the source should contain the pattern \"fp-input w-20 text-right\"",
+            "line": 655,
+            "name": "the source should not contain the pattern \"backdrop-blur-xl bg-white/10\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:43"
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:59"
             },
             "result": {
               "status": "passed",
-              "duration": 110290
-            }
-          },
-          {
-            "arguments": [],
-            "keyword": "And ",
-            "line": 308,
-            "name": "the source should contain the pattern \"fp-input w-24 text-right\"",
-            "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:43"
-            },
-            "result": {
-              "status": "passed",
-              "duration": 78208
+              "duration": 515458
             }
           },
           {
@@ -293,7 +237,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 3823333
+              "duration": 2718499
             }
           },
           {
@@ -301,7 +245,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 15957
+              "duration": 10291
             }
           }
         ],
@@ -311,33 +255,33 @@
             "line": 1
           },
           {
-            "name": "@E-014-S-31",
-            "line": 302
+            "name": "@E-014-S-59",
+            "line": 650
           },
           {
             "name": "@FR-UI-DESIGN-02",
-            "line": 302
+            "line": 650
           },
           {
-            "name": "@story-14-6",
-            "line": 302
+            "name": "@story-14-7",
+            "line": 650
           }
         ],
         "type": "scenario"
       },
       {
         "description": "",
-        "id": "frontend-design-system-migration;pricecalculator-action-buttons-use-canonical-fp-btn-*-variants",
+        "id": "frontend-design-system-migration;opportunities-page-stat-cards-use-canonical-fp-glow-card-with-zero-palette-violations",
         "keyword": "Scenario",
-        "line": 312,
-        "name": "PriceCalculator action buttons use canonical fp-btn-* variants",
+        "line": 659,
+        "name": "Opportunities page stat cards use canonical fp-glow-card with zero palette violations",
         "steps": [
           {
             "keyword": "Before",
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 18250
+              "duration": 13542
             }
           },
           {
@@ -345,59 +289,85 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 47754542
+              "duration": 34290625
             }
           },
           {
             "arguments": [],
             "keyword": "Given ",
-            "line": 313,
-            "name": "the source file \"src/components/PriceCalculator.tsx\" exists",
+            "line": 660,
+            "name": "the source file \"app/opportunities/page.tsx\" exists",
             "match": {
               "location": "test/acceptance/step_definitions/E-014-shared-ui-state.steps.ts:51"
             },
             "result": {
               "status": "passed",
-              "duration": 321750
+              "duration": 252540
             }
           },
           {
             "arguments": [],
             "keyword": "When ",
-            "line": 314,
-            "name": "I read the source of \"src/components/PriceCalculator.tsx\"",
+            "line": 661,
+            "name": "I read the source of \"app/opportunities/page.tsx\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:34"
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:39"
             },
             "result": {
               "status": "passed",
-              "duration": 146416
+              "duration": 926208
             }
           },
           {
             "arguments": [],
             "keyword": "Then ",
-            "line": 315,
-            "name": "the source should contain the pattern \"fp-btn-primary text-xs px-3 py-1.5\"",
+            "line": 662,
+            "name": "the source should contain the pattern \"fp-glow-card\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:43"
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
             },
             "result": {
               "status": "passed",
-              "duration": 118875
+              "duration": 186833
             }
           },
           {
             "arguments": [],
             "keyword": "And ",
-            "line": 316,
-            "name": "the source should contain the pattern \"fp-btn-ghost text-xs px-3 py-1.5\"",
+            "line": 663,
+            "name": "the source should not contain the pattern \"hover:shadow-blue-500\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:43"
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:59"
             },
             "result": {
               "status": "passed",
-              "duration": 147332
+              "duration": 173708
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 664,
+            "name": "the source should not contain the pattern \"hover:shadow-orange-500\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:59"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 61000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 665,
+            "name": "the raw Tailwind palette class count should equal 0",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:70"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 187207
             }
           },
           {
@@ -405,7 +375,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 4435290
+              "duration": 2362082
             }
           },
           {
@@ -413,7 +383,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 26708
+              "duration": 8792
             }
           }
         ],
@@ -423,33 +393,33 @@
             "line": 1
           },
           {
-            "name": "@E-014-S-32",
-            "line": 311
+            "name": "@E-014-S-60",
+            "line": 658
           },
           {
             "name": "@FR-UI-DESIGN-02",
-            "line": 311
+            "line": 658
           },
           {
-            "name": "@story-14-6",
-            "line": 311
+            "name": "@story-14-7",
+            "line": 658
           }
         ],
         "type": "scenario"
       },
       {
         "description": "",
-        "id": "frontend-design-system-migration;pricecalculator-alert-banners-use-canonical-fp-alert-*-variants",
+        "id": "frontend-design-system-migration;listings-detail-page-imports-loadingskeleton,-errorbanner,-emptystate-from-shared-ui",
         "keyword": "Scenario",
-        "line": 320,
-        "name": "PriceCalculator alert banners use canonical fp-alert-* variants",
+        "line": 669,
+        "name": "Listings detail page imports LoadingSkeleton, ErrorBanner, EmptyState from shared ui",
         "steps": [
           {
             "keyword": "Before",
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 23791
+              "duration": 12125
             }
           },
           {
@@ -457,59 +427,85 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 45468208
+              "duration": 37667790
             }
           },
           {
             "arguments": [],
             "keyword": "Given ",
-            "line": 321,
-            "name": "the source file \"src/components/PriceCalculator.tsx\" exists",
+            "line": 670,
+            "name": "the source file \"app/listings/[id]/page.tsx\" exists",
             "match": {
               "location": "test/acceptance/step_definitions/E-014-shared-ui-state.steps.ts:51"
             },
             "result": {
               "status": "passed",
-              "duration": 208333
+              "duration": 174582
             }
           },
           {
             "arguments": [],
             "keyword": "When ",
-            "line": 322,
-            "name": "I read the source of \"src/components/PriceCalculator.tsx\"",
+            "line": 671,
+            "name": "I read the source of \"app/listings/[id]/page.tsx\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:34"
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:39"
             },
             "result": {
               "status": "passed",
-              "duration": 114290
+              "duration": 207208
             }
           },
           {
             "arguments": [],
             "keyword": "Then ",
-            "line": 323,
-            "name": "the source should contain the pattern \"fp-alert-warn px-4 py-3\"",
+            "line": 672,
+            "name": "the source should contain the pattern \"LoadingSkeleton, ErrorBanner, EmptyState\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:43"
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
             },
             "result": {
               "status": "passed",
-              "duration": 79082
+              "duration": 75957
             }
           },
           {
             "arguments": [],
             "keyword": "And ",
-            "line": 324,
-            "name": "the source should contain the pattern \"fp-alert-danger px-4 py-3\"",
+            "line": 673,
+            "name": "the source should contain the pattern \"errorStatus === 404\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:43"
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
             },
             "result": {
               "status": "passed",
-              "duration": 65459
+              "duration": 52999
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 674,
+            "name": "the source should contain the pattern \"fp-glass\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 44957
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 675,
+            "name": "the raw Tailwind palette class count should equal 0",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:70"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 78207
             }
           },
           {
@@ -517,7 +513,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 4048792
+              "duration": 3198957
             }
           },
           {
@@ -525,7 +521,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 13958
+              "duration": 113749
             }
           }
         ],
@@ -535,33 +531,37 @@
             "line": 1
           },
           {
-            "name": "@E-014-S-33",
-            "line": 319
+            "name": "@E-014-S-61",
+            "line": 668
           },
           {
             "name": "@FR-UI-DESIGN-02",
-            "line": 319
+            "line": 668
           },
           {
-            "name": "@story-14-6",
-            "line": 319
+            "name": "@FR-UI-DESIGN-06",
+            "line": 668
+          },
+          {
+            "name": "@story-14-7",
+            "line": 668
           }
         ],
         "type": "scenario"
       },
       {
         "description": "",
-        "id": "frontend-design-system-migration;range-slider-uses-canonical-accent-color-without-palette-class",
+        "id": "frontend-design-system-migration;messagebubble-source-ships-zero-palette-classes-and-zero-dark-prefixes",
         "keyword": "Scenario",
-        "line": 328,
-        "name": "Range slider uses canonical accent-color without palette class",
+        "line": 679,
+        "name": "MessageBubble source ships zero palette classes and zero dark prefixes",
         "steps": [
           {
             "keyword": "Before",
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 30583
+              "duration": 20499
             }
           },
           {
@@ -569,59 +569,85 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 45728250
+              "duration": 39007540
             }
           },
           {
             "arguments": [],
             "keyword": "Given ",
-            "line": 329,
-            "name": "the source file \"src/components/PriceCalculator.tsx\" exists",
+            "line": 680,
+            "name": "the source file \"src/components/messages/MessageBubble.tsx\" exists",
             "match": {
               "location": "test/acceptance/step_definitions/E-014-shared-ui-state.steps.ts:51"
             },
             "result": {
               "status": "passed",
-              "duration": 221375
+              "duration": 163708
             }
           },
           {
             "arguments": [],
             "keyword": "When ",
-            "line": 330,
-            "name": "I read the source of \"src/components/PriceCalculator.tsx\"",
+            "line": 681,
+            "name": "I read the source of \"src/components/messages/MessageBubble.tsx\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:34"
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:39"
             },
             "result": {
               "status": "passed",
-              "duration": 207707
+              "duration": 264167
             }
           },
           {
             "arguments": [],
             "keyword": "Then ",
-            "line": 331,
-            "name": "the source should contain the pattern \"accentColor: '#7c3aed'\"",
+            "line": 682,
+            "name": "the source should not contain the pattern \"dark:\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:43"
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:59"
             },
             "result": {
               "status": "passed",
-              "duration": 121708
+              "duration": 88207
             }
           },
           {
             "arguments": [],
             "keyword": "And ",
-            "line": 332,
-            "name": "the source should not contain the pattern \"accent-purple-\"",
+            "line": 683,
+            "name": "the source should contain the pattern \"fp-glass-sm\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:54"
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
             },
             "result": {
               "status": "passed",
-              "duration": 696333
+              "duration": 73792
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 684,
+            "name": "the source should contain the pattern \"rgba(124,58,237,0.15)\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 81000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 685,
+            "name": "the raw Tailwind palette class count should equal 0",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:70"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 124791
             }
           },
           {
@@ -629,7 +655,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 3107834
+              "duration": 3789708
             }
           },
           {
@@ -637,7 +663,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 12708
+              "duration": 11958
             }
           }
         ],
@@ -647,175 +673,33 @@
             "line": 1
           },
           {
-            "name": "@E-014-S-34",
-            "line": 327
-          },
-          {
-            "name": "@FR-UI-DESIGN-07",
-            "line": 327
-          },
-          {
-            "name": "@story-14-6",
-            "line": 327
-          }
-        ],
-        "type": "scenario"
-      },
-      {
-        "description": "",
-        "id": "frontend-design-system-migration;listing-detail-page-renders-pricecalculator-on-a-canonical-glass-surface",
-        "keyword": "Scenario",
-        "line": 336,
-        "name": "Listing detail page renders PriceCalculator on a canonical glass surface",
-        "steps": [
-          {
-            "keyword": "Before",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 14457
-            }
-          },
-          {
-            "keyword": "Before",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 45949749
-            }
-          },
-          {
-            "arguments": [],
-            "keyword": "Given ",
-            "line": 337,
-            "name": "I am logged in",
-            "match": {
-              "location": "test/acceptance/step_definitions/E-002-auth-access.steps.ts:26"
-            },
-            "result": {
-              "status": "passed",
-              "duration": 4549374
-            }
-          },
-          {
-            "arguments": [],
-            "keyword": "And ",
-            "line": 338,
-            "name": "the \"/api/listings/mock-listing-14-6\" route returns a mocked listing with optimal pricing",
-            "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:79"
-            },
-            "result": {
-              "status": "passed",
-              "duration": 17881250
-            }
-          },
-          {
-            "arguments": [],
-            "keyword": "When ",
-            "line": 339,
-            "name": "I load the \"/listings/mock-listing-14-6\" route in the browser",
-            "match": {
-              "location": "test/acceptance/step_definitions/E-014-frontend-design-migration.steps.ts:35"
-            },
-            "result": {
-              "status": "passed",
-              "duration": 432814916
-            }
-          },
-          {
-            "arguments": [],
-            "keyword": "Then ",
-            "line": 340,
-            "name": "an element matching \"[data-testid='price-calculator']\" with class \"fp-glass\" is visible",
-            "match": {
-              "location": "test/acceptance/step_definitions/E-014-shared-ui-state.steps.ts:209"
-            },
-            "result": {
-              "status": "passed",
-              "duration": 974052334
-            }
-          },
-          {
-            "arguments": [],
-            "keyword": "And ",
-            "line": 341,
-            "name": "the element \"[data-testid='price-calculator-hero']\" has aria-live \"polite\"",
-            "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:154"
-            },
-            "result": {
-              "status": "passed",
-              "duration": 16868333
-            }
-          },
-          {
-            "arguments": [],
-            "keyword": "And ",
-            "line": 342,
-            "name": "the slider \"#price-calc-margin-slider\" has aria-valuemin, aria-valuemax, aria-valuenow, and aria-valuetext populated",
-            "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:164"
-            },
-            "result": {
-              "status": "passed",
-              "duration": 140034999
-            }
-          },
-          {
-            "keyword": "After",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 52909209
-            }
-          },
-          {
-            "keyword": "After",
-            "hidden": true,
-            "result": {
-              "status": "passed",
-              "duration": 38042
-            }
-          }
-        ],
-        "tags": [
-          {
-            "name": "@epic-14",
-            "line": 1
-          },
-          {
-            "name": "@E-014-S-35",
-            "line": 335
+            "name": "@E-014-S-62",
+            "line": 678
           },
           {
             "name": "@FR-UI-DESIGN-02",
-            "line": 335
+            "line": 678
           },
           {
-            "name": "@FR-UI-DESIGN-07",
-            "line": 335
-          },
-          {
-            "name": "@story-14-6",
-            "line": 335
+            "name": "@story-14-7",
+            "line": 678
           }
         ],
         "type": "scenario"
       },
       {
         "description": "",
-        "id": "frontend-design-system-migration;pricecalculator-best-platform-badge-uses-canonical-fp-badge-purple",
+        "id": "frontend-design-system-migration;status_colors-entries-all-return-canonical-fp-badge-class-strings",
         "keyword": "Scenario",
-        "line": 346,
-        "name": "PriceCalculator best-platform badge uses canonical fp-badge-purple",
+        "line": 689,
+        "name": "STATUS_COLORS entries all return canonical fp-badge class strings",
         "steps": [
           {
             "keyword": "Before",
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 62083
+              "duration": 13625
             }
           },
           {
@@ -823,46 +707,111 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 94095416
+              "duration": 38210750
             }
           },
           {
             "arguments": [],
             "keyword": "Given ",
-            "line": 347,
-            "name": "the source file \"src/components/PriceCalculator.tsx\" exists",
+            "line": 690,
+            "name": "the source file \"src/lib/message-constants.ts\" exists",
             "match": {
               "location": "test/acceptance/step_definitions/E-014-shared-ui-state.steps.ts:51"
             },
             "result": {
               "status": "passed",
-              "duration": 434000
+              "duration": 164249
             }
           },
           {
             "arguments": [],
             "keyword": "When ",
-            "line": 348,
-            "name": "I read the source of \"src/components/PriceCalculator.tsx\"",
+            "line": 691,
+            "name": "I read the source of \"src/lib/message-constants.ts\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:34"
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:39"
             },
             "result": {
               "status": "passed",
-              "duration": 356832
+              "duration": 423499
             }
           },
           {
             "arguments": [],
             "keyword": "Then ",
-            "line": 349,
-            "name": "the source should contain the pattern \"fp-badge fp-badge-purple\"",
+            "line": 692,
+            "name": "the source should contain the pattern \"fp-badge fp-badge-yellow\"",
             "match": {
-              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:43"
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
             },
             "result": {
               "status": "passed",
-              "duration": 802458
+              "duration": 79208
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 693,
+            "name": "the source should contain the pattern \"fp-badge fp-badge-red\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 56916
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 694,
+            "name": "the source should contain the pattern \"fp-badge fp-badge-blue\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 42124
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 695,
+            "name": "the source should contain the pattern \"fp-badge fp-badge-gray\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 38875
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 696,
+            "name": "the source should not contain the pattern \"dark:\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:59"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 44165
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 697,
+            "name": "the raw Tailwind palette class count should equal 0",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:70"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 50292
             }
           },
           {
@@ -870,7 +819,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 7506167
+              "duration": 2309417
             }
           },
           {
@@ -878,7 +827,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 38249
+              "duration": 9540
             }
           }
         ],
@@ -888,16 +837,511 @@
             "line": 1
           },
           {
-            "name": "@E-014-S-36",
-            "line": 345
+            "name": "@E-014-S-63",
+            "line": 688
           },
           {
             "name": "@FR-UI-DESIGN-02",
-            "line": 345
+            "line": 688
           },
           {
-            "name": "@story-14-6",
-            "line": 345
+            "name": "@FR-UI-DESIGN-04",
+            "line": 688
+          },
+          {
+            "name": "@story-14-7",
+            "line": 688
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "frontend-design-system-migration;messages-page-imports-emptystate-and-has-zero-palette-classes",
+        "keyword": "Scenario",
+        "line": 701,
+        "name": "Messages page imports EmptyState and has zero palette classes",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 21584
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 40439374
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 702,
+            "name": "the source file \"app/messages/page.tsx\" exists",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-shared-ui-state.steps.ts:51"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 165749
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 703,
+            "name": "I read the source of \"app/messages/page.tsx\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:39"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 354499
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 704,
+            "name": "the source should contain the pattern \"EmptyState\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 70541
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 705,
+            "name": "the source should contain the pattern \"fp-glass\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 47791
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 706,
+            "name": "the raw Tailwind palette class count should equal 0",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:70"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 197000
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 5945040
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 28749
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-14",
+            "line": 1
+          },
+          {
+            "name": "@E-014-S-64",
+            "line": 700
+          },
+          {
+            "name": "@FR-UI-DESIGN-02",
+            "line": 700
+          },
+          {
+            "name": "@FR-UI-DESIGN-06",
+            "line": 700
+          },
+          {
+            "name": "@story-14-7",
+            "line": 700
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "frontend-design-system-migration;thread-components-ship-canonical-surfaces-with-zero-palette-and-zero-dark-prefixes",
+        "keyword": "Scenario Outline",
+        "line": 719,
+        "name": "Thread components ship canonical surfaces with zero palette and zero dark prefixes",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 22249
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 38599666
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 711,
+            "name": "the source file \"src/components/messages/ThreadItem.tsx\" exists",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-shared-ui-state.steps.ts:51"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 182792
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 712,
+            "name": "I read the source of \"src/components/messages/ThreadItem.tsx\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:39"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 293667
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 713,
+            "name": "the source should not contain the pattern \"dark:\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:59"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 65667
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 714,
+            "name": "the source should contain the pattern \"fp-glass-sm\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 46583
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 715,
+            "name": "the raw Tailwind palette class count should equal 0",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:70"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 54958
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 2894291
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 14374
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-14",
+            "line": 1
+          },
+          {
+            "name": "@E-014-S-65",
+            "line": 709
+          },
+          {
+            "name": "@FR-UI-DESIGN-02",
+            "line": 709
+          },
+          {
+            "name": "@story-14-7",
+            "line": 709
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "frontend-design-system-migration;thread-components-ship-canonical-surfaces-with-zero-palette-and-zero-dark-prefixes",
+        "keyword": "Scenario Outline",
+        "line": 720,
+        "name": "Thread components ship canonical surfaces with zero palette and zero dark prefixes",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 31500
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 42752208
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 711,
+            "name": "the source file \"src/components/messages/ThreadHeader.tsx\" exists",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-shared-ui-state.steps.ts:51"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 194667
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 712,
+            "name": "I read the source of \"src/components/messages/ThreadHeader.tsx\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:39"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 314792
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 713,
+            "name": "the source should not contain the pattern \"dark:\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:59"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 199791
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 714,
+            "name": "the source should contain the pattern \"fp-glass\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 196124
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 715,
+            "name": "the raw Tailwind palette class count should equal 0",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:70"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 140457
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 5223667
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 22124
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-14",
+            "line": 1
+          },
+          {
+            "name": "@E-014-S-65",
+            "line": 709
+          },
+          {
+            "name": "@FR-UI-DESIGN-02",
+            "line": 709
+          },
+          {
+            "name": "@story-14-7",
+            "line": 709
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "frontend-design-system-migration;messageapprovalcard-status_colors-consumer-does-not-double-apply-badge-padding",
+        "keyword": "Scenario",
+        "line": 724,
+        "name": "MessageApprovalCard STATUS_COLORS consumer does not double-apply badge padding",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 19291
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 43833290
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 725,
+            "name": "the source file \"src/components/MessageApprovalCard.tsx\" exists",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-shared-ui-state.steps.ts:51"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 177208
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 726,
+            "name": "I read the source of \"src/components/MessageApprovalCard.tsx\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:39"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 99833
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 727,
+            "name": "the source should not contain the pattern \"text-xs px-2 py-0.5 rounded font-medium ${STATUS_COLORS\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:59"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 61250
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 728,
+            "name": "the source should contain the pattern \"flex-shrink-0 ${STATUS_COLORS[message.status]\"",
+            "match": {
+              "location": "test/acceptance/step_definitions/E-014-price-calculator.steps.ts:48"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 46084
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 2167165
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 9708
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@epic-14",
+            "line": 1
+          },
+          {
+            "name": "@E-014-S-66",
+            "line": 723
+          },
+          {
+            "name": "@FR-UI-DESIGN-02",
+            "line": 723
+          },
+          {
+            "name": "@story-14-7",
+            "line": 723
           }
         ],
         "type": "scenario"

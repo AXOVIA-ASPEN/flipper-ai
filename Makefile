@@ -77,7 +77,7 @@ db-setup: ensure-env
 # Preview: install deps, set up DB if needed, start dev server
 preview: install db-setup
 	@echo "Starting Flipper.ai preview server..."
-	@echo "Open http://localhost:3000 in your browser"
+	@echo "Open http://localhost:3200 in your browser"
 	pnpm dev
 
 # Production build
@@ -145,14 +145,14 @@ test-e2e-ui:
 # Filter by tags:   make test-acceptance TAGS=@FR-RELIST-01  or  TAGS="@story-9-2 and @FR-RELIST-03"
 test-acceptance:
 	@if [ -n "$(STORY)" ]; then \
-		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3000 'pnpm exec cucumber-js --profile acceptance --tags "@story-$(subst .,-,$(STORY))"'; \
+		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3200 'pnpm exec cucumber-js --profile acceptance --tags "@story-$(subst .,-,$(STORY))"'; \
 	elif [ -n "$(FEATURE)" ]; then \
 		EPIC_NUM=$$(echo "$(FEATURE)" | tr -d 'Ff' | sed 's/^0*//'); \
-		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3000 "pnpm exec cucumber-js --profile acceptance --tags \"@epic-$$EPIC_NUM\""; \
+		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3200 "pnpm exec cucumber-js --profile acceptance --tags \"@epic-$$EPIC_NUM\""; \
 	elif [ -n "$(TAGS)" ]; then \
-		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3000 'pnpm exec cucumber-js --profile acceptance --tags "$(TAGS)"'; \
+		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3200 'pnpm exec cucumber-js --profile acceptance --tags "$(TAGS)"'; \
 	else \
-		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3000 'pnpm exec cucumber-js --profile acceptance'; \
+		pnpm exec start-server-and-test 'pnpm dev' http://localhost:3200 'pnpm exec cucumber-js --profile acceptance'; \
 	fi
 
 # Alias for test-acceptance.

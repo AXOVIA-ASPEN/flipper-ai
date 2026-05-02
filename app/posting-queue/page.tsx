@@ -301,7 +301,12 @@ function PostingQueueContent() {
             </option>
           ))}
         </select>
-        <span style={{ fontSize: 13, color: '#64748b' }}>
+        <span
+          aria-live="polite"
+          aria-atomic="true"
+          data-testid="queue-total-count"
+          style={{ fontSize: 13, color: '#64748b' }}
+        >
           {total} item{total === 1 ? '' : 's'}
         </span>
       </div>

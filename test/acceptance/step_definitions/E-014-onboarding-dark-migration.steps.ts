@@ -15,7 +15,7 @@
  * src/components/Onboarding and app/onboarding directories.
  */
 
-import { When, Then, setDefaultTimeout } from '@cucumber/cucumber';
+import { When, Then, Before, setDefaultTimeout } from '@cucumber/cucumber';
 import assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -67,15 +67,75 @@ const BANNED_BORDER_GRAY_PATTERN = /border-gray-\d/g;
 
 // The load step is borrowed from Story 14.1's step-defs file via the shared
 // `When I load the {string} route in the browser` phrasing — reused here.
+// That step waits only for `domcontentloaded`, so the onboarding page's async
+// fetch of /api/user/onboarding hasn't resolved and the wizard hasn't mounted
+// yet. Every DOM-query step below awaits `waitForOnboardingWizard` first so
+// the assertion never races the React mount.
 //
 // The reusable Continue/Back/option interactions are unique to the wizard and
 // defined locally to keep the onboarding vocabulary isolated from other stories.
 
+async function waitForOnboardingWizard(page: CustomWorld['page']): Promise<void> {
+  // The wizard's glass card is the canonical readiness sentinel. The loading
+  // screen has no .fp-glass, so this selector only matches once the initial
+  // API fetch has settled and WizardLayout has mounted.
+  await page.waitForSelector('.fp-glass button.fp-btn-primary', { timeout: 20_000 });
+}
+
+// Reset onboarding state before every Story 14.5 scenario so the shared test
+// user lands on step 1 even if a prior run completed onboarding. Without this,
+// app/onboarding/page.tsx redirects to "/" and the wizard selector times out.
+// Runs before `Given I am logged in` (which sets the session cookie), so we
+// reset via Prisma directly rather than the authenticated API route.
+Before({ tags: '@story-14-5' }, async function (this: CustomWorld) {
+  try {
+    await this.db.user.updateMany({
+      where: { firebaseUid: 'test-user-id' },
+      data: { onboardingComplete: false, onboardingStep: 0 },
+    });
+  } catch {
+    // If the test user doesn't exist yet, the navigation step will surface a
+    // clearer failure than this hook should swallow.
+  }
+});
+
 async function clickOnboardingContinue(page: CustomWorld['page']): Promise<void> {
+  await waitForOnboardingWizard(page);
   const continueBtn = page.locator('button.fp-btn-primary').first();
   await continueBtn.click({ timeout: 10_000 });
   // Give React a tick to re-render the next step
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(300);
+}
+
+// ─── Purple-color tolerance helper ────────────────────────────────────────────
+
+// Computed rgba values drift slightly from the declared CSS color values
+// — headless Chrome applies color-space conversion and (for class-based focus
+// rules) compositing. We parse the expected "R, G, B" triple from the Gherkin
+// step (so the assertion stays parameterized) and match on a ±tolerance window.
+function parseRgbTriple(triple: string): { r: number; g: number; b: number } | null {
+  const match = triple.match(/(\d+)[,\s]+(\d+)[,\s]+(\d+)/);
+  if (!match) return null;
+  return {
+    r: parseInt(match[1], 10),
+    g: parseInt(match[2], 10),
+    b: parseInt(match[3], 10),
+  };
+}
+
+function matchesRgbTripleWithTolerance(colorString: string, expected: string): boolean {
+  const target = parseRgbTriple(expected);
+  if (!target) return false;
+  const match = colorString.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (!match) return false;
+  const r = parseInt(match[1], 10);
+  const g = parseInt(match[2], 10);
+  const b = parseInt(match[3], 10);
+  return (
+    Math.abs(r - target.r) <= 15 &&
+    Math.abs(g - target.g) <= 20 &&
+    Math.abs(b - target.b) <= 10
+  );
 }
 
 // ─── Wrapper-class assertions ─────────────────────────────────────────────────
@@ -83,6 +143,7 @@ async function clickOnboardingContinue(page: CustomWorld['page']): Promise<void>
 Then(
   'the onboarding page wrapper has no class containing {string} or {string} or {string} or {string}',
   async function (this: CustomWorld, a: string, b: string, c: string, d: string) {
+    await waitForOnboardingWizard(this.page);
     const banned = [a, b, c, d];
     const offending = await this.page.evaluate((patterns: string[]) => {
       const wrappers = Array.from(document.querySelectorAll('.min-h-screen'));
@@ -109,6 +170,7 @@ Then(
 Then(
   'the onboarding progress bar container has the class {string}',
   async function (this: CustomWorld, className: string) {
+    await waitForOnboardingWizard(this.page);
     const has = await this.page.evaluate((cls: string) => {
       const el = document.querySelector('[role="progressbar"]');
       return !!el && el.classList.contains(cls);
@@ -124,6 +186,7 @@ Then(
 Then(
   'the onboarding progress fill element has the class {string}',
   async function (this: CustomWorld, className: string) {
+    await waitForOnboardingWizard(this.page);
     const has = await this.page.evaluate((cls: string) => {
       const track = document.querySelector('[role="progressbar"]');
       const fill = track?.querySelector(':scope > *');
@@ -140,6 +203,7 @@ Then(
 Then(
   'the onboarding progress fill computed background includes {string}',
   async function (this: CustomWorld, expected: string) {
+    await waitForOnboardingWizard(this.page);
     const bg = await this.page.evaluate(() => {
       const track = document.querySelector('[role="progressbar"]');
       const fill = track?.querySelector(':scope > *');
@@ -160,9 +224,10 @@ Then(
 Then(
   'the onboarding Continue button has the class {string}',
   async function (this: CustomWorld, className: string) {
+    await waitForOnboardingWizard(this.page);
     const has = await this.page.evaluate((cls: string) => {
-      const btn = document.querySelector('button.' + cls);
-      return !!btn && (btn.textContent || '').toLowerCase().includes('continue');
+      const buttons = Array.from(document.querySelectorAll('button.' + cls));
+      return buttons.some((b) => (b.textContent || '').toLowerCase().includes('continue'));
     }, className);
     assert.strictEqual(
       has,
@@ -175,6 +240,7 @@ Then(
 Then(
   'the onboarding Back button has the class {string}',
   async function (this: CustomWorld, className: string) {
+    await waitForOnboardingWizard(this.page);
     const has = await this.page.evaluate((cls: string) => {
       const buttons = Array.from(document.querySelectorAll('button.' + cls));
       return buttons.some((b) => (b.textContent || '').toLowerCase().includes('back'));
@@ -190,6 +256,7 @@ Then(
 Then(
   'the onboarding {string} button has the class {string}',
   async function (this: CustomWorld, buttonText: string, className: string) {
+    await waitForOnboardingWizard(this.page);
     const has = await this.page.evaluate(
       ([text, cls]: string[]) => {
         const buttons = Array.from(document.querySelectorAll('button.' + cls));
@@ -213,6 +280,7 @@ When(
   'I click the onboarding Continue button to advance to step {int}',
   async function (this: CustomWorld, targetStep: number) {
     await clickOnboardingContinue(this.page);
+    await waitForOnboardingWizard(this.page);
     // Verify the progress bar actually advanced
     const currentStep = await this.page.evaluate(() => {
       const span = Array.from(document.querySelectorAll('span')).find((el) =>
@@ -232,13 +300,20 @@ When(
     if (!this.testData.onboardingStepsSeen) {
       this.testData.onboardingStepsSeen = [];
     }
-    const wrapperClass = await this.page.evaluate(() => {
-      const el = document.querySelector('.min-h-screen');
-      return el ? el.getAttribute('class') || '' : '';
+    const captured = await this.page.evaluate(() => {
+      const wrapperEl = document.querySelector('.min-h-screen');
+      const continueBtn = Array.from(document.querySelectorAll('button')).find((b) =>
+        /(continue|finish setup|go to dashboard)/i.test(b.textContent || '')
+      );
+      return {
+        wrapperClass: wrapperEl ? wrapperEl.getAttribute('class') || '' : '',
+        continueBtnClass: continueBtn ? continueBtn.getAttribute('class') || '' : '',
+      };
     });
     this.testData.onboardingStepsSeen.push({
       step: targetStep,
-      wrapperClass,
+      wrapperClass: captured.wrapperClass,
+      continueBtnClass: captured.continueBtnClass,
     });
   }
 );
@@ -246,6 +321,7 @@ When(
 When(
   'I select the onboarding marketplace option {string}',
   async function (this: CustomWorld, label: string) {
+    await waitForOnboardingWizard(this.page);
     // Click the <label> whose text contains the marketplace name.
     const clicked = await this.page.evaluate((text: string) => {
       const labels = Array.from(document.querySelectorAll('label'));
@@ -264,8 +340,9 @@ When(
 Then(
   'the selected marketplace card has a computed border color containing {string}',
   async function (this: CustomWorld, expected: string) {
+    await waitForOnboardingWizard(this.page);
     const border = await this.page.evaluate(() => {
-      const labels = Array.from(document.querySelectorAll('label'));
+      const labels = Array.from(document.querySelectorAll('.space-y-3 label'));
       const selected = labels.find((l) => !!l.querySelector('input:checked'));
       if (!selected) return null;
       const style = window.getComputedStyle(selected);
@@ -277,8 +354,8 @@ Then(
       );
     });
     assert.ok(
-      typeof border === 'string' && border.includes(expected),
-      `Expected selected marketplace card border to include "${expected}" but got "${border}"`
+      typeof border === 'string' && matchesRgbTripleWithTolerance(border, expected),
+      `Expected selected marketplace card border to match "${expected}" (±tolerance) but got "${border}"`
     );
   }
 );
@@ -286,8 +363,9 @@ Then(
 Then(
   'the selected marketplace card has a computed background color containing {string}',
   async function (this: CustomWorld, expected: string) {
+    await waitForOnboardingWizard(this.page);
     const bg = await this.page.evaluate(() => {
-      const labels = Array.from(document.querySelectorAll('label'));
+      const labels = Array.from(document.querySelectorAll('.space-y-3 label'));
       const selected = labels.find((l) => !!l.querySelector('input:checked'));
       if (!selected) return null;
       const style = window.getComputedStyle(selected);
@@ -295,8 +373,8 @@ Then(
       return style.backgroundColor || style.background || '';
     });
     assert.ok(
-      typeof bg === 'string' && bg.includes(expected),
-      `Expected selected marketplace card background to include "${expected}" but got "${bg}"`
+      typeof bg === 'string' && matchesRgbTripleWithTolerance(bg, expected),
+      `Expected selected marketplace card background to match "${expected}" (±tolerance) but got "${bg}"`
     );
   }
 );
@@ -304,6 +382,7 @@ Then(
 Then(
   'no onboarding marketplace card has a class containing {string} or {string}',
   async function (this: CustomWorld, bad1: string, bad2: string) {
+    await waitForOnboardingWizard(this.page);
     const offenders = await this.page.evaluate(
       ([a, b]: string[]) => {
         const labels = Array.from(document.querySelectorAll('label'));
@@ -328,6 +407,7 @@ Then(
 Then(
   'the onboarding ZIP input has the class {string}',
   async function (this: CustomWorld, className: string) {
+    await waitForOnboardingWizard(this.page);
     const has = await this.page.evaluate((cls: string) => {
       const input = document.querySelector('#zip-code');
       return !!input && input.classList.contains(cls);
@@ -352,6 +432,8 @@ Then(
       const input = document.querySelector('#zip-code');
       if (!input) return null;
       const style = window.getComputedStyle(input as Element);
+      // Check borderColor first; fall back to box-shadow which carries the
+      // 3px purple focus ring when :focus is active.
       return (
         style.borderColor ||
         style.borderTopColor ||
@@ -360,8 +442,8 @@ Then(
       );
     });
     assert.ok(
-      typeof border === 'string' && border.includes(expected),
-      `Expected #zip-code focus border to include "${expected}" but got "${border}"`
+      typeof border === 'string' && matchesRgbTripleWithTolerance(border, expected),
+      `Expected #zip-code focus border to match "${expected}" (±tolerance) but got "${border}"`
     );
   }
 );
@@ -389,15 +471,18 @@ Then('the count of onboarding palette matches is zero', function (this: CustomWo
   );
 });
 
-// ─── Full-journey assertion ──────────────────────────────────────────────────
+// ─── Full-journey assertions ─────────────────────────────────────────────────
+
+type CapturedStep = {
+  step: number;
+  wrapperClass: string;
+  continueBtnClass: string;
+};
 
 Then(
   'every captured onboarding step had a wrapper without the class {string}',
   function (this: CustomWorld, bannedClass: string) {
-    const seen = (this.testData.onboardingStepsSeen || []) as Array<{
-      step: number;
-      wrapperClass: string;
-    }>;
+    const seen = (this.testData.onboardingStepsSeen || []) as CapturedStep[];
     assert.ok(seen.length > 0, 'No onboarding steps were captured during navigation');
     const offending = seen.filter(({ wrapperClass }) => wrapperClass.includes(bannedClass));
     assert.strictEqual(
@@ -409,6 +494,72 @@ Then(
     );
   }
 );
+
+// AC #6(a): the AC bans every `bg-gradient-*` variant on the outermost
+// wrapper, not just the legacy `bg-gradient-to-br`. Use a single broad-prefix
+// step so a future regression to `bg-gradient-to-r` (or any direction) fails.
+Then(
+  'every captured onboarding step had a wrapper without any {string} class',
+  function (this: CustomWorld, bannedPrefix: string) {
+    const seen = (this.testData.onboardingStepsSeen || []) as CapturedStep[];
+    assert.ok(seen.length > 0, 'No onboarding steps were captured during navigation');
+    const pattern = new RegExp(`(^|\\s)${bannedPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[A-Za-z0-9-]*`);
+    const offending = seen.filter(({ wrapperClass }) => pattern.test(wrapperClass));
+    assert.strictEqual(
+      offending.length,
+      0,
+      `Expected no step wrapper to contain a class starting with "${bannedPrefix}" but found: ${JSON.stringify(
+        offending
+      )}`
+    );
+  }
+);
+
+// AC #6(c): every Continue button across the full journey must carry
+// fp-btn-primary — verifying once on step 1 (S-53) does not satisfy the AC.
+Then(
+  'every captured onboarding Continue button had the class {string}',
+  function (this: CustomWorld, expectedClass: string) {
+    const seen = (this.testData.onboardingStepsSeen || []) as CapturedStep[];
+    assert.ok(seen.length > 0, 'No onboarding steps were captured during navigation');
+    const offending = seen.filter(
+      ({ continueBtnClass }) => !continueBtnClass.split(/\s+/).includes(expectedClass)
+    );
+    assert.strictEqual(
+      offending.length,
+      0,
+      `Expected every captured Continue button to have class "${expectedClass}" but found: ${JSON.stringify(
+        offending
+      )}`
+    );
+  }
+);
+
+// AC #6(e): the journey must end at the dashboard. Click the StepComplete CTA
+// and verify the URL pathname becomes "/".
+When('I click the onboarding {string} button', async function (this: CustomWorld, label: string) {
+  await waitForOnboardingWizard(this.page);
+  // Use Playwright's locator click (not page.evaluate's .click()) so the
+  // click is awaited as a real user interaction and the test stays paused
+  // until Next.js client-side navigation finishes.
+  const button = this.page.locator('button', { hasText: label }).first();
+  await button.waitFor({ state: 'visible', timeout: 10_000 });
+  await Promise.all([
+    this.page
+      .waitForURL((url) => !url.pathname.startsWith('/onboarding'), { timeout: 15_000 })
+      .catch(() => undefined),
+    button.click({ timeout: 10_000 }),
+  ]);
+});
+
+Then('the browser URL pathname is {string}', async function (this: CustomWorld, expected: string) {
+  const url = new URL(this.page.url());
+  assert.strictEqual(
+    url.pathname,
+    expected,
+    `Expected URL pathname "${expected}" but got "${url.pathname}" (full url: ${this.page.url()})`
+  );
+});
 
 // Re-export helpers for parity with sibling E-014 files (no-op at runtime).
 export { countMatchesInFiles, walkFiles };

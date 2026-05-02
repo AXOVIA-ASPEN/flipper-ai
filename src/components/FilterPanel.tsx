@@ -146,10 +146,14 @@ export default function FilterPanel({
                   }
                   className={`px-2 py-1 rounded-lg border text-xs font-medium transition-all duration-200 ${
                     active
-                      ? 'bg-blue-500/40 border-blue-400 text-blue-200 shadow-sm shadow-blue-500/30'
-                      : 'border-white/20 text-white/60 hover:bg-white/10 hover:text-white'
+                      ? 'shadow-sm'
+                      : 'hover:opacity-90'
                   }`}
-                  style={active ? {} : { background: 'rgba(255,255,255,0.04)' }}
+                  style={
+                    active
+                      ? { background: 'rgba(124,58,237,0.4)', borderColor: 'rgba(167,139,250,0.6)', color: '#c4b5fd', boxShadow: '0 0 12px rgba(124,58,237,0.3)' }
+                      : { background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.6)' }
+                  }
                 >
                   {platform.label}
                 </button>
@@ -178,7 +182,13 @@ export default function FilterPanel({
                 onChange={(e) =>
                   setFilter('minScore', e.target.value === '0' ? '' : e.target.value)
                 }
-                className="flex-1 accent-purple-500"
+                aria-label="Minimum score"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={Number(filters.minScore || '0')}
+                aria-valuetext={`Minimum score ${filters.minScore || '0'}`}
+                className="flex-1"
+                style={{ accentColor: '#7c3aed' }}
               />
             </div>
             <div className="flex gap-2 items-center">
@@ -192,7 +202,13 @@ export default function FilterPanel({
                 onChange={(e) =>
                   setFilter('maxScore', e.target.value === '100' ? '' : e.target.value)
                 }
-                className="flex-1 accent-purple-500"
+                aria-label="Maximum score"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={Number(filters.maxScore || '100')}
+                aria-valuetext={`Maximum score ${filters.maxScore || '100'}`}
+                className="flex-1"
+                style={{ accentColor: '#7c3aed' }}
               />
             </div>
           </div>
@@ -244,10 +260,14 @@ export default function FilterPanel({
                   }
                   className={`px-2 py-1 rounded-lg border text-xs font-medium transition-all duration-200 ${
                     active
-                      ? 'bg-purple-500/40 border-purple-400 text-purple-200 shadow-sm shadow-purple-500/30'
-                      : 'border-white/20 text-white/60 hover:bg-white/10 hover:text-white'
+                      ? 'shadow-sm'
+                      : 'hover:opacity-90'
                   }`}
-                  style={active ? {} : { background: 'rgba(255,255,255,0.04)' }}
+                  style={
+                    active
+                      ? { background: 'rgba(124,58,237,0.4)', borderColor: 'rgba(167,139,250,0.6)', color: '#c4b5fd', boxShadow: '0 0 12px rgba(124,58,237,0.3)' }
+                      : { background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.6)' }
+                  }
                 >
                   {cat}
                 </button>
@@ -276,10 +296,14 @@ export default function FilterPanel({
                     }
                     className={`px-2 py-1 rounded-lg border text-xs font-medium transition-all duration-200 ${
                       active
-                        ? 'bg-green-500/40 border-green-400 text-green-200 shadow-sm shadow-green-500/30'
-                        : 'border-white/20 text-white/60 hover:bg-white/10 hover:text-white'
+                        ? 'shadow-sm'
+                        : 'hover:opacity-90'
                     }`}
-                    style={active ? {} : { background: 'rgba(255,255,255,0.04)' }}
+                    style={
+                      active
+                        ? { background: 'rgba(124,58,237,0.4)', borderColor: 'rgba(167,139,250,0.6)', color: '#c4b5fd', boxShadow: '0 0 12px rgba(124,58,237,0.3)' }
+                        : { background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.6)' }
+                    }
                   >
                     {option.label}
                   </button>

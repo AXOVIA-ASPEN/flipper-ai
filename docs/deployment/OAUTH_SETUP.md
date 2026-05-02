@@ -55,7 +55,7 @@ Or follow the manual steps below.
 5. **Name:** Flipper AI Web
 6. **Authorized JavaScript origins:**
    ```
-   http://localhost:3000
+   http://localhost:3200
    https://axovia-flipper.web.app
    ```
 
@@ -93,7 +93,7 @@ echo -n "your_google_client_secret_here" | gcloud secrets create GOOGLE_CLIENT_S
 3. Fill in:
    - **Application name:** Flipper AI
    - **Homepage URL:** 
-     - Dev: `http://localhost:3000`
+     - Dev: `http://localhost:3200`
      - Prod: `https://axovia-flipper.web.app`
    - **Application description:** AI-powered marketplace flipping tool
    - **Authorization callback URL:**
@@ -155,7 +155,7 @@ After deploying to Firebase Hosting + Cloud Run, update your OAuth callback URLs
    npm run dev
    ```
 
-2. Open: http://localhost:3000/auth/login
+2. Open: http://localhost:3200/auth/login
 
 3. Click **"Continue with Google"** or **"Continue with GitHub"**
 
@@ -224,7 +224,7 @@ npx playwright test e2e/acceptance/auth-oauth.spec.ts --headed
 4. **APP_URL mismatch**
    ```bash
    # In .env.local (dev)
-   APP_URL=http://localhost:3000
+   APP_URL=http://localhost:3200
    
    # In production
    APP_URL=https://axovia-flipper.web.app
@@ -271,7 +271,7 @@ npx playwright test e2e/acceptance/auth-oauth.spec.ts --headed
 # Firebase Auth
 ✅ FIREBASE_CLIENT_EMAIL=your-service-account@project.iam.gserviceaccount.com
 ✅ FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
-✅ APP_URL=http://localhost:3000  # or production URL
+✅ APP_URL=http://localhost:3200  # or production URL
 
 # Google OAuth (configured in Firebase Console)
 ✅ GOOGLE_CLIENT_ID=your_google_client_id

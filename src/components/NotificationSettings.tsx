@@ -1,9 +1,9 @@
 /**
  * @file src/components/NotificationSettings.tsx
  * @author Stephen Boyett
- * @company Axovia
+ * @company Axovia AI
  * @date 2026-04-08
- * @version 3.0
+ * @version 3.1
  * @brief Comprehensive notification preferences panel — three independent channels per event type.
  *
  * @description
@@ -14,6 +14,13 @@
  * three independent toggles: Email | Push | SMS. The Push column is gated behind browser
  * Notification permission and the master pushNotifications toggle; the SMS column is gated
  * behind phoneVerified and the master smsNotifications toggle.
+ *
+ * Story 14.8: migrated all surfaces to the canonical dark-glassmorphism design system.
+ * Section wrappers use `.fp-glass-sm`, every toggle uses the canonical `#7c3aed` active
+ * color with explicit background-color transition (ADR-14.8-A), inputs use `.fp-input`,
+ * primary actions use `.fp-btn-primary`, secondary use `.fp-btn-ghost`, banners use
+ * `.fp-alert-warn` / `.fp-alert-info`. Toggle/save/optimistic-rollback semantics and
+ * push/SMS gating are preserved verbatim.
  *
  * Architecture decisions:
  * - NOTIFICATION_EVENT_TYPES config array drives table row rendering — avoids triplication
@@ -167,17 +174,22 @@ function ToggleButton({
       onClick={disabled ? undefined : onToggle}
       title={disabled && disabledReason ? disabledReason : undefined}
       className={[
-        'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
-        'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
-        checked && !disabled ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700',
+        'relative inline-flex items-center justify-start min-h-[44px] min-w-[44px] w-11 rounded-full',
+        'focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2',
         disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
       ].join(' ')}
+      style={{
+        background: checked && !disabled ? '#7c3aed' : 'rgba(255,255,255,0.06)',
+        transition: 'background-color 150ms ease',
+        outlineColor: 'rgba(139, 92, 246, 0.6)',
+      }}
     >
       <span
         className={[
-          'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+          'inline-block h-4 w-4 transform rounded-full transition-transform',
           checked && !disabled ? 'translate-x-6' : 'translate-x-1',
         ].join(' ')}
+        style={{ background: '#f1f5f9' }}
       />
     </button>
   );
@@ -213,8 +225,8 @@ function NotificationRow({
   const smsDisabled = smsColumnDisabled || saving;
 
   return (
-    <tr className="border-b dark:border-gray-700 last:border-0">
-      <td className="py-3 pr-2 text-sm font-medium text-gray-900 dark:text-gray-100 align-middle">
+    <tr className="last:border-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <td className="py-3 pr-2 text-sm font-medium align-middle" style={{ color: '#e2e8f0' }}>
         {tooltip ? (
           <span title={tooltip} className="cursor-help underline decoration-dotted">
             {displayName}
@@ -266,7 +278,7 @@ function CategoryHeader({ label }: { label: string }) {
   return (
     <tr>
       <td colSpan={4} className="pt-4 pb-1">
-        <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#94a3b8' }}>
           {label}
         </span>
       </td>
@@ -279,12 +291,12 @@ function CategoryHeader({ label }: { label: string }) {
 // ---------------------------------------------------------------------------
 function LoadingSkeleton() {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-4">
-      <div className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded h-6 w-48" />
+    <div className="fp-glass-sm p-6 space-y-4">
+      <div className="animate-pulse rounded h-6 w-48" style={{ background: 'rgba(255,255,255,0.06)' }} />
       {[1, 2, 3, 4, 5].map((i) => (
         <div key={i} className="flex items-center justify-between py-2">
-          <div className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded h-4 w-40" />
-          <div className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-full h-6 w-11" />
+          <div className="animate-pulse rounded h-4 w-40" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div className="animate-pulse rounded-full h-6 w-11" style={{ background: 'rgba(255,255,255,0.06)' }} />
         </div>
       ))}
     </div>
@@ -311,13 +323,13 @@ function FrequencyOption({
 }) {
   return (
     <label
-      className={[
-        'flex items-start space-x-3 p-3 rounded-lg border cursor-pointer transition-colors',
-        selected
-          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-          : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50',
-        disabled ? 'opacity-50 cursor-not-allowed' : '',
-      ].join(' ')}
+      className={`flex items-start space-x-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+        disabled ? 'opacity-50 cursor-not-allowed' : ''
+      }`}
+      style={{
+        borderColor: selected ? 'rgba(124,58,237,0.5)' : 'rgba(255,255,255,0.08)',
+        background: selected ? 'rgba(124,58,237,0.08)' : 'transparent',
+      }}
     >
       <input
         type="radio"
@@ -327,10 +339,11 @@ function FrequencyOption({
         disabled={disabled}
         onChange={() => onChange(value)}
         className="mt-1"
+        style={{ accentColor: '#7c3aed' }}
       />
       <div>
-        <div className="font-medium text-sm">{label}</div>
-        <div className="text-xs text-gray-500 dark:text-gray-400">{description}</div>
+        <div className="font-medium text-sm" style={{ color: '#e2e8f0' }}>{label}</div>
+        <div className="text-xs" style={{ color: '#94a3b8' }}>{description}</div>
       </div>
     </label>
   );
@@ -723,9 +736,9 @@ export default function NotificationSettings() {
 
   if (!settings) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 className="text-2xl font-semibold mb-4">Notification Preferences</h2>
-        <p className="text-red-500">Failed to load settings</p>
+      <div className="fp-glass-sm p-6">
+        <h2 className="text-2xl font-semibold mb-4" style={{ color: '#e2e8f0' }}>Notification Preferences</h2>
+        <p style={{ color: '#fca5a5' }}>Failed to load settings</p>
       </div>
     );
   }
@@ -745,29 +758,29 @@ export default function NotificationSettings() {
     : 'Enable SMS notifications above to configure individual SMS preferences';
 
   return (
-    <div ref={sectionRef} id="notifications" className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-6">
+    <div ref={sectionRef} id="notifications" className="fp-glass-sm p-6 space-y-6">
       <div>
-        <h2 className="text-2xl font-semibold">Notification Preferences</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <h2 className="text-2xl font-semibold" style={{ color: '#e2e8f0' }}>Notification Preferences</h2>
+        <p className="text-sm mt-1" style={{ color: '#94a3b8' }}>
           Control which events notify you and how.
         </p>
       </div>
 
       {/* ── Push Notifications (Story 11.1) ──────────────────────────────── */}
-      <div className="py-3 border-b dark:border-gray-700">
+      <div className="py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-medium">Push Notifications</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Receive instant alerts in your browser</p>
+            <h3 className="font-medium" style={{ color: '#e2e8f0' }}>Push Notifications</h3>
+            <p className="text-sm" style={{ color: '#94a3b8' }}>Receive instant alerts in your browser</p>
           </div>
           <div className="flex items-center gap-2">
             {pushPermissionState === 'unsupported' || pushPermissionState === 'denied' ? null : pushIsEnabled ? (
               <>
-                <span className="text-sm text-green-600 dark:text-green-400 font-medium">Push Enabled ✓</span>
+                <span className="text-sm font-medium" style={{ color: '#6ee7b7' }}>Push Enabled ✓</span>
                 <button
                   onClick={disablePush}
                   disabled={pushLoading || saving}
-                  className="px-3 py-1 text-sm rounded border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="fp-btn-ghost"
                 >
                   {pushLoading ? 'Disabling…' : 'Disable'}
                 </button>
@@ -776,7 +789,7 @@ export default function NotificationSettings() {
               <button
                 onClick={enablePush}
                 disabled={pushLoading || saving}
-                className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="fp-btn-primary"
               >
                 {pushLoading ? 'Enabling…' : 'Enable Push Notifications'}
               </button>
@@ -784,23 +797,23 @@ export default function NotificationSettings() {
           </div>
         </div>
         {pushPermissionState === 'denied' && (
-          <p className="mt-2 text-sm text-yellow-600 dark:text-yellow-400">
+          <p className="mt-2 text-sm" style={{ color: '#fcd34d' }}>
             Push notifications are blocked by your browser. Reset in browser settings (Site Settings → Notifications).
           </p>
         )}
         {pushPermissionState === 'unsupported' && (
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-2 text-sm" style={{ color: '#94a3b8' }}>
             Push notifications are not supported in this browser.
           </p>
         )}
       </div>
 
       {/* ── SMS Text Alerts (Story 11.2) ─────────────────────────────────── */}
-      <div className="py-3 border-b dark:border-gray-700">
+      <div className="py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-medium">SMS Text Alerts</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Get critical flip alerts via text message</p>
+            <h3 className="font-medium" style={{ color: '#e2e8f0' }}>SMS Text Alerts</h3>
+            <p className="text-sm" style={{ color: '#94a3b8' }}>Get critical flip alerts via text message</p>
           </div>
           <button
             role="switch"
@@ -813,22 +826,26 @@ export default function NotificationSettings() {
             disabled={saving || !settings.phoneVerified}
             title={settings.phoneVerified ? 'Toggle SMS notifications' : 'Verify your phone number to enable SMS alerts'}
             className={[
-              'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
-              'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
-              settings.smsNotifications ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700',
+              'relative inline-flex items-center justify-start min-h-[44px] min-w-[44px] w-11 rounded-full',
+              'focus:outline-none focus:ring-2 focus:ring-offset-2',
               !settings.phoneVerified || saving ? 'opacity-50 cursor-not-allowed' : '',
             ].join(' ')}
+            style={{
+              background: settings.smsNotifications ? '#7c3aed' : 'rgba(255,255,255,0.06)',
+              transition: 'background-color 150ms ease',
+            }}
           >
             <span
               className={[
-                'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                'inline-block h-4 w-4 transform rounded-full transition-transform',
                 settings.smsNotifications ? 'translate-x-6' : 'translate-x-1',
               ].join(' ')}
+              style={{ background: '#f1f5f9' }}
             />
           </button>
         </div>
         {!settings.phoneVerified && (
-          <p className="mt-2 text-sm text-yellow-700 dark:text-yellow-400">
+          <p className="mt-2 text-sm" style={{ color: '#fcd34d' }}>
             Verify your phone number to enable SMS alerts
           </p>
         )}
@@ -837,21 +854,21 @@ export default function NotificationSettings() {
           {phoneUiState === 'verified' && settings.phoneNumber ? (
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">{maskPhoneNumber(settings.phoneNumber)}</span>
-                <span className="text-sm text-green-600 dark:text-green-400 font-medium">Verified ✓</span>
+                <span className="text-sm font-medium" style={{ color: '#e2e8f0' }}>{maskPhoneNumber(settings.phoneNumber)}</span>
+                <span className="text-sm font-medium" style={{ color: '#6ee7b7' }}>Verified ✓</span>
               </div>
               <button
                 type="button"
                 onClick={handleRemovePhone}
                 disabled={saving}
-                className="px-3 py-1 text-sm rounded border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="fp-btn-ghost"
               >
                 Remove
               </button>
             </div>
           ) : phoneUiState === 'code-sent' || phoneUiState === 'verifying' ? (
             <div className="space-y-2">
-              <label htmlFor="sms-code" className="block text-sm text-gray-700 dark:text-gray-300">
+              <label htmlFor="sms-code" className="block text-sm" style={{ color: '#e2e8f0' }}>
                 Enter the 6-digit code we texted to {phoneInput}
               </label>
               <div className="flex items-center gap-2">
@@ -865,13 +882,13 @@ export default function NotificationSettings() {
                   onChange={(e) => setCodeInput(e.target.value.replace(/\D/g, ''))}
                   placeholder="123456"
                   aria-label="6-digit verification code"
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-sm"
+                  className="fp-input flex-1"
                 />
                 <button
                   type="button"
                   onClick={handleVerifyCode}
                   disabled={phoneUiState === 'verifying'}
-                  className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="fp-btn-primary"
                 >
                   {phoneUiState === 'verifying' ? 'Verifying…' : 'Verify'}
                 </button>
@@ -879,14 +896,15 @@ export default function NotificationSettings() {
               <button
                 type="button"
                 onClick={() => { setPhoneUiState('idle'); setCodeInput(''); setPhoneError(null); }}
-                className="text-xs text-gray-500 dark:text-gray-400 hover:underline"
+                className="text-xs hover:underline"
+                style={{ color: '#94a3b8' }}
               >
                 Use a different number
               </button>
             </div>
           ) : (
             <div className="space-y-2">
-              <label htmlFor="sms-phone" id="sms-phone-hint" className="block text-sm text-gray-700 dark:text-gray-300">
+              <label htmlFor="sms-phone" id="sms-phone-hint" className="block text-sm" style={{ color: '#e2e8f0' }}>
                 Phone number (include country code, e.g. +12025551234)
               </label>
               <div className="flex items-center gap-2">
@@ -898,13 +916,13 @@ export default function NotificationSettings() {
                   placeholder="+12025551234"
                   aria-label="Phone number for SMS notifications"
                   aria-describedby="sms-phone-hint"
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-sm"
+                  className="fp-input flex-1"
                 />
                 <button
                   type="button"
                   onClick={handleSendCode}
                   disabled={phoneUiState === 'sending'}
-                  className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="fp-btn-primary"
                 >
                   {phoneUiState === 'sending' ? 'Sending…' : 'Send Code'}
                 </button>
@@ -912,7 +930,7 @@ export default function NotificationSettings() {
             </div>
           )}
           {phoneError && (
-            <p className="mt-2 text-sm text-red-600 dark:text-red-400" role="alert">
+            <p className="mt-2 text-sm" style={{ color: '#fca5a5' }} role="alert">
               {phoneError}
             </p>
           )}
@@ -924,8 +942,8 @@ export default function NotificationSettings() {
         {/* Master email toggle */}
         <div className="flex items-center justify-between pb-4">
           <div>
-            <h3 className="font-medium">Email Notifications</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Enable or disable all email notifications</p>
+            <h3 className="font-medium" style={{ color: '#e2e8f0' }}>Email Notifications</h3>
+            <p className="text-sm" style={{ color: '#94a3b8' }}>Enable or disable all email notifications</p>
           </div>
           <button
             role="switch"
@@ -934,17 +952,21 @@ export default function NotificationSettings() {
             onClick={() => handleToggle('emailNotifications')}
             disabled={saving}
             className={[
-              'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
-              'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
-              masterOn ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700',
+              'relative inline-flex items-center justify-start min-h-[44px] min-w-[44px] w-11 rounded-full',
+              'focus:outline-none focus:ring-2 focus:ring-offset-2',
               saving ? 'opacity-50 cursor-not-allowed' : '',
             ].join(' ')}
+            style={{
+              background: masterOn ? '#7c3aed' : 'rgba(255,255,255,0.06)',
+              transition: 'background-color 150ms ease',
+            }}
           >
             <span
               className={[
-                'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                'inline-block h-4 w-4 transform rounded-full transition-transform',
                 masterOn ? 'translate-x-6' : 'translate-x-1',
               ].join(' ')}
+              style={{ background: '#f1f5f9' }}
             />
           </button>
         </div>
@@ -953,7 +975,8 @@ export default function NotificationSettings() {
         {!masterOn && (
           <div
             aria-live="polite"
-            className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded text-sm text-yellow-800 dark:text-yellow-300"
+            className="fp-alert-warn mb-4 p-3 text-sm"
+            style={{ color: '#fcd34d' }}
           >
             Email notifications are turned off. Enable the master toggle above to configure individual preferences.
           </div>
@@ -963,25 +986,21 @@ export default function NotificationSettings() {
         <div className={!masterOn ? 'opacity-50 cursor-not-allowed' : ''}>
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b dark:border-gray-700">
-                <th className="pb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">Event</th>
-                <th className="pb-2 px-2 text-center text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                <th className="pb-2 text-sm font-semibold" style={{ color: '#94a3b8' }}>Event</th>
+                <th className="pb-2 px-2 text-center text-sm font-semibold" style={{ color: '#94a3b8' }}>
                   <span className="hidden sm:inline">Email</span>
                   <span className="sm:hidden">E</span>
                 </th>
-                <th className={[
-                  'pb-2 px-2 text-center text-sm font-semibold',
-                  pushColumnDisabled ? 'text-gray-400 dark:text-gray-500' : 'text-gray-700 dark:text-gray-300',
-                ].join(' ')}
+                <th className="pb-2 px-2 text-center text-sm font-semibold"
+                  style={{ color: pushColumnDisabled ? '#475569' : '#94a3b8' }}
                   title={pushColumnDisabled ? pushDisabledReason : undefined}
                 >
                   <span className="hidden sm:inline">Push</span>
                   <span className="sm:hidden">P</span>
                 </th>
-                <th className={[
-                  'pb-2 px-2 text-center text-sm font-semibold',
-                  smsColumnDisabled ? 'text-gray-400 dark:text-gray-500' : 'text-gray-700 dark:text-gray-300',
-                ].join(' ')}
+                <th className="pb-2 px-2 text-center text-sm font-semibold"
+                  style={{ color: smsColumnDisabled ? '#475569' : '#94a3b8' }}
                   title={smsColumnDisabled ? smsDisabledReason : undefined}
                 >
                   <span className="hidden sm:inline">SMS</span>
@@ -1029,7 +1048,7 @@ export default function NotificationSettings() {
                       <tr key="cold-threshold">
                         <td colSpan={4} className="pb-3 pt-1 pl-2">
                           <div className="flex items-center gap-2">
-                            <label htmlFor="cold-hours-input" className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                            <label htmlFor="cold-hours-input" className="text-xs whitespace-nowrap" style={{ color: '#94a3b8' }}>
                               Flip Gone Cold Time
                             </label>
                             <input
@@ -1042,12 +1061,12 @@ export default function NotificationSettings() {
                               onBlur={handleColdHoursBlur}
                               disabled={saving}
                               aria-label="Hours before cold flip alert"
-                              className="w-20 text-sm px-2 py-1 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                              className="fp-input w-20 text-sm"
                             />
-                            <span className="text-xs text-gray-500 dark:text-gray-400">hours with no response</span>
+                            <span className="text-xs" style={{ color: '#94a3b8' }}>hours with no response</span>
                           </div>
                           {(Number(coldHoursInput) < 1 || Number(coldHoursInput) > 168) && coldHoursInput !== '' && (
-                            <p className="mt-1 text-xs text-red-600 dark:text-red-400">Must be between 1 and 168</p>
+                            <p className="mt-1 text-xs" style={{ color: '#fca5a5' }}>Must be between 1 and 168</p>
                           )}
                         </td>
                       </tr>
@@ -1059,7 +1078,7 @@ export default function NotificationSettings() {
                       <tr key="hot-threshold">
                         <td colSpan={4} className="pb-3 pt-1 pl-2">
                           <div className="flex items-center gap-2">
-                            <label htmlFor="hot-count-input" className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                            <label htmlFor="hot-count-input" className="text-xs whitespace-nowrap" style={{ color: '#94a3b8' }}>
                               Flip Turned Hot Threshold
                             </label>
                             <input
@@ -1072,12 +1091,12 @@ export default function NotificationSettings() {
                               onBlur={handleHotCountBlur}
                               disabled={saving}
                               aria-label="Consecutive inbound messages before hot flip alert"
-                              className="w-16 text-sm px-2 py-1 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                              className="fp-input w-16 text-sm"
                             />
-                            <span className="text-xs text-gray-500 dark:text-gray-400">consecutive inbound messages</span>
+                            <span className="text-xs" style={{ color: '#94a3b8' }}>consecutive inbound messages</span>
                           </div>
                           {(Number(hotCountInput) < 1 || Number(hotCountInput) > 20) && hotCountInput !== '' && (
-                            <p className="mt-1 text-xs text-red-600 dark:text-red-400">Must be between 1 and 20</p>
+                            <p className="mt-1 text-xs" style={{ color: '#fca5a5' }}>Must be between 1 and 20</p>
                           )}
                         </td>
                       </tr>
@@ -1093,13 +1112,11 @@ export default function NotificationSettings() {
 
         {/* Notification frequency */}
         <div
-          className={[
-            'pt-4 border-t dark:border-gray-700 mt-4',
-            !masterOn ? 'opacity-50' : '',
-          ].join(' ')}
+          className={`pt-4 mt-4 ${!masterOn ? 'opacity-50' : ''}`}
+          style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
         >
-          <h3 className="font-medium mb-2">Notification Frequency</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+          <h3 className="font-medium mb-2" style={{ color: '#e2e8f0' }}>Notification Frequency</h3>
+          <p className="text-sm mb-3" style={{ color: '#94a3b8' }}>
             How often should we send you email notifications?
           </p>
           <div className="space-y-2">
@@ -1132,17 +1149,17 @@ export default function NotificationSettings() {
       </div>
 
       {/* ── Meeting Reminders (Story 12.2) ──────────────────────────────── */}
-      <div className="pt-4 border-t dark:border-gray-700">
-        <h3 className="font-medium mb-1">Meeting Reminders</h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+      <div className="pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <h3 className="font-medium mb-1" style={{ color: '#e2e8f0' }}>Meeting Reminders</h3>
+        <p className="text-sm mb-4" style={{ color: '#94a3b8' }}>
           Get a departure alert when it&apos;s time to leave for a scheduled meetup.
         </p>
 
         {/* notifyMeetingReminder toggle */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Departure reminder</span>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <span className="text-sm font-medium" style={{ color: '#e2e8f0' }}>Departure reminder</span>
+            <p className="text-xs" style={{ color: '#94a3b8' }}>
               Notify me when it&apos;s time to leave for a meetup
             </p>
           </div>
@@ -1153,17 +1170,21 @@ export default function NotificationSettings() {
             onClick={() => handleToggle('notifyMeetingReminder')}
             disabled={saving}
             className={[
-              'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
-              'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
-              settings.notifyMeetingReminder ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700',
+              'relative inline-flex items-center justify-start min-h-[44px] min-w-[44px] w-11 rounded-full',
+              'focus:outline-none focus:ring-2 focus:ring-offset-2',
               saving ? 'opacity-50 cursor-not-allowed' : '',
             ].join(' ')}
+            style={{
+              background: settings.notifyMeetingReminder ? '#7c3aed' : 'rgba(255,255,255,0.06)',
+              transition: 'background-color 150ms ease',
+            }}
           >
             <span
               className={[
-                'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                'inline-block h-4 w-4 transform rounded-full transition-transform',
                 settings.notifyMeetingReminder ? 'translate-x-6' : 'translate-x-1',
               ].join(' ')}
+              style={{ background: '#f1f5f9' }}
             />
           </button>
         </div>
@@ -1171,7 +1192,7 @@ export default function NotificationSettings() {
         {/* meetingDepartureBufferMinutes input — only visible when reminder is on */}
         {settings.notifyMeetingReminder && (
           <div className="flex items-center gap-3">
-            <label htmlFor="departure-buffer-input" className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+            <label htmlFor="departure-buffer-input" className="text-sm whitespace-nowrap" style={{ color: '#e2e8f0' }}>
               Extra buffer time
             </label>
             <input
@@ -1184,11 +1205,11 @@ export default function NotificationSettings() {
               onBlur={handleBufferBlur}
               disabled={saving}
               aria-label="Minutes of extra buffer before departure"
-              className="w-20 text-sm px-2 py-1 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="fp-input w-20 text-sm"
             />
-            <span className="text-sm text-gray-500 dark:text-gray-400">minutes before departure</span>
+            <span className="text-sm" style={{ color: '#94a3b8' }}>minutes before departure</span>
             {(Number(bufferInput) < 0 || Number(bufferInput) > 60) && bufferInput !== '' && (
-              <p className="text-xs text-red-600 dark:text-red-400">Must be between 0 and 60</p>
+              <p className="text-xs" style={{ color: '#fca5a5' }}>Must be between 0 and 60</p>
             )}
           </div>
         )}

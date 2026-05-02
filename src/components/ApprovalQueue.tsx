@@ -3,7 +3,7 @@
  * @author Stephen Boyett
  * @company Axovia AI
  * @date 2026-03-31
- * @version 1.0
+ * @version 1.1
  * @brief Approval queue panel for reviewing outbound messages before sending.
  *
  * @description
@@ -11,13 +11,21 @@
  * renders MessageApprovalCard for each, and handles approve/confirm/edit/reject
  * actions with optimistic removal. Includes error handling for 409 (race
  * condition), 403 (tier gate), and 401 (auth). FREE tier users see an
- * UpgradePrompt banner. Pagination via "Load more" button.
+ * upgrade banner. Pagination via "Load more" button.
+ *
+ * Story 14.8: migrated to canonical glass surfaces and the shared UI state
+ * components — `<LoadingSkeleton variant="list" />` for loading,
+ * `<ErrorBanner onRetry>` for fetch failures, `<EmptyState>` for the
+ * "no pending approvals" case. Tier-gate banner uses `.fp-alert-warn`,
+ * toast uses `.fp-alert-info`, Load more button uses `.fp-btn-ghost`.
+ * Approval/edit/reject API flow and optimistic removal preserved verbatim.
  */
 
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import MessageApprovalCard from '@/components/MessageApprovalCard';
+import { LoadingSkeleton, ErrorBanner, EmptyState } from '@/components/ui';
 
 interface ApprovalMessage {
   id: string;
@@ -193,60 +201,49 @@ export default function ApprovalQueue({
   const handleReject = useCallback((id: string) => handleAction(id, 'reject'), [handleAction]);
 
   if (loading) {
-    return (
-      <div className="space-y-3">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-32 bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse" />
-        ))}
-      </div>
-    );
+    return <LoadingSkeleton variant="list" rows={3} data-testid="approval-queue-loading" />;
   }
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-400">
-        {error}
-        <button onClick={() => fetchMessages()} className="ml-2 underline hover:no-underline">Retry</button>
-      </div>
+      <ErrorBanner
+        message={error}
+        onRetry={() => fetchMessages()}
+        data-testid="approval-queue-error"
+      />
     );
   }
 
   return (
-    <div>
+    <div className="fp-glass-sm p-4">
       {/* Toast */}
       {toast && (
-        <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-sm text-blue-700 dark:text-blue-400">
+        <div
+          className="fp-alert-info mb-4 p-3 text-sm"
+          style={{ color: '#93c5fd' }}
+          role="status"
+          aria-live="polite"
+        >
           {toast}
         </div>
       )}
 
       {/* FREE tier banner */}
       {isFree && messages.length > 0 && (
-        <div className="mb-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-          <p className="text-sm font-medium text-amber-800 dark:text-amber-300">Messaging requires a Flipper plan</p>
-          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">Upgrade your subscription to approve and send messages.</p>
-          <a href="/settings" className="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-2 inline-block">Upgrade plan &rarr;</a>
+        <div className="fp-alert-warn mb-4 p-4">
+          <p className="text-sm font-medium" style={{ color: '#fcd34d' }}>Messaging requires a Flipper plan</p>
+          <p className="text-xs mt-1" style={{ color: '#fde68a' }}>Upgrade your subscription to approve and send messages.</p>
+          <a href="/settings" className="text-xs hover:underline mt-2 inline-block" style={{ color: '#c4b5fd' }}>Upgrade plan &rarr;</a>
         </div>
       )}
 
       {messages.length === 0 ? (
-        <div className="text-center py-16">
-          <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-4xl">✅</span>
-          </div>
-          <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            No messages pending approval
-          </h3>
-          <p className="text-gray-400 dark:text-gray-500 mb-6 max-w-sm mx-auto">
-            Find items to flip and generate messages to start communicating with sellers.
-          </p>
-          <a
-            href="/opportunities"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-          >
-            Browse Opportunities
-          </a>
-        </div>
+        <EmptyState
+          title="No pending approvals"
+          message="AI-drafted messages will appear here for your review."
+          action={{ label: 'Browse Opportunities', href: '/opportunities', variant: 'primary' }}
+          data-testid="approval-queue-empty"
+        />
       ) : (
         <div className="space-y-3">
           {messages.map(message => (
@@ -271,7 +268,7 @@ export default function ApprovalQueue({
           <button
             onClick={() => fetchMessages(messages.length, true)}
             disabled={loadingMore}
-            className="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+            className="fp-btn-ghost"
           >
             {loadingMore ? 'Loading...' : `Load more (${messages.length} of ${total})`}
           </button>

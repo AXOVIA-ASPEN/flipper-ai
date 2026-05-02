@@ -1,12 +1,17 @@
 /**
- * API Documentation page — interactive Swagger UI
- * Route: /docs
+ * @file app/docs/page.tsx
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-04-28
+ * @version 1.0
+ * @brief API documentation page — Swagger UI loaded from CDN.
  *
- * Renders the OpenAPI spec via Swagger UI from CDN (no npm package needed).
- * The spec is served by GET /api/docs.
- *
- * Author: Stephen Boyett
- * Company: Axovia AI
+ * @description
+ * Public route /docs that renders the Flipper.ai REST API specification via
+ * Swagger UI loaded from a CDN bundle (no swagger-ui-react dependency). The
+ * underlying OpenAPI document is served by GET /api/docs and fetched by
+ * Swagger UI on mount. Used by partners and internal engineers to explore
+ * available endpoints without installing additional tooling.
  */
 export const metadata = {
   title: 'API Documentation — Flipper AI',

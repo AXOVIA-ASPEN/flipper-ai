@@ -1,3 +1,24 @@
+/**
+ * @file app/scraper/page.tsx
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-04-26
+ * @version 2.0
+ * @brief Scraper management page rebuilt on the canonical dark-glassmorphism design system.
+ *
+ * @description
+ * Renders the multi-marketplace scrape form, real-time SSE progress indicator, save-config
+ * flow, scraped-listings preview, tier-limit upgrade prompt, and full job-history table with
+ * status/date filters. The migration is purely visual — all SSE subscription mechanics,
+ * tier-limit handling, save/load config logic, fetch/delete job lifecycle, and the
+ * `data-testid="scrape-progress-*"` attribute set are preserved verbatim per ADR-14.9-E so
+ * Story 3.7's regression suite continues to pass. Surfaces collapse to canonical .fp-glass /
+ * .fp-glass-nav / .fp-glass-sm; inputs use .fp-input; buttons use .fp-btn-primary /
+ * .fp-btn-ghost; alerts use .fp-alert-success / .fp-alert-danger; status pills use
+ * .fp-badge .fp-badge-{green|red|purple|gray}. Progress-bar fills use inline purple gradient
+ * (running/complete) and red gradient (failed) per AC #4 and pre-mortem P-4.
+ */
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -28,6 +49,8 @@ import UpgradePrompt from '@/components/UpgradePrompt';
 import type { SubscriptionTier } from '@/lib/subscription-tiers';
 import { useSseEvents } from '@/hooks/useSseEvents';
 import type { SseEventType } from '@/lib/sse-emitter';
+import { LoadingSkeleton, EmptyState } from '@/components/ui';
+import { getStatusColor, getStatusBadgeClass } from '@/lib/scraper-status';
 
 // Story 3.7: Stable reference outside component prevents EventSource reconnect loops.
 const SSE_EVENT_TYPES: SseEventType[] = [
@@ -37,6 +60,18 @@ const SSE_EVENT_TYPES: SseEventType[] = [
   'job.failed',
   'listing.found',
 ];
+
+const TEXT_PRIMARY = '#e2e8f0';
+const TEXT_SECONDARY = '#94a3b8';
+const PURPLE_ACCENT = '#c4b5fd';
+const PROFIT_GREEN = '#34d399';
+const DANGER_RED = '#f87171';
+const DANGER_RED_SOFT = '#fca5a5';
+const RUNNING_PURPLE = '#a78bfa';
+const PROGRESS_TRACK = 'rgba(255,255,255,0.06)';
+const PROGRESS_FILL_RUNNING = 'linear-gradient(90deg, #7c3aed, #a78bfa)';
+const PROGRESS_FILL_FAILED = 'linear-gradient(90deg, #f87171, #fca5a5)';
+const ACTIVE_FILTER_BG = 'rgba(124,58,237,0.15)';
 
 interface SseListingFoundData {
   jobId?: string;
@@ -108,12 +143,10 @@ interface SearchConfig {
 }
 
 function inferCurrentTier(errorDetail: string, details?: Record<string, unknown>): SubscriptionTier {
-  // Prefer structured tier from error details (set by enforceTierLimits)
   if (details?.tier && typeof details.tier === 'string') {
     const tier = details.tier as SubscriptionTier;
     if (['FREE', 'FLIPPER', 'PRO'].includes(tier)) return tier;
   }
-  // Fallback: infer from error message text
   if (errorDetail.includes('FREE plan') || errorDetail.includes('Upgrade to FLIPPER')) return 'FREE';
   if (errorDetail.includes('FLIPPER plan') || errorDetail.includes('Upgrade to PRO')) return 'FLIPPER';
   return 'FREE';
@@ -125,6 +158,30 @@ function inferFeatureName(errorDetail: string): string {
   if (errorDetail.includes('Search config') || errorDetail.includes('search config')) return 'Saved Searches';
   return 'Feature';
 }
+
+function StatusIcon({ status }: { status: string }) {
+  switch (status) {
+    case 'COMPLETED':
+      return <CheckCircle className="w-4 h-4" />;
+    case 'RUNNING':
+      return <Loader2 className="w-4 h-4 animate-spin" />;
+    case 'FAILED':
+      return <XCircle className="w-4 h-4" />;
+    default:
+      return <Clock className="w-4 h-4" />;
+  }
+}
+
+const FORM_LABEL_STYLE: React.CSSProperties = {
+  display: 'block',
+  fontSize: 13,
+  fontWeight: 500,
+  color: TEXT_PRIMARY,
+  marginBottom: 8,
+};
+
+const FILTER_BTN_STYLE = (active: boolean): React.CSSProperties =>
+  active ? { background: ACTIVE_FILTER_BG, color: PURPLE_ACCENT } : {};
 
 export default function ScraperPage() {
   const [platform, setPlatform] = useState('craigslist');
@@ -150,7 +207,7 @@ export default function ScraperPage() {
   const [jobs, setJobs] = useState<ScraperJob[]>([]);
   const [jobsLoading, setJobsLoading] = useState(true);
   const [jobStatusFilter, setJobStatusFilter] = useState<string>('');
-  const [jobDateFilter, setJobDateFilter] = useState<string>(''); // "today", "week", "month", ""
+  const [jobDateFilter, setJobDateFilter] = useState<string>('');
 
   // Saved configs state
   const [savedConfigs, setSavedConfigs] = useState<SearchConfig[]>([]);
@@ -184,7 +241,6 @@ export default function ScraperPage() {
   }
 
   function loadConfig(config: SearchConfig) {
-    // Set platform first, then location (to match platform's location format)
     const configPlatform = config.platform.toLowerCase();
     setPlatform(configPlatform);
     setLocation(config.location);
@@ -222,7 +278,6 @@ export default function ScraperPage() {
         fetchSavedConfigs();
       } else {
         const data = await response.json();
-        // Handle tier limit 403 responses
         if (response.status === 403 && data.error?.code === 'FORBIDDEN') {
           const detail = data.error.detail || data.error.message || 'Feature limit reached.';
           setTierLimitError({
@@ -257,7 +312,6 @@ export default function ScraperPage() {
       const data = await response.json();
       let filteredJobs = data.jobs || [];
 
-      // Client-side date filtering
       if (dateToUse) {
         const now = new Date();
         let cutoff: Date;
@@ -305,36 +359,8 @@ export default function ScraperPage() {
     }
   }
 
-  function getStatusColor(status: string) {
-    switch (status) {
-      case 'COMPLETED':
-        return 'text-green-400';
-      case 'RUNNING':
-        return 'text-blue-400';
-      case 'FAILED':
-        return 'text-red-400';
-      default:
-        return 'text-gray-400';
-    }
-  }
-
-  function getStatusIcon(status: string) {
-    switch (status) {
-      case 'COMPLETED':
-        return <CheckCircle className="w-4 h-4" />;
-      case 'RUNNING':
-        return <Loader2 className="w-4 h-4 animate-spin" />;
-      case 'FAILED':
-        return <XCircle className="w-4 h-4" />;
-      default:
-        return <Clock className="w-4 h-4" />;
-    }
-  }
-
-  // Reset location when platform changes
   const handlePlatformChange = (newPlatform: string) => {
     setPlatform(newPlatform);
-    // Set default location for the new platform
     if (newPlatform === 'offerup') {
       setLocation('sarasota-fl');
     } else {
@@ -349,7 +375,6 @@ export default function ScraperPage() {
     setTierLimitError(null);
     clearSseEvents();
 
-    // Determine API endpoint based on platform
     const apiEndpoint = platform === 'offerup' ? '/api/scraper/offerup' : '/api/scraper/craigslist';
 
     try {
@@ -367,7 +392,6 @@ export default function ScraperPage() {
 
       const data = await response.json();
 
-      // Handle tier limit 403 responses
       if (response.status === 403 && data.error?.code === 'FORBIDDEN') {
         const detail = data.error.detail || data.error.message || 'Feature limit reached.';
         setTierLimitError({
@@ -380,7 +404,6 @@ export default function ScraperPage() {
       }
 
       setResult(data);
-      // Refresh job history after scrape
       fetchJobs();
     } catch (error) {
       setResult({
@@ -408,7 +431,6 @@ export default function ScraperPage() {
     { value: 'cell_phones', label: 'Cell Phones' },
   ];
 
-  // Craigslist locations (subdomain format)
   const craigslistLocations = [
     { value: 'sarasota', label: 'Sarasota, FL' },
     { value: 'tampa', label: 'Tampa, FL' },
@@ -424,7 +446,6 @@ export default function ScraperPage() {
     { value: 'denver', label: 'Denver, CO' },
   ];
 
-  // OfferUp locations (city-state format)
   const offerupLocations = [
     { value: 'sarasota-fl', label: 'Sarasota, FL' },
     { value: 'tampa-fl', label: 'Tampa, FL' },
@@ -443,31 +464,34 @@ export default function ScraperPage() {
     { value: 'dallas-tx', label: 'Dallas, TX' },
   ];
 
-  // Get locations based on selected platform
   const locations = platform === 'offerup' ? offerupLocations : craigslistLocations;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* FLIPPER-14-2 interim — theme orb divs deleted; fp-bg-mesh provides ambient glow. Replace during Story 14.9 rebuild */}
-
+    <div style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden', color: TEXT_PRIMARY }}>
       {/* Header */}
-      <header className="relative backdrop-blur-xl bg-white/10 border-b border-white/20 shadow-2xl sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-16 gap-4">
-            <Link
-              href="/"
-              className="p-2 hover:bg-white/20 rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-purple-500/50 group"
-            >
-              <ArrowLeft className="w-5 h-5 text-white group-hover:text-purple-200 transition-colors" />
+      <header className="fp-glass-nav" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
+        <div style={{ maxWidth: 1024, margin: '0 auto', padding: '0 24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', height: 64, gap: 16 }}>
+            <Link href="/" className="fp-btn-ghost" aria-label="Back to dashboard" style={{ padding: 8 }}>
+              <ArrowLeft className="w-5 h-5" />
             </Link>
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/50 animate-pulse-slow">
-              <Search className="w-6 h-6 text-white" />
+            <div
+              style={{
+                width: 40,
+                height: 40,
+                background: 'linear-gradient(135deg, #a78bfa, #7c3aed)',
+                borderRadius: 8,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 16px rgba(124,58,237,0.4)',
+              }}
+            >
+              <Search className="w-6 h-6" style={{ color: 'white' }} />
             </div>
             <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-purple-200 via-pink-200 to-blue-200 bg-clip-text text-transparent">
-                Scrape Listings
-              </h1>
-              <p className="text-xs text-blue-200/70">
+              <h1 style={{ fontSize: 20, fontWeight: 700, color: TEXT_PRIMARY }}>Scrape Listings</h1>
+              <p style={{ fontSize: 12, color: TEXT_SECONDARY }}>
                 Find deals on {platform === 'offerup' ? 'OfferUp' : 'Craigslist'}
               </p>
             </div>
@@ -475,74 +499,96 @@ export default function ScraperPage() {
         </div>
       </header>
 
-      <main className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Page content — landmark provided by app/layout.tsx <main>. */}
+      <div style={{ position: 'relative', maxWidth: 1024, margin: '0 auto', padding: '32px 24px' }}>
         {/* Config Message Toast */}
         {configMessage && (
           <div
-            className={`fixed top-20 right-4 z-50 p-4 rounded-xl border shadow-lg flex items-center gap-2 ${
-              configMessage.type === 'success'
-                ? 'backdrop-blur-xl bg-gradient-to-r from-green-400/20 to-emerald-600/20 border-green-400/50 text-white'
-                : 'backdrop-blur-xl bg-gradient-to-r from-red-400/20 to-pink-600/20 border-red-400/50 text-white'
-            }`}
+            className={configMessage.type === 'success' ? 'fp-alert-success' : 'fp-alert-danger'}
+            style={{ position: 'fixed', top: 80, right: 16, zIndex: 50, padding: 16, display: 'flex', alignItems: 'center', gap: 8, maxWidth: 360 }}
           >
             {configMessage.type === 'success' ? (
-              <CheckCircle className="w-5 h-5 text-green-300" />
+              <CheckCircle className="w-5 h-5" style={{ color: PROFIT_GREEN }} />
             ) : (
-              <AlertCircle className="w-5 h-5 text-red-300" />
+              <AlertCircle className="w-5 h-5" style={{ color: DANGER_RED }} />
             )}
-            {configMessage.text}
+            <span style={{ color: TEXT_PRIMARY, fontSize: 13, fontWeight: 600 }}>{configMessage.text}</span>
           </div>
         )}
 
         {/* Saved Searches Quick Select */}
         {savedConfigs.length > 0 && (
-          <div className="mb-4 relative">
+          <div style={{ marginBottom: 16, position: 'relative' }}>
             <button
               type="button"
               onClick={() => setShowSavedConfigs(!showSavedConfigs)}
-              className="flex items-center gap-2 px-4 py-2 backdrop-blur-xl bg-white/10 rounded-lg border border-white/20 text-white hover:bg-white/15 transition-all"
+              className="fp-btn-ghost"
+              style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+              aria-expanded={showSavedConfigs}
             >
-              <Bookmark className="w-4 h-4 text-purple-300" />
+              <Bookmark className="w-4 h-4" style={{ color: PURPLE_ACCENT }} />
               <span>Saved Searches</span>
               <ChevronDown
-                className={`w-4 h-4 transition-transform ${showSavedConfigs ? 'rotate-180' : ''}`}
+                className="w-4 h-4"
+                style={{ transition: 'transform 0.2s', transform: showSavedConfigs ? 'rotate(180deg)' : 'none' }}
               />
             </button>
             {showSavedConfigs && (
-              <div className="absolute top-full left-0 mt-2 w-80 backdrop-blur-xl bg-slate-800/95 rounded-xl border border-white/20 shadow-2xl z-20 overflow-hidden">
-                <div className="p-2 border-b border-white/10 bg-white/5">
-                  <span className="text-xs text-blue-200/70">Click to load search parameters</span>
+              <div
+                className="fp-glass"
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  marginTop: 8,
+                  width: 320,
+                  zIndex: 20,
+                  overflow: 'hidden',
+                  padding: 0,
+                }}
+              >
+                <div className="fp-glass-sm" style={{ padding: 8, borderRadius: 0 }}>
+                  <span style={{ fontSize: 12, color: TEXT_SECONDARY }}>Click to load search parameters</span>
                 </div>
-                <div className="max-h-60 overflow-y-auto">
+                <div style={{ maxHeight: 240, overflowY: 'auto' }}>
                   {savedConfigs.map((config) => (
                     <button
                       key={config.id}
                       type="button"
                       onClick={() => loadConfig(config)}
-                      className="w-full p-3 text-left hover:bg-white/10 transition-all border-b border-white/5 last:border-0"
+                      style={{
+                        width: '100%',
+                        padding: 12,
+                        textAlign: 'left',
+                        background: 'transparent',
+                        border: 'none',
+                        borderBottom: '1px solid rgba(255,255,255,0.06)',
+                        cursor: 'pointer',
+                        color: TEXT_PRIMARY,
+                      }}
+                      data-fp-row-hover="true"
                     >
-                      <div className="font-medium text-white text-sm">{config.name}</div>
-                      <div className="flex flex-wrap gap-2 mt-1 text-xs text-blue-200/60">
-                        <span className="flex items-center gap-1">
+                      <div style={{ fontWeight: 500, color: TEXT_PRIMARY, fontSize: 13 }}>{config.name}</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 4, fontSize: 12, color: TEXT_SECONDARY }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                           <MapPin className="w-3 h-3" />
-                          {locations.find((l) => l.value === config.location)?.label ||
-                            config.location}
+                          {locations.find((l) => l.value === config.location)?.label || config.location}
                         </span>
                         {config.category && (
-                          <span className="flex items-center gap-1">
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                             <Tag className="w-3 h-3" />
-                            {categories.find((c) => c.value === config.category)?.label ||
-                              config.category}
+                            {categories.find((c) => c.value === config.category)?.label || config.category}
                           </span>
                         )}
                       </div>
                     </button>
                   ))}
                 </div>
-                <div className="p-2 border-t border-white/10 bg-white/5">
+                <div className="fp-glass-sm" style={{ padding: 8, borderRadius: 0 }}>
                   <Link
                     href="/settings"
-                    className="block text-center text-xs text-purple-300 hover:text-purple-200 transition-colors"
+                    style={{ display: 'block', textAlign: 'center', fontSize: 12, color: PURPLE_ACCENT, textDecoration: 'none' }}
+                    className="hover:underline"
                   >
                     Manage in Settings →
                   </Link>
@@ -553,122 +599,115 @@ export default function ScraperPage() {
         )}
 
         {/* Scraper Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-6 shadow-xl"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Platform */}
+        <form onSubmit={handleSubmit} className="fp-glass" style={{ padding: 24 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 24 }}>
             <div>
-              <label className="block text-sm font-medium text-blue-200/90 mb-2">Platform</label>
+              <label style={FORM_LABEL_STYLE} htmlFor="scraper-platform">Platform</label>
               <select
+                id="scraper-platform"
                 value={platform}
                 onChange={(e) => handlePlatformChange(e.target.value)}
-                className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white transition-all duration-300 hover:bg-white/15"
+                className="fp-input"
               >
-                <option value="craigslist" className="bg-slate-800 text-white">
-                  Craigslist
-                </option>
-                <option value="offerup" className="bg-slate-800 text-white">
-                  OfferUp
-                </option>
-                <option value="facebook" disabled className="bg-slate-800 text-gray-400">
-                  Facebook Marketplace (coming soon)
-                </option>
+                <option value="craigslist">Craigslist</option>
+                <option value="offerup">OfferUp</option>
+                <option value="facebook" disabled>Facebook Marketplace (coming soon)</option>
               </select>
             </div>
 
-            {/* Location */}
             <div>
-              <label className="block text-sm font-medium text-blue-200/90 mb-2">
-                <MapPin className="w-4 h-4 inline mr-1" />
+              <label style={FORM_LABEL_STYLE} htmlFor="scraper-location">
+                <MapPin className="w-4 h-4" style={{ display: 'inline', marginRight: 4 }} />
                 Location
               </label>
               <select
+                id="scraper-location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white transition-all duration-300 hover:bg-white/15"
+                className="fp-input"
               >
                 {locations.map((loc) => (
-                  <option key={loc.value} value={loc.value} className="bg-slate-800 text-white">
+                  <option key={loc.value} value={loc.value}>
                     {loc.label}
                   </option>
                 ))}
               </select>
             </div>
 
-            {/* Category */}
             <div>
-              <label className="block text-sm font-medium text-blue-200/90 mb-2">
-                <Tag className="w-4 h-4 inline mr-1" />
+              <label style={FORM_LABEL_STYLE} htmlFor="scraper-category">
+                <Tag className="w-4 h-4" style={{ display: 'inline', marginRight: 4 }} />
                 Category
               </label>
               <select
+                id="scraper-category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white transition-all duration-300 hover:bg-white/15"
+                className="fp-input"
               >
                 {categories.map((cat) => (
-                  <option key={cat.value} value={cat.value} className="bg-slate-800 text-white">
+                  <option key={cat.value} value={cat.value}>
                     {cat.label}
                   </option>
                 ))}
               </select>
             </div>
 
-            {/* Keywords */}
             <div>
-              <label className="block text-sm font-medium text-blue-200/90 mb-2">
-                <Search className="w-4 h-4 inline mr-1" />
+              <label style={FORM_LABEL_STYLE} htmlFor="scraper-keywords">
+                <Search className="w-4 h-4" style={{ display: 'inline', marginRight: 4 }} />
                 Keywords (optional)
               </label>
               <input
+                id="scraper-keywords"
                 type="text"
                 value={keywords}
                 onChange={(e) => setKeywords(e.target.value)}
                 placeholder="e.g., iPhone, Nintendo, Dyson"
-                className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white placeholder-blue-200/50 transition-all duration-300 hover:bg-white/15"
+                className="fp-input"
               />
             </div>
 
-            {/* Min Price */}
             <div>
-              <label className="block text-sm font-medium text-blue-200/90 mb-2">
-                <DollarSign className="w-4 h-4 inline mr-1" />
+              <label style={FORM_LABEL_STYLE} htmlFor="scraper-min-price">
+                <DollarSign className="w-4 h-4" style={{ display: 'inline', marginRight: 4 }} />
                 Min Price
               </label>
               <input
+                id="scraper-min-price"
                 type="number"
                 value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
                 placeholder="0"
                 min="0"
-                className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white placeholder-blue-200/50 transition-all duration-300 hover:bg-white/15"
+                className="fp-input"
               />
             </div>
 
-            {/* Max Price */}
             <div>
-              <label className="block text-sm font-medium text-blue-200/90 mb-2">
-                <DollarSign className="w-4 h-4 inline mr-1" />
+              <label style={FORM_LABEL_STYLE} htmlFor="scraper-max-price">
+                <DollarSign className="w-4 h-4" style={{ display: 'inline', marginRight: 4 }} />
                 Max Price
               </label>
               <input
+                id="scraper-max-price"
                 type="number"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
                 placeholder="1000"
                 min="0"
-                className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 text-white placeholder-blue-200/50 transition-all duration-300 hover:bg-white/15"
+                className="fp-input"
               />
             </div>
           </div>
 
-          <div className="mt-6 flex gap-3">
+          <div style={{ marginTop: 24, display: 'flex', gap: 12 }}>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-lg hover:from-purple-600 hover:to-pink-700 transition-all duration-300 shadow-lg shadow-purple-500/50 hover:shadow-purple-500/80 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="fp-btn-primary"
+              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 24px' }}
+              data-testid="scraper-submit"
             >
               {loading ? (
                 <>
@@ -685,8 +724,10 @@ export default function ScraperPage() {
             <button
               type="button"
               onClick={() => setShowSaveDialog(true)}
-              className="flex items-center justify-center gap-2 px-4 py-3 backdrop-blur-xl bg-white/10 text-white rounded-lg border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105"
+              className="fp-btn-ghost"
               title="Save this search"
+              aria-label="Save this search configuration"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px' }}
             >
               <Bookmark className="w-5 h-5" />
             </button>
@@ -696,12 +737,10 @@ export default function ScraperPage() {
         {/* Story 3.7: Real-time scrape progress indicator (SSE-driven) */}
         {loading && (() => {
           const platformUpper = platform.toUpperCase();
-          const platformEvents = sseEvents.filter(
-            (e) => {
-              const d = (e.data as { platform?: string })?.platform;
-              return !d || d === platformUpper;
-            }
-          );
+          const platformEvents = sseEvents.filter((e) => {
+            const d = (e.data as { platform?: string })?.platform;
+            return !d || d === platformUpper;
+          });
           const latestProgress = platformEvents.find((e) => e.type === 'job.progress');
           const progressData = (latestProgress?.data as SseJobProgressData) || {};
           const percentage = progressData.percentage ?? 0;
@@ -710,13 +749,11 @@ export default function ScraperPage() {
           const listingsFound = progressData.listingsFound ?? 0;
           const complete = platformEvents.find((e) => e.type === 'job.complete');
           const failed = platformEvents.find((e) => e.type === 'job.failed');
-          const liveListings = platformEvents
-            .filter((e) => e.type === 'listing.found')
-            .slice(0, 20);
+          const liveListings = platformEvents.filter((e) => e.type === 'listing.found').slice(0, 20);
 
-          let borderClass = 'border-white/20';
-          if (complete) borderClass = 'border-green-400/50';
-          else if (failed) borderClass = 'border-red-400/50';
+          let borderColor = 'rgba(255,255,255,0.1)';
+          if (complete) borderColor = 'rgba(52,211,153,0.5)';
+          else if (failed) borderColor = 'rgba(248,113,113,0.5)';
 
           const effectivePercentage = complete ? 100 : percentage;
           const phaseLabel = platformEvents.length === 0
@@ -727,60 +764,78 @@ export default function ScraperPage() {
                 ? 'Scan Complete!'
                 : `Scanning ${platformUpper}...`;
 
+          const progressFill = failed ? PROGRESS_FILL_FAILED : PROGRESS_FILL_RUNNING;
+
           return (
             <div
               data-testid="scrape-progress-indicator"
-              className={`mt-6 backdrop-blur-xl bg-white/10 rounded-xl border ${borderClass} p-6 shadow-xl transition-colors duration-500`}
+              className="fp-glass"
+              style={{ marginTop: 24, padding: 24, borderColor, transition: 'border-color 0.5s' }}
             >
-              <div className="flex items-center gap-3 mb-4">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
                 {failed ? (
-                  <AlertCircle className="w-5 h-5 text-red-300" />
+                  <AlertCircle className="w-5 h-5" style={{ color: DANGER_RED }} />
                 ) : complete ? (
-                  <CheckCircle className="w-5 h-5 text-green-300" />
+                  <CheckCircle className="w-5 h-5" style={{ color: PROFIT_GREEN }} />
                 ) : (
-                  <Loader2 className="w-5 h-5 animate-spin text-blue-300" />
+                  <Loader2 className="w-5 h-5 animate-spin" style={{ color: RUNNING_PURPLE }} />
                 )}
                 <span
                   data-testid="scrape-progress-platform"
-                  className="font-medium text-white"
+                  style={{ fontWeight: 500, color: TEXT_PRIMARY }}
                 >
                   {phaseLabel}
                 </span>
               </div>
 
-              <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
+              <div
+                style={{
+                  width: '100%',
+                  height: 12,
+                  borderRadius: 9999,
+                  background: PROGRESS_TRACK,
+                  overflow: 'hidden',
+                }}
+              >
                 <div
                   data-testid="scrape-progress-bar"
-                  className={`h-full rounded-full transition-all duration-500 ease-out ${
-                    failed
-                      ? 'bg-gradient-to-r from-red-500 to-pink-500'
-                      : 'bg-gradient-to-r from-blue-500 to-cyan-400'
-                  }`}
-                  style={{ width: `${effectivePercentage}%` }}
+                  style={{
+                    height: '100%',
+                    borderRadius: 9999,
+                    width: `${effectivePercentage}%`,
+                    background: progressFill,
+                    transition: 'width 0.5s ease-out',
+                  }}
                 />
               </div>
 
-              <div className="mt-3 text-sm text-blue-200/70 flex flex-wrap gap-4">
+              <div
+                data-testid="sse-progress-region"
+                aria-live="polite"
+                aria-atomic="true"
+                style={{ marginTop: 12, fontSize: 13, color: TEXT_SECONDARY, display: 'flex', flexWrap: 'wrap', gap: 16 }}
+              >
                 <span data-testid="scrape-progress-percentage">
                   {effectivePercentage}%
                 </span>
                 {total !== null && (
-                  <span>
-                    {current}/{total} processed
-                  </span>
+                  <span>{current}/{total} processed</span>
                 )}
-                <span>{listingsFound} opportunities</span>
+                <span style={{ color: PROFIT_GREEN }}>{listingsFound} opportunities</span>
               </div>
 
               {failed && (
-                <p className="mt-3 text-sm text-red-300" data-testid="scrape-progress-error">
+                <p
+                  style={{ marginTop: 12, fontSize: 13, color: DANGER_RED_SOFT }}
+                  data-testid="scrape-progress-error"
+                >
                   {(failed.data as SseJobFailedData).errorMessage ?? 'Scrape failed'}
                 </p>
               )}
 
               {liveListings.length > 0 && (
-                <div className="mt-4 space-y-1" data-testid="scrape-progress-listings">
-                  <p className="text-xs uppercase tracking-wide text-blue-200/60 mb-2">
+                <div style={{ marginTop: 16 }} data-testid="scrape-progress-listings">
+                  <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: TEXT_SECONDARY, marginBottom: 8 }}>
                     Latest finds:
                   </p>
                   {liveListings.map((ev, idx) => {
@@ -789,7 +844,7 @@ export default function ScraperPage() {
                     return (
                       <div
                         key={idx}
-                        className="text-sm text-white/90 truncate"
+                        style={{ fontSize: 13, color: TEXT_PRIMARY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                       >
                         • {d.title ?? 'Listing'} {price !== undefined && `— $${price}`}
                       </div>
@@ -803,13 +858,30 @@ export default function ScraperPage() {
 
         {/* Save Config Dialog */}
         {showSaveDialog && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="backdrop-blur-xl bg-slate-800/95 rounded-xl border border-white/20 p-6 shadow-2xl w-full max-w-md mx-4">
-              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <Save className="w-5 h-5 text-purple-300" />
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0,0,0,0.5)',
+              backdropFilter: 'blur(4px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 50,
+            }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="save-config-title"
+          >
+            <div className="fp-glass" style={{ padding: 24, maxWidth: 448, width: '100%', margin: '0 16px' }}>
+              <h3
+                id="save-config-title"
+                style={{ fontSize: 18, fontWeight: 600, color: TEXT_PRIMARY, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}
+              >
+                <Save className="w-5 h-5" style={{ color: PURPLE_ACCENT }} />
                 Save Search Configuration
               </h3>
-              <p className="text-sm text-blue-200/70 mb-4">
+              <p style={{ fontSize: 13, color: TEXT_SECONDARY, marginBottom: 16 }}>
                 Save your current search parameters for quick access later.
               </p>
               <input
@@ -817,24 +889,27 @@ export default function ScraperPage() {
                 value={saveConfigName}
                 onChange={(e) => setSaveConfigName(e.target.value)}
                 placeholder="Search name (e.g., Electronics in Tampa)"
-                className="w-full px-4 py-2 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-white placeholder-blue-200/50 mb-4"
+                className="fp-input"
+                style={{ marginBottom: 16 }}
                 autoFocus
+                aria-label="Search configuration name"
               />
-              <div className="text-xs text-blue-200/50 mb-4 space-y-1">
+              <div style={{ fontSize: 12, color: TEXT_SECONDARY, marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <p>Location: {locations.find((l) => l.value === location)?.label}</p>
                 <p>Category: {categories.find((c) => c.value === category)?.label}</p>
                 {keywords && <p>Keywords: {keywords}</p>}
                 {(minPrice || maxPrice) && (
-                  <p>
-                    Price: ${minPrice || '0'} - ${maxPrice || '∞'}
-                  </p>
+                  <p>Price: ${minPrice || '0'} - ${maxPrice || '∞'}</p>
                 )}
               </div>
-              <div className="flex gap-3">
+              <div style={{ display: 'flex', gap: 12 }}>
                 <button
+                  type="button"
                   onClick={handleSaveConfig}
                   disabled={savingConfig || !saveConfigName.trim()}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all disabled:opacity-50"
+                  className="fp-btn-primary"
+                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                  data-testid="save-config-submit"
                 >
                   {savingConfig ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -844,11 +919,13 @@ export default function ScraperPage() {
                   Save
                 </button>
                 <button
+                  type="button"
                   onClick={() => {
                     setShowSaveDialog(false);
                     setSaveConfigName('');
                   }}
-                  className="flex-1 px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all border border-white/20"
+                  className="fp-btn-ghost"
+                  style={{ flex: 1 }}
                 >
                   Cancel
                 </button>
@@ -859,7 +936,7 @@ export default function ScraperPage() {
 
         {/* Tier Limit Upgrade Prompt */}
         {tierLimitError && (
-          <div className="mt-6" data-testid="tier-limit-upgrade">
+          <div style={{ marginTop: 24 }} data-testid="tier-limit-upgrade">
             <UpgradePrompt
               currentTier={tierLimitError.currentTier}
               feature={tierLimitError.feature}
@@ -870,69 +947,72 @@ export default function ScraperPage() {
 
         {/* Results */}
         {result && (
-          <div className="mt-8">
+          <div style={{ marginTop: 32 }}>
             {/* Status Message */}
             <div
-              className={`p-4 rounded-xl border shadow-lg ${
-                result.success
-                  ? 'backdrop-blur-xl bg-gradient-to-r from-green-400/20 to-emerald-600/20 border-green-400/50 text-white shadow-green-500/30'
-                  : 'backdrop-blur-xl bg-gradient-to-r from-red-400/20 to-pink-600/20 border-red-400/50 text-white shadow-red-500/30'
-              }`}
+              className={result.success ? 'fp-alert-success' : 'fp-alert-danger'}
+              style={{ padding: 16 }}
             >
-              <div className="flex items-center gap-2">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 {result.success ? (
-                  <CheckCircle className="w-5 h-5 text-green-300" />
+                  <CheckCircle className="w-5 h-5" style={{ color: PROFIT_GREEN }} />
                 ) : (
-                  <AlertCircle className="w-5 h-5 text-red-300" />
+                  <AlertCircle className="w-5 h-5" style={{ color: DANGER_RED }} />
                 )}
-                <span className="font-medium">{result.message}</span>
+                <span style={{ fontWeight: 500, color: TEXT_PRIMARY }}>{result.message}</span>
               </div>
               {result.savedCount !== undefined && (
-                <p className="mt-1 text-sm text-blue-200/70">
+                <p style={{ marginTop: 4, fontSize: 13, color: TEXT_SECONDARY }}>
                   {result.savedCount} listings saved to database
                 </p>
               )}
-              {result.error && <p className="mt-1 text-sm text-blue-200/50">{result.error}</p>}
+              {result.error && <p style={{ marginTop: 4, fontSize: 13, color: TEXT_SECONDARY }}>{result.error}</p>}
             </div>
 
             {/* Scraped Listings Preview */}
             {result.listings && result.listings.length > 0 && (
-              <div className="mt-6 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 overflow-hidden shadow-xl">
-                <div className="p-4 border-b border-white/10 bg-white/5">
-                  <h3 className="font-semibold bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-transparent">
+              <div className="fp-glass" style={{ marginTop: 24, padding: 0, overflow: 'hidden' }}>
+                <div className="fp-glass-sm" style={{ padding: 16, borderRadius: 0 }}>
+                  <h3 style={{ fontWeight: 600, color: TEXT_PRIMARY }}>
                     Found {result.listings.length} Listings
                   </h3>
                 </div>
-                <div className="divide-y divide-white/10">
+                <div>
                   {result.listings.slice(0, 10).map((listing, index) => (
                     <div
                       key={index}
-                      className="p-4 flex items-center gap-4 hover:bg-white/5 transition-all duration-300"
+                      style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 16, borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                      data-fp-row-hover="true"
                     >
                       {listing.imageUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={listing.imageUrl}
                           alt={listing.title}
-                          className="w-16 h-16 object-cover rounded-lg border-2 border-white/20 ring-2 ring-white/10"
+                          style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)' }}
                         />
                       ) : (
-                        <div className="w-16 h-16 bg-white/10 rounded-lg flex items-center justify-center border border-white/20">
-                          <Package className="w-6 h-6 text-blue-200/50" />
+                        <div
+                          className="fp-glass-sm"
+                          style={{ width: 64, height: 64, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          <Package className="w-6 h-6" style={{ color: TEXT_SECONDARY }} />
                         </div>
                       )}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-white truncate">{listing.title}</p>
-                        <p className="text-sm text-blue-200/70">{listing.location}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold bg-gradient-to-r from-green-300 to-emerald-300 bg-clip-text text-transparent">
-                          {listing.price}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontWeight: 500, color: TEXT_PRIMARY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {listing.title}
                         </p>
+                        <p style={{ fontSize: 13, color: TEXT_SECONDARY }}>{listing.location}</p>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <p style={{ fontWeight: 700, color: PROFIT_GREEN }}>{listing.price}</p>
                         <a
                           href={listing.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm text-blue-300 hover:text-blue-200 transition-colors hover:underline"
+                          style={{ fontSize: 13, color: PURPLE_ACCENT, textDecoration: 'none' }}
+                          className="hover:underline"
                         >
                           View
                         </a>
@@ -941,7 +1021,7 @@ export default function ScraperPage() {
                   ))}
                 </div>
                 {result.listings.length > 10 && (
-                  <div className="p-4 text-center text-blue-200/70 border-t border-white/10 bg-white/5">
+                  <div className="fp-glass-sm" style={{ padding: 16, textAlign: 'center', color: TEXT_SECONDARY, borderRadius: 0, fontSize: 13 }}>
                     +{result.listings.length - 10} more listings saved
                   </div>
                 )}
@@ -950,13 +1030,14 @@ export default function ScraperPage() {
 
             {/* View Dashboard Link */}
             {result.success && (
-              <div className="mt-6 text-center">
+              <div style={{ marginTop: 24, textAlign: 'center' }}>
                 <Link
                   href="/"
-                  className="inline-flex items-center gap-2 px-6 py-3 backdrop-blur-xl bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all duration-300 border border-white/20 shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-105"
+                  className="fp-btn-primary"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}
                 >
                   View Dashboard
-                  <ArrowLeft className="w-4 h-4 rotate-180" />
+                  <ArrowLeft className="w-4 h-4" style={{ transform: 'rotate(180deg)' }} />
                 </Link>
               </div>
             )}
@@ -964,81 +1045,100 @@ export default function ScraperPage() {
         )}
 
         {/* Job History Section */}
-        <div className="mt-8 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 overflow-hidden shadow-xl">
-          <div className="p-4 border-b border-white/10 bg-white/5 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <History className="w-5 h-5 text-purple-300" />
-              <h3 className="font-semibold bg-gradient-to-r from-purple-200 to-pink-200 bg-clip-text text-transparent">
-                Scraper Job History
-              </h3>
+        <div className="fp-glass" style={{ marginTop: 32, padding: 0, overflow: 'hidden' }}>
+          <div
+            className="fp-glass-sm"
+            style={{ padding: 16, borderRadius: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <History className="w-5 h-5" style={{ color: PURPLE_ACCENT }} />
+              <h3 style={{ fontWeight: 600, color: TEXT_PRIMARY }}>Scraper Job History</h3>
             </div>
             <button
+              type="button"
               onClick={() => fetchJobs()}
-              className="p-1.5 hover:bg-white/10 rounded transition-all text-blue-300"
-              title="Refresh"
+              className="fp-btn-ghost"
+              aria-label="Refresh job history"
+              style={{ padding: 6 }}
             >
               <RefreshCw className="w-4 h-4" />
             </button>
           </div>
 
           {/* Filters */}
-          <div className="p-3 border-b border-white/10 bg-white/5 flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2 text-xs text-blue-200/70">
+          <div
+            className="fp-glass-sm"
+            style={{ padding: 12, borderRadius: 0, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12, borderTop: '1px solid rgba(255,255,255,0.06)' }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: TEXT_SECONDARY }}>
               <Filter className="w-3.5 h-3.5" />
               <span>Filters:</span>
             </div>
 
             {/* Status Filter */}
-            <div className="flex items-center gap-1">
-              {['', 'COMPLETED', 'FAILED', 'RUNNING'].map((status) => (
-                <button
-                  key={status || 'all'}
-                  onClick={() => handleStatusFilterChange(status)}
-                  className={`px-2 py-1 text-xs rounded transition-all ${
-                    jobStatusFilter === status
-                      ? 'bg-purple-500/40 text-white border border-purple-400/50'
-                      : 'bg-white/5 text-blue-200/70 hover:bg-white/10 border border-transparent'
-                  }`}
-                >
-                  {status || 'All'}
-                </button>
-              ))}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              {['', 'COMPLETED', 'FAILED', 'RUNNING'].map((status) => {
+                const active = jobStatusFilter === status;
+                return (
+                  <button
+                    key={status || 'all'}
+                    type="button"
+                    onClick={() => handleStatusFilterChange(status)}
+                    className="fp-btn-ghost"
+                    aria-pressed={active}
+                    style={{ padding: '4px 10px', fontSize: 12, ...FILTER_BTN_STYLE(active) }}
+                  >
+                    {status || 'All'}
+                  </button>
+                );
+              })}
             </div>
 
-            <div className="w-px h-4 bg-white/20" />
+            <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.12)' }} />
 
             {/* Date Filter */}
-            <div className="flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5 text-blue-200/70" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Calendar className="w-3.5 h-3.5" style={{ color: TEXT_SECONDARY }} />
               {[
                 { value: '', label: 'All time' },
                 { value: 'today', label: 'Today' },
                 { value: 'week', label: 'This week' },
                 { value: 'month', label: 'This month' },
-              ].map((option) => (
-                <button
-                  key={option.value || 'all-time'}
-                  onClick={() => handleDateFilterChange(option.value)}
-                  className={`px-2 py-1 text-xs rounded transition-all ${
-                    jobDateFilter === option.value
-                      ? 'bg-purple-500/40 text-white border border-purple-400/50'
-                      : 'bg-white/5 text-blue-200/70 hover:bg-white/10 border border-transparent'
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
+              ].map((option) => {
+                const active = jobDateFilter === option.value;
+                return (
+                  <button
+                    key={option.value || 'all-time'}
+                    type="button"
+                    onClick={() => handleDateFilterChange(option.value)}
+                    className="fp-btn-ghost"
+                    aria-pressed={active}
+                    style={{ padding: '4px 10px', fontSize: 12, ...FILTER_BTN_STYLE(active) }}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Clear filters */}
             {(jobStatusFilter || jobDateFilter) && (
               <button
+                type="button"
                 onClick={() => {
                   setJobStatusFilter('');
                   setJobDateFilter('');
                   fetchJobs('', '');
                 }}
-                className="ml-auto px-2 py-1 text-xs text-red-300 hover:text-red-200 hover:bg-red-500/10 rounded transition-all"
+                style={{
+                  marginLeft: 'auto',
+                  padding: '4px 10px',
+                  fontSize: 12,
+                  color: DANGER_RED_SOFT,
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+                className="hover:underline"
               >
                 Clear filters
               </button>
@@ -1046,64 +1146,72 @@ export default function ScraperPage() {
           </div>
 
           {jobsLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="w-6 h-6 text-blue-400 animate-spin" />
+            <div style={{ padding: 16 }}>
+              <LoadingSkeleton variant="list" rows={3} />
             </div>
           ) : jobs.length === 0 ? (
-            <p className="text-center text-blue-200/50 py-6">
-              {jobStatusFilter || jobDateFilter
-                ? 'No jobs match the current filters.'
-                : 'No scraper jobs yet. Run your first scrape above.'}
-            </p>
+            <div style={{ padding: 24 }}>
+              <EmptyState
+                title={jobStatusFilter || jobDateFilter ? 'No jobs match the current filters' : 'No scraper jobs yet'}
+                message={
+                  jobStatusFilter || jobDateFilter
+                    ? 'Try clearing the filters to see all jobs.'
+                    : 'Run your first scrape above to see job history.'
+                }
+              />
+            </div>
           ) : (
-            <div className="divide-y divide-white/10">
+            <div>
               {jobs.map((job) => (
                 <div
                   key={job.id}
-                  className="p-4 flex items-center gap-4 hover:bg-white/5 transition-all duration-300"
+                  style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 16, borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                  data-fp-row-hover="true"
                 >
-                  <div className={`${getStatusColor(job.status)}`}>{getStatusIcon(job.status)}</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-white">{job.platform}</span>
-                      <span className="px-1.5 py-0.5 text-xs rounded bg-purple-500/30 text-purple-200">
-                        {job.status}
-                      </span>
+                  <div style={{ color: getStatusColor(job.status) }}>
+                    <StatusIcon status={job.status} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontWeight: 500, color: TEXT_PRIMARY }}>{job.platform}</span>
+                      <span className={getStatusBadgeClass(job.status)}>{job.status}</span>
                     </div>
-                    <div className="flex flex-wrap gap-2 text-xs text-blue-200/60">
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, fontSize: 12, color: TEXT_SECONDARY }}>
                       {job.location && (
-                        <span className="flex items-center gap-1">
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                           <MapPin className="w-3 h-3" />
                           {job.location}
                         </span>
                       )}
                       {job.category && (
-                        <span className="flex items-center gap-1">
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                           <Tag className="w-3 h-3" />
                           {job.category}
                         </span>
                       )}
-                      <span className="flex items-center gap-1">
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                         <Clock className="w-3 h-3" />
                         {formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}
                       </span>
                     </div>
                     {job.errorMessage && (
-                      <p className="text-xs text-red-300 mt-1">{job.errorMessage}</p>
+                      <p style={{ fontSize: 12, color: DANGER_RED_SOFT, marginTop: 4 }}>{job.errorMessage}</p>
                     )}
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm text-white">{job.listingsFound} listings</p>
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ fontSize: 13, color: TEXT_PRIMARY }}>{job.listingsFound} listings</p>
                     {job.opportunitiesFound > 0 && (
-                      <p className="text-xs text-green-300">
+                      <p style={{ fontSize: 12, color: PROFIT_GREEN }}>
                         {job.opportunitiesFound} opportunities
                       </p>
                     )}
                   </div>
                   <button
+                    type="button"
                     onClick={() => deleteJob(job.id)}
-                    className="p-1.5 hover:bg-red-500/20 rounded transition-all text-red-400"
-                    title="Delete"
+                    className="fp-btn-ghost"
+                    aria-label="Delete job"
+                    style={{ padding: 6 }}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -1112,7 +1220,7 @@ export default function ScraperPage() {
             </div>
           )}
         </div>
-      </main>
+      </div>
     </div>
   );
 }

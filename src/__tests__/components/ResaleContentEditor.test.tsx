@@ -94,8 +94,10 @@ describe('ResaleContentEditor', () => {
     const titleInput = screen.getByPlaceholderText(/Generated title appears here/i);
     fireEvent.change(titleInput, { target: { value: 'x'.repeat(45) } });
 
+    // Story 14.8 migrated counter color from Tailwind text-red-* utility to inline
+    // canonical danger hex (#fca5a5). Assert on the inline style instead of className.
     const counter = screen.getByText(/45 \/ 40 chars/);
-    expect(counter.className).toMatch(/text-red-600/);
+    expect((counter as HTMLElement).style.color).toBe('rgb(252, 165, 165)');
   });
 
   it('calls /api/listings/<id>/generate-resale-content with platform + useLLM when Generate clicked', async () => {

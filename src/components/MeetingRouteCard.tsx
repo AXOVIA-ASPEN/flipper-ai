@@ -3,7 +3,7 @@
  * @author Stephen Boyett
  * @company Axovia AI
  * @date 2026-04-11
- * @version 1.0
+ * @version 1.1
  * @brief Client Component displaying driving route, departure time, and Maps deep link for a scheduled meetup.
  *
  * @description
@@ -16,6 +16,12 @@
  *  - past_meeting        → "This meeting has passed" (AC-2)
  *  - loading             → Skeleton card
  *  - error               → Fallback link to Google Maps search
+ *
+ * Story 14.8: migrated all surfaces to canonical glassmorphism — `.fp-glass` wrapper,
+ * `.fp-alert-info` for the "next meeting" banner, `.fp-alert-warn` for the missing-home /
+ * late-departure banners, `.fp-btn-primary` / `.fp-btn-ghost` buttons, inline purple for
+ * the upcoming-meeting header accent. Platform-aware deep linking and Maps attribution
+ * are preserved verbatim.
  *
  * Google Maps attribution ("Route data ©Google Maps") is required by Google Maps ToS §3.2.
  * Platform-aware deep linking: iOS uses comgooglemaps://, Android uses google.navigation:,
@@ -99,12 +105,14 @@ function minutesLate(departureIso: string): number {
 // Skeleton placeholder
 // ---------------------------------------------------------------------------
 
+const SKELETON_BG = { background: 'rgba(255,255,255,0.06)' };
+
 function RouteCardSkeleton(): React.JSX.Element {
   return (
-    <div className="border border-gray-200 rounded-lg p-4 animate-pulse" data-testid="route-card-skeleton">
-      <div className="h-4 bg-gray-200 rounded w-1/3 mb-3" />
-      <div className="h-3 bg-gray-200 rounded w-2/3 mb-2" />
-      <div className="h-3 bg-gray-200 rounded w-1/2" />
+    <div className="fp-glass-sm p-4 animate-pulse" data-testid="route-card-skeleton">
+      <div className="h-4 rounded w-1/3 mb-3" style={SKELETON_BG} />
+      <div className="h-3 rounded w-2/3 mb-2" style={SKELETON_BG} />
+      <div className="h-3 rounded w-1/2" style={SKELETON_BG} />
     </div>
   );
 }
@@ -148,14 +156,15 @@ export default function MeetingRouteCard({ opportunityId, meetingLocation }: Mee
       ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(meetingLocation)}`
       : 'https://www.google.com/maps';
     return (
-      <div className="border border-gray-200 rounded-lg p-4 bg-gray-50" data-testid="route-card-error">
-        <p className="text-sm text-gray-600">
+      <div className="fp-glass-sm p-4" data-testid="route-card-error">
+        <p className="text-sm" style={{ color: '#94a3b8' }}>
           Could not load route.{' '}
           <a
             href={fallbackSearchUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 hover:underline inline-flex items-center gap-1"
+            className="hover:underline inline-flex items-center gap-1"
+            style={{ color: '#c4b5fd' }}
           >
             View location on Google Maps
             <ExternalLink className="w-3 h-3" />
@@ -168,13 +177,13 @@ export default function MeetingRouteCard({ opportunityId, meetingLocation }: Mee
   // Past meeting (AC-2)
   if (data.state === 'past_meeting') {
     return (
-      <div className="border border-gray-200 rounded-lg p-4 bg-gray-50" data-testid="route-card-past">
-        <div className="flex items-center gap-2 text-gray-500">
+      <div className="fp-glass-sm p-4" data-testid="route-card-past">
+        <div className="flex items-center gap-2" style={{ color: '#94a3b8' }}>
           <Clock className="w-4 h-4" />
           <span className="text-sm font-medium">This meeting has passed</span>
         </div>
         {data.location && (
-          <p className="mt-2 text-sm text-gray-500">{data.location}</p>
+          <p className="mt-2 text-sm" style={{ color: '#94a3b8' }}>{data.location}</p>
         )}
       </div>
     );
@@ -183,12 +192,12 @@ export default function MeetingRouteCard({ opportunityId, meetingLocation }: Mee
   // Missing home location nudge (AC-6)
   if (data.state === 'missing_home_location') {
     return (
-      <div className="border border-amber-200 rounded-lg p-4 bg-amber-50" data-testid="route-card-no-home">
+      <div className="fp-alert-warn p-4" data-testid="route-card-no-home">
         <div className="flex items-start gap-2">
-          <MapPin className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-          <p className="text-sm text-amber-800">
+          <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: '#fcd34d' }} />
+          <p className="text-sm" style={{ color: '#fcd34d' }}>
             Set your home location in{' '}
-            <Link href="/settings" className="font-medium text-amber-900 underline">
+            <Link href="/settings" className="font-medium underline" style={{ color: '#fde68a' }}>
               Settings
             </Link>{' '}
             to get driving directions and departure alerts
@@ -201,19 +210,20 @@ export default function MeetingRouteCard({ opportunityId, meetingLocation }: Mee
   // Degraded state — no API key or no route found (AC-5)
   if (data.state === 'degraded') {
     return (
-      <div className="border border-gray-200 rounded-lg p-4" data-testid="route-card-degraded">
+      <div className="fp-glass-sm p-4" data-testid="route-card-degraded">
         <div className="flex items-start gap-2 mb-3">
-          <MapPin className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
+          <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: '#94a3b8' }} />
           <div>
-            <p className="text-sm font-medium text-gray-900">Meeting location</p>
-            <p className="text-sm text-gray-600 mt-1">{data.location}</p>
+            <p className="text-sm font-medium" style={{ color: '#e2e8f0' }}>Meeting location</p>
+            <p className="text-sm mt-1" style={{ color: '#94a3b8' }}>{data.location}</p>
           </div>
         </div>
         <a
           href={data.mapsSearchUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline"
+          className="inline-flex items-center gap-1 text-sm hover:underline"
+          style={{ color: '#c4b5fd' }}
           data-testid="view-on-maps-link"
         >
           View on Maps
@@ -228,33 +238,36 @@ export default function MeetingRouteCard({ opportunityId, meetingLocation }: Mee
   const lateMinutes = dept && data.departureIsPast ? minutesLate(dept) : 0;
 
   return (
-    <div className="border border-blue-100 rounded-lg p-4 bg-blue-50" data-testid="route-card-ok">
+    <div className="fp-alert-info p-4" data-testid="route-card-ok">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Navigation className="w-4 h-4 text-blue-600" />
-          <span className="text-sm font-semibold text-blue-900">Route to meetup</span>
+          <Navigation className="w-4 h-4" style={{ color: '#c4b5fd' }} />
+          <span className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>Route to meetup</span>
         </div>
-        <span className="text-xs text-gray-500">Route from your saved home location</span>
+        <span className="text-xs" style={{ color: '#94a3b8' }}>Route from your saved home location</span>
       </div>
 
       {/* Route stats */}
       {data.route && (
         <div className="flex gap-6 mb-3">
           <div>
-            <p className="text-xs text-gray-500">Travel time</p>
-            <p className="text-base font-bold text-gray-900">{data.route.durationText}</p>
+            <p className="text-xs" style={{ color: '#94a3b8' }}>Travel time</p>
+            <p className="text-base font-bold" style={{ color: '#e2e8f0' }}>{data.route.durationText}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Distance</p>
-            <p className="text-base font-bold text-gray-900">{data.route.distanceText}</p>
+            <p className="text-xs" style={{ color: '#94a3b8' }}>Distance</p>
+            <p className="text-base font-bold" style={{ color: '#e2e8f0' }}>{data.route.distanceText}</p>
           </div>
         </div>
       )}
 
       {/* Departure recommendation */}
       {dept && (
-        <div className={`rounded p-2 mb-3 text-sm ${data.departureIsPast ? 'bg-red-50 text-red-800 border border-red-200' : 'bg-white text-gray-800 border border-gray-200'}`}>
+        <div
+          className={data.departureIsPast ? 'fp-alert-warn rounded p-2 mb-3 text-sm' : 'fp-glass-sm rounded p-2 mb-3 text-sm'}
+          style={{ color: data.departureIsPast ? '#fcd34d' : '#e2e8f0' }}
+        >
           {data.departureIsPast ? (
             <span>
               You should have left {lateMinutes} minute{lateMinutes !== 1 ? 's' : ''} ago —{' '}
@@ -267,7 +280,7 @@ export default function MeetingRouteCard({ opportunityId, meetingLocation }: Mee
       )}
 
       {/* Traffic disclaimer (AC-2) */}
-      <p className="text-xs text-gray-500 mb-3">
+      <p className="text-xs mb-3" style={{ color: '#94a3b8' }}>
         Estimate based on typical traffic conditions — add extra time during peak hours.
         Driving directions shown — tap Open in Maps to switch to transit or walking.
       </p>
@@ -277,7 +290,7 @@ export default function MeetingRouteCard({ opportunityId, meetingLocation }: Mee
         <button
           type="button"
           onClick={() => openMaps(data.deepLinkUrl!, data.location)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="fp-btn-primary"
           aria-label={`Open directions to ${data.location} in Google Maps`}
           data-testid="open-in-maps-btn"
         >
@@ -287,7 +300,7 @@ export default function MeetingRouteCard({ opportunityId, meetingLocation }: Mee
       )}
 
       {/* Google Maps ToS attribution §3.2 — REQUIRED */}
-      <p className="mt-3 text-xs text-gray-400">
+      <p className="mt-3 text-xs" style={{ color: '#475569' }}>
         Route data{' '}
         <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer" className="hover:underline">
           ©Google Maps

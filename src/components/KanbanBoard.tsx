@@ -3,7 +3,7 @@
  * @author Stephen Boyett
  * @company Axovia AI
  * @date 2026-04-17
- * @version 1.1
+ * @version 1.2
  * @brief Drag-and-drop Kanban board for opportunities.
  *
  * @description
@@ -11,6 +11,9 @@
  * → Listed → Sold → Passed) with @hello-pangea/dnd. Cards carry image,
  * title, asking price, profit, score, and demand badge. DEMAND_BADGES is
  * canonicalized to .fp-badge-* classes per ADR-14.7-A (Story 14.7).
+ * v1.2: droppable wrappers declare role="list" + aria-label; draggable
+ * cards declare role="listitem" to satisfy AC #15(c) explicitly without
+ * relying on @hello-pangea/dnd's default DOM (which uses divs, not ul/li).
  */
 'use client';
 
@@ -187,6 +190,8 @@ export default function KanbanBoard({
                     ref={provided.innerRef}
                     {...provided.droppableProps}
                     className="fp-glass-sm fp-scroll"
+                    role="list"
+                    aria-label={`${col.label} opportunities`}
                     style={{
                       minHeight: 200,
                       maxHeight: 'calc(100vh - 220px)',
@@ -217,6 +222,7 @@ export default function KanbanBoard({
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
                               className="fp-glass"
+                              role="listitem"
                               style={{
                                 ...provided.draggableProps.style,
                                 marginBottom: 8,

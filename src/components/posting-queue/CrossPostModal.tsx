@@ -3,7 +3,7 @@
  * @author Stephen Boyett
  * @company Axovia AI
  * @date 2026-03-31
- * @version 1.0
+ * @version 1.1
  * @brief Modal for selecting cross-post target platforms for a listing.
  *
  * @description
@@ -13,6 +13,12 @@
  * disabled. Submit calls POST /api/posting-queue with a batch payload and
  * surfaces a success/error toast. Handles the edge case where every
  * non-source platform is already queued by suppressing the submit button.
+ *
+ * Story 14.8: migrated to canonical glassmorphism — `.fp-glass` modal body,
+ * `.fp-glass-sm` per-platform rows, `.fp-input` price field, `.fp-btn-primary`
+ * submit, `.fp-btn-ghost` close, `.fp-alert-warn` load-error banner,
+ * `.fp-alert-info` "all queued" banner. Submit handler, fetch flow, and
+ * already-queued/source-platform exclusion logic are preserved verbatim.
  */
 'use client';
 
@@ -172,22 +178,28 @@ export default function CrossPostModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.6)' }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="cross-post-modal-title"
     >
-      <div className="w-full max-w-lg rounded-lg bg-white shadow-xl dark:bg-gray-900">
-        <div className="flex items-start justify-between border-b border-gray-200 p-4 dark:border-gray-700">
+      <div className="fp-glass w-full max-w-lg">
+        <div
+          className="flex items-start justify-between p-4"
+          style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+        >
           <div>
             <h2
               id="cross-post-modal-title"
-              className="text-lg font-semibold text-gray-900 dark:text-gray-100"
+              className="text-lg font-semibold"
+              style={{ color: '#e2e8f0' }}
             >
               Cross-post listing
             </h2>
             <p
-              className="mt-1 truncate text-sm text-gray-500 dark:text-gray-400"
+              className="mt-1 truncate text-sm"
+              style={{ color: '#94a3b8' }}
               title={listingTitle}
             >
               {listingTitle}
@@ -196,8 +208,8 @@ export default function CrossPostModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
-            aria-label="Close"
+            className="fp-icon-btn"
+            aria-label="Close cross-post dialog"
           >
             <X size={18} />
           </button>
@@ -205,18 +217,19 @@ export default function CrossPostModal({
 
         <div className="space-y-4 p-4">
           {loadError && (
-            <p className="rounded border border-yellow-200 bg-yellow-50 px-3 py-2 text-xs text-yellow-800 dark:border-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200">
+            <p className="fp-alert-warn rounded px-3 py-2 text-xs" style={{ color: '#fcd34d' }}>
               {loadError}
             </p>
           )}
 
           {existing === null ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm" style={{ color: '#94a3b8' }}>
               Checking existing queue...
             </p>
           ) : allQueued ? (
             <p
-              className="rounded border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-200"
+              className="fp-alert-info rounded px-3 py-2 text-sm"
+              style={{ color: '#93c5fd' }}
               data-testid="all-queued-message"
             >
               This listing is already queued for all available platforms.
@@ -224,7 +237,7 @@ export default function CrossPostModal({
           ) : (
             <>
               <fieldset className="space-y-2">
-                <legend className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                <legend className="mb-1 text-sm font-medium" style={{ color: '#e2e8f0' }}>
                   Target platforms
                 </legend>
                 {availablePlatforms.map((p) => {
@@ -233,22 +246,28 @@ export default function CrossPostModal({
                   return (
                     <label
                       key={p.key}
-                      className={`flex items-center gap-2 rounded border px-3 py-2 text-sm ${
-                        isAlreadyQueued
-                          ? 'cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-500'
-                          : 'cursor-pointer border-gray-200 bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700'
+                      className={`fp-glass-sm flex items-center gap-2 px-3 py-2 text-sm ${
+                        isAlreadyQueued ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
                       }`}
+                      style={{ color: '#e2e8f0' }}
                     >
                       <input
                         type="checkbox"
                         disabled={isAlreadyQueued}
                         checked={isChecked}
                         onChange={() => togglePlatform(p.key)}
+                        style={{ accentColor: '#7c3aed' }}
                         data-testid={`platform-checkbox-${p.key}`}
                       />
                       <span className="flex-1">{p.label}</span>
+                      {p.key === 'EBAY' && (
+                        <span className="fp-badge fp-badge-purple text-xs">Pro</span>
+                      )}
+                      {p.key === 'FACEBOOK_MARKETPLACE' && (
+                        <span className="fp-badge fp-badge-yellow text-xs">Enterprise</span>
+                      )}
                       {isAlreadyQueued && (
-                        <span className="text-xs italic">Already queued</span>
+                        <span className="text-xs italic" style={{ color: '#94a3b8' }}>Already queued</span>
                       )}
                     </label>
                   );
@@ -258,7 +277,8 @@ export default function CrossPostModal({
               <div>
                 <label
                   htmlFor="cross-post-price"
-                  className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  className="mb-1 block text-sm font-medium"
+                  style={{ color: '#e2e8f0' }}
                 >
                   Asking price (optional)
                 </label>
@@ -270,18 +290,21 @@ export default function CrossPostModal({
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                   placeholder="Leave blank to reuse the original price"
-                  className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                  className="fp-input w-full"
                 />
               </div>
             </>
           )}
         </div>
 
-        <div className="flex items-center justify-end gap-2 border-t border-gray-200 p-4 dark:border-gray-700">
+        <div
+          className="flex items-center justify-end gap-2 p-4"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+        >
           <button
             type="button"
             onClick={onClose}
-            className="rounded border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+            className="fp-btn-ghost"
           >
             Close
           </button>
@@ -290,12 +313,13 @@ export default function CrossPostModal({
               type="button"
               onClick={handleSubmit}
               disabled={submitting || selected.size === 0 || existing === null}
-              className="inline-flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="fp-btn-primary"
               data-testid="submit-cross-post"
             >
               {submitting && (
                 <span
-                  className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent"
+                  className="h-3 w-3 animate-spin rounded-full"
+                  style={{ border: '2px solid #f1f5f9', borderTopColor: 'transparent' }}
                   aria-hidden="true"
                 />
               )}

@@ -241,8 +241,16 @@ describe('ScoringSettings', () => {
 
   it('displays threshold value in label', async () => {
     render(<ScoringSettings />);
+    // Story 14.8 split the value into a separate <span> with .fp-metric-num styling.
+    // Locate the slider's <label> and assert its concatenated text content includes
+    // "Opportunity Threshold: 70". Querying by id avoids the multi-match problem of
+    // a flexible text matcher walking up the DOM tree.
     await waitFor(() => {
-      expect(screen.getByText(/Opportunity Threshold: 70/)).toBeInTheDocument();
+      const slider = screen.getByLabelText(/Opportunity threshold/i);
+      expect(slider).toBeInTheDocument();
     });
+    const labelEl = document.querySelector('label[for="opportunity-threshold"]');
+    expect(labelEl).not.toBeNull();
+    expect((labelEl as HTMLElement).textContent ?? '').toMatch(/Opportunity Threshold:\s*70/);
   });
 });

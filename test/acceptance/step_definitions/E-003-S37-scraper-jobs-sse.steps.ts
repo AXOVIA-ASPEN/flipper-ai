@@ -24,7 +24,7 @@ import * as path from 'path';
 import { CustomWorld } from '../support/world';
 
 const PROJECT_ROOT = process.cwd();
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3200';
 // Read E2E_TEST_SECRET lazily — hooks.ts loads .env AFTER this module is imported.
 const getE2ESecret = (): string | undefined => process.env.E2E_TEST_SECRET;
 

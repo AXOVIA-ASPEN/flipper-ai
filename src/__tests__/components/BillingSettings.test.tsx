@@ -97,11 +97,33 @@ function mockUsageResponse(tier: string, scansToday: number) {
   };
 }
 
+// Story 14.8 AC #5 added a third fetch (`/api/invoices`) to BillingSettings.
+// Existing tests use `mockResolvedValueOnce` chains keyed to call ORDER, not
+// URL. We preserve that contract by prepending an empty-invoices response to
+// every chain via the helper below, and by defaulting the empty-invoices
+// response in `beforeEach` for tests that don't chain.
+const emptyInvoicesResponse = {
+  ok: true,
+  json: () => Promise.resolve({ success: true, data: [] }),
+};
+
 describe('BillingSettings', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Default: FREE tier
-    mockFetch.mockResolvedValue(mockUsageResponse('FREE', 3));
+    // Default: URL-aware mockImplementation. /api/invoices always returns
+    // empty array; everything else returns the FREE usage response. Tests
+    // that need different responses for /api/checkout / /api/checkout/portal
+    // chain their own `.mockResolvedValueOnce(...)` calls in TEST ORDER —
+    // remember that the new component fires (1) /api/invoices, (2) /api/usage,
+    // (3) action endpoint, so chained tests prepend `emptyInvoicesResponse`
+    // and `mockUsageResponse(tier, ...)` to keep the queue aligned with the
+    // call order.
+    mockFetch.mockImplementation((url: string) => {
+      if (typeof url === 'string' && url.includes('/api/invoices')) {
+        return Promise.resolve(emptyInvoicesResponse);
+      }
+      return Promise.resolve(mockUsageResponse('FREE', 3));
+    });
   });
 
   // ── Loading state ──────────────────────────────────────────────────────────
@@ -362,6 +384,7 @@ describe('BillingSettings', () => {
     it('calls checkout API when upgrade button is clicked', async () => {
       const user = userEvent.setup();
       mockFetch
+        .mockResolvedValueOnce(emptyInvoicesResponse)
         .mockResolvedValueOnce(mockUsageResponse('FREE', 0))
         .mockResolvedValueOnce({
           ok: true,
@@ -387,6 +410,7 @@ describe('BillingSettings', () => {
     it('calls checkout API and receives redirect URL on success', async () => {
       const user = userEvent.setup();
       mockFetch
+        .mockResolvedValueOnce(emptyInvoicesResponse)
         .mockResolvedValueOnce(mockUsageResponse('FREE', 0))
         .mockResolvedValueOnce({
           ok: true,
@@ -411,6 +435,7 @@ describe('BillingSettings', () => {
     it('sends correct tier in checkout request body', async () => {
       const user = userEvent.setup();
       mockFetch
+        .mockResolvedValueOnce(emptyInvoicesResponse)
         .mockResolvedValueOnce(mockUsageResponse('FREE', 0))
         .mockResolvedValueOnce({
           ok: true,
@@ -438,6 +463,7 @@ describe('BillingSettings', () => {
     it('handles null URL in checkout response without error', async () => {
       const user = userEvent.setup();
       mockFetch
+        .mockResolvedValueOnce(emptyInvoicesResponse)
         .mockResolvedValueOnce(mockUsageResponse('FREE', 0))
         .mockResolvedValueOnce({
           ok: true,
@@ -453,7 +479,8 @@ describe('BillingSettings', () => {
       await user.click(screen.getByText(/Upgrade to Flipper/));
 
       await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledTimes(2);
+        // Story 14.8 added /api/invoices fetch on mount → expected count is now 3 (invoices + usage + action API).
+        expect(mockFetch).toHaveBeenCalledTimes(3);
       });
 
       // Component should still be rendered without errors
@@ -463,6 +490,7 @@ describe('BillingSettings', () => {
     it('handles checkout API error gracefully and shows error toast', async () => {
       const user = userEvent.setup();
       mockFetch
+        .mockResolvedValueOnce(emptyInvoicesResponse)
         .mockResolvedValueOnce(mockUsageResponse('FREE', 0))
         .mockRejectedValueOnce(new Error('Network error'));
 
@@ -487,6 +515,7 @@ describe('BillingSettings', () => {
       const user = userEvent.setup();
       let resolveCheckout: (value: unknown) => void;
       mockFetch
+        .mockResolvedValueOnce(emptyInvoicesResponse)
         .mockResolvedValueOnce(mockUsageResponse('FREE', 0))
         .mockReturnValueOnce(
           new Promise((resolve) => {
@@ -527,6 +556,7 @@ describe('BillingSettings', () => {
     it('calls portal API when Manage Billing is clicked', async () => {
       const user = userEvent.setup();
       mockFetch
+        .mockResolvedValueOnce(emptyInvoicesResponse)
         .mockResolvedValueOnce(mockUsageResponse('FLIPPER', 0))
         .mockResolvedValueOnce({
           ok: true,
@@ -549,6 +579,7 @@ describe('BillingSettings', () => {
     it('calls portal API and receives redirect URL', async () => {
       const user = userEvent.setup();
       mockFetch
+        .mockResolvedValueOnce(emptyInvoicesResponse)
         .mockResolvedValueOnce(mockUsageResponse('PRO', 0))
         .mockResolvedValueOnce({
           ok: true,
@@ -571,6 +602,7 @@ describe('BillingSettings', () => {
     it('handles portal API error gracefully and shows error toast', async () => {
       const user = userEvent.setup();
       mockFetch
+        .mockResolvedValueOnce(emptyInvoicesResponse)
         .mockResolvedValueOnce(mockUsageResponse('FLIPPER', 0))
         .mockRejectedValueOnce(new Error('Portal unavailable'));
 
@@ -594,6 +626,7 @@ describe('BillingSettings', () => {
     it('handles null URL in portal response without error', async () => {
       const user = userEvent.setup();
       mockFetch
+        .mockResolvedValueOnce(emptyInvoicesResponse)
         .mockResolvedValueOnce(mockUsageResponse('FLIPPER', 0))
         .mockResolvedValueOnce({
           ok: true,
@@ -609,7 +642,8 @@ describe('BillingSettings', () => {
       await user.click(screen.getByText('Manage Billing'));
 
       await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledTimes(2);
+        // Story 14.8 added /api/invoices fetch on mount → expected count is now 3 (invoices + usage + action API).
+        expect(mockFetch).toHaveBeenCalledTimes(3);
       });
 
       // Should still render normally

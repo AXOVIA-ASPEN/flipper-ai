@@ -128,7 +128,10 @@ export default function ThreadDetailPage({
   if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        <div
+          className="animate-spin rounded-full h-8 w-8"
+          style={{ borderBottom: '2px solid #8b5cf6' }}
+        />
       </div>
     );
   }
@@ -138,7 +141,8 @@ export default function ThreadDetailPage({
       {/* Back link */}
       <Link
         href="/messages"
-        className="inline-flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline mb-4"
+        className="inline-flex items-center gap-1.5 text-sm hover:underline mb-4"
+        style={{ color: '#c4b5fd' }}
       >
         <ArrowLeft size={16} />
         Back to Messages
@@ -147,16 +151,21 @@ export default function ThreadDetailPage({
       {/* Loading state */}
       {loading && (
         <div className="space-y-4">
-          <div className="h-20 bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse" />
+          <div
+            className="h-20 rounded-lg animate-pulse"
+            style={{ background: 'rgba(255,255,255,0.04)' }}
+          />
           <div className="space-y-3">
             {[...Array(4)].map((_, i) => (
               <div
                 key={i}
-                className={`h-16 rounded-lg animate-pulse ${
-                  i % 2 === 0
-                    ? 'bg-gray-100 dark:bg-gray-800 w-2/3'
-                    : 'bg-blue-50 dark:bg-blue-900/20 w-2/3 ml-auto'
-                }`}
+                className={`h-16 rounded-lg animate-pulse w-2/3 ${i % 2 === 0 ? '' : 'ml-auto'}`}
+                style={{
+                  background:
+                    i % 2 === 0
+                      ? 'rgba(255,255,255,0.04)'
+                      : 'rgba(124, 58, 237, 0.10)',
+                }}
               />
             ))}
           </div>
@@ -166,10 +175,11 @@ export default function ThreadDetailPage({
       {/* Error state */}
       {error && !loading && (
         <div className="text-center py-16">
-          <p className="text-gray-500 dark:text-gray-400 mb-4">{error}</p>
+          <p className="mb-4" style={{ color: '#94a3b8' }}>{error}</p>
           <button
             onClick={fetchThread}
-            className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+            className="text-sm hover:underline"
+            style={{ color: '#c4b5fd' }}
           >
             Try again
           </button>
@@ -187,7 +197,7 @@ export default function ThreadDetailPage({
 
           {/* Message count */}
           <div className="flex items-center justify-between mt-4 mb-3">
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+            <span className="text-sm" style={{ color: '#94a3b8' }}>
               {threadData.threadMeta.messageCount} message
               {threadData.threadMeta.messageCount !== 1 ? 's' : ''}
             </span>
@@ -208,11 +218,20 @@ export default function ThreadDetailPage({
                 <div key={msg.id}>
                   {showDateSeparator && (
                     <div className="flex items-center gap-3 my-4">
-                      <div className="flex-1 border-t border-gray-200 dark:border-gray-700" />
-                      <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">
+                      <div
+                        className="flex-1"
+                        style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                      />
+                      <span
+                        className="text-xs font-medium"
+                        style={{ color: '#64748b' }}
+                      >
                         {getDateLabel(msg.createdAt)}
                       </span>
-                      <div className="flex-1 border-t border-gray-200 dark:border-gray-700" />
+                      <div
+                        className="flex-1"
+                        style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                      />
                     </div>
                   )}
                   <MessageBubble

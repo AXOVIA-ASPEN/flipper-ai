@@ -16,9 +16,9 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import ThreadItem from '@/components/messages/ThreadItem';
 import ApprovalQueue from '@/components/ApprovalQueue';
 import { LoadingSkeleton, EmptyState } from '@/components/ui';
@@ -48,13 +48,19 @@ interface ThreadSummary {
 
 type TabType = 'all' | 'inbox' | 'sent' | 'approval';
 
-export default function MessagesPage() {
+function isTabType(value: string | null): value is TabType {
+  return value === 'all' || value === 'inbox' || value === 'sent' || value === 'approval';
+}
+
+function MessagesPageInner() {
   const { user: firebaseUser, loading: authLoading } = useFirebaseAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialTab: TabType = isTabType(searchParams.get('tab')) ? (searchParams.get('tab') as TabType) : 'all';
   const [threads, setThreads] = useState<ThreadSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<TabType>('all');
+  const [tab, setTab] = useState<TabType>(initialTab);
   const [search, setSearch] = useState('');
   const [total, setTotal] = useState(0);
   const [offset, setOffset] = useState(0);
@@ -312,5 +318,13 @@ export default function MessagesPage() {
       )}
       </div>
     </div>
+  );
+}
+
+export default function MessagesPage() {
+  return (
+    <Suspense fallback={<LoadingSkeleton variant="card" />}>
+      <MessagesPageInner />
+    </Suspense>
   );
 }

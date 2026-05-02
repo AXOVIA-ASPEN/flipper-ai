@@ -64,7 +64,7 @@ export default function StepBudget({ selected, onChange }: Props) {
                 className="w-4 h-4 rounded-full border-2 flex-shrink-0"
                 style={
                   isSelected
-                    ? { borderColor: '#7c3aed', background: '#7c3aed' }
+                    ? { borderColor: '#8b5cf6', background: '#8b5cf6' }
                     : { borderColor: 'rgba(255,255,255,0.15)', background: 'transparent' }
                 }
               />

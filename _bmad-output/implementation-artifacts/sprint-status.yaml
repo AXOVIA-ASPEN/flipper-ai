@@ -171,15 +171,15 @@ development_status:
   #         dark-first :root, shared state components, accessibility, file headers.
   # Story 14.1 (foundation) blocks all others; 14.3 blocks pages consuming shared state;
   # 14.10 is the final enforcement gate.
-  epic-14: in-progress
+  epic-14: done
   14-1-design-tokens-base-style-unification: done
   14-2-remove-competing-multi-theme-system: done
   14-3-shared-ui-state-components: done
-  14-4-landing-page-auth-pages-rebuild: review
-  14-5-onboarding-wizard-dark-migration: in-progress
-  14-6-pricecalculator-canonical-reference: review
-  14-7-opportunities-listings-messaging-migration: ready-for-dev
-  14-8-settings-component-polish: ready-for-dev
-  14-9-analytics-scraper-health-static-pages: backlog
-  14-10-accessibility-file-header-sweep: backlog
+  14-4-landing-page-auth-pages-rebuild: done
+  14-5-onboarding-wizard-dark-migration: done
+  14-6-pricecalculator-canonical-reference: done
+  14-7-opportunities-listings-messaging-migration: done
+  14-8-settings-component-polish: done
+  14-9-analytics-scraper-health-static-pages: done
+  14-10-accessibility-file-header-sweep: done
   epic-14-retrospective: optional

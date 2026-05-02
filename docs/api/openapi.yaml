@@ -12,7 +12,7 @@ info:
     name: Proprietary
 
 servers:
-  - url: http://localhost:3000/api
+  - url: http://localhost:3200/api
     description: Local development
   - url: https://axovia-flipper.web.app/api
     description: Production

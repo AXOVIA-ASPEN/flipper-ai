@@ -5,16 +5,16 @@ import { defineConfig, devices } from '@playwright/test';
  *
  * Server resolution order:
  *   1. BASE_URL env var (explicit override, e.g. CI staging server)
- *   2. PM2 staging on port 3001 (reuseExistingServer=true picks this up locally)
- *   3. webServer auto-starts `next start` on port 3000 if nothing is running
+ *   2. webServer auto-starts `next start` on port 3200 if nothing is running
+ *
+ * Port 3200 is the Flipper.ai project standard (avoids conflicts with other
+ * Next.js projects defaulting to 3000/3001).
  *
  * In CI: build job runs first, then e2e job uses the built output to start
  * `next start` via webServer config below.
  */
 
-// In CI, always use localhost:3000 (webServer will auto-start `next start`).
-// Locally, default to :3001 (assumes PM2 staging server is running).
-const BASE_URL = process.env.BASE_URL || (process.env.CI ? 'http://localhost:3000' : 'http://localhost:3001');
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3200';
 
 export default defineConfig({
   testDir: './e2e',
@@ -29,19 +29,19 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     trace: 'on-first-retry',
   },
-  // Auto-start a production server if nothing is already listening.
+  // Auto-start a production server if nothing is already listening on 3200.
   // - In CI: `next build` runs before this job; webServer starts `next start`.
-  // - Locally with PM2 on :3001: set BASE_URL=http://localhost:3001 and
-  //   reuseExistingServer will skip launching a new process.
-  webServer: BASE_URL.includes('localhost:3000')
+  // - Locally: reuseExistingServer skips launching a new process if 3200 is up.
+  // - Override with BASE_URL env var to point at any other server.
+  webServer: BASE_URL.includes('localhost:3200')
     ? {
-        command: 'npx next start -p 3000',
-        url: 'http://localhost:3000',
+        command: 'npx next start -p 3200',
+        url: 'http://localhost:3200',
         reuseExistingServer: !process.env.CI, // In CI, always start fresh
         timeout: 120_000,
         env: {
           DATABASE_URL: process.env.DATABASE_URL || 'file:./dev.db',
-          APP_URL: 'http://localhost:3000',
+          APP_URL: 'http://localhost:3200',
         },
       }
     : undefined,

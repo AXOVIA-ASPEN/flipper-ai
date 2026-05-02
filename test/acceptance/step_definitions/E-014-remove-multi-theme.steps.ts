@@ -27,7 +27,7 @@ import { CustomWorld } from '../support/world';
 
 setDefaultTimeout(120 * 1000);
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3200';
 
 // Console errors that are expected in acceptance-test environment (no real backend).
 const IGNORABLE_CONSOLE_PATTERNS = [

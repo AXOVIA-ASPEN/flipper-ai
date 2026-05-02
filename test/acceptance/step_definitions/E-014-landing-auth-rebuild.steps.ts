@@ -25,7 +25,7 @@ import { CustomWorld } from '../support/world';
 
 setDefaultTimeout(120 * 1000);
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3200';
 
 // Five pages rebuilt by Story 14.4
 const REBUILT_FILES = [
@@ -37,9 +37,12 @@ const REBUILT_FILES = [
 ];
 
 // Non-canonical Tailwind palette color classes that must not appear in rebuilt files.
-// The design system expresses all accent colors via fp-* classes and inline hex tokens.
+// Mirrors AC #7's regex exactly — purple is the canonical accent and MUST NOT be banned
+// (see story 14.4 AC #7 regex). Green/red are banned on auth pages via AC #7's carve-out
+// language; password-strength meters use inline hex values so zero Tailwind-class matches
+// still hold (see ADR-14.4-D).
 const BANNED_PALETTE_PATTERN =
-  /(bg|text|border|from|to|via|ring)-(blue|cyan|teal|sky|indigo|violet|purple|fuchsia|pink|rose|emerald|green|amber|yellow|orange|red)-\d+/g;
+  /(bg|text|border|from|to|via|ring)-(blue|cyan|teal|sky|indigo|violet|fuchsia|pink|rose|emerald|green|amber|yellow|orange|red)-\d+/g;
 
 const FLIPPER_14_2_PATTERN = /FLIPPER-14-2/g;
 
@@ -186,12 +189,23 @@ Then('the count of legacy theme class references is zero', function (this: Custo
 When(
   'I click the first button with text {string}',
   async function (this: CustomWorld, buttonText: string) {
-    // Covers both <button> and <a> elements styled as buttons (Next.js Link renders as <a>).
-    await this.page
+    // Wait for the document `load` event so React event handlers (router.push,
+    // onClick) are wired before we click. `networkidle` is unreliable in dev —
+    // Next.js HMR poll and Sentry beacons can keep the network busy past any
+    // reasonable timeout; `load` is bounded by the document load event.
+    await this.page.waitForLoadState('load', { timeout: 30_000 });
+    const target = this.page
       .locator(`button:has-text("${buttonText}"), a:has-text("${buttonText}")`)
-      .first()
-      .click({ timeout: 10_000 });
-    await this.page.waitForLoadState('domcontentloaded', { timeout: 30_000 });
+      .first();
+    const startUrl = this.page.url();
+    await target.click({ timeout: 10_000 });
+    // Wait for either an in-app router.push() URL change OR a full document load.
+    await this.page
+      .waitForFunction((prev) => window.location.href !== prev, startUrl, { timeout: 15_000 })
+      .catch(() => {
+        // If the URL didn't change (e.g., button has no navigation), continue —
+        // the assertion step will surface the failure with the actual URL.
+      });
   }
 );
 

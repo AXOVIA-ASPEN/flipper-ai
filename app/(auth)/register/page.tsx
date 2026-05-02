@@ -259,7 +259,7 @@ export default function RegisterPage() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute inset-y-0 right-0 p-2 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-3 pl-3 flex items-center justify-center min-w-[44px] min-h-[44px]"
                   style={{ color: '#475569' }}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}

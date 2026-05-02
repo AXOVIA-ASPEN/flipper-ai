@@ -1,3 +1,21 @@
+/**
+ * @file src/components/ScoringSettings.tsx
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-03-08
+ * @version 1.1
+ * @brief Opportunity scoring threshold and platform fee-rate configuration.
+ *
+ * @description
+ * Lets the user adjust the opportunity-flag threshold (range slider) and
+ * per-platform selling fee rates (numeric inputs). Saves are debounced via
+ * onMouseUp/onBlur. Story 14.8 migrated to canonical glass surfaces, .fp-input
+ * fields, and .fp-btn-primary / .fp-btn-ghost buttons. The slider thumb
+ * styling is owned by Story 14.1's globals.css range-thumb pseudo-element
+ * rules — no inline thumb override is present in this file. Save semantics
+ * and value validation are preserved verbatim.
+ */
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -113,43 +131,47 @@ export default function ScoringSettings() {
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 className="text-2xl font-semibold mb-4">Scoring &amp; Fees</h2>
-        <p className="text-gray-500">Loading...</p>
+      <div className="fp-glass-sm p-6">
+        <h2 className="text-2xl font-semibold mb-4" style={{ color: '#e2e8f0' }}>Scoring &amp; Fees</h2>
+        <p style={{ color: '#94a3b8' }}>Loading...</p>
       </div>
     );
   }
 
   if (!settings) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 className="text-2xl font-semibold mb-4">Scoring &amp; Fees</h2>
-        <p className="text-red-500">{error || 'Failed to load settings'}</p>
+      <div className="fp-glass-sm p-6">
+        <h2 className="text-2xl font-semibold mb-4" style={{ color: '#e2e8f0' }}>Scoring &amp; Fees</h2>
+        <p style={{ color: '#fca5a5' }}>{error || 'Failed to load settings'}</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+    <div className="fp-glass-sm p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-semibold">Scoring &amp; Fees</h2>
+        <h2 className="text-2xl font-semibold" style={{ color: '#e2e8f0' }}>Scoring &amp; Fees</h2>
         <button
           onClick={handleResetToDefaults}
           disabled={saving}
-          className="text-sm px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="fp-btn-ghost"
         >
           Reset to Defaults
         </button>
       </div>
 
+      <div className="fp-alert-warn mb-4 p-3 text-xs" style={{ color: '#fcd34d' }}>
+        Changing weights or fees will recompute opportunity scores on your next scan.
+      </div>
+
       {error && (
-        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-red-600 dark:text-red-400">
+        <div className="fp-alert-danger mb-4 p-3" style={{ color: '#fca5a5' }}>
           {error}
         </div>
       )}
 
       {successMessage && (
-        <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded text-green-600 dark:text-green-400">
+        <div className="fp-alert-success mb-4 p-3" style={{ color: '#6ee7b7' }}>
           {successMessage}
         </div>
       )}
@@ -159,11 +181,15 @@ export default function ScoringSettings() {
         <div>
           <label
             htmlFor="opportunity-threshold"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            className="block text-sm font-medium mb-1"
+            style={{ color: '#e2e8f0' }}
           >
-            Opportunity Threshold: {settings.opportunityThreshold}
+            Opportunity Threshold:{' '}
+            <span className="fp-metric-num text-sm" style={{ color: '#c4b5fd' }}>
+              {settings.opportunityThreshold}
+            </span>
           </label>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+          <p className="text-xs mb-2" style={{ color: '#94a3b8' }}>
             Minimum value score (0–100) for a listing to be flagged as an opportunity. Default: 70.
           </p>
           <input
@@ -186,8 +212,13 @@ export default function ScoringSettings() {
             }}
             disabled={saving}
             className="w-full"
+            aria-label="Opportunity threshold"
+            aria-valuemin={10}
+            aria-valuemax={100}
+            aria-valuenow={settings.opportunityThreshold}
+            aria-valuetext={`Opportunity threshold ${settings.opportunityThreshold}`}
           />
-          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex justify-between text-xs" style={{ color: '#94a3b8' }}>
             <span>10</span>
             <span>55</span>
             <span>100</span>
@@ -195,9 +226,9 @@ export default function ScoringSettings() {
         </div>
 
         {/* Platform Fee Rates */}
-        <div className="border-t dark:border-gray-700 pt-4">
-          <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-1">Platform Selling Fee Rates (%)</h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+        <div className="pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <h3 className="font-medium mb-1" style={{ color: '#e2e8f0' }}>Platform Selling Fee Rates (%)</h3>
+          <p className="text-xs mb-4" style={{ color: '#94a3b8' }}>
             Enter the selling fee percentage for each platform (0–50). These are used to calculate profit estimates.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -205,7 +236,8 @@ export default function ScoringSettings() {
               <div key={key}>
                 <label
                   htmlFor={`fee-${key}`}
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: '#e2e8f0' }}
                 >
                   {label}
                 </label>
@@ -230,9 +262,9 @@ export default function ScoringSettings() {
                       }
                     }}
                     disabled={saving}
-                    className="w-full px-3 py-2 pr-8 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                    className="fp-input w-full pr-8"
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: '#475569' }}>%</span>
                 </div>
               </div>
             ))}
@@ -240,13 +272,13 @@ export default function ScoringSettings() {
         </div>
 
         {/* Holding Cost Rate */}
-        <div className="border-t dark:border-gray-700 pt-4">
-          <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-1">Holding Cost Rate ($/day)</h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+        <div className="pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <h3 className="font-medium mb-1" style={{ color: '#e2e8f0' }}>Holding Cost Rate ($/day)</h3>
+          <p className="text-xs mb-3" style={{ color: '#94a3b8' }}>
             Daily cost to hold purchased inventory (storage, opportunity cost). Used in the Inventory view.
           </p>
           <div className="relative max-w-xs">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: '#475569' }}>$</span>
             <input
               id="holding-cost-daily-rate"
               type="number"
@@ -267,7 +299,7 @@ export default function ScoringSettings() {
                 }
               }}
               disabled={saving}
-              className="w-full pl-7 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              className="fp-input w-full pl-7"
             />
           </div>
         </div>

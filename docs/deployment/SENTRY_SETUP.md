@@ -46,7 +46,7 @@ echo 'SENTRY_DSN="https://your-dsn@sentry.io/..."' >> .env.local
 
 # Trigger a test error
 npm run dev
-# Visit http://localhost:3000/api/test-error (if you create this endpoint)
+# Visit http://localhost:3200/api/test-error (if you create this endpoint)
 ```
 
 #### Check Sentry Dashboard

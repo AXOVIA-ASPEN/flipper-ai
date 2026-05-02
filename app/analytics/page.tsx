@@ -1,3 +1,22 @@
+/**
+ * @file app/analytics/page.tsx
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-04-26
+ * @version 2.0
+ * @brief Profit & Loss analytics dashboard rebuilt on the canonical dark-glassmorphism design system.
+ *
+ * @description
+ * Renders the user's flipping P&L: primary/secondary metric cards, granularity toggle (monthly/weekly),
+ * date-range filter, three Recharts visualisations (Trends LineChart, Profit-by-Category BarChart,
+ * Platform Performance BarChart), Best/Worst Deal cards, and a per-item table. All surfaces use canonical
+ * .fp-glass / .fp-glass-sm / .fp-btn-primary / .fp-btn-ghost / .fp-badge / .fp-input utilities. Chart series
+ * collapse to canonical purple palette with green reserved for the "Profit" series only (FR-UI-DESIGN-04 +
+ * ADR-14.9-A). Loading / Error / Empty states consume the shared @/components/ui state components.
+ * The CSV/PDF export flow, date-range filter mechanics, granularity toggle behaviour, and analytics fetch
+ * lifecycle are preserved verbatim from the previous revision — Story 14.9 is a pure visual migration.
+ */
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -8,48 +27,111 @@ import {
   XAxis, YAxis, Tooltip, CartesianGrid,
   ResponsiveContainer,
 } from 'recharts';
+import { LoadingSkeleton, ErrorBanner, EmptyState } from '@/components/ui';
+
+const TEXT_PRIMARY = '#e2e8f0';
+const TEXT_SECONDARY = '#94a3b8';
+const PURPLE_ACCENT = '#c4b5fd';
+const PROFIT_GREEN = '#34d399';
+const DANGER_RED = '#f87171';
+const PURPLE_PRIMARY = '#7c3aed';
+const PURPLE_TERTIARY = '#c4b5fd';
+const GRID_LINE = 'rgba(255,255,255,0.06)';
+const TOOLTIP_BG = 'rgba(15,23,42,0.95)';
+const TOOLTIP_BORDER = '1px solid rgba(255,255,255,0.1)';
+const ACTIVE_TOGGLE_BG = 'rgba(124,58,237,0.15)';
+
+const TOOLTIP_CONTENT_STYLE = {
+  background: TOOLTIP_BG,
+  border: TOOLTIP_BORDER,
+  color: TEXT_PRIMARY,
+  borderRadius: 8,
+} as const;
+const TOOLTIP_LABEL_STYLE = { color: TEXT_SECONDARY } as const;
+const TOOLTIP_ITEM_STYLE = { color: TEXT_PRIMARY } as const;
 
 function formatCurrency(val: number): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
 }
 
 function ProfitBadge({ value }: { value: number }) {
-  const color = value >= 0 ? 'text-green-600' : 'text-red-600';
-  return <span className={`font-semibold ${color}`}>{formatCurrency(value)}</span>;
+  return (
+    <span
+      style={{ color: value >= 0 ? PROFIT_GREEN : DANGER_RED, fontWeight: 600 }}
+    >
+      {formatCurrency(value)}
+    </span>
+  );
 }
 
 function SummaryCard({
   label,
   value,
   subtitle,
-  color,
+  valueColor,
 }: {
   label: string;
   value: string;
   subtitle?: string;
-  color?: string;
+  valueColor?: string;
 }) {
   return (
-    <div className="border rounded-lg p-4 bg-white shadow-sm">
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className={`text-2xl font-bold ${color || ''}`}>{value}</p>
-      {subtitle && <p className="text-xs text-gray-400 mt-1">{subtitle}</p>}
+    <div className="fp-glass-sm" style={{ padding: 16 }}>
+      <p style={{ color: TEXT_SECONDARY, fontSize: 13 }}>{label}</p>
+      <p
+        className="fp-metric-num"
+        style={{
+          fontSize: 24,
+          fontWeight: 700,
+          color: valueColor ?? TEXT_PRIMARY,
+          marginTop: 4,
+        }}
+      >
+        {value}
+      </p>
+      {subtitle && (
+        <p style={{ color: TEXT_SECONDARY, fontSize: 12, marginTop: 4 }}>{subtitle}</p>
+      )}
     </div>
   );
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const colors: Record<string, string> = {
-    PURCHASED: 'bg-yellow-100 text-yellow-800',
-    LISTED: 'bg-blue-100 text-blue-800',
-    SOLD: 'bg-green-100 text-green-800',
+  const map: Record<string, string> = {
+    PURCHASED: 'fp-badge fp-badge-yellow',
+    LISTED: 'fp-badge fp-badge-blue',
+    SOLD: 'fp-badge fp-badge-green',
   };
-  return (
-    <span className={`px-2 py-0.5 rounded text-xs font-medium ${colors[status] || 'bg-gray-100'}`}>
-      {status}
-    </span>
-  );
+  const cls = map[status] ?? 'fp-badge fp-badge-gray';
+  return <span className={cls}>{status}</span>;
 }
+
+const TOGGLE_BTN_BASE = 'fp-btn-ghost';
+function toggleStyle(active: boolean): React.CSSProperties {
+  return active
+    ? { background: ACTIVE_TOGGLE_BG, color: PURPLE_ACCENT }
+    : {};
+}
+
+const TABLE_HEADER_CELL: React.CSSProperties = {
+  textAlign: 'left',
+  padding: '8px 12px',
+  color: TEXT_SECONDARY,
+  fontSize: 12,
+  fontWeight: 600,
+  textTransform: 'uppercase',
+  letterSpacing: '0.04em',
+};
+const TABLE_HEADER_CELL_RIGHT: React.CSSProperties = { ...TABLE_HEADER_CELL, textAlign: 'right' };
+const TABLE_ROW_DIVIDER: React.CSSProperties = {
+  borderTop: `1px solid ${GRID_LINE}`,
+};
+const TABLE_BODY_CELL: React.CSSProperties = {
+  padding: '10px 12px',
+  color: TEXT_PRIMARY,
+  fontSize: 13,
+};
+const TABLE_BODY_CELL_RIGHT: React.CSSProperties = { ...TABLE_BODY_CELL, textAlign: 'right' };
 
 export default function AnalyticsPage() {
   const [data, setData] = useState<ProfitLossSummary | null>(null);
@@ -123,16 +205,16 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full" />
+      <div style={{ minHeight: '100vh', padding: '32px 16px', maxWidth: 1280, margin: '0 auto' }}>
+        <LoadingSkeleton variant="card" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-red-50 text-red-700 p-4 rounded-lg">{error}</div>
+      <div style={{ minHeight: '100vh', padding: '32px 16px', maxWidth: 1280, margin: '0 auto' }}>
+        <ErrorBanner message={error} onRetry={() => window.location.reload()} />
       </div>
     );
   }
@@ -140,56 +222,73 @@ export default function AnalyticsPage() {
   if (!data) return null;
 
   return (
-    <main className="max-w-7xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
+    <div
+      style={{
+        minHeight: '100vh',
+        padding: '32px 16px',
+        maxWidth: 1280,
+        margin: '0 auto',
+        color: TEXT_PRIMARY,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
         <div>
-          <h1 className="text-3xl font-bold">📊 Profit & Loss Dashboard</h1>
-          <p className="text-gray-500 mt-1">Track your flipping performance</p>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: TEXT_PRIMARY }}>📊 Profit & Loss Dashboard</h1>
+          <p style={{ color: TEXT_SECONDARY, marginTop: 4 }}>Track your flipping performance</p>
         </div>
-        <div className="flex flex-col items-end gap-1">
-          <div className="flex items-center gap-3">
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <button
+              type="button"
               onClick={handleExportCsv}
               disabled={exportingCsv || !data}
-              className="px-3 py-1.5 rounded bg-gray-100 hover:bg-gray-200 text-sm font-medium disabled:opacity-50"
+              className="fp-btn-ghost"
+              data-testid="analytics-export-csv"
             >
               {exportingCsv ? 'Exporting…' : '⬇ Export CSV'}
             </button>
             <button
+              type="button"
               onClick={handleExportPdf}
               disabled={exportingPdf || !data}
-              className="px-3 py-1.5 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium disabled:opacity-50"
+              className="fp-btn-primary"
+              data-testid="analytics-export-pdf"
             >
               {exportingPdf ? 'Generating…' : '⬇ Export PDF'}
             </button>
-            <Link href="/" className="text-blue-600 hover:underline">← Back</Link>
+            <Link href="/" style={{ color: PURPLE_ACCENT, textDecoration: 'none' }} className="hover:underline">← Back</Link>
           </div>
           {exportError && (
-            <p className="text-xs text-red-600">{exportError}</p>
+            <p style={{ color: DANGER_RED, fontSize: 12 }}>{exportError}</p>
           )}
         </div>
       </div>
 
       {/* Date Range Filter */}
-      <div className="flex flex-wrap items-center gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
-        <span className="text-sm font-medium text-gray-600">Date Range:</span>
+      <div className="fp-glass-sm" style={{ padding: 16, marginBottom: 24, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 16 }}>
+        <span style={{ fontSize: 13, fontWeight: 600, color: TEXT_SECONDARY }}>Date Range:</span>
         <input
           type="date"
           value={dateFrom}
           onChange={(e) => setDateFrom(e.target.value)}
-          className="border rounded px-3 py-1.5 text-sm"
+          className="fp-input"
+          style={{ width: 'auto' }}
+          aria-label="Filter analytics from date"
         />
-        <span className="text-gray-400">to</span>
+        <span style={{ color: TEXT_SECONDARY }}>to</span>
         <input
           type="date"
           value={dateTo}
           onChange={(e) => setDateTo(e.target.value)}
-          className="border rounded px-3 py-1.5 text-sm"
+          className="fp-input"
+          style={{ width: 'auto' }}
+          aria-label="Filter analytics to date"
         />
         {(dateFrom || dateTo) && (
           <button
+            type="button"
             onClick={() => { setDateFrom(''); setDateTo(''); }}
-            className="text-sm text-blue-600 hover:underline"
+            style={{ fontSize: 13, color: PURPLE_ACCENT, background: 'transparent', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
           >
             Clear dates
           </button>
@@ -197,20 +296,17 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Primary Metrics — 4 cards per AC #1 */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 24 }}>
         <SummaryCard
           label="Total Profit"
           value={formatCurrency(data.totalNetProfit)}
-          color={data.totalNetProfit >= 0 ? 'text-green-600' : 'text-red-600'}
+          valueColor={data.totalNetProfit >= 0 ? PROFIT_GREEN : DANGER_RED}
         />
-        <SummaryCard
-          label="Flips Completed"
-          value={String(data.completedDeals)}
-        />
+        <SummaryCard label="Flips Completed" value={String(data.completedDeals)} />
         <SummaryCard
           label="Avg Profit / Flip"
           value={formatCurrency(data.avgProfitPerFlip)}
-          color={data.avgProfitPerFlip >= 0 ? 'text-green-600' : 'text-red-600'}
+          valueColor={data.avgProfitPerFlip >= 0 ? PROFIT_GREEN : DANGER_RED}
         />
         <SummaryCard
           label="Success Rate"
@@ -220,113 +316,137 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Secondary Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-sm">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 32 }}>
         <SummaryCard label="Total Invested" value={formatCurrency(data.totalInvested)} />
         <SummaryCard label="Total Revenue" value={formatCurrency(data.totalRevenue)} />
         <SummaryCard
           label="Overall ROI"
           value={`${data.overallROI}%`}
-          color={data.overallROI >= 0 ? 'text-green-600' : 'text-red-600'}
+          valueColor={data.overallROI >= 0 ? PROFIT_GREEN : DANGER_RED}
         />
         <SummaryCard label="Avg Days Held" value={String(data.avgDaysHeld)} />
       </div>
 
       {/* Granularity Toggle */}
-      <div className="flex gap-2 mb-6">
+      <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
         <button
+          type="button"
           onClick={() => setGranularity('monthly')}
-          className={`px-3 py-1 rounded ${granularity === 'monthly' ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}
+          aria-pressed={granularity === 'monthly'}
+          className={TOGGLE_BTN_BASE}
+          style={toggleStyle(granularity === 'monthly')}
+          data-testid="granularity-monthly"
         >
           Monthly
         </button>
         <button
+          type="button"
           onClick={() => setGranularity('weekly')}
-          className={`px-3 py-1 rounded ${granularity === 'weekly' ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}
+          aria-pressed={granularity === 'weekly'}
+          className={TOGGLE_BTN_BASE}
+          style={toggleStyle(granularity === 'weekly')}
+          data-testid="granularity-weekly"
         >
           Weekly
         </button>
       </div>
 
-      {/* Monthly Trends Line Chart — AC #2 */}
+      {/* Monthly Trends Line Chart — AC #1 */}
       {data.trends.length > 0 && (
-        <section className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">📈 Monthly Trends</h2>
+        <section style={{ marginBottom: 32 }} data-testid="analytics-trends-chart">
+          <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 16, color: TEXT_PRIMARY }}>📈 Monthly Trends</h2>
           {mounted ? (
             <ResponsiveContainer width="100%" height={280}>
               <LineChart data={data.trends}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="period" tick={{ fontSize: 12 }} />
-                <YAxis tickFormatter={(v: number) => `$${v}`} />
-                <Tooltip formatter={(val: number | undefined) => formatCurrency(val ?? 0)} />
-                <Line type="monotone" dataKey="profit" stroke="#10b981" name="Profit" strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="revenue" stroke="#3b82f6" name="Revenue" strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="costs" stroke="#f59e0b" name="Cost" strokeWidth={2} dot={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
+                <XAxis dataKey="period" stroke={TEXT_SECONDARY} tick={{ fill: TEXT_SECONDARY, fontSize: 12 }} />
+                <YAxis stroke={TEXT_SECONDARY} tick={{ fill: TEXT_SECONDARY, fontSize: 12 }} tickFormatter={(v: number) => `$${v}`} />
+                <Tooltip
+                  formatter={(val: number | undefined) => formatCurrency(val ?? 0)}
+                  contentStyle={TOOLTIP_CONTENT_STYLE}
+                  labelStyle={TOOLTIP_LABEL_STYLE}
+                  itemStyle={TOOLTIP_ITEM_STYLE}
+                />
+                <Line type="monotone" dataKey="profit" stroke={PROFIT_GREEN} name="Profit" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="revenue" stroke={PURPLE_PRIMARY} name="Revenue" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="costs" stroke={PURPLE_TERTIARY} name="Cost" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-64 animate-pulse bg-gray-100 rounded" />
+            <LoadingSkeleton variant="card" />
           )}
         </section>
       )}
 
-      {/* Profit by Category Bar Chart — AC #2 */}
+      {/* Profit by Category Bar Chart — AC #1 */}
       {data.categoryBreakdown.length > 0 && (
-        <section className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">📦 Profit by Category</h2>
+        <section style={{ marginBottom: 32 }} data-testid="analytics-category-chart">
+          <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 16, color: TEXT_PRIMARY }}>📦 Profit by Category</h2>
           {mounted ? (
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={data.categoryBreakdown} layout="vertical">
-                <XAxis type="number" tickFormatter={(v: number) => `$${v}`} />
-                <YAxis type="category" dataKey="category" width={120} tick={{ fontSize: 12 }} />
-                <Tooltip formatter={(val: number | undefined) => formatCurrency(val ?? 0)} />
-                <Bar dataKey="totalProfit" name="Profit" fill="#10b981" radius={[0, 4, 4, 0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
+                <XAxis type="number" stroke={TEXT_SECONDARY} tick={{ fill: TEXT_SECONDARY, fontSize: 12 }} tickFormatter={(v: number) => `$${v}`} />
+                <YAxis type="category" dataKey="category" width={120} stroke={TEXT_SECONDARY} tick={{ fill: TEXT_SECONDARY, fontSize: 12 }} />
+                <Tooltip
+                  formatter={(val: number | undefined) => formatCurrency(val ?? 0)}
+                  contentStyle={TOOLTIP_CONTENT_STYLE}
+                  labelStyle={TOOLTIP_LABEL_STYLE}
+                  itemStyle={TOOLTIP_ITEM_STYLE}
+                />
+                <Bar dataKey="totalProfit" name="Profit" fill={PROFIT_GREEN} radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-64 animate-pulse bg-gray-100 rounded" />
+            <LoadingSkeleton variant="card" />
           )}
         </section>
       )}
 
-      {/* Platform Performance — AC #2 */}
+      {/* Platform Performance — AC #1 */}
       {data.platformBreakdown.length > 0 && (
-        <section className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">🏪 Platform Performance</h2>
+        <section style={{ marginBottom: 32 }} data-testid="analytics-platform-chart">
+          <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 16, color: TEXT_PRIMARY }}>🏪 Platform Performance</h2>
           {mounted ? (
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={data.platformBreakdown}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="platform" tickFormatter={(v: string) => v.replace('_MARKETPLACE', '')} />
-                <YAxis tickFormatter={(v: number) => `$${v}`} />
-                <Tooltip formatter={(val: number | undefined, name: string | undefined) =>
-                  name === 'totalProfit' ? [formatCurrency(val ?? 0), 'Total Profit'] : [formatCurrency(val ?? 0), 'Avg Profit']
-                } />
-                <Bar dataKey="totalProfit" name="totalProfit" fill="#3b82f6" />
-                <Bar dataKey="avgProfit" name="avgProfit" fill="#10b981" />
+                <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
+                <XAxis dataKey="platform" stroke={TEXT_SECONDARY} tick={{ fill: TEXT_SECONDARY, fontSize: 12 }} tickFormatter={(v: string) => v.replace('_MARKETPLACE', '')} />
+                <YAxis stroke={TEXT_SECONDARY} tick={{ fill: TEXT_SECONDARY, fontSize: 12 }} tickFormatter={(v: number) => `$${v}`} />
+                <Tooltip
+                  formatter={(val: number | undefined, name: string | undefined) =>
+                    name === 'totalProfit' ? [formatCurrency(val ?? 0), 'Total Profit'] : [formatCurrency(val ?? 0), 'Avg Profit']
+                  }
+                  contentStyle={TOOLTIP_CONTENT_STYLE}
+                  labelStyle={TOOLTIP_LABEL_STYLE}
+                  itemStyle={TOOLTIP_ITEM_STYLE}
+                />
+                <Bar dataKey="totalProfit" name="totalProfit" fill={PURPLE_PRIMARY} />
+                <Bar dataKey="avgProfit" name="avgProfit" fill={PURPLE_TERTIARY} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-64 animate-pulse bg-gray-100 rounded" />
+            <LoadingSkeleton variant="card" />
           )}
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-sm border-collapse">
+          <div className="fp-glass" style={{ marginTop: 16, padding: 0, overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
-                <tr className="bg-gray-50">
-                  <th className="text-left p-2 border">Platform</th>
-                  <th className="text-right p-2 border">Deals</th>
-                  <th className="text-right p-2 border">Total Profit</th>
-                  <th className="text-right p-2 border">Avg Profit</th>
-                  <th className="text-right p-2 border">Success Rate</th>
+                <tr>
+                  <th style={TABLE_HEADER_CELL}>Platform</th>
+                  <th style={TABLE_HEADER_CELL_RIGHT}>Deals</th>
+                  <th style={TABLE_HEADER_CELL_RIGHT}>Total Profit</th>
+                  <th style={TABLE_HEADER_CELL_RIGHT}>Avg Profit</th>
+                  <th style={TABLE_HEADER_CELL_RIGHT}>Success Rate</th>
                 </tr>
               </thead>
               <tbody>
                 {data.platformBreakdown.map((p) => (
-                  <tr key={p.platform} className="hover:bg-gray-50">
-                    <td className="p-2 border">{p.platform.replace('_MARKETPLACE', '')}</td>
-                    <td className="p-2 border text-right">{p.count}</td>
-                    <td className="p-2 border text-right"><ProfitBadge value={p.totalProfit} /></td>
-                    <td className="p-2 border text-right"><ProfitBadge value={p.avgProfit} /></td>
-                    <td className="p-2 border text-right">{p.successRate}%</td>
+                  <tr key={p.platform} style={TABLE_ROW_DIVIDER}>
+                    <td style={TABLE_BODY_CELL}>{p.platform.replace('_MARKETPLACE', '')}</td>
+                    <td style={TABLE_BODY_CELL_RIGHT}>{p.count}</td>
+                    <td style={TABLE_BODY_CELL_RIGHT}><ProfitBadge value={p.totalProfit} /></td>
+                    <td style={TABLE_BODY_CELL_RIGHT}><ProfitBadge value={p.avgProfit} /></td>
+                    <td style={TABLE_BODY_CELL_RIGHT}>{p.successRate}%</td>
                   </tr>
                 ))}
               </tbody>
@@ -335,24 +455,24 @@ export default function AnalyticsPage() {
         </section>
       )}
 
-      {/* Best/Worst Deals — AC #2 (best flip card) */}
-      <div className="grid md:grid-cols-2 gap-4 mb-8">
+      {/* Best/Worst Deals */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginBottom: 32 }}>
         {data.bestDeal && (
-          <div className="border rounded-lg p-4 bg-green-50">
-            <h3 className="font-semibold text-green-800 mb-2">🏆 Best Deal</h3>
-            <p className="font-medium">{data.bestDeal.title}</p>
-            <p className="text-sm text-gray-600">{data.bestDeal.platform}</p>
-            <p className="text-lg font-bold text-green-700">
+          <div className="fp-glass" style={{ padding: 16 }} data-testid="analytics-best-deal">
+            <h3 style={{ fontWeight: 600, marginBottom: 8, color: PROFIT_GREEN }}>🏆 Best Deal</h3>
+            <p style={{ fontWeight: 500, color: TEXT_PRIMARY }}>{data.bestDeal.title}</p>
+            <p style={{ fontSize: 13, color: TEXT_SECONDARY }}>{data.bestDeal.platform}</p>
+            <p className="fp-metric-num" style={{ fontSize: 18, fontWeight: 700, color: PROFIT_GREEN, marginTop: 8 }}>
               {formatCurrency(data.bestDeal.netProfit)} ({data.bestDeal.roiPercent}% ROI)
             </p>
           </div>
         )}
         {data.worstDeal && (
-          <div className="border rounded-lg p-4 bg-red-50">
-            <h3 className="font-semibold text-red-800 mb-2">📉 Worst Deal</h3>
-            <p className="font-medium">{data.worstDeal.title}</p>
-            <p className="text-sm text-gray-600">{data.worstDeal.platform}</p>
-            <p className="text-lg font-bold text-red-700">
+          <div className="fp-glass" style={{ padding: 16 }} data-testid="analytics-worst-deal">
+            <h3 style={{ fontWeight: 600, marginBottom: 8, color: DANGER_RED }}>📉 Worst Deal</h3>
+            <p style={{ fontWeight: 500, color: TEXT_PRIMARY }}>{data.worstDeal.title}</p>
+            <p style={{ fontSize: 13, color: TEXT_SECONDARY }}>{data.worstDeal.platform}</p>
+            <p className="fp-metric-num" style={{ fontSize: 18, fontWeight: 700, color: DANGER_RED, marginTop: 8 }}>
               {formatCurrency(data.worstDeal.netProfit)} ({data.worstDeal.roiPercent}% ROI)
             </p>
           </div>
@@ -362,38 +482,38 @@ export default function AnalyticsPage() {
       {/* Items Table */}
       {data.items.length > 0 && (
         <section>
-          <h2 className="text-xl font-semibold mb-4">📋 All Deals ({data.items.length})</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm border-collapse">
+          <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 16, color: TEXT_PRIMARY }}>📋 All Deals ({data.items.length})</h2>
+          <div className="fp-glass" style={{ padding: 0, overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
-                <tr className="bg-gray-50">
-                  <th className="text-left p-2 border">Item</th>
-                  <th className="text-left p-2 border">Platform</th>
-                  <th className="text-left p-2 border">Status</th>
-                  <th className="text-right p-2 border">Bought</th>
-                  <th className="text-right p-2 border">Sold</th>
-                  <th className="text-right p-2 border">Profit</th>
-                  <th className="text-right p-2 border">ROI</th>
-                  <th className="text-right p-2 border">Days</th>
+                <tr>
+                  <th style={TABLE_HEADER_CELL}>Item</th>
+                  <th style={TABLE_HEADER_CELL}>Platform</th>
+                  <th style={TABLE_HEADER_CELL}>Status</th>
+                  <th style={TABLE_HEADER_CELL_RIGHT}>Bought</th>
+                  <th style={TABLE_HEADER_CELL_RIGHT}>Sold</th>
+                  <th style={TABLE_HEADER_CELL_RIGHT}>Profit</th>
+                  <th style={TABLE_HEADER_CELL_RIGHT}>ROI</th>
+                  <th style={TABLE_HEADER_CELL_RIGHT}>Days</th>
                 </tr>
               </thead>
               <tbody>
                 {data.items.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="p-2 border max-w-xs truncate">{item.title}</td>
-                    <td className="p-2 border">{item.platform}</td>
-                    <td className="p-2 border">
+                  <tr key={item.id} style={TABLE_ROW_DIVIDER}>
+                    <td style={{ ...TABLE_BODY_CELL, maxWidth: 320, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</td>
+                    <td style={TABLE_BODY_CELL}>{item.platform}</td>
+                    <td style={TABLE_BODY_CELL}>
                       <StatusBadge status={item.status} />
                     </td>
-                    <td className="p-2 border text-right">{formatCurrency(item.purchasePrice)}</td>
-                    <td className="p-2 border text-right">
+                    <td style={TABLE_BODY_CELL_RIGHT}>{formatCurrency(item.purchasePrice)}</td>
+                    <td style={TABLE_BODY_CELL_RIGHT}>
                       {item.resalePrice ? formatCurrency(item.resalePrice) : '—'}
                     </td>
-                    <td className="p-2 border text-right">
+                    <td style={TABLE_BODY_CELL_RIGHT}>
                       <ProfitBadge value={item.netProfit} />
                     </td>
-                    <td className="p-2 border text-right">{item.roiPercent}%</td>
-                    <td className="p-2 border text-right">{item.daysHeld}</td>
+                    <td style={TABLE_BODY_CELL_RIGHT}>{item.roiPercent}%</td>
+                    <td style={TABLE_BODY_CELL_RIGHT}>{item.daysHeld}</td>
                   </tr>
                 ))}
               </tbody>
@@ -402,31 +522,21 @@ export default function AnalyticsPage() {
         </section>
       )}
 
-      {/* Enhanced Empty State — AC #3 */}
+      {/* Empty State */}
       {data.items.length === 0 && (
-        <div className="text-center py-16">
-          <p className="text-5xl mb-4">📊</p>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">No analytics yet</h3>
-          <p className="text-gray-500 mb-6 max-w-md mx-auto">
-            Your analytics dashboard will populate as you purchase and sell items.
-            Find a deal on the <strong>Opportunities</strong> page and mark it as purchased to get started.
-          </p>
-          <div className="flex justify-center gap-4">
-            <Link
-              href="/opportunities"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-              Browse Opportunities
-            </Link>
-            <Link
-              href="/scraper"
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-            >
+        <div style={{ marginTop: 24 }}>
+          <EmptyState
+            title="No analytics yet"
+            message="Your analytics dashboard will populate as you purchase and sell items. Find a deal on the Opportunities page and mark it as purchased to get started."
+            action={{ label: 'Browse Opportunities', href: '/opportunities', variant: 'primary' }}
+          />
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+            <Link href="/scraper" className="fp-btn-ghost" style={{ textDecoration: 'none' }}>
               Start Scanning
             </Link>
           </div>
         </div>
       )}
-    </main>
+    </div>
   );
 }

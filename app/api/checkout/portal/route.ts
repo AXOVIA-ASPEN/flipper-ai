@@ -33,7 +33,7 @@ export async function POST() {
       throw new NotFoundError('No billing account found. Subscribe first.');
     }
 
-    const baseUrl = process.env.APP_URL || 'http://localhost:3000';
+    const baseUrl = process.env.APP_URL || 'http://localhost:3200';
 
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: customers.data[0].id,

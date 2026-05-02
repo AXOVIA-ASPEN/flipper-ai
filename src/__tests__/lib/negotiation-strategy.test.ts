@@ -93,6 +93,11 @@ const mockLogger = (jest.requireMock('@/lib/logger') as any).logger;
 // ---------------------------------------------------------------------------
 
 function makeInput(overrides: Partial<NegotiationStrategyInput> = {}): NegotiationStrategyInput {
+  // Compute a fresh date relative to "now" so the freshness-downgrade window
+  // (>14 days) never accidentally fires due to test bit-rot. Five days ago is
+  // safely inside the 14-day fresh window.
+  const fiveDaysAgo = new Date();
+  fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
   return {
     listingId: 'listing-1',
     askingPrice: 100,
@@ -105,7 +110,7 @@ function makeInput(overrides: Partial<NegotiationStrategyInput> = {}): Negotiati
     sellabilityScore: 75,
     platform: 'CRAIGSLIST',
     recommendedOffer: 85,
-    marketDataDate: new Date('2026-04-05'), // 5 days ago — fresh
+    marketDataDate: fiveDaysAgo,
     ...overrides,
   };
 }

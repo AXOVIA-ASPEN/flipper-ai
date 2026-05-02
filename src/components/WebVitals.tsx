@@ -1,12 +1,21 @@
+/**
+ * @file src/components/WebVitals.tsx
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-04-28
+ * @version 1.0
+ * @brief Core Web Vitals reporter — LCP / FID / CLS / FCP / TTFB → /api/web-vitals.
+ *
+ * @description
+ * Client-only component mounted at the root layout. Subscribes to the
+ * web-vitals library callbacks and POSTs each metric (with name, value,
+ * rating, id, navigationType) to the analytics endpoint. Renders no UI;
+ * its sole responsibility is performance telemetry collection from real
+ * users on every page load.
+ */
 'use client';
 
 import { useEffect } from 'react';
-
-/**
- * Web Vitals Reporting Component for Flipper AI
- * Reports Core Web Vitals (LCP, FID, CLS, FCP, TTFB) to the analytics endpoint.
- * Include this component in the root layout for client-side performance monitoring.
- */
 
 interface WebVitalMetric {
   name: string;

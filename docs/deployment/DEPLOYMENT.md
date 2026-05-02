@@ -184,7 +184,7 @@ docker build -t gcr.io/axovia-flipper/flipper-web:v1.0.0 .
 ### 4. Test Locally
 ```bash
 docker run -p 3000:3000 --env-file .env.production gcr.io/axovia-flipper/flipper-web:v1.0.0
-curl http://localhost:3000/api/health
+curl http://localhost:3200/api/health
 ```
 
 ### 5. Push to Registry

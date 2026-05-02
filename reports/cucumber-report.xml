@@ -1,51 +1,79 @@
 <?xml version="1.0"?>
-<testsuite name="Cucumber" time="8.184" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-04-17T11:31:06.095Z">
-  <testcase classname="Frontend Design System Migration" name="PriceCalculator root container uses canonical fp-glass surface" time="0.146">
-    <system-out><![CDATA[Given the source file "src/components/PriceCalculator.tsx" exists...........passed
-When I read the source of "src/components/PriceCalculator.tsx"..............passed
-Then the source should contain the pattern "fp-glass p-6 rounded-lg"........passed]]></system-out>
+<testsuite name="Cucumber" time="3.087" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-04-27T01:12:27.340Z">
+  <testcase classname="Frontend Design System Migration" name="KanbanBoard DEMAND_BADGES maps every key to canonical fp-badge-*" time="0.074">
+    <system-out><![CDATA[Given the source file "src/components/KanbanBoard.tsx" exists...............passed
+When I read the source of "src/components/KanbanBoard.tsx"..................passed
+Then the source should contain the pattern "rising: { label: 'Hot', className: 'fp-badge fp-badge-red' }"..passed
+And the source should contain the pattern "high: { label: 'Active', className: 'fp-badge fp-badge-purple' }"..passed
+And the source should contain the pattern "stable: { label: 'Steady', className: 'fp-badge fp-badge-blue' }"..passed
+And the source should contain the pattern "low_liquidity: { label: 'Dead', className: 'fp-badge fp-badge-yellow' }"..passed
+And the raw Tailwind palette class count should equal 0.....................passed]]></system-out>
   </testcase>
-  <testcase classname="Frontend Design System Migration" name="PriceCalculator source has zero raw Tailwind palette classes" time="0.059">
-    <system-out><![CDATA[Given the source file "src/components/PriceCalculator.tsx" exists...........passed
-When I read the source of "src/components/PriceCalculator.tsx"..............passed
-Then the raw Tailwind palette class count should equal 0....................passed]]></system-out>
+  <testcase classname="Frontend Design System Migration" name="Opportunities page header uses canonical fp-glass-nav surface" time="0.037">
+    <system-out><![CDATA[Given the source file "app/opportunities/page.tsx" exists...................passed
+When I read the source of "app/opportunities/page.tsx"......................passed
+Then the source should contain the pattern "fp-glass-nav"...................passed
+And the source should not contain the pattern "backdrop-blur-xl bg-white/10"..passed]]></system-out>
   </testcase>
-  <testcase classname="Frontend Design System Migration" name="PriceCalculator numeric inputs use canonical fp-input class" time="0.056">
-    <system-out><![CDATA[Given the source file "src/components/PriceCalculator.tsx" exists...........passed
-When I read the source of "src/components/PriceCalculator.tsx"..............passed
-Then the source should contain the pattern "fp-input w-28 text-right".......passed
-And the source should contain the pattern "fp-input w-20 text-right"........passed
-And the source should contain the pattern "fp-input w-24 text-right"........passed]]></system-out>
+  <testcase classname="Frontend Design System Migration" name="Opportunities page stat cards use canonical fp-glow-card with zero palette violations" time="0.039">
+    <system-out><![CDATA[Given the source file "app/opportunities/page.tsx" exists...................passed
+When I read the source of "app/opportunities/page.tsx"......................passed
+Then the source should contain the pattern "fp-glow-card"...................passed
+And the source should not contain the pattern "hover:shadow-blue-500".......passed
+And the source should not contain the pattern "hover:shadow-orange-500".....passed
+And the raw Tailwind palette class count should equal 0.....................passed]]></system-out>
   </testcase>
-  <testcase classname="Frontend Design System Migration" name="PriceCalculator action buttons use canonical fp-btn-* variants" time="0.054">
-    <system-out><![CDATA[Given the source file "src/components/PriceCalculator.tsx" exists...........passed
-When I read the source of "src/components/PriceCalculator.tsx"..............passed
-Then the source should contain the pattern "fp-btn-primary text-xs px-3 py-1.5"..passed
-And the source should contain the pattern "fp-btn-ghost text-xs px-3 py-1.5"..passed]]></system-out>
+  <testcase classname="Frontend Design System Migration" name="Listings detail page imports LoadingSkeleton, ErrorBanner, EmptyState from shared ui" time="0.042">
+    <system-out><![CDATA[Given the source file "app/listings/[id]/page.tsx" exists...................passed
+When I read the source of "app/listings/[id]/page.tsx"......................passed
+Then the source should contain the pattern "LoadingSkeleton, ErrorBanner, EmptyState"..passed
+And the source should contain the pattern "errorStatus === 404".............passed
+And the source should contain the pattern "fp-glass"........................passed
+And the raw Tailwind palette class count should equal 0.....................passed]]></system-out>
   </testcase>
-  <testcase classname="Frontend Design System Migration" name="PriceCalculator alert banners use canonical fp-alert-* variants" time="0.05">
-    <system-out><![CDATA[Given the source file "src/components/PriceCalculator.tsx" exists...........passed
-When I read the source of "src/components/PriceCalculator.tsx"..............passed
-Then the source should contain the pattern "fp-alert-warn px-4 py-3"........passed
-And the source should contain the pattern "fp-alert-danger px-4 py-3".......passed]]></system-out>
+  <testcase classname="Frontend Design System Migration" name="MessageBubble source ships zero palette classes and zero dark prefixes" time="0.044">
+    <system-out><![CDATA[Given the source file "src/components/messages/MessageBubble.tsx" exists....passed
+When I read the source of "src/components/messages/MessageBubble.tsx".......passed
+Then the source should not contain the pattern "dark:"......................passed
+And the source should contain the pattern "fp-glass-sm".....................passed
+And the source should contain the pattern "rgba(124,58,237,0.15)"...........passed
+And the raw Tailwind palette class count should equal 0.....................passed]]></system-out>
   </testcase>
-  <testcase classname="Frontend Design System Migration" name="Range slider uses canonical accent-color without palette class" time="0.051">
-    <system-out><![CDATA[Given the source file "src/components/PriceCalculator.tsx" exists...........passed
-When I read the source of "src/components/PriceCalculator.tsx"..............passed
-Then the source should contain the pattern "accentColor: '#7c3aed'".........passed
-And the source should not contain the pattern "accent-purple-"..............passed]]></system-out>
+  <testcase classname="Frontend Design System Migration" name="STATUS_COLORS entries all return canonical fp-badge class strings" time="0.042">
+    <system-out><![CDATA[Given the source file "src/lib/message-constants.ts" exists.................passed
+When I read the source of "src/lib/message-constants.ts"....................passed
+Then the source should contain the pattern "fp-badge fp-badge-yellow".......passed
+And the source should contain the pattern "fp-badge fp-badge-red"...........passed
+And the source should contain the pattern "fp-badge fp-badge-blue"..........passed
+And the source should contain the pattern "fp-badge fp-badge-gray"..........passed
+And the source should not contain the pattern "dark:".......................passed
+And the raw Tailwind palette class count should equal 0.....................passed]]></system-out>
   </testcase>
-  <testcase classname="Frontend Design System Migration" name="Listing detail page renders PriceCalculator on a canonical glass surface" time="1.688">
-    <system-out><![CDATA[Given I am logged in........................................................passed
-And the "/api/listings/mock-listing-14-6" route returns a mocked listing with optimal pricing..passed
-When I load the "/listings/mock-listing-14-6" route in the browser..........passed
-Then an element matching "[data-testid='price-calculator']" with class "fp-glass" is visible..passed
-And the element "[data-testid='price-calculator-hero']" has aria-live "polite"..passed
-And the slider "#price-calc-margin-slider" has aria-valuemin, aria-valuemax, aria-valuenow, and aria-valuetext populated..passed]]></system-out>
+  <testcase classname="Frontend Design System Migration" name="Messages page imports EmptyState and has zero palette classes" time="0.048">
+    <system-out><![CDATA[Given the source file "app/messages/page.tsx" exists........................passed
+When I read the source of "app/messages/page.tsx"...........................passed
+Then the source should contain the pattern "EmptyState".....................passed
+And the source should contain the pattern "fp-glass"........................passed
+And the raw Tailwind palette class count should equal 0.....................passed]]></system-out>
   </testcase>
-  <testcase classname="Frontend Design System Migration" name="PriceCalculator best-platform badge uses canonical fp-badge-purple" time="0.104">
-    <system-out><![CDATA[Given the source file "src/components/PriceCalculator.tsx" exists...........passed
-When I read the source of "src/components/PriceCalculator.tsx"..............passed
-Then the source should contain the pattern "fp-badge fp-badge-purple".......passed]]></system-out>
+  <testcase classname="Frontend Design System Migration" name="Thread components ship canonical surfaces with zero palette and zero dark prefixes - #1.1" time="0.043">
+    <system-out><![CDATA[Given the source file "src/components/messages/ThreadItem.tsx" exists.......passed
+When I read the source of "src/components/messages/ThreadItem.tsx"..........passed
+Then the source should not contain the pattern "dark:"......................passed
+And the source should contain the pattern "fp-glass-sm".....................passed
+And the raw Tailwind palette class count should equal 0.....................passed]]></system-out>
+  </testcase>
+  <testcase classname="Frontend Design System Migration" name="Thread components ship canonical surfaces with zero palette and zero dark prefixes - #1.2" time="0.049">
+    <system-out><![CDATA[Given the source file "src/components/messages/ThreadHeader.tsx" exists.....passed
+When I read the source of "src/components/messages/ThreadHeader.tsx"........passed
+Then the source should not contain the pattern "dark:"......................passed
+And the source should contain the pattern "fp-glass"........................passed
+And the raw Tailwind palette class count should equal 0.....................passed]]></system-out>
+  </testcase>
+  <testcase classname="Frontend Design System Migration" name="MessageApprovalCard STATUS_COLORS consumer does not double-apply badge padding" time="0.047">
+    <system-out><![CDATA[Given the source file "src/components/MessageApprovalCard.tsx" exists.......passed
+When I read the source of "src/components/MessageApprovalCard.tsx"..........passed
+Then the source should not contain the pattern "text-xs px-2 py-0.5 rounded font-medium ${STATUS_COLORS"..passed
+And the source should contain the pattern "flex-shrink-0 ${STATUS_COLORS[message.status]"..passed]]></system-out>
   </testcase>
 </testsuite>

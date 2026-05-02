@@ -1,3 +1,18 @@
+/**
+ * @file src/components/UserMenu.tsx
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-04-28
+ * @version 1.0
+ * @brief Navigation user menu — avatar trigger, dropdown with sign-out.
+ *
+ * @description
+ * Client component rendered inside <Navigation> for authenticated users.
+ * Shows the user's display name + avatar, opens a dropdown with the user's
+ * email and a Sign Out action. Handles outside-click to close, keyboard
+ * navigation (Esc to close), and signs the user out via the firebase auth
+ * hook before navigating to /login?loggedOut=true.
+ */
 'use client';
 
 import { useState, useRef, useEffect } from 'react';

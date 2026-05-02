@@ -115,7 +115,7 @@ async headers() {
 npm run dev
 
 # Check headers (in another terminal)
-curl -I http://localhost:3000
+curl -I http://localhost:3200
 
 # Expected headers should include all security headers
 ```
@@ -129,7 +129,7 @@ npm run build
 npm start
 
 # Check headers
-curl -I http://localhost:3000
+curl -I http://localhost:3200
 ```
 
 ### Automated Testing

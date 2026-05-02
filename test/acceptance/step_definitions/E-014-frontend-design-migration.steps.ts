@@ -20,7 +20,7 @@ import { When, Then, setDefaultTimeout } from '@cucumber/cucumber';
 import { expect } from '@playwright/test';
 import { CustomWorld } from '../support/world';
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3200';
 
 // The first compile of /dashboard, /settings, /posting-queue under
 // Turbopack can exceed Cucumber's default 5s step timeout. Raise it here
@@ -34,11 +34,11 @@ setDefaultTimeout(120 * 1000);
 // this variant uses `domcontentloaded` and an explicit 90s timeout.
 When(
   'I load the {string} route in the browser',
-  { timeout: 120 * 1000 },
+  { timeout: 180 * 1000 },
   async function (this: CustomWorld, path: string) {
     await this.page.goto(`${BASE_URL}${path}`, {
       waitUntil: 'domcontentloaded',
-      timeout: 90 * 1000,
+      timeout: 150 * 1000,
     });
   }
 );

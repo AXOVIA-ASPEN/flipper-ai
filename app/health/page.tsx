@@ -1,3 +1,21 @@
+/**
+ * @file app/health/page.tsx
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-04-26
+ * @version 2.0
+ * @brief System health/status page rebuilt on the canonical dark-glassmorphism design system.
+ *
+ * @description
+ * Renders Flipper AI's public service-status dashboard: overall-status banner with semantic
+ * left-border accent stripe + redundant .fp-badge summary pill (per ADR-14.9-D, accessibility-
+ * forward redundant text-state for color-vision-difference users), four MetricCards on .fp-glass,
+ * optional memory metrics panel, conditional Recent Errors panel with red left-border accent,
+ * Service Health list with canonical .fp-badge-* status pills, and Quick Links tiles. Auto-
+ * refresh cadence (30s), per-service async probes (API, Auth, SSE, Rate Limiter, DB, AI), and
+ * overall-status derivation are preserved verbatim — Story 14.9 is a pure visual migration.
+ */
+
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
@@ -13,6 +31,17 @@ import {
   RefreshCw,
   Server,
 } from 'lucide-react';
+import { statusIconColor, statusBadgeClass, type ServiceStatus } from '@/lib/health-status';
+
+const TEXT_PRIMARY = '#e2e8f0';
+const TEXT_SECONDARY = '#94a3b8';
+const PURPLE_ACCENT = '#c4b5fd';
+const PURPLE_BRIGHT = '#a78bfa';
+const PROFIT_GREEN = '#34d399';
+const DANGER_RED = '#f87171';
+const DANGER_RED_SOFT = '#fca5a5';
+const WARNING_YELLOW = '#fbbf24';
+const DIVIDER = 'rgba(255,255,255,0.06)';
 
 interface HealthData {
   status: string;
@@ -44,8 +73,6 @@ interface MetricsData {
   };
 }
 
-type ServiceStatus = 'online' | 'degraded' | 'offline' | 'loading';
-
 interface ServiceCheck {
   name: string;
   status: ServiceStatus;
@@ -63,24 +90,16 @@ function formatUptime(seconds: number): string {
 }
 
 function StatusIcon({ status }: { status: ServiceStatus }) {
-  if (status === 'loading')
-    return <RefreshCw className="h-4 w-4 text-gray-400 animate-spin" />;
-  if (status === 'online') return <CheckCircle2 className="h-4 w-4 text-green-500" />;
-  if (status === 'degraded') return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
-  return <XCircle className="h-4 w-4 text-red-500" />;
+  const color = statusIconColor(status);
+  if (status === 'loading') return <RefreshCw className="h-4 w-4 animate-spin" style={{ color }} />;
+  if (status === 'online') return <CheckCircle2 className="h-4 w-4" style={{ color }} />;
+  if (status === 'degraded') return <AlertTriangle className="h-4 w-4" style={{ color }} />;
+  return <XCircle className="h-4 w-4" style={{ color }} />;
 }
 
 function StatusBadge({ status }: { status: ServiceStatus }) {
-  const color =
-    status === 'online'
-      ? 'bg-green-100 text-green-800'
-      : status === 'degraded'
-        ? 'bg-yellow-100 text-yellow-800'
-        : status === 'loading'
-          ? 'bg-gray-100 text-gray-600'
-          : 'bg-red-100 text-red-800';
   return (
-    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>
+    <span className={statusBadgeClass(status)}>
       {status === 'loading' ? 'checking…' : status}
     </span>
   );
@@ -88,15 +107,23 @@ function StatusBadge({ status }: { status: ServiceStatus }) {
 
 function ServiceRow({ service }: { service: ServiceCheck }) {
   return (
-    <div className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
-      <div className="flex items-center gap-3">
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '12px 0',
+        borderBottom: `1px solid ${DIVIDER}`,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <StatusIcon status={service.status} />
-        <span className="text-sm font-medium text-gray-700">{service.name}</span>
-        {service.message && <span className="text-xs text-gray-400">{service.message}</span>}
+        <span style={{ fontSize: 13, fontWeight: 500, color: TEXT_PRIMARY }}>{service.name}</span>
+        {service.message && <span style={{ fontSize: 12, color: TEXT_SECONDARY }}>{service.message}</span>}
       </div>
-      <div className="flex items-center gap-3">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         {service.latency !== undefined && (
-          <span className="text-xs text-gray-400">{service.latency}ms</span>
+          <span style={{ fontSize: 12, color: TEXT_SECONDARY }}>{service.latency}ms</span>
         )}
         <StatusBadge status={service.status} />
       </div>
@@ -112,17 +139,31 @@ function MetricCard({
 }: {
   title: string;
   value: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   subtitle?: string;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
-      <div className="flex items-center gap-2 mb-1">
-        <Icon className="h-4 w-4 text-indigo-500" />
-        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">{title}</span>
+    <div className="fp-glass" style={{ padding: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+        <Icon className="h-4 w-4" style={{ color: PURPLE_BRIGHT }} />
+        <span
+          style={{
+            fontSize: 12,
+            fontWeight: 500,
+            color: TEXT_SECONDARY,
+            textTransform: 'uppercase',
+            letterSpacing: '0.04em',
+          }}
+        >
+          {title}
+        </span>
       </div>
-      <div className="text-2xl font-bold text-gray-900">{value}</div>
-      {subtitle && <div className="text-xs text-gray-400 mt-0.5">{subtitle}</div>}
+      <div className="fp-metric-num" style={{ fontSize: 24, fontWeight: 700, color: TEXT_PRIMARY }}>
+        {value}
+      </div>
+      {subtitle && (
+        <div style={{ fontSize: 12, color: TEXT_SECONDARY, marginTop: 2 }}>{subtitle}</div>
+      )}
     </div>
   );
 }
@@ -145,7 +186,6 @@ export default function HealthPage() {
   const fetchHealth = useCallback(async () => {
     setRefreshing(true);
 
-    // Fetch metrics (non-blocking — may fail in prod if unauthenticated)
     fetch('/api/health/metrics')
       .then((res) => (res.ok ? res.json() : null))
       .then((data: MetricsData | null) => {
@@ -181,7 +221,6 @@ export default function HealthPage() {
       );
     }
 
-    // Check auth
     try {
       const t = Date.now();
       const res = await fetch('/api/auth/session');
@@ -208,12 +247,10 @@ export default function HealthPage() {
       );
     }
 
-    // Check SSE endpoint
     try {
       const t = Date.now();
       const res = await fetch('/api/events', { method: 'GET', signal: AbortSignal.timeout(2000) });
       const latency = Date.now() - t;
-      // SSE returns 200 or 401 (if not authenticated) - both mean endpoint is up
       setServices((prev) =>
         prev.map((s) =>
           s.name === 'Real-time SSE'
@@ -234,7 +271,6 @@ export default function HealthPage() {
       );
     }
 
-    // Check rate limiter (just the health endpoint response time)
     setServices((prev) =>
       prev.map((s) =>
         s.name === 'Rate Limiter' ? { ...s, status: 'online', message: 'per-IP + per-user' } : s
@@ -263,7 +299,6 @@ export default function HealthPage() {
     setRefreshing(false);
   }, []);
 
-  // Calculate overall status
   useEffect(() => {
     if (services.every((s) => s.status === 'loading')) {
       setOverallStatus('loading');
@@ -278,18 +313,11 @@ export default function HealthPage() {
 
   useEffect(() => {
     fetchHealth();
-    const interval = setInterval(fetchHealth, 30000); // auto-refresh every 30s
+    const interval = setInterval(fetchHealth, 30000);
     return () => clearInterval(interval);
   }, [fetchHealth]);
 
-  const overallColor =
-    overallStatus === 'online'
-      ? 'bg-green-500'
-      : overallStatus === 'degraded'
-        ? 'bg-yellow-500'
-        : overallStatus === 'loading'
-          ? 'bg-gray-400'
-          : 'bg-red-500';
+  const overallBorderColor = statusIconColor(overallStatus);
 
   const overallText =
     overallStatus === 'online'
@@ -301,45 +329,68 @@ export default function HealthPage() {
           : 'Service Disruption';
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div style={{ minHeight: '100vh', padding: 24, color: TEXT_PRIMARY }}>
+      <div style={{ maxWidth: 1024, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-indigo-600 rounded-lg">
-              <Activity className="h-6 w-6 text-white" />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div
+              style={{
+                padding: 8,
+                background: 'linear-gradient(135deg, #a78bfa, #7c3aed)',
+                borderRadius: 8,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Activity className="h-6 w-6" style={{ color: 'white' }} />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Flipper AI System Status</h1>
-              <p className="text-sm text-gray-500">
+              <h1 style={{ fontSize: 20, fontWeight: 700, color: TEXT_PRIMARY }}>Flipper AI System Status</h1>
+              <p style={{ fontSize: 13, color: TEXT_SECONDARY }}>
                 Last updated: {lastRefresh.toLocaleTimeString()} · Auto-refreshes every 30s
               </p>
             </div>
           </div>
           <button
+            type="button"
             onClick={fetchHealth}
             disabled={refreshing}
-            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            className="fp-btn-ghost"
+            style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+            data-testid="health-refresh"
           >
             <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             Refresh
           </button>
         </div>
 
-        {/* Overall Status Banner */}
-        <div className={`${overallColor} rounded-xl p-4 flex items-center gap-3`}>
-          <Server className="h-6 w-6 text-white" />
-          <span className="text-white font-semibold text-lg">{overallText}</span>
+        {/* Overall Status Banner — ADR-14.9-D: glass + left-border stripe + summary pill */}
+        <div
+          className="fp-glass"
+          data-testid="health-overall-status"
+          style={{
+            padding: 16,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            borderLeft: `4px solid ${overallBorderColor}`,
+          }}
+        >
+          <Server className="h-6 w-6" style={{ color: overallBorderColor }} />
+          <span style={{ fontSize: 18, fontWeight: 600, color: TEXT_PRIMARY, flex: 1 }}>{overallText}</span>
+          <StatusBadge status={overallStatus} />
         </div>
 
         {/* Metrics Grid */}
         {health && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
             <MetricCard
               title="Uptime"
               value={formatUptime(health.uptime)}
               icon={Clock}
-              subtitle={`since last restart`}
+              subtitle="since last restart"
             />
             <MetricCard
               title="Version"
@@ -362,9 +413,9 @@ export default function HealthPage() {
           </div>
         )}
 
-        {/* Metrics Panel (if available) */}
+        {/* Memory metrics panel */}
         {metrics && (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
             <MetricCard
               title="Heap Used"
               value={`${metrics.memory?.heapUsedMB ?? 0} MB`}
@@ -386,27 +437,27 @@ export default function HealthPage() {
           </div>
         )}
 
-        {/* Recent Errors (if any) */}
+        {/* Recent Errors */}
         {metrics && metrics.recent_errors && metrics.recent_errors.length > 0 && (
-          <div className="bg-white rounded-xl border border-red-200">
-            <div className="p-4 border-b border-red-100 flex items-center gap-2">
-              <XCircle className="h-4 w-4 text-red-500" />
-              <h2 className="font-semibold text-gray-800">
+          <div className="fp-glass" style={{ padding: 0, borderLeft: `4px solid ${DANGER_RED}` }}>
+            <div className="fp-glass-sm" style={{ padding: 16, borderRadius: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <XCircle className="h-4 w-4" style={{ color: DANGER_RED }} />
+              <h2 style={{ fontWeight: 600, color: TEXT_PRIMARY }}>
                 Recent Errors ({metrics.recent_errors.length})
               </h2>
             </div>
-            <div className="px-4 py-2 divide-y divide-gray-100">
+            <div style={{ padding: '0 16px' }}>
               {metrics.recent_errors.slice(-5).map((err, i) => (
-                <div key={i} className="py-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-red-700 font-mono truncate max-w-xs">
+                <div key={i} style={{ padding: '8px 0', borderTop: i === 0 ? 'none' : `1px solid ${DIVIDER}` }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                    <span style={{ fontSize: 13, color: DANGER_RED_SOFT, fontFamily: 'ui-monospace, monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 480 }}>
                       {err.message}
                     </span>
                     {err.route && (
-                      <span className="text-xs text-gray-400 font-mono">{err.route}</span>
+                      <span style={{ fontSize: 12, color: TEXT_SECONDARY, fontFamily: 'ui-monospace, monospace' }}>{err.route}</span>
                     )}
                   </div>
-                  <div className="text-xs text-gray-400 mt-0.5">
+                  <div style={{ fontSize: 12, color: TEXT_SECONDARY, marginTop: 2 }}>
                     {new Date(err.timestamp).toLocaleTimeString()}
                   </div>
                 </div>
@@ -416,21 +467,21 @@ export default function HealthPage() {
         )}
 
         {/* Services Status */}
-        <div className="bg-white rounded-xl border border-gray-200">
-          <div className="p-4 border-b border-gray-100">
-            <h2 className="font-semibold text-gray-800">Service Health</h2>
+        <div className="fp-glass" style={{ padding: 0 }}>
+          <div className="fp-glass-sm" style={{ padding: 16, borderRadius: 0 }}>
+            <h2 style={{ fontWeight: 600, color: TEXT_PRIMARY }}>Service Health</h2>
           </div>
-          <div className="px-4">
+          <div style={{ padding: '0 16px' }}>
             {services.map((service) => (
               <ServiceRow key={service.name} service={service} />
             ))}
           </div>
         </div>
 
-        {/* Links */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <h2 className="font-semibold text-gray-800 mb-3">Quick Links</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        {/* Quick Links */}
+        <div className="fp-glass" style={{ padding: 16 }}>
+          <h2 style={{ fontWeight: 600, color: TEXT_PRIMARY, marginBottom: 12 }}>Quick Links</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 8 }}>
             {[
               { label: '📊 API Docs', href: '/docs' },
               { label: '🔍 OpenAPI Spec', href: '/api/docs' },
@@ -440,7 +491,17 @@ export default function HealthPage() {
               <a
                 key={href}
                 href={href}
-                className="text-center px-3 py-2 text-sm text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 font-medium"
+                className="fp-glass-sm"
+                style={{
+                  textAlign: 'center',
+                  padding: '8px 12px',
+                  fontSize: 13,
+                  color: PURPLE_ACCENT,
+                  fontWeight: 500,
+                  textDecoration: 'none',
+                  display: 'block',
+                }}
+                data-fp-row-hover="true"
               >
                 {label}
               </a>
@@ -449,7 +510,7 @@ export default function HealthPage() {
         </div>
 
         {/* Footer */}
-        <div className="text-center text-xs text-gray-400">
+        <div style={{ textAlign: 'center', fontSize: 12, color: TEXT_SECONDARY }}>
           Flipper AI · Axovia AI · Built by Stephen Boyett ·{' '}
           <time dateTime={health?.timestamp ?? ''}>{health?.timestamp}</time>
         </div>

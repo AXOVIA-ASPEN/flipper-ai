@@ -189,6 +189,8 @@ export default function QueueItemCard({ item, onRetry, onCancel }: Props) {
           <span
             className={`flex-shrink-0 ${statusClass}`}
             data-testid="status-pill"
+            aria-live="polite"
+            aria-atomic="true"
           >
             {item.status}
           </span>
@@ -196,7 +198,7 @@ export default function QueueItemCard({ item, onRetry, onCancel }: Props) {
 
         {/* Error message for FAILED items */}
         {item.status === 'FAILED' && item.errorMessage && (
-          <div className="mt-2 text-xs text-red-600 dark:text-red-400">
+          <div className="mt-2 text-xs" style={{ color: '#f87171' }}>
             <p
               className={errorExpanded ? '' : 'line-clamp-2'}
               style={{ color: '#f87171' }}

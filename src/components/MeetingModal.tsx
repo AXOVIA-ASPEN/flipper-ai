@@ -3,7 +3,7 @@
  * @author Stephen Boyett
  * @company Axovia AI
  * @date 2026-04-11
- * @version 1.0
+ * @version 1.1
  * @brief Meeting scheduling modal — datetime picker, location, type, and Google Calendar sync.
  *
  * @description
@@ -14,6 +14,10 @@
  * - Captures browser timezone via Intl.DateTimeFormat().resolvedOptions().timeZone
  * - Calls POST /api/opportunities/[id]/meeting
  * - On CALENDAR_AUTH_REQUIRED response: shows a reconnect toast
+ *
+ * Story 14.8: migrated to canonical glass surfaces — `.fp-glass` modal body,
+ * `.fp-input` form fields, `.fp-btn-primary` save and `.fp-btn-ghost` cancel.
+ * Scheduling/timezone/calendar-sync semantics preserved verbatim.
  */
 
 'use client';
@@ -120,16 +124,22 @@ export default function MeetingModal({
   const isAmbiguous = opportunityStatus === 'PURCHASED';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ background: 'rgba(0,0,0,0.6)' }}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="fp-glass w-full max-w-md mx-4 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-lg font-semibold" style={{ color: '#e2e8f0' }}>
             {initialMeeting?.meetingTime ? 'Update Meeting' : 'Schedule Meeting'}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-xl leading-none"
-            aria-label="Close"
+            className="fp-icon-btn"
+            style={{ fontSize: 20, lineHeight: 1, color: '#94a3b8' }}
+            aria-label="Close meeting dialog"
           >
             ×
           </button>
@@ -137,42 +147,45 @@ export default function MeetingModal({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="meeting-datetime" className="block text-sm font-medium mb-1" style={{ color: '#e2e8f0' }}>
               Date & Time
             </label>
             <input
+              id="meeting-datetime"
               type="datetime-local"
               value={meetingTime}
               onChange={(e) => setMeetingTime(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="fp-input w-full"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="meeting-location" className="block text-sm font-medium mb-1" style={{ color: '#e2e8f0' }}>
               Location
             </label>
             <input
+              id="meeting-location"
               type="text"
               value={meetingLocation}
               onChange={(e) => setMeetingLocation(e.target.value)}
               placeholder="e.g. 456 Oak Ave, Seattle, WA"
               required
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="fp-input w-full"
             />
           </div>
 
           {/* meetingType — auto-derived, editable only when status is PURCHASED */}
           {isAmbiguous && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="meeting-type" className="block text-sm font-medium mb-1" style={{ color: '#e2e8f0' }}>
                 Meeting Type
               </label>
               <select
+                id="meeting-type"
                 value={meetingType}
                 onChange={(e) => setMeetingType(e.target.value as 'buy' | 'sell')}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="fp-input w-full"
               >
                 <option value="buy">Buy (picking up item)</option>
                 <option value="sell">Sell (delivering item)</option>
@@ -184,14 +197,14 @@ export default function MeetingModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="fp-btn-ghost flex-1 justify-center"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving || !meetingTime || !meetingLocation.trim()}
-              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50 transition-colors"
+              className="fp-btn-primary flex-1 justify-center"
             >
               {saving ? 'Saving…' : 'Save Meeting'}
             </button>

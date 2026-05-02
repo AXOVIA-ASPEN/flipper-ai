@@ -36,29 +36,34 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen" role="main">
-      {/* Hero Section */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
-        {/* Nav */}
-        <nav className="flex justify-between items-center mb-16">
-          <div className="flex items-center gap-3">
-            <div className="text-4xl">🐧</div>
-            <h1 className="text-2xl font-bold">
-              <span className="fp-grad-purple">Flipper.ai</span>
-            </h1>
-          </div>
-          <div className="flex gap-4 items-center">
-            <Link href="/login" className="fp-btn-ghost">
-              Log In
-            </Link>
-            <button onClick={handleGetStarted} className="fp-btn-hot">
-              Get Started Free
-            </button>
-          </div>
-        </nav>
+    <div className="min-h-screen">
+      {/* Top-level header landmark — contains the public nav. */}
+      <header>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+          <nav className="flex justify-between items-center mb-16">
+            <div className="flex items-center gap-3">
+              <div className="text-4xl">🐧</div>
+              <h1 className="text-2xl font-bold">
+                <span className="fp-grad-purple">Flipper.ai</span>
+              </h1>
+            </div>
+            <div className="flex gap-4 items-center">
+              <Link href="/login" className="fp-btn-ghost">
+                Log In
+              </Link>
+              <button onClick={handleGetStarted} className="fp-btn-hot">
+                Get Started Free
+              </button>
+            </div>
+          </nav>
+        </div>
+      </header>
 
-        {/* Hero Content */}
-        <div className="text-center max-w-4xl mx-auto">
+      {/* Main content — hero, features, pricing, CTA. Landmark provided by app/layout.tsx <main>. */}
+      <div>
+        {/* Hero Section */}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+          <div className="text-center max-w-4xl mx-auto">
           <h2 className="text-5xl md:text-6xl font-bold mb-6" style={{ color: '#e2e8f0' }}>
             Find Hidden Profits in{' '}
             <span className="fp-grad-purple">Every Marketplace</span>
@@ -82,7 +87,7 @@ export default function LandingPage() {
             </button>
           </div>
 
-          <p className="text-sm" style={{ color: '#475569' }}>
+          <p className="text-sm" style={{ color: '#94a3b8' }}>
             ✨ Free trial • No credit card required • Cancel anytime
           </p>
         </div>
@@ -168,7 +173,7 @@ export default function LandingPage() {
           <div className="fp-glass p-8 rounded-xl">
             <h4 className="text-xl font-semibold mb-2" style={{ color: '#e2e8f0' }}>Free</h4>
             <p className="text-4xl font-bold mb-4" style={{ color: '#e2e8f0' }}>
-              $0<span className="text-lg" style={{ color: '#475569' }}>/mo</span>
+              $0<span className="text-lg" style={{ color: '#94a3b8' }}>/mo</span>
             </p>
             <ul className="space-y-3 mb-6" style={{ color: '#94a3b8' }}>
               <li>✓ 5 scans per day</li>
@@ -179,30 +184,30 @@ export default function LandingPage() {
             <button onClick={handleGetStarted} className="fp-btn-ghost w-full">Start Free</button>
           </div>
 
-          {/* Pro Tier */}
-          <div className="fp-hot-card p-10 rounded-xl" style={{ position: 'relative' }}>
-            <div className="fp-glass rounded-xl p-2" style={{ position: 'relative', zIndex: 0 }}>
-              <span className="fp-badge fp-badge-purple mb-4 block w-fit">MOST POPULAR</span>
-              <h4 className="text-xl font-semibold mb-2" style={{ color: '#e2e8f0' }}>Pro</h4>
-              <p className="text-4xl font-bold mb-4" style={{ color: '#e2e8f0' }}>
-                $29<span className="text-lg" style={{ color: '#475569' }}>/mo</span>
-              </p>
-              <ul className="space-y-3 mb-6" style={{ color: '#94a3b8' }}>
-                <li>✓ Unlimited scans</li>
-                <li>✓ Advanced AI analysis</li>
-                <li>✓ All 5 marketplaces</li>
-                <li>✓ Real-time alerts</li>
-                <li>✓ Profit tracking</li>
-              </ul>
-              <button onClick={handleGetStarted} className="fp-btn-primary w-full">Start Pro Trial</button>
-            </div>
+          {/* Pro Tier — .fp-hot-card provides the animated border (::before z-index:-1)
+              over a combined .fp-glass surface so the border stays visible without a
+              nested wrapper that would create a new stacking context. */}
+          <div className="fp-hot-card fp-glass p-10 rounded-xl">
+            <span className="fp-badge fp-badge-purple mb-4 block w-fit">MOST POPULAR</span>
+            <h4 className="text-xl font-semibold mb-2" style={{ color: '#e2e8f0' }}>Pro</h4>
+            <p className="text-4xl font-bold mb-4" style={{ color: '#e2e8f0' }}>
+              $29<span className="text-lg" style={{ color: '#94a3b8' }}>/mo</span>
+            </p>
+            <ul className="space-y-3 mb-6" style={{ color: '#94a3b8' }}>
+              <li>✓ Unlimited scans</li>
+              <li>✓ Advanced AI analysis</li>
+              <li>✓ All 5 marketplaces</li>
+              <li>✓ Real-time alerts</li>
+              <li>✓ Profit tracking</li>
+            </ul>
+            <button onClick={handleGetStarted} className="fp-btn-primary w-full">Start Pro Trial</button>
           </div>
 
           {/* Business Tier */}
           <div className="fp-glass p-8 rounded-xl">
             <h4 className="text-xl font-semibold mb-2" style={{ color: '#e2e8f0' }}>Business</h4>
             <p className="text-4xl font-bold mb-4" style={{ color: '#e2e8f0' }}>
-              $99<span className="text-lg" style={{ color: '#475569' }}>/mo</span>
+              $99<span className="text-lg" style={{ color: '#94a3b8' }}>/mo</span>
             </p>
             <ul className="space-y-3 mb-6" style={{ color: '#94a3b8' }}>
               <li>✓ Everything in Pro</li>
@@ -231,10 +236,11 @@ export default function LandingPage() {
           >
             Start Your Free Trial
           </button>
-          <p className="text-sm mt-4" style={{ color: '#475569' }}>
+          <p className="text-sm mt-4" style={{ color: '#94a3b8' }}>
             No credit card required • 14-day free trial
           </p>
         </div>
+      </div>
       </div>
 
       {/* Footer */}
@@ -245,13 +251,13 @@ export default function LandingPage() {
               <div className="text-2xl">🐧</div>
               <span className="font-semibold" style={{ color: '#e2e8f0' }}>Flipper.ai</span>
             </div>
-            <div className="flex gap-6 text-sm" style={{ color: '#475569' }}>
+            <div className="flex gap-6 text-sm" style={{ color: '#94a3b8' }}>
               <Link href="/privacy" className="hover:underline" style={{ color: '#94a3b8' }}>Privacy</Link>
               <Link href="/terms" className="hover:underline" style={{ color: '#94a3b8' }}>Terms</Link>
               <Link href="/contact" className="hover:underline" style={{ color: '#94a3b8' }}>Contact</Link>
             </div>
           </div>
-          <div className="mt-8 text-center text-sm" style={{ color: '#475569' }}>
+          <div className="mt-8 text-center text-sm" style={{ color: '#94a3b8' }}>
             © 2026 Flipper.ai by Axovia AI. All rights reserved.
           </div>
         </div>

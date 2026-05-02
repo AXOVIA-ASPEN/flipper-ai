@@ -783,7 +783,7 @@ export default function PriceCalculator({
             </tbody>
           </table>
         </div>
-        <p className="mt-2 text-xs" style={{ color: '#475569' }}>
+        <p className="mt-2 text-xs" style={{ color: '#94a3b8' }}>
           Edit any list price before clicking &ldquo;List on …&rdquo; to override the recommendation.
         </p>
       </div>

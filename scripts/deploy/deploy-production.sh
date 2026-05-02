@@ -338,7 +338,7 @@ deploy_cloud_run() {
 verify_deployment() {
     log "Running post-deployment verification..."
     
-    URL="${1:-http://localhost:3000}"
+    URL="${1:-http://localhost:3200}"
     
     # Health check
     log "Testing health endpoint..."
@@ -473,7 +473,7 @@ main() {
         deploy_cloud_run
         verify_deployment "$(cat ${PROJECT_ROOT}/.last-deployment-url)"
     else
-        verify_deployment "http://localhost:3000"
+        verify_deployment "http://localhost:3200"
     fi
     
     create_manifest

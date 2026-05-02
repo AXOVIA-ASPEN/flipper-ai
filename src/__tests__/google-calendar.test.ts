@@ -9,7 +9,7 @@
 
 process.env.GOOGLE_CALENDAR_CLIENT_ID = 'test-client-id';
 process.env.GOOGLE_CALENDAR_CLIENT_SECRET = 'test-client-secret';
-process.env.GOOGLE_CALENDAR_REDIRECT_URI = 'http://localhost:3000/api/integrations/google-calendar/callback';
+process.env.GOOGLE_CALENDAR_REDIRECT_URI = 'http://localhost:3200/api/integrations/google-calendar/callback';
 process.env.ENCRYPTION_SECRET = 'test-encryption-secret-for-hmac';
 
 // ----- googleapis mock -----

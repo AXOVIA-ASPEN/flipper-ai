@@ -11,18 +11,23 @@ import * as path from 'path';
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
 import { Before, After, BeforeAll, AfterAll, Status } from '@cucumber/cucumber';
-import { chromium, Browser } from '@playwright/test';
+import { chromium, webkit, firefox, Browser } from '@playwright/test';
 import { CustomWorld } from './world';
 
 let browser: Browser;
 
 BeforeAll(async function () {
-  // Launch browser once for all tests
-  browser = await chromium.launch({
+  // Story 14.10 AC #1 requires the skip-link scenario to run in BOTH Chromium
+  // and WebKit (Safari has stricter focus-on-hash-change semantics; the
+  // tabIndex={-1} on <main> exists exclusively for WebKit). Honor BROWSER env
+  // var: BROWSER=webkit (or firefox) overrides the default Chromium launcher.
+  const browserType = (process.env.BROWSER || 'chromium').toLowerCase();
+  const launcher = browserType === 'webkit' ? webkit : browserType === 'firefox' ? firefox : chromium;
+  browser = await launcher.launch({
     headless: true, // Always headless on server (no X display)
     slowMo: process.env.SLOW_MO ? parseInt(process.env.SLOW_MO) : 0,
   });
-  console.log('🚀 Browser launched');
+  console.log(`🚀 ${browserType} launched`);
 });
 
 AfterAll(async function () {
@@ -33,7 +38,7 @@ AfterAll(async function () {
   }
 });
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3200';
 
 Before(async function (this: CustomWorld, { pickle }) {
   // Create a new browser context for each scenario (isolation)

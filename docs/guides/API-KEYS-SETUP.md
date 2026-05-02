@@ -89,12 +89,12 @@ Facebook scraping uses **Stagehand** (AI-powered browser automation via Google G
    - Add **Facebook Login** product
    - Under Settings > Basic, note the **App ID** and **App Secret**
    - Under Facebook Login > Settings, add Valid OAuth Redirect URI:
-     `http://localhost:3000/api/auth/facebook/callback`
+     `http://localhost:3200/api/auth/facebook/callback`
    - Add to `.env`:
      ```
      FACEBOOK_APP_ID="123456789"
      FACEBOOK_APP_SECRET="abc123..."
-     FACEBOOK_REDIRECT_URI="http://localhost:3000/api/auth/facebook/callback"
+     FACEBOOK_REDIRECT_URI="http://localhost:3200/api/auth/facebook/callback"
      ENABLE_OAUTH_FACEBOOK="true"
      ```
 
@@ -164,7 +164,7 @@ Handles subscription billing (Free/Pro/Enterprise tiers).
 5. For webhooks:
    - Go to **Developers** > **Webhooks**
    - Click **Add endpoint**
-   - URL: `http://localhost:3000/api/webhooks/stripe` (use Stripe CLI for local dev)
+   - URL: `http://localhost:3200/api/webhooks/stripe` (use Stripe CLI for local dev)
    - Select events: `checkout.session.completed`, `customer.subscription.*`, `invoice.*`
    - Copy the **Signing secret** (starts with `whsec_`)
 6. Create price IDs for subscription tiers:
@@ -181,7 +181,7 @@ Handles subscription billing (Free/Pro/Enterprise tiers).
 
 **Local webhook testing:** Install [Stripe CLI](https://stripe.com/docs/stripe-cli) and run:
 ```bash
-stripe listen --forward-to localhost:3000/api/webhooks/stripe
+stripe listen --forward-to localhost:3200/api/webhooks/stripe
 ```
 
 ### Resend (`RESEND_API_KEY`)
@@ -277,13 +277,13 @@ Scheduling meetups directly from the app.
 3. Enable **Google Calendar API**
 4. Navigate to **Credentials** > **Create Credentials** > **OAuth client ID**
 5. Application type: **Web application**
-6. Add authorized redirect URI: `http://localhost:3000/api/integrations/google-calendar/callback`
+6. Add authorized redirect URI: `http://localhost:3200/api/integrations/google-calendar/callback`
 7. Copy the **Client ID** and **Client Secret**
 8. Add to `.env`:
    ```
    GOOGLE_CALENDAR_CLIENT_ID="123456789-abc.apps.googleusercontent.com"
    GOOGLE_CALENDAR_CLIENT_SECRET="GOCSPX-..."
-   GOOGLE_CALENDAR_REDIRECT_URI="http://localhost:3000/api/integrations/google-calendar/callback"
+   GOOGLE_CALENDAR_REDIRECT_URI="http://localhost:3200/api/integrations/google-calendar/callback"
    ```
 
 ---
@@ -358,7 +358,7 @@ make db-setup
 make dev
 
 # 4. Open the app and log in
-open http://localhost:3000
+open http://localhost:3200
 
 # 5. Try a scraper run from the Scraper page
 #    - Select a category and marketplace

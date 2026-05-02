@@ -61,7 +61,7 @@ pnpm exec playwright install chromium
 pnpm exec playwright test --headed
 
 # Check dev server is running
-curl http://localhost:3000/api/health
+curl http://localhost:3200/api/health
 ```
 
 ### Authentication Issues

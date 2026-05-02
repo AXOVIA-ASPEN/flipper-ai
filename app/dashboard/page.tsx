@@ -1,3 +1,19 @@
+/**
+ * @file app/dashboard/page.tsx
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-04-28
+ * @version 1.0
+ * @brief Main dashboard — listing grid, stats cards, SSE live status.
+ *
+ * @description
+ * Client page that shows the user's most recent listings as a paginated
+ * grid with quick "track as opportunity" actions, four headline stats
+ * cards, and an SSE-driven "Live"/"Reconnecting" status pill. Reads
+ * filter state from URL, fetches /api/listings, and subscribes to SSE
+ * for real-time updates. Errors from the SSE channel surface via a
+ * dismissible warning banner.
+ */
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
@@ -237,8 +253,9 @@ function Dashboard() {
             <span>Real-time updates: {lastError}. Data will refresh when connection is restored.</span>
             <button
               onClick={() => setSseErrorDismissed(true)}
-              style={{ flexShrink: 0, padding: 4, background: 'none', border: 'none', cursor: 'pointer', color: '#fbbf24', borderRadius: 4 }}
-              aria-label="Dismiss"
+              className="fp-icon-btn"
+              style={{ flexShrink: 0, color: '#fbbf24' }}
+              aria-label="Dismiss real-time updates banner"
             >
               <X className="w-4 h-4" />
             </button>
@@ -340,12 +357,16 @@ function Dashboard() {
                       </div>
                       <button
                         onClick={(e) => handleCreateOpportunity(e, listing.id)}
-                        style={{ padding: 4, background: 'none', border: 'none', cursor: 'pointer', borderRadius: 4 }}
+                        className="fp-icon-btn"
                         disabled={!!listing.opportunity}
                         aria-label={listing.opportunity ? 'Already tracked as opportunity' : 'Track as opportunity'}
                       >
                         <Star
-                          className={`w-5 h-5 ${listing.opportunity ? 'fill-yellow-400 text-yellow-400' : 'text-slate-500'}`}
+                          className="w-5 h-5"
+                          style={{
+                            fill: listing.opportunity ? '#fbbf24' : 'transparent',
+                            color: listing.opportunity ? '#fbbf24' : '#64748b',
+                          }}
                         />
                       </button>
                     </div>

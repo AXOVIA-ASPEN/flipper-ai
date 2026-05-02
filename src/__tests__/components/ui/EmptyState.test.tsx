@@ -77,4 +77,11 @@ describe('EmptyState', () => {
     render(<EmptyState title="Empty" icon={<span data-testid="my-icon">🔥</span>} />);
     expect(screen.getByTestId('my-icon')).toBeInTheDocument();
   });
+
+  it('exposes role="status" + aria-live="polite" so screen readers announce empty states (Story 14.7 AC #15)', () => {
+    render(<EmptyState title="No conversation selected" />);
+    const region = screen.getByTestId('empty-state');
+    expect(region).toHaveAttribute('role', 'status');
+    expect(region).toHaveAttribute('aria-live', 'polite');
+  });
 });

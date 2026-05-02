@@ -276,4 +276,76 @@ describe('MessageApprovalCard', () => {
     fireEvent.click(copyBtn);
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith('Is this still available?');
   });
+
+  // Story 14.8 AC #10 + Task 9.3 + Task 15.2 — guard against the 14.7 line-202 regression.
+  describe('Story 14.8 — canonical badge surfaces (AC #10, Task 15.2)', () => {
+    const FP_BADGE_RE = /^fp-badge fp-badge-(red|blue|gray|yellow|purple|green)$/;
+
+    it.each([
+      ['DRAFT', 'fp-badge fp-badge-gray'],
+      ['PENDING_APPROVAL', 'fp-badge fp-badge-yellow'],
+      ['SENT', 'fp-badge fp-badge-blue'],
+      ['REJECTED', 'fp-badge fp-badge-red'],
+      ['READ', 'fp-badge fp-badge-purple'],
+    ])('status %s pill className matches the canonical fp-badge regex', (status, expected) => {
+      const { container } = render(
+        <MessageApprovalCard
+          message={makeMessage({ status })}
+          loadingAction={null}
+          messageApprovalRequired={false}
+          {...noopHandlers}
+        />
+      );
+      const pills = container.querySelectorAll('.fp-badge.fp-badge-gray, .fp-badge.fp-badge-yellow, .fp-badge.fp-badge-blue, .fp-badge.fp-badge-red, .fp-badge.fp-badge-purple, .fp-badge.fp-badge-green');
+      const statusPill = Array.from(pills).find((el) => el.textContent?.trim() === (status === 'PENDING_APPROVAL' ? 'PENDING' : status));
+      expect(statusPill).toBeTruthy();
+      // The status-pill className contains a flex-shrink-0 layout token plus the canonical fp-badge string.
+      // Normalize by stripping known layout tokens, then assert the residual matches the fp-badge regex.
+      const cls = (statusPill?.className ?? '')
+        .split(/\s+/)
+        .filter((t) => t !== 'flex-shrink-0' && t !== '')
+        .join(' ');
+      expect(cls).toBe(expected);
+      expect(cls).toMatch(FP_BADGE_RE);
+    });
+
+    it('status pill className contains NO external padding/font/rounded utilities (14.7 line-202 fix preserved)', () => {
+      const { container } = render(
+        <MessageApprovalCard
+          message={makeMessage({ status: 'DRAFT' })}
+          loadingAction={null}
+          messageApprovalRequired={false}
+          {...noopHandlers}
+        />
+      );
+      // The DRAFT status pill — find it by its rendered text.
+      const pill = Array.from(container.querySelectorAll('span')).find(
+        (el) => el.textContent?.trim() === 'DRAFT' && el.className.includes('fp-badge')
+      );
+      expect(pill).toBeTruthy();
+      const className = pill?.className ?? '';
+      // None of these external wrap utilities should appear — they would re-introduce the
+      // double-padding / double-font-weight bug ADR-14.7-I called out.
+      expect(className).not.toMatch(/\btext-xs\b/);
+      expect(className).not.toMatch(/\bpx-2\b/);
+      expect(className).not.toMatch(/\bpy-0\.5\b/);
+      expect(className).not.toMatch(/\brounded\b/);
+      expect(className).not.toMatch(/\bfont-medium\b/);
+    });
+
+    it('source-platform pill renders as fp-badge fp-badge-blue (AC #10)', () => {
+      render(
+        <MessageApprovalCard
+          message={makeMessage({ status: 'DRAFT' })}
+          loadingAction={null}
+          messageApprovalRequired={false}
+          {...noopHandlers}
+        />
+      );
+      const pill = screen.getByTestId('source-platform-pill');
+      expect(pill.className).toContain('fp-badge');
+      expect(pill.className).toContain('fp-badge-blue');
+      expect(pill.textContent).toBe('craigslist');
+    });
+  });
 });

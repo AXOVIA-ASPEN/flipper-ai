@@ -3,13 +3,21 @@
  * @author Stephen Boyett
  * @company Axovia AI
  * @date 2026-04-17
- * @version 1.0
+ * @version 1.1
  * @brief Shared empty-state card using .fp-glass surface + optional action.
  *
  * @description
  * Renders a centred .fp-glass card with title, optional message, optional decorative
  * icon slot, and an optional action (link or button). The action.href takes precedence
  * over action.onClick when both are provided — document this at call sites if mixing.
+ *
+ * Carries role="status" + aria-live="polite" so screen readers announce empty
+ * states on first render (Story 14.7 AC #15(d)). NOTE: this announcement also
+ * fires when EmptyState is used as a terminal "not found" state (e.g.
+ * /listings/[id] 404 path) — semantically acceptable since the user benefits
+ * from being told the page is empty, but be deliberate when adopting this
+ * component for permanent landing surfaces where a polite announcement on
+ * every load may be unwanted.
  */
 
 'use client';
@@ -46,6 +54,8 @@ export function EmptyState({
   return (
     <div
       data-testid={testId}
+      role="status"
+      aria-live="polite"
       className={`fp-glass${className ? ` ${className}` : ''}`}
       style={{ textAlign: 'center', padding: '48px 24px', maxWidth: 480, margin: '0 auto' }}
     >

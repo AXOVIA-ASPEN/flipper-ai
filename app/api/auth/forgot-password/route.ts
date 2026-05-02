@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Construct reset URL from env var only (prevent host header poisoning)
-    const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '');
+    const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3200').replace(/\/$/, '');
     const resetUrl = `${appUrl}/reset-password?token=${rawToken}`;
 
     // Send email — if it fails, log but still return 200

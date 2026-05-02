@@ -306,7 +306,7 @@ Then(
 let healthResponse: Record<string, unknown>;
 
 Given('the application is running', async function (this: CustomWorld) {
-  const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+  const baseUrl = process.env.BASE_URL || 'http://localhost:3200';
   const res = await fetch(`${baseUrl}/api/health`);
   expect(res.ok).toBe(true);
   console.log('✅ Application is running');
@@ -315,7 +315,7 @@ Given('the application is running', async function (this: CustomWorld) {
 When(
   'I navigate to the health endpoint {string}',
   async function (this: CustomWorld, healthPath: string) {
-    const res = await fetch(`http://localhost:3000${healthPath}`);
+    const res = await fetch(`http://localhost:3200${healthPath}`);
     expect(res.ok).toBe(true);
 
     const contentType = res.headers.get('content-type') || '';
@@ -496,7 +496,7 @@ When(
     // Import and invoke the actual middleware to verify 403 rejection
     const { middleware } = require('../../../middleware');
     const { NextRequest } = require('next/server');
-    const req = new NextRequest(new URL('/api/listings', 'http://localhost:3000'), {
+    const req = new NextRequest(new URL('/api/listings', 'http://localhost:3200'), {
       method: 'POST',
       headers: { origin },
     });

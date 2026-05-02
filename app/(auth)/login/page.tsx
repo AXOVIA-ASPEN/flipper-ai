@@ -180,7 +180,8 @@ function LoginPageInner() {
             <p style={{ color: '#94a3b8' }}>Sign in to find your next profitable flip</p>
           </div>
 
-          {/* Success message (e.g. after logout) */}
+          {/* Success message (e.g. after logout) — icon + text inherit from .fp-alert-success
+              so there are zero inline green hex values on the login page (AC #7 spirit). */}
           {successMessage && (
             <div
               className="fp-alert-success mx-8 mb-4 p-3 flex items-center gap-2"
@@ -188,8 +189,8 @@ function LoginPageInner() {
               aria-live="polite"
               data-testid="logout-success-message"
             >
-              <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: '#34d399' }} />
-              <span className="text-sm" style={{ color: '#6ee7b7' }}>{successMessage}</span>
+              <CheckCircle className="w-5 h-5 flex-shrink-0" />
+              <span className="text-sm">{successMessage}</span>
             </div>
           )}
 
@@ -294,7 +295,7 @@ function LoginPageInner() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute inset-y-0 right-0 p-2 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-3 pl-3 flex items-center justify-center min-w-[44px] min-h-[44px]"
                   style={{ color: '#475569' }}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}

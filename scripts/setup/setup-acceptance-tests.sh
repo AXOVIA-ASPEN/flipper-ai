@@ -46,7 +46,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     fi
 
     # Create user via API
-    curl -X POST http://localhost:3000/api/auth/signup \
+    curl -X POST http://localhost:3200/api/auth/signup \
       -H "Content-Type: application/json" \
       -d '{
         "email": "test@example.com",
@@ -69,13 +69,13 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 
     cat > .env.test << EOF
 # Test environment variables
-PLAYWRIGHT_TEST_BASE_URL=http://localhost:3000
+PLAYWRIGHT_TEST_BASE_URL=http://localhost:3200
 
 # Database
 DATABASE_URL=postgresql://localhost/flipper_ai_test
 
 # App URL
-APP_URL=http://localhost:3000
+APP_URL=http://localhost:3200
 
 # Encryption
 ENCRYPTION_SECRET=test-secret-$(openssl rand -base64 32)

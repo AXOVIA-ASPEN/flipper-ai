@@ -37,7 +37,7 @@ docker compose -f config/docker/docker-compose.prod.yml --env-file .env.producti
 docker compose -f config/docker/docker-compose.prod.yml exec app npx prisma migrate deploy
 
 # Health check
-curl http://localhost:3000/api/health
+curl http://localhost:3200/api/health
 ```
 
 ---

@@ -28,7 +28,7 @@ import { expect } from '@playwright/test';
 import { CustomWorld } from '../support/world';
 import { scoreColor } from '../../../src/components/ui/ScoreRing';
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3200';
 
 setDefaultTimeout(120 * 1000);
 

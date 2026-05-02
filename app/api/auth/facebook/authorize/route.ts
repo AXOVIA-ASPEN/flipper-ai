@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     const appId = process.env.FACEBOOK_APP_ID;
     const appSecret = process.env.FACEBOOK_APP_SECRET;
     const redirectUri =
-      process.env.FACEBOOK_REDIRECT_URI || 'http://localhost:3000/api/auth/facebook/callback';
+      process.env.FACEBOOK_REDIRECT_URI || 'http://localhost:3200/api/auth/facebook/callback';
 
     if (!appId || !appSecret) {
       return NextResponse.json(

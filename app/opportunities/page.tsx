@@ -1,3 +1,19 @@
+/**
+ * @file app/opportunities/page.tsx
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-04-28
+ * @version 1.0
+ * @brief Opportunities Kanban + list + inventory views with SSE-driven updates.
+ *
+ * @description
+ * Client page that renders the user's tracked flip opportunities in three
+ * view modes (list / kanban / inventory). Reads filter state from URL,
+ * fetches /api/opportunities, applies search-term refinement client-side,
+ * and subscribes to SSE for real-time updates. Exposes lifecycle modals
+ * (PURCHASED / LISTED / SOLD) and cross-post launching from the kanban
+ * board. Filter result count is announced via aria-live for screen readers.
+ */
 'use client';
 
 import { Suspense, useState, useEffect, useCallback } from 'react';
@@ -570,6 +586,7 @@ function OpportunitiesContent() {
               href="/"
               className="fp-btn-ghost group"
               style={{ padding: 8, display: 'inline-flex', alignItems: 'center' }}
+              aria-label="Back to home"
             >
               <ArrowLeft className="w-5 h-5" style={{ color: '#c4b5fd' }} />
             </Link>
@@ -590,7 +607,8 @@ function OpportunitiesContent() {
         </div>
       </header>
 
-      <main className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Page content — landmark provided by app/layout.tsx <main>. */}
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards — canonical .fp-glow-card, single purple accent per ADR-14.7-C */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="fp-glow-card p-6">
@@ -662,6 +680,15 @@ function OpportunitiesContent() {
                   className="fp-input w-full pl-10 pr-4"
                 />
               </div>
+              {/* Filter result count — announced to screen readers (Story 14.10 AC #6). */}
+              <p
+                aria-live="polite"
+                aria-atomic="true"
+                data-testid="filter-result-count"
+                style={{ marginTop: 8, fontSize: 12, color: '#94a3b8' }}
+              >
+                Showing {filteredOpportunities.length} of {opportunities.length} opportunities
+              </p>
             </div>
 
             {/* View Toggle — aria-pressed idiom for toggle group */}
@@ -1778,7 +1805,7 @@ function OpportunitiesContent() {
             })}
           </div>
         )}
-      </main>
+      </div>
 
       {/* Kanban Lifecycle Modals */}
 

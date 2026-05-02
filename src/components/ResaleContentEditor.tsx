@@ -3,7 +3,7 @@
  * @author Stephen Boyett
  * @company Axovia AI
  * @date 2026-04-08
- * @version 1.0
+ * @version 1.1
  * @brief Editor for AI-generated resale titles and descriptions.
  *
  * @description
@@ -13,7 +13,10 @@
  * Calls POST /api/listings/[id]/generate-resale-content to fetch content
  * and reports the final edited values back via the onSave callback so the
  * parent (typically the listing detail page) can post the result to the
- * posting queue.
+ * posting queue. Story 14.8: migrated to canonical glassmorphism — `.fp-glass`
+ * wrapper, `.fp-input` form fields, `.fp-btn-primary` for Generate/Save,
+ * `.fp-alert-warn` warnings, `.fp-alert-danger` errors. Generation flow,
+ * platform validation, char/word limits preserved verbatim.
  */
 
 'use client';
@@ -142,20 +145,20 @@ export default function ResaleContentEditor({
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 space-y-4">
+    <div className="fp-glass p-4 space-y-4">
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <h3 className="text-lg font-semibold" style={{ color: '#e2e8f0' }}>
           Generate Resale Listing
         </h3>
         {source && (
-          <span className="text-xs px-2 py-1 rounded bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-200">
+          <span className="fp-badge fp-badge-purple text-xs">
             Source: {source === 'ai' ? 'AI' : 'Template'}
           </span>
         )}
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <label className="text-sm text-gray-700 dark:text-gray-200">
+        <label className="text-sm" style={{ color: '#e2e8f0' }}>
           Platform:
           <select
             value={platform}
@@ -163,7 +166,7 @@ export default function ResaleContentEditor({
               const next = e.target.value;
               if (isPlatformKey(next)) setPlatform(next);
             }}
-            className="ml-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1 text-sm"
+            className="fp-input ml-2 text-sm"
           >
             {PLATFORMS.map((p) => (
               <option key={p} value={p}>
@@ -173,12 +176,13 @@ export default function ResaleContentEditor({
           </select>
         </label>
 
-        <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+        <label className="inline-flex items-center gap-2 text-sm" style={{ color: '#e2e8f0' }}>
           <input
             type="checkbox"
             checked={useLLM}
             onChange={(e) => setUseLLM(e.target.checked)}
-            className="rounded border-gray-300"
+            className="rounded"
+            style={{ accentColor: '#7c3aed' }}
           />
           Use AI (uncheck for algorithmic template)
         </label>
@@ -187,14 +191,14 @@ export default function ResaleContentEditor({
           type="button"
           onClick={handleGenerate}
           disabled={isGenerating}
-          className="ml-auto rounded-md bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 disabled:opacity-50"
+          className="fp-btn-primary ml-auto"
         >
           {isGenerating ? 'Generating…' : 'Generate'}
         </button>
       </div>
 
       {warnings.length > 0 && (
-        <ul className="text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 rounded p-2 list-disc list-inside">
+        <ul className="fp-alert-warn text-xs rounded p-2 list-disc list-inside" style={{ color: '#fcd34d' }}>
           {warnings.map((w) => (
             <li key={w}>{w}</li>
           ))}
@@ -202,19 +206,17 @@ export default function ResaleContentEditor({
       )}
 
       {error && (
-        <p className="text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded p-2">
+        <p className="fp-alert-danger text-xs rounded p-2" style={{ color: '#fca5a5' }}>
           {error}
         </p>
       )}
 
       <div>
         <div className="flex items-center justify-between mb-1">
-          <label htmlFor="resale-title" className="text-sm font-medium text-gray-700 dark:text-gray-200">
+          <label htmlFor="resale-title" className="text-sm font-medium" style={{ color: '#e2e8f0' }}>
             Title
           </label>
-          <span
-            className={`text-xs ${titleOver ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'}`}
-          >
+          <span className="text-xs" style={{ color: titleOver ? '#fca5a5' : '#94a3b8' }}>
             {title.length} / {titleLimit} chars
           </span>
         </div>
@@ -224,7 +226,7 @@ export default function ResaleContentEditor({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Generated title appears here"
-          className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
+          className="fp-input w-full"
         />
       </div>
 
@@ -232,13 +234,12 @@ export default function ResaleContentEditor({
         <div className="flex items-center justify-between mb-1">
           <label
             htmlFor="resale-description"
-            className="text-sm font-medium text-gray-700 dark:text-gray-200"
+            className="text-sm font-medium"
+            style={{ color: '#e2e8f0' }}
           >
             Description
           </label>
-          <span
-            className={`text-xs ${descriptionOver ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'}`}
-          >
+          <span className="text-xs" style={{ color: descriptionOver ? '#fca5a5' : '#94a3b8' }}>
             {countWords(description)} / {descriptionWordLimit} words
           </span>
         </div>
@@ -248,7 +249,7 @@ export default function ResaleContentEditor({
           onChange={(e) => setDescription(e.target.value)}
           rows={8}
           placeholder="Generated description appears here"
-          className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
+          className="fp-input w-full"
         />
       </div>
 
@@ -257,7 +258,7 @@ export default function ResaleContentEditor({
           type="button"
           onClick={handleSave}
           disabled={!title.trim() || !description.trim()}
-          className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+          className="fp-btn-primary"
         >
           Save to Queue
         </button>

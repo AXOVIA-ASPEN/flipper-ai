@@ -41,7 +41,7 @@ pnpm dev
 make preview  # install + migrate + dev
 ```
 
-Open http://localhost:3000
+Open http://localhost:3200
 
 ---
 
@@ -101,7 +101,7 @@ pnpm format           # Prettier formatting
 DATABASE_URL=              # PostgreSQL connection string (PostgreSQL is required — SQLite is not supported)
 FIREBASE_CLIENT_EMAIL=     # Firebase Admin SDK service account email
 FIREBASE_PRIVATE_KEY=      # Firebase Admin SDK private key
-APP_URL=                   # App base URL (http://localhost:3000 for dev)
+APP_URL=                   # App base URL (http://localhost:3200 for dev)
 ```
 
 ### AI Integration (Optional)

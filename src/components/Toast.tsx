@@ -75,7 +75,8 @@ export default function Toast({ id, type, title, message, duration = 5000, onClo
       </div>
       <button
         onClick={() => onClose(id)}
-        style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', color: '#475569', padding: 2, borderRadius: 4, transition: 'color 0.2s' }}
+        className="fp-icon-btn"
+        style={{ flexShrink: 0, color: '#475569' }}
         aria-label="Close notification"
         onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#94a3b8'; }}
         onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#475569'; }}

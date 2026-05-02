@@ -23,8 +23,9 @@ import CheckoutResultBanner from '@/components/CheckoutResultBanner';
 import IntegrationsSettings from '@/components/IntegrationsSettings';
 
 export default function SettingsPage() {
+  // Page content — landmark provided by app/layout.tsx <main>.
   return (
-    <div style={{ minHeight: '100vh', padding: '32px 24px' }}>
+    <div id="settings-main" style={{ minHeight: '100vh', padding: '32px 24px' }}>
       <div style={{ maxWidth: 1152, margin: '0 auto' }}>
         <Suspense>
           <CheckoutResultBanner />

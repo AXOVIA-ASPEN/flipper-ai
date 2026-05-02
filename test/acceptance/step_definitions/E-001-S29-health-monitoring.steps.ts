@@ -21,7 +21,7 @@ function readProjectFile(relativePath: string): string {
 // ==================== Shared state for health endpoint responses ====================
 // State is stored on `this` (CustomWorld) so it is scoped per scenario.
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3200';
 
 // ==================== S-29: Liveness probe ====================
 

@@ -3,14 +3,18 @@
  * @author Stephen Boyett
  * @company Axovia AI
  * @date 2026-03-31
- * @version 1.0
+ * @version 1.1
  * @brief Messaging settings toggle for two-step send confirmation.
  *
  * @description
  * Client Component that displays and controls the messageApprovalRequired
  * user setting. When enabled, messages require an additional confirmation
  * step after approval before being sent. Shows a count of orphaned
- * PENDING_APPROVAL messages when disabling.
+ * PENDING_APPROVAL messages when disabling. Story 14.8 migrated the
+ * surfaces to canonical glassmorphism — `.fp-glass-sm` wrapper, canonical
+ * toggle (`#7c3aed` active, explicit transition), `.fp-alert-danger` /
+ * `.fp-alert-success` banners. Save semantics, toggle role/aria, and
+ * pending-count warning behavior are preserved verbatim.
  */
 
 'use client';
@@ -87,25 +91,25 @@ export default function MessagingSettings() {
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 className="text-2xl font-semibold mb-4">Messaging</h2>
-        <p className="text-gray-500">Loading...</p>
+      <div className="fp-glass-sm p-6">
+        <h2 className="text-2xl font-semibold mb-4" style={{ color: '#e2e8f0' }}>Messaging</h2>
+        <p style={{ color: '#94a3b8' }}>Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-      <h2 className="text-2xl font-semibold mb-4">Messaging</h2>
+    <div className="fp-glass-sm p-6">
+      <h2 className="text-2xl font-semibold mb-4" style={{ color: '#e2e8f0' }}>Messaging</h2>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-red-600 dark:text-red-400">
+        <div className="fp-alert-danger mb-4 p-3" style={{ color: '#fca5a5' }}>
           {error}
         </div>
       )}
 
       {successMessage && (
-        <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded text-green-600 dark:text-green-400">
+        <div className="fp-alert-success mb-4 p-3" style={{ color: '#6ee7b7' }}>
           {successMessage}
         </div>
       )}
@@ -114,15 +118,16 @@ export default function MessagingSettings() {
         <div className="flex-1 mr-4">
           <label
             htmlFor="message-approval-toggle"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            className="block text-sm font-medium"
+            style={{ color: '#e2e8f0' }}
           >
             Two-step send confirmation
           </label>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-xs mt-1" style={{ color: '#94a3b8' }}>
             When enabled, messages require an additional confirmation step after approval before being sent.
           </p>
           {!approvalRequired && pendingCount > 0 && (
-            <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+            <p className="text-xs mt-1" style={{ color: '#fcd34d' }}>
               {pendingCount} message{pendingCount !== 1 ? 's' : ''} still pending confirmation.
             </p>
           )}
@@ -133,14 +138,17 @@ export default function MessagingSettings() {
           aria-checked={approvalRequired}
           onClick={handleToggle}
           disabled={saving}
-          className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
-            approvalRequired ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-600'
-          }`}
+          className="relative inline-flex items-center min-h-[44px] min-w-[44px] w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          style={{
+            background: approvalRequired ? '#7c3aed' : 'rgba(255,255,255,0.06)',
+            transition: 'background-color 150ms ease',
+          }}
         >
           <span
-            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full shadow ring-0 transition duration-200 ease-in-out ${
               approvalRequired ? 'translate-x-5' : 'translate-x-0'
             }`}
+            style={{ background: '#f1f5f9' }}
           />
         </button>
       </div>

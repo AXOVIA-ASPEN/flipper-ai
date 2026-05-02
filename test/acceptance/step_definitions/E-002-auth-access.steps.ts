@@ -19,7 +19,7 @@ import { Given, When, Then, DataTable } from '@cucumber/cucumber';
 import { expect } from '@playwright/test';
 import { CustomWorld } from '../support/world';
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3200';
 
 // ─── Authenticated-user helper ───────────────────────────────────────────────
 
@@ -51,6 +51,25 @@ Given('I am logged in', async function (this: CustomWorld) {
       sameSite: 'Strict',
     },
   ]);
+
+  // Some pages (e.g. /messages) gate render on the client-side
+  // FirebaseAuthProvider's `firebaseUser`. The provider checks for
+  // window.__E2E_AUTH_USER__ as a test bypass and resolves with that user
+  // synchronously, avoiding the auth-state subscription that never fires
+  // in tests because Firebase persistence is disabled. Inject before any
+  // navigation so the provider sees it on first render.
+  await this.page.addInitScript(() => {
+    (window as unknown as { __E2E_AUTH_USER__: unknown }).__E2E_AUTH_USER__ = {
+      uid: 'test-user-id',
+      email: 'test@example.com',
+      displayName: 'Test User',
+      emailVerified: true,
+      isAnonymous: false,
+      providerData: [],
+      metadata: {},
+      providerId: 'firebase',
+    };
+  });
 });
 
 // `When I navigate to {string}` is provided by E-002-settings.steps.ts.

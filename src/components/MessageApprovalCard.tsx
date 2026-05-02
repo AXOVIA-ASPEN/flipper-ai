@@ -3,7 +3,7 @@
  * @author Stephen Boyett
  * @company Axovia AI
  * @date 2026-03-31
- * @version 1.0
+ * @version 1.1
  * @brief Card for reviewing and acting on messages in the approval queue.
  *
  * @description
@@ -12,6 +12,15 @@
  * confirmation with auto-revert, copy-to-clipboard, stale listing
  * detection, and responsive mobile layout. All body/subject content
  * is rendered as plain text only.
+ *
+ * Story 14.8: migrated all surfaces to canonical glassmorphism — `.fp-glass`
+ * card wrapper, `.fp-input` inline editor fields, `.fp-btn-primary` /
+ * `.fp-btn-ghost` / `.fp-btn-danger` actions, `.fp-alert-warn` stale-listing
+ * banner, AI-confidence readout in `#c4b5fd`. Per ADR-14.8-D, the line-202
+ * STATUS_COLORS pattern (preserved from Story 14.7) is NOT wrapped in any
+ * external padding/font utilities — STATUS_COLORS already carries the
+ * canonical `fp-badge fp-badge-*` classes. Approval-flow callbacks, edit
+ * state, reject confirmation, and clipboard copy are preserved verbatim.
  */
 
 'use client';
@@ -172,27 +181,33 @@ export default function MessageApprovalCard({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4">
+    <div className="fp-glass p-4">
       {/* Header: listing info + status badge */}
       <div className="flex items-start gap-3 mb-3">
         {/* Listing thumbnail / platform icon */}
-        <div className="flex-shrink-0 w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center text-2xl">
+        <div
+          className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center text-2xl"
+          style={{ background: 'rgba(255,255,255,0.04)' }}
+        >
           {platformIcon}
         </div>
 
         <div className="flex-1 min-w-0">
           {message.listing ? (
             <>
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+              <p className="text-sm font-medium truncate" style={{ color: '#e2e8f0' }}>
                 {message.listing.title}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {message.listing.platform} &middot; ${message.listing.askingPrice.toFixed(2)}
-                {message.sellerName && ` &middot; ${message.sellerName}`}
+              <p className="text-xs flex items-center gap-2 flex-wrap" style={{ color: '#94a3b8' }}>
+                <span className="fp-badge fp-badge-blue" data-testid="source-platform-pill">
+                  {message.listing.platform}
+                </span>
+                <span>${message.listing.askingPrice.toFixed(2)}</span>
+                {message.sellerName && <span>· {message.sellerName}</span>}
               </p>
             </>
           ) : (
-            <p className="text-sm text-gray-400 dark:text-gray-500 italic">
+            <p className="text-sm italic" style={{ color: '#475569' }}>
               Original listing no longer available
             </p>
           )}
@@ -206,7 +221,7 @@ export default function MessageApprovalCard({
 
       {/* Stale listing warning */}
       {isStale && (
-        <div className="mb-3 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded text-xs text-yellow-700 dark:text-yellow-400">
+        <div className="fp-alert-warn mb-3 p-2 rounded text-xs" style={{ color: '#fcd34d' }}>
           Listing updated since this message was drafted.
         </div>
       )}
@@ -214,19 +229,19 @@ export default function MessageApprovalCard({
       {/* Subject */}
       {isEditing ? (
         <div className="mb-2">
-          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+          <label className="block text-xs font-medium mb-1" style={{ color: '#94a3b8' }}>
             Subject ({editSubject.length}/{SUBJECT_MAX})
           </label>
           <input
             type="text"
             value={editSubject}
             onChange={(e) => setEditSubject(e.target.value.slice(0, SUBJECT_MAX))}
-            className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="fp-input w-full text-sm"
             placeholder="Subject (optional)"
           />
         </div>
       ) : message.subject ? (
-        <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <p className="text-sm font-medium mb-1" style={{ color: '#e2e8f0' }}>
           {message.subject}
         </p>
       ) : null}
@@ -234,32 +249,32 @@ export default function MessageApprovalCard({
       {/* Body */}
       {isEditing ? (
         <div className="mb-3">
-          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+          <label className="block text-xs font-medium mb-1" style={{ color: '#94a3b8' }}>
             Body ({editBody.length}/{BODY_MAX})
           </label>
           <textarea
             ref={textareaRef}
             value={editBody}
             onChange={(e) => setEditBody(e.target.value.slice(0, BODY_MAX))}
-            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            className="fp-input w-full text-sm resize-none"
             style={{ minHeight: '100px', maxHeight: '300px' }}
           />
         </div>
       ) : (
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2 whitespace-pre-wrap">
+        <p className="text-sm mb-3 line-clamp-2 whitespace-pre-wrap" style={{ color: '#94a3b8' }}>
           {message.body}
         </p>
       )}
 
       {/* SENT status: display "Queued for delivery" */}
       {message.status === 'SENT' && (
-        <div className="flex items-center gap-2 mb-3 text-sm text-blue-600 dark:text-blue-400">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex items-center gap-2 mb-3 text-sm" style={{ color: '#c4b5fd' }}>
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span>Queued for delivery</span>
           {message.sentAt && (
-            <span className="text-xs text-gray-400 dark:text-gray-500">
+            <span className="text-xs" style={{ color: '#475569' }}>
               {new Date(message.sentAt).toLocaleString()}
             </span>
           )}
@@ -274,28 +289,34 @@ export default function MessageApprovalCard({
             <button
               onClick={handleEdit}
               disabled={isActionDisabled}
-              className="min-h-[44px] px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed order-1 md:order-none"
+              className="fp-btn-ghost min-h-[44px] order-1 md:order-none justify-center"
             >
               Edit
             </button>
             <button
               onClick={handleApprove}
               disabled={isActionDisabled}
-              className="min-h-[44px] px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed order-2 md:order-none flex items-center justify-center gap-2"
+              className="fp-btn-primary min-h-[44px] order-2 md:order-none justify-center"
             >
-              {loadingAction === 'approve' && <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />}
+              {loadingAction === 'approve' && (
+                <span
+                  className="animate-spin h-4 w-4 rounded-full"
+                  style={{ border: '2px solid #f1f5f9', borderTopColor: 'transparent' }}
+                />
+              )}
               {messageApprovalRequired ? 'Approve' : 'Approve & Send'}
             </button>
             <button
               onClick={handleReject}
               disabled={isActionDisabled}
-              className={`min-h-[44px] px-4 py-2 text-sm font-medium rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed order-3 md:order-none ${
-                rejectConfirm
-                  ? 'border-red-500 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20'
-                  : 'border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:border-red-300 dark:hover:border-red-600'
-              }`}
+              className={`fp-btn-danger min-h-[44px] order-3 md:order-none justify-center ${rejectConfirm ? 'opacity-100' : ''}`}
             >
-              {loadingAction === 'reject' && <span className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full inline-block mr-1" />}
+              {loadingAction === 'reject' && (
+                <span
+                  className="animate-spin h-4 w-4 rounded-full inline-block mr-1"
+                  style={{ border: '2px solid currentColor', borderTopColor: 'transparent' }}
+                />
+              )}
               {rejectConfirm ? 'Confirm Reject?' : 'Reject'}
             </button>
           </>
@@ -307,15 +328,20 @@ export default function MessageApprovalCard({
             <button
               onClick={handleEdit}
               disabled={isActionDisabled || editBody.trim() === ''}
-              className="min-h-[44px] px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="fp-btn-primary min-h-[44px] justify-center"
             >
-              {loadingAction === 'edit' && <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />}
+              {loadingAction === 'edit' && (
+                <span
+                  className="animate-spin h-4 w-4 rounded-full"
+                  style={{ border: '2px solid #f1f5f9', borderTopColor: 'transparent' }}
+                />
+              )}
               Save
             </button>
             <button
               onClick={handleCancelEdit}
               disabled={isActionDisabled}
-              className="min-h-[44px] px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="fp-btn-ghost min-h-[44px] justify-center"
             >
               Cancel
             </button>
@@ -328,29 +354,40 @@ export default function MessageApprovalCard({
             <button
               onClick={handleConfirm}
               disabled={isActionDisabled}
-              className="min-h-[44px] px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="fp-btn-primary min-h-[44px] justify-center"
             >
-              {loadingAction === 'confirm' && <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />}
+              {loadingAction === 'confirm' && (
+                <span
+                  className="animate-spin h-4 w-4 rounded-full"
+                  style={{ border: '2px solid #f1f5f9', borderTopColor: 'transparent' }}
+                />
+              )}
               Confirm Send
             </button>
             <button
               onClick={handleEditFromPending}
               disabled={isActionDisabled}
-              className="min-h-[44px] px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="fp-btn-ghost min-h-[44px] justify-center"
             >
-              {loadingAction === 'reject' && pendingEditAfterReject && <span className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full inline-block mr-1" />}
+              {loadingAction === 'reject' && pendingEditAfterReject && (
+                <span
+                  className="animate-spin h-4 w-4 rounded-full inline-block mr-1"
+                  style={{ border: '2px solid currentColor', borderTopColor: 'transparent' }}
+                />
+              )}
               Edit
             </button>
             <button
               onClick={handleReject}
               disabled={isActionDisabled}
-              className={`min-h-[44px] px-4 py-2 text-sm font-medium rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed ${
-                rejectConfirm
-                  ? 'border-red-500 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20'
-                  : 'border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:border-red-300 dark:hover:border-red-600'
-              }`}
+              className="fp-btn-danger min-h-[44px] justify-center"
             >
-              {loadingAction === 'reject' && !pendingEditAfterReject && <span className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full inline-block mr-1" />}
+              {loadingAction === 'reject' && !pendingEditAfterReject && (
+                <span
+                  className="animate-spin h-4 w-4 rounded-full inline-block mr-1"
+                  style={{ border: '2px solid currentColor', borderTopColor: 'transparent' }}
+                />
+              )}
               {rejectConfirm ? 'Confirm Reject?' : 'Reject'}
             </button>
           </>
@@ -359,7 +396,7 @@ export default function MessageApprovalCard({
         {/* Copy button — always available */}
         <button
           onClick={handleCopy}
-          className="min-h-[44px] px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 ml-auto"
+          className="fp-btn-ghost min-h-[44px] ml-auto justify-center"
         >
           {copySuccess ? 'Copied!' : 'Copy Message'}
         </button>

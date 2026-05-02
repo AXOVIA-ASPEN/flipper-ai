@@ -23,11 +23,17 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - Test count increased to 2,378 across 111 suites
 - Statement coverage: 99.66% · Branch coverage: 99.31% · Function coverage: 99.8%
 - README badges and project status table updated
+- **Story 14.7 — Opportunities + Listings Detail + Messaging visual migration** — `app/opportunities/page.tsx`, `app/listings/[id]/page.tsx`, `app/messages/page.tsx`, `src/components/KanbanBoard.tsx`, `src/components/messages/{MessageBubble,ThreadHeader,ThreadItem,utils}.tsx`, `src/lib/message-constants.ts`, and `src/components/MessageApprovalCard.tsx` rebuilt on canonical `.fp-glass` / `.fp-glass-sm` / `.fp-glass-nav` / `.fp-glow-card` / `.fp-badge` surfaces with inline hex tokens. Zero raw Tailwind palette shades, zero `bg-white|gray-*` surfaces, zero `dark:*` prefixes across the six target files. `STATUS_COLORS` and `DEMAND_BADGES` rewritten to canonical `fp-badge fp-badge-*` strings per ADR-14.7-A. Listing detail page now consumes Story 14.3 `<LoadingSkeleton>` / `<ErrorBanner>` / `<EmptyState>` with distinct 404-vs-5xx render branches.
 
 ### Fixed
 - **Auth hardening** — 5 API routes returning HTTP 500 for unauthenticated requests now correctly return 401 (`/api/user/settings`, `/api/scraper/ebay`, `/api/search-configs`, `/api/reports/generate`, `/api/user/settings PATCH`)
 - **Playwright E2E config** — `playwright.config.ts` now reads `BASE_URL` env var for staging runs
 - **ESLint** — deprecated rule and anonymous export warnings resolved
+- **`<EmptyState>` accessibility** — root surface now ships `role="status"` + `aria-live="polite"` so screen readers announce empty states on first render (Story 14.7 AC #15(d))
+- **Opportunities page back-arrow accessibility** — icon-only `<Link href="/">` at `app/opportunities/page.tsx:573` now carries `aria-label="Back to home"` (a11y bug surfaced by axe-core in Story 14.7 scenario `@E-014-S-86`)
+
+### Internal
+- **E2E auth bypass for Cucumber tests** — `FirebaseAuthProvider` resolves immediately with `window.__E2E_AUTH_USER__` when set; Playwright `Given I am logged in` injects the global via `addInitScript`. Production never sets the global → zero behaviour change in production paths. Without this, /messages-style client-Firebase-gated routes silently redirected to /login under the cookie-only test fixture, so Story 14.7 acceptance scenarios never actually exercised the page under test.
 
 ---
 

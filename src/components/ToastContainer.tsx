@@ -1,9 +1,18 @@
 /**
- * Toast Container Component
- * Manages a stack of toast notifications in the top-right corner
+ * @file src/components/ToastContainer.tsx
+ * @author Stephen Boyett
+ * @company Axovia AI
+ * @date 2026-04-28
+ * @version 1.0
+ * @brief Toast notification stack provider — top-right anchored, auto-dismiss queue.
  *
- * Author: Stephen Boyett
- * Company: Axovia AI
+ * @description
+ * Client component exposing the ToastContext + useToast() hook. Maintains a
+ * stack of in-flight ToastProps, renders them via <Toast> children inside a
+ * fixed top-right region, and surfaces a single showToast() entry point that
+ * the rest of the app calls for transient user feedback (success / error /
+ * info). Used at app/layout.tsx as a top-level provider so any descendant
+ * client component can request a toast.
  */
 'use client';
 

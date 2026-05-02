@@ -45,7 +45,7 @@ const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 // Constants
 // ---------------------------------------------------------------------------
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3200';
 const TEST_LISTING_ID = 'e012-test-listing';
 const TEST_OPP_ID = 'e012-test-opp';
 const TEST_USER_ID = 'e012-test-user';

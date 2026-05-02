@@ -3,16 +3,18 @@
  * @author Stephen Boyett
  * @company Axovia AI
  * @date 2026-04-11
- * @version 1.0
+ * @version 1.1
  * @brief Integrations settings section — Google Calendar OAuth connect/disconnect.
  *
  * @description
  * Client Component that self-fetches integration status from
  * GET /api/integrations/google-calendar and renders the connect/disconnect UI.
  * Also reads the ?tab=integrations&connected=true query param to show a success
- * toast after the OAuth redirect completes.
- * If GOOGLE_CALENDAR_CLIENT_ID is absent from env the connect button is
- * disabled with a tooltip.
+ * toast after the OAuth redirect completes. If GOOGLE_CALENDAR_CLIENT_ID is
+ * absent from env the connect button is disabled with a tooltip. Story 14.8
+ * migrated the surfaces to canonical glassmorphism — `.fp-glass-sm` wrapper,
+ * `.fp-badge .fp-badge-green` connected pill, `.fp-btn-danger` disconnect,
+ * `.fp-btn-primary` connect. Network/OAuth flows are preserved verbatim.
  */
 
 'use client';
@@ -67,16 +69,16 @@ export default function IntegrationsSettings() {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-      <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Integrations</h2>
+    <div className="fp-glass-sm p-6">
+      <h2 className="text-xl font-semibold mb-4" style={{ color: '#e2e8f0' }}>Integrations</h2>
 
       <div className="flex items-center justify-between py-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-900 dark:text-white">Google Calendar</span>
+            <span className="font-medium" style={{ color: '#e2e8f0' }}>Google Calendar</span>
             {status?.connected && (
-              <span className="inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-400 font-medium">
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <span className="fp-badge fp-badge-green inline-flex items-center gap-1 text-xs font-medium">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                   <path
                     fillRule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -88,10 +90,10 @@ export default function IntegrationsSettings() {
             )}
           </div>
           {status?.connected && status.email && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{status.email}</p>
+            <p className="text-sm mt-0.5" style={{ color: '#94a3b8' }}>{status.email}</p>
           )}
           {!status?.connected && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-sm mt-1" style={{ color: '#94a3b8' }}>
               This allows Flipper AI to create, update, and delete events on your Google Calendar.
             </p>
           )}
@@ -102,21 +104,21 @@ export default function IntegrationsSettings() {
             <button
               onClick={handleDisconnect}
               disabled={disconnecting}
-              className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 border border-red-300 dark:border-red-700 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-50 transition-colors"
+              className="fp-btn-danger"
             >
               {disconnecting ? 'Disconnecting…' : 'Disconnect'}
             </button>
           ) : status?.configured === false ? (
             <span
               title="Google Calendar is not configured in this environment"
-              className="px-4 py-2 text-sm font-medium text-gray-400 border border-gray-200 dark:border-gray-700 rounded-lg cursor-not-allowed"
+              className="fp-btn-ghost cursor-not-allowed opacity-50"
             >
               Not configured
             </span>
           ) : (
             <a
               href="/api/integrations/google-calendar/connect"
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+              className="fp-btn-primary"
             >
               Connect Google Calendar
             </a>

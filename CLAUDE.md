@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 make preview
 
 # Development
-make dev                    # Start dev server at http://localhost:3000
+make dev                    # Start dev server at http://localhost:3200 (project standard port)
 
 # Testing
 make test                   # Jest unit tests (src/**/__tests__/)
@@ -207,7 +207,11 @@ Key patterns: `hasRunningJob()` check prevents duplicate concurrent jobs, `Promi
 
 - **Jest** (`jest.config.js`): Tests in `src/__tests__/`. `testEnvironment: 'node'` (not jsdom), `maxWorkers: 1` (prevents resource conflicts), `forceExit: true`. Coverage collected from `src/lib/`, `app/api/`, `src/scrapers/` only. `src/lib/db.ts` and `src/generated/` excluded from coverage. Integration tests excluded by default (run via `pnpm test:integration`).
 - **Cucumber BDD**: Tests in `test/acceptance/features/` (epic-organized). Step definitions follow `E-{epic}-{descriptor}.steps.ts` naming. Runs against dev server via `start-server-and-test`.
-- **Playwright** (`playwright.config.ts`): Tests in `e2e/`. 5 browser projects. Locally defaults to port 3001, CI uses port 3000.
+- **Playwright** (`playwright.config.ts`): Tests in `e2e/`. 5 browser projects. Defaults to `http://localhost:3200` (the project standard port). Override with `BASE_URL` env var.
+
+### Project-Standard Dev Port
+
+**Always use port `3200` for the local Next.js dev/preview server** (frontend + API routes are a single Next.js process). This avoids collisions with other Next.js projects defaulting to 3000/3001 and is hard-wired into `package.json` (`dev`/`start`), `Makefile`, `playwright.config.ts`, and `.env.example`. If you spin up an ad-hoc server, use `3200` (or pass `BASE_URL=http://localhost:<port>` everywhere downstream).
 
 ### Story Definition of Done — Quality Gate
 
