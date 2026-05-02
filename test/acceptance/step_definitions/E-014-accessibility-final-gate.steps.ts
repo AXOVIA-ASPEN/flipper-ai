@@ -36,8 +36,25 @@ When('I press Tab once on the page', async function (this: CustomWorld) {
 
 When('I press Enter on the page', async function (this: CustomWorld) {
   await this.page.keyboard.press('Enter');
-  // Allow URL hash + focus update to flush.
-  await this.page.waitForTimeout(150);
+  // Allow URL hash + focus update to flush. Skip-link activation can race
+  // with Next.js' soft-navigation handler in some browser-engine + hydration
+  // timings, so we extend the settle window and wait for the hash to land
+  // when one is expected.
+  await this.page.waitForTimeout(400);
+});
+
+Then('the URL hash should be {string}', async function (this: CustomWorld, expectedHash: string) {
+  // Polled assertion — the skip-link's `<a href="#main">` triggers a
+  // browser-managed hash change that the document's `popstate` listener
+  // reflects on the next animation frame; on cold cache that can lag
+  // beyond Playwright's default sync read.
+  await this.page.waitForFunction(
+    (expected) => new URL(window.location.href).hash === expected,
+    expectedHash,
+    { timeout: 5000 }
+  ).catch(() => undefined);
+  const url = new URL(this.page.url());
+  expect(url.hash).toBe(expectedHash);
 });
 
 // ─── Active element + URL assertions ─────────────────────────────────────────
@@ -55,10 +72,8 @@ Then(
   }
 );
 
-Then('the URL hash should be {string}', async function (this: CustomWorld, expectedHash: string) {
-  const url = new URL(this.page.url());
-  expect(url.hash).toBe(expectedHash);
-});
+// Original 'the URL hash should be {string}' step removed — the polled
+// variant above subsumes it.
 
 Then(
   'the active element should be the main landmark with tabindex {string}',
