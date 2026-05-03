@@ -14,7 +14,7 @@
  * message types). API route structure is validated via code inspection.
  */
 
-import { Given, When, Then } from '@cucumber/cucumber';
+import { Given, When, Then, setDefaultTimeout } from '@cucumber/cucumber';
 import assert from 'assert';
 import {
   generatePurchaseMessage,
@@ -23,6 +23,13 @@ import {
 } from '../../../src/lib/message-generator';
 import type { MessageGeneratorInput, GeneratedMessage, MessageType } from '../../../src/lib/message-generator';
 import * as fs from 'fs';
+
+// AI-driven scenarios call real Groq → Gemini → OpenAI providers (per the
+// project policy: AI MUST NEVER be mocked). Lift the per-step timeout to
+// 3 minutes so a slow provider response or one fallback rotation doesn't
+// trip cucumber's default 5s budget. Provider-level retry already happens
+// inside `callWithRetry()` in src/lib/ai/index.ts.
+setDefaultTimeout(180 * 1000);
 import * as path from 'path';
 
 // Shared scenario state

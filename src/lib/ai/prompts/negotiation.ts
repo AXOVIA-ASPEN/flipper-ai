@@ -19,8 +19,8 @@ export const negotiationStrategy: PromptConfig = {
   name: 'negotiationStrategy',
   description:
     'Generates an optimal negotiation strategy with initial offer, walk-away price, tactics, and counter-offer suggestions.',
-  provider: 'gemini',
-  fallbacks: ['groq', 'openai'],
+  provider: 'groq',
+  fallbacks: ['gemini', 'openai'],
   model: 'gpt-4o-mini',
   temperature: 0.3,
   maxTokens: 600,

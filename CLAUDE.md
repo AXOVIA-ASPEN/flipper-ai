@@ -73,7 +73,30 @@ git push origin vX.Y.Z
 - **Styling**: Tailwind CSS 4
 - **Database**: PostgreSQL with Prisma ORM + `PrismaPg` driver adapter (pool: 2 connections per Cloud Run instance)
 - **Auth**: Firebase Auth (client-side sign-in → server session cookie). Legacy NextAuth models exist in schema but are deprecated.
-- **AI**: Multi-provider via `src/lib/ai/` — Gemini (primary, free), Groq (fast, free), OpenAI, Anthropic Claude. Per-task routing with automatic fallback. 12 prompts centralized in `src/lib/ai/prompts/`. Stagehand + Gemini for Facebook browser automation.
+- **AI**: Multi-provider via `src/lib/ai/` — **Groq is the primary** for every text-only task (10 of 12 prompts), with Gemini → OpenAI fallbacks. Anthropic Claude is the primary for `claudeAnalysis` (Tier-2 structural reasoning). OpenAI is the primary only for `itemCompleteness` because Groq's open-source Llama models cannot consume images — Gemini Vision is the fallback. Per-task routing with automatic fallback through the chain. 12 prompts centralized in `src/lib/ai/prompts/`. Stagehand + Gemini for Facebook browser automation.
+
+### AI testing — NEVER MOCK
+
+**🚨 CRITICAL — VERY IMPORTANT 🚨**
+
+**AI provider calls (Groq, Gemini, OpenAI, Anthropic) MUST NEVER be mocked, stubbed, faked, or short-circuited in ANY layer — production, tests, CI, or local dev.** The acceptance suite, unit tests, and integration tests must all exercise the real `completeAI()` router and the real provider chain. AI behaviour IS the system's behaviour for AI-driven features (message generation, sellability scoring, item identification, negotiation strategy, listing copy) — substituting a stub removes the very thing those tests are validating.
+
+**Forbidden patterns (do not introduce):**
+- Stub providers, fake response builders, hard-coded JSON returns
+- `E2E_AI_STUB`-style env-var escape hatches in `src/lib/ai/`
+- `jest.mock('@/lib/ai')` / `jest.mock('@/lib/ai/providers/*')` to short-circuit real calls
+- `nock` / `msw` / network-level interception of api.groq.com, generativelanguage.googleapis.com, api.openai.com, api.anthropic.com
+- Conditional branches in `completeAI()` that bypass the provider chain when a test flag is set
+
+**If AI flakes on rate limits or slowness** — fix the root cause:
+- Confirm Groq is the primary (it has the most generous free tier — Llama 3.3 70B at 30 RPM / 6,000 TPM)
+- Tune provider-level retry/backoff in `src/lib/ai/providers/*.ts` and `callWithRetry()` in `src/lib/ai/index.ts`
+- Lift per-scenario timeouts for AI-heavy `@story-8-*` / `@story-13-*` cucumber scenarios with `setDefaultTimeout(180 * 1000)` in the relevant step file
+- Sequence AI-heavy tests with `@serial` so they don't compete for the same rate-limit window
+- Cache repeated-prompt responses in the database (`AiAnalysisCache`) so the same fixture doesn't re-call the API
+- Reduce prompt token counts so requests fit further inside provider quotas
+
+The only acceptable test-time substitution is at the network layer with explicit, recorded real responses (e.g. Polly.js cassettes captured from actual provider calls). Even that requires explicit user approval before introduction. **Default position: real AI calls everywhere, including in CI.**
 - **Payments**: Stripe (checkout, subscriptions, webhooks)
 - **Email**: Resend
 - **CAPTCHA**: hCaptcha

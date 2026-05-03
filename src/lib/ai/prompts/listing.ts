@@ -20,8 +20,8 @@ export const listingTitle: PromptConfig = {
   name: 'listingTitle',
   description:
     'Generates SEO-optimized resale listing titles for a given marketplace platform with character limits.',
-  provider: 'gemini',
-  fallbacks: ['groq', 'openai'],
+  provider: 'groq',
+  fallbacks: ['gemini', 'openai'],
   model: 'gpt-4o-mini',
   temperature: 0.4,
   maxTokens: 100,
@@ -62,8 +62,8 @@ export const listingDescription: PromptConfig = {
   name: 'listingDescription',
   description:
     'Generates compelling marketplace listing descriptions with platform-specific tone and formatting.',
-  provider: 'gemini',
-  fallbacks: ['groq', 'openai'],
+  provider: 'groq',
+  fallbacks: ['gemini', 'openai'],
   model: 'gpt-4o-mini',
   temperature: 0.6,
   maxTokens: 800,
@@ -119,8 +119,8 @@ export const apiDescription: PromptConfig = {
   name: 'apiDescription',
   description:
     'Generates structured resale listing descriptions via API with title, highlights, suggested price, and keywords.',
-  provider: 'gemini',
-  fallbacks: ['groq', 'openai'],
+  provider: 'groq',
+  fallbacks: ['gemini', 'openai'],
   model: 'gpt-4o-mini',
   temperature: 0.7,
   maxTokens: 1500,

@@ -7,7 +7,14 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Changed
+- **AI router: Groq is now the primary provider for every text-only task** (10 of 12 prompts in `src/lib/ai/prompts/`). Fallback chain: Groq → Gemini → OpenAI for text. Anthropic Claude remains the primary for `claudeAnalysis` (Tier-2 structural reasoning, with a Groq → Gemini → OpenAI fallback chain). OpenAI remains the primary only for `itemCompleteness` because Groq's open-source Llama models cannot consume images (Gemini Vision is the fallback).
+
+### Removed
+- **`E2E_AI_STUB` env-var escape hatch** — completely removed from `src/lib/ai/index.ts` and `.env.example`. Per the new project policy in CLAUDE.md and `_bmad-output/project-context.md`, AI provider calls (Groq / Gemini / OpenAI / Anthropic) MUST NEVER be mocked, stubbed, or short-circuited in any layer. AI flakiness on rate limits is fixed at the root by tuning provider-level retry, lifting per-scenario timeouts on AI-heavy stories, and caching repeated-prompt responses in `AiAnalysisCache`.
+
 ### Added
+- **CLAUDE.md + project-context.md "AI must NEVER be mocked" policy** — explicit hard rule with a list of forbidden patterns (jest.mock on `@/lib/ai`, network-level interception, env-var bypasses, stub providers) and a checklist of root-cause-fix alternatives when AI scenarios flake.
 - **Acceptance-suite stabilization loop** — drove `make test-acceptance` from 96% step pass (44 failed / 8 ambiguous / 17 undefined) to fully green: 685 scenarios, 685 passed, 0 failed, 0 ambiguous, 0 undefined, 0 skipped (excluding `@wip`). 19 iterations. Closed via test-side fixes (ambiguity de-duplication across 9 step patterns, source-drift refresh across E-002/E-004/E-005/E-006/E-008/E-009/E-010/E-011/E-012/E-013/E-014, immutable-namespace mock workarounds, polled assertions for hash-change race) and product-side fixes (CORS allowlist for port 3200, `formatForStorage` LLM-identification persistence, message-generator seller-name post-process, lazy-prisma in `sms-notification-service` and `google-calendar-token-store`, `imageCaptureOverrides` indirection on `posting-queue-processor`)
 - **`E-NFR-non-functional-requirements.feature` + step file** — 30 new source-inspection scenarios covering all PRD-declared FR-PERF/RELY/SCALE/SEC/TEST/UX requirements that previously had no Gherkin coverage; closes story-2-1 (Landing Page) and story-3-6 (Search Configurations) coverage gaps
 - **`E-001-S17-ci-cd.steps.ts`** — covers the previously-undefined CI/CD scenarios (S-17..S-21) for `.github/workflows/ci.yml`: build-container + deploy-cloud-run job declarations, push/pull_request triggers, GCP authentication via WIF, post-deploy health checks

@@ -14,8 +14,13 @@
  * analysis, algorithmic fallback).
  */
 
-import { Given, When, Then } from '@cucumber/cucumber';
+import { Given, When, Then, setDefaultTimeout } from '@cucumber/cucumber';
 import assert from 'assert';
+
+// AI-driven scenarios — real Groq → Gemini → OpenAI calls. AI MUST NEVER be
+// mocked (see CLAUDE.md / project-context.md). Lift the per-step timeout to
+// 3 minutes so a slow provider or one fallback rotation has room to complete.
+setDefaultTimeout(180 * 1000);
 import {
   generateFallbackStrategy,
   generateFallbackCounterAnalysis,

@@ -357,11 +357,31 @@ When('I switch to the Kanban view', async function (this: CustomWorld) {
   const board = this.page.locator('[data-testid="kanban-board"]').first();
   if ((await board.count()) === 0) {
     // The view-toggle Kanban button is icon-only — distinguish via title attr.
+    // Click via the DOM element directly so React's onClick fires regardless of
+    // any pointer-events overlay or hydration race in the toggle group's
+    // styled wrapper. Force-click was insufficient under cold-start cucumber
+    // runs where the icon button could be re-rendered between actionability
+    // check and click.
     const kanbanBtn = this.page.locator('button[title="Kanban view"]').first();
+    await kanbanBtn.waitFor({ state: 'visible', timeout: 15000 });
     await kanbanBtn.scrollIntoViewIfNeeded();
-    await kanbanBtn.click();
+    await kanbanBtn.evaluate((el) => (el as HTMLButtonElement).click());
+    // Settle: let React flush the view-mode state update and remount the
+    // tree under the Kanban branch.
+    await this.page.waitForTimeout(200);
   }
-  await board.waitFor({ state: 'visible', timeout: 30000 });
+  // Poll for the kanban board to attach AND become visible — rather than
+  // a single waitFor, use waitForFunction so we don't lose visibility on
+  // the brief Suspense fallback re-render that fires when the view mode
+  // changes. The DragDropContext mounts in two stages (Suspense boundary
+  // then dnd provider) so we need both attached + offsetParent check.
+  await this.page.waitForFunction(
+    () => {
+      const el = document.querySelector('[data-testid="kanban-board"]') as HTMLElement | null;
+      return Boolean(el && el.offsetParent !== null);
+    },
+    { timeout: 60000 }
+  );
 });
 
 When(

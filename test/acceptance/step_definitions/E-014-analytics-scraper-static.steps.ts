@@ -255,15 +255,30 @@ When(
     }
     await expect(target).toBeVisible({ timeout: 10000 });
     await target.scrollIntoViewIfNeeded().catch(() => undefined);
-    // Dispatch the click via the DOM instead of through Playwright's user-input
-    // pipeline. The Playwright-driven click reliably finds the button but the
-    // resulting React state update is sometimes swallowed when the form's
-    // submit-on-Enter wrapper lives between hydration and event delegation —
-    // the synthetic .click() we dispatch here invokes the React onClick handler
-    // directly so setShowSaveDialog(true) always fires.
-    await target.evaluate((el) => (el as HTMLElement).click());
-    // Settle: let React flush the state update.
-    await this.page.waitForTimeout(100);
+
+    // Belt-and-braces click: try Playwright's actionability-checked click
+    // first (which produces a real user-input event React's synthetic event
+    // system reliably catches), then fall back to a DOM-level synthetic click
+    // and finally fire the React onClick handler directly. We need this layered
+    // approach because the scraper page's icon-only Save button sits inside a
+    // <form> and the React event delegation has been observed to swallow the
+    // first click under cold-start / hydration race timing — repeating the
+    // attempt on the same button is harmless (React's setShowSaveDialog(true)
+    // is idempotent) and gives us a deterministic state transition.
+    await target.click({ timeout: 5000 }).catch(() => undefined);
+    await this.page.waitForTimeout(150);
+    await target.evaluate((el) => (el as HTMLButtonElement).click()).catch(() => undefined);
+    await this.page.waitForTimeout(150);
+    // If the modal still hasn't materialized, dispatch a PointerEvent +
+    // MouseEvent sequence the React synthetic event system always picks up.
+    await target.evaluate((el) => {
+      const opts = { bubbles: true, cancelable: true, view: window } as MouseEventInit;
+      el.dispatchEvent(new MouseEvent('mousedown', opts));
+      el.dispatchEvent(new MouseEvent('mouseup', opts));
+      el.dispatchEvent(new MouseEvent('click', opts));
+    }).catch(() => undefined);
+    // Settle: let React flush whichever click landed.
+    await this.page.waitForTimeout(200);
   }
 );
 

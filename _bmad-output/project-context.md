@@ -137,7 +137,7 @@ Every story MUST pass ALL items before status changes to `review`. This is a har
 - **Styling:** Tailwind CSS 4.x
 - **Database:** PostgreSQL (production); Prisma 7.x ORM. Client generated to `src/generated/prisma/`
 - **Auth:** Firebase Auth (client-side sign-in → server session cookie via `__session`). Legacy NextAuth models exist in Prisma schema but are deprecated and unused.
-- **AI:** Claude/Anthropic SDK (primary), OpenAI GPT-4o-mini (secondary, cached), Gemini via Stagehand (Facebook scraping only). Full details: `docs/AI-Agents/README.md`
+- **AI:** Multi-provider router at `src/lib/ai/index.ts` exposing `completeAI(taskName, context)`. **Groq is the primary provider for every text-only task (10 of 12 prompts in `src/lib/ai/prompts/`)** — Groq hosts Llama 3.3 70B with the most generous free tier of any provider, which keeps per-prompt latency low and free-tier headroom high. Fallback chain: Groq → Gemini → OpenAI for text tasks. Anthropic Claude is the primary for `claudeAnalysis` (Tier-2 structural reasoning). OpenAI is the primary only for `itemCompleteness` because Groq's open-source Llama models cannot consume images (Gemini Vision is the fallback). Stagehand + Gemini for Facebook browser automation. Full details: `docs/AI-Agents/README.md`.
 - **Scraping:** Playwright
 - **Validation:** Zod
 - **Testing:** Jest 30 (unit/integration), Playwright (E2E), Cucumber (BDD)
@@ -178,6 +178,35 @@ Every story MUST pass ALL items before status changes to `review`. This is a har
 
 - Prefer React Server Components by default; Client Components only when needed.
 - Tailwind: group classes as layout -> spacing -> color.
+
+---
+
+## 🚨 VERY IMPORTANT — AI must NEVER be mocked
+
+**Hard rule, no exceptions:** AI provider calls (Groq, Gemini, OpenAI, Anthropic) MUST NEVER be mocked, stubbed, faked, or short-circuited in ANY layer of this codebase. That includes production code, unit tests, integration tests, acceptance/BDD tests, E2E tests, and CI workflows. Every test that exercises an AI-driven feature must call the real `completeAI()` router and the real provider chain (Groq → Gemini → OpenAI for text; Anthropic for `claudeAnalysis`; OpenAI Vision for `itemCompleteness`).
+
+The acceptance suite, the unit-test suite, and CI all run with real API keys for at minimum the primary provider (`GROQ_API_KEY` is mandatory; secondary keys are recommended for fallback resilience). AI behaviour IS the system's behaviour for AI-driven features — substituting a stub removes the very thing those tests are meant to validate.
+
+**Forbidden patterns — do not introduce these under any condition:**
+
+1. Stub providers, fake response builders, hard-coded JSON returns inside `src/lib/ai/`
+2. `E2E_AI_STUB`-style env-var escape hatches that bypass the provider chain when set
+3. `jest.mock('@/lib/ai')` or `jest.mock('@/lib/ai/providers/*')` to short-circuit real calls
+4. `nock` / `msw` / network-level interception of `api.groq.com`, `generativelanguage.googleapis.com`, `api.openai.com`, `api.anthropic.com`
+5. Conditional branches in `completeAI()` or any provider class that bypass real calls when a test flag is set
+6. Wrapping `completeAI()` callers in test-only `if (process.env.NODE_ENV === 'test')` short-circuits
+
+**If AI scenarios flake on rate limits or slowness — fix the root cause:**
+
+- Confirm Groq is the primary for that prompt (it has the most generous free tier — Llama 3.3 70B at 30 RPM / 6,000 TPM)
+- Tune provider-level retry/backoff in `src/lib/ai/providers/*.ts` and `callWithRetry()` in `src/lib/ai/index.ts`
+- Lift per-scenario timeouts for AI-heavy `@story-8-*` / `@story-13-*` scenarios with `setDefaultTimeout(180 * 1000)` in the relevant step file
+- Sequence AI-heavy tests serially so they don't compete for the same rate-limit window
+- Cache repeated-prompt responses in the database (`AiAnalysisCache`) so the same fixture doesn't re-call the API
+- Reduce prompt token counts so requests fit further inside provider quotas
+- If a single provider is throttling, ensure `prompt.fallbacks` actually has live keys configured so the chain can rotate
+
+The only acceptable test-time substitution is at the network layer with explicit, recorded real responses (e.g. Polly.js cassettes captured from actual provider calls). Even that requires explicit user approval before introduction. **Default position: real AI calls everywhere, including in CI.**
 
 ---
 

@@ -20,8 +20,8 @@ export const productIdentification: PromptConfig = {
   name: 'productIdentification',
   description:
     'Extracts structured product information (brand, model, variant, condition) from marketplace listing titles and descriptions.',
-  provider: 'gemini',
-  fallbacks: ['groq', 'openai'],
+  provider: 'groq',
+  fallbacks: ['gemini', 'openai'],
   model: 'gpt-4o-mini',
   temperature: 0.3,
   maxTokens: 500,
@@ -74,8 +74,8 @@ export const logisticsClassification: PromptConfig = {
   name: 'logisticsClassification',
   description:
     'Classifies items by size/weight category for shipping logistics (small_shippable, large_local_only, fragile_special_handling).',
-  provider: 'gemini',
-  fallbacks: ['groq', 'openai'],
+  provider: 'groq',
+  fallbacks: ['gemini', 'openai'],
   model: 'gpt-4o-mini',
   temperature: 0.3,
   maxTokens: 300,
@@ -104,6 +104,8 @@ export const itemCompleteness: PromptConfig = {
   name: 'itemCompleteness',
   description:
     'Uses GPT-4o Vision to assess item completeness from listing images and description, detecting missing parts and damage.',
+  // Vision-only — Groq's open-source Llama models cannot consume images, so
+  // OpenAI's GPT-4o is the correct primary. Gemini Vision serves as fallback.
   provider: 'openai',
   fallbacks: ['gemini'],
   model: 'gpt-4o',

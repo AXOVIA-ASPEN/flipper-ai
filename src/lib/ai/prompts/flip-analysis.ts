@@ -19,8 +19,8 @@ import type { PromptConfig } from './types';
 export const flipAnalysis: PromptConfig = {
   name: 'flipAnalysis',
   description: 'Full sellability analysis for a marketplace listing using market data and item identification.',
-  provider: 'gemini',
-  fallbacks: ['groq', 'openai'],
+  provider: 'groq',
+  fallbacks: ['gemini', 'openai'],
   model: 'gpt-4o-mini',
   temperature: 0.3,
   maxTokens: 800,
@@ -99,8 +99,8 @@ export const quickDiscountCheck: PromptConfig = {
   name: 'quickDiscountCheck',
   description:
     'Lightweight algorithmic pre-filter that checks if a listing meets a minimum discount threshold before expensive LLM analysis.',
-  provider: 'gemini',
-  fallbacks: ['groq', 'openai'],
+  provider: 'groq',
+  fallbacks: ['gemini', 'openai'],
   model: 'gpt-4o-mini',
   temperature: 0.3,
   maxTokens: 200,
@@ -121,7 +121,10 @@ export const claudeAnalysis: PromptConfig = {
   description:
     'Structured listing analysis using Anthropic Claude for category, condition, brand, and flippability assessment.',
   provider: 'anthropic',
-  fallbacks: ['gemini', 'openai'],
+  // Tier-2 analysis prefers Anthropic Claude for structural reasoning, then
+  // falls through Groq → Gemini → OpenAI to keep the chain available even
+  // when Anthropic credentials aren't provisioned in dev/test environments.
+  fallbacks: ['groq', 'gemini', 'openai'],
   model: 'claude-sonnet-4-5-20250929',
   temperature: 0.3,
   maxTokens: 1500,
