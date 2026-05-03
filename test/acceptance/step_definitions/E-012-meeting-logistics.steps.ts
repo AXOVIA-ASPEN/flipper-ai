@@ -45,7 +45,7 @@ const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 // Lightweight mock-fn helper (cucumber runs without jest globals)
 // ---------------------------------------------------------------------------
 
-interface MockFn<TReturn = unknown> extends Function {
+interface MockFn<TReturn = unknown> {
   (...args: unknown[]): TReturn;
   mockResolvedValue(v: TReturn): MockFn<TReturn>;
   mockRejectedValue(err: unknown): MockFn<TReturn>;

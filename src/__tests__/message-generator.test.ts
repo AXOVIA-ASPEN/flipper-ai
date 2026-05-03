@@ -388,7 +388,11 @@ describe('generatePurchaseMessage', () => {
 
     const result = await generatePurchaseMessage(baseInput);
     expect(result.subject).toContain('Question about');
-    expect(result.body).toBe('Hello there!');
+    // generatePurchaseMessage's `ensureSellerNameInBody` post-processor
+    // injects the seller name when the AI body omits it, guaranteeing the
+    // seller-name AC contract regardless of provider variability.
+    expect(result.body).toContain('Hi John!');
+    expect(result.body).toContain('Hello there!');
     expect(result.isFallback).toBe(false);
   });
 
