@@ -60,8 +60,8 @@ every public and protected route combination.
 | FR-SCAN-03 | Facebook Graph API + Stagehand | 3 | 3.3 | @E-003-S-016, @E-003-S-017, @E-003-S-018, @E-003-S-019, @E-003-S-023, @E-003-S-024 | E-003-multi-marketplace-scanning.feature | Covered |
 | FR-SCAN-04 | Mercari reverse-engineered API | 3 | 3.4 | @E-003-S-026, @E-003-S-027, @E-003-S-028, @E-003-S-031, @E-003-S-032, @E-003-S-033 | E-003-multi-marketplace-scanning.feature | Covered |
 | FR-SCAN-05 | OfferUp Playwright scraper | 3 | 3.5 | @E-003-S-034, @E-003-S-035, @E-003-S-036, @E-003-S-039, @E-003-S-040, @E-003-S-041, @E-003-S-043 | E-003-multi-marketplace-scanning.feature | Covered |
-| FR-SCAN-06 | Configurable search filters | 3 | 3.6 | | E-003-multi-marketplace-scanning.feature | Pending |
-| FR-SCAN-07 | Saved search configurations | 3 | 3.6 | | E-003-multi-marketplace-scanning.feature | Pending |
+| FR-SCAN-06 | Configurable search filters | 3 | 3.6 | @E-003-S-044, @E-003-S-045, @E-003-S-046 | E-003-multi-marketplace-scanning.feature / E-003-search-config.steps.ts | Covered |
+| FR-SCAN-07 | Saved search configurations | 3 | 3.6 | @E-003-S-047, @E-003-S-048, @E-003-S-049, @E-003-S-050, @E-003-S-053 | E-003-multi-marketplace-scanning.feature / E-003-search-config.steps.ts | Covered |
 | FR-SCAN-08 | ScraperJob status tracking | 3 | 3.7 | @E-003-S-061, @E-003-S-062, @E-003-S-065, @E-003-S-066, @E-003-S-067, @E-003-S-069, @E-003-S-070, @E-003-S-071 | E-003-multi-marketplace-scanning.feature / E-003-S37-scraper-jobs-sse.steps.ts | Covered |
 | FR-SCAN-09 | SSE real-time events | 3 | 3.7 | @E-003-S-063, @E-003-S-064, @E-003-S-068 | E-003-multi-marketplace-scanning.feature / E-003-S37-scraper-jobs-sse.steps.ts | Covered |
 | FR-SCAN-10 | Anti-detection measures | 3 | 3.1, 3.3, 3.4, 3.5 | @E-003-S-005, @E-003-S-020, @E-003-S-021, @E-003-S-022, @E-003-S-025, @E-003-S-029, @E-003-S-030, @E-003-S-037, @E-003-S-038, @E-003-S-042 | E-003-multi-marketplace-scanning.feature | Covered |
@@ -149,7 +149,7 @@ every public and protected route combination.
 | FR-DASH-10 | Real-time SSE dashboard updates | 6 | 6.6 | @E-006-S-32, @E-006-S-33 | E-006-flip-lifecycle-management-analytics.feature | Covered |
 | FR-DASH-11 | Onboarding wizard | 2 | 2.5 | @E-002-S-31, @E-002-S-32, @E-002-S-35, @E-002-S-36, @E-002-S-37, @E-002-S-38, @E-002-S-39 | E-002-user-registration-auth-onboarding.feature | WIP — 7 scenarios written but all tagged @wip, not yet executing in test runs |
 | FR-DASH-12 | Persist onboarding progress | 2 | 2.5 | @E-002-S-33, @E-002-S-34 | E-002-user-registration-auth-onboarding.feature | WIP — 2 scenarios written but all tagged @wip, not yet executing in test runs |
-| FR-DASH-13 | Landing page | 2 | 2.1 | | E-002-user-registration-auth-onboarding.feature | Pending |
+| FR-DASH-13 | Landing page | 2 | 2.1 | (steps ready: E-002-landing-page.steps.ts) | E-002-user-registration-auth-onboarding.feature | Pending — deferred on Epic 14 landing rebuild (step defs exist but assert pre-redesign markup) |
 
 ## FR-MONITOR: Listing Monitoring
 

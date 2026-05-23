@@ -468,6 +468,93 @@ Feature: Multi-Marketplace Scanning & Image Capture
     And it should use ExternalServiceError for unexpected scraping failures
 
   # =================================================================
+  # Story 3.6: Search Configuration & Filters
+  # FR-SCAN-06 (configurable search filters), FR-SCAN-07 (saved search configs)
+  # Step definitions: E-003-search-config.steps.ts
+  # NOTE: scenarios S-051, S-052, S-054, S-055 (saved-config dropdown styling,
+  #       legacy-null ownership, delete-confirm dialog) are deferred — the
+  #       scraper-page UI and ownership checks were changed by Epic 14's
+  #       redesign and need reconciliation before those steps will pass.
+  # =================================================================
+
+  # AC #1: Search filters flow from UI to scraper
+  @E-003-S-044 @FR-SCAN-06 @story-3-6
+  Scenario: Scraper UI sends all filter parameters in the scrape submission
+    Given the scraper UI at "app/scraper/page.tsx"
+    When I inspect the scrape submission payload
+    Then the POST body should include "keywords"
+    And the POST body should include "minPrice"
+    And the POST body should include "maxPrice"
+
+  # AC #1: Craigslist route applies all filter params
+  @E-003-S-045 @FR-SCAN-06 @story-3-6
+  Scenario: Craigslist scraper route applies all filter parameters
+    Given the Craigslist scraper route at "app/api/scraper/craigslist/route.ts"
+    When I inspect how the route processes the request body
+    Then it should extract "keywords" from the request body
+    And it should extract "minPrice" from the request body
+    And it should extract "maxPrice" from the request body
+    And it should extract "location" from the request body
+    And it should extract "category" from the request body
+
+  # AC #1: OfferUp route applies all filter params
+  @E-003-S-046 @FR-SCAN-06 @story-3-6
+  Scenario: OfferUp scraper route applies all filter parameters
+    Given the OfferUp scraper route at "app/api/scraper/offerup/route.ts"
+    When I inspect how the route processes the request body
+    Then it should extract "keywords" from the request body
+    And it should extract "minPrice" from the request body
+    And it should extract "maxPrice" from the request body
+    And it should extract "location" from the request body
+    And it should extract "category" from the request body
+
+  # AC #2: Save search configuration
+  @E-003-S-047 @FR-SCAN-07 @story-3-6
+  Scenario: Search configuration is saved with authentication and validation
+    Given the search config POST endpoint at "app/api/search-configs/route.ts"
+    When I inspect the POST handler
+    Then it should require authentication via "getAuthUserId"
+    And it should validate the request body with "CreateSearchConfigSchema"
+
+  # AC #2: SearchConfig model defines all required fields
+  @E-003-S-048 @FR-SCAN-07 @story-3-6
+  Scenario: SearchConfig model defines all required fields
+    Given the SearchConfig Prisma model at "prisma/schema.prisma"
+    When I inspect the SearchConfig model fields
+    Then it should have a "name" field of type String
+    And it should have a "platform" field of type String
+    And it should have a "location" field of type String
+    And it should have a "minPrice" field of type Float
+    And it should have a "maxPrice" field of type Float
+    And it should have an "enabled" field of type Boolean with default true
+
+  # AC #3: Saved searches listed and loadable
+  @E-003-S-049 @FR-SCAN-07 @story-3-6
+  Scenario: Saved search configurations are listed and loadable
+    Given the scraper UI at "app/scraper/page.tsx"
+    When I inspect the saved configs functionality
+    Then it should fetch all saved configs from "/api/search-configs"
+    And it should display each config with its name and location
+    And the "loadConfig" function should populate all form fields from the config
+
+  # AC #4: Toggle enabled via PATCH
+  @E-003-S-050 @FR-SCAN-07 @story-3-6
+  Scenario: Search configuration can be toggled enabled or disabled via PATCH
+    Given the search config PATCH endpoint at "app/api/search-configs/[id]/route.ts"
+    When I inspect the PATCH handler
+    Then it should verify ownership before allowing updates
+    And it should allow updating the "enabled" field to false
+
+  # AC #5: Delete search configuration with ownership enforcement
+  @E-003-S-053 @FR-SCAN-07 @story-3-6
+  Scenario: Search configuration can be deleted with ownership enforcement
+    Given the search config DELETE endpoint at "app/api/search-configs/[id]/route.ts"
+    When I inspect the DELETE handler
+    Then it should verify ownership before allowing deletion
+    And it should call "prisma.searchConfig.delete" on confirmed deletion
+    And it should return "{ success: true }" on success
+
+  # =================================================================
   # Story 3.9: Image Capture & Storage
   # =================================================================
 

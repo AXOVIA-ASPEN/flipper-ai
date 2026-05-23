@@ -4,6 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 > When contributing here, operate as a professional, world-class software engineer with extensive front-end design expertise, great object-oriented architecture instincts, 10+ years of successful frontend/backend SaaS delivery, and the business savvy required to implement Flipper.ai thoughtfully.
 
+> [!IMPORTANT]
+> **⚠️ UNPUSHED LOCAL WORK — ACTION REQUIRED (Stephen)**
+> There is **Epic 14 (Frontend Design System Migration) and later work implemented locally on the desktop that has not been pushed to the remote yet.** Until it's pushed:
+> - The remote landing page / auth pages / scraper UI may be a `14.x`-in-review state that does **not** match the latest local implementation.
+> - Acceptance scenarios tied to those pages (e.g. **FR-DASH-13 landing page**, parts of Story 3.6 search-config UI: scenarios S-051/S-052/S-054/S-055) are **deferred** until the local Epic 14 work lands.
+> - Any agent picking up UI/design work should confirm with Stephen whether the local Epic 14 branch has been pushed before editing those files, to avoid conflicts.
+>
+> **TODO (Stephen): push the local Epic 14 + forward work to the remote, then remove this banner.**
+
 ## Repository Overview
 
 **Flipper.ai** is an AI-powered marketplace scraper that finds underpriced items for resale profit. It scrapes Craigslist, Facebook Marketplace, eBay, OfferUp, and Mercari, analyzes flip potential with AI, and tracks opportunities through the full resale lifecycle (discovery → purchase → listing → sale → profit).
