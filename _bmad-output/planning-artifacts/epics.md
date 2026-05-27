@@ -3166,3 +3166,25 @@ rg -c "bg-(white|gray-[0-9])" app src/components
 
 **DoD — Acceptance Tests Required:**
 Write Gherkin scenarios in `test/acceptance/features/E-014-frontend-design-migration.feature` covering ALL acceptance criteria above, including at least one axe-core / keyboard-only / screen-reader-traversal scenario per accessibility AC. Tag each scenario with `@E-014-S-<N>` (sequential within Epic 14, continuing from previous stories), `@story-14-10`, and `@FR-UI-DESIGN-07` / `@FR-UI-DESIGN-08` as applicable. Update the requirements traceability matrix. This story is the final gate — Epic 14 cannot be marked `done` until this story is `done`.
+
+---
+
+## Mobile App Track — Epics 15–29
+
+The full mobile-app track (15 epics, 80 stories, ~21 weeks kickoff → GA) has been extracted into a dedicated child document to keep this file focused on web concerns:
+
+📱 **[`epics-mobile-app.md`](./epics-mobile-app.md)** — native iOS + Android via Expo / React Native / EAS, reusing the existing Cloud Run / Next.js backend.
+
+The mobile document contains:
+
+- Its own canonical Definition of Done tuned for mobile (Maestro flows, EAS Build gates, VoiceOver/TalkBack verification, iOS Simulator + Android Emulator)
+- A separate FR inventory (`FR-MOBILE-*` and `FR-RELEASE-MOBILE-*` — additive to the web inventory in this file)
+- Mobile-specific NFRs (`NFR-MOB-*` covering perf, security, accessibility, release, test)
+- Epic List for Epics 15–29 organized into four release phases (A: Rails up → B: Lovable beta → C: Feature parity → D: GA)
+- Full per-story breakdowns (role/goal, Given/When/Then ACs, FRs fulfilled, DoD tagging notes)
+- A Mobile Release Phase Summary table
+
+**Cross-references:**
+- The two documents share one Requirements Traceability Matrix at `_bmad-output/test-artifacts/requirements-traceability-matrix.md` — every web AND mobile FR/NFR maps to scenarios there
+- Mobile stories tagged `@FR-MOBILE-*` live in feature files under the same `test/acceptance/features/` tree as web feature files
+- Web FRs / NFRs / additional requirements declared in THIS file are referenced by mobile epics where parity is required (e.g. Epic 21 references `FR-NOTIFY-01..11`, Epic 25 references `NFR-SEC-08`)
