@@ -1,5 +1,5 @@
-# generated: 2026-02-27
-# project: flipper-ai
+# generated: 2026-05-27
+# project: Flipper AI
 # project_key: NOKEY
 # tracking_system: file-system
 # story_location: _bmad-output/implementation-artifacts
@@ -12,8 +12,8 @@
 #   - done: All stories in epic completed
 #
 # Epic Status Transitions:
-#   - backlog -> in-progress: Automatically when first story is created (via create-story)
-#   - in-progress -> done: Manually when all stories reach 'done' status
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
 #
 # Story Status:
 #   - backlog: Story only exists in epic file
@@ -33,8 +33,8 @@
 # - SM typically creates next story after previous one is 'done' to incorporate learnings
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
-generated: 2026-02-27
-project: flipper-ai
+generated: 2026-05-27
+project: Flipper AI
 project_key: NOKEY
 tracking_system: file-system
 story_location: _bmad-output/implementation-artifacts
@@ -154,6 +154,7 @@ development_status:
   epic-12-retrospective: optional
 
   # Epic 13: AI Scoring Algorithm Improvements
+  # Note: This epic exists in sprint-status.yaml and has story artifacts but is not formally documented in epics.md epic list
   epic-13: done
   13-1-iqr-outlier-filtering-ebay-sold-prices: done
   13-2-structured-json-llm-response: done
@@ -166,11 +167,6 @@ development_status:
   epic-13-retrospective: optional
 
   # Epic 14: Frontend Design System Migration
-  # Source audit: docs/frontend-design-gaps.md (2026-04-17)
-  # Target: 100% canonical .fp-* compliance, eliminate competing theme system,
-  #         dark-first :root, shared state components, accessibility, file headers.
-  # Story 14.1 (foundation) blocks all others; 14.3 blocks pages consuming shared state;
-  # 14.10 is the final enforcement gate.
   epic-14: done
   14-1-design-tokens-base-style-unification: done
   14-2-remove-competing-multi-theme-system: done
@@ -183,3 +179,143 @@ development_status:
   14-9-analytics-scraper-health-static-pages: done
   14-10-accessibility-file-header-sweep: done
   epic-14-retrospective: optional
+
+  # Epic 15: Mobile Foundation, Monorepo & Expo Bootstrap (Phase A)
+  epic-15: backlog
+  15-1-convert-repo-to-pnpm-workspace-monorepo: backlog
+  15-2-extract-shared-packages-types-design-tokens: backlog
+  15-3-bootstrap-mobile-workspace-expo: backlog
+  15-4-mobile-lint-format-test-scaffolding: backlog
+  15-5-top-level-mobile-makefile-targets: backlog
+  epic-15-retrospective: optional
+
+  # Epic 16: Mobile CI/CD — EAS Build + Firebase App Distribution + TestFlight (Phase A)
+  epic-16: backlog
+  16-1-eas-build-profiles-credentials-setup: backlog
+  16-2-github-actions-mobile-ci-pr-validation: backlog
+  16-3-github-actions-mobile-preview-build: backlog
+  16-4-auto-distribution-firebase-testflight: backlog
+  16-5-versioning-changelog-tag-release: backlog
+  16-6-eas-update-ota-phased-rollout: backlog
+  epic-16-retrospective: optional
+
+  # Epic 17: Mobile Auth & Session Bridge — Firebase ID Tokens (Phase A)
+  epic-17: backlog
+  17-1-backend-bearer-token-acceptance: backlog
+  17-2-mobile-firebase-auth-provider-token-storage: backlog
+  17-3-mobile-sign-up-sign-in-password-reset: backlog
+  17-4-biometric-re-authentication: backlog
+  17-5-mobile-onboarding-wizard-touch-first: backlog
+  17-6-auth-event-sentry-breadcrumbs: backlog
+  epic-17-retrospective: optional
+
+  # Epic 18: Mobile Shell, Navigation & Design System (Phase B)
+  epic-18: backlog
+  18-1-tab-navigation-root-layout: backlog
+  18-2-screen-wrapper-safe-areas-pull-refresh: backlog
+  18-3-canonical-nativewind-utility-library: backlog
+  18-4-shared-state-components-loading-skeleton: backlog
+  18-5-splash-screen-app-icon-error-boundary: backlog
+  18-6-deep-links-reduced-motion-haptic-feedback: backlog
+  epic-18-retrospective: optional
+
+  # Epic 19: Mobile Marketplace Scanning, Listings & Opportunities (Phase B)
+  epic-19: backlog
+  19-1-scanner-screen-saved-search-quick-picks: backlog
+  19-2-live-job-progress-sse-polling: backlog
+  19-3-listings-feed-infinite-scroll-pull-refresh: backlog
+  19-4-filter-sheet-score-price-distance: backlog
+  19-5-listing-detail-screen-gallery-score: backlog
+  19-6-save-as-opportunity-pass-on-listing: backlog
+  19-7-persistent-cache-instant-feed-launch: backlog
+  epic-19-retrospective: optional
+
+  # Epic 20: Mobile Flip Lifecycle, Kanban & Swipeable Cards (Phase B)
+  epic-20: backlog
+  20-1-opportunities-screen-kanban-card-stack: backlog
+  20-2-swipe-long-press-stage-transitions: backlog
+  20-3-purchased-stage-prompt-price-date: backlog
+  20-4-listed-stage-prompt-cross-platform: backlog
+  20-5-sold-celebration-profit-calculation: backlog
+  20-6-inventory-view-activity-timeline: backlog
+  epic-20-retrospective: optional
+
+  # Epic 21: Mobile Push Notifications & Real-Time Updates (Phase B)
+  epic-21: backlog
+  21-1-permission-request-device-token: backlog
+  21-2-backend-dispatcher-mobile-push: backlog
+  21-3-deep-linking-taps-foreground-toasts: backlog
+  21-4-notification-action-buttons-background: backlog
+  21-5-badge-counts-notification-preferences: backlog
+  21-6-foreground-sse-real-time-updates: backlog
+  epic-21-retrospective: optional
+
+  # Epic 22: Mobile Messaging, Negotiation & Inbox (Phase C)
+  epic-22: backlog
+  22-1-unified-inbox: backlog
+  22-2-chat-style-thread-detail-ai-alternates: backlog
+  22-3-ai-message-generation-type-picker: backlog
+  22-4-approval-workflow-negotiation-inline: backlog
+  22-5-inbound-real-time-updates-conversation: backlog
+  epic-22-retrospective: optional
+
+  # Epic 23: Mobile Cross-Platform Resale Posting Queue (Phase C)
+  epic-23: backlog
+  23-1-posting-queue-screen: backlog
+  23-2-ai-title-description-inline-edit: backlog
+  23-3-optimal-price-recommendation-slider: backlog
+  23-4-multi-marketplace-post-photo-picker: backlog
+  23-5-real-time-posting-status-confirmations: backlog
+  epic-23-retrospective: optional
+
+  # Epic 24: Mobile Analytics, Reports & Insights (Phase C)
+  epic-24: backlog
+  24-1-analytics-summary-tiles: backlog
+  24-2-profit-over-time-chart-range-toggle: backlog
+  24-3-marketplace-category-breakdown-health: backlog
+  24-4-export-report-native-share-sheet: backlog
+  epic-24-retrospective: optional
+
+  # Epic 25: Mobile Subscription & Billing (RevenueCat IAP) (Phase C)
+  epic-25: backlog
+  25-1-revenuecat-configuration-product-catalog: backlog
+  25-2-backend-webhooks-revenuecat-entitlement: backlog
+  25-3-web-iap-reconciliation-double-billing: backlog
+  25-4-os-level-subscription-management-restore: backlog
+  25-5-tier-based-feature-gating-mobile-ux: backlog
+  epic-25-retrospective: optional
+
+  # Epic 26: Mobile Settings, Notification Preferences & Accessibility (Phase C)
+  epic-26: backlog
+  26-1-settings-screen-sectioned-layout: backlog
+  26-2-account-management-profile-linked: backlog
+  26-3-privacy-about-feedback-delete-account: backlog
+  26-4-accessibility-labels-roles-touch-targets: backlog
+  26-5-color-contrast-dynamic-type-alt-text: backlog
+  epic-26-retrospective: optional
+
+  # Epic 27: Mobile Meeting, Logistics & Native Integrations (Phase C)
+  epic-27: backlog
+  27-1-calendar-integration-os-calendar-google: backlog
+  27-2-maps-directions-deep-link: backlog
+  27-3-geofence-10-minutes-away-reminder: backlog
+  27-4-share-sheet-share-extension-quick-capture: backlog
+  epic-27-retrospective: optional
+
+  # Epic 28: Mobile Camera Capture, Offline & Native Polish (Phase D)
+  epic-28: backlog
+  28-1-in-app-camera-multi-shot-capture: backlog
+  28-2-firebase-storage-upload-pipeline-captured: backlog
+  28-3-offline-mode-read-cache-write-queue: backlog
+  28-4-optimistic-ui-rollback-toasts: backlog
+  28-5-tablet-support-spotlight-app-indexing: backlog
+  epic-28-retrospective: optional
+
+  # Epic 29: Mobile Production Launch — App Store + Google Play GA (Phase D)
+  epic-29: backlog
+  29-1-app-store-connect-play-console-assets: backlog
+  29-2-app-privacy-nutrition-label-data-safety: backlog
+  29-3-pre-submission-compliance-checklist-production: backlog
+  29-4-phased-rollout-crash-monitoring-post-launch: backlog
+  29-5-minimum-version-enforcement-force-upgrade: backlog
+  epic-29-retrospective: optional
