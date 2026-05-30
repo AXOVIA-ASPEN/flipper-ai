@@ -58,3 +58,4 @@ helpers/.venv/
 
 # Claude Code runtime artifacts
 .claude/scheduled_tasks.lock
+.claude/worktrees/
