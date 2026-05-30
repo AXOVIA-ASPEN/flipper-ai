@@ -58,6 +58,7 @@ helpers/.venv/
 
 # Claude Code runtime artifacts
 .claude/scheduled_tasks.lock
+.claude/worktrees/
 
 # Playwright MCP scratch logs
 .playwright-mcp/
