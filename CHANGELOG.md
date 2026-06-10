@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Fixed
+- **Prisma migration chain reconciled with `schema.prisma` — release blocker.** A fresh `prisma migrate deploy` (production provisioning) failed at `20260411000000_add_meeting_route_settings` (`ERROR: column "meetingTime" does not exist`) and, more broadly, the migration history had fallen far behind the schema because columns/tables were applied via `prisma db push` (which writes no migration files). Two new migrations restore a clean from-scratch deploy:
+  - `20260410020000_add_opportunity_meeting_fields` — backfills the Story 12.1 `Opportunity` meeting columns (`meetingTime`, `meetingLocation`, `meetingType`, `calendarEventId`) **before** the 12.2 index that references them.
+  - `20260412020000_reconcile_db_push_drift` — backfills everything else missing from a migrate-deploy database: `User.firebaseUid` (the auth lookup key) + `stripeCustomerId` unique indexes, the entire `GoogleCalendarToken` and `PasswordResetToken` tables, ~15 `Listing` AI-analysis columns, `UserSettings` fee-rate/logistics columns, `AiAnalysisCache.analysisType`, notification retry columns, price-history `dataType`, and associated indexes/FKs. Purely additive; intentionally preserves the partial unique index `monitoring_job_running_unique` (a `WHERE status='RUNNING'` index Prisma cannot model in `schema.prisma`). Verified: fresh `migrate deploy` of all 17 migrations + `next build` both pass clean.
+
 ### Changed
 - **AI router: Groq is now the primary provider for every text-only task** (10 of 12 prompts in `src/lib/ai/prompts/`). Fallback chain: Groq → Gemini → OpenAI for text. Anthropic Claude remains the primary for `claudeAnalysis` (Tier-2 structural reasoning, with a Groq → Gemini → OpenAI fallback chain). OpenAI remains the primary only for `itemCompleteness` because Groq's open-source Llama models cannot consume images (Gemini Vision is the fallback).
 

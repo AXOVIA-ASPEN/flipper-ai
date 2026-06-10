@@ -176,6 +176,7 @@
   .badge.p1{color:var(--cyan);background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.28)}
   .badge.verify{color:var(--amber);background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3)}
   .badge.danger{color:var(--rose);background:rgba(251,113,133,.12);border:1px solid rgba(251,113,133,.4)}
+  .badge.auto{color:var(--go);background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.4)}
   .t-desc{color:var(--ink-2);font-size:14.5px;margin:9px 0 0}
   .steps{margin:14px 0 0;padding:0;list-style:none;counter-reset:s;display:grid;gap:9px}
   .steps li{position:relative;padding-left:30px;font-size:14px;color:var(--ink-2)}
@@ -301,23 +302,20 @@
     <p class="sec-sub">The real P0. <code class="kbd">main</code> (GitHub default) is stale and diverged from your live trunk <code class="kbd">django-main</code>. Nothing deploys cleanly until this is resolved. <b>Back up before any force operation.</b></p>
     <div class="tasks-list">
 
-      <div class="task" data-id="0-1">
+      <div class="task" data-id="0-1" data-done="true">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">0.1</span><span class="t-title">Review &amp; merge the roadmap PR</span><span class="badge p0">P0</span></div>
-        <p class="t-desc">PR #1 adds this walkthrough, the fresh roadmap, and the 21-doc launch toolkit onto the trunk. Merge it first so everything downstream references landed files.</p>
-        <div class="linkrow"><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/pull/1" target="_blank" rel="noopener">Open PR #1</a></div>
+        <div class="t-head"><span class="t-id">0.1</span><span class="t-title">Review &amp; merge the roadmap PR</span><span class="badge p0">P0</span><span class="badge auto">✓ done</span></div>
+        <p class="t-desc">PR #1 (roadmap + 21-doc launch toolkit + this walkthrough) was <b>squash-merged into <code class="kbd">django-main</code></b> as <code class="kbd">fa5b044</code>.</p>
+        <div class="linkrow"><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/pull/1" target="_blank" rel="noopener">PR #1 (merged)</a></div>
       </div>
 
-      <div class="task" data-id="0-2">
+      <div class="task" data-id="0-2" data-done="true">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">0.2</span><span class="t-title">Salvage the 2 remaining main-only commits</span><span class="badge p0">P0</span></div>
+        <div class="t-head"><span class="t-id">0.2</span><span class="t-title">Salvage the 2 remaining main-only commits</span><span class="badge p0">P0</span><span class="badge auto">✓ done</span></div>
         <ol class="steps">
-          <li>Diff the Story-3.6 scenarios commit against current E-003 coverage; cherry-pick only if it adds net-new scenarios.</li>
-          <li>Take the trivial <code class="kbd">.claude/worktrees/</code> gitignore tweak.</li>
+          <li>✓ Gitignore tweak (<code class="kbd">1a8c58e</code>, <code class="kbd">.claude/worktrees/</code>) cherry-picked onto the trunk.</li>
+          <li>⊘ Story-3.6 scenarios (<code class="kbd">28208ba</code>) <b>skipped</b> — FR-SCAN-06/07 already covered on trunk, so per the "only if net-new" rule it would duplicate. Re-evaluate with the SM if you want them in E-003 specifically.</li>
         </ol>
-        <div class="cmd"><pre>git diff origin/django-main..28208ba -- test/acceptance/features
-git cherry-pick 28208ba   # Story 3.6 scenarios (only if net-new)
-git cherry-pick 1a8c58e   # gitignore .claude/worktrees/</pre><button class="copy">copy</button></div>
       </div>
 
       <div class="task" data-id="0-3">
@@ -664,6 +662,9 @@ curl -s <span class="dom" data-token>https://your-domain.com</span>/api/health/r
   state.tasks=state.tasks||{};
   tasks.forEach(function(t){
     var id=t.dataset.id;
+    // seed: tasks pre-completed in the markup (data-done) start checked unless
+    // the user's saved state already has an explicit value for them.
+    if(!(id in state.tasks) && t.dataset.done==='true'){ state.tasks[id]=true; }
     if(state.tasks[id]) t.classList.add('done');
     var chk=t.querySelector('.chk');
     chk.setAttribute('role','checkbox');
@@ -675,6 +676,8 @@ curl -s <span class="dom" data-token>https://your-domain.com</span>/api/health/r
       state.tasks[id]=now; save(); render();
     });
   });
+
+  save(); // persist any seeded (data-done) completions on first load
 
   // ---- progress ----
   var ringFill=document.getElementById('ringFill'),C=326.7;
