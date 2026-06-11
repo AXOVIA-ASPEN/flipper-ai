@@ -62,3 +62,8 @@ helpers/.venv/
 
 # Playwright MCP scratch logs
 .playwright-mcp/
+
+# Local secret material — dropped credential files, service-account JSONs, keys.
+# Ignore the ENTIRE directory; keep only the tracked README documenting it.
+.secrets/*
+!.secrets/README.md
