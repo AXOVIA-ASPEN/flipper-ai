@@ -15,6 +15,15 @@ Firebase service-account JSONs, downloaded API-key files, OAuth client secrets.
   separately gitignored. This directory does not replace `.env`; it centralizes
   the loose credential *files* that would otherwise litter the project root.
 
+## Files in this directory
+
+- **`production-secrets.env`** — local ledger of production secrets captured by
+  paste/download, mirroring GCP Secret Manager. Each line is
+  `PRODUCTION_<NAME>=<value>`. This is a backup/audit record, **not** the source
+  of truth. Gitignored.
+- **`*.json`** (e.g. `firebase-admin-prod.json`) — downloaded service-account /
+  credential files, kept for reference until verified in the cloud. Gitignored.
+
 ## Typical flow
 
 1. Download/export a credential (e.g. Firebase → Service Accounts → Generate key).
