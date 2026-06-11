@@ -318,41 +318,38 @@
         </ol>
       </div>
 
-      <div class="task" data-id="0-3">
+      <div class="task" data-id="0-3" data-done="true">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">0.3</span><span class="t-title">Back up old main</span><span class="badge danger">Safety</span></div>
-        <p class="t-desc">Always recoverable, but make the backup branch explicit before any force-push.</p>
+        <div class="t-head"><span class="t-id">0.3</span><span class="t-title">Back up old main</span><span class="badge danger">Safety</span><span class="badge auto">✓ done</span></div>
+        <p class="t-desc">Old <code class="kbd">main</code> (<code class="kbd">1a8c58e</code>) archived to <code class="kbd">backup/main-pre-reconcile-2026-06-10</code> before reconciliation.</p>
         <div class="cmd"><pre>git push origin main:refs/heads/backup/main-pre-reconcile-2026-06-10</pre><button class="copy">copy</button></div>
       </div>
 
-      <div class="task" data-id="0-4">
+      <div class="task" data-id="0-4" data-done="true">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">0.4</span><span class="t-title">Reconcile main ↔ django-main</span><span class="badge danger">Destructive</span></div>
-        <p class="t-desc">Per your Q2 choice. Below is <b>Option A (force-reset, recommended)</b>. Options B/C are in the linked doc.</p>
-        <div class="cmd"><pre>git checkout main
-git fetch origin
-git reset --hard origin/django-main
-git push origin main --force-with-lease</pre><button class="copy">copy</button></div>
-        <div class="note warn"><span class="i">!</span><span>This rewrites <code class="kbd">main</code>. Confirm the backup branch (0.3) exists first. <code class="kbd">--force-with-lease</code> aborts if someone else pushed in the meantime.</span></div>
+        <div class="t-head"><span class="t-id">0.4</span><span class="t-title">Reconcile main ↔ django-main</span><span class="badge danger">Destructive</span><span class="badge auto">✓ done (Option A)</span></div>
+        <p class="t-desc"><b>Option A executed.</b> <code class="kbd">main</code> force-reset <code class="kbd">1a8c58e → 63dc2ea</code> — it now matches the trunk. Done without checkout (your <code class="kbd">django-main</code> WIP untouched).</p>
+        <div class="cmd"><pre>git push --force-with-lease origin django-main:main</pre><button class="copy">copy</button></div>
+        <div class="note tip"><span class="i">✓</span><span><code class="kbd">main</code> and <code class="kbd">django-main</code> both at <code class="kbd">63dc2ea</code>. Going forward, treat <code class="kbd">main</code> as the trunk (and optionally retire <code class="kbd">django-main</code>) to avoid re-diverging.</span></div>
         <div class="linkrow"><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/django-main/docs/launch/branch-reconciliation.md" target="_blank" rel="noopener">branch-reconciliation.md</a></div>
       </div>
 
-      <div class="task" data-id="0-5">
+      <div class="task" data-id="0-5" data-done="true">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">0.5</span><span class="t-title">Archive &amp; delete stale branches</span><span class="badge p0">P0</span></div>
-        <p class="t-desc">After confirming salvage, archive then prune the stale <code class="kbd">claude/*</code> branches and (if you renamed) the old trunk.</p>
+        <div class="t-head"><span class="t-id">0.5</span><span class="t-title">Archive &amp; delete stale branches</span><span class="badge p0">P0</span><span class="badge auto">✓ done</span></div>
+        <p class="t-desc">Both <code class="kbd">claude/*</code> branches pruned and archived to <code class="kbd">legacy/roadmap-NCkB5</code> and <code class="kbd">legacy/fr-coverage-e2e</code> (recoverable). <code class="kbd">roadmap/release-v1-plan</code> was auto-deleted on PR #1 merge.</p>
         <div class="cmd"><pre>git push origin origin/claude/create-release-roadmap-NCkB5:refs/heads/legacy/roadmap-NCkB5
 git push origin --delete claude/create-release-roadmap-NCkB5
 git push origin --delete claude/fr-coverage-e2e
 git fetch --all --prune</pre><button class="copy">copy</button></div>
       </div>
 
-      <div class="task" data-id="0-6">
+      <div class="task" data-id="0-6" data-done="true">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">0.6</span><span class="t-title">Set GitHub default branch &amp; verify</span><span class="badge p0">P0</span></div>
+        <div class="t-head"><span class="t-id">0.6</span><span class="t-title">Set GitHub default branch &amp; verify</span><span class="badge p0">P0</span><span class="badge auto">✓ done</span></div>
         <ol class="steps">
-          <li>If you renamed (Option C), set the default branch in repo settings.</li>
-          <li>Verify the trunk tip is at HEAD of <code class="kbd">main</code>.</li>
+          <li>Default branch stays <code class="kbd">main</code> (Option A keeps the name — no rename needed).</li>
+          <li>Verified: <code class="kbd">origin/main</code> HEAD = <code class="kbd">63dc2ea</code> = trunk tip; local <code class="kbd">main</code> re-synced; <code class="kbd">origin/HEAD → main</code>.</li>
         </ol>
         <div class="cmd"><pre>git remote set-head origin -a
 git log --oneline main -3   # should show the django-main tip commit</pre><button class="copy">copy</button></div>
