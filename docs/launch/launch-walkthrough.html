@@ -296,6 +296,107 @@
     </div>
   </section>
 
+  <!-- ============================ ACCOUNT SETUP ============================ -->
+  <section class="block" id="accounts" data-phase="Accounts">
+    <div class="sec-head"><span class="sec-no" style="background:var(--cyan);box-shadow:0 0 24px rgba(56,189,248,.4)">A</span><h2>Account Setup</h2><span class="cnt" data-cnt></span></div>
+    <p class="sec-sub">Every external account/credential, tracked one row at a time. ✓ = wired into Secret Manager + mirrored to the local <code class="kbd">.secrets/</code> ledger. Paste a credential in chat and it gets wired + checked here.</p>
+    <div class="tasks-list">
+
+      <div class="task" data-id="acct-firebase" data-done="true">
+        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
+        <div class="t-head"><span class="t-id">A1</span><span class="t-title">Firebase</span><span class="badge auto">✓ done</span></div>
+        <p class="t-desc">Admin SDK (server auth: <code class="kbd">CLIENT_EMAIL</code>+<code class="kbd">PRIVATE_KEY</code>) · public web config · web-push VAPID key. Powers all authentication.</p>
+      </div>
+
+      <div class="task" data-id="acct-google" data-done="true">
+        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
+        <div class="t-head"><span class="t-id">A2</span><span class="t-title">Google Cloud</span><span class="badge auto">✓ done</span></div>
+        <p class="t-desc">One project covers a lot: OAuth Web client (Google sign-in + Calendar), Maps API key, Gemini AI key (<code class="kbd">GOOGLE_API_KEY</code>).</p>
+      </div>
+
+      <div class="task" data-id="acct-groq" data-done="true">
+        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
+        <div class="t-head"><span class="t-id">A3</span><span class="t-title">Groq</span><span class="badge auto">✓ done</span></div>
+        <p class="t-desc">Primary AI provider (10 of 12 prompts). Promoted into <code class="kbd">PRODUCTION_</code> scope.</p>
+      </div>
+
+      <div class="task" data-id="acct-hcaptcha" data-done="true">
+        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
+        <div class="t-head"><span class="t-id">A4</span><span class="t-title">hCaptcha</span><span class="badge auto">✓ done</span></div>
+        <p class="t-desc">Bot protection on login + register. Promoted from <code class="kbd">.env</code>.</p>
+      </div>
+
+      <div class="task" data-id="acct-resend" data-done="true">
+        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
+        <div class="t-head"><span class="t-id">A5</span><span class="t-title">Resend</span><span class="badge auto">✓ key</span><span class="badge verify">⚠ shared/temp</span></div>
+        <p class="t-desc">Transactional email API key wired. <b>Still TODO:</b> verify <code class="kbd">axovia.ai</code> domain (GoDaddy DNS) + set <code class="kbd">EMAIL_FROM</code> + rotate to a dedicated key — see task 3.4.</p>
+      </div>
+
+      <div class="task" data-id="acct-sentry">
+        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
+        <div class="t-head"><span class="t-id">A6</span><span class="t-title">Sentry</span><span class="badge p1">in progress</span></div>
+        <p class="t-desc">Error monitoring. Need the project <b>DSN</b> → wires <code class="kbd">SENTRY_DSN</code> + <code class="kbd">NEXT_PUBLIC_SENTRY_DSN</code>. Optional: org/project slugs + auth token for source maps.</p>
+        <div class="linkrow"><a class="link" href="https://sentry.io/" target="_blank" rel="noopener">sentry.io</a><a class="link" href="https://sentry.io/settings/projects/" target="_blank" rel="noopener">Project → Client Keys (DSN)</a></div>
+      </div>
+
+      <div class="task" data-id="acct-github">
+        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
+        <div class="t-head"><span class="t-id">A7</span><span class="t-title">GitHub OAuth</span><span class="badge p1">optional</span></div>
+        <p class="t-desc">GitHub sign-in. <b>Note:</b> real login config goes in Firebase Console → Auth → Sign-in method; the secret only gates the button. Defer unless you want GitHub login at launch.</p>
+        <div class="linkrow"><a class="link" href="https://github.com/settings/developers" target="_blank" rel="noopener">GitHub OAuth Apps</a><a class="link" href="https://console.firebase.google.com/project/axovia-flipper/authentication/providers" target="_blank" rel="noopener">Firebase → Sign-in method</a></div>
+      </div>
+
+      <div class="task" data-id="acct-facebook">
+        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
+        <div class="t-head"><span class="t-id">A8</span><span class="t-title">Facebook</span><span class="badge p1">optional</span></div>
+        <p class="t-desc">Two uses: FB login (Firebase Console) <b>and</b> the Facebook Marketplace scraper (server reads <code class="kbd">FACEBOOK_APP_ID</code>/<code class="kbd">SECRET</code>). Paste app id+secret if you want FB scraping.</p>
+        <div class="linkrow"><a class="link" href="https://developers.facebook.com/apps/" target="_blank" rel="noopener">Facebook Apps</a></div>
+      </div>
+
+      <div class="task" data-id="acct-openai">
+        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
+        <div class="t-head"><span class="t-id">A9</span><span class="t-title">OpenAI</span><span class="badge p1">optional</span></div>
+        <p class="t-desc">AI fallback + image/vision for item-completeness. Groq+Gemini already cover the chain, so optional.</p>
+        <div class="linkrow"><a class="link" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">OpenAI API keys</a></div>
+      </div>
+
+      <div class="task" data-id="acct-anthropic">
+        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
+        <div class="t-head"><span class="t-id">A10</span><span class="t-title">Anthropic</span><span class="badge p1">optional</span></div>
+        <p class="t-desc">Claude — primary for Tier-2 structural analysis (<code class="kbd">claudeAnalysis</code>), with Groq/Gemini fallback. Wires <code class="kbd">ANTHROPIC_API_KEY</code> + <code class="kbd">CLAUDE_API_KEY</code>.</p>
+        <div class="linkrow"><a class="link" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Anthropic API keys</a></div>
+      </div>
+
+      <div class="task" data-id="acct-ebay">
+        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
+        <div class="t-head"><span class="t-id">A11</span><span class="t-title">eBay</span><span class="badge p1">optional</span></div>
+        <p class="t-desc">eBay Browse API token — powers the eBay scanner (1 of 5 platforms; the others work without it).</p>
+        <div class="linkrow"><a class="link" href="https://developer.ebay.com/my/keys" target="_blank" rel="noopener">eBay developer keys</a></div>
+      </div>
+
+      <div class="task" data-id="acct-geoapify">
+        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
+        <div class="t-head"><span class="t-id">A12</span><span class="t-title">Geoapify</span><span class="badge p1">optional</span></div>
+        <p class="t-desc">Geocoding for meeting/logistics distance calcs (Epic 12).</p>
+        <div class="linkrow"><a class="link" href="https://myprojects.geoapify.com/" target="_blank" rel="noopener">Geoapify projects</a></div>
+      </div>
+
+      <div class="task" data-id="acct-shippo">
+        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
+        <div class="t-head"><span class="t-id">A13</span><span class="t-title">Shippo</span><span class="badge p1">optional</span></div>
+        <p class="t-desc">Shipping-cost estimates for resale logistics (Epic 5).</p>
+        <div class="linkrow"><a class="link" href="https://apps.goshippo.com/settings/api" target="_blank" rel="noopener">Shippo API</a></div>
+      </div>
+
+      <div class="task" data-id="acct-twilio">
+        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
+        <div class="t-head"><span class="t-id">A14</span><span class="t-title">Twilio</span><span class="badge p1">optional</span></div>
+        <p class="t-desc">SMS notifications (SID + auth token + from-number). Also needs 10DLC registration to send at scale (task 5.4).</p>
+        <div class="linkrow"><a class="link" href="https://console.twilio.com/" target="_blank" rel="noopener">Twilio Console</a></div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============================ PHASE 0 ============================ -->
   <section class="block" id="phase-0" data-phase="Repo Reconciliation">
     <div class="sec-head"><span class="sec-no">0</span><h2>Repo Reconciliation</h2><span class="cnt" data-cnt></span></div>
