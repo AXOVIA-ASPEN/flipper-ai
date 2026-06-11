@@ -332,11 +332,11 @@
         <p class="t-desc">Transactional email API key wired. <b>Still TODO:</b> verify <code class="kbd">axovia.ai</code> domain (GoDaddy DNS) + set <code class="kbd">EMAIL_FROM</code> + rotate to a dedicated key — see task 3.4.</p>
       </div>
 
-      <div class="task" data-id="acct-sentry">
+      <div class="task" data-id="acct-sentry" data-done="true">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A6</span><span class="t-title">Sentry</span><span class="badge p1">in progress</span></div>
-        <p class="t-desc">Error monitoring. Need the project <b>DSN</b> → wires <code class="kbd">SENTRY_DSN</code> + <code class="kbd">NEXT_PUBLIC_SENTRY_DSN</code>. Optional: org/project slugs + auth token for source maps.</p>
-        <div class="linkrow"><a class="link" href="https://sentry.io/" target="_blank" rel="noopener">sentry.io</a><a class="link" href="https://sentry.io/settings/projects/" target="_blank" rel="noopener">Project → Client Keys (DSN)</a></div>
+        <div class="t-head"><span class="t-id">A6</span><span class="t-title">Sentry</span><span class="badge auto">✓ done</span></div>
+        <p class="t-desc">Fully wired: <b>DSN</b> (<code class="kbd">SENTRY_DSN</code>+<code class="kbd">NEXT_PUBLIC_SENTRY_DSN</code>, error capture) + <b>auth token</b> + org <code class="kbd">realrandom</code> / project <code class="kbd">flipper-ai</code> (source-map upload → readable stack traces). Org/project are build-time CI env vars.</p>
+        <div class="note tip"><span class="i">i</span><span>Minor cleanup later: the Sentry org slug <code class="kbd">realrandom</code> is a client-name leftover — cosmetic, can rename in Sentry org settings.</span></div>
       </div>
 
       <div class="task" data-id="acct-github">
