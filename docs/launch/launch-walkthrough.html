@@ -375,16 +375,16 @@ git push origin v1.1.0</pre><button class="copy">copy</button></div>
 
       <div class="task" data-id="1-1">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">1.1</span><span class="t-title">Seed all PROD_ secrets in Secret Manager</span><span class="badge p0">P0</span><span class="badge auto" id="secretTally">core ✓ · ~14 to paste</span></div>
+        <div class="t-head"><span class="t-id">1.1</span><span class="t-title">Seed all PROD_ secrets in Secret Manager</span><span class="badge p0">P0</span><span class="badge auto" id="secretTally">core ✓ · ~9 to paste</span></div>
         <p class="t-desc"><b>⚠️ Value audit (not just name-existence):</b> many "existing" prod secrets held <code class="kbd">PLACEHOLDER</code> text, not real keys — caught by reading every value. Real status below (project <code class="kbd">axovia-flipper</code>, <code class="kbd">PRODUCTION_*</code>).</p>
         <ul class="steps plain">
-          <li>✅ <b>Real &amp; verified — core launch path covered</b> — <code class="kbd">DATABASE_URL</code>, Firebase Admin (<code class="kbd">CLIENT_EMAIL</code>+<code class="kbd">PRIVATE_KEY</code>) + public client config + VAPID, <b>AI: <code class="kbd">GROQ</code> (primary) + <code class="kbd">GOOGLE_API_KEY</code>/Gemini (fallback)</b>, <code class="kbd">HCAPTCHA_SECRET_KEY</code>, <code class="kbd">ENCRYPTION_SECRET</code>, <code class="kbd">AUTH_SECRET</code>, generated internal tokens, <code class="kbd">GOOGLE_MAPS_API_KEY</code></li>
-          <li>⬜ <b>Were placeholders — need real values (paste)</b>: <b>OAuth logins</b> <a class="link" href="https://console.cloud.google.com/apis/credentials?project=axovia-flipper" target="_blank" rel="noopener">Google</a>/<a class="link" href="https://github.com/settings/developers" target="_blank" rel="noopener">GitHub</a>/<a class="link" href="https://developers.facebook.com/apps/" target="_blank" rel="noopener">Facebook</a> id+secret · <b>Email</b> <a class="link" href="https://resend.com/api-keys" target="_blank" rel="noopener">Resend</a> · <b>Errors</b> <a class="link" href="https://sentry.io/" target="_blank" rel="noopener">Sentry</a> DSN+auth · <b>AI fallback</b> <a class="link" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">OpenAI</a> + <a class="link" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Anthropic</a> · <b>eBay</b> token</li>
-          <li>⬜ <b>Optional feature secrets</b> — Google Calendar (reuses Google OAuth client) · <a class="link" href="https://myprojects.geoapify.com/" target="_blank" rel="noopener">Geoapify</a> · <a class="link" href="https://apps.goshippo.com/settings/api" target="_blank" rel="noopener">Shippo</a> · <a class="link" href="https://console.twilio.com/" target="_blank" rel="noopener">Twilio</a> (SID/token/number)</li>
-          <li>🔒 <b>Decision-blocked</b> — <code class="kbd">APP_URL</code> (needs domain · Q3) · <code class="kbd">STRIPE_SECRET_KEY</code>/<code class="kbd">WEBHOOK</code>/<code class="kbd">PRICE_*</code> (live mode · Phase 2)</li>
+          <li>✅ <b>Real &amp; verified — core launch path covered</b> — <code class="kbd">DATABASE_URL</code>, Firebase Admin + public config + VAPID, <b>AI: <code class="kbd">GROQ</code> (primary) + Gemini (fallback)</b>, <b>Google OAuth (login + calendar)</b>, <b>Resend</b> (⚠️ shared/temp key), <code class="kbd">GOOGLE_MAPS_API_KEY</code>, <code class="kbd">HCAPTCHA_SECRET_KEY</code>, <code class="kbd">ENCRYPTION_SECRET</code>, <code class="kbd">AUTH_SECRET</code>, internal tokens, <code class="kbd">APP_URL</code>=web.app</li>
+          <li>⬜ <b>Were placeholders — still to paste</b>: <b>OAuth logins</b> <a class="link" href="https://github.com/settings/developers" target="_blank" rel="noopener">GitHub</a>/<a class="link" href="https://developers.facebook.com/apps/" target="_blank" rel="noopener">Facebook</a> id+secret · <b>Errors</b> <a class="link" href="https://sentry.io/" target="_blank" rel="noopener">Sentry</a> DSN+auth · <b>AI fallback</b> <a class="link" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">OpenAI</a> + <a class="link" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Anthropic</a> · <b>eBay</b> token</li>
+          <li>⬜ <b>Optional feature secrets</b> — <a class="link" href="https://myprojects.geoapify.com/" target="_blank" rel="noopener">Geoapify</a> · <a class="link" href="https://apps.goshippo.com/settings/api" target="_blank" rel="noopener">Shippo</a> · <a class="link" href="https://console.twilio.com/" target="_blank" rel="noopener">Twilio</a> (SID/token/number)</li>
+          <li>🔒 <b>Decision-blocked</b> — <code class="kbd">STRIPE_SECRET_KEY</code>/<code class="kbd">WEBHOOK</code>/<code class="kbd">PRICE_*</code> (live mode · Phase 2)</li>
         </ul>
         <div class="note tip"><span class="i">✓</span><span>Each pasted/generated credential is mirrored to the local gitignored ledger <code class="kbd">.secrets/production-secrets.env</code> so nothing is lost to a chat scrollback.</span></div>
-        <div class="note warn"><span class="i">!</span><span><b>Core soft launch is covered</b> (DB, Firebase auth, Groq+Gemini AI, hCaptcha, encryption). <b>Resend (email verification/reset)</b> and at least one <b>OAuth login</b> are the most important remaining pastes; Stripe is Phase-2/live-mode.</span></div>
+        <div class="note warn"><span class="i">!</span><span><b>Core soft launch is covered</b> (DB, Firebase auth, Groq+Gemini AI, Google login, hCaptcha, encryption, APP_URL). Remaining pastes are secondary logins + AI fallbacks + error tracking; Stripe is Phase-2/live-mode. Resend key is shared/temporary — rotate at domain setup (3.4).</span></div>
         <div class="linkrow"><a class="link" href="https://console.cloud.google.com/security/secret-manager?project=axovia-flipper" target="_blank" rel="noopener">Secret Manager console</a><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/main/docs/launch/gcp-secret-manager-checklist.md" target="_blank" rel="noopener">Full secret checklist</a></div>
       </div>
 
@@ -464,52 +464,54 @@ curl -s <span class="dom" data-token>https://your-domain.com</span>/api/health/r
 
   <!-- ============================ PHASE 3 ============================ -->
   <section class="block" id="phase-3" data-phase="Domain & Brand">
-    <div class="sec-head"><span class="sec-no">3</span><h2>Domain &amp; Brand</h2><span class="cnt" data-cnt></span></div>
-    <p class="sec-sub"><code class="kbd">flipper.ai</code> is taken. Pick a domain, grab the social handles, then wire it through Firebase, OAuth, Stripe &amp; Resend. Reference: <code class="kbd">domain-and-brand-identity.md</code>.</p>
+    <div class="sec-head"><span class="sec-no">3</span><h2>Domain &amp; Hosting</h2><span class="cnt" data-cnt></span></div>
+    <p class="sec-sub"><b>Decided:</b> soft-launch on the Firebase URL <code class="kbd">axovia-flipper.web.app</code> (zero domain work) → then wire the <code class="kbd">flipper.axovia.ai</code> subdomain → later migrate to a dedicated domain bought from early revenue. <b>axovia.ai DNS lives in GoDaddy.</b> Email sends from <code class="kbd">axovia.ai</code> once its DNS is verified in Resend.</p>
     <div class="tasks-list">
 
-      <div class="task" data-id="3-1">
+      <div class="task" data-id="3-1" data-done="true">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">3.1</span><span class="t-title">Check availability &amp; decide (Q3)</span><span class="badge p0">P0</span></div>
-        <p class="t-desc">Top candidates — check, then record your pick in the Q3 decision and the domain field up top.</p>
-        <div class="linkrow">
-          <a class="link" href="https://instantdomainsearch.com/search?q=flipperai&tlds=app,com" target="_blank" rel="noopener">flipperai.app / .com</a>
-          <a class="link" href="https://instantdomainsearch.com/search?q=flipper&tlds=app,tools" target="_blank" rel="noopener">flipper.app / .tools</a>
-          <a class="link" href="https://instantdomainsearch.com/search?q=getflipper&tlds=ai" target="_blank" rel="noopener">getflipper.ai</a>
-          <a class="link" href="https://instantdomainsearch.com/search?q=flipscout&tlds=ai" target="_blank" rel="noopener">flipscout.ai</a>
-        </div>
+        <div class="t-head"><span class="t-id">3.1</span><span class="t-title">Hosting decision + interim APP_URL</span><span class="badge p0">P0</span><span class="badge auto">✓ done</span></div>
+        <p class="t-desc">Interim host = <code class="kbd">axovia-flipper.web.app</code>. <code class="kbd">PRODUCTION_APP_URL</code> wired to it. Future = <code class="kbd">flipper.axovia.ai</code> (3.3), then a dedicated domain (3.5).</p>
       </div>
 
       <div class="task" data-id="3-2">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">3.2</span><span class="t-title">Reserve social handles</span><span class="badge p1">P1</span></div>
-        <p class="t-desc">Check the matching handle across ~12 platforms before you commit to the name.</p>
-        <div class="linkrow"><a class="link" href="https://namecheckly.com/" target="_blank" rel="noopener">Namecheckly (bulk)</a><a class="link" href="https://namechk.com/" target="_blank" rel="noopener">Namechk</a></div>
+        <div class="t-head"><span class="t-id">3.2</span><span class="t-title">Add OAuth redirect URIs for the web.app URL</span><span class="badge p0">P0</span></div>
+        <p class="t-desc">Needed <b>now</b> so Google/GitHub/Facebook sign-in works on the interim URL. Add the callback for each provider:</p>
+        <ul class="steps plain">
+          <li><code class="kbd">https://axovia-flipper.web.app/api/auth/callback/&lt;provider&gt;</code> + <code class="kbd">https://axovia-flipper.firebaseapp.com/__/auth/handler</code></li>
+          <li><a class="link" href="https://console.cloud.google.com/apis/credentials?project=axovia-flipper" target="_blank" rel="noopener">Google</a> (edit the Web client → Authorized redirect URIs) · <a class="link" href="https://github.com/settings/developers" target="_blank" rel="noopener">GitHub</a> · <a class="link" href="https://developers.facebook.com/apps/" target="_blank" rel="noopener">Facebook</a></li>
+        </ul>
       </div>
 
       <div class="task" data-id="3-3">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">3.3</span><span class="t-title">Buy the domain</span><span class="badge p0">P0</span></div>
-        <p class="t-desc">Cloudflare Registrar sells <code class="kbd">.ai</code> at cost; Namecheap is the common alternative.</p>
-        <div class="linkrow"><a class="link" href="https://www.cloudflare.com/products/registrar/" target="_blank" rel="noopener">Cloudflare Registrar</a><a class="link" href="https://www.namecheap.com/" target="_blank" rel="noopener">Namecheap</a></div>
+        <div class="t-head"><span class="t-id">3.3</span><span class="t-title">Wire flipper.axovia.ai subdomain</span><span class="badge p1">Launch item</span></div>
+        <p class="t-desc">The "real" interim home, no code changes (subdomain, not subpath). Steps:</p>
+        <ul class="steps">
+          <li><a class="link" href="https://console.firebase.google.com/project/axovia-flipper/hosting/sites" target="_blank" rel="noopener">Firebase Hosting</a> → Add custom domain → <code class="kbd">flipper.axovia.ai</code></li>
+          <li>In <a class="link" href="https://dcc.godaddy.com/control/portfolio/axovia.ai/settings?tab=dns" target="_blank" rel="noopener">GoDaddy DNS (axovia.ai)</a> add the CNAME/A records Firebase shows; wait for verification + SSL</li>
+          <li>Update <code class="kbd">PRODUCTION_APP_URL</code>→<code class="kbd">https://flipper.axovia.ai</code>, set <code class="kbd">PRODUCTION_ALLOWED_ORIGINS</code>, add the new OAuth redirect URIs (3.2), redeploy</li>
+        </ul>
       </div>
 
       <div class="task" data-id="3-4">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">3.4</span><span class="t-title">Add custom domain in Firebase Hosting</span><span class="badge p0">P0</span></div>
-        <p class="t-desc">Add <span class="dom" data-token>your-domain.com</span> as a Hosting site and complete DNS verification.</p>
-        <div class="linkrow"><a class="link" href="https://console.firebase.google.com/project/axovia-flipper/hosting/sites" target="_blank" rel="noopener">Firebase Hosting</a></div>
+        <div class="t-head"><span class="t-id">3.4</span><span class="t-title">Verify sending domain in Resend + set EMAIL_FROM</span><span class="badge p1">Launch item</span></div>
+        <p class="t-desc">Until done, transactional email (verification, password reset, alerts) can't send to real users. Steps:</p>
+        <ul class="steps">
+          <li><a class="link" href="https://resend.com/domains" target="_blank" rel="noopener">Resend → Domains</a> → add <code class="kbd">axovia.ai</code> → copy the TXT/DKIM records</li>
+          <li>Add those records in <a class="link" href="https://dcc.godaddy.com/control/portfolio/axovia.ai/settings?tab=dns" target="_blank" rel="noopener">GoDaddy DNS</a>; wait for "Verified"</li>
+          <li>Set <code class="kbd">EMAIL_FROM = Flipper AI &lt;flipper@axovia.ai&gt;</code></li>
+          <li>⚠️ <b>Rotate the shared Resend key</b> → create a dedicated Flipper key (see <code class="kbd">.secrets</code> ledger note)</li>
+        </ul>
       </div>
 
       <div class="task" data-id="3-5">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">3.5</span><span class="t-title">Update all redirect URIs &amp; sender domains</span><span class="badge p0">P0</span></div>
-        <ul class="steps plain">
-          <li>OAuth callbacks → add <span class="dom" data-token>https://your-domain.com</span><code class="kbd">/api/auth/callback/&lt;provider&gt;</code> on <a class="link" href="https://console.cloud.google.com/apis/credentials?project=axovia-flipper" target="_blank" rel="noopener">Google</a>, <a class="link" href="https://github.com/settings/developers" target="_blank" rel="noopener">GitHub</a>, <a class="link" href="https://developers.facebook.com/apps/" target="_blank" rel="noopener">Facebook</a></li>
-          <li>Stripe webhook URL → <a class="link" href="https://dashboard.stripe.com/webhooks" target="_blank" rel="noopener">update endpoint</a></li>
-          <li>Resend sender domain → <a class="link" href="https://resend.com/domains" target="_blank" rel="noopener">add + verify DNS (TXT/MX/DKIM)</a></li>
-          <li>Update <code class="kbd">PROD_APP_URL</code> &amp; <code class="kbd">PROD_ALLOWED_ORIGINS</code> secrets, then redeploy.</li>
-        </ul>
+        <div class="t-head"><span class="t-id">3.5</span><span class="t-title">Later: dedicated domain + social handles</span><span class="badge p1">Post-revenue</span></div>
+        <p class="t-desc">Buy a standalone domain from early revenue, migrate hosting + email + OAuth + Stripe webhook to it, and reserve matching social handles.</p>
+        <div class="linkrow"><a class="link" href="https://namecheckly.com/" target="_blank" rel="noopener">Namecheckly (handle check)</a><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/main/docs/launch/domain-and-brand-identity.md" target="_blank" rel="noopener">domain-and-brand-identity.md</a></div>
       </div>
     </div>
   </section>
