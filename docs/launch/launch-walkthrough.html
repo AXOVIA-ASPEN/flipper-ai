@@ -339,23 +339,17 @@
         <div class="note tip"><span class="i">i</span><span>Minor cleanup later: the Sentry org slug <code class="kbd">realrandom</code> is a client-name leftover — cosmetic, can rename in Sentry org settings.</span></div>
       </div>
 
-      <div class="task" data-id="acct-firebase-auth">
+      <div class="task" data-id="acct-firebase-auth" data-done="true">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A7</span><span class="t-title">Firebase Console — enable sign-in methods</span><span class="badge p0">P0 · the real switch</span></div>
-        <p class="t-desc"><b>This is what actually turns login on</b> — not the secrets. The login page renders Email/Password + Google + GitHub buttons (all via Firebase <code class="kbd">signInWithPopup</code>). In <a class="link" href="https://console.firebase.google.com/project/axovia-flipper/authentication/providers" target="_blank" rel="noopener">Firebase → Auth → Sign-in method</a>:</p>
-        <ul class="steps">
-          <li><b>Email/Password</b> → Enable (the essential one)</li>
-          <li><b>Google</b> → Enable (highest-value social login; OAuth client already wired)</li>
-          <li><b>GitHub</b> → either enable it (paste the GitHub OAuth app id/secret here, see A7b) <i>or</i> the GitHub button on the login page will error — decide before launch</li>
-          <li>Add authorized domains: <code class="kbd">axovia-flipper.web.app</code>, <code class="kbd">axovia-flipper.firebaseapp.com</code> (+ <code class="kbd">flipper.axovia.ai</code> later)</li>
-        </ul>
+        <div class="t-head"><span class="t-id">A7</span><span class="t-title">Firebase Console — enable sign-in methods</span><span class="badge auto">✓ done</span></div>
+        <p class="t-desc"><b>Email/Password + Google both Enabled</b> in <a class="link" href="https://console.firebase.google.com/project/axovia-flipper/authentication/providers" target="_blank" rel="noopener">Firebase → Auth → Sign-in method</a> — this is the actual switch that turns login on. Core auth is live. Later: add <code class="kbd">flipper.axovia.ai</code> to Authorized domains when the subdomain is wired (3.3).</p>
       </div>
 
-      <div class="task" data-id="acct-github">
+      <div class="task" data-id="acct-github" data-done="true">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A7b</span><span class="t-title">GitHub OAuth (low priority)</span><span class="badge p1">optional</span></div>
-        <p class="t-desc">Niche for a reselling audience. Two choices: (a) create a GitHub OAuth app → paste id+secret → enable GitHub in Firebase (A7), or (b) hide the GitHub button on the login page until later. Email + Google cover the vast majority of users.</p>
-        <div class="linkrow"><a class="link" href="https://github.com/settings/developers" target="_blank" rel="noopener">GitHub OAuth Apps</a></div>
+        <div class="t-head"><span class="t-id">A7b</span><span class="t-title">GitHub login — button hidden via flag</span><span class="badge auto">✓ resolved</span></div>
+        <p class="t-desc"><b>Handled in code</b>: the GitHub button on login + register is now gated behind <code class="kbd">NEXT_PUBLIC_ENABLE_GITHUB_AUTH</code> (default <code class="kbd">false</code> = hidden), so no broken button — Email + Google only. To enable GitHub later: create a GitHub OAuth app, enable the GitHub provider in Firebase, then set the flag to <code class="kbd">true</code>. Verified: <code class="kbd">make build</code> compiles <code class="kbd">/login</code>+<code class="kbd">/register</code> clean.</p>
+        <div class="linkrow"><a class="link" href="https://github.com/settings/developers" target="_blank" rel="noopener">GitHub OAuth Apps (for later)</a></div>
       </div>
 
       <div class="task" data-id="acct-facebook" data-done="true">
