@@ -1,0 +1,198 @@
+<!--
+  file: docs/client-facing/previews/11-analytics.html
+  author: Stephen Boyett
+  company: Axovia
+  date: 2026-06-11
+  version: 1.0
+  brief: Mobile preview — profit analytics with time-series chart, breakdown, and inventory health gauge.
+
+  description:
+      Illustrates Feature 24 / Stories 24.1-24.4: lifetime / MTD / YTD profit
+      tiles, profit-over-time chart with range toggles, per-marketplace
+      breakdown, the inventory-health gauge with aged-item drill-in, and
+      CSV/PDF export through the native share sheet
+      (FR-MOBILE-ANALYTICS-01..05).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Flipper.ai · Analytics — preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .anWrap { padding: 64px 16px 12px; display: flex; flex-direction: column; gap: 10px; height: 100%; }
+    .anHead { display: flex; align-items: center; justify-content: space-between; }
+    .anHead h2 { margin: 0; font-size: 20px; color: var(--screen-text); letter-spacing: -0.01em; }
+    .anHead .exp { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; color: var(--fp-lavender); padding: 7px 12px; border-radius: 999px; background: rgba(124,58,237,0.16); border: 1px solid rgba(139,92,246,0.4); }
+    .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .tile { padding: 10px 11px; }
+    .tile .l { font-size: 8.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--screen-text-muted); }
+    .tile b { display: block; margin-top: 3px; font-size: 16px; color: var(--screen-text); letter-spacing: -0.01em; }
+    .tile .d { font-size: 9px; font-weight: 700; color: var(--fp-green); }
+    .chartCard { padding: 12px 13px 9px; }
+    .chartTop { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .chartTop .t { font-size: 11px; font-weight: 800; color: var(--screen-text-2); }
+    .ranges { display: inline-flex; gap: 3px; }
+    .ranges span { padding: 3px 7px; border-radius: 999px; font-size: 8.5px; font-weight: 800; color: var(--screen-text-muted); }
+    .ranges span.on { background: rgba(124,58,237,0.3); color: var(--fp-lavender); }
+    .donutRow { display: flex; gap: 8px; }
+    .donutCard { flex: 1.2; padding: 11px 12px; display: flex; align-items: center; gap: 11px; }
+    .donut { width: 58px; height: 58px; border-radius: 999px; flex-shrink: 0; position: relative;
+      background: conic-gradient(#8b5cf6 0 38%, #34d399 38% 64%, #fbbf24 64% 82%, #60a5fa 82% 93%, #f87171 93% 100%); }
+    .donut::before { content: ""; position: absolute; inset: 9px; border-radius: 999px; background: #0d1120; }
+    .legend { display: grid; gap: 4px; font-size: 9px; color: var(--screen-text-muted); }
+    .legend i { display: inline-block; width: 7px; height: 7px; border-radius: 2px; margin-right: 5px; }
+    .legend b { color: var(--screen-text-2); font-weight: 700; }
+    .gaugeCard { flex: 1; padding: 11px 12px; }
+    .gaugeCard .l { font-size: 8.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--screen-text-muted); }
+    .gaugeBar { margin: 9px 0 7px; height: 8px; border-radius: 999px; background: linear-gradient(90deg, #34d399, #fbbf24 55%, #f87171); position: relative; }
+    .gaugeBar .pin { position: absolute; top: -4px; left: 46%; width: 4px; height: 16px; border-radius: 999px; background: #fff; box-shadow: 0 0 8px rgba(255,255,255,0.6); }
+    .gaugeCard .st { font-size: 10px; font-weight: 700; color: var(--fp-yellow); }
+    .gaugeCard .ds { font-size: 9px; color: var(--screen-text-muted); margin-top: 2px; }
+  </style>
+</head>
+<body>
+  <main class="previewPage">
+    <header class="previewTop">
+      <a class="previewBrand" href="index.html">
+        <span class="mark">F</span>
+        <span class="word">Flipper.ai <em>mobile preview deck</em></span>
+      </a>
+      <div class="previewIndex">
+        <span class="step">11 / 17</span>
+        <span class="step active">Analytics</span>
+      </div>
+    </header>
+
+    <section class="previewHero">
+      <div>
+        <p class="previewKicker">Feature 24 · Analytics &amp; Reports · Phase C</p>
+        <h1 class="previewTitle">Profit, <em>proven</em>.</h1>
+        <p class="previewLede">
+          Lifetime, month-to-date, and year-to-date profit; flips completed; margin; a
+          profit-over-time chart; marketplace breakdown; and an inventory-health gauge that
+          flags aging stock — exportable as CSV or PDF through the share sheet.
+        </p>
+        <div class="previewFrCloud">
+          <a href="16-functional-requirements.html#FR-MOBILE-ANALYTICS-01"><span>FR-MOBILE-ANALYTICS-01</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-ANALYTICS-02"><span>FR-MOBILE-ANALYTICS-02</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-ANALYTICS-03"><span>FR-MOBILE-ANALYTICS-03</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-ANALYTICS-05"><span>FR-MOBILE-ANALYTICS-05</span></a>
+        </div>
+      </div>
+      <div class="previewMetaCard">
+        <h4>What this screen shows</h4>
+        <ul>
+          <li><strong>Surface</strong><span>Analytics · under the More tab</span></li>
+          <li><strong>Story</strong><span>Feature 24 / Stories 24.1 – 24.4</span></li>
+          <li><strong>Ranges</strong><span>7d · 30d · 90d · YTD · All-time toggles</span></li>
+          <li><strong>Export</strong><span>CSV/PDF via iOS Share Sheet / Android Intent</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="phoneStage">
+      <aside class="stageNoteLeft">
+        <div class="stageNote">
+          <h5>The numbers that matter</h5>
+          <p>Every tile is fed by confirmed lifecycle data — the purchase and sale prices captured at each stage transition, not estimates.</p>
+          <span class="frTag">FR-MOBILE-ANALYTICS-01</span>
+        </div>
+        <div class="stageNote">
+          <h5>Where the profit lives</h5>
+          <p>The breakdown donut splits profit by marketplace, answering the operator question: which platform actually pays?</p>
+          <span class="frTag">FR-MOBILE-ANALYTICS-03</span>
+        </div>
+      </aside>
+
+      <div class="phoneFrame">
+        <div class="phoneScreen fpDark">
+          <div class="statusBar onDark">
+            <span>9:41</span>
+            <span class="icons"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></span>
+          </div>
+
+          <div class="screenScroll">
+            <div class="anWrap">
+              <div class="anHead">
+                <h2>Analytics</h2>
+                <span class="exp">⬆ Export</span>
+              </div>
+
+              <div class="tiles">
+                <div class="tile fpGlassSm"><span class="l">Lifetime</span><b>$4,820</b><span class="d">38 flips</span></div>
+                <div class="tile fpGlassSm"><span class="l">This month</span><b>$640</b><span class="d">▲ 22%</span></div>
+                <div class="tile fpGlassSm"><span class="l">Avg margin</span><b>41%</b><span class="d">per flip</span></div>
+              </div>
+
+              <div class="chartCard fpGlass">
+                <div class="chartTop">
+                  <span class="t">Profit over time</span>
+                  <div class="ranges"><span>7D</span><span class="on">30D</span><span>90D</span><span>YTD</span><span>ALL</span></div>
+                </div>
+                <svg viewBox="0 0 320 110" width="100%" height="110" role="img" aria-label="Profit over time chart">
+                  <defs>
+                    <linearGradient id="ar" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.5"/>
+                      <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M0,92 C28,84 44,88 64,74 C90,56 108,68 132,58 C156,48 172,52 196,40 C222,28 240,44 264,30 C286,18 304,22 320,12 L320,110 L0,110 Z" fill="url(#ar)"/>
+                  <path d="M0,92 C28,84 44,88 64,74 C90,56 108,68 132,58 C156,48 172,52 196,40 C222,28 240,44 264,30 C286,18 304,22 320,12" fill="none" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round"/>
+                  <circle cx="264" cy="30" r="4" fill="#c4b5fd"/>
+                </svg>
+              </div>
+
+              <div class="donutRow">
+                <div class="donutCard fpGlass">
+                  <div class="donut"></div>
+                  <div class="legend">
+                    <span><i style="background:#8b5cf6;"></i><b>eBay</b> · $1,832</span>
+                    <span><i style="background:#34d399;"></i><b>Facebook</b> · $1,253</span>
+                    <span><i style="background:#fbbf24;"></i><b>Craigslist</b> · $868</span>
+                    <span><i style="background:#60a5fa;"></i><b>Mercari</b> · $530</span>
+                    <span><i style="background:#f87171;"></i><b>OfferUp</b> · $337</span>
+                  </div>
+                </div>
+                <div class="gaugeCard fpGlass">
+                  <span class="l">Inventory health</span>
+                  <div class="gaugeBar"><span class="pin"></span></div>
+                  <div class="st">⚠ 2 items aged 30+ days</div>
+                  <div class="ds">$265 cost basis at risk · tap to review</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <nav class="tabBar fpDark">
+            <div class="tab active"><span class="glyph">📊</span>Dashboard</div>
+            <div class="tab"><span class="glyph">📡</span>Scanner</div>
+            <div class="tab"><span class="glyph">💎</span>Flips</div>
+            <div class="tab"><span class="glyph">💬</span>Messages</div>
+            <div class="tab"><span class="glyph">⋯</span>More</div>
+          </nav>
+        </div>
+      </div>
+
+      <aside class="stageNoteRight">
+        <div class="stageNote">
+          <h5>Aging stock can't hide</h5>
+          <p>The health gauge goes amber when 1–3 purchased items pass 30 days held, red at 4+. Tapping drills into the aged-inventory list.</p>
+          <span class="frTag">FR-MOBILE-ANALYTICS-05</span>
+        </div>
+        <div class="stageNote">
+          <h5>Reports that travel</h5>
+          <p>Export hands a CSV or PDF to the native share sheet — text it to a partner, save to Files, or drop it into a tax folder.</p>
+          <span class="frTag">FR-MOBILE-ANALYTICS-04</span>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="previewFooter">
+      <span>Prepared by <b>Silverline Software Inc.</b> for the Flipper.ai Mobile v2.0 review · 2026-06-11</span>
+      <span class="right"><a href="10-posting-composer.html">← prev</a> <a href="index.html">index</a> <a href="12-subscription.html">next: Subscription →</a></span>
+    </footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!--
+  file: docs/client-facing/previews/03-scanner.html
+  author: Stephen Boyett
+  company: Axovia
+  date: 2026-06-11
+  version: 1.0
+  brief: Mobile preview — Scanner with saved-search quick picks and a live in-flight scan job.
+
+  description:
+      Illustrates Feature 19 (Marketplace Scanning), Stories 19.1-19.2:
+      one-tap re-runs of saved searches, multi-marketplace scan triggering via
+      the same backend endpoint the web uses, and real-time job progress over
+      the SSE event stream with a polling fallback for flaky cellular
+      (FR-MOBILE-SCAN-01..04).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Flipper.ai · Scanner — preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .scWrap { padding: 70px 18px 12px; display: flex; flex-direction: column; gap: 14px; height: 100%; }
+    .scHead h2 { margin: 0; font-size: 22px; color: var(--screen-text); letter-spacing: -0.01em; }
+    .scHead p { margin: 2px 0 0; font-size: 11.5px; color: var(--screen-text-muted); }
+    .scChips { display: flex; gap: 8px; overflow: hidden; }
+    .scLabel { font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--screen-text-muted); margin: 0 0 7px; }
+    .mkRow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .mkTile {
+      height: 52px; border-radius: 12px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 3px;
+      font-size: 9px; font-weight: 700; color: var(--screen-text-muted);
+    }
+    .mkTile .lg { width: 22px; height: 22px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff; }
+    .mkTile.on { border-color: rgba(139, 92, 246, 0.5); background: rgba(124, 58, 237, 0.12); color: var(--fp-lavender); }
+    .jobCard { padding: 14px; position: relative; overflow: hidden; }
+    .jobCard .row1 { display: flex; align-items: center; gap: 10px; }
+    .jobCard .lg { width: 34px; height: 34px; border-radius: 10px; background: #5c2d91; color: #fff; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+    .jobCard .kw { font-size: 13.5px; font-weight: 700; color: var(--screen-text); }
+    .jobCard .meta { font-size: 11px; color: var(--screen-text-muted); }
+    .liveBadge {
+      margin-left: auto; display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.08em;
+      background: rgba(52, 211, 153, 0.14); color: var(--fp-green);
+    }
+    .liveBadge .led { width: 7px; height: 7px; border-radius: 999px; background: var(--fp-green); animation: fpPulse 1.4s ease infinite; }
+    .jobStats { display: flex; gap: 16px; margin-top: 12px; font-size: 11px; color: var(--screen-text-muted); }
+    .jobStats b { color: var(--screen-text); font-size: 14px; display: block; }
+    .progTrack { margin-top: 12px; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.07); overflow: hidden; position: relative; }
+    .progTrack .fill { position: absolute; inset: 0; width: 45%; border-radius: 999px; background: linear-gradient(90deg, #6d28d9, #8b5cf6); box-shadow: 0 0 12px var(--fp-glow-purple); }
+    .progTrack .sheen { position: absolute; inset: 0; width: 30%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent); animation: fpProgress 1.8s ease infinite; }
+    .doneRow { display: flex; align-items: center; gap: 10px; padding: 11px 14px; }
+    .doneRow .lg { width: 28px; height: 28px; border-radius: 8px; background: #1877f2; color:#fff; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .doneRow .t { font-size: 12px; font-weight: 700; color: var(--screen-text-2); }
+    .doneRow .s { font-size: 10.5px; color: var(--screen-text-muted); }
+    .doneRow .res { margin-left: auto; font-size: 11px; font-weight: 800; color: var(--fp-green); }
+  </style>
+</head>
+<body>
+  <main class="previewPage">
+    <header class="previewTop">
+      <a class="previewBrand" href="index.html">
+        <span class="mark">F</span>
+        <span class="word">Flipper.ai <em>mobile preview deck</em></span>
+      </a>
+      <div class="previewIndex">
+        <span class="step">03 / 17</span>
+        <span class="step active">Scanner</span>
+      </div>
+    </header>
+
+    <section class="previewHero">
+      <div>
+        <p class="previewKicker">Feature 19 · Marketplace Scanning · Phase B</p>
+        <h1 class="previewTitle">Scan five marketplaces <em>from your pocket</em>.</h1>
+        <p class="previewLede">
+          Trigger a scrape against Craigslist, Facebook, eBay, OfferUp, or Mercari and watch it
+          run live. Saved searches become one-tap chips — re-run "Tampa vintage audio" from the truck.
+        </p>
+        <div class="previewFrCloud">
+          <a href="16-functional-requirements.html#FR-MOBILE-SCAN-01"><span>FR-MOBILE-SCAN-01</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-SCAN-02"><span>FR-MOBILE-SCAN-02</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-SCAN-03"><span>FR-MOBILE-SCAN-03</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-SCAN-04"><span>FR-MOBILE-SCAN-04</span></a>
+        </div>
+      </div>
+      <div class="previewMetaCard">
+        <h4>What this screen shows</h4>
+        <ul>
+          <li><strong>Surface</strong><span>Scanner tab · config + in-flight job</span></li>
+          <li><strong>Story</strong><span>Feature 19 / Stories 19.1 – 19.2</span></li>
+          <li><strong>Backend</strong><span>Same scraper endpoints and job model as web</span></li>
+          <li><strong>Realtime</strong><span>SSE stream · falls back to polling on weak cellular</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="phoneStage">
+      <aside class="stageNoteLeft">
+        <div class="stageNote">
+          <h5>Saved searches as chips</h5>
+          <p>Every saved search config surfaces as a quick-select chip. One tap re-runs the whole search — keywords, radius, price band, platforms.</p>
+          <span class="frTag">FR-MOBILE-SCAN-02</span>
+        </div>
+        <div class="stageNote">
+          <h5>Live progress, animated glow</h5>
+          <p>In-flight jobs show marketplace, keyword, elapsed time, and listings found — streaming over the same real-time channel the web dashboard uses.</p>
+          <span class="frTag">FR-MOBILE-SCAN-03 · 04</span>
+        </div>
+      </aside>
+
+      <div class="phoneFrame">
+        <div class="phoneScreen fpDark">
+          <div class="statusBar onDark">
+            <span>9:41</span>
+            <span class="icons"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></span>
+          </div>
+
+          <div class="screenScroll">
+            <div class="scWrap">
+              <div class="scHead">
+                <h2>Scanner</h2>
+                <p>Find your next flip</p>
+              </div>
+
+              <div>
+                <p class="scLabel">Saved searches</p>
+                <div class="scChips">
+                  <span class="fpChip active">⚡ Tampa vintage audio</span>
+                  <span class="fpChip">PS5 deals &lt;$300</span>
+                  <span class="fpChip">+ New</span>
+                </div>
+              </div>
+
+              <div>
+                <p class="scLabel">Marketplaces</p>
+                <div class="mkRow">
+                  <div class="mkTile fpGlassSm on"><span class="lg" style="background:#5c2d91;">CL</span>Craigslist</div>
+                  <div class="mkTile fpGlassSm on"><span class="lg" style="background:#1877f2;">f</span>Facebook</div>
+                  <div class="mkTile fpGlassSm on"><span class="lg" style="background:#e53238;">e</span>eBay</div>
+                  <div class="mkTile fpGlassSm"><span class="lg" style="background:#00ab80;">OU</span>OfferUp</div>
+                  <div class="mkTile fpGlassSm"><span class="lg" style="background:#4a52ff;">m</span>Mercari</div>
+                </div>
+              </div>
+
+              <div class="fpInput filled">🔎&nbsp; vintage receiver</div>
+              <div class="fpBtnPrimary">⚡ Scan Now</div>
+
+              <div class="jobCard fpGlass fpHot">
+                <div class="row1">
+                  <span class="lg">CL</span>
+                  <div>
+                    <div class="kw">vintage receiver</div>
+                    <div class="meta">Craigslist · Tampa · 25 mi</div>
+                  </div>
+                  <span class="liveBadge"><span class="led"></span>LIVE</span>
+                </div>
+                <div class="jobStats">
+                  <span><b>0:42</b>elapsed</span>
+                  <span><b>17</b>listings found</span>
+                  <span><b>3</b>scored 70+</span>
+                </div>
+                <div class="progTrack"><span class="fill"></span><span class="sheen"></span></div>
+              </div>
+
+              <div class="doneRow fpGlassSm">
+                <span class="lg">f</span>
+                <div><div class="t">PS5 deals &lt;$300</div><div class="s">Finished 12 min ago</div></div>
+                <span class="res">31 results ›</span>
+              </div>
+            </div>
+          </div>
+
+          <nav class="tabBar fpDark">
+            <div class="tab"><span class="glyph">📊</span>Dashboard</div>
+            <div class="tab active"><span class="glyph">📡</span>Scanner</div>
+            <div class="tab"><span class="glyph">💎</span>Flips</div>
+            <div class="tab"><span class="glyph">💬</span>Messages</div>
+            <div class="tab"><span class="glyph">⋯</span>More</div>
+          </nav>
+        </div>
+      </div>
+
+      <aside class="stageNoteRight">
+        <div class="stageNote">
+          <h5>One backend, two clients</h5>
+          <p>Scan Now calls the exact endpoint the web app uses. Jobs started here appear on the web dashboard in real time — and the reverse.</p>
+          <span class="frTag">FR-MOBILE-SCAN-01</span>
+        </div>
+        <div class="stageNote">
+          <h5>Field-proof realtime</h5>
+          <p>If the SSE stream drops on cellular, the app silently falls back to short-interval polling. Progress never freezes.</p>
+          <span class="frTag">FR-MOBILE-SCAN-03</span>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="previewFooter">
+      <span>Prepared by <b>Silverline Software Inc.</b> for the Flipper.ai Mobile v2.0 review · 2026-06-11</span>
+      <span class="right"><a href="02-onboarding.html">← prev</a> <a href="index.html">index</a> <a href="04-listings-feed.html">next: Listings Feed →</a></span>
+    </footer>
+  </main>
+</body>
+</html>

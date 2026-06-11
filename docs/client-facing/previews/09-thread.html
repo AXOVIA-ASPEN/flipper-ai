@@ -1,0 +1,168 @@
+<!--
+  file: docs/client-facing/previews/09-thread.html
+  author: Stephen Boyett
+  company: Axovia
+  date: 2026-06-11
+  version: 1.0
+  brief: Mobile preview — chat thread with AI-drafted reply, approval workflow, and negotiation strategy.
+
+  description:
+      Illustrates Feature 22 / Stories 22.2-22.4: chat-style thread with
+      sent/received bubbles, an AI-generated DRAFT that requires explicit
+      "Approve & Send", inline negotiation strategy above the compose bar,
+      and the message-type picker. AI drafts come from the live provider
+      chain — never canned (FR-MOBILE-MSG-02..05).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Flipper.ai · AI Negotiation — preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .chWrap { padding: 60px 0 0; display: flex; flex-direction: column; height: 100%; }
+    .chHead { display: flex; align-items: center; gap: 10px; padding: 8px 16px 10px; border-bottom: 1px solid var(--fp-glass-border); }
+    .chHead .back { font-size: 16px; color: var(--screen-text-2); }
+    .chHead img { width: 34px; height: 34px; border-radius: 9px; object-fit: cover; }
+    .chHead .nm { font-size: 13px; font-weight: 800; color: var(--screen-text); }
+    .chHead .it { font-size: 10px; color: var(--screen-text-muted); }
+    .chHead .st { margin-left: auto; display: inline-flex; align-items: center; gap: 5px; font-size: 9px; font-weight: 800; letter-spacing: 0.08em; color: var(--fp-green); }
+    .chHead .st i { width: 6px; height: 6px; border-radius: 999px; background: var(--fp-green); }
+    .chBody { flex: 1; padding: 12px 16px; display: flex; flex-direction: column; gap: 9px; overflow: hidden; }
+    .bub { max-width: 78%; padding: 9px 12px; border-radius: 15px; font-size: 12px; line-height: 1.4; }
+    .bub .tm { display: block; margin-top: 3px; font-size: 8.5px; opacity: .6; }
+    .bub.in { align-self: flex-start; background: rgba(255,255,255,0.07); color: var(--screen-text-2); border-bottom-left-radius: 5px; }
+    .bub.out { align-self: flex-end; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border-bottom-right-radius: 5px; }
+    .draft { align-self: flex-end; max-width: 88%; border-radius: 15px; padding: 10px 12px; background: rgba(124, 58, 237, 0.10); border: 1.5px dashed rgba(139, 92, 246, 0.6); }
+    .draft .lbl { display: flex; align-items: center; gap: 6px; font-size: 9px; font-weight: 800; letter-spacing: 0.12em; color: var(--fp-lavender); margin-bottom: 5px; }
+    .draft p { margin: 0; font-size: 12px; line-height: 1.45; color: var(--screen-text); }
+    .draft .acts { display: flex; gap: 7px; margin-top: 9px; }
+    .draft .acts .ap { flex: 1.6; height: 34px; border-radius: 10px; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(109,40,217,0.45); }
+    .draft .acts .ed { flex: 1; height: 34px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.16); color: var(--screen-text-2); font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .strat { margin: 0 16px 8px; padding: 9px 12px; display: flex; gap: 8px; align-items: flex-start; border-left: 2px solid var(--fp-yellow); font-size: 10.5px; line-height: 1.4; color: var(--screen-text-2); }
+    .strat b { color: var(--fp-yellow); }
+    .composeRow { display: flex; gap: 8px; padding: 0 16px 12px; align-items: center; }
+    .composeRow .gen { width: 44px; height: 44px; border-radius: 13px; flex-shrink: 0; background: rgba(124,58,237,0.2); border: 1px solid rgba(139,92,246,0.45); display: flex; align-items: center; justify-content: center; font-size: 17px; box-shadow: 0 0 14px var(--fp-glow-purple); }
+    .composeRow .fld { flex: 1; height: 44px; border-radius: 13px; background: rgba(255,255,255,0.05); border: 1px solid var(--fp-glass-border); display: flex; align-items: center; padding: 0 13px; font-size: 12px; color: var(--screen-text-muted); }
+  </style>
+</head>
+<body>
+  <main class="previewPage">
+    <header class="previewTop">
+      <a class="previewBrand" href="index.html">
+        <span class="mark">F</span>
+        <span class="word">Flipper.ai <em>mobile preview deck</em></span>
+      </a>
+      <div class="previewIndex">
+        <span class="step">09 / 17</span>
+        <span class="step active">AI Negotiation</span>
+      </div>
+    </header>
+
+    <section class="previewHero">
+      <div>
+        <p class="previewKicker">Feature 22 · Messaging &amp; Negotiation · Phase C</p>
+        <h1 class="previewTitle">AI drafts. <em>You approve</em>.</h1>
+        <p class="previewLede">
+          The AI writes the negotiation — lowball offers, counter-responses, pickup scheduling —
+          and a strategy strip explains the play. Nothing sends until the user taps Approve.
+        </p>
+        <div class="previewFrCloud">
+          <a href="16-functional-requirements.html#FR-MOBILE-MSG-02"><span>FR-MOBILE-MSG-02</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-MSG-03"><span>FR-MOBILE-MSG-03</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-MSG-04"><span>FR-MOBILE-MSG-04</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-MSG-05"><span>FR-MOBILE-MSG-05</span></a>
+        </div>
+      </div>
+      <div class="previewMetaCard">
+        <h4>What this screen shows</h4>
+        <ul>
+          <li><strong>Surface</strong><span>Thread detail · draft awaiting approval</span></li>
+          <li><strong>Story</strong><span>Feature 22 / Stories 22.2 – 22.4</span></li>
+          <li><strong>Types</strong><span>Inquiry · lowball · counter · scheduling · payment · follow-up</span></li>
+          <li><strong>Guardrail</strong><span>DRAFT state until explicit Approve &amp; Send</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="phoneStage">
+      <aside class="stageNoteLeft">
+        <div class="stageNote">
+          <h5>Human-in-the-loop, always</h5>
+          <p>AI messages enter a DRAFT state — the dashed bubble. The user approves, edits, or discards. The app never speaks to a seller unsupervised.</p>
+          <span class="frTag">FR-MOBILE-MSG-04</span>
+        </div>
+        <div class="stageNote">
+          <h5>Strategy on tap</h5>
+          <p>The amber strip above the compose bar is the negotiation coach: a concrete counter number and the reasoning, generated per-thread.</p>
+          <span class="frTag">FR-MOBILE-MSG-05</span>
+        </div>
+      </aside>
+
+      <div class="phoneFrame">
+        <div class="phoneScreen fpDark">
+          <div class="statusBar onDark">
+            <span>9:41</span>
+            <span class="icons"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></span>
+          </div>
+
+          <div class="screenScroll">
+            <div class="chWrap">
+              <div class="chHead">
+                <span class="back">‹</span>
+                <img src="https://picsum.photos/seed/flipper-receiver/68/68" alt="" />
+                <div>
+                  <div class="nm">Mike R.</div>
+                  <div class="it">Marantz 2270 · asking $120 · Craigslist</div>
+                </div>
+                <span class="st"><i></i>ACTIVE</span>
+              </div>
+
+              <div class="chBody">
+                <div class="bub out">Hi Mike — is the Marantz still available? I can pick up today with cash.<span class="tm">10:02 AM ✓</span></div>
+                <div class="bub in">Yes it's available. It was my dad's, works perfectly. $120 firm-ish 🙂<span class="tm">10:14 AM</span></div>
+                <div class="bub in">Could do $95 if you pick up today<span class="tm">10:31 AM</span></div>
+
+                <div class="draft">
+                  <div class="lbl">✨ AI DRAFT — NEGOTIATION RESPONSE</div>
+                  <p>That works — $95 cash and I'll be there by 5 pm. I'll bring exact change. What's a good address for pickup?</p>
+                  <div class="acts"><span class="ap">Approve &amp; Send</span><span class="ed">Edit</span></div>
+                </div>
+              </div>
+
+              <div class="strat fpGlassSm">
+                <span>🎯</span>
+                <span><b>Strategy:</b> Accept at $95 — already 21% under ask and comps clear $285+. Lock the time before he reconsiders; long-press the draft for alternate tones.</span>
+              </div>
+
+              <div class="composeRow">
+                <span class="gen">✨</span>
+                <span class="fld">Write your own reply…</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="stageNoteRight">
+        <div class="stageNote">
+          <h5>Six message plays</h5>
+          <p>Initial inquiry, lowball offer, negotiation response, pickup scheduling, payment confirmation, no-show follow-up — the same playbook as the web, generated by the live AI chain.</p>
+          <span class="frTag">FR-MOBILE-MSG-03</span>
+        </div>
+        <div class="stageNote">
+          <h5>Alternates on long-press</h5>
+          <p>Long-press any AI bubble to see alternate drafts — friendlier, firmer, shorter — and swap before approving.</p>
+          <span class="frTag">FR-MOBILE-MSG-02</span>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="previewFooter">
+      <span>Prepared by <b>Silverline Software Inc.</b> for the Flipper.ai Mobile v2.0 review · 2026-06-11</span>
+      <span class="right"><a href="08-inbox.html">← prev</a> <a href="index.html">index</a> <a href="10-posting-composer.html">next: Cross-Posting →</a></span>
+    </footer>
+  </main>
+</body>
+</html>

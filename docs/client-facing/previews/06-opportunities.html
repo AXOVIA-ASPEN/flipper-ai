@@ -1,0 +1,202 @@
+<!--
+  file: docs/client-facing/previews/06-opportunities.html
+  author: Stephen Boyett
+  company: Axovia
+  date: 2026-06-11
+  version: 1.0
+  brief: Mobile preview — flip lifecycle Kanban with swipe-to-advance and card-stack toggle.
+
+  description:
+      Illustrates Feature 20 / Stories 20.1-20.2: every flip tracked
+      IDENTIFIED → PURCHASED → LISTED → SOLD on a mobile-native Kanban with
+      horizontally scrollable columns, a toggle to a swipeable card stack,
+      swipe-left-to-advance / swipe-right-to-revert gestures, and live sync
+      with the web board (FR-MOBILE-LIFECYCLE-01, 02, 07).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Flipper.ai · Opportunities — preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .kbWrap { padding: 66px 0 12px; display: flex; flex-direction: column; gap: 12px; height: 100%; }
+    .kbHead { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
+    .kbHead h2 { margin: 0; font-size: 20px; color: var(--screen-text); letter-spacing: -0.01em; }
+    .kbToggle { display: inline-flex; border-radius: 999px; border: 1px solid var(--fp-glass-border); background: rgba(255,255,255,0.04); padding: 3px; }
+    .kbToggle span { padding: 5px 11px; border-radius: 999px; font-size: 10.5px; font-weight: 800; color: var(--screen-text-muted); }
+    .kbToggle span.on { background: rgba(124, 58, 237, 0.3); color: var(--fp-lavender); }
+    .kbTotals { display: flex; gap: 14px; padding: 0 16px; font-size: 10.5px; color: var(--screen-text-muted); }
+    .kbTotals b { color: var(--screen-text); }
+    .kbCols { display: flex; gap: 10px; padding: 0 16px; overflow: hidden; flex: 1; }
+    .kbCol { width: 168px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
+    .kbColHead { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+    .kbColHead .n { margin-left: auto; font-size: 10px; color: var(--screen-text-muted); font-weight: 700; }
+    .kbColHead .led { width: 7px; height: 7px; border-radius: 999px; }
+    .kCard { padding: 9px; border-radius: 13px; }
+    .kCard img { width: 100%; height: 64px; border-radius: 9px; object-fit: cover; }
+    .kCard .t { margin: 7px 0 3px; font-size: 11px; font-weight: 700; color: var(--screen-text); line-height: 1.25; }
+    .kCard .m { display: flex; justify-content: space-between; font-size: 9.5px; color: var(--screen-text-muted); }
+    .kCard .m b { color: var(--fp-green); }
+    .swipeGhost { position: relative; }
+    .swipeGhost::after {
+      content: "→ PURCHASED"; position: absolute; inset: 0; border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(124, 58, 237, 0.30); backdrop-filter: blur(1px);
+      color: #e6dbff; font-size: 10px; font-weight: 800; letter-spacing: 0.1em;
+      border: 1px dashed rgba(139, 92, 246, 0.7);
+    }
+    .kbHint { text-align: center; font-size: 10px; color: #64748b; letter-spacing: 0.05em; padding: 0 16px; }
+  </style>
+</head>
+<body>
+  <main class="previewPage">
+    <header class="previewTop">
+      <a class="previewBrand" href="index.html">
+        <span class="mark">F</span>
+        <span class="word">Flipper.ai <em>mobile preview deck</em></span>
+      </a>
+      <div class="previewIndex">
+        <span class="step">06 / 17</span>
+        <span class="step active">Opportunities</span>
+      </div>
+    </header>
+
+    <section class="previewHero">
+      <div>
+        <p class="previewKicker">Feature 20 · Flip Lifecycle Tracking · Phase B</p>
+        <h1 class="previewTitle">Your pipeline, <em>swipe by swipe</em>.</h1>
+        <p class="previewLede">
+          Every flip moves IDENTIFIED → PURCHASED → LISTED → SOLD. Swipe a card left to advance the
+          stage, right to revert. Toggle between Kanban columns and a swipeable card stack — your choice sticks.
+        </p>
+        <div class="previewFrCloud">
+          <a href="16-functional-requirements.html#FR-MOBILE-LIFECYCLE-01"><span>FR-MOBILE-LIFECYCLE-01</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-LIFECYCLE-02"><span>FR-MOBILE-LIFECYCLE-02</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-LIFECYCLE-07"><span>FR-MOBILE-LIFECYCLE-07</span></a>
+        </div>
+      </div>
+      <div class="previewMetaCard">
+        <h4>What this screen shows</h4>
+        <ul>
+          <li><strong>Surface</strong><span>Opportunities tab · Kanban view</span></li>
+          <li><strong>Story</strong><span>Feature 20 / Stories 20.1 – 20.2</span></li>
+          <li><strong>Gesture</strong><span>Swipe ← advance · swipe → revert · long-press for menu</span></li>
+          <li><strong>Sync</strong><span>Stage moves here appear on the web board live</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="phoneStage">
+      <aside class="stageNoteLeft">
+        <div class="stageNote">
+          <h5>Two views, one pipeline</h5>
+          <p>Kanban columns for scanning the whole pipeline; card stack for one-handed triage. The toggle choice persists per user.</p>
+          <span class="frTag">FR-MOBILE-LIFECYCLE-01</span>
+        </div>
+        <div class="stageNote">
+          <h5>Swipe to advance</h5>
+          <p>The mid-swipe card shows the gesture: drag left and "→ PURCHASED" confirms the stage you're about to land on. Buttery 55+ fps animations are a hard performance requirement.</p>
+          <span class="frTag">FR-MOBILE-LIFECYCLE-02 · NFR-MOB-PERF-03</span>
+        </div>
+      </aside>
+
+      <div class="phoneFrame">
+        <div class="phoneScreen fpDark">
+          <div class="statusBar onDark">
+            <span>9:41</span>
+            <span class="icons"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></span>
+          </div>
+
+          <div class="screenScroll">
+            <div class="kbWrap">
+              <div class="kbHead">
+                <h2>Flips</h2>
+                <div class="kbToggle"><span class="on">Kanban</span><span>Cards</span></div>
+              </div>
+              <div class="kbTotals">
+                <span><b>7</b> active flips</span>
+                <span><b>$405</b> invested</span>
+                <span><b>$612</b> projected profit</span>
+              </div>
+
+              <div class="kbCols">
+                <div class="kbCol">
+                  <div class="kbColHead" style="color:#94a3b8;"><span class="led" style="background:#94a3b8;"></span>Identified<span class="n">3</span></div>
+                  <div class="kCard fpGlass swipeGhost">
+                    <img src="https://picsum.photos/seed/flipper-receiver/300/128" alt="Receiver" />
+                    <div class="t">Marantz 2270 Receiver</div>
+                    <div class="m"><span>ask $120</span><b>+$190 est</b></div>
+                  </div>
+                  <div class="kCard fpGlass">
+                    <img src="https://picsum.photos/seed/flipper-kitchenaid/300/128" alt="Mixer" />
+                    <div class="t">KitchenAid Pro 600</div>
+                    <div class="m"><span>ask $85</span><b>+$145 est</b></div>
+                  </div>
+                  <div class="kCard fpGlass">
+                    <img src="https://picsum.photos/seed/flipper-dewalt/300/128" alt="Tools" />
+                    <div class="t">DeWalt 20V Combo Kit</div>
+                    <div class="m"><span>ask $160</span><b>+$180 est</b></div>
+                  </div>
+                </div>
+
+                <div class="kbCol">
+                  <div class="kbColHead" style="color:var(--fp-yellow);"><span class="led" style="background:var(--fp-yellow);"></span>Purchased<span class="n">2</span></div>
+                  <div class="kCard fpGlass">
+                    <img src="https://picsum.photos/seed/flipper-lego/300/128" alt="Lego" />
+                    <div class="t">LEGO UCS Falcon, sealed</div>
+                    <div class="m"><span>paid $140</span><b>+$120 est</b></div>
+                  </div>
+                  <div class="kCard fpGlass">
+                    <img src="https://picsum.photos/seed/flipper-bike/300/128" alt="Bike" />
+                    <div class="t">Trek FX 3 Hybrid</div>
+                    <div class="m"><span>paid $125</span><b>+$160 est</b></div>
+                  </div>
+                </div>
+
+                <div class="kbCol">
+                  <div class="kbColHead" style="color:var(--fp-lavender);"><span class="led" style="background:var(--fp-purple-bright);"></span>Listed<span class="n">2</span></div>
+                  <div class="kCard fpGlass fpHot">
+                    <img src="https://picsum.photos/seed/flipper-ps5/300/128" alt="Console" />
+                    <div class="t">PS5 Disc + 2 controllers</div>
+                    <div class="m"><span>listed $399</span><b>3 watchers</b></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="kbHint">‹ swipe columns · drag card left to advance stage ›</div>
+            </div>
+          </div>
+
+          <nav class="tabBar fpDark">
+            <div class="tab"><span class="glyph">📊</span>Dashboard</div>
+            <div class="tab"><span class="glyph">📡</span>Scanner</div>
+            <div class="tab active"><span class="glyph">💎</span>Flips</div>
+            <div class="tab"><span class="glyph">💬</span>Messages</div>
+            <div class="tab"><span class="glyph">⋯</span>More</div>
+          </nav>
+        </div>
+      </div>
+
+      <aside class="stageNoteRight">
+        <div class="stageNote">
+          <h5>Stage prompts capture the money</h5>
+          <p>Advancing to PURCHASED asks for price paid; LISTED asks for the resale URL; SOLD captures the sale price and computes profit. The numbers feed Analytics automatically.</p>
+          <span class="frTag">FR-MOBILE-LIFECYCLE-03 · 04 · 05</span>
+        </div>
+        <div class="stageNote">
+          <h5>Same board as the web</h5>
+          <p>Moves made on a phone in a parking lot show up on the web Kanban in real time — one pipeline, every device.</p>
+          <span class="frTag">FR-MOBILE-LIFECYCLE-07</span>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="previewFooter">
+      <span>Prepared by <b>Silverline Software Inc.</b> for the Flipper.ai Mobile v2.0 review · 2026-06-11</span>
+      <span class="right"><a href="05-listing-detail.html">← prev</a> <a href="index.html">index</a> <a href="07-sold-celebration.html">next: Sold →</a></span>
+    </footer>
+  </main>
+</body>
+</html>

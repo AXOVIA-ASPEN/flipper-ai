@@ -1,0 +1,184 @@
+<!--
+  file: docs/client-facing/previews/02-onboarding.html
+  author: Stephen Boyett
+  company: Axovia
+  date: 2026-06-11
+  version: 1.0
+  brief: Mobile preview — touch-first onboarding wizard, marketplace-selection step.
+
+  description:
+      Illustrates Feature 17 / Story 17.5: the web's 6-step onboarding wizard
+      reflowed for portrait and touch — large tap targets, swipe-between-steps,
+      progress dots, "Skip for now". State persists to the same backend
+      endpoints, so onboarding once (web or mobile) counts everywhere
+      (FR-MOBILE-AUTH-07).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Flipper.ai · Onboarding — preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .obWrap { padding: 78px 22px 26px; display: flex; flex-direction: column; height: 100%; }
+    .obTop { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .obDots { display: inline-flex; gap: 6px; }
+    .obDots span { width: 8px; height: 8px; border-radius: 999px; background: rgba(255,255,255,0.14); }
+    .obDots span.done { background: var(--fp-purple-bright); }
+    .obDots span.now { width: 22px; background: var(--fp-purple-bright); box-shadow: 0 0 10px var(--fp-glow-purple); }
+    .obSkip { font-size: 12px; font-weight: 700; color: var(--screen-text-muted); }
+    .obStep { font-size: 10px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fp-lavender); margin: 0 0 6px; }
+    .obTitle { margin: 0 0 4px; font-size: 23px; letter-spacing: -0.01em; color: var(--screen-text); }
+    .obSub { margin: 0 0 16px; font-size: 12.5px; line-height: 1.45; color: var(--screen-text-muted); }
+    .mkList { display: grid; gap: 9px; }
+    .mkCard {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 14px; border-radius: 14px;
+    }
+    .mkCard .logo {
+      width: 38px; height: 38px; border-radius: 11px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 800; color: #fff;
+    }
+    .mkCard .nm { font-size: 14px; font-weight: 700; color: var(--screen-text); }
+    .mkCard .ds { font-size: 11px; color: var(--screen-text-muted); }
+    .mkCard .chk {
+      margin-left: auto; width: 24px; height: 24px; border-radius: 999px;
+      border: 1.5px solid rgba(255,255,255,0.18);
+      display: flex; align-items: center; justify-content: center; font-size: 12px;
+    }
+    .mkCard.on { border-color: rgba(139, 92, 246, 0.5); background: rgba(124, 58, 237, 0.10); }
+    .mkCard.on .chk { border-color: transparent; background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; }
+    .obSwipeHint { margin: 14px 0 10px; text-align: center; font-size: 10.5px; color: #64748b; letter-spacing: 0.04em; }
+    .obCta { margin-top: auto; display: grid; gap: 8px; }
+  </style>
+</head>
+<body>
+  <main class="previewPage">
+    <header class="previewTop">
+      <a class="previewBrand" href="index.html">
+        <span class="mark">F</span>
+        <span class="word">Flipper.ai <em>mobile preview deck</em></span>
+      </a>
+      <div class="previewIndex">
+        <span class="step">02 / 17</span>
+        <span class="step active">Onboarding</span>
+      </div>
+    </header>
+
+    <section class="previewHero">
+      <div>
+        <p class="previewKicker">Feature 17 · Sign-In &amp; Onboarding · Phase A</p>
+        <h1 class="previewTitle">Set up once, <em>flip everywhere</em>.</h1>
+        <p class="previewLede">
+          The six-step setup wizard — marketplaces, categories, budget, location — rebuilt
+          thumb-first: swipe between steps, big tap targets, skippable at any point.
+        </p>
+        <div class="previewFrCloud">
+          <a href="16-functional-requirements.html#FR-MOBILE-AUTH-07"><span>FR-MOBILE-AUTH-07</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-A11Y-01"><span>FR-MOBILE-A11Y-01</span></a>
+        </div>
+      </div>
+      <div class="previewMetaCard">
+        <h4>What this screen shows</h4>
+        <ul>
+          <li><strong>Surface</strong><span>Onboarding wizard · step 2 of 6 (marketplaces)</span></li>
+          <li><strong>Story</strong><span>Feature 17 / Story 17.5</span></li>
+          <li><strong>Steps</strong><span>Welcome → Marketplaces → Categories → Budget → Location → Done</span></li>
+          <li><strong>Sync</strong><span>Same backend state as the web wizard — onboard once</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="phoneStage">
+      <aside class="stageNoteLeft">
+        <div class="stageNote">
+          <h5>Swipe between steps</h5>
+          <p>Progress dots up top, swipe gesture or Continue button to advance — the same six steps the web wizard runs, reflowed for one-handed use.</p>
+          <span class="frTag">FR-MOBILE-AUTH-07</span>
+        </div>
+        <div class="stageNote">
+          <h5>Skippable by design</h5>
+          <p>"Skip for now" is always available. Users land on the dashboard immediately and can finish setup later from Settings.</p>
+          <span class="frTag">Story 17.5</span>
+        </div>
+      </aside>
+
+      <div class="phoneFrame">
+        <div class="phoneScreen fpDark">
+          <div class="statusBar onDark">
+            <span>9:41</span>
+            <span class="icons"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></span>
+          </div>
+
+          <div class="screenScroll">
+            <div class="obWrap">
+              <div class="obTop">
+                <div class="obDots"><span class="done"></span><span class="now"></span><span></span><span></span><span></span><span></span></div>
+                <span class="obSkip">Skip for now</span>
+              </div>
+
+              <p class="obStep">Step 2 of 6</p>
+              <h2 class="obTitle">Where should we hunt?</h2>
+              <p class="obSub">Pick the marketplaces Flipper scans for underpriced items. You can change these anytime.</p>
+
+              <div class="mkList">
+                <div class="mkCard fpGlassSm on">
+                  <span class="logo" style="background:#5c2d91;">CL</span>
+                  <div><div class="nm">Craigslist</div><div class="ds">Local listings · best for pickup deals</div></div>
+                  <span class="chk">✓</span>
+                </div>
+                <div class="mkCard fpGlassSm on">
+                  <span class="logo" style="background:#1877f2;">f</span>
+                  <div><div class="nm">Facebook Marketplace</div><div class="ds">Huge local volume · fast movers</div></div>
+                  <span class="chk">✓</span>
+                </div>
+                <div class="mkCard fpGlassSm on">
+                  <span class="logo" style="background:#e53238;">e</span>
+                  <div><div class="nm">eBay</div><div class="ds">Sold comps power your price checks</div></div>
+                  <span class="chk">✓</span>
+                </div>
+                <div class="mkCard fpGlassSm">
+                  <span class="logo" style="background:#00ab80;">OU</span>
+                  <div><div class="nm">OfferUp</div><div class="ds">Local + shipped deals</div></div>
+                  <span class="chk"></span>
+                </div>
+                <div class="mkCard fpGlassSm">
+                  <span class="logo" style="background:#4a52ff;">m</span>
+                  <div><div class="nm">Mercari</div><div class="ds">Shipped-only flips</div></div>
+                  <span class="chk"></span>
+                </div>
+              </div>
+
+              <div class="obSwipeHint">← swipe to go back · swipe to continue →</div>
+
+              <div class="obCta">
+                <div class="fpBtnPrimary">Continue</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="stageNoteRight">
+        <div class="stageNote">
+          <h5>44pt minimum targets</h5>
+          <p>Every selectable card meets Apple's 44 pt / Android's 48 dp touch-target minimum — accessibility is in the plan from the first screen.</p>
+          <span class="frTag">FR-MOBILE-A11Y-01</span>
+        </div>
+        <div class="stageNote">
+          <h5>One source of truth</h5>
+          <p>Selections write to the existing onboarding endpoints. A user who onboarded on web is treated as already onboarded here — and vice versa.</p>
+          <span class="frTag">FR-MOBILE-AUTH-07</span>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="previewFooter">
+      <span>Prepared by <b>Silverline Software Inc.</b> for the Flipper.ai Mobile v2.0 review · 2026-06-11</span>
+      <span class="right"><a href="01-sign-in.html">← prev</a> <a href="index.html">index</a> <a href="03-scanner.html">next: Scanner →</a></span>
+    </footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!--
+  file: docs/client-facing/previews/10-posting-composer.html
+  author: Stephen Boyett
+  company: Axovia
+  date: 2026-06-11
+  version: 1.0
+  brief: Mobile preview — AI listing composer with optimal-price slider and multi-marketplace posting.
+
+  description:
+      Illustrates Feature 23 / Stories 23.2-23.5: AI-generated title and
+      description with inline edit, the recommended optimal price with a
+      ±25% adjustment slider, multi-select target marketplaces, and live
+      per-platform posting status from the queue
+      (FR-MOBILE-RELIST-02..06).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Flipper.ai · Cross-Posting — preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .pcWrap { padding: 64px 16px 12px; display: flex; flex-direction: column; gap: 10px; height: 100%; }
+    .pcHead { display: flex; align-items: center; gap: 9px; }
+    .pcHead .back { font-size: 16px; color: var(--screen-text-2); }
+    .pcHead h2 { margin: 0; font-size: 18px; color: var(--screen-text); letter-spacing: -0.01em; }
+    .pcItem { display: flex; gap: 10px; align-items: center; padding: 9px 11px; }
+    .pcItem img { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; }
+    .pcItem .t { font-size: 12px; font-weight: 700; color: var(--screen-text); }
+    .pcItem .s { font-size: 10px; color: var(--screen-text-muted); }
+    .pcLabel { display: flex; align-items: center; justify-content: space-between; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--screen-text-muted); margin: 2px 2px 0; }
+    .pcLabel .re { color: var(--fp-lavender); display: inline-flex; gap: 4px; align-items: center; text-transform: none; letter-spacing: 0.02em; }
+    .pcField { padding: 10px 12px; font-size: 12px; line-height: 1.4; color: var(--screen-text); }
+    .pcField.desc { color: var(--screen-text-2); font-size: 11px; }
+    .priceCard { padding: 12px 14px; }
+    .priceTop { display: flex; align-items: baseline; gap: 8px; }
+    .priceTop b { font-size: 24px; color: var(--screen-text); }
+    .priceTop .rec { font-size: 10px; font-weight: 800; letter-spacing: 0.08em; color: var(--fp-green); }
+    .slider { margin-top: 10px; position: relative; height: 22px; }
+    .slider .track { position: absolute; top: 9px; left: 0; right: 0; height: 4px; border-radius: 999px; background: rgba(255,255,255,0.08); }
+    .slider .fillL { position: absolute; top: 9px; left: 25%; width: 32%; height: 4px; border-radius: 999px; background: linear-gradient(90deg, #6d28d9, #8b5cf6); }
+    .slider .knob { position: absolute; top: 2px; left: 55%; width: 18px; height: 18px; border-radius: 999px; background: #fff; box-shadow: 0 0 0 4px rgba(139,92,246,0.35), 0 2px 8px rgba(0,0,0,0.5); }
+    .slider .ends { position: absolute; top: -8px; left: 0; right: 0; display: flex; justify-content: space-between; font-size: 8.5px; color: var(--screen-text-muted); }
+    .mkChecks { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .mkCheck { display: flex; align-items: center; gap: 8px; padding: 9px 10px; border-radius: 11px; font-size: 11px; font-weight: 700; color: var(--screen-text-2); }
+    .mkCheck .bx { width: 17px; height: 17px; border-radius: 5px; border: 1.5px solid rgba(255,255,255,0.22); display: flex; align-items: center; justify-content: center; font-size: 10px; }
+    .mkCheck.on { border-color: rgba(139,92,246,0.5); background: rgba(124,58,237,0.12); color: var(--screen-text); }
+    .mkCheck.on .bx { border-color: transparent; background: linear-gradient(135deg,#8b5cf6,#6d28d9); color: #fff; }
+    .qStatus { display: flex; gap: 7px; }
+    .qPill { flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 7px 4px; border-radius: 10px; font-size: 9.5px; font-weight: 800; }
+    .qPill.ok { background: rgba(52,211,153,0.12); color: var(--fp-green); }
+    .qPill.run { background: rgba(124,58,237,0.16); color: var(--fp-lavender); }
+    .qPill.run i { width: 6px; height: 6px; border-radius: 999px; background: var(--fp-purple-bright); animation: fpPulse 1.2s ease infinite; }
+    .qPill.fail { background: rgba(248,113,113,0.12); color: var(--fp-red); }
+  </style>
+</head>
+<body>
+  <main class="previewPage">
+    <header class="previewTop">
+      <a class="previewBrand" href="index.html">
+        <span class="mark">F</span>
+        <span class="word">Flipper.ai <em>mobile preview deck</em></span>
+      </a>
+      <div class="previewIndex">
+        <span class="step">10 / 17</span>
+        <span class="step active">Cross-Posting</span>
+      </div>
+    </header>
+
+    <section class="previewHero">
+      <div>
+        <p class="previewKicker">Feature 23 · Cross-Platform Posting · Phase C</p>
+        <h1 class="previewTitle">List once, <em>sell everywhere</em>.</h1>
+        <p class="previewLede">
+          AI writes the title and description, recommends the optimal price, and posts to every
+          selected marketplace from one tap — with live per-platform status as each post lands.
+        </p>
+        <div class="previewFrCloud">
+          <a href="16-functional-requirements.html#FR-MOBILE-RELIST-02"><span>FR-MOBILE-RELIST-02</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-RELIST-03"><span>FR-MOBILE-RELIST-03</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-RELIST-04"><span>FR-MOBILE-RELIST-04</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-RELIST-06"><span>FR-MOBILE-RELIST-06</span></a>
+        </div>
+      </div>
+      <div class="previewMetaCard">
+        <h4>What this screen shows</h4>
+        <ul>
+          <li><strong>Surface</strong><span>Posting composer · from a LISTED-stage flip</span></li>
+          <li><strong>Story</strong><span>Feature 23 / Stories 23.2 – 23.5</span></li>
+          <li><strong>AI</strong><span>Title, description &amp; optimal price from live endpoints</span></li>
+          <li><strong>Photos</strong><span>Reuses originals + camera-roll or in-app capture</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="phoneStage">
+      <aside class="stageNoteLeft">
+        <div class="stageNote">
+          <h5>AI copy, editable inline</h5>
+          <p>Title and description are generated per-item and editable in place. The ✨ regenerate affordance re-rolls either field.</p>
+          <span class="frTag">FR-MOBILE-RELIST-02</span>
+        </div>
+        <div class="stageNote">
+          <h5>Priced by the data</h5>
+          <p>The recommended price comes from the optimal-price engine; the slider lets the user push ±25% before queueing.</p>
+          <span class="frTag">FR-MOBILE-RELIST-03</span>
+        </div>
+      </aside>
+
+      <div class="phoneFrame">
+        <div class="phoneScreen fpDark">
+          <div class="statusBar onDark">
+            <span>9:41</span>
+            <span class="icons"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></span>
+          </div>
+
+          <div class="screenScroll">
+            <div class="pcWrap">
+              <div class="pcHead"><span class="back">‹</span><h2>Post for resale</h2></div>
+
+              <div class="pcItem fpGlassSm">
+                <img src="https://picsum.photos/seed/flipper-receiver/88/88" alt="" />
+                <div><div class="t">Marantz 2270 Receiver</div><div class="s">Purchased $95 · 4 photos attached</div></div>
+              </div>
+
+              <div class="pcLabel"><span>AI title</span><span class="re">✨ regenerate</span></div>
+              <div class="pcField fpGlassSm">Marantz 2270 Stereo Receiver — Serviced, Beautiful Faceplate, Works Perfectly</div>
+
+              <div class="pcLabel"><span>AI description</span><span class="re">✨ regenerate</span></div>
+              <div class="pcField fpGlassSm desc">Iconic 70s Marantz warmth with the blue-glow tuning dial collectors want. Fully functional, recently cleaned pots, no scratchy channels…</div>
+
+              <div class="pcLabel"><span>Price</span></div>
+              <div class="priceCard fpGlass">
+                <div class="priceTop"><b>$289</b><span class="rec">RECOMMENDED $275–$300</span></div>
+                <div class="slider">
+                  <span class="ends"><span>−25%</span><span>+25%</span></span>
+                  <span class="track"></span><span class="fillL"></span><span class="knob"></span>
+                </div>
+              </div>
+
+              <div class="pcLabel"><span>Post to</span></div>
+              <div class="mkChecks">
+                <div class="mkCheck fpGlassSm on"><span class="bx">✓</span>eBay</div>
+                <div class="mkCheck fpGlassSm on"><span class="bx">✓</span>Mercari</div>
+                <div class="mkCheck fpGlassSm on"><span class="bx">✓</span>Facebook</div>
+                <div class="mkCheck fpGlassSm"><span class="bx"></span>OfferUp</div>
+              </div>
+
+              <div class="fpBtnPrimary" style="height:44px;">🚀 Queue 3 posts</div>
+
+              <div class="qStatus">
+                <span class="qPill ok">✓ Mercari listed</span>
+                <span class="qPill run"><i></i> eBay posting…</span>
+                <span class="qPill fail">⟲ FB retry</span>
+              </div>
+            </div>
+          </div>
+
+          <nav class="tabBar fpDark">
+            <div class="tab"><span class="glyph">📊</span>Dashboard</div>
+            <div class="tab"><span class="glyph">📡</span>Scanner</div>
+            <div class="tab active"><span class="glyph">💎</span>Flips</div>
+            <div class="tab"><span class="glyph">💬</span>Messages</div>
+            <div class="tab"><span class="glyph">⋯</span>More</div>
+          </nav>
+        </div>
+      </div>
+
+      <aside class="stageNoteRight">
+        <div class="stageNote">
+          <h5>One tap, three storefronts</h5>
+          <p>The posting queue fans the listing out to every checked marketplace, reusing the stored photos. Failures surface with a one-tap retry.</p>
+          <span class="frTag">FR-MOBILE-RELIST-04 · 01</span>
+        </div>
+        <div class="stageNote">
+          <h5>Status you can act on</h5>
+          <p>Per-platform results stream in live — "Listed on Mercari ✓", "Facebook posting failed — retry?" — via the event stream and push.</p>
+          <span class="frTag">FR-MOBILE-RELIST-06</span>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="previewFooter">
+      <span>Prepared by <b>Silverline Software Inc.</b> for the Flipper.ai Mobile v2.0 review · 2026-06-11</span>
+      <span class="right"><a href="09-thread.html">← prev</a> <a href="index.html">index</a> <a href="11-analytics.html">next: Analytics →</a></span>
+    </footer>
+  </main>
+</body>
+</html>

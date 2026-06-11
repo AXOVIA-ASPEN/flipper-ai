@@ -1,0 +1,185 @@
+<!--
+  file: docs/client-facing/previews/05-listing-detail.html
+  author: Stephen Boyett
+  company: Axovia
+  date: 2026-06-11
+  version: 1.0
+  brief: Mobile preview — listing detail with swipeable gallery, score breakdown, comps, and save/pass actions.
+
+  description:
+      Illustrates Feature 19 / Stories 19.5-19.6: the full listing detail —
+      pinch-to-zoom gallery, AI sellability assessment, score-factor
+      breakdown, comparable sold items, deep link to the original listing,
+      and the one-tap Save-as-Opportunity / Pass pair
+      (FR-MOBILE-SCAN-07, 08, 09).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Flipper.ai · Listing Detail — preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .dtHero { position: relative; height: 218px; }
+    .dtHero img { width: 100%; height: 100%; object-fit: cover; }
+    .dtHero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,11,20,0.25), transparent 35%, transparent 60%, rgba(8,11,20,0.92)); }
+    .dtHero .dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; z-index: 2; }
+    .dtHero .dots span { width: 6px; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.35); }
+    .dtHero .dots span.on { background: #fff; }
+    .dtHero .back { position: absolute; top: 56px; left: 14px; z-index: 2; width: 32px; height: 32px; border-radius: 999px; background: rgba(8,11,20,0.55); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .dtBody { padding: 12px 16px 12px; display: flex; flex-direction: column; gap: 10px; }
+    .dtTitleRow { display: flex; align-items: flex-start; gap: 10px; }
+    .dtTitleRow h2 { margin: 0; font-size: 17px; line-height: 1.25; color: var(--screen-text); letter-spacing: -0.01em; }
+    .dtTitleRow .pr { margin-left: auto; text-align: right; flex-shrink: 0; }
+    .dtTitleRow .pr b { font-size: 19px; color: var(--screen-text); }
+    .dtTitleRow .pr span { display: block; font-size: 10px; color: var(--screen-text-muted); }
+    .dtMeta { font-size: 10.5px; color: var(--screen-text-muted); }
+    .scoreCard { padding: 12px 14px; display: flex; gap: 14px; align-items: center; }
+    .scoreRing { width: 64px; height: 64px; border-radius: 999px; flex-shrink: 0;
+      background: conic-gradient(#8b5cf6 0 87%, rgba(255,255,255,0.08) 87% 100%);
+      display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 18px var(--fp-glow-purple); }
+    .scoreRing::before { content: ""; position: absolute; inset: 6px; border-radius: 999px; background: #0d1120; }
+    .scoreRing b { position: relative; font-size: 19px; color: #d8c8ff; }
+    .factors { flex: 1; display: grid; gap: 6px; }
+    .factor { display: grid; grid-template-columns: 64px 1fr 28px; align-items: center; gap: 8px; font-size: 9.5px; color: var(--screen-text-muted); }
+    .factor .bar { height: 4px; border-radius: 999px; background: rgba(255,255,255,0.07); position: relative; }
+    .factor .bar i { position: absolute; inset: 0; border-radius: 999px; background: linear-gradient(90deg, #6d28d9, #8b5cf6); }
+    .factor .v { text-align: right; font-weight: 800; color: var(--screen-text-2); font-size: 10px; }
+    .aiLine { padding: 10px 12px; display: flex; gap: 9px; align-items: flex-start; font-size: 11px; line-height: 1.45; color: var(--screen-text-2); border-left: 2px solid var(--fp-purple-bright); }
+    .aiLine .spark { flex-shrink: 0; }
+    .compsRow { display: flex; gap: 8px; }
+    .comp { flex: 1; padding: 9px 10px; text-align: center; }
+    .comp b { display: block; font-size: 13.5px; color: var(--fp-green); }
+    .comp span { font-size: 9px; color: var(--screen-text-muted); }
+    .dtActions { display: grid; grid-template-columns: 1fr 1.6fr; gap: 9px; margin-top: 2px; }
+    .dtOrig { text-align: center; font-size: 10.5px; font-weight: 700; color: var(--screen-text-muted); }
+  </style>
+</head>
+<body>
+  <main class="previewPage">
+    <header class="previewTop">
+      <a class="previewBrand" href="index.html">
+        <span class="mark">F</span>
+        <span class="word">Flipper.ai <em>mobile preview deck</em></span>
+      </a>
+      <div class="previewIndex">
+        <span class="step">05 / 17</span>
+        <span class="step active">Listing Detail</span>
+      </div>
+    </header>
+
+    <section class="previewHero">
+      <div>
+        <p class="previewKicker">Feature 19 · Marketplace Scanning · Phase B</p>
+        <h1 class="previewTitle">The full case for the flip, <em>one screen</em>.</h1>
+        <p class="previewLede">
+          Swipeable gallery, score breakdown by factor, AI sellability read, and real comparable
+          solds — then a single tap to save it as an opportunity or pass forever.
+        </p>
+        <div class="previewFrCloud">
+          <a href="16-functional-requirements.html#FR-MOBILE-SCAN-07"><span>FR-MOBILE-SCAN-07</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-SCAN-08"><span>FR-MOBILE-SCAN-08</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-SCAN-09"><span>FR-MOBILE-SCAN-09</span></a>
+        </div>
+      </div>
+      <div class="previewMetaCard">
+        <h4>What this screen shows</h4>
+        <ul>
+          <li><strong>Surface</strong><span>Listing detail · pushed from the feed</span></li>
+          <li><strong>Story</strong><span>Feature 19 / Stories 19.5 – 19.6</span></li>
+          <li><strong>AI</strong><span>Sellability runs on the live AI provider chain — never canned</span></li>
+          <li><strong>Gesture</strong><span>Swipe gallery · pinch-to-zoom photos</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="phoneStage">
+      <aside class="stageNoteLeft">
+        <div class="stageNote">
+          <h5>Score, decomposed</h5>
+          <p>The 0–100 score breaks into brand, condition, demand, and risk factors — the same engine that powers the web, rendered for a phone.</p>
+          <span class="frTag">FR-MOBILE-SCAN-07</span>
+        </div>
+        <div class="stageNote">
+          <h5>Real comps</h5>
+          <p>Comparable sold items anchor the resale estimate to market reality, not optimism.</p>
+          <span class="frTag">FR-MOBILE-SCAN-07</span>
+        </div>
+      </aside>
+
+      <div class="phoneFrame">
+        <div class="phoneScreen fpDark">
+          <div class="statusBar onHero">
+            <span>9:41</span>
+            <span class="icons"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></span>
+          </div>
+
+          <div class="screenScroll">
+            <div class="dtHero">
+              <img src="https://picsum.photos/seed/flipper-receiver/760/440" alt="Marantz receiver photos" />
+              <span class="back">‹</span>
+              <div class="dots"><span class="on"></span><span></span><span></span><span></span></div>
+            </div>
+
+            <div class="dtBody">
+              <div class="dtTitleRow">
+                <div>
+                  <h2>Marantz 2270 Receiver — works great</h2>
+                  <div class="dtMeta">Craigslist · Tampa · 2.1 mi · listed 14 min ago</div>
+                </div>
+                <div class="pr"><b>$120</b><span>asking</span></div>
+              </div>
+
+              <div class="scoreCard fpGlass fpHot">
+                <div class="scoreRing"><b>92</b></div>
+                <div class="factors">
+                  <div class="factor"><span>Brand</span><span class="bar"><i style="width:95%"></i></span><span class="v">9.5</span></div>
+                  <div class="factor"><span>Condition</span><span class="bar"><i style="width:84%"></i></span><span class="v">8.4</span></div>
+                  <div class="factor"><span>Demand</span><span class="bar"><i style="width:91%"></i></span><span class="v">9.1</span></div>
+                  <div class="factor"><span>Risk</span><span class="bar"><i style="width:22%"></i></span><span class="v">low</span></div>
+                </div>
+              </div>
+
+              <div class="aiLine fpGlassSm">
+                <span class="spark">✨</span>
+                <span><b style="color:var(--fp-lavender);">Sellability: strong.</b> Vintage Marantz receivers in working order sell within 9 days on average. Seller's "works great" + original faceplate photos suggest honest condition.</span>
+              </div>
+
+              <div class="compsRow">
+                <div class="comp fpGlassSm"><b>$310</b><span>sold · 6 d ago</span></div>
+                <div class="comp fpGlassSm"><b>$285</b><span>sold · 11 d ago</span></div>
+                <div class="comp fpGlassSm"><b>$340</b><span>sold · 15 d ago</span></div>
+              </div>
+
+              <div class="dtActions">
+                <div class="fpBtnGhost">Pass</div>
+                <div class="fpBtnPrimary">💎 Save Opportunity</div>
+              </div>
+              <div class="dtOrig">Open original listing ↗</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="stageNoteRight">
+        <div class="stageNote">
+          <h5>Live AI read</h5>
+          <p>The sellability assessment comes from the production AI router — Groq primary with automatic fallbacks. Per project policy it is never mocked, even in tests.</p>
+          <span class="frTag">Project policy · POL-01</span>
+        </div>
+        <div class="stageNote">
+          <h5>Save or pass, once</h5>
+          <p>Save fires a success haptic and creates the opportunity. Pass marks the listing so it never resurfaces in future scans.</p>
+          <span class="frTag">FR-MOBILE-SCAN-08 · 09</span>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="previewFooter">
+      <span>Prepared by <b>Silverline Software Inc.</b> for the Flipper.ai Mobile v2.0 review · 2026-06-11</span>
+      <span class="right"><a href="04-listings-feed.html">← prev</a> <a href="index.html">index</a> <a href="06-opportunities.html">next: Opportunities →</a></span>
+    </footer>
+  </main>
+</body>
+</html>

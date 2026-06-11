@@ -1,0 +1,167 @@
+<!--
+  file: docs/client-facing/previews/15-camera.html
+  author: Stephen Boyett
+  company: Axovia
+  date: 2026-06-11
+  version: 1.0
+  brief: Mobile preview — in-app multi-shot camera for listing photos, with offline-sync indicator.
+
+  description:
+      Illustrates Feature 28 / Stories 28.1-28.3: the in-app camera flow for
+      capturing in-hand item photos — multi-shot up to 12, flash control,
+      auto-crop — uploading to Firebase Storage, plus the offline
+      write-through queue that syncs edits when the connection returns
+      (FR-MOBILE-CAMERA-01, 02, FR-MOBILE-POLISH-01, 02).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Flipper.ai · Camera Capture — preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .cmView { position: relative; height: 100%; display: flex; flex-direction: column; }
+    .cmFeed { position: absolute; inset: 0; }
+    .cmFeed img { width: 100%; height: 100%; object-fit: cover; }
+    .cmFeed::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,11,20,0.55), transparent 22%, transparent 64%, rgba(8,11,20,0.88)); }
+    .cmTop { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; padding: 58px 18px 0; }
+    .cmPill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgba(8,11,20,0.6); border: 1px solid rgba(255,255,255,0.14); font-size: 10.5px; font-weight: 800; color: #e8edf7; backdrop-filter: blur(6px); }
+    .cmFrame { position: relative; z-index: 2; margin: 26px 34px 0; flex: 1; max-height: 320px; }
+    .cmFrame i { position: absolute; width: 26px; height: 26px; border: 2.5px solid rgba(196,181,253,0.95); }
+    .cmFrame i:nth-child(1) { top: 0; left: 0; border-right: none; border-bottom: none; border-radius: 6px 0 0 0; }
+    .cmFrame i:nth-child(2) { top: 0; right: 0; border-left: none; border-bottom: none; border-radius: 0 6px 0 0; }
+    .cmFrame i:nth-child(3) { bottom: 0; left: 0; border-right: none; border-top: none; border-radius: 0 0 0 6px; }
+    .cmFrame i:nth-child(4) { bottom: 0; right: 0; border-left: none; border-top: none; border-radius: 0 0 6px 0; }
+    .cmHintChip { position: absolute; left: 50%; bottom: -14px; transform: translateX(-50%); white-space: nowrap; padding: 4px 11px; border-radius: 999px; background: rgba(124,58,237,0.85); color: #fff; font-size: 9px; font-weight: 800; letter-spacing: 0.06em; }
+    .cmBottom { position: relative; z-index: 2; margin-top: auto; padding: 0 18px 18px; display: flex; flex-direction: column; gap: 12px; }
+    .cmShots { display: flex; gap: 7px; align-items: center; }
+    .cmShots img { width: 44px; height: 44px; border-radius: 9px; object-fit: cover; border: 1.5px solid rgba(255,255,255,0.25); }
+    .cmShots .more { width: 44px; height: 44px; border-radius: 9px; border: 1.5px dashed rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: #cbd5e1; }
+    .cmShots .cnt { margin-left: auto; font-size: 11px; font-weight: 800; color: #e8edf7; }
+    .cmCtrl { display: flex; align-items: center; justify-content: space-between; }
+    .cmSide { width: 44px; height: 44px; border-radius: 999px; background: rgba(8,11,20,0.6); border: 1px solid rgba(255,255,255,0.16); display: flex; align-items: center; justify-content: center; font-size: 17px; backdrop-filter: blur(6px); }
+    .cmShutter { width: 72px; height: 72px; border-radius: 999px; border: 4px solid #fff; display: flex; align-items: center; justify-content: center; }
+    .cmShutter i { width: 56px; height: 56px; border-radius: 999px; background: linear-gradient(135deg, #8b5cf6, #6d28d9); box-shadow: 0 0 26px var(--fp-glow-purple); }
+    .cmSync { position: relative; z-index: 2; margin: 0 18px; display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 11px; background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.35); font-size: 10px; font-weight: 700; color: var(--fp-yellow); }
+  </style>
+</head>
+<body>
+  <main class="previewPage">
+    <header class="previewTop">
+      <a class="previewBrand" href="index.html">
+        <span class="mark">F</span>
+        <span class="word">Flipper.ai <em>mobile preview deck</em></span>
+      </a>
+      <div class="previewIndex">
+        <span class="step">15 / 17</span>
+        <span class="step active">Camera</span>
+      </div>
+    </header>
+
+    <section class="previewHero">
+      <div>
+        <p class="previewKicker">Feature 28 · Camera, Offline &amp; Polish · Phase D</p>
+        <h1 class="previewTitle">Shoot it, list it — <em>even offline</em>.</h1>
+        <p class="previewLede">
+          A purpose-built capture flow for resale photos: up to 12 shots per listing, flash and
+          auto-crop, straight to cloud storage. And when the garage has no signal, edits queue
+          locally and sync on reconnect.
+        </p>
+        <div class="previewFrCloud">
+          <a href="16-functional-requirements.html#FR-MOBILE-CAMERA-01"><span>FR-MOBILE-CAMERA-01</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-CAMERA-02"><span>FR-MOBILE-CAMERA-02</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-POLISH-01"><span>FR-MOBILE-POLISH-01</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-POLISH-02"><span>FR-MOBILE-POLISH-02</span></a>
+        </div>
+      </div>
+      <div class="previewMetaCard">
+        <h4>What this screen shows</h4>
+        <ul>
+          <li><strong>Surface</strong><span>In-app camera · multi-shot listing capture</span></li>
+          <li><strong>Story</strong><span>Feature 28 / Stories 28.1 – 28.3</span></li>
+          <li><strong>Upload</strong><span>Firebase Storage, per-user path, auto-registered</span></li>
+          <li><strong>Offline</strong><span>Write-through queue replays edits on reconnect</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="phoneStage">
+      <aside class="stageNoteLeft">
+        <div class="stageNote">
+          <h5>Twelve shots, one flow</h5>
+          <p>Multi-shot mode keeps the seller in the moment: shoot all angles, review the strip, retake any frame — no camera-roll round-trips.</p>
+          <span class="frTag">FR-MOBILE-CAMERA-01</span>
+        </div>
+        <div class="stageNote">
+          <h5>Straight into the listing</h5>
+          <p>Captures upload to the user's cloud storage path and register against the listing's image set automatically.</p>
+          <span class="frTag">FR-MOBILE-CAMERA-02</span>
+        </div>
+      </aside>
+
+      <div class="phoneFrame">
+        <div class="phoneScreen fpDark">
+          <div class="statusBar onHero">
+            <span>9:41</span>
+            <span class="icons"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></span>
+          </div>
+
+          <div class="screenScroll">
+            <div class="cmView">
+              <div class="cmFeed"><img src="https://picsum.photos/seed/flipper-amp-shot/760/1500" alt="Camera viewfinder" /></div>
+
+              <div class="cmTop">
+                <span class="cmPill">✕</span>
+                <span class="cmPill">⚡ Flash auto</span>
+                <span class="cmPill">✂ Auto-crop ON</span>
+              </div>
+
+              <div class="cmFrame">
+                <i></i><i></i><i></i><i></i>
+                <span class="cmHintChip">FILL THE FRAME · TAP TO FOCUS</span>
+              </div>
+
+              <div class="cmSync">📶 Offline — 4 photos &amp; 1 stage change queued · will sync on reconnect</div>
+
+              <div class="cmBottom">
+                <div class="cmShots">
+                  <img src="https://picsum.photos/seed/flipper-shot1/88/88" alt="" />
+                  <img src="https://picsum.photos/seed/flipper-shot2/88/88" alt="" />
+                  <img src="https://picsum.photos/seed/flipper-shot3/88/88" alt="" />
+                  <img src="https://picsum.photos/seed/flipper-shot4/88/88" alt="" />
+                  <span class="more">+</span>
+                  <span class="cnt">4 / 12</span>
+                </div>
+                <div class="cmCtrl">
+                  <span class="cmSide">🖼️</span>
+                  <span class="cmShutter"><i></i></span>
+                  <span class="cmSide">🔄</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="stageNoteRight">
+        <div class="stageNote">
+          <h5>Offline isn't an error</h5>
+          <p>The amber strip is the whole story: photos and lifecycle edits queue in fast local storage and replay to the backend when signal returns. Optimistic UI advances immediately, with a rollback toast if a sync fails.</p>
+          <span class="frTag">FR-MOBILE-POLISH-01 · 02</span>
+        </div>
+        <div class="stageNote">
+          <h5>Phase D polish</h5>
+          <p>This feature also brings tablet 4-column Kanban and OS-level search (Spotlight / App Indexing) — the last mile before GA.</p>
+          <span class="frTag">FR-MOBILE-POLISH-03 · 04</span>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="previewFooter">
+      <span>Prepared by <b>Silverline Software Inc.</b> for the Flipper.ai Mobile v2.0 review · 2026-06-11</span>
+      <span class="right"><a href="14-meetup.html">← prev</a> <a href="index.html">index</a> <a href="16-functional-requirements.html">next: FR Catalog →</a></span>
+    </footer>
+  </main>
+</body>
+</html>

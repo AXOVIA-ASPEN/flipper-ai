@@ -1,0 +1,200 @@
+<!--
+  file: docs/client-facing/previews/14-meetup.html
+  author: Stephen Boyett
+  company: Axovia
+  date: 2026-06-11
+  version: 1.0
+  brief: Mobile preview — meetup logistics with calendar, directions, geofence reminder, and sharing.
+
+  description:
+      Illustrates Feature 27 / Stories 27.1-27.4: scheduling a buy/sell
+      meetup into the OS or Google calendar, one-tap driving directions in
+      the user's preferred maps app, the "notify me 10 minutes away"
+      geofence reminder, and share-sheet integration
+      (FR-MOBILE-MEET-01..04).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Flipper.ai · Meetups — preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .mtWrap { padding: 64px 16px 14px; display: flex; flex-direction: column; gap: 10px; height: 100%; }
+    .mtHead { display: flex; align-items: center; gap: 9px; }
+    .mtHead .back { font-size: 16px; color: var(--screen-text-2); }
+    .mtHead h2 { margin: 0; font-size: 18px; color: var(--screen-text); letter-spacing: -0.01em; }
+    .mtMap { position: relative; height: 150px; border-radius: 16px; overflow: hidden;
+      background:
+        linear-gradient(rgba(139,92,246,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139,92,246,0.06) 1px, transparent 1px),
+        radial-gradient(at 60% 40%, rgba(124,58,237,0.22), transparent 60%),
+        #0d1120;
+      background-size: 26px 26px, 26px 26px, 100% 100%, 100% 100%;
+      border: 1px solid var(--fp-glass-border); }
+    .mtMap .rd { position: absolute; background: rgba(255,255,255,0.08); }
+    .mtMap .rd.h1 { top: 44px; left: 0; right: 0; height: 7px; }
+    .mtMap .rd.v1 { top: 0; bottom: 0; left: 58%; width: 7px; }
+    .mtMap .rd.d1 { top: 108px; left: -10%; right: 30%; height: 5px; transform: rotate(-7deg); }
+    .mtMap .pin { position: absolute; top: 34px; left: 55%; font-size: 24px; filter: drop-shadow(0 4px 10px rgba(124,58,237,0.7)); }
+    .mtMap .eta { position: absolute; bottom: 10px; left: 10px; padding: 5px 11px; border-radius: 999px; background: rgba(8,11,20,0.82); border: 1px solid var(--fp-glass-border); font-size: 10px; font-weight: 800; color: var(--screen-text-2); }
+    .mtMap .eta b { color: var(--fp-green); }
+    .mtCard { padding: 12px 14px; }
+    .mtCard .row { display: flex; align-items: center; gap: 11px; }
+    .mtCard img { width: 44px; height: 44px; border-radius: 11px; object-fit: cover; }
+    .mtCard .t { font-size: 13px; font-weight: 800; color: var(--screen-text); }
+    .mtCard .s { font-size: 10.5px; color: var(--screen-text-muted); margin-top: 1px; }
+    .mtCard .amt { margin-left: auto; text-align: right; }
+    .mtCard .amt b { font-size: 15px; color: var(--fp-green); }
+    .mtCard .amt span { display: block; font-size: 9px; color: var(--screen-text-muted); }
+    .mtWhen { display: flex; gap: 8px; margin-top: 10px; }
+    .mtWhen .pc { flex: 1; padding: 8px 10px; border-radius: 11px; background: rgba(255,255,255,0.04); border: 1px solid var(--fp-glass-border); }
+    .mtWhen .pc .l { font-size: 8.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--screen-text-muted); }
+    .mtWhen .pc .v { font-size: 11.5px; font-weight: 700; color: var(--screen-text); margin-top: 2px; }
+    .actGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .actTile { padding: 11px 12px; display: flex; align-items: center; gap: 9px; font-size: 11.5px; font-weight: 700; color: var(--screen-text); }
+    .actTile .ic { width: 30px; height: 30px; border-radius: 9px; background: rgba(124,58,237,0.16); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .actTile .s { display: block; font-size: 9px; font-weight: 600; color: var(--screen-text-muted); }
+    .geoRow { display: flex; align-items: center; gap: 11px; padding: 11px 13px; }
+    .geoRow .ic { width: 30px; height: 30px; border-radius: 9px; background: rgba(52,211,153,0.14); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .geoRow .t { font-size: 12px; font-weight: 700; color: var(--screen-text); }
+    .geoRow .s { font-size: 9.5px; color: var(--screen-text-muted); }
+    .geoTog { margin-left: auto; width: 38px; height: 22px; border-radius: 999px; background: linear-gradient(135deg, #10b981, #34d399); position: relative; }
+    .geoTog::after { content: ""; position: absolute; top: 3px; right: 4px; width: 16px; height: 16px; border-radius: 999px; background: #fff; }
+  </style>
+</head>
+<body>
+  <main class="previewPage">
+    <header class="previewTop">
+      <a class="previewBrand" href="index.html">
+        <span class="mark">F</span>
+        <span class="word">Flipper.ai <em>mobile preview deck</em></span>
+      </a>
+      <div class="previewIndex">
+        <span class="step">14 / 17</span>
+        <span class="step active">Meetups</span>
+      </div>
+    </header>
+
+    <section class="previewHero">
+      <div>
+        <p class="previewKicker">Feature 27 · Meetups &amp; Native Integrations · Phase C</p>
+        <h1 class="previewTitle">From chat to <em>curbside</em>.</h1>
+        <p class="previewLede">
+          The handoff layer the web can't do: the meetup goes on the phone's calendar, directions
+          open in the user's maps app, and a geofence pings them ten minutes out — bring the cash.
+        </p>
+        <div class="previewFrCloud">
+          <a href="16-functional-requirements.html#FR-MOBILE-MEET-01"><span>FR-MOBILE-MEET-01</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-MEET-02"><span>FR-MOBILE-MEET-02</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-MEET-03"><span>FR-MOBILE-MEET-03</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-MEET-04"><span>FR-MOBILE-MEET-04</span></a>
+        </div>
+      </div>
+      <div class="previewMetaCard">
+        <h4>What this screen shows</h4>
+        <ul>
+          <li><strong>Surface</strong><span>Meetup detail · from an opportunity in negotiation</span></li>
+          <li><strong>Story</strong><span>Feature 27 / Stories 27.1 – 27.3</span></li>
+          <li><strong>Calendar</strong><span>OS calendar, Google Calendar, or both — user's choice</span></li>
+          <li><strong>Maps</strong><span>Apple Maps or Google Maps deep link</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="phoneStage">
+      <aside class="stageNoteLeft">
+        <div class="stageNote">
+          <h5>Calendar without OAuth friction</h5>
+          <p>The meetup writes straight into the device calendar — no Google account linking required, though the existing Google Calendar path remains available.</p>
+          <span class="frTag">FR-MOBILE-MEET-01</span>
+        </div>
+        <div class="stageNote">
+          <h5>Ten minutes out</h5>
+          <p>An opt-in geofence reminder fires as the user approaches the meetup point — the "did you bring the cash?" nudge at exactly the right moment.</p>
+          <span class="frTag">FR-MOBILE-MEET-03</span>
+        </div>
+      </aside>
+
+      <div class="phoneFrame">
+        <div class="phoneScreen fpDark">
+          <div class="statusBar onDark">
+            <span>9:41</span>
+            <span class="icons"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></span>
+          </div>
+
+          <div class="screenScroll">
+            <div class="mtWrap">
+              <div class="mtHead"><span class="back">‹</span><h2>Meetup</h2></div>
+
+              <div class="mtMap">
+                <span class="rd h1"></span><span class="rd v1"></span><span class="rd d1"></span>
+                <span class="pin">📍</span>
+                <span class="eta">🚗 14 min · 6.2 mi · <b>arrive 4:46 PM</b></span>
+              </div>
+
+              <div class="mtCard fpGlass">
+                <div class="row">
+                  <img src="https://picsum.photos/seed/flipper-receiver/88/88" alt="" />
+                  <div>
+                    <div class="t">Marantz 2270 · Mike R.</div>
+                    <div class="s">Starbucks, Westshore Plaza · Tampa</div>
+                  </div>
+                  <div class="amt"><b>$95</b><span>cash agreed</span></div>
+                </div>
+                <div class="mtWhen">
+                  <div class="pc"><span class="l">When</span><div class="v">Today · 5:00 PM</div></div>
+                  <div class="pc"><span class="l">Bring</span><div class="v">$95 cash · blanket</div></div>
+                </div>
+              </div>
+
+              <div class="actGrid">
+                <div class="actTile fpGlassSm"><span class="ic">🗓️</span><div>Add to Calendar<span class="s">OS calendar or Google</span></div></div>
+                <div class="actTile fpGlassSm"><span class="ic">🧭</span><div>Directions<span class="s">Apple / Google Maps</span></div></div>
+                <div class="actTile fpGlassSm"><span class="ic">📤</span><div>Share meetup<span class="s">Messages, WhatsApp…</span></div></div>
+                <div class="actTile fpGlassSm"><span class="ic">💬</span><div>Message Mike<span class="s">back to the thread</span></div></div>
+              </div>
+
+              <div class="geoRow fpGlass">
+                <span class="ic">📡</span>
+                <div>
+                  <div class="t">Notify me when I'm 10 min away</div>
+                  <div class="s">Geofence reminder · location used only for this meetup</div>
+                </div>
+                <span class="geoTog"></span>
+              </div>
+            </div>
+          </div>
+
+          <nav class="tabBar fpDark">
+            <div class="tab"><span class="glyph">📊</span>Dashboard</div>
+            <div class="tab"><span class="glyph">📡</span>Scanner</div>
+            <div class="tab active"><span class="glyph">💎</span>Flips</div>
+            <div class="tab"><span class="glyph">💬</span>Messages</div>
+            <div class="tab"><span class="glyph">⋯</span>More</div>
+          </nav>
+        </div>
+      </div>
+
+      <aside class="stageNoteRight">
+        <div class="stageNote">
+          <h5>Native share, both ways</h5>
+          <p>Opportunities share out through the system sheet — and a share-extension lets users send a URL from Safari or Chrome INTO Flipper as a draft opportunity.</p>
+          <span class="frTag">FR-MOBILE-MEET-04 · 05</span>
+        </div>
+        <div class="stageNote">
+          <h5>Privacy-scoped location</h5>
+          <p>Location powers only the meetup reminder the user enabled. The data-collection map is documented for both stores' privacy disclosures.</p>
+          <span class="frTag">FR-RELEASE-MOBILE-14</span>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="previewFooter">
+      <span>Prepared by <b>Silverline Software Inc.</b> for the Flipper.ai Mobile v2.0 review · 2026-06-11</span>
+      <span class="right"><a href="13-settings.html">← prev</a> <a href="index.html">index</a> <a href="15-camera.html">next: Camera →</a></span>
+    </footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!--
+  file: docs/client-facing/previews/index.html
+  author: Stephen Boyett
+  company: Axovia
+  date: 2026-06-11
+  version: 1.0
+  brief: Cover page of the Flipper.ai Mobile v2.0 client-facing preview deck.
+
+  description:
+      Index for the investor/partner walkthrough of the Flipper.ai native
+      mobile app plan (Features 15-29): 15 phone-frame screen previews plus
+      the full FR catalog and the four-phase release roadmap. Every card
+      links to a numbered preview page; every preview links back here.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Flipper.ai · Mobile v2.0 Preview Deck</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="previewPage">
+    <header class="previewTop">
+      <div class="previewBrand">
+        <span class="mark">F</span>
+        <span class="word">Flipper.ai <em>mobile preview deck</em></span>
+      </div>
+      <div class="previewIndex">
+        <span class="step active">Index</span>
+        <span>v2.0 plan · 2026-06-11</span>
+      </div>
+    </header>
+
+    <section class="indexHero">
+      <span class="eyebrow">Mobile v2.0 · iOS + Android · Audience: Investors &amp; Partners</span>
+      <h1>Flipper.ai goes <span>native</span>.</h1>
+      <p>
+        The AI flip-finder that already scans five marketplaces on the web, rebuilt as a native
+        iOS + Android app — scan from the field, negotiate with AI drafts, track every flip, and
+        get pinged the moment a 90-score deal appears. 15 features, 80 stories, four releases to GA.
+      </p>
+      <div class="meta">
+        <span><b>15</b> screen previews</span>
+        <span><b>2</b> reference documents</span>
+        <span><b>123</b> functional requirements</span>
+        <span><b>20</b> NFR quality bars</span>
+        <span><b>Phases A–D</b> → v2.0.0 GA</span>
+      </div>
+    </section>
+
+    <section class="indexSection">
+      <h2>Application Experience Previews</h2>
+      <p class="sub">Fifteen phone-frame mockups in the canonical dark-glassmorphism design language — purple glow on near-black, exactly as the product ships.</p>
+      <div class="indexGrid">
+        <a class="indexCard" href="01-sign-in.html">
+          <div class="thumb">🔐</div>
+          <span class="num">01 · MOBILE · FEATURE 17</span>
+          <h3>Sign In &amp; Biometric</h3>
+          <p>One Firebase identity across web and mobile, Apple/Google OAuth, Face ID unlock, Keychain-grade token storage.</p>
+          <footer><span>FR-MOBILE-AUTH-01–05</span><span class="open">Open →</span></footer>
+        </a>
+        <a class="indexCard" href="02-onboarding.html">
+          <div class="thumb">🎟️</div>
+          <span class="num">02 · MOBILE · FEATURE 17</span>
+          <h3>Onboarding Wizard</h3>
+          <p>The 6-step setup reflowed thumb-first — swipe between steps, big targets, skippable, synced with web.</p>
+          <footer><span>FR-MOBILE-AUTH-07</span><span class="open">Open →</span></footer>
+        </a>
+        <a class="indexCard" href="03-scanner.html">
+          <div class="thumb">📡</div>
+          <span class="num">03 · MOBILE · FEATURE 19</span>
+          <h3>Scanner &amp; Live Scan</h3>
+          <p>Saved-search chips, five-marketplace scan trigger, and a live job card streaming progress in real time.</p>
+          <footer><span>FR-MOBILE-SCAN-01–04</span><span class="open">Open →</span></footer>
+        </a>
+        <a class="indexCard" href="04-listings-feed.html">
+          <div class="thumb">📜</div>
+          <span class="num">04 · MOBILE · FEATURE 19</span>
+          <h3>Listings Feed</h3>
+          <p>Score-coded infinite scroll — 85+ deals glow purple, filters persist, the feed paints instantly from cache.</p>
+          <footer><span>FR-MOBILE-SCAN-05 · 06 · 10</span><span class="open">Open →</span></footer>
+        </a>
+        <a class="indexCard" href="05-listing-detail.html">
+          <div class="thumb">🔍</div>
+          <span class="num">05 · MOBILE · FEATURE 19</span>
+          <h3>Listing Detail</h3>
+          <p>Gallery, score-factor breakdown, AI sellability read, real comps — then Save Opportunity or Pass.</p>
+          <footer><span>FR-MOBILE-SCAN-07–09</span><span class="open">Open →</span></footer>
+        </a>
+        <a class="indexCard" href="06-opportunities.html">
+          <div class="thumb">💎</div>
+          <span class="num">06 · MOBILE · FEATURE 20</span>
+          <h3>Flip Pipeline (Kanban)</h3>
+          <p>IDENTIFIED → SOLD as swipeable columns or a card stack, with live sync to the web board.</p>
+          <footer><span>FR-MOBILE-LIFECYCLE-01 · 02 · 07</span><span class="open">Open →</span></footer>
+        </a>
+        <a class="indexCard" href="07-sold-celebration.html">
+          <div class="thumb">🎉</div>
+          <span class="num">07 · MOBILE · FEATURE 20</span>
+          <h3>Flip Sold</h3>
+          <p>Sale price in, net profit computed (fees included), celebratory haptic — straight into analytics.</p>
+          <footer><span>FR-MOBILE-LIFECYCLE-05 · 06</span><span class="open">Open →</span></footer>
+        </a>
+        <a class="indexCard" href="08-inbox.html">
+          <div class="thumb">📨</div>
+          <span class="num">08 · MOBILE · FEATURE 22</span>
+          <h3>Unified Inbox</h3>
+          <p>Every marketplace conversation in one list — unread badges, listing thumbnails, swipe to triage status.</p>
+          <footer><span>FR-MOBILE-MSG-01 · 06 · 07</span><span class="open">Open →</span></footer>
+        </a>
+        <a class="indexCard" href="09-thread.html">
+          <div class="thumb">🤝</div>
+          <span class="num">09 · MOBILE · FEATURE 22</span>
+          <h3>AI Negotiation Thread</h3>
+          <p>AI-drafted replies in DRAFT state, strategy coaching inline, nothing sends without explicit approval.</p>
+          <footer><span>FR-MOBILE-MSG-02–05</span><span class="open">Open →</span></footer>
+        </a>
+        <a class="indexCard" href="10-posting-composer.html">
+          <div class="thumb">🚀</div>
+          <span class="num">10 · MOBILE · FEATURE 23</span>
+          <h3>Cross-Platform Posting</h3>
+          <p>AI title/description, optimal-price slider, multi-marketplace fan-out, live per-platform status.</p>
+          <footer><span>FR-MOBILE-RELIST-02–06</span><span class="open">Open →</span></footer>
+        </a>
+        <a class="indexCard" href="11-analytics.html">
+          <div class="thumb">📊</div>
+          <span class="num">11 · MOBILE · FEATURE 24</span>
+          <h3>Analytics</h3>
+          <p>Lifetime/MTD/YTD profit, trend chart, marketplace breakdown, inventory-health gauge, share-sheet export.</p>
+          <footer><span>FR-MOBILE-ANALYTICS-01–05</span><span class="open">Open →</span></footer>
+        </a>
+        <a class="indexCard" href="12-subscription.html">
+          <div class="thumb">💳</div>
+          <span class="num">12 · MOBILE · FEATURE 25</span>
+          <h3>Subscription (IAP)</h3>
+          <p>FLIPPER and PRO via native store billing, reconciled to one backend tier — web subscribers never double-billed.</p>
+          <footer><span>FR-MOBILE-BILLING-01–07</span><span class="open">Open →</span></footer>
+        </a>
+        <a class="indexCard" href="13-settings.html">
+          <div class="thumb">⚙️</div>
+          <span class="num">13 · MOBILE · FEATURE 26</span>
+          <h3>Settings</h3>
+          <p>Notification preferences with quiet hours, appearance, marketplaces, and the store-mandated delete-account.</p>
+          <footer><span>FR-MOBILE-SETTINGS-01–07</span><span class="open">Open →</span></footer>
+        </a>
+        <a class="indexCard" href="14-meetup.html">
+          <div class="thumb">📍</div>
+          <span class="num">14 · MOBILE · FEATURE 27</span>
+          <h3>Meetup Logistics</h3>
+          <p>Calendar, one-tap directions, "10 minutes away" geofence reminder, and share-sheet integration.</p>
+          <footer><span>FR-MOBILE-MEET-01–04</span><span class="open">Open →</span></footer>
+        </a>
+        <a class="indexCard" href="15-camera.html">
+          <div class="thumb">📸</div>
+          <span class="num">15 · MOBILE · FEATURE 28</span>
+          <h3>Camera &amp; Offline</h3>
+          <p>Multi-shot listing capture with auto-crop, cloud upload, and the offline write-through queue.</p>
+          <footer><span>FR-MOBILE-CAMERA-01 · 02 · POLISH-01</span><span class="open">Open →</span></footer>
+        </a>
+      </div>
+    </section>
+
+    <section class="indexSection">
+      <h2>Reference &amp; Planning</h2>
+      <p class="sub">The complete requirements catalog and the four-phase release plan behind the screens.</p>
+      <div class="indexGrid">
+        <a class="indexCard" href="16-functional-requirements.html">
+          <div class="thumb">📜</div>
+          <span class="num">16 · FR REFERENCE</span>
+          <h3>Functional Requirements</h3>
+          <p>All 123 mobile FRs and 20 NFRs, grouped by feature with phase badges — the anchor target every screen links into.</p>
+          <footer><span>Features 15–29</span><span class="open">Open →</span></footer>
+        </a>
+        <a class="indexCard" href="17-roadmap.html">
+          <div class="thumb">🗓️</div>
+          <span class="num">17 · RELEASE ROADMAP</span>
+          <h3>Phases A–D Roadmap</h3>
+          <p>Pipeline-first sequencing: stub binary → closed beta → web parity → v2.0.0 GA, with OTA hot-fix and rollback ops.</p>
+          <footer><span>15 features · 80 stories</span><span class="open">Open →</span></footer>
+        </a>
+      </div>
+    </section>
+
+    <footer class="previewFooter">
+      <span>Prepared by <b>Silverline Software Inc.</b> for the Flipper.ai Mobile v2.0 plan review · 2026-06-11</span>
+      <span class="right"><span>Click any preview to open it · click the Flipper.ai mark to return to this index</span></span>
+    </footer>
+  </main>
+</body>
+</html>

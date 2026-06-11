@@ -1,0 +1,196 @@
+<!--
+  file: docs/client-facing/previews/04-listings-feed.html
+  author: Stephen Boyett
+  company: Axovia
+  date: 2026-06-11
+  version: 1.0
+  brief: Mobile preview — score-coded listings feed with filters, hot-card glow, and pull-to-refresh.
+
+  description:
+      Illustrates Feature 19 / Stories 19.3-19.4 and 19.7: the infinite-scroll
+      scan-results feed — hero image, title, asking price, color-coded
+      algorithmic score, location, and age per row; high scorers get the
+      fp-hot-card glow. Filter sheet state persists per-user, and the feed
+      renders instantly from the on-device cache before refresh completes
+      (FR-MOBILE-SCAN-05, 06, 10).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Flipper.ai · Listings Feed — preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .fdWrap { padding: 66px 16px 12px; display: flex; flex-direction: column; gap: 10px; height: 100%; }
+    .fdHead { display: flex; align-items: baseline; justify-content: space-between; padding: 0 2px; }
+    .fdHead h2 { margin: 0; font-size: 20px; color: var(--screen-text); letter-spacing: -0.01em; }
+    .fdHead .cnt { font-size: 11px; color: var(--screen-text-muted); }
+    .fdPull { text-align: center; font-size: 10px; color: #64748b; letter-spacing: 0.06em; }
+    .fdChips { display: flex; gap: 7px; overflow: hidden; }
+    .lRow { display: flex; gap: 11px; padding: 10px; align-items: center; }
+    .lRow img { width: 76px; height: 76px; border-radius: 11px; object-fit: cover; flex-shrink: 0; }
+    .lRow .ti { font-size: 13px; font-weight: 700; color: var(--screen-text); line-height: 1.25; margin: 0 0 3px; }
+    .lRow .pr { font-size: 15px; font-weight: 800; color: var(--screen-text); }
+    .lRow .est { font-size: 10.5px; color: var(--fp-green); font-weight: 700; }
+    .lRow .meta { margin-top: 3px; font-size: 10.5px; color: var(--screen-text-muted); }
+    .lRow .right { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+    .lRow .mk { font-size: 9px; font-weight: 800; letter-spacing: 0.08em; color: var(--screen-text-muted); }
+  </style>
+</head>
+<body>
+  <main class="previewPage">
+    <header class="previewTop">
+      <a class="previewBrand" href="index.html">
+        <span class="mark">F</span>
+        <span class="word">Flipper.ai <em>mobile preview deck</em></span>
+      </a>
+      <div class="previewIndex">
+        <span class="step">04 / 17</span>
+        <span class="step active">Listings Feed</span>
+      </div>
+    </header>
+
+    <section class="previewHero">
+      <div>
+        <p class="previewKicker">Feature 19 · Marketplace Scanning · Phase B</p>
+        <h1 class="previewTitle">Every result, <em>scored and sorted</em>.</h1>
+        <p class="previewLede">
+          Scan results land in a thumb-first feed — image, price, location, age, and the
+          0–100 flip score on every row. Listings scoring 85+ glow. Pull down to re-run the last scan.
+        </p>
+        <div class="previewFrCloud">
+          <a href="16-functional-requirements.html#FR-MOBILE-SCAN-05"><span>FR-MOBILE-SCAN-05</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-SCAN-06"><span>FR-MOBILE-SCAN-06</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-SCAN-10"><span>FR-MOBILE-SCAN-10</span></a>
+        </div>
+      </div>
+      <div class="previewMetaCard">
+        <h4>What this screen shows</h4>
+        <ul>
+          <li><strong>Surface</strong><span>Listings feed · post-scan results</span></li>
+          <li><strong>Story</strong><span>Feature 19 / Stories 19.3, 19.4, 19.7</span></li>
+          <li><strong>Score</strong><span>Purple glow ≥85 · green 70+ · amber/red below</span></li>
+          <li><strong>Cache</strong><span>Last 200 listings render instantly on launch</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="phoneStage">
+      <aside class="stageNoteLeft">
+        <div class="stageNote">
+          <h5>Hot-card glow</h5>
+          <p>Listings scoring 85+ get the signature purple glow treatment — the same fp-hot-card language the web dashboard uses, so a deal reads as a deal at a glance.</p>
+          <span class="frTag">FR-MOBILE-SCAN-05</span>
+        </div>
+        <div class="stageNote">
+          <h5>Filters that stick</h5>
+          <p>The filter sheet covers marketplace, score threshold, price band, distance, category, and condition — and remembers your setup between sessions.</p>
+          <span class="frTag">FR-MOBILE-SCAN-06</span>
+        </div>
+      </aside>
+
+      <div class="phoneFrame">
+        <div class="phoneScreen fpDark">
+          <div class="statusBar onDark">
+            <span>9:41</span>
+            <span class="icons"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></span>
+          </div>
+
+          <div class="screenScroll">
+            <div class="fdWrap">
+              <div class="fdPull">⌄ &nbsp;pull to re-run last scan&nbsp; ⌄</div>
+              <div class="fdHead">
+                <h2>Results</h2>
+                <span class="cnt">48 listings · 9 scored 70+</span>
+              </div>
+              <div class="fdChips">
+                <span class="fpChip active">Score 70+</span>
+                <span class="fpChip">&lt; $200</span>
+                <span class="fpChip">25 mi</span>
+                <span class="fpChip">⚙ Filters</span>
+              </div>
+
+              <div class="lRow fpGlass fpHot">
+                <img src="https://picsum.photos/seed/flipper-receiver/152/152" alt="Marantz receiver" />
+                <div>
+                  <p class="ti">Marantz 2270 Receiver — works great</p>
+                  <span class="pr">$120</span> <span class="est">est. resale $310</span>
+                  <div class="meta">Craigslist · Tampa · 2.1 mi · 14 min ago</div>
+                </div>
+                <div class="right"><span class="fpScore hot">92</span><span class="mk">CL</span></div>
+              </div>
+
+              <div class="lRow fpGlass">
+                <img src="https://picsum.photos/seed/flipper-kitchenaid/152/152" alt="Stand mixer" />
+                <div>
+                  <p class="ti">KitchenAid Pro 600 Stand Mixer</p>
+                  <span class="pr">$85</span> <span class="est">est. resale $230</span>
+                  <div class="meta">Facebook · Brandon · 6.4 mi · 32 min ago</div>
+                </div>
+                <div class="right"><span class="fpScore good">81</span><span class="mk">FB</span></div>
+              </div>
+
+              <div class="lRow fpGlass">
+                <img src="https://picsum.photos/seed/flipper-dewalt/152/152" alt="Tool set" />
+                <div>
+                  <p class="ti">DeWalt 20V Max Combo Kit (5-tool)</p>
+                  <span class="pr">$160</span> <span class="est">est. resale $340</span>
+                  <div class="meta">OfferUp · St. Pete · 11 mi · 1 h ago</div>
+                </div>
+                <div class="right"><span class="fpScore good">76</span><span class="mk">OU</span></div>
+              </div>
+
+              <div class="lRow fpGlass">
+                <img src="https://picsum.photos/seed/flipper-eames/152/152" alt="Lounge chair" />
+                <div>
+                  <p class="ti">Mid-century lounge chair, needs glue</p>
+                  <span class="pr">$60</span> <span class="est">est. resale $150</span>
+                  <div class="meta">Craigslist · Clearwater · 16 mi · 2 h ago</div>
+                </div>
+                <div class="right"><span class="fpScore mid">64</span><span class="mk">CL</span></div>
+              </div>
+
+              <div class="lRow fpGlass" style="opacity:.85;">
+                <img src="https://picsum.photos/seed/flipper-monitor/152/152" alt="Monitor" />
+                <div>
+                  <p class="ti">27" 1440p monitor — dead pixel</p>
+                  <span class="pr">$90</span> <span class="est" style="color:var(--fp-red);">est. resale $95</span>
+                  <div class="meta">Mercari · shipped · 3 h ago</div>
+                </div>
+                <div class="right"><span class="fpScore low">38</span><span class="mk">ME</span></div>
+              </div>
+            </div>
+          </div>
+
+          <nav class="tabBar fpDark">
+            <div class="tab"><span class="glyph">📊</span>Dashboard</div>
+            <div class="tab active"><span class="glyph">📡</span>Scanner</div>
+            <div class="tab"><span class="glyph">💎</span>Flips</div>
+            <div class="tab"><span class="glyph">💬</span>Messages</div>
+            <div class="tab"><span class="glyph">⋯</span>More</div>
+          </nav>
+        </div>
+      </div>
+
+      <aside class="stageNoteRight">
+        <div class="stageNote">
+          <h5>Profit math up front</h5>
+          <p>Each row pairs the asking price with the estimated resale value from the scoring engine — the gap is the pitch.</p>
+          <span class="frTag">FR-MOBILE-SCAN-05</span>
+        </div>
+        <div class="stageNote">
+          <h5>Instant on launch</h5>
+          <p>The most recent 200 listings persist on-device, so the feed paints immediately when the app opens — refresh fills in behind it.</p>
+          <span class="frTag">FR-MOBILE-SCAN-10</span>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="previewFooter">
+      <span>Prepared by <b>Silverline Software Inc.</b> for the Flipper.ai Mobile v2.0 review · 2026-06-11</span>
+      <span class="right"><a href="03-scanner.html">← prev</a> <a href="index.html">index</a> <a href="05-listing-detail.html">next: Listing Detail →</a></span>
+    </footer>
+  </main>
+</body>
+</html>

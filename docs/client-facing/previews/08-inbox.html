@@ -1,0 +1,202 @@
+<!--
+  file: docs/client-facing/previews/08-inbox.html
+  author: Stephen Boyett
+  company: Axovia
+  date: 2026-06-11
+  version: 1.0
+  brief: Mobile preview — unified message inbox across all marketplaces with status swipes.
+
+  description:
+      Illustrates Feature 22 / Stories 22.1 and 22.5: one inbox for every
+      marketplace conversation, sorted by last activity, with listing
+      thumbnail, preview, unread badges, and swipe gestures to mark a
+      conversation ACTIVE / STALLED / CLOSED. Inbound messages arrive via
+      push and update live in the foreground (FR-MOBILE-MSG-01, 06, 07).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Flipper.ai · Inbox — preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .ibWrap { padding: 66px 16px 12px; display: flex; flex-direction: column; gap: 10px; height: 100%; }
+    .ibHead { display: flex; align-items: baseline; justify-content: space-between; padding: 0 2px; }
+    .ibHead h2 { margin: 0; font-size: 20px; color: var(--screen-text); letter-spacing: -0.01em; }
+    .ibHead .unr { font-size: 11px; color: var(--fp-lavender); font-weight: 700; }
+    .ibSeg { display: flex; gap: 7px; }
+    .thRow { display: flex; gap: 11px; padding: 11px 12px; align-items: center; position: relative; }
+    .thRow .av { width: 42px; height: 42px; border-radius: 999px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; }
+    .thRow .nm { font-size: 13px; font-weight: 700; color: var(--screen-text); display: flex; align-items: center; gap: 6px; }
+    .thRow .mk { font-size: 8.5px; font-weight: 800; letter-spacing: 0.06em; padding: 2px 6px; border-radius: 999px; background: rgba(255,255,255,0.07); color: var(--screen-text-muted); }
+    .thRow .pv { margin-top: 2px; font-size: 11px; color: var(--screen-text-muted); line-height: 1.3; max-width: 190px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .thRow .pv b { color: var(--screen-text-2); font-weight: 600; }
+    .thRow .right { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+    .thRow .tm { font-size: 9.5px; color: var(--screen-text-muted); }
+    .thRow .bdg { min-width: 18px; height: 18px; border-radius: 999px; background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px var(--fp-glow-purple); }
+    .thRow img.thumb { width: 30px; height: 30px; border-radius: 7px; object-fit: cover; position: absolute; left: 38px; top: 34px; border: 2px solid #0d1120; }
+    .thSwiped { display: flex; align-items: stretch; gap: 0; overflow: hidden; border-radius: 12px; }
+    .thSwiped .inner { flex: 1; display: flex; gap: 11px; padding: 11px 12px; align-items: center; position: relative; }
+    .thSwiped .acts { display: flex; flex-shrink: 0; }
+    .thSwiped .acts span { width: 58px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 8.5px; font-weight: 800; letter-spacing: 0.04em; color: #fff; }
+    .thSwiped .acts .stall { background: rgba(251, 191, 36, 0.85); color: #1c1303; }
+    .thSwiped .acts .close { background: rgba(248, 113, 113, 0.85); color: #2b0707; }
+    .stDot { display: inline-block; width: 7px; height: 7px; border-radius: 999px; margin-right: 2px; }
+  </style>
+</head>
+<body>
+  <main class="previewPage">
+    <header class="previewTop">
+      <a class="previewBrand" href="index.html">
+        <span class="mark">F</span>
+        <span class="word">Flipper.ai <em>mobile preview deck</em></span>
+      </a>
+      <div class="previewIndex">
+        <span class="step">08 / 17</span>
+        <span class="step active">Inbox</span>
+      </div>
+    </header>
+
+    <section class="previewHero">
+      <div>
+        <p class="previewKicker">Feature 22 · Messaging &amp; Negotiation · Phase C</p>
+        <h1 class="previewTitle">Five marketplaces, <em>one inbox</em>.</h1>
+        <p class="previewLede">
+          Every seller conversation — Craigslist, Facebook, eBay, OfferUp, Mercari — in a single
+          thread list sorted by activity. Swipe to triage: active, stalled, or closed.
+        </p>
+        <div class="previewFrCloud">
+          <a href="16-functional-requirements.html#FR-MOBILE-MSG-01"><span>FR-MOBILE-MSG-01</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-MSG-06"><span>FR-MOBILE-MSG-06</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-MSG-07"><span>FR-MOBILE-MSG-07</span></a>
+        </div>
+      </div>
+      <div class="previewMetaCard">
+        <h4>What this screen shows</h4>
+        <ul>
+          <li><strong>Surface</strong><span>Messages tab · unified inbox</span></li>
+          <li><strong>Story</strong><span>Feature 22 / Stories 22.1, 22.5</span></li>
+          <li><strong>Push</strong><span>Inbound replies arrive as push notifications</span></li>
+          <li><strong>Gesture</strong><span>Swipe a row to set conversation status</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="phoneStage">
+      <aside class="stageNoteLeft">
+        <div class="stageNote">
+          <h5>Everything in one place</h5>
+          <p>Each row carries the counterparty, the listing thumbnail, the last message, and an unread badge — no app-hopping between five marketplace inboxes.</p>
+          <span class="frTag">FR-MOBILE-MSG-01</span>
+        </div>
+        <div class="stageNote">
+          <h5>Swipe to triage</h5>
+          <p>The swiped-open row shows the status actions: mark a negotiation STALLED or CLOSED without opening it. Status follows the same taxonomy as the web.</p>
+          <span class="frTag">FR-MOBILE-MSG-07</span>
+        </div>
+      </aside>
+
+      <div class="phoneFrame">
+        <div class="phoneScreen fpDark">
+          <div class="statusBar onDark">
+            <span>9:41</span>
+            <span class="icons"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></span>
+          </div>
+
+          <div class="screenScroll">
+            <div class="ibWrap">
+              <div class="ibHead">
+                <h2>Messages</h2>
+                <span class="unr">3 unread</span>
+              </div>
+              <div class="ibSeg">
+                <span class="fpChip active">All</span>
+                <span class="fpChip"><span class="stDot" style="background:var(--fp-green);"></span>Active</span>
+                <span class="fpChip"><span class="stDot" style="background:var(--fp-yellow);"></span>Stalled</span>
+                <span class="fpChip"><span class="stDot" style="background:#64748b;"></span>Closed</span>
+              </div>
+
+              <div class="thRow fpGlass fpHot">
+                <span class="av" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);">MR</span>
+                <img class="thumb" src="https://picsum.photos/seed/flipper-receiver/60/60" alt="" />
+                <div>
+                  <div class="nm">Mike R. <span class="mk">CRAIGSLIST</span></div>
+                  <div class="pv"><b>Mike:</b> Could do $95 if you pick up today</div>
+                </div>
+                <div class="right"><span class="tm">2 m</span><span class="bdg">2</span></div>
+              </div>
+
+              <div class="thRow fpGlass">
+                <span class="av" style="background:#1877f2;">SL</span>
+                <img class="thumb" src="https://picsum.photos/seed/flipper-kitchenaid/60/60" alt="" />
+                <div>
+                  <div class="nm">Sarah L. <span class="mk">FACEBOOK</span></div>
+                  <div class="pv"><b>You:</b> Is the bowl included? Any rust?</div>
+                </div>
+                <div class="right"><span class="tm">18 m</span><span class="bdg">1</span></div>
+              </div>
+
+              <div class="thSwiped fpGlass">
+                <div class="inner">
+                  <span class="av" style="background:#00ab80;">DT</span>
+                  <div>
+                    <div class="nm">Dave T. <span class="mk">OFFERUP</span></div>
+                    <div class="pv"><b>Dave:</b> Sorry, busy this week maybe next…</div>
+                  </div>
+                </div>
+                <div class="acts"><span class="stall">⏸<br/>STALL</span><span class="close">✕<br/>CLOSE</span></div>
+              </div>
+
+              <div class="thRow fpGlass" style="opacity:.8;">
+                <span class="av" style="background:#4a52ff;">KP</span>
+                <img class="thumb" src="https://picsum.photos/seed/flipper-lego/60/60" alt="" />
+                <div>
+                  <div class="nm">Kim P. <span class="mk">MERCARI</span></div>
+                  <div class="pv"><b>You:</b> Payment confirmed — shipping label sent</div>
+                </div>
+                <div class="right"><span class="tm">1 d</span></div>
+              </div>
+
+              <div class="thRow fpGlass" style="opacity:.65;">
+                <span class="av" style="background:#e53238;">JB</span>
+                <div>
+                  <div class="nm">Jordan B. <span class="mk">EBAY</span></div>
+                  <div class="pv"><b>Jordan:</b> Thanks again, great transaction!</div>
+                </div>
+                <div class="right"><span class="tm">3 d</span></div>
+              </div>
+            </div>
+          </div>
+
+          <nav class="tabBar fpDark">
+            <div class="tab"><span class="glyph">📊</span>Dashboard</div>
+            <div class="tab"><span class="glyph">📡</span>Scanner</div>
+            <div class="tab"><span class="glyph">💎</span>Flips</div>
+            <div class="tab active"><span class="glyph">💬</span>Messages</div>
+            <div class="tab"><span class="glyph">⋯</span>More</div>
+          </nav>
+        </div>
+      </div>
+
+      <aside class="stageNoteRight">
+        <div class="stageNote">
+          <h5>Push-first, live always</h5>
+          <p>Inbound replies arrive as push notifications that deep-link straight into the thread; in the foreground, rows update in real time over the event stream.</p>
+          <span class="frTag">FR-MOBILE-MSG-06 · FR-MOBILE-NOTIFY-04</span>
+        </div>
+        <div class="stageNote">
+          <h5>Negotiations don't go cold</h5>
+          <p>Stalled threads are visually separated so follow-ups happen — the AI can draft the nudge message from the thread view.</p>
+          <span class="frTag">FR-MOBILE-MSG-03</span>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="previewFooter">
+      <span>Prepared by <b>Silverline Software Inc.</b> for the Flipper.ai Mobile v2.0 review · 2026-06-11</span>
+      <span class="right"><a href="07-sold-celebration.html">← prev</a> <a href="index.html">index</a> <a href="09-thread.html">next: AI Negotiation →</a></span>
+    </footer>
+  </main>
+</body>
+</html>

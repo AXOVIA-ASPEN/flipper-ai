@@ -1,0 +1,211 @@
+<!--
+  file: docs/client-facing/previews/13-settings.html
+  author: Stephen Boyett
+  company: Axovia
+  date: 2026-06-11
+  version: 1.0
+  brief: Mobile preview — sectioned settings with notification preferences, appearance, and account deletion.
+
+  description:
+      Illustrates Feature 26 / Stories 26.1-26.3: the sectioned Settings
+      screen — account, notifications with quiet hours, appearance
+      (dark/light/system), subscription, marketplaces, privacy/legal, about
+      with visible version, send-feedback, and the App Store-mandated
+      "Delete my account" affordance
+      (FR-MOBILE-SETTINGS-01..07, FR-MOBILE-NOTIFY-08, 09).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Flipper.ai · Settings — preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .stWrap { padding: 64px 16px 12px; display: flex; flex-direction: column; gap: 9px; height: 100%; }
+    .stWrap h2 { margin: 0 0 2px; font-size: 20px; color: var(--screen-text); letter-spacing: -0.01em; }
+    .stGroupLbl { font-size: 9px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--screen-text-muted); margin: 4px 2px 0; }
+    .stGroup { border-radius: 14px; overflow: hidden; }
+    .stRow { display: flex; align-items: center; gap: 11px; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .stRow:last-child { border-bottom: none; }
+    .stRow .ic { width: 28px; height: 28px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 13px; background: rgba(124,58,237,0.16); flex-shrink: 0; }
+    .stRow .t { font-size: 12.5px; font-weight: 700; color: var(--screen-text); }
+    .stRow .s { font-size: 9.5px; color: var(--screen-text-muted); margin-top: 1px; }
+    .stRow .end { margin-left: auto; display: flex; align-items: center; gap: 7px; font-size: 10px; color: var(--screen-text-muted); flex-shrink: 0; }
+    .stRow .chev { color: #5b647a; font-size: 13px; }
+    .avRow .av { width: 36px; height: 36px; border-radius: 999px; background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .proTag { padding: 2px 8px; border-radius: 999px; background: rgba(124,58,237,0.25); color: var(--fp-lavender); font-size: 9px; font-weight: 800; letter-spacing: 0.08em; }
+    .tog { width: 38px; height: 22px; border-radius: 999px; background: rgba(255,255,255,0.1); position: relative; }
+    .tog::after { content: ""; position: absolute; top: 3px; left: 4px; width: 16px; height: 16px; border-radius: 999px; background: #94a3b8; }
+    .tog.on { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+    .tog.on::after { left: auto; right: 4px; background: #fff; }
+    .seg3 { display: inline-flex; border-radius: 999px; border: 1px solid var(--fp-glass-border); background: rgba(255,255,255,0.04); padding: 2px; }
+    .seg3 span { padding: 3px 9px; border-radius: 999px; font-size: 9px; font-weight: 800; color: var(--screen-text-muted); }
+    .seg3 span.on { background: rgba(124,58,237,0.32); color: var(--fp-lavender); }
+    .stRow.danger .ic { background: rgba(248,113,113,0.14); }
+    .stRow.danger .t { color: var(--fp-red); }
+  </style>
+</head>
+<body>
+  <main class="previewPage">
+    <header class="previewTop">
+      <a class="previewBrand" href="index.html">
+        <span class="mark">F</span>
+        <span class="word">Flipper.ai <em>mobile preview deck</em></span>
+      </a>
+      <div class="previewIndex">
+        <span class="step">13 / 17</span>
+        <span class="step active">Settings</span>
+      </div>
+    </header>
+
+    <section class="previewHero">
+      <div>
+        <p class="previewKicker">Feature 26 · Settings &amp; Accessibility · Phase C</p>
+        <h1 class="previewTitle">Every preference, <em>store-compliant</em>.</h1>
+        <p class="previewLede">
+          Account, per-event notification preferences with quiet hours, appearance, subscription,
+          marketplaces, privacy and legal — including the account-deletion affordance Apple
+          requires of every app with sign-up.
+        </p>
+        <div class="previewFrCloud">
+          <a href="16-functional-requirements.html#FR-MOBILE-SETTINGS-01"><span>FR-MOBILE-SETTINGS-01</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-SETTINGS-06"><span>FR-MOBILE-SETTINGS-06</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-NOTIFY-08"><span>FR-MOBILE-NOTIFY-08</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-NOTIFY-09"><span>FR-MOBILE-NOTIFY-09</span></a>
+        </div>
+      </div>
+      <div class="previewMetaCard">
+        <h4>What this screen shows</h4>
+        <ul>
+          <li><strong>Surface</strong><span>Settings · under the More tab</span></li>
+          <li><strong>Story</strong><span>Feature 26 / Stories 26.1 – 26.3</span></li>
+          <li><strong>Sync</strong><span>Notification prefs write to the same backend as web</span></li>
+          <li><strong>Policy</strong><span>Delete-account satisfies App Store 5.1.1(v)</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="phoneStage">
+      <aside class="stageNoteLeft">
+        <div class="stageNote">
+          <h5>Per-event, per-channel</h5>
+          <p>Each alert type — new opportunity, inbound message, flip sold, price change — toggles independently across email, push, and SMS, with server-enforced quiet hours.</p>
+          <span class="frTag">FR-MOBILE-NOTIFY-08 · 09</span>
+        </div>
+        <div class="stageNote">
+          <h5>Brand-true theming</h5>
+          <p>Dark is the default; "light" is a lite-dark slate that preserves the product's identity. The OS preference is honored unless overridden here.</p>
+          <span class="frTag">FR-MOBILE-SHELL-09</span>
+        </div>
+      </aside>
+
+      <div class="phoneFrame">
+        <div class="phoneScreen fpDark">
+          <div class="statusBar onDark">
+            <span>9:41</span>
+            <span class="icons"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></span>
+          </div>
+
+          <div class="screenScroll">
+            <div class="stWrap">
+              <h2>Settings</h2>
+
+              <div class="stGroup fpGlassSm">
+                <div class="stRow avRow">
+                  <span class="av">SB</span>
+                  <div><div class="t">Stephen Boyett</div><div class="s">stephen@flipper.ai</div></div>
+                  <span class="end"><span class="proTag">PRO</span><span class="chev">›</span></span>
+                </div>
+              </div>
+
+              <p class="stGroupLbl">Preferences</p>
+              <div class="stGroup fpGlassSm">
+                <div class="stRow">
+                  <span class="ic">🔔</span>
+                  <div><div class="t">Notifications</div><div class="s">Per-event · push, email, SMS</div></div>
+                  <span class="end"><span class="chev">›</span></span>
+                </div>
+                <div class="stRow">
+                  <span class="ic">🌙</span>
+                  <div><div class="t">Quiet hours</div><div class="s">10:00 PM – 7:00 AM</div></div>
+                  <span class="end"><span class="tog on"></span></span>
+                </div>
+                <div class="stRow">
+                  <span class="ic">🎨</span>
+                  <div><div class="t">Appearance</div></div>
+                  <span class="end"><span class="seg3"><span class="on">Dark</span><span>Light</span><span>Auto</span></span></span>
+                </div>
+                <div class="stRow">
+                  <span class="ic">📳</span>
+                  <div><div class="t">Haptic feedback</div></div>
+                  <span class="end"><span class="tog on"></span></span>
+                </div>
+              </div>
+
+              <p class="stGroupLbl">Flipping</p>
+              <div class="stGroup fpGlassSm">
+                <div class="stRow">
+                  <span class="ic">🛒</span>
+                  <div><div class="t">Marketplaces</div><div class="s">3 of 5 connected</div></div>
+                  <span class="end"><span class="chev">›</span></span>
+                </div>
+                <div class="stRow">
+                  <span class="ic">💳</span>
+                  <div><div class="t">Subscription</div><div class="s">Pro · manage in App Store</div></div>
+                  <span class="end"><span class="chev">›</span></span>
+                </div>
+              </div>
+
+              <p class="stGroupLbl">About &amp; legal</p>
+              <div class="stGroup fpGlassSm">
+                <div class="stRow">
+                  <span class="ic">📨</span>
+                  <div><div class="t">Send feedback</div></div>
+                  <span class="end"><span class="chev">›</span></span>
+                </div>
+                <div class="stRow">
+                  <span class="ic">ℹ️</span>
+                  <div><div class="t">About</div><div class="s">v2.0.0 (build 214) · privacy · terms</div></div>
+                  <span class="end"><span class="chev">›</span></span>
+                </div>
+                <div class="stRow danger">
+                  <span class="ic">🗑️</span>
+                  <div><div class="t">Delete my account</div></div>
+                  <span class="end"><span class="chev">›</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <nav class="tabBar fpDark">
+            <div class="tab"><span class="glyph">📊</span>Dashboard</div>
+            <div class="tab"><span class="glyph">📡</span>Scanner</div>
+            <div class="tab"><span class="glyph">💎</span>Flips</div>
+            <div class="tab"><span class="glyph">💬</span>Messages</div>
+            <div class="tab active"><span class="glyph">⋯</span>More</div>
+          </nav>
+        </div>
+      </div>
+
+      <aside class="stageNoteRight">
+        <div class="stageNote">
+          <h5>Submission-ready by design</h5>
+          <p>Delete-account, privacy policy, terms links, and a visible version/build number are all store-review requirements — built into the plan, not bolted on at submission.</p>
+          <span class="frTag">FR-MOBILE-SETTINGS-04 · 05 · 06</span>
+        </div>
+        <div class="stageNote">
+          <h5>Accessibility is a gate</h5>
+          <p>Feature 26 also carries the WCAG AA bar: screen-reader labels, 44pt targets, dynamic type to 200%, and contrast checks on every screen.</p>
+          <span class="frTag">FR-MOBILE-A11Y-01 – 05</span>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="previewFooter">
+      <span>Prepared by <b>Silverline Software Inc.</b> for the Flipper.ai Mobile v2.0 review · 2026-06-11</span>
+      <span class="right"><a href="12-subscription.html">← prev</a> <a href="index.html">index</a> <a href="14-meetup.html">next: Meetups →</a></span>
+    </footer>
+  </main>
+</body>
+</html>

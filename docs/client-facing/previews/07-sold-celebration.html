@@ -1,0 +1,159 @@
+<!--
+  file: docs/client-facing/previews/07-sold-celebration.html
+  author: Stephen Boyett
+  company: Axovia
+  date: 2026-06-11
+  version: 1.0
+  brief: Mobile preview — SOLD stage prompt with computed net profit and celebration moment.
+
+  description:
+      Illustrates Feature 20 / Story 20.5: advancing a flip to SOLD prompts
+      for the final sale price, computes net profit (sale − cost − fees) on
+      the spot, and rewards the user with a celebratory haptic, animated
+      checkmark, and "$$$" badge. Inventory totals and analytics update
+      automatically (FR-MOBILE-LIFECYCLE-05, 06).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Flipper.ai · Flip Sold — preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .slWrap { padding: 86px 22px 24px; display: flex; flex-direction: column; height: 100%; text-align: center; position: relative; }
+    .confetti span { position: absolute; border-radius: 2px; opacity: .85; }
+    .confetti span:nth-child(1) { top: 90px; left: 12%; width: 7px; height: 7px; background: var(--fp-purple-bright); transform: rotate(20deg); }
+    .confetti span:nth-child(2) { top: 130px; right: 16%; width: 6px; height: 10px; background: var(--fp-green); transform: rotate(-28deg); }
+    .confetti span:nth-child(3) { top: 200px; left: 20%; width: 5px; height: 9px; background: var(--fp-yellow); transform: rotate(45deg); }
+    .confetti span:nth-child(4) { top: 170px; right: 30%; width: 6px; height: 6px; border-radius: 999px; background: var(--fp-lavender); }
+    .confetti span:nth-child(5) { top: 250px; right: 12%; width: 7px; height: 7px; background: var(--fp-purple-bright); transform: rotate(12deg); }
+    .confetti span:nth-child(6) { top: 280px; left: 10%; width: 5px; height: 10px; background: var(--fp-green); transform: rotate(-40deg); }
+    .slCheck {
+      width: 84px; height: 84px; border-radius: 999px; margin: 6px auto 14px;
+      background: radial-gradient(circle at 35% 30%, rgba(52,211,153,0.35), rgba(52,211,153,0.12));
+      border: 2px solid var(--fp-green);
+      box-shadow: 0 0 36px rgba(52, 211, 153, 0.4);
+      display: flex; align-items: center; justify-content: center; font-size: 38px; color: var(--fp-green);
+    }
+    .slBadge { margin: 0 auto 8px; display: inline-flex; padding: 5px 14px; border-radius: 999px; background: rgba(52,211,153,0.14); color: var(--fp-green); font-size: 11px; font-weight: 800; letter-spacing: 0.14em; }
+    .slTitle { margin: 0; font-size: 25px; color: var(--screen-text); letter-spacing: -0.01em; }
+    .slSub { margin: 4px 0 18px; font-size: 12px; color: var(--screen-text-muted); }
+    .mathCard { padding: 16px; text-align: left; }
+    .mathRow { display: flex; justify-content: space-between; padding: 7px 2px; font-size: 13px; color: var(--screen-text-2); }
+    .mathRow span:last-child { font-weight: 700; color: var(--screen-text); }
+    .mathRow.neg span:last-child { color: var(--fp-red); }
+    .mathRow.total { border-top: 1px solid var(--fp-glass-border); margin-top: 6px; padding-top: 12px; font-size: 15px; font-weight: 800; }
+    .mathRow.total span:last-child { color: var(--fp-green); font-size: 21px; text-shadow: 0 0 18px rgba(52,211,153,0.5); }
+    .slStat { margin: 12px 0 0; font-size: 11px; color: var(--screen-text-muted); }
+    .slStat b { color: var(--fp-lavender); }
+    .slCtas { margin-top: auto; display: grid; gap: 9px; }
+  </style>
+</head>
+<body>
+  <main class="previewPage">
+    <header class="previewTop">
+      <a class="previewBrand" href="index.html">
+        <span class="mark">F</span>
+        <span class="word">Flipper.ai <em>mobile preview deck</em></span>
+      </a>
+      <div class="previewIndex">
+        <span class="step">07 / 17</span>
+        <span class="step active">Flip Sold</span>
+      </div>
+    </header>
+
+    <section class="previewHero">
+      <div>
+        <p class="previewKicker">Feature 20 · Flip Lifecycle Tracking · Phase B</p>
+        <h1 class="previewTitle">The moment that <em>pays for the app</em>.</h1>
+        <p class="previewLede">
+          Marking a flip SOLD captures the sale price, computes the real net profit — sale minus
+          cost minus fees — and celebrates it. Dopamine with an audit trail.
+        </p>
+        <div class="previewFrCloud">
+          <a href="16-functional-requirements.html#FR-MOBILE-LIFECYCLE-05"><span>FR-MOBILE-LIFECYCLE-05</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-LIFECYCLE-06"><span>FR-MOBILE-LIFECYCLE-06</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-SHELL-12"><span>FR-MOBILE-SHELL-12</span></a>
+        </div>
+      </div>
+      <div class="previewMetaCard">
+        <h4>What this screen shows</h4>
+        <ul>
+          <li><strong>Surface</strong><span>SOLD confirmation · after the stage prompt</span></li>
+          <li><strong>Story</strong><span>Feature 20 / Story 20.5</span></li>
+          <li><strong>Haptic</strong><span>Celebratory pulse on confirmation (toggleable)</span></li>
+          <li><strong>Math</strong><span>Profit = sale − purchase − marketplace fees</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="phoneStage">
+      <aside class="stageNoteLeft">
+        <div class="stageNote">
+          <h5>Honest profit math</h5>
+          <p>Fees are part of the equation, not a footnote. The number the user celebrates is the number that hits their analytics.</p>
+          <span class="frTag">FR-MOBILE-LIFECYCLE-05</span>
+        </div>
+        <div class="stageNote">
+          <h5>Felt, not just seen</h5>
+          <p>A celebratory haptic fires with the checkmark — one of the keyed haptic moments (posting success, stage advance, hot listing found). All toggleable in Settings.</p>
+          <span class="frTag">FR-MOBILE-SHELL-12</span>
+        </div>
+      </aside>
+
+      <div class="phoneFrame">
+        <div class="phoneScreen fpDark">
+          <div class="statusBar onDark">
+            <span>9:41</span>
+            <span class="icons"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></span>
+          </div>
+
+          <div class="screenScroll">
+            <div class="slWrap">
+              <div class="confetti"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+
+              <div class="slCheck">✓</div>
+              <span class="slBadge">$$$ FLIP COMPLETE</span>
+              <h2 class="slTitle">Sold!</h2>
+              <p class="slSub">PS5 Disc + 2 controllers · 11 days listed</p>
+
+              <div class="mathCard fpGlass">
+                <div class="mathRow"><span>Sale price</span><span>$399.00</span></div>
+                <div class="mathRow neg"><span>Purchase cost</span><span>− $260.00</span></div>
+                <div class="mathRow neg"><span>Marketplace fees (13%)</span><span>− $51.87</span></div>
+                <div class="mathRow total"><span>Net profit</span><span>+ $87.13</span></div>
+              </div>
+
+              <p class="slStat">That's <b>flip #12</b> this quarter — lifetime profit updated in Analytics.</p>
+
+              <div class="slCtas">
+                <div class="fpBtnPrimary">View in Analytics</div>
+                <div class="fpBtnGhost">Back to pipeline</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="stageNoteRight">
+        <div class="stageNote">
+          <h5>Inventory keeps score</h5>
+          <p>The Inventory view tracks cost basis, days-held, and holding-cost drag across everything PURCHASED and LISTED — so aging stock can't hide.</p>
+          <span class="frTag">FR-MOBILE-LIFECYCLE-06</span>
+        </div>
+        <div class="stageNote">
+          <h5>Straight to the books</h5>
+          <p>The confirmed sale flows into profit-over-time charts and exportable reports with no re-entry.</p>
+          <span class="frTag">FR-MOBILE-ANALYTICS-01</span>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="previewFooter">
+      <span>Prepared by <b>Silverline Software Inc.</b> for the Flipper.ai Mobile v2.0 review · 2026-06-11</span>
+      <span class="right"><a href="06-opportunities.html">← prev</a> <a href="index.html">index</a> <a href="08-inbox.html">next: Inbox →</a></span>
+    </footer>
+  </main>
+</body>
+</html>

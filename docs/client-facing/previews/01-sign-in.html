@@ -1,0 +1,175 @@
+<!--
+  file: docs/client-facing/previews/01-sign-in.html
+  author: Stephen Boyett
+  company: Axovia
+  date: 2026-06-11
+  version: 1.0
+  brief: Mobile preview — Sign-In with email/password, Apple & Google OAuth, and Face ID unlock.
+
+  description:
+      Illustrates Feature 17 (Mobile Sign-In & Onboarding), Stories 17.2-17.4:
+      one Firebase identity shared with the web app, Bearer-token session
+      bridge to the existing backend, tokens held in iOS Keychain / Android
+      Keystore, and optional biometric re-authentication
+      (FR-MOBILE-AUTH-01..05, AUTH-09).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Flipper.ai · Sign In — preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .authWrap { padding: 86px 22px 28px; display: flex; flex-direction: column; height: 100%; }
+    .authMark {
+      width: 64px; height: 64px; border-radius: 20px; margin: 0 auto 14px;
+      background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+      box-shadow: 0 12px 32px rgba(109, 40, 217, 0.5);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 30px;
+    }
+    .authTitle { margin: 0; text-align: center; font-size: 24px; letter-spacing: -0.01em; color: var(--screen-text); }
+    .authSub { margin: 6px 0 22px; text-align: center; font-size: 12.5px; color: var(--screen-text-muted); }
+    .authForm { display: grid; gap: 10px; }
+    .authForm .fpInput .ph { color: var(--screen-text-muted); }
+    .authForm .fpInput.filled { color: var(--screen-text); }
+    .authForgot { text-align: right; font-size: 11.5px; font-weight: 700; color: var(--fp-lavender); padding: 2px 4px 0; }
+    .authDivider {
+      display: flex; align-items: center; gap: 12px; margin: 16px 0 12px;
+      color: var(--screen-text-muted); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .authDivider::before, .authDivider::after { content: ""; flex: 1; height: 1px; background: var(--fp-glass-border); }
+    .oauthRow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .bioChip {
+      margin: 18px auto 0;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 16px; border-radius: 999px;
+      background: rgba(124, 58, 237, 0.14); border: 1px solid rgba(139, 92, 246, 0.4);
+      color: var(--fp-lavender); font-size: 12px; font-weight: 700;
+    }
+    .bioChip .ring {
+      width: 18px; height: 18px; border-radius: 999px; border: 2px solid var(--fp-lavender);
+      display: inline-flex; align-items: center; justify-content: center; font-size: 9px;
+    }
+    .authFootnote { margin-top: auto; text-align: center; font-size: 12px; color: var(--screen-text-muted); }
+    .authFootnote b { color: var(--fp-lavender); }
+    .captchaNote {
+      margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 6px;
+      font-size: 10px; color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <main class="previewPage">
+    <header class="previewTop">
+      <a class="previewBrand" href="index.html">
+        <span class="mark">F</span>
+        <span class="word">Flipper.ai <em>mobile preview deck</em></span>
+      </a>
+      <div class="previewIndex">
+        <span class="step">01 / 17</span>
+        <span class="step active">Sign In &amp; Biometric</span>
+      </div>
+    </header>
+
+    <section class="previewHero">
+      <div>
+        <p class="previewKicker">Feature 17 · Sign-In &amp; Onboarding · Phase A</p>
+        <h1 class="previewTitle">One identity, <em>web and mobile</em>.</h1>
+        <p class="previewLede">
+          Email/password, Google, and Apple sign-in against the same Firebase project as the
+          web app. Sessions persist securely across launches, with optional Face ID / fingerprint unlock.
+        </p>
+        <div class="previewFrCloud">
+          <a href="16-functional-requirements.html#FR-MOBILE-AUTH-01"><span>FR-MOBILE-AUTH-01</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-AUTH-02"><span>FR-MOBILE-AUTH-02</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-AUTH-03"><span>FR-MOBILE-AUTH-03</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-AUTH-04"><span>FR-MOBILE-AUTH-04</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-AUTH-05"><span>FR-MOBILE-AUTH-05</span></a>
+        </div>
+      </div>
+      <div class="previewMetaCard">
+        <h4>What this screen shows</h4>
+        <ul>
+          <li><strong>Surface</strong><span>Auth stack · entry screen before the tab shell</span></li>
+          <li><strong>Story</strong><span>Feature 17 / Stories 17.2 – 17.4</span></li>
+          <li><strong>Backend</strong><span>Existing Cloud Run API — no parallel auth system</span></li>
+          <li><strong>Stores</strong><span>Apple requires Sign in with Apple when Google is offered</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="phoneStage">
+      <aside class="stageNoteLeft">
+        <div class="stageNote">
+          <h5>Same Firebase identity</h5>
+          <p>A user who registered on the web signs straight in here — same UID, same account, same data. No migration, no re-onboarding.</p>
+          <span class="frTag">FR-MOBILE-AUTH-01</span>
+        </div>
+        <div class="stageNote">
+          <h5>Bearer-token bridge</h5>
+          <p>Every API call carries the Firebase ID token. The existing backend accepts it alongside the web's session cookie — one API serves both clients.</p>
+          <span class="frTag">FR-MOBILE-AUTH-02</span>
+        </div>
+      </aside>
+
+      <div class="phoneFrame">
+        <div class="phoneScreen fpDark">
+          <div class="statusBar onDark">
+            <span>9:41</span>
+            <span class="icons"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></span>
+          </div>
+
+          <div class="screenScroll">
+            <div class="authWrap">
+              <div class="authMark">🐧</div>
+              <h2 class="authTitle">Welcome back</h2>
+              <p class="authSub">Sign in to keep flipping</p>
+
+              <div class="authForm">
+                <div class="fpInput filled">✉️&nbsp; stephen@flipper.ai</div>
+                <div class="fpInput"><span class="ph">🔒&nbsp; Password</span></div>
+                <div class="authForgot">Forgot password?</div>
+                <div class="fpBtnPrimary">Sign In</div>
+              </div>
+
+              <div class="authDivider">or continue with</div>
+              <div class="oauthRow">
+                <div class="fpBtnGhost"> Apple</div>
+                <div class="fpBtnGhost">G&nbsp; Google</div>
+              </div>
+
+              <div style="text-align:center;">
+                <span class="bioChip"><span class="ring">◉</span> Unlock with Face ID</span>
+              </div>
+
+              <div class="authFootnote">New to Flipper? <b>Create account</b>
+                <div class="captchaNote">🛡️ Protected by hCaptcha on sign-up &amp; reset</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="stageNoteRight">
+        <div class="stageNote">
+          <h5>Keychain-grade storage</h5>
+          <p>Tokens live exclusively in iOS Keychain / Android Keystore via expo-secure-store — never in plain storage, never in logs.</p>
+          <span class="frTag">FR-MOBILE-AUTH-03 · NFR-MOB-SEC-01</span>
+        </div>
+        <div class="stageNote">
+          <h5>Biometric unlock</h5>
+          <p>Face ID / fingerprint re-opens a cached session as an opt-in convenience. It never replaces the underlying Firebase credential.</p>
+          <span class="frTag">FR-MOBILE-AUTH-05</span>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="previewFooter">
+      <span>Prepared by <b>Silverline Software Inc.</b> for the Flipper.ai Mobile v2.0 review · 2026-06-11</span>
+      <span class="right"><a href="index.html">← back to index</a> <a href="02-onboarding.html">next: Onboarding →</a></span>
+    </footer>
+  </main>
+</body>
+</html>

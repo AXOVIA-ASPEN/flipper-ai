@@ -1,0 +1,348 @@
+<!--
+  file: docs/client-facing/previews/16-functional-requirements.html
+  author: Stephen Boyett
+  company: Axovia
+  date: 2026-06-11
+  version: 1.0
+  brief: Reference — full catalog of the 123 mobile FRs + 20 NFRs, grouped by feature, anchor-linked.
+
+  description:
+      The cross-reference target for every screen preview in the deck. Renders
+      all functional requirements of the Flipper.ai mobile track (Features
+      15-29) in client-readable one-line form, grouped by capability family
+      with release-phase badges, plus the non-functional requirements
+      (performance, security, accessibility, release, testing). Every FR id
+      is an anchor: 04-listings-feed.html links to #FR-MOBILE-SCAN-05, etc.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Flipper.ai · Mobile Functional Requirements — preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .frHero {
+      background:
+        radial-gradient(at top right, rgba(139, 92, 246, 0.35), transparent 55%),
+        linear-gradient(145deg, #150a2e, #2a1065 60%, #3b1797);
+      color: #f4f0ff;
+      border-radius: 18px;
+      padding: 26px 30px;
+      position: relative;
+      overflow: hidden;
+    }
+    .frHero .eyebrow { display: inline-flex; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.22); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: #d8c8ff; text-transform: uppercase; }
+    .frHero h1 { margin: 10px 0 6px; font-size: clamp(24px, 3vw, 34px); letter-spacing: -0.02em; }
+    .frHero p { margin: 0; max-width: 660px; font-size: 14px; line-height: 1.5; color: #d6cdf4; }
+    .frHero .meta { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; color: #d6cdf4; align-items: center; }
+    .frHero .meta b { color: #fff; }
+    .phasePill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.06em; }
+    .phasePill.a { background: rgba(96, 165, 250, 0.2); color: #9cc4ff; border: 1px solid rgba(96,165,250,0.4); }
+    .phasePill.b { background: rgba(52, 211, 153, 0.18); color: #7fe7c0; border: 1px solid rgba(52,211,153,0.4); }
+    .phasePill.c { background: rgba(251, 191, 36, 0.16); color: #ffd97a; border: 1px solid rgba(251,191,36,0.4); }
+    .phasePill.d { background: rgba(244, 114, 182, 0.16); color: #ffaed6; border: 1px solid rgba(244,114,182,0.4); }
+    .frToc { display: flex; flex-wrap: wrap; gap: 7px; }
+    .frToc a { padding: 6px 11px; border-radius: 999px; background: #fff; border: 1px solid var(--line); font-size: 11.5px; font-weight: 700; color: #3a4358; }
+    .frToc a:hover { border-color: #c9b8f5; color: var(--primary-deep); }
+    .frArea { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; }
+    .frArea > header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+    .frArea h2 { margin: 0; font-size: 19px; letter-spacing: -0.01em; }
+    .frArea .featRef { font-size: 11px; font-weight: 800; color: var(--primary-deep); letter-spacing: 0.06em; text-transform: uppercase; }
+    .frArea .areaSub { margin: 2px 0 12px; font-size: 12.5px; color: #6a7390; }
+    .phasePill.onLight.a { background: #e8f1ff; color: #1d59b3; border-color: #c4dbff; }
+    .phasePill.onLight.b { background: #e9f9f1; color: #117f55; border-color: #c6e8d6; }
+    .phasePill.onLight.c { background: #fff1d8; color: #8a5a07; border-color: #f3ddb0; }
+    .phasePill.onLight.d { background: #ffe9f3; color: #b3266b; border-color: #f7c4dd; }
+    .frRow { display: grid; grid-template-columns: 190px 1fr; gap: 14px; padding: 9px 6px; border-top: 1px solid #eef0f8; font-size: 13px; }
+    .frRow:first-of-type { border-top: none; }
+    .frRow:target { background: var(--primary-tint); border-radius: 10px; box-shadow: inset 0 0 0 1px #d8ccff; }
+    .frId { font-size: 11px; font-weight: 800; color: var(--primary-deep); letter-spacing: 0.02em; padding-top: 2px; }
+    .frRow p { margin: 0; color: #3a4358; line-height: 1.45; }
+    .nfrArea h2 { font-size: 19px; }
+    @media (max-width: 720px) { .frRow { grid-template-columns: 1fr; gap: 3px; } }
+  </style>
+</head>
+<body>
+  <main class="previewPage" style="max-width: 1120px; margin: 0 auto;">
+    <nav class="topNav">
+      <a href="index.html">← back to index</a>
+      <span class="crumb">Flipper.ai · Mobile Functional Requirements · v2.0</span>
+    </nav>
+
+    <section class="frHero">
+      <span class="eyebrow">Functional Requirements · Mobile Track</span>
+      <h1>Everything the mobile app ships at v2.0</h1>
+      <p>
+        123 functional requirements across 15 features (Features 15–29), plus 20 non-functional
+        requirements covering performance, security, accessibility, release operations, and testing.
+        Mobile requirements are additive to the web platform's existing FR inventory.
+      </p>
+      <div class="meta">
+        <span><b>123</b> functional requirements</span>
+        <span><b>20</b> non-functional requirements</span>
+        <span><b>15</b> features · <b>80</b> stories</span>
+        <span>
+          <span class="phasePill a">PHASE A · Rails up</span>
+          <span class="phasePill b">PHASE B · Closed beta</span>
+          <span class="phasePill c">PHASE C · Web parity</span>
+          <span class="phasePill d">PHASE D · GA launch</span>
+        </span>
+      </div>
+    </section>
+
+    <nav class="frToc">
+      <a href="#area-foundation">Foundation</a>
+      <a href="#area-release">Release Pipeline</a>
+      <a href="#area-auth">Sign-In &amp; Onboarding</a>
+      <a href="#area-shell">App Shell</a>
+      <a href="#area-scan">Scanning &amp; Listings</a>
+      <a href="#area-lifecycle">Flip Lifecycle</a>
+      <a href="#area-notify">Push &amp; Real-Time</a>
+      <a href="#area-msg">Messaging</a>
+      <a href="#area-relist">Cross-Posting</a>
+      <a href="#area-analytics">Analytics</a>
+      <a href="#area-billing">Subscriptions</a>
+      <a href="#area-settings">Settings</a>
+      <a href="#area-meet">Meetups</a>
+      <a href="#area-camera">Camera</a>
+      <a href="#area-polish">Offline &amp; Polish</a>
+      <a href="#area-a11y">Accessibility</a>
+      <a href="#area-nfr">NFRs</a>
+    </nav>
+
+    <section class="frArea" id="area-foundation">
+      <header><h2>Foundation &amp; Shared Platform</h2><span class="phasePill onLight a">PHASE A</span><span class="featRef">Feature 15</span></header>
+      <p class="areaSub">One codebase family: the mobile workspace lives beside the web app, sharing types, design tokens, and tooling.</p>
+      <article id="FR-MOBILE-FOUNDATION-01" class="frRow"><span class="frId">FR-MOBILE-FOUNDATION-01</span><p>Repository becomes a pnpm workspace monorepo with a dedicated <code>mobile/</code> workspace and shared <code>packages/</code> beside the existing web app.</p></article>
+      <article id="FR-MOBILE-FOUNDATION-02" class="frRow"><span class="frId">FR-MOBILE-FOUNDATION-02</span><p>Mobile app is built on Expo (SDK 53+, managed workflow) with file-based routing that mirrors the web's route structure.</p></article>
+      <article id="FR-MOBILE-FOUNDATION-03" class="frRow"><span class="frId">FR-MOBILE-FOUNDATION-03</span><p>TypeScript strict mode throughout, extending the project base config and path-alias conventions.</p></article>
+      <article id="FR-MOBILE-FOUNDATION-04" class="frRow"><span class="frId">FR-MOBILE-FOUNDATION-04</span><p>Shared domain types (Listing, Opportunity, ScraperJob, User, Message, PostingJob…) extracted to a shared package consumed by both web and mobile — no duplication.</p></article>
+      <article id="FR-MOBILE-FOUNDATION-05" class="frRow"><span class="frId">FR-MOBILE-FOUNDATION-05</span><p>Design tokens (color, spacing, radius, typography, glass-surface values) extracted to a framework-agnostic package feeding both web Tailwind and mobile styling.</p></article>
+      <article id="FR-MOBILE-FOUNDATION-06" class="frRow"><span class="frId">FR-MOBILE-FOUNDATION-06</span><p>NativeWind renders the canonical dark-glassmorphism design language natively — purple #7c3aed accent on the #080b14 dark surface, glass cards and glow treatments included.</p></article>
+      <article id="FR-MOBILE-FOUNDATION-07" class="frRow"><span class="frId">FR-MOBILE-FOUNDATION-07</span><p>Every mobile source file carries the project's standard file header (author, description, copyright).</p></article>
+      <article id="FR-MOBILE-FOUNDATION-08" class="frRow"><span class="frId">FR-MOBILE-FOUNDATION-08</span><p>ESLint config inherits the project root rules plus React Native/Expo plugins; one lint command covers web and mobile.</p></article>
+      <article id="FR-MOBILE-FOUNDATION-09" class="frRow"><span class="frId">FR-MOBILE-FOUNDATION-09</span><p>Prettier formatting matches the project root across both workspaces.</p></article>
+      <article id="FR-MOBILE-FOUNDATION-10" class="frRow"><span class="frId">FR-MOBILE-FOUNDATION-10</span><p>Make targets for every mobile workflow: dev, test, e2e, iOS/Android builds, store submission.</p></article>
+    </section>
+
+    <section class="frArea" id="area-release">
+      <header><h2>Release Pipeline (CI/CD, OTA &amp; Stores)</h2><span class="phasePill onLight a">PHASE A</span><span class="phasePill onLight d">PHASE D</span><span class="featRef">Features 16 · 29</span></header>
+      <p class="areaSub">The pipeline lands before the features: every merge ships a signed build to testers automatically, and production release is one git tag.</p>
+      <article id="FR-RELEASE-MOBILE-01" class="frRow"><span class="frId">FR-RELEASE-MOBILE-01</span><p>EAS build profiles for development, preview (internal QA), and production (App Store + Play Store).</p></article>
+      <article id="FR-RELEASE-MOBILE-02" class="frRow"><span class="frId">FR-RELEASE-MOBILE-02</span><p>Signed iOS and Android binaries per profile, with code-signing credentials managed centrally in EAS.</p></article>
+      <article id="FR-RELEASE-MOBILE-03" class="frRow"><span class="frId">FR-RELEASE-MOBILE-03</span><p>CI validates every mobile PR: lint, typecheck, unit tests, and Expo health checks.</p></article>
+      <article id="FR-RELEASE-MOBILE-04" class="frRow"><span class="frId">FR-RELEASE-MOBILE-04</span><p>Every merge to main touching mobile code auto-builds preview binaries for both platforms and posts the build links.</p></article>
+      <article id="FR-RELEASE-MOBILE-05" class="frRow"><span class="frId">FR-RELEASE-MOBILE-05</span><p>Preview builds auto-distribute to TestFlight internal testers (iOS) and Firebase App Distribution groups (Android).</p></article>
+      <article id="FR-RELEASE-MOBILE-06" class="frRow"><span class="frId">FR-RELEASE-MOBILE-06</span><p>Pushing a <code>mobile-vX.Y.Z</code> tag triggers the full production release: build, then submit to App Store Review and the Play production track.</p></article>
+      <article id="FR-RELEASE-MOBILE-07" class="frRow"><span class="frId">FR-RELEASE-MOBILE-07</span><p>Canonical semver version source drives the app version and platform build numbers automatically.</p></article>
+      <article id="FR-RELEASE-MOBILE-08" class="frRow"><span class="frId">FR-RELEASE-MOBILE-08</span><p>Mobile keeps its own Keep-a-Changelog file; cutting a release promotes the Unreleased section and tags the repo.</p></article>
+      <article id="FR-RELEASE-MOBILE-09" class="frRow"><span class="frId">FR-RELEASE-MOBILE-09</span><p>Release notes auto-extract from the changelog into the GitHub Release and the App Store / Play "What's New" copy.</p></article>
+      <article id="FR-RELEASE-MOBILE-10" class="frRow"><span class="frId">FR-RELEASE-MOBILE-10</span><p>Over-the-air JavaScript updates between binary releases, with production rollouts phased 10% → 25% → 50% → 100%.</p></article>
+      <article id="FR-RELEASE-MOBILE-11" class="frRow"><span class="frId">FR-RELEASE-MOBILE-11</span><p>Documented one-command emergency rollback that re-publishes the prior stable update.</p></article>
+      <article id="FR-RELEASE-MOBILE-12" class="frRow"><span class="frId">FR-RELEASE-MOBILE-12</span><p>Launch-time minimum-version check: devices below the supported floor see a force-upgrade screen deep-linked to the store listing.</p></article>
+      <article id="FR-RELEASE-MOBILE-13" class="frRow"><span class="frId">FR-RELEASE-MOBILE-13</span><p>Crash reporting tagged to the exact release version, with source maps uploaded automatically on every build.</p></article>
+      <article id="FR-RELEASE-MOBILE-14" class="frRow"><span class="frId">FR-RELEASE-MOBILE-14</span><p>A privacy manifest maps every data category the app collects, feeding Apple's App Privacy label and Google's Data Safety form.</p></article>
+      <article id="FR-RELEASE-MOBILE-15" class="frRow"><span class="frId">FR-RELEASE-MOBILE-15</span><p>A pre-submission checklist enumerates every applicable App Store guideline and Play policy — account deletion, Sign in with Apple, privacy labels, restore purchases, scraping disclaimers.</p></article>
+    </section>
+
+    <section class="frArea" id="area-auth">
+      <header><h2>Sign-In &amp; Onboarding</h2><span class="phasePill onLight a">PHASE A</span><span class="featRef">Feature 17</span></header>
+      <p class="areaSub">Same identity as the web — sign in once, stay signed in, optionally unlock with a face or fingerprint.</p>
+      <article id="FR-MOBILE-AUTH-01" class="frRow"><span class="frId">FR-MOBILE-AUTH-01</span><p>Mobile authenticates against the same Firebase project as the web app — identical user identity on every device.</p></article>
+      <article id="FR-MOBILE-AUTH-02" class="frRow"><span class="frId">FR-MOBILE-AUTH-02</span><p>API calls carry the Firebase ID token as a Bearer header; the existing backend accepts it alongside the web session cookie.</p></article>
+      <article id="FR-MOBILE-AUTH-03" class="frRow"><span class="frId">FR-MOBILE-AUTH-03</span><p>Tokens persist in iOS Keychain / Android Keystore with automatic refresh — users stay signed in across launches.</p></article>
+      <article id="FR-MOBILE-AUTH-04" class="frRow"><span class="frId">FR-MOBILE-AUTH-04</span><p>Email/password sign-up and sign-in, password reset, and OAuth with Google and Apple (Apple is required by App Store policy).</p></article>
+      <article id="FR-MOBILE-AUTH-05" class="frRow"><span class="frId">FR-MOBILE-AUTH-05</span><p>Optional biometric re-authentication (Face ID / Touch ID / Android biometrics) that unlocks a cached session — never replaces the credential.</p></article>
+      <article id="FR-MOBILE-AUTH-06" class="frRow"><span class="frId">FR-MOBILE-AUTH-06</span><p>Sign-out clears the secure token store and local caches, then returns to the auth stack.</p></article>
+      <article id="FR-MOBILE-AUTH-07" class="frRow"><span class="frId">FR-MOBILE-AUTH-07</span><p>The 6-step onboarding wizard reflows for touch — swipe between steps, progress dots, skippable — and syncs to the same backend so onboarding once counts everywhere.</p></article>
+      <article id="FR-MOBILE-AUTH-08" class="frRow"><span class="frId">FR-MOBILE-AUTH-08</span><p>An auth guard redirects unauthenticated users to sign-in, mirroring the web's provider pattern.</p></article>
+      <article id="FR-MOBILE-AUTH-09" class="frRow"><span class="frId">FR-MOBILE-AUTH-09</span><p>Abuse protection (hCaptcha or App Check) on sign-up and password-reset, at parity with the web.</p></article>
+      <article id="FR-MOBILE-AUTH-10" class="frRow"><span class="frId">FR-MOBILE-AUTH-10</span><p>Authentication events leave diagnostic breadcrumbs in crash reporting (never tokens or PII).</p></article>
+    </section>
+
+    <section class="frArea" id="area-shell">
+      <header><h2>App Shell, Navigation &amp; Design System</h2><span class="phasePill onLight b">PHASE B</span><span class="featRef">Feature 18</span></header>
+      <p class="areaSub">The five-tab shell that everything else lives in, rendered in the canonical dark-glass design language.</p>
+      <article id="FR-MOBILE-SHELL-01" class="frRow"><span class="frId">FR-MOBILE-SHELL-01</span><p>Tab-based root navigation: Dashboard, Scanner, Opportunities, Messages, More.</p></article>
+      <article id="FR-MOBILE-SHELL-02" class="frRow"><span class="frId">FR-MOBILE-SHELL-02</span><p>Shared screen wrapper applying the dark mesh background, safe-area insets, and pull-to-refresh on data screens.</p></article>
+      <article id="FR-MOBILE-SHELL-03" class="frRow"><span class="frId">FR-MOBILE-SHELL-03</span><p>The full glass-surface utility set (glass cards, glow cards, hot cards, buttons, inputs, badges, gradients, alerts) available natively from the shared tokens.</p></article>
+      <article id="FR-MOBILE-SHELL-04" class="frRow"><span class="frId">FR-MOBILE-SHELL-04</span><p>Shared state components matching web: loading skeletons, error banner, empty state, score ring.</p></article>
+      <article id="FR-MOBILE-SHELL-05" class="frRow"><span class="frId">FR-MOBILE-SHELL-05</span><p>Global toast system with success / error / info / alert / opportunity types, matching the web's API and look.</p></article>
+      <article id="FR-MOBILE-SHELL-06" class="frRow"><span class="frId">FR-MOBILE-SHELL-06</span><p>Global error boundary that reports crashes and presents a recoverable fallback UI.</p></article>
+      <article id="FR-MOBILE-SHELL-07" class="frRow"><span class="frId">FR-MOBILE-SHELL-07</span><p>Branded splash screen on the dark mesh, dismissed only after the auth state hydrates.</p></article>
+      <article id="FR-MOBILE-SHELL-08" class="frRow"><span class="frId">FR-MOBILE-SHELL-08</span><p>Adaptive app icons for iOS and Android generated from a single source asset.</p></article>
+      <article id="FR-MOBILE-SHELL-09" class="frRow"><span class="frId">FR-MOBILE-SHELL-09</span><p>Light/dark mode honoring the OS preference with an in-app override; "light" is a brand-preserving lite-dark slate, not white.</p></article>
+      <article id="FR-MOBILE-SHELL-10" class="frRow"><span class="frId">FR-MOBILE-SHELL-10</span><p>Deep links into opportunities, message threads, scan jobs, and settings — including universal links from flipper.ai URLs.</p></article>
+      <article id="FR-MOBILE-SHELL-11" class="frRow"><span class="frId">FR-MOBILE-SHELL-11</span><p>Reduced-motion OS settings disable or shorten glow animations, score-ring fills, and transitions.</p></article>
+      <article id="FR-MOBILE-SHELL-12" class="frRow"><span class="frId">FR-MOBILE-SHELL-12</span><p>Haptic feedback on key moments — posting success, stage advance, hot-listing found, errors — toggleable in Settings.</p></article>
+    </section>
+
+    <section class="frArea" id="area-scan">
+      <header><h2>Marketplace Scanning &amp; Listings</h2><span class="phasePill onLight b">PHASE B</span><span class="featRef">Feature 19</span></header>
+      <p class="areaSub">The core hunt: trigger scans, watch them live, browse scored results, and act on them — all against the existing backend.</p>
+      <article id="FR-MOBILE-SCAN-01" class="frRow"><span class="frId">FR-MOBILE-SCAN-01</span><p>Trigger a scrape against any configured marketplace (Craigslist, Facebook, eBay, OfferUp, Mercari) via the same endpoint the web uses.</p></article>
+      <article id="FR-MOBILE-SCAN-02" class="frRow"><span class="frId">FR-MOBILE-SCAN-02</span><p>Saved searches surface as one-tap quick-select chips on the Scanner.</p></article>
+      <article id="FR-MOBILE-SCAN-03" class="frRow"><span class="frId">FR-MOBILE-SCAN-03</span><p>Live scan progress over the shared event stream, with automatic fallback to polling on unreliable cellular.</p></article>
+      <article id="FR-MOBILE-SCAN-04" class="frRow"><span class="frId">FR-MOBILE-SCAN-04</span><p>In-flight jobs show marketplace, keyword, elapsed time, found-count, and an animated progress indicator; tapping drills into job detail.</p></article>
+      <article id="FR-MOBILE-SCAN-05" class="frRow"><span class="frId">FR-MOBILE-SCAN-05</span><p>Results render in an infinite-scroll feed — image, title, price, color-coded score, location, age — with pull-to-refresh re-running the last scan.</p></article>
+      <article id="FR-MOBILE-SCAN-06" class="frRow"><span class="frId">FR-MOBILE-SCAN-06</span><p>A filter sheet covers marketplace, score threshold, price range, distance, category, and condition — and persists per user.</p></article>
+      <article id="FR-MOBILE-SCAN-07" class="frRow"><span class="frId">FR-MOBILE-SCAN-07</span><p>Listing detail: swipeable pinch-to-zoom gallery, full description, score breakdown, comparable solds, sellability assessment, and a link to the original listing.</p></article>
+      <article id="FR-MOBILE-SCAN-08" class="frRow"><span class="frId">FR-MOBILE-SCAN-08</span><p>One tap saves a listing as an Opportunity, with a success haptic and confirmation toast.</p></article>
+      <article id="FR-MOBILE-SCAN-09" class="frRow"><span class="frId">FR-MOBILE-SCAN-09</span><p>Pass on a listing and it never reappears in future scans.</p></article>
+      <article id="FR-MOBILE-SCAN-10" class="frRow"><span class="frId">FR-MOBILE-SCAN-10</span><p>The most recent 200 listings, 50 opportunities, and 20 jobs cache on-device so the feed renders instantly at launch.</p></article>
+    </section>
+
+    <section class="frArea" id="area-lifecycle">
+      <header><h2>Flip Lifecycle Tracking</h2><span class="phasePill onLight b">PHASE B</span><span class="featRef">Feature 20</span></header>
+      <p class="areaSub">IDENTIFIED → PURCHASED → LISTED → SOLD, tracked with gestures and prompts that capture the real money at each step.</p>
+      <article id="FR-MOBILE-LIFECYCLE-01" class="frRow"><span class="frId">FR-MOBILE-LIFECYCLE-01</span><p>Opportunities render as a Kanban of horizontal columns or a swipeable card stack — toggleable, with the choice remembered.</p></article>
+      <article id="FR-MOBILE-LIFECYCLE-02" class="frRow"><span class="frId">FR-MOBILE-LIFECYCLE-02</span><p>Advance or revert lifecycle stages via swipe gestures or a long-press action sheet, using the same backend endpoint as the web board.</p></article>
+      <article id="FR-MOBILE-LIFECYCLE-03" class="frRow"><span class="frId">FR-MOBILE-LIFECYCLE-03</span><p>Advancing to PURCHASED prompts for the purchase price, date, and optional notes.</p></article>
+      <article id="FR-MOBILE-LIFECYCLE-04" class="frRow"><span class="frId">FR-MOBILE-LIFECYCLE-04</span><p>Advancing to LISTED prompts for the resale URL and platform, and offers to start the cross-posting flow.</p></article>
+      <article id="FR-MOBILE-LIFECYCLE-05" class="frRow"><span class="frId">FR-MOBILE-LIFECYCLE-05</span><p>Advancing to SOLD captures the sale price and displays computed net profit (sale − cost − fees) with a celebratory moment.</p></article>
+      <article id="FR-MOBILE-LIFECYCLE-06" class="frRow"><span class="frId">FR-MOBILE-LIFECYCLE-06</span><p>An Inventory view of purchased + listed items with running totals: cost basis, days held, projected profit, holding-cost drag.</p></article>
+      <article id="FR-MOBILE-LIFECYCLE-07" class="frRow"><span class="frId">FR-MOBILE-LIFECYCLE-07</span><p>Pull-to-refresh plus live event-stream subscription — lifecycle changes made on web or other devices appear in real time.</p></article>
+      <article id="FR-MOBILE-LIFECYCLE-08" class="frRow"><span class="frId">FR-MOBILE-LIFECYCLE-08</span><p>A per-flip activity timeline: stage transitions, captured prices, messages, posting jobs, and monitoring events.</p></article>
+    </section>
+
+    <section class="frArea" id="area-notify">
+      <header><h2>Push Notifications &amp; Real-Time</h2><span class="phasePill onLight b">PHASE B</span><span class="featRef">Feature 21</span></header>
+      <p class="areaSub">Every alert the web supports, delivered natively — with deep links, action buttons, badges, and quiet hours.</p>
+      <article id="FR-MOBILE-NOTIFY-01" class="frRow"><span class="frId">FR-MOBILE-NOTIFY-01</span><p>Push permission requested on first launch; the state is surfaced in Settings with a deep link to OS settings if denied.</p></article>
+      <article id="FR-MOBILE-NOTIFY-02" class="frRow"><span class="frId">FR-MOBILE-NOTIFY-02</span><p>Device push tokens register with the backend per user, per platform, on login.</p></article>
+      <article id="FR-MOBILE-NOTIFY-03" class="frRow"><span class="frId">FR-MOBILE-NOTIFY-03</span><p>The existing notification pipeline extends so every user-facing event also dispatches mobile push when the user has opted in.</p></article>
+      <article id="FR-MOBILE-NOTIFY-04" class="frRow"><span class="frId">FR-MOBILE-NOTIFY-04</span><p>Pushes carry deep-link payloads — tapping opens the exact opportunity, thread, or job the alert is about.</p></article>
+      <article id="FR-MOBILE-NOTIFY-05" class="frRow"><span class="frId">FR-MOBILE-NOTIFY-05</span><p>Foreground notifications surface as in-app toasts with tap-to-navigate; background ones use the OS tray.</p></article>
+      <article id="FR-MOBILE-NOTIFY-06" class="frRow"><span class="frId">FR-MOBILE-NOTIFY-06</span><p>Actionable notifications where useful — "Mark Sold", "Approve &amp; Send", "Dismiss" — acting without opening the app.</p></article>
+      <article id="FR-MOBILE-NOTIFY-07" class="frRow"><span class="frId">FR-MOBILE-NOTIFY-07</span><p>App icon badge counts reflect unread items needing attention, clearing as screens are visited.</p></article>
+      <article id="FR-MOBILE-NOTIFY-08" class="frRow"><span class="frId">FR-MOBILE-NOTIFY-08</span><p>Per-event notification preferences across email / push / SMS, writing to the same backend record the web uses.</p></article>
+      <article id="FR-MOBILE-NOTIFY-09" class="frRow"><span class="frId">FR-MOBILE-NOTIFY-09</span><p>Quiet hours: a daily window during which pushes are suppressed server-side (in the user's timezone) and queued in-app instead.</p></article>
+      <article id="FR-MOBILE-NOTIFY-10" class="frRow"><span class="frId">FR-MOBILE-NOTIFY-10</span><p>In the foreground, the live event stream delivers real-time updates without requiring push permission.</p></article>
+    </section>
+
+    <section class="frArea" id="area-msg">
+      <header><h2>Messaging &amp; Negotiation</h2><span class="phasePill onLight c">PHASE C</span><span class="featRef">Feature 22</span></header>
+      <p class="areaSub">A unified seller inbox with AI-drafted messages, an explicit approval gate, and inline negotiation strategy.</p>
+      <article id="FR-MOBILE-MSG-01" class="frRow"><span class="frId">FR-MOBILE-MSG-01</span><p>Unified inbox across all marketplaces, sorted by activity, with counterparty, listing thumbnail, preview, and unread badge per thread.</p></article>
+      <article id="FR-MOBILE-MSG-02" class="frRow"><span class="frId">FR-MOBILE-MSG-02</span><p>Chat-style thread view with sent/received bubbles, timestamps, and AI-generated alternates on long-press.</p></article>
+      <article id="FR-MOBILE-MSG-03" class="frRow"><span class="frId">FR-MOBILE-MSG-03</span><p>Generate AI messages by type: purchase inquiry, lowball offer, negotiation response, pickup scheduling, payment confirmation, no-show follow-up.</p></article>
+      <article id="FR-MOBILE-MSG-04" class="frRow"><span class="frId">FR-MOBILE-MSG-04</span><p>AI drafts require an explicit "Approve &amp; Send" — the same human-in-the-loop workflow as the web.</p></article>
+      <article id="FR-MOBILE-MSG-05" class="frRow"><span class="frId">FR-MOBILE-MSG-05</span><p>Negotiation strategy suggestions render inline above the compose bar with a concrete counter and rationale.</p></article>
+      <article id="FR-MOBILE-MSG-06" class="frRow"><span class="frId">FR-MOBILE-MSG-06</span><p>Inbound messages arrive via push and update the open thread in real time.</p></article>
+      <article id="FR-MOBILE-MSG-07" class="frRow"><span class="frId">FR-MOBILE-MSG-07</span><p>Swipe a conversation to mark it ACTIVE, STALLED, or CLOSED — the same status taxonomy as the web.</p></article>
+    </section>
+
+    <section class="frArea" id="area-relist">
+      <header><h2>Cross-Platform Resale Posting</h2><span class="phasePill onLight c">PHASE C</span><span class="featRef">Feature 23</span></header>
+      <p class="areaSub">List once, sell everywhere: AI copy, data-driven pricing, multi-marketplace fan-out, live status.</p>
+      <article id="FR-MOBILE-RELIST-01" class="frRow"><span class="frId">FR-MOBILE-RELIST-01</span><p>A Posting Queue screen shows in-flight, completed, and failed cross-platform posts with status, platform, retries, and last error.</p></article>
+      <article id="FR-MOBILE-RELIST-02" class="frRow"><span class="frId">FR-MOBILE-RELIST-02</span><p>AI-optimized title and description generation with inline editing before queueing the post.</p></article>
+      <article id="FR-MOBILE-RELIST-03" class="frRow"><span class="frId">FR-MOBILE-RELIST-03</span><p>The recommended optimal listing price surfaces with a ±25% adjustment slider.</p></article>
+      <article id="FR-MOBILE-RELIST-04" class="frRow"><span class="frId">FR-MOBILE-RELIST-04</span><p>Multi-select target marketplaces (eBay, Mercari, Facebook, OfferUp, Craigslist), reusing the stored listing photos.</p></article>
+      <article id="FR-MOBILE-RELIST-05" class="frRow"><span class="frId">FR-MOBILE-RELIST-05</span><p>Add an ad-hoc photo from the camera roll or capture one in-app, uploaded to the user's cloud storage.</p></article>
+      <article id="FR-MOBILE-RELIST-06" class="frRow"><span class="frId">FR-MOBILE-RELIST-06</span><p>Posting status streams live per platform — "Listed on Mercari ✓", "Facebook failed — retry?".</p></article>
+    </section>
+
+    <section class="frArea" id="area-analytics">
+      <header><h2>Analytics &amp; Reports</h2><span class="phasePill onLight c">PHASE C</span><span class="featRef">Feature 24</span></header>
+      <p class="areaSub">Profit proven on the phone: totals, trends, breakdowns, inventory health, and shareable exports.</p>
+      <article id="FR-MOBILE-ANALYTICS-01" class="frRow"><span class="frId">FR-MOBILE-ANALYTICS-01</span><p>Summary tiles: lifetime / MTD / YTD profit, flips completed, average margin, cost basis, items in inventory.</p></article>
+      <article id="FR-MOBILE-ANALYTICS-02" class="frRow"><span class="frId">FR-MOBILE-ANALYTICS-02</span><p>Profit-over-time chart with 7d / 30d / 90d / YTD / all-time range toggles.</p></article>
+      <article id="FR-MOBILE-ANALYTICS-03" class="frRow"><span class="frId">FR-MOBILE-ANALYTICS-03</span><p>Marketplace and category breakdown charts showing where the profit comes from.</p></article>
+      <article id="FR-MOBILE-ANALYTICS-04" class="frRow"><span class="frId">FR-MOBILE-ANALYTICS-04</span><p>CSV/PDF profit-report export delivered through the native share sheet.</p></article>
+      <article id="FR-MOBILE-ANALYTICS-05" class="frRow"><span class="frId">FR-MOBILE-ANALYTICS-05</span><p>Inventory-health gauge — green / yellow / red by aged-item count — drilling into the aged list on tap.</p></article>
+    </section>
+
+    <section class="frArea" id="area-billing">
+      <header><h2>Subscriptions (In-App Purchase)</h2><span class="phasePill onLight c">PHASE C</span><span class="featRef">Feature 25</span></header>
+      <p class="areaSub">Native store billing reconciled to one backend tier record — never double-billing a web subscriber.</p>
+      <article id="FR-MOBILE-BILLING-01" class="frRow"><span class="frId">FR-MOBILE-BILLING-01</span><p>Subscriptions sell through Apple StoreKit / Google Play Billing (mediated by RevenueCat) — no web-checkout workarounds, per store policy.</p></article>
+      <article id="FR-MOBILE-BILLING-02" class="frRow"><span class="frId">FR-MOBILE-BILLING-02</span><p>IAP tiers mirror the web: FREE, FLIPPER (monthly + annual), PRO (monthly + annual), with consistent product identifiers in both stores.</p></article>
+      <article id="FR-MOBILE-BILLING-03" class="frRow"><span class="frId">FR-MOBILE-BILLING-03</span><p>Purchase webhooks update the same backend subscription record that web Stripe purchases use — one source of truth.</p></article>
+      <article id="FR-MOBILE-BILLING-04" class="frRow"><span class="frId">FR-MOBILE-BILLING-04</span><p>Web subscribers are never charged again on mobile — their tier is honored automatically and no upsell is shown.</p></article>
+      <article id="FR-MOBILE-BILLING-05" class="frRow"><span class="frId">FR-MOBILE-BILLING-05</span><p>Subscription management and cancellation deep-link to the OS-level subscription settings.</p></article>
+      <article id="FR-MOBILE-BILLING-06" class="frRow"><span class="frId">FR-MOBILE-BILLING-06</span><p>Tier-based feature gating matches the web; gates render client-side as UX but the server is authoritative.</p></article>
+      <article id="FR-MOBILE-BILLING-07" class="frRow"><span class="frId">FR-MOBILE-BILLING-07</span><p>The App Store-required "Restore Purchases" affordance in Settings → Subscription.</p></article>
+    </section>
+
+    <section class="frArea" id="area-settings">
+      <header><h2>Settings &amp; Preferences</h2><span class="phasePill onLight c">PHASE C</span><span class="featRef">Feature 26</span></header>
+      <p class="areaSub">Full account control, store-compliance affordances, and feedback channels.</p>
+      <article id="FR-MOBILE-SETTINGS-01" class="frRow"><span class="frId">FR-MOBILE-SETTINGS-01</span><p>Sectioned settings: Account, Notifications, Appearance, Subscription, Marketplaces, Search Defaults, Privacy, About/Legal.</p></article>
+      <article id="FR-MOBILE-SETTINGS-02" class="frRow"><span class="frId">FR-MOBILE-SETTINGS-02</span><p>Link / unlink Google, Apple, and other OAuth accounts.</p></article>
+      <article id="FR-MOBILE-SETTINGS-03" class="frRow"><span class="frId">FR-MOBILE-SETTINGS-03</span><p>Update profile data — display name, email, photo (with image picker).</p></article>
+      <article id="FR-MOBILE-SETTINGS-04" class="frRow"><span class="frId">FR-MOBILE-SETTINGS-04</span><p>Privacy section linking to the Privacy Policy and Terms of Service (also required at store submission).</p></article>
+      <article id="FR-MOBILE-SETTINGS-05" class="frRow"><span class="frId">FR-MOBILE-SETTINGS-05</span><p>About section showing app version, build number, and the changelog.</p></article>
+      <article id="FR-MOBILE-SETTINGS-06" class="frRow"><span class="frId">FR-MOBILE-SETTINGS-06</span><p>"Delete my account" affordance per App Store Guideline 5.1.1(v), scheduling account purge per the privacy policy.</p></article>
+      <article id="FR-MOBILE-SETTINGS-07" class="frRow"><span class="frId">FR-MOBILE-SETTINGS-07</span><p>"Send Feedback" composes a pre-filled support email.</p></article>
+    </section>
+
+    <section class="frArea" id="area-meet">
+      <header><h2>Meetups &amp; Native Integrations</h2><span class="phasePill onLight c">PHASE C</span><span class="featRef">Feature 27</span></header>
+      <p class="areaSub">The physical-handoff layer only a native app can deliver.</p>
+      <article id="FR-MOBILE-MEET-01" class="frRow"><span class="frId">FR-MOBILE-MEET-01</span><p>Schedule a buy/sell meetup into the device calendar, Google Calendar, or both — user's choice.</p></article>
+      <article id="FR-MOBILE-MEET-02" class="frRow"><span class="frId">FR-MOBILE-MEET-02</span><p>One-tap driving directions in the user's default maps app (Apple Maps or Google Maps).</p></article>
+      <article id="FR-MOBILE-MEET-03" class="frRow"><span class="frId">FR-MOBILE-MEET-03</span><p>"Notify me when I'm 10 minutes away" geofence reminder — bring the cash, bring the item.</p></article>
+      <article id="FR-MOBILE-MEET-04" class="frRow"><span class="frId">FR-MOBILE-MEET-04</span><p>Share an opportunity (image + title + link) through the iOS Share Sheet / Android Share Intent.</p></article>
+      <article id="FR-MOBILE-MEET-05" class="frRow"><span class="frId">FR-MOBILE-MEET-05</span><p>Quick-capture share extension: a URL or image shared from another app becomes a draft opportunity for evaluation.</p></article>
+    </section>
+
+    <section class="frArea" id="area-camera">
+      <header><h2>Camera Capture</h2><span class="phasePill onLight d">PHASE D</span><span class="featRef">Feature 28</span></header>
+      <p class="areaSub">Purpose-built photography for resale listings.</p>
+      <article id="FR-MOBILE-CAMERA-01" class="frRow"><span class="frId">FR-MOBILE-CAMERA-01</span><p>In-app camera with auto-cropping, flash control, and multi-shot capture — up to 12 photos per listing.</p></article>
+      <article id="FR-MOBILE-CAMERA-02" class="frRow"><span class="frId">FR-MOBILE-CAMERA-02</span><p>Captured photos upload to the user's cloud storage path and register against the listing's image set.</p></article>
+    </section>
+
+    <section class="frArea" id="area-polish">
+      <header><h2>Offline, Optimistic UI, Tablet &amp; OS Search</h2><span class="phasePill onLight d">PHASE D</span><span class="featRef">Feature 28</span></header>
+      <p class="areaSub">The native polish pass before GA.</p>
+      <article id="FR-MOBILE-POLISH-01" class="frRow"><span class="frId">FR-MOBILE-POLISH-01</span><p>Offline mode for Opportunities and Inventory: the last snapshot renders from cache, and offline edits queue and replay on reconnect.</p></article>
+      <article id="FR-MOBILE-POLISH-02" class="frRow"><span class="frId">FR-MOBILE-POLISH-02</span><p>Optimistic UI on every lifecycle mutation — instant local update, background sync, rollback toast on failure.</p></article>
+      <article id="FR-MOBILE-POLISH-03" class="frRow"><span class="frId">FR-MOBILE-POLISH-03</span><p>iPad / Android tablets get a landscape 4-column desktop-style Kanban; phones stay portrait-locked.</p></article>
+      <article id="FR-MOBILE-POLISH-04" class="frRow"><span class="frId">FR-MOBILE-POLISH-04</span><p>Opportunities and listings surface in OS-level search (iOS Spotlight, Android App Indexing) where feasible.</p></article>
+    </section>
+
+    <section class="frArea" id="area-a11y">
+      <header><h2>Accessibility</h2><span class="phasePill onLight c">PHASE C</span><span class="featRef">Feature 26</span></header>
+      <p class="areaSub">WCAG AA is a release gate, not a nice-to-have.</p>
+      <article id="FR-MOBILE-A11Y-01" class="frRow"><span class="frId">FR-MOBILE-A11Y-01</span><p>Every interactive control carries proper accessibility labels and roles; touch targets meet 44 pt (iOS) / 48 dp (Android) minimums.</p></article>
+      <article id="FR-MOBILE-A11Y-02" class="frRow"><span class="frId">FR-MOBILE-A11Y-02</span><p>Every screen is tested with VoiceOver and TalkBack with a logical navigation order.</p></article>
+      <article id="FR-MOBILE-A11Y-03" class="frRow"><span class="frId">FR-MOBILE-A11Y-03</span><p>Color contrast meets WCAG AA (4.5:1 body, 3:1 large text/UI) on both dark and light palettes.</p></article>
+      <article id="FR-MOBILE-A11Y-04" class="frRow"><span class="frId">FR-MOBILE-A11Y-04</span><p>System font scaling honored up to 200% on key screens without truncation.</p></article>
+      <article id="FR-MOBILE-A11Y-05" class="frRow"><span class="frId">FR-MOBILE-A11Y-05</span><p>Listing images carry descriptive labels so screen-reader users hear title and price.</p></article>
+    </section>
+
+    <section class="frArea nfrArea" id="area-nfr">
+      <header><h2>Non-Functional Requirements</h2><span class="featRef">20 NFRs · All Phases</span></header>
+      <p class="areaSub">The quality bars the app must clear regardless of feature.</p>
+      <article id="NFR-MOB-PERF-01" class="frRow"><span class="frId">NFR-MOB-PERF-01</span><p>Cold start ≤ 2.5 s to first interactive frame on a mid-tier device (Pixel 5 / iPhone 12).</p></article>
+      <article id="NFR-MOB-PERF-02" class="frRow"><span class="frId">NFR-MOB-PERF-02</span><p>Warm start (background → foreground) ≤ 800 ms.</p></article>
+      <article id="NFR-MOB-PERF-03" class="frRow"><span class="frId">NFR-MOB-PERF-03</span><p>Sustained ≥ 55 fps on Kanban and feed scroll on reference devices.</p></article>
+      <article id="NFR-MOB-PERF-04" class="frRow"><span class="frId">NFR-MOB-PERF-04</span><p>Initial JS bundle ≤ 8 MB; total install ≤ 80 MB.</p></article>
+      <article id="NFR-MOB-PERF-05" class="frRow"><span class="frId">NFR-MOB-PERF-05</span><p>Crash-free-users rate ≥ 99.5% over rolling 7-day production windows.</p></article>
+      <article id="NFR-MOB-SEC-01" class="frRow"><span class="frId">NFR-MOB-SEC-01</span><p>Auth tokens live only in iOS Keychain / Android Keystore — never plain storage.</p></article>
+      <article id="NFR-MOB-SEC-02" class="frRow"><span class="frId">NFR-MOB-SEC-02</span><p>HTTPS-only networking; cleartext HTTP disabled at the OS configuration level.</p></article>
+      <article id="NFR-MOB-SEC-03" class="frRow"><span class="frId">NFR-MOB-SEC-03</span><p>Certificate pinning for the production API host with a documented rotation procedure.</p></article>
+      <article id="NFR-MOB-SEC-04" class="frRow"><span class="frId">NFR-MOB-SEC-04</span><p>No tokens, OAuth secrets, or PII in logs, crash reports, or analytics — enforced by a runtime safety filter.</p></article>
+      <article id="NFR-MOB-SEC-05" class="frRow"><span class="frId">NFR-MOB-SEC-05</span><p>No critical CVEs in production dependencies, verified continuously in CI.</p></article>
+      <article id="NFR-MOB-A11Y-01" class="frRow"><span class="frId">NFR-MOB-A11Y-01</span><p>WCAG AA on every screen — contrast, dynamic type, screen readers, focus order.</p></article>
+      <article id="NFR-MOB-A11Y-02" class="frRow"><span class="frId">NFR-MOB-A11Y-02</span><p>Platform touch-target minimums and accessibility roles/labels on all interactive controls.</p></article>
+      <article id="NFR-MOB-RELEASE-01" class="frRow"><span class="frId">NFR-MOB-RELEASE-01</span><p>Hot-fixes ship over-the-air in ≤ 30 minutes; rollback in ≤ 5; standard binary releases within ≤ 7 days (iOS) / ≤ 3 days (Android).</p></article>
+      <article id="NFR-MOB-RELEASE-02" class="frRow"><span class="frId">NFR-MOB-RELEASE-02</span><p>Every production binary has a GitHub Release with notes auto-extracted from the changelog.</p></article>
+      <article id="NFR-MOB-RELEASE-03" class="frRow"><span class="frId">NFR-MOB-RELEASE-03</span><p>Submissions comply with current Apple App Store Review Guidelines and Google Play policies.</p></article>
+      <article id="NFR-MOB-RELEASE-04" class="frRow"><span class="frId">NFR-MOB-RELEASE-04</span><p>Semantic version + build number visible in Settings → About for support reproducibility.</p></article>
+      <article id="NFR-MOB-TEST-01" class="frRow"><span class="frId">NFR-MOB-TEST-01</span><p>Unit-test coverage ≥ 80% statements / 70% branches on new modules.</p></article>
+      <article id="NFR-MOB-TEST-02" class="frRow"><span class="frId">NFR-MOB-TEST-02</span><p>E2E coverage at the correct level for every acceptance criterion — UI flows hit real device automation, logic hits service tests.</p></article>
+      <article id="NFR-MOB-TEST-03" class="frRow"><span class="frId">NFR-MOB-TEST-03</span><p>E2E suite runs on both iOS Simulator and Android Emulator in CI; smoke pack ≤ 8 minutes.</p></article>
+      <article id="NFR-MOB-TEST-04" class="frRow"><span class="frId">NFR-MOB-TEST-04</span><p>One requirements-traceability matrix spans web and mobile — every FR and NFR mapped to scenarios, 100% coverage.</p></article>
+    </section>
+
+    <footer class="previewFooter">
+      <span>Prepared by <b>Silverline Software Inc.</b> for the Flipper.ai Mobile v2.0 review · 2026-06-11</span>
+      <span class="right"><a href="index.html">← back to index</a> <a href="17-roadmap.html">next: Release Roadmap →</a></span>
+    </footer>
+  </main>
+</body>
+</html>

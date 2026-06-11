@@ -1,0 +1,183 @@
+<!--
+  file: docs/client-facing/previews/17-roadmap.html
+  author: Stephen Boyett
+  company: Axovia
+  date: 2026-06-11
+  version: 1.0
+  brief: Reference — four-phase mobile release roadmap (Features 15-29) with milestones, no pricing.
+
+  description:
+      Renders the mobile track's release sequencing: Phase A (rails up),
+      Phase B (lovable closed beta), Phase C (feature parity / open beta),
+      Phase D (v2.0.0 GA on both stores). Includes the per-phase feature
+      breakdown with story counts, the four release milestones, and the
+      release-operations capabilities (OTA hot-fixes, phased rollout,
+      one-command rollback). Hour/dollar estimates are intentionally absent —
+      they are not part of the source plan.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Flipper.ai · Mobile Release Roadmap — preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .tlHero {
+      background:
+        radial-gradient(at top right, rgba(139, 92, 246, 0.35), transparent 55%),
+        linear-gradient(145deg, #150a2e, #2a1065 60%, #3b1797);
+      color: #f4f0ff; border-radius: 18px; padding: 26px 30px; position: relative; overflow: hidden;
+    }
+    .tlHero .eyebrow { display: inline-flex; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.22); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: #d8c8ff; text-transform: uppercase; }
+    .tlHero h1 { margin: 10px 0 6px; font-size: clamp(24px, 3vw, 34px); letter-spacing: -0.02em; }
+    .tlHero p { margin: 0; max-width: 680px; font-size: 14px; line-height: 1.5; color: #d6cdf4; }
+    .tlHero .meta { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 18px; font-size: 12px; color: #d6cdf4; }
+    .tlHero .meta b { color: #fff; }
+    .phaseGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    @media (max-width: 980px) { .phaseGrid { grid-template-columns: repeat(2, 1fr); } }
+    .phaseCard { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden; }
+    .phaseCard::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+    .phaseCard.a::before { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
+    .phaseCard.b::before { background: linear-gradient(90deg, #34d399, #10b981); }
+    .phaseCard.c::before { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+    .phaseCard.d::before { background: linear-gradient(90deg, #f472b6, #ec4899); }
+    .phaseCard .ph { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #6c748b; }
+    .phaseCard h3 { margin: 0; font-size: 18px; letter-spacing: -0.01em; }
+    .phaseCard ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+    .phaseCard li { font-size: 12.5px; color: #3a4358; line-height: 1.35; display: grid; grid-template-columns: auto 1fr; gap: 8px; }
+    .phaseCard li .fid { font-size: 10px; font-weight: 800; color: var(--primary-deep); padding-top: 2px; white-space: nowrap; }
+    .phaseCard li .st { color: #8b93a8; font-size: 11px; }
+    .phaseMilestone { margin-top: auto; padding: 10px 12px; border-radius: 11px; font-size: 12px; font-weight: 700; line-height: 1.35; }
+    .phaseCard.a .phaseMilestone { background: #e8f1ff; color: #1d59b3; }
+    .phaseCard.b .phaseMilestone { background: #e9f9f1; color: #117f55; }
+    .phaseCard.c .phaseMilestone { background: #fff1d8; color: #8a5a07; }
+    .phaseCard.d .phaseMilestone { background: #ffe9f3; color: #b3266b; }
+    .opsGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    @media (max-width: 860px) { .opsGrid { grid-template-columns: 1fr; } }
+    .opsCard { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+    .opsCard .ic { font-size: 22px; }
+    .opsCard h4 { margin: 8px 0 4px; font-size: 15px; }
+    .opsCard p { margin: 0; font-size: 12.5px; color: #5a6479; line-height: 1.45; }
+    .opsCard .ref { display: inline-flex; margin-top: 10px; border-radius: 999px; padding: 3px 9px; background: var(--primary-soft); color: var(--primary-text); font-size: 10.5px; font-weight: 700; }
+    .seqNote { background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--primary); border-radius: 12px; padding: 14px 18px; font-size: 13px; color: #3a4358; line-height: 1.5; }
+    .seqNote b { color: var(--primary-deep); }
+  </style>
+</head>
+<body>
+  <main class="previewPage" style="max-width: 1180px; margin: 0 auto;">
+    <nav class="topNav">
+      <a href="index.html">← back to index</a>
+      <span class="crumb">Flipper.ai · Mobile Release Roadmap · v2.0</span>
+    </nav>
+
+    <section class="tlHero">
+      <span class="eyebrow">Release Roadmap · Four Phases</span>
+      <h1>15 features, four releases, one git tag to GA</h1>
+      <p>
+        The mobile track sequences Features 15–29 into four phases, each ending in a real release
+        to real devices. The delivery pipeline is built <em>first</em> — so from Phase B onward,
+        every merged story is on testers' phones within minutes.
+      </p>
+      <div class="meta">
+        <span><b>15</b> features</span>
+        <span><b>80</b> stories</span>
+        <span><b>4</b> release milestones</span>
+        <span><b>Target:</b> v2.0.0 on App Store + Google Play</span>
+      </div>
+    </section>
+
+    <div class="seqNote">
+      <b>Fastest-path principle:</b> Phase A stands up the monorepo, the CI/CD pipeline, and the
+      auth bridge before any feature work. A stub-but-real binary reaches TestFlight and Firebase
+      App Distribution at the end of Phase A — everything after that ships continuously.
+    </div>
+
+    <section class="phaseGrid">
+      <article class="phaseCard a">
+        <span class="ph">Phase A</span>
+        <h3>Rails up</h3>
+        <ul>
+          <li><span class="fid">F-15</span><span>Mobile Foundation &amp; Shared Platform <span class="st">· 5 stories</span></span></li>
+          <li><span class="fid">F-16</span><span>Release Pipeline — builds, distribution, OTA <span class="st">· 6 stories</span></span></li>
+          <li><span class="fid">F-17</span><span>Sign-In &amp; Onboarding — auth bridge <span class="st">· 6 stories</span></span></li>
+        </ul>
+        <div class="phaseMilestone">🚀 Milestone: signed stub binary on TestFlight + Firebase App Distribution</div>
+      </article>
+
+      <article class="phaseCard b">
+        <span class="ph">Phase B</span>
+        <h3>Lovable beta</h3>
+        <ul>
+          <li><span class="fid">F-18</span><span>App Shell &amp; Design System <span class="st">· 6 stories</span></span></li>
+          <li><span class="fid">F-19</span><span>Marketplace Scanning &amp; Listings <span class="st">· 7 stories</span></span></li>
+          <li><span class="fid">F-20</span><span>Flip Lifecycle Tracking <span class="st">· 6 stories</span></span></li>
+          <li><span class="fid">F-21</span><span>Push Notifications &amp; Real-Time <span class="st">· 6 stories</span></span></li>
+        </ul>
+        <div class="phaseMilestone">🧪 Milestone: first product-grade closed beta (TestFlight + Play Internal Testing)</div>
+      </article>
+
+      <article class="phaseCard c">
+        <span class="ph">Phase C</span>
+        <h3>Feature parity</h3>
+        <ul>
+          <li><span class="fid">F-22</span><span>Messaging &amp; Negotiation <span class="st">· 5 stories</span></span></li>
+          <li><span class="fid">F-23</span><span>Cross-Platform Posting <span class="st">· 5 stories</span></span></li>
+          <li><span class="fid">F-24</span><span>Analytics &amp; Reports <span class="st">· 4 stories</span></span></li>
+          <li><span class="fid">F-25</span><span>Subscriptions (IAP) <span class="st">· 5 stories</span></span></li>
+          <li><span class="fid">F-26</span><span>Settings &amp; Accessibility <span class="st">· 5 stories</span></span></li>
+          <li><span class="fid">F-27</span><span>Meetups &amp; Native Integrations <span class="st">· 4 stories</span></span></li>
+        </ul>
+        <div class="phaseMilestone">🌐 Milestone: open beta — feature parity with the web app</div>
+      </article>
+
+      <article class="phaseCard d">
+        <span class="ph">Phase D</span>
+        <h3>Production launch</h3>
+        <ul>
+          <li><span class="fid">F-28</span><span>Camera, Offline &amp; Native Polish <span class="st">· 5 stories</span></span></li>
+          <li><span class="fid">F-29</span><span>App Store + Play Store Launch <span class="st">· 5 stories</span></span></li>
+        </ul>
+        <div class="phaseMilestone">🏪 Milestone: v2.0.0 GA on the Apple App Store and Google Play, phased rollout 10% → 100%</div>
+      </article>
+    </section>
+
+    <section>
+      <h2 style="margin:0 0 4px; font-size:20px; letter-spacing:-0.01em;">Release operations, built in</h2>
+      <p style="margin:0 0 12px; color:#6a7390; font-size:13px;">The machinery that keeps a live mobile product safe — specified as requirements, not aspirations.</p>
+      <div class="opsGrid">
+        <article class="opsCard">
+          <span class="ic">⚡</span>
+          <h4>Hot-fixes in minutes, not weeks</h4>
+          <p>Over-the-air JavaScript updates ship fixes in ≤ 30 minutes — no App Review wait. Production rollouts phase 10% → 25% → 50% → 100% with bake time at each stage.</p>
+          <span class="ref"><a href="16-functional-requirements.html#FR-RELEASE-MOBILE-10">FR-RELEASE-MOBILE-10 · NFR-MOB-RELEASE-01</a></span>
+        </article>
+        <article class="opsCard">
+          <span class="ic">⏪</span>
+          <h4>One-command rollback</h4>
+          <p>A documented rollback re-publishes the prior stable update in ≤ 5 minutes if a regression slips through — with the procedure runbooked for operations.</p>
+          <span class="ref"><a href="16-functional-requirements.html#FR-RELEASE-MOBILE-11">FR-RELEASE-MOBILE-11</a></span>
+        </article>
+        <article class="opsCard">
+          <span class="ic">🛡️</span>
+          <h4>Force-upgrade floor</h4>
+          <p>The backend declares a minimum supported version per platform; older installs see an upgrade screen deep-linked to the store — no zombie clients against a moving API.</p>
+          <span class="ref"><a href="16-functional-requirements.html#FR-RELEASE-MOBILE-12">FR-RELEASE-MOBILE-12</a></span>
+        </article>
+      </div>
+    </section>
+
+    <div class="seqNote">
+      <b>Backend stays untouched at v1:</b> the mobile app consumes the existing Cloud Run API —
+      same scraper jobs, opportunities, messages, posting queue, and analytics endpoints the web
+      uses. The only backend additions are the Bearer-token bridge, a device-token model for push,
+      and the purchase webhook. Web and mobile stay in lock-step by construction.
+    </div>
+
+    <footer class="previewFooter">
+      <span>Prepared by <b>Silverline Software Inc.</b> for the Flipper.ai Mobile v2.0 review · 2026-06-11</span>
+      <span class="right"><a href="16-functional-requirements.html">← prev: FR Catalog</a> <a href="index.html">back to index</a></span>
+    </footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!--
+  file: docs/client-facing/previews/12-subscription.html
+  author: Stephen Boyett
+  company: Axovia
+  date: 2026-06-11
+  version: 1.0
+  brief: Mobile preview — in-app subscription tiers via RevenueCat with restore-purchases affordance.
+
+  description:
+      Illustrates Feature 25 / Stories 25.1-25.5: FLIPPER and PRO tiers
+      offered through Apple StoreKit / Google Play Billing (mediated by
+      RevenueCat), monthly/annual toggle, tier benefits drawn from the real
+      TIER_LIMITS definition, web-subscriber reconciliation to prevent
+      double-billing, and the App Store-required Restore Purchases link.
+      Dollar price points are configured in App Store Connect / Play Console
+      at launch and intentionally not invented here
+      (FR-MOBILE-BILLING-01..07).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Flipper.ai · Subscription — preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .pwWrap { padding: 70px 18px 14px; display: flex; flex-direction: column; gap: 11px; height: 100%; }
+    .pwHead { text-align: center; }
+    .pwHead h2 { margin: 0; font-size: 22px; color: var(--screen-text); letter-spacing: -0.01em; }
+    .pwHead p { margin: 4px 0 0; font-size: 11.5px; color: var(--screen-text-muted); }
+    .pwSeg { margin: 0 auto; display: inline-flex; border-radius: 999px; border: 1px solid var(--fp-glass-border); background: rgba(255,255,255,0.04); padding: 3px; }
+    .pwSeg span { padding: 6px 16px; border-radius: 999px; font-size: 11px; font-weight: 800; color: var(--screen-text-muted); }
+    .pwSeg span.on { background: rgba(124,58,237,0.32); color: var(--fp-lavender); }
+    .pwSeg .save { font-size: 8.5px; color: var(--fp-green); margin-left: 4px; }
+    .tierCard { padding: 13px 14px; position: relative; }
+    .tierCard .tn { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; color: var(--screen-text); }
+    .tierCard .pr { margin-left: auto; font-size: 11px; font-weight: 700; color: var(--screen-text-muted); }
+    .tierCard ul { margin: 8px 0 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+    .tierCard li { font-size: 10.5px; color: var(--screen-text-2); display: flex; gap: 7px; align-items: center; }
+    .tierCard li i { font-style: normal; color: var(--fp-green); font-size: 10px; }
+    .tierCard li.no { color: #5b647a; }
+    .tierCard li.no i { color: #5b647a; }
+    .bestBadge { position: absolute; top: -9px; right: 12px; padding: 3px 10px; border-radius: 999px; background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.1em; box-shadow: 0 4px 12px var(--fp-glow-purple); }
+    .tierCta { margin-top: 9px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; }
+    .tierCta.pri { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; box-shadow: 0 6px 16px rgba(109,40,217,0.45); }
+    .tierCta.gho { border: 1px solid rgba(255,255,255,0.14); color: var(--screen-text-2); }
+    .curChip { display: inline-flex; padding: 3px 9px; border-radius: 999px; background: rgba(255,255,255,0.07); color: var(--screen-text-muted); font-size: 8.5px; font-weight: 800; letter-spacing: 0.08em; }
+    .pwFoot { margin-top: auto; text-align: center; font-size: 10px; color: #64748b; line-height: 1.5; }
+    .pwFoot b { color: var(--fp-lavender); font-weight: 700; }
+  </style>
+</head>
+<body>
+  <main class="previewPage">
+    <header class="previewTop">
+      <a class="previewBrand" href="index.html">
+        <span class="mark">F</span>
+        <span class="word">Flipper.ai <em>mobile preview deck</em></span>
+      </a>
+      <div class="previewIndex">
+        <span class="step">12 / 17</span>
+        <span class="step active">Subscription</span>
+      </div>
+    </header>
+
+    <section class="previewHero">
+      <div>
+        <p class="previewKicker">Feature 25 · Subscriptions (In-App Purchase) · Phase C</p>
+        <h1 class="previewTitle">Native billing, <em>one source of truth</em>.</h1>
+        <p class="previewLede">
+          FLIPPER and PRO subscriptions sell through Apple and Google's native billing (mediated by
+          RevenueCat) and reconcile to the same backend tier record as web Stripe subscriptions —
+          a web subscriber is never double-billed on mobile.
+        </p>
+        <div class="previewFrCloud">
+          <a href="16-functional-requirements.html#FR-MOBILE-BILLING-01"><span>FR-MOBILE-BILLING-01</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-BILLING-04"><span>FR-MOBILE-BILLING-04</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-BILLING-06"><span>FR-MOBILE-BILLING-06</span></a>
+          <a href="16-functional-requirements.html#FR-MOBILE-BILLING-07"><span>FR-MOBILE-BILLING-07</span></a>
+        </div>
+      </div>
+      <div class="previewMetaCard">
+        <h4>What this screen shows</h4>
+        <ul>
+          <li><strong>Surface</strong><span>Upgrade paywall · from Settings or a gated feature</span></li>
+          <li><strong>Story</strong><span>Feature 25 / Stories 25.1 – 25.5</span></li>
+          <li><strong>Limits</strong><span>Benefits mirror the production tier definitions</span></li>
+          <li><strong>Pricing</strong><span>Dollar points set in App Store Connect / Play Console at launch</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="phoneStage">
+      <aside class="stageNoteLeft">
+        <div class="stageNote">
+          <h5>Store-policy compliant</h5>
+          <p>Mobile purchases go through StoreKit / Play Billing as Apple and Google require — no web checkout workarounds that risk rejection.</p>
+          <span class="frTag">FR-MOBILE-BILLING-01</span>
+        </div>
+        <div class="stageNote">
+          <h5>No double billing</h5>
+          <p>A user already subscribed on the web sees their tier honored here automatically. The upgrade sheet only appears for FREE users.</p>
+          <span class="frTag">FR-MOBILE-BILLING-04</span>
+        </div>
+      </aside>
+
+      <div class="phoneFrame">
+        <div class="phoneScreen fpDark">
+          <div class="statusBar onDark">
+            <span>9:41</span>
+            <span class="icons"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></span>
+          </div>
+
+          <div class="screenScroll">
+            <div class="pwWrap">
+              <div class="pwHead">
+                <h2>Flip without limits</h2>
+                <p>Upgrade to scan more, message sellers, and cross-list</p>
+              </div>
+
+              <div style="text-align:center;">
+                <div class="pwSeg"><span>Monthly</span><span class="on">Annual <span class="save">SAVE</span></span></div>
+              </div>
+
+              <div class="tierCard fpGlassSm">
+                <div class="tn">Free <span class="curChip">CURRENT PLAN</span></div>
+                <ul>
+                  <li><i>✓</i>10 scans per day · 1 marketplace</li>
+                  <li><i>✓</i>3 saved searches · AI analysis included</li>
+                  <li class="no"><i>✕</i>Messaging, price history &amp; cross-listing</li>
+                </ul>
+              </div>
+
+              <div class="tierCard fpGlass fpHot">
+                <span class="bestBadge">MOST POPULAR</span>
+                <div class="tn">⚡ Flipper <span class="pr">billed via App Store</span></div>
+                <ul>
+                  <li><i>✓</i>Unlimited scans · 3 marketplaces</li>
+                  <li><i>✓</i>20 saved searches · 5 concurrent scans</li>
+                  <li><i>✓</i>Seller messaging + AI negotiation</li>
+                  <li><i>✓</i>Price history</li>
+                </ul>
+                <div class="tierCta pri">Upgrade to Flipper</div>
+              </div>
+
+              <div class="tierCard fpGlassSm">
+                <div class="tn">💎 Pro <span class="pr">billed via App Store</span></div>
+                <ul>
+                  <li><i>✓</i>Everything in Flipper — uncapped</li>
+                  <li><i>✓</i>All 5 marketplaces · 20 concurrent scans</li>
+                  <li><i>✓</i>eBay cross-listing + meetup logistics</li>
+                </ul>
+                <div class="tierCta gho">Upgrade to Pro</div>
+              </div>
+
+              <div class="pwFoot">
+                <b>Restore Purchases</b> · Manage in App Store settings<br/>
+                Subscriptions renew automatically until cancelled.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="stageNoteRight">
+        <div class="stageNote">
+          <h5>Real tier limits</h5>
+          <p>The benefits shown mirror the production tier definitions exactly — 10 scans/day on Free, unlimited on Flipper, all five marketplaces and eBay cross-listing on Pro.</p>
+          <span class="frTag">FR-MOBILE-BILLING-02 · 06</span>
+        </div>
+        <div class="stageNote">
+          <h5>Server is the referee</h5>
+          <p>Tier gates render as UX on-device but are enforced server-side — a jailbroken client can't scan past its plan.</p>
+          <span class="frTag">FR-MOBILE-BILLING-06</span>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="previewFooter">
+      <span>Prepared by <b>Silverline Software Inc.</b> for the Flipper.ai Mobile v2.0 review · 2026-06-11</span>
+      <span class="right"><a href="11-analytics.html">← prev</a> <a href="index.html">index</a> <a href="13-settings.html">next: Settings →</a></span>
+    </footer>
+  </main>
+</body>
+</html>
