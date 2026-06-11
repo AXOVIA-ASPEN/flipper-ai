@@ -360,11 +360,11 @@
         <div class="linkrow"><a class="link" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">OpenAI API keys</a></div>
       </div>
 
-      <div class="task" data-id="acct-anthropic">
+      <div class="task" data-id="acct-anthropic" data-done="true">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A10</span><span class="t-title">Anthropic</span><span class="badge p1">optional</span></div>
-        <p class="t-desc">Claude — primary for Tier-2 structural analysis (<code class="kbd">claudeAnalysis</code>), with Groq/Gemini fallback. Wires <code class="kbd">ANTHROPIC_API_KEY</code> + <code class="kbd">CLAUDE_API_KEY</code>.</p>
-        <div class="linkrow"><a class="link" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Anthropic API keys</a></div>
+        <div class="t-head"><span class="t-id">A10</span><span class="t-title">Anthropic</span><span class="badge auto">✓ key</span></div>
+        <p class="t-desc">Claude key wired (<code class="kbd">ANTHROPIC_API_KEY</code>+<code class="kbd">CLAUDE_API_KEY</code>). Primary for Tier-2 structural analysis. <b>Add credits when ready</b> — until then the Groq→Gemini→OpenAI fallback covers <code class="kbd">claudeAnalysis</code>, so nothing breaks.</p>
+        <div class="linkrow"><a class="link" href="https://console.anthropic.com/settings/billing" target="_blank" rel="noopener">Anthropic billing (add credits)</a></div>
       </div>
 
       <div class="task" data-id="acct-ebay">
