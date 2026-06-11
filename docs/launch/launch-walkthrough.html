@@ -353,11 +353,11 @@
         <div class="linkrow"><a class="link" href="https://developers.facebook.com/apps/" target="_blank" rel="noopener">Facebook Apps</a></div>
       </div>
 
-      <div class="task" data-id="acct-openai">
+      <div class="task" data-id="acct-openai" data-done="true">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A9</span><span class="t-title">OpenAI</span><span class="badge p1">optional</span></div>
-        <p class="t-desc">AI fallback + image/vision for item-completeness. Groq+Gemini already cover the chain, so optional.</p>
-        <div class="linkrow"><a class="link" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">OpenAI API keys</a></div>
+        <div class="t-head"><span class="t-id">A9</span><span class="t-title">OpenAI</span><span class="badge auto">✓ key</span></div>
+        <p class="t-desc">Key wired (<code class="kbd">OPENAI_API_KEY</code>). Primary for <code class="kbd">itemCompleteness</code> image/vision (Groq's Llama can't read images) + general AI fallback. With OpenAI + Gemini both real, image item-analysis is covered. Add credits when ready.</p>
+        <div class="linkrow"><a class="link" href="https://platform.openai.com/settings/organization/billing/overview" target="_blank" rel="noopener">OpenAI billing</a></div>
       </div>
 
       <div class="task" data-id="acct-anthropic" data-done="true">
@@ -702,7 +702,19 @@ curl -s <span class="dom" data-token>https://your-domain.com</span>/api/health/r
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
         <div class="t-head"><span class="t-id">5.5</span><span class="t-title">Public pages: pricing · FAQ · status · changelog</span><span class="badge p1">P1</span></div>
         <p class="t-desc">Specs are pre-written in the toolkit.</p>
-        <div class="linkrow"><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/tree/django-main/docs/launch" target="_blank" rel="noopener">docs/launch/ specs</a></div>
+        <div class="linkrow"><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/tree/main/docs/launch" target="_blank" rel="noopener">docs/launch/ specs</a></div>
+      </div>
+
+      <div class="task" data-id="5-6">
+        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
+        <div class="t-head"><span class="t-id">5.6</span><span class="t-title">Converge duplicate env-var names → one canonical per credential</span><span class="badge p1">Tech debt</span></div>
+        <p class="t-desc">Some credentials are read under two env names — pick one canonical name each and remove the alias so a single value isn't duplicated across Secret Manager + the codebase. Known cases:</p>
+        <ul class="steps plain">
+          <li><b>Anthropic:</b> <code class="kbd">ANTHROPIC_API_KEY</code> (canonical) vs <code class="kbd">CLAUDE_API_KEY</code> (alias) — both read in <code class="kbd">src/lib/ai/providers/anthropic.ts</code> (<code class="kbd">ANTHROPIC || CLAUDE</code>). Drop <code class="kbd">CLAUDE_API_KEY</code>.</li>
+          <li><b>Gemini:</b> standardize on <code class="kbd">GOOGLE_API_KEY</code> (current) — ensure no stray <code class="kbd">GEMINI_API_KEY</code> creeps in.</li>
+          <li><b>Audit pass:</b> grep <code class="kbd">process.env.*_KEY|_TOKEN|_SECRET</code> for any other dual-name pairs; reconcile <code class="kbd">config/secretmanager.yaml</code> + <code class="kbd">.env.example</code> + <code class="kbd">.secrets/</code> ledger to the canonical set.</li>
+        </ul>
+        <div class="note tip"><span class="i">i</span><span>Do this as a single cleanup PR after launch — low risk but touches secret config, so isolate it. Keep the alias readable for one release (deprecation) before deleting, to avoid a deploy gap.</span></div>
       </div>
     </div>
   </section>
