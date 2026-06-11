@@ -380,11 +380,11 @@
         <p class="t-desc">Key wired (<code class="kbd">GEOAPIFY_API_KEY</code>). Geocoding for meeting/logistics distance calcs (Epic 12).</p>
       </div>
 
-      <div class="task" data-id="acct-shippo">
+      <div class="task" data-id="acct-shippo" data-done="true">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A13</span><span class="t-title">Shippo</span><span class="badge p1">optional</span></div>
-        <p class="t-desc">Shipping-cost estimates for resale logistics (Epic 5).</p>
-        <div class="linkrow"><a class="link" href="https://apps.goshippo.com/settings/api" target="_blank" rel="noopener">Shippo API</a></div>
+        <div class="t-head"><span class="t-id">A13</span><span class="t-title">Shippo</span><span class="badge auto">✓ test key</span><span class="badge verify">live pending</span></div>
+        <p class="t-desc">Real carrier shipping rates → subtracted from profit (<code class="kbd">adjustedProfitMargin = profit − shippingCost</code>) so flip scores reflect <b>net</b> profit. <b>Test token wired</b> (sample rates); <b>swap to live token</b> when it arrives for accurate rates. Falls back to null if unkeyed — non-blocking.</p>
+        <div class="linkrow"><a class="link" href="https://apps.goshippo.com/settings/api" target="_blank" rel="noopener">Shippo API (live token)</a></div>
       </div>
 
       <div class="task" data-id="acct-twilio">
