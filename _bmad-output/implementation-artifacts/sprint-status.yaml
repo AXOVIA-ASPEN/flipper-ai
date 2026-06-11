@@ -181,12 +181,12 @@ development_status:
   epic-14-retrospective: optional
 
   # Epic 15: Mobile Foundation, Monorepo & Expo Bootstrap (Phase A)
-  epic-15: backlog
-  15-1-convert-repo-to-pnpm-workspace-monorepo: backlog
-  15-2-extract-shared-packages-types-design-tokens: backlog
-  15-3-bootstrap-mobile-workspace-expo: backlog
-  15-4-mobile-lint-format-test-scaffolding: backlog
-  15-5-top-level-mobile-makefile-targets: backlog
+  epic-15: in-progress
+  15-1-convert-repo-to-pnpm-workspace-monorepo: ready-for-dev
+  15-2-extract-shared-packages-types-design-tokens: ready-for-dev
+  15-3-bootstrap-mobile-workspace-expo: ready-for-dev
+  15-4-mobile-lint-format-test-scaffolding: ready-for-dev
+  15-5-top-level-mobile-makefile-targets: ready-for-dev
   epic-15-retrospective: optional
 
   # Epic 16: Mobile CI/CD — EAS Build + Firebase App Distribution + TestFlight (Phase A)
