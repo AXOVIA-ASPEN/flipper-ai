@@ -346,11 +346,11 @@
         <div class="linkrow"><a class="link" href="https://github.com/settings/developers" target="_blank" rel="noopener">GitHub OAuth Apps</a><a class="link" href="https://console.firebase.google.com/project/axovia-flipper/authentication/providers" target="_blank" rel="noopener">Firebase → Sign-in method</a></div>
       </div>
 
-      <div class="task" data-id="acct-facebook">
+      <div class="task" data-id="acct-facebook" data-done="true">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A8</span><span class="t-title">Facebook</span><span class="badge p1">optional</span></div>
-        <p class="t-desc">Two uses: FB login (Firebase Console) <b>and</b> the Facebook Marketplace scraper (server reads <code class="kbd">FACEBOOK_APP_ID</code>/<code class="kbd">SECRET</code>). Paste app id+secret if you want FB scraping.</p>
-        <div class="linkrow"><a class="link" href="https://developers.facebook.com/apps/" target="_blank" rel="noopener">Facebook Apps</a></div>
+        <div class="t-head"><span class="t-id">A8</span><span class="t-title">Facebook</span><span class="badge auto">✓ done</span></div>
+        <p class="t-desc">App ID + secret wired (<code class="kbd">FACEBOOK_APP_ID</code>/<code class="kbd">SECRET</code>) — powers the Facebook Marketplace scraper. For FB <i>login</i>, also enable the Facebook provider in Firebase Console → Auth → Sign-in method.</p>
+        <div class="linkrow"><a class="link" href="https://console.firebase.google.com/project/axovia-flipper/authentication/providers" target="_blank" rel="noopener">Firebase → Sign-in method (for FB login)</a></div>
       </div>
 
       <div class="task" data-id="acct-openai" data-done="true">
