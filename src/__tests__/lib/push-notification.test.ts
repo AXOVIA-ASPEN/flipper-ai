@@ -44,7 +44,9 @@ import * as messagingAdmin from '@/lib/firebase/messaging-admin';
 import { logger } from '@/lib/logger';
 
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
-const mockSendToDevice = messagingAdmin.sendToDevice as jest.MockedFunction<typeof messagingAdmin.sendToDevice>;
+const mockSendToDevice = messagingAdmin.sendToDevice as jest.MockedFunction<
+  typeof messagingAdmin.sendToDevice
+>;
 
 const PAYLOAD = { title: 'Test', body: 'Test body' };
 const USER_ID = 'user-123';
@@ -69,7 +71,9 @@ describe('PushNotificationService', () => {
         { id: 'dt-1', token: TOKEN_A },
         { id: 'dt-2', token: TOKEN_B },
       ]);
-      (mockPrisma.userSettings.findUnique as jest.Mock).mockResolvedValue({ pushNotifications: true });
+      (mockPrisma.userSettings.findUnique as jest.Mock).mockResolvedValue({
+        pushNotifications: true,
+      });
       mockSendToDevice.mockResolvedValue('msg-id-123');
 
       await service.sendToUser(USER_ID, PAYLOAD);
@@ -91,7 +95,9 @@ describe('PushNotificationService', () => {
       (mockPrisma.deviceToken.findMany as jest.Mock).mockResolvedValue([
         { id: 'dt-1', token: TOKEN_A },
       ]);
-      (mockPrisma.userSettings.findUnique as jest.Mock).mockResolvedValue({ pushNotifications: false });
+      (mockPrisma.userSettings.findUnique as jest.Mock).mockResolvedValue({
+        pushNotifications: false,
+      });
 
       await service.sendToUser(USER_ID, PAYLOAD);
 
@@ -115,7 +121,9 @@ describe('PushNotificationService', () => {
       (mockPrisma.deviceToken.findMany as jest.Mock).mockResolvedValue([
         { id: 'dt-1', token: TOKEN_A },
       ]);
-      (mockPrisma.userSettings.findUnique as jest.Mock).mockResolvedValue({ pushNotifications: true });
+      (mockPrisma.userSettings.findUnique as jest.Mock).mockResolvedValue({
+        pushNotifications: true,
+      });
       mockSendToDevice.mockResolvedValue(null); // stale token
       (mockPrisma.deviceToken.deleteMany as jest.Mock).mockResolvedValue({ count: 1 });
 
@@ -135,10 +143,12 @@ describe('PushNotificationService', () => {
         { id: 'dt-1', token: TOKEN_A },
         { id: 'dt-2', token: TOKEN_B },
       ]);
-      (mockPrisma.userSettings.findUnique as jest.Mock).mockResolvedValue({ pushNotifications: true });
+      (mockPrisma.userSettings.findUnique as jest.Mock).mockResolvedValue({
+        pushNotifications: true,
+      });
       mockSendToDevice
-        .mockResolvedValueOnce('msg-id-a')  // TOKEN_A succeeds
-        .mockResolvedValueOnce(null);         // TOKEN_B is stale
+        .mockResolvedValueOnce('msg-id-a') // TOKEN_A succeeds
+        .mockResolvedValueOnce(null); // TOKEN_B is stale
       (mockPrisma.deviceToken.deleteMany as jest.Mock).mockResolvedValue({ count: 1 });
 
       await service.sendToUser(USER_ID, PAYLOAD);
@@ -150,7 +160,9 @@ describe('PushNotificationService', () => {
     });
 
     it('does not propagate errors — swallows exceptions silently', async () => {
-      (mockPrisma.deviceToken.findMany as jest.Mock).mockRejectedValue(new Error('DB connection failed'));
+      (mockPrisma.deviceToken.findMany as jest.Mock).mockRejectedValue(
+        new Error('DB connection failed')
+      );
 
       await expect(service.sendToUser(USER_ID, PAYLOAD)).resolves.toBeUndefined();
       expect(logger.error).toHaveBeenCalledWith(
@@ -163,7 +175,9 @@ describe('PushNotificationService', () => {
       (mockPrisma.deviceToken.findMany as jest.Mock).mockResolvedValue([
         { id: 'dt-1', token: TOKEN_A },
       ]);
-      (mockPrisma.userSettings.findUnique as jest.Mock).mockResolvedValue({ pushNotifications: true });
+      (mockPrisma.userSettings.findUnique as jest.Mock).mockResolvedValue({
+        pushNotifications: true,
+      });
       mockSendToDevice.mockRejectedValue(new Error('FCM network error'));
 
       await expect(service.sendToUser(USER_ID, PAYLOAD)).resolves.toBeUndefined();

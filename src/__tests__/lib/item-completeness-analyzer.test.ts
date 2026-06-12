@@ -8,7 +8,10 @@ const mockCompleteAI = jest.fn();
 jest.mock('@/lib/ai', () => ({
   completeAI: (...args: unknown[]) => mockCompleteAI(...args),
   AIProviderUnavailableError: class extends Error {
-    constructor() { super('No AI provider available'); this.name = 'AIProviderUnavailableError'; }
+    constructor() {
+      super('No AI provider available');
+      this.name = 'AIProviderUnavailableError';
+    }
   },
 }));
 
@@ -101,10 +104,13 @@ describe('analyzeItemCompleteness()', () => {
 
       await analyzeItemCompleteness(['https://example.com/img.jpg'], 'Item', null, 'other');
 
-      expect(mockCompleteAI).toHaveBeenCalledWith('itemCompleteness', expect.objectContaining({
-        title: 'Item',
-        category: 'other',
-      }));
+      expect(mockCompleteAI).toHaveBeenCalledWith(
+        'itemCompleteness',
+        expect.objectContaining({
+          title: 'Item',
+          category: 'other',
+        })
+      );
     });
 
     it('passes image URLs in context', async () => {
@@ -113,9 +119,12 @@ describe('analyzeItemCompleteness()', () => {
 
       await analyzeItemCompleteness(imageUrls, 'Item', null, 'electronics');
 
-      expect(mockCompleteAI).toHaveBeenCalledWith('itemCompleteness', expect.objectContaining({
-        imageUrls: ['https://example.com/img1.jpg', 'https://example.com/img2.jpg'],
-      }));
+      expect(mockCompleteAI).toHaveBeenCalledWith(
+        'itemCompleteness',
+        expect.objectContaining({
+          imageUrls: ['https://example.com/img1.jpg', 'https://example.com/img2.jpg'],
+        })
+      );
     });
 
     it('limits images to 3 even when more are provided', async () => {
@@ -124,9 +133,12 @@ describe('analyzeItemCompleteness()', () => {
 
       await analyzeItemCompleteness(manyUrls, 'Item', null, 'electronics');
 
-      expect(mockCompleteAI).toHaveBeenCalledWith('itemCompleteness', expect.objectContaining({
-        imageUrls: ['u1', 'u2', 'u3'],
-      }));
+      expect(mockCompleteAI).toHaveBeenCalledWith(
+        'itemCompleteness',
+        expect.objectContaining({
+          imageUrls: ['u1', 'u2', 'u3'],
+        })
+      );
     });
 
     it('passes null description in context', async () => {
@@ -134,9 +146,12 @@ describe('analyzeItemCompleteness()', () => {
 
       await analyzeItemCompleteness(['https://example.com/img.jpg'], 'Item', null, 'electronics');
 
-      expect(mockCompleteAI).toHaveBeenCalledWith('itemCompleteness', expect.objectContaining({
-        description: null,
-      }));
+      expect(mockCompleteAI).toHaveBeenCalledWith(
+        'itemCompleteness',
+        expect.objectContaining({
+          description: null,
+        })
+      );
     });
 
     it('passes description in context', async () => {
@@ -150,9 +165,12 @@ describe('analyzeItemCompleteness()', () => {
         'electronics'
       );
 
-      expect(mockCompleteAI).toHaveBeenCalledWith('itemCompleteness', expect.objectContaining({
-        description: longDescription,
-      }));
+      expect(mockCompleteAI).toHaveBeenCalledWith(
+        'itemCompleteness',
+        expect.objectContaining({
+          description: longDescription,
+        })
+      );
     });
   });
 

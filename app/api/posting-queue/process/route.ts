@@ -17,12 +17,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
-import {
-  handleError,
-  UnauthorizedError,
-  ForbiddenError,
-  RateLimitError,
-} from '@/lib/errors';
+import { handleError, UnauthorizedError, ForbiddenError, RateLimitError } from '@/lib/errors';
 import { checkFeatureAccess } from '@/lib/tier-enforcement';
 import { processQueue } from '@/lib/posting-queue-processor';
 import { ensurePostersRegistered } from '@/lib/platform-posters';
@@ -64,9 +59,7 @@ export async function POST() {
       const elapsedMs = Date.now() - recent.updatedAt.getTime();
       if (elapsedMs < RATE_LIMIT_WINDOW_MS) {
         const retryAfterSec = Math.ceil((RATE_LIMIT_WINDOW_MS - elapsedMs) / 1000);
-        throw new RateLimitError(
-          `Queue was processed recently. Try again in ${retryAfterSec}s.`
-        );
+        throw new RateLimitError(`Queue was processed recently. Try again in ${retryAfterSec}s.`);
       }
     }
 

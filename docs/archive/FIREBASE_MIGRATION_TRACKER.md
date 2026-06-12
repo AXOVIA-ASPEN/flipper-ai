@@ -6,11 +6,13 @@
 ## Migration Strategy
 
 ### Phase 1: Authentication & Core (DONE ✅)
+
 - [x] `/api/auth/register` - Firebase Auth
 - [x] Firebase client config
 - [x] Firebase admin config
 
 ### Phase 2: Essential Routes (Priority 1)
+
 - [ ] `/api/listings` - Core functionality
 - [ ] `/api/listings/[id]` - Single listing
 - [ ] `/api/opportunities` - Deal tracking
@@ -20,6 +22,7 @@
 - [ ] `/api/scraper/facebook` - Secondary scraper
 
 ### Phase 3: Supporting Routes (Priority 2)
+
 - [ ] `/api/analyze/[listingId]` - AI analysis
 - [ ] `/api/search-configs` - Search settings
 - [ ] `/api/search-configs/[id]` - Single config
@@ -28,6 +31,7 @@
 - [ ] `/api/diagnostics` - Health check
 
 ### Phase 4: Advanced Routes (Priority 3)
+
 - [ ] `/api/scraper/offerup` - Additional platform
 - [ ] `/api/scraper/mercari` - Additional platform
 - [ ] `/api/posting-queue` - Cross-listing

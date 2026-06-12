@@ -40,9 +40,7 @@ const mockListings = [
     location: 'Tampa, FL',
     url: 'https://ebay.com/2',
     scrapedAt: '2026-02-14T08:00:00Z',
-    imageUrls: JSON.stringify([
-      'https://via.placeholder.com/400x300/ffff00/000000?text=Clock',
-    ]),
+    imageUrls: JSON.stringify(['https://via.placeholder.com/400x300/ffff00/000000?text=Clock']),
     opportunity: null,
   },
   {
@@ -94,7 +92,10 @@ test.describe('Image Modal & Carousel', () => {
       await expect(page.getByText('Vintage Fender Guitar')).toBeVisible();
 
       // Find and click the image thumbnail for the first listing
-      const _imageButton = page.locator('button').filter({ has: page.locator('img[alt*="Vintage Fender Guitar"]') }).first();
+      const _imageButton = page
+        .locator('button')
+        .filter({ has: page.locator('img[alt*="Vintage Fender Guitar"]') })
+        .first();
 
       // If image is rendered as an img tag directly, try clicking it
       const imgElement = page.locator('img[alt*="Vintage Fender Guitar"]').first();
@@ -102,8 +103,14 @@ test.describe('Image Modal & Carousel', () => {
         await imgElement.click();
       } else {
         // Fallback: click the image icon/button in the listing row
-        const row = page.locator('tr, [class*="listing"]').filter({ hasText: 'Vintage Fender Guitar' }).first();
-        const imgBtn = row.locator('button').filter({ has: page.locator('svg, img') }).first();
+        const row = page
+          .locator('tr, [class*="listing"]')
+          .filter({ hasText: 'Vintage Fender Guitar' })
+          .first();
+        const imgBtn = row
+          .locator('button')
+          .filter({ has: page.locator('svg, img') })
+          .first();
         await imgBtn.click();
       }
 
@@ -136,8 +143,15 @@ test.describe('Image Modal & Carousel', () => {
       await expect(page.getByText('1 / 3')).toBeVisible({ timeout: 3000 });
 
       // Click next arrow button
-      const nextButton = page.locator('button').filter({ has: page.locator('[class*="chevron-right"], [data-testid="next"]') });
-      if (await nextButton.first().isVisible({ timeout: 1000 }).catch(() => false)) {
+      const nextButton = page
+        .locator('button')
+        .filter({ has: page.locator('[class*="chevron-right"], [data-testid="next"]') });
+      if (
+        await nextButton
+          .first()
+          .isVisible({ timeout: 1000 })
+          .catch(() => false)
+      ) {
         await nextButton.first().click();
       } else {
         // Try finding by aria-label or text
@@ -168,7 +182,10 @@ test.describe('Image Modal & Carousel', () => {
       await expect(page.getByText('1 / 3')).toBeVisible({ timeout: 3000 });
 
       // Click close button (X)
-      const closeButton = page.locator('button').filter({ has: page.locator('[class*="x"], [class*="close"]') }).first();
+      const closeButton = page
+        .locator('button')
+        .filter({ has: page.locator('[class*="x"], [class*="close"]') })
+        .first();
       if (await closeButton.isVisible({ timeout: 1000 }).catch(() => false)) {
         await closeButton.click();
       } else {
@@ -211,7 +228,10 @@ test.describe('Image Modal & Carousel', () => {
       await expect(page.getByText('Plain Widget (no image)')).toBeVisible();
 
       // The listing row for the no-image item should have an image placeholder icon
-      const row = page.locator('tr, [class*="listing"]').filter({ hasText: 'Plain Widget' }).first();
+      const row = page
+        .locator('tr, [class*="listing"]')
+        .filter({ hasText: 'Plain Widget' })
+        .first();
       // Should contain the ImageIcon SVG placeholder, not an <img> tag
       const imgTag = row.locator('img');
       const imgCount = await imgTag.count();

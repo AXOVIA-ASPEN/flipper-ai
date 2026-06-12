@@ -227,11 +227,17 @@ function parseComparableSales(value: string | null): ComparableSale[] {
         // Handle both new format (soldPrice/soldDate from comp-matcher) and
         // legacy format (price/soldAt from market-price raw listings)
         const price =
-          typeof record.soldPrice === 'number' ? record.soldPrice :
-          typeof record.price === 'number' ? record.price : null;
+          typeof record.soldPrice === 'number'
+            ? record.soldPrice
+            : typeof record.price === 'number'
+              ? record.price
+              : null;
         const soldAt =
-          typeof record.soldDate === 'string' ? record.soldDate :
-          typeof record.soldAt === 'string' ? record.soldAt : null;
+          typeof record.soldDate === 'string'
+            ? record.soldDate
+            : typeof record.soldAt === 'string'
+              ? record.soldAt
+              : null;
         return {
           title: typeof record.title === 'string' ? record.title : 'Comparable Sale',
           price,
@@ -306,9 +312,7 @@ function OpportunitiesContent() {
   const [modalFees, setModalFees] = useState('');
   // Cross-post state — the parent owns modal visibility and stores the
   // source opportunity so the modal can read its platform + listing fields.
-  const [crossPostTarget, setCrossPostTarget] = useState<Opportunity | null>(
-    null
-  );
+  const [crossPostTarget, setCrossPostTarget] = useState<Opportunity | null>(null);
   // Fetched from /api/user/tier on mount. The Firebase client session does
   // not include subscriptionTier, so without this we cannot decide whether
   // to wire up onCrossPost on the KanbanBoard.
@@ -372,7 +376,8 @@ function OpportunitiesContent() {
       if (filters.statuses) params.set('statuses', filters.statuses);
       else if (filters.status && filters.status !== 'all') params.set('status', filters.status);
       if (filters.platforms) params.set('platforms', filters.platforms);
-      else if (filters.platform && filters.platform !== 'all') params.set('platform', filters.platform);
+      else if (filters.platform && filters.platform !== 'all')
+        params.set('platform', filters.platform);
       if (filters.minScore) params.set('minScore', filters.minScore);
       if (filters.maxScore) params.set('maxScore', filters.maxScore);
       if (filters.minProfit) params.set('minProfit', filters.minProfit);
@@ -591,16 +596,23 @@ function OpportunitiesContent() {
               <ArrowLeft className="w-5 h-5" style={{ color: '#c4b5fd' }} />
             </Link>
             <div className="flex items-center gap-3">
-              <div
-                className="fp-glass-sm w-10 h-10 rounded-lg flex items-center justify-center"
-              >
+              <div className="fp-glass-sm w-10 h-10 rounded-lg flex items-center justify-center">
                 <Trophy className="w-6 h-6" style={{ color: '#8b5cf6' }} />
               </div>
               <div>
-                <h1 style={{ fontSize: 28, fontWeight: 800, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
+                <h1
+                  style={{
+                    fontSize: 28,
+                    fontWeight: 800,
+                    color: '#e2e8f0',
+                    letterSpacing: '-0.02em',
+                  }}
+                >
                   Opportunities
                 </h1>
-                <p style={{ fontSize: 12, color: '#64748b' }}>Track your flips from start to finish</p>
+                <p style={{ fontSize: 12, color: '#64748b' }}>
+                  Track your flips from start to finish
+                </p>
               </div>
             </div>
           </div>
@@ -614,8 +626,15 @@ function OpportunitiesContent() {
           <div className="fp-glow-card p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 4 }}>Total Opportunities</p>
-                <p className="fp-metric-num" style={{ fontSize: 30, fontWeight: 700, color: '#e2e8f0' }}>{stats.totalOpportunities}</p>
+                <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 4 }}>
+                  Total Opportunities
+                </p>
+                <p
+                  className="fp-metric-num"
+                  style={{ fontSize: 30, fontWeight: 700, color: '#e2e8f0' }}
+                >
+                  {stats.totalOpportunities}
+                </p>
               </div>
               <div className="fp-glass-sm w-12 h-12 rounded-xl flex items-center justify-center">
                 <Package className="w-6 h-6" style={{ color: '#8b5cf6' }} />
@@ -627,7 +646,12 @@ function OpportunitiesContent() {
             <div className="flex items-center justify-between">
               <div>
                 <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 4 }}>Total Invested</p>
-                <p className="fp-metric-num" style={{ fontSize: 30, fontWeight: 700, color: '#e2e8f0' }}>${stats.totalInvested.toFixed(0)}</p>
+                <p
+                  className="fp-metric-num"
+                  style={{ fontSize: 30, fontWeight: 700, color: '#e2e8f0' }}
+                >
+                  ${stats.totalInvested.toFixed(0)}
+                </p>
               </div>
               <div className="fp-glass-sm w-12 h-12 rounded-xl flex items-center justify-center">
                 <ShoppingCart className="w-6 h-6" style={{ color: '#8b5cf6' }} />
@@ -639,7 +663,12 @@ function OpportunitiesContent() {
             <div className="flex items-center justify-between">
               <div>
                 <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 4 }}>Total Revenue</p>
-                <p className="fp-metric-num" style={{ fontSize: 30, fontWeight: 700, color: '#e2e8f0' }}>${stats.totalRevenue.toFixed(0)}</p>
+                <p
+                  className="fp-metric-num"
+                  style={{ fontSize: 30, fontWeight: 700, color: '#e2e8f0' }}
+                >
+                  ${stats.totalRevenue.toFixed(0)}
+                </p>
               </div>
               <div className="fp-glass-sm w-12 h-12 rounded-xl flex items-center justify-center">
                 <Store className="w-6 h-6" style={{ color: '#8b5cf6' }} />
@@ -651,7 +680,10 @@ function OpportunitiesContent() {
             <div className="flex items-center justify-between">
               <div>
                 <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 4 }}>Total Profit</p>
-                <p className="fp-metric-num" style={{ fontSize: 30, fontWeight: 700, color: '#34d399' }}>
+                <p
+                  className="fp-metric-num"
+                  style={{ fontSize: 30, fontWeight: 700, color: '#34d399' }}
+                >
                   ${stats.totalProfit.toFixed(0)}
                 </p>
               </div>
@@ -838,102 +870,111 @@ function OpportunitiesContent() {
         )}
 
         {/* Inventory View */}
-        {viewMode === 'inventory' && !loading && (() => {
-          const purchasedItems = opportunities.filter((opp) => opp.status === 'PURCHASED');
-          if (purchasedItems.length === 0) {
+        {viewMode === 'inventory' &&
+          !loading &&
+          (() => {
+            const purchasedItems = opportunities.filter((opp) => opp.status === 'PURCHASED');
+            if (purchasedItems.length === 0) {
+              return (
+                <EmptyState
+                  icon={
+                    <div
+                      className="fp-glass-sm"
+                      style={{
+                        width: 80,
+                        height: 80,
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto 16px',
+                      }}
+                    >
+                      <Warehouse className="w-10 h-10" style={{ color: '#8b5cf6' }} />
+                    </div>
+                  }
+                  title="No inventory yet"
+                  message="Mark an opportunity as Purchased to track holding costs here."
+                />
+              );
+            }
             return (
-              <EmptyState
-                icon={
-                  <div
-                    className="fp-glass-sm"
-                    style={{
-                      width: 80,
-                      height: 80,
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      margin: '0 auto 16px',
-                    }}
-                  >
-                    <Warehouse className="w-10 h-10" style={{ color: '#8b5cf6' }} />
-                  </div>
-                }
-                title="No inventory yet"
-                message="Mark an opportunity as Purchased to track holding costs here."
-              />
-            );
-          }
-          return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="inventory-view">
-              {purchasedItems.map((opp) => {
-                const daysHeld = opp.purchaseDate
-                  ? calculateDaysHeld(new Date(opp.purchaseDate))
-                  : null;
-                const carryingCost =
-                  daysHeld !== null ? calculateCarryingCost(daysHeld, holdingCostRate) : null;
-                const aging = daysHeld !== null ? isAgingInventory(daysHeld) : false;
-                return (
-                  <div
-                    key={opp.id}
-                    className="fp-glass p-5"
-                    data-testid="inventory-card"
-                  >
-                    {aging && (
-                      <div style={{ marginBottom: 12 }}>
-                        <span className="fp-badge fp-badge-yellow">⚠️ Aging Inventory</span>
-                      </div>
-                    )}
-                    <h3 style={{ fontWeight: 600, color: '#e2e8f0', marginBottom: 12 }} className="line-clamp-2">
-                      {opp.listing.title}
-                    </h3>
-                    <div className="space-y-1.5 text-sm">
-                      <div className="flex justify-between">
-                        <span style={{ color: '#94a3b8' }}>Purchase Price</span>
-                        <span style={{ color: '#e2e8f0', fontWeight: 500 }}>
-                          {opp.purchasePrice != null ? `$${opp.purchasePrice.toFixed(2)}` : '—'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span style={{ color: '#94a3b8' }}>Market Value</span>
-                        <span style={{ color: '#e2e8f0', fontWeight: 500 }}>
-                          {opp.listing.estimatedValue != null
-                            ? `$${opp.listing.estimatedValue.toFixed(2)}`
-                            : '—'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span style={{ color: '#94a3b8' }}>Days Held</span>
-                        <span style={{ color: '#e2e8f0', fontWeight: 500 }}>
-                          {daysHeld !== null ? `${daysHeld} days` : 'N/A'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span style={{ color: '#94a3b8' }}>Carrying Cost</span>
-                        <span
-                          style={{
-                            color: aging ? '#f87171' : '#e2e8f0',
-                            fontWeight: aging ? 700 : 500,
-                          }}
-                        >
-                          {carryingCost !== null ? `$${carryingCost.toFixed(2)}` : 'N/A'}
-                        </span>
+              <div
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                data-testid="inventory-view"
+              >
+                {purchasedItems.map((opp) => {
+                  const daysHeld = opp.purchaseDate
+                    ? calculateDaysHeld(new Date(opp.purchaseDate))
+                    : null;
+                  const carryingCost =
+                    daysHeld !== null ? calculateCarryingCost(daysHeld, holdingCostRate) : null;
+                  const aging = daysHeld !== null ? isAgingInventory(daysHeld) : false;
+                  return (
+                    <div key={opp.id} className="fp-glass p-5" data-testid="inventory-card">
+                      {aging && (
+                        <div style={{ marginBottom: 12 }}>
+                          <span className="fp-badge fp-badge-yellow">⚠️ Aging Inventory</span>
+                        </div>
+                      )}
+                      <h3
+                        style={{ fontWeight: 600, color: '#e2e8f0', marginBottom: 12 }}
+                        className="line-clamp-2"
+                      >
+                        {opp.listing.title}
+                      </h3>
+                      <div className="space-y-1.5 text-sm">
+                        <div className="flex justify-between">
+                          <span style={{ color: '#94a3b8' }}>Purchase Price</span>
+                          <span style={{ color: '#e2e8f0', fontWeight: 500 }}>
+                            {opp.purchasePrice != null ? `$${opp.purchasePrice.toFixed(2)}` : '—'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span style={{ color: '#94a3b8' }}>Market Value</span>
+                          <span style={{ color: '#e2e8f0', fontWeight: 500 }}>
+                            {opp.listing.estimatedValue != null
+                              ? `$${opp.listing.estimatedValue.toFixed(2)}`
+                              : '—'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span style={{ color: '#94a3b8' }}>Days Held</span>
+                          <span style={{ color: '#e2e8f0', fontWeight: 500 }}>
+                            {daysHeld !== null ? `${daysHeld} days` : 'N/A'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span style={{ color: '#94a3b8' }}>Carrying Cost</span>
+                          <span
+                            style={{
+                              color: aging ? '#f87171' : '#e2e8f0',
+                              fontWeight: aging ? 700 : 500,
+                            }}
+                          >
+                            {carryingCost !== null ? `$${carryingCost.toFixed(2)}` : 'N/A'}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })()}
+                  );
+                })}
+              </div>
+            );
+          })()}
 
         {/* List View */}
         {loading ? (
           <LoadingSkeleton variant="list" rows={6} />
-        ) : viewMode === 'kanban' || viewMode === 'inventory' ? null : filteredOpportunities.length === 0 ? (
+        ) : viewMode === 'kanban' ||
+          viewMode === 'inventory' ? null : filteredOpportunities.length === 0 ? (
           <EmptyState
             title="No opportunities found"
-            message={searchTerm ? 'Try adjusting your search or filters' : 'Start by marking high-value listings as opportunities'}
+            message={
+              searchTerm
+                ? 'Try adjusting your search or filters'
+                : 'Start by marking high-value listings as opportunities'
+            }
             action={{ label: 'Run a scrape', href: '/scraper' }}
           />
         ) : (
@@ -1118,11 +1159,7 @@ function OpportunitiesContent() {
               );
 
               return (
-                <div
-                  key={opp.id}
-                  className="fp-glow-card group"
-                  style={{ overflow: 'hidden' }}
-                >
+                <div key={opp.id} className="fp-glow-card group" style={{ overflow: 'hidden' }}>
                   <div className="p-6">
                     <div className="flex items-start gap-4">
                       {/* Image */}
@@ -1136,9 +1173,7 @@ function OpportunitiesContent() {
                           />
                         </div>
                       ) : (
-                        <div
-                          className="w-24 h-24 rounded-lg flex items-center justify-center flex-shrink-0 fp-glass-sm"
-                        >
+                        <div className="w-24 h-24 rounded-lg flex items-center justify-center flex-shrink-0 fp-glass-sm">
                           <Package className="w-8 h-8" style={{ color: '#c4b5fd' }} />
                         </div>
                       )}
@@ -1153,7 +1188,10 @@ function OpportunitiesContent() {
                             >
                               {opp.listing.title}
                             </h3>
-                            <div className="flex items-center gap-2 text-sm" style={{ color: '#94a3b8' }}>
+                            <div
+                              className="flex items-center gap-2 text-sm"
+                              style={{ color: '#94a3b8' }}
+                            >
                               <span className="capitalize">
                                 {opp.listing.platform.toLowerCase()}
                               </span>
@@ -1185,27 +1223,45 @@ function OpportunitiesContent() {
                         {/* Pricing Info — canonical .fp-glass-sm tiles */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                           <div className="fp-glass-sm p-3">
-                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Asking Price</p>
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>
+                              Asking Price
+                            </p>
                             <p style={{ fontSize: 18, fontWeight: 700, color: '#e2e8f0' }}>
                               ${opp.listing.askingPrice.toFixed(0)}
                             </p>
                           </div>
                           <div className="fp-glass-sm p-3">
                             <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>
-                              {opp.listing.verifiedMarketValue !== null ? 'Verified Value' : 'Est. Value'}
+                              {opp.listing.verifiedMarketValue !== null
+                                ? 'Verified Value'
+                                : 'Est. Value'}
                             </p>
                             <p style={{ fontSize: 18, fontWeight: 700, color: '#e2e8f0' }}>
-                              ${(opp.listing.verifiedMarketValue ?? opp.listing.estimatedValue)?.toFixed(0) || '—'}
+                              $
+                              {(
+                                opp.listing.verifiedMarketValue ?? opp.listing.estimatedValue
+                              )?.toFixed(0) || '—'}
                             </p>
                           </div>
                           <div className="fp-glass-sm p-3">
-                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Potential Profit</p>
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>
+                              Potential Profit
+                            </p>
                             <p style={{ fontSize: 18, fontWeight: 700, color: '#34d399' }}>
                               ${opp.listing.profitPotential?.toFixed(0) || '—'}
                             </p>
                           </div>
-                          <div className="fp-glass-sm p-3" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Value Score</p>
+                          <div
+                            className="fp-glass-sm p-3"
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>
+                              Value Score
+                            </p>
                             <ScoreRing score={opp.listing.valueScore ?? 0} size={40} />
                           </div>
                         </div>
@@ -1213,27 +1269,31 @@ function OpportunitiesContent() {
                         {/* Listing metadata */}
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                           {metadataItems.map((item) => (
-                            <div
-                              key={`${opp.id}-${item.label}`}
-                              className="fp-glass-sm p-3"
-                            >
-                              <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>{item.label}</p>
-                              <p style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}>{item.value}</p>
+                            <div key={`${opp.id}-${item.label}`} className="fp-glass-sm p-3">
+                              <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>
+                                {item.label}
+                              </p>
+                              <p style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}>
+                                {item.value}
+                              </p>
                             </div>
                           ))}
                         </div>
 
                         {displayedLLMDetails.length > 0 && (
-                          <div
-                            className="fp-glass-sm p-4 mb-4"
-                            data-testid="llm-identification"
-                          >
-                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>LLM Identification</p>
+                          <div className="fp-glass-sm p-4 mb-4" data-testid="llm-identification">
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>
+                              LLM Identification
+                            </p>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                               {displayedLLMDetails.map((detail) => (
                                 <div key={`${opp.id}-${detail.label}`}>
-                                  <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>{detail.label}</p>
-                                  <p style={{ fontSize: 14, color: '#e2e8f0', fontWeight: 500 }}>{detail.value}</p>
+                                  <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>
+                                    {detail.label}
+                                  </p>
+                                  <p style={{ fontSize: 14, color: '#e2e8f0', fontWeight: 500 }}>
+                                    {detail.value}
+                                  </p>
                                 </div>
                               ))}
                             </div>
@@ -1242,13 +1302,15 @@ function OpportunitiesContent() {
 
                         {/* Low-liquidity warning (Story 5.3) */}
                         {opp.listing.demandLevel === 'low_liquidity' && (
-                          <div
-                            className="fp-alert-danger mb-4"
-                            data-testid="low-liquidity-warning"
-                          >
-                            <p style={{ fontSize: 14, fontWeight: 600, color: '#fca5a5' }}>⚠ Low Liquidity Warning</p>
-                            <p style={{ fontSize: 12, color: '#fca5a5', marginTop: 4, opacity: 0.9 }}>
-                              No verified sales found in the past 90 days. Resale may take significantly longer than expected.
+                          <div className="fp-alert-danger mb-4" data-testid="low-liquidity-warning">
+                            <p style={{ fontSize: 14, fontWeight: 600, color: '#fca5a5' }}>
+                              ⚠ Low Liquidity Warning
+                            </p>
+                            <p
+                              style={{ fontSize: 12, color: '#fca5a5', marginTop: 4, opacity: 0.9 }}
+                            >
+                              No verified sales found in the past 90 days. Resale may take
+                              significantly longer than expected.
                             </p>
                           </div>
                         )}
@@ -1259,8 +1321,12 @@ function OpportunitiesContent() {
                             className="fp-alert-warn mb-4"
                             data-testid="outside-pickup-radius-warning"
                           >
-                            <p style={{ fontSize: 14, fontWeight: 600, color: '#fcd34d' }}>⚠ Outside Pickup Radius</p>
-                            <p style={{ fontSize: 12, color: '#fcd34d', marginTop: 4, opacity: 0.9 }}>
+                            <p style={{ fontSize: 14, fontWeight: 600, color: '#fcd34d' }}>
+                              ⚠ Outside Pickup Radius
+                            </p>
+                            <p
+                              style={{ fontSize: 12, color: '#fcd34d', marginTop: 4, opacity: 0.9 }}
+                            >
                               This local-only item is beyond your configured pickup radius.
                               {opp.listing.pickupDistanceMiles !== null &&
                                 ` Estimated distance: ${opp.listing.pickupDistanceMiles} miles.`}
@@ -1269,16 +1335,19 @@ function OpportunitiesContent() {
                         )}
 
                         {displayedMarketDetails.length > 0 && (
-                          <div
-                            className="fp-glass-sm p-4 mb-4"
-                            data-testid="market-insights"
-                          >
-                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>Market Insights</p>
+                          <div className="fp-glass-sm p-4 mb-4" data-testid="market-insights">
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>
+                              Market Insights
+                            </p>
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                               {displayedMarketDetails.map((detail) => (
                                 <div key={`${opp.id}-market-${detail.label}`}>
-                                  <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>{detail.label}</p>
-                                  <p style={{ fontSize: 14, color: '#e2e8f0', fontWeight: 500 }}>{detail.value}</p>
+                                  <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>
+                                    {detail.label}
+                                  </p>
+                                  <p style={{ fontSize: 14, color: '#e2e8f0', fontWeight: 500 }}>
+                                    {detail.value}
+                                  </p>
                                 </div>
                               ))}
                             </div>
@@ -1294,7 +1363,8 @@ function OpportunitiesContent() {
                                   data-testid="low-seller-rating-warning"
                                 >
                                   <span style={{ fontSize: 13, color: '#fcd34d' }}>
-                                    ⚠️ Low Seller Rating — Below-average feedback. Verify item condition carefully before purchasing.
+                                    ⚠️ Low Seller Rating — Below-average feedback. Verify item
+                                    condition carefully before purchasing.
                                   </span>
                                 </div>
                               )}
@@ -1315,24 +1385,36 @@ function OpportunitiesContent() {
                               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                                 {displayedRecommendationDetails.map((detail) => (
                                   <div key={`${opp.id}-rec-${detail.label}`}>
-                                    <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>{detail.label}</p>
-                                    <p style={{ fontSize: 14, color: '#e2e8f0', fontWeight: 500 }}>{detail.value}</p>
+                                    <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>
+                                      {detail.label}
+                                    </p>
+                                    <p style={{ fontSize: 14, color: '#e2e8f0', fontWeight: 500 }}>
+                                      {detail.value}
+                                    </p>
                                   </div>
                                 ))}
                               </div>
                             )}
                             {opp.listing.resaleStrategy && (
                               <div className="mb-3">
-                                <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Resale Strategy</p>
-                                <p style={{ fontSize: 14, color: '#e2e8f0', whiteSpace: 'pre-line' }}>
+                                <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>
+                                  Resale Strategy
+                                </p>
+                                <p
+                                  style={{ fontSize: 14, color: '#e2e8f0', whiteSpace: 'pre-line' }}
+                                >
                                   {opp.listing.resaleStrategy}
                                 </p>
                               </div>
                             )}
                             {opp.listing.analysisReasoning && (
                               <div>
-                                <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Analysis Reasoning</p>
-                                <p style={{ fontSize: 14, color: '#e2e8f0', whiteSpace: 'pre-line' }}>
+                                <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>
+                                  Analysis Reasoning
+                                </p>
+                                <p
+                                  style={{ fontSize: 14, color: '#e2e8f0', whiteSpace: 'pre-line' }}
+                                >
                                   {opp.listing.analysisReasoning}
                                 </p>
                               </div>
@@ -1342,7 +1424,9 @@ function OpportunitiesContent() {
 
                         {listingTags.length > 0 && (
                           <div className="mb-4">
-                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>Detected Tags</p>
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>
+                              Detected Tags
+                            </p>
                             <div className="flex flex-wrap gap-2">
                               {listingTags.map((tag) => (
                                 <span
@@ -1359,7 +1443,9 @@ function OpportunitiesContent() {
 
                         {opp.listing.description && (
                           <div className="fp-glass-sm p-4 mb-4">
-                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>Listing Description</p>
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>
+                              Listing Description
+                            </p>
                             <p style={{ fontSize: 14, color: '#e2e8f0', whiteSpace: 'pre-line' }}>
                               {opp.listing.description}
                             </p>
@@ -1368,7 +1454,9 @@ function OpportunitiesContent() {
 
                         {opp.listing.priceReasoning && (
                           <div className="fp-glass-sm p-4 mb-4">
-                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>Pricing Reasoning</p>
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>
+                              Pricing Reasoning
+                            </p>
                             <p style={{ fontSize: 14, color: '#e2e8f0', whiteSpace: 'pre-line' }}>
                               {opp.listing.priceReasoning}
                             </p>
@@ -1377,8 +1465,13 @@ function OpportunitiesContent() {
 
                         {hasSellerDetails && (
                           <div className="fp-glass-sm p-4 mb-4">
-                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>Seller Details</p>
-                            <div className="flex flex-col gap-2" style={{ fontSize: 14, color: '#e2e8f0' }}>
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>
+                              Seller Details
+                            </p>
+                            <div
+                              className="flex flex-col gap-2"
+                              style={{ fontSize: 14, color: '#e2e8f0' }}
+                            >
                               {opp.listing.sellerName && (
                                 <span className="flex items-center gap-2">
                                   <User className="w-4 h-4" style={{ color: '#c4b5fd' }} />
@@ -1408,10 +1501,19 @@ function OpportunitiesContent() {
                                     className="flex items-center gap-2"
                                     style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}
                                   >
-                                    <MessageSquare className="w-4 h-4" style={{ color: '#c4b5fd' }} />
+                                    <MessageSquare
+                                      className="w-4 h-4"
+                                      style={{ color: '#c4b5fd' }}
+                                    />
                                     Purchase Message
                                   </p>
-                                  <p style={{ fontSize: 14, color: '#e2e8f0', whiteSpace: 'pre-line' }}>
+                                  <p
+                                    style={{
+                                      fontSize: 14,
+                                      color: '#e2e8f0',
+                                      whiteSpace: 'pre-line',
+                                    }}
+                                  >
                                     {opp.listing.requestToBuy}
                                   </p>
                                 </div>
@@ -1431,7 +1533,9 @@ function OpportunitiesContent() {
 
                         {comparableUrls.length > 0 && (
                           <div className="fp-glass-sm p-4 mb-4">
-                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>Comparable Listings</p>
+                            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>
+                              Comparable Listings
+                            </p>
                             <div className="flex flex-col gap-2">
                               {comparableUrls.map((comp, index) => (
                                 <a
@@ -1454,10 +1558,13 @@ function OpportunitiesContent() {
                           </div>
                         )}
 
-                        {(comparableSales.length > 0 || opp.listing.compMatchConfidence === 'insufficient') && (
+                        {(comparableSales.length > 0 ||
+                          opp.listing.compMatchConfidence === 'insufficient') && (
                           <div className="fp-glass-sm p-4 mb-4">
                             <div className="flex items-center justify-between mb-2">
-                              <p style={{ fontSize: 12, color: '#94a3b8' }}>Comparable Sold Listings</p>
+                              <p style={{ fontSize: 12, color: '#94a3b8' }}>
+                                Comparable Sold Listings
+                              </p>
                               {opp.listing.compMatchConfidence && (
                                 <span
                                   className={(() => {
@@ -1479,11 +1586,12 @@ function OpportunitiesContent() {
                                 </span>
                               )}
                             </div>
-                            {comparableSales.length === 0 && opp.listing.compMatchConfidence === 'insufficient' && (
-                              <p style={{ fontSize: 14, color: '#64748b', fontStyle: 'italic' }}>
-                                No comparable sold listings found for this item.
-                              </p>
-                            )}
+                            {comparableSales.length === 0 &&
+                              opp.listing.compMatchConfidence === 'insufficient' && (
+                                <p style={{ fontSize: 14, color: '#64748b', fontStyle: 'italic' }}>
+                                  No comparable sold listings found for this item.
+                                </p>
+                              )}
                             <div className="flex flex-col gap-3">
                               {comparableSales.map((sale, index) => (
                                 <div
@@ -1492,7 +1600,9 @@ function OpportunitiesContent() {
                                   style={{ padding: '8px 12px' }}
                                 >
                                   <div>
-                                    <p style={{ fontSize: 14, color: '#e2e8f0', fontWeight: 500 }}>{sale.title}</p>
+                                    <p style={{ fontSize: 14, color: '#e2e8f0', fontWeight: 500 }}>
+                                      {sale.title}
+                                    </p>
                                     {sale.soldAt && (
                                       <p style={{ fontSize: 12, color: '#94a3b8' }}>
                                         Sold {formatDateTime(sale.soldAt)}
@@ -1500,7 +1610,9 @@ function OpportunitiesContent() {
                                     )}
                                   </div>
                                   <div className="flex items-center gap-3">
-                                    <span style={{ fontSize: 14, fontWeight: 600, color: '#34d399' }}>
+                                    <span
+                                      style={{ fontSize: 14, fontWeight: 600, color: '#34d399' }}
+                                    >
                                       {sale.price ? formatCurrency(sale.price) : '—'}
                                     </span>
                                     {sale.url && (
@@ -1509,7 +1621,11 @@ function OpportunitiesContent() {
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="inline-flex items-center gap-1 transition-colors"
-                                        style={{ fontSize: 12, color: '#c4b5fd', textDecoration: 'none' }}
+                                        style={{
+                                          fontSize: 12,
+                                          color: '#c4b5fd',
+                                          textDecoration: 'none',
+                                        }}
                                       >
                                         <ExternalLink className="w-3.5 h-3.5" />
                                         View
@@ -1526,16 +1642,24 @@ function OpportunitiesContent() {
                           <div className="fp-glass-sm p-4 mb-4 space-y-4">
                             {opp.listing.priceReasoning && (
                               <div>
-                                <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>Value Reasoning</p>
-                                <p style={{ fontSize: 14, color: '#e2e8f0', whiteSpace: 'pre-line' }}>
+                                <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>
+                                  Value Reasoning
+                                </p>
+                                <p
+                                  style={{ fontSize: 14, color: '#e2e8f0', whiteSpace: 'pre-line' }}
+                                >
                                   {opp.listing.priceReasoning}
                                 </p>
                               </div>
                             )}
                             {opp.listing.notes && (
                               <div>
-                                <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>Listing Notes</p>
-                                <p style={{ fontSize: 14, color: '#e2e8f0', whiteSpace: 'pre-line' }}>
+                                <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>
+                                  Listing Notes
+                                </p>
+                                <p
+                                  style={{ fontSize: 14, color: '#e2e8f0', whiteSpace: 'pre-line' }}
+                                >
                                   {opp.listing.notes}
                                 </p>
                               </div>
@@ -1713,33 +1837,53 @@ function OpportunitiesContent() {
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                   {opp.purchasePrice && (
                                     <div>
-                                      <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>
+                                      <p
+                                        style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}
+                                      >
                                         Purchase Price
                                       </p>
-                                      <p style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}>
+                                      <p
+                                        style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}
+                                      >
                                         ${opp.purchasePrice.toFixed(2)}
                                       </p>
                                     </div>
                                   )}
                                   {opp.resalePrice && (
                                     <div>
-                                      <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Resale Price</p>
-                                      <p style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}>
+                                      <p
+                                        style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}
+                                      >
+                                        Resale Price
+                                      </p>
+                                      <p
+                                        style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}
+                                      >
                                         ${opp.resalePrice.toFixed(2)}
                                       </p>
                                     </div>
                                   )}
                                   {opp.fees && (
                                     <div>
-                                      <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Fees</p>
-                                      <p style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}>
+                                      <p
+                                        style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}
+                                      >
+                                        Fees
+                                      </p>
+                                      <p
+                                        style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}
+                                      >
                                         ${opp.fees.toFixed(2)}
                                       </p>
                                     </div>
                                   )}
                                   {opp.actualProfit !== null && (
                                     <div>
-                                      <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Actual Profit</p>
+                                      <p
+                                        style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}
+                                      >
+                                        Actual Profit
+                                      </p>
                                       <p
                                         style={{
                                           fontSize: 14,
@@ -1757,7 +1901,9 @@ function OpportunitiesContent() {
                                     className="mt-3 pt-3"
                                     style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
                                   >
-                                    <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Notes</p>
+                                    <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>
+                                      Notes
+                                    </p>
                                     <p style={{ fontSize: 14, color: '#e2e8f0' }}>{opp.notes}</p>
                                   </div>
                                 )}
@@ -1820,7 +1966,9 @@ function OpportunitiesContent() {
             aria-label="Mark as Purchased"
             className="fp-glass max-w-md w-full mx-4 p-6"
           >
-            <h2 style={{ fontSize: 18, fontWeight: 600, color: '#e2e8f0', marginBottom: 16 }}>Mark as Purchased</h2>
+            <h2 style={{ fontSize: 18, fontWeight: 600, color: '#e2e8f0', marginBottom: 16 }}>
+              Mark as Purchased
+            </h2>
             <div className="mb-5">
               <label
                 htmlFor="modal-purchase-price"
@@ -1842,11 +1990,7 @@ function OpportunitiesContent() {
               />
             </div>
             <div className="flex gap-3 justify-end">
-              <button
-                onClick={cancelKanbanModal}
-                className="fp-btn-ghost"
-                style={{ fontSize: 14 }}
-              >
+              <button onClick={cancelKanbanModal} className="fp-btn-ghost" style={{ fontSize: 14 }}>
                 Cancel
               </button>
               <button
@@ -1873,7 +2017,9 @@ function OpportunitiesContent() {
             aria-label="Mark as Listed"
             className="fp-glass max-w-md w-full mx-4 p-6"
           >
-            <h2 style={{ fontSize: 18, fontWeight: 600, color: '#e2e8f0', marginBottom: 16 }}>Mark as Listed</h2>
+            <h2 style={{ fontSize: 18, fontWeight: 600, color: '#e2e8f0', marginBottom: 16 }}>
+              Mark as Listed
+            </h2>
             <div className="mb-5">
               <label
                 htmlFor="modal-resale-url"
@@ -1893,11 +2039,7 @@ function OpportunitiesContent() {
               />
             </div>
             <div className="flex gap-3 justify-end">
-              <button
-                onClick={cancelKanbanModal}
-                className="fp-btn-ghost"
-                style={{ fontSize: 14 }}
-              >
+              <button onClick={cancelKanbanModal} className="fp-btn-ghost" style={{ fontSize: 14 }}>
                 Cancel
               </button>
               <button
@@ -1924,7 +2066,9 @@ function OpportunitiesContent() {
             aria-label="Mark as Sold"
             className="fp-glass max-w-md w-full mx-4 p-6"
           >
-            <h2 style={{ fontSize: 18, fontWeight: 600, color: '#e2e8f0', marginBottom: 16 }}>Mark as Sold</h2>
+            <h2 style={{ fontSize: 18, fontWeight: 600, color: '#e2e8f0', marginBottom: 16 }}>
+              Mark as Sold
+            </h2>
             <div className="mb-4">
               <label
                 htmlFor="modal-sale-price"
@@ -1965,11 +2109,7 @@ function OpportunitiesContent() {
               />
             </div>
             <div className="flex gap-3 justify-end">
-              <button
-                onClick={cancelKanbanModal}
-                className="fp-btn-ghost"
-                style={{ fontSize: 14 }}
-              >
+              <button onClick={cancelKanbanModal} className="fp-btn-ghost" style={{ fontSize: 14 }}>
                 Cancel
               </button>
               <button

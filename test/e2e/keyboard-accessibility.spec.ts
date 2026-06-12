@@ -21,31 +21,29 @@ test.describe('Keyboard Accessibility', () => {
         await page.keyboard.press('Tab');
         const tag = await page.evaluate(() => {
           const el = document.activeElement;
-          return el ? `${el.tagName.toLowerCase()}[${el.getAttribute('type') || el.getAttribute('role') || ''}]` : 'none';
+          return el
+            ? `${el.tagName.toLowerCase()}[${el.getAttribute('type') || el.getAttribute('role') || ''}]`
+            : 'none';
         });
         focusedTags.push(tag);
       }
 
       // Should focus at least one input and one button
-      const hasInput = focusedTags.some(
-        (t) => t.includes('input') || t.includes('textarea'),
-      );
-      const hasButton = focusedTags.some(
-        (t) => t.includes('button') || t.includes('a['),
-      );
+      const hasInput = focusedTags.some((t) => t.includes('input') || t.includes('textarea'));
+      const hasButton = focusedTags.some((t) => t.includes('button') || t.includes('a['));
       expect(hasInput || hasButton).toBeTruthy();
     });
 
-    test('When I fill the login form and press Enter, Then the form submits', async ({
-      page,
-    }) => {
+    test('When I fill the login form and press Enter, Then the form submits', async ({ page }) => {
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
 
       // Find email/username input
-      const emailInput = page.locator(
-        'input[type="email"], input[type="text"], input[name="email"], input[name="username"]',
-      ).first();
+      const emailInput = page
+        .locator(
+          'input[type="email"], input[type="text"], input[name="email"], input[name="username"]'
+        )
+        .first();
       const passwordInput = page.locator('input[type="password"]').first();
 
       const emailVisible = await emailInput.isVisible().catch(() => false);
@@ -86,13 +84,13 @@ test.describe('Keyboard Accessibility', () => {
       await page.keyboard.press('Tab');
 
       const forwardElement = await page.evaluate(
-        () => document.activeElement?.tagName?.toLowerCase() || 'none',
+        () => document.activeElement?.tagName?.toLowerCase() || 'none'
       );
 
       // Shift+Tab backward
       await page.keyboard.press('Shift+Tab');
       const backwardElement = await page.evaluate(
-        () => document.activeElement?.tagName?.toLowerCase() || 'none',
+        () => document.activeElement?.tagName?.toLowerCase() || 'none'
       );
 
       // Forward and backward should land on different elements (or same if only one interactive element)
@@ -102,16 +100,14 @@ test.describe('Keyboard Accessibility', () => {
   });
 
   test.describe('Given I am on any page', () => {
-    test('When I press Escape on a modal or dropdown, Then it closes', async ({
-      page,
-    }) => {
+    test('When I press Escape on a modal or dropdown, Then it closes', async ({ page }) => {
       await page.goto('/');
       await page.waitForLoadState('networkidle');
 
       // Try to find and open any dropdown or modal trigger
-      const trigger = page.locator(
-        'button[aria-haspopup], [role="combobox"], [aria-expanded]',
-      ).first();
+      const trigger = page
+        .locator('button[aria-haspopup], [role="combobox"], [aria-expanded]')
+        .first();
       const hasTrigger = await trigger.isVisible().catch(() => false);
 
       if (hasTrigger) {
@@ -173,8 +169,7 @@ test.describe('Keyboard Accessibility', () => {
           focusStyles.outline !== 'none' &&
           focusStyles.outline !== '' &&
           focusStyles.outlineWidth !== '0px';
-        const hasBoxShadow =
-          focusStyles.boxShadow !== 'none' && focusStyles.boxShadow !== '';
+        const hasBoxShadow = focusStyles.boxShadow !== 'none' && focusStyles.boxShadow !== '';
 
         // At least one focus indicator should be present (or the default browser outline)
         expect(hasOutline || hasBoxShadow || focusStyles.outline).toBeTruthy();

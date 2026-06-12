@@ -39,10 +39,7 @@ import {
   messageSentEmailHtml,
   messageSentEmailText,
 } from '@/lib/communication-email-templates';
-import {
-  createMessageNotificationEvent,
-  NotificationEventType,
-} from '@/lib/notification-events';
+import { createMessageNotificationEvent, NotificationEventType } from '@/lib/notification-events';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -97,7 +94,10 @@ function reviewUrl(listingId?: string | null): string {
 }
 
 function stripHtml(text: string): string {
-  return text.replace(/<[^>]*>/g, '').replace(/&[a-z]+;/gi, ' ').trim();
+  return text
+    .replace(/<[^>]*>/g, '')
+    .replace(/&[a-z]+;/gi, ' ')
+    .trim();
 }
 
 function truncate(text: string, maxLength = 200): string {
@@ -149,9 +149,12 @@ export class CommunicationNotificationService {
 
     try {
       if (this.consecutiveFailures >= CIRCUIT_BREAKER_THRESHOLD) {
-        logger.error('[CommunicationNotification] Circuit breaker open — skipping message.received', {
-          consecutiveFailures: this.consecutiveFailures,
-        });
+        logger.error(
+          '[CommunicationNotification] Circuit breaker open — skipping message.received',
+          {
+            consecutiveFailures: this.consecutiveFailures,
+          }
+        );
         return;
       }
 
@@ -211,7 +214,11 @@ export class CommunicationNotificationService {
       // Story 11.3: fire-and-forget push alongside email.
       /* istanbul ignore next -- push catch callback: pushNotificationService is mocked in tests */
       void pushNotificationService
-        .sendToUser(params.userId, { title: '💬 New Message', body: `${sellerName} replied about ${listingTitle}` }, 'messageReceived')
+        .sendToUser(
+          params.userId,
+          { title: '💬 New Message', body: `${sellerName} replied about ${listingTitle}` },
+          'messageReceived'
+        )
         .catch(() => undefined);
     } catch (err) {
       this.consecutiveFailures++;
@@ -237,9 +244,12 @@ export class CommunicationNotificationService {
 
     try {
       if (this.consecutiveFailures >= CIRCUIT_BREAKER_THRESHOLD) {
-        logger.error('[CommunicationNotification] Circuit breaker open — skipping message.draft_ready', {
-          consecutiveFailures: this.consecutiveFailures,
-        });
+        logger.error(
+          '[CommunicationNotification] Circuit breaker open — skipping message.draft_ready',
+          {
+            consecutiveFailures: this.consecutiveFailures,
+          }
+        );
         return;
       }
 
@@ -291,7 +301,11 @@ export class CommunicationNotificationService {
       // Story 11.3: fire-and-forget push alongside email.
       /* istanbul ignore next -- push catch callback: pushNotificationService is mocked in tests */
       void pushNotificationService
-        .sendToUser(params.userId, { title: '✍️ AI Draft Ready', body: `Review your draft for ${listingTitle}` }, 'draftReady')
+        .sendToUser(
+          params.userId,
+          { title: '✍️ AI Draft Ready', body: `Review your draft for ${listingTitle}` },
+          'draftReady'
+        )
         .catch(() => undefined);
     } catch (err) {
       this.consecutiveFailures++;
@@ -375,7 +389,11 @@ export class CommunicationNotificationService {
       // Story 11.3: fire-and-forget push alongside email.
       /* istanbul ignore next -- push catch callback: pushNotificationService is mocked in tests */
       void pushNotificationService
-        .sendToUser(params.userId, { title: '✅ Message Sent', body: `Your message about ${listingTitle} was delivered` }, 'messageSent')
+        .sendToUser(
+          params.userId,
+          { title: '✅ Message Sent', body: `Your message about ${listingTitle} was delivered` },
+          'messageSent'
+        )
         .catch(() => undefined);
     } catch (err) {
       this.consecutiveFailures++;

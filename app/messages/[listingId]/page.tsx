@@ -72,11 +72,7 @@ function getDateLabel(dateStr: string): string {
   });
 }
 
-export default function ThreadDetailPage({
-  params,
-}: {
-  params: Promise<{ listingId: string }>;
-}) {
+export default function ThreadDetailPage({ params }: { params: Promise<{ listingId: string }> }) {
   const { listingId } = use(params);
   const { user: firebaseUser, loading: authLoading } = useFirebaseAuth();
   const router = useRouter();
@@ -93,7 +89,7 @@ export default function ThreadDetailPage({
     if (!authLoading && firebaseUser) {
       fetchThread();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading, firebaseUser, listingId]);
 
   async function fetchThread() {
@@ -161,10 +157,7 @@ export default function ThreadDetailPage({
                 key={i}
                 className={`h-16 rounded-lg animate-pulse w-2/3 ${i % 2 === 0 ? '' : 'ml-auto'}`}
                 style={{
-                  background:
-                    i % 2 === 0
-                      ? 'rgba(255,255,255,0.04)'
-                      : 'rgba(124, 58, 237, 0.10)',
+                  background: i % 2 === 0 ? 'rgba(255,255,255,0.04)' : 'rgba(124, 58, 237, 0.10)',
                 }}
               />
             ))}
@@ -175,7 +168,9 @@ export default function ThreadDetailPage({
       {/* Error state */}
       {error && !loading && (
         <div className="text-center py-16">
-          <p className="mb-4" style={{ color: '#94a3b8' }}>{error}</p>
+          <p className="mb-4" style={{ color: '#94a3b8' }}>
+            {error}
+          </p>
           <button
             onClick={fetchThread}
             className="text-sm hover:underline"
@@ -190,10 +185,7 @@ export default function ThreadDetailPage({
       {threadData && !loading && (
         <>
           {/* Listing header */}
-          <ThreadHeader
-            listing={threadData.listing}
-            sellerName={threadData.sellerName}
-          />
+          <ThreadHeader listing={threadData.listing} sellerName={threadData.sellerName} />
 
           {/* Message count */}
           <div className="flex items-center justify-between mt-4 mb-3">
@@ -209,9 +201,7 @@ export default function ThreadDetailPage({
               // Date separator logic
               const currentDate = new Date(msg.createdAt).toDateString();
               const prevDate =
-                idx > 0
-                  ? new Date(threadData.messages[idx - 1].createdAt).toDateString()
-                  : null;
+                idx > 0 ? new Date(threadData.messages[idx - 1].createdAt).toDateString() : null;
               const showDateSeparator = idx === 0 || currentDate !== prevDate;
 
               return (
@@ -222,10 +212,7 @@ export default function ThreadDetailPage({
                         className="flex-1"
                         style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
                       />
-                      <span
-                        className="text-xs font-medium"
-                        style={{ color: '#64748b' }}
-                      >
+                      <span className="text-xs font-medium" style={{ color: '#64748b' }}>
                         {getDateLabel(msg.createdAt)}
                       </span>
                       <div

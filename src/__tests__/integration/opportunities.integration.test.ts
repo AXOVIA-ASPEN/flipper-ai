@@ -243,7 +243,9 @@ describe('Opportunities API Integration Tests', () => {
     });
 
     it('should filter by platform', async () => {
-      const request = new NextRequest('http://localhost:3000/api/opportunities?platform=CRAIGSLIST');
+      const request = new NextRequest(
+        'http://localhost:3000/api/opportunities?platform=CRAIGSLIST'
+      );
       const response = await GET(request);
       const data = await response.json();
 
@@ -275,7 +277,9 @@ describe('Opportunities API Integration Tests', () => {
     });
 
     it('should filter by minProfit and maxProfit', async () => {
-      const request = new NextRequest('http://localhost:3000/api/opportunities?minProfit=100&maxProfit=250');
+      const request = new NextRequest(
+        'http://localhost:3000/api/opportunities?minProfit=100&maxProfit=250'
+      );
       const response = await GET(request);
       const data = await response.json();
 
@@ -288,7 +292,9 @@ describe('Opportunities API Integration Tests', () => {
     });
 
     it('should combine platform and score filters', async () => {
-      const request = new NextRequest('http://localhost:3000/api/opportunities?platform=CRAIGSLIST&minScore=80');
+      const request = new NextRequest(
+        'http://localhost:3000/api/opportunities?platform=CRAIGSLIST&minScore=80'
+      );
       const response = await GET(request);
       const data = await response.json();
 

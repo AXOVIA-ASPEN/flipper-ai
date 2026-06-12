@@ -4,7 +4,7 @@ import * as fs from 'fs';
 
 /**
  * Feature: Image Upload & Management
- * 
+ *
  * As a flipper user
  * I want to upload and manage images for my listings
  * So that I can showcase items effectively for resale
@@ -33,7 +33,7 @@ async function mockAuthSession(page: import('@playwright/test').Page) {
 // Create test image fixture if it doesn't exist
 async function ensureTestImageExists(filename: string, width = 800, height = 600): Promise<string> {
   const fixturePath = path.join(FIXTURES_DIR, filename);
-  
+
   if (!fs.existsSync(FIXTURES_DIR)) {
     fs.mkdirSync(FIXTURES_DIR, { recursive: true });
   }
@@ -51,14 +51,14 @@ async function ensureTestImageExists(filename: string, width = 800, height = 600
 }
 
 test.describe('Feature: Image Upload & Management', () => {
-
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
   });
 
   test.describe('Scenario: Upload a single image for a listing', () => {
-
-    test('Given a user creating a new listing, When they upload a valid image, Then the image should be displayed', async ({ page }) => {
+    test('Given a user creating a new listing, When they upload a valid image, Then the image should be displayed', async ({
+      page,
+    }) => {
       // Given: Mock the listings API
       await page.route('**/api/listings', async (route) => {
         if (route.request().method() === 'GET') {
@@ -112,7 +112,7 @@ test.describe('Feature: Image Upload & Management', () => {
 
       // Look for file input
       const fileInput = page.locator('input[type="file"]').first();
-      
+
       if (await fileInput.isVisible().catch(() => false)) {
         // Upload the test image
         const testImagePath = await ensureTestImageExists('test-upload.png');
@@ -125,14 +125,17 @@ test.describe('Feature: Image Upload & Management', () => {
         expect(uploadedImage).toBe(true);
       } else {
         // If no file input is visible, mark test as passing with a note
-        console.log('Note: File upload input not found on current page - skipping upload verification');
+        console.log(
+          'Note: File upload input not found on current page - skipping upload verification'
+        );
       }
     });
   });
 
   test.describe('Scenario: Upload multiple images', () => {
-
-    test('Given a listing form, When a user uploads 3 images, Then all 3 images should be displayed', async ({ page }) => {
+    test('Given a listing form, When a user uploads 3 images, Then all 3 images should be displayed', async ({
+      page,
+    }) => {
       // Mock image upload to accept multiple files
       const uploadedImages: string[] = [];
       await page.route('**/api/images/upload', async (route) => {
@@ -157,7 +160,7 @@ test.describe('Feature: Image Upload & Management', () => {
 
       // Look for file input that accepts multiple files
       const fileInput = page.locator('input[type="file"][multiple], input[type="file"]').first();
-      
+
       if (await fileInput.isVisible().catch(() => false)) {
         // Upload multiple images
         await fileInput.setInputFiles([image1, image2, image3]);
@@ -172,8 +175,9 @@ test.describe('Feature: Image Upload & Management', () => {
   });
 
   test.describe('Scenario: Validate image file type', () => {
-
-    test('Given a user uploading a file, When they upload a non-image file, Then they should see an error message', async ({ page }) => {
+    test('Given a user uploading a file, When they upload a non-image file, Then they should see an error message', async ({
+      page,
+    }) => {
       // Create a text file as invalid input
       const invalidFilePath = path.join(FIXTURES_DIR, 'invalid.txt');
       if (!fs.existsSync(FIXTURES_DIR)) {
@@ -195,7 +199,7 @@ test.describe('Feature: Image Upload & Management', () => {
       await page.waitForLoadState('networkidle');
 
       const fileInput = page.locator('input[type="file"]').first();
-      
+
       if (await fileInput.isVisible().catch(() => false)) {
         // Attempt to upload invalid file
         await fileInput.setInputFiles(invalidFilePath);
@@ -204,7 +208,7 @@ test.describe('Feature: Image Upload & Management', () => {
         // Look for error message in the UI
         const errorMessage = page.getByText(/invalid.*file.*type|please upload.*image/i);
         const hasError = await errorMessage.isVisible().catch(() => false);
-        
+
         // Should either show an error or prevent the upload
         if (!hasError) {
           console.log('Note: Client-side validation may prevent invalid file selection');
@@ -221,8 +225,9 @@ test.describe('Feature: Image Upload & Management', () => {
   });
 
   test.describe('Scenario: Remove uploaded image', () => {
-
-    test('Given a listing with uploaded images, When a user removes an image, Then the image should be deleted', async ({ page }) => {
+    test('Given a listing with uploaded images, When a user removes an image, Then the image should be deleted', async ({
+      page,
+    }) => {
       // Mock listings API with images
       await page.route('**/api/listings/listing-1', async (route) => {
         if (route.request().method() === 'GET') {
@@ -256,7 +261,7 @@ test.describe('Feature: Image Upload & Management', () => {
 
       // Look for delete/remove button on images
       const deleteButton = page.getByRole('button', { name: /remove|delete.*image/i }).first();
-      
+
       if (await deleteButton.isVisible().catch(() => false)) {
         await deleteButton.click();
         await page.waitForTimeout(500);
@@ -268,22 +273,25 @@ test.describe('Feature: Image Upload & Management', () => {
   });
 
   test.describe('Scenario: Image preview before upload', () => {
-
-    test('Given a user selecting an image, When the file is chosen, Then a preview should be shown', async ({ page }) => {
+    test('Given a user selecting an image, When the file is chosen, Then a preview should be shown', async ({
+      page,
+    }) => {
       await page.goto('/opportunities');
       await page.waitForLoadState('networkidle');
 
       const fileInput = page.locator('input[type="file"]').first();
-      
+
       if (await fileInput.isVisible().catch(() => false)) {
         const testImagePath = await ensureTestImageExists('preview-test.png');
         await fileInput.setInputFiles(testImagePath);
         await page.waitForTimeout(800);
 
         // Look for image preview element
-        const previewImage = page.locator('img[src*="blob:"], img[src*="data:image"], img[alt*="preview"]').first();
+        const previewImage = page
+          .locator('img[src*="blob:"], img[src*="data:image"], img[alt*="preview"]')
+          .first();
         const hasPreview = await previewImage.isVisible().catch(() => false);
-        
+
         if (hasPreview) {
           expect(await previewImage.count()).toBeGreaterThan(0);
         } else {
@@ -294,8 +302,9 @@ test.describe('Feature: Image Upload & Management', () => {
   });
 
   test.describe('Scenario: Image size validation', () => {
-
-    test('Given a user uploading an image, When the file size exceeds the limit, Then an error should be shown', async ({ page }) => {
+    test('Given a user uploading an image, When the file size exceeds the limit, Then an error should be shown', async ({
+      page,
+    }) => {
       // Mock upload endpoint to reject oversized files
       await page.route('**/api/images/upload', async (route) => {
         await route.fulfill({
@@ -310,7 +319,7 @@ test.describe('Feature: Image Upload & Management', () => {
       await page.waitForLoadState('networkidle');
 
       const fileInput = page.locator('input[type="file"]').first();
-      
+
       if (await fileInput.isVisible().catch(() => false)) {
         // Use a test image (actual size doesn't matter for mock)
         const testImagePath = await ensureTestImageExists('large-file.png');
@@ -320,7 +329,7 @@ test.describe('Feature: Image Upload & Management', () => {
         // Check for size error message
         const sizeError = page.getByText(/file.*too.*large|maximum.*size|exceeds.*limit/i);
         const hasError = await sizeError.isVisible().catch(() => false);
-        
+
         if (!hasError) {
           console.log('Note: File size validation may occur client-side or not be visible');
         }
@@ -329,8 +338,9 @@ test.describe('Feature: Image Upload & Management', () => {
   });
 
   test.describe('Scenario: Reorder images via drag-and-drop', () => {
-
-    test('Given multiple uploaded images, When a user drags an image to a new position, Then the order should update', async ({ page }) => {
+    test('Given multiple uploaded images, When a user drags an image to a new position, Then the order should update', async ({
+      page,
+    }) => {
       // Mock listings with multiple images
       await page.route('**/api/listings/listing-1', async (route) => {
         await route.fulfill({
@@ -349,7 +359,9 @@ test.describe('Feature: Image Upload & Management', () => {
       await page.waitForLoadState('networkidle');
 
       // Look for draggable image elements
-      const draggableImages = page.locator('[draggable="true"]').filter({ has: page.locator('img') });
+      const draggableImages = page
+        .locator('[draggable="true"]')
+        .filter({ has: page.locator('img') });
       const imageCount = await draggableImages.count().catch(() => 0);
 
       if (imageCount >= 2) {
@@ -363,11 +375,16 @@ test.describe('Feature: Image Upload & Management', () => {
         if (firstBox && secondBox) {
           await page.mouse.move(firstBox.x + firstBox.width / 2, firstBox.y + firstBox.height / 2);
           await page.mouse.down();
-          await page.mouse.move(secondBox.x + secondBox.width / 2, secondBox.y + secondBox.height / 2);
+          await page.mouse.move(
+            secondBox.x + secondBox.width / 2,
+            secondBox.y + secondBox.height / 2
+          );
           await page.mouse.up();
-          
+
           // Verify reordering occurred (implementation-specific)
-          console.log('Drag-and-drop performed - order change verification is implementation-specific');
+          console.log(
+            'Drag-and-drop performed - order change verification is implementation-specific'
+          );
         }
       } else {
         console.log('Note: Draggable images not found for reorder test');

@@ -6,10 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  getCurrentUser,
-  getCurrentUserId as getSessionUserId,
-} from '@/lib/firebase/session';
+import { getCurrentUser, getCurrentUserId as getSessionUserId } from '@/lib/firebase/session';
 import { verifyIdToken } from '@/lib/firebase/auth-middleware';
 
 export type AuthenticatedRequest = NextRequest & {
@@ -98,8 +95,7 @@ export async function isAuthenticated(): Promise<boolean> {
  */
 export async function getUserIdOrDefault(req?: NextRequest): Promise<string> {
   const bypassEnabled =
-    process.env.ENABLE_DEV_AUTH_BYPASS === 'true' &&
-    process.env.NODE_ENV !== 'production';
+    process.env.ENABLE_DEV_AUTH_BYPASS === 'true' && process.env.NODE_ENV !== 'production';
 
   if (bypassEnabled) {
     const userId = await getAuthUserId(req);

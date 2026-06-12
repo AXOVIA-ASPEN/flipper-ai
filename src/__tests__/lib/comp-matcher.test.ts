@@ -123,7 +123,13 @@ describe('findComparableSales()', () => {
         makeSoldListing({ title: 'Sony WH-1000XM5 Noise Canceling', price: 175 }),
       ];
 
-      const result = await findComparableSales('Sony WH-1000XM5', 'Sony', 'WH-1000XM5', 'electronics', rawComps);
+      const result = await findComparableSales(
+        'Sony WH-1000XM5',
+        'Sony',
+        'WH-1000XM5',
+        'electronics',
+        rawComps
+      );
 
       expect(result).not.toBeNull();
       expect(result!.comps).toHaveLength(2);
@@ -142,7 +148,13 @@ describe('findComparableSales()', () => {
         makeSoldListing({ title: 'Apple AirPods Pro', price: 180 }),
       ];
 
-      const result = await findComparableSales('Sony WH-1000XM5', 'Sony', 'WH-1000XM5', undefined, rawComps);
+      const result = await findComparableSales(
+        'Sony WH-1000XM5',
+        'Sony',
+        'WH-1000XM5',
+        undefined,
+        rawComps
+      );
 
       expect(result).not.toBeNull();
       expect(result!.comps).toHaveLength(0);
@@ -187,7 +199,12 @@ describe('findComparableSales()', () => {
         fetchedAt: new Date(),
       });
 
-      const result = await findComparableSales('Sony WH-1000XM5', 'Sony', 'WH-1000XM5', 'electronics');
+      const result = await findComparableSales(
+        'Sony WH-1000XM5',
+        'Sony',
+        'WH-1000XM5',
+        'electronics'
+      );
 
       expect(fetchMarketPrice).toHaveBeenCalledWith('Sony WH-1000XM5', 'electronics');
       expect(result).not.toBeNull();
@@ -226,7 +243,13 @@ describe('findComparableSales()', () => {
         },
       ];
 
-      const result = await findComparableSales('Sony WH-1000XM5', 'Sony', 'WH-1000XM5', undefined, rawComps);
+      const result = await findComparableSales(
+        'Sony WH-1000XM5',
+        'Sony',
+        'WH-1000XM5',
+        undefined,
+        rawComps
+      );
 
       expect(result!.comps[0]).toEqual({
         title: 'Sony WH-1000XM5',

@@ -22,18 +22,18 @@ Flipper.ai is an AI-powered marketplace arbitrage platform that helps users find
 
 ## Tech Stack Summary
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Next.js 16, React 19, Tailwind CSS 4 |
-| Backend | Next.js API Routes (80+ endpoints) |
-| Database | PostgreSQL via Prisma ORM (13 models) |
-| AI | OpenAI GPT-4o-mini + Anthropic Claude Sonnet |
-| Scraping | Playwright + Stagehand (AI browser automation) |
-| Auth | Firebase Auth (session cookies + Facebook OAuth) |
-| Payments | Stripe (FREE/FLIPPER/PRO tiers) |
-| Monitoring | Sentry + Firebase Analytics |
-| Testing | Jest + Playwright + Cucumber (full pyramid) |
-| Deployment | Firebase Hosting + Cloud Run |
+| Layer      | Technology                                       |
+| ---------- | ------------------------------------------------ |
+| Frontend   | Next.js 16, React 19, Tailwind CSS 4             |
+| Backend    | Next.js API Routes (80+ endpoints)               |
+| Database   | PostgreSQL via Prisma ORM (13 models)            |
+| AI         | OpenAI GPT-4o-mini + Anthropic Claude Sonnet     |
+| Scraping   | Playwright + Stagehand (AI browser automation)   |
+| Auth       | Firebase Auth (session cookies + Facebook OAuth) |
+| Payments   | Stripe (FREE/FLIPPER/PRO tiers)                  |
+| Monitoring | Sentry + Firebase Analytics                      |
+| Testing    | Jest + Playwright + Cucumber (full pyramid)      |
+| Deployment | Firebase Hosting + Cloud Run                     |
 
 ---
 
@@ -69,12 +69,14 @@ flipper-ai/
 ## Key Features
 
 ### Marketplace Scraping
+
 - 5 platform integrations (Craigslist, eBay, Facebook, Mercari, OfferUp)
 - Playwright-based browser automation with anti-detection measures
 - Saved search configurations for recurring scans
 - Real-time SSE notifications during scraping
 
 ### AI Analysis Pipeline
+
 - **Algorithmic scoring** (always runs) — Category/brand/condition-based value estimation
 - **LLM identification** (optional) — GPT-4o-mini extracts brand, model, variant
 - **Market verification** — Playwright scrapes actual eBay sold prices
@@ -82,18 +84,21 @@ flipper-ai/
 - Only saves items verified as 50%+ undervalued
 
 ### Opportunity Management
+
 - Kanban board with drag-and-drop status tracking
 - 5-stage lifecycle: IDENTIFIED → CONTACTED → PURCHASED → LISTED → SOLD
 - Auto-calculated profit with fee tracking
 - Cross-platform posting queue
 
 ### Analytics & Reporting
+
 - Profit/loss tracking (weekly/monthly)
 - ROI calculation per item
 - Category breakdown and trend analysis
 - CSV/JSON report export
 
 ### User Management
+
 - Subscription tiers (FREE/FLIPPER/PRO) with feature gating
 - 6-step onboarding wizard
 - Configurable notification preferences
@@ -103,15 +108,15 @@ flipper-ai/
 
 ## Documentation Index
 
-| Document | Description |
-|----------|-------------|
-| [Architecture](./architecture-deep-scan.md) | System architecture, tech stack, data flow |
-| [API Contracts](./api-contracts.md) | 80+ API endpoint documentation |
-| [Data Models](./data-models.md) | 13 database models with relationships |
-| [Component Inventory](./component-inventory.md) | 15+ UI components, hooks, contexts |
-| [Source Tree](./source-tree-analysis.md) | Annotated directory structure |
-| [Development Guide](./development-guide.md) | Setup, build, test commands |
-| [Existing: API Reference](./api/API_REFERENCE.md) | Detailed API reference |
-| [Existing: PRD](./PRD.md) | Product requirements document |
-| [Existing: Deployment](./deployment/DEPLOYMENT.md) | Deployment procedures |
-| [Existing: User Guide](./guides/USER_GUIDE.md) | End-user documentation |
+| Document                                           | Description                                |
+| -------------------------------------------------- | ------------------------------------------ |
+| [Architecture](./architecture-deep-scan.md)        | System architecture, tech stack, data flow |
+| [API Contracts](./api-contracts.md)                | 80+ API endpoint documentation             |
+| [Data Models](./data-models.md)                    | 13 database models with relationships      |
+| [Component Inventory](./component-inventory.md)    | 15+ UI components, hooks, contexts         |
+| [Source Tree](./source-tree-analysis.md)           | Annotated directory structure              |
+| [Development Guide](./development-guide.md)        | Setup, build, test commands                |
+| [Existing: API Reference](./api/API_REFERENCE.md)  | Detailed API reference                     |
+| [Existing: PRD](./PRD.md)                          | Product requirements document              |
+| [Existing: Deployment](./deployment/DEPLOYMENT.md) | Deployment procedures                      |
+| [Existing: User Guide](./guides/USER_GUIDE.md)     | End-user documentation                     |

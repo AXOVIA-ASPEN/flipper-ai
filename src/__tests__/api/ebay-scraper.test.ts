@@ -10,7 +10,15 @@ jest.mock('@/lib/auth-middleware', () => ({
 }));
 
 jest.mock('@/lib/auth', () => ({
-  getCurrentUser: jest.fn(() => Promise.resolve({ id: 'test-user-id', email: 'test@test.com', name: 'Test User', firebaseUid: 'fb-uid', image: null })),
+  getCurrentUser: jest.fn(() =>
+    Promise.resolve({
+      id: 'test-user-id',
+      email: 'test@test.com',
+      name: 'Test User',
+      firebaseUid: 'fb-uid',
+      image: null,
+    })
+  ),
   getCurrentUserId: jest.fn(() => Promise.resolve('test-user-id')),
 }));
 
@@ -906,11 +914,24 @@ describe('eBay Scraper API', () => {
           json: async () => ({
             itemSummaries: [
               // Opportunity: Apple product, low price, new condition = high score
-              makeEbayItem({ itemId: 'e1', price: { value: '400', currency: 'USD' }, condition: 'New' }),
-              // Not an opportunity: Generic item, low price, generic description = low score  
-              makeEbayItem({ itemId: 'e2', title: 'Random old misc lot', price: { value: '20', currency: 'USD' }, categories: undefined }),
+              makeEbayItem({
+                itemId: 'e1',
+                price: { value: '400', currency: 'USD' },
+                condition: 'New',
+              }),
+              // Not an opportunity: Generic item, low price, generic description = low score
+              makeEbayItem({
+                itemId: 'e2',
+                title: 'Random old misc lot',
+                price: { value: '20', currency: 'USD' },
+                categories: undefined,
+              }),
               // Opportunity: Apple product, low price, new condition = high score
-              makeEbayItem({ itemId: 'e3', price: { value: '400', currency: 'USD' }, condition: 'New' }),
+              makeEbayItem({
+                itemId: 'e3',
+                price: { value: '400', currency: 'USD' },
+                condition: 'New',
+              }),
             ],
           }),
         })
@@ -1018,9 +1039,7 @@ describe('eBay Scraper API', () => {
       // Price history should be saved with condition: null
       expect(mockPriceHistoryCreateMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.arrayContaining([
-            expect.objectContaining({ condition: null }),
-          ]),
+          data: expect.arrayContaining([expect.objectContaining({ condition: null })]),
         })
       );
     });

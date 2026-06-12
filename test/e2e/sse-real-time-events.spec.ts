@@ -254,7 +254,9 @@ test.describe('Feature: Real-time Notifications via SSE', () => {
               const msgEvt = e as MessageEvent;
               try {
                 const data = JSON.parse(msgEvt.data);
-                ((window as unknown as Record<string, unknown>).__sseEvents as unknown[]).push(data);
+                ((window as unknown as Record<string, unknown>).__sseEvents as unknown[]).push(
+                  data
+                );
               } catch {
                 // ignore parse errors
               }

@@ -239,7 +239,9 @@ describe('Facebook Auth - Callback', () => {
     const location = res.headers.get('location') || '';
     expect(location).toContain('facebook_auth=success');
     expect(mockExchangeCodeForToken).toHaveBeenCalledWith(
-      expect.objectContaining({ redirectUri: 'https://myapp.example.com/api/auth/facebook/callback' }),
+      expect.objectContaining({
+        redirectUri: 'https://myapp.example.com/api/auth/facebook/callback',
+      }),
       'auth-code2'
     );
     delete process.env.FACEBOOK_REDIRECT_URI;

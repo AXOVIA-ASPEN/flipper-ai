@@ -232,10 +232,7 @@ describe('captcha-tracker', () => {
       const result = await verifyHCaptcha('test-token');
 
       expect(result).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith(
-        'hCaptcha verification failed:',
-        expect.any(Error)
-      );
+      expect(consoleSpy).toHaveBeenCalledWith('hCaptcha verification failed:', expect.any(Error));
     });
   });
 });

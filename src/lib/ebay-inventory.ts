@@ -209,7 +209,8 @@ async function createOffer(
   }
   if (input.returnPolicyId) {
     (body as Record<string, unknown>).listingPolicies = {
-      ...(((body as Record<string, unknown>).listingPolicies as object) /* istanbul ignore next */ || {}),
+      ...(((body as Record<string, unknown>)
+        .listingPolicies as object) /* istanbul ignore next */ || {}),
       returnPolicyId: input.returnPolicyId,
     };
   }

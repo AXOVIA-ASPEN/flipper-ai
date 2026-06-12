@@ -18,24 +18,28 @@
 >
 > **Your link:**
 > `https://<domain>/r/stephenboyett-x4f9`
-> [ Copy link ]  [ Share on X ]  [ Email a friend ]
+> [ Copy link ] [ Share on X ] [ Email a friend ]
 >
 > **Your referrals:**
+>
 > - **3 invited** → 2 signed up → 1 paid → **1 month credited** (next billing: 2026-06-15)
 >
 > **Your friend gets:**
+>
 > - 20% off their first month on any paid tier
 >
 > **You get:**
+>
 > - 1 free month of your current tier when they pay their first invoice
 > - No cap. Refer 12 friends in a year, get a free year of Flipper.ai.
 
 ### Referee side (the friend who clicks the link)
 
 When someone clicks `https://<domain>/r/stephenboyett-x4f9`:
+
 1. Cookie is set (`flipper_ref=stephenboyett-x4f9`, 30-day expiry)
 2. They're redirected to the landing page
-3. The landing page shows a banner: *"Stephen invited you — get 20% off your first month"*
+3. The landing page shows a banner: _"Stephen invited you — get 20% off your first month"_
 4. On signup, the cookie value is stored in `User.referredBy`
 5. On their first paid invoice, the 20% discount applies (one-time, first month only)
 6. The referrer's account gets credited 1 free month
@@ -88,13 +92,14 @@ model Referral {
 
 ## API surface (new routes)
 
-| Route                                  | Method | Auth          | Purpose                                          |
-| -------------------------------------- | ------ | ------------- | ------------------------------------------------ |
-| `/api/referrals/me`                    | GET    | Authenticated | Returns user's referral code, count, credits    |
-| `/api/referrals/track-click`           | POST   | None          | Records a referral cookie click (analytics only) |
-| `/r/[code]`                            | GET    | None          | Landing redirect — sets cookie, redirects home   |
+| Route                        | Method | Auth          | Purpose                                          |
+| ---------------------------- | ------ | ------------- | ------------------------------------------------ |
+| `/api/referrals/me`          | GET    | Authenticated | Returns user's referral code, count, credits     |
+| `/api/referrals/track-click` | POST   | None          | Records a referral cookie click (analytics only) |
+| `/r/[code]`                  | GET    | None          | Landing redirect — sets cookie, redirects home   |
 
 Webhook handler additions in `app/api/webhooks/stripe/route.ts`:
+
 - On `checkout.session.completed` for a subscription with `referredBy` set → mark `Referral.signedUpAt`
 - On `invoice.payment_succeeded` for first invoice → mark `Referral.convertedAt`, credit referrer with 1 free month, send notification email to referrer
 
@@ -107,6 +112,7 @@ There are two ways to handle the referrer's free month:
 ### Option A — Stripe Coupon per credit (recommended)
 
 For each credit the referrer earns:
+
 1. Create a Stripe coupon with `duration: once`, `amount_off: <referrer's monthly price>`, `max_redemptions: 1`
 2. Apply it to the next invoice via `subscriptions.update({customer, coupon})`
 3. The next invoice is $0 (or $0 + tax)
@@ -125,6 +131,7 @@ For each credit the referrer earns:
 > **Recommendation:** Option A. The user-visible math ("free month of FLIPPER tier") is more comprehensible than "$19 credit on next invoice".
 
 For the referee's **20% off first month** discount:
+
 - Create a single coupon at setup: `REFERRAL_FRIEND_20OFF` (`duration: once`, `percent_off: 20`)
 - Auto-apply via `checkout.sessions.create({discounts: [{coupon: 'REFERRAL_FRIEND_20OFF'}]})` when `User.referredBy` is set
 
@@ -138,8 +145,8 @@ Additional guardrails:
 
 1. **Same-payment-method block:** If referee uses a card already on the referrer's account, reject the credit.
 2. **Same-IP grace:** If referee signs up from the same IP as the referrer, flag for manual review (don't auto-credit). Won't catch all abuse but raises the bar.
-3. **Email domain check:** If referee's email domain is the same as the referrer's *and* personal (gmail/icloud/etc.), allow. Same business domain (e.g., both `@yourcompany.com`)? Allow. Disposable email domain (10minutemail, etc.)? Reject.
-4. **Refund cascade:** If referee refunds within 60 days, *reverse the referrer credit* if not yet redeemed.
+3. **Email domain check:** If referee's email domain is the same as the referrer's _and_ personal (gmail/icloud/etc.), allow. Same business domain (e.g., both `@yourcompany.com`)? Allow. Disposable email domain (10minutemail, etc.)? Reject.
+4. **Refund cascade:** If referee refunds within 60 days, _reverse the referrer credit_ if not yet redeemed.
 5. **Cap at 12 credits per referrer per rolling 12 months** to prevent industrial-scale referral farming. Higher caps unlock at PRO tier.
 6. **Self-referral attempt:** If `referrerId === refereeId`, reject with friendly error.
 
@@ -147,13 +154,13 @@ Additional guardrails:
 
 ## Email notifications (use Resend)
 
-| Trigger                                        | Recipient | Subject                                              |
-| ---------------------------------------------- | --------- | ---------------------------------------------------- |
-| Friend signs up via referral link              | Referrer  | "{{firstName}} just signed up via your link"          |
-| Friend pays first invoice                      | Referrer  | "🎉 You earned a free month — credited to your next invoice" |
-| Friend pays first invoice                      | Referee   | "Welcome — your 20% discount was applied"             |
-| Referrer's account credited                    | Referrer  | "Your next billing date moved to {{newDate}}"          |
-| Referrer hits 5 successful referrals           | Referrer  | "5 referrals = 5 free months. You're crushing this." |
+| Trigger                              | Recipient | Subject                                                      |
+| ------------------------------------ | --------- | ------------------------------------------------------------ |
+| Friend signs up via referral link    | Referrer  | "{{firstName}} just signed up via your link"                 |
+| Friend pays first invoice            | Referrer  | "🎉 You earned a free month — credited to your next invoice" |
+| Friend pays first invoice            | Referee   | "Welcome — your 20% discount was applied"                    |
+| Referrer's account credited          | Referrer  | "Your next billing date moved to {{newDate}}"                |
+| Referrer hits 5 successful referrals | Referrer  | "5 referrals = 5 free months. You're crushing this."         |
 
 ---
 

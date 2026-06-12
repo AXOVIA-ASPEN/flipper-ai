@@ -104,7 +104,9 @@ export function generateAlgorithmicDescription(
 
   // Price context
   if (input.originalPrice && input.originalPrice > input.askingPrice) {
-    const savings = Math.round(((input.originalPrice - input.askingPrice) / input.originalPrice) * 100);
+    const savings = Math.round(
+      ((input.originalPrice - input.askingPrice) / input.originalPrice) * 100
+    );
     sections.push(`\nRetails for $${input.originalPrice} — save ${savings}%!`);
   }
 
@@ -114,9 +116,10 @@ export function generateAlgorithmicDescription(
   }
 
   // Shipping note
-  const shippingNote = platform === 'facebook' || platform === 'offerup'
-    ? '\nLocal pickup available. Will consider shipping for serious buyers.'
-    : '\nShips quickly with tracking. Combined shipping available on multiple items.';
+  const shippingNote =
+    platform === 'facebook' || platform === 'offerup'
+      ? '\nLocal pickup available. Will consider shipping for serious buyers.'
+      : '\nShips quickly with tracking. Combined shipping available on multiple items.';
   sections.push(shippingNote);
 
   const description = sections.join('\n').trim();
@@ -144,7 +147,10 @@ export function generateDescriptionsForAllPlatforms(
 
   // 'ebay' is always in platforms; find() always returns an entry with a non-empty description.
   /* istanbul ignore next -- defensive fallbacks for find() miss or empty description; unreachable in practice */
-  const primary = descriptions.find((d) => d.platform === 'ebay')?.description || descriptions[0]?.description || '';
+  const primary =
+    descriptions.find((d) => d.platform === 'ebay')?.description ||
+    descriptions[0]?.description ||
+    '';
   return { descriptions, primary };
 }
 

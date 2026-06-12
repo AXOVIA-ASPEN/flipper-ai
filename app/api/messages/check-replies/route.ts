@@ -38,10 +38,7 @@ export async function POST(request: NextRequest) {
       where: { id: userId },
       select: { subscriptionTier: true },
     });
-    const featureCheck = checkFeatureAccess(
-      user?.subscriptionTier,
-      'messaging'
-    );
+    const featureCheck = checkFeatureAccess(user?.subscriptionTier, 'messaging');
     if (!featureCheck.allowed) {
       throw new ForbiddenError(featureCheck.reason);
     }

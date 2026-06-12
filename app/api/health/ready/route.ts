@@ -22,7 +22,10 @@ export async function GET() {
   } catch (error) {
     healthy = false;
     checks.database = { status: 'error' };
-    log.error({ error: error instanceof Error ? error.message : String(error) }, 'Readiness check: database unreachable');
+    log.error(
+      { error: error instanceof Error ? error.message : String(error) },
+      'Readiness check: database unreachable'
+    );
   }
 
   metrics.increment('readiness_checks');

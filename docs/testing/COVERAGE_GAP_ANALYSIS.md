@@ -4,6 +4,7 @@
 **Source of truth:** `origin/django-main` (the active development trunk)
 **Authors:** Stephen Boyett (founder) + this audit
 **Companion docs:**
+
 - `PROPOSED_FR_ADDITIONS.md` — new FRs to fill the gaps identified here
 - `PROPOSED_BDD_SCENARIOS.md` — Gherkin stubs for the new FRs and still-pending NFRs
 
@@ -13,14 +14,14 @@
 
 ## TL;DR
 
-| Layer                                     | Status                                                                                |
-| ----------------------------------------- | ------------------------------------------------------------------------------------- |
-| **Unit tests (Jest)**                     | 218 test files, 99%+ coverage on covered modules. **Strong.**                         |
-| **BDD acceptance (Cucumber)**             | 14 epic-level feature files exist. **150 of 174 requirement rows covered (86%).**      |
-| **E2E (Playwright)**                      | 84 spec files. **Strong, but few `@smoke` tags for fast prod-monitoring runs.**       |
-| **NFR coverage in BDD**                   | **Weak — 16 NFRs marked Pending.** Performance, security, scalability, accessibility, UX. |
-| **FR catalog completeness**               | **17 functional surfaces in code lack any FR mapping.** Multi-provider AI, background jobs, in-app notification inbox, several APIs. |
-| **Test types missing entirely**           | Performance regression, security regression (DAST/SAST in CI), visual diff per-PR, contract tests for external APIs (eBay, Stripe webhook events) |
+| Layer                           | Status                                                                                                                                            |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Unit tests (Jest)**           | 218 test files, 99%+ coverage on covered modules. **Strong.**                                                                                     |
+| **BDD acceptance (Cucumber)**   | 14 epic-level feature files exist. **150 of 174 requirement rows covered (86%).**                                                                 |
+| **E2E (Playwright)**            | 84 spec files. **Strong, but few `@smoke` tags for fast prod-monitoring runs.**                                                                   |
+| **NFR coverage in BDD**         | **Weak — 16 NFRs marked Pending.** Performance, security, scalability, accessibility, UX.                                                         |
+| **FR catalog completeness**     | **17 functional surfaces in code lack any FR mapping.** Multi-provider AI, background jobs, in-app notification inbox, several APIs.              |
+| **Test types missing entirely** | Performance regression, security regression (DAST/SAST in CI), visual diff per-PR, contract tests for external APIs (eBay, Stripe webhook events) |
 
 **Bottom line:** Code-level coverage is excellent. **Behavioral and operational coverage has documented holes** that are mostly in the requirements catalog itself, not the test suite. The fix is dual: close the FR gaps (make sure every functional surface has at least one FR), then close the BDD gaps (every FR/NFR has at least one Gherkin scenario).
 
@@ -58,6 +59,7 @@ These are surfaces present in the codebase that no current FR explicitly describ
 ### 2.1 Multi-provider AI architecture (entire `src/lib/ai/` tree)
 
 **Code surface:**
+
 - `src/lib/ai/index.ts` — `completeAI()` public API
 - `src/lib/ai/providers/` — Gemini, Groq, OpenAI, Anthropic adapters with auto-fallback
 - `src/lib/ai/prompts/` — 12 centralized prompt configs across flip-analysis, identification, listing, messaging, negotiation
@@ -66,6 +68,7 @@ These are surfaces present in the codebase that no current FR explicitly describ
 **FR coverage today:** Zero. FR-SCORE references "GPT-4o-mini" and "Claude Sonnet" by name but doesn't formalize the abstraction.
 
 **Why this matters:**
+
 - Provider routing logic, fallback order, rate-limit handling, and prompt registry are all production-critical.
 - No acceptance test today verifies "if provider A fails, fall back to B → C → D".
 - A regression here silently degrades the product (slower responses, higher cost, lower accuracy).
@@ -77,6 +80,7 @@ These are surfaces present in the codebase that no current FR explicitly describ
 ### 2.2 Background job scheduler / processors
 
 **Code surface:**
+
 - `app/api/posting-queue/process/route.ts` — drains the posting queue
 - `app/api/notifications/process/route.ts` — sends queued notifications
 - `app/api/monitoring/run/route.ts` — runs monitoring sweep
@@ -89,9 +93,10 @@ These are surfaces present in the codebase that no current FR explicitly describ
 - `src/lib/flip-notification-processor.ts`
 - `src/lib/smart-alert-notification-processor.ts`
 
-**FR coverage today:** Implicit. FR-NOTIFY-* describe what to notify *about*, but **no FR formalizes the scheduler itself** — invocation, idempotency, retry semantics, backpressure, observability.
+**FR coverage today:** Implicit. FR-NOTIFY-* describe what to notify *about\*, but **no FR formalizes the scheduler itself** — invocation, idempotency, retry semantics, backpressure, observability.
 
 **Why this matters:**
+
 - Background jobs are the most failure-prone class of code in any SaaS. Without explicit FRs, regressions are hard to spot.
 - Cron schedule + idempotency + dead-letter handling are unspecified. Today's code may silently double-send notifications if a job retries.
 
@@ -102,11 +107,12 @@ These are surfaces present in the codebase that no current FR explicitly describ
 ### 2.3 In-app notification feed / inbox
 
 **Code surface:**
+
 - `app/api/notifications/route.ts` — list notifications
 - `app/api/notifications/[id]/route.ts` — read/dismiss
 - `src/lib/notification-events.ts` — event taxonomy
 
-**FR coverage today:** FR-NOTIFY-01 through FR-NOTIFY-13 describe *triggering* notifications via push/email/SMS, but **none describes the in-app notification feed** that users see at e.g. `/notifications`.
+**FR coverage today:** FR-NOTIFY-01 through FR-NOTIFY-13 describe _triggering_ notifications via push/email/SMS, but **none describes the in-app notification feed** that users see at e.g. `/notifications`.
 
 **Recommendation:** Add **FR-NOTIFY-14, 15, 16** for the in-app feed, mark-read behavior, and pagination. See `PROPOSED_FR_ADDITIONS.md` §3.
 
@@ -115,6 +121,7 @@ These are surfaces present in the codebase that no current FR explicitly describ
 ### 2.4 Phone verification (SMS opt-in)
 
 **Code surface:**
+
 - `app/api/user/phone/send-code/route.ts`
 - `app/api/user/phone/verify/route.ts`
 
@@ -127,6 +134,7 @@ These are surfaces present in the codebase that no current FR explicitly describ
 ### 2.5 Push notification device registration
 
 **Code surface:**
+
 - `app/api/user/device-token/route.ts`
 - `src/lib/firebase/messaging.ts`
 - `src/lib/firebase/messaging-admin.ts`
@@ -141,10 +149,11 @@ These are surfaces present in the codebase that no current FR explicitly describ
 ### 2.6 Image proxy
 
 **Code surface:**
+
 - `app/api/images/proxy/route.ts`
 - `src/lib/image-helpers.ts`
 
-**FR coverage today:** None. FR-INFRA-13 covers Firebase Storage *as a backend*, but the **authenticated image-proxy** that resolves storage paths to user-scoped URLs is not in the FR catalog.
+**FR coverage today:** None. FR-INFRA-13 covers Firebase Storage _as a backend_, but the **authenticated image-proxy** that resolves storage paths to user-scoped URLs is not in the FR catalog.
 
 **Recommendation:** Add **FR-INFRA-15** for the image proxy. See `PROPOSED_FR_ADDITIONS.md` §4.
 
@@ -153,6 +162,7 @@ These are surfaces present in the codebase that no current FR explicitly describ
 ### 2.7 Diagnostics endpoint
 
 **Code surface:**
+
 - `app/api/diagnostics/route.ts`
 
 **FR coverage today:** None. Used heavily during the Feb 2026 LibSQL → PG migration; **production debugging utility** with no acceptance criteria today.
@@ -164,6 +174,7 @@ These are surfaces present in the codebase that no current FR explicitly describ
 ### 2.8 Test seed endpoint
 
 **Code surface:**
+
 - `app/api/test/seed-user/route.ts`
 
 **FR coverage today:** None. **Should not exist in production.** This is a test utility that, if reachable in prod, allows arbitrary user creation.
@@ -175,6 +186,7 @@ These are surfaces present in the codebase that no current FR explicitly describ
 ### 2.9 Counter-offer analysis
 
 **Code surface:**
+
 - `app/api/listings/[id]/counter-offer-analysis/route.ts`
 - `src/lib/negotiation-strategy.ts`
 
@@ -187,6 +199,7 @@ These are surfaces present in the codebase that no current FR explicitly describ
 ### 2.10 Cold/hot flip detection
 
 **Code surface:**
+
 - `src/lib/cold-hot-detector.ts`
 
 **FR coverage today:** FR-NOTIFY-09 (cold) and FR-NOTIFY-10 (hot) describe the **notification** but not the **detection logic** (thresholds, configurability, edge cases).
@@ -198,6 +211,7 @@ These are surfaces present in the codebase that no current FR explicitly describ
 ### 2.11 Listing expiry monitoring
 
 **Code surface:**
+
 - `src/lib/listing-expiry.ts`
 - `src/lib/listing-tracker.ts`
 
@@ -210,6 +224,7 @@ These are surfaces present in the codebase that no current FR explicitly describ
 ### 2.12 Holding cost calculation
 
 **Code surface:**
+
 - `src/lib/holding-cost.ts`
 
 **FR coverage today:** FR-DASH-09 mentions "estimated carrying cost" but doesn't specify **carrying-cost rate, currency, or formula**.
@@ -221,6 +236,7 @@ These are surfaces present in the codebase that no current FR explicitly describ
 ### 2.13 Cross-platform price intelligence
 
 **Code surface:**
+
 - `src/lib/cross-platform-price.ts`
 
 **FR coverage today:** Story 13.8 mentions cross-platform price intelligence but **no explicit FR**.
@@ -232,6 +248,7 @@ These are surfaces present in the codebase that no current FR explicitly describ
 ### 2.14 IQR outlier filtering for sold prices
 
 **Code surface:**
+
 - `src/lib/market-price.ts` (with IQR-related logic)
 - `src/__tests__/lib/iqr-backtest.test.ts`
 
@@ -244,6 +261,7 @@ These are surfaces present in the codebase that no current FR explicitly describ
 ### 2.15 Demand velocity tier integration
 
 **Code surface:**
+
 - `src/lib/demand-analyzer.ts`
 
 **FR coverage today:** FR-SCORE-18 mentions "demand trend" abstractly. Story 13.6 introduced **velocity tiers** (HOT, WARM, COLD, DEAD) but no formal FR.
@@ -255,6 +273,7 @@ These are surfaces present in the codebase that no current FR explicitly describ
 ### 2.16 Conversation status auto-transitions
 
 **Code surface:**
+
 - `src/lib/conversation-status.ts`
 - `app/api/listings/[id]/conversation-status/route.ts`
 
@@ -267,6 +286,7 @@ These are surfaces present in the codebase that no current FR explicitly describ
 ### 2.17 Distance / ETA calculation for meetings
 
 **Code surface:**
+
 - `src/lib/distance-calculator.ts`
 - `src/lib/maps-service.ts`
 - `app/api/opportunities/[id]/maps-route/route.ts`
@@ -281,25 +301,25 @@ These are surfaces present in the codebase that no current FR explicitly describ
 
 These FRs exist in the catalog but the traceability matrix marks them **Pending** — i.e., no Gherkin scenario references them.
 
-| FR / NFR              | Description                                       | Why this is dangerous                                                              |
-| --------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| **FR-SCAN-06**        | Configurable search filters                       | Users can submit invalid filter combos that crash the scanner                      |
-| **FR-SCAN-07**        | Saved search configurations                       | Saved-search persistence + retrieval is core to repeat usage; untested             |
-| **FR-DASH-13**        | Landing page                                      | Implementation exists but conversion-critical UI has no acceptance test            |
-| **NFR-PERF-01..04**   | Page load <2s, scraper <60s, AI <10s, SSE <1s     | These are SLA promises with no automated verification; they will silently regress  |
-| **NFR-SEC-01**        | All traffic over HTTPS                            | Easy to verify via header check; absence is a P1 ops gap                           |
-| **NFR-SEC-07**        | Security headers (CSP, HSTS, X-Frame-Options)     | Trivially testable; no test today                                                  |
-| **NFR-SEC-10**        | No critical/high vulns in deps                    | Should be a CI gate (`npm audit --production --audit-level=high`)                  |
-| **NFR-SCALE-01**      | Cloud Run auto-scaling 0-N                        | Hard to acceptance-test; needs synthetic load test                                 |
-| **NFR-SCALE-03**      | AI analysis caching 24h TTL                       | Cache hit/miss behavior unverified                                                 |
-| **NFR-RELY-01**       | Graceful degradation when AI APIs unavailable     | Fallback path is critical — no test ensures it works                              |
-| **NFR-RELY-02**       | Scraper retry + exponential backoff               | Retry math is unverified; could be too aggressive (infinite loop) or too timid    |
-| **NFR-TEST-01..04**   | Coverage thresholds and traceability discipline   | Self-referential; should be CI gates                                              |
-| **NFR-UX-01**         | Mobile-responsive (mobile-first)                  | Visual regression tests don't currently fail on viewport-specific bugs            |
-| **NFR-UX-02**         | WCAG AA accessibility                             | Axe runs in some specs but no global WCAG-AA gate                                  |
-| **NFR-UX-03**         | Consistent design system (Tailwind 4)             | Subjective, but Story 14.1's design tokens make automated checking possible       |
-| **NFR-UX-04**         | Toast notification system                         | Toast helpers are tested; the *user-visible* behavior is not                       |
-| **NFR-UX-05**         | Global error boundary + retry                     | Error boundaries fire silently — easy to break without anyone noticing             |
+| FR / NFR            | Description                                     | Why this is dangerous                                                             |
+| ------------------- | ----------------------------------------------- | --------------------------------------------------------------------------------- |
+| **FR-SCAN-06**      | Configurable search filters                     | Users can submit invalid filter combos that crash the scanner                     |
+| **FR-SCAN-07**      | Saved search configurations                     | Saved-search persistence + retrieval is core to repeat usage; untested            |
+| **FR-DASH-13**      | Landing page                                    | Implementation exists but conversion-critical UI has no acceptance test           |
+| **NFR-PERF-01..04** | Page load <2s, scraper <60s, AI <10s, SSE <1s   | These are SLA promises with no automated verification; they will silently regress |
+| **NFR-SEC-01**      | All traffic over HTTPS                          | Easy to verify via header check; absence is a P1 ops gap                          |
+| **NFR-SEC-07**      | Security headers (CSP, HSTS, X-Frame-Options)   | Trivially testable; no test today                                                 |
+| **NFR-SEC-10**      | No critical/high vulns in deps                  | Should be a CI gate (`npm audit --production --audit-level=high`)                 |
+| **NFR-SCALE-01**    | Cloud Run auto-scaling 0-N                      | Hard to acceptance-test; needs synthetic load test                                |
+| **NFR-SCALE-03**    | AI analysis caching 24h TTL                     | Cache hit/miss behavior unverified                                                |
+| **NFR-RELY-01**     | Graceful degradation when AI APIs unavailable   | Fallback path is critical — no test ensures it works                              |
+| **NFR-RELY-02**     | Scraper retry + exponential backoff             | Retry math is unverified; could be too aggressive (infinite loop) or too timid    |
+| **NFR-TEST-01..04** | Coverage thresholds and traceability discipline | Self-referential; should be CI gates                                              |
+| **NFR-UX-01**       | Mobile-responsive (mobile-first)                | Visual regression tests don't currently fail on viewport-specific bugs            |
+| **NFR-UX-02**       | WCAG AA accessibility                           | Axe runs in some specs but no global WCAG-AA gate                                 |
+| **NFR-UX-03**       | Consistent design system (Tailwind 4)           | Subjective, but Story 14.1's design tokens make automated checking possible       |
+| **NFR-UX-04**       | Toast notification system                       | Toast helpers are tested; the _user-visible_ behavior is not                      |
+| **NFR-UX-05**       | Global error boundary + retry                   | Error boundaries fire silently — easy to break without anyone noticing            |
 
 **Verdict:** All NFRs marked Pending need at least one verifying scenario each. Concrete BDD stubs for every Pending NFR are in `PROPOSED_BDD_SCENARIOS.md` §3.
 
@@ -309,32 +329,32 @@ These FRs exist in the catalog but the traceability matrix marks them **Pending*
 
 Cross-referenced every `.ts` file in `src/lib/` and `src/scrapers/` against `src/__tests__/`. Modules that **don't have a corresponding `*.test.ts`**:
 
-| Module                                     | Status                                                                     | Action                                                                  |
-| ------------------------------------------ | -------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| `src/lib/ai/index.ts` (`completeAI()`)     | **No direct test for completeAI**; provider tests exist                    | Add `src/__tests__/lib/ai/index.test.ts` for fallback chain logic        |
-| `src/lib/ai/prompts/index.ts`              | No test for `getPrompt()` registry                                         | Add `src/__tests__/lib/ai/prompts.test.ts`                                |
-| `src/lib/billing-events.ts`                | No test                                                                    | Add — billing event taxonomy needs validation                             |
-| `src/lib/cache.ts`                         | No test                                                                    | Add — cache behavior is critical for AI cost                              |
-| `src/lib/cold-hot-detector.ts`             | No test                                                                    | Add                                                                       |
-| `src/lib/communication-email-templates.ts` | No test                                                                    | Add                                                                       |
-| `src/lib/communication-notification.ts`    | No test                                                                    | Add                                                                       |
-| `src/lib/comp-matcher.ts`                  | No direct test (covered indirectly via market-price)                       | Add — comp-matching is FR-SCORE-17 logic                                  |
-| `src/lib/conversation-status.ts`           | No test                                                                    | Add                                                                       |
-| `src/lib/cross-platform-price.ts`          | No test                                                                    | Add — Epic 13.8                                                           |
-| `src/lib/demand-analyzer.ts`               | No test                                                                    | Add — Epic 13.6                                                           |
-| `src/lib/distance-calculator.ts`           | No test                                                                    | Add                                                                       |
-| `src/lib/firebase/admin.ts`                | No test                                                                    | Add — server-side Firebase admin init is brittle                         |
-| `src/lib/firebase/auth-middleware.ts`      | Indirect via auth-middleware                                               | Add explicit                                                              |
-| `src/lib/firebase/auth.ts`                 | Indirect                                                                   | Add explicit                                                              |
-| `src/lib/firebase/config.ts`               | Trivial; OK to skip                                                        | Skip                                                                      |
-| `src/lib/firebase/ensure-user.ts`          | No test                                                                    | Add — user-creation idempotency is critical                              |
-| `src/lib/firebase/session.ts`              | No test                                                                    | Add                                                                       |
-| `src/lib/maps-service.ts`                  | No test                                                                    | Add                                                                       |
-| `src/lib/meeting-reminder-scheduler.ts`    | No test                                                                    | Add                                                                       |
-| `src/lib/message-generator.ts`             | One test exists at `src/__tests__/message-generator.test.ts`                | Verify it covers all message types; FR-COMM-02                            |
-| `src/lib/seller-reputation-analyzer.ts`    | Test exists but limited                                                    | Expand                                                                    |
-| `src/lib/sms-service.ts`                   | Test exists                                                                | Verify error path coverage                                               |
-| `src/lib/usage-tracker.ts`                 | Test exists                                                                | Verify month-rollover and tier-change coverage                            |
+| Module                                     | Status                                                       | Action                                                            |
+| ------------------------------------------ | ------------------------------------------------------------ | ----------------------------------------------------------------- |
+| `src/lib/ai/index.ts` (`completeAI()`)     | **No direct test for completeAI**; provider tests exist      | Add `src/__tests__/lib/ai/index.test.ts` for fallback chain logic |
+| `src/lib/ai/prompts/index.ts`              | No test for `getPrompt()` registry                           | Add `src/__tests__/lib/ai/prompts.test.ts`                        |
+| `src/lib/billing-events.ts`                | No test                                                      | Add — billing event taxonomy needs validation                     |
+| `src/lib/cache.ts`                         | No test                                                      | Add — cache behavior is critical for AI cost                      |
+| `src/lib/cold-hot-detector.ts`             | No test                                                      | Add                                                               |
+| `src/lib/communication-email-templates.ts` | No test                                                      | Add                                                               |
+| `src/lib/communication-notification.ts`    | No test                                                      | Add                                                               |
+| `src/lib/comp-matcher.ts`                  | No direct test (covered indirectly via market-price)         | Add — comp-matching is FR-SCORE-17 logic                          |
+| `src/lib/conversation-status.ts`           | No test                                                      | Add                                                               |
+| `src/lib/cross-platform-price.ts`          | No test                                                      | Add — Epic 13.8                                                   |
+| `src/lib/demand-analyzer.ts`               | No test                                                      | Add — Epic 13.6                                                   |
+| `src/lib/distance-calculator.ts`           | No test                                                      | Add                                                               |
+| `src/lib/firebase/admin.ts`                | No test                                                      | Add — server-side Firebase admin init is brittle                  |
+| `src/lib/firebase/auth-middleware.ts`      | Indirect via auth-middleware                                 | Add explicit                                                      |
+| `src/lib/firebase/auth.ts`                 | Indirect                                                     | Add explicit                                                      |
+| `src/lib/firebase/config.ts`               | Trivial; OK to skip                                          | Skip                                                              |
+| `src/lib/firebase/ensure-user.ts`          | No test                                                      | Add — user-creation idempotency is critical                       |
+| `src/lib/firebase/session.ts`              | No test                                                      | Add                                                               |
+| `src/lib/maps-service.ts`                  | No test                                                      | Add                                                               |
+| `src/lib/meeting-reminder-scheduler.ts`    | No test                                                      | Add                                                               |
+| `src/lib/message-generator.ts`             | One test exists at `src/__tests__/message-generator.test.ts` | Verify it covers all message types; FR-COMM-02                    |
+| `src/lib/seller-reputation-analyzer.ts`    | Test exists but limited                                      | Expand                                                            |
+| `src/lib/sms-service.ts`                   | Test exists                                                  | Verify error path coverage                                        |
+| `src/lib/usage-tracker.ts`                 | Test exists                                                  | Verify month-rollover and tier-change coverage                    |
 
 **Recommendation:** Add ~18 new unit test files. Each is small (~100-200 LOC). Estimated total effort: 2-3 working days.
 
@@ -348,7 +368,7 @@ These categories of tests aren't represented in the codebase at all:
 
 **What's missing:** Automated assertions that pages load <2s, scrapers complete <60s, AI analyses <10s, SSE delivers <1s (NFR-PERF-01..04).
 
-**What exists:** `test/e2e/performance-vitals.spec.ts` measures Web Vitals but doesn't *fail* on regression.
+**What exists:** `test/e2e/performance-vitals.spec.ts` measures Web Vitals but doesn't _fail_ on regression.
 
 **Recommendation:** Add `@perf` Playwright tests with explicit thresholds. See `PROPOSED_BDD_SCENARIOS.md` §3.1.
 
@@ -357,15 +377,17 @@ These categories of tests aren't represented in the codebase at all:
 ### 5.2 Security regression tests in CI
 
 **What's missing:**
+
 - DAST scan (e.g., OWASP ZAP) against production-like build
 - SAST scan (e.g., Semgrep, GitGuardian) for newly introduced patterns
-- Dependency vulnerability check as a CI *gate*, not just a notification (NFR-SEC-10)
+- Dependency vulnerability check as a CI _gate_, not just a notification (NFR-SEC-10)
 - Header-presence assertions (NFR-SEC-07)
 - HTTPS-only enforcement assertions (NFR-SEC-01)
 
 **What exists:** `src/__tests__/security/` has ~3 unit tests for hCaptcha and auth security, plus `docs/security/SECURITY_AUDIT.md` (manual).
 
 **Recommendation:**
+
 1. Add `pnpm audit --audit-level=high` as a CI gate
 2. Add Semgrep workflow with the OWASP ruleset
 3. Add a single Playwright spec that asserts every required security header is present on `/`, `/dashboard`, `/api/health`
@@ -374,7 +396,7 @@ These categories of tests aren't represented in the codebase at all:
 
 ### 5.3 Visual regression per-PR
 
-**What's missing:** Most Playwright specs take screenshots but the CI doesn't *fail* on pixel diff against a baseline.
+**What's missing:** Most Playwright specs take screenshots but the CI doesn't _fail_ on pixel diff against a baseline.
 
 **What exists:** `test/e2e/visual-regression.spec.ts` exists but historically has been allowed to fail soft.
 
@@ -385,6 +407,7 @@ These categories of tests aren't represented in the codebase at all:
 ### 5.4 Contract tests for external APIs
 
 **What's missing:** Tests that detect **breaking changes in external APIs we depend on**:
+
 - eBay Browse API response shape changes
 - Stripe webhook event payload changes
 - Firebase Auth response format changes
@@ -417,7 +440,7 @@ These categories of tests aren't represented in the codebase at all:
 
 ## §6 — BDD Step Definitions: Missing
 
-The `test/acceptance/step_definitions/` directory has files for Epics 1, 2, 3, but **gaps for Epics 4-14**. The feature files exist but lack step definitions in many places — meaning the scenarios are essentially stubbed but don't *run*.
+The `test/acceptance/step_definitions/` directory has files for Epics 1, 2, 3, but **gaps for Epics 4-14**. The feature files exist but lack step definitions in many places — meaning the scenarios are essentially stubbed but don't _run_.
 
 Quick check: features that exist but step-defs may be incomplete:
 
@@ -490,11 +513,11 @@ This sequence keeps the test pyramid healthy: unit foundation → acceptance beh
 
 This audit produces three companion documents. They live in `docs/testing/` and should be merged into `_bmad-output/test-artifacts/` as the source of truth once you've reviewed.
 
-| File                                                  | Purpose                                                                |
-| ----------------------------------------------------- | ---------------------------------------------------------------------- |
-| `docs/testing/COVERAGE_GAP_ANALYSIS.md` (this file)   | The audit itself                                                       |
-| `docs/testing/PROPOSED_FR_ADDITIONS.md`               | New FRs to fill the gaps (ready to merge into `epics.md`)              |
-| `docs/testing/PROPOSED_BDD_SCENARIOS.md`              | Gherkin scenario stubs for new FRs and Pending NFRs                     |
+| File                                                | Purpose                                                   |
+| --------------------------------------------------- | --------------------------------------------------------- |
+| `docs/testing/COVERAGE_GAP_ANALYSIS.md` (this file) | The audit itself                                          |
+| `docs/testing/PROPOSED_FR_ADDITIONS.md`             | New FRs to fill the gaps (ready to merge into `epics.md`) |
+| `docs/testing/PROPOSED_BDD_SCENARIOS.md`            | Gherkin scenario stubs for new FRs and Pending NFRs       |
 
 After review, the FR additions get merged into `_bmad-output/planning-artifacts/epics.md`, the scenarios into the appropriate `test/acceptance/features/E-NNN-*.feature` files, and the traceability matrix gets updated.
 
@@ -502,20 +525,20 @@ After review, the FR additions get merged into `_bmad-output/planning-artifacts/
 
 ## §11 — One-page summary
 
-| Surface                                                       | Coverage status                                          |
-| ------------------------------------------------------------- | -------------------------------------------------------- |
-| **Unit tests**                                                | 99%+ on covered modules; 18 modules need new test files  |
-| **Functional behavior (FR catalog)**                          | 119 FRs; 17 functional surfaces in code lack any FR      |
-| **BDD acceptance**                                            | 86% of requirement rows covered; 25 Pending             |
-| **Non-functional (NFR catalog)**                              | 30 NFRs; 16 marked Pending                               |
-| **Security testing**                                          | Audit doc exists; no automated security regression in CI |
-| **Performance testing**                                       | Web Vitals measured but not gated                        |
-| **Visual regression**                                         | Specs exist; CI doesn't fail on pixel diff                |
-| **Contract tests for external APIs**                          | None                                                     |
-| **Smoke-tag suite for prod monitoring**                       | Not implemented                                          |
-| **Production deploy verification**                            | `scripts/deploy/verify-deployment.sh` exists, manual      |
-| **Mutation testing**                                          | Not implemented                                          |
-| **Property-based tests**                                      | Not implemented                                          |
-| **Load / soak tests**                                         | Single script; not scheduled                              |
+| Surface                                 | Coverage status                                          |
+| --------------------------------------- | -------------------------------------------------------- |
+| **Unit tests**                          | 99%+ on covered modules; 18 modules need new test files  |
+| **Functional behavior (FR catalog)**    | 119 FRs; 17 functional surfaces in code lack any FR      |
+| **BDD acceptance**                      | 86% of requirement rows covered; 25 Pending              |
+| **Non-functional (NFR catalog)**        | 30 NFRs; 16 marked Pending                               |
+| **Security testing**                    | Audit doc exists; no automated security regression in CI |
+| **Performance testing**                 | Web Vitals measured but not gated                        |
+| **Visual regression**                   | Specs exist; CI doesn't fail on pixel diff               |
+| **Contract tests for external APIs**    | None                                                     |
+| **Smoke-tag suite for prod monitoring** | Not implemented                                          |
+| **Production deploy verification**      | `scripts/deploy/verify-deployment.sh` exists, manual     |
+| **Mutation testing**                    | Not implemented                                          |
+| **Property-based tests**                | Not implemented                                          |
+| **Load / soak tests**                   | Single script; not scheduled                             |
 
 **Net assessment:** **Code-level coverage is excellent. Behavioral and operational coverage has gaps that map cleanly to a 4-week tightening plan.** Nothing here blocks launch — but every gap left open is a future regression you'll have to debug under pressure.

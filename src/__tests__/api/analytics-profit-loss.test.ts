@@ -52,7 +52,12 @@ describe('GET /api/analytics/profit-loss', () => {
     expect(body.totalInvested).toBe(500);
     expect(body.totalNetProfit).toBe(230);
     expect(body.overallROI).toBe(46);
-    expect(getProfitLossAnalytics).toHaveBeenCalledWith('test-user-123', 'monthly', undefined, undefined);
+    expect(getProfitLossAnalytics).toHaveBeenCalledWith(
+      'test-user-123',
+      'monthly',
+      undefined,
+      undefined
+    );
   });
 
   it('accepts weekly granularity', async () => {
@@ -60,31 +65,58 @@ describe('GET /api/analytics/profit-loss', () => {
     const res = await GET(req);
 
     expect(res.status).toBe(200);
-    expect(getProfitLossAnalytics).toHaveBeenCalledWith('test-user-123', 'weekly', undefined, undefined);
+    expect(getProfitLossAnalytics).toHaveBeenCalledWith(
+      'test-user-123',
+      'weekly',
+      undefined,
+      undefined
+    );
   });
 
   it('forwards dateFrom param to service', async () => {
     const req = new NextRequest('http://localhost/api/analytics/profit-loss?dateFrom=2026-01-01');
     await GET(req);
-    expect(getProfitLossAnalytics).toHaveBeenCalledWith('test-user-123', 'monthly', '2026-01-01', undefined);
+    expect(getProfitLossAnalytics).toHaveBeenCalledWith(
+      'test-user-123',
+      'monthly',
+      '2026-01-01',
+      undefined
+    );
   });
 
   it('forwards dateTo param to service', async () => {
     const req = new NextRequest('http://localhost/api/analytics/profit-loss?dateTo=2026-01-31');
     await GET(req);
-    expect(getProfitLossAnalytics).toHaveBeenCalledWith('test-user-123', 'monthly', undefined, '2026-01-31');
+    expect(getProfitLossAnalytics).toHaveBeenCalledWith(
+      'test-user-123',
+      'monthly',
+      undefined,
+      '2026-01-31'
+    );
   });
 
   it('forwards both dateFrom and dateTo to service', async () => {
-    const req = new NextRequest('http://localhost/api/analytics/profit-loss?dateFrom=2026-01-01&dateTo=2026-01-31');
+    const req = new NextRequest(
+      'http://localhost/api/analytics/profit-loss?dateFrom=2026-01-01&dateTo=2026-01-31'
+    );
     await GET(req);
-    expect(getProfitLossAnalytics).toHaveBeenCalledWith('test-user-123', 'monthly', '2026-01-01', '2026-01-31');
+    expect(getProfitLossAnalytics).toHaveBeenCalledWith(
+      'test-user-123',
+      'monthly',
+      '2026-01-01',
+      '2026-01-31'
+    );
   });
 
   it('defaults to monthly for invalid granularity values', async () => {
     const req = new NextRequest('http://localhost/api/analytics/profit-loss?granularity=quarterly');
     await GET(req);
-    expect(getProfitLossAnalytics).toHaveBeenCalledWith('test-user-123', 'monthly', undefined, undefined);
+    expect(getProfitLossAnalytics).toHaveBeenCalledWith(
+      'test-user-123',
+      'monthly',
+      undefined,
+      undefined
+    );
   });
 
   it('returns 500 on error', async () => {

@@ -33,7 +33,13 @@ import * as path from 'path';
 interface State {
   sourceText: string;
   listingId: string;
-  messages: Array<{ direction: string; readAt: Date | null; body: string; sellerName: string | null; createdAt: Date }>;
+  messages: Array<{
+    direction: string;
+    readAt: Date | null;
+    body: string;
+    sellerName: string | null;
+    createdAt: Date;
+  }>;
   coldFlipResult: Array<{ listingId: string; coldReason: string; hoursSinceLastResponse: number }>;
   hotFlipResult: Array<{ listingId: string; consecutiveInboundCount: number }>;
   threshold: number;
@@ -130,21 +136,27 @@ Then('the source contains the handler for {string}', function (eventType: string
   );
 });
 
-Then('the source validates direction as {string} or {string}', function (dir1: string, dir2: string) {
-  assert.ok(
-    state.sourceText.includes(dir1) && state.sourceText.includes(dir2),
-    `Expected source to validate direction as "${dir1}" or "${dir2}"`
-  );
-});
+Then(
+  'the source validates direction as {string} or {string}',
+  function (dir1: string, dir2: string) {
+    assert.ok(
+      state.sourceText.includes(dir1) && state.sourceText.includes(dir2),
+      `Expected source to validate direction as "${dir1}" or "${dir2}"`
+    );
+  }
+);
 
-Then('the schema includes field {string} with default {string}', function (fieldName: string, defaultValue: string) {
-  // Schema lines look like: fieldName Boolean @default(true) or Int @default(24)
-  const pattern = new RegExp(`${fieldName}\\s+\\w+\\s+@default\\(${defaultValue}\\)`);
-  assert.ok(
-    pattern.test(state.sourceText),
-    `Expected Prisma schema to include field "${fieldName}" with @default(${defaultValue})`
-  );
-});
+Then(
+  'the schema includes field {string} with default {string}',
+  function (fieldName: string, defaultValue: string) {
+    // Schema lines look like: fieldName Boolean @default(true) or Int @default(24)
+    const pattern = new RegExp(`${fieldName}\\s+\\w+\\s+@default\\(${defaultValue}\\)`);
+    assert.ok(
+      pattern.test(state.sourceText),
+      `Expected Prisma schema to include field "${fieldName}" with @default(${defaultValue})`
+    );
+  }
+);
 
 Then('the source contains deduplication window constant {string}', function (constName: string) {
   assert.ok(
@@ -158,7 +170,9 @@ Then('the deduplication window equals {int} ms', function (ms: number) {
   const as4h = '4 * 3600 * 1000';
   const as4hCompact = '4*3600*1000';
   assert.ok(
-    state.sourceText.includes(asLiteral) || state.sourceText.includes(as4h) || state.sourceText.includes(as4hCompact),
+    state.sourceText.includes(asLiteral) ||
+      state.sourceText.includes(as4h) ||
+      state.sourceText.includes(as4hCompact),
     `Expected deduplication window to equal ${ms} ms`
   );
 });
@@ -170,16 +184,19 @@ Then('the source catches P2002 errors to skip duplicate events', function () {
   );
 });
 
-Then('the source contains the constant {string} with value {int}', function (constName: string, value: number) {
-  assert.ok(
-    state.sourceText.includes(constName),
-    `Expected source to define constant "${constName}"`
-  );
-  assert.ok(
-    state.sourceText.includes(String(value)),
-    `Expected constant "${constName}" to have value ${value}`
-  );
-});
+Then(
+  'the source contains the constant {string} with value {int}',
+  function (constName: string, value: number) {
+    assert.ok(
+      state.sourceText.includes(constName),
+      `Expected source to define constant "${constName}"`
+    );
+    assert.ok(
+      state.sourceText.includes(String(value)),
+      `Expected constant "${constName}" to have value ${value}`
+    );
+  }
+);
 
 Then('the source sorts hot flips before cold flips using a numeric priority field', function () {
   // The processor assigns priority 0 to hot flips and 1 to cold flips, then sorts ascending
@@ -200,7 +217,13 @@ const fakePrismaState = {
   listings: [] as Array<{
     id: string;
     title: string;
-    messages: Array<{ direction: string; readAt: Date | null; body: string; sellerName: string | null; createdAt: Date }>;
+    messages: Array<{
+      direction: string;
+      readAt: Date | null;
+      body: string;
+      sellerName: string | null;
+      createdAt: Date;
+    }>;
   }>,
 };
 
@@ -232,7 +255,8 @@ function ensureDbInjected() {
 
   // Also set default export
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (require.cache[dbModulePath]!.exports as any).default = require.cache[dbModulePath]!.exports.prisma;
+  (require.cache[dbModulePath]!.exports as any).default =
+    require.cache[dbModulePath]!.exports.prisma;
 
   // Evict cold-hot-detector so it re-binds to our fake db
   coldHotDetectorPath = require.resolve(path.resolve(process.cwd(), 'src/lib/cold-hot-detector'));
@@ -263,41 +287,47 @@ Given('the cold-hot detector is loaded with a mocked db', function () {
   fakePrismaState.listings = [];
 });
 
-Given('a listing {string} has an INBOUND message from {int} hours ago', function (listingId: string, hours: number) {
-  state.listingId = listingId;
-  fakePrismaState.listings = [
-    {
-      id: listingId,
-      title: `Listing ${listingId}`,
-      messages: [
-        {
+Given(
+  'a listing {string} has an INBOUND message from {int} hours ago',
+  function (listingId: string, hours: number) {
+    state.listingId = listingId;
+    fakePrismaState.listings = [
+      {
+        id: listingId,
+        title: `Listing ${listingId}`,
+        messages: [
+          {
+            direction: 'INBOUND',
+            readAt: null,
+            body: 'Is this available?',
+            sellerName: 'Alice',
+            createdAt: hoursAgo(hours),
+          },
+        ],
+      },
+    ];
+  }
+);
+
+Given(
+  'a listing {string} has {int} consecutive unread INBOUND messages',
+  function (listingId: string, count: number) {
+    state.listingId = listingId;
+    fakePrismaState.listings = [
+      {
+        id: listingId,
+        title: `Listing ${listingId}`,
+        messages: Array.from({ length: count }, (_, i) => ({
           direction: 'INBOUND',
           readAt: null,
-          body: 'Is this available?',
-          sellerName: 'Alice',
-          createdAt: hoursAgo(hours),
-        },
-      ],
-    },
-  ];
-});
-
-Given('a listing {string} has {int} consecutive unread INBOUND messages', function (listingId: string, count: number) {
-  state.listingId = listingId;
-  fakePrismaState.listings = [
-    {
-      id: listingId,
-      title: `Listing ${listingId}`,
-      messages: Array.from({ length: count }, (_, i) => ({
-        direction: 'INBOUND',
-        readAt: null,
-        body: `Message ${i + 1}`,
-        sellerName: null,
-        createdAt: hoursAgo(i * 0.1), // slightly different times, most recent first
-      })),
-    },
-  ];
-});
+          body: `Message ${i + 1}`,
+          sellerName: null,
+          createdAt: hoursAgo(i * 0.1), // slightly different times, most recent first
+        })),
+      },
+    ];
+  }
+);
 
 When('detectColdFlips is called with threshold {int}', async function (threshold: number) {
   state.threshold = threshold;
@@ -321,7 +351,10 @@ When('detectHotFlips is called with threshold {int}', async function (threshold:
 Then('the result contains a cold flip with reason {string}', function (reason: string) {
   assert.ok(state.coldFlipResult.length > 0, 'Expected at least one cold flip result');
   const match = state.coldFlipResult.find((r) => r.coldReason === reason);
-  assert.ok(match, `Expected a cold flip with coldReason "${reason}" but got: ${JSON.stringify(state.coldFlipResult)}`);
+  assert.ok(
+    match,
+    `Expected a cold flip with coldReason "${reason}" but got: ${JSON.stringify(state.coldFlipResult)}`
+  );
 });
 
 Then('the result listing id is {string}', function (listingId: string) {
@@ -334,7 +367,10 @@ Then('the result listing id is {string}', function (listingId: string) {
 Then('the result contains a hot flip for listing {string}', function (listingId: string) {
   assert.ok(state.hotFlipResult.length > 0, 'Expected at least one hot flip result');
   const match = state.hotFlipResult.find((r) => r.listingId === listingId);
-  assert.ok(match, `Expected a hot flip for listing "${listingId}" but got: ${JSON.stringify(state.hotFlipResult)}`);
+  assert.ok(
+    match,
+    `Expected a hot flip for listing "${listingId}" but got: ${JSON.stringify(state.hotFlipResult)}`
+  );
 });
 
 Then('the hot flip consecutiveInboundCount is {int}', function (count: number) {

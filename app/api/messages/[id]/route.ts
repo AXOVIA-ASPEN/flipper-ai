@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, ConflictError } from '@/lib/errors';
+import {
+  handleError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  ConflictError,
+} from '@/lib/errors';
 import { checkFeatureAccess } from '@/lib/tier-enforcement';
 import { dispatchMessage } from '@/lib/message-dispatcher';
 import { communicationNotificationService } from '@/lib/communication-notification';
@@ -77,7 +84,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     // User + tier lookup for feature gating
-    const user = await prisma.user.findUnique({ where: { id: userId }, select: { subscriptionTier: true } });
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { subscriptionTier: true },
+    });
     const userTier = user?.subscriptionTier;
 
     let updateData: Record<string, unknown> = {};
@@ -87,8 +97,12 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       case 'approve': {
         if (existing.status !== 'DRAFT') throw new ConflictError('Can only approve DRAFT messages');
         const tierCheck = checkFeatureAccess(userTier, 'messaging');
-        if (!tierCheck.allowed) throw new ForbiddenError(tierCheck.reason || 'Messaging requires Flipper plan');
-        const settings = await prisma.userSettings.findUnique({ where: { userId }, select: { messageApprovalRequired: true } });
+        if (!tierCheck.allowed)
+          throw new ForbiddenError(tierCheck.reason || 'Messaging requires Flipper plan');
+        const settings = await prisma.userSettings.findUnique({
+          where: { userId },
+          select: { messageApprovalRequired: true },
+        });
         // null settings = new user = no approval gate
         if (settings?.messageApprovalRequired) {
           updateData = { status: 'PENDING_APPROVAL' };
@@ -98,19 +112,26 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         break;
       }
       case 'confirm': {
-        if (existing.status !== 'PENDING_APPROVAL') throw new ConflictError('Only PENDING_APPROVAL messages can be confirmed');
+        if (existing.status !== 'PENDING_APPROVAL')
+          throw new ConflictError('Only PENDING_APPROVAL messages can be confirmed');
         const tierCheck = checkFeatureAccess(userTier, 'messaging');
-        if (!tierCheck.allowed) throw new ForbiddenError(tierCheck.reason || 'Messaging requires Flipper plan');
+        if (!tierCheck.allowed)
+          throw new ForbiddenError(tierCheck.reason || 'Messaging requires Flipper plan');
         updateData = { status: 'SENT', sentAt: new Date() };
         break;
       }
       case 'edit': {
         if (existing.status !== 'DRAFT') throw new ConflictError('Can only edit DRAFT messages');
-        if (newBody === undefined && newSubject === undefined) throw new ValidationError('Edit requires body or subject');
-        if (newBody !== undefined && newBody.trim() === '') throw new ValidationError('Message body cannot be empty');
+        if (newBody === undefined && newSubject === undefined)
+          throw new ValidationError('Edit requires body or subject');
+        if (newBody !== undefined && newBody.trim() === '')
+          throw new ValidationError('Message body cannot be empty');
         const sanitizedBody = newBody ? newBody.replace(/<[^>]*>/g, '').slice(0, 2000) : undefined;
-        if (sanitizedBody !== undefined && sanitizedBody.trim() === '') throw new ValidationError('Message body cannot be empty after removing HTML');
-        const sanitizedSubject = newSubject ? newSubject.replace(/<[^>]*>/g, '').slice(0, 200) : undefined;
+        if (sanitizedBody !== undefined && sanitizedBody.trim() === '')
+          throw new ValidationError('Message body cannot be empty after removing HTML');
+        const sanitizedSubject = newSubject
+          ? newSubject.replace(/<[^>]*>/g, '').slice(0, 200)
+          : undefined;
         updateData = {
           ...(sanitizedBody !== undefined ? { body: sanitizedBody } : {}),
           ...(sanitizedSubject !== undefined ? { subject: sanitizedSubject } : {}),
@@ -131,28 +152,38 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     // Atomic update — updateMany supports non-PK in where; update() does NOT
-    const result = await prisma.message.updateMany({ where: { id, userId, status: expectedStatus }, data: updateData });
-    if (result.count === 0) throw new ConflictError('Message status changed. Refresh and try again.');
+    const result = await prisma.message.updateMany({
+      where: { id, userId, status: expectedStatus },
+      data: updateData,
+    });
+    if (result.count === 0)
+      throw new ConflictError('Message status changed. Refresh and try again.');
 
     // Fetch updated record for response
     const updated = await prisma.message.findUnique({
       where: { id },
-      include: { listing: { select: { id: true, title: true, platform: true, askingPrice: true, updatedAt: true } } },
+      include: {
+        listing: {
+          select: { id: true, title: true, platform: true, askingPrice: true, updatedAt: true },
+        },
+      },
     });
 
     // Fire-and-forget dispatch
     if (updated?.status === 'SENT') {
       /* istanbul ignore next -- dispatch error handler; tested via integration */
-      dispatchMessage(id).catch(err => console.error('[dispatch]', err));
+      dispatchMessage(id).catch((err) => console.error('[dispatch]', err));
       // Communication notification: message sent (Story 10.4, AC3)
       /* istanbul ignore next -- fire-and-forget; rejection is intentionally swallowed */
-      void communicationNotificationService.notifyMessageSent({
-        userId,
-        listingId: updated.listingId,
-        listingTitle: updated.listing?.title ?? null,
-        messagePreview: updated.body,
-        deliveryStatus: 'Delivered',
-      }).catch(() => {});
+      void communicationNotificationService
+        .notifyMessageSent({
+          userId,
+          listingId: updated.listingId,
+          listingTitle: updated.listing?.title ?? null,
+          messagePreview: updated.body,
+          deliveryStatus: 'Delivered',
+        })
+        .catch(() => {});
     }
 
     return NextResponse.json({

@@ -34,17 +34,17 @@ Firebase + Cloud SQL). What remains before a public launch is **operational**, n
 feature work: reconcile the branch mess, run a real production deploy, verify Stripe
 live mode, buy a domain, and smoke-test the live site.
 
-| Dimension | Status (as of 2026-06-09) |
-| --- | --- |
-| **Version** | v1.0.1 |
-| **Active trunk** | `django-main` (⚠️ **not** a Django port — Next.js; the branch name is misleading) |
+| Dimension                   | Status (as of 2026-06-09)                                                                                                                                                                                                                    |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Version**                 | v1.0.1                                                                                                                                                                                                                                       |
+| **Active trunk**            | `django-main` (⚠️ **not** a Django port — Next.js; the branch name is misleading)                                                                                                                                                            |
 | **Functional epics (1–14)** | ✅ **All done** — infra, auth, 5 scrapers, scoring, AI intelligence, lifecycle/analytics, billing, comms/negotiation, resale listing, notifications, push/SMS, calendar/maps, AI scoring improvements, full frontend design-system migration |
-| **Tests** | 685/685 acceptance scenarios green · 2,378+ unit tests · 96% FR coverage (158/164) · Playwright E2E + visual + a11y + perf + load |
-| **AI pipeline** | Multi-provider router — Groq primary (text), Claude for structural analysis, OpenAI for vision; automatic fallback; **never mocked** (hard project policy) |
-| **Architecture** | Already migrated: Firebase Hosting + Cloud Run + Cloud SQL Postgres + Firebase Auth + GCP Secret Manager. Vercel/NextAuth decommissioned. |
-| **Billing** | Stripe checkout + portal + webhooks + tier enforcement + metering — **built, not yet verified in live mode** |
-| **Mobile (Epics 15–22)** | Next phase. Epic 15 `in-progress` (5 stories `ready-for-dev`, files currently untracked locally); 16–22 `backlog` |
-| **Hard blockers** | 0 feature blockers · ~6 operational pre-launch items (see §4) · 1 repo-hygiene P0 (branch reconciliation, §3) |
+| **Tests**                   | 685/685 acceptance scenarios green · 2,378+ unit tests · 96% FR coverage (158/164) · Playwright E2E + visual + a11y + perf + load                                                                                                            |
+| **AI pipeline**             | Multi-provider router — Groq primary (text), Claude for structural analysis, OpenAI for vision; automatic fallback; **never mocked** (hard project policy)                                                                                   |
+| **Architecture**            | Already migrated: Firebase Hosting + Cloud Run + Cloud SQL Postgres + Firebase Auth + GCP Secret Manager. Vercel/NextAuth decommissioned.                                                                                                    |
+| **Billing**                 | Stripe checkout + portal + webhooks + tier enforcement + metering — **built, not yet verified in live mode**                                                                                                                                 |
+| **Mobile (Epics 15–22)**    | Next phase. Epic 15 `in-progress` (5 stories `ready-for-dev`, files currently untracked locally); 16–22 `backlog`                                                                                                                            |
+| **Hard blockers**           | 0 feature blockers · ~6 operational pre-launch items (see §4) · 1 repo-hygiene P0 (branch reconciliation, §3)                                                                                                                                |
 
 ---
 
@@ -52,22 +52,22 @@ live mode, buy a domain, and smoke-test the live site.
 
 Legend: ✅ Done · 🟡 Done, needs live verification · 🟠 In progress · ⛔ Not started
 
-| Epic | Stories | Status | Notes |
-| --- | --- | --- | --- |
-| **E1 — Production Infrastructure & Secure Deployment** | 9/9 | ✅ | GCP Secret Manager (YAML-driven), Cloud Run + Cloud SQL, Firebase Hosting + CORS + Storage + FCM, CI/CD, health checks |
-| **E2 — User Registration, Auth & Onboarding** | 6/6 | ✅ | Firebase Auth; landing/login/register/reset/onboarding/settings |
-| **E3 — Multi-Marketplace Scanning & Image Capture** | 9/9 | 🟡 | 5 scrapers + SSE job events + image capture. **Selectors rot — re-verify against live sites before launch (§4)** |
-| **E4 — Core Scoring & Deal Evaluation** | 6/6 | ✅ | Algorithmic + LLM verification + caching + fallback |
-| **E5 — Advanced Market Intelligence** | 5/5 | ✅ | Claude structural analysis, comp matching, demand trend, completeness/reputation, logistics |
-| **E6 — Flip Lifecycle Management & Analytics** | 6/6 | ✅ | Dashboard, kanban, filtering, analytics, CSV/PDF export, inventory + ROI |
-| **E7 — Subscription & Billing** | 4/4 | 🟡 | Stripe checkout/portal/webhooks/tiers/metering — **needs live-mode end-to-end test (§4)** |
-| **E8 — Seller Communication & Negotiation** | 5/5 | ✅ | AI message gen, negotiation strategy, inbox/threads, approval, status tracking |
-| **E9 — Cross-Platform Resale Listing** | 4/4 | ✅ | AI title/desc, optimal pricing, posting queue, image reuse |
-| **E10 — Monitoring & Email Notifications** | 6/6 | ✅ | Scheduler, listing monitoring, Resend templates, preferences |
-| **E11 — Push (FCM) & SMS (Twilio)** | 3/3 | 🟡 | Implemented. **Twilio 10DLC registration is a manual compliance step — see `docs/launch/twilio-10dlc-checklist.md`** |
-| **E12 — Meeting & Logistics** | 2/2 | ✅ | Google Calendar OAuth + events; Maps route generation |
-| **E13 — AI Scoring Algorithm Improvements** | 8/8 | ✅ | IQR outlier filtering, structured JSON, cache invalidation, weighted scoring, brand regex, demand velocity, cross-platform price intelligence |
-| **E14 — Frontend Design System Migration** | 10/10 | ✅ | Glassmorphism dark theme; multi-theme removed; shared UI state; all pages migrated; a11y + file-header sweep |
+| Epic                                                   | Stories | Status | Notes                                                                                                                                         |
+| ------------------------------------------------------ | ------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **E1 — Production Infrastructure & Secure Deployment** | 9/9     | ✅     | GCP Secret Manager (YAML-driven), Cloud Run + Cloud SQL, Firebase Hosting + CORS + Storage + FCM, CI/CD, health checks                        |
+| **E2 — User Registration, Auth & Onboarding**          | 6/6     | ✅     | Firebase Auth; landing/login/register/reset/onboarding/settings                                                                               |
+| **E3 — Multi-Marketplace Scanning & Image Capture**    | 9/9     | 🟡     | 5 scrapers + SSE job events + image capture. **Selectors rot — re-verify against live sites before launch (§4)**                              |
+| **E4 — Core Scoring & Deal Evaluation**                | 6/6     | ✅     | Algorithmic + LLM verification + caching + fallback                                                                                           |
+| **E5 — Advanced Market Intelligence**                  | 5/5     | ✅     | Claude structural analysis, comp matching, demand trend, completeness/reputation, logistics                                                   |
+| **E6 — Flip Lifecycle Management & Analytics**         | 6/6     | ✅     | Dashboard, kanban, filtering, analytics, CSV/PDF export, inventory + ROI                                                                      |
+| **E7 — Subscription & Billing**                        | 4/4     | 🟡     | Stripe checkout/portal/webhooks/tiers/metering — **needs live-mode end-to-end test (§4)**                                                     |
+| **E8 — Seller Communication & Negotiation**            | 5/5     | ✅     | AI message gen, negotiation strategy, inbox/threads, approval, status tracking                                                                |
+| **E9 — Cross-Platform Resale Listing**                 | 4/4     | ✅     | AI title/desc, optimal pricing, posting queue, image reuse                                                                                    |
+| **E10 — Monitoring & Email Notifications**             | 6/6     | ✅     | Scheduler, listing monitoring, Resend templates, preferences                                                                                  |
+| **E11 — Push (FCM) & SMS (Twilio)**                    | 3/3     | 🟡     | Implemented. **Twilio 10DLC registration is a manual compliance step — see `docs/launch/twilio-10dlc-checklist.md`**                          |
+| **E12 — Meeting & Logistics**                          | 2/2     | ✅     | Google Calendar OAuth + events; Maps route generation                                                                                         |
+| **E13 — AI Scoring Algorithm Improvements**            | 8/8     | ✅     | IQR outlier filtering, structured JSON, cache invalidation, weighted scoring, brand regex, demand velocity, cross-platform price intelligence |
+| **E14 — Frontend Design System Migration**             | 10/10   | ✅     | Glassmorphism dark theme; multi-theme removed; shared UI state; all pages migrated; a11y + file-header sweep                                  |
 
 **Verdict:** Feature-complete for a web v1. The two 🟡 items (live scraper re-verify, Stripe live test) are verification tasks, not development.
 
@@ -79,13 +79,13 @@ This is the single biggest hygiene problem and it blocks any clean production de
 
 ### 3.1 Current branch reality
 
-| Branch | Relationship | State |
-| --- | --- | --- |
-| `origin/django-main` | **the live trunk** | All 14 epics done. ⚠️ Misnamed — it is Next.js, not Django. |
-| `origin/main` | GitHub **default** branch | **Stale + diverged.** +3 / −9 vs `django-main`. Its 3 unique commits are the launch-toolkit + Story-3.6 scenarios + a gitignore tweak. |
-| `origin/claude/create-release-roadmap-NCkB5` | +16 / −98 vs trunk | Forked from old `main`. **Do not merge** (would delete ~193k lines). Value already salvaged: launch toolkit + this roadmap. |
-| `origin/claude/fr-coverage-e2e` | +3 / −9 vs trunk | ≈ same tip as `origin/main`. Story-3.6 scenarios worth a targeted diff/cherry-pick; rest is stale. |
-| `origin/backup/main-pre-reconcile-2026-05-06` | backup snapshot | Archive; ignore. |
+| Branch                                        | Relationship              | State                                                                                                                                  |
+| --------------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `origin/django-main`                          | **the live trunk**        | All 14 epics done. ⚠️ Misnamed — it is Next.js, not Django.                                                                            |
+| `origin/main`                                 | GitHub **default** branch | **Stale + diverged.** +3 / −9 vs `django-main`. Its 3 unique commits are the launch-toolkit + Story-3.6 scenarios + a gitignore tweak. |
+| `origin/claude/create-release-roadmap-NCkB5`  | +16 / −98 vs trunk        | Forked from old `main`. **Do not merge** (would delete ~193k lines). Value already salvaged: launch toolkit + this roadmap.            |
+| `origin/claude/fr-coverage-e2e`               | +3 / −9 vs trunk          | ≈ same tip as `origin/main`. Story-3.6 scenarios worth a targeted diff/cherry-pick; rest is stale.                                     |
+| `origin/backup/main-pre-reconcile-2026-05-06` | backup snapshot           | Archive; ignore.                                                                                                                       |
 
 ### 3.2 The problem in one sentence
 
@@ -144,16 +144,16 @@ The full toolkit for each item lives in `docs/launch/`. P0 = before any soft bet
 The mobile app (Expo / React Native, pnpm-workspace monorepo) is the post-web-v1
 initiative. Current state:
 
-| Epic | Phase | Status |
-| --- | --- | --- |
-| **E15 — Mobile Foundation, Monorepo & Expo Bootstrap** | A | 🟠 in-progress · 5 stories `ready-for-dev` (story files currently **untracked locally** — commit them) |
-| **E16 — Mobile CI/CD (EAS + Firebase + TestFlight)** | A | ⛔ backlog |
-| **E17 — Mobile Auth & Session Bridge** | A | ⛔ backlog |
-| **E18 — Mobile Shell, Navigation & Design System** | B | ⛔ backlog |
-| **E19 — Mobile Scanning, Listings & Opportunities** | B | ⛔ backlog |
-| **E20 — Mobile Flip Lifecycle & Kanban** | B | ⛔ backlog |
-| **E21 — Mobile Push & Real-Time** | B | ⛔ backlog |
-| **E22 — Mobile Messaging & Inbox** | C | ⛔ backlog |
+| Epic                                                   | Phase | Status                                                                                                 |
+| ------------------------------------------------------ | ----- | ------------------------------------------------------------------------------------------------------ |
+| **E15 — Mobile Foundation, Monorepo & Expo Bootstrap** | A     | 🟠 in-progress · 5 stories `ready-for-dev` (story files currently **untracked locally** — commit them) |
+| **E16 — Mobile CI/CD (EAS + Firebase + TestFlight)**   | A     | ⛔ backlog                                                                                             |
+| **E17 — Mobile Auth & Session Bridge**                 | A     | ⛔ backlog                                                                                             |
+| **E18 — Mobile Shell, Navigation & Design System**     | B     | ⛔ backlog                                                                                             |
+| **E19 — Mobile Scanning, Listings & Opportunities**    | B     | ⛔ backlog                                                                                             |
+| **E20 — Mobile Flip Lifecycle & Kanban**               | B     | ⛔ backlog                                                                                             |
+| **E21 — Mobile Push & Real-Time**                      | B     | ⛔ backlog                                                                                             |
+| **E22 — Mobile Messaging & Inbox**                     | C     | ⛔ backlog                                                                                             |
 
 **Interaction with launch:** Epic 15.1 (convert repo to pnpm-workspace monorepo)
 is a structural change to the whole repo. Doing it **before** a web v1 launch means
@@ -169,17 +169,17 @@ The three live options:
 
 - **Option A — Ship web v1 now.** Treat Epics 1–14 as v1. Reconcile → launch
   checklist → tag → public launch. Mobile (15–22) becomes v2, started after launch.
-  *Fastest to revenue; lowest structural risk.*
+  _Fastest to revenue; lowest structural risk._
 - **Option B — Web v1 + start mobile in parallel.** Launch web while kicking off
   Epic 15 (monorepo + Expo bootstrap) on a parallel track.
-  *More moving parts; monorepo conversion lands near launch.*
+  _More moving parts; monorepo conversion lands near launch._
 - **Option C — Reconcile + plan only (current).** Finish repo hygiene and this
-  roadmap, review together, then pick A or B with eyes open. *(You are here.)*
+  roadmap, review together, then pick A or B with eyes open. _(You are here.)_
 
 **[DECISION]** After reviewing this doc, choose A or B (or adjust). The team
 re-plans §7 around your answer.
 
-> *Your answer:* ____________________________________________
+> _Your answer:_ **\*\*\*\***\*\*\*\***\*\*\*\***\_\_\_\_**\*\*\*\***\*\*\*\***\*\*\*\***
 
 ---
 
@@ -187,12 +187,12 @@ re-plans §7 around your answer.
 
 Indicative shape for **Option A** (web v1 now):
 
-| Week | Focus |
-| --- | --- |
-| **W1** | Branch reconciliation (§3) · production deploy dry-run · secret-manager verify |
-| **W2** | Stripe live-mode test · domain purchase + DNS/OAuth wiring · scraper re-verify |
+| Week   | Focus                                                                                                                   |
+| ------ | ----------------------------------------------------------------------------------------------------------------------- |
+| **W1** | Branch reconciliation (§3) · production deploy dry-run · secret-manager verify                                          |
+| **W2** | Stripe live-mode test · domain purchase + DNS/OAuth wiring · scraper re-verify                                          |
 | **W3** | Live smoke tests · P1 hardening (backups, uptime, Sentry) · soft beta to invite list (`docs/launch/beta-invitation.md`) |
-| **W4** | GTM assets final (`docs/launch/`) · Product Hunt / Show HN / Reddit scheduling · public launch |
+| **W4** | GTM assets final (`docs/launch/`) · Product Hunt / Show HN / Reddit scheduling · public launch                          |
 
 (Option B adds a parallel mobile lane starting W1 with Epic 15.)
 
@@ -211,10 +211,10 @@ The full GTM playbook is pre-written in `docs/launch/`:
 
 ## Appendix — Open Questions Tracker
 
-| # | Question | Owner | Answer |
-| --- | --- | --- | --- |
-| Q1 | Launch scope: Option A or B? (§6) | Stephen | _____ |
-| Q2 | Branch reconciliation: rename `django-main`→`main`, or fast-forward `main`? (§3.3) | Stephen | _____ |
-| Q3 | Domain choice? (§4.1) | Stephen | _____ |
-| Q4 | Run monorepo conversion (15.1) before or after web launch? (§5) | Stephen | _____ |
-| Q5 | Stripe SKUs/pricing tiers to create in live mode? (`pricing-page-proposal.md`) | Stephen | _____ |
+| #   | Question                                                                           | Owner   | Answer |
+| --- | ---------------------------------------------------------------------------------- | ------- | ------ |
+| Q1  | Launch scope: Option A or B? (§6)                                                  | Stephen | **\_** |
+| Q2  | Branch reconciliation: rename `django-main`→`main`, or fast-forward `main`? (§3.3) | Stephen | **\_** |
+| Q3  | Domain choice? (§4.1)                                                              | Stephen | **\_** |
+| Q4  | Run monorepo conversion (15.1) before or after web launch? (§5)                    | Stephen | **\_** |
+| Q5  | Stripe SKUs/pricing tiers to create in live mode? (`pricing-page-proposal.md`)     | Stephen | **\_** |

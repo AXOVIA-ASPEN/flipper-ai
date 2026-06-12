@@ -52,9 +52,7 @@ test.describe('OAuth Authentication - Acceptance Tests', () => {
       expect(pathCount).toBeGreaterThanOrEqual(4);
     });
 
-    test('should show Google button in both signup and login pages', async ({
-      page,
-    }) => {
+    test('should show Google button in both signup and login pages', async ({ page }) => {
       // Check signup page
       await page.goto('/auth/signup');
       await expect(page.getByRole('button', { name: /google/i })).toBeVisible();
@@ -64,9 +62,7 @@ test.describe('OAuth Authentication - Acceptance Tests', () => {
       await expect(page.getByRole('button', { name: /google/i })).toBeVisible();
     });
 
-    test('should have proper aria labels for accessibility', async ({
-      page,
-    }) => {
+    test('should have proper aria labels for accessibility', async ({ page }) => {
       await page.goto('/auth/signup');
 
       const googleButton = page.getByRole('button', { name: /google/i });
@@ -146,9 +142,7 @@ test.describe('OAuth Authentication - Acceptance Tests', () => {
       expect(fill).toBe('currentColor');
     });
 
-    test('should show GitHub button in both signup and login pages', async ({
-      page,
-    }) => {
+    test('should show GitHub button in both signup and login pages', async ({ page }) => {
       await page.goto('/auth/signup');
       await expect(page.getByRole('button', { name: /github/i })).toBeVisible();
 
@@ -167,7 +161,7 @@ test.describe('OAuth Authentication - Acceptance Tests', () => {
 
       // Manual steps:
       // - Enter GitHub username/email
-      // - Enter GitHub password  
+      // - Enter GitHub password
       // - Authorize app
 
       await expect(page).toHaveURL(/\/dashboard/, { timeout: 30000 });
@@ -207,9 +201,7 @@ test.describe('OAuth Authentication - Acceptance Tests', () => {
       expect(currentUrl).toMatch(/\/auth\/(login|signup|error)/);
     });
 
-    test('should show helpful error message when OAuth provider is down', async ({
-      page,
-    }) => {
+    test('should show helpful error message when OAuth provider is down', async ({ page }) => {
       // This is difficult to test automatically
       // In production, you'd want to mock the OAuth provider being down
 
@@ -223,9 +215,7 @@ test.describe('OAuth Authentication - Acceptance Tests', () => {
   });
 
   test.describe('OAuth Security', () => {
-    test('should include state parameter in OAuth redirect', async ({
-      page,
-    }) => {
+    test('should include state parameter in OAuth redirect', async ({ page }) => {
       await page.goto('/auth/signup');
 
       const googleButton = page.getByRole('button', { name: /google/i });
@@ -252,9 +242,7 @@ test.describe('OAuth Authentication - Acceptance Tests', () => {
       expect(allScripts).not.toContain('GITHUB_CLIENT_SECRET');
     });
 
-    test('should use HTTPS for OAuth redirects in production', async ({
-      page,
-    }) => {
+    test('should use HTTPS for OAuth redirects in production', async ({ page }) => {
       await page.goto('/auth/signup');
 
       const googleButton = page.getByRole('button', { name: /google/i });
@@ -276,9 +264,7 @@ test.describe('OAuth Authentication - Acceptance Tests', () => {
   });
 
   test.describe('OAuth Configuration Check', () => {
-    test('should provide clear error if OAuth not configured', async ({
-      page,
-    }) => {
+    test('should provide clear error if OAuth not configured', async ({ page }) => {
       // Go to signup page
       await page.goto('/auth/signup');
 

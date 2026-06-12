@@ -36,14 +36,11 @@ const PALETTE_REGEX =
 
 // ─── Source-level scenario helpers ───────────────────────────────────────────
 
-When(
-  'I read the source of {string}',
-  function (this: CustomWorld, relativePath: string) {
-    const fullPath = path.join(process.cwd(), relativePath);
-    this.testData.sourceContent = fs.readFileSync(fullPath, 'utf-8');
-    this.testData.sourcePath = relativePath;
-  }
-);
+When('I read the source of {string}', function (this: CustomWorld, relativePath: string) {
+  const fullPath = path.join(process.cwd(), relativePath);
+  this.testData.sourceContent = fs.readFileSync(fullPath, 'utf-8');
+  this.testData.sourcePath = relativePath;
+});
 
 Then(
   'the source should contain the pattern {string}',
@@ -189,21 +186,14 @@ Then(
   async function (this: CustomWorld, selector: string, expectedColor: string) {
     const slider = this.page.locator(selector).first();
     await slider.waitFor({ state: 'attached', timeout: 15000 });
-    const actual = await slider.evaluate(
-      (el) => window.getComputedStyle(el).accentColor
-    );
+    const actual = await slider.evaluate((el) => window.getComputedStyle(el).accentColor);
     expect(actual, `slider ${selector} accent-color`).toBe(expectedColor);
   }
 );
 
 Then(
   'the slider {string} className matches none of {string} or {string}',
-  async function (
-    this: CustomWorld,
-    selector: string,
-    pattern1: string,
-    pattern2: string
-  ) {
+  async function (this: CustomWorld, selector: string, pattern1: string, pattern2: string) {
     const slider = this.page.locator(selector).first();
     await slider.waitFor({ state: 'attached', timeout: 15000 });
     const className = (await slider.getAttribute('class')) ?? '';
@@ -227,8 +217,10 @@ Then(
     const scope = this.page.locator('[data-testid="price-calculator"]');
     await scope.first().waitFor({ state: 'attached', timeout: 15000 });
     const count = await scope.locator(selector).count();
-    expect(count, `Expected ≥${minCount} "${selector}" inside PriceCalculator, found ${count}`)
-      .toBeGreaterThanOrEqual(minCount);
+    expect(
+      count,
+      `Expected ≥${minCount} "${selector}" inside PriceCalculator, found ${count}`
+    ).toBeGreaterThanOrEqual(minCount);
   }
 );
 
@@ -352,15 +344,12 @@ Then(
   }
 );
 
-Then(
-  'the browser URL still ends with {string}',
-  function (this: CustomWorld, suffix: string) {
-    const current = this.page.url();
-    const initial = this.testData.initialUrl as string;
-    expect(current, `URL changed: ${initial} → ${current}`).toBe(initial);
-    expect(current.endsWith(suffix), `URL "${current}" does not end with "${suffix}"`).toBe(true);
-  }
-);
+Then('the browser URL still ends with {string}', function (this: CustomWorld, suffix: string) {
+  const current = this.page.url();
+  const initial = this.testData.initialUrl as string;
+  expect(current, `URL changed: ${initial} → ${current}`).toBe(initial);
+  expect(current.endsWith(suffix), `URL "${current}" does not end with "${suffix}"`).toBe(true);
+});
 
 Then(
   'only one network request to {string} was issued',
@@ -389,12 +378,9 @@ Then(
         const ariaLabel = el.getAttribute('aria-label');
         const id = el.getAttribute('id');
         const labelledBy = el.getAttribute('aria-labelledby');
-        const hasLabelFor = id
-          ? !!root.ownerDocument?.querySelector(`label[for="${id}"]`)
-          : false;
+        const hasLabelFor = id ? !!root.ownerDocument?.querySelector(`label[for="${id}"]`) : false;
         const hasButtonText =
-          el.tagName.toLowerCase() === 'button' &&
-          (el.textContent ?? '').trim().length > 0;
+          el.tagName.toLowerCase() === 'button' && (el.textContent ?? '').trim().length > 0;
         if (!ariaLabel && !labelledBy && !hasLabelFor && !hasButtonText) {
           missing.push(
             `${el.tagName.toLowerCase()}${id ? `#${id}` : ''}${el.className ? `.${el.className.split(' ')[0]}` : ''}`
@@ -403,10 +389,9 @@ Then(
       }
       return missing;
     });
-    expect(
-      unnamed.length,
-      `form controls without an accessible name: ${unnamed.join(', ')}`
-    ).toBe(0);
+    expect(unnamed.length, `form controls without an accessible name: ${unnamed.join(', ')}`).toBe(
+      0
+    );
   }
 );
 
@@ -450,7 +435,10 @@ Then(
       // for the slider is satisfied by the always-on thumb visual; we verify
       // the canonical CSS class scoping is in force by checking the slider's
       // computed background (track), which only the canonical rule sets.
-      if (element.tagName.toLowerCase() === 'input' && (element as HTMLInputElement).type === 'range') {
+      if (
+        element.tagName.toLowerCase() === 'input' &&
+        (element as HTMLInputElement).type === 'range'
+      ) {
         // Canonical rule sets background: rgba(255,255,255,0.08) on the host.
         // Browser default is none/transparent. If background is non-default,
         // the canonical rule is in force AND the canonical thumb rule (which

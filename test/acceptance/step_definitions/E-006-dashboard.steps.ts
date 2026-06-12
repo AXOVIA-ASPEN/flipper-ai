@@ -100,47 +100,33 @@ Then('it uses Promise.all to run stats queries concurrently', function () {
   }
 });
 
-Then(
-  'it includes a listing count query for totalListings',
-  function () {
-    const content: string = this.fileContent;
-    if (!content.includes('listing.count')) {
-      throw new Error('Expected prisma.listing.count for totalListings');
-    }
+Then('it includes a listing count query for totalListings', function () {
+  const content: string = this.fileContent;
+  if (!content.includes('listing.count')) {
+    throw new Error('Expected prisma.listing.count for totalListings');
   }
-);
+});
 
-Then(
-  'it includes an opportunity count query for opportunitiesFound',
-  function () {
-    const content: string = this.fileContent;
-    if (!content.includes('opportunity.count')) {
-      throw new Error('Expected prisma.opportunity.count for opportunitiesFound');
-    }
+Then('it includes an opportunity count query for opportunitiesFound', function () {
+  const content: string = this.fileContent;
+  if (!content.includes('opportunity.count')) {
+    throw new Error('Expected prisma.opportunity.count for opportunitiesFound');
   }
-);
+});
 
-Then(
-  'it includes an active flips count query excluding SOLD and PASSED status',
-  function () {
-    const content: string = this.fileContent;
-    if (!content.includes('notIn') || !content.includes('SOLD') || !content.includes('PASSED')) {
-      throw new Error(
-        'Expected active flips query with notIn: [SOLD, PASSED]'
-      );
-    }
+Then('it includes an active flips count query excluding SOLD and PASSED status', function () {
+  const content: string = this.fileContent;
+  if (!content.includes('notIn') || !content.includes('SOLD') || !content.includes('PASSED')) {
+    throw new Error('Expected active flips query with notIn: [SOLD, PASSED]');
   }
-);
+});
 
-Then(
-  'it includes an opportunity aggregate query for totalProfit from SOLD status',
-  function () {
-    const content: string = this.fileContent;
-    if (!content.includes('opportunity.aggregate') || !content.includes('actualProfit')) {
-      throw new Error('Expected prisma.opportunity.aggregate with actualProfit for totalProfit');
-    }
+Then('it includes an opportunity aggregate query for totalProfit from SOLD status', function () {
+  const content: string = this.fileContent;
+  if (!content.includes('opportunity.aggregate') || !content.includes('actualProfit')) {
+    throw new Error('Expected prisma.opportunity.aggregate with actualProfit for totalProfit');
   }
-);
+});
 
 Then(
   'the response includes a stats object with totalListings, opportunitiesFound, activeFlips, and totalProfit',
@@ -204,7 +190,11 @@ Then('it only allows limit values of 10, 20, or 50', function () {
   if (!content.includes('10') || !content.includes('20') || !content.includes('50')) {
     throw new Error('Expected allowed limit values of 10, 20, 50');
   }
-  if (!content.includes('ALLOWED_LIMITS') && !content.includes('allowedLimits') && !content.includes('[10')) {
+  if (
+    !content.includes('ALLOWED_LIMITS') &&
+    !content.includes('allowedLimits') &&
+    !content.includes('[10')
+  ) {
     throw new Error('Expected limit validation against [10, 20, 50]');
   }
 });
@@ -238,10 +228,13 @@ Then('it renders an Opportunities Found stat card', function () {
   const content: string = this.fileContent;
   // Accept either the literal label "Opportunities Found" or the canonical
   // shortened label "Opportunities" backed by the opportunitiesFound stat field.
-  const hasLabel = content.includes('Opportunities Found') ||
+  const hasLabel =
+    content.includes('Opportunities Found') ||
     (content.includes('>Opportunities<') && content.includes('opportunitiesFound'));
   if (!hasLabel) {
-    throw new Error('Expected "Opportunities Found" (or "Opportunities" + opportunitiesFound stat) in dashboard');
+    throw new Error(
+      'Expected "Opportunities Found" (or "Opportunities" + opportunitiesFound stat) in dashboard'
+    );
   }
 });
 
@@ -318,26 +311,20 @@ Then(
   }
 );
 
-Then(
-  'the ExternalLink button uses stopPropagation to prevent card navigation',
-  function () {
-    const content: string = this.fileContent;
-    if (!content.includes('stopPropagation')) {
-      throw new Error('Expected e.stopPropagation() on ExternalLink to prevent card navigation');
-    }
+Then('the ExternalLink button uses stopPropagation to prevent card navigation', function () {
+  const content: string = this.fileContent;
+  if (!content.includes('stopPropagation')) {
+    throw new Error('Expected e.stopPropagation() on ExternalLink to prevent card navigation');
   }
-);
+});
 
-Then(
-  'the Star button uses stopPropagation to prevent card navigation',
-  function () {
-    const content: string = this.fileContent;
-    // The star button's handler calls stopPropagation (same check as above — both in same file)
-    if (!content.includes('stopPropagation')) {
-      throw new Error('Expected e.stopPropagation() on Star button to prevent card navigation');
-    }
+Then('the Star button uses stopPropagation to prevent card navigation', function () {
+  const content: string = this.fileContent;
+  // The star button's handler calls stopPropagation (same check as above — both in same file)
+  if (!content.includes('stopPropagation')) {
+    throw new Error('Expected e.stopPropagation() on Star button to prevent card navigation');
   }
-);
+});
 
 // ==================== Then: Listing detail page (S-8) ====================
 

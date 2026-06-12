@@ -307,9 +307,27 @@ test.describe('Feature: BDD Marketplace Scanning Scenarios', () => {
             message: 'Scrape complete',
             savedCount: 3,
             listings: [
-              { title: 'High Value Item', price: '$100', location: 'Tampa', url: '#', flippabilityScore: 90 },
-              { title: 'Medium Value Item', price: '$50', location: 'Tampa', url: '#', flippabilityScore: 60 },
-              { title: 'Low Value Item', price: '$20', location: 'Tampa', url: '#', flippabilityScore: 30 },
+              {
+                title: 'High Value Item',
+                price: '$100',
+                location: 'Tampa',
+                url: '#',
+                flippabilityScore: 90,
+              },
+              {
+                title: 'Medium Value Item',
+                price: '$50',
+                location: 'Tampa',
+                url: '#',
+                flippabilityScore: 60,
+              },
+              {
+                title: 'Low Value Item',
+                price: '$20',
+                location: 'Tampa',
+                url: '#',
+                flippabilityScore: 30,
+              },
             ],
           },
         });
@@ -320,8 +338,10 @@ test.describe('Feature: BDD Marketplace Scanning Scenarios', () => {
       await expect(page.getByText('Scrape complete')).toBeVisible();
 
       // Look for flippability filter if it exists
-      const flipFilter = page.locator('[data-testid="flippability-filter"], select:has-text("flippability"), input[placeholder*="score"]');
-      if (await flipFilter.count() > 0) {
+      const flipFilter = page.locator(
+        '[data-testid="flippability-filter"], select:has-text("flippability"), input[placeholder*="score"]'
+      );
+      if ((await flipFilter.count()) > 0) {
         await flipFilter.fill('70');
         // High value item should remain visible
         await expect(page.getByText('High Value Item')).toBeVisible();
@@ -350,12 +370,12 @@ test.describe('Feature: BDD Marketplace Scanning Scenarios', () => {
 
       // Look for save search button
       const saveBtn = page.locator('button', { hasText: /save.*search|save.*config/i });
-      if (await saveBtn.count() > 0) {
+      if ((await saveBtn.count()) > 0) {
         await saveBtn.click();
 
         // Enter search name if prompted
         const nameInput = page.locator('input[placeholder*="name"], [data-testid="search-name"]');
-        if (await nameInput.count() > 0) {
+        if ((await nameInput.count()) > 0) {
           await nameInput.fill('Vintage Furniture FB');
           await page.locator('button', { hasText: /save|confirm/i }).click();
         }

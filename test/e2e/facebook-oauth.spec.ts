@@ -128,7 +128,8 @@ test.describe('Facebook OAuth Integration', () => {
         await route.fulfill({
           status: 302,
           headers: {
-            Location: 'https://www.facebook.com/v18.0/dialog/oauth?client_id=fake&redirect_uri=http%3A%2F%2Flocalhost%3A3001%2Fapi%2Fauth%2Ffacebook%2Fcallback&state=abc123&scope=email',
+            Location:
+              'https://www.facebook.com/v18.0/dialog/oauth?client_id=fake&redirect_uri=http%3A%2F%2Flocalhost%3A3001%2Fapi%2Fauth%2Ffacebook%2Fcallback&state=abc123&scope=email',
           },
         });
       });

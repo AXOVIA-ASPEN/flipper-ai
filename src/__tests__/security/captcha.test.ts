@@ -30,7 +30,7 @@ describe('CAPTCHA Tracker', () => {
       recordFailedAttempt(testEmail);
       recordFailedAttempt(testEmail);
       const count = recordFailedAttempt(testEmail);
-      
+
       expect(count).toBe(3);
       expect(getFailedAttemptCount(testEmail)).toBe(3);
     });
@@ -39,7 +39,7 @@ describe('CAPTCHA Tracker', () => {
       recordFailedAttempt(testEmail);
       recordFailedAttempt(testEmail);
       clearFailedAttempts(testEmail);
-      
+
       expect(getFailedAttemptCount(testEmail)).toBe(0);
     });
 
@@ -122,7 +122,7 @@ describe('CAPTCHA Tracker', () => {
       recordFailedAttempt('Test@Example.COM');
       recordFailedAttempt('test@example.com');
       recordFailedAttempt('TEST@EXAMPLE.COM');
-      
+
       expect(getFailedAttemptCount('test@example.com')).toBe(3);
       expect(requiresCaptcha('test@example.com')).toBe(true);
     });

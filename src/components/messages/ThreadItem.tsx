@@ -96,31 +96,21 @@ export default function ThreadItem({
                   {listing?.title || 'Listing removed'}
                 </h3>
                 {listing && (
-                  <span
-                    className={
-                      PLATFORM_COLORS[listing.platform] || 'fp-badge fp-badge-gray'
-                    }
-                  >
+                  <span className={PLATFORM_COLORS[listing.platform] || 'fp-badge fp-badge-gray'}>
                     {listing.platform}
                   </span>
                 )}
               </div>
 
               {/* Seller name + price */}
-              <div
-                className="flex items-center gap-2 text-xs mb-1"
-                style={{ color: '#94a3b8' }}
-              >
+              <div className="flex items-center gap-2 text-xs mb-1" style={{ color: '#94a3b8' }}>
                 {sellerName && <span>{sellerName}</span>}
                 {sellerName && listing && <span>·</span>}
                 {listing && <span>${listing.askingPrice.toLocaleString()}</span>}
               </div>
 
               {/* Last message preview */}
-              <p
-                className="text-sm truncate"
-                style={{ color: isUnread ? '#e2e8f0' : '#94a3b8' }}
-              >
+              <p className="text-sm truncate" style={{ color: isUnread ? '#e2e8f0' : '#94a3b8' }}>
                 {lastMessage.direction === 'OUTBOUND' && (
                   <span style={{ color: '#64748b' }}>You: </span>
                 )}
@@ -130,10 +120,7 @@ export default function ThreadItem({
 
             {/* Right side: timestamp + badges */}
             <div className="flex flex-col items-end gap-1 flex-shrink-0">
-              <span
-                className="text-xs whitespace-nowrap"
-                style={{ color: '#64748b' }}
-              >
+              <span className="text-xs whitespace-nowrap" style={{ color: '#64748b' }}>
                 {formatDistanceToNow(new Date(lastMessageAt), { addSuffix: true })}
               </span>
               <div className="flex items-center gap-1.5">

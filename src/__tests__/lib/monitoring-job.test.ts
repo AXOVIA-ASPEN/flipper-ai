@@ -108,7 +108,7 @@ import { RateLimitError } from '@/lib/errors';
 
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mockMonitoringJob = (mockPrisma.monitoringJob as any);
+const mockMonitoringJob = mockPrisma.monitoringJob as any;
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -134,10 +134,18 @@ function makeMockResponse(status: number, body: string) {
 // Mock listings for batch testing
 // ---------------------------------------------------------------------------
 
-const makeListing = (overrides: Partial<{
-  id: string; platform: string; url: string; askingPrice: number;
-  userId: string; title: string; status: string; lastMonitoredAt: Date | null;
-}> = {}) => ({
+const makeListing = (
+  overrides: Partial<{
+    id: string;
+    platform: string;
+    url: string;
+    askingPrice: number;
+    userId: string;
+    title: string;
+    status: string;
+    lastMonitoredAt: Date | null;
+  }> = {}
+) => ({
   id: 'listing-1',
   title: 'Test Item',
   platform: 'CRAIGSLIST',
@@ -218,7 +226,11 @@ describe('MonitoringJobService', () => {
     });
 
     it('throws ExternalServiceError for other Prisma known request errors', async () => {
-      const { Prisma } = jest.requireActual('@/generated/prisma') as { Prisma: { PrismaClientKnownRequestError: typeof import('@/generated/prisma').Prisma.PrismaClientKnownRequestError } };
+      const { Prisma } = jest.requireActual('@/generated/prisma') as {
+        Prisma: {
+          PrismaClientKnownRequestError: typeof import('@/generated/prisma').Prisma.PrismaClientKnownRequestError;
+        };
+      };
       // Simulate a non-P2002 Prisma error by mocking create to reject with a DB error
       mockMonitoringJob.create.mockRejectedValueOnce(
         new ExternalServiceError('database', 'Connection failed')
@@ -229,9 +241,14 @@ describe('MonitoringJobService', () => {
 
     it('throws ExternalServiceError when startJob create rejects with PrismaClientInitializationError', async () => {
       const { Prisma } = jest.requireActual('@/generated/prisma') as {
-        Prisma: { PrismaClientInitializationError: new (message: string, clientVersion: string) => Error };
+        Prisma: {
+          PrismaClientInitializationError: new (message: string, clientVersion: string) => Error;
+        };
       };
-      const initErr = new Prisma.PrismaClientInitializationError('DB engine failed to start', 'test');
+      const initErr = new Prisma.PrismaClientInitializationError(
+        'DB engine failed to start',
+        'test'
+      );
       mockMonitoringJob.create.mockRejectedValueOnce(initErr);
 
       await expect(service.startJob()).rejects.toBeInstanceOf(ExternalServiceError);
@@ -366,7 +383,9 @@ describe('MonitoringJobService', () => {
     });
 
     it('processes listing sold state change', async () => {
-      const { getTrackableListings, detectSoldStatus } = jest.requireMock('@/lib/listing-tracker') as {
+      const { getTrackableListings, detectSoldStatus } = jest.requireMock(
+        '@/lib/listing-tracker'
+      ) as {
         getTrackableListings: jest.Mock;
         detectSoldStatus: jest.Mock;
         classifyHttpResponse: jest.Mock;
@@ -378,7 +397,9 @@ describe('MonitoringJobService', () => {
       const listing = makeListing();
       getTrackableListings.mockResolvedValueOnce([listing]);
 
-      mockFetch.mockImplementationOnce(() => makeMockResponse(200, 'This posting has been deleted'));
+      mockFetch.mockImplementationOnce(() =>
+        makeMockResponse(200, 'This posting has been deleted')
+      );
       detectSoldStatus.mockReturnValueOnce(true);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -397,7 +418,9 @@ describe('MonitoringJobService', () => {
     });
 
     it('handles rate-limited response — increments circuit breaker, no event', async () => {
-      const { getTrackableListings, classifyHttpResponse } = jest.requireMock('@/lib/listing-tracker') as {
+      const { getTrackableListings, classifyHttpResponse } = jest.requireMock(
+        '@/lib/listing-tracker'
+      ) as {
         getTrackableListings: jest.Mock;
         classifyHttpResponse: jest.Mock;
       };
@@ -443,14 +466,17 @@ describe('MonitoringJobService', () => {
       const { getTrackableListings } = jest.requireMock('@/lib/listing-tracker') as {
         getTrackableListings: jest.Mock;
       };
-      const ebayListing = makeListing({ platform: 'EBAY', url: 'https://ebay.com/itm/123456789012' });
+      const ebayListing = makeListing({
+        platform: 'EBAY',
+        url: 'https://ebay.com/itm/123456789012',
+      });
       getTrackableListings.mockResolvedValueOnce([ebayListing]);
 
       // Mock DB budget check to show exhausted budget
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mockEbayBudgetQuery = jest.fn().mockResolvedValueOnce([
-        { platformStats: { EBAY: { checked: 2001 } } },
-      ]);
+      const mockEbayBudgetQuery = jest
+        .fn()
+        .mockResolvedValueOnce([{ platformStats: { EBAY: { checked: 2001 } } }]);
       mockMonitoringJob.findMany
         .mockResolvedValueOnce([]) // stale jobs check
         .mockImplementationOnce(mockEbayBudgetQuery); // budget check
@@ -526,7 +552,10 @@ describe('MonitoringJobService', () => {
 
       const summary = await service.run();
 
-      expect(computeEstimatedExpiry).toHaveBeenCalledWith('CRAIGSLIST', listingWithoutExpiry.postedAt);
+      expect(computeEstimatedExpiry).toHaveBeenCalledWith(
+        'CRAIGSLIST',
+        listingWithoutExpiry.postedAt
+      );
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect((mockPrisma.listing as any).update).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -570,11 +599,12 @@ describe('MonitoringJobService', () => {
     });
 
     it('treats unavailable reason from checkHtmlPlatformListing as the event reason (Story 10.2)', async () => {
-      const { getTrackableListings, classifyHttpResponse, classifyUnavailableReason } = jest.requireMock('@/lib/listing-tracker') as {
-        getTrackableListings: jest.Mock;
-        classifyHttpResponse: jest.Mock;
-        classifyUnavailableReason: jest.Mock;
-      };
+      const { getTrackableListings, classifyHttpResponse, classifyUnavailableReason } =
+        jest.requireMock('@/lib/listing-tracker') as {
+          getTrackableListings: jest.Mock;
+          classifyHttpResponse: jest.Mock;
+          classifyUnavailableReason: jest.Mock;
+        };
       const listing = makeListing();
       getTrackableListings.mockResolvedValueOnce([listing]);
 
@@ -658,7 +688,9 @@ describe('MonitoringJobService', () => {
     it('processes eBay listings via the Browse API and emits sold events', async () => {
       const listing = makeEbayListing('998877665544');
 
-      const { getTrackableListings, detectSoldStatus } = jest.requireMock('@/lib/listing-tracker') as {
+      const { getTrackableListings, detectSoldStatus } = jest.requireMock(
+        '@/lib/listing-tracker'
+      ) as {
         getTrackableListings: jest.Mock;
         detectSoldStatus: jest.Mock;
       };
@@ -690,7 +722,9 @@ describe('MonitoringJobService', () => {
     it('detects price changes on eBay listings', async () => {
       const listing = makeEbayListing('112233445566', 100);
 
-      const { getTrackableListings, isPriceChangeMeaningful } = jest.requireMock('@/lib/listing-tracker') as {
+      const { getTrackableListings, isPriceChangeMeaningful } = jest.requireMock(
+        '@/lib/listing-tracker'
+      ) as {
         getTrackableListings: jest.Mock;
         isPriceChangeMeaningful: jest.Mock;
       };
@@ -781,17 +815,19 @@ describe('MonitoringJobService', () => {
     it('suppresses eBay unavailable events when the anomaly threshold is exceeded', async () => {
       const listing = makeEbayListing('445566778899');
 
-      const { getTrackableListings, updatePlatformParseStats, isAnomalyThresholdExceeded } = jest.requireMock('@/lib/listing-tracker') as {
-        getTrackableListings: jest.Mock;
-        updatePlatformParseStats: jest.Mock;
-        isAnomalyThresholdExceeded: jest.Mock;
-      };
+      const { getTrackableListings, updatePlatformParseStats, isAnomalyThresholdExceeded } =
+        jest.requireMock('@/lib/listing-tracker') as {
+          getTrackableListings: jest.Mock;
+          updatePlatformParseStats: jest.Mock;
+          isAnomalyThresholdExceeded: jest.Mock;
+        };
       getTrackableListings.mockResolvedValueOnce([listing]);
       // Simulate the platformStats being populated
       updatePlatformParseStats.mockImplementation(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (stats: Record<string, any>, platform: string) => {
-          if (!stats[platform]) stats[platform] = { checked: 0, parsed: 0, events: 0, unavailable: 0 };
+          if (!stats[platform])
+            stats[platform] = { checked: 0, parsed: 0, events: 0, unavailable: 0 };
           stats[platform].checked++;
           stats[platform].unavailable++;
         }
@@ -811,7 +847,9 @@ describe('MonitoringJobService', () => {
     it('handles per-listing transaction failures in eBay batch without aborting', async () => {
       const listing = makeEbayListing('556677889900');
 
-      const { getTrackableListings, detectSoldStatus } = jest.requireMock('@/lib/listing-tracker') as {
+      const { getTrackableListings, detectSoldStatus } = jest.requireMock(
+        '@/lib/listing-tracker'
+      ) as {
         getTrackableListings: jest.Mock;
         detectSoldStatus: jest.Mock;
       };
@@ -960,13 +998,17 @@ describe('MonitoringJobService', () => {
     it('suppresses unavailable events when anomaly threshold is exceeded in processOneListing', async () => {
       const listing = makeListing();
 
-      const { getTrackableListings, classifyHttpResponse, isAnomalyThresholdExceeded, classifyUnavailableReason } =
-        jest.requireMock('@/lib/listing-tracker') as {
-          getTrackableListings: jest.Mock;
-          classifyHttpResponse: jest.Mock;
-          isAnomalyThresholdExceeded: jest.Mock;
-          classifyUnavailableReason: jest.Mock;
-        };
+      const {
+        getTrackableListings,
+        classifyHttpResponse,
+        isAnomalyThresholdExceeded,
+        classifyUnavailableReason,
+      } = jest.requireMock('@/lib/listing-tracker') as {
+        getTrackableListings: jest.Mock;
+        classifyHttpResponse: jest.Mock;
+        isAnomalyThresholdExceeded: jest.Mock;
+        classifyUnavailableReason: jest.Mock;
+      };
       getTrackableListings.mockResolvedValueOnce([listing]);
       classifyHttpResponse.mockReturnValueOnce('removed');
       classifyUnavailableReason.mockReturnValueOnce('removed');
@@ -989,9 +1031,10 @@ describe('MonitoringJobService', () => {
 
       // Mock Date.now(): first call sets runStart=0; all subsequent calls return a value
       // exceeding maxRunDurationMs (600_000ms default), triggering completedEarly.
-      const nowSpy = jest.spyOn(Date, 'now')
-        .mockReturnValueOnce(0)      // runStart = 0
-        .mockReturnValue(700_000);   // all later calls: 700s > maxRunDurationMs (600s)
+      const nowSpy = jest
+        .spyOn(Date, 'now')
+        .mockReturnValueOnce(0) // runStart = 0
+        .mockReturnValue(700_000); // all later calls: 700s > maxRunDurationMs (600s)
 
       try {
         const summary = await service.run();
@@ -1010,7 +1053,9 @@ describe('MonitoringJobService', () => {
         makeListing({ id: `failing-${i}`, url: `https://cl/${i}` })
       );
 
-      const { getTrackableListings, classifyHttpResponse } = jest.requireMock('@/lib/listing-tracker') as {
+      const { getTrackableListings, classifyHttpResponse } = jest.requireMock(
+        '@/lib/listing-tracker'
+      ) as {
         getTrackableListings: jest.Mock;
         classifyHttpResponse: jest.Mock;
       };
@@ -1049,15 +1094,12 @@ describe('MonitoringJobService', () => {
         makeListing({ id: `canary-${i}`, url: `https://cl/canary/${i}` })
       );
 
-      const {
-        getTrackableListings,
-        extractCurrentPrice,
-        updatePlatformParseStats,
-      } = jest.requireMock('@/lib/listing-tracker') as {
-        getTrackableListings: jest.Mock;
-        extractCurrentPrice: jest.Mock;
-        updatePlatformParseStats: jest.Mock;
-      };
+      const { getTrackableListings, extractCurrentPrice, updatePlatformParseStats } =
+        jest.requireMock('@/lib/listing-tracker') as {
+          getTrackableListings: jest.Mock;
+          extractCurrentPrice: jest.Mock;
+          updatePlatformParseStats: jest.Mock;
+        };
       getTrackableListings.mockResolvedValueOnce(listings);
       extractCurrentPrice.mockReturnValue(null);
 
@@ -1065,7 +1107,8 @@ describe('MonitoringJobService', () => {
       updatePlatformParseStats.mockImplementation(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (stats: Record<string, any>, platform: string, parsed: boolean) => {
-          if (!stats[platform]) stats[platform] = { checked: 0, parsed: 0, events: 0, unavailable: 0 };
+          if (!stats[platform])
+            stats[platform] = { checked: 0, parsed: 0, events: 0, unavailable: 0 };
           stats[platform].checked++;
           if (parsed) stats[platform].parsed++;
         }
@@ -1080,7 +1123,9 @@ describe('MonitoringJobService', () => {
     it('rethrows RateLimitError from processOneListing to increment circuit breaker counter', async () => {
       const listing = makeListing();
 
-      const { getTrackableListings, classifyHttpResponse } = jest.requireMock('@/lib/listing-tracker') as {
+      const { getTrackableListings, classifyHttpResponse } = jest.requireMock(
+        '@/lib/listing-tracker'
+      ) as {
         getTrackableListings: jest.Mock;
         classifyHttpResponse: jest.Mock;
       };
@@ -1126,10 +1171,10 @@ describe('MonitoringJobService', () => {
       const { Prisma } = jest.requireActual('@/generated/prisma') as {
         Prisma: { PrismaClientKnownRequestError: new (...args: unknown[]) => Error };
       };
-      const prismaErr = new Prisma.PrismaClientKnownRequestError(
-        'DB constraint violation',
-        { code: 'P1000', clientVersion: 'test' }
-      );
+      const prismaErr = new Prisma.PrismaClientKnownRequestError('DB constraint violation', {
+        code: 'P1000',
+        clientVersion: 'test',
+      });
       mockMonitoringJob.update.mockRejectedValueOnce(prismaErr);
 
       await expect(
@@ -1150,10 +1195,10 @@ describe('MonitoringJobService', () => {
       const { Prisma } = jest.requireActual('@/generated/prisma') as {
         Prisma: { PrismaClientKnownRequestError: new (...args: unknown[]) => Error };
       };
-      const prismaErr = new Prisma.PrismaClientKnownRequestError(
-        'DB constraint violation',
-        { code: 'P1001', clientVersion: 'test' }
-      );
+      const prismaErr = new Prisma.PrismaClientKnownRequestError('DB constraint violation', {
+        code: 'P1001',
+        clientVersion: 'test',
+      });
       mockMonitoringJob.update.mockRejectedValueOnce(prismaErr);
 
       await expect(service.failJob('job-4', 'reason')).rejects.toBeInstanceOf(ExternalServiceError);
@@ -1224,6 +1269,4 @@ describe('MonitoringJobService', () => {
       expect(summary.status).toBe('COMPLETED');
     });
   });
-
 });
-

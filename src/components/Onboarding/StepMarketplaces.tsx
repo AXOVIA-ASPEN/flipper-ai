@@ -66,7 +66,9 @@ export default function StepMarketplaces({ selected, onChange }: Props) {
                 aria-label={label}
               />
               <span className="text-2xl">{icon}</span>
-              <span className="font-medium" style={{ color: '#e2e8f0' }}>{label}</span>
+              <span className="font-medium" style={{ color: '#e2e8f0' }}>
+                {label}
+              </span>
               {isSelected && (
                 <span className="ml-auto" style={{ color: '#8b5cf6' }}>
                   ✓

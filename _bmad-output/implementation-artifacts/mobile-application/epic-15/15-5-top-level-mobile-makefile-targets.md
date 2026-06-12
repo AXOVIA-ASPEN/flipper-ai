@@ -1,8 +1,8 @@
 # Story 15.5: Top-Level Mobile Makefile Targets
 
-Status: ready-for-dev
-Blocked: false
-Blocked-Reason:
+Status: blocked
+Blocked: true
+Blocked-Reason: HUMAN REVIEW GATE — Stephen must review and approve the mobile architecture overview (docs/architecture/mobile-architecture-overview.html) before ANY Epic 15+ mobile development starts. Do not begin implementation while this gate is in place. To lift: after approval, set Blocked: false, clear this reason, set Status: ready-for-dev (all five Epic 15 stories carry this same gate).
 Trello-Card-ID: 6a16b89a15efdbcddd908143
 
 <!-- Valid statuses: backlog | ready-for-dev | in-progress | blocked | review | done -->

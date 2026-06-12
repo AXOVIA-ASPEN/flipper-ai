@@ -132,9 +132,7 @@ function matchesRgbTripleWithTolerance(colorString: string, expected: string): b
   const g = parseInt(match[2], 10);
   const b = parseInt(match[3], 10);
   return (
-    Math.abs(r - target.r) <= 15 &&
-    Math.abs(g - target.g) <= 20 &&
-    Math.abs(b - target.b) <= 10
+    Math.abs(r - target.r) <= 15 && Math.abs(g - target.g) <= 20 && Math.abs(b - target.b) <= 10
   );
 }
 
@@ -346,12 +344,7 @@ Then(
       const selected = labels.find((l) => !!l.querySelector('input:checked'));
       if (!selected) return null;
       const style = window.getComputedStyle(selected);
-      return (
-        style.borderColor ||
-        style.borderTopColor ||
-        style.borderLeftColor ||
-        ''
-      );
+      return style.borderColor || style.borderTopColor || style.borderLeftColor || '';
     });
     assert.ok(
       typeof border === 'string' && matchesRgbTripleWithTolerance(border, expected),
@@ -412,11 +405,7 @@ Then(
       const input = document.querySelector('#zip-code');
       return !!input && input.classList.contains(cls);
     }, className);
-    assert.strictEqual(
-      has,
-      true,
-      `Expected #zip-code to have class "${className}" but it did not`
-    );
+    assert.strictEqual(has, true, `Expected #zip-code to have class "${className}" but it did not`);
   }
 );
 
@@ -434,12 +423,7 @@ Then(
       const style = window.getComputedStyle(input as Element);
       // Check borderColor first; fall back to box-shadow which carries the
       // 3px purple focus ring when :focus is active.
-      return (
-        style.borderColor ||
-        style.borderTopColor ||
-        style.boxShadow ||
-        ''
-      );
+      return style.borderColor || style.borderTopColor || style.boxShadow || '';
     });
     assert.ok(
       typeof border === 'string' && matchesRgbTripleWithTolerance(border, expected),
@@ -488,9 +472,7 @@ Then(
     assert.strictEqual(
       offending.length,
       0,
-      `Expected no step wrapper to contain "${bannedClass}" but found: ${JSON.stringify(
-        offending
-      )}`
+      `Expected no step wrapper to contain "${bannedClass}" but found: ${JSON.stringify(offending)}`
     );
   }
 );
@@ -503,7 +485,9 @@ Then(
   function (this: CustomWorld, bannedPrefix: string) {
     const seen = (this.testData.onboardingStepsSeen || []) as CapturedStep[];
     assert.ok(seen.length > 0, 'No onboarding steps were captured during navigation');
-    const pattern = new RegExp(`(^|\\s)${bannedPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[A-Za-z0-9-]*`);
+    const pattern = new RegExp(
+      `(^|\\s)${bannedPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[A-Za-z0-9-]*`
+    );
     const offending = seen.filter(({ wrapperClass }) => pattern.test(wrapperClass));
     assert.strictEqual(
       offending.length,

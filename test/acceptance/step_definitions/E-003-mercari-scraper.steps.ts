@@ -52,15 +52,21 @@ Then('it should use POST method to the {string} endpoint', function (endpoint: s
   expect(this.fileContent).toContain(`callMercariApi('${endpoint}', 'POST'`);
 });
 
-Then('it should include browser-mimicking headers with {string} set to {string}', function (header: string, value: string) {
-  expect(this.fileContent).toContain(`'${header}': '${value}'`);
-});
+Then(
+  'it should include browser-mimicking headers with {string} set to {string}',
+  function (header: string, value: string) {
+    expect(this.fileContent).toContain(`'${header}': '${value}'`);
+  }
+);
 
-Then('it should include {string}, {string}, and {string} headers', function (h1: string, h2: string, h3: string) {
-  expect(this.fileContent).toContain(`'${h1}'`);
-  expect(this.fileContent).toContain(`'${h2}'`);
-  expect(this.fileContent).toContain(`'${h3}'`);
-});
+Then(
+  'it should include {string}, {string}, and {string} headers',
+  function (h1: string, h2: string, h3: string) {
+    expect(this.fileContent).toContain(`'${h1}'`);
+    expect(this.fileContent).toContain(`'${h2}'`);
+    expect(this.fileContent).toContain(`'${h3}'`);
+  }
+);
 
 // ==================== AC #2: Playwright Fallback ====================
 
@@ -139,7 +145,7 @@ Then('it should detect HTTP 429 status as rate limiting', function () {
 
 Then('it should detect HTML responses as rate limiting via isRateLimitOrBlock', function () {
   expect(this.fileContent).toContain('isRateLimitOrBlock');
-  expect(this.fileContent).toContain("text/html");
+  expect(this.fileContent).toContain('text/html');
 });
 
 Then('it should retry up to MAX_RETRIES times before Playwright fallback', function () {
@@ -177,14 +183,17 @@ Then('all Mercari user agents should reference Chrome version 130 or higher', fu
   }
 });
 
-Then('viewport randomization should be configured between 1280-1920 width and 800-1080 height', function () {
-  expect(this.fileContent).toContain('VIEWPORT_MIN_WIDTH');
-  expect(this.fileContent).toContain('VIEWPORT_MAX_WIDTH');
-  expect(this.fileContent).toContain('1280');
-  expect(this.fileContent).toContain('1920');
-  expect(this.fileContent).toContain('800');
-  expect(this.fileContent).toContain('1080');
-});
+Then(
+  'viewport randomization should be configured between 1280-1920 width and 800-1080 height',
+  function () {
+    expect(this.fileContent).toContain('VIEWPORT_MIN_WIDTH');
+    expect(this.fileContent).toContain('VIEWPORT_MAX_WIDTH');
+    expect(this.fileContent).toContain('1280');
+    expect(this.fileContent).toContain('1920');
+    expect(this.fileContent).toContain('800');
+    expect(this.fileContent).toContain('1080');
+  }
+);
 
 Then('it should include randomized Accept-Language header variants', function () {
   expect(this.fileContent).toContain('ACCEPT_LANGUAGE_VARIANTS');

@@ -181,24 +181,22 @@ export default function BillingSettings() {
 
   const fetchSubscription = useCallback(async () => {
     try {
-        const res = await fetch('/api/usage');
-        if (res.ok) {
-          const json = await res.json();
-          const payload = json.data ?? json;
-          const scans = payload.scans as
-            | { usedToday?: number; used?: number }
-            | undefined;
-          const usedToday =
-            typeof scans?.usedToday === 'number'
-              ? scans.usedToday
-              : typeof scans?.used === 'number'
-                ? scans.used
-                : 0;
-          setData({
-            tier: (payload.tier || 'FREE') as SubscriptionTier,
-            scansToday: usedToday,
-          });
-        }
+      const res = await fetch('/api/usage');
+      if (res.ok) {
+        const json = await res.json();
+        const payload = json.data ?? json;
+        const scans = payload.scans as { usedToday?: number; used?: number } | undefined;
+        const usedToday =
+          typeof scans?.usedToday === 'number'
+            ? scans.usedToday
+            : typeof scans?.used === 'number'
+              ? scans.used
+              : 0;
+        setData({
+          tier: (payload.tier || 'FREE') as SubscriptionTier,
+          scansToday: usedToday,
+        });
+      }
     } catch (err) {
       console.error('Failed to fetch subscription data:', err);
     } finally {
@@ -215,7 +213,8 @@ export default function BillingSettings() {
       void fetchSubscription();
     }
     window.addEventListener(BILLING_SUBSCRIPTION_SYNCED_EVENT, onSubscriptionSynced);
-    return () => window.removeEventListener(BILLING_SUBSCRIPTION_SYNCED_EVENT, onSubscriptionSynced);
+    return () =>
+      window.removeEventListener(BILLING_SUBSCRIPTION_SYNCED_EVENT, onSubscriptionSynced);
   }, [fetchSubscription]);
 
   async function handleUpgrade(tier: SubscriptionTier) {
@@ -270,10 +269,7 @@ export default function BillingSettings() {
   const limits = TIER_LIMITS[data.tier];
 
   return (
-    <div
-      id="billing"
-      style={{ padding: 8 }}
-    >
+    <div id="billing" style={{ padding: 8 }}>
       {/* Shimmer keyframes */}
       <style>{`
         @keyframes shimmer {
@@ -348,10 +344,7 @@ export default function BillingSettings() {
           </h2>
         </div>
         {isPaid && (
-          <button
-            onClick={handleManageBilling}
-            className="fp-btn-ghost"
-          >
+          <button onClick={handleManageBilling} className="fp-btn-ghost">
             <CreditCard className="w-4 h-4" />
             Manage Billing
           </button>
@@ -361,10 +354,10 @@ export default function BillingSettings() {
       {/* Current plan summary with scan progress */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-3">
-          <span className="text-sm" style={{ color: '#94a3b8' }}>Current plan:</span>
-          <span className={TIER_META[data.tier].badge}>
-            {limits.name}
+          <span className="text-sm" style={{ color: '#94a3b8' }}>
+            Current plan:
           </span>
+          <span className={TIER_META[data.tier].badge}>{limits.name}</span>
           {data.tier !== 'FREE' && (
             <span className="text-sm" style={{ color: '#94a3b8' }}>
               {TIER_PRICING[data.tier].label}
@@ -387,7 +380,12 @@ export default function BillingSettings() {
             </div>
             <div
               className="overflow-hidden"
-              style={{ height: '8px', width: '100%', borderRadius: '4px', background: 'rgba(255,255,255,0.06)' }}
+              style={{
+                height: '8px',
+                width: '100%',
+                borderRadius: '4px',
+                background: 'rgba(255,255,255,0.06)',
+              }}
             >
               <div
                 style={{
@@ -430,7 +428,9 @@ export default function BillingSettings() {
               } ${isPopular && !isCurrentTier ? 'shimmer-border glow-card' : ''}`}
               style={{
                 border: '2px solid rgba(255,255,255,0.1)',
-                ...(isCurrentTier ? { boxShadow: '0 0 0 2px #7c3aed, 0 0 0 4px rgba(15,23,42,0.5)' } : {}),
+                ...(isCurrentTier
+                  ? { boxShadow: '0 0 0 2px #7c3aed, 0 0 0 4px rgba(15,23,42,0.5)' }
+                  : {}),
               }}
             >
               {/* Popular badge */}
@@ -438,7 +438,10 @@ export default function BillingSettings() {
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <div
                     className="shimmer-badge float-badge relative flex items-center gap-1.5 rounded-full px-4 py-1 text-xs font-bold shadow-lg"
-                    style={{ background: 'linear-gradient(90deg, #7c3aed, #a78bfa)', color: '#f1f5f9' }}
+                    style={{
+                      background: 'linear-gradient(90deg, #7c3aed, #a78bfa)',
+                      color: '#f1f5f9',
+                    }}
                   >
                     <Star className="w-3 h-3" />
                     Most Popular
@@ -455,19 +458,15 @@ export default function BillingSettings() {
                       tier === 'FREE'
                         ? 'rgba(148,163,184,0.15)'
                         : tier === 'FLIPPER'
-                        ? 'rgba(124,58,237,0.15)'
-                        : 'rgba(251,191,36,0.15)',
+                          ? 'rgba(124,58,237,0.15)'
+                          : 'rgba(251,191,36,0.15)',
                   }}
                 >
                   <Icon
                     className="w-6 h-6"
                     style={{
                       color:
-                        tier === 'FREE'
-                          ? '#94a3b8'
-                          : tier === 'FLIPPER'
-                          ? '#c4b5fd'
-                          : '#fcd34d',
+                        tier === 'FREE' ? '#94a3b8' : tier === 'FLIPPER' ? '#c4b5fd' : '#fcd34d',
                     }}
                   />
                 </div>
@@ -485,7 +484,9 @@ export default function BillingSettings() {
                   <span className="text-4xl font-extrabold" style={{ color: '#e2e8f0' }}>
                     {pricing.monthly === 0 ? '$0' : `$${pricing.monthly / 100}`}
                   </span>
-                  <span className="text-sm" style={{ color: '#94a3b8' }}>/mo</span>
+                  <span className="text-sm" style={{ color: '#94a3b8' }}>
+                    /mo
+                  </span>
                 </div>
                 {meta.daily && (
                   <p className="font-medium mt-1 text-xs" style={{ color: '#c4b5fd' }}>
@@ -497,11 +498,20 @@ export default function BillingSettings() {
               {/* Features */}
               <ul className="space-y-3 mb-6">
                 {FEATURES.map((feature) => {
-                  const value = tier === 'FREE' ? feature.free : tier === 'FLIPPER' ? feature.flipper : feature.pro;
+                  const value =
+                    tier === 'FREE'
+                      ? feature.free
+                      : tier === 'FLIPPER'
+                        ? feature.flipper
+                        : feature.pro;
                   const hasFeature = value !== false;
 
                   return (
-                    <li key={feature.label} className="flex items-center gap-2 text-sm" style={{ color: hasFeature ? '#94a3b8' : '#475569' }}>
+                    <li
+                      key={feature.label}
+                      className="flex items-center gap-2 text-sm"
+                      style={{ color: hasFeature ? '#94a3b8' : '#475569' }}
+                    >
                       {hasFeature ? (
                         <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#34d399' }} />
                       ) : (
@@ -559,7 +569,10 @@ export default function BillingSettings() {
                     )}
                   </button>
                 ) : (
-                  <div className="fp-glass-sm w-full rounded-xl py-3 text-center text-sm" style={{ color: '#94a3b8' }}>
+                  <div
+                    className="fp-glass-sm w-full rounded-xl py-3 text-center text-sm"
+                    style={{ color: '#94a3b8' }}
+                  >
                     Included in your plan
                   </div>
                 )}
@@ -574,7 +587,10 @@ export default function BillingSettings() {
         <div className="space-y-4">
           <div
             className="relative overflow-hidden rounded-xl"
-            style={{ padding: '1px', background: 'linear-gradient(90deg, #7c3aed, #a78bfa, #7c3aed)' }}
+            style={{
+              padding: '1px',
+              background: 'linear-gradient(90deg, #7c3aed, #a78bfa, #7c3aed)',
+            }}
           >
             <div className="fp-glass-sm rounded-xl px-6 py-5">
               <div className="flex items-start gap-4">
@@ -590,9 +606,8 @@ export default function BillingSettings() {
                   </h3>
                   <p className="text-sm mt-1" style={{ color: '#94a3b8' }}>
                     The average flipper finds deals worth $100+ in profit. At just{' '}
-                    {TIER_PRICING.FLIPPER.label}, Flipper pays for itself on your very
-                    first find. Stop scrolling marketplace listings for hours — let AI
-                    do the hunting.
+                    {TIER_PRICING.FLIPPER.label}, Flipper pays for itself on your very first find.
+                    Stop scrolling marketplace listings for hours — let AI do the hunting.
                   </p>
                 </div>
               </div>
@@ -600,7 +615,11 @@ export default function BillingSettings() {
           </div>
 
           {/* Trust signals */}
-          <div className="flex flex-wrap items-center justify-center gap-6 text-xs" style={{ color: '#64748b' }} data-testid="trust-signals">
+          <div
+            className="flex flex-wrap items-center justify-center gap-6 text-xs"
+            style={{ color: '#64748b' }}
+            data-testid="trust-signals"
+          >
             <span className="flex items-center gap-1.5">
               <Lock className="w-3.5 h-3.5" />
               Secure checkout via Stripe
@@ -618,10 +637,18 @@ export default function BillingSettings() {
       )}
 
       {/* Invoice history (Story 14.8 AC #5) */}
-      <section className="mt-10" aria-labelledby="invoice-history-heading" data-testid="invoice-history">
+      <section
+        className="mt-10"
+        aria-labelledby="invoice-history-heading"
+        data-testid="invoice-history"
+      >
         <div className="flex items-center gap-2 mb-4">
           <FileText className="w-5 h-5" style={{ color: '#8b5cf6' }} />
-          <h3 id="invoice-history-heading" className="text-lg font-semibold" style={{ color: '#e2e8f0' }}>
+          <h3
+            id="invoice-history-heading"
+            className="text-lg font-semibold"
+            style={{ color: '#e2e8f0' }}
+          >
             Invoice History
           </h3>
         </div>
@@ -638,9 +665,17 @@ export default function BillingSettings() {
               ))}
             </div>
           ) : invoicesError ? (
-            <div className="fp-alert-warn p-3 text-sm" data-testid="invoice-history-error" style={{ color: '#fcd34d' }}>
+            <div
+              className="fp-alert-warn p-3 text-sm"
+              data-testid="invoice-history-error"
+              style={{ color: '#fcd34d' }}
+            >
               {invoicesError}{' '}
-              <button onClick={() => void fetchInvoices()} className="underline" style={{ color: '#c4b5fd' }}>
+              <button
+                onClick={() => void fetchInvoices()}
+                className="underline"
+                style={{ color: '#c4b5fd' }}
+              >
                 Retry
               </button>
             </div>

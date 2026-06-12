@@ -21,7 +21,11 @@ import {
   generateFallbackMessage,
   getPlatformTone,
 } from '../../../src/lib/message-generator';
-import type { MessageGeneratorInput, GeneratedMessage, MessageType } from '../../../src/lib/message-generator';
+import type {
+  MessageGeneratorInput,
+  GeneratedMessage,
+  MessageType,
+} from '../../../src/lib/message-generator';
 import * as fs from 'fs';
 
 // AI-driven scenarios call real Groq → Gemini → OpenAI providers (per the
@@ -40,25 +44,24 @@ let sellerName: string | null;
 let offerPrice: number | null;
 
 // Reset state before each scenario
-Given('a listing on {string} with title {string} priced at {int}', function (
-  platform: string,
-  title: string,
-  price: number
-) {
-  apiUnavailable = false;
-  sellerName = null;
-  offerPrice = null;
-  listingInput = {
-    listingTitle: title,
-    askingPrice: price,
-    platform,
-    sellerName: null,
-    messageType: 'inquiry',
-    offerPrice: null,
-    itemCondition: null,
-    additionalContext: null,
-  };
-});
+Given(
+  'a listing on {string} with title {string} priced at {int}',
+  function (platform: string, title: string, price: number) {
+    apiUnavailable = false;
+    sellerName = null;
+    offerPrice = null;
+    listingInput = {
+      listingTitle: title,
+      askingPrice: price,
+      platform,
+      sellerName: null,
+      messageType: 'inquiry',
+      offerPrice: null,
+      itemCondition: null,
+      additionalContext: null,
+    };
+  }
+);
 
 Given('the seller name is {string}', function (name: string) {
   sellerName = name;
@@ -135,10 +138,7 @@ Then('the generated message contains a subject line', function () {
 });
 
 Then('the generated message contains a body', function () {
-  assert.ok(
-    generatedMessage.body && generatedMessage.body.length > 0,
-    'Expected non-empty body'
-  );
+  assert.ok(generatedMessage.body && generatedMessage.body.length > 0, 'Expected non-empty body');
 });
 
 Then('the generated message has a non-empty subject', function () {
@@ -149,10 +149,7 @@ Then('the generated message has a non-empty subject', function () {
 });
 
 Then('the generated message has a non-empty body', function () {
-  assert.ok(
-    generatedMessage.body && generatedMessage.body.length > 0,
-    'Expected non-empty body'
-  );
+  assert.ok(generatedMessage.body && generatedMessage.body.length > 0, 'Expected non-empty body');
 });
 
 Then('the generated message body references the seller {string}', function (name: string) {
@@ -192,10 +189,7 @@ Then('the generated message body contains a price placeholder', function () {
 
 Given('the message generation API endpoint exists at {string}', function (routePath: string) {
   const fullPath = path.resolve(process.cwd(), routePath);
-  assert.ok(
-    fs.existsSync(fullPath),
-    `Expected API route file to exist at ${routePath}`
-  );
+  assert.ok(fs.existsSync(fullPath), `Expected API route file to exist at ${routePath}`);
 });
 
 Then('the route creates messages with initial status {string}', function (status: string) {
@@ -203,18 +197,12 @@ Then('the route creates messages with initial status {string}', function (status
   const content = fs.readFileSync(routePath, 'utf-8');
   // Match both single and double quotes for resilience against formatting changes
   const pattern = new RegExp(`status:\\s*['"\`]${status}['"\`]`);
-  assert.ok(
-    pattern.test(content),
-    `Expected route to create messages with status "${status}"`
-  );
+  assert.ok(pattern.test(content), `Expected route to create messages with status "${status}"`);
 });
 
 Then('the route sets direction to {string}', function (direction: string) {
   const routePath = path.resolve(process.cwd(), 'app/api/messages/generate/route.ts');
   const content = fs.readFileSync(routePath, 'utf-8');
   const pattern = new RegExp(`direction:\\s*['"\`]${direction}['"\`]`);
-  assert.ok(
-    pattern.test(content),
-    `Expected route to set direction to "${direction}"`
-  );
+  assert.ok(pattern.test(content), `Expected route to set direction to "${direction}"`);
 });

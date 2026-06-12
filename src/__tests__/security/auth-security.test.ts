@@ -65,7 +65,9 @@ describe('Security: Firebase Authentication', () => {
 
     test('should reject tampered session cookies', async () => {
       mockCookieGet.mockReturnValue({ value: 'tampered-cookie' });
-      mockVerifySessionCookie.mockRejectedValue(new Error('Decoding Firebase session cookie failed'));
+      mockVerifySessionCookie.mockRejectedValue(
+        new Error('Decoding Firebase session cookie failed')
+      );
 
       const user = await getCurrentUser();
       expect(user).toBeNull();
@@ -126,7 +128,9 @@ describe('Security: Firebase Authentication', () => {
       const req = new NextRequest('http://localhost:3000/api/test', {
         headers: { Authorization: 'Bearer invalid-token' },
       });
-      mockAdminVerifyIdToken.mockRejectedValue(new Error('Firebase ID token has invalid signature'));
+      mockAdminVerifyIdToken.mockRejectedValue(
+        new Error('Firebase ID token has invalid signature')
+      );
 
       const result = await verifyIdToken(req);
       expect(result).toBeNull();

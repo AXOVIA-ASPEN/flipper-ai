@@ -48,21 +48,24 @@ Then('the URL hash should be {string}', async function (this: CustomWorld, expec
   // browser-managed hash change that the document's `popstate` listener
   // reflects on the next animation frame; on cold cache that can lag
   // beyond Playwright's default sync read.
-  await this.page.waitForFunction(
-    (expected) => new URL(window.location.href).hash === expected,
-    expectedHash,
-    { timeout: 5000 }
-  ).catch(() => undefined);
+  await this.page
+    .waitForFunction((expected) => new URL(window.location.href).hash === expected, expectedHash, {
+      timeout: 5000,
+    })
+    .catch(() => undefined);
   const url = new URL(this.page.url());
   expect(url.hash).toBe(expectedHash);
 });
 
 // ─── Active element + URL assertions ─────────────────────────────────────────
 
-Then('the active element tag should be {string}', async function (this: CustomWorld, expectedTag: string) {
-  const tag = await this.page.evaluate(() => document.activeElement?.tagName ?? null);
-  expect(tag).toBe(expectedTag);
-});
+Then(
+  'the active element tag should be {string}',
+  async function (this: CustomWorld, expectedTag: string) {
+    const tag = await this.page.evaluate(() => document.activeElement?.tagName ?? null);
+    expect(tag).toBe(expectedTag);
+  }
+);
 
 Then(
   'the active element should have text {string}',
@@ -132,7 +135,10 @@ Then(
           const missing = required.filter(
             (attr) => !el.hasAttribute(attr) || (el.getAttribute(attr) ?? '').length === 0
           );
-          return { id: (el as HTMLElement).id || (el as HTMLElement).outerHTML.slice(0, 80), missing };
+          return {
+            id: (el as HTMLElement).id || (el as HTMLElement).outerHTML.slice(0, 80),
+            missing,
+          };
         })
         .filter((r) => r.missing.length > 0);
     });
@@ -152,9 +158,7 @@ Then(
   'the page passes axe-core {string} rule with zero violations',
   { timeout: 180 * 1000 },
   async function (this: CustomWorld, ruleId: string) {
-    const results = await new AxeBuilder({ page: this.page })
-      .withRules([ruleId])
-      .analyze();
+    const results = await new AxeBuilder({ page: this.page }).withRules([ruleId]).analyze();
     if (results.violations.length > 0) {
       const detail = results.violations
         .map((v) => `  [${v.impact}] ${v.id}: ${v.description}`)
@@ -271,9 +275,7 @@ Then(
   'the page passes axe-core target-size with zero violations',
   { timeout: 180 * 1000 },
   async function (this: CustomWorld) {
-    const results = await new AxeBuilder({ page: this.page })
-      .withRules(['target-size'])
-      .analyze();
+    const results = await new AxeBuilder({ page: this.page }).withRules(['target-size']).analyze();
     if (results.violations.length > 0) {
       const detail = results.violations
         .map((v) => `  [${v.impact}] ${v.id}: ${v.nodes.length} node(s)`)
@@ -285,41 +287,36 @@ Then(
 
 // ─── Sliders ARIA quartet on a specific route (AC #3 multi-page) ────────────
 
-Then(
-  'every range input on the page has the full ARIA quartet',
-  async function (this: CustomWorld) {
-    const offenders = await this.page.evaluate(() => {
-      const sliders = Array.from(document.querySelectorAll('input[type="range"]'));
-      return sliders
-        .map((el) => {
-          const required = ['aria-valuemin', 'aria-valuemax', 'aria-valuenow', 'aria-valuetext'];
-          const missing = required.filter(
-            (attr) => !el.hasAttribute(attr) || (el.getAttribute(attr) ?? '').length === 0
-          );
-          return { id: (el as HTMLElement).id || (el as HTMLElement).outerHTML.slice(0, 80), missing };
-        })
-        .filter((r) => r.missing.length > 0);
-    });
-    if (offenders.length > 0) {
-      throw new Error(
-        `Sliders missing ARIA attributes:\n${offenders
-          .map((o) => `  ${o.id} → missing ${o.missing.join(', ')}`)
-          .join('\n')}`
-      );
-    }
+Then('every range input on the page has the full ARIA quartet', async function (this: CustomWorld) {
+  const offenders = await this.page.evaluate(() => {
+    const sliders = Array.from(document.querySelectorAll('input[type="range"]'));
+    return sliders
+      .map((el) => {
+        const required = ['aria-valuemin', 'aria-valuemax', 'aria-valuenow', 'aria-valuetext'];
+        const missing = required.filter(
+          (attr) => !el.hasAttribute(attr) || (el.getAttribute(attr) ?? '').length === 0
+        );
+        return {
+          id: (el as HTMLElement).id || (el as HTMLElement).outerHTML.slice(0, 80),
+          missing,
+        };
+      })
+      .filter((r) => r.missing.length > 0);
+  });
+  if (offenders.length > 0) {
+    throw new Error(
+      `Sliders missing ARIA attributes:\n${offenders
+        .map((o) => `  ${o.id} → missing ${o.missing.join(', ')}`)
+        .join('\n')}`
+    );
   }
-);
+});
 
 // ─── aria-live attribute on a data-testid element ───────────────────────────
 
 Then(
   'the data-testid {string} element has attribute {string} equal to {string}',
-  async function (
-    this: CustomWorld,
-    testid: string,
-    attr: string,
-    expected: string
-  ) {
+  async function (this: CustomWorld, testid: string, attr: string, expected: string) {
     // Wait for the element to appear — pages that gate render on Firebase auth
     // briefly show only a loading spinner before hydration. Without this wait,
     // the querySelector below returns null and the assertion fires "null !== polite".
@@ -340,34 +337,39 @@ const HEADER_EXCLUDED_GLOBS = [
   '**/.next/**',
   '**/node_modules/**',
 ];
-const REQUIRED_HEADER_TAGS = ['@file', '@author', '@company', '@date', '@version', '@brief', '@description'];
+const REQUIRED_HEADER_TAGS = [
+  '@file',
+  '@author',
+  '@company',
+  '@date',
+  '@version',
+  '@brief',
+  '@description',
+];
 
 let lastHeaderAuditOffenders: Array<{ file: string; missing: string[] }> = [];
 
-When(
-  'the file-header audit walks all production TSX files',
-  async function (this: CustomWorld) {
-    const files = (
-      await Promise.all(
-        HEADER_GLOB_PATTERNS.map((p) =>
-          glob(p, { cwd: REPO_ROOT, ignore: HEADER_EXCLUDED_GLOBS, absolute: false })
-        )
+When('the file-header audit walks all production TSX files', async function (this: CustomWorld) {
+  const files = (
+    await Promise.all(
+      HEADER_GLOB_PATTERNS.map((p) =>
+        glob(p, { cwd: REPO_ROOT, ignore: HEADER_EXCLUDED_GLOBS, absolute: false })
       )
     )
-      .flat()
-      .sort();
+  )
+    .flat()
+    .sort();
 
-    lastHeaderAuditOffenders = [];
-    for (const rel of files) {
-      const abs = path.join(REPO_ROOT, rel);
-      const head = fs.readFileSync(abs, 'utf-8').split('\n').slice(0, 30).join('\n');
-      const missing = REQUIRED_HEADER_TAGS.filter((tag) => !head.includes(tag));
-      if (missing.length > 0) {
-        lastHeaderAuditOffenders.push({ file: rel, missing });
-      }
+  lastHeaderAuditOffenders = [];
+  for (const rel of files) {
+    const abs = path.join(REPO_ROOT, rel);
+    const head = fs.readFileSync(abs, 'utf-8').split('\n').slice(0, 30).join('\n');
+    const missing = REQUIRED_HEADER_TAGS.filter((tag) => !head.includes(tag));
+    if (missing.length > 0) {
+      lastHeaderAuditOffenders.push({ file: rel, missing });
     }
   }
-);
+});
 
 Then(
   /^every file's first 30 lines contain "@file", "@author", "@company", "@date", "@version", "@brief", and "@description"$/,
@@ -436,12 +438,9 @@ async function runAudit(regex: RegExp): Promise<AuditMatch[]> {
 let lastPaletteMatches: AuditMatch[] = [];
 let lastLightModeMatches: AuditMatch[] = [];
 
-When(
-  'the palette violation audit walks all production files',
-  async function (this: CustomWorld) {
-    lastPaletteMatches = await runAudit(PALETTE_REGEX);
-  }
-);
+When('the palette violation audit walks all production files', async function (this: CustomWorld) {
+  lastPaletteMatches = await runAudit(PALETTE_REGEX);
+});
 
 Then('the palette violation count is zero', function (this: CustomWorld) {
   if (lastPaletteMatches.length > 0) {
@@ -500,56 +499,53 @@ Then(
 
 // ─── Keyboard journey helpers (S-120 onboarding) ────────────────────────────
 
-When(
-  'I press Tab repeatedly until a button receives focus',
-  async function (this: CustomWorld) {
-    // Wait for the wizard layout to be hydrated before tabbing — pages gated
-    // on a fetch (e.g. /onboarding loads /api/user/onboarding before rendering
-    // the wizard) initially show only a loading spinner with no focusable
-    // buttons, so tabs would just cycle through the auth nav.
-    const wizardReady = this.page.locator('button, [role="button"]').first();
-    await wizardReady.waitFor({ state: 'attached', timeout: 15000 }).catch(() => undefined);
+When('I press Tab repeatedly until a button receives focus', async function (this: CustomWorld) {
+  // Wait for the wizard layout to be hydrated before tabbing — pages gated
+  // on a fetch (e.g. /onboarding loads /api/user/onboarding before rendering
+  // the wizard) initially show only a loading spinner with no focusable
+  // buttons, so tabs would just cycle through the auth nav.
+  const wizardReady = this.page.locator('button, [role="button"]').first();
+  await wizardReady.waitFor({ state: 'attached', timeout: 15000 }).catch(() => undefined);
 
-    // A real keyboard user activates the skip-link if focus lands on it first,
-    // jumping straight into the main content. Without that step, the loop can
-    // burn its budget on the auth nav links.
-    const firstTag = await this.page.evaluate(() => document.activeElement?.tagName ?? null);
-    if (firstTag === 'A') {
-      const isSkipLink = await this.page.evaluate(() => {
-        const el = document.activeElement as HTMLAnchorElement | null;
-        if (!el) return false;
-        const text = (el.textContent || '').toLowerCase();
-        const href = el.getAttribute('href') || '';
-        return /skip\s+to/.test(text) || href.startsWith('#main') || href.startsWith('#content');
-      });
-      if (isSkipLink) {
-        await this.page.keyboard.press('Enter');
-        await this.page.keyboard.press('Tab');
-      }
-    }
-    // Bound the loop so a misconfigured page can't hang the suite.
-    // Accept anything semantically interactive as a button: <button>, role=button,
-    // or input type=button/submit — the wizard uses native buttons today, but the
-    // contract is "a button receives focus", not specifically a <button> tag.
-    for (let i = 0; i < 30; i++) {
-      const interactive = await this.page.evaluate(() => {
-        const el = document.activeElement as HTMLElement | null;
-        if (!el) return false;
-        if (el.tagName === 'BUTTON') return true;
-        if (el.getAttribute('role') === 'button') return true;
-        if (el.tagName === 'INPUT') {
-          const t = (el as HTMLInputElement).type;
-          return t === 'button' || t === 'submit';
-        }
-        return false;
-      });
-      if (interactive) return;
+  // A real keyboard user activates the skip-link if focus lands on it first,
+  // jumping straight into the main content. Without that step, the loop can
+  // burn its budget on the auth nav links.
+  const firstTag = await this.page.evaluate(() => document.activeElement?.tagName ?? null);
+  if (firstTag === 'A') {
+    const isSkipLink = await this.page.evaluate(() => {
+      const el = document.activeElement as HTMLAnchorElement | null;
+      if (!el) return false;
+      const text = (el.textContent || '').toLowerCase();
+      const href = el.getAttribute('href') || '';
+      return /skip\s+to/.test(text) || href.startsWith('#main') || href.startsWith('#content');
+    });
+    if (isSkipLink) {
+      await this.page.keyboard.press('Enter');
       await this.page.keyboard.press('Tab');
     }
-    const finalTag = await this.page.evaluate(() => document.activeElement?.tagName ?? null);
-    throw new Error(`No <button> received focus after 30 Tab presses (last: ${finalTag})`);
   }
-);
+  // Bound the loop so a misconfigured page can't hang the suite.
+  // Accept anything semantically interactive as a button: <button>, role=button,
+  // or input type=button/submit — the wizard uses native buttons today, but the
+  // contract is "a button receives focus", not specifically a <button> tag.
+  for (let i = 0; i < 30; i++) {
+    const interactive = await this.page.evaluate(() => {
+      const el = document.activeElement as HTMLElement | null;
+      if (!el) return false;
+      if (el.tagName === 'BUTTON') return true;
+      if (el.getAttribute('role') === 'button') return true;
+      if (el.tagName === 'INPUT') {
+        const t = (el as HTMLInputElement).type;
+        return t === 'button' || t === 'submit';
+      }
+      return false;
+    });
+    if (interactive) return;
+    await this.page.keyboard.press('Tab');
+  }
+  const finalTag = await this.page.evaluate(() => document.activeElement?.tagName ?? null);
+  throw new Error(`No <button> received focus after 30 Tab presses (last: ${finalTag})`);
+});
 
 Then('the focused button has visible focus styling', async function (this: CustomWorld) {
   const styling = await this.page.evaluate(() => {
@@ -594,7 +590,8 @@ Then(
       ([pt, ct, cls, href]) => {
         const parent = document.querySelector(pt);
         if (!parent) return { error: `No <${pt}> in DOM`, focusables: [] as string[] };
-        const focusableSelector = 'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])';
+        const focusableSelector =
+          'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])';
         const focusables = Array.from(parent.querySelectorAll(focusableSelector));
         const first = focusables[0];
         return {

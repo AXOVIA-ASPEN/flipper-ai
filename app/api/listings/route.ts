@@ -85,29 +85,35 @@ export async function GET(request: NextRequest) {
         : null;
     if (statusList?.length) where.status = { in: statusList };
 
-    const [totalListings, opportunitiesCount, activeFlipsCount, totalProfitAgg, filteredTotal, listings] =
-      await Promise.all([
-        prisma.listing.count({ where: { userId } }),
-        prisma.opportunity.count({ where: { userId } }),
-        prisma.opportunity.count({
-          where: { userId, status: { notIn: ['SOLD', 'PASSED'] } },
-        }),
-        prisma.opportunity.aggregate({
-          where: { userId, status: 'SOLD' },
-          _sum: { actualProfit: true },
-        }),
-        prisma.listing.count({ where }),
-        prisma.listing.findMany({
-          where,
-          orderBy: { scrapedAt: 'desc' },
-          skip,
-          take: limit,
-          include: {
-            images: { take: 1, orderBy: { imageIndex: 'asc' } },
-            opportunity: { select: { id: true, status: true } },
-          },
-        }),
-      ]);
+    const [
+      totalListings,
+      opportunitiesCount,
+      activeFlipsCount,
+      totalProfitAgg,
+      filteredTotal,
+      listings,
+    ] = await Promise.all([
+      prisma.listing.count({ where: { userId } }),
+      prisma.opportunity.count({ where: { userId } }),
+      prisma.opportunity.count({
+        where: { userId, status: { notIn: ['SOLD', 'PASSED'] } },
+      }),
+      prisma.opportunity.aggregate({
+        where: { userId, status: 'SOLD' },
+        _sum: { actualProfit: true },
+      }),
+      prisma.listing.count({ where }),
+      prisma.listing.findMany({
+        where,
+        orderBy: { scrapedAt: 'desc' },
+        skip,
+        take: limit,
+        include: {
+          images: { take: 1, orderBy: { imageIndex: 'asc' } },
+          opportunity: { select: { id: true, status: true } },
+        },
+      }),
+    ]);
 
     return NextResponse.json({
       success: true,

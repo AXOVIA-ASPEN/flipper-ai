@@ -54,6 +54,7 @@ Full spec: `_bmad-output/project-context.md` → _Versioning & Release Pipeline_
 **As you work:** add entries to the `[Unreleased]` section of `CHANGELOG.md` under the appropriate category (`Added`, `Changed`, `Fixed`, `Removed`, `Security`, `Deprecated`).
 
 **To cut a release:**
+
 ```bash
 # 1. Update CHANGELOG.md — promote [Unreleased] to ## [X.Y.Z] - YYYY-MM-DD, leave fresh [Unreleased] at top
 # 2. Update VERSION.md — set to new version number
@@ -82,6 +83,7 @@ git push origin vX.Y.Z
 **AI provider calls (Groq, Gemini, OpenAI, Anthropic) MUST NEVER be mocked, stubbed, faked, or short-circuited in ANY layer — production, tests, CI, or local dev.** The acceptance suite, unit tests, and integration tests must all exercise the real `completeAI()` router and the real provider chain. AI behaviour IS the system's behaviour for AI-driven features (message generation, sellability scoring, item identification, negotiation strategy, listing copy) — substituting a stub removes the very thing those tests are validating.
 
 **Forbidden patterns (do not introduce):**
+
 - Stub providers, fake response builders, hard-coded JSON returns
 - `E2E_AI_STUB`-style env-var escape hatches in `src/lib/ai/`
 - `jest.mock('@/lib/ai')` / `jest.mock('@/lib/ai/providers/*')` to short-circuit real calls
@@ -89,6 +91,7 @@ git push origin vX.Y.Z
 - Conditional branches in `completeAI()` that bypass the provider chain when a test flag is set
 
 **If AI flakes on rate limits or slowness** — fix the root cause:
+
 - Confirm Groq is the primary (it has the most generous free tier — Llama 3.3 70B at 30 RPM / 6,000 TPM)
 - Tune provider-level retry/backoff in `src/lib/ai/providers/*.ts` and `callWithRetry()` in `src/lib/ai/index.ts`
 - Lift per-scenario timeouts for AI-heavy `@story-8-*` / `@story-13-*` cucumber scenarios with `setDefaultTimeout(180 * 1000)` in the relevant step file
@@ -97,6 +100,7 @@ git push origin vX.Y.Z
 - Reduce prompt token counts so requests fit further inside provider quotas
 
 The only acceptable test-time substitution is at the network layer with explicit, recorded real responses (e.g. Polly.js cassettes captured from actual provider calls). Even that requires explicit user approval before introduction. **Default position: real AI calls everywhere, including in CI.**
+
 - **Payments**: Stripe (checkout, subscriptions, webhooks)
 - **Email**: Resend
 - **CAPTCHA**: hCaptcha
@@ -111,6 +115,7 @@ The only acceptable test-time substitution is at the network layer with explicit
 **Single source of truth:** `config/secretmanager.yaml` defines ALL secrets organized by environment scope (all, production, staging, dev). This YAML file is the canonical reference for what secrets exist and where they're used.
 
 **CLI tool:** `scripts/secretmanager.py` provides the `EnvSecretManager` class and CLI commands:
+
 ```bash
 python scripts/secretmanager.py validate --env production  # Check secrets exist in GCP
 python scripts/secretmanager.py populate --env staging      # Generate .env from GCP
@@ -119,6 +124,7 @@ python scripts/secretmanager.py load --env production       # Container startup 
 ```
 
 **Rules:**
+
 - When adding a new secret, ALWAYS add it to `config/secretmanager.yaml` first under the correct scope
 - GCP naming convention: `{SCOPE}_{SECRET_NAME}` (e.g., `PRODUCTION_DATABASE_URL`)
 - Also add to `.env.example` with a description comment
@@ -181,6 +187,7 @@ test/acceptance/step_definitions/ # BDD step definitions (E-{epic}-{name}.steps.
 ### Key Architectural Patterns
 
 **API Routes**: All routes in `app/api/` export named HTTP method handlers (GET, POST, PATCH, DELETE). Standard pattern:
+
 ```typescript
 export async function GET(request: NextRequest) {
   try {
@@ -193,6 +200,7 @@ export async function GET(request: NextRequest) {
   }
 }
 ```
+
 - Response shape: `{ success: true, data: ... }` or `{ success: false, error: { code, detail, ... } }` (RFC 7807)
 - `handleError()` auto-maps error messages: "blocked"/"captcha" → RATE_LIMITED, "not found" → NOT_FOUND
 - Retryable errors (`RATE_LIMITED`, `SERVICE_UNAVAILABLE`, `EXTERNAL_SERVICE_ERROR`) include `retryable: true` in response
@@ -200,6 +208,7 @@ export async function GET(request: NextRequest) {
 **Error Hierarchy**: `src/lib/errors.ts` provides typed errors — `NotFoundError`, `ValidationError`, `UnauthorizedError`, `ForbiddenError`, `RateLimitError`, `ExternalServiceError`, `ConfigurationError`, `ConflictError`. Always throw specific subclasses, not generic `AppError`.
 
 **Auth**: Firebase Auth with session cookies. `src/lib/auth.ts` re-exports from `src/lib/firebase/session.ts`:
+
 - `getCurrentUserId()` → returns Prisma user `id` (cuid) or `null` if unauthenticated
 - `requireAuth()` → throws `UnauthorizedError` if unauthenticated (use in routes that must be protected)
 - Flow: client Firebase sign-in → POST `/api/auth/session` with Firebase ID token → server creates `__session` cookie (5-day TTL)
@@ -212,6 +221,7 @@ export async function GET(request: NextRequest) {
 ### Scraper Architecture
 
 Each platform scraper in `src/scrapers/{platform}/` follows the same structure:
+
 - `types.ts` — interfaces, config constants (`SCRAPER_CONFIG`), timeouts/delays/retries
 - `scraper.ts` — Playwright scraping logic with anti-detection (randomized UA, viewport, webdriver override)
 - `index.ts` — public barrel re-export
@@ -243,15 +253,18 @@ Key patterns: `hasRunningJob()` check prevents duplicate concurrent jobs, `Promi
 Every story MUST pass ALL items before status changes to `review`. Hard gate — no exceptions.
 
 **1. Implementation Complete**
+
 - All tasks/subtasks marked `[x]`; every AC satisfied; no `any` in production code
 
 **2. Code Quality Gates** _(run these commands — all must pass)_
+
 - `make lint` — zero ESLint errors
 - `make build` — strict TypeScript, no `ignoreBuildErrors`
 - `make test` — all tests green, zero regressions
 - Coverage: branches ≥96%, functions ≥98%, lines ≥99%, statements ≥99%
 
 **3. Test Coverage**
+
 - Unit tests for all new/changed logic in `src/lib/`, `app/api/`, `src/scrapers/`
 - Every AC has a test at the **correct level**:
   - Logic/calculation AC → service-level Jest test
@@ -268,11 +281,13 @@ Every story MUST pass ALL items before status changes to `review`. Hard gate —
   - `make test-ac FEATURE=F<epic_num>` passes cleanly (all stories in the epic)
 
 **4. Documentation & Tracking**
+
 - Story `Status` → `review`; `sprint-status.yaml` → `review`
 - RTM (`_bmad-output/test-artifacts/requirements-traceability-matrix.md`) updated
 - Story `File List` updated with every new/modified/deleted file
 
 **5. Trello**
+
 - Story card moved to Done list (trello-axovia)
 
 ### Linting Rules

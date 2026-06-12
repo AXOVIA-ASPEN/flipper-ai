@@ -85,9 +85,7 @@ function buildListingSnapshot(userId: string, platform: string) {
   };
 }
 
-function createItem(
-  overrides: Partial<StoredQueueItem> = {}
-): StoredQueueItem {
+function createItem(overrides: Partial<StoredQueueItem> = {}): StoredQueueItem {
   const id = `pq-${state.idCounter++}`;
   const now = new Date();
   const userId = overrides.userId ?? state.defaultUserId;
@@ -118,9 +116,7 @@ function createItem(
 function matchesWhere(item: StoredQueueItem, where: Record<string, unknown>): boolean {
   for (const [key, value] of Object.entries(where)) {
     if (key === 'OR' && Array.isArray(value)) {
-      const anyMatch = value.some((clause: Record<string, unknown>) =>
-        matchesWhere(item, clause)
-      );
+      const anyMatch = value.some((clause: Record<string, unknown>) => matchesWhere(item, clause));
       if (!anyMatch) return false;
       continue;
     }
@@ -160,9 +156,7 @@ function installPrismaStubs(): void {
       }) => {
         let results = state.items.filter((i) => matchesWhere(i, where));
         if (orderBy?.createdAt === 'asc') {
-          results = results.sort(
-            (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
-          );
+          results = results.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
         }
         if (take !== undefined) results = results.slice(0, take);
         return results;
@@ -179,12 +173,7 @@ function installPrismaStubs(): void {
         const item = state.items.find((i) => i.id === id);
         if (!item) throw new Error(`item ${id} not found`);
         for (const [k, v] of Object.entries(data)) {
-          if (
-            k === 'retryCount' &&
-            v &&
-            typeof v === 'object' &&
-            'increment' in (v as object)
-          ) {
+          if (k === 'retryCount' && v && typeof v === 'object' && 'increment' in (v as object)) {
             item.retryCount += (v as { increment: number }).increment;
           } else {
             (item as unknown as Record<string, unknown>)[k] = v;
@@ -237,10 +226,7 @@ function installPrismaStubs(): void {
   dbModule.default = fakePrisma;
   // Keep the exported proxy singleton in sync so any named-import path hits
   // the same fake.
-  Object.assign(
-    prisma as unknown as Record<string, unknown>,
-    fakePrisma
-  );
+  Object.assign(prisma as unknown as Record<string, unknown>, fakePrisma);
 }
 
 // ── Given steps ──────────────────────────────────────────────────────────────
@@ -250,9 +236,7 @@ Given('a resale listing ready to cross-post', function () {
   installPrismaStubs();
 });
 
-Given('a pending posting queue item for platform {string}', function (
-  platform: string
-) {
+Given('a pending posting queue item for platform {string}', function (platform: string) {
   state = freshState();
   installPrismaStubs();
   createItem({ targetPlatform: platform });
@@ -267,76 +251,54 @@ Given(
   }
 );
 
-Given(
-  'a pending posting queue item for user A on platform {string}',
-  function (platform: string) {
-    state = freshState();
-    installPrismaStubs();
-    createItem({ userId: 'user-A', targetPlatform: platform });
-  }
-);
+Given('a pending posting queue item for user A on platform {string}', function (platform: string) {
+  state = freshState();
+  installPrismaStubs();
+  createItem({ userId: 'user-A', targetPlatform: platform });
+});
 
-Given(
-  'a pending posting queue item for user B on platform {string}',
-  function (platform: string) {
-    createItem({ userId: 'user-B', targetPlatform: platform });
-  }
-);
+Given('a pending posting queue item for user B on platform {string}', function (platform: string) {
+  createItem({ userId: 'user-B', targetPlatform: platform });
+});
 
-Given('a pending posting queue item already exists for {string}', function (
-  platform: string
-) {
+Given('a pending posting queue item already exists for {string}', function (platform: string) {
   state = freshState();
   installPrismaStubs();
   createItem({ targetPlatform: platform });
 });
 
-Given(
-  'a successful platform poster registered for {string}',
-  function (platform: string) {
-    const poster: PlatformPoster = async () =>
-      ({
-        success: true,
-        externalPostId: `ext-${platform}`,
-        externalPostUrl: `https://${platform.toLowerCase()}.example.com/listing`,
-      }) as PostingResult;
-    registerPoster(platform, poster);
-  }
-);
+Given('a successful platform poster registered for {string}', function (platform: string) {
+  const poster: PlatformPoster = async () =>
+    ({
+      success: true,
+      externalPostId: `ext-${platform}`,
+      externalPostUrl: `https://${platform.toLowerCase()}.example.com/listing`,
+    }) as PostingResult;
+  registerPoster(platform, poster);
+});
 
-Given(
-  'a failing platform poster registered for {string}',
-  function (platform: string) {
-    const poster: PlatformPoster = async () =>
-      ({
-        success: false,
-        errorMessage: `Simulated failure on ${platform}`,
-      }) as PostingResult;
-    registerPoster(platform, poster);
-  }
-);
+Given('a failing platform poster registered for {string}', function (platform: string) {
+  const poster: PlatformPoster = async () =>
+    ({
+      success: false,
+      errorMessage: `Simulated failure on ${platform}`,
+    }) as PostingResult;
+  registerPoster(platform, poster);
+});
 
-Given(
-  'the process API endpoint exists at {string}',
-  function (relativePath: string) {
-    const absolute = path.resolve(__dirname, '..', '..', '..', relativePath);
-    assert.ok(fs.existsSync(absolute), `Expected file at ${relativePath}`);
-  }
-);
+Given('the process API endpoint exists at {string}', function (relativePath: string) {
+  const absolute = path.resolve(__dirname, '..', '..', '..', relativePath);
+  assert.ok(fs.existsSync(absolute), `Expected file at ${relativePath}`);
+});
 
-Given(
-  'the platform posters module exists at {string}',
-  function (relativePath: string) {
-    const absolute = path.resolve(__dirname, '..', '..', '..', relativePath);
-    assert.ok(fs.existsSync(absolute), `Expected file at ${relativePath}`);
-  }
-);
+Given('the platform posters module exists at {string}', function (relativePath: string) {
+  const absolute = path.resolve(__dirname, '..', '..', '..', relativePath);
+  assert.ok(fs.existsSync(absolute), `Expected file at ${relativePath}`);
+});
 
 // ── When steps ───────────────────────────────────────────────────────────────
 
-When('the user selects platforms {string}', async function (
-  platformsCsv: string
-) {
+When('the user selects platforms {string}', async function (platformsCsv: string) {
   const platforms = platformsCsv.split(',').map((p) => p.trim());
   for (const p of platforms) {
     if (p === state.defaultSourcePlatform) continue;
@@ -344,9 +306,7 @@ When('the user selects platforms {string}', async function (
   }
 });
 
-When('the user batch-selects platforms {string}', async function (
-  platformsCsv: string
-) {
+When('the user batch-selects platforms {string}', async function (platformsCsv: string) {
   const platforms = platformsCsv.split(',').map((p) => p.trim());
   for (const p of platforms) {
     const already = state.items.find(
@@ -380,9 +340,7 @@ When('ensurePostersRegistered is invoked', async function () {
 Then(
   'a posting queue item exists for each selected platform with status {string}',
   function (status: string) {
-    const nonSource = state.items.filter(
-      (i) => i.targetPlatform !== state.defaultSourcePlatform
-    );
+    const nonSource = state.items.filter((i) => i.targetPlatform !== state.defaultSourcePlatform);
     assert.ok(nonSource.length > 0, 'no items were created');
     for (const i of nonSource) {
       assert.strictEqual(i.status, status, `item ${i.id} status`);
@@ -391,9 +349,7 @@ Then(
 );
 
 Then('no posting queue item is created for the source platform', function () {
-  const sourceItems = state.items.filter(
-    (i) => i.targetPlatform === state.defaultSourcePlatform
-  );
+  const sourceItems = state.items.filter((i) => i.targetPlatform === state.defaultSourcePlatform);
   assert.strictEqual(sourceItems.length, 0);
 });
 
@@ -408,14 +364,11 @@ Then(
   }
 );
 
-Then(
-  'the posted item stores the external post URL returned by the poster',
-  function () {
-    const item = state.items[0];
-    assert.ok(item.externalPostUrl);
-    assert.match(item.externalPostUrl as string, /^https:\/\//);
-  }
-);
+Then('the posted item stores the external post URL returned by the poster', function () {
+  const item = state.items[0];
+  assert.ok(item.externalPostUrl);
+  assert.match(item.externalPostUrl as string, /^https:\/\//);
+});
 
 Then('the item status becomes {string}', function (status: string) {
   const item = state.items[0];
@@ -427,17 +380,12 @@ Then('the error message is persisted on the queue item', function () {
   assert.ok(item.errorMessage && item.errorMessage.length > 0);
 });
 
-Then(
-  'exactly one additional queue item is created for {string}',
-  function (platform: string) {
-    const matching = state.items.filter((i) => i.targetPlatform === platform);
-    assert.strictEqual(matching.length, 1);
-  }
-);
+Then('exactly one additional queue item is created for {string}', function (platform: string) {
+  const matching = state.items.filter((i) => i.targetPlatform === platform);
+  assert.strictEqual(matching.length, 1);
+});
 
-Then('the existing {string} queue item is left untouched', function (
-  platform: string
-) {
+Then('the existing {string} queue item is left untouched', function (platform: string) {
   const matching = state.items.filter((i) => i.targetPlatform === platform);
   assert.strictEqual(matching.length, 1);
   assert.strictEqual(matching[0].status, 'PENDING');
@@ -493,10 +441,7 @@ Then(
   }
 );
 
-Then(
-  'each stub returns success false with a descriptive error message',
-  function () {
-    // Assertion covered by the previous step which checks errorMessage text.
-    // Left as an explicit step so the feature file reads naturally.
-  }
-);
+Then('each stub returns success false with a descriptive error message', function () {
+  // Assertion covered by the previous step which checks errorMessage text.
+  // Left as an explicit step so the feature file reads naturally.
+});

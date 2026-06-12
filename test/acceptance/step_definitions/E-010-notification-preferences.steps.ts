@@ -71,10 +71,7 @@ Then('the source contains the category label {string}', (label: string) => {
 // ---------------------------------------------------------------------------
 
 Then('the source references the field {string}', (field: string) => {
-  assert.ok(
-    state.sourceText.includes(field),
-    `Expected source to reference field "${field}"`
-  );
+  assert.ok(state.sourceText.includes(field), `Expected source to reference field "${field}"`);
 });
 
 // ---------------------------------------------------------------------------
@@ -82,10 +79,7 @@ Then('the source references the field {string}', (field: string) => {
 // ---------------------------------------------------------------------------
 
 Then('the source contains {string}', (pattern: string) => {
-  assert.ok(
-    state.sourceText.includes(pattern),
-    `Expected source to contain "${pattern}"`
-  );
+  assert.ok(state.sourceText.includes(pattern), `Expected source to contain "${pattern}"`);
 });
 
 Then('the source uses the PATCH method for saving toggles', () => {
@@ -130,39 +124,48 @@ Then('the source renders disabled SMS toggle buttons for each event row', () => 
 // Threshold validation
 // ---------------------------------------------------------------------------
 
-Then('the source validates flipGoneColdHours minimum of {int} and maximum of {int}', (min: number, max: number) => {
-  const src = state.sourceText;
-  assert.ok(src.includes('flipGoneColdHours'), 'Expected source to reference flipGoneColdHours');
-  // Check for lower-bound comparison pattern (e.g., "hours < 1" or "< 1" near flipGoneColdHours)
-  const lowerBound = new RegExp(`hours\\s*<\\s*${min}|between ${min} and ${max}`);
-  assert.ok(
-    lowerBound.test(src),
-    `Expected source to enforce flipGoneColdHours lower bound (< ${min})`
-  );
-  // Check for upper-bound comparison pattern (e.g., "hours > 168")
-  const upperBound = new RegExp(`hours\\s*>\\s*${max}|between ${min} and ${max}`);
-  assert.ok(
-    upperBound.test(src),
-    `Expected source to enforce flipGoneColdHours upper bound (> ${max})`
-  );
-});
+Then(
+  'the source validates flipGoneColdHours minimum of {int} and maximum of {int}',
+  (min: number, max: number) => {
+    const src = state.sourceText;
+    assert.ok(src.includes('flipGoneColdHours'), 'Expected source to reference flipGoneColdHours');
+    // Check for lower-bound comparison pattern (e.g., "hours < 1" or "< 1" near flipGoneColdHours)
+    const lowerBound = new RegExp(`hours\\s*<\\s*${min}|between ${min} and ${max}`);
+    assert.ok(
+      lowerBound.test(src),
+      `Expected source to enforce flipGoneColdHours lower bound (< ${min})`
+    );
+    // Check for upper-bound comparison pattern (e.g., "hours > 168")
+    const upperBound = new RegExp(`hours\\s*>\\s*${max}|between ${min} and ${max}`);
+    assert.ok(
+      upperBound.test(src),
+      `Expected source to enforce flipGoneColdHours upper bound (> ${max})`
+    );
+  }
+);
 
-Then('the source validates flipTurnedHotCount minimum of {int} and maximum of {int}', (min: number, max: number) => {
-  const src = state.sourceText;
-  assert.ok(src.includes('flipTurnedHotCount'), 'Expected source to reference flipTurnedHotCount');
-  // Check for lower-bound comparison pattern (e.g., "count < 1")
-  const lowerBound = new RegExp(`count\\s*<\\s*${min}|between ${min} and ${max}`);
-  assert.ok(
-    lowerBound.test(src),
-    `Expected source to enforce flipTurnedHotCount lower bound (< ${min})`
-  );
-  // Check for upper-bound comparison pattern (e.g., "count > 20")
-  const upperBound = new RegExp(`count\\s*>\\s*${max}|between ${min} and ${max}`);
-  assert.ok(
-    upperBound.test(src),
-    `Expected source to enforce flipTurnedHotCount upper bound (> ${max})`
-  );
-});
+Then(
+  'the source validates flipTurnedHotCount minimum of {int} and maximum of {int}',
+  (min: number, max: number) => {
+    const src = state.sourceText;
+    assert.ok(
+      src.includes('flipTurnedHotCount'),
+      'Expected source to reference flipTurnedHotCount'
+    );
+    // Check for lower-bound comparison pattern (e.g., "count < 1")
+    const lowerBound = new RegExp(`count\\s*<\\s*${min}|between ${min} and ${max}`);
+    assert.ok(
+      lowerBound.test(src),
+      `Expected source to enforce flipTurnedHotCount lower bound (< ${min})`
+    );
+    // Check for upper-bound comparison pattern (e.g., "count > 20")
+    const upperBound = new RegExp(`count\\s*>\\s*${max}|between ${min} and ${max}`);
+    assert.ok(
+      upperBound.test(src),
+      `Expected source to enforce flipTurnedHotCount upper bound (> ${max})`
+    );
+  }
+);
 
 // ---------------------------------------------------------------------------
 // Settings API route assertions

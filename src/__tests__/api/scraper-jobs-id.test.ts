@@ -163,7 +163,10 @@ describe('PATCH /api/scraper-jobs/[id]', () => {
     mockFindUnique.mockResolvedValue(makeJob());
     mockUpdate.mockResolvedValue(updated);
 
-    const res = await PATCH(makePatchRequest({ status: 'COMPLETED', listingsFound: 10 }), makeParams());
+    const res = await PATCH(
+      makePatchRequest({ status: 'COMPLETED', listingsFound: 10 }),
+      makeParams()
+    );
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.status).toBe('COMPLETED');

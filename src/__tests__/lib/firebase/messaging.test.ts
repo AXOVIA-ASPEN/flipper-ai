@@ -43,8 +43,16 @@ describe('Firebase Cloud Messaging — Client-side', () => {
   });
 
   afterEach(() => {
-    Object.defineProperty(global, 'window', { value: originalWindow, writable: true, configurable: true });
-    Object.defineProperty(global, 'Notification', { value: originalNotification, writable: true, configurable: true });
+    Object.defineProperty(global, 'window', {
+      value: originalWindow,
+      writable: true,
+      configurable: true,
+    });
+    Object.defineProperty(global, 'Notification', {
+      value: originalNotification,
+      writable: true,
+      configurable: true,
+    });
     process.env = originalEnv;
   });
 
@@ -57,7 +65,11 @@ describe('Firebase Cloud Messaging — Client-side', () => {
     });
 
     it('returns null on server (no window)', async () => {
-      Object.defineProperty(global, 'window', { value: undefined, writable: true, configurable: true });
+      Object.defineProperty(global, 'window', {
+        value: undefined,
+        writable: true,
+        configurable: true,
+      });
       const { getMessagingInstance } = await import('@/lib/firebase/messaging');
       const result = await getMessagingInstance();
       expect(result).toBeNull();
@@ -96,14 +108,22 @@ describe('Firebase Cloud Messaging — Client-side', () => {
     });
 
     it('returns false on server (no window)', async () => {
-      Object.defineProperty(global, 'window', { value: undefined, writable: true, configurable: true });
+      Object.defineProperty(global, 'window', {
+        value: undefined,
+        writable: true,
+        configurable: true,
+      });
       const { requestNotificationPermission } = await import('@/lib/firebase/messaging');
       const result = await requestNotificationPermission();
       expect(result).toBe(false);
     });
 
     it('returns false when Notification API is undefined', async () => {
-      Object.defineProperty(global, 'Notification', { value: undefined, writable: true, configurable: true });
+      Object.defineProperty(global, 'Notification', {
+        value: undefined,
+        writable: true,
+        configurable: true,
+      });
       const { requestNotificationPermission } = await import('@/lib/firebase/messaging');
       const result = await requestNotificationPermission();
       expect(result).toBe(false);
@@ -119,14 +139,15 @@ describe('Firebase Cloud Messaging — Client-side', () => {
 
   describe('getFCMToken', () => {
     it('returns token when granted and VAPID key configured', async () => {
-      process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY = 'BLongBase64VapidKeyStringThatIsAtLeast50CharsLongForValidation123456789012345678';
+      process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY =
+        'BLongBase64VapidKeyStringThatIsAtLeast50CharsLongForValidation123456789012345678';
       const { getFCMToken } = await import('@/lib/firebase/messaging');
       const token = await getFCMToken();
       expect(token).toBe('mock-fcm-token-123');
-      expect(mockGetToken).toHaveBeenCalledWith(
-        expect.anything(),
-        { vapidKey: 'BLongBase64VapidKeyStringThatIsAtLeast50CharsLongForValidation123456789012345678' }
-      );
+      expect(mockGetToken).toHaveBeenCalledWith(expect.anything(), {
+        vapidKey:
+          'BLongBase64VapidKeyStringThatIsAtLeast50CharsLongForValidation123456789012345678',
+      });
     });
 
     it('returns null when VAPID key is not configured', async () => {
@@ -138,15 +159,21 @@ describe('Firebase Cloud Messaging — Client-side', () => {
     });
 
     it('returns null on server (no window)', async () => {
-      Object.defineProperty(global, 'window', { value: undefined, writable: true, configurable: true });
-      process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY = 'BLongBase64VapidKeyStringThatIsAtLeast50CharsLongForValidation123456789012345678';
+      Object.defineProperty(global, 'window', {
+        value: undefined,
+        writable: true,
+        configurable: true,
+      });
+      process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY =
+        'BLongBase64VapidKeyStringThatIsAtLeast50CharsLongForValidation123456789012345678';
       const { getFCMToken } = await import('@/lib/firebase/messaging');
       const token = await getFCMToken();
       expect(token).toBeNull();
     });
 
     it('returns null when getToken throws', async () => {
-      process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY = 'BLongBase64VapidKeyStringThatIsAtLeast50CharsLongForValidation123456789012345678';
+      process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY =
+        'BLongBase64VapidKeyStringThatIsAtLeast50CharsLongForValidation123456789012345678';
       mockGetToken.mockRejectedValue(new Error('Token retrieval failed'));
       const { getFCMToken } = await import('@/lib/firebase/messaging');
       const token = await getFCMToken();
@@ -154,7 +181,8 @@ describe('Firebase Cloud Messaging — Client-side', () => {
     });
 
     it('returns null when getToken returns empty string', async () => {
-      process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY = 'BLongBase64VapidKeyStringThatIsAtLeast50CharsLongForValidation123456789012345678';
+      process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY =
+        'BLongBase64VapidKeyStringThatIsAtLeast50CharsLongForValidation123456789012345678';
       mockGetToken.mockResolvedValue('');
       const { getFCMToken } = await import('@/lib/firebase/messaging');
       const token = await getFCMToken();
@@ -174,7 +202,11 @@ describe('Firebase Cloud Messaging — Client-side', () => {
     });
 
     it('returns no-op on server (no window)', async () => {
-      Object.defineProperty(global, 'window', { value: undefined, writable: true, configurable: true });
+      Object.defineProperty(global, 'window', {
+        value: undefined,
+        writable: true,
+        configurable: true,
+      });
       const { onForegroundMessage } = await import('@/lib/firebase/messaging');
       const unsub = await onForegroundMessage(jest.fn());
       expect(typeof unsub).toBe('function');

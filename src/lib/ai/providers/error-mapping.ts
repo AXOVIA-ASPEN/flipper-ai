@@ -34,8 +34,9 @@ function parseRetryAfter(headers: SdkErrorShape['headers']): number | undefined 
   if (typeof (headers as { get?: unknown }).get === 'function') {
     raw = (headers as { get: (k: string) => string | null }).get('retry-after');
   } else {
-    raw = (headers as Record<string, string>)['retry-after']
-      ?? (headers as Record<string, string>)['Retry-After'];
+    raw =
+      (headers as Record<string, string>)['retry-after'] ??
+      (headers as Record<string, string>)['Retry-After'];
   }
   if (!raw) return undefined;
   const seconds = Number(raw);
@@ -43,7 +44,13 @@ function parseRetryAfter(headers: SdkErrorShape['headers']): number | undefined 
   return seconds * 1000;
 }
 
-const TIMEOUT_CODES = new Set(['ECONNRESET', 'ECONNREFUSED', 'ETIMEDOUT', 'ENOTFOUND', 'EAI_AGAIN']);
+const TIMEOUT_CODES = new Set([
+  'ECONNRESET',
+  'ECONNREFUSED',
+  'ETIMEDOUT',
+  'ENOTFOUND',
+  'EAI_AGAIN',
+]);
 const TIMEOUT_NAMES = new Set(['AbortError', 'TimeoutError', 'FetchError']);
 
 /**

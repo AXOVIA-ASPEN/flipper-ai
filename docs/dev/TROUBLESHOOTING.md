@@ -10,6 +10,7 @@
 ### Build Failures
 
 **Problem:** `pnpm build` fails with TypeScript errors
+
 ```bash
 # Check for type errors
 pnpm tsc --noEmit
@@ -20,6 +21,7 @@ pnpm build
 ```
 
 **Problem:** Turbopack build hangs
+
 ```bash
 # Use webpack fallback
 TURBOPACK=0 pnpm build
@@ -28,6 +30,7 @@ TURBOPACK=0 pnpm build
 ### Database Issues
 
 **Problem:** Prisma migration fails
+
 ```bash
 # Reset database (development only!)
 pnpm prisma migrate reset
@@ -37,6 +40,7 @@ pnpm prisma generate
 ```
 
 **Problem:** "Can't reach database server"
+
 - Check DATABASE_URL in `.env`
 - Verify PostgreSQL is running: `pg_isready`
 - For SQLite dev: ensure `prisma/dev.db` exists
@@ -44,6 +48,7 @@ pnpm prisma generate
 ### Test Failures
 
 **Problem:** Jest tests hang with open handles
+
 ```bash
 # Run with detection
 pnpm test -- --detectOpenHandles --forceExit
@@ -53,6 +58,7 @@ pnpm test -- --verbose 2>&1 | grep "open handle"
 ```
 
 **Problem:** Playwright tests fail
+
 ```bash
 # Install browsers
 pnpm exec playwright install chromium
@@ -67,6 +73,7 @@ curl http://localhost:3200/api/health
 ### Authentication Issues
 
 **Problem:** Firebase Auth session not persisting
+
 - Check Firebase config env vars are set in `.env` (`NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, etc.)
 - Check `APP_URL` matches your dev URL
 - Clear browser cookies (especially `__session`) and retry
@@ -74,10 +81,12 @@ curl http://localhost:3200/api/health
 ### API Issues
 
 **Problem:** 401 on all API routes
+
 - Ensure you're authenticated (`__session` cookie present)
 - Check Firebase Auth configuration in `src/lib/firebase/session.ts`
 
 **Problem:** Claude API errors
+
 - Verify `ANTHROPIC_API_KEY` in `.env`
 - Check API rate limits
 - Review error in server logs
@@ -85,6 +94,7 @@ curl http://localhost:3200/api/health
 ### Docker Issues
 
 **Problem:** Container won't start
+
 ```bash
 # Check logs
 docker compose logs -f app

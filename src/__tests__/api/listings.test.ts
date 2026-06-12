@@ -38,14 +38,16 @@ jest.mock('@/lib/db', () => ({
 }));
 
 // Helper: default mock setup for GET /api/listings (6 queries in Promise.all)
-function setupListingGetMocks(opts: {
-  listings?: unknown[];
-  listingCount?: number;
-  filteredCount?: number;
-  oppsCount?: number;
-  activeFlips?: number;
-  profit?: number | null;
-} = {}) {
+function setupListingGetMocks(
+  opts: {
+    listings?: unknown[];
+    listingCount?: number;
+    filteredCount?: number;
+    oppsCount?: number;
+    activeFlips?: number;
+    profit?: number | null;
+  } = {}
+) {
   const {
     listings = [],
     listingCount = 0,
@@ -107,7 +109,13 @@ describe('Listings API', () => {
         { id: '1', title: 'Test Item 1', askingPrice: 100, userId: 'test-user-id' },
         { id: '2', title: 'Test Item 2', askingPrice: 200, userId: 'test-user-id' },
       ];
-      setupListingGetMocks({ listings: mockListings, listingCount: 2, oppsCount: 1, activeFlips: 1, profit: 50 });
+      setupListingGetMocks({
+        listings: mockListings,
+        listingCount: 2,
+        oppsCount: 1,
+        activeFlips: 1,
+        profit: 50,
+      });
 
       const request = createMockRequest('GET', '/api/listings');
       const response = await GET(request);
@@ -153,9 +161,7 @@ describe('Listings API', () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(mockFindMany).toHaveBeenCalledWith(
-        expect.objectContaining({ skip: 10, take: 10 })
-      );
+      expect(mockFindMany).toHaveBeenCalledWith(expect.objectContaining({ skip: 10, take: 10 }));
       expect(data.pagination).toEqual({
         page: 2,
         limit: 10,
@@ -170,9 +176,7 @@ describe('Listings API', () => {
       const request = createMockRequest('GET', '/api/listings?limit=999');
       await GET(request);
 
-      expect(mockFindMany).toHaveBeenCalledWith(
-        expect.objectContaining({ take: 20 })
-      );
+      expect(mockFindMany).toHaveBeenCalledWith(expect.objectContaining({ take: 20 }));
     });
 
     it('should return totalProfit of 0 when no SOLD opportunities', async () => {

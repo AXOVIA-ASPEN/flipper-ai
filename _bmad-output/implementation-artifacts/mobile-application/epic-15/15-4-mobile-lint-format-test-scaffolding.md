@@ -1,8 +1,8 @@
 # Story 15.4: Mobile Lint, Format & Test Scaffolding
 
-Status: ready-for-dev
-Blocked: false
-Blocked-Reason:
+Status: blocked
+Blocked: true
+Blocked-Reason: HUMAN REVIEW GATE — Stephen must review and approve the mobile architecture overview (docs/architecture/mobile-architecture-overview.html) before ANY Epic 15+ mobile development starts. Do not begin implementation while this gate is in place. To lift: after approval, set Blocked: false, clear this reason, set Status: ready-for-dev (all five Epic 15 stories carry this same gate).
 Trello-Card-ID: 6a16b8959f65834dc52b811f
 
 <!-- Valid statuses: backlog | ready-for-dev | in-progress | blocked | review | done -->
@@ -62,7 +62,7 @@ The mobile workspace needs equivalents that **inherit** these where possible and
 
 - [ ] **Task 3: jest-expo harness** (AC #3)
   - [ ] 3.1 Install `jest-expo`, `@testing-library/react-native`, `jest`, `react-test-renderer` in the `mobile` workspace (versions matching the Expo SDK).
-  - [ ] 3.2 Create `mobile/jest.config.js` — `preset: 'jest-expo'`, `setupFilesAfterEnv` for Testing Library, `transformIgnorePatterns` per jest-expo guidance, and `moduleNameMapper` for `@/*` → `mobile/src/*` and `@shared/*` → `packages/*/src/*` (mirror the web Jest mapping pattern from Story 15.2).
+  - [ ] 3.2 Create `mobile/jest.config.js` — `preset: 'jest-expo'`, `setupFilesAfterEnv` for Testing Library, `transformIgnorePatterns` per jest-expo guidance, and `moduleNameMapper` for `@/*` → `mobile/src/*` and `@shared/*` → the barrel form `'^@shared/(.*)$': '<rootDir>/../packages/$1/src'` (Jest regex equivalent of the single-wildcard tsconfig alias per ADR-15.1-C; mirror the web Jest mapping pattern from Story 15.2).
   - [ ] 3.3 Add `test` script to `mobile/package.json`. Write `mobile/src/__tests__/greeting.test.ts` exercising the pure util from 15.3; `pnpm --filter mobile test` passes. Keep/promote the NativeWind token render test from 15.3 here.
   - [ ] 3.4 Set coverage expectations per mobile DoD (≥80% statements / 70% branches on new modules) — configure thresholds in `mobile/jest.config.js`.
 

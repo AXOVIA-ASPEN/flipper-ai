@@ -22,14 +22,14 @@ This guide walks you through obtaining every API key Flipper.ai uses, organized 
 
 To run scrapers and score listings you need **Tier 1** keys. Everything else enhances the experience but isn't blocking.
 
-| Tier | What It Unlocks | Time to Set Up |
-|------|----------------|----------------|
-| **1 - Core Scraping** | eBay Browse API, Craigslist/Mercari/OfferUp (Playwright) | ~15 min |
-| **2 - AI Analysis** | LLM item identification, sellability scoring, Claude Tier 2 | ~5 min |
-| **3 - Payments & Email** | Stripe subscriptions, Resend transactional email | ~20 min |
-| **4 - Notifications** | Twilio SMS, Firebase push, monitoring scheduler | ~15 min |
-| **5 - Maps & Calendar** | Google Maps routes, Google Calendar meetup scheduling | ~20 min |
-| **6 - Shipping & Monitoring** | Shippo rate estimates, Sentry error tracking | ~15 min |
+| Tier                          | What It Unlocks                                             | Time to Set Up |
+| ----------------------------- | ----------------------------------------------------------- | -------------- |
+| **1 - Core Scraping**         | eBay Browse API, Craigslist/Mercari/OfferUp (Playwright)    | ~15 min        |
+| **2 - AI Analysis**           | LLM item identification, sellability scoring, Claude Tier 2 | ~5 min         |
+| **3 - Payments & Email**      | Stripe subscriptions, Resend transactional email            | ~20 min        |
+| **4 - Notifications**         | Twilio SMS, Firebase push, monitoring scheduler             | ~15 min        |
+| **5 - Maps & Calendar**       | Google Maps routes, Google Calendar meetup scheduling       | ~20 min        |
+| **6 - Shipping & Monitoring** | Shippo rate estimates, Sentry error tracking                | ~15 min        |
 
 ---
 
@@ -65,6 +65,7 @@ The eBay Browse API is the primary data source for pricing and sold-item compara
 These scrapers use **Playwright browser automation** and don't require API keys. They work out of the box once the dev server is running and you're authenticated.
 
 **Requirements:**
+
 - Playwright browsers installed: `npx playwright install chromium`
 - Dev server running: `make dev`
 - Logged in via the browser UI
@@ -180,6 +181,7 @@ Handles subscription billing (Free/Pro/Enterprise tiers).
    ```
 
 **Local webhook testing:** Install [Stripe CLI](https://stripe.com/docs/stripe-cli) and run:
+
 ```bash
 stripe listen --forward-to localhost:3200/api/webhooks/stripe
 ```
@@ -241,6 +243,7 @@ openssl rand -hex 32  # Use for NOTIFICATION_PROCESSOR_API_KEY
 ```
 
 Add to `.env`:
+
 ```
 MONITORING_API_KEY="<64-char hex>"
 NOTIFICATION_PROCESSOR_API_KEY="<different 64-char hex>"
@@ -317,6 +320,7 @@ Error tracking and performance monitoring.
    ```
 
 For source map uploads during production builds:
+
 ```
 SENTRY_ORG="your-org"
 SENTRY_PROJECT="flipper-ai"
@@ -336,6 +340,7 @@ CAPTCHA verification for registration and sensitive actions.
    ```
 
 **Development shortcut:** Use the hCaptcha test keys for local dev:
+
 ```
 NEXT_PUBLIC_HCAPTCHA_SITE_KEY="10000000-ffff-ffff-ffff-000000000001"
 HCAPTCHA_SECRET_KEY="0x0000000000000000000000000000000000000000"
@@ -368,13 +373,13 @@ open http://localhost:3200
 
 ### Troubleshooting
 
-| Error | Cause | Fix |
-|-------|-------|-----|
-| `EBAY_OAUTH_TOKEN not set` | Missing eBay token | Add to `.env`, restart dev server |
-| `401 Unauthorized` from eBay | Token expired | Regenerate at developer.ebay.com |
-| `OPENAI_API_KEY not configured` | Missing OpenAI key | Add to `.env`; LLM features will be skipped without it |
-| `Cannot reach database` | Postgres not running | `make db-up` |
-| `FirebaseError: auth/invalid-api-key` | Wrong Firebase config | Check NEXT_PUBLIC_FIREBASE_* vars match your project |
+| Error                                 | Cause                 | Fix                                                    |
+| ------------------------------------- | --------------------- | ------------------------------------------------------ |
+| `EBAY_OAUTH_TOKEN not set`            | Missing eBay token    | Add to `.env`, restart dev server                      |
+| `401 Unauthorized` from eBay          | Token expired         | Regenerate at developer.ebay.com                       |
+| `OPENAI_API_KEY not configured`       | Missing OpenAI key    | Add to `.env`; LLM features will be skipped without it |
+| `Cannot reach database`               | Postgres not running  | `make db-up`                                           |
+| `FirebaseError: auth/invalid-api-key` | Wrong Firebase config | Check NEXT*PUBLIC_FIREBASE*\* vars match your project  |
 
 ---
 

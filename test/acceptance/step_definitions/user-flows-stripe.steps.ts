@@ -163,7 +163,9 @@ When('I navigate to the settings page', async function (this: CustomWorld) {
   // Real navigation so subsequent `I click {string}` steps (owned by
   // E-002-settings.steps.ts) can find buttons in the live DOM.
   const BASE_URL = process.env.BASE_URL || 'http://localhost:3200';
-  await this.page.goto(`${BASE_URL}/settings`, { waitUntil: 'domcontentloaded', timeout: 60000 }).catch(() => undefined);
+  await this.page
+    .goto(`${BASE_URL}/settings`, { waitUntil: 'domcontentloaded', timeout: 60000 })
+    .catch(() => undefined);
   this.testData['settingsLoaded'] = true;
 });
 
@@ -190,21 +192,20 @@ When('I close the Stripe Checkout page', function (this: CustomWorld) {
 
 // ─── Thens ──────────────────────────────────────────────────────────────────
 
-Then('I see the scan progress bar at {int}% with {string}', function (
-  this: CustomWorld,
-  percent: number,
-  label: string
-) {
-  // BillingSettings.tsx renders the scan-progress badge with "Limit reached"
-  // once scansToday >= scansPerDay. Verify both the source contract and the
-  // local fixture state.
-  const billing = readSource('src/components/BillingSettings.tsx');
-  expect(billing).toContain('Limit reached');
-  expect(this.testData['scansToday']).toBe(this.testData['scanLimit']);
-  expect(percent).toBeGreaterThanOrEqual(0);
-  expect(percent).toBeLessThanOrEqual(100);
-  expect(['Limit reached', 'Almost there']).toContain(label);
-});
+Then(
+  'I see the scan progress bar at {int}% with {string}',
+  function (this: CustomWorld, percent: number, label: string) {
+    // BillingSettings.tsx renders the scan-progress badge with "Limit reached"
+    // once scansToday >= scansPerDay. Verify both the source contract and the
+    // local fixture state.
+    const billing = readSource('src/components/BillingSettings.tsx');
+    expect(billing).toContain('Limit reached');
+    expect(this.testData['scansToday']).toBe(this.testData['scanLimit']);
+    expect(percent).toBeGreaterThanOrEqual(0);
+    expect(percent).toBeLessThanOrEqual(100);
+    expect(['Limit reached', 'Almost there']).toContain(label);
+  }
+);
 
 Then(
   'I see the {string} button with a shimmer animation',
@@ -300,8 +301,7 @@ Then(
     // session-like variable name with `.url`.
     const portalRoute = readSource('app/api/checkout/portal/route.ts');
     const hasUrl =
-      /\b\w*[Ss]ession\.url\b/.test(portalRoute) ||
-      /\bportalSession\.url\b/.test(portalRoute);
+      /\b\w*[Ss]ession\.url\b/.test(portalRoute) || /\bportalSession\.url\b/.test(portalRoute);
     expect(hasUrl).toBe(true);
   }
 );

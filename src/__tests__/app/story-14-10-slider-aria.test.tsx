@@ -21,7 +21,12 @@ import { render, screen } from '@testing-library/react';
 import FilterPanel from '@/components/FilterPanel';
 import ScoringSettings from '@/components/ScoringSettings';
 
-const REQUIRED_ATTRS = ['aria-valuemin', 'aria-valuemax', 'aria-valuenow', 'aria-valuetext'] as const;
+const REQUIRED_ATTRS = [
+  'aria-valuemin',
+  'aria-valuemax',
+  'aria-valuenow',
+  'aria-valuetext',
+] as const;
 
 function assertSliderQuartet(slider: HTMLElement, label: string) {
   REQUIRED_ATTRS.forEach((attr) => {

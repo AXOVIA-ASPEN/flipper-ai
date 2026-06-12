@@ -62,12 +62,8 @@ export const purchaseMessage: PromptConfig = {
       ? `The seller's name is "${sellerName}". You MUST address them by this exact name in the greeting (e.g. "Hi ${sellerName}," or "Hello ${sellerName},").`
       : 'The seller name is unknown — open with a simple greeting like "Hi" or "Hello".';
     const offerLine =
-      messageType === 'offer' && offerPrice
-        ? `The buyer wants to offer $${offerPrice}.`
-        : '';
-    const conditionLine = itemCondition
-      ? `Listed condition: ${itemCondition}.`
-      : '';
+      messageType === 'offer' && offerPrice ? `The buyer wants to offer $${offerPrice}.` : '';
+    const conditionLine = itemCondition ? `Listed condition: ${itemCondition}.` : '';
     const contextLine = additionalContext
       ? `Additional context from the buyer: ${additionalContext}`
       : '';

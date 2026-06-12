@@ -19,12 +19,12 @@
 
 ## Cost
 
-| Item                                       | Cost (paid via Twilio)                    |
-| ------------------------------------------ | ----------------------------------------- |
-| Brand registration (one-time)              | $4 vetting + $2/quarter brand fee          |
-| Campaign registration (one-time per use case) | $10 setup + $1.50-10/month per campaign |
-| Per-segment SMS surcharge (carrier fees)   | $0.0040-0.0070 per segment, on top of Twilio's regular SMS price |
-| Per-MMS surcharge                          | $0.0050-0.0500 per message                 |
+| Item                                          | Cost (paid via Twilio)                                           |
+| --------------------------------------------- | ---------------------------------------------------------------- |
+| Brand registration (one-time)                 | $4 vetting + $2/quarter brand fee                                |
+| Campaign registration (one-time per use case) | $10 setup + $1.50-10/month per campaign                          |
+| Per-segment SMS surcharge (carrier fees)      | $0.0040-0.0070 per segment, on top of Twilio's regular SMS price |
+| Per-MMS surcharge                             | $0.0050-0.0500 per message                                       |
 
 For Flipper.ai's use case (transactional alerts + occasional marketing), expect ~$5-15/month in 10DLC overhead before any actual SMS volume.
 
@@ -42,7 +42,7 @@ For Flipper.ai's use case (transactional alerts + occasional marketing), expect 
   - State carriers and TCR may receive opt-in metadata
 - [ ] **Have a compliant Terms of Service live** at `https://<domain>/terms`. It must include SMS terms.
 - [ ] **Document the SMS opt-in flow.** A screenshot of where the user gives explicit consent — required during campaign registration.
-  - Required text near the opt-in checkbox: *"By providing your phone number, you agree to receive transactional SMS from Flipper.ai. Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for help."*
+  - Required text near the opt-in checkbox: _"By providing your phone number, you agree to receive transactional SMS from Flipper.ai. Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for help."_
 - [ ] **Implement STOP/HELP keyword handling** in `app/api/twilio/sms-webhook/route.ts`.
 
 ---
@@ -78,6 +78,7 @@ URL: https://console.twilio.com/us1/develop/sms/a2p-10dlc/brand-registration
 - [ ] Submit for vetting (~1-3 business days for the trust score to come back)
 
 **Trust score ranges:**
+
 - 80-100: Standard tier (high throughput, all features)
 - 50-79: Low Volume tier (some throughput limits)
 - <50: Reject — would need to reapply with corrections
@@ -93,23 +94,23 @@ You'll need to register one campaign per distinct use case. For Flipper.ai, expe
 ### Campaign 1: Transactional Alerts (account/billing/notifications)
 
 - [ ] Use case: **Mixed** (covers transactional + product updates)
-- [ ] Description (sample): *"Account-related notifications for Flipper.ai users including new opportunity alerts, message inbox notifications, billing alerts, and security notices. Users explicitly opt in via account settings and can opt out via STOP keyword."*
+- [ ] Description (sample): _"Account-related notifications for Flipper.ai users including new opportunity alerts, message inbox notifications, billing alerts, and security notices. Users explicitly opt in via account settings and can opt out via STOP keyword."_
 - [ ] Sample messages (provide 2-5 representative examples):
-  1. *"Flipper.ai: New opportunity found — vintage Bose 901 speakers, $150 (est. $400-600 resale). View: https://<domain>/o/abc123. Reply STOP to opt out."*
-  2. *"Flipper.ai: Your watch has gone live — eBay listing for [item] just dropped to $X. View: https://<domain>/p/abc123. Reply STOP to opt out."*
-  3. *"Flipper.ai: Subscription renewal upcoming — your Pro plan renews on [date] for $49. Manage: https://<domain>/billing. Reply STOP to opt out."*
-- [ ] Opt-in mechanism: *"Users opt-in via web form in app settings. Phone number confirmation requires SMS reply 'YES' to confirm."*
+  1. _"Flipper.ai: New opportunity found — vintage Bose 901 speakers, $150 (est. $400-600 resale). View: https://<domain>/o/abc123. Reply STOP to opt out."_
+  2. _"Flipper.ai: Your watch has gone live — eBay listing for [item] just dropped to $X. View: https://<domain>/p/abc123. Reply STOP to opt out."_
+  3. _"Flipper.ai: Subscription renewal upcoming — your Pro plan renews on [date] for $49. Manage: https://<domain>/billing. Reply STOP to opt out."_
+- [ ] Opt-in mechanism: _"Users opt-in via web form in app settings. Phone number confirmation requires SMS reply 'YES' to confirm."_
 - [ ] Opt-out: STOP keyword auto-removes
-- [ ] Help: HELP keyword returns *"Reply STOP to opt out. Visit <domain>/support for help. Msg & data rates may apply."*
+- [ ] Help: HELP keyword returns _"Reply STOP to opt out. Visit <domain>/support for help. Msg & data rates may apply."_
 - [ ] Submit. ~1-3 business days for carrier review.
 
 ### Campaign 2: Marketing (optional — only if you'll send promotional SMS)
 
 - [ ] Use case: **Marketing**
-- [ ] Description: *"Promotional SMS to Flipper.ai users about new features, special offers, and product updates. Strict opt-in required; opt-out via STOP."*
+- [ ] Description: _"Promotional SMS to Flipper.ai users about new features, special offers, and product updates. Strict opt-in required; opt-out via STOP."_
 - [ ] Sample messages:
-  1. *"Flipper.ai: New feature — cross-platform listing now available on Pro tier. Try free: https://<domain>/listings. Reply STOP to opt out."*
-- [ ] Opt-in: *"Users opt-in to marketing SMS via separate checkbox in account settings (default off)."*
+  1. _"Flipper.ai: New feature — cross-platform listing now available on Pro tier. Try free: https://<domain>/listings. Reply STOP to opt out."_
+- [ ] Opt-in: _"Users opt-in to marketing SMS via separate checkbox in account settings (default off)."_
 
 > **Recommendation:** Skip Campaign 2 at launch. Marketing SMS has stricter opt-in audit requirements and rarely justifies the work. Push notifications and email cover the same use case more cheaply.
 
@@ -149,7 +150,8 @@ You need three endpoints. (Some may already exist on django-main; verify before 
 Handles STOP, HELP, and any other inbound replies.
 
 **Required keyword handlers:**
-- `STOP`, `STOPALL`, `UNSUBSCRIBE`, `CANCEL`, `END`, `QUIT` → mark `User.smsOptOut = true`, reply with *"You've been unsubscribed from Flipper.ai SMS. Reply START to resubscribe."*
+
+- `STOP`, `STOPALL`, `UNSUBSCRIBE`, `CANCEL`, `END`, `QUIT` → mark `User.smsOptOut = true`, reply with _"You've been unsubscribed from Flipper.ai SMS. Reply START to resubscribe."_
 - `HELP`, `INFO` → reply with the canned help message
 - `START`, `YES`, `UNSTOP` → re-enable opt-in
 - Anything else → log + ignore (or route to a manual review queue if you want to handle replies)
@@ -159,6 +161,7 @@ Handles STOP, HELP, and any other inbound replies.
 Logs delivery success/failure per message. Update `Message` table with status (`DELIVERED`, `FAILED`, `UNDELIVERED`).
 
 Useful for:
+
 - Debugging deliverability issues
 - Pruning invalid numbers from your DB
 - Computing delivery success rate
@@ -166,7 +169,8 @@ Useful for:
 ### `app/api/twilio/opt-in-confirmation/route.ts` — initial double opt-in
 
 When a user enters their phone in settings:
-1. Call this route to send a confirmation SMS: *"Reply YES to confirm SMS notifications from Flipper.ai. Reply STOP to cancel."*
+
+1. Call this route to send a confirmation SMS: _"Reply YES to confirm SMS notifications from Flipper.ai. Reply STOP to cancel."_
 2. The user's reply lands at the inbound webhook
 3. The inbound webhook flips `User.smsOptInConfirmed = true`
 
@@ -200,7 +204,7 @@ Before flipping the switch:
 3. **Mismatched brand info.** If your Twilio brand name says `Flipper AI Inc.` but your domain says `Flipper.ai`, vetting may flag for review.
 4. **Forgetting the STOP keyword.** Carriers test this — if a STOP doesn't work, you can be deregistered.
 5. **Not including identifier in messages.** Best practice: every SMS leads with `Flipper.ai:` so users know who it's from.
-6. **Marketing campaign without explicit opt-in.** Transactional alerts only need account opt-in; marketing needs a *separate* checkbox. Conflating these is a fast track to deregistration.
+6. **Marketing campaign without explicit opt-in.** Transactional alerts only need account opt-in; marketing needs a _separate_ checkbox. Conflating these is a fast track to deregistration.
 
 ---
 

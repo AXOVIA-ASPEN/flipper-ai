@@ -45,11 +45,7 @@
  */
 
 import prisma from './db';
-import {
-  NotFoundError,
-  ValidationError,
-  ConfigurationError,
-} from './errors';
+import { NotFoundError, ValidationError, ConfigurationError } from './errors';
 import {
   DEFAULT_TARGET_MARGIN_PERCENT,
   DEFAULT_MARKET_CAP_PERCENT,
@@ -61,19 +57,10 @@ import {
 // names from the calculator module directly; the constants now live in
 // listing-price-constants.ts so the React PriceCalculator can import them
 // without dragging the Prisma client into the browser bundle.
-export {
-  DEFAULT_TARGET_MARGIN_PERCENT,
-  DEFAULT_MARKET_CAP_PERCENT,
-  FREE_ITEM_DISCOUNT_FACTOR,
-};
+export { DEFAULT_TARGET_MARGIN_PERCENT, DEFAULT_MARKET_CAP_PERCENT, FREE_ITEM_DISCOUNT_FACTOR };
 
 /** Supported target platforms for the calculator. */
-export type TargetPlatform =
-  | 'ebay'
-  | 'mercari'
-  | 'facebook'
-  | 'offerup'
-  | 'craigslist';
+export type TargetPlatform = 'ebay' | 'mercari' | 'facebook' | 'offerup' | 'craigslist';
 
 export const SUPPORTED_PLATFORMS: TargetPlatform[] = [
   'ebay',
@@ -196,8 +183,7 @@ interface UserSettingsRow {
 export async function calculateOptimalListingPrice(
   input: CalculateOptimalListingPriceInput
 ): Promise<ListingPriceResult> {
-  const targetMarginPercent =
-    input.targetMarginPercent ?? DEFAULT_TARGET_MARGIN_PERCENT;
+  const targetMarginPercent = input.targetMarginPercent ?? DEFAULT_TARGET_MARGIN_PERCENT;
   const marketCapPercent = input.marketCapPercent ?? DEFAULT_MARKET_CAP_PERCENT;
 
   const ctx = await loadListingContext(input.listingId, input.userId);
@@ -223,8 +209,7 @@ export async function calculateOptimalListingPrice(
 export async function calculateMultiPlatformPrices(
   input: CalculateMultiPlatformPricesInput
 ): Promise<MultiPlatformPriceResult> {
-  const targetMarginPercent =
-    input.targetMarginPercent ?? DEFAULT_TARGET_MARGIN_PERCENT;
+  const targetMarginPercent = input.targetMarginPercent ?? DEFAULT_TARGET_MARGIN_PERCENT;
   const marketCapPercent = input.marketCapPercent ?? DEFAULT_MARKET_CAP_PERCENT;
 
   const ctx = await loadListingContext(input.listingId, input.userId);
@@ -296,9 +281,7 @@ function computeForPlatform(args: ComputeArgs): ListingPriceResult {
   // platform as impossible (multi-platform comparison).
   if (feeRateDecimal + targetMarginDecimal >= 1.0) {
     if (throwOnImpossible) {
-      throw new ValidationError(
-        'Target margin plus platform fees cannot equal or exceed 100%'
-      );
+      throw new ValidationError('Target margin plus platform fees cannot equal or exceed 100%');
     }
     return {
       targetPlatform,
@@ -317,8 +300,7 @@ function computeForPlatform(args: ComputeArgs): ListingPriceResult {
       priceBreakdown: {
         cappedByMarket: false,
         freeItemPricing: false,
-        impossibleReason:
-          'Target margin plus platform fees cannot equal or exceed 100%',
+        impossibleReason: 'Target margin plus platform fees cannot equal or exceed 100%',
       },
       impossible: true,
     };
@@ -394,9 +376,7 @@ function computeForPlatform(args: ComputeArgs): ListingPriceResult {
   breakdown.cappedByMarket = cappedByMarket;
 
   const estimatedFees = roundCents(recommendedPrice * feeRateDecimal);
-  const purchasePortion = isFreeItem
-    ? 0
-    : Math.max(costBasis - shippingCost, 0);
+  const purchasePortion = isFreeItem ? 0 : Math.max(costBasis - shippingCost, 0);
   const estimatedProfit = roundCents(
     recommendedPrice - estimatedFees - purchasePortion - shippingCost
   );
@@ -517,10 +497,7 @@ async function loadUserSettings(userId: string): Promise<UserSettingsRow> {
   );
 }
 
-function pickFeeRatePercent(
-  settings: UserSettingsRow,
-  platform: TargetPlatform
-): number {
+function pickFeeRatePercent(settings: UserSettingsRow, platform: TargetPlatform): number {
   switch (platform) {
     case 'ebay':
       return settings.feeRateEbay;

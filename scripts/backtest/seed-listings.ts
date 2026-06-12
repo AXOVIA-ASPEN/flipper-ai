@@ -22,7 +22,9 @@ import { estimateValue, detectCategory } from '../../src/lib/value-estimator';
 
 // --- Database setup ---
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL!, max: 2 });
-const prisma = new PrismaClientBase({ adapter }) as ReturnType<() => InstanceType<typeof PrismaClientBase>>;
+const prisma = new PrismaClientBase({ adapter }) as ReturnType<
+  () => InstanceType<typeof PrismaClientBase>
+>;
 
 // --- Craigslist config ---
 const LOCATION = 'sfbay';
@@ -167,50 +169,50 @@ async function scrapeCategory(category: string, path: string): Promise<ScrapedIt
 
 async function main() {
   try {
-  console.log('=== Flipper.ai Backtesting Data Seeder ===\n');
-  console.log(`Location: ${LOCATION}.craigslist.org`);
-  console.log(`Categories: ${Object.keys(CATEGORIES).join(', ')}\n`);
+    console.log('=== Flipper.ai Backtesting Data Seeder ===\n');
+    console.log(`Location: ${LOCATION}.craigslist.org`);
+    console.log(`Categories: ${Object.keys(CATEGORIES).join(', ')}\n`);
 
-  // Ensure backtest user exists (raw SQL — PrismaPg doesn't handle @updatedAt)
-  const userExists = await (prisma as any).user.findUnique({ where: { id: BACKTEST_USER_ID } });
-  if (!userExists) {
-    console.log('Creating backtest user...');
-    const now = new Date();
-    await (prisma as any).$executeRaw(Prisma.sql`
+    // Ensure backtest user exists (raw SQL — PrismaPg doesn't handle @updatedAt)
+    const userExists = await (prisma as any).user.findUnique({ where: { id: BACKTEST_USER_ID } });
+    if (!userExists) {
+      console.log('Creating backtest user...');
+      const now = new Date();
+      await (prisma as any).$executeRaw(Prisma.sql`
       INSERT INTO "User" ("id", "email", "name", "firebaseUid", "subscriptionTier", "onboardingComplete", "onboardingStep", "createdAt", "updatedAt")
       VALUES (${BACKTEST_USER_ID}, 'backtest@flipper.local', 'Backtest Seed', 'backtest-firebase-uid', 'FREE', false, 0, ${now}, ${now})
       ON CONFLICT ("id") DO NOTHING
     `);
-  }
+    }
 
-  let totalInserted = 0;
-  const categoryStats: Record<string, number> = {};
+    let totalInserted = 0;
+    const categoryStats: Record<string, number> = {};
 
-  for (const [category, path] of Object.entries(CATEGORIES)) {
-    const items = await scrapeCategory(category, path);
+    for (const [category, path] of Object.entries(CATEGORIES)) {
+      const items = await scrapeCategory(category, path);
 
-    let inserted = 0;
-    for (const item of items) {
-      try {
-        // Run the scoring algorithm
-        const detectedCategory = detectCategory(item.title, null);
-        const estimation = estimateValue(
-          item.title,
-          null, // no description from search results
-          item.price,
-          null, // condition unknown
-          detectedCategory
-        );
+      let inserted = 0;
+      for (const item of items) {
+        try {
+          // Run the scoring algorithm
+          const detectedCategory = detectCategory(item.title, null);
+          const estimation = estimateValue(
+            item.title,
+            null, // no description from search results
+            item.price,
+            null, // condition unknown
+            detectedCategory
+          );
 
-        // Parameterized SQL insert (PrismaPg adapter doesn't handle @updatedAt)
-        const now = new Date();
-        const id = 'cl' + Math.random().toString(36).slice(2, 15);
-        const status = estimation.valueScore >= 70 ? 'OPPORTUNITY' : 'NEW';
-        const comparableUrlsJson = JSON.stringify(estimation.comparableUrls);
-        const tagsJson = JSON.stringify(estimation.tags);
-        const imageUrl = item.imageUrl || null;
+          // Parameterized SQL insert (PrismaPg adapter doesn't handle @updatedAt)
+          const now = new Date();
+          const id = 'cl' + Math.random().toString(36).slice(2, 15);
+          const status = estimation.valueScore >= 70 ? 'OPPORTUNITY' : 'NEW';
+          const comparableUrlsJson = JSON.stringify(estimation.comparableUrls);
+          const tagsJson = JSON.stringify(estimation.tags);
+          const imageUrl = item.imageUrl || null;
 
-        await (prisma as any).$executeRaw(Prisma.sql`
+          await (prisma as any).$executeRaw(Prisma.sql`
           INSERT INTO "Listing" (
             "id", "userId", "externalId", "platform", "url", "title",
             "askingPrice", "location", "category", "imageUrls",
@@ -241,58 +243,57 @@ async function main() {
             "valueScore" = EXCLUDED."valueScore",
             "updatedAt" = EXCLUDED."updatedAt"
         `);
-        inserted++;
-      } catch (err) {
-        // Skip duplicates or constraint violations silently
-        const msg = (err as Error).message;
-        if (!msg.includes('Unique constraint')) {
-          console.error(`  Error inserting ${item.title}:`, msg.slice(0, 100));
+          inserted++;
+        } catch (err) {
+          // Skip duplicates or constraint violations silently
+          const msg = (err as Error).message;
+          if (!msg.includes('Unique constraint')) {
+            console.error(`  Error inserting ${item.title}:`, msg.slice(0, 100));
+          }
         }
       }
+
+      categoryStats[category] = inserted;
+      totalInserted += inserted;
+      console.log(`  Inserted ${inserted} listings for ${category}\n`);
+
+      // Small delay between categories to be respectful
+      await new Promise((r) => setTimeout(r, 2000));
     }
 
-    categoryStats[category] = inserted;
-    totalInserted += inserted;
-    console.log(`  Inserted ${inserted} listings for ${category}\n`);
-
-    // Small delay between categories to be respectful
-    await new Promise((r) => setTimeout(r, 2000));
-  }
-
-  // Summary
-  console.log('\n=== Seeding Complete ===');
-  console.log(`Total listings inserted: ${totalInserted}`);
-  console.log('\nPer category:');
-  for (const [cat, count] of Object.entries(categoryStats)) {
-    console.log(`  ${cat}: ${count}`);
-  }
-
-  // Score distribution
-  const scored = await (prisma as any).listing.findMany({
-    where: { userId: BACKTEST_USER_ID, valueScore: { not: null } },
-    select: { valueScore: true },
-    orderBy: { valueScore: 'asc' },
-  });
-  if (scored.length > 0) {
-    const scores = scored.map((s: { valueScore: number }) => s.valueScore);
-    console.log('\nScore distribution:');
-    for (let b = 0; b < 100; b += 10) {
-      const count = scores.filter((s: number) => s >= b && s < b + 10).length;
-      const bar = '#'.repeat(count);
-      console.log(`  ${String(b).padStart(2)}-${String(b + 9).padStart(2)}: ${bar} (${count})`);
+    // Summary
+    console.log('\n=== Seeding Complete ===');
+    console.log(`Total listings inserted: ${totalInserted}`);
+    console.log('\nPer category:');
+    for (const [cat, count] of Object.entries(categoryStats)) {
+      console.log(`  ${cat}: ${count}`);
     }
-    const perfect = scores.filter((s: number) => s === 100).length;
-    if (perfect > 0) console.log(`   100: ${'#'.repeat(perfect)} (${perfect})`);
-    console.log(
-      `\nMin: ${Math.min(...scores)}, Max: ${Math.max(...scores)}, Mean: ${Math.round(scores.reduce((a: number, b: number) => a + b, 0) / scores.length)}`
-    );
 
-    const opportunities = scores.filter((s: number) => s >= 70).length;
-    console.log(
-      `Opportunities (score >= 70): ${opportunities} (${Math.round((opportunities / scores.length) * 100)}%)`
-    );
-  }
+    // Score distribution
+    const scored = await (prisma as any).listing.findMany({
+      where: { userId: BACKTEST_USER_ID, valueScore: { not: null } },
+      select: { valueScore: true },
+      orderBy: { valueScore: 'asc' },
+    });
+    if (scored.length > 0) {
+      const scores = scored.map((s: { valueScore: number }) => s.valueScore);
+      console.log('\nScore distribution:');
+      for (let b = 0; b < 100; b += 10) {
+        const count = scores.filter((s: number) => s >= b && s < b + 10).length;
+        const bar = '#'.repeat(count);
+        console.log(`  ${String(b).padStart(2)}-${String(b + 9).padStart(2)}: ${bar} (${count})`);
+      }
+      const perfect = scores.filter((s: number) => s === 100).length;
+      if (perfect > 0) console.log(`   100: ${'#'.repeat(perfect)} (${perfect})`);
+      console.log(
+        `\nMin: ${Math.min(...scores)}, Max: ${Math.max(...scores)}, Mean: ${Math.round(scores.reduce((a: number, b: number) => a + b, 0) / scores.length)}`
+      );
 
+      const opportunities = scores.filter((s: number) => s >= 70).length;
+      console.log(
+        `Opportunities (score >= 70): ${opportunities} (${Math.round((opportunities / scores.length) * 100)}%)`
+      );
+    }
   } finally {
     await (prisma as any).$disconnect();
   }

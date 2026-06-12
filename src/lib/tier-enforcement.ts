@@ -14,7 +14,13 @@
  * feature-gated API routes.
  */
 
-import { getTierLimits, isAtScanLimit, canAddMarketplace, canAddSearchConfig, hasFeatureAccess } from './subscription-tiers';
+import {
+  getTierLimits,
+  isAtScanLimit,
+  canAddMarketplace,
+  canAddSearchConfig,
+  hasFeatureAccess,
+} from './subscription-tiers';
 import type { SubscriptionTier, TierLimits } from './subscription-tiers';
 import prisma from './db';
 import { ForbiddenError } from './errors';
@@ -29,7 +35,10 @@ export interface TierCheckResult {
 /**
  * Check if a user can perform a scan based on their tier and today's usage.
  */
-export function checkScanLimit(tier: string | undefined | null, scansToday: number): TierCheckResult {
+export function checkScanLimit(
+  tier: string | undefined | null,
+  scansToday: number
+): TierCheckResult {
   const resolvedTier = (tier || 'FREE') as SubscriptionTier;
   const limits = getTierLimits(resolvedTier);
 
@@ -48,7 +57,10 @@ export function checkScanLimit(tier: string | undefined | null, scansToday: numb
 /**
  * Check if a user can add a marketplace.
  */
-export function checkMarketplaceLimit(tier: string | undefined | null, currentCount: number): TierCheckResult {
+export function checkMarketplaceLimit(
+  tier: string | undefined | null,
+  currentCount: number
+): TierCheckResult {
   const resolvedTier = (tier || 'FREE') as SubscriptionTier;
   const limits = getTierLimits(resolvedTier);
 
@@ -60,7 +72,9 @@ export function checkMarketplaceLimit(tier: string | undefined | null, currentCo
     return {
       allowed: false,
       /* istanbul ignore next -- fallback is unreachable: all limit-enforced tiers (FREE, FLIPPER) are in the messages map */
-      reason: marketplaceMessages[resolvedTier] || `Marketplace limit reached (${limits.maxMarketplaces} on ${limits.name} plan). Upgrade for more marketplaces.`,
+      reason:
+        marketplaceMessages[resolvedTier] ||
+        `Marketplace limit reached (${limits.maxMarketplaces} on ${limits.name} plan). Upgrade for more marketplaces.`,
       tier: resolvedTier,
       limits,
     };
@@ -72,7 +86,10 @@ export function checkMarketplaceLimit(tier: string | undefined | null, currentCo
 /**
  * Check if a user can create a search config.
  */
-export function checkSearchConfigLimit(tier: string | undefined | null, currentCount: number): TierCheckResult {
+export function checkSearchConfigLimit(
+  tier: string | undefined | null,
+  currentCount: number
+): TierCheckResult {
   const resolvedTier = (tier || 'FREE') as SubscriptionTier;
   const limits = getTierLimits(resolvedTier);
 

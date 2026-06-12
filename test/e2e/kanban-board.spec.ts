@@ -26,7 +26,9 @@ test.describe('KanbanBoard View', () => {
       // The KanbanBoard component renders columns: New, Contacted, Purchased, Listed, Sold
       const columnLabels = ['New', 'Contacted', 'Purchased', 'Listed', 'Sold'];
       for (const label of columnLabels) {
-        await expect(page.getByText(label, { exact: false }).first()).toBeVisible({ timeout: 5000 });
+        await expect(page.getByText(label, { exact: false }).first()).toBeVisible({
+          timeout: 5000,
+        });
       }
     });
 

@@ -18,7 +18,8 @@ import type { PromptConfig } from './types';
 
 export const flipAnalysis: PromptConfig = {
   name: 'flipAnalysis',
-  description: 'Full sellability analysis for a marketplace listing using market data and item identification.',
+  description:
+    'Full sellability analysis for a marketplace listing using market data and item identification.',
   provider: 'groq',
   fallbacks: ['gemini', 'openai'],
   model: 'gpt-4o-mini',
@@ -105,8 +106,7 @@ export const quickDiscountCheck: PromptConfig = {
   temperature: 0.3,
   maxTokens: 200,
   responseFormat: 'json',
-  systemPrompt:
-    'You are a resale market expert. Respond with valid JSON only.',
+  systemPrompt: 'You are a resale market expert. Respond with valid JSON only.',
   buildUserPrompt: (context: Record<string, unknown>) => {
     const title = String(context.title ?? '');
     const askingPrice = context.askingPrice as number;
@@ -133,7 +133,8 @@ export const claudeAnalysis: PromptConfig = {
     'You are a resale market expert. Always respond with valid JSON only, no markdown formatting.',
   buildUserPrompt: (context: Record<string, unknown>) => {
     const title = String(context.title ?? '');
-    const description = context.description != null ? String(context.description) : 'No description provided';
+    const description =
+      context.description != null ? String(context.description) : 'No description provided';
     const askingPrice = context.askingPrice as number;
     const imageCount = (context.imageCount as number) ?? 0;
 

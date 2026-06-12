@@ -48,10 +48,13 @@ export function ToastProvider({ children }: ToastProviderProps) {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  const showToast = useCallback((toast: ToastData) => {
-    const id = toast.id ?? `toast-${Date.now()}-${Math.random()}`;
-    setToasts((prev) => [...prev, { ...toast, id, onClose: removeToast }]);
-  }, [removeToast]);
+  const showToast = useCallback(
+    (toast: ToastData) => {
+      const id = toast.id ?? `toast-${Date.now()}-${Math.random()}`;
+      setToasts((prev) => [...prev, { ...toast, id, onClose: removeToast }]);
+    },
+    [removeToast]
+  );
 
   return (
     <ToastContext.Provider value={{ showToast }}>

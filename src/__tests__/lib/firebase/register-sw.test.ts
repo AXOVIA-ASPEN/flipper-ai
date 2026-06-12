@@ -31,18 +31,25 @@ describe('FCM Service Worker Registration', () => {
   });
 
   afterEach(() => {
-    Object.defineProperty(global, 'window', { value: originalWindow, writable: true, configurable: true });
-    Object.defineProperty(global, 'navigator', { value: originalNavigator, writable: true, configurable: true });
+    Object.defineProperty(global, 'window', {
+      value: originalWindow,
+      writable: true,
+      configurable: true,
+    });
+    Object.defineProperty(global, 'navigator', {
+      value: originalNavigator,
+      writable: true,
+      configurable: true,
+    });
   });
 
   it('registers the service worker at /firebase-messaging-sw.js', async () => {
     const { registerFCMServiceWorker } = await import('@/lib/firebase/register-sw');
     const registration = await registerFCMServiceWorker();
     expect(registration).toBeDefined();
-    expect(navigator.serviceWorker.register).toHaveBeenCalledWith(
-      '/firebase-messaging-sw.js',
-      { scope: '/' }
-    );
+    expect(navigator.serviceWorker.register).toHaveBeenCalledWith('/firebase-messaging-sw.js', {
+      scope: '/',
+    });
   });
 
   it('returns the ServiceWorkerRegistration on success', async () => {
@@ -65,7 +72,11 @@ describe('FCM Service Worker Registration', () => {
   });
 
   it('returns null on server (no window)', async () => {
-    Object.defineProperty(global, 'window', { value: undefined, writable: true, configurable: true });
+    Object.defineProperty(global, 'window', {
+      value: undefined,
+      writable: true,
+      configurable: true,
+    });
     const { registerFCMServiceWorker } = await import('@/lib/firebase/register-sw');
     const result = await registerFCMServiceWorker();
     expect(result).toBeNull();

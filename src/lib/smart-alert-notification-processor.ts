@@ -240,7 +240,11 @@ async function markEventProcessed(eventId: string): Promise<void> {
   });
 }
 
-async function markEventFailed(eventId: string, retryCount: number, errorMessage: string): Promise<void> {
+async function markEventFailed(
+  eventId: string,
+  retryCount: number,
+  errorMessage: string
+): Promise<void> {
   await prisma.notificationEvent.update({
     where: { id: eventId },
     data: {
@@ -347,11 +351,13 @@ async function phase1(result: SmartAlertProcessorResult): Promise<void> {
           });
           // Story 11.3: fire push fire-and-forget alongside email
           /* istanbul ignore next -- fire-and-forget; rejection is intentionally swallowed */
-          void pushNotificationService.sendToUser(
-            event.userId,
-            { title: '⭐ Review Received', body: `${p.rating}/5 on ${p.platform}` },
-            'reviewReceived'
-          ).catch(() => {});
+          void pushNotificationService
+            .sendToUser(
+              event.userId,
+              { title: '⭐ Review Received', body: `${p.rating}/5 on ${p.platform}` },
+              'reviewReceived'
+            )
+            .catch(() => {});
           break;
         }
 
@@ -378,20 +384,27 @@ async function phase1(result: SmartAlertProcessorResult): Promise<void> {
           // SMS: only for price drops (not increases)
           if (p.direction === 'decrease') {
             /* istanbul ignore next -- fire-and-forget; rejection is intentionally swallowed */
-            void smsNotificationService.notifyPriceDrop({
-              userId: event.userId,
-              listingTitle: p.listingTitle,
-              newPrice: p.newPrice,
-            }).catch(() => {});
+            void smsNotificationService
+              .notifyPriceDrop({
+                userId: event.userId,
+                listingTitle: p.listingTitle,
+                newPrice: p.newPrice,
+              })
+              .catch(() => {});
           }
           // Story 11.3: push for price drops only
           if (p.direction === 'decrease') {
             /* istanbul ignore next -- fire-and-forget; rejection is intentionally swallowed */
-            void pushNotificationService.sendToUser(
-              event.userId,
-              { title: '📉 Price Drop Alert', body: `${p.listingTitle} dropped to $${Math.round(p.newPrice)}` },
-              'priceDrops'
-            ).catch(() => {});
+            void pushNotificationService
+              .sendToUser(
+                event.userId,
+                {
+                  title: '📉 Price Drop Alert',
+                  body: `${p.listingTitle} dropped to $${Math.round(p.newPrice)}`,
+                },
+                'priceDrops'
+              )
+              .catch(() => {});
           }
           break;
         }
@@ -414,18 +427,25 @@ async function phase1(result: SmartAlertProcessorResult): Promise<void> {
             threadUrl: p.threadUrl,
           });
           /* istanbul ignore next -- fire-and-forget; rejection is intentionally swallowed */
-          void smsNotificationService.notifyFlipGoneCold({
-            userId: event.userId,
-            listingTitle: p.listingTitle,
-            hoursInactive: p.hoursSinceLastResponse,
-          }).catch(() => {});
+          void smsNotificationService
+            .notifyFlipGoneCold({
+              userId: event.userId,
+              listingTitle: p.listingTitle,
+              hoursInactive: p.hoursSinceLastResponse,
+            })
+            .catch(() => {});
           // Story 11.3: push for gone cold
           /* istanbul ignore next -- fire-and-forget; rejection is intentionally swallowed */
-          void pushNotificationService.sendToUser(
-            event.userId,
-            { title: '🥶 Flip Gone Cold', body: `${p.listingTitle} — ${Math.round(p.hoursSinceLastResponse)}h inactive` },
-            'flipGoneCold'
-          ).catch(() => {});
+          void pushNotificationService
+            .sendToUser(
+              event.userId,
+              {
+                title: '🥶 Flip Gone Cold',
+                body: `${p.listingTitle} — ${Math.round(p.hoursSinceLastResponse)}h inactive`,
+              },
+              'flipGoneCold'
+            )
+            .catch(() => {});
           break;
         }
 
@@ -447,17 +467,21 @@ async function phase1(result: SmartAlertProcessorResult): Promise<void> {
             threadUrl: p.threadUrl,
           });
           /* istanbul ignore next -- fire-and-forget; rejection is intentionally swallowed */
-          void smsNotificationService.notifyFlipTurnedHot({
-            userId: event.userId,
-            listingTitle: p.listingTitle,
-          }).catch(() => {});
+          void smsNotificationService
+            .notifyFlipTurnedHot({
+              userId: event.userId,
+              listingTitle: p.listingTitle,
+            })
+            .catch(() => {});
           // Story 11.3: push for turned hot
           /* istanbul ignore next -- fire-and-forget; rejection is intentionally swallowed */
-          void pushNotificationService.sendToUser(
-            event.userId,
-            { title: '🔥 Flip Turned Hot!', body: `${p.listingTitle} — respond now` },
-            'flipTurnedHot'
-          ).catch(() => {});
+          void pushNotificationService
+            .sendToUser(
+              event.userId,
+              { title: '🔥 Flip Turned Hot!', body: `${p.listingTitle} — respond now` },
+              'flipTurnedHot'
+            )
+            .catch(() => {});
           break;
         }
 
@@ -579,7 +603,7 @@ async function phase2(result: SmartAlertProcessorResult): Promise<void> {
         ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
         orderBy: { id: 'asc' },
       });
-    /* istanbul ignore next -- batch query catch; tested in phase2 DB error tests */
+      /* istanbul ignore next -- batch query catch; tested in phase2 DB error tests */
     } catch (err) {
       logger.error('smart_alert.phase2.batch_query_failed', {
         /* istanbul ignore next -- tests always throw Error instances */
@@ -684,22 +708,34 @@ async function phase2(result: SmartAlertProcessorResult): Promise<void> {
                   threadUrl,
                 });
                 /* istanbul ignore next -- fire-and-forget; rejection is intentionally swallowed */
-                void smsNotificationService.notifyFlipGoneCold({
-                  userId: user.id,
-                  listingTitle: cold.listingTitle,
-                  hoursInactive: cold.hoursSinceLastResponse,
-                }).catch(() => {});
+                void smsNotificationService
+                  .notifyFlipGoneCold({
+                    userId: user.id,
+                    listingTitle: cold.listingTitle,
+                    hoursInactive: cold.hoursSinceLastResponse,
+                  })
+                  .catch(() => {});
                 // Story 11.3: push fire-and-forget
                 /* istanbul ignore next -- fire-and-forget; rejection is intentionally swallowed */
-                void pushNotificationService.sendToUser(
-                  user.id,
-                  { title: '🥶 Flip Gone Cold', body: `${cold.listingTitle} — ${Math.round(cold.hoursSinceLastResponse)}h inactive` },
-                  'flipGoneCold'
-                ).catch(() => {});
+                void pushNotificationService
+                  .sendToUser(
+                    user.id,
+                    {
+                      title: '🥶 Flip Gone Cold',
+                      body: `${cold.listingTitle} — ${Math.round(cold.hoursSinceLastResponse)}h inactive`,
+                    },
+                    'flipGoneCold'
+                  )
+                  .catch(() => {});
 
                 // Find the created event and mark processed
                 const ev = await prisma.notificationEvent.findFirst({
-                  where: { userId: user.id, listingId: cold.listingId, eventType, deduplicationKey: dedupKey },
+                  where: {
+                    userId: user.id,
+                    listingId: cold.listingId,
+                    eventType,
+                    deduplicationKey: dedupKey,
+                  },
                   select: { id: true },
                 });
 
@@ -769,20 +805,29 @@ async function phase2(result: SmartAlertProcessorResult): Promise<void> {
                   threadUrl,
                 });
                 /* istanbul ignore next -- fire-and-forget; rejection is intentionally swallowed */
-                void smsNotificationService.notifyFlipTurnedHot({
-                  userId: user.id,
-                  listingTitle: hot.listingTitle,
-                }).catch(() => {});
+                void smsNotificationService
+                  .notifyFlipTurnedHot({
+                    userId: user.id,
+                    listingTitle: hot.listingTitle,
+                  })
+                  .catch(() => {});
                 // Story 11.3: push fire-and-forget
                 /* istanbul ignore next -- fire-and-forget; rejection is intentionally swallowed */
-                void pushNotificationService.sendToUser(
-                  user.id,
-                  { title: '🔥 Flip Turned Hot!', body: `${hot.listingTitle} — respond now` },
-                  'flipTurnedHot'
-                ).catch(() => {});
+                void pushNotificationService
+                  .sendToUser(
+                    user.id,
+                    { title: '🔥 Flip Turned Hot!', body: `${hot.listingTitle} — respond now` },
+                    'flipTurnedHot'
+                  )
+                  .catch(() => {});
 
                 const ev = await prisma.notificationEvent.findFirst({
-                  where: { userId: user.id, listingId: hot.listingId, eventType, deduplicationKey: dedupKey },
+                  where: {
+                    userId: user.id,
+                    listingId: hot.listingId,
+                    eventType,
+                    deduplicationKey: dedupKey,
+                  },
                   select: { id: true },
                 });
 

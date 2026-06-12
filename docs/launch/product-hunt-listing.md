@@ -9,9 +9,11 @@
 ## Tagline (60 char max)
 
 **Primary:**
+
 > AI scout that finds underpriced flips on 5 marketplaces
 
 **Alternates:**
+
 > The AI sidekick for everyone who flips on the side
 > Find. Flip. Profit. Now with an AI that does the finding.
 > Scans 5 marketplaces. Tells you what's worth buying.
@@ -32,13 +34,13 @@ If you've ever found a $40 lamp on Craigslist that sells for $400 on eBay, Flipp
 
 **Why I built it**
 
-I was spending 2-3 hours a day scrolling Craigslist and FB Marketplace looking for things to flip. Most of that time was filtering out junk. The actual *deal-finding* was maybe 10 minutes. So I automated the filter.
+I was spending 2-3 hours a day scrolling Craigslist and FB Marketplace looking for things to flip. Most of that time was filtering out junk. The actual _deal-finding_ was maybe 10 minutes. So I automated the filter.
 
 **How it works (3 layers, multi-provider AI):**
 
 1. **Scraping** — 5 marketplaces, all with anti-detection, dedup, real-time SSE progress
 2. **Identification** — A small LLM (GPT-4o-mini or Gemini Flash) extracts brand, model, condition, year
-3. **Verification** — eBay sold-listings API gives the *actual* market value, not a guess from the asking price
+3. **Verification** — eBay sold-listings API gives the _actual_ market value, not a guess from the asking price
 4. **Sellability** — A second LLM call rates demand, days-to-sell, and authenticity risk
 5. **Triage** — Only the top X% (default >50% margin) hit your dashboard
 
@@ -93,22 +95,22 @@ Try it free — no card required. Feedback welcome in the comments. I'll respond
 ## Gallery image captions (PH allows 6 images + 1 video)
 
 1. **Hero shot** — Dashboard with three high-margin opportunities visible, kanban in background
-   *Caption:* "Your dashboard, after 24 hours. Three flips with verified margin > 60%."
+   _Caption:_ "Your dashboard, after 24 hours. Three flips with verified margin > 60%."
 
 2. **Scanner config** — A saved-search setup screen with categories, location, price range
-   *Caption:* "One saved search. Five marketplaces. Real-time alerts."
+   _Caption:_ "One saved search. Five marketplaces. Real-time alerts."
 
 3. **AI analysis card** — A single opportunity expanded showing brand/model/verified market price/sellability
-   *Caption:* "The AI doesn't guess — it identifies the item, then pulls real eBay sold prices."
+   _Caption:_ "The AI doesn't guess — it identifies the item, then pulls real eBay sold prices."
 
 4. **Kanban** — All 6 lifecycle columns with cards, one being dragged
-   *Caption:* "From discovery to sale. Drag to update status; profit gets calculated automatically."
+   _Caption:_ "From discovery to sale. Drag to update status; profit gets calculated automatically."
 
 5. **Negotiation message** — A draft AI-generated buyer message with the "Approve & send" button
-   *Caption:* "AI drafts the message. You approve before it sends. No autonomous spam."
+   _Caption:_ "AI drafts the message. You approve before it sends. No autonomous spam."
 
 6. **Profit dashboard** — Analytics page with monthly P&L chart and ROI metrics
-   *Caption:* "Track every flip. Monthly P&L, ROI by category, days-to-sell distribution."
+   _Caption:_ "Track every flip. Monthly P&L, ROI by category, days-to-sell distribution."
 
 ## Video brief (60-90 seconds)
 
@@ -116,19 +118,19 @@ Try it free — no card required. Feedback welcome in the comments. I'll respond
 
 **Script:**
 
-> *[0-5s, cold open]* "Last week I bought this $40 mid-century lamp on Craigslist. It sold on eBay for $385. The reason I found it isn't because I'm good at flipping — it's because I built an AI that does the finding."
+> _[0-5s, cold open]_ "Last week I bought this $40 mid-century lamp on Craigslist. It sold on eBay for $385. The reason I found it isn't because I'm good at flipping — it's because I built an AI that does the finding."
 >
-> *[5-15s]* "This is Flipper.ai. I tell it what I'm looking for [show search config]. It scans 5 marketplaces in real time."
+> _[5-15s]_ "This is Flipper.ai. I tell it what I'm looking for [show search config]. It scans 5 marketplaces in real time."
 >
-> *[15-30s]* "It identifies each item with an LLM — brand, model, condition. Then it pulls actual eBay sold prices to verify market value. None of this 'estimated value = asking price × 1.3' nonsense."
+> _[15-30s]_ "It identifies each item with an LLM — brand, model, condition. Then it pulls actual eBay sold prices to verify market value. None of this 'estimated value = asking price × 1.3' nonsense."
 >
-> *[30-45s]* "Anything with >50% margin shows up in my dashboard. I move them through this kanban as I buy, list, and sell."
+> _[30-45s]_ "Anything with >50% margin shows up in my dashboard. I move them through this kanban as I buy, list, and sell."
 >
-> *[45-60s]* "When I'm ready to message a seller, the AI drafts it. I approve. It sends. When I'm ready to relist, the AI writes the new title, description, and price."
+> _[45-60s]_ "When I'm ready to message a seller, the AI drafts it. I approve. It sends. When I'm ready to relist, the AI writes the new title, description, and price."
 >
-> *[60-75s]* "Free tier gets you 1 saved search and 10 scans a day. $19/mo unlocks all 5 marketplaces."
+> _[60-75s]_ "Free tier gets you 1 saved search and 10 scans a day. $19/mo unlocks all 5 marketplaces."
 >
-> *[75-90s]* "It's flipperai.app. Comments are open."
+> _[75-90s]_ "It's flipperai.app. Comments are open."
 
 ---
 

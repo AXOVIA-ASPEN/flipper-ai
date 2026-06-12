@@ -140,91 +140,64 @@ Given(
   }
 );
 
-Given(
-  'listing {string} is marked as refreshing',
-  function (listingId: string) {
-    this.listingId = listingId;
-    setRefreshing(listingId, true);
-  }
-);
+Given('listing {string} is marked as refreshing', function (listingId: string) {
+  this.listingId = listingId;
+  setRefreshing(listingId, true);
+});
 
 // ==================== When steps ====================
 
-When(
-  'the listing is re-checked with current price {int}',
-  async function (currentPrice: number) {
-    this.cacheResult = await getCachedSellabilityAnalysis(this.listingId, currentPrice);
-  }
-);
+When('the listing is re-checked with current price {int}', async function (currentPrice: number) {
+  this.cacheResult = await getCachedSellabilityAnalysis(this.listingId, currentPrice);
+});
 
-When(
-  'another refresh is attempted for listing {string}',
-  function (listingId: string) {
-    this.isAlreadyRefreshing = isRefreshing(listingId);
-  }
-);
+When('another refresh is attempted for listing {string}', function (listingId: string) {
+  this.isAlreadyRefreshing = isRefreshing(listingId);
+});
 
 // ==================== Then steps ====================
 
-Then(
-  'the cached analysis should be returned',
-  function () {
-    const result: CacheResult = this.cacheResult;
-    assert(result.analysis !== null, 'Expected cached analysis to be returned, but got null');
-    assert.strictEqual(
-      result.analysis.sellabilityScore,
-      MOCK_ANALYSIS.sellabilityScore,
-      'Returned analysis should match the cached analysis'
-    );
-  }
-);
+Then('the cached analysis should be returned', function () {
+  const result: CacheResult = this.cacheResult;
+  assert(result.analysis !== null, 'Expected cached analysis to be returned, but got null');
+  assert.strictEqual(
+    result.analysis.sellabilityScore,
+    MOCK_ANALYSIS.sellabilityScore,
+    'Returned analysis should match the cached analysis'
+  );
+});
 
-Then(
-  'no cached analysis should be returned',
-  function () {
-    const result: CacheResult = this.cacheResult;
-    assert.strictEqual(result.analysis, null, 'Expected no cached analysis (null), but got a result');
-  }
-);
+Then('no cached analysis should be returned', function () {
+  const result: CacheResult = this.cacheResult;
+  assert.strictEqual(result.analysis, null, 'Expected no cached analysis (null), but got a result');
+});
 
-Then(
-  'the stale analysis flag should be false',
-  function () {
-    const result: CacheResult = this.cacheResult;
-    assert.strictEqual(result.staleAnalysis, false, 'Expected staleAnalysis to be false');
-  }
-);
+Then('the stale analysis flag should be false', function () {
+  const result: CacheResult = this.cacheResult;
+  assert.strictEqual(result.staleAnalysis, false, 'Expected staleAnalysis to be false');
+});
 
-Then(
-  'the stale analysis flag should be true',
-  function () {
-    const result: CacheResult = this.cacheResult;
-    assert.strictEqual(result.staleAnalysis, true, 'Expected staleAnalysis to be true');
-  }
-);
+Then('the stale analysis flag should be true', function () {
+  const result: CacheResult = this.cacheResult;
+  assert.strictEqual(result.staleAnalysis, true, 'Expected staleAnalysis to be true');
+});
 
-Then(
-  'the cache entry should have analyzedAtPrice set to {int}',
-  function (expectedPrice: number) {
-    const upsertArgs = this._upsertData as Record<string, Record<string, unknown>> | null;
-    assert(upsertArgs !== null, 'Expected upsert to have been called');
-    const createData = upsertArgs.create as Record<string, unknown>;
-    assert.strictEqual(
-      createData.analyzedAtPrice,
-      expectedPrice,
-      `Expected analyzedAtPrice to be ${expectedPrice}, got ${createData.analyzedAtPrice}`
-    );
-  }
-);
+Then('the cache entry should have analyzedAtPrice set to {int}', function (expectedPrice: number) {
+  const upsertArgs = this._upsertData as Record<string, Record<string, unknown>> | null;
+  assert(upsertArgs !== null, 'Expected upsert to have been called');
+  const createData = upsertArgs.create as Record<string, unknown>;
+  assert.strictEqual(
+    createData.analyzedAtPrice,
+    expectedPrice,
+    `Expected analyzedAtPrice to be ${expectedPrice}, got ${createData.analyzedAtPrice}`
+  );
+});
 
-Then(
-  'the refresh should be skipped because it is already in progress',
-  function () {
-    assert.strictEqual(
-      this.isAlreadyRefreshing,
-      true,
-      'Expected isRefreshing() to return true, indicating the refresh should be skipped'
-    );
-    setRefreshing(this.listingId, false);
-  }
-);
+Then('the refresh should be skipped because it is already in progress', function () {
+  assert.strictEqual(
+    this.isAlreadyRefreshing,
+    true,
+    'Expected isRefreshing() to return true, indicating the refresh should be skipped'
+  );
+  setRefreshing(this.listingId, false);
+});

@@ -57,15 +57,17 @@ const mockFindFirst = (prisma.monitoringJob as any).findFirst as jest.Mock;
 
 const VALID_KEY = 'a'.repeat(32);
 
-function makeRequest(options: {
-  apiKey?: string;
-  body?: string;
-} = {}): NextRequest {
+function makeRequest(
+  options: {
+    apiKey?: string;
+    body?: string;
+  } = {}
+): NextRequest {
   const { apiKey = VALID_KEY, body = '' } = options;
   return new NextRequest('http://localhost/api/monitoring/run', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${apiKey}`,
+      Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
     body: body || undefined,
@@ -158,7 +160,7 @@ describe('POST /api/monitoring/run', () => {
       const res = await POST(req);
 
       expect(res.status).toBe(429);
-      const body = await res.json() as { success: boolean; error: { code: string } };
+      const body = (await res.json()) as { success: boolean; error: { code: string } };
       expect(body.success).toBe(false);
       expect(body.error.code).toBe('RATE_LIMITED');
     });
@@ -183,7 +185,7 @@ describe('POST /api/monitoring/run', () => {
       const res = await POST(req);
 
       expect(res.status).toBe(200);
-      const body = await res.json() as { success: boolean; data: typeof defaultSummary };
+      const body = (await res.json()) as { success: boolean; data: typeof defaultSummary };
       expect(body.success).toBe(true);
       expect(body.data.jobId).toBe('job-1');
       expect(body.data.listingsChecked).toBe(5);
@@ -207,7 +209,7 @@ describe('POST /api/monitoring/run', () => {
       const res = await POST(req);
 
       expect(res.status).toBe(409);
-      const body = await res.json() as { success: boolean; error: { code: string } };
+      const body = (await res.json()) as { success: boolean; error: { code: string } };
       expect(body.success).toBe(false);
       expect(body.error.code).toBe('CONFLICT');
     });

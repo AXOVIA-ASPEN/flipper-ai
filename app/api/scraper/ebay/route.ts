@@ -6,7 +6,15 @@ import { getAuthUserId } from '@/lib/auth-middleware';
 // The module exposes the canonical API helpers (callEbayApi, convertEbayItemsToNormalized).
 import * as ebayModule from '@/scrapers/ebay';
 void ebayModule;
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
+import {
+  handleError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  AppError,
+  ErrorCode,
+} from '@/lib/errors';
 import { enforceTierLimits } from '@/lib/tier-enforcement';
 import { computeEstimatedExpiry } from '@/lib/listing-expiry';
 import {
@@ -195,7 +203,10 @@ function convertEbayItemsToNormalized(items: EbayItemSummary[]): RawListing[] {
     .map((item) => {
       const price = parseFloat(item.price?.value || '0');
       const description = item.shortDescription || item.description || '';
-      const category = item.categories?.[0]?.categoryName || detectCategory(item.title, description) || 'electronics';
+      const category =
+        item.categories?.[0]?.categoryName ||
+        detectCategory(item.title, description) ||
+        'electronics';
       const imageUrls = [
         item.image?.imageUrl,
         ...(item.additionalImages?.map((img) => img.imageUrl) ?? []),
@@ -336,12 +347,12 @@ export async function POST(request: NextRequest) {
       };
 
       // Process listings through centralized viability logic with SSE events
-      const processedResults = processListings(
-        'EBAY',
-        normalizedListings,
-        viabilityCriteria,
-        { emitEvents: true, userId, feeRate, opportunityThreshold }
-      );
+      const processedResults = processListings('EBAY', normalizedListings, viabilityCriteria, {
+        emitEvents: true,
+        userId,
+        feeRate,
+        opportunityThreshold,
+      });
 
       // Step 1.5: Cross-Platform Price Intelligence (Story 13.8)
       // Override Tier 1 multiplier-based scores with verified market data before Tier 2
@@ -353,7 +364,11 @@ export async function POST(request: NextRequest) {
 
       // Enrich listings with market data (LLM path or verified price path)
       if (hasLLM) {
-        enrichedListings = await enrichWithSellabilityAnalysis(enrichedListings, discountThreshold, feeRate);
+        enrichedListings = await enrichWithSellabilityAnalysis(
+          enrichedListings,
+          discountThreshold,
+          feeRate
+        );
       } else {
         enrichedListings = await enrichWithVerifiedMarketPrice(enrichedListings);
       }
@@ -388,7 +403,10 @@ export async function POST(request: NextRequest) {
       const savedListings = [];
       for (const analyzed of enrichedListings) {
         const storageData = formatForStorage(analyzed);
-        const estimatedExpiresAt = computeEstimatedExpiry('EBAY', (storageData as { postedAt?: Date | null }).postedAt ?? null);
+        const estimatedExpiresAt = computeEstimatedExpiry(
+          'EBAY',
+          (storageData as { postedAt?: Date | null }).postedAt ?? null
+        );
         try {
           const listing = await prisma.listing.upsert({
             where: {
@@ -423,7 +441,10 @@ export async function POST(request: NextRequest) {
                 },
               });
             } catch (cacheErr) {
-              console.error(`Failed to cache Claude analysis for ${analyzed.externalId}:`, cacheErr);
+              console.error(
+                `Failed to cache Claude analysis for ${analyzed.externalId}:`,
+                cacheErr
+              );
             }
           }
           // Story 10.3: Emit opportunity.found notification event (fire-and-forget).

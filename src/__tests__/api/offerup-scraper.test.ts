@@ -39,7 +39,13 @@ jest.mock('@/lib/image-capture', () => ({
 
 // Mock logger
 jest.mock('@/lib/logger', () => ({
-  logger: { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn(), fatal: jest.fn() },
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    fatal: jest.fn(),
+  },
 }));
 
 jest.mock('@/lib/auth-middleware', () => ({
@@ -90,8 +96,12 @@ const mockGetAuthUserId = getAuthUserId as jest.MockedFunction<typeof getAuthUse
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 const mockEstimateValue = estimateValue as jest.MockedFunction<typeof estimateValue>;
 const mockDetectCategory = detectCategory as jest.MockedFunction<typeof detectCategory>;
-const mockGeneratePurchaseMessage = generatePurchaseMessage as jest.MockedFunction<typeof generatePurchaseMessage>;
-const mockDownloadAndCacheImages = downloadAndCacheImages as jest.MockedFunction<typeof downloadAndCacheImages>;
+const mockGeneratePurchaseMessage = generatePurchaseMessage as jest.MockedFunction<
+  typeof generatePurchaseMessage
+>;
+const mockDownloadAndCacheImages = downloadAndCacheImages as jest.MockedFunction<
+  typeof downloadAndCacheImages
+>;
 const mockNormalizeLocation = normalizeLocation as jest.MockedFunction<typeof normalizeLocation>;
 
 function makeRequest(body: Record<string, unknown> = {}): NextRequest {
@@ -115,11 +125,21 @@ describe('extractListingId edge cases', () => {
     mockGetAuthUserId.mockResolvedValue('user-123');
     mockDetectCategory.mockReturnValue('electronics');
     mockEstimateValue.mockReturnValue({
-      estimatedValue: 500, estimatedLow: 400, estimatedHigh: 600,
-      profitPotential: 200, profitLow: 100, profitHigh: 300,
-      valueScore: 75, discountPercent: 40, resaleDifficulty: 'medium',
-      comparableUrls: [], reasoning: 'Good deal', notes: '',
-      shippable: true, negotiable: true, tags: ['electronics'],
+      estimatedValue: 500,
+      estimatedLow: 400,
+      estimatedHigh: 600,
+      profitPotential: 200,
+      profitLow: 100,
+      profitHigh: 300,
+      valueScore: 75,
+      discountPercent: 40,
+      resaleDifficulty: 'medium',
+      comparableUrls: [],
+      reasoning: 'Good deal',
+      notes: '',
+      shippable: true,
+      negotiable: true,
+      tags: ['electronics'],
     } as any);
     mockGeneratePurchaseMessage.mockReturnValue('Hi, is this still available?');
     mockDownloadAndCacheImages.mockResolvedValue({ cachedUrls: [], successCount: 0 } as any);
@@ -133,7 +153,12 @@ describe('extractListingId edge cases', () => {
       waitForSelector: jest.fn().mockResolvedValue(undefined),
       content: jest.fn().mockResolvedValue('<html></html>'),
       evaluate: jest.fn().mockResolvedValue([
-        { title: 'Alt URL Item', price: '$100', url: 'https://offerup.com/listing/12345/', location: 'Tampa' },
+        {
+          title: 'Alt URL Item',
+          price: '$100',
+          url: 'https://offerup.com/listing/12345/',
+          location: 'Tampa',
+        },
       ]),
     };
     const mockContext = {
@@ -168,7 +193,12 @@ describe('extractListingId edge cases', () => {
       waitForSelector: jest.fn().mockResolvedValue(undefined),
       content: jest.fn().mockResolvedValue('<html></html>'),
       evaluate: jest.fn().mockResolvedValue([
-        { title: 'Weird URL', price: '$50', url: 'https://offerup.com/some-listing-slug', location: 'Tampa' },
+        {
+          title: 'Weird URL',
+          price: '$50',
+          url: 'https://offerup.com/some-listing-slug',
+          location: 'Tampa',
+        },
       ]),
     };
     const mockContext = {
@@ -207,7 +237,8 @@ describe('withRetry behavior', () => {
   it('retries page.goto on first failure then succeeds', async () => {
     const { chromium } = require('playwright');
     const mockPage = {
-      goto: jest.fn()
+      goto: jest
+        .fn()
         .mockRejectedValueOnce(new Error('Network error'))
         .mockResolvedValueOnce(undefined),
       waitForSelector: jest.fn().mockResolvedValue(undefined),
@@ -267,7 +298,10 @@ describe('POST /api/scraper/offerup', () => {
       tags: ['electronics'],
     } as any);
     mockGeneratePurchaseMessage.mockReturnValue('Hi, is this still available?');
-    mockDownloadAndCacheImages.mockResolvedValue({ cachedUrls: ['cached.jpg'], successCount: 1 } as any);
+    mockDownloadAndCacheImages.mockResolvedValue({
+      cachedUrls: ['cached.jpg'],
+      successCount: 1,
+    } as any);
     mockNormalizeLocation.mockReturnValue({ normalized: 'Tampa, FL' } as any);
   });
 
@@ -378,8 +412,20 @@ describe('POST /api/scraper/offerup', () => {
       waitForSelector: jest.fn().mockResolvedValue(undefined),
       content: jest.fn().mockResolvedValue('<html>normal page</html>'),
       evaluate: jest.fn().mockResolvedValue([
-        { title: 'iPhone 15', price: '$500', url: 'https://offerup.com/item/detail/123', location: 'Tampa', imageUrl: 'img.jpg', condition: 'Good' },
-        { title: 'Free stuff', price: 'Free', url: 'https://offerup.com/item/detail/456', location: 'Tampa' },
+        {
+          title: 'iPhone 15',
+          price: '$500',
+          url: 'https://offerup.com/item/detail/123',
+          location: 'Tampa',
+          imageUrl: 'img.jpg',
+          condition: 'Good',
+        },
+        {
+          title: 'Free stuff',
+          price: 'Free',
+          url: 'https://offerup.com/item/detail/456',
+          location: 'Tampa',
+        },
       ]),
     };
     const mockContext = {
@@ -417,8 +463,22 @@ describe('POST /api/scraper/offerup', () => {
       waitForSelector: jest.fn().mockResolvedValue(undefined),
       content: jest.fn().mockResolvedValue('<html></html>'),
       evaluate: jest.fn().mockResolvedValue([
-        { title: 'Failing Item', price: '$100', url: 'https://offerup.com/item/detail/111', location: 'Tampa', imageUrl: 'img.jpg', condition: 'New' },
-        { title: 'Good Item', price: '$200', url: 'https://offerup.com/item/detail/222', location: 'Tampa', imageUrl: 'img2.jpg', condition: 'Good' },
+        {
+          title: 'Failing Item',
+          price: '$100',
+          url: 'https://offerup.com/item/detail/111',
+          location: 'Tampa',
+          imageUrl: 'img.jpg',
+          condition: 'New',
+        },
+        {
+          title: 'Good Item',
+          price: '$200',
+          url: 'https://offerup.com/item/detail/222',
+          location: 'Tampa',
+          imageUrl: 'img2.jpg',
+          condition: 'Good',
+        },
       ]),
     };
     const mockContext = {
@@ -481,7 +541,12 @@ describe('POST /api/scraper/offerup', () => {
       waitForSelector: jest.fn().mockResolvedValue(undefined),
       content: jest.fn().mockResolvedValue('<html></html>'),
       evaluate: jest.fn().mockResolvedValue([
-        { title: 'No Image Item', price: '$1,500', url: 'https://offerup.com/item/detail/333', location: 'Tampa' },
+        {
+          title: 'No Image Item',
+          price: '$1,500',
+          url: 'https://offerup.com/item/detail/333',
+          location: 'Tampa',
+        },
       ]),
     };
     const mockContext = {
@@ -519,19 +584,27 @@ describe('POST /api/scraper/offerup', () => {
       close: jest.fn().mockResolvedValue(undefined),
     });
 
-    await POST(makeRequest({ location: 'tampa-fl', keywords: 'iphone', minPrice: 100, maxPrice: 500, category: 'cell_phones' }));
+    await POST(
+      makeRequest({
+        location: 'tampa-fl',
+        keywords: 'iphone',
+        minPrice: 100,
+        maxPrice: 500,
+        category: 'cell_phones',
+      })
+    );
     // Verify the URL includes search params
     expect(mockPage.goto).toHaveBeenCalledWith(
       expect.stringContaining('q=iphone'),
-      expect.any(Object),
+      expect.any(Object)
     );
     expect(mockPage.goto).toHaveBeenCalledWith(
       expect.stringContaining('price_min=100'),
-      expect.any(Object),
+      expect.any(Object)
     );
     expect(mockPage.goto).toHaveBeenCalledWith(
       expect.stringContaining('price_max=500'),
-      expect.any(Object),
+      expect.any(Object)
     );
   });
 
@@ -543,7 +616,12 @@ describe('POST /api/scraper/offerup', () => {
       waitForSelector: jest.fn().mockResolvedValue(undefined),
       content: jest.fn().mockResolvedValue('<html></html>'),
       evaluate: jest.fn().mockResolvedValue([
-        { title: 'Alt URL Item', price: '$50', url: 'https://offerup.com/item/detail/99999', location: 'Tampa' },
+        {
+          title: 'Alt URL Item',
+          price: '$50',
+          url: 'https://offerup.com/item/detail/99999',
+          location: 'Tampa',
+        },
       ]),
     };
     const mockContext = {
@@ -601,7 +679,12 @@ describe('POST /api/scraper/offerup', () => {
       waitForSelector: jest.fn().mockRejectedValue(new Error('Timeout')),
       content: jest.fn().mockResolvedValue('<html><body>OfferUp listings page</body></html>'),
       evaluate: jest.fn().mockResolvedValue([
-        { title: 'Found Item', price: '$30', url: 'https://offerup.com/item/detail/777', location: 'Tampa' },
+        {
+          title: 'Found Item',
+          price: '$30',
+          url: 'https://offerup.com/item/detail/777',
+          location: 'Tampa',
+        },
       ]),
     };
     const mockContext = {
@@ -630,11 +713,27 @@ describe('POST /api/scraper/offerup', () => {
       content: jest.fn().mockResolvedValue('<html></html>'),
       evaluate: jest.fn().mockResolvedValue([
         // Unparseable price → parsePrice returns 0 → skipped (price <= 0)
-        { title: 'Weird Price', price: 'negotiable', url: 'https://offerup.com/item/detail/444', location: 'Tampa' },
+        {
+          title: 'Weird Price',
+          price: 'negotiable',
+          url: 'https://offerup.com/item/detail/444',
+          location: 'Tampa',
+        },
         // Empty price string
-        { title: 'No Price', price: '', url: 'https://offerup.com/item/detail/555', location: 'Tampa' },
+        {
+          title: 'No Price',
+          price: '',
+          url: 'https://offerup.com/item/detail/555',
+          location: 'Tampa',
+        },
         // Valid item with alt URL (trailing number)
-        { title: 'Valid Alt', price: '$75', url: 'https://offerup.com/item/detail/666', location: 'Tampa', condition: 'Like New' },
+        {
+          title: 'Valid Alt',
+          price: '$75',
+          url: 'https://offerup.com/item/detail/666',
+          location: 'Tampa',
+          condition: 'Like New',
+        },
       ]),
     };
     const mockContext = {
@@ -692,7 +791,12 @@ describe('POST /api/scraper/offerup', () => {
       waitForSelector: jest.fn().mockResolvedValue(undefined),
       content: jest.fn().mockResolvedValue('<html></html>'),
       evaluate: jest.fn().mockResolvedValue([
-        { title: 'Old TV', price: '$50', url: 'https://offerup.com/item/detail/789', location: 'Tampa' },
+        {
+          title: 'Old TV',
+          price: '$50',
+          url: 'https://offerup.com/item/detail/789',
+          location: 'Tampa',
+        },
       ]),
     };
     const mockContext = {
@@ -720,7 +824,12 @@ describe('POST /api/scraper/offerup', () => {
       waitForSelector: jest.fn().mockResolvedValue(undefined),
       content: jest.fn().mockResolvedValue('<html></html>'),
       evaluate: jest.fn().mockResolvedValue([
-        { title: 'No Location Item', price: '$100', url: 'https://offerup.com/item/detail/800', location: '' },
+        {
+          title: 'No Location Item',
+          price: '$100',
+          url: 'https://offerup.com/item/detail/800',
+          location: '',
+        },
       ]),
     };
     const mockContext = {
@@ -748,7 +857,13 @@ describe('POST /api/scraper/offerup', () => {
       waitForSelector: jest.fn().mockResolvedValue(undefined),
       content: jest.fn().mockResolvedValue('<html></html>'),
       evaluate: jest.fn().mockResolvedValue([
-        { title: 'Image Item', price: '$150', url: 'https://offerup.com/item/detail/900', location: 'Tampa', imageUrl: 'https://img.example.com/original.jpg' },
+        {
+          title: 'Image Item',
+          price: '$150',
+          url: 'https://offerup.com/item/detail/900',
+          location: 'Tampa',
+          imageUrl: 'https://img.example.com/original.jpg',
+        },
       ]),
     };
     const mockContext = {
@@ -808,11 +923,21 @@ describe('context.route resource blocking callbacks', () => {
     mockGetAuthUserId.mockResolvedValue('user-123');
     mockDetectCategory.mockReturnValue('electronics');
     mockEstimateValue.mockReturnValue({
-      estimatedValue: 300, estimatedLow: 200, estimatedHigh: 400,
-      profitPotential: 100, profitLow: 50, profitHigh: 150,
-      valueScore: 72, discountPercent: 35, resaleDifficulty: 'medium',
-      comparableUrls: [], reasoning: 'OK deal', notes: '',
-      shippable: true, negotiable: true, tags: ['electronics'],
+      estimatedValue: 300,
+      estimatedLow: 200,
+      estimatedHigh: 400,
+      profitPotential: 100,
+      profitLow: 50,
+      profitHigh: 150,
+      valueScore: 72,
+      discountPercent: 35,
+      resaleDifficulty: 'medium',
+      comparableUrls: [],
+      reasoning: 'OK deal',
+      notes: '',
+      shippable: true,
+      negotiable: true,
+      tags: ['electronics'],
     } as any);
     mockGeneratePurchaseMessage.mockReturnValue('Is this available?');
     mockDownloadAndCacheImages.mockResolvedValue({ cachedUrls: [], successCount: 0 } as any);
@@ -824,11 +949,13 @@ describe('context.route resource blocking callbacks', () => {
     const mockAbort = jest.fn().mockResolvedValue(undefined);
 
     // Make context.route actually call the handler with a mock route object
-    const mockRoute = jest.fn().mockImplementation(
-      async (_pattern: string, handler: (r: { abort: jest.Mock }) => unknown) => {
-        await handler({ abort: mockAbort });
-      }
-    );
+    const mockRoute = jest
+      .fn()
+      .mockImplementation(
+        async (_pattern: string, handler: (r: { abort: jest.Mock }) => unknown) => {
+          await handler({ abort: mockAbort });
+        }
+      );
 
     const mockPage = {
       goto: jest.fn().mockResolvedValue(undefined),
@@ -934,14 +1061,27 @@ describe('OfferUp scraper - LLM sellability pipeline (Story 4.5)', () => {
     mockGetAuthUserId.mockResolvedValue('user-llm');
     (mockPrisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-llm' });
     (mockPrisma.scraperJob.update as jest.Mock).mockResolvedValue({});
-    (mockPrisma.listing.upsert as jest.Mock).mockResolvedValue({ id: 'listing-llm', status: 'OPPORTUNITY' });
+    (mockPrisma.listing.upsert as jest.Mock).mockResolvedValue({
+      id: 'listing-llm',
+      status: 'OPPORTUNITY',
+    });
 
     mockEstimateValue.mockReturnValue({
-      estimatedValue: 380, estimatedLow: 300, estimatedHigh: 460,
-      profitPotential: 130, profitLow: 80, profitHigh: 180,
-      valueScore: 80, discountPercent: 38, resaleDifficulty: 'medium',
-      comparableUrls: [], reasoning: 'Good deal', notes: '',
-      shippable: true, negotiable: true, tags: ['gaming'],
+      estimatedValue: 380,
+      estimatedLow: 300,
+      estimatedHigh: 460,
+      profitPotential: 130,
+      profitLow: 80,
+      profitHigh: 180,
+      valueScore: 80,
+      discountPercent: 38,
+      resaleDifficulty: 'medium',
+      comparableUrls: [],
+      reasoning: 'Good deal',
+      notes: '',
+      shippable: true,
+      negotiable: true,
+      tags: ['gaming'],
     } as any);
     mockDetectCategory.mockReturnValue('gaming');
     mockGeneratePurchaseMessage.mockReturnValue('Hi, is this still available?');
@@ -949,9 +1089,16 @@ describe('OfferUp scraper - LLM sellability pipeline (Story 4.5)', () => {
     mockNormalizeLocation.mockReturnValue({ normalized: 'Tampa, FL' } as any);
 
     // Browser returns one valid listing
-    buildChromiumMock(jest.fn().mockResolvedValue([
-      { title: 'PlayStation 5', price: '$250', url: 'https://offerup.com/item/detail/99999/', location: 'Tampa, FL' },
-    ]));
+    buildChromiumMock(
+      jest.fn().mockResolvedValue([
+        {
+          title: 'PlayStation 5',
+          price: '$250',
+          url: 'https://offerup.com/item/detail/99999/',
+          location: 'Tampa, FL',
+        },
+      ])
+    );
   });
 
   afterEach(() => {
@@ -1008,7 +1155,10 @@ describe('OfferUp scraper - LLM sellability pipeline (Story 4.5)', () => {
   });
 
   it('skips item when analyzeSellability returns meetsThreshold=false', async () => {
-    mockAnalyzeSellability.mockResolvedValue({ ...defaultSellabilityResult, meetsThreshold: false });
+    mockAnalyzeSellability.mockResolvedValue({
+      ...defaultSellabilityResult,
+      meetsThreshold: false,
+    });
 
     const res = await POST(makeRequest({ location: 'tampa-fl' }));
     expect(res.status).toBe(200);
@@ -1033,18 +1183,20 @@ describe('OfferUp scraper - LLM sellability pipeline (Story 4.5)', () => {
 
   it('reads discountThreshold from userSettings and passes it to analyzeSellability', async () => {
     // Override userSettings to return a custom discountThreshold
-    (mockPrisma.userSettings.findUnique as jest.Mock).mockResolvedValueOnce({ discountThreshold: 60 });
+    (mockPrisma.userSettings.findUnique as jest.Mock).mockResolvedValueOnce({
+      discountThreshold: 60,
+    });
 
     const res = await POST(makeRequest({ location: 'tampa-fl' }));
     expect(res.status).toBe(200);
 
     expect(mockAnalyzeSellability).toHaveBeenCalledWith(
-      expect.any(String),   // title
-      expect.any(Number),   // price
-      expect.any(Object),   // identification
-      expect.any(Object),   // marketData
-      60,                   // discountThreshold from userSettings
-      expect.any(Number)    // feeRate from userSettings
+      expect.any(String), // title
+      expect.any(Number), // price
+      expect.any(Object), // identification
+      expect.any(Object), // marketData
+      60, // discountThreshold from userSettings
+      expect.any(Number) // feeRate from userSettings
     );
   });
 });

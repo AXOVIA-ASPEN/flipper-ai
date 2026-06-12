@@ -48,7 +48,9 @@ Then(
 
 Then('it renders a score range with min and max range inputs', function () {
   assert.ok(
-    fileContent.includes('type="range"') && fileContent.includes('minScore') && fileContent.includes('maxScore'),
+    fileContent.includes('type="range"') &&
+      fileContent.includes('minScore') &&
+      fileContent.includes('maxScore'),
     'Expected score range slider inputs in FilterPanel'
   );
 });
@@ -90,21 +92,17 @@ When('I inspect the GET handler filter logic', function () {
 
 Then('it reads a platforms query parameter and splits by comma', function () {
   assert.ok(
-    fileContent.includes("searchParams.get('platforms')") &&
-      fileContent.includes("split(',')"),
+    fileContent.includes("searchParams.get('platforms')") && fileContent.includes("split(',')"),
     'Expected platforms param read and comma splitting'
   );
 });
 
-Then(
-  /^it builds a Prisma where clause with platform using \{ in: platformList \}$/,
-  function () {
-    assert.ok(
-      fileContent.includes('{ in: platformList }') || fileContent.includes("in: platformList"),
-      'Expected Prisma { in: platformList } where clause for platform'
-    );
-  }
-);
+Then(/^it builds a Prisma where clause with platform using \{ in: platformList \}$/, function () {
+  assert.ok(
+    fileContent.includes('{ in: platformList }') || fileContent.includes('in: platformList'),
+    'Expected Prisma { in: platformList } where clause for platform'
+  );
+});
 
 Then(
   'the multi-select platforms param takes precedence over the single platform param',
@@ -166,22 +164,20 @@ When('I inspect the setFilter function with a cleared value', function () {
   // File loaded
 });
 
-Then(
-  'calling setFilter with an empty string removes that parameter from the URL',
-  function () {
-    // updateURL only sets params when values are truthy
-    assert.ok(
-      fileContent.includes('if (newFilters.platforms)') ||
-        fileContent.includes("if (newFilters.platforms)"),
-      'Expected conditional URL param setting (only non-empty values)'
-    );
-  }
-);
+Then('calling setFilter with an empty string removes that parameter from the URL', function () {
+  // updateURL only sets params when values are truthy
+  assert.ok(
+    fileContent.includes('if (newFilters.platforms)') ||
+      fileContent.includes('if (newFilters.platforms)'),
+    'Expected conditional URL param setting (only non-empty values)'
+  );
+});
 
 Then('other active filter parameters remain in the URL unchanged', function () {
   // The updateURL function serializes the full FilterState
   assert.ok(
-    fileContent.includes('params.set(') && fileContent.includes('const params = new URLSearchParams'),
+    fileContent.includes('params.set(') &&
+      fileContent.includes('const params = new URLSearchParams'),
     'Expected URLSearchParams construction with all active filters'
   );
 });
@@ -194,47 +190,34 @@ When('I inspect the URL encoding behavior', function () {
   // File loaded
 });
 
-Then(
-  'the platforms filter is stored as a comma-separated string in the URL',
-  function () {
-    assert.ok(
-      fileContent.includes("params.set('platforms'") ||
-        fileContent.includes('params.set("platforms"'),
-      'Expected platforms to be set in URL params'
-    );
-  }
-);
+Then('the platforms filter is stored as a comma-separated string in the URL', function () {
+  assert.ok(
+    fileContent.includes("params.set('platforms'") ||
+      fileContent.includes('params.set("platforms"'),
+    'Expected platforms to be set in URL params'
+  );
+});
 
-Then(
-  'the categories filter is stored as a comma-separated string in the URL',
-  function () {
-    assert.ok(
-      fileContent.includes("params.set('categories'") ||
-        fileContent.includes('params.set("categories"'),
-      'Expected categories to be set in URL params'
-    );
-  }
-);
+Then('the categories filter is stored as a comma-separated string in the URL', function () {
+  assert.ok(
+    fileContent.includes("params.set('categories'") ||
+      fileContent.includes('params.set("categories"'),
+    'Expected categories to be set in URL params'
+  );
+});
 
-Then(
-  'the statuses filter is stored as a comma-separated string in the URL',
-  function () {
-    assert.ok(
-      fileContent.includes("params.set('statuses'") ||
-        fileContent.includes('params.set("statuses"'),
-      'Expected statuses to be set in URL params'
-    );
-  }
-);
+Then('the statuses filter is stored as a comma-separated string in the URL', function () {
+  assert.ok(
+    fileContent.includes("params.set('statuses'") || fileContent.includes('params.set("statuses"'),
+    'Expected statuses to be set in URL params'
+  );
+});
 
-Then(
-  'all filter values are read back from searchParams on hook initialization',
-  function () {
-    assert.ok(
-      fileContent.includes("searchParams.get('platforms')") &&
-        fileContent.includes("searchParams.get('categories')") &&
-        fileContent.includes("searchParams.get('statuses')"),
-      'Expected all multi-select filters read from searchParams'
-    );
-  }
-);
+Then('all filter values are read back from searchParams on hook initialization', function () {
+  assert.ok(
+    fileContent.includes("searchParams.get('platforms')") &&
+      fileContent.includes("searchParams.get('categories')") &&
+      fileContent.includes("searchParams.get('statuses')"),
+    'Expected all multi-select filters read from searchParams'
+  );
+});

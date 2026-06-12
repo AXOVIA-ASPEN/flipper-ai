@@ -48,7 +48,9 @@ CONFIG_PATH = Path(__file__).resolve().parent.parent / "config" / "secretmanager
 class SecretScope(StrEnum):
     ALL = "ALL"
     DEV = "DEV"
-    PROD = "PROD"
+    # Value doubles as the GCP secret-name prefix: PRODUCTION_DATABASE_URL etc.
+    # (config/secretmanager.yaml naming convention — NOT "PROD").
+    PROD = "PRODUCTION"
     STAGING = "STAGING"
 
 

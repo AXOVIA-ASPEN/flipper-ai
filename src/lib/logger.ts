@@ -18,12 +18,13 @@ const pinoLogger = pino({
     },
   },
   base: { service: 'flipper-ai' },
-  ...((!isProduction && process.env.NODE_ENV !== 'test') && {
-    transport: {
-      target: 'pino-pretty',
-      options: { colorize: true },
-    },
-  }),
+  ...(!isProduction &&
+    process.env.NODE_ENV !== 'test' && {
+      transport: {
+        target: 'pino-pretty',
+        options: { colorize: true },
+      },
+    }),
 });
 
 export const logger = {

@@ -122,15 +122,10 @@ function createItem(overrides: Partial<StoredItem> = {}): StoredItem {
 
 // ── Prisma stubs ────────────────────────────────────────────────────────────
 
-function matchesWhere(
-  item: StoredItem,
-  where: Record<string, unknown>
-): boolean {
+function matchesWhere(item: StoredItem, where: Record<string, unknown>): boolean {
   for (const [key, value] of Object.entries(where)) {
     if (key === 'OR' && Array.isArray(value)) {
-      const anyMatch = value.some((clause: Record<string, unknown>) =>
-        matchesWhere(item, clause)
-      );
+      const anyMatch = value.some((clause: Record<string, unknown>) => matchesWhere(item, clause));
       if (!anyMatch) return false;
       continue;
     }
@@ -168,14 +163,14 @@ function installPrismaStubs(): void {
         where: Record<string, unknown>;
         take?: number;
         orderBy?: { createdAt: 'asc' | 'desc' };
-        include?: { listing?: { include?: { images?: { orderBy?: { imageIndex?: 'asc' | 'desc' } } } } };
+        include?: {
+          listing?: { include?: { images?: { orderBy?: { imageIndex?: 'asc' | 'desc' } } } };
+        };
       }) => {
         s94.findManyCallCount += 1;
         let results = s94.items.filter((i) => matchesWhere(i, where));
         if (orderBy?.createdAt === 'asc') {
-          results = results.sort(
-            (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
-          );
+          results = results.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
         }
         if (take !== undefined) results = results.slice(0, take);
         // Honor the eager-load contract: when callers ask for
@@ -206,12 +201,7 @@ function installPrismaStubs(): void {
         const item = s94.items.find((i) => i.id === id);
         if (!item) throw new Error(`item ${id} not found`);
         for (const [k, v] of Object.entries(data)) {
-          if (
-            k === 'retryCount' &&
-            v &&
-            typeof v === 'object' &&
-            'increment' in (v as object)
-          ) {
+          if (k === 'retryCount' && v && typeof v === 'object' && 'increment' in (v as object)) {
             item.retryCount += (v as { increment: number }).increment;
           } else {
             (item as unknown as Record<string, unknown>)[k] = v;
@@ -245,10 +235,7 @@ function installPrismaStubs(): void {
   Object.assign(prisma as unknown as Record<string, unknown>, fakePrisma);
 }
 
-function stubImageCapture(
-  capturedCount: number,
-  behavior: 'ok' | 'throw' = 'ok'
-): void {
+function stubImageCapture(capturedCount: number, behavior: 'ok' | 'throw' = 'ok'): void {
   // Preserve originals only once so a subsequent scenario can re-install.
   // We override via the processor's `imageCaptureOverrides` indirection layer
   // because tsx/cjs creates immutable getter-defined namespace exports — direct
@@ -279,7 +266,8 @@ function stubImageCapture(
       failed: [],
     };
   }) as unknown as typeof imageCapture.captureListingImages;
-  imageCaptureOverrides.saveImageMetadata = (async () => undefined) as unknown as typeof imageCapture.saveImageMetadata;
+  imageCaptureOverrides.saveImageMetadata = (async () =>
+    undefined) as unknown as typeof imageCapture.saveImageMetadata;
 }
 
 // ── Given steps ──────────────────────────────────────────────────────────────
@@ -336,51 +324,45 @@ Given(
   }
 );
 
-Given(
-  'a pending posting queue item whose listing belongs to a different user',
-  function () {
-    s94 = freshS94State();
-    installPrismaStubs();
-    createItem({
-      targetPlatform: 'EBAY',
-      userId: s94.defaultUserId,
-      listing: {
-        id: s94.defaultListingId,
-        userId: 'other-user-id',
-        platform: 'CRAIGSLIST',
-        title: 'Stolen listing',
-        imageUrls: null,
-        images: [
-          {
-            id: 'img-0',
-            imageIndex: 0,
-            storageUrl: 'https://fb.storage/x.jpg',
-            contentType: 'image/jpeg',
-          },
-        ],
-      },
-    });
-  }
-);
+Given('a pending posting queue item whose listing belongs to a different user', function () {
+  s94 = freshS94State();
+  installPrismaStubs();
+  createItem({
+    targetPlatform: 'EBAY',
+    userId: s94.defaultUserId,
+    listing: {
+      id: s94.defaultListingId,
+      userId: 'other-user-id',
+      platform: 'CRAIGSLIST',
+      title: 'Stolen listing',
+      imageUrls: null,
+      images: [
+        {
+          id: 'img-0',
+          imageIndex: 0,
+          storageUrl: 'https://fb.storage/x.jpg',
+          contentType: 'image/jpeg',
+        },
+      ],
+    },
+  });
+});
 
-Given(
-  'a pending posting queue item whose listing has only legacy imageUrls',
-  function () {
-    s94 = freshS94State();
-    installPrismaStubs();
-    createItem({
-      targetPlatform: 'EBAY',
-      listing: {
-        id: s94.defaultListingId,
-        userId: s94.defaultUserId,
-        platform: 'CRAIGSLIST',
-        title: 'Legacy listing',
-        imageUrls: JSON.stringify(['https://craigslist.example/a.jpg']),
-        images: [],
-      },
-    });
-  }
-);
+Given('a pending posting queue item whose listing has only legacy imageUrls', function () {
+  s94 = freshS94State();
+  installPrismaStubs();
+  createItem({
+    targetPlatform: 'EBAY',
+    listing: {
+      id: s94.defaultListingId,
+      userId: s94.defaultUserId,
+      platform: 'CRAIGSLIST',
+      title: 'Legacy listing',
+      imageUrls: JSON.stringify(['https://craigslist.example/a.jpg']),
+      images: [],
+    },
+  });
+});
 
 Given('the legacy image downloader returns one captured image', function () {
   stubImageCapture(1, 'ok');
@@ -390,21 +372,15 @@ Given('the legacy image downloader throws an error', function () {
   stubImageCapture(0, 'throw');
 });
 
-Given(
-  'the posting queue image status helper exists at {string}',
-  function (relative: string) {
-    const absolute = path.resolve(__dirname, '..', '..', '..', relative);
-    assert.ok(fs.existsSync(absolute), `missing ${relative}`);
-  }
-);
+Given('the posting queue image status helper exists at {string}', function (relative: string) {
+  const absolute = path.resolve(__dirname, '..', '..', '..', relative);
+  assert.ok(fs.existsSync(absolute), `missing ${relative}`);
+});
 
-Given(
-  'the posting queue processor exists at {string}',
-  function (relative: string) {
-    const absolute = path.resolve(__dirname, '..', '..', '..', relative);
-    assert.ok(fs.existsSync(absolute), `missing ${relative}`);
-  }
-);
+Given('the posting queue processor exists at {string}', function (relative: string) {
+  const absolute = path.resolve(__dirname, '..', '..', '..', relative);
+  assert.ok(fs.existsSync(absolute), `missing ${relative}`);
+});
 
 // ── When steps ───────────────────────────────────────────────────────────────
 // "the posting queue processor runs for the authenticated user" is defined
@@ -428,45 +404,33 @@ Then('the images are sorted by imageIndex ascending', function () {
   assert.deepStrictEqual(indexes, sorted, 'images not sorted by imageIndex asc');
 });
 
-Then(
-  'only one findMany call resolves both queue items with images',
-  function () {
-    assert.strictEqual(
-      s94.findManyCallCount,
-      1,
-      `expected 1 findMany call, saw ${s94.findManyCallCount}`
+Then('only one findMany call resolves both queue items with images', function () {
+  assert.strictEqual(
+    s94.findManyCallCount,
+    1,
+    `expected 1 findMany call, saw ${s94.findManyCallCount}`
+  );
+  // Both items processed.
+  for (const item of s94.items) {
+    assert.ok(
+      item.status === 'POSTED' || item.status === 'IN_PROGRESS',
+      `item ${item.id} did not advance (status ${item.status})`
     );
-    // Both items processed.
-    for (const item of s94.items) {
-      assert.ok(
-        item.status === 'POSTED' || item.status === 'IN_PROGRESS',
-        `item ${item.id} did not advance (status ${item.status})`
-      );
-    }
   }
-);
+});
 
-Then(
-  'the ownership-mismatch item status becomes {string}',
-  function (status: string) {
-    assert.strictEqual(s94.items[0].status, status);
-  }
-);
+Then('the ownership-mismatch item status becomes {string}', function (status: string) {
+  assert.strictEqual(s94.items[0].status, status);
+});
 
-Then(
-  'the legacy-fallback item status becomes {string}',
-  function (status: string) {
-    assert.strictEqual(s94.items[0].status, status);
-  }
-);
+Then('the legacy-fallback item status becomes {string}', function (status: string) {
+  assert.strictEqual(s94.items[0].status, status);
+});
 
-Then(
-  'the ownership-mismatch error message is persisted on the queue item',
-  function () {
-    const msg = s94.items[0].errorMessage;
-    assert.ok(msg && /authorization/i.test(msg), `got: ${msg}`);
-  }
-);
+Then('the ownership-mismatch error message is persisted on the queue item', function () {
+  const msg = s94.items[0].errorMessage;
+  assert.ok(msg && /authorization/i.test(msg), `got: ${msg}`);
+});
 
 Then('the legacy image downloader is invoked once', function () {
   assert.strictEqual(s94.captureCallCount, 1);
@@ -494,13 +458,10 @@ Then(
   }
 );
 
-Then(
-  'the helper returns {string} when neither source has URLs',
-  function (expected: string) {
-    const out = computeImageStatus({ images: [], imageUrls: null });
-    assert.strictEqual(out, expected);
-  }
-);
+Then('the helper returns {string} when neither source has URLs', function (expected: string) {
+  const out = computeImageStatus({ images: [], imageUrls: null });
+  assert.strictEqual(out, expected);
+});
 
 Then(
   'the processor source declares the PlatformPoster type accepts ListingWithImages',
@@ -513,16 +474,13 @@ Then(
   }
 );
 
-Then(
-  'the processor source eagerly loads images ordered by imageIndex',
-  function () {
-    const src = fs.readFileSync(
-      path.resolve(__dirname, '..', '..', '..', 'src/lib/posting-queue-processor.ts'),
-      'utf-8'
-    );
-    assert.match(src, /images:\s*\{\s*orderBy:\s*\{\s*imageIndex:\s*'asc'/);
-  }
-);
+Then('the processor source eagerly loads images ordered by imageIndex', function () {
+  const src = fs.readFileSync(
+    path.resolve(__dirname, '..', '..', '..', 'src/lib/posting-queue-processor.ts'),
+    'utf-8'
+  );
+  assert.match(src, /images:\s*\{\s*orderBy:\s*\{\s*imageIndex:\s*'asc'/);
+});
 
 // ── Wire a successful poster that captures the listing it receives ──────────
 

@@ -43,7 +43,6 @@ npx playwright test e2e/visual/ --update-snapshots --only-changed
   - Full page (desktop)
   - Hero section
   - Mobile view
-  
 - **Authentication** (`auth.visual.spec.ts`)
   - Login page
   - Signup page

@@ -213,13 +213,7 @@ describe('GET /api/analyze/[listingId]', () => {
 
     await GET(makeGetRequest(), makeParams());
 
-    expect(mockEstimateValue).toHaveBeenCalledWith(
-      'iPhone 12 128GB',
-      null,
-      200,
-      null,
-      null
-    );
+    expect(mockEstimateValue).toHaveBeenCalledWith('iPhone 12 128GB', null, 200, null, null);
   });
 
   test('should recover and return AI result on subsequent call after fallback', async () => {

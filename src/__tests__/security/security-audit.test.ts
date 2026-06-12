@@ -123,10 +123,7 @@ describe('CORS Configuration', () => {
   test('ALLOWED_ORIGINS env var is documented in .env.example', async () => {
     const fs = await import('fs');
     const path = await import('path');
-    const envExample = fs.readFileSync(
-      path.resolve(__dirname, '../../../.env.example'),
-      'utf-8'
-    );
+    const envExample = fs.readFileSync(path.resolve(__dirname, '../../../.env.example'), 'utf-8');
     expect(envExample).toContain('ALLOWED_ORIGINS');
   });
 

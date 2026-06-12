@@ -31,7 +31,7 @@
 livenessProbe:
   httpGet:
     path: /api/health
-    port: 8080  # Cloud Run injects PORT=8080
+    port: 8080 # Cloud Run injects PORT=8080
   initialDelaySeconds: 10
   periodSeconds: 30
   timeoutSeconds: 5
@@ -46,4 +46,4 @@ startupProbe:
   initialDelaySeconds: 0
   periodSeconds: 5
   timeoutSeconds: 5
-  failureThreshold: 10  # 10 * 5s = 50s max startup time
+  failureThreshold: 10 # 10 * 5s = 50s max startup time

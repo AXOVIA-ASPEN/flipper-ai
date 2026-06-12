@@ -115,12 +115,17 @@ export default function MessageApprovalCard({
     }
   }, [pendingEditAfterReject, message.status, message.body, message.subject]);
 
-  const guardAction = useCallback((fn: () => void) => {
-    if (actionGuard.current || loadingAction) return;
-    actionGuard.current = true;
-    fn();
-    setTimeout(() => { actionGuard.current = false; }, 300);
-  }, [loadingAction]);
+  const guardAction = useCallback(
+    (fn: () => void) => {
+      if (actionGuard.current || loadingAction) return;
+      actionGuard.current = true;
+      fn();
+      setTimeout(() => {
+        actionGuard.current = false;
+      }, 300);
+    },
+    [loadingAction]
+  );
 
   const handleApprove = () => guardAction(() => onApprove(message.id));
   const handleConfirm = () => guardAction(() => onConfirm(message.id));
@@ -166,8 +171,8 @@ export default function MessageApprovalCard({
     }
   };
 
-  const isStale = message.listing &&
-    new Date(message.listing.updatedAt) > new Date(message.createdAt);
+  const isStale =
+    message.listing && new Date(message.listing.updatedAt) > new Date(message.createdAt);
 
   const platformIcon = message.platform
     ? PLATFORM_ICONS[message.platform.toLowerCase()] || '📦'
@@ -269,8 +274,19 @@ export default function MessageApprovalCard({
       {/* SENT status: display "Queued for delivery" */}
       {message.status === 'SENT' && (
         <div className="flex items-center gap-2 mb-3 text-sm" style={{ color: '#c4b5fd' }}>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
           <span>Queued for delivery</span>
           {message.sentAt && (
@@ -394,10 +410,7 @@ export default function MessageApprovalCard({
         )}
 
         {/* Copy button — always available */}
-        <button
-          onClick={handleCopy}
-          className="fp-btn-ghost min-h-[44px] ml-auto justify-center"
-        >
+        <button onClick={handleCopy} className="fp-btn-ghost min-h-[44px] ml-auto justify-center">
           {copySuccess ? 'Copied!' : 'Copy Message'}
         </button>
       </div>

@@ -48,6 +48,7 @@ python scripts/secretmanager.py load --env production
 ## Adding a New Secret
 
 1. Add it to `config/secretmanager.yaml` under the correct scope:
+
    ```yaml
    production:
      my-new-secret:
@@ -58,6 +59,7 @@ python scripts/secretmanager.py load --env production
 2. Add it to `.env.example` with a description comment
 
 3. Create in GCP:
+
    ```bash
    echo -n "your-value" | gcloud secrets create PRODUCTION_MY_NEW_SECRET \
      --project=axovia-flipper --replication-policy=automatic --data-file=-
@@ -91,28 +93,28 @@ print(drift["missing_in_yaml"])   # in GCP but not YAML
 
 ## Environment Scopes
 
-| Scope | Purpose | Example Secrets |
-|-------|---------|-----------------|
-| `all` | Shared across all environments | Firebase public config (`NEXT_PUBLIC_*`) |
-| `production` | Production Cloud Run | `DATABASE_URL`, `STRIPE_SECRET_KEY`, all AI keys |
-| `staging` | Staging Cloud Run | Mirrors production with test-mode values |
-| `dev` | Local development overrides | `DATABASE_URL` (local PostgreSQL) |
+| Scope        | Purpose                        | Example Secrets                                  |
+| ------------ | ------------------------------ | ------------------------------------------------ |
+| `all`        | Shared across all environments | Firebase public config (`NEXT_PUBLIC_*`)         |
+| `production` | Production Cloud Run           | `DATABASE_URL`, `STRIPE_SECRET_KEY`, all AI keys |
+| `staging`    | Staging Cloud Run              | Mirrors production with test-mode values         |
+| `dev`        | Local development overrides    | `DATABASE_URL` (local PostgreSQL)                |
 
 ## Secret Categories
 
 The full inventory lives in `config/secretmanager.yaml`. Key categories:
 
-| Category | Secrets | Required |
-|----------|---------|----------|
-| Database | `DATABASE_URL` | Yes |
-| Auth & Encryption | `ENCRYPTION_SECRET` | Yes |
-| Firebase Admin | `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY` | Production |
-| OAuth | Google, GitHub, Facebook client IDs/secrets | No |
-| AI Providers | `GOOGLE_API_KEY`, `GROQ_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` | No |
-| Payments | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, price IDs | No |
-| Email | `RESEND_API_KEY` | No |
-| Monitoring | `SENTRY_DSN`, `MONITORING_API_KEY` | No |
-| Integrations | Google Calendar, Maps, Twilio | No |
+| Category          | Secrets                                                                 | Required   |
+| ----------------- | ----------------------------------------------------------------------- | ---------- |
+| Database          | `DATABASE_URL`                                                          | Yes        |
+| Auth & Encryption | `ENCRYPTION_SECRET`                                                     | Yes        |
+| Firebase Admin    | `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`                         | Production |
+| OAuth             | Google, GitHub, Facebook client IDs/secrets                             | No         |
+| AI Providers      | `GOOGLE_API_KEY`, `GROQ_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` | No         |
+| Payments          | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, price IDs                 | No         |
+| Email             | `RESEND_API_KEY`                                                        | No         |
+| Monitoring        | `SENTRY_DSN`, `MONITORING_API_KEY`                                      | No         |
+| Integrations      | Google Calendar, Maps, Twilio                                           | No         |
 
 ## Google Maps API Key — Provisioning SOP (Story 12.2)
 
@@ -145,6 +147,7 @@ These are set directly in Cloud Run service config (NOT in Secret Manager):
 For local development, use `.env.local` (not Secret Manager). The `scripts/secretmanager.py` module is only invoked at container startup in Cloud Run.
 
 To authenticate locally for testing the module:
+
 ```bash
 gcloud auth application-default login
 python scripts/secretmanager.py populate --env staging -o .env.staging

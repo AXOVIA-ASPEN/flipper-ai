@@ -28,6 +28,7 @@ description:
 **Goal:** Calibrate the Flipper.ai algorithmic scoring formula (`src/lib/value-estimator.ts`) against real marketplace data and Stephen's flipping experience.
 
 **Dataset:**
+
 - 300 real Craigslist listings scraped from SF Bay Area
 - 10 categories × 30 listings each: electronics, furniture, appliances, sporting, tools, antiques, video_gaming, music_instr, computers, cell_phones
 - Price range: $20–$2,000
@@ -39,16 +40,17 @@ description:
 
 ## Before/After Backtesting Comparison
 
-| Metric | Before (Current) | After (Refined) | Change |
-|--------|------------------|-----------------|--------|
-| Mean score | 31 | 39 | +8 |
-| Median score | 10 | ~20 | +10 |
-| Opportunities (score ≥ 70) | 51 (17%) | 72 (24%) | +21 items |
-| Items stuck in 10-19 band | 172 (57%) | 118 (39%) | -54 items |
-| Perfect 100 items | 7 | 5 | -2 (less runaway) |
-| "Other"-categorized items | 107 (36%) | lower (est. <15%) | Better detection |
+| Metric                     | Before (Current) | After (Refined)   | Change            |
+| -------------------------- | ---------------- | ----------------- | ----------------- |
+| Mean score                 | 31               | 39                | +8                |
+| Median score               | 10               | ~20               | +10               |
+| Opportunities (score ≥ 70) | 51 (17%)         | 72 (24%)          | +21 items         |
+| Items stuck in 10-19 band  | 172 (57%)        | 118 (39%)         | -54 items         |
+| Perfect 100 items          | 7                | 5                 | -2 (less runaway) |
+| "Other"-categorized items  | 107 (36%)        | lower (est. <15%) | Better detection  |
 
 **Interpretation:**
+
 - Opportunity rate rose from 17% → 24%, closer to expected real-world flip hit rate
 - The "dead zone" of 10-19 scored items shrank by 54 listings — items that were being over-penalized (no brand boost, wrong category) are now scoring more appropriately
 - Fewer perfect-100 scores means less runaway inflation from vintage+rare+collectibles stacking
@@ -60,21 +62,22 @@ description:
 
 **File:** `src/lib/value-estimator.ts` lines 53-65
 
-| Category | Old (low→high, difficulty) | New | Reasoning |
-|----------|---------------------------|------|-----------|
-| electronics | 1.2→1.6, difficulty 2 | **1.3→1.8**, difficulty 2 | Phones/tablets/laptops routinely sell at 1.5-2x on eBay. Old range was leaving Apple Watch, Samsung Galaxy, Pixel phones scoring only 10-40. |
-| furniture | 1.3→1.8, diff 4 | 1.3→1.8, diff 4 (unchanged) | Well-calibrated. Herman Miller Aeron at $500 scoring 88 = correct. |
-| appliances | 1.1→1.4, diff 4 | **1.2→1.5**, diff **5** | Slight markup bump for name-brand (Dyson, KitchenAid). Difficulty → VERY_HARD because appliances are heavy, hard to ship, local-only market. |
-| tools | 1.3→1.7, diff 2 | **1.4→1.9**, diff 2 | Milwaukee, DeWalt, Makita are "the Apple of tools." Current 0 opportunities across 9 tool listings was too conservative. |
-| video games | 1.4→2.0, diff 1 | 1.4→2.0, diff 1 (unchanged) | Well-calibrated. PS4/PS5/Switch scoring appropriately. 35% opportunity rate feels right. |
-| collectibles | 1.5→2.5, diff 2 | **1.4→2.2**, diff 2 | Reduced to prevent runaway stacking with vintage/rare keyword boosts. 84% opportunity rate was too generous. |
-| clothing | 1.1→1.5, diff 3 | 1.1→1.5, diff 3 (unchanged) | No clothing data in sample; range stays conservative. |
-| sports | 1.2→1.6, diff 3 | **1.3→1.7**, diff 3 | Bikes and fitness gear hold value well. 0% opportunity rate at old range was too conservative. |
-| musical | 1.3→1.7, diff 3 | **1.4→2.0**, diff **2** | Guitars, amps, synths have exceptional resale. Also: instruments ship well and have established resale markets → lower difficulty. |
-| automotive | 1.1→1.4, diff 4 | 1.1→1.4, diff 4 (unchanged) | No data; conservative is safer. |
-| default | 1.2→1.5, diff 3 | 1.2→1.5, diff 3 (unchanged) | Fallback for uncategorized; keep conservative. |
+| Category     | Old (low→high, difficulty) | New                         | Reasoning                                                                                                                                    |
+| ------------ | -------------------------- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| electronics  | 1.2→1.6, difficulty 2      | **1.3→1.8**, difficulty 2   | Phones/tablets/laptops routinely sell at 1.5-2x on eBay. Old range was leaving Apple Watch, Samsung Galaxy, Pixel phones scoring only 10-40. |
+| furniture    | 1.3→1.8, diff 4            | 1.3→1.8, diff 4 (unchanged) | Well-calibrated. Herman Miller Aeron at $500 scoring 88 = correct.                                                                           |
+| appliances   | 1.1→1.4, diff 4            | **1.2→1.5**, diff **5**     | Slight markup bump for name-brand (Dyson, KitchenAid). Difficulty → VERY_HARD because appliances are heavy, hard to ship, local-only market. |
+| tools        | 1.3→1.7, diff 2            | **1.4→1.9**, diff 2         | Milwaukee, DeWalt, Makita are "the Apple of tools." Current 0 opportunities across 9 tool listings was too conservative.                     |
+| video games  | 1.4→2.0, diff 1            | 1.4→2.0, diff 1 (unchanged) | Well-calibrated. PS4/PS5/Switch scoring appropriately. 35% opportunity rate feels right.                                                     |
+| collectibles | 1.5→2.5, diff 2            | **1.4→2.2**, diff 2         | Reduced to prevent runaway stacking with vintage/rare keyword boosts. 84% opportunity rate was too generous.                                 |
+| clothing     | 1.1→1.5, diff 3            | 1.1→1.5, diff 3 (unchanged) | No clothing data in sample; range stays conservative.                                                                                        |
+| sports       | 1.2→1.6, diff 3            | **1.3→1.7**, diff 3         | Bikes and fitness gear hold value well. 0% opportunity rate at old range was too conservative.                                               |
+| musical      | 1.3→1.7, diff 3            | **1.4→2.0**, diff **2**     | Guitars, amps, synths have exceptional resale. Also: instruments ship well and have established resale markets → lower difficulty.           |
+| automotive   | 1.1→1.4, diff 4            | 1.1→1.4, diff 4 (unchanged) | No data; conservative is safer.                                                                                                              |
+| default      | 1.2→1.5, diff 3            | 1.2→1.5, diff 3 (unchanged) | Fallback for uncategorized; keep conservative.                                                                                               |
 
 **Data supporting change:**
+
 - Appliances: all 8 items in backtest scored exactly 10 (capped due to negative profit at old multipliers)
 - Tools: 0/9 items passed 70 threshold despite including Milwaukee, Makita, DeWalt
 - Musical: only 3/26 items were opportunities; Marshall MG30DFX amp scored 10 (severely under-calibrated)
@@ -90,35 +93,36 @@ description:
 
 ### Existing Brand Adjustments
 
-| Brand | Old Boost | New Boost | Reasoning |
-|-------|-----------|-----------|-----------|
-| apple | 1.2x | **1.25x** | Apple products consistently hold 70-90% of retail. Slight bump justified. |
-| samsung | 1.15x | 1.15x (unchanged) | Samsung mid-tier resale; Galaxy phones depreciate faster than Apple. |
-| sony/playstation | 1.2x | 1.2x (unchanged) | Well-calibrated. |
-| nintendo | 1.25x | **1.3x** | Nintendo products hold value exceptionally; Switch games barely depreciate. |
-| xbox | 1.15x | **1.2x** | Xbox Series X holding value well in resale market. |
-| vintage/antique/retro | 1.4x | **1.3x** | Reduced to prevent stacking runaway with collectibles category multiplier. |
-| rare/limited edition | 1.4x | **1.3x** | Same rationale — reduce stacking with other boosts. |
-| sealed/NIB | 1.3x | 1.3x (unchanged) | Accurate; sealed items genuinely command premium. |
+| Brand                 | Old Boost | New Boost         | Reasoning                                                                   |
+| --------------------- | --------- | ----------------- | --------------------------------------------------------------------------- |
+| apple                 | 1.2x      | **1.25x**         | Apple products consistently hold 70-90% of retail. Slight bump justified.   |
+| samsung               | 1.15x     | 1.15x (unchanged) | Samsung mid-tier resale; Galaxy phones depreciate faster than Apple.        |
+| sony/playstation      | 1.2x      | 1.2x (unchanged)  | Well-calibrated.                                                            |
+| nintendo              | 1.25x     | **1.3x**          | Nintendo products hold value exceptionally; Switch games barely depreciate. |
+| xbox                  | 1.15x     | **1.2x**          | Xbox Series X holding value well in resale market.                          |
+| vintage/antique/retro | 1.4x      | **1.3x**          | Reduced to prevent stacking runaway with collectibles category multiplier.  |
+| rare/limited edition  | 1.4x      | **1.3x**          | Same rationale — reduce stacking with other boosts.                         |
+| sealed/NIB            | 1.3x      | 1.3x (unchanged)  | Accurate; sealed items genuinely command premium.                           |
 
 ### New Brand Boosts Added
 
-| Brand Pattern | Boost | Tag | Reasoning |
-|--------------|-------|-----|-----------|
-| `milwaukee\|dewalt\|makita` | 1.25x | power-tools | "The Apple of tools" — strong resale, brand loyalty. 5 items in data received no boost previously. |
-| `fender\|gibson\|martin` | 1.3x | premium-guitar | Guitars are one of the best flip categories. Fender Tele at $1250 needs higher scoring. |
-| `marshall\|mesa.?boogie\|vox\|orange amp` | 1.25x | premium-amp | Tube amps hold exceptional value. Marshall MG at $250 scoring 10 was wrong. |
-| `moog\|roland\|korg\|akai` | 1.25x | synth-keys | Synths are collectible. Roland HPD-15 at $499 scoring 10 was severely miscalibrated. |
-| `bose\|sonos\|jbl` | 1.15x | premium-audio | Decent resale, moderate boost. |
-| `canon\|nikon` | 1.2x | camera-brand | Camera bodies and lenses hold strong eBay value. |
-| `restoration hardware\|rh\|pottery barn\|west elm` | 1.3x | premium-home | RH furniture commands strong resale. 8 items in data received no boost. |
-| `snap-on` | 1.3x | snap-on | Professional-grade tools with cult following. |
-| `lego` | 1.3x | lego | Retired LEGO sets appreciate significantly. |
-| `north face\|patagonia` | 1.2x | outdoor-apparel | Strong resale in outdoor apparel market. |
+| Brand Pattern                                      | Boost | Tag             | Reasoning                                                                                          |
+| -------------------------------------------------- | ----- | --------------- | -------------------------------------------------------------------------------------------------- |
+| `milwaukee\|dewalt\|makita`                        | 1.25x | power-tools     | "The Apple of tools" — strong resale, brand loyalty. 5 items in data received no boost previously. |
+| `fender\|gibson\|martin`                           | 1.3x  | premium-guitar  | Guitars are one of the best flip categories. Fender Tele at $1250 needs higher scoring.            |
+| `marshall\|mesa.?boogie\|vox\|orange amp`          | 1.25x | premium-amp     | Tube amps hold exceptional value. Marshall MG at $250 scoring 10 was wrong.                        |
+| `moog\|roland\|korg\|akai`                         | 1.25x | synth-keys      | Synths are collectible. Roland HPD-15 at $499 scoring 10 was severely miscalibrated.               |
+| `bose\|sonos\|jbl`                                 | 1.15x | premium-audio   | Decent resale, moderate boost.                                                                     |
+| `canon\|nikon`                                     | 1.2x  | camera-brand    | Camera bodies and lenses hold strong eBay value.                                                   |
+| `restoration hardware\|rh\|pottery barn\|west elm` | 1.3x  | premium-home    | RH furniture commands strong resale. 8 items in data received no boost.                            |
+| `snap-on`                                          | 1.3x  | snap-on         | Professional-grade tools with cult following.                                                      |
+| `lego`                                             | 1.3x  | lego            | Retired LEGO sets appreciate significantly.                                                        |
+| `north face\|patagonia`                            | 1.2x  | outdoor-apparel | Strong resale in outdoor apparel market.                                                           |
 
 **Negative patterns:** Each new brand with phone/camera accessory risk (Canon, LEGO) received negative patterns to prevent false positives on compatible products.
 
 **Data supporting change:**
+
 - Dyson boost: 0 hits in 300-item backtest sample (rare in Craigslist listings)
 - Premium-kitchen (KitchenAid/Vitamix): 0 hits
 - Missing brand analysis showed 5+ Milwaukee/DeWalt, 6 Fender/Gibson, 3 Roland/Moog, 8 Restoration Hardware items scoring poorly without appropriate boosts
@@ -156,30 +160,30 @@ description:
 
 **File:** `src/lib/value-estimator.ts` lines 428-451
 
-| Parameter | Old | New | Reasoning |
-|-----------|-----|-----|-----------|
-| Margin weight | 0.4 | **0.5** | Balance margin % and absolute $ equally |
-| Absolute profit weight | 0.6 | **0.5** | (sum = 1.0) |
-| Log curve multiplier | 33.33 | **36** | Steeper reward for smaller absolute profits — important for low-ticket flips |
-| Cap: profit < 0 | score ≤ 10 | ≤ 10 (unchanged) | Negative profit = not a flip |
-| Cap: profit = 0 | score ≤ 15 | ≤ 15 (unchanged) | Zero profit = not worth chasing |
-| Cap: profit < $15 | score ≤ 40 | ≤ 40 (unchanged) | Sub-$15 flips fail to justify time cost |
-| Boost: profit > $100 | +5 | +5 (unchanged) | Mid-tier flip reward |
-| Boost: profit > $300 | +10 | +10 (unchanged) | Strong-tier flip reward |
-| **NEW:** Boost: profit > $500 | N/A | **+15** | Cluster true "home run" flips tightly at top |
+| Parameter                     | Old        | New              | Reasoning                                                                    |
+| ----------------------------- | ---------- | ---------------- | ---------------------------------------------------------------------------- |
+| Margin weight                 | 0.4        | **0.5**          | Balance margin % and absolute $ equally                                      |
+| Absolute profit weight        | 0.6        | **0.5**          | (sum = 1.0)                                                                  |
+| Log curve multiplier          | 33.33      | **36**           | Steeper reward for smaller absolute profits — important for low-ticket flips |
+| Cap: profit < 0               | score ≤ 10 | ≤ 10 (unchanged) | Negative profit = not a flip                                                 |
+| Cap: profit = 0               | score ≤ 15 | ≤ 15 (unchanged) | Zero profit = not worth chasing                                              |
+| Cap: profit < $15             | score ≤ 40 | ≤ 40 (unchanged) | Sub-$15 flips fail to justify time cost                                      |
+| Boost: profit > $100          | +5         | +5 (unchanged)   | Mid-tier flip reward                                                         |
+| Boost: profit > $300          | +10        | +10 (unchanged)  | Strong-tier flip reward                                                      |
+| **NEW:** Boost: profit > $500 | N/A        | **+15**          | Cluster true "home run" flips tightly at top                                 |
 
 **Simulation data:**
 
 Tested 6 formula variants on 300-item dataset:
 
-| Variant | Opportunities | Mean Score |
-|---------|--------------|-----------|
-| Current (40/60) | 51 (17%) | 31 |
-| Balanced (50/50) | 57 (19%) | 32 |
-| Margin-heavy (60/40) | 61 (20%) | 33 |
-| Profit-heavy (30/70) | 46 (15%) | 30 |
-| **Steeper log 36 (40/60)** | 62 (21%) | 33 |
-| Higher caps (40/60, cap=20) | 51 (17%) | 31 |
+| Variant                     | Opportunities | Mean Score |
+| --------------------------- | ------------- | ---------- |
+| Current (40/60)             | 51 (17%)      | 31         |
+| Balanced (50/50)            | 57 (19%)      | 32         |
+| Margin-heavy (60/40)        | 61 (20%)      | 33         |
+| Profit-heavy (30/70)        | 46 (15%)      | 30         |
+| **Steeper log 36 (40/60)**  | 62 (21%)      | 33         |
+| Higher caps (40/60, cap=20) | 51 (17%)      | 31         |
 
 **Chosen: 50/50 + log curve 36** (blending Balanced weights with Steeper log for best of both).
 
@@ -191,11 +195,11 @@ Tested 6 formula variants on 300-item dataset:
 
 **File:** `src/lib/marketplace-scanner.ts` lines 155-161
 
-| Parameter | Old | New | Reasoning |
-|-----------|-----|-----|-----------|
-| Opportunity threshold | score ≥ 70 | score ≥ 70 (unchanged) | Distribution analysis confirms 70 is well-positioned |
-| **NEW:** Minimum profit floor | None | **profit ≥ $25** | Items scoring 70+ but with <$25 profit are marginal flips; don't justify seller outreach time |
-| Configurable via options | `opportunityThreshold` | **+ `opportunityMinProfit`** | Both are now override-able per scan |
+| Parameter                     | Old                    | New                          | Reasoning                                                                                     |
+| ----------------------------- | ---------------------- | ---------------------------- | --------------------------------------------------------------------------------------------- |
+| Opportunity threshold         | score ≥ 70             | score ≥ 70 (unchanged)       | Distribution analysis confirms 70 is well-positioned                                          |
+| **NEW:** Minimum profit floor | None                   | **profit ≥ $25**             | Items scoring 70+ but with <$25 profit are marginal flips; don't justify seller outreach time |
+| Configurable via options      | `opportunityThreshold` | **+ `opportunityMinProfit`** | Both are now override-able per scan                                                           |
 
 **Data supporting change:**
 
@@ -221,6 +225,7 @@ with the updated algorithm. This IS the "existing data" — Flipper.ai is pre-la
 seeded backtesting listings are the only Listings in the database.
 
 **Before/after opportunity shift:**
+
 - 51 items scored ≥70 under the old algorithm
 - 72 items scored ≥70 under the refined algorithm
 - **21 new opportunities** surfaced (items previously scoring <70 that now qualify)
@@ -263,16 +268,16 @@ This session is session **#1** of an ongoing refinement process. Recommended cad
 
 ## Files Modified
 
-| File | Change |
-|------|--------|
-| `src/lib/value-estimator.ts` | Category multipliers, VALUE_KEYWORDS brand boosts (+10 new), detectCategory patterns, formula weights (50/50), log curve (36), +$500 profit boost tier |
-| `src/lib/marketplace-scanner.ts` | Added `opportunityMinProfit` option ($25 default), combined threshold+profit floor for `isOpportunity` |
-| `src/__tests__/lib/value-estimator.test.ts` | Updated 4 tests to reflect new multipliers/weights |
-| `scripts/backtest/seed-listings.ts` | NEW — standalone Craigslist scraper for backtesting data |
-| `docker-compose.dev.yml` | NEW — local Postgres for development |
-| `Makefile` | Added `db-up` / `db-down` targets |
-| `docs/guides/API-KEYS-SETUP.md` | NEW — step-by-step guide for obtaining all API keys |
-| `docs/scoring-refinement-log.md` | NEW — this document |
+| File                                        | Change                                                                                                                                                 |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/lib/value-estimator.ts`                | Category multipliers, VALUE_KEYWORDS brand boosts (+10 new), detectCategory patterns, formula weights (50/50), log curve (36), +$500 profit boost tier |
+| `src/lib/marketplace-scanner.ts`            | Added `opportunityMinProfit` option ($25 default), combined threshold+profit floor for `isOpportunity`                                                 |
+| `src/__tests__/lib/value-estimator.test.ts` | Updated 4 tests to reflect new multipliers/weights                                                                                                     |
+| `scripts/backtest/seed-listings.ts`         | NEW — standalone Craigslist scraper for backtesting data                                                                                               |
+| `docker-compose.dev.yml`                    | NEW — local Postgres for development                                                                                                                   |
+| `Makefile`                                  | Added `db-up` / `db-down` targets                                                                                                                      |
+| `docs/guides/API-KEYS-SETUP.md`             | NEW — step-by-step guide for obtaining all API keys                                                                                                    |
+| `docs/scoring-refinement-log.md`            | NEW — this document                                                                                                                                    |
 
 ---
 
@@ -295,7 +300,7 @@ This session is session **#1** of an ongoing refinement process. Recommended cad
 
 ---
 
-*End of Session 1 — 2026-04-15*
+_End of Session 1 — 2026-04-15_
 
 ---
 
@@ -311,17 +316,18 @@ Ran 282/300 listings through `identifyItem()` via Groq/Llama 3.3 70B to validate
 
 ## Session 2 Results
 
-| Agreement Type | Count | % |
-|---|---|---|
-| **Both agree: OPPORTUNITY** | 70 | 36% |
-| **Both agree: PASS** | 28 | 14% |
-| **Algorithm says PASS, LLM says investigate** | 96 | 49% |
-| **Algorithm says OPP, LLM says pass** | 0 | **0%** |
-| LLM errors (rate limits) | 88 | — |
+| Agreement Type                                | Count | %      |
+| --------------------------------------------- | ----- | ------ |
+| **Both agree: OPPORTUNITY**                   | 70    | 36%    |
+| **Both agree: PASS**                          | 28    | 14%    |
+| **Algorithm says PASS, LLM says investigate** | 96    | 49%    |
+| **Algorithm says OPP, LLM says pass**         | 0     | **0%** |
+| LLM errors (rate limits)                      | 88    | —      |
 
 **Key Finding: 0% false positive rate.** Every item the algorithm flags as an opportunity, the LLM agrees is worth investigating. The Tier 1 algorithm is conservative but never wrong.
 
 **96 false negatives** — items the LLM says are worth investigating but the algorithm scores below 70. Common patterns:
+
 - Older iPhones/iPads (still have resale value the algorithm underestimates)
 - Niche guitar brands (Taylor, Ovation, Squier, B&G)
 - Pro audio gear (DBX, Drawmer, Panamax)
@@ -334,15 +340,15 @@ Ran 282/300 listings through `identifyItem()` via Groq/Llama 3.3 70B to validate
 
 **7 new brand groups added to VALUE_KEYWORDS** based on the 96 false-negative items:
 
-| Brand Pattern | Boost | Tag | Reasoning |
-|---|---|---|---|
-| taylor/ovation/squier/epiphone/prs/ibanez | 1.25x | guitar-brand | Niche guitar brands with strong resale (negative pattern for "taylor swift") |
-| dbx/drawmer/panamax/furman | 1.2x | pro-audio | Professional audio processing gear — niche but high-value |
-| rtx/geforce/radeon/ryzen | 1.2x | gaming-pc | GPU/CPU component brands in custom gaming PC builds |
-| ping/cobra/taylormade/callaway/titleist | 1.2x | premium-golf | Premium golf equipment holds value well in resale market |
-| ubiquiti/unifi/amplifi/nighthawk/asus zen wifi | 1.15x | premium-network | Enterprise-grade network gear with strong secondary market |
-| mid-century/chippendale/eames/kartell/room & board | 1.25x | designer-furniture | Period/designer furniture commands premium over generic |
-| greenlee/klein | 1.2x | trade-tools | Professional electrician/trade tools with cult following |
+| Brand Pattern                                      | Boost | Tag                | Reasoning                                                                    |
+| -------------------------------------------------- | ----- | ------------------ | ---------------------------------------------------------------------------- |
+| taylor/ovation/squier/epiphone/prs/ibanez          | 1.25x | guitar-brand       | Niche guitar brands with strong resale (negative pattern for "taylor swift") |
+| dbx/drawmer/panamax/furman                         | 1.2x  | pro-audio          | Professional audio processing gear — niche but high-value                    |
+| rtx/geforce/radeon/ryzen                           | 1.2x  | gaming-pc          | GPU/CPU component brands in custom gaming PC builds                          |
+| ping/cobra/taylormade/callaway/titleist            | 1.2x  | premium-golf       | Premium golf equipment holds value well in resale market                     |
+| ubiquiti/unifi/amplifi/nighthawk/asus zen wifi     | 1.15x | premium-network    | Enterprise-grade network gear with strong secondary market                   |
+| mid-century/chippendale/eames/kartell/room & board | 1.25x | designer-furniture | Period/designer furniture commands premium over generic                      |
+| greenlee/klein                                     | 1.2x  | trade-tools        | Professional electrician/trade tools with cult following                     |
 
 **detectCategory patterns also expanded** with golf brands, gaming PC terms (rtx/gtx/radeon/imac), designer furniture styles, niche guitar/audio brands, and trade tools.
 
@@ -350,13 +356,13 @@ Ran 282/300 listings through `identifyItem()` via Groq/Llama 3.3 70B to validate
 
 ## Session 2 Before/After (Three-Way Comparison)
 
-| Metric | Original | Session 1 | Session 2 | Total |
-|---|---|---|---|---|
-| Mean score | 31 | 39 | **41** | +10 |
-| Items 10-19 | 172 | 118 | **113** | -59 |
-| Items 40-49 | 17 | 31 | **42** | +25 |
-| Items 90-100 | 13 | 11 | **30** | +17 |
-| Opportunities (≥70) | 51 (17%) | 72 (24%) | **72 (24%)** | +21 |
+| Metric              | Original | Session 1 | Session 2    | Total |
+| ------------------- | -------- | --------- | ------------ | ----- |
+| Mean score          | 31       | 39        | **41**       | +10   |
+| Items 10-19         | 172      | 118       | **113**      | -59   |
+| Items 40-49         | 17       | 31        | **42**       | +25   |
+| Items 90-100        | 13       | 11        | **30**       | +17   |
+| Opportunities (≥70) | 51 (17%) | 72 (24%)  | **72 (24%)** | +21   |
 
 ## Infrastructure Findings
 
@@ -370,14 +376,14 @@ Ran 282/300 listings through `identifyItem()` via Groq/Llama 3.3 70B to validate
 
 ## Additional Files Modified/Created (Session 2)
 
-| File | Change |
-|---|---|
-| `src/lib/ai/providers/gemini.ts` | Added GEMINI_MODEL_MAPPINGS + mapToGeminiModel() |
-| `src/lib/value-estimator.ts` | 7 new brand groups, expanded detectCategory patterns |
-| `scripts/backtest/enrich-with-ai.ts` | Created — LLM identification backtest script |
+| File                                       | Change                                                        |
+| ------------------------------------------ | ------------------------------------------------------------- |
+| `src/lib/ai/providers/gemini.ts`           | Added GEMINI_MODEL_MAPPINGS + mapToGeminiModel()              |
+| `src/lib/value-estimator.ts`               | 7 new brand groups, expanded detectCategory patterns          |
+| `scripts/backtest/enrich-with-ai.ts`       | Created — LLM identification backtest script                  |
 | `scripts/backtest/enrich-full-pipeline.ts` | Created — full pipeline enrichment (LLM + eBay + sellability) |
-| `scripts/secrets/pull-from-gcp.sh` | Added GROQ_API_KEY to secret list |
+| `scripts/secrets/pull-from-gcp.sh`         | Added GROQ_API_KEY to secret list                             |
 
 ---
 
-*End of Session 2 — 2026-04-17*
+_End of Session 2 — 2026-04-17_

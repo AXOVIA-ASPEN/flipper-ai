@@ -90,11 +90,11 @@ function formatRelative(iso: string): string {
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  PENDING:     'fp-badge fp-badge-yellow',
+  PENDING: 'fp-badge fp-badge-yellow',
   IN_PROGRESS: 'fp-badge fp-badge-blue',
-  POSTED:      'fp-badge fp-badge-green',
-  FAILED:      'fp-badge fp-badge-red',
-  CANCELLED:   'fp-badge fp-badge-gray',
+  POSTED: 'fp-badge fp-badge-green',
+  FAILED: 'fp-badge fp-badge-red',
+  CANCELLED: 'fp-badge fp-badge-gray',
 };
 
 const PLATFORM_LABELS: Record<string, string> = {
@@ -134,9 +134,7 @@ export default function QueueItemCard({ item, onRetry, onCancel }: Props) {
   const handleCancel = async () => {
     if (busy) return;
     const confirmed =
-      typeof window === 'undefined'
-        ? true
-        : window.confirm('Cancel this queued cross-post?');
+      typeof window === 'undefined' ? true : window.confirm('Cancel this queued cross-post?');
     if (!confirmed) return;
     setBusy(true);
     try {
@@ -160,7 +158,10 @@ export default function QueueItemCard({ item, onRetry, onCancel }: Props) {
           style={{ border: '1px solid rgba(255,255,255,0.09)' }}
         />
       ) : (
-        <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md text-2xl" style={{ background: 'rgba(255,255,255,0.04)' }}>
+        <div
+          className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md text-2xl"
+          style={{ background: 'rgba(255,255,255,0.04)' }}
+        >
           📦
         </div>
       )}
@@ -175,13 +176,12 @@ export default function QueueItemCard({ item, onRetry, onCancel }: Props) {
             >
               {displayTitle}
             </h3>
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs" style={{ color: '#64748b' }}>
-              <span className="rounded fp-badge fp-badge-gray">
-                {platformLabel}
-              </span>
-              {item.askingPrice != null && (
-                <span>${item.askingPrice.toFixed(0)}</span>
-              )}
+            <div
+              className="mt-1 flex flex-wrap items-center gap-2 text-xs"
+              style={{ color: '#64748b' }}
+            >
+              <span className="rounded fp-badge fp-badge-gray">{platformLabel}</span>
+              {item.askingPrice != null && <span>${item.askingPrice.toFixed(0)}</span>}
               <span>{formatRelative(item.createdAt)}</span>
             </div>
           </div>
@@ -252,7 +252,12 @@ export default function QueueItemCard({ item, onRetry, onCancel }: Props) {
               target="_blank"
               rel="noopener noreferrer"
               className="fp-btn-ghost"
-              style={{ padding: '4px 10px', fontSize: 12, color: '#34d399', borderColor: 'rgba(52,211,153,0.3)' }}
+              style={{
+                padding: '4px 10px',
+                fontSize: 12,
+                color: '#34d399',
+                borderColor: 'rgba(52,211,153,0.3)',
+              }}
               data-testid="view-link"
             >
               <ExternalLink size={12} /> View listing

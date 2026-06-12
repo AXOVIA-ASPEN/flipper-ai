@@ -13,48 +13,48 @@
 #
 # Exits 0 if all required secrets are present, non-zero otherwise.
 # Does NOT print secret values — just presence.
+#
+# GCP naming convention (config/secretmanager.yaml): {SCOPE}_{SECRET_NAME}
+# e.g. PRODUCTION_DATABASE_URL, STAGING_STRIPE_SECRET_KEY
 
 set -euo pipefail
 
 # ---- Configuration --------------------------------------------------------
 
 PROJECT="${PROJECT:-axovia-flipper}"
-ENV="${ENV:-prod}"
+ENV="${ENV:-production}"
 PREFIX="$(echo "$ENV" | tr '[:lower:]' '[:upper:]')"
 
 # Required secrets — fail closed if any are missing
 REQUIRED_SECRETS=(
   # Database
-  "${PREFIX}_DB_URL"
-  "${PREFIX}_DB_DIRECT_URL"
+  "${PREFIX}_DATABASE_URL"
 
   # Auth & sessions
   "${PREFIX}_ENCRYPTION_SECRET"
+  "${PREFIX}_AUTH_SECRET"
   "${PREFIX}_FIREBASE_CLIENT_EMAIL"
   "${PREFIX}_FIREBASE_PRIVATE_KEY"
-  "${PREFIX}_HCAPTCHA_SECRET"
-  "${PREFIX}_HCAPTCHA_SITE_KEY"
+  "${PREFIX}_HCAPTCHA_SECRET_KEY"
 
-  # AI providers — at least one is required, but we list all and check separately below
-  # (skipped here; checked in the AI section)
-
-  # Stripe billing
-  "${PREFIX}_STRIPE_SECRET_KEY"
-  "${PREFIX}_STRIPE_PUBLISHABLE_KEY"
-  "${PREFIX}_STRIPE_WEBHOOK_SECRET"
-  "${PREFIX}_STRIPE_PRICE_ID_FLIPPER"
-  "${PREFIX}_STRIPE_PRICE_ID_PRO"
+  # Firebase public web config (baked into the client bundle at image build)
+  "${PREFIX}_NEXT_PUBLIC_FIREBASE_API_KEY"
+  "${PREFIX}_NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN"
+  "${PREFIX}_NEXT_PUBLIC_FIREBASE_PROJECT_ID"
+  "${PREFIX}_NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET"
+  "${PREFIX}_NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID"
+  "${PREFIX}_NEXT_PUBLIC_FIREBASE_APP_ID"
+  "${PREFIX}_NEXT_PUBLIC_FIREBASE_VAPID_KEY"
 
   # Email
   "${PREFIX}_RESEND_API_KEY"
-  "${PREFIX}_RESEND_FROM_DOMAIN"
 
   # Observability
   "${PREFIX}_SENTRY_DSN"
+  "${PREFIX}_SENTRY_AUTH_TOKEN"
 
   # App-level config
   "${PREFIX}_APP_URL"
-  "${PREFIX}_ALLOWED_ORIGINS"
 )
 
 # At least one AI provider must be configured
@@ -65,7 +65,8 @@ AI_PROVIDER_SECRETS=(
   "${PREFIX}_ANTHROPIC_API_KEY"
 )
 
-# Optional secrets — warn if missing but don't fail
+# Optional secrets — warn if missing but don't fail.
+# Stripe lives here until Phase 2 (live billing) flips it to required.
 OPTIONAL_SECRETS=(
   "${PREFIX}_GOOGLE_CLIENT_ID"
   "${PREFIX}_GOOGLE_CLIENT_SECRET"
@@ -76,14 +77,19 @@ OPTIONAL_SECRETS=(
   "${PREFIX}_TWILIO_ACCOUNT_SID"
   "${PREFIX}_TWILIO_AUTH_TOKEN"
   "${PREFIX}_TWILIO_PHONE_NUMBER"
-  "${PREFIX}_FCM_SERVER_KEY"
-  "${PREFIX}_EBAY_CLIENT_ID"
-  "${PREFIX}_EBAY_CLIENT_SECRET"
   "${PREFIX}_EBAY_OAUTH_TOKEN"
   "${PREFIX}_GOOGLE_MAPS_API_KEY"
-  "${PREFIX}_STRIPE_PRICE_ID_LIFETIME_FOUNDER"
-  "${PREFIX}_STRIPE_PRICE_ID_FLIPPER_ANNUAL"
-  "${PREFIX}_STRIPE_PRICE_ID_PRO_ANNUAL"
+  "${PREFIX}_GEOAPIFY_API_KEY"
+  "${PREFIX}_SHIPPO_API_TOKEN"
+  "${PREFIX}_ALLOWED_ORIGINS"
+  "${PREFIX}_EMAIL_FROM"
+  "${PREFIX}_NEXT_PUBLIC_HCAPTCHA_SITE_KEY"
+  "${PREFIX}_NEXT_PUBLIC_SENTRY_DSN"
+  "${PREFIX}_NEXT_PUBLIC_APP_URL"
+  "${PREFIX}_STRIPE_SECRET_KEY"
+  "${PREFIX}_STRIPE_WEBHOOK_SECRET"
+  "${PREFIX}_STRIPE_PRICE_ID_FLIPPER"
+  "${PREFIX}_STRIPE_PRICE_ID_PRO"
 )
 
 # ---- Helpers --------------------------------------------------------------
@@ -166,7 +172,7 @@ echo
 
 # ---- Stripe live-mode sanity check ----------------------------------------
 
-if [ "$ENV" = "prod" ] && secret_exists "${PREFIX}_STRIPE_SECRET_KEY"; then
+if [ "$ENV" = "production" ] && secret_exists "${PREFIX}_STRIPE_SECRET_KEY"; then
   STRIPE_KEY_PREFIX=$(gcloud secrets versions access latest \
     --secret="${PREFIX}_STRIPE_SECRET_KEY" \
     --project="$PROJECT" 2>/dev/null | head -c 8)

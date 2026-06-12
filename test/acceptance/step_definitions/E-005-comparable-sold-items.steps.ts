@@ -86,24 +86,21 @@ Then(
 
 // ==================== Then: S-12 (insufficientData flag + page insufficient state) ====================
 
-Then(
-  '"CompMatchResult" includes an "insufficientData" boolean field',
-  function () {
-    const interfaceStart = this.source.indexOf('export interface CompMatchResult');
-    assert.ok(interfaceStart > -1, `Expected CompMatchResult interface in ${this.filePath}`);
-    const rest = this.source.substring(interfaceStart);
-    const closingBrace = rest.indexOf('}');
-    const block = closingBrace > -1 ? rest.substring(0, closingBrace + 1) : rest;
-    assert.ok(
-      block.includes('insufficientData'),
-      `Expected CompMatchResult to include "insufficientData" field in ${this.filePath}`
-    );
-    assert.ok(
-      block.includes('boolean'),
-      `Expected "insufficientData" to be typed as boolean in ${this.filePath}`
-    );
-  }
-);
+Then('"CompMatchResult" includes an "insufficientData" boolean field', function () {
+  const interfaceStart = this.source.indexOf('export interface CompMatchResult');
+  assert.ok(interfaceStart > -1, `Expected CompMatchResult interface in ${this.filePath}`);
+  const rest = this.source.substring(interfaceStart);
+  const closingBrace = rest.indexOf('}');
+  const block = closingBrace > -1 ? rest.substring(0, closingBrace + 1) : rest;
+  assert.ok(
+    block.includes('insufficientData'),
+    `Expected CompMatchResult to include "insufficientData" field in ${this.filePath}`
+  );
+  assert.ok(
+    block.includes('boolean'),
+    `Expected "insufficientData" to be typed as boolean in ${this.filePath}`
+  );
+});
 
 Then(
   'the opportunities page at {string} shows an insufficient data state',

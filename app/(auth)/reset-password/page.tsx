@@ -63,7 +63,11 @@ function ResetPasswordInner() {
     number: /[0-9]/.test(password),
   };
 
-  const passwordStrength = [passwordChecks.length, passwordChecks.uppercase, passwordChecks.number].filter(Boolean).length;
+  const passwordStrength = [
+    passwordChecks.length,
+    passwordChecks.uppercase,
+    passwordChecks.number,
+  ].filter(Boolean).length;
 
   function strengthBarColor(strength: number): string {
     // ADR-14.4-D: security carve-out — green/yellow/red are semantic for password strength
@@ -78,12 +82,13 @@ function ResetPasswordInner() {
         <div className="w-full max-w-md relative z-10" role="main">
           <div className="fp-glass rounded-2xl overflow-hidden p-8 text-center">
             <AlertCircle className="w-12 h-12 mx-auto mb-4" style={{ color: '#f87171' }} />
-            <h1 className="text-xl font-bold mb-2" style={{ color: '#e2e8f0' }}>Invalid Reset Link</h1>
-            <p className="mb-6" style={{ color: '#94a3b8' }}>This password reset link is invalid or incomplete.</p>
-            <Link
-              href="/forgot-password"
-              className="fp-btn-primary inline-flex items-center gap-2"
-            >
+            <h1 className="text-xl font-bold mb-2" style={{ color: '#e2e8f0' }}>
+              Invalid Reset Link
+            </h1>
+            <p className="mb-6" style={{ color: '#94a3b8' }}>
+              This password reset link is invalid or incomplete.
+            </p>
+            <Link href="/forgot-password" className="fp-btn-primary inline-flex items-center gap-2">
               Request a new reset link
             </Link>
           </div>
@@ -160,7 +165,9 @@ function ResetPasswordInner() {
                 <span className="text-2xl font-bold fp-grad-purple">Flipper.ai</span>
               </div>
             </Link>
-            <h1 className="text-2xl font-bold mb-2" style={{ color: '#e2e8f0' }}>Set new password</h1>
+            <h1 className="text-2xl font-bold mb-2" style={{ color: '#e2e8f0' }}>
+              Set new password
+            </h1>
             <p style={{ color: '#94a3b8' }}>Enter your new password below</p>
           </div>
 
@@ -168,9 +175,15 @@ function ResetPasswordInner() {
           {errorMessage && (
             <div className="fp-alert-danger mx-8 mb-4 p-3 flex items-center gap-2" role="alert">
               <AlertCircle className="w-5 h-5 flex-shrink-0" style={{ color: '#f87171' }} />
-              <span className="text-sm" style={{ color: '#fca5a5' }}>{errorMessage}</span>
+              <span className="text-sm" style={{ color: '#fca5a5' }}>
+                {errorMessage}
+              </span>
               {errorMessage.includes('expired') && (
-                <Link href="/forgot-password" className="text-sm hover:underline ml-1 whitespace-nowrap" style={{ color: '#a78bfa' }}>
+                <Link
+                  href="/forgot-password"
+                  className="text-sm hover:underline ml-1 whitespace-nowrap"
+                  style={{ color: '#a78bfa' }}
+                >
                   Request new link
                 </Link>
               )}
@@ -179,7 +192,9 @@ function ResetPasswordInner() {
 
           <form onSubmit={handleSubmit} className="px-8 pb-8 space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: '#e2e8f0' }}>New password</label>
+              <label className="block text-sm font-medium mb-2" style={{ color: '#e2e8f0' }}>
+                New password
+              </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5" style={{ color: '#475569' }} />
@@ -213,23 +228,33 @@ function ResetPasswordInner() {
                         key={level}
                         className="h-1 flex-1 rounded-full transition-colors"
                         style={{
-                          background: passwordStrength >= level
-                            ? strengthBarColor(passwordStrength)
-                            : 'rgba(255,255,255,0.08)',
+                          background:
+                            passwordStrength >= level
+                              ? strengthBarColor(passwordStrength)
+                              : 'rgba(255,255,255,0.08)',
                         }}
                       />
                     ))}
                   </div>
                   <div className="grid grid-cols-2 gap-1 text-xs">
-                    <div className="flex items-center gap-1" style={{ color: passwordChecks.length ? '#34d399' : '#475569' }}>
+                    <div
+                      className="flex items-center gap-1"
+                      style={{ color: passwordChecks.length ? '#34d399' : '#475569' }}
+                    >
                       <CheckCircle className="w-3 h-3" />
                       8+ characters
                     </div>
-                    <div className="flex items-center gap-1" style={{ color: passwordChecks.uppercase ? '#34d399' : '#475569' }}>
+                    <div
+                      className="flex items-center gap-1"
+                      style={{ color: passwordChecks.uppercase ? '#34d399' : '#475569' }}
+                    >
                       <CheckCircle className="w-3 h-3" />
                       Uppercase
                     </div>
-                    <div className="flex items-center gap-1" style={{ color: passwordChecks.number ? '#34d399' : '#475569' }}>
+                    <div
+                      className="flex items-center gap-1"
+                      style={{ color: passwordChecks.number ? '#34d399' : '#475569' }}
+                    >
                       <CheckCircle className="w-3 h-3" />
                       Number
                     </div>
@@ -239,7 +264,9 @@ function ResetPasswordInner() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: '#e2e8f0' }}>Confirm password</label>
+              <label className="block text-sm font-medium mb-2" style={{ color: '#e2e8f0' }}>
+                Confirm password
+              </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5" style={{ color: '#475569' }} />
@@ -260,13 +287,21 @@ function ResetPasswordInner() {
                 />
               </div>
               {confirmPassword && password !== confirmPassword && (
-                <p className="mt-1 text-xs" style={{ color: '#f87171' }}>Passwords do not match</p>
+                <p className="mt-1 text-xs" style={{ color: '#f87171' }}>
+                  Passwords do not match
+                </p>
               )}
             </div>
 
             <button
               type="submit"
-              disabled={isLoading || password !== confirmPassword || !passwordChecks.length || !passwordChecks.uppercase || !passwordChecks.number}
+              disabled={
+                isLoading ||
+                password !== confirmPassword ||
+                !passwordChecks.length ||
+                !passwordChecks.uppercase ||
+                !passwordChecks.number
+              }
               className="fp-btn-primary w-full flex items-center justify-center gap-2"
             >
               {isLoading ? (

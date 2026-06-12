@@ -40,15 +40,11 @@ async function runScenario(name: string, config: LoadTestConfig): Promise<LoadTe
   const failures: string[] = [];
 
   if (result.requests.average < config.expectedRps) {
-    failures.push(
-      `RPS ${result.requests.average.toFixed(0)} < expected ${config.expectedRps}`
-    );
+    failures.push(`RPS ${result.requests.average.toFixed(0)} < expected ${config.expectedRps}`);
   }
 
   if (result.latency.p99 > config.expectedLatencyP99) {
-    failures.push(
-      `P99 latency ${result.latency.p99}ms > expected ${config.expectedLatencyP99}ms`
-    );
+    failures.push(`P99 latency ${result.latency.p99}ms > expected ${config.expectedLatencyP99}ms`);
   }
 
   const passed = failures.length === 0;
@@ -56,7 +52,9 @@ async function runScenario(name: string, config: LoadTestConfig): Promise<LoadTe
 
   console.log(`${icon} ${name}:`);
   console.log(`   RPS: avg=${result.requests.average.toFixed(0)} (min ${config.expectedRps})`);
-  console.log(`   Latency: p50=${result.latency.p50}ms p95=${result.latency.p95}ms p99=${result.latency.p99}ms (max p99: ${config.expectedLatencyP99}ms)`);
+  console.log(
+    `   Latency: p50=${result.latency.p50}ms p95=${result.latency.p95}ms p99=${result.latency.p99}ms (max p99: ${config.expectedLatencyP99}ms)`
+  );
   console.log(`   Errors: ${result.errors} | Timeouts: ${result.timeouts}`);
   if (failures.length) console.log(`   Failures: ${failures.join('; ')}`);
 
@@ -91,14 +89,14 @@ async function main() {
 
   console.log('🐧 Flipper AI Load Testing');
   console.log('==========================');
-  console.log(`Performance budgets: min ${performanceBudgets.minRpsUnderLoad} RPS, max ${performanceBudgets.maxTTFB}ms TTFB`);
+  console.log(
+    `Performance budgets: min ${performanceBudgets.minRpsUnderLoad} RPS, max ${performanceBudgets.maxTTFB}ms TTFB`
+  );
 
   const scenarios =
     scenario === 'all'
       ? Object.entries(loadTestScenarios)
-      : [[scenario, loadTestScenarios[scenario]] as [string, LoadTestConfig]].filter(
-          ([, v]) => v
-        );
+      : [[scenario, loadTestScenarios[scenario]] as [string, LoadTestConfig]].filter(([, v]) => v);
 
   if (scenarios.length === 0) {
     console.error(`Unknown scenario: ${scenario}`);

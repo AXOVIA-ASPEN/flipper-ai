@@ -108,7 +108,14 @@ describe('Price History Service', () => {
       jest.mocked(marketPrice.fetchMarketPrice).mockResolvedValue({
         source: 'ebay_scrape' as const,
         soldListings: [
-          { title: 'iPhone', price: 500, shippingCost: 0, condition: 'Used', url: 'http://x.com', soldDate: new Date() }
+          {
+            title: 'iPhone',
+            price: 500,
+            shippingCost: 0,
+            condition: 'Used',
+            url: 'http://x.com',
+            soldDate: new Date(),
+          },
         ],
         medianPrice: 500,
         lowPrice: 450,
@@ -130,11 +137,23 @@ describe('Price History Service', () => {
       jest.mocked(marketPrice.fetchMarketPrice).mockResolvedValue({
         source: 'ebay_scrape' as const,
         soldListings: [
-          { title: 'Item', price: 100, shippingCost: 0, condition: 'Used',
-            url: 'http://x.com', soldDate: null }, // null soldDate → uses new Date()
+          {
+            title: 'Item',
+            price: 100,
+            shippingCost: 0,
+            condition: 'Used',
+            url: 'http://x.com',
+            soldDate: null,
+          }, // null soldDate → uses new Date()
         ],
-        medianPrice: 100, lowPrice: 80, highPrice: 120, avgPrice: 100,
-        salesCount: 1, avgDaysToSell: null, searchQuery: 'Item', fetchedAt: new Date(),
+        medianPrice: 100,
+        lowPrice: 80,
+        highPrice: 120,
+        avgPrice: 100,
+        salesCount: 1,
+        avgDaysToSell: null,
+        searchQuery: 'Item',
+        fetchedAt: new Date(),
       });
       jest.mocked(prisma.priceHistory.createMany).mockResolvedValue({ count: 1 });
       const result = await fetchAndStorePriceHistory('Item');
@@ -210,10 +229,46 @@ describe('Price History Service', () => {
     it('uses average of two middle values for even count (false branch of % 2 !== 0)', async () => {
       // 4 records → even count → median = average of 2 middle values
       jest.mocked(prisma.priceHistory.findMany).mockResolvedValue([
-        { id: '1', productName: 'X', category: null, platform: 'EBAY', soldPrice: 100, condition: null, soldAt: new Date(), createdAt: new Date() },
-        { id: '2', productName: 'X', category: null, platform: 'EBAY', soldPrice: 200, condition: null, soldAt: new Date(), createdAt: new Date() },
-        { id: '3', productName: 'X', category: null, platform: 'EBAY', soldPrice: 300, condition: null, soldAt: new Date(), createdAt: new Date() },
-        { id: '4', productName: 'X', category: null, platform: 'EBAY', soldPrice: 400, condition: null, soldAt: new Date(), createdAt: new Date() },
+        {
+          id: '1',
+          productName: 'X',
+          category: null,
+          platform: 'EBAY',
+          soldPrice: 100,
+          condition: null,
+          soldAt: new Date(),
+          createdAt: new Date(),
+        },
+        {
+          id: '2',
+          productName: 'X',
+          category: null,
+          platform: 'EBAY',
+          soldPrice: 200,
+          condition: null,
+          soldAt: new Date(),
+          createdAt: new Date(),
+        },
+        {
+          id: '3',
+          productName: 'X',
+          category: null,
+          platform: 'EBAY',
+          soldPrice: 300,
+          condition: null,
+          soldAt: new Date(),
+          createdAt: new Date(),
+        },
+        {
+          id: '4',
+          productName: 'X',
+          category: null,
+          platform: 'EBAY',
+          soldPrice: 400,
+          condition: null,
+          soldAt: new Date(),
+          createdAt: new Date(),
+        },
       ]);
       const result = await getPriceHistory({ productName: 'X' });
       // Sorted: [100, 200, 300, 400], mid=2, median = (200+300)/2 = 250

@@ -25,7 +25,9 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
 
 // Guard: prevent empty-string bypass of webhook signature verification
 if (!webhookSecret && process.env.NODE_ENV === 'production') {
-  console.error('🚨 CRITICAL: STRIPE_WEBHOOK_SECRET is not configured — webhook endpoint is INSECURE');
+  console.error(
+    '🚨 CRITICAL: STRIPE_WEBHOOK_SECRET is not configured — webhook endpoint is INSECURE'
+  );
 }
 
 export async function POST(req: NextRequest) {
@@ -47,7 +49,10 @@ export async function POST(req: NextRequest) {
     try {
       event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
     } catch (err: unknown) {
-      console.error('Webhook signature verification failed:', err instanceof Error ? err.message : String(err));
+      console.error(
+        'Webhook signature verification failed:',
+        err instanceof Error ? err.message : String(err)
+      );
       throw new ValidationError('Invalid signature');
     }
 
@@ -56,7 +61,9 @@ export async function POST(req: NextRequest) {
         const session = event.data.object as Stripe.Checkout.Session;
         const tier = session.metadata?.tier;
         if (!tier || !['FREE', 'FLIPPER', 'PRO'].includes(tier)) {
-          console.warn(`[Stripe Webhook] checkout.session.completed missing or invalid tier metadata: "${tier}" — skipping tier update`);
+          console.warn(
+            `[Stripe Webhook] checkout.session.completed missing or invalid tier metadata: "${tier}" — skipping tier update`
+          );
           break;
         }
         const email = session.customer_details?.email || session.metadata?.userId;
@@ -73,12 +80,14 @@ export async function POST(req: NextRequest) {
         const priceId = subscription.items.data[0]?.price.id;
         const tier = PRICE_TO_TIER[priceId] || subscription.metadata?.tier;
         if (!tier || !['FREE', 'FLIPPER', 'PRO'].includes(tier)) {
-          console.warn(`[Stripe Webhook] subscription.created — unrecognized tier "${tier}" (priceId: ${priceId}) — skipping tier update`);
+          console.warn(
+            `[Stripe Webhook] subscription.created — unrecognized tier "${tier}" (priceId: ${priceId}) — skipping tier update`
+          );
           break;
         }
-        const customer = await stripe.customers.retrieve(
+        const customer = (await stripe.customers.retrieve(
           subscription.customer as string
-        ) as Stripe.Customer;
+        )) as Stripe.Customer;
         if (customer.email) {
           await updateUserTier(customer.email, tier);
           console.log(`✅ Subscription created: ${customer.email} → ${tier}`);
@@ -91,12 +100,14 @@ export async function POST(req: NextRequest) {
         const priceId = subscription.items.data[0]?.price.id;
         const tier = PRICE_TO_TIER[priceId] || subscription.metadata?.tier;
         if (!tier || !['FREE', 'FLIPPER', 'PRO'].includes(tier)) {
-          console.warn(`[Stripe Webhook] subscription.updated — unrecognized tier "${tier}" (priceId: ${priceId}) — skipping tier update`);
+          console.warn(
+            `[Stripe Webhook] subscription.updated — unrecognized tier "${tier}" (priceId: ${priceId}) — skipping tier update`
+          );
           break;
         }
-        const customer = await stripe.customers.retrieve(
+        const customer = (await stripe.customers.retrieve(
           subscription.customer as string
-        ) as Stripe.Customer;
+        )) as Stripe.Customer;
         if (customer.email) {
           await updateUserTier(customer.email, tier);
           console.log(`✅ Subscription updated: ${customer.email} → ${tier}`);
@@ -106,9 +117,9 @@ export async function POST(req: NextRequest) {
 
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
-        const customer = await stripe.customers.retrieve(
+        const customer = (await stripe.customers.retrieve(
           subscription.customer as string
-        ) as Stripe.Customer;
+        )) as Stripe.Customer;
         if (customer.email) {
           await updateUserTier(customer.email, 'FREE');
           console.log(`✅ Subscription cancelled: ${customer.email} → FREE`);
@@ -118,9 +129,9 @@ export async function POST(req: NextRequest) {
 
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice;
-        const customer = await stripe.customers.retrieve(
+        const customer = (await stripe.customers.retrieve(
           invoice.customer as string
-        ) as Stripe.Customer;
+        )) as Stripe.Customer;
         if (customer.email) {
           console.warn(`[Stripe Webhook] Payment failed for ${customer.email}`);
           try {
@@ -151,7 +162,11 @@ export async function POST(req: NextRequest) {
  * Uses updateMany instead of update so a missing user returns count: 0
  * rather than throwing — webhooks MUST always return 200 to Stripe.
  */
-async function updateUserTier(email: string, tier: string, stripeCustomerId?: string): Promise<void> {
+async function updateUserTier(
+  email: string,
+  tier: string,
+  stripeCustomerId?: string
+): Promise<void> {
   const data: { subscriptionTier: string; stripeCustomerId?: string } = {
     subscriptionTier: tier,
   };

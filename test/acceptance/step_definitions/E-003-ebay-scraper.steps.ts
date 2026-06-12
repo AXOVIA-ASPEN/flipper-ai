@@ -46,12 +46,9 @@ Then(
   }
 );
 
-Then(
-  'it should call the eBay Browse API v1 endpoint {string}',
-  function (endpoint: string) {
-    expect(this.fileContent).toContain(endpoint);
-  }
-);
+Then('it should call the eBay Browse API v1 endpoint {string}', function (endpoint: string) {
+  expect(this.fileContent).toContain(endpoint);
+});
 
 // ==================== AC #2: Response Normalization ====================
 
@@ -106,27 +103,18 @@ Then('it should always include {string}', function (filterStr: string) {
   expect(this.fileContent).toContain(filterStr);
 });
 
-Then(
-  'it should map categoryId to the {string} query parameter',
-  function (paramName: string) {
-    expect(this.fileContent).toContain(paramName);
-  }
-);
+Then('it should map categoryId to the {string} query parameter', function (paramName: string) {
+  expect(this.fileContent).toContain(paramName);
+});
 
-Then(
-  'it should map condition to {string} filter format',
-  function (format: string) {
-    const prefix = format.split('{')[0] + '{';
-    expect(this.fileContent).toContain(prefix);
-  }
-);
+Then('it should map condition to {string} filter format', function (format: string) {
+  const prefix = format.split('{')[0] + '{';
+  expect(this.fileContent).toContain(prefix);
+});
 
-Then(
-  'it should map price range to {string} filter format',
-  function (_format: string) {
-    expect(this.fileContent).toContain('price:[');
-  }
-);
+Then('it should map price range to {string} filter format', function (_format: string) {
+  expect(this.fileContent).toContain('price:[');
+});
 
 Then(
   'it should support all 6 categories: Electronics, Clothing, Collectibles, Musical Instruments, Video Games, Antiques',
@@ -165,13 +153,10 @@ When('I inspect the error handling logic', function () {
   // Content already loaded from Given step
 });
 
-Then(
-  'it should throw ConfigurationError when EBAY_OAUTH_TOKEN is not set',
-  function () {
-    expect(this.fileContent).toContain('ConfigurationError');
-    expect(this.fileContent).toContain('EBAY_OAUTH_TOKEN');
-  }
-);
+Then('it should throw ConfigurationError when EBAY_OAUTH_TOKEN is not set', function () {
+  expect(this.fileContent).toContain('ConfigurationError');
+  expect(this.fileContent).toContain('EBAY_OAUTH_TOKEN');
+});
 
 Then(
   'it should throw ExternalServiceError on 401 or 403 API responses indicating expired token',
@@ -202,14 +187,11 @@ When('I inspect the eBay scraper module structure', function () {
   expect(fs.existsSync(fullPath)).toBe(true);
 });
 
-Then(
-  '{string} should contain the core API integration logic',
-  function (filePath: string) {
-    const content = readFile(filePath);
-    expect(content).toContain('callEbayApi');
-    expect(content).toContain('fetchEbayListings');
-  }
-);
+Then('{string} should contain the core API integration logic', function (filePath: string) {
+  const content = readFile(filePath);
+  expect(content).toContain('callEbayApi');
+  expect(content).toContain('fetchEbayListings');
+});
 
 // ==================== Marketplace Scanner Integration ====================
 
@@ -225,24 +207,15 @@ Then(
   }
 );
 
-Then(
-  'it should use {string} for database-ready format',
-  function (funcName: string) {
-    expect(this.routeContent).toContain(funcName);
-  }
-);
+Then('it should use {string} for database-ready format', function (funcName: string) {
+  expect(this.routeContent).toContain(funcName);
+});
 
-Then(
-  'it should use {string} for consistent response format',
-  function (funcName: string) {
-    expect(this.routeContent).toContain(funcName);
-  }
-);
+Then('it should use {string} for consistent response format', function (funcName: string) {
+  expect(this.routeContent).toContain(funcName);
+});
 
-Then(
-  'it should emit SSE events with emitEvents:true for real-time notifications',
-  function () {
-    expect(this.routeContent).toContain('emitEvents');
-    expect(this.routeContent).toContain('true');
-  }
-);
+Then('it should emit SSE events with emitEvents:true for real-time notifications', function () {
+  expect(this.routeContent).toContain('emitEvents');
+  expect(this.routeContent).toContain('true');
+});

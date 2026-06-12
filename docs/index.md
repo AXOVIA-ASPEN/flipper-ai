@@ -26,18 +26,22 @@
 ## Generated Documentation
 
 ### Core Architecture
+
 - [Project Overview](./project-overview.md) — Executive summary, features, tech stack
 - [Architecture (Deep Scan)](./architecture-deep-scan.md) — System architecture, data flow, AI pipeline
 - [Source Tree Analysis](./source-tree-analysis.md) — Annotated directory structure with critical folders
 
 ### API & Data
+
 - [API Contracts](./api-contracts.md) — 80+ API endpoints documented
 - [Data Models](./data-models.md) — 13 database models with relationships
 
 ### UI & Components
-- ~~Component Inventory~~ — *(not yet generated; run `document-project` workflow to create)*
+
+- ~~Component Inventory~~ — _(not yet generated; run `document-project` workflow to create)_
 
 ### Development
+
 - [Development Guide](./development-guide.md) — Setup, commands, testing, deployment
 
 ---
@@ -45,28 +49,33 @@
 ## Existing Documentation
 
 ### Architecture & Design
+
 - [Architecture (Original)](./architecture/ARCHITECTURE.md) — Original system architecture with Mermaid diagrams
 - PRD — see `_bmad-output/planning-artifacts/prd/PRD.md`
 - [Go-to-Market Strategy](./GO_TO_MARKET_STRATEGY.md) — Launch strategy
 
 ### API & Technical
+
 - [API Reference](./api/API_REFERENCE.md) — Detailed API reference
 - [OpenAPI Spec](./api/openapi.yaml) — OpenAPI 3.0 specification
 - [Prisma Guide](./tools/PRISMA.md) — Prisma ORM documentation
 - [Listing Decision Logic](./LISTING-DECISION-LOGIC.md) — Business rules for listing/opportunity decisions
 
 ### Development & Operations
+
 - [Developer Setup](./dev/DEVELOPER_SETUP.md) — Local development environment setup
 - [Troubleshooting](./dev/TROUBLESHOOTING.md) — Common issues and solutions
 - [Operations Runbook](./dev/OPERATIONS_RUNBOOK.md) — Operational procedures
 
 ### Security & Secrets
+
 - [GCP Secret Manager](./secrets/secretmanager.md) — Secret names and usage for GCP Secret Manager
 - [Security Audit](./security/SECURITY_AUDIT.md) — Security findings and recommendations
 - [Security Headers](./security/SECURITY_HEADERS.md) — HTTP security header configuration
 - [Security Cleanup](./security/SECURITY_CLEANUP_2026-02-18.md) — Security cleanup tasks
 
 ### Deployment
+
 - [Deployment Guide](./deployment/DEPLOYMENT.md) — Deployment procedures
 - [Production Readiness](./deployment/PRODUCTION_READINESS.md) — Production readiness checklist
 - [Production Readiness Report](./deployment/PRODUCTION_READINESS_REPORT.md) — Assessment report
@@ -78,9 +87,11 @@
 - Deployment checklists & history: [QUICK-START-DEPLOYMENT](./deployment/QUICK-START-DEPLOYMENT.md), [Firebase](./deployment/FIREBASE-README.md), [MIGRATION](./deployment/MIGRATION.md)
 
 ### Planning
+
 - [Implementation Plan](./planning/IMPLEMENTATION-PLAN.md) — High-level implementation roadmap
 
 ### Testing
+
 - [BDD Test Plan](./testing/BDD_TEST_PLAN.md) — Behavior-driven test plan
 - [Coverage Gaps](./testing/COVERAGE_GAPS.md) — Test coverage analysis
 - [Integration Test Results](./testing/INTEGRATION-TEST-RESULTS.md) — Integration test results
@@ -89,13 +100,16 @@
 - [Test Plan](./testing/test-plan.md) — Test planning notes
 
 ### User Documentation
+
 - [User Guide](./guides/USER_GUIDE.md) — End-user documentation
 - [User Flows](./prd/user-flows.md) — User interaction flows
 
 ### Archive
+
 - [Firebase Migration Tracker](./archive/FIREBASE_MIGRATION_TRACKER.md) — Migration tracking notes
 
 ### Reports
+
 - [VALUE-REPORT-001](./reports/VALUE-REPORT-001.json) — Sample value report
 
 ---
@@ -103,20 +117,25 @@
 ## Getting Started
 
 ### For Development
+
 ```bash
 make preview    # Install deps, migrate DB, start dev server
 ```
+
 See [Development Guide](./development-guide.md) for full setup instructions.
 
 ### For AI-Assisted Development
+
 When creating a brownfield PRD or planning new features, reference:
+
 1. This `index.md` as the entry point
 2. [Architecture](./architecture-deep-scan.md) for system design context
 3. [API Contracts](./api-contracts.md) for existing endpoint inventory
 4. [Data Models](./data-models.md) for database schema
-5. Component Inventory *(not yet generated)* for reusable UI elements
+5. Component Inventory _(not yet generated)_ for reusable UI elements
 
 ### Key Commands
+
 ```bash
 make dev          # Start dev server
 make test         # Run unit tests

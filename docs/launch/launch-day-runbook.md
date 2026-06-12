@@ -70,7 +70,7 @@ The day Flipper.ai goes public on Product Hunt. Designed for a Tuesday launch (P
 - [ ] Indie Hackers product post: https://www.indiehackers.com/products
 - [ ] Reply to the day's PH comments. Don't fall behind here.
 - [ ] If a YouTuber or content creator has commented, DM them with a custom Lifetime Founder code as a thank-you.
-- [ ] Check your Stripe dashboard. Live mode should be processing payments. If not — *fix immediately*.
+- [ ] Check your Stripe dashboard. Live mode should be processing payments. If not — _fix immediately_.
 
 ## 12 PM - 3 PM PT
 
@@ -89,7 +89,7 @@ The day Flipper.ai goes public on Product Hunt. Designed for a Tuesday launch (P
 
 - [ ] Post a "thank you" tweet (not the same as the recap — that's for tomorrow). Pin it.
 - [ ] Pin a thank-you comment on your PH listing (catches voters arriving late).
-- [ ] If you're not in top 10 yet but are close, ask 2-3 close friends to vote *now* — late votes count too.
+- [ ] If you're not in top 10 yet but are close, ask 2-3 close friends to vote _now_ — late votes count too.
 
 ## 9 PM - 11:59 PM PT (close)
 
@@ -122,18 +122,18 @@ The day Flipper.ai goes public on Product Hunt. Designed for a Tuesday launch (P
 
 Set up a single live spreadsheet or Linear board and update hourly:
 
-| Metric                     | Hourly check                                                       |
-| -------------------------- | ------------------------------------------------------------------ |
-| PH rank                    | Refresh listing, log position                                      |
-| PH upvotes                 | Logs trend                                                         |
-| Total signups              | DB query or Vercel/Cloud Run analytics                             |
-| First-scan rate            | (Users who ran ≥1 scan) / (signups). Should be ≥60%               |
-| Conversion to paid         | (Paid users) / (signups). Day-1 expectation: 1-3%                  |
-| MRR added                  | Stripe dashboard                                                   |
-| 5xx rate                   | Sentry. Should be <0.1% of requests                                |
-| AI cost                    | Per-provider dashboard or `metrics.ts` log aggregation             |
-| Top referrer URLs          | Vercel/Cloud Run analytics or Plausible/Fathom                     |
-| Top conversion source      | UTMs on launch links → Stripe checkout                             |
+| Metric                | Hourly check                                           |
+| --------------------- | ------------------------------------------------------ |
+| PH rank               | Refresh listing, log position                          |
+| PH upvotes            | Logs trend                                             |
+| Total signups         | DB query or Vercel/Cloud Run analytics                 |
+| First-scan rate       | (Users who ran ≥1 scan) / (signups). Should be ≥60%    |
+| Conversion to paid    | (Paid users) / (signups). Day-1 expectation: 1-3%      |
+| MRR added             | Stripe dashboard                                       |
+| 5xx rate              | Sentry. Should be <0.1% of requests                    |
+| AI cost               | Per-provider dashboard or `metrics.ts` log aggregation |
+| Top referrer URLs     | Vercel/Cloud Run analytics or Plausible/Fathom         |
+| Top conversion source | UTMs on launch links → Stripe checkout                 |
 
 ---
 
@@ -153,7 +153,7 @@ Set up a single live spreadsheet or Linear board and update hourly:
 
 ### Scenario: Stripe live mode fails on first paid signup
 
-> **Email the user immediately**: "Saw your upgrade attempt failed — totally on us. I've manually upgraded your account; please don't try to re-pay until I confirm what went wrong." Then dig in. *Never* let the first paid customer hit a generic Stripe error and walk away.
+> **Email the user immediately**: "Saw your upgrade attempt failed — totally on us. I've manually upgraded your account; please don't try to re-pay until I confirm what went wrong." Then dig in. _Never_ let the first paid customer hit a generic Stripe error and walk away.
 
 ### Scenario: Negative comment goes viral on PH or Twitter
 
@@ -161,7 +161,7 @@ Set up a single live spreadsheet or Linear board and update hourly:
 
 ### Scenario: Reddit auto-mods remove your post
 
-> Read the auto-mod's reason. Common ones: account too new, post too promotional, post needs a flair. Edit and resubmit per the rules. Do *not* argue with mods publicly — DM them politely if you think it was a mistake.
+> Read the auto-mod's reason. Common ones: account too new, post too promotional, post needs a flair. Edit and resubmit per the rules. Do _not_ argue with mods publicly — DM them politely if you think it was a mistake.
 
 ### Scenario: Cloud Run autoscaling can't keep up
 
@@ -169,7 +169,7 @@ Set up a single live spreadsheet or Linear board and update hourly:
 
 ### Scenario: GCP Secret Manager rate limit hit
 
-> Caused by re-reading secrets on every request instead of caching them. Hot-fix: cache `EnvSecretManager` results for the lifetime of the Cloud Run instance. This *should* already be the case but verify.
+> Caused by re-reading secrets on every request instead of caching them. Hot-fix: cache `EnvSecretManager` results for the lifetime of the Cloud Run instance. This _should_ already be the case but verify.
 
 ---
 

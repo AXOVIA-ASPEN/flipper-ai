@@ -17,14 +17,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { resetPassword } from '@/lib/firebase/auth';
-import {
-  Mail,
-  Loader2,
-  AlertCircle,
-  CheckCircle,
-  Sparkles,
-  ArrowLeft,
-} from 'lucide-react';
+import { Mail, Loader2, AlertCircle, CheckCircle, Sparkles, ArrowLeft } from 'lucide-react';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -69,7 +62,9 @@ export default function ForgotPasswordPage() {
                 <span className="text-2xl font-bold fp-grad-purple">Flipper.ai</span>
               </div>
             </Link>
-            <h1 className="text-2xl font-bold mb-2" style={{ color: '#e2e8f0' }}>Reset your password</h1>
+            <h1 className="text-2xl font-bold mb-2" style={{ color: '#e2e8f0' }}>
+              Reset your password
+            </h1>
             <p style={{ color: '#94a3b8' }}>
               {success
                 ? 'Check your email for a reset link'
@@ -81,7 +76,9 @@ export default function ForgotPasswordPage() {
           {errorMessage && (
             <div className="fp-alert-danger mx-8 mb-4 p-3 flex items-center gap-2" role="alert">
               <AlertCircle className="w-5 h-5 flex-shrink-0" style={{ color: '#f87171' }} />
-              <span className="text-sm" style={{ color: '#fca5a5' }}>{errorMessage}</span>
+              <span className="text-sm" style={{ color: '#fca5a5' }}>
+                {errorMessage}
+              </span>
             </div>
           )}
 
@@ -94,7 +91,8 @@ export default function ForgotPasswordPage() {
             >
               <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: '#34d399' }} />
               <span className="text-sm" style={{ color: '#6ee7b7' }}>
-                If an account exists with this email, you&apos;ll receive a password reset link shortly.
+                If an account exists with this email, you&apos;ll receive a password reset link
+                shortly.
               </span>
             </div>
           )}
@@ -134,7 +132,10 @@ export default function ForgotPasswordPage() {
             </form>
           ) : (
             <div className="px-8 pb-8">
-              <Link href="/login" className="fp-btn-primary w-full flex items-center justify-center gap-2">
+              <Link
+                href="/login"
+                className="fp-btn-primary w-full flex items-center justify-center gap-2"
+              >
                 <span>Back to sign in</span>
               </Link>
             </div>

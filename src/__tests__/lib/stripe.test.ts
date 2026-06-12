@@ -25,9 +25,7 @@ describe('lib/stripe', () => {
     const mod = require('@/lib/stripe');
     expect(mod.stripe).toBeDefined();
 
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('STRIPE_SECRET_KEY not set')
-    );
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('STRIPE_SECRET_KEY not set'));
     warnSpy.mockRestore();
   });
 

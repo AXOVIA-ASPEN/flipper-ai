@@ -78,7 +78,7 @@ const DISCLAIMER = 'AI-generated suggestion for informational purposes only. Not
 
 const PLATFORM_FEE_RATES: Record<string, number> = {
   EBAY: 0.13,
-  MERCARI: 0.10,
+  MERCARI: 0.1,
   FACEBOOK_MARKETPLACE: 0.05,
   OFFERUP: 0.129,
   CRAIGSLIST: 0,
@@ -88,9 +88,7 @@ const DEFAULT_FEE_RATE = 0.13;
 
 // ── Cache ────────────────────────────────────────────────────────────────────
 
-export async function getCachedStrategy(
-  listingId: string
-): Promise<NegotiationStrategy | null> {
+export async function getCachedStrategy(listingId: string): Promise<NegotiationStrategy | null> {
   // L1: in-memory LRU cache
   const l1 = analysisCache.get(L1_KEY(listingId)) as NegotiationStrategy | undefined;
   if (l1) {
@@ -211,9 +209,7 @@ function validateStrategyResponse(
     : ['Make a fair initial offer based on market data'];
 
   // Validate counter-offer suggestions
-  const counterOfferSuggestions: CounterOfferStep[] = Array.isArray(
-    parsed.counterOfferSuggestions
-  )
+  const counterOfferSuggestions: CounterOfferStep[] = Array.isArray(parsed.counterOfferSuggestions)
     ? (parsed.counterOfferSuggestions as Record<string, unknown>[])
         .filter((s) => s && typeof s === 'object')
         .slice(0, 3)
@@ -268,14 +264,11 @@ function validateCounterOfferResponse(
 
 // ── Fallback Strategy ────────────────────────────────────────────────────────
 
-export function generateFallbackStrategy(
-  input: NegotiationStrategyInput
-): NegotiationStrategy {
+export function generateFallbackStrategy(input: NegotiationStrategyInput): NegotiationStrategy {
   const marketValue = getMarketValue(input);
   const isNegotiable = input.negotiable !== false;
   const daysListed = input.daysListed ?? 0;
-  const isHighDemand =
-    input.demandLevel === 'high' || input.demandLevel === 'very_high';
+  const isHighDemand = input.demandLevel === 'high' || input.demandLevel === 'very_high';
   const feeRate = getFeeRate(input.platform);
 
   // Base offer: 75-90% of asking depending on conditions
@@ -283,7 +276,7 @@ export function generateFallbackStrategy(
 
   // Aging thresholds
   if (daysListed > 30) {
-    offerPercent -= 0.10; // Stale — aggressive
+    offerPercent -= 0.1; // Stale — aggressive
   } else if (daysListed > 14) {
     offerPercent -= 0.05; // Aging — moderately aggressive
   } else if (daysListed <= 3 && daysListed > 0) {
@@ -294,7 +287,7 @@ export function generateFallbackStrategy(
   if (!isNegotiable) offerPercent = 0.95;
 
   // Clamp offerPercent between 0.50 and 0.95
-  offerPercent = Math.max(0.50, Math.min(offerPercent, 0.95));
+  offerPercent = Math.max(0.5, Math.min(offerPercent, 0.95));
 
   const initialOfferPrice = Math.max(1, Math.round(input.askingPrice * offerPercent));
 
@@ -365,9 +358,7 @@ function buildFallbackReasoning(
   const marketValue = getMarketValue(input);
   const parts: string[] = [];
 
-  parts.push(
-    `Algorithmic strategy based on ${Math.round(offerPercent * 100)}% offer ratio.`
-  );
+  parts.push(`Algorithmic strategy based on ${Math.round(offerPercent * 100)}% offer ratio.`);
 
   if (input.verifiedMarketValue != null) {
     parts.push(`Verified market value: $${input.verifiedMarketValue}.`);
@@ -448,9 +439,7 @@ function applyMarketDataFreshnessCheck(
 ): NegotiationStrategy {
   if (!marketDataDate) return strategy;
 
-  const marketDataAge = Math.floor(
-    (Date.now() - marketDataDate.getTime()) / (1000 * 60 * 60 * 24)
-  );
+  const marketDataAge = Math.floor((Date.now() - marketDataDate.getTime()) / (1000 * 60 * 60 * 24));
 
   if (marketDataAge > 14) {
     return {
@@ -479,9 +468,7 @@ export async function generateNegotiationStrategy(
     const feeRate = getFeeRate(input.platform);
     const feePercent = Math.round(feeRate * 100);
     const discountPercent =
-      marketValue > 0
-        ? Math.round(((marketValue - input.askingPrice) / marketValue) * 100)
-        : 0;
+      marketValue > 0 ? Math.round(((marketValue - input.askingPrice) / marketValue) * 100) : 0;
 
     const response = await completeAI('negotiationStrategy', {
       askingPrice: input.askingPrice,

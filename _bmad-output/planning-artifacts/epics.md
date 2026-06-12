@@ -275,6 +275,16 @@ FR-UI-DESIGN-06: Shared state components shall exist under `src/components/ui/`:
 FR-UI-DESIGN-07: Accessibility shall be enforced — visible focus rings on all interactive elements (buttons, links, inputs, sliders, `.fp-nav-link`); mobile touch targets ≥44×44 pixels; sliders include `aria-valuemin/valuemax/valuenow/valuetext`; dynamic regions use `aria-live="polite"` or `aria-live="assertive"`; `app/layout.tsx` wraps page children in a `<main>` landmark; icon-only buttons include `aria-label`
 FR-UI-DESIGN-08: Every TSX file in `src/components/` and `app/` shall begin with the canonical JSDoc file header (`@file`, `@author` Stephen Boyett, `@company` Axovia AI, `@date`, `@version`, `@brief` ≤120 chars, `@description` multi-line) per the project File Header Standard
 
+**FR-LEGAL: Legal Compliance & Data-Acquisition Hardening (Epic 31)**
+
+FR-LEGAL-01: Facebook Marketplace data shall be acquired within the user's own authenticated session via a user-initiated client (browser extension / local agent), not via centralized server-side logged-in scraping; the system shall not store or use centralized Facebook session tokens or credentials, and shall ingest user-collected listings through an authenticated endpoint into the standard processing/scoring pipeline
+FR-LEGAL-02: The system shall not employ anti-bot evasion techniques (webdriver-property spoofing, per-request user-agent/viewport randomization intended to defeat detection) on scraped marketplaces; server-side access shall be identified (stable honest UA), rate-limited per source, and robots.txt-aware. (Revises FR-SCAN-10 from an anti-detection mandate to a respectful-access mandate)
+FR-LEGAL-03: The system shall provide a durable per-platform "stop-on-notice" control that immediately halts all acquisition from a platform upon a cease-and-desist or access block — cancelling in-flight and scheduled jobs, persisting across restarts, recording an audit entry — and shall back off rather than circumvent block signals (403/429/CAPTCHA), never rotating IPs or identities to push through
+FR-LEGAL-04: eBay data obtained via the Browse API shall be used in compliance with the eBay API License: no ingestion into generative-AI models/tools without written consent, no raw/aggregated/bulk redistribution, comparison-clause compliance, and deletion within the licensed retention window
+FR-LEGAL-05: The system shall not persist scraped listing photographs; it shall store only factual listing metadata (title, price, condition, location, source URL) and link back to the source listing, with image-based AI analysis operating on transient data only. (Revises FR-SCAN-14/15/16 and FR-RELIST-08)
+FR-LEGAL-06: The system shall not retain seller personal information beyond transient processing needs, shall never email or auto-contact scraped seller contacts, shall scope data to US-only (avoiding GDPR), and shall maintain a CCPA-aligned data-minimization and deletion posture
+FR-LEGAL-07: Flipper.ai shall publish Terms of Service including a binding arbitration clause and class-action waiver for subscribers, maintain a per-platform data-acquisition compliance policy/register, document that its AI layer performs inference on transient data (not model training), and add the FR-LEGAL-01..07 family to the PRD
+
 ### Non-Functional Requirements
 
 NFR-PERF-01: Page loads < 2 seconds
@@ -542,6 +552,15 @@ The entire Flipper.ai frontend is migrated to the canonical dark-glassmorphism d
 **Implementation notes:** Audit documented in `docs/frontend-design-gaps.md`. Current state: ~15% compliance (135 canonical uses vs. 742 non-canonical palette+light-mode violations across 44 files). Target: 100% compliance. Epic is sequenced foundation → shared components → public-facing pages (landing, auth, onboarding) → core app surfaces (opportunities, listings, messaging) → settings & component polish → peripheral pages → final accessibility + file-header sweep. Two exemplar files already comply and serve as reference implementations: `app/dashboard/page.tsx` and `src/components/Navigation.tsx`.
 
 > **Note:** Epic 13 (AI Scoring Algorithm Improvements) exists in `_bmad-output/implementation-artifacts/sprint-status.yaml` and has story artifacts under `_bmad-output/implementation-artifacts/epic-13/`, but is not currently documented in this `epics.md` epic list. This is a pre-existing inconsistency noted here for awareness; Epic 14 is numbered after Epic 13 to avoid renumbering.
+
+### Epic 31: Legal Compliance & Data-Acquisition Hardening
+Flipper.ai's data-acquisition methods are hardened to remove existential and high legal risk identified by the 2026-06-12 legality research, while preserving product functionality. Facebook Marketplace moves to a user-initiated (browser extension / local agent, user-session-only) model and the central Facebook token store is removed; anti-bot evasion is rolled back to respectful, identified, rate-limited, robots-aware access; a per-platform stop-on-notice kill switch is added; eBay Browse API usage is brought into license compliance (AI-ingestion, redistribution, comparison, retention); scraped photos and seller PII are no longer persisted (link back to source, transient image analysis); and a ToS (arbitration + class-action waiver) plus per-platform compliance policy make the posture enforceable and marketable as "compliant by design."
+**FRs covered:** FR-LEGAL-01, FR-LEGAL-02, FR-LEGAL-03, FR-LEGAL-04, FR-LEGAL-05, FR-LEGAL-06, FR-LEGAL-07
+**Revises:** FR-SCAN-10 (anti-detection → respectful access), FR-SCAN-14/15/16 (image storage → link-back + transient analysis), FR-RELIST-08 (image reuse → user-supplied resale photos)
+**NFRs addressed:** NFR-SEC-* (data minimization), NFR-RELY-* (graceful halt on block)
+**Implementation notes:** Source = `_bmad-output/planning-artifacts/research/market-flipper-ai-legality-and-competitive-landscape-research-2026-06-12.md` (§ Legal and Regulatory Landscape, 13-item mitigation checklist). Facebook architecture decision (user-initiated) confirmed by Stephen 2026-06-12. Several ACs depend on licensed-counsel review (eBay license text, ToS arbitration language, the user-initiated architecture) — engineering enforces the counsel conclusion; this epic is research, not legal advice. **This epic gates production launch.**
+
+> **Note on numbering:** Epic 30 is reserved for the Python LangGraph AI-layer conversion (decided 2026-06-11). This legal-compliance epic is numbered 31 to avoid colliding with that reservation. Epics 15–29 are the mobile-app track (`epics-mobile-app.md`).
 
 ---
 
@@ -865,6 +884,27 @@ So that unhealthy instances are automatically replaced and system status is obse
 
 **DoD — Acceptance Tests Required:**
 Write Gherkin scenarios in `test/acceptance/features/E-001-production-infrastructure.feature` covering ALL acceptance criteria above. Tag each scenario with `@E-001-S-<N>` (sequential within Epic 1, continuing from previous stories), `@story-1-9`, and `@FR-INFRA-10` / `@NFR-RELY-03` / `@NFR-RELY-04` as applicable. Update the requirements traceability matrix at `_bmad-output/test-artifacts/requirements-traceability-matrix.md`. See "Definition of Done (DoD) — All Stories" at the top of this file for full tagging rules and examples.
+
+---
+
+### Story 1.10: Versioning & Release Pipeline — Plan Integration & Acceptance Coverage
+
+As **the founder / release manager**,
+I want the implemented versioning & release pipeline (semver `VERSION.md`, Keep-a-Changelog `CHANGELOG.md`, tag-triggered `.github/workflows/release.yml`) formally integrated into the plan with PRD requirements and acceptance coverage,
+So that the release machinery is requirement-backed and regression-protected instead of untracked shadow work.
+
+> **Origin:** Retroactive plan integration of the approved design spec `docs/superpowers/specs/2026-04-11-versioning-release-pipeline-design.md`, implemented 2026-04-11 outside BMAD tracking (audit 2026-06-12; spec doc removed 2026-06-12 — the BMAD plan is canonical, spec recoverable via git history). Full ACs in the story file: `_bmad-output/implementation-artifacts/web-application/epic-1/1-10-versioning-release-pipeline.md`.
+
+**Acceptance Criteria (summary):**
+
+**Given** the repository
+**When** acceptance scenarios inspect the release machinery
+**Then** `VERSION.md` is a single strict-semver line, `CHANGELOG.md` follows Keep a Changelog with `[Unreleased]` first and a heading matching `VERSION.md`, and `release.yml` triggers on `v*.*.*` tags, extracts the tagged version's changelog section, and creates the GitHub Release via `softprops/action-gh-release@v2`
+
+**FRs fulfilled:** FR-INFRA-15 _(NEW — added to PRD by this story)_
+
+**DoD — Acceptance Tests Required:**
+Write Gherkin scenarios in `test/acceptance/features/E-001-production-infrastructure.feature` covering ALL acceptance criteria. Tag each scenario with `@E-001-S-<N>` (continuing from @E-001-S-52), `@story-1-10`, and `@FR-INFRA-15`. Update the requirements traceability matrix at `_bmad-output/test-artifacts/requirements-traceability-matrix.md`.
 
 ---
 
@@ -3188,3 +3228,163 @@ The mobile document contains:
 - The two documents share one Requirements Traceability Matrix at `_bmad-output/test-artifacts/requirements-traceability-matrix.md` — every web AND mobile FR/NFR maps to scenarios there
 - Mobile stories tagged `@FR-MOBILE-*` live in feature files under the same `test/acceptance/features/` tree as web feature files
 - Web FRs / NFRs / additional requirements declared in THIS file are referenced by mobile epics where parity is required (e.g. Epic 21 references `FR-NOTIFY-01..11`, Epic 25 references `NFR-SEC-08`)
+
+---
+
+## Epic 31 Stories: Legal Compliance & Data-Acquisition Hardening
+
+> Source: `_bmad-output/planning-artifacts/research/market-flipper-ai-legality-and-competitive-landscape-research-2026-06-12.md`. Full story files: `_bmad-output/implementation-artifacts/web-application/epic-31/`. Feature file: `test/acceptance/features/E-031-legal-compliance-data-acquisition-hardening.feature` (scenario tags `@E-031-S-<NNN>`). **This epic gates production launch.** Several ACs depend on licensed-counsel review — research, not legal advice.
+
+### Story 31.1: User-Initiated Facebook Marketplace Acquisition
+
+As **the founder**,
+I want Facebook Marketplace listings acquired inside each user's own authenticated session via a user-initiated client (browser extension / local agent) instead of centralized logged-in scraping with stored credentials,
+So that Flipper.ai exits the highest-risk legal fact pattern while preserving full Facebook Marketplace coverage.
+
+**Acceptance Criteria:**
+
+**Given** the current centralized Facebook acquisition path (`src/scrapers/facebook/` Stagehand + `token-store.ts`)
+**When** Epic 31 remediation is complete
+**Then** the central Facebook token store is removed and no Facebook credentials/session tokens are stored server-side
+
+**Given** a user has installed/configured the user-initiated client
+**When** the client collects Marketplace listings within the user's own Facebook session and submits them to `POST /api/scraper/facebook/ingest`
+**Then** the listings are validated, attributed to the user, and flow into the standard dedup + scoring pipeline identically to other platforms
+
+**Given** the user-initiated model
+**When** acquisition runs
+**Then** it uses only the user's own session (never shared/centralized credentials) and applies no detection-evasion against Facebook
+
+**FRs fulfilled:** FR-LEGAL-01, FR-LEGAL-02
+
+**DoD — Acceptance Tests Required:** Gherkin scenarios in `E-031-legal-compliance-data-acquisition-hardening.feature` covering all ACs, tagged `@E-031-S-<N>` (sequential from 1), `@story-31-1`, `@FR-LEGAL-01`/`@FR-LEGAL-02`. Update RTM. Never-mock-AI honored (ingested-listing scoring uses the real provider chain).
+
+---
+
+### Story 31.2: Anti-Detection Rollback & Respectful Access Controls
+
+As **the founder**,
+I want the scrapers' anti-bot evasion (webdriver override, detection-evasion UA/viewport randomization) removed in favor of identified, rate-limited, robots-aware access,
+So that Flipper.ai stops strengthening CFAA, DMCA §1201, and trespass theories.
+
+**Acceptance Criteria:**
+
+**Given** the server-side scrapers (Craigslist, OfferUp, Mercari)
+**When** the rollback is complete
+**Then** no webdriver-property spoofing or detection-evasion randomization remains, and any UA sent is a stable honest identifier
+
+**Given** acquisition from any source
+**When** requests are made
+**Then** a per-source rate limiter enforces a conservative configurable ceiling and robots.txt posture is evaluated first
+
+**Given** FR-SCAN-10 currently mandates anti-detection
+**When** Epic 31 is complete
+**Then** FR-SCAN-10 is revised to a respectful-access mandate in the PRD/epics and CHANGELOG, with selector-fallback resilience retained
+
+**FRs fulfilled:** FR-LEGAL-02 (revises FR-SCAN-10)
+
+**DoD — Acceptance Tests Required:** Scenarios tagged `@E-031-S-<N>`, `@story-31-2`, `@FR-LEGAL-02`. Update RTM.
+
+---
+
+### Story 31.3: Stop-on-Notice — Cease-and-Desist / Block Compliance Controls
+
+As **the founder**,
+I want a durable per-platform kill switch that immediately halts acquisition on a cease-and-desist or block, with no circumvention,
+So that Flipper.ai never crosses into CFAA "without authorization" (the 3Taps line).
+
+**Acceptance Criteria:**
+
+**Given** a per-platform acquisition flag checked before every run
+**When** a platform is disabled
+**Then** no acquisition occurs for it, in-flight and scheduled jobs are cancelled, and the disable persists across restarts
+
+**Given** a platform returns sustained block signals (403/429/CAPTCHA)
+**When** the scraper encounters them
+**Then** it backs off / halts and never rotates IPs or identities to push through
+
+**Given** any enable/disable action
+**When** it occurs
+**Then** an audit entry (actor, platform, timestamp, reason) is recorded and a documented stop-on-notice runbook exists covering all five platforms
+
+**FRs fulfilled:** FR-LEGAL-03
+
+**DoD — Acceptance Tests Required:** Scenarios tagged `@E-031-S-<N>`, `@story-31-3`, `@FR-LEGAL-03`. Update RTM.
+
+---
+
+### Story 31.4: eBay Browse API License Compliance
+
+As **the founder**,
+I want our eBay Browse API data usage to comply with the eBay API License (AI-ingestion, redistribution, comparison, retention),
+So that Flipper.ai keeps its cleanest data source without breaching the license.
+
+**Acceptance Criteria:**
+
+**Given** the current eBay API License
+**When** a counsel/founder review is recorded
+**Then** a decision log captures what is permitted vs needs written consent for AI-ingestion, redistribution, comparison, and retention
+
+**Given** the AI-ingestion gate
+**When** the consent flag is unset
+**Then** eBay data does not reach `completeAI()` callers and eBay valuation uses the algorithmic path; no raw/bulk eBay export endpoint exists
+
+**Given** eBay-derived cached data
+**When** stored
+**Then** it carries a TTL within the licensed retention window and is purged on expiry; comparison displays conform to the review's conclusion
+
+**FRs fulfilled:** FR-LEGAL-04
+
+**DoD — Acceptance Tests Required:** Scenarios tagged `@E-031-S-<N>`, `@story-31-4`, `@FR-LEGAL-04`. Update RTM. Never-mock-AI honored (ingestion gate verified against the real router).
+
+---
+
+### Story 31.5: Listing Data Hygiene — No Photo Storage, No Seller PII
+
+As **the founder**,
+I want only factual listing metadata stored (with link-back to source) instead of scraped photos, and no seller PII retained or contacted,
+So that Flipper.ai removes the copyright vector and minimizes CCPA/privacy exposure.
+
+**Acceptance Criteria:**
+
+**Given** an acquired listing
+**When** it is persisted
+**Then** only factual metadata + source URL are stored (no image binary/Storage object, no seller PII fields), and the UI links back to source for photos
+
+**Given** image-based AI analysis (`itemCompleteness`)
+**When** it runs
+**Then** it operates on a transiently-fetched image against the real provider chain and leaves no stored copy; Epic 9 cross-posting uses the user's own supplied photos
+
+**Given** seller data and outbound communication
+**When** reviewed
+**Then** no scraped-contact outbound channel exists, data scope is US-only, FR-SCAN-14/15/16 are revised, and a CCPA data-minimization posture is documented
+
+**FRs fulfilled:** FR-LEGAL-05, FR-LEGAL-06 (revises FR-SCAN-14/15/16, FR-RELIST-08)
+
+**DoD — Acceptance Tests Required:** Scenarios tagged `@E-031-S-<N>`, `@story-31-5`, `@FR-LEGAL-05`/`@FR-LEGAL-06`. Update RTM. Never-mock-AI honored (vision path uses real providers).
+
+---
+
+### Story 31.6: Compliance Documentation, Terms of Service & Acquisition Policy
+
+As **the founder**,
+I want a ToS (arbitration + class-action waiver), a per-platform acquisition compliance register, and the FR-LEGAL family added to the PRD,
+So that the Epic 31 posture is documented, enforceable, and marketable as "compliant by design."
+
+**Acceptance Criteria:**
+
+**Given** the FR-LEGAL family
+**When** Epic 31 is complete
+**Then** FR-LEGAL-01..07 are present in the PRD Requirements Inventory
+
+**Given** Flipper.ai's Terms of Service (`app/terms/`)
+**When** rendered
+**Then** they include a binding arbitration clause and class-action waiver for subscribers
+
+**Given** the compliance documentation
+**When** reviewed
+**Then** a per-platform acquisition register (all five platforms), an "AI = inference, not training" statement, and a compliant-by-design positioning artifact exist
+
+**FRs fulfilled:** FR-LEGAL-07 (adds FR-LEGAL-01..07 to PRD)
+
+**DoD — Acceptance Tests Required:** Scenarios tagged `@E-031-S-<N>`, `@story-31-6`, `@FR-LEGAL-07`. Update RTM to reflect full FR-LEGAL-01..07 coverage. ToS arbitration language pending counsel review before publication.

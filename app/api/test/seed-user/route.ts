@@ -33,10 +33,7 @@ export async function POST(request: NextRequest) {
   const { id, email, firebaseUid, name, subscriptionTier } = body;
 
   if (!email || !firebaseUid) {
-    return NextResponse.json(
-      { error: 'email and firebaseUid are required' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'email and firebaseUid are required' }, { status: 400 });
   }
 
   const user = await prisma.user.upsert({

@@ -139,7 +139,7 @@ export async function hasValidToken(userId: string): Promise<boolean> {
  * (same idempotent pattern as Facebook token-store.deleteToken).
  */
 export async function deleteToken(userId: string): Promise<void> {
-  await prisma().googleCalendarToken
-    .delete({ where: { userId } })
+  await prisma()
+    .googleCalendarToken.delete({ where: { userId } })
     .catch(() => {});
 }

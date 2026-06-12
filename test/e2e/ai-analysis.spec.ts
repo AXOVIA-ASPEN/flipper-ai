@@ -154,9 +154,7 @@ test.describe('Feature: AI Flippability Scoring', () => {
     }) => {
       // This tests the GET /api/analyze/[listingId] cache check endpoint
       // Note: requires the app to be running; skip gracefully if not
-      const response = await request
-        .get('/api/analyze/nonexistent-listing')
-        .catch(() => null);
+      const response = await request.get('/api/analyze/nonexistent-listing').catch(() => null);
 
       if (response) {
         // If the app is running, verify the response structure
@@ -175,9 +173,7 @@ test.describe('Feature: AI Flippability Scoring', () => {
     test('Given an invalid listing ID, When I POST to analyze, Then I get an appropriate error', async ({
       request,
     }) => {
-      const response = await request
-        .post('/api/analyze/invalid-id-999')
-        .catch(() => null);
+      const response = await request.post('/api/analyze/invalid-id-999').catch(() => null);
 
       if (response) {
         const status = response.status();
@@ -248,14 +244,10 @@ test.describe('Feature: AI Flippability Scoring', () => {
       await page.waitForLoadState('networkidle');
 
       // Then I should see the risky listing
-      await expect(
-        page.getByText('MacBook Pro - needs battery replacement')
-      ).toBeVisible();
+      await expect(page.getByText('MacBook Pro - needs battery replacement')).toBeVisible();
 
       // And the description mentioning the issue
-      await expect(
-        page.getByText("Battery doesn't hold charge, otherwise works")
-      ).toBeVisible();
+      await expect(page.getByText("Battery doesn't hold charge, otherwise works")).toBeVisible();
     });
   });
 

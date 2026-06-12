@@ -29,7 +29,10 @@ import { test, expect, Page } from '@playwright/test';
 // ---------------------------------------------------------------------------
 
 /** Base settings payload returned by GET /api/user/settings. */
-function makeSettings(overrides: Partial<SettingsPayload> = {}): { success: true; data: SettingsPayload } {
+function makeSettings(overrides: Partial<SettingsPayload> = {}): {
+  success: true;
+  data: SettingsPayload;
+} {
   return {
     success: true,
     data: {
@@ -73,7 +76,13 @@ function makeSettings(overrides: Partial<SettingsPayload> = {}): { success: true
       notifyListingUnavailable: true,
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-04-01T00:00:00.000Z',
-      user: { id: 'user-test', email: 'test@example.com', name: 'Test User', image: null, subscriptionTier: 'FREE' },
+      user: {
+        id: 'user-test',
+        email: 'test@example.com',
+        name: 'Test User',
+        image: null,
+        subscriptionTier: 'FREE',
+      },
       ...overrides,
     },
   };
@@ -105,8 +114,13 @@ async function mockSettingsGet(page: Page, payload: ReturnType<typeof makeSettin
 // ---------------------------------------------------------------------------
 
 test.describe('AC-5: SMS toggle gating', () => {
-  test('SMS master toggle is disabled with verification prompt when phone is not verified', async ({ page }) => {
-    await mockSettingsGet(page, makeSettings({ phoneNumber: null, phoneVerified: false, smsNotifications: false }));
+  test('SMS master toggle is disabled with verification prompt when phone is not verified', async ({
+    page,
+  }) => {
+    await mockSettingsGet(
+      page,
+      makeSettings({ phoneNumber: null, phoneVerified: false, smsNotifications: false })
+    );
 
     await page.goto('/settings');
 
@@ -121,22 +135,33 @@ test.describe('AC-5: SMS toggle gating', () => {
     await expect(page.getByText('Verify your phone number to enable SMS alerts')).toBeVisible();
   });
 
-  test('SMS master toggle title tooltip describes the verification requirement', async ({ page }) => {
-    await mockSettingsGet(page, makeSettings({ phoneNumber: null, phoneVerified: false, smsNotifications: false }));
+  test('SMS master toggle title tooltip describes the verification requirement', async ({
+    page,
+  }) => {
+    await mockSettingsGet(
+      page,
+      makeSettings({ phoneNumber: null, phoneVerified: false, smsNotifications: false })
+    );
 
     await page.goto('/settings');
     await page.waitForSelector('text=SMS Text Alerts', { timeout: 10_000 });
 
     const smsToggle = page.getByRole('switch', { name: 'Toggle SMS notifications' });
-    await expect(smsToggle).toHaveAttribute('title', 'Verify your phone number to enable SMS alerts');
+    await expect(smsToggle).toHaveAttribute(
+      'title',
+      'Verify your phone number to enable SMS alerts'
+    );
   });
 
   test('SMS master toggle is enabled once phone is verified', async ({ page }) => {
-    await mockSettingsGet(page, makeSettings({
-      phoneNumber: '+12025551234',
-      phoneVerified: true,
-      smsNotifications: false,
-    }));
+    await mockSettingsGet(
+      page,
+      makeSettings({
+        phoneNumber: '+12025551234',
+        phoneVerified: true,
+        smsNotifications: false,
+      })
+    );
 
     // Mock PATCH for the toggle
     await page.route('/api/user/settings', (route) => {
@@ -144,7 +169,13 @@ test.describe('AC-5: SMS toggle gating', () => {
         return route.fulfill({
           status: 200,
           contentType: 'application/json',
-          body: JSON.stringify(makeSettings({ phoneNumber: '+12025551234', phoneVerified: true, smsNotifications: true })),
+          body: JSON.stringify(
+            makeSettings({
+              phoneNumber: '+12025551234',
+              phoneVerified: true,
+              smsNotifications: true,
+            })
+          ),
         });
       }
       return route.continue();
@@ -178,7 +209,9 @@ test.describe('AC-1: Phone verification UI flow', () => {
     await expect(sendCodeButton).toBeVisible();
   });
 
-  test('entering a phone number and clicking Send Code transitions to code-sent state', async ({ page }) => {
+  test('entering a phone number and clicking Send Code transitions to code-sent state', async ({
+    page,
+  }) => {
     await mockSettingsGet(page, makeSettings({ phoneNumber: null, phoneVerified: false }));
 
     // Mock the send-code endpoint
@@ -205,11 +238,17 @@ test.describe('AC-1: Phone verification UI flow', () => {
     await expect(page.getByRole('button', { name: 'Verify' })).toBeVisible();
   });
 
-  test('entering the correct code and clicking Verify transitions to verified state', async ({ page }) => {
+  test('entering the correct code and clicking Verify transitions to verified state', async ({
+    page,
+  }) => {
     await mockSettingsGet(page, makeSettings({ phoneNumber: null, phoneVerified: false }));
 
     await page.route('/api/user/phone/send-code', (route) =>
-      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true }) })
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true }),
+      })
     );
 
     await page.route('/api/user/phone/verify', (route) =>
@@ -280,10 +319,13 @@ test.describe('AC-1: Phone verification UI flow', () => {
   });
 
   test('already-verified phone shows masked number and Remove button', async ({ page }) => {
-    await mockSettingsGet(page, makeSettings({
-      phoneNumber: '+12025551234',
-      phoneVerified: true,
-    }));
+    await mockSettingsGet(
+      page,
+      makeSettings({
+        phoneNumber: '+12025551234',
+        phoneVerified: true,
+      })
+    );
 
     await page.goto('/settings');
     await page.waitForSelector('text=SMS Text Alerts', { timeout: 10_000 });

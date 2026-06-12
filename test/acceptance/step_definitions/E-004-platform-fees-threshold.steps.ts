@@ -13,10 +13,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { expect } from '@playwright/test';
 import { estimateValue } from '../../../src/lib/value-estimator';
-import {
-  getPlatformFeeRate,
-  PLATFORM_FEE_DEFAULTS,
-} from '../../../src/lib/marketplace-scanner';
+import { getPlatformFeeRate, PLATFORM_FEE_DEFAULTS } from '../../../src/lib/marketplace-scanner';
 
 const PROJECT_ROOT = process.cwd();
 
@@ -84,10 +81,13 @@ Then('"PLATFORM_FEE_DEFAULTS" is exported as a constant', function () {
   expect(typeof PLATFORM_FEE_DEFAULTS).toBe('object');
 });
 
-Then('the default fee rate for {string} is {float}', function (platform: string, expectedRate: number) {
-  const rate = getPlatformFeeRate(platform, null);
-  expect(rate).toBeCloseTo(expectedRate, 3);
-});
+Then(
+  'the default fee rate for {string} is {float}',
+  function (platform: string, expectedRate: number) {
+    const rate = getPlatformFeeRate(platform, null);
+    expect(rate).toBeCloseTo(expectedRate, 3);
+  }
+);
 
 // ==================== Then: S-9 (estimateValue feeRate parameter) ====================
 
@@ -98,10 +98,13 @@ Then('it accepts an optional feeRate parameter as the sixth argument', function 
   expect(this.resultHighFee).toBeDefined();
 });
 
-Then('when feeRate is {float} the profit reasoning mentions {string}', function (feeRate: number, expectedPercent: string) {
-  const result = estimateValue('Apple iPhone 12', null, 300, null, 'electronics', feeRate);
-  expect(result.reasoning).toContain(expectedPercent);
-});
+Then(
+  'when feeRate is {float} the profit reasoning mentions {string}',
+  function (feeRate: number, expectedPercent: string) {
+    const result = estimateValue('Apple iPhone 12', null, 300, null, 'electronics', feeRate);
+    expect(result.reasoning).toContain(expectedPercent);
+  }
+);
 
 Then('when no feeRate is provided it defaults to 13% fee', function () {
   expect(this.resultNoFee.reasoning).toContain('13%');
@@ -109,14 +112,11 @@ Then('when no feeRate is provided it defaults to 13% fee', function () {
 
 // ==================== Then: S-10 (settings API validation) ====================
 
-Then(
-  'it validates opportunityThreshold must be an integer between 10 and 100',
-  function () {
-    expect(this.fileContent).toContain('opportunityThreshold');
-    expect(this.fileContent).toContain('ot < 10');
-    expect(this.fileContent).toContain('ot > 100');
-  }
-);
+Then('it validates opportunityThreshold must be an integer between 10 and 100', function () {
+  expect(this.fileContent).toContain('opportunityThreshold');
+  expect(this.fileContent).toContain('ot < 10');
+  expect(this.fileContent).toContain('ot > 100');
+});
 
 Then('the GET handler returns opportunityThreshold in the response data', function () {
   // Check that the GET handler response includes opportunityThreshold
@@ -126,14 +126,11 @@ Then('the GET handler returns opportunityThreshold in the response data', functi
   expect(getHandlerBody).toContain('opportunityThreshold');
 });
 
-Then(
-  'the UserSettings schema includes opportunityThreshold with default 70',
-  function () {
-    const schemaContent = readSourceFile('prisma/schema.prisma');
-    expect(schemaContent).toContain('opportunityThreshold');
-    expect(schemaContent).toContain('@default(70)');
-  }
-);
+Then('the UserSettings schema includes opportunityThreshold with default 70', function () {
+  const schemaContent = readSourceFile('prisma/schema.prisma');
+  expect(schemaContent).toContain('opportunityThreshold');
+  expect(schemaContent).toContain('@default(70)');
+});
 
 // ==================== Then: S-11 (OfferUp scraper uses fee/threshold) ====================
 
@@ -142,20 +139,14 @@ Then('it imports getPlatformFeeRate from marketplace-scanner', function () {
   expect(this.fileContent).toContain('marketplace-scanner');
 });
 
-Then(
-  'it extracts feeRate using getPlatformFeeRate with the OFFERUP platform',
-  function () {
-    expect(this.fnBody).toContain("getPlatformFeeRate('OFFERUP'");
-  }
-);
+Then('it extracts feeRate using getPlatformFeeRate with the OFFERUP platform', function () {
+  expect(this.fnBody).toContain("getPlatformFeeRate('OFFERUP'");
+});
 
-Then(
-  'it extracts opportunityThreshold from userSettings with fallback to 70',
-  function () {
-    expect(this.fnBody).toContain('opportunityThreshold');
-    expect(this.fnBody).toContain('?? 70');
-  }
-);
+Then('it extracts opportunityThreshold from userSettings with fallback to 70', function () {
+  expect(this.fnBody).toContain('opportunityThreshold');
+  expect(this.fnBody).toContain('?? 70');
+});
 
 Then('the estimateValue call passes feeRate as the sixth argument', function () {
   expect(this.fnBody).toContain('feeRate');

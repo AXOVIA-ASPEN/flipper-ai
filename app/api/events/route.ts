@@ -20,7 +20,13 @@ import { NextRequest } from 'next/server';
 import { sseEmitter } from '@/lib/sse-emitter';
 import { getAuthUserId } from '@/lib/auth-middleware';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import {
+  handleError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+} from '@/lib/errors';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
@@ -46,9 +52,7 @@ export async function GET(request: NextRequest) {
 
   // Send initial ping so the client knows the stream is alive
   await writer.write(
-    ENCODER.encode(
-      sseEmitter.formatMessage({ type: 'ping', data: { ts: Date.now(), userId } })
-    )
+    ENCODER.encode(sseEmitter.formatMessage({ type: 'ping', data: { ts: Date.now(), userId } }))
   );
 
   // Heartbeat interval — prevent proxy timeouts.

@@ -110,7 +110,7 @@ describe('Provider Factory', () => {
 
     test('throws AIProviderUnavailableError when none available', () => {
       expect(() => resolveProvider(['gemini', 'groq', 'openai', 'anthropic'])).toThrow(
-        AIProviderUnavailableError,
+        AIProviderUnavailableError
       );
     });
 
@@ -153,9 +153,7 @@ describe('Provider Factory', () => {
       process.env.ANTHROPIC_API_KEY = 'sk-ant-test';
       const available = getAvailableProviders();
       expect(available).toHaveLength(4);
-      expect(available).toEqual(
-        expect.arrayContaining(['gemini', 'groq', 'openai', 'anthropic']),
-      );
+      expect(available).toEqual(expect.arrayContaining(['gemini', 'groq', 'openai', 'anthropic']));
     });
   });
 

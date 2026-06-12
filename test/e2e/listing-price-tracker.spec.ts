@@ -167,9 +167,7 @@ test.describe('Feature: Listing Price Tracker', () => {
       const response = await page.request.get('/api/listings/track');
       const body = await response.json();
 
-      const opportunity = body.listings.find(
-        (l: { id: string }) => l.id === 'lst-001'
-      );
+      const opportunity = body.listings.find((l: { id: string }) => l.id === 'lst-001');
       expect(opportunity).toBeDefined();
       expect(opportunity.status).toBe('OPPORTUNITY');
     });

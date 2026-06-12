@@ -23,8 +23,14 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { ProfitLossSummary } from '@/lib/analytics-service';
 import {
-  LineChart, Line, BarChart, Bar,
-  XAxis, YAxis, Tooltip, CartesianGrid,
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
   ResponsiveContainer,
 } from 'recharts';
 import { LoadingSkeleton, ErrorBanner, EmptyState } from '@/components/ui';
@@ -56,9 +62,7 @@ function formatCurrency(val: number): string {
 
 function ProfitBadge({ value }: { value: number }) {
   return (
-    <span
-      style={{ color: value >= 0 ? PROFIT_GREEN : DANGER_RED, fontWeight: 600 }}
-    >
+    <span style={{ color: value >= 0 ? PROFIT_GREEN : DANGER_RED, fontWeight: 600 }}>
       {formatCurrency(value)}
     </span>
   );
@@ -89,9 +93,7 @@ function SummaryCard({
       >
         {value}
       </p>
-      {subtitle && (
-        <p style={{ color: TEXT_SECONDARY, fontSize: 12, marginTop: 4 }}>{subtitle}</p>
-      )}
+      {subtitle && <p style={{ color: TEXT_SECONDARY, fontSize: 12, marginTop: 4 }}>{subtitle}</p>}
     </div>
   );
 }
@@ -108,9 +110,7 @@ function StatusBadge({ status }: { status: string }) {
 
 const TOGGLE_BTN_BASE = 'fp-btn-ghost';
 function toggleStyle(active: boolean): React.CSSProperties {
-  return active
-    ? { background: ACTIVE_TOGGLE_BG, color: PURPLE_ACCENT }
-    : {};
+  return active ? { background: ACTIVE_TOGGLE_BG, color: PURPLE_ACCENT } : {};
 }
 
 const TABLE_HEADER_CELL: React.CSSProperties = {
@@ -231,9 +231,20 @@ export default function AnalyticsPage() {
         color: TEXT_PRIMARY,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 32,
+          flexWrap: 'wrap',
+          gap: 16,
+        }}
+      >
         <div>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: TEXT_PRIMARY }}>📊 Profit & Loss Dashboard</h1>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: TEXT_PRIMARY }}>
+            📊 Profit & Loss Dashboard
+          </h1>
           <p style={{ color: TEXT_SECONDARY, marginTop: 4 }}>Track your flipping performance</p>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
@@ -256,16 +267,30 @@ export default function AnalyticsPage() {
             >
               {exportingPdf ? 'Generating…' : '⬇ Export PDF'}
             </button>
-            <Link href="/" style={{ color: PURPLE_ACCENT, textDecoration: 'none' }} className="hover:underline">← Back</Link>
+            <Link
+              href="/"
+              style={{ color: PURPLE_ACCENT, textDecoration: 'none' }}
+              className="hover:underline"
+            >
+              ← Back
+            </Link>
           </div>
-          {exportError && (
-            <p style={{ color: DANGER_RED, fontSize: 12 }}>{exportError}</p>
-          )}
+          {exportError && <p style={{ color: DANGER_RED, fontSize: 12 }}>{exportError}</p>}
         </div>
       </div>
 
       {/* Date Range Filter */}
-      <div className="fp-glass-sm" style={{ padding: 16, marginBottom: 24, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 16 }}>
+      <div
+        className="fp-glass-sm"
+        style={{
+          padding: 16,
+          marginBottom: 24,
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          gap: 16,
+        }}
+      >
         <span style={{ fontSize: 13, fontWeight: 600, color: TEXT_SECONDARY }}>Date Range:</span>
         <input
           type="date"
@@ -287,8 +312,18 @@ export default function AnalyticsPage() {
         {(dateFrom || dateTo) && (
           <button
             type="button"
-            onClick={() => { setDateFrom(''); setDateTo(''); }}
-            style={{ fontSize: 13, color: PURPLE_ACCENT, background: 'transparent', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+            onClick={() => {
+              setDateFrom('');
+              setDateTo('');
+            }}
+            style={{
+              fontSize: 13,
+              color: PURPLE_ACCENT,
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+            }}
           >
             Clear dates
           </button>
@@ -296,7 +331,14 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Primary Metrics — 4 cards per AC #1 */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 24 }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: 16,
+          marginBottom: 24,
+        }}
+      >
         <SummaryCard
           label="Total Profit"
           value={formatCurrency(data.totalNetProfit)}
@@ -316,7 +358,14 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Secondary Metrics */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 32 }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: 16,
+          marginBottom: 32,
+        }}
+      >
         <SummaryCard label="Total Invested" value={formatCurrency(data.totalInvested)} />
         <SummaryCard label="Total Revenue" value={formatCurrency(data.totalRevenue)} />
         <SummaryCard
@@ -354,22 +403,53 @@ export default function AnalyticsPage() {
       {/* Monthly Trends Line Chart — AC #1 */}
       {data.trends.length > 0 && (
         <section style={{ marginBottom: 32 }} data-testid="analytics-trends-chart">
-          <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 16, color: TEXT_PRIMARY }}>📈 Monthly Trends</h2>
+          <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 16, color: TEXT_PRIMARY }}>
+            📈 Monthly Trends
+          </h2>
           {mounted ? (
             <ResponsiveContainer width="100%" height={280}>
               <LineChart data={data.trends}>
                 <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
-                <XAxis dataKey="period" stroke={TEXT_SECONDARY} tick={{ fill: TEXT_SECONDARY, fontSize: 12 }} />
-                <YAxis stroke={TEXT_SECONDARY} tick={{ fill: TEXT_SECONDARY, fontSize: 12 }} tickFormatter={(v: number) => `$${v}`} />
+                <XAxis
+                  dataKey="period"
+                  stroke={TEXT_SECONDARY}
+                  tick={{ fill: TEXT_SECONDARY, fontSize: 12 }}
+                />
+                <YAxis
+                  stroke={TEXT_SECONDARY}
+                  tick={{ fill: TEXT_SECONDARY, fontSize: 12 }}
+                  tickFormatter={(v: number) => `$${v}`}
+                />
                 <Tooltip
                   formatter={(val: number | undefined) => formatCurrency(val ?? 0)}
                   contentStyle={TOOLTIP_CONTENT_STYLE}
                   labelStyle={TOOLTIP_LABEL_STYLE}
                   itemStyle={TOOLTIP_ITEM_STYLE}
                 />
-                <Line type="monotone" dataKey="profit" stroke={PROFIT_GREEN} name="Profit" strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="revenue" stroke={PURPLE_PRIMARY} name="Revenue" strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="costs" stroke={PURPLE_TERTIARY} name="Cost" strokeWidth={2} dot={false} />
+                <Line
+                  type="monotone"
+                  dataKey="profit"
+                  stroke={PROFIT_GREEN}
+                  name="Profit"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke={PURPLE_PRIMARY}
+                  name="Revenue"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="costs"
+                  stroke={PURPLE_TERTIARY}
+                  name="Cost"
+                  strokeWidth={2}
+                  dot={false}
+                />
               </LineChart>
             </ResponsiveContainer>
           ) : (
@@ -381,20 +461,38 @@ export default function AnalyticsPage() {
       {/* Profit by Category Bar Chart — AC #1 */}
       {data.categoryBreakdown.length > 0 && (
         <section style={{ marginBottom: 32 }} data-testid="analytics-category-chart">
-          <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 16, color: TEXT_PRIMARY }}>📦 Profit by Category</h2>
+          <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 16, color: TEXT_PRIMARY }}>
+            📦 Profit by Category
+          </h2>
           {mounted ? (
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={data.categoryBreakdown} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
-                <XAxis type="number" stroke={TEXT_SECONDARY} tick={{ fill: TEXT_SECONDARY, fontSize: 12 }} tickFormatter={(v: number) => `$${v}`} />
-                <YAxis type="category" dataKey="category" width={120} stroke={TEXT_SECONDARY} tick={{ fill: TEXT_SECONDARY, fontSize: 12 }} />
+                <XAxis
+                  type="number"
+                  stroke={TEXT_SECONDARY}
+                  tick={{ fill: TEXT_SECONDARY, fontSize: 12 }}
+                  tickFormatter={(v: number) => `$${v}`}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="category"
+                  width={120}
+                  stroke={TEXT_SECONDARY}
+                  tick={{ fill: TEXT_SECONDARY, fontSize: 12 }}
+                />
                 <Tooltip
                   formatter={(val: number | undefined) => formatCurrency(val ?? 0)}
                   contentStyle={TOOLTIP_CONTENT_STYLE}
                   labelStyle={TOOLTIP_LABEL_STYLE}
                   itemStyle={TOOLTIP_ITEM_STYLE}
                 />
-                <Bar dataKey="totalProfit" name="Profit" fill={PROFIT_GREEN} radius={[0, 4, 4, 0]} />
+                <Bar
+                  dataKey="totalProfit"
+                  name="Profit"
+                  fill={PROFIT_GREEN}
+                  radius={[0, 4, 4, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           ) : (
@@ -406,16 +504,29 @@ export default function AnalyticsPage() {
       {/* Platform Performance — AC #1 */}
       {data.platformBreakdown.length > 0 && (
         <section style={{ marginBottom: 32 }} data-testid="analytics-platform-chart">
-          <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 16, color: TEXT_PRIMARY }}>🏪 Platform Performance</h2>
+          <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 16, color: TEXT_PRIMARY }}>
+            🏪 Platform Performance
+          </h2>
           {mounted ? (
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={data.platformBreakdown}>
                 <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
-                <XAxis dataKey="platform" stroke={TEXT_SECONDARY} tick={{ fill: TEXT_SECONDARY, fontSize: 12 }} tickFormatter={(v: string) => v.replace('_MARKETPLACE', '')} />
-                <YAxis stroke={TEXT_SECONDARY} tick={{ fill: TEXT_SECONDARY, fontSize: 12 }} tickFormatter={(v: number) => `$${v}`} />
+                <XAxis
+                  dataKey="platform"
+                  stroke={TEXT_SECONDARY}
+                  tick={{ fill: TEXT_SECONDARY, fontSize: 12 }}
+                  tickFormatter={(v: string) => v.replace('_MARKETPLACE', '')}
+                />
+                <YAxis
+                  stroke={TEXT_SECONDARY}
+                  tick={{ fill: TEXT_SECONDARY, fontSize: 12 }}
+                  tickFormatter={(v: number) => `$${v}`}
+                />
                 <Tooltip
                   formatter={(val: number | undefined, name: string | undefined) =>
-                    name === 'totalProfit' ? [formatCurrency(val ?? 0), 'Total Profit'] : [formatCurrency(val ?? 0), 'Avg Profit']
+                    name === 'totalProfit'
+                      ? [formatCurrency(val ?? 0), 'Total Profit']
+                      : [formatCurrency(val ?? 0), 'Avg Profit']
                   }
                   contentStyle={TOOLTIP_CONTENT_STYLE}
                   labelStyle={TOOLTIP_LABEL_STYLE}
@@ -444,8 +555,12 @@ export default function AnalyticsPage() {
                   <tr key={p.platform} style={TABLE_ROW_DIVIDER}>
                     <td style={TABLE_BODY_CELL}>{p.platform.replace('_MARKETPLACE', '')}</td>
                     <td style={TABLE_BODY_CELL_RIGHT}>{p.count}</td>
-                    <td style={TABLE_BODY_CELL_RIGHT}><ProfitBadge value={p.totalProfit} /></td>
-                    <td style={TABLE_BODY_CELL_RIGHT}><ProfitBadge value={p.avgProfit} /></td>
+                    <td style={TABLE_BODY_CELL_RIGHT}>
+                      <ProfitBadge value={p.totalProfit} />
+                    </td>
+                    <td style={TABLE_BODY_CELL_RIGHT}>
+                      <ProfitBadge value={p.avgProfit} />
+                    </td>
                     <td style={TABLE_BODY_CELL_RIGHT}>{p.successRate}%</td>
                   </tr>
                 ))}
@@ -456,13 +571,23 @@ export default function AnalyticsPage() {
       )}
 
       {/* Best/Worst Deals */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginBottom: 32 }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: 16,
+          marginBottom: 32,
+        }}
+      >
         {data.bestDeal && (
           <div className="fp-glass" style={{ padding: 16 }} data-testid="analytics-best-deal">
             <h3 style={{ fontWeight: 600, marginBottom: 8, color: PROFIT_GREEN }}>🏆 Best Deal</h3>
             <p style={{ fontWeight: 500, color: TEXT_PRIMARY }}>{data.bestDeal.title}</p>
             <p style={{ fontSize: 13, color: TEXT_SECONDARY }}>{data.bestDeal.platform}</p>
-            <p className="fp-metric-num" style={{ fontSize: 18, fontWeight: 700, color: PROFIT_GREEN, marginTop: 8 }}>
+            <p
+              className="fp-metric-num"
+              style={{ fontSize: 18, fontWeight: 700, color: PROFIT_GREEN, marginTop: 8 }}
+            >
               {formatCurrency(data.bestDeal.netProfit)} ({data.bestDeal.roiPercent}% ROI)
             </p>
           </div>
@@ -472,7 +597,10 @@ export default function AnalyticsPage() {
             <h3 style={{ fontWeight: 600, marginBottom: 8, color: DANGER_RED }}>📉 Worst Deal</h3>
             <p style={{ fontWeight: 500, color: TEXT_PRIMARY }}>{data.worstDeal.title}</p>
             <p style={{ fontSize: 13, color: TEXT_SECONDARY }}>{data.worstDeal.platform}</p>
-            <p className="fp-metric-num" style={{ fontSize: 18, fontWeight: 700, color: DANGER_RED, marginTop: 8 }}>
+            <p
+              className="fp-metric-num"
+              style={{ fontSize: 18, fontWeight: 700, color: DANGER_RED, marginTop: 8 }}
+            >
               {formatCurrency(data.worstDeal.netProfit)} ({data.worstDeal.roiPercent}% ROI)
             </p>
           </div>
@@ -482,7 +610,9 @@ export default function AnalyticsPage() {
       {/* Items Table */}
       {data.items.length > 0 && (
         <section>
-          <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 16, color: TEXT_PRIMARY }}>📋 All Deals ({data.items.length})</h2>
+          <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 16, color: TEXT_PRIMARY }}>
+            📋 All Deals ({data.items.length})
+          </h2>
           <div className="fp-glass" style={{ padding: 0, overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
@@ -500,7 +630,17 @@ export default function AnalyticsPage() {
               <tbody>
                 {data.items.map((item) => (
                   <tr key={item.id} style={TABLE_ROW_DIVIDER}>
-                    <td style={{ ...TABLE_BODY_CELL, maxWidth: 320, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</td>
+                    <td
+                      style={{
+                        ...TABLE_BODY_CELL,
+                        maxWidth: 320,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {item.title}
+                    </td>
                     <td style={TABLE_BODY_CELL}>{item.platform}</td>
                     <td style={TABLE_BODY_CELL}>
                       <StatusBadge status={item.status} />

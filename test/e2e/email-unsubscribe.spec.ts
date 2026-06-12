@@ -165,9 +165,7 @@ test.describe('Feature: Email Unsubscribe — API', () => {
     }) => {
       // Given  – a well-formed token for an address not in the DB
       const token = encodeToken('nobody@nowhere.example.com');
-      const response = await request.post(
-        `/api/user/unsubscribe?token=${token}&resubscribe=true`,
-      );
+      const response = await request.post(`/api/user/unsubscribe?token=${token}&resubscribe=true`);
 
       // Then   – 404 (re-subscribe doesn't need to hide existence)
       expect([404, 400, 500]).toContain(response.status());

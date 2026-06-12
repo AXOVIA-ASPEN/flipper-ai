@@ -147,24 +147,30 @@ Then('I should be redirected to {string}', async function (this: CustomWorld, pa
   expect(new URL(this.page.url()).pathname).toBe(path);
 });
 
-Then('the {string} cookie should be cleared', async function (this: CustomWorld, cookieName: string) {
-  const cookies = await this.page.context().cookies();
-  const cookie = cookies.find((c) => c.name === cookieName);
-  // Either absent or value is empty (expired cookies with maxAge=0 are cleared)
-  if (cookie) {
-    expect(cookie.value).toBe('');
+Then(
+  'the {string} cookie should be cleared',
+  async function (this: CustomWorld, cookieName: string) {
+    const cookies = await this.page.context().cookies();
+    const cookie = cookies.find((c) => c.name === cookieName);
+    // Either absent or value is empty (expired cookies with maxAge=0 are cleared)
+    if (cookie) {
+      expect(cookie.value).toBe('');
+    }
   }
-});
+);
 
 // ─── FR-AUTH-ACCESS-05: whitelisted public routes return 200 ─────────────────
 // Status code is asserted by issuing a direct fetch so we don't have to rely
 // on Playwright's goto() response (which follows middleware redirects).
 
-Then('the response status code should be {int}', async function (this: CustomWorld, expected: number) {
-  const currentUrl = new URL(this.page.url());
-  const response = await fetch(currentUrl.toString(), { redirect: 'manual' });
-  expect(response.status).toBe(expected);
-});
+Then(
+  'the response status code should be {int}',
+  async function (this: CustomWorld, expected: number) {
+    const currentUrl = new URL(this.page.url());
+    const response = await fetch(currentUrl.toString(), { redirect: 'manual' });
+    expect(response.status).toBe(expected);
+  }
+);
 
 // ─── FR-AUTH-ACCESS-06: no protected links on public pages ───────────────────
 

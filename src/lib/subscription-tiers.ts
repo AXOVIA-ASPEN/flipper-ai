@@ -131,7 +131,10 @@ export function canAddSearchConfig(tier: SubscriptionTier, currentCount: number)
  */
 export function hasFeatureAccess(
   tier: SubscriptionTier,
-  feature: keyof Pick<TierLimits, 'aiAnalysis' | 'priceHistory' | 'messaging' | 'ebayCrossListing' | 'meetingLogistics'>
+  feature: keyof Pick<
+    TierLimits,
+    'aiAnalysis' | 'priceHistory' | 'messaging' | 'ebayCrossListing' | 'meetingLogistics'
+  >
 ): boolean {
   return TIER_LIMITS[tier][feature];
 }

@@ -106,7 +106,12 @@ const state: ScenarioState = {
 };
 
 function resetState(): void {
-  state.settings = { emailNotifications: true, notifyNewDeals: true, notifySoldItems: true, notifyFrequency: 'instant' };
+  state.settings = {
+    emailNotifications: true,
+    notifyNewDeals: true,
+    notifySoldItems: true,
+    notifyFrequency: 'instant',
+  };
   state.pendingEvents = [];
   state.staleEvents = [];
   state.capturedCalls = [];
@@ -187,9 +192,7 @@ injectMockModule(resolve(projectRoot, 'src/lib/db'), {
 
 // 2. Evict the processor from the require cache and re-require it so that its
 //    captured `import_db.default` === prismaMock.
-const processorPath = require.resolve(
-  resolve(projectRoot, 'src/lib/flip-notification-processor')
-);
+const processorPath = require.resolve(resolve(projectRoot, 'src/lib/flip-notification-processor'));
 delete require.cache[processorPath];
 
 // We MUST use dynamic require here — static imports are hoisted above module-level
@@ -253,11 +256,26 @@ function makeSpyMethod(methodName: string, messageId: string) {
 }
 
 function installEmailSpy(): void {
-  emailService.sendOpportunityFound = makeSpyMethod('sendOpportunityFound', 'msg-opp-1') as typeof emailService.sendOpportunityFound;
-  emailService.sendFlipPurchased = makeSpyMethod('sendFlipPurchased', 'msg-pur-1') as typeof emailService.sendFlipPurchased;
-  emailService.sendFlipListed = makeSpyMethod('sendFlipListed', 'msg-lst-1') as typeof emailService.sendFlipListed;
-  emailService.sendFlipSold = makeSpyMethod('sendFlipSold', 'msg-sld-1') as typeof emailService.sendFlipSold;
-  emailService.sendDigest = makeSpyMethod('sendDigest', 'msg-dig-1') as typeof emailService.sendDigest;
+  emailService.sendOpportunityFound = makeSpyMethod(
+    'sendOpportunityFound',
+    'msg-opp-1'
+  ) as typeof emailService.sendOpportunityFound;
+  emailService.sendFlipPurchased = makeSpyMethod(
+    'sendFlipPurchased',
+    'msg-pur-1'
+  ) as typeof emailService.sendFlipPurchased;
+  emailService.sendFlipListed = makeSpyMethod(
+    'sendFlipListed',
+    'msg-lst-1'
+  ) as typeof emailService.sendFlipListed;
+  emailService.sendFlipSold = makeSpyMethod(
+    'sendFlipSold',
+    'msg-sld-1'
+  ) as typeof emailService.sendFlipSold;
+  emailService.sendDigest = makeSpyMethod(
+    'sendDigest',
+    'msg-dig-1'
+  ) as typeof emailService.sendDigest;
 }
 
 // ---------------------------------------------------------------------------
@@ -287,11 +305,14 @@ Given('a flip notification user with email notifications disabled', function () 
   state.settings.emailNotifications = false;
 });
 
-Given('a flip notification user with email notifications enabled and notifyNewDeals off', function () {
-  state.settings.emailNotifications = true;
-  state.settings.notifyNewDeals = false;
-  state.settings.notifySoldItems = true;
-});
+Given(
+  'a flip notification user with email notifications enabled and notifyNewDeals off',
+  function () {
+    state.settings.emailNotifications = true;
+    state.settings.notifyNewDeals = false;
+    state.settings.notifySoldItems = true;
+  }
+);
 
 Given('the user notifyFrequency is {string}', function (freq: string) {
   state.settings.notifyFrequency = freq;
@@ -309,15 +330,21 @@ Given(
   ) {
     const id = `evt-opp-${state.pendingEvents.length + 1}`;
     state.pendingEvents.push(
-      makeEvent(id, state.userId, eventType, {
-        platform,
-        askingPrice: buyPrice,
-        profitPotential: profit,
-        valueScore: score,
-        flippabilityLabel: score >= 80 ? 'Excellent' : score >= 70 ? 'Great' : 'Good',
-        listingTitle: title,
-        estimatedValue: buyPrice + profit,
-      }, state.settings)
+      makeEvent(
+        id,
+        state.userId,
+        eventType,
+        {
+          platform,
+          askingPrice: buyPrice,
+          profitPotential: profit,
+          valueScore: score,
+          flippabilityLabel: score >= 80 ? 'Excellent' : score >= 70 ? 'Great' : 'Good',
+          listingTitle: title,
+          estimatedValue: buyPrice + profit,
+        },
+        state.settings
+      )
     );
   }
 );
@@ -333,31 +360,38 @@ Given(
   ) {
     const id = `evt-pur-${state.pendingEvents.length + 1}`;
     state.pendingEvents.push(
-      makeEvent(id, state.userId, eventType, {
-        listingTitle: itemTitle,
-        purchasePrice,
-        estimatedProfit,
-        platform,
-      }, state.settings)
+      makeEvent(
+        id,
+        state.userId,
+        eventType,
+        {
+          listingTitle: itemTitle,
+          purchasePrice,
+          estimatedProfit,
+          platform,
+        },
+        state.settings
+      )
     );
   }
 );
 
 Given(
   'a pending {string} event with itemTitle {string} destinationPlatform {string} listingUrl {string}',
-  function (
-    eventType: string,
-    itemTitle: string,
-    destinationPlatform: string,
-    listingUrl: string
-  ) {
+  function (eventType: string, itemTitle: string, destinationPlatform: string, listingUrl: string) {
     const id = `evt-lst-${state.pendingEvents.length + 1}`;
     state.pendingEvents.push(
-      makeEvent(id, state.userId, eventType, {
-        listingTitle: itemTitle,
-        destinationPlatform,
-        listingUrl,
-      }, state.settings)
+      makeEvent(
+        id,
+        state.userId,
+        eventType,
+        {
+          listingTitle: itemTitle,
+          destinationPlatform,
+          listingUrl,
+        },
+        state.settings
+      )
     );
   }
 );
@@ -374,14 +408,20 @@ Given(
   ) {
     const id = `evt-sld-${state.pendingEvents.length + 1}`;
     state.pendingEvents.push(
-      makeEvent(id, state.userId, eventType, {
-        listingTitle: itemTitle,
-        salePrice,
-        actualProfit,
-        roiPercent,
-        platform,
-        purchasePrice: salePrice - actualProfit,
-      }, state.settings)
+      makeEvent(
+        id,
+        state.userId,
+        eventType,
+        {
+          listingTitle: itemTitle,
+          salePrice,
+          actualProfit,
+          roiPercent,
+          platform,
+          purchasePrice: salePrice - actualProfit,
+        },
+        state.settings
+      )
     );
   }
 );
@@ -392,15 +432,21 @@ Given(
     for (let i = 0; i < count; i++) {
       const id = `evt-digest-${i + 1}`;
       state.pendingEvents.push(
-        makeEvent(id, state.userId, eventType, {
-          platform: 'Craigslist',
-          askingPrice: 50 + i * 10,
-          profitPotential: 40,
-          valueScore,
-          flippabilityLabel: 'Excellent',
-          listingTitle: `Item ${i + 1}`,
-          estimatedValue: 100,
-        }, state.settings)
+        makeEvent(
+          id,
+          state.userId,
+          eventType,
+          {
+            platform: 'Craigslist',
+            askingPrice: 50 + i * 10,
+            profitPotential: 40,
+            valueScore,
+            flippabilityLabel: 'Excellent',
+            listingTitle: `Item ${i + 1}`,
+            estimatedValue: 100,
+          },
+          state.settings
+        )
       );
     }
   }
@@ -430,14 +476,17 @@ Then(
   }
 );
 
-Then('the result shows {int} emails sent and {int} skipped', function (sentCount: number, _skippedCount: number) {
-  assert.ok(state.processingResult, 'Processing result is null');
-  assert.strictEqual(
-    state.processingResult.sent,
-    sentCount,
-    `Expected ${sentCount} sent but got ${state.processingResult.sent}`
-  );
-});
+Then(
+  'the result shows {int} emails sent and {int} skipped',
+  function (sentCount: number, _skippedCount: number) {
+    assert.ok(state.processingResult, 'Processing result is null');
+    assert.strictEqual(
+      state.processingResult.sent,
+      sentCount,
+      `Expected ${sentCount} sent but got ${state.processingResult.sent}`
+    );
+  }
+);
 
 // Standalone form (no "and N skipped" suffix) — used by scenarios that only
 // care about the email count, e.g. concurrency/duplicate-claim scenarios where
@@ -477,17 +526,14 @@ Then('the result shows {int} email sent', function (sentCount: number) {
   );
 });
 
-Then(
-  'the result shows {int} event deferred due to frequency',
-  function (deferredCount: number) {
-    assert.ok(state.processingResult, 'Processing result is null');
-    assert.strictEqual(
-      state.processingResult.skipped.frequencyDeferred,
-      deferredCount,
-      `Expected ${deferredCount} frequencyDeferred but got ${state.processingResult.skipped.frequencyDeferred}`
-    );
-  }
-);
+Then('the result shows {int} event deferred due to frequency', function (deferredCount: number) {
+  assert.ok(state.processingResult, 'Processing result is null');
+  assert.strictEqual(
+    state.processingResult.skipped.frequencyDeferred,
+    deferredCount,
+    `Expected ${deferredCount} frequencyDeferred but got ${state.processingResult.skipped.frequencyDeferred}`
+  );
+});
 
 Then(
   'the result shows {int} email sent and {int} skipped due to preference disabled',
@@ -512,8 +558,16 @@ Then(
     const call = state.capturedCalls.find((c) => c.method === 'sendOpportunityFound');
     assert.ok(call, 'sendOpportunityFound was not called');
     const args = call.args as Record<string, unknown>;
-    assert.strictEqual(args.platform, platform, `Expected platform "${platform}" but got "${args.platform}"`);
-    assert.strictEqual(args.itemTitle, itemTitle, `Expected itemTitle "${itemTitle}" but got "${args.itemTitle}"`);
+    assert.strictEqual(
+      args.platform,
+      platform,
+      `Expected platform "${platform}" but got "${args.platform}"`
+    );
+    assert.strictEqual(
+      args.itemTitle,
+      itemTitle,
+      `Expected itemTitle "${itemTitle}" but got "${args.itemTitle}"`
+    );
   }
 );
 
@@ -523,7 +577,11 @@ Then(
     const call = state.capturedCalls.find((c) => c.method === 'sendFlipPurchased');
     assert.ok(call, 'sendFlipPurchased was not called');
     const args = call.args as Record<string, unknown>;
-    assert.strictEqual(args.itemTitle, itemTitle, `Expected itemTitle "${itemTitle}" but got "${args.itemTitle}"`);
+    assert.strictEqual(
+      args.itemTitle,
+      itemTitle,
+      `Expected itemTitle "${itemTitle}" but got "${args.itemTitle}"`
+    );
   }
 );
 
@@ -547,8 +605,16 @@ Then(
     const call = state.capturedCalls.find((c) => c.method === 'sendFlipSold');
     assert.ok(call, 'sendFlipSold was not called');
     const args = call.args as Record<string, unknown>;
-    assert.strictEqual(args.itemTitle, itemTitle, `Expected itemTitle "${itemTitle}" but got "${args.itemTitle}"`);
-    assert.strictEqual(args.salePrice, salePrice, `Expected salePrice ${salePrice} but got ${args.salePrice}`);
+    assert.strictEqual(
+      args.itemTitle,
+      itemTitle,
+      `Expected itemTitle "${itemTitle}" but got "${args.itemTitle}"`
+    );
+    assert.strictEqual(
+      args.salePrice,
+      salePrice,
+      `Expected salePrice ${salePrice} but got ${args.salePrice}`
+    );
   }
 );
 
@@ -566,32 +632,34 @@ Given(
   function (eventType: string, retryCount: number) {
     const id = `evt-failed-${state.pendingEvents.length + 1}`;
     state.pendingEvents.push(
-      makeEvent(id, state.userId, eventType, {
-        platform: 'Craigslist',
-        askingPrice: 50,
-        profitPotential: 40,
-        valueScore: 80,
-        flippabilityLabel: 'Excellent',
-        listingTitle: 'Test Item',
-        estimatedValue: 90,
-      }, state.settings, 'FAILED', retryCount)
+      makeEvent(
+        id,
+        state.userId,
+        eventType,
+        {
+          platform: 'Craigslist',
+          askingPrice: 50,
+          profitPotential: 40,
+          valueScore: 80,
+          flippabilityLabel: 'Excellent',
+          listingTitle: 'Test Item',
+          estimatedValue: 90,
+        },
+        state.settings,
+        'FAILED',
+        retryCount
+      )
     );
   }
 );
 
-Given(
-  'the database reports the event was already claimed by another processor run',
-  function () {
-    state.simulateConcurrentClaim = true;
-  }
-);
+Given('the database reports the event was already claimed by another processor run', function () {
+  state.simulateConcurrentClaim = true;
+});
 
-Given(
-  'the user has already sent {int} emails in the last hour',
-  function (count: number) {
-    state.recentEmailCount = count;
-  }
-);
+Given('the user has already sent {int} emails in the last hour', function (count: number) {
+  state.recentEmailCount = count;
+});
 
 Given(
   'a stale {string} event created {int} hours ago',
@@ -600,11 +668,20 @@ Given(
     const id = `evt-stale-${state.staleEvents.length + 1}`;
     // Stale events go into staleEvents — returned by the 2nd findMany call
     state.staleEvents.push(
-      makeEvent(id, state.userId, eventType, {
-        platform: 'Test',
-        listingTitle: 'Old Item',
-        askingPrice: 10,
-      }, state.settings, 'PENDING', 0, oldDate)
+      makeEvent(
+        id,
+        state.userId,
+        eventType,
+        {
+          platform: 'Test',
+          listingTitle: 'Old Item',
+          askingPrice: 10,
+        },
+        state.settings,
+        'PENDING',
+        0,
+        oldDate
+      )
     );
   }
 );
@@ -621,32 +698,32 @@ Given(
   ) {
     const id = `evt-opp-extra-${state.pendingEvents.length + 1}`;
     state.pendingEvents.push(
-      makeEvent(id, state.userId, eventType, {
-        platform,
-        askingPrice: buyPrice,
-        profitPotential: profit,
-        valueScore: score,
-        flippabilityLabel: score >= 80 ? 'Excellent' : score >= 70 ? 'Great' : 'Good',
-        listingTitle: title,
-        estimatedValue: buyPrice + profit,
-      }, state.settings)
+      makeEvent(
+        id,
+        state.userId,
+        eventType,
+        {
+          platform,
+          askingPrice: buyPrice,
+          profitPotential: profit,
+          valueScore: score,
+          flippabilityLabel: score >= 80 ? 'Excellent' : score >= 70 ? 'Great' : 'Good',
+          listingTitle: title,
+          estimatedValue: buyPrice + profit,
+        },
+        state.settings
+      )
     );
   }
 );
 
-Given(
-  'the email service will fail all sends with a provider error',
-  function () {
-    state.failNextNSends = 999;
-  }
-);
+Given('the email service will fail all sends with a provider error', function () {
+  state.failNextNSends = 999;
+});
 
-Given(
-  'the email service will fail for the first send only',
-  function () {
-    state.failNextNSends = 1;
-  }
-);
+Given('the email service will fail for the first send only', function () {
+  state.failNextNSends = 1;
+});
 
 // ---------------------------------------------------------------------------
 // Then steps — Task 7.4 behavioral scenarios

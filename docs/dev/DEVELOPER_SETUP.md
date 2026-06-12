@@ -47,14 +47,14 @@ pnpm dev
 
 See `.env.production.example` for all variables. Key ones:
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `DATABASE_URL` | Yes | `file:./dev.db` for local SQLite |
-| `FIREBASE_CLIENT_EMAIL` | Yes | Firebase Admin SDK service account email |
-| `FIREBASE_PRIVATE_KEY` | Yes | Firebase Admin SDK private key |
-| `ENCRYPTION_SECRET` | Yes | Data encryption key |
-| `APP_URL` | Yes | `http://localhost:3200` for dev |
-| `OPENAI_API_KEY` | Optional | For AI analysis features |
+| Variable                | Required | Description                              |
+| ----------------------- | -------- | ---------------------------------------- |
+| `DATABASE_URL`          | Yes      | `file:./dev.db` for local SQLite         |
+| `FIREBASE_CLIENT_EMAIL` | Yes      | Firebase Admin SDK service account email |
+| `FIREBASE_PRIVATE_KEY`  | Yes      | Firebase Admin SDK private key           |
+| `ENCRYPTION_SECRET`     | Yes      | Data encryption key                      |
+| `APP_URL`               | Yes      | `http://localhost:3200` for dev          |
+| `OPENAI_API_KEY`        | Optional | For AI analysis features                 |
 
 ---
 
@@ -84,18 +84,19 @@ pnpm test:all
 ```
 
 **Note:** When running the full test suite, use `--forceExit --maxWorkers=2` to avoid Jest worker hangs with 74 test files:
+
 ```bash
 npx jest --forceExit --maxWorkers=2
 ```
 
 ### Test Coverage Targets
 
-| Metric | Target | Current |
-|--------|--------|---------|
-| Statements | 90% | 99.26% |
-| Branches | 85% | 93.82% |
-| Functions | 90% | 98.62% |
-| Lines | 90% | 99.33% |
+| Metric     | Target | Current |
+| ---------- | ------ | ------- |
+| Statements | 90%    | 99.26%  |
+| Branches   | 85%    | 93.82%  |
+| Functions  | 90%    | 98.62%  |
+| Lines      | 90%    | 99.33%  |
 
 ---
 
@@ -128,24 +129,25 @@ flipper-ai/
 
 ## Available Scripts
 
-| Script | Description |
-|--------|-------------|
-| `pnpm dev` | Start dev server (hot reload) |
-| `pnpm build` | Production build |
-| `pnpm start` | Start production server |
-| `pnpm lint` | Run ESLint |
-| `pnpm lint:fix` | Fix lint issues |
-| `pnpm format` | Format with Prettier |
-| `pnpm test` | Run unit tests |
-| `pnpm test:coverage` | Tests with coverage |
-| `pnpm test:e2e` | Playwright E2E |
-| `pnpm test:bdd` | Cucumber BDD |
+| Script               | Description                   |
+| -------------------- | ----------------------------- |
+| `pnpm dev`           | Start dev server (hot reload) |
+| `pnpm build`         | Production build              |
+| `pnpm start`         | Start production server       |
+| `pnpm lint`          | Run ESLint                    |
+| `pnpm lint:fix`      | Fix lint issues               |
+| `pnpm format`        | Format with Prettier          |
+| `pnpm test`          | Run unit tests                |
+| `pnpm test:coverage` | Tests with coverage           |
+| `pnpm test:e2e`      | Playwright E2E                |
+| `pnpm test:bdd`      | Cucumber BDD                  |
 
 ---
 
 ## Database
 
 ### Local Development (SQLite)
+
 ```bash
 npx prisma generate    # Generate client
 npx prisma db push     # Sync schema
@@ -153,6 +155,7 @@ npx prisma studio      # Visual DB browser → http://localhost:5555
 ```
 
 ### Production (PostgreSQL)
+
 ```bash
 DATABASE_URL="postgresql://user:pass@host:5432/flipper"
 npx prisma migrate deploy
@@ -175,6 +178,7 @@ docker build -t flipper-ai .
 ## CI/CD
 
 GitHub Actions runs on every push/PR:
+
 1. **Lint** — ESLint checks
 2. **Test** — Jest unit + integration (coverage enforced)
 3. **Build** — Next.js production build
@@ -188,17 +192,20 @@ See `.github/workflows/ci.yml` for the full pipeline.
 ## Troubleshooting
 
 ### Jest hangs when running all tests
+
 ```bash
 # Use forceExit and limit workers
 npx jest --forceExit --maxWorkers=2
 ```
 
 ### Prisma client out of date
+
 ```bash
 npx prisma generate
 ```
 
 ### Port 3000 already in use
+
 ```bash
 lsof -i :3000  # Find the process
 kill -9 <PID>  # Kill it

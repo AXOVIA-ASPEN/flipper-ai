@@ -9,3 +9,18 @@ e2e/screenshots
 test-results
 playwright-report
 reports
+# BMAD planning/implementation artifacts — generated docs, not gated code style
+_bmad-output
+_bmad
+# Coverage + report artifacts
+coverage-partial
+# Generated/vendored docs bundles
+docs/client-facing
+docs/api
+pnpm-lock.yaml
+# Local secrets ledger + AI tool workspaces — never format
+.secrets
+.claude
+.cursor
+.opencode
+.bmad-*

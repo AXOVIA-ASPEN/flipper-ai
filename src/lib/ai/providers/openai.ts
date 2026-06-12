@@ -33,7 +33,10 @@ export class OpenAIProvider implements AIProvider {
 
     const requestParams: OpenAI.ChatCompletionCreateParamsNonStreaming = {
       model: config.model,
-      messages: messages.map((m) => ({ role: m.role as 'system' | 'user' | 'assistant', content: m.content })),
+      messages: messages.map((m) => ({
+        role: m.role as 'system' | 'user' | 'assistant',
+        content: m.content,
+      })),
       temperature: config.temperature,
       max_tokens: config.maxTokens,
     };

@@ -31,12 +31,7 @@ const PUBLIC_PATHS = [
 ];
 
 // Static file patterns to skip
-const SKIP_PATTERNS = [
-  '/_next/',
-  '/favicon.ico',
-  '/robots.txt',
-  '/sitemap.xml',
-];
+const SKIP_PATTERNS = ['/_next/', '/favicon.ico', '/robots.txt', '/sitemap.xml'];
 
 // Mutating HTTP methods that require origin validation
 const MUTATING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
@@ -84,10 +79,7 @@ export function middleware(req: NextRequest) {
 
     // Reject mutating requests from unauthorized origins
     if (origin && !hasAllowedOrigin && MUTATING_METHODS.has(req.method)) {
-      return NextResponse.json(
-        { error: 'Origin not allowed' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Origin not allowed' }, { status: 403 });
     }
 
     // Continue with CORS + request ID propagated to route handlers
@@ -162,7 +154,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
 };

@@ -109,7 +109,9 @@ describe('MessageApprovalCard', () => {
       />
     );
     expect(screen.getByText('Queued for delivery')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Approve|Confirm|Reject/ })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Approve|Confirm|Reject/ })
+    ).not.toBeInTheDocument();
   });
 
   it('shows no action buttons for REJECTED status', () => {
@@ -121,7 +123,9 @@ describe('MessageApprovalCard', () => {
         {...noopHandlers}
       />
     );
-    expect(screen.queryByRole('button', { name: /Approve|Confirm|Reject/ })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Approve|Confirm|Reject/ })
+    ).not.toBeInTheDocument();
     // Copy button is always available
     expect(screen.getByRole('button', { name: /Copy Message/ })).toBeInTheDocument();
   });
@@ -296,8 +300,12 @@ describe('MessageApprovalCard', () => {
           {...noopHandlers}
         />
       );
-      const pills = container.querySelectorAll('.fp-badge.fp-badge-gray, .fp-badge.fp-badge-yellow, .fp-badge.fp-badge-blue, .fp-badge.fp-badge-red, .fp-badge.fp-badge-purple, .fp-badge.fp-badge-green');
-      const statusPill = Array.from(pills).find((el) => el.textContent?.trim() === (status === 'PENDING_APPROVAL' ? 'PENDING' : status));
+      const pills = container.querySelectorAll(
+        '.fp-badge.fp-badge-gray, .fp-badge.fp-badge-yellow, .fp-badge.fp-badge-blue, .fp-badge.fp-badge-red, .fp-badge.fp-badge-purple, .fp-badge.fp-badge-green'
+      );
+      const statusPill = Array.from(pills).find(
+        (el) => el.textContent?.trim() === (status === 'PENDING_APPROVAL' ? 'PENDING' : status)
+      );
       expect(statusPill).toBeTruthy();
       // The status-pill className contains a flex-shrink-0 layout token plus the canonical fp-badge string.
       // Normalize by stripping known layout tokens, then assert the residual matches the fp-badge regex.

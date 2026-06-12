@@ -76,15 +76,19 @@ import { pushNotificationService } from '@/lib/push-notification';
 
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 const mockEmailSend = emailService.send as jest.MockedFunction<typeof emailService.send>;
-const mockPushSendToUser = pushNotificationService.sendToUser as jest.MockedFunction<typeof pushNotificationService.sendToUser>;
+const mockPushSendToUser = pushNotificationService.sendToUser as jest.MockedFunction<
+  typeof pushNotificationService.sendToUser
+>;
 
-function mockUser(overrides: {
-  email?: string | null;
-  emailNotifications?: boolean;
-  notifyMessageReceived?: boolean;
-  notifyDraftReady?: boolean;
-  notifyMessageSent?: boolean;
-} = {}) {
+function mockUser(
+  overrides: {
+    email?: string | null;
+    emailNotifications?: boolean;
+    notifyMessageReceived?: boolean;
+    notifyDraftReady?: boolean;
+    notifyMessageSent?: boolean;
+  } = {}
+) {
   const email = overrides.email === undefined ? 'user@example.com' : overrides.email;
   const emailNotifications = overrides.emailNotifications ?? true;
   const notifyMessageReceived = overrides.notifyMessageReceived ?? true;
@@ -92,7 +96,15 @@ function mockUser(overrides: {
   const notifyMessageSent = overrides.notifyMessageSent ?? false;
   (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(
     email
-      ? { email, settings: { emailNotifications, notifyMessageReceived, notifyDraftReady, notifyMessageSent } }
+      ? {
+          email,
+          settings: {
+            emailNotifications,
+            notifyMessageReceived,
+            notifyDraftReady,
+            notifyMessageSent,
+          },
+        }
       : null
   );
 }

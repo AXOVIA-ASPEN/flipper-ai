@@ -26,9 +26,9 @@ Reddit is the highest-fit traffic source for Flipper.ai but the **least forgivin
 
 > Long-time lurker, first-time poster.
 >
-> I've been flipping part-time for [N] years and the most painful part was always the *finding*. I'd spend 2-3 hours on weekend mornings scrolling Craigslist and FB Marketplace, and 90% of that was filtering junk listings.
+> I've been flipping part-time for [N] years and the most painful part was always the _finding_. I'd spend 2-3 hours on weekend mornings scrolling Craigslist and FB Marketplace, and 90% of that was filtering junk listings.
 >
-> So I automated the filter. The TL;DR: an AI that watches 5 marketplaces (CL, eBay, FB, OfferUp, Mercari), identifies what each item actually is (brand/model/condition), pulls the *real* eBay sold price, and only shows me deals where the asking price is >50% below verified market value.
+> So I automated the filter. The TL;DR: an AI that watches 5 marketplaces (CL, eBay, FB, OfferUp, Mercari), identifies what each item actually is (brand/model/condition), pulls the _real_ eBay sold price, and only shows me deals where the asking price is >50% below verified market value.
 >
 > **Last 24 hours in my zip code (greater [city] area):**
 >
@@ -47,13 +47,13 @@ Reddit is the highest-fit traffic source for Flipper.ai but the **least forgivin
 
 ### Likely top-comment patterns + your replies
 
-| Comment                                                | Reply                                                                                                |
-| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
-| "Cool — but isn't this against [marketplace] ToS?"     | "Each scan is user-initiated; we don't republish listings or build a side database. Each user only sees their own results. Happy to dig deeper on a specific marketplace if you have concerns." |
-| "How accurate is the scoring?"                         | "Margin and verified eBay sold price are very accurate (it's just data lookup). Sellability/days-to-sell is squishier — it's an LLM judgment call on the listing description. I'm tracking error per category and tuning weekly." |
-| "Free tier is too limited"                             | "Yeah, fair. Free is meant for 'see if it works for your area'; if it does, $19 unlocks all 5 marketplaces. Open to feedback on what should be in free vs paid."                                |
-| "Will it find [niche category]?"                       | "If you can search for it on the source marketplace, the scanner picks it up. The AI scoring is tuned for general resale categories (electronics, furniture, tools, collectibles) — niche stuff like Reverb gear isn't covered yet but is on the list." |
-| "I tried it and the results are bad"                   | "Sorry — DM me your saved search and I'll look at the actual listings it returned. Usually it's either a too-broad search or a category the scoring isn't tuned for yet."                       |
+| Comment                                            | Reply                                                                                                                                                                                                                                                   |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| "Cool — but isn't this against [marketplace] ToS?" | "Each scan is user-initiated; we don't republish listings or build a side database. Each user only sees their own results. Happy to dig deeper on a specific marketplace if you have concerns."                                                         |
+| "How accurate is the scoring?"                     | "Margin and verified eBay sold price are very accurate (it's just data lookup). Sellability/days-to-sell is squishier — it's an LLM judgment call on the listing description. I'm tracking error per category and tuning weekly."                       |
+| "Free tier is too limited"                         | "Yeah, fair. Free is meant for 'see if it works for your area'; if it does, $19 unlocks all 5 marketplaces. Open to feedback on what should be in free vs paid."                                                                                        |
+| "Will it find [niche category]?"                   | "If you can search for it on the source marketplace, the scanner picks it up. The AI scoring is tuned for general resale categories (electronics, furniture, tools, collectibles) — niche stuff like Reverb gear isn't covered yet but is on the list." |
+| "I tried it and the results are bad"               | "Sorry — DM me your saved search and I'll look at the actual listings it returned. Usually it's either a too-broad search or a category the scoring isn't tuned for yet."                                                                               |
 
 ---
 
@@ -75,7 +75,7 @@ Reddit is the highest-fit traffic source for Flipper.ai but the **least forgivin
 > - **Old:** 6-10 hours a week on Craigslist + FB Marketplace + OfferUp, manually filtering listings to find anything worth picking up. ROI per hour was maybe $15-25.
 > - **New:** Saved searches in an AI tool I built that does the filtering for me. ~30 minutes of weekend review. ROI per hour is now closer to $80-120.
 >
-> The unlock was *not* better deals (the deals were always there). It was getting back the time I was burning on grunt search work.
+> The unlock was _not_ better deals (the deals were always there). It was getting back the time I was burning on grunt search work.
 >
 > I open-sourced the algorithm logic at `<your-domain>/docs/scoring-logic` (the actual app costs money to run AI calls so it's a paid tool, but free tier exists).
 >
@@ -84,7 +84,7 @@ Reddit is the highest-fit traffic source for Flipper.ai but the **least forgivin
 > - 1 saved search + 10 scans/day = free.
 > - All 5 marketplaces + unlimited = $19/mo.
 >
-> Happy to answer questions about the *side hustle* part more than the tool part — what's working/not working for the rest of you?
+> Happy to answer questions about the _side hustle_ part more than the tool part — what's working/not working for the rest of you?
 
 ---
 
@@ -107,7 +107,7 @@ Reddit is the highest-fit traffic source for Flipper.ai but the **least forgivin
 >
 > 1. **Building it for myself first.** I'm a flipper. I had the problem before I had a product. The first 20 users were people in my Reddit dms who saw me complain about the same problem.
 > 2. **One channel at a time.** I tried Twitter, Reddit, PH, FB groups, and TikTok in week 1. Nothing worked. In week 3 I committed only to r/Flipping for 30 days. That was the unlock.
-> 3. **Free tier with real value.** Free tier gets you the actual scoring on 1 saved search. People upgrade because the tool *is* useful at $0; they pay $19 to expand it, not unlock it.
+> 3. **Free tier with real value.** Free tier gets you the actual scoring on 1 saved search. People upgrade because the tool _is_ useful at $0; they pay $19 to expand it, not unlock it.
 > 4. **Multi-provider AI architecture.** I'm running ~80% of my LLM traffic on Gemini Flash's free tier. My COGS-per-user is <$0.10/mo at the free tier and <$2/mo at PRO. Made it possible to keep prices low and still have margin.
 >
 > **What didn't:**
@@ -155,9 +155,9 @@ Reddit is the highest-fit traffic source for Flipper.ai but the **least forgivin
 
 - **r/thrifting** (300k) — frame as "AI that helps thrifters spot resale opportunities"
 - **r/garagesale** (50k) — frame as "tool for people doing garage-sale → resale arb"
-- **r/RealEstateInvesting** (1.5M) — *only* if you build a real-estate angle (probably skip)
+- **r/RealEstateInvesting** (1.5M) — _only_ if you build a real-estate angle (probably skip)
 - **r/passive_income** (200k) — frame as "side income with reduced time commitment"
-- **r/EtsySellers** (200k) — *only* if you add Etsy comps in the future
-- **r/buildapc** (4M) — *only* if you tune for PC parts arbitrage and post a write-up about that specifically
+- **r/EtsySellers** (200k) — _only_ if you add Etsy comps in the future
+- **r/buildapc** (4M) — _only_ if you tune for PC parts arbitrage and post a write-up about that specifically
 
 Don't post to all of these in week 1. Pick one per week, write per-sub, build karma in the sub for 5+ days first.

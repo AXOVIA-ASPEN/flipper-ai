@@ -782,10 +782,7 @@ describe('flip-notification-processor', () => {
         expect.objectContaining({
           where: {
             id: {
-              in: expect.arrayContaining([
-                'evt-newdeals-1',
-                'evt-newdeals-6',
-              ]),
+              in: expect.arrayContaining(['evt-newdeals-1', 'evt-newdeals-6']),
             },
           },
           data: expect.objectContaining({ status: 'PROCESSED' }),
@@ -832,10 +829,7 @@ describe('flip-notification-processor', () => {
         expect.objectContaining({
           where: {
             id: {
-              in: expect.arrayContaining([
-                'evt-daily-1',
-                'evt-daily-6',
-              ]),
+              in: expect.arrayContaining(['evt-daily-1', 'evt-daily-6']),
             },
           },
           data: expect.objectContaining({ status: 'PROCESSED' }),
@@ -1083,9 +1077,7 @@ describe('flip-notification-processor', () => {
       const result = await processFlipLifecycleNotifications();
 
       expect(result.failed).toBe(1);
-      expect(result.errors).toEqual([
-        { eventId: 'evt-err-1', error: 'SMTP connection refused' },
-      ]);
+      expect(result.errors).toEqual([{ eventId: 'evt-err-1', error: 'SMTP connection refused' }]);
       expect(mockPrisma.notificationEvent.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
@@ -1699,7 +1691,10 @@ describe('flip-notification-processor', () => {
   // -----------------------------------------------------------------------
   describe('push dispatch (Story 11.3)', () => {
     it('fires pushNotificationService.sendToUser for opportunity.found events', async () => {
-      const event = makeEvent({ eventType: 'opportunity.found', payload: { listingTitle: 'iPhone', askingPrice: 400, profitPotential: 100 } });
+      const event = makeEvent({
+        eventType: 'opportunity.found',
+        payload: { listingTitle: 'iPhone', askingPrice: 400, profitPotential: 100 },
+      });
 
       (mockPrisma.notificationEvent.findMany as jest.Mock)
         .mockReset()
@@ -1709,7 +1704,10 @@ describe('flip-notification-processor', () => {
       (mockPrisma.notificationEvent.updateMany as jest.Mock).mockResolvedValue({ count: 1 });
       (mockPrisma.notificationEvent.update as jest.Mock).mockResolvedValue({});
       (mockPrisma.notificationEvent.findUnique as jest.Mock).mockResolvedValue({ payload: {} });
-      (mockEmailService.sendOpportunityFound as jest.Mock).mockResolvedValue({ success: true, messageId: 'msg-1' });
+      (mockEmailService.sendOpportunityFound as jest.Mock).mockResolvedValue({
+        success: true,
+        messageId: 'msg-1',
+      });
       (mockPushService.sendToUser as jest.Mock).mockResolvedValue(undefined);
 
       await processFlipLifecycleNotifications();
@@ -1777,13 +1775,15 @@ describe('flip-notification-processor', () => {
     let mockCommService: any;
 
     beforeEach(() => {
-      mockCommService = (jest.requireMock('@/lib/communication-notification') as {
-        communicationNotificationService: {
-          notifyMessageReceived: jest.Mock;
-          notifyDraftReady: jest.Mock;
-          notifyMessageSent: jest.Mock;
-        };
-      }).communicationNotificationService;
+      mockCommService = (
+        jest.requireMock('@/lib/communication-notification') as {
+          communicationNotificationService: {
+            notifyMessageReceived: jest.Mock;
+            notifyDraftReady: jest.Mock;
+            notifyMessageSent: jest.Mock;
+          };
+        }
+      ).communicationNotificationService;
       mockCommService.notifyMessageReceived.mockReset().mockResolvedValue(undefined);
       mockCommService.notifyDraftReady.mockReset().mockResolvedValue(undefined);
       mockCommService.notifyMessageSent.mockReset().mockResolvedValue(undefined);

@@ -18,7 +18,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
-import { handleError, UnauthorizedError, ForbiddenError, ValidationError, NotFoundError } from '@/lib/errors';
+import {
+  handleError,
+  UnauthorizedError,
+  ForbiddenError,
+  ValidationError,
+  NotFoundError,
+} from '@/lib/errors';
 import { checkFeatureAccess } from '@/lib/tier-enforcement';
 import { generatePurchaseMessage, isValidMessageType } from '@/lib/message-generator';
 import type { MessageType } from '@/lib/message-generator';
@@ -115,12 +121,14 @@ export async function POST(request: NextRequest) {
 
     // Fire-and-forget: draft ready notification (Story 10.4, AC2)
     /* istanbul ignore next -- fire-and-forget; rejection is intentionally swallowed */
-    void communicationNotificationService.notifyDraftReady({
-      userId,
-      listingId,
-      listingTitle: listing.title,
-      draftPreview: message.body,
-    }).catch(() => {});
+    void communicationNotificationService
+      .notifyDraftReady({
+        userId,
+        listingId,
+        listingTitle: listing.title,
+        draftPreview: message.body,
+      })
+      .catch(() => {});
 
     return NextResponse.json(
       {

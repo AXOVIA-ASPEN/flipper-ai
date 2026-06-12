@@ -67,7 +67,11 @@ let prismaBefore: PrismaClient | undefined;
 function buildPrismaStub(): PrismaClient {
   return {
     deviceToken: {
-      upsert: async (args: { where: unknown; create: { userId: string; token: string; userAgent: string | null }; update: unknown }) => {
+      upsert: async (args: {
+        where: unknown;
+        create: { userId: string; token: string; userAgent: string | null };
+        update: unknown;
+      }) => {
         const id = `dt-${state.storedTokens.length + 1}`;
         state.storedTokens.push({ id, token: args.create.token, userAgent: args.create.userAgent });
         return { id, token: args.create.token };
@@ -135,13 +139,13 @@ Given('the app is running', function () {
   // No-op — filesystem check only
 });
 
-Given('the user has registered device tokens {string} and {string}', async function (
-  token1: string,
-  token2: string
-) {
-  state.storedTokens.push({ id: 'dt-a', token: token1, userAgent: null });
-  state.storedTokens.push({ id: 'dt-b', token: token2, userAgent: null });
-});
+Given(
+  'the user has registered device tokens {string} and {string}',
+  async function (token1: string, token2: string) {
+    state.storedTokens.push({ id: 'dt-a', token: token1, userAgent: null });
+    state.storedTokens.push({ id: 'dt-b', token: token2, userAgent: null });
+  }
+);
 
 Given('the user has a registered device token {string}', function (token: string) {
   state.storedTokens.push({ id: 'dt-single', token, userAgent: null });
@@ -154,15 +158,17 @@ Given('the user has a registered device token {string}', function (token: string
 When(
   'the user registers a device token {string} with userAgent {string}',
   async function (token: string, userAgent: string) {
-    const result = await (globalForPrisma.prisma as unknown as {
-      deviceToken: {
-        upsert: (a: {
-          where: unknown;
-          create: { userId: string; token: string; userAgent: string | null };
-          update: unknown;
-        }) => Promise<{ id: string }>;
-      };
-    }).deviceToken.upsert({
+    const result = await (
+      globalForPrisma.prisma as unknown as {
+        deviceToken: {
+          upsert: (a: {
+            where: unknown;
+            create: { userId: string; token: string; userAgent: string | null };
+            update: unknown;
+          }) => Promise<{ id: string }>;
+        };
+      }
+    ).deviceToken.upsert({
       where: { userId_token: { userId: state.userId, token } },
       create: { userId: state.userId, token, userAgent },
       update: { updatedAt: new Date() },
@@ -173,9 +179,17 @@ When(
 );
 
 When('the user registers device token {string} on device 1', async function (token: string) {
-  await (globalForPrisma.prisma as unknown as {
-    deviceToken: { upsert: (a: { where: unknown; create: { userId: string; token: string; userAgent: null }; update: unknown }) => Promise<{ id: string }> };
-  }).deviceToken.upsert({
+  await (
+    globalForPrisma.prisma as unknown as {
+      deviceToken: {
+        upsert: (a: {
+          where: unknown;
+          create: { userId: string; token: string; userAgent: null };
+          update: unknown;
+        }) => Promise<{ id: string }>;
+      };
+    }
+  ).deviceToken.upsert({
     where: { userId_token: { userId: state.userId, token } },
     create: { userId: state.userId, token, userAgent: null },
     update: { updatedAt: new Date() },
@@ -183,9 +197,17 @@ When('the user registers device token {string} on device 1', async function (tok
 });
 
 When('the user registers device token {string} on device 2', async function (token: string) {
-  await (globalForPrisma.prisma as unknown as {
-    deviceToken: { upsert: (a: { where: unknown; create: { userId: string; token: string; userAgent: null }; update: unknown }) => Promise<{ id: string }> };
-  }).deviceToken.upsert({
+  await (
+    globalForPrisma.prisma as unknown as {
+      deviceToken: {
+        upsert: (a: {
+          where: unknown;
+          create: { userId: string; token: string; userAgent: null };
+          update: unknown;
+        }) => Promise<{ id: string }>;
+      };
+    }
+  ).deviceToken.upsert({
     where: { userId_token: { userId: state.userId, token } },
     create: { userId: state.userId, token, userAgent: null },
     update: { updatedAt: new Date() },
@@ -252,20 +274,17 @@ Then('the file is served at {string}', function (filePath: string) {
   assert.ok(fs.existsSync(fullPath), `Expected service worker at public${filePath}`);
 });
 
-Then(
-  'the file imports the firebase-app-compat and firebase-messaging-compat scripts',
-  function () {
-    const content = fs.readFileSync(
-      path.join(PROJECT_ROOT, 'public', 'firebase-messaging-sw.js'),
-      'utf-8'
-    );
-    assert.ok(content.includes('firebase-app-compat.js'), 'SW must import firebase-app-compat.js');
-    assert.ok(
-      content.includes('firebase-messaging-compat.js'),
-      'SW must import firebase-messaging-compat.js'
-    );
-  }
-);
+Then('the file imports the firebase-app-compat and firebase-messaging-compat scripts', function () {
+  const content = fs.readFileSync(
+    path.join(PROJECT_ROOT, 'public', 'firebase-messaging-sw.js'),
+    'utf-8'
+  );
+  assert.ok(content.includes('firebase-app-compat.js'), 'SW must import firebase-app-compat.js');
+  assert.ok(
+    content.includes('firebase-messaging-compat.js'),
+    'SW must import firebase-messaging-compat.js'
+  );
+});
 
 Then('the file initialises a firebase messaging instance', function () {
   const content = fs.readFileSync(

@@ -18,9 +18,7 @@ jest.mock('@/lib/auth-middleware', () => ({
 // ── Mock sseEmitter ─────────────────────────────────────────────────────────
 const mockUnsubscribe = jest.fn();
 const mockSubscribe = jest.fn().mockReturnValue(mockUnsubscribe);
-const mockFormatMessage = jest
-  .fn()
-  .mockReturnValue('event: ping\ndata: {"ts":1}\n\n');
+const mockFormatMessage = jest.fn().mockReturnValue('event: ping\ndata: {"ts":1}\n\n');
 
 jest.mock('@/lib/sse-emitter', () => ({
   sseEmitter: {
@@ -122,9 +120,7 @@ describe('GET /api/events', () => {
   it('sends initial ping on connect via formatMessage', async () => {
     mockGetAuthUserId.mockResolvedValue('user-123');
     await GET(makeRequest());
-    expect(mockFormatMessage).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'ping' })
-    );
+    expect(mockFormatMessage).toHaveBeenCalledWith(expect.objectContaining({ type: 'ping' }));
   });
 
   it('initial ping includes userId', async () => {

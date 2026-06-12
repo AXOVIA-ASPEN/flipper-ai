@@ -61,8 +61,14 @@ export function LoadingSkeleton({
           className="fp-shimmer"
           style={{ height: 16, width: '40%', borderRadius: 6, marginBottom: 12 }}
         />
-        <div className="fp-shimmer" style={{ height: 12, width: '80%', borderRadius: 6, marginBottom: 8 }} />
-        <div className="fp-shimmer" style={{ height: 12, width: '90%', borderRadius: 6, marginBottom: 8 }} />
+        <div
+          className="fp-shimmer"
+          style={{ height: 12, width: '80%', borderRadius: 6, marginBottom: 8 }}
+        />
+        <div
+          className="fp-shimmer"
+          style={{ height: 12, width: '90%', borderRadius: 6, marginBottom: 8 }}
+        />
         <div className="fp-shimmer" style={{ height: 12, width: '60%', borderRadius: 6 }} />
       </div>
     );
@@ -78,11 +84,7 @@ export function LoadingSkeleton({
     >
       <span style={srOnlyStyle}>Loading…</span>
       {Array.from({ length: rows }).map((_, i) => (
-        <div
-          key={i}
-          className="fp-glass-sm"
-          style={{ padding: 12, height: 80, marginBottom: 8 }}
-        >
+        <div key={i} className="fp-glass-sm" style={{ padding: 12, height: 80, marginBottom: 8 }}>
           <div className="fp-shimmer" style={{ height: '100%', borderRadius: 6 }} />
         </div>
       ))}

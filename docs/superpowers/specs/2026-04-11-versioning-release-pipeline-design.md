@@ -9,6 +9,7 @@
 ## Overview
 
 Establishes a lightweight, consistent versioning and release pipeline for Flipper.ai using:
+
 - **Semantic Versioning (semver)** — `MAJOR.MINOR.PATCH`
 - **Keep a Changelog** — human-curated `CHANGELOG.md`
 - **Trunk-based releases** — tag `main` to cut a release
@@ -49,10 +50,12 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [1.0.0] - 2026-04-11
 
 ### Added
+
 - Initial release
 ```
 
 **Changelog categories** (use only what applies):
+
 - `Added` — new features
 - `Changed` — changes to existing functionality
 - `Deprecated` — soon-to-be removed features
@@ -64,10 +67,10 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## Semver Bump Rules
 
-| Change type | Bump | Example trigger |
-|-------------|------|-----------------|
-| Bug fixes, dependency updates, minor tweaks | `PATCH` | Fix craigslist scraper timeout |
-| New features, non-breaking additions | `MINOR` | Add OfferUp scraper, new dashboard page |
+| Change type                                 | Bump    | Example trigger                          |
+| ------------------------------------------- | ------- | ---------------------------------------- |
+| Bug fixes, dependency updates, minor tweaks | `PATCH` | Fix craigslist scraper timeout           |
+| New features, non-breaking additions        | `MINOR` | Add OfferUp scraper, new dashboard page  |
 | Breaking changes, major architecture shifts | `MAJOR` | Auth system rewrite, API incompatibility |
 
 ---
@@ -141,7 +144,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "Flipper.ai v${{ steps.changelog.outputs.version }}"
+          name: 'Flipper.ai v${{ steps.changelog.outputs.version }}'
           body_path: /tmp/release_notes.md
           draft: false
           prerelease: false
@@ -152,7 +155,9 @@ jobs:
 ## What Gets Updated in Config Files
 
 ### `_bmad-output/project-context.md`
+
 Adds a new **Versioning & Release Pipeline** section with:
+
 - VERSION.md format
 - CHANGELOG.md format and categories
 - Semver bump rules table
@@ -160,7 +165,9 @@ Adds a new **Versioning & Release Pipeline** section with:
 - GitHub Actions workflow description
 
 ### `CLAUDE.md`
+
 Adds a concise **Versioning & Releases** reference section with:
+
 - Pointer to project-context.md for the full spec
 - The 5-step release command sequence inline for quick lookup
 - Semver bump rules summary
@@ -169,10 +176,10 @@ Adds a concise **Versioning & Releases** reference section with:
 
 ## Files to Create/Modify
 
-| File | Action |
-|------|--------|
-| `VERSION.md` | Create — initial value `1.0.0` |
-| `CHANGELOG.md` | Create — with `[Unreleased]` + `[1.0.0]` initial entry |
-| `.github/workflows/release.yml` | Create — tag-triggered release workflow |
-| `_bmad-output/project-context.md` | Modify — add Versioning & Release Pipeline section |
-| `CLAUDE.md` | Modify — add concise Versioning & Releases section |
+| File                              | Action                                                 |
+| --------------------------------- | ------------------------------------------------------ |
+| `VERSION.md`                      | Create — initial value `1.0.0`                         |
+| `CHANGELOG.md`                    | Create — with `[Unreleased]` + `[1.0.0]` initial entry |
+| `.github/workflows/release.yml`   | Create — tag-triggered release workflow                |
+| `_bmad-output/project-context.md` | Modify — add Versioning & Release Pipeline section     |
+| `CLAUDE.md`                       | Modify — add concise Versioning & Releases section     |

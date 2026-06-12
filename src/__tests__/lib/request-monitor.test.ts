@@ -1,4 +1,9 @@
-import { recordRequest, getRecentRequests, getRequestStats, clearRequests } from '@/lib/request-monitor';
+import {
+  recordRequest,
+  getRecentRequests,
+  getRequestStats,
+  clearRequests,
+} from '@/lib/request-monitor';
 import { metrics } from '@/lib/metrics';
 
 // Mock dependencies
@@ -100,9 +105,12 @@ describe('Request Monitor', () => {
         timestamp: new Date().toISOString(),
       });
 
-      expect(logger.warn).toHaveBeenCalledWith('Slow request detected', expect.objectContaining({
-        durationMs: 1500,
-      }));
+      expect(logger.warn).toHaveBeenCalledWith(
+        'Slow request detected',
+        expect.objectContaining({
+          durationMs: 1500,
+        })
+      );
     });
 
     it('does not log normal speed requests', () => {
@@ -174,8 +182,20 @@ describe('Request Monitor', () => {
     it('calculates error rate', () => {
       recordRequest({ method: 'GET', path: '/ok', statusCode: 200, durationMs: 10, timestamp: '' });
       recordRequest({ method: 'GET', path: '/ok', statusCode: 200, durationMs: 10, timestamp: '' });
-      recordRequest({ method: 'GET', path: '/err', statusCode: 500, durationMs: 10, timestamp: '' });
-      recordRequest({ method: 'GET', path: '/err', statusCode: 404, durationMs: 10, timestamp: '' });
+      recordRequest({
+        method: 'GET',
+        path: '/err',
+        statusCode: 500,
+        durationMs: 10,
+        timestamp: '',
+      });
+      recordRequest({
+        method: 'GET',
+        path: '/err',
+        statusCode: 404,
+        durationMs: 10,
+        timestamp: '',
+      });
 
       const stats = getRequestStats();
       expect(stats.errorRate).toBe(0.5);
@@ -198,7 +218,13 @@ describe('Request Monitor', () => {
       clearRequests();
       // Add 202 requests to exceed MAX_RECENT_REQUESTS=200 and trigger shift
       for (let i = 0; i < 202; i++) {
-        recordRequest({ method: 'GET', path: `/test/${i}`, statusCode: 200, durationMs: 10, timestamp: '' });
+        recordRequest({
+          method: 'GET',
+          path: `/test/${i}`,
+          statusCode: 200,
+          durationMs: 10,
+          timestamp: '',
+        });
       }
       // getRecentRequests default limit is 50, but total stored should be 200
       // Check that we got 200 stored (requesting 200 bypasses default limit)

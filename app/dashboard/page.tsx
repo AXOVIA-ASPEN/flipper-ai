@@ -70,10 +70,13 @@ interface PaginationData {
   totalPages: number;
 }
 
-
 export default function DashboardPage() {
   return (
-    <Suspense fallback={<div style={{ padding: 32, textAlign: 'center', color: '#94a3b8' }}>Loading dashboard…</div>}>
+    <Suspense
+      fallback={
+        <div style={{ padding: 32, textAlign: 'center', color: '#94a3b8' }}>Loading dashboard…</div>
+      }
+    >
       <Dashboard />
     </Suspense>
   );
@@ -188,19 +191,19 @@ function Dashboard() {
 
   function getPlatformBadgeClass(platform: string) {
     const map: Record<string, string> = {
-      EBAY:       'fp-badge fp-badge-yellow',
+      EBAY: 'fp-badge fp-badge-yellow',
       CRAIGSLIST: 'fp-badge fp-badge-blue',
-      FACEBOOK:   'fp-badge fp-badge-blue',
-      OFFERUP:    'fp-badge fp-badge-green',
-      MERCARI:    'fp-badge fp-badge-orange',
+      FACEBOOK: 'fp-badge fp-badge-blue',
+      OFFERUP: 'fp-badge fp-badge-green',
+      MERCARI: 'fp-badge fp-badge-orange',
     };
     return map[platform] ?? 'fp-badge fp-badge-gray';
   }
 
   function getStatusBadgeClass(status: string) {
     const map: Record<string, string> = {
-      NEW:         'fp-badge fp-badge-gray',
-      ANALYZED:    'fp-badge fp-badge-blue',
+      NEW: 'fp-badge fp-badge-gray',
+      ANALYZED: 'fp-badge fp-badge-blue',
       OPPORTUNITY: 'fp-badge fp-badge-purple',
     };
     return map[status] ?? 'fp-badge fp-badge-gray';
@@ -227,30 +230,82 @@ function Dashboard() {
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-            <h1 style={{ fontSize: 28, fontWeight: 800, color: '#e2e8f0', letterSpacing: '-0.02em' }}>Flipper Dashboard</h1>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 8,
+            }}
+          >
+            <h1
+              style={{ fontSize: 28, fontWeight: 800, color: '#e2e8f0', letterSpacing: '-0.02em' }}
+            >
+              Flipper Dashboard
+            </h1>
             {/* SSE connection status indicator */}
-            <div className="flex items-center gap-1.5 text-sm" aria-live="polite" data-testid="sse-status">
+            <div
+              className="flex items-center gap-1.5 text-sm"
+              aria-live="polite"
+              data-testid="sse-status"
+            >
               {isConnected ? (
                 <>
-                  <span className="fp-pulse" style={{ width: 7, height: 7, borderRadius: '50%', background: '#34d399', display: 'inline-block' }} />
+                  <span
+                    className="fp-pulse"
+                    style={{
+                      width: 7,
+                      height: 7,
+                      borderRadius: '50%',
+                      background: '#34d399',
+                      display: 'inline-block',
+                    }}
+                  />
                   <span style={{ color: '#34d399', fontWeight: 600, fontSize: 13 }}>Live</span>
                 </>
               ) : (
                 <>
-                  <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#fbbf24', display: 'inline-block', animation: 'fp-pulse 2s ease-in-out infinite' }} />
-                  <span style={{ color: '#fbbf24', fontWeight: 600, fontSize: 13 }}>Reconnecting…</span>
+                  <span
+                    style={{
+                      width: 7,
+                      height: 7,
+                      borderRadius: '50%',
+                      background: '#fbbf24',
+                      display: 'inline-block',
+                      animation: 'fp-pulse 2s ease-in-out infinite',
+                    }}
+                  />
+                  <span style={{ color: '#fbbf24', fontWeight: 600, fontSize: 13 }}>
+                    Reconnecting…
+                  </span>
                 </>
               )}
             </div>
           </div>
-          <p style={{ color: '#94a3b8', fontSize: 14 }}>Find and track profitable flipping opportunities</p>
+          <p style={{ color: '#94a3b8', fontSize: 14 }}>
+            Find and track profitable flipping opportunities
+          </p>
         </div>
 
         {/* SSE error banner */}
         {lastError && !sseErrorDismissed && (
-          <div className="fp-alert-warn" style={{ marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 16px', fontSize: 13, color: '#fcd34d' }} data-testid="sse-error-banner">
-            <span>Real-time updates: {lastError}. Data will refresh when connection is restored.</span>
+          <div
+            className="fp-alert-warn"
+            style={{
+              marginBottom: 24,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12,
+              padding: '12px 16px',
+              fontSize: 13,
+              color: '#fcd34d',
+            }}
+            data-testid="sse-error-banner"
+          >
+            <span>
+              Real-time updates: {lastError}. Data will refresh when connection is restored.
+            </span>
             <button
               onClick={() => setSseErrorDismissed(true)}
               className="fp-icon-btn"
@@ -263,22 +318,77 @@ function Dashboard() {
         )}
 
         {/* Stats Cards — 4-column grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" style={{ marginBottom: 32 }}>
+        <div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          style={{ marginBottom: 32 }}
+        >
           <div className="fp-stat-card">
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#475569', marginBottom: 8 }}>Total Listings</div>
-            <div style={{ fontSize: 32, fontWeight: 800, color: '#e2e8f0' }}>{stats.totalListings}</div>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: '#475569',
+                marginBottom: 8,
+              }}
+            >
+              Total Listings
+            </div>
+            <div style={{ fontSize: 32, fontWeight: 800, color: '#e2e8f0' }}>
+              {stats.totalListings}
+            </div>
           </div>
           <div className="fp-stat-card">
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#475569', marginBottom: 8 }}>Opportunities</div>
-            <div className="fp-grad-purple" style={{ fontSize: 32, fontWeight: 800 }}>{stats.opportunitiesFound}</div>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: '#475569',
+                marginBottom: 8,
+              }}
+            >
+              Opportunities
+            </div>
+            <div className="fp-grad-purple" style={{ fontSize: 32, fontWeight: 800 }}>
+              {stats.opportunitiesFound}
+            </div>
           </div>
           <div className="fp-stat-card">
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#475569', marginBottom: 8 }}>Active Flips</div>
-            <div style={{ fontSize: 32, fontWeight: 800, color: '#8b5cf6' }}>{stats.activeFlips}</div>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: '#475569',
+                marginBottom: 8,
+              }}
+            >
+              Active Flips
+            </div>
+            <div style={{ fontSize: 32, fontWeight: 800, color: '#8b5cf6' }}>
+              {stats.activeFlips}
+            </div>
           </div>
           <div className="fp-stat-card">
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#475569', marginBottom: 8 }}>Total Profit</div>
-            <div className="fp-grad-green" style={{ fontSize: 32, fontWeight: 800 }}>${stats.totalProfit.toFixed(0)}</div>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: '#475569',
+                marginBottom: 8,
+              }}
+            >
+              Total Profit
+            </div>
+            <div className="fp-grad-green" style={{ fontSize: 32, fontWeight: 800 }}>
+              ${stats.totalProfit.toFixed(0)}
+            </div>
           </div>
         </div>
 
@@ -320,7 +430,9 @@ function Dashboard() {
         {listings.length === 0 ? (
           <div className="fp-glass" style={{ padding: '48px 24px', textAlign: 'center' }}>
             <div style={{ fontSize: 18, color: '#94a3b8', marginBottom: 8 }}>No listings found</div>
-            <p style={{ color: '#475569', fontSize: 14 }}>Try adjusting your filters or running a new scan</p>
+            <p style={{ color: '#475569', fontSize: 14 }}>
+              Try adjusting your filters or running a new scan
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -335,7 +447,14 @@ function Dashboard() {
                 >
                   {/* Image */}
                   {imageUrl && (
-                    <div style={{ height: 192, background: 'rgba(255,255,255,0.04)', borderRadius: '15px 15px 0 0', overflow: 'hidden' }}>
+                    <div
+                      style={{
+                        height: 192,
+                        background: 'rgba(255,255,255,0.04)',
+                        borderRadius: '15px 15px 0 0',
+                        overflow: 'hidden',
+                      }}
+                    >
                       <img
                         src={imageUrl}
                         alt={listing.title}
@@ -359,7 +478,11 @@ function Dashboard() {
                         onClick={(e) => handleCreateOpportunity(e, listing.id)}
                         className="fp-icon-btn"
                         disabled={!!listing.opportunity}
-                        aria-label={listing.opportunity ? 'Already tracked as opportunity' : 'Track as opportunity'}
+                        aria-label={
+                          listing.opportunity
+                            ? 'Already tracked as opportunity'
+                            : 'Track as opportunity'
+                        }
                       >
                         <Star
                           className="w-5 h-5"
@@ -372,7 +495,17 @@ function Dashboard() {
                     </div>
 
                     {/* Title */}
-                    <h3 style={{ fontWeight: 600, color: '#e2e8f0', marginBottom: 8, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    <h3
+                      style={{
+                        fontWeight: 600,
+                        color: '#e2e8f0',
+                        marginBottom: 8,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                      }}
+                    >
                       {listing.title}
                     </h3>
 
@@ -380,7 +513,9 @@ function Dashboard() {
                     <div className="flex justify-between items-center mb-2">
                       <div>
                         <div style={{ fontSize: 12, color: '#94a3b8' }}>Asking</div>
-                        <div style={{ fontSize: 18, fontWeight: 700, color: '#e2e8f0' }}>${listing.askingPrice}</div>
+                        <div style={{ fontSize: 18, fontWeight: 700, color: '#e2e8f0' }}>
+                          ${listing.askingPrice}
+                        </div>
                       </div>
                       <div className="text-right">
                         <div style={{ fontSize: 12, color: '#94a3b8' }}>
@@ -399,7 +534,9 @@ function Dashboard() {
                     {listing.valueScore !== null && (
                       <div className="mb-2 text-sm">
                         <span style={{ color: '#94a3b8' }}>Score: </span>
-                        <span style={{ fontWeight: 600, color: '#8b5cf6' }}>{listing.valueScore}/100</span>
+                        <span style={{ fontWeight: 600, color: '#8b5cf6' }}>
+                          {listing.valueScore}/100
+                        </span>
                       </div>
                     )}
 
@@ -417,34 +554,53 @@ function Dashboard() {
                     {/* Demand Badge (Story 5.3) */}
                     {listing.demandLevel && (
                       <div style={{ marginBottom: 8 }}>
-                        <span className={`fp-badge ${
-                          listing.demandLevel === 'rising'        ? 'fp-badge-green'  :
-                          listing.demandLevel === 'stable'        ? 'fp-badge-blue'   :
-                          listing.demandLevel === 'declining'     ? 'fp-badge-orange' :
-                          listing.demandLevel === 'low_liquidity' ? 'fp-badge-red'    :
-                                                                     'fp-badge-gray'
-                        }`}>
-                          {listing.demandLevel === 'rising'        ? '↑ Rising demand'  :
-                           listing.demandLevel === 'stable'        ? '→ Stable demand'  :
-                           listing.demandLevel === 'declining'     ? '↓ Declining'      :
-                           listing.demandLevel === 'low_liquidity' ? '⚠ Low liquidity'  :
-                           listing.demandLevel}
+                        <span
+                          className={`fp-badge ${
+                            listing.demandLevel === 'rising'
+                              ? 'fp-badge-green'
+                              : listing.demandLevel === 'stable'
+                                ? 'fp-badge-blue'
+                                : listing.demandLevel === 'declining'
+                                  ? 'fp-badge-orange'
+                                  : listing.demandLevel === 'low_liquidity'
+                                    ? 'fp-badge-red'
+                                    : 'fp-badge-gray'
+                          }`}
+                        >
+                          {listing.demandLevel === 'rising'
+                            ? '↑ Rising demand'
+                            : listing.demandLevel === 'stable'
+                              ? '→ Stable demand'
+                              : listing.demandLevel === 'declining'
+                                ? '↓ Declining'
+                                : listing.demandLevel === 'low_liquidity'
+                                  ? '⚠ Low liquidity'
+                                  : listing.demandLevel}
                         </span>
                       </div>
                     )}
 
                     {/* Logistics Badges (Story 5.5) */}
                     {(listing.sizeCategory || listing.outsidePickupRadius) && (
-                      <div style={{ marginBottom: 12, display: 'flex', flexWrap: 'wrap', gap: 4 }} data-testid="logistics-badges">
+                      <div
+                        style={{ marginBottom: 12, display: 'flex', flexWrap: 'wrap', gap: 4 }}
+                        data-testid="logistics-badges"
+                      >
                         {listing.sizeCategory && (
-                          <span className={`fp-badge ${
-                            listing.sizeCategory === 'large_local_only'         ? 'fp-badge-yellow'  :
-                            listing.sizeCategory === 'fragile_special_handling' ? 'fp-badge-purple'  :
-                                                                                   'fp-badge-gray'
-                          }`}>
-                            {listing.sizeCategory === 'large_local_only'         ? '🚚 Local only'  :
-                             listing.sizeCategory === 'fragile_special_handling' ? '⚠ Fragile'      :
-                             '📦 Shippable'}
+                          <span
+                            className={`fp-badge ${
+                              listing.sizeCategory === 'large_local_only'
+                                ? 'fp-badge-yellow'
+                                : listing.sizeCategory === 'fragile_special_handling'
+                                  ? 'fp-badge-purple'
+                                  : 'fp-badge-gray'
+                            }`}
+                          >
+                            {listing.sizeCategory === 'large_local_only'
+                              ? '🚚 Local only'
+                              : listing.sizeCategory === 'fragile_special_handling'
+                                ? '⚠ Fragile'
+                                : '📦 Shippable'}
                           </span>
                         )}
                         {listing.outsidePickupRadius && (
@@ -454,14 +610,28 @@ function Dashboard() {
                     )}
 
                     {/* Location & External Link */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, color: '#64748b' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        fontSize: 13,
+                        color: '#64748b',
+                      }}
+                    >
                       <span>{listing.location}</span>
                       <a
                         href={listing.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#8b5cf6', textDecoration: 'none' }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 4,
+                          color: '#8b5cf6',
+                          textDecoration: 'none',
+                        }}
                       >
                         View <ExternalLink className="w-4 h-4" />
                       </a>

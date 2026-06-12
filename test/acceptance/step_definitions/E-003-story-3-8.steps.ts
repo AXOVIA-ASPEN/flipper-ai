@@ -32,12 +32,9 @@ Given('the preFilterListings function exists in {string}', function (filePath: s
 
 // ==================== When ====================
 
-When(
-  'I call deduplicateListings with a platform, a list of listings, and a userId',
-  function () {
-    // Context loaded in Given; assertions in Then steps
-  }
-);
+When('I call deduplicateListings with a platform, a list of listings, and a userId', function () {
+  // Context loaded in Given; assertions in Then steps
+});
 
 When(
   'some of those listings already exist in the database for that platform and user',
@@ -110,7 +107,9 @@ When('the value estimator returns a score of {int}', function (score: number) {
   this.testScore = score;
   if (score >= 70) {
     // High score: accept path compares valueScore to the opportunity threshold (default 70).
-    expect(/valueScore\s*>=\s*(70|\(?options\.opportunityThreshold)/.test(this.fileContent)).toBe(true);
+    expect(/valueScore\s*>=\s*(70|\(?options\.opportunityThreshold)/.test(this.fileContent)).toBe(
+      true
+    );
     expect(this.fileContent).toContain('accepted.push(listing)');
   } else {
     // Low score: free-item below-threshold skip reason must exist.
@@ -130,7 +129,9 @@ Then(
     );
     expect(declPattern.test(this.fileContent)).toBe(true);
     // Return shape must include both unique and duplicates (any whitespace/formatting)
-    expect(/return\s*\{[\s\S]*?unique[\s\S]*?duplicates[\s\S]*?\}/.test(this.fileContent)).toBe(true);
+    expect(/return\s*\{[\s\S]*?unique[\s\S]*?duplicates[\s\S]*?\}/.test(this.fileContent)).toBe(
+      true
+    );
   }
 );
 
@@ -156,16 +157,13 @@ Then('the existing database records are not modified', function () {
   expect(fnBody).not.toContain('.update(');
 });
 
-Then(
-  'deduplicateListings for the original platform still treats it as unique',
-  function () {
-    // The findMany query must scope by all three fields (platform, userId, externalId)
-    // so cross-platform/cross-user matches don't falsely appear as duplicates. Tolerant of
-    // single-line and multi-line formatting.
-    const wherePattern = /where\s*:\s*\{[\s\S]*?platform[\s\S]*?userId[\s\S]*?externalId[\s\S]*?\}/;
-    expect(wherePattern.test(this.fileContent)).toBe(true);
-  }
-);
+Then('deduplicateListings for the original platform still treats it as unique', function () {
+  // The findMany query must scope by all three fields (platform, userId, externalId)
+  // so cross-platform/cross-user matches don't falsely appear as duplicates. Tolerant of
+  // single-line and multi-line formatting.
+  const wherePattern = /where\s*:\s*\{[\s\S]*?platform[\s\S]*?userId[\s\S]*?externalId[\s\S]*?\}/;
+  expect(wherePattern.test(this.fileContent)).toBe(true);
+});
 
 Then('deduplicateListings for the original userId still treats it as unique', function () {
   const wherePattern = /where\s*:\s*\{[\s\S]*?platform[\s\S]*?userId[\s\S]*?externalId[\s\S]*?\}/;

@@ -21,10 +21,7 @@
  *         upload images themselves before posting (or accept a text-only listing)
  */
 
-export type PostingQueueImageStatus =
-  | 'available'
-  | 'legacy-fallback'
-  | 'manual-upload-required';
+export type PostingQueueImageStatus = 'available' | 'legacy-fallback' | 'manual-upload-required';
 
 // Narrow listing shape — only the two fields we actually need to inspect.
 // Kept loose on purpose so both the full Prisma Listing relation and the

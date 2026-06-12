@@ -14,10 +14,7 @@ import { getCurrentUserId } from '@/lib/auth';
 const STALE_THRESHOLD = 0.05; // 5% change → stale
 const INVALIDATION_THRESHOLD = 0.15; // 15% change → fully invalidated
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userId = await getCurrentUserId();
     if (!userId) {
@@ -61,10 +58,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userId = await getCurrentUserId();
     if (!userId) {
@@ -83,7 +77,8 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { title, description, location, condition, askingPrice, sellerName, sellerContact } = body;
+    const { title, description, location, condition, askingPrice, sellerName, sellerContact } =
+      body;
     const updateData: Record<string, unknown> = {};
     if (title !== undefined) updateData.title = title;
     if (description !== undefined) updateData.description = description;

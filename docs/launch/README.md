@@ -6,38 +6,38 @@ Ready-to-edit copy, specs, and operational checklists for Flipper.ai's public la
 
 ### Marketing copy
 
-| File                                       | When to use it                                                  |
-| ------------------------------------------ | --------------------------------------------------------------- |
-| `product-hunt-listing.md`                  | The day you launch on Product Hunt                              |
-| `hacker-news-show-hn.md`                   | Day after PH (HN is a different audience, different tone)       |
-| `reddit-launch-posts.md`                   | Same week as PH; tailored per subreddit                         |
-| `twitter-launch-thread.md`                 | Launch day + 30-day #buildinpublic prompts                      |
-| `email-drip-campaign.md`                   | Wire into Resend/onboarding flow before public launch            |
-| `beta-invitation.md`                       | Send this week to 10-20 hand-picked beta users                  |
+| File                       | When to use it                                            |
+| -------------------------- | --------------------------------------------------------- |
+| `product-hunt-listing.md`  | The day you launch on Product Hunt                        |
+| `hacker-news-show-hn.md`   | Day after PH (HN is a different audience, different tone) |
+| `reddit-launch-posts.md`   | Same week as PH; tailored per subreddit                   |
+| `twitter-launch-thread.md` | Launch day + 30-day #buildinpublic prompts                |
+| `email-drip-campaign.md`   | Wire into Resend/onboarding flow before public launch     |
+| `beta-invitation.md`       | Send this week to 10-20 hand-picked beta users            |
 
 ### Operational playbooks
 
-| File                                       | When to use it                                                  |
-| ------------------------------------------ | --------------------------------------------------------------- |
-| `launch-day-runbook.md`                    | Hour-by-hour playbook for Product Hunt Tuesday                  |
-| `pre-launch-smoke-test.md`                 | 60-min checklist after first prod deploy, before beta invites    |
-| `gcp-secret-manager-checklist.md`          | Verify every required production secret is seeded in GCP        |
-| `branch-reconciliation.md`                 | Pre-launch git hygiene to merge `django-main` into trunk        |
-| `twilio-10dlc-checklist.md`                | Conditional — only if shipping SMS at launch                    |
+| File                              | When to use it                                                |
+| --------------------------------- | ------------------------------------------------------------- |
+| `launch-day-runbook.md`           | Hour-by-hour playbook for Product Hunt Tuesday                |
+| `pre-launch-smoke-test.md`        | 60-min checklist after first prod deploy, before beta invites |
+| `gcp-secret-manager-checklist.md` | Verify every required production secret is seeded in GCP      |
+| `branch-reconciliation.md`        | Pre-launch git hygiene to merge `django-main` into trunk      |
+| `twilio-10dlc-checklist.md`       | Conditional — only if shipping SMS at launch                  |
 
 ### Strategy & specs
 
-| File                                       | What it is                                                       |
-| ------------------------------------------ | ---------------------------------------------------------------- |
-| `domain-and-brand-identity.md`             | 9 candidate domains with one-click availability links + post-buy wiring |
-| `pricing-page-proposal.md`                 | Recommended 4-tier pricing structure with full page copy + Stripe setup |
-| `free-tools-specs.md`                      | 7 free SEO top-of-funnel tools with UX flows and shipping order |
-| `seo-content-calendar.md`                  | 30-day content engine — 8 posts targeting 27,000+ monthly searches |
-| `referral-program-spec.md`                 | DB schema + Stripe integration + anti-abuse + email triggers     |
-| `affiliate-program.md`                     | Commission tiers + outreach DMs + creative kit                   |
-| `public-faq.md`                            | Source for `/faq` page and support email canned responses        |
-| `changelog-page-spec.md`                   | Renders `CHANGELOG.md` as `/changelog` with RSS + email subs     |
-| `status-page-spec.md`                      | Public uptime status page (Better Stack recommended)             |
+| File                           | What it is                                                              |
+| ------------------------------ | ----------------------------------------------------------------------- |
+| `domain-and-brand-identity.md` | 9 candidate domains with one-click availability links + post-buy wiring |
+| `pricing-page-proposal.md`     | Recommended 4-tier pricing structure with full page copy + Stripe setup |
+| `free-tools-specs.md`          | 7 free SEO top-of-funnel tools with UX flows and shipping order         |
+| `seo-content-calendar.md`      | 30-day content engine — 8 posts targeting 27,000+ monthly searches      |
+| `referral-program-spec.md`     | DB schema + Stripe integration + anti-abuse + email triggers            |
+| `affiliate-program.md`         | Commission tiers + outreach DMs + creative kit                          |
+| `public-faq.md`                | Source for `/faq` page and support email canned responses               |
+| `changelog-page-spec.md`       | Renders `CHANGELOG.md` as `/changelog` with RSS + email subs            |
+| `status-page-spec.md`          | Public uptime status page (Better Stack recommended)                    |
 
 ## Reading order
 
@@ -68,7 +68,7 @@ They favor:
 
 - Specific, falsifiable claims ("I scanned 10,000 listings; 47 had >70% margin")
 - Personal, founder-voice posts (people upvote founders, not brands)
-- The actual product mechanics (people on r/Flipping want to know *how* it works)
+- The actual product mechanics (people on r/Flipping want to know _how_ it works)
 - Real numbers wherever possible
 
 When you personalize, **keep specifics specific**. "I made $X on this lamp" beats "I made hundreds" every time.

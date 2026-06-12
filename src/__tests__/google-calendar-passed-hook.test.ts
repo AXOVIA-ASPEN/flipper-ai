@@ -42,9 +42,15 @@ jest.mock('@/lib/google-calendar', () => ({
 jest.mock('@/lib/conversation-status', () => ({ transitionToPurchased: jest.fn() }));
 jest.mock('@/lib/notification-events', () => ({
   createFlipNotificationEvent: jest.fn(),
-  NotificationEventType: { FLIP_PURCHASED: 'flip.purchased', FLIP_LISTED: 'flip.listed', FLIP_SOLD: 'flip.sold' },
+  NotificationEventType: {
+    FLIP_PURCHASED: 'flip.purchased',
+    FLIP_LISTED: 'flip.listed',
+    FLIP_SOLD: 'flip.sold',
+  },
 }));
-jest.mock('@/lib/logger', () => ({ logger: { error: jest.fn(), warn: jest.fn(), info: jest.fn() } }));
+jest.mock('@/lib/logger', () => ({
+  logger: { error: jest.fn(), warn: jest.fn(), info: jest.fn() },
+}));
 
 import { PATCH } from '@/app/api/opportunities/[id]/route';
 

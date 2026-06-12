@@ -9,6 +9,7 @@
 **Tech Stack:** TypeScript, `@google/generative-ai` (already installed), `openai` SDK (reused for Groq), `@anthropic-ai/sdk` (existing)
 
 **Key context:**
+
 - `src/lib/gemini-client.ts` already exists with `geminiGenerateText()` and `geminiGenerateJSON()` — the new Gemini adapter wraps this or replaces it
 - Existing tests mock at SDK level (`jest.mock('openai')`) — after migration, tests mock `@/lib/ai` instead
 - File header standard: `@file`, `@author Stephen Boyett`, `@company Axovia AI`, `@date`, `@version 1.0`, `@brief`, `@description`
@@ -38,6 +39,7 @@ src/lib/ai/
 ```
 
 **Tests:**
+
 ```
 src/__tests__/lib/ai/
 ├── providers/
@@ -55,6 +57,7 @@ src/__tests__/lib/ai/
 ### Task 1: Provider Types
 
 **Files:**
+
 - Create: `src/lib/ai/providers/types.ts`
 
 - [ ] **Step 1: Create provider types file**
@@ -116,6 +119,7 @@ git commit -m "feat(ai): add provider types — AIProvider interface, AIMessage,
 ### Task 2: Gemini Provider Adapter
 
 **Files:**
+
 - Create: `src/lib/ai/providers/gemini.ts`
 - Create: `src/__tests__/lib/ai/providers/gemini.test.ts`
 
@@ -197,10 +201,11 @@ describe('GeminiProvider', () => {
     delete process.env.GOOGLE_API_KEY;
     const provider = new GeminiProvider();
     await expect(
-      provider.complete(
-        [{ role: 'user', content: 'test' }],
-        { model: 'gemini-2.0-flash', temperature: 0.3, maxTokens: 100 }
-      )
+      provider.complete([{ role: 'user', content: 'test' }], {
+        model: 'gemini-2.0-flash',
+        temperature: 0.3,
+        maxTokens: 100,
+      })
     ).rejects.toThrow('GOOGLE_API_KEY');
   });
 });
@@ -303,6 +308,7 @@ git commit -m "feat(ai): add Gemini provider adapter with tests"
 ### Task 3: Groq Provider Adapter
 
 **Files:**
+
 - Create: `src/lib/ai/providers/groq.ts`
 - Create: `src/__tests__/lib/ai/providers/groq.test.ts`
 
@@ -464,6 +470,7 @@ git commit -m "feat(ai): add Groq provider adapter with tests"
 ### Task 4: OpenAI Provider Adapter
 
 **Files:**
+
 - Create: `src/lib/ai/providers/openai.ts`
 - Create: `src/__tests__/lib/ai/providers/openai.test.ts`
 
@@ -497,6 +504,7 @@ git commit -m "feat(ai): add OpenAI provider adapter with tests"
 ### Task 5: Anthropic Provider Adapter
 
 **Files:**
+
 - Create: `src/lib/ai/providers/anthropic.ts`
 - Create: `src/__tests__/lib/ai/providers/anthropic.test.ts`
 
@@ -530,11 +538,13 @@ git commit -m "feat(ai): add Anthropic provider adapter with tests"
 ### Task 6: Provider Factory + Fallback Logic
 
 **Files:**
+
 - Create: `src/lib/ai/providers/index.ts`
 
 - [ ] **Step 1: Write failing test for provider factory**
 
 Create `src/__tests__/lib/ai/providers/factory.test.ts`. Tests:
+
 - `getProvider('gemini')` returns GeminiProvider when `GOOGLE_API_KEY` is set
 - `getProvider('groq')` returns GroqProvider when `GROQ_API_KEY` is set
 - `resolveProvider(['gemini', 'groq', 'openai'])` returns first available provider
@@ -596,8 +606,8 @@ export function resolveProvider(preferences: ProviderName[]): AIProvider {
 }
 
 export function getAvailableProviders(): ProviderName[] {
-  return (Object.keys(providers) as ProviderName[]).filter(
-    (name) => getProvider(name).isAvailable()
+  return (Object.keys(providers) as ProviderName[]).filter((name) =>
+    getProvider(name).isAvailable()
   );
 }
 ```
@@ -619,6 +629,7 @@ git commit -m "feat(ai): add provider factory with fallback resolution"
 ### Task 7: Prompt Types + Registry
 
 **Files:**
+
 - Create: `src/lib/ai/prompts/types.ts`
 - Create: `src/lib/ai/prompts/index.ts`
 
@@ -642,6 +653,7 @@ git commit -m "feat(ai): add prompt types and registry scaffold"
 ### Task 8: Extract Flip Analysis Prompts
 
 **Files:**
+
 - Create: `src/lib/ai/prompts/flip-analysis.ts`
 
 - [ ] **Step 1: Extract prompts from `src/lib/llm-analyzer.ts` and `src/lib/claude-analyzer.ts`**
@@ -666,6 +678,7 @@ git commit -m "feat(ai): extract flip analysis prompts — flipAnalysis, quickDi
 ### Task 9: Extract Negotiation Prompts
 
 **Files:**
+
 - Create: `src/lib/ai/prompts/negotiation.ts`
 
 - [ ] **Step 1: Extract from `src/lib/negotiation-strategy.ts`**
@@ -689,6 +702,7 @@ git commit -m "feat(ai): extract negotiation prompts — strategy and counter-of
 ### Task 10: Extract Messaging Prompts
 
 **Files:**
+
 - Create: `src/lib/ai/prompts/messaging.ts`
 
 - [ ] **Step 1: Extract from `src/lib/message-generator.ts`**
@@ -709,6 +723,7 @@ git commit -m "feat(ai): extract messaging prompts — purchaseMessage"
 ### Task 11: Extract Listing Prompts
 
 **Files:**
+
 - Create: `src/lib/ai/prompts/listing.ts`
 
 - [ ] **Step 1: Extract from `title-generator.ts`, `description-generator.ts`, `app/api/listings/[id]/description/route.ts`**
@@ -729,6 +744,7 @@ git commit -m "feat(ai): extract listing prompts — title, description, apiDesc
 ### Task 12: Extract Identification Prompts
 
 **Files:**
+
 - Create: `src/lib/ai/prompts/identification.ts`
 
 - [ ] **Step 1: Extract from `llm-identifier.ts`, `logistics-classifier.ts`, `item-completeness-analyzer.ts`**
@@ -749,6 +765,7 @@ git commit -m "feat(ai): extract identification prompts — product ID, logistic
 ### Task 13: Prompt Registry Tests
 
 **Files:**
+
 - Create: `src/__tests__/lib/ai/prompts/registry.test.ts`
 
 - [ ] **Step 1: Write registry tests**
@@ -772,12 +789,14 @@ git commit -m "test(ai): add prompt registry tests — all 12 prompts registered
 ### Task 14: Public API — `completeAI()`
 
 **Files:**
+
 - Create: `src/lib/ai/index.ts`
 - Create: `src/__tests__/lib/ai/complete-ai.test.ts`
 
 - [ ] **Step 1: Write failing tests for `completeAI()`**
 
 Test cases:
+
 - Resolves prompt by name, selects preferred provider, calls `complete()`
 - Falls back to next provider when preferred is unavailable
 - Throws `AIProviderUnavailableError` when no providers configured
@@ -854,6 +873,7 @@ git commit -m "feat(ai): add completeAI() public API with provider fallback"
 ### Task 15: Migrate Consumer Files
 
 **Files:**
+
 - Modify: `src/lib/llm-analyzer.ts`
 - Modify: `src/lib/claude-analyzer.ts`
 - Modify: `src/lib/negotiation-strategy.ts`
@@ -868,6 +888,7 @@ git commit -m "feat(ai): add completeAI() public API with provider fallback"
 - [ ] **Step 1: Migrate each consumer file**
 
 For each file:
+
 1. Replace `import OpenAI from 'openai'` (or `import Anthropic`) with `import { completeAI, AIProviderUnavailableError } from '@/lib/ai'`
 2. Remove inline prompt text (now in `src/lib/ai/prompts/`)
 3. Replace `new OpenAI(...)` + `client.chat.completions.create(...)` with `await completeAI('task-name', context)`
@@ -904,6 +925,7 @@ Zero changes to public function signatures or API routes."
 ### Task 16: Remove Legacy gemini-client.ts
 
 **Files:**
+
 - Delete: `src/lib/gemini-client.ts`
 - Modify: `src/lib/llm-analyzer.ts` (remove gemini-client import if still present)
 
@@ -935,6 +957,7 @@ git commit -m "chore: remove legacy gemini-client.ts — replaced by ai/provider
 ### Task 17: Add GROQ_API_KEY to .env.example + Documentation
 
 **Files:**
+
 - Modify: `.env.example`
 - Modify: `CLAUDE.md` (tech stack AI line)
 - Modify: `docs/DISCREPANCIES.md` (if needed)
@@ -942,6 +965,7 @@ git commit -m "chore: remove legacy gemini-client.ts — replaced by ai/provider
 - [ ] **Step 1: Add `GROQ_API_KEY` to `.env.example`**
 
 Add under the API Keys section:
+
 ```env
 # Groq API key — free tier: 30 RPM, 14,400 req/day (Llama 3.3 70B)
 # Get your key at: https://console.groq.com/keys
@@ -951,6 +975,7 @@ GROQ_API_KEY=""
 - [ ] **Step 2: Update CLAUDE.md AI line**
 
 Update the tech stack to reflect the new multi-provider architecture:
+
 ```
 - **AI**: Multi-provider (Gemini, Groq, OpenAI, Anthropic) via `src/lib/ai/`. Prompts centralized in `src/lib/ai/prompts/`. Per-task provider routing with automatic fallback.
 ```

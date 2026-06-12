@@ -72,8 +72,10 @@ Then('it uses the {string} model for Vision analysis', function (modelName: stri
   // prompt registry. The analyzer module calls completeAI('itemCompleteness', ...)
   // and the model lives on the itemCompleteness PromptConfig.
   if (this.source.includes(`model: '${modelName}'`)) return;
-  if (this.source.includes("completeAI('itemCompleteness'") ||
-      this.source.includes('completeAI("itemCompleteness"')) {
+  if (
+    this.source.includes("completeAI('itemCompleteness'") ||
+    this.source.includes('completeAI("itemCompleteness"')
+  ) {
     const promptModule = fs.readFileSync(
       path.join(process.cwd(), 'src/lib/ai/prompts/identification.ts'),
       'utf-8'
@@ -110,26 +112,24 @@ Then('{string} is exported as an interface', function (interfaceName: string) {
   const src = this.source || this.fileContent || this.routeContent || this.sourceContent || '';
   const where = this.filePath || '<unknown source>';
   assert.ok(
-    src.includes(`export interface ${interfaceName}`) || src.includes(`export type ${interfaceName}`),
+    src.includes(`export interface ${interfaceName}`) ||
+      src.includes(`export type ${interfaceName}`),
     `Expected "${interfaceName}" to be exported as an interface or type in ${where}`
   );
 });
 
 // ==================== Then: S-5 (opportunities page completeness display) ====================
 
-Then(
-  'the Listing interface includes {string} as a nullable string',
-  function (fieldName: string) {
-    assert.ok(
-      this.fileContent.includes(fieldName),
-      `Expected Listing interface to include "${fieldName}"`
-    );
-    assert.ok(
-      this.fileContent.match(new RegExp(`${fieldName}\\s*:\\s*string\\s*\\|\\s*null`)),
-      `Expected "${fieldName}" to be typed as "string | null"`
-    );
-  }
-);
+Then('the Listing interface includes {string} as a nullable string', function (fieldName: string) {
+  assert.ok(
+    this.fileContent.includes(fieldName),
+    `Expected Listing interface to include "${fieldName}"`
+  );
+  assert.ok(
+    this.fileContent.match(new RegExp(`${fieldName}\\s*:\\s*string\\s*\\|\\s*null`)),
+    `Expected "${fieldName}" to be typed as "string | null"`
+  );
+});
 
 Then('the page renders completenessLabel in the market details section', function () {
   assert.ok(
@@ -153,15 +153,12 @@ Then('it defines a reputation threshold for {string}', function (platform: strin
 
 // ==================== Then: S-7 (enrichWithCompletenessAndReputation risk escalation) ====================
 
-Then(
-  'it imports {string} from the seller-reputation-analyzer',
-  function (fnName: string) {
-    assert.ok(
-      this.source.includes(fnName) && this.source.includes('seller-reputation-analyzer'),
-      `Expected "${fnName}" to be imported from seller-reputation-analyzer in ${this.filePath}`
-    );
-  }
-);
+Then('it imports {string} from the seller-reputation-analyzer', function (fnName: string) {
+  assert.ok(
+    this.source.includes(fnName) && this.source.includes('seller-reputation-analyzer'),
+    `Expected "${fnName}" to be imported from seller-reputation-analyzer in ${this.filePath}`
+  );
+});
 
 Then(
   'it escalates authenticityRisk to {string} when riskEscalation is true',

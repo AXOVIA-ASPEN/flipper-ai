@@ -30,12 +30,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  handleError,
-  UnauthorizedError,
-  ForbiddenError,
-  ValidationError,
-} from '@/lib/errors';
+import { handleError, UnauthorizedError, ForbiddenError, ValidationError } from '@/lib/errors';
 import { getCurrentUserId } from '@/lib/auth';
 import { checkFeatureAccess } from '@/lib/tier-enforcement';
 import prisma from '@/lib/db';
@@ -130,9 +125,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         body.targetMarginPercent < 0 ||
         body.targetMarginPercent >= 100)
     ) {
-      throw new ValidationError(
-        'targetMarginPercent must be a number between 0 and 99'
-      );
+      throw new ValidationError('targetMarginPercent must be a number between 0 and 99');
     }
 
     if (
@@ -141,9 +134,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         body.marketCapPercent <= 0 ||
         body.marketCapPercent > 1)
     ) {
-      throw new ValidationError(
-        'marketCapPercent must be a decimal between 0 and 1'
-      );
+      throw new ValidationError('marketCapPercent must be a decimal between 0 and 1');
     }
 
     if (body.targetPlatform !== undefined) {

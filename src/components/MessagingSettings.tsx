@@ -47,7 +47,9 @@ export default function MessagingSettings() {
       setApprovalRequired(result.data.messageApprovalRequired ?? false);
 
       // Fetch pending approval count for info display
-      const msgResponse = await fetch('/api/messages?status=PENDING_APPROVAL&direction=OUTBOUND&limit=0');
+      const msgResponse = await fetch(
+        '/api/messages?status=PENDING_APPROVAL&direction=OUTBOUND&limit=0'
+      );
       const msgResult = await msgResponse.json();
       if (msgResponse.ok && msgResult.success) {
         setPendingCount(msgResult.pagination?.total ?? 0);
@@ -92,7 +94,9 @@ export default function MessagingSettings() {
   if (loading) {
     return (
       <div className="fp-glass-sm p-6">
-        <h2 className="text-2xl font-semibold mb-4" style={{ color: '#e2e8f0' }}>Messaging</h2>
+        <h2 className="text-2xl font-semibold mb-4" style={{ color: '#e2e8f0' }}>
+          Messaging
+        </h2>
         <p style={{ color: '#94a3b8' }}>Loading...</p>
       </div>
     );
@@ -100,7 +104,9 @@ export default function MessagingSettings() {
 
   return (
     <div className="fp-glass-sm p-6">
-      <h2 className="text-2xl font-semibold mb-4" style={{ color: '#e2e8f0' }}>Messaging</h2>
+      <h2 className="text-2xl font-semibold mb-4" style={{ color: '#e2e8f0' }}>
+        Messaging
+      </h2>
 
       {error && (
         <div className="fp-alert-danger mb-4 p-3" style={{ color: '#fca5a5' }}>
@@ -124,7 +130,8 @@ export default function MessagingSettings() {
             Two-step send confirmation
           </label>
           <p className="text-xs mt-1" style={{ color: '#94a3b8' }}>
-            When enabled, messages require an additional confirmation step after approval before being sent.
+            When enabled, messages require an additional confirmation step after approval before
+            being sent.
           </p>
           {!approvalRequired && pendingCount > 0 && (
             <p className="text-xs mt-1" style={{ color: '#fcd34d' }}>

@@ -94,13 +94,7 @@ interface UserSettings {
 
 type PushPermissionState = 'default' | 'granted' | 'denied' | 'unsupported';
 
-type PhoneUiState =
-  | 'idle'
-  | 'sending'
-  | 'code-sent'
-  | 'verifying'
-  | 'verified'
-  | 'error';
+type PhoneUiState = 'idle' | 'sending' | 'code-sent' | 'verifying' | 'verified' | 'error';
 
 /** Format a stored E.164 phone number as a masked, readable US-style display. */
 function maskPhoneNumber(e164: string): string {
@@ -129,22 +123,95 @@ type NotificationEventConfig = {
 
 const NOTIFICATION_EVENT_TYPES: readonly NotificationEventConfig[] = [
   // Flip Lifecycle
-  { displayName: 'New Opportunity Found', category: 'flip-lifecycle', emailField: 'notifyNewDeals', pushField: 'pushNotifyNewDeals', smsField: 'smsNotifyNewDeals' },
-  { displayName: 'Flip Lifecycle Updates', category: 'flip-lifecycle', emailField: 'notifySoldItems', pushField: 'pushNotifySoldItems', smsField: 'smsNotifySoldItems', tooltip: 'Controls notifications for purchase, shipping, and sale events' },
+  {
+    displayName: 'New Opportunity Found',
+    category: 'flip-lifecycle',
+    emailField: 'notifyNewDeals',
+    pushField: 'pushNotifyNewDeals',
+    smsField: 'smsNotifyNewDeals',
+  },
+  {
+    displayName: 'Flip Lifecycle Updates',
+    category: 'flip-lifecycle',
+    emailField: 'notifySoldItems',
+    pushField: 'pushNotifySoldItems',
+    smsField: 'smsNotifySoldItems',
+    tooltip: 'Controls notifications for purchase, shipping, and sale events',
+  },
   // Communication
-  { displayName: 'Seller Reply Received', category: 'communication', emailField: 'notifyMessageReceived', pushField: 'pushNotifyMessageReceived', smsField: 'smsNotifyMessageReceived' },
-  { displayName: 'AI Draft Ready', category: 'communication', emailField: 'notifyDraftReady', pushField: 'pushNotifyDraftReady', smsField: 'smsNotifyDraftReady' },
-  { displayName: 'Message Sent', category: 'communication', emailField: 'notifyMessageSent', pushField: 'pushNotifyMessageSent', smsField: 'smsNotifyMessageSent' },
+  {
+    displayName: 'Seller Reply Received',
+    category: 'communication',
+    emailField: 'notifyMessageReceived',
+    pushField: 'pushNotifyMessageReceived',
+    smsField: 'smsNotifyMessageReceived',
+  },
+  {
+    displayName: 'AI Draft Ready',
+    category: 'communication',
+    emailField: 'notifyDraftReady',
+    pushField: 'pushNotifyDraftReady',
+    smsField: 'smsNotifyDraftReady',
+  },
+  {
+    displayName: 'Message Sent',
+    category: 'communication',
+    emailField: 'notifyMessageSent',
+    pushField: 'pushNotifyMessageSent',
+    smsField: 'smsNotifyMessageSent',
+  },
   // Smart Alerts
-  { displayName: 'Review Received', category: 'smart-alerts', emailField: 'notifyReviewReceived', pushField: 'pushNotifyReviewReceived', smsField: 'smsNotifyReviewReceived' },
-  { displayName: 'Flip Gone Cold', category: 'smart-alerts', emailField: 'notifyFlipGoneCold', pushField: 'pushNotifyFlipGoneCold', smsField: 'smsNotifyFlipGoneCold' },
-  { displayName: 'Flip Turned Hot', category: 'smart-alerts', emailField: 'notifyFlipTurnedHot', pushField: 'pushNotifyFlipTurnedHot', smsField: 'smsNotifyFlipTurnedHot' },
-  { displayName: 'Price Change Alert', category: 'smart-alerts', emailField: 'notifyPriceDrops', pushField: 'pushNotifyPriceDrops', smsField: 'smsNotifyPriceDrops' },
+  {
+    displayName: 'Review Received',
+    category: 'smart-alerts',
+    emailField: 'notifyReviewReceived',
+    pushField: 'pushNotifyReviewReceived',
+    smsField: 'smsNotifyReviewReceived',
+  },
+  {
+    displayName: 'Flip Gone Cold',
+    category: 'smart-alerts',
+    emailField: 'notifyFlipGoneCold',
+    pushField: 'pushNotifyFlipGoneCold',
+    smsField: 'smsNotifyFlipGoneCold',
+  },
+  {
+    displayName: 'Flip Turned Hot',
+    category: 'smart-alerts',
+    emailField: 'notifyFlipTurnedHot',
+    pushField: 'pushNotifyFlipTurnedHot',
+    smsField: 'smsNotifyFlipTurnedHot',
+  },
+  {
+    displayName: 'Price Change Alert',
+    category: 'smart-alerts',
+    emailField: 'notifyPriceDrops',
+    pushField: 'pushNotifyPriceDrops',
+    smsField: 'smsNotifyPriceDrops',
+  },
   // Monitoring
-  { displayName: 'Listing Expiring', category: 'monitoring', emailField: 'notifyExpiring', pushField: 'pushNotifyExpiring', smsField: 'smsNotifyExpiring' },
-  { displayName: 'Listing Unavailable', category: 'monitoring', emailField: 'notifyListingUnavailable', pushField: 'pushNotifyListingUnavailable', smsField: 'smsNotifyListingUnavailable' },
+  {
+    displayName: 'Listing Expiring',
+    category: 'monitoring',
+    emailField: 'notifyExpiring',
+    pushField: 'pushNotifyExpiring',
+    smsField: 'smsNotifyExpiring',
+  },
+  {
+    displayName: 'Listing Unavailable',
+    category: 'monitoring',
+    emailField: 'notifyListingUnavailable',
+    pushField: 'pushNotifyListingUnavailable',
+    smsField: 'smsNotifyListingUnavailable',
+  },
   // Digest
-  { displayName: 'Weekly Digest', category: 'digest', emailField: 'notifyWeeklyDigest', pushField: 'pushNotifyWeeklyDigest', smsField: 'smsNotifyWeeklyDigest' },
+  {
+    displayName: 'Weekly Digest',
+    category: 'digest',
+    emailField: 'notifyWeeklyDigest',
+    pushField: 'pushNotifyWeeklyDigest',
+    smsField: 'smsNotifyWeeklyDigest',
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -278,7 +345,10 @@ function CategoryHeader({ label }: { label: string }) {
   return (
     <tr>
       <td colSpan={4} className="pt-4 pb-1">
-        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#94a3b8' }}>
+        <span
+          className="text-xs font-semibold uppercase tracking-wider"
+          style={{ color: '#94a3b8' }}
+        >
           {label}
         </span>
       </td>
@@ -292,11 +362,20 @@ function CategoryHeader({ label }: { label: string }) {
 function LoadingSkeleton() {
   return (
     <div className="fp-glass-sm p-6 space-y-4">
-      <div className="animate-pulse rounded h-6 w-48" style={{ background: 'rgba(255,255,255,0.06)' }} />
+      <div
+        className="animate-pulse rounded h-6 w-48"
+        style={{ background: 'rgba(255,255,255,0.06)' }}
+      />
       {[1, 2, 3, 4, 5].map((i) => (
         <div key={i} className="flex items-center justify-between py-2">
-          <div className="animate-pulse rounded h-4 w-40" style={{ background: 'rgba(255,255,255,0.06)' }} />
-          <div className="animate-pulse rounded-full h-6 w-11" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div
+            className="animate-pulse rounded h-4 w-40"
+            style={{ background: 'rgba(255,255,255,0.06)' }}
+          />
+          <div
+            className="animate-pulse rounded-full h-6 w-11"
+            style={{ background: 'rgba(255,255,255,0.06)' }}
+          />
         </div>
       ))}
     </div>
@@ -342,8 +421,12 @@ function FrequencyOption({
         style={{ accentColor: '#7c3aed' }}
       />
       <div>
-        <div className="font-medium text-sm" style={{ color: '#e2e8f0' }}>{label}</div>
-        <div className="text-xs" style={{ color: '#94a3b8' }}>{description}</div>
+        <div className="font-medium text-sm" style={{ color: '#e2e8f0' }}>
+          {label}
+        </div>
+        <div className="text-xs" style={{ color: '#94a3b8' }}>
+          {description}
+        </div>
       </div>
     </label>
   );
@@ -548,12 +631,17 @@ export default function NotificationSettings() {
   async function handleColdHoursBlur() {
     const hours = Math.round(Number(coldHoursInput));
     if (!isFinite(hours) || hours < 1 || hours > 168) {
-      showToast({ type: 'error', title: 'Invalid value', message: 'Must be between 1 and 168 hours' });
+      showToast({
+        type: 'error',
+        title: 'Invalid value',
+        message: 'Must be between 1 and 168 hours',
+      });
       setColdHoursInput(String(settings?.flipGoneColdHours ?? 24));
       return;
     }
     const saved = await saveSettings({ flipGoneColdHours: hours });
-    if (saved) showToast({ type: 'success', title: 'Saved', message: 'Cold flip threshold updated.' });
+    if (saved)
+      showToast({ type: 'success', title: 'Saved', message: 'Cold flip threshold updated.' });
   }
 
   async function handleHotCountBlur() {
@@ -564,14 +652,19 @@ export default function NotificationSettings() {
       return;
     }
     const saved = await saveSettings({ flipTurnedHotCount: count });
-    if (saved) showToast({ type: 'success', title: 'Saved', message: 'Hot flip threshold updated.' });
+    if (saved)
+      showToast({ type: 'success', title: 'Saved', message: 'Hot flip threshold updated.' });
   }
 
   // Story 12.2: Meeting departure buffer
   async function handleBufferBlur() {
     const buffer = Math.round(Number(bufferInput));
     if (!isFinite(buffer) || buffer < 0 || buffer > 60) {
-      showToast({ type: 'error', title: 'Invalid value', message: 'Must be between 0 and 60 minutes' });
+      showToast({
+        type: 'error',
+        title: 'Invalid value',
+        message: 'Must be between 0 and 60 minutes',
+      });
       setBufferInput(String(settings?.meetingDepartureBufferMinutes ?? 10));
       return;
     }
@@ -588,21 +681,33 @@ export default function NotificationSettings() {
       const { registerFCMServiceWorker } = await import('@/lib/firebase/register-sw');
       const registration = await registerFCMServiceWorker();
       if (!registration) {
-        showToast({ type: 'error', title: 'Error', message: 'Failed to register push service worker. Please try again.' });
+        showToast({
+          type: 'error',
+          title: 'Error',
+          message: 'Failed to register push service worker. Please try again.',
+        });
         return;
       }
       const { requestNotificationPermission } = await import('@/lib/firebase/messaging');
       const granted = await requestNotificationPermission();
       if (!granted) {
         setPushPermissionState('denied');
-        showToast({ type: 'error', title: 'Permission Denied', message: 'Push permission denied. Reset in your browser settings and try again.' });
+        showToast({
+          type: 'error',
+          title: 'Permission Denied',
+          message: 'Push permission denied. Reset in your browser settings and try again.',
+        });
         return;
       }
       setPushPermissionState('granted');
       const { getFCMToken } = await import('@/lib/firebase/messaging');
       const token = await getFCMToken();
       if (!token) {
-        showToast({ type: 'error', title: 'Error', message: 'Failed to get push notification token. Ensure VAPID key is configured.' });
+        showToast({
+          type: 'error',
+          title: 'Error',
+          message: 'Failed to get push notification token. Ensure VAPID key is configured.',
+        });
         return;
       }
       const tokenRes = await fetch('/api/user/device-token', {
@@ -611,13 +716,25 @@ export default function NotificationSettings() {
         body: JSON.stringify({ token, userAgent: navigator.userAgent }),
       });
       if (!tokenRes.ok) {
-        showToast({ type: 'error', title: 'Error', message: 'Failed to register push device. Please try again.' });
+        showToast({
+          type: 'error',
+          title: 'Error',
+          message: 'Failed to register push device. Please try again.',
+        });
         return;
       }
       await saveSettings({ pushNotifications: true });
-      showToast({ type: 'success', title: 'Push Enabled', message: 'Push notifications are now active.' });
+      showToast({
+        type: 'success',
+        title: 'Push Enabled',
+        message: 'Push notifications are now active.',
+      });
     } catch (err) {
-      showToast({ type: 'error', title: 'Error', message: err instanceof Error ? err.message : 'Failed to enable push notifications' });
+      showToast({
+        type: 'error',
+        title: 'Error',
+        message: err instanceof Error ? err.message : 'Failed to enable push notifications',
+      });
     } finally {
       setPushLoading(false);
     }
@@ -636,9 +753,17 @@ export default function NotificationSettings() {
         });
       }
       await saveSettings({ pushNotifications: false });
-      showToast({ type: 'success', title: 'Push Disabled', message: 'Push notifications have been turned off.' });
+      showToast({
+        type: 'success',
+        title: 'Push Disabled',
+        message: 'Push notifications have been turned off.',
+      });
     } catch (err) {
-      showToast({ type: 'error', title: 'Error', message: err instanceof Error ? err.message : 'Failed to disable push notifications' });
+      showToast({
+        type: 'error',
+        title: 'Error',
+        message: err instanceof Error ? err.message : 'Failed to disable push notifications',
+      });
     } finally {
       setPushLoading(false);
     }
@@ -694,7 +819,11 @@ export default function NotificationSettings() {
       }
       setCodeInput('');
       setPhoneUiState('verified');
-      showToast({ type: 'success', title: 'Verified', message: 'Phone number verified successfully.' });
+      showToast({
+        type: 'success',
+        title: 'Verified',
+        message: 'Phone number verified successfully.',
+      });
       await fetchSettings();
     } catch (err) {
       setPhoneError(err instanceof Error ? err.message : 'Verification failed');
@@ -720,7 +849,11 @@ export default function NotificationSettings() {
       await fetchSettings();
       showToast({ type: 'success', title: 'Removed', message: 'Phone number removed.' });
     } catch (err) {
-      showToast({ type: 'error', title: 'Error', message: err instanceof Error ? err.message : 'Failed to remove phone number' });
+      showToast({
+        type: 'error',
+        title: 'Error',
+        message: err instanceof Error ? err.message : 'Failed to remove phone number',
+      });
     } finally {
       setSaving(false);
     }
@@ -737,7 +870,9 @@ export default function NotificationSettings() {
   if (!settings) {
     return (
       <div className="fp-glass-sm p-6">
-        <h2 className="text-2xl font-semibold mb-4" style={{ color: '#e2e8f0' }}>Notification Preferences</h2>
+        <h2 className="text-2xl font-semibold mb-4" style={{ color: '#e2e8f0' }}>
+          Notification Preferences
+        </h2>
         <p style={{ color: '#fca5a5' }}>Failed to load settings</p>
       </div>
     );
@@ -760,7 +895,9 @@ export default function NotificationSettings() {
   return (
     <div ref={sectionRef} id="notifications" className="fp-glass-sm p-6 space-y-6">
       <div>
-        <h2 className="text-2xl font-semibold" style={{ color: '#e2e8f0' }}>Notification Preferences</h2>
+        <h2 className="text-2xl font-semibold" style={{ color: '#e2e8f0' }}>
+          Notification Preferences
+        </h2>
         <p className="text-sm mt-1" style={{ color: '#94a3b8' }}>
           Control which events notify you and how.
         </p>
@@ -770,13 +907,20 @@ export default function NotificationSettings() {
       <div className="py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-medium" style={{ color: '#e2e8f0' }}>Push Notifications</h3>
-            <p className="text-sm" style={{ color: '#94a3b8' }}>Receive instant alerts in your browser</p>
+            <h3 className="font-medium" style={{ color: '#e2e8f0' }}>
+              Push Notifications
+            </h3>
+            <p className="text-sm" style={{ color: '#94a3b8' }}>
+              Receive instant alerts in your browser
+            </p>
           </div>
           <div className="flex items-center gap-2">
-            {pushPermissionState === 'unsupported' || pushPermissionState === 'denied' ? null : pushIsEnabled ? (
+            {pushPermissionState === 'unsupported' ||
+            pushPermissionState === 'denied' ? null : pushIsEnabled ? (
               <>
-                <span className="text-sm font-medium" style={{ color: '#6ee7b7' }}>Push Enabled ✓</span>
+                <span className="text-sm font-medium" style={{ color: '#6ee7b7' }}>
+                  Push Enabled ✓
+                </span>
                 <button
                   onClick={disablePush}
                   disabled={pushLoading || saving}
@@ -798,7 +942,8 @@ export default function NotificationSettings() {
         </div>
         {pushPermissionState === 'denied' && (
           <p className="mt-2 text-sm" style={{ color: '#fcd34d' }}>
-            Push notifications are blocked by your browser. Reset in browser settings (Site Settings → Notifications).
+            Push notifications are blocked by your browser. Reset in browser settings (Site Settings
+            → Notifications).
           </p>
         )}
         {pushPermissionState === 'unsupported' && (
@@ -812,8 +957,12 @@ export default function NotificationSettings() {
       <div className="py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-medium" style={{ color: '#e2e8f0' }}>SMS Text Alerts</h3>
-            <p className="text-sm" style={{ color: '#94a3b8' }}>Get critical flip alerts via text message</p>
+            <h3 className="font-medium" style={{ color: '#e2e8f0' }}>
+              SMS Text Alerts
+            </h3>
+            <p className="text-sm" style={{ color: '#94a3b8' }}>
+              Get critical flip alerts via text message
+            </p>
           </div>
           <button
             role="switch"
@@ -824,7 +973,11 @@ export default function NotificationSettings() {
               handleToggle('smsNotifications');
             }}
             disabled={saving || !settings.phoneVerified}
-            title={settings.phoneVerified ? 'Toggle SMS notifications' : 'Verify your phone number to enable SMS alerts'}
+            title={
+              settings.phoneVerified
+                ? 'Toggle SMS notifications'
+                : 'Verify your phone number to enable SMS alerts'
+            }
             className={[
               'relative inline-flex items-center justify-start min-h-[44px] min-w-[44px] w-11 rounded-full',
               'focus:outline-none focus:ring-2 focus:ring-offset-2',
@@ -854,8 +1007,12 @@ export default function NotificationSettings() {
           {phoneUiState === 'verified' && settings.phoneNumber ? (
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium" style={{ color: '#e2e8f0' }}>{maskPhoneNumber(settings.phoneNumber)}</span>
-                <span className="text-sm font-medium" style={{ color: '#6ee7b7' }}>Verified ✓</span>
+                <span className="text-sm font-medium" style={{ color: '#e2e8f0' }}>
+                  {maskPhoneNumber(settings.phoneNumber)}
+                </span>
+                <span className="text-sm font-medium" style={{ color: '#6ee7b7' }}>
+                  Verified ✓
+                </span>
               </div>
               <button
                 type="button"
@@ -895,7 +1052,11 @@ export default function NotificationSettings() {
               </div>
               <button
                 type="button"
-                onClick={() => { setPhoneUiState('idle'); setCodeInput(''); setPhoneError(null); }}
+                onClick={() => {
+                  setPhoneUiState('idle');
+                  setCodeInput('');
+                  setPhoneError(null);
+                }}
                 className="text-xs hover:underline"
                 style={{ color: '#94a3b8' }}
               >
@@ -904,7 +1065,12 @@ export default function NotificationSettings() {
             </div>
           ) : (
             <div className="space-y-2">
-              <label htmlFor="sms-phone" id="sms-phone-hint" className="block text-sm" style={{ color: '#e2e8f0' }}>
+              <label
+                htmlFor="sms-phone"
+                id="sms-phone-hint"
+                className="block text-sm"
+                style={{ color: '#e2e8f0' }}
+              >
                 Phone number (include country code, e.g. +12025551234)
               </label>
               <div className="flex items-center gap-2">
@@ -942,8 +1108,12 @@ export default function NotificationSettings() {
         {/* Master email toggle */}
         <div className="flex items-center justify-between pb-4">
           <div>
-            <h3 className="font-medium" style={{ color: '#e2e8f0' }}>Email Notifications</h3>
-            <p className="text-sm" style={{ color: '#94a3b8' }}>Enable or disable all email notifications</p>
+            <h3 className="font-medium" style={{ color: '#e2e8f0' }}>
+              Email Notifications
+            </h3>
+            <p className="text-sm" style={{ color: '#94a3b8' }}>
+              Enable or disable all email notifications
+            </p>
           </div>
           <button
             role="switch"
@@ -978,7 +1148,8 @@ export default function NotificationSettings() {
             className="fp-alert-warn mb-4 p-3 text-sm"
             style={{ color: '#fcd34d' }}
           >
-            Email notifications are turned off. Enable the master toggle above to configure individual preferences.
+            Email notifications are turned off. Enable the master toggle above to configure
+            individual preferences.
           </div>
         )}
 
@@ -987,19 +1158,26 @@ export default function NotificationSettings() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                <th className="pb-2 text-sm font-semibold" style={{ color: '#94a3b8' }}>Event</th>
-                <th className="pb-2 px-2 text-center text-sm font-semibold" style={{ color: '#94a3b8' }}>
+                <th className="pb-2 text-sm font-semibold" style={{ color: '#94a3b8' }}>
+                  Event
+                </th>
+                <th
+                  className="pb-2 px-2 text-center text-sm font-semibold"
+                  style={{ color: '#94a3b8' }}
+                >
                   <span className="hidden sm:inline">Email</span>
                   <span className="sm:hidden">E</span>
                 </th>
-                <th className="pb-2 px-2 text-center text-sm font-semibold"
+                <th
+                  className="pb-2 px-2 text-center text-sm font-semibold"
                   style={{ color: pushColumnDisabled ? '#475569' : '#94a3b8' }}
                   title={pushColumnDisabled ? pushDisabledReason : undefined}
                 >
                   <span className="hidden sm:inline">Push</span>
                   <span className="sm:hidden">P</span>
                 </th>
-                <th className="pb-2 px-2 text-center text-sm font-semibold"
+                <th
+                  className="pb-2 px-2 text-center text-sm font-semibold"
                   style={{ color: smsColumnDisabled ? '#475569' : '#94a3b8' }}
                   title={smsColumnDisabled ? smsDisabledReason : undefined}
                 >
@@ -1018,12 +1196,17 @@ export default function NotificationSettings() {
                   if (config.category !== lastCategory) {
                     const categoryLabels: Record<string, string> = {
                       'flip-lifecycle': 'Flip Lifecycle',
-                      'communication': 'Communication',
+                      communication: 'Communication',
                       'smart-alerts': 'Smart Alerts',
-                      'monitoring': 'Monitoring',
-                      'digest': 'Digest',
+                      monitoring: 'Monitoring',
+                      digest: 'Digest',
                     };
-                    rows.push(<CategoryHeader key={`cat-${config.category}`} label={categoryLabels[config.category]} />);
+                    rows.push(
+                      <CategoryHeader
+                        key={`cat-${config.category}`}
+                        label={categoryLabels[config.category]}
+                      />
+                    );
                     lastCategory = config.category;
                   }
 
@@ -1042,13 +1225,23 @@ export default function NotificationSettings() {
                     />
                   );
 
-                  {/* Inline threshold inputs after Flip Gone Cold and Flip Turned Hot rows */}
-                  if (config.emailField === 'notifyFlipGoneCold' && settings.notifyFlipGoneCold && masterOn) {
+                  {
+                    /* Inline threshold inputs after Flip Gone Cold and Flip Turned Hot rows */
+                  }
+                  if (
+                    config.emailField === 'notifyFlipGoneCold' &&
+                    settings.notifyFlipGoneCold &&
+                    masterOn
+                  ) {
                     rows.push(
                       <tr key="cold-threshold">
                         <td colSpan={4} className="pb-3 pt-1 pl-2">
                           <div className="flex items-center gap-2">
-                            <label htmlFor="cold-hours-input" className="text-xs whitespace-nowrap" style={{ color: '#94a3b8' }}>
+                            <label
+                              htmlFor="cold-hours-input"
+                              className="text-xs whitespace-nowrap"
+                              style={{ color: '#94a3b8' }}
+                            >
                               Flip Gone Cold Time
                             </label>
                             <input
@@ -1063,22 +1256,35 @@ export default function NotificationSettings() {
                               aria-label="Hours before cold flip alert"
                               className="fp-input w-20 text-sm"
                             />
-                            <span className="text-xs" style={{ color: '#94a3b8' }}>hours with no response</span>
+                            <span className="text-xs" style={{ color: '#94a3b8' }}>
+                              hours with no response
+                            </span>
                           </div>
-                          {(Number(coldHoursInput) < 1 || Number(coldHoursInput) > 168) && coldHoursInput !== '' && (
-                            <p className="mt-1 text-xs" style={{ color: '#fca5a5' }}>Must be between 1 and 168</p>
-                          )}
+                          {(Number(coldHoursInput) < 1 || Number(coldHoursInput) > 168) &&
+                            coldHoursInput !== '' && (
+                              <p className="mt-1 text-xs" style={{ color: '#fca5a5' }}>
+                                Must be between 1 and 168
+                              </p>
+                            )}
                         </td>
                       </tr>
                     );
                   }
 
-                  if (config.emailField === 'notifyFlipTurnedHot' && settings.notifyFlipTurnedHot && masterOn) {
+                  if (
+                    config.emailField === 'notifyFlipTurnedHot' &&
+                    settings.notifyFlipTurnedHot &&
+                    masterOn
+                  ) {
                     rows.push(
                       <tr key="hot-threshold">
                         <td colSpan={4} className="pb-3 pt-1 pl-2">
                           <div className="flex items-center gap-2">
-                            <label htmlFor="hot-count-input" className="text-xs whitespace-nowrap" style={{ color: '#94a3b8' }}>
+                            <label
+                              htmlFor="hot-count-input"
+                              className="text-xs whitespace-nowrap"
+                              style={{ color: '#94a3b8' }}
+                            >
                               Flip Turned Hot Threshold
                             </label>
                             <input
@@ -1093,11 +1299,16 @@ export default function NotificationSettings() {
                               aria-label="Consecutive inbound messages before hot flip alert"
                               className="fp-input w-16 text-sm"
                             />
-                            <span className="text-xs" style={{ color: '#94a3b8' }}>consecutive inbound messages</span>
+                            <span className="text-xs" style={{ color: '#94a3b8' }}>
+                              consecutive inbound messages
+                            </span>
                           </div>
-                          {(Number(hotCountInput) < 1 || Number(hotCountInput) > 20) && hotCountInput !== '' && (
-                            <p className="mt-1 text-xs" style={{ color: '#fca5a5' }}>Must be between 1 and 20</p>
-                          )}
+                          {(Number(hotCountInput) < 1 || Number(hotCountInput) > 20) &&
+                            hotCountInput !== '' && (
+                              <p className="mt-1 text-xs" style={{ color: '#fca5a5' }}>
+                                Must be between 1 and 20
+                              </p>
+                            )}
                         </td>
                       </tr>
                     );
@@ -1115,7 +1326,9 @@ export default function NotificationSettings() {
           className={`pt-4 mt-4 ${!masterOn ? 'opacity-50' : ''}`}
           style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
         >
-          <h3 className="font-medium mb-2" style={{ color: '#e2e8f0' }}>Notification Frequency</h3>
+          <h3 className="font-medium mb-2" style={{ color: '#e2e8f0' }}>
+            Notification Frequency
+          </h3>
           <p className="text-sm mb-3" style={{ color: '#94a3b8' }}>
             How often should we send you email notifications?
           </p>
@@ -1150,7 +1363,9 @@ export default function NotificationSettings() {
 
       {/* ── Meeting Reminders (Story 12.2) ──────────────────────────────── */}
       <div className="pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <h3 className="font-medium mb-1" style={{ color: '#e2e8f0' }}>Meeting Reminders</h3>
+        <h3 className="font-medium mb-1" style={{ color: '#e2e8f0' }}>
+          Meeting Reminders
+        </h3>
         <p className="text-sm mb-4" style={{ color: '#94a3b8' }}>
           Get a departure alert when it&apos;s time to leave for a scheduled meetup.
         </p>
@@ -1158,7 +1373,9 @@ export default function NotificationSettings() {
         {/* notifyMeetingReminder toggle */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <span className="text-sm font-medium" style={{ color: '#e2e8f0' }}>Departure reminder</span>
+            <span className="text-sm font-medium" style={{ color: '#e2e8f0' }}>
+              Departure reminder
+            </span>
             <p className="text-xs" style={{ color: '#94a3b8' }}>
               Notify me when it&apos;s time to leave for a meetup
             </p>
@@ -1192,7 +1409,11 @@ export default function NotificationSettings() {
         {/* meetingDepartureBufferMinutes input — only visible when reminder is on */}
         {settings.notifyMeetingReminder && (
           <div className="flex items-center gap-3">
-            <label htmlFor="departure-buffer-input" className="text-sm whitespace-nowrap" style={{ color: '#e2e8f0' }}>
+            <label
+              htmlFor="departure-buffer-input"
+              className="text-sm whitespace-nowrap"
+              style={{ color: '#e2e8f0' }}
+            >
               Extra buffer time
             </label>
             <input
@@ -1207,9 +1428,13 @@ export default function NotificationSettings() {
               aria-label="Minutes of extra buffer before departure"
               className="fp-input w-20 text-sm"
             />
-            <span className="text-sm" style={{ color: '#94a3b8' }}>minutes before departure</span>
+            <span className="text-sm" style={{ color: '#94a3b8' }}>
+              minutes before departure
+            </span>
             {(Number(bufferInput) < 0 || Number(bufferInput) > 60) && bufferInput !== '' && (
-              <p className="text-xs" style={{ color: '#fca5a5' }}>Must be between 0 and 60</p>
+              <p className="text-xs" style={{ color: '#fca5a5' }}>
+                Must be between 0 and 60
+              </p>
             )}
           </div>
         )}

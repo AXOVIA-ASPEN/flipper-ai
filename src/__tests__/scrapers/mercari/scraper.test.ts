@@ -323,10 +323,12 @@ describe('Mercari Scraper Module', () => {
       const originalSetTimeout = global.setTimeout;
       const setTimeoutSpy = jest
         .spyOn(global, 'setTimeout')
-        .mockImplementation((fn: Parameters<typeof setTimeout>[0], delay?: number, ...args: unknown[]) => {
-          if (typeof delay === 'number') capturedDelays.push(delay);
-          return originalSetTimeout(fn as () => void, delay, ...args);
-        });
+        .mockImplementation(
+          (fn: Parameters<typeof setTimeout>[0], delay?: number, ...args: unknown[]) => {
+            if (typeof delay === 'number') capturedDelays.push(delay);
+            return originalSetTimeout(fn as () => void, delay, ...args);
+          }
+        );
 
       try {
         await scrapeMercariSearch({ keywords: 'test' });
@@ -388,9 +390,7 @@ describe('Mercari Scraper Module', () => {
         addInitScript: jest.fn(),
         goto: jest.fn(),
         waitForSelector: jest.fn().mockRejectedValue(new Error('timeout')),
-        evaluate: jest.fn().mockResolvedValue([
-          { id: 'pw-1', name: 'Playwright Item', price: 50 },
-        ]),
+        evaluate: jest.fn().mockResolvedValue([{ id: 'pw-1', name: 'Playwright Item', price: 50 }]),
         close: jest.fn(),
       };
       const mockContext = {
@@ -423,9 +423,7 @@ describe('Mercari Scraper Module', () => {
       // Playwright also fails
       chromium.launch.mockRejectedValue(new Error('Browser launch failed'));
 
-      await expect(scrapeMercariSearch({ keywords: 'switch' })).rejects.toThrow(
-        RateLimitError
-      );
+      await expect(scrapeMercariSearch({ keywords: 'switch' })).rejects.toThrow(RateLimitError);
     }, 30000);
 
     it('throws ExternalServiceError when API fails with non-rate-limit error and Playwright also fails', async () => {
@@ -830,7 +828,10 @@ describe('Mercari Scraper Module', () => {
       expect(raw.location).toBe('California');
       expect(raw.sellerName).toBe('TestSeller');
       expect(raw.sellerContact).toBeNull();
-      expect(raw.imageUrls).toEqual(['https://mercari.com/photo1.jpg', 'https://mercari.com/photo2.jpg']);
+      expect(raw.imageUrls).toEqual([
+        'https://mercari.com/photo1.jpg',
+        'https://mercari.com/photo2.jpg',
+      ]);
       expect(raw.category).toBe('Electronics');
       expect(raw.postedAt).toBeInstanceOf(Date);
     });
@@ -967,7 +968,13 @@ describe('Mercari Scraper Module', () => {
     it('converts extracted items to MercariItem format', async () => {
       const { mockPage } = createMockPlaywright();
       mockPage.evaluate.mockResolvedValue([
-        { id: 'pw-item-1', name: 'Playwright Item', price: 99, imageUrl: 'https://img.jpg', url: 'https://mercari.com/item/pw-item-1/' },
+        {
+          id: 'pw-item-1',
+          name: 'Playwright Item',
+          price: 99,
+          imageUrl: 'https://img.jpg',
+          url: 'https://mercari.com/item/pw-item-1/',
+        },
       ]);
 
       const result = await scrapeMercariWithPlaywright({ keywords: 'test' });
@@ -991,9 +998,7 @@ describe('Mercari Scraper Module', () => {
 
     it('handles items without imageUrl', async () => {
       const { mockPage } = createMockPlaywright();
-      mockPage.evaluate.mockResolvedValue([
-        { id: 'pw-2', name: 'No Image Item', price: 50 },
-      ]);
+      mockPage.evaluate.mockResolvedValue([{ id: 'pw-2', name: 'No Image Item', price: 50 }]);
 
       const result = await scrapeMercariWithPlaywright({ keywords: 'test' });
 
@@ -1021,7 +1026,9 @@ describe('Mercari Scraper Module', () => {
       const contextCall = mockBrowser.newContext.mock.calls[0][0];
       expect(contextCall.viewport.width).toBeGreaterThanOrEqual(SCRAPER_CONFIG.VIEWPORT_MIN_WIDTH);
       expect(contextCall.viewport.width).toBeLessThanOrEqual(SCRAPER_CONFIG.VIEWPORT_MAX_WIDTH);
-      expect(contextCall.viewport.height).toBeGreaterThanOrEqual(SCRAPER_CONFIG.VIEWPORT_MIN_HEIGHT);
+      expect(contextCall.viewport.height).toBeGreaterThanOrEqual(
+        SCRAPER_CONFIG.VIEWPORT_MIN_HEIGHT
+      );
       expect(contextCall.viewport.height).toBeLessThanOrEqual(SCRAPER_CONFIG.VIEWPORT_MAX_HEIGHT);
     });
   });

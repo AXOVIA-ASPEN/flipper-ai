@@ -106,7 +106,10 @@ async function fetchWithRetry(url: string, maxRetries = 3): Promise<Response> {
       }
     }
   }
-  throw new ExternalServiceError('Google Maps', `API unavailable after ${maxRetries} retries: ${String(lastError)}`);
+  throw new ExternalServiceError(
+    'Google Maps',
+    `API unavailable after ${maxRetries} retries: ${String(lastError)}`
+  );
 }
 
 // ---------------------------------------------------------------------------

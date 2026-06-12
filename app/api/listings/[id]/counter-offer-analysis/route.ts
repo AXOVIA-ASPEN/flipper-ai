@@ -27,10 +27,7 @@ import { checkFeatureAccess } from '@/lib/tier-enforcement';
 import { analyzeCounterOffer } from '@/lib/negotiation-strategy';
 import type { NegotiationStrategyInput } from '@/lib/negotiation-strategy';
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
@@ -67,9 +64,7 @@ export async function POST(
       counterOfferPrice <= 0 ||
       counterOfferPrice > 999999
     ) {
-      throw new ValidationError(
-        'Counter-offer price must be a positive number under $1,000,000'
-      );
+      throw new ValidationError('Counter-offer price must be a positive number under $1,000,000');
     }
 
     if (
@@ -78,9 +73,7 @@ export async function POST(
       ourPreviousOffer <= 0 ||
       ourPreviousOffer > 999999
     ) {
-      throw new ValidationError(
-        'Our previous offer must be a positive number under $1,000,000'
-      );
+      throw new ValidationError('Our previous offer must be a positive number under $1,000,000');
     }
 
     // Fetch listing with market data fields
@@ -114,9 +107,7 @@ export async function POST(
     const analysisInput: NegotiationStrategyInput = {
       listingId: listing.id,
       askingPrice: Number(listing.askingPrice),
-      verifiedMarketValue: listing.verifiedMarketValue
-        ? Number(listing.verifiedMarketValue)
-        : null,
+      verifiedMarketValue: listing.verifiedMarketValue ? Number(listing.verifiedMarketValue) : null,
       estimatedValue: listing.estimatedValue ? Number(listing.estimatedValue) : null,
       condition: listing.condition,
       daysListed: listing.daysListed,
@@ -124,17 +115,11 @@ export async function POST(
       demandLevel: listing.demandLevel,
       sellabilityScore: listing.sellabilityScore,
       platform: listing.platform,
-      recommendedOffer: listing.recommendedOffer
-        ? Number(listing.recommendedOffer)
-        : null,
+      recommendedOffer: listing.recommendedOffer ? Number(listing.recommendedOffer) : null,
       marketDataDate: listing.marketDataDate ?? null,
     };
 
-    const analysis = await analyzeCounterOffer(
-      analysisInput,
-      counterOfferPrice,
-      ourPreviousOffer
-    );
+    const analysis = await analyzeCounterOffer(analysisInput, counterOfferPrice, ourPreviousOffer);
 
     return NextResponse.json({
       success: true,

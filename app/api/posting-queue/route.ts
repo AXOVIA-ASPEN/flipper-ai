@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import {
+  handleError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+} from '@/lib/errors';
 import {
   PostingQueueQuerySchema,
   CreatePostingQueueItemSchema,
@@ -85,17 +91,14 @@ function buildTitleInput(listing: ListingForGeneration): TitleGeneratorInput {
 /**
  * Build a DescriptionGeneratorInput from a Listing row's identification fields.
  */
-function buildDescriptionInput(
-  listing: ListingForGeneration
-): DescriptionGeneratorInput {
+function buildDescriptionInput(listing: ListingForGeneration): DescriptionGeneratorInput {
   return {
     brand: listing.identifiedBrand || null,
     model: listing.identifiedModel || null,
     variant: listing.identifiedVariant || null,
     condition: listing.identifiedCondition || listing.condition || 'good',
     category: listing.category || null,
-    askingPrice:
-      listing.recommendedList ?? listing.verifiedMarketValue ?? listing.askingPrice,
+    askingPrice: listing.recommendedList ?? listing.verifiedMarketValue ?? listing.askingPrice,
     originalPrice: listing.askingPrice,
     sellerNotes: listing.notes || null,
   };
@@ -217,7 +220,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Enforce eBay cross-listing feature gate
-    const user = await prisma.user.findUnique({ where: { id: userId }, select: { subscriptionTier: true } });
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { subscriptionTier: true },
+    });
     const featureCheck = checkFeatureAccess(user?.subscriptionTier, 'ebayCrossListing');
     if (!featureCheck.allowed) {
       throw new ForbiddenError(featureCheck.reason);
@@ -259,12 +265,7 @@ export async function POST(request: NextRequest) {
       // tone are honored when the caller did not pass explicit content.
       const created = await Promise.all(
         filteredPlatforms.map((targetPlatform) => {
-          const resolved = resolveTitleAndDescription(
-            listing,
-            targetPlatform,
-            title,
-            description
-          );
+          const resolved = resolveTitleAndDescription(listing, targetPlatform, title, description);
           return prisma.postingQueueItem.upsert({
             where: {
               listingId_targetPlatform_userId: { listingId, targetPlatform, userId },
@@ -295,8 +296,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { listingId, targetPlatform, askingPrice, title, description, scheduledAt } =
-      parsed.data;
+    const { listingId, targetPlatform, askingPrice, title, description, scheduledAt } = parsed.data;
 
     // Verify listing exists and belongs to user. Select identification fields
     // so we can auto-generate title/description when the caller omits them.
@@ -312,12 +312,7 @@ export async function POST(request: NextRequest) {
       throw new ValidationError('Cannot post to the same platform the listing was scraped from');
     }
 
-    const resolved = resolveTitleAndDescription(
-      listing,
-      targetPlatform,
-      title,
-      description
-    );
+    const resolved = resolveTitleAndDescription(listing, targetPlatform, title, description);
 
     const item = await prisma.postingQueueItem.upsert({
       where: {

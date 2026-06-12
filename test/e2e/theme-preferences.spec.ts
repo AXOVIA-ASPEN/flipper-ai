@@ -116,16 +116,12 @@ test.describe('Feature: Theme & User Preference Persistence', () => {
 
       await page.goto('/');
       await expect(page.locator('body')).toBeVisible();
-      const initialBg = await page.evaluate(() =>
-        getComputedStyle(document.body).backgroundColor
-      );
+      const initialBg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
 
       // Navigate to settings
       await page.goto('/settings');
       await expect(page.locator('body')).toBeVisible();
-      const settingsBg = await page.evaluate(() =>
-        getComputedStyle(document.body).backgroundColor
-      );
+      const settingsBg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
 
       // Background should be consistent (both dark or both matching)
       expect(settingsBg).toBe(initialBg);
@@ -134,9 +130,7 @@ test.describe('Feature: Theme & User Preference Persistence', () => {
   });
 
   test.describe('Scenario: Theme preference stored in localStorage', () => {
-    test('Given I visit the app, Then theme preference is stored locally', async ({
-      page,
-    }) => {
+    test('Given I visit the app, Then theme preference is stored locally', async ({ page }) => {
       await page.goto('/');
       await expect(page.locator('body')).toBeVisible();
 

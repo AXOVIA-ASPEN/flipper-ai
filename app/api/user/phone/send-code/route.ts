@@ -26,7 +26,14 @@ import { randomInt } from 'crypto';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/db';
 import { getCurrentUserId } from '@/lib/auth';
-import { handleError, UnauthorizedError, ValidationError, RateLimitError, AppError, ErrorCode } from '@/lib/errors';
+import {
+  handleError,
+  UnauthorizedError,
+  ValidationError,
+  RateLimitError,
+  AppError,
+  ErrorCode,
+} from '@/lib/errors';
 import { smsService } from '@/lib/sms-service';
 import { logger } from '@/lib/logger';
 
@@ -48,9 +55,7 @@ export async function POST(request: NextRequest) {
     const { phoneNumber } = body as { phoneNumber?: unknown };
 
     if (typeof phoneNumber !== 'string' || !E164_REGEX.test(phoneNumber)) {
-      throw new ValidationError(
-        'phoneNumber must be in E.164 format (e.g., +12025551234)'
-      );
+      throw new ValidationError('phoneNumber must be in E.164 format (e.g., +12025551234)');
     }
 
     // Ensure settings row exists (should already from onboarding, but be safe)

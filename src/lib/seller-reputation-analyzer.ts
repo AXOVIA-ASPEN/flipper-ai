@@ -2,16 +2,16 @@
 // Pure synchronous function — reads pre-populated listing fields, no network calls.
 
 export interface SellerReputationResult {
-  sellerRating: number | null;         // eBay: feedback % (0–100), Mercari: stars (0–5)
-  sellerReviewCount: number | null;    // Total reviews/feedback count
+  sellerRating: number | null; // eBay: feedback % (0–100), Mercari: stars (0–5)
+  sellerReviewCount: number | null; // Total reviews/feedback count
   sellerAccountAgeDays: number | null; // Days since account creation
-  isLowReputation: boolean;            // true if below platform average
-  riskEscalation: boolean;             // true if authenticityRisk should be raised to 'high'
+  isLowReputation: boolean; // true if below platform average
+  riskEscalation: boolean; // true if authenticityRisk should be raised to 'high'
 }
 
 // Platform-specific reputation thresholds
 const PLATFORM_THRESHOLDS: Record<string, { minRating: number }> = {
-  EBAY: { minRating: 97 },     // eBay feedback percentage — below 97% is low
+  EBAY: { minRating: 97 }, // eBay feedback percentage — below 97% is low
   MERCARI: { minRating: 4.0 }, // Mercari star rating out of 5.0
 };
 

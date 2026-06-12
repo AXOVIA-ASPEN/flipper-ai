@@ -252,7 +252,11 @@ describe('getProfitLossAnalytics - branch coverage', () => {
   it('computes avgROI correctly for sold item in category', async () => {
     // Normal item, verifies the avgROI > 0 path in categoryBreakdown
     (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([
-      makeOpp({ purchasePrice: 50, resalePrice: 100, resaleDate: new Date('2026-01-20T12:00:00Z') }),
+      makeOpp({
+        purchasePrice: 50,
+        resalePrice: 100,
+        resaleDate: new Date('2026-01-20T12:00:00Z'),
+      }),
     ]);
     const result = await getProfitLossAnalytics('user-1');
     const cat = result.categoryBreakdown.find((c) => c.category === 'Electronics');
@@ -271,10 +275,22 @@ describe('getProfitLossAnalytics - avgProfitPerFlip and successRate', () => {
     // Use same purchase and resale date to eliminate carrying cost, making netProfit exact
     const sameDay = new Date('2026-01-02T12:00:00Z');
     (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([
-      makeOpp({ id: 'opp-a', purchasePrice: 50, resalePrice: 160, fees: 10,
-        purchaseDate: sameDay, resaleDate: sameDay }),
-      makeOpp({ id: 'opp-b', purchasePrice: 50, resalePrice: 260, fees: 10,
-        purchaseDate: sameDay, resaleDate: sameDay }),
+      makeOpp({
+        id: 'opp-a',
+        purchasePrice: 50,
+        resalePrice: 160,
+        fees: 10,
+        purchaseDate: sameDay,
+        resaleDate: sameDay,
+      }),
+      makeOpp({
+        id: 'opp-b',
+        purchasePrice: 50,
+        resalePrice: 260,
+        fees: 10,
+        purchaseDate: sameDay,
+        resaleDate: sameDay,
+      }),
     ]);
     const result = await getProfitLossAnalytics('user-1');
     // opp-a netProfit: 160-50-10=100, opp-b: 260-50-10=200, avg=150
@@ -292,9 +308,12 @@ describe('getProfitLossAnalytics - avgProfitPerFlip and successRate', () => {
   it('computes successRate: 2 SOLD out of 3 total → successRate = 66.67', async () => {
     (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([
       makeOpp({ id: 'sold-1', status: 'SOLD' }),
-      makeOpp({ id: 'sold-2', status: 'SOLD',
+      makeOpp({
+        id: 'sold-2',
+        status: 'SOLD',
         purchaseDate: new Date('2026-01-05T12:00:00Z'),
-        resaleDate: new Date('2026-01-20T12:00:00Z') }),
+        resaleDate: new Date('2026-01-20T12:00:00Z'),
+      }),
       makeOpp({ id: 'active-1', status: 'PURCHASED', resalePrice: null, resaleDate: null }),
     ]);
     const result = await getProfitLossAnalytics('user-1');
@@ -309,14 +328,29 @@ describe('getProfitLossAnalytics - avgProfitPerFlip and successRate', () => {
 
   it('computes platformBreakdown: 2 EBAY items, 1 CRAIGSLIST → two entries sorted by totalProfit', async () => {
     (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([
-      makeOpp({ id: 'eb-1', purchasePrice: 50, resalePrice: 200, fees: 10,
-        listing: { title: 'eBay 1', platform: 'EBAY', category: 'Electronics' } }),
-      makeOpp({ id: 'eb-2', purchasePrice: 50, resalePrice: 200, fees: 10,
+      makeOpp({
+        id: 'eb-1',
+        purchasePrice: 50,
+        resalePrice: 200,
+        fees: 10,
+        listing: { title: 'eBay 1', platform: 'EBAY', category: 'Electronics' },
+      }),
+      makeOpp({
+        id: 'eb-2',
+        purchasePrice: 50,
+        resalePrice: 200,
+        fees: 10,
         purchaseDate: new Date('2026-01-05T12:00:00Z'),
         resaleDate: new Date('2026-01-20T12:00:00Z'),
-        listing: { title: 'eBay 2', platform: 'EBAY', category: 'Electronics' } }),
-      makeOpp({ id: 'cl-1', purchasePrice: 100, resalePrice: 120, fees: 0,
-        listing: { title: 'CL item', platform: 'CRAIGSLIST', category: 'Furniture' } }),
+        listing: { title: 'eBay 2', platform: 'EBAY', category: 'Electronics' },
+      }),
+      makeOpp({
+        id: 'cl-1',
+        purchasePrice: 100,
+        resalePrice: 120,
+        fees: 0,
+        listing: { title: 'CL item', platform: 'CRAIGSLIST', category: 'Furniture' },
+      }),
     ]);
     const result = await getProfitLossAnalytics('user-1');
     expect(result.platformBreakdown).toHaveLength(2);
@@ -330,11 +364,22 @@ describe('getProfitLossAnalytics - avgProfitPerFlip and successRate', () => {
     const sameDay = new Date('2026-01-02T12:00:00Z');
     (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([
       // SOLD item: netProfit = 200 - 100 - 10 = 90 (same-day purchase/resale, no carrying cost)
-      makeOpp({ id: 'sold-1', purchasePrice: 100, resalePrice: 200, fees: 10,
-        purchaseDate: sameDay, resaleDate: sameDay }),
+      makeOpp({
+        id: 'sold-1',
+        purchasePrice: 100,
+        resalePrice: 200,
+        fees: 10,
+        purchaseDate: sameDay,
+        resaleDate: sameDay,
+      }),
       // PURCHASED item: contributes large negative netProfit to totalNetProfit via carrying costs
-      makeOpp({ id: 'active-1', status: 'PURCHASED', purchasePrice: 500,
-        resalePrice: null, resaleDate: null }),
+      makeOpp({
+        id: 'active-1',
+        status: 'PURCHASED',
+        purchasePrice: 500,
+        resalePrice: null,
+        resaleDate: null,
+      }),
     ]);
     const result = await getProfitLossAnalytics('user-1');
     // avgProfitPerFlip must reflect only the SOLD item: 90 / 1 = 90
@@ -345,10 +390,18 @@ describe('getProfitLossAnalytics - avgProfitPerFlip and successRate', () => {
 
   it('platformBreakdown successRate is SOLD / all items per platform', async () => {
     (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([
-      makeOpp({ id: 'eb-sold', status: 'SOLD',
-        listing: { title: 'eBay sold', platform: 'EBAY', category: 'Electronics' } }),
-      makeOpp({ id: 'eb-active', status: 'PURCHASED', resalePrice: null, resaleDate: null,
-        listing: { title: 'eBay active', platform: 'EBAY', category: 'Electronics' } }),
+      makeOpp({
+        id: 'eb-sold',
+        status: 'SOLD',
+        listing: { title: 'eBay sold', platform: 'EBAY', category: 'Electronics' },
+      }),
+      makeOpp({
+        id: 'eb-active',
+        status: 'PURCHASED',
+        resalePrice: null,
+        resaleDate: null,
+        listing: { title: 'eBay active', platform: 'EBAY', category: 'Electronics' },
+      }),
     ]);
     const result = await getProfitLossAnalytics('user-1');
     const ebay = result.platformBreakdown.find((p) => p.platform === 'EBAY');

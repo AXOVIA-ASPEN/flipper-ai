@@ -18,7 +18,10 @@ const mockCompleteAI = jest.fn();
 jest.mock('@/lib/ai', () => ({
   completeAI: (...args: unknown[]) => mockCompleteAI(...args),
   AIProviderUnavailableError: class extends Error {
-    constructor() { super('No AI provider available'); this.name = 'AIProviderUnavailableError'; }
+    constructor() {
+      super('No AI provider available');
+      this.name = 'AIProviderUnavailableError';
+    }
   },
 }));
 
@@ -248,8 +251,12 @@ describe('negotiation-strategy', () => {
     });
 
     it('boosts offer for high demand (isHighDemand = true)', () => {
-      const highDemand = generateFallbackStrategy(makeInput({ demandLevel: 'high', negotiable: true }));
-      const lowDemand = generateFallbackStrategy(makeInput({ demandLevel: 'low', negotiable: true }));
+      const highDemand = generateFallbackStrategy(
+        makeInput({ demandLevel: 'high', negotiable: true })
+      );
+      const lowDemand = generateFallbackStrategy(
+        makeInput({ demandLevel: 'low', negotiable: true })
+      );
       expect(highDemand.initialOfferPrice).toBeGreaterThanOrEqual(lowDemand.initialOfferPrice);
     });
 
@@ -484,7 +491,8 @@ describe('negotiation-strategy', () => {
           demandLevel: undefined,
           negotiable: undefined,
         }),
-        90, 70
+        90,
+        70
       );
       expect(result.recommendation).toBe('accept');
       expect(result.suggestedCounterPrice).toBeNull();
@@ -525,7 +533,7 @@ describe('negotiation-strategy', () => {
       const result = generateFallbackCounterAnalysis(
         makeInput({ askingPrice: 100, demandLevel: 'high' }),
         115, // > 100 * 1.1 = 110
-        80   // previous offer
+        80 // previous offer
       );
       expect(result.recommendation).toBe('walkaway');
       expect(result.suggestedCounterPrice).toBeNull();
@@ -553,7 +561,7 @@ describe('negotiation-strategy', () => {
       const result = generateFallbackCounterAnalysis(
         makeInput({ askingPrice: 100, verifiedMarketValue: 200, platform: 'CRAIGSLIST' }),
         90, // counter
-        70  // previous offer
+        70 // previous offer
       );
       expect(result.recommendation).toBe('counter');
       expect(result.suggestedCounterPrice).toBe(80); // midpoint(70, 90)

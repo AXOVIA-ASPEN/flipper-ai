@@ -117,9 +117,7 @@ function buildSearchUrl(params: OfferUpSearchParams): string {
 }
 
 // Main scrape function — launches browser, extracts listings, returns structured result
-export async function scrapeOfferUp(
-  params: OfferUpSearchParams
-): Promise<OfferUpScrapeResult> {
+export async function scrapeOfferUp(params: OfferUpSearchParams): Promise<OfferUpScrapeResult> {
   let browser: Browser | null = null;
   let timeoutId: ReturnType<typeof setTimeout>;
 
@@ -188,8 +186,9 @@ async function scrapeWithBrowser(
   });
 
   // Block unnecessary resources to speed up scraping
-  await context.route('**/*.{png,jpg,jpeg,gif,webp,svg,ico,woff,woff2,ttf}', /* istanbul ignore next */ (route) =>
-    route.abort()
+  await context.route(
+    '**/*.{png,jpg,jpeg,gif,webp,svg,ico,woff,woff2,ttf}',
+    /* istanbul ignore next */ (route) => route.abort()
   );
   await context.route('**/analytics/**', /* istanbul ignore next */ (route) => route.abort());
   await context.route('**/tracking/**', /* istanbul ignore next */ (route) => route.abort());
@@ -197,9 +196,11 @@ async function scrapeWithBrowser(
   const page = await context.newPage();
 
   // Override navigator.webdriver to avoid headless detection
-  await page.addInitScript(/* istanbul ignore next */ () => {
-    Object.defineProperty(navigator, 'webdriver', { get: () => false });
-  });
+  await page.addInitScript(
+    /* istanbul ignore next */ () => {
+      Object.defineProperty(navigator, 'webdriver', { get: () => false });
+    }
+  );
 
   const searchUrl = buildSearchUrl(params);
   console.log(`[offerup-scraper] Navigating to: ${searchUrl}`);
@@ -222,7 +223,9 @@ async function scrapeWithBrowser(
       { timeout: SCRAPER_CONFIG.SELECTOR_WAIT_TIMEOUT_MS }
     )
     .catch(() => {
-      console.log('[offerup-scraper] No standard listing selector found, trying alternate approach');
+      console.log(
+        '[offerup-scraper] No standard listing selector found, trying alternate approach'
+      );
     });
 
   // Check for blocked/captcha
@@ -237,77 +240,79 @@ async function scrapeWithBrowser(
 
   // Extract listings using page.evaluate for in-browser DOM extraction
   // istanbul ignore next -- Browser-side DOM code runs in Playwright context, not Node.js
-  const rawListings = await page.evaluate(/* istanbul ignore next */ () => {
-    const items: Array<{
-      title: string;
-      price: string;
-      url: string;
-      location: string;
-      imageUrl?: string;
-      condition?: string;
-    }> = [];
+  const rawListings = await page.evaluate(
+    /* istanbul ignore next */ () => {
+      const items: Array<{
+        title: string;
+        price: string;
+        url: string;
+        location: string;
+        imageUrl?: string;
+        condition?: string;
+      }> = [];
 
-    // Try multiple selector patterns
-    const cardSelectors = [
-      '[data-testid="listing-card"]',
-      '[class*="listing-card"]',
-      '[class*="ItemCard"]',
-      'a[href*="/item/detail/"]',
-    ];
+      // Try multiple selector patterns
+      const cardSelectors = [
+        '[data-testid="listing-card"]',
+        '[class*="listing-card"]',
+        '[class*="ItemCard"]',
+        'a[href*="/item/detail/"]',
+      ];
 
-    let listingElements: Element[] = [];
-    for (const selector of cardSelectors) {
-      const elements = document.querySelectorAll(selector);
-      if (elements.length > 0) {
-        listingElements = Array.from(elements);
-        break;
-      }
-    }
-
-    // If using link-based selection, get parent containers
-    if (listingElements.length > 0 && listingElements[0].tagName === 'A') {
-      listingElements = listingElements.map(
-        (el) => el.closest('article, div[class*="card"], li') || el
-      );
-    }
-
-    for (const el of listingElements.slice(0, 50)) {
-      try {
-        const titleEl = el.querySelector(
-          'h3, [class*="title"], [data-testid="listing-title"], span[class*="Title"]'
-        ) as HTMLElement;
-        const title =
-          titleEl?.innerText?.trim() || (el as HTMLElement).querySelector('a')?.title || '';
-
-        const linkEl = el.querySelector('a[href*="/item/detail/"]') as HTMLAnchorElement;
-        const url = linkEl?.href || '';
-
-        const priceEl = el.querySelector(
-          '[class*="price"], [data-testid="listing-price"], span[class*="Price"]'
-        ) as HTMLElement;
-        const price = priceEl?.innerText?.trim() || '$0';
-
-        const locationEl = el.querySelector(
-          '[class*="location"], [data-testid="listing-location"]'
-        ) as HTMLElement;
-        const location = locationEl?.innerText?.trim() || '';
-
-        const imgEl = el.querySelector('img') as HTMLImageElement;
-        const imageUrl = imgEl?.src || imgEl?.getAttribute('data-src') || '';
-
-        const conditionEl = el.querySelector('[class*="condition"]') as HTMLElement;
-        const condition = conditionEl?.innerText?.trim() || '';
-
-        if (title && url && url.includes('/item/detail/')) {
-          items.push({ title, price, url, location, imageUrl, condition });
+      let listingElements: Element[] = [];
+      for (const selector of cardSelectors) {
+        const elements = document.querySelectorAll(selector);
+        if (elements.length > 0) {
+          listingElements = Array.from(elements);
+          break;
         }
-      } catch {
-        // Skip problematic listings
       }
-    }
 
-    return items;
-  });
+      // If using link-based selection, get parent containers
+      if (listingElements.length > 0 && listingElements[0].tagName === 'A') {
+        listingElements = listingElements.map(
+          (el) => el.closest('article, div[class*="card"], li') || el
+        );
+      }
+
+      for (const el of listingElements.slice(0, 50)) {
+        try {
+          const titleEl = el.querySelector(
+            'h3, [class*="title"], [data-testid="listing-title"], span[class*="Title"]'
+          ) as HTMLElement;
+          const title =
+            titleEl?.innerText?.trim() || (el as HTMLElement).querySelector('a')?.title || '';
+
+          const linkEl = el.querySelector('a[href*="/item/detail/"]') as HTMLAnchorElement;
+          const url = linkEl?.href || '';
+
+          const priceEl = el.querySelector(
+            '[class*="price"], [data-testid="listing-price"], span[class*="Price"]'
+          ) as HTMLElement;
+          const price = priceEl?.innerText?.trim() || '$0';
+
+          const locationEl = el.querySelector(
+            '[class*="location"], [data-testid="listing-location"]'
+          ) as HTMLElement;
+          const location = locationEl?.innerText?.trim() || '';
+
+          const imgEl = el.querySelector('img') as HTMLImageElement;
+          const imageUrl = imgEl?.src || imgEl?.getAttribute('data-src') || '';
+
+          const conditionEl = el.querySelector('[class*="condition"]') as HTMLElement;
+          const condition = conditionEl?.innerText?.trim() || '';
+
+          if (title && url && url.includes('/item/detail/')) {
+            items.push({ title, price, url, location, imageUrl, condition });
+          }
+        } catch {
+          // Skip problematic listings
+        }
+      }
+
+      return items;
+    }
+  );
 
   console.log(`[offerup-scraper] Found ${rawListings.length} listings`);
 

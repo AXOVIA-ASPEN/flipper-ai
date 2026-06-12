@@ -52,13 +52,10 @@ Then(
   }
 );
 
-Then(
-  'I should see a {string} CTA button',
-  async function (this: CustomWorld, buttonText: string) {
-    const cta = this.page.getByRole('link', { name: buttonText }).first();
-    await expect(cta).toBeVisible();
-  }
-);
+Then('I should see a {string} CTA button', async function (this: CustomWorld, buttonText: string) {
+  const cta = this.page.getByRole('link', { name: buttonText }).first();
+  await expect(cta).toBeVisible();
+});
 
 Then(
   'the Flipper AI logo and brand name should be visible in the header',
@@ -127,14 +124,11 @@ Then(
 
 // ==================== S-4: Pricing section ====================
 
-Then(
-  'I should see 3 pricing tiers',
-  async function (this: CustomWorld) {
-    const section = this.page.locator('section[aria-labelledby="pricing-heading"]');
-    const tiers = section.locator('.grid > div');
-    await expect(tiers).toHaveCount(3);
-  }
-);
+Then('I should see 3 pricing tiers', async function (this: CustomWorld) {
+  const section = this.page.locator('section[aria-labelledby="pricing-heading"]');
+  const tiers = section.locator('.grid > div');
+  await expect(tiers).toHaveCount(3);
+});
 
 Then(
   'the {string} tier should show {string} per month',
@@ -157,23 +151,17 @@ Then(
 
 // ==================== S-5 & S-6: CTA navigation ====================
 
-When(
-  'I click the {string} button',
-  async function (this: CustomWorld, buttonText: string) {
-    const cta = this.page.getByRole('link', { name: buttonText }).first();
-    await cta.click();
-    await this.page.waitForLoadState('domcontentloaded');
-  }
-);
+When('I click the {string} button', async function (this: CustomWorld, buttonText: string) {
+  const cta = this.page.getByRole('link', { name: buttonText }).first();
+  await cta.click();
+  await this.page.waitForLoadState('domcontentloaded');
+});
 
-Then(
-  'I should be navigated to {string}',
-  async function (this: CustomWorld, path: string) {
-    await this.page.waitForURL(`**${path}`, { timeout: 5000 });
-    const url = new URL(this.page.url());
-    expect(url.pathname).toBe(path);
-  }
-);
+Then('I should be navigated to {string}', async function (this: CustomWorld, path: string) {
+  await this.page.waitForURL(`**${path}`, { timeout: 5000 });
+  const url = new URL(this.page.url());
+  expect(url.pathname).toBe(path);
+});
 
 Then(
   'the {string} tier CTA should link to {string}',
@@ -194,38 +182,29 @@ Given(
   }
 );
 
-Then(
-  'feature cards should be stacked in a single column',
-  async function (this: CustomWorld) {
-    const section = this.page.locator('section[aria-labelledby="features-heading"]');
-    const grid = section.locator('.grid');
-    const style = await grid.evaluate((el) => window.getComputedStyle(el).gridTemplateColumns);
-    // Single column means one column track (no multiple column values)
-    const columnCount = style.split(' ').filter((s) => s.trim() && s !== 'none').length;
-    expect(columnCount).toBeLessThanOrEqual(1);
-  }
-);
+Then('feature cards should be stacked in a single column', async function (this: CustomWorld) {
+  const section = this.page.locator('section[aria-labelledby="features-heading"]');
+  const grid = section.locator('.grid');
+  const style = await grid.evaluate((el) => window.getComputedStyle(el).gridTemplateColumns);
+  // Single column means one column track (no multiple column values)
+  const columnCount = style.split(' ').filter((s) => s.trim() && s !== 'none').length;
+  expect(columnCount).toBeLessThanOrEqual(1);
+});
 
-Then(
-  'pricing cards should be stacked in a single column',
-  async function (this: CustomWorld) {
-    const section = this.page.locator('section[aria-labelledby="pricing-heading"]');
-    const grid = section.locator('.grid');
-    const style = await grid.evaluate((el) => window.getComputedStyle(el).gridTemplateColumns);
-    const columnCount = style.split(' ').filter((s) => s.trim() && s !== 'none').length;
-    expect(columnCount).toBeLessThanOrEqual(1);
-  }
-);
+Then('pricing cards should be stacked in a single column', async function (this: CustomWorld) {
+  const section = this.page.locator('section[aria-labelledby="pricing-heading"]');
+  const grid = section.locator('.grid');
+  const style = await grid.evaluate((el) => window.getComputedStyle(el).gridTemplateColumns);
+  const columnCount = style.split(' ').filter((s) => s.trim() && s !== 'none').length;
+  expect(columnCount).toBeLessThanOrEqual(1);
+});
 
-Then(
-  'no horizontal scrollbar should be present',
-  async function (this: CustomWorld) {
-    const hasHorizontalScroll = await this.page.evaluate(
-      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
-    );
-    expect(hasHorizontalScroll).toBe(false);
-  }
-);
+Then('no horizontal scrollbar should be present', async function (this: CustomWorld) {
+  const hasHorizontalScroll = await this.page.evaluate(
+    () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+  );
+  expect(hasHorizontalScroll).toBe(false);
+});
 
 Then(
   'all CTA buttons should have a minimum touch target of 44 pixels',
@@ -253,13 +232,10 @@ Then(
   }
 );
 
-Then(
-  'I should see a {string} link',
-  async function (this: CustomWorld, linkText: string) {
-    const link = this.page.getByRole('link', { name: linkText });
-    await expect(link).toBeVisible();
-  }
-);
+Then('I should see a {string} link', async function (this: CustomWorld, linkText: string) {
+  const link = this.page.getByRole('link', { name: linkText });
+  await expect(link).toBeVisible();
+});
 
 Then(
   'I should see {string} in the copyright notice',
@@ -269,15 +245,12 @@ Then(
   }
 );
 
-Then(
-  'the copyright notice should include the current year',
-  async function (this: CustomWorld) {
-    const currentYear = new Date().getFullYear().toString();
-    const footer = this.page.locator('footer');
-    const copyrightText = await footer.textContent();
-    expect(copyrightText).toContain(currentYear);
-  }
-);
+Then('the copyright notice should include the current year', async function (this: CustomWorld) {
+  const currentYear = new Date().getFullYear().toString();
+  const footer = this.page.locator('footer');
+  const copyrightText = await footer.textContent();
+  expect(copyrightText).toContain(currentYear);
+});
 
 // ==================== S-9: Accessibility ====================
 

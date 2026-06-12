@@ -49,37 +49,29 @@ describe('computeImageStatus', () => {
   });
 
   it("returns 'manual-upload-required' when neither source has URLs", () => {
-    expect(computeImageStatus({ images: [], imageUrls: null })).toBe(
-      'manual-upload-required'
-    );
-    expect(computeImageStatus({ images: [], imageUrls: '' })).toBe(
-      'manual-upload-required'
-    );
+    expect(computeImageStatus({ images: [], imageUrls: null })).toBe('manual-upload-required');
+    expect(computeImageStatus({ images: [], imageUrls: '' })).toBe('manual-upload-required');
     expect(computeImageStatus({})).toBe('manual-upload-required');
   });
 
   it("returns 'manual-upload-required' for empty JSON array imageUrls ('[]')", () => {
-    expect(computeImageStatus({ images: [], imageUrls: '[]' })).toBe(
-      'manual-upload-required'
-    );
+    expect(computeImageStatus({ images: [], imageUrls: '[]' })).toBe('manual-upload-required');
   });
 
   it("returns 'manual-upload-required' for non-array JSON imageUrls ('{}')", () => {
-    expect(computeImageStatus({ images: [], imageUrls: '{}' })).toBe(
+    expect(computeImageStatus({ images: [], imageUrls: '{}' })).toBe('manual-upload-required');
+  });
+
+  it("returns 'manual-upload-required' for malformed JSON imageUrls", () => {
+    expect(computeImageStatus({ images: [], imageUrls: '{not valid json' })).toBe(
       'manual-upload-required'
     );
   });
 
-  it("returns 'manual-upload-required' for malformed JSON imageUrls", () => {
-    expect(
-      computeImageStatus({ images: [], imageUrls: '{not valid json' })
-    ).toBe('manual-upload-required');
-  });
-
   it("returns 'manual-upload-required' for array of only non-string items", () => {
-    expect(
-      computeImageStatus({ images: [], imageUrls: '[42, null, true]' })
-    ).toBe('manual-upload-required');
+    expect(computeImageStatus({ images: [], imageUrls: '[42, null, true]' })).toBe(
+      'manual-upload-required'
+    );
   });
 
   it('returns null when the listing itself is missing', () => {

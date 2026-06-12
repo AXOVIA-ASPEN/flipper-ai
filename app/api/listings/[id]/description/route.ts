@@ -3,7 +3,15 @@ import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
 import { completeAI, AIProviderUnavailableError, AIProviderError } from '@/lib/ai';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, AppError, ErrorCode } from '@/lib/errors';
+import {
+  handleError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  AppError,
+  ErrorCode,
+} from '@/lib/errors';
 interface RouteParams {
   params: Promise<{ id: string }>;
 }

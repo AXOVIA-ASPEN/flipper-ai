@@ -8,13 +8,12 @@ import { test, expect } from '@playwright/test';
  */
 
 const VIEWPORTS = {
-  mobile: { width: 375, height: 812 },   // iPhone X
-  tablet: { width: 768, height: 1024 },  // iPad
+  mobile: { width: 375, height: 812 }, // iPhone X
+  tablet: { width: 768, height: 1024 }, // iPad
   desktop: { width: 1440, height: 900 }, // Laptop
 };
 
 test.describe('Mobile & Responsive Layout', () => {
-
   test.beforeEach(async ({ page }) => {
     // Mock session for authenticated routes
     await page.route('**/api/auth/session', (route) =>
@@ -25,7 +24,7 @@ test.describe('Mobile & Responsive Layout', () => {
           user: { name: 'Test User', email: 'test@example.com' },
           expires: '2099-01-01T00:00:00.000Z',
         }),
-      }),
+      })
     );
 
     // Mock opportunities API
@@ -50,7 +49,7 @@ test.describe('Mobile & Responsive Layout', () => {
             postedAt: '2026-02-15T12:00:00Z',
           },
         ]),
-      }),
+      })
     );
 
     // Mock analytics API
@@ -64,7 +63,7 @@ test.describe('Mobile & Responsive Layout', () => {
           avgMargin: 85,
           topCategory: 'electronics',
         }),
-      }),
+      })
     );
   });
 
@@ -112,7 +111,7 @@ test.describe('Mobile & Responsive Layout', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({}),
-      }),
+      })
     );
 
     await page.setViewportSize(VIEWPORTS.mobile);
@@ -134,7 +133,7 @@ test.describe('Mobile & Responsive Layout', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({}),
-      }),
+      })
     );
 
     await page.setViewportSize(VIEWPORTS.mobile);
@@ -195,10 +194,9 @@ test.describe('Mobile & Responsive Layout', () => {
 
       const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
       const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
-      expect(
-        scrollWidth,
-        `Horizontal overflow on ${route} at mobile viewport`,
-      ).toBeLessThanOrEqual(clientWidth + 1);
+      expect(scrollWidth, `Horizontal overflow on ${route} at mobile viewport`).toBeLessThanOrEqual(
+        clientWidth + 1
+      );
     }
   });
 });

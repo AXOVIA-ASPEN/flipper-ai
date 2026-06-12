@@ -34,7 +34,15 @@ setDefaultTimeout(120 * 1000);
 
 // ─── Filesystem / header assertions (S-20, S-27) ─────────────────────────────
 
-const CANONICAL_HEADER_TOKENS = ['@file', '@author Stephen Boyett', '@company Axovia AI', '@date', '@version', '@brief', '@description'];
+const CANONICAL_HEADER_TOKENS = [
+  '@file',
+  '@author Stephen Boyett',
+  '@company Axovia AI',
+  '@date',
+  '@version',
+  '@brief',
+  '@description',
+];
 
 Then(
   'the source file {string} exists with canonical header tokens',
@@ -48,13 +56,10 @@ Then(
   }
 );
 
-Then(
-  'the source file {string} exists',
-  function (this: CustomWorld, relativePath: string) {
-    const fullPath = path.join(process.cwd(), relativePath);
-    expect(fs.existsSync(fullPath), `File not found: ${relativePath}`).toBe(true);
-  }
-);
+Then('the source file {string} exists', function (this: CustomWorld, relativePath: string) {
+  const fullPath = path.join(process.cwd(), relativePath);
+  expect(fs.existsSync(fullPath), `File not found: ${relativePath}`).toBe(true);
+});
 
 When(
   'a grep for inline loading block patterns runs across the five target pages',
@@ -79,10 +84,7 @@ When(
 
 Then('zero inline loading blocks are found', function (this: CustomWorld) {
   const matches = this.testData.inlineLoadingMatches as string[];
-  expect(
-    matches,
-    `Found inline loading blocks in: ${matches.join(', ')}`
-  ).toHaveLength(0);
+  expect(matches, `Found inline loading blocks in: ${matches.join(', ')}`).toHaveLength(0);
 });
 
 // ─── scoreColor boundary matrix (S-24, service-level) ────────────────────────
@@ -94,19 +96,13 @@ Given(
   }
 );
 
-When(
-  'scoreColor is called with score {int}',
-  function (this: CustomWorld, score: number) {
-    this.testData.scoreColorResult = scoreColor(score);
-  }
-);
+When('scoreColor is called with score {int}', function (this: CustomWorld, score: number) {
+  this.testData.scoreColorResult = scoreColor(score);
+});
 
-Then(
-  'the returned colour should be {string}',
-  function (this: CustomWorld, expected: string) {
-    expect(this.testData.scoreColorResult).toBe(expected);
-  }
-);
+Then('the returned colour should be {string}', function (this: CustomWorld, expected: string) {
+  expect(this.testData.scoreColorResult).toBe(expected);
+});
 
 // ─── API route interception helpers ──────────────────────────────────────────
 
@@ -226,9 +222,9 @@ Then(
   'the empty state contains a link or button matching {string}',
   async function (this: CustomWorld, labelPattern: string) {
     const re = new RegExp(labelPattern, 'i');
-    const linkOrBtn = this.page.locator(
-      `[data-testid="empty-state"] a, [data-testid="empty-state"] button`
-    ).filter({ hasText: re });
+    const linkOrBtn = this.page
+      .locator(`[data-testid="empty-state"] a, [data-testid="empty-state"] button`)
+      .filter({ hasText: re });
     await expect(linkOrBtn.first()).toBeVisible({ timeout: 10000 });
   }
 );

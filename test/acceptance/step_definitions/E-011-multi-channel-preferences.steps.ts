@@ -335,10 +335,18 @@ When('a flip-turned-hot SMS notification is dispatched', async function () {
 Then('the settings include all 12 push per-event toggle fields', function () {
   const s = state.settings;
   const pushFields = [
-    'pushNotifyNewDeals', 'pushNotifySoldItems', 'pushNotifyMessageReceived',
-    'pushNotifyDraftReady', 'pushNotifyMessageSent', 'pushNotifyReviewReceived',
-    'pushNotifyFlipGoneCold', 'pushNotifyFlipTurnedHot', 'pushNotifyPriceDrops',
-    'pushNotifyExpiring', 'pushNotifyListingUnavailable', 'pushNotifyWeeklyDigest',
+    'pushNotifyNewDeals',
+    'pushNotifySoldItems',
+    'pushNotifyMessageReceived',
+    'pushNotifyDraftReady',
+    'pushNotifyMessageSent',
+    'pushNotifyReviewReceived',
+    'pushNotifyFlipGoneCold',
+    'pushNotifyFlipTurnedHot',
+    'pushNotifyPriceDrops',
+    'pushNotifyExpiring',
+    'pushNotifyListingUnavailable',
+    'pushNotifyWeeklyDigest',
   ] as const;
   for (const field of pushFields) {
     assert.ok(field in s, `Missing push field: ${field}`);
@@ -349,10 +357,18 @@ Then('the settings include all 12 push per-event toggle fields', function () {
 Then('the settings include all 12 SMS per-event toggle fields', function () {
   const s = state.settings;
   const smsFields = [
-    'smsNotifyNewDeals', 'smsNotifySoldItems', 'smsNotifyMessageReceived',
-    'smsNotifyDraftReady', 'smsNotifyMessageSent', 'smsNotifyReviewReceived',
-    'smsNotifyFlipGoneCold', 'smsNotifyFlipTurnedHot', 'smsNotifyPriceDrops',
-    'smsNotifyExpiring', 'smsNotifyListingUnavailable', 'smsNotifyWeeklyDigest',
+    'smsNotifyNewDeals',
+    'smsNotifySoldItems',
+    'smsNotifyMessageReceived',
+    'smsNotifyDraftReady',
+    'smsNotifyMessageSent',
+    'smsNotifyReviewReceived',
+    'smsNotifyFlipGoneCold',
+    'smsNotifyFlipTurnedHot',
+    'smsNotifyPriceDrops',
+    'smsNotifyExpiring',
+    'smsNotifyListingUnavailable',
+    'smsNotifyWeeklyDigest',
   ] as const;
   for (const field of smsFields) {
     assert.ok(field in s, `Missing SMS field: ${field}`);
@@ -361,37 +377,58 @@ Then('the settings include all 12 SMS per-event toggle fields', function () {
 });
 
 Then('the setting is stored as false for that user', function () {
-  assert.strictEqual(state.settings.pushNotifySoldItems, false,
-    'pushNotifySoldItems should be false after update');
+  assert.strictEqual(
+    state.settings.pushNotifySoldItems,
+    false,
+    'pushNotifySoldItems should be false after update'
+  );
 });
 
 Then('re-loading settings confirms pushNotifySoldItems is false', function () {
   // State is already reflected — confirm it persisted in our in-memory store
-  assert.strictEqual(state.settings.pushNotifySoldItems, false,
-    'pushNotifySoldItems did not persist');
+  assert.strictEqual(
+    state.settings.pushNotifySoldItems,
+    false,
+    'pushNotifySoldItems did not persist'
+  );
 });
 
 Then('the setting is stored as false for smsNotifyFlipGoneCold', function () {
-  assert.strictEqual(state.settings.smsNotifyFlipGoneCold, false,
-    'smsNotifyFlipGoneCold should be false after update');
+  assert.strictEqual(
+    state.settings.smsNotifyFlipGoneCold,
+    false,
+    'smsNotifyFlipGoneCold should be false after update'
+  );
 });
 
 Then('re-loading settings confirms smsNotifyFlipGoneCold is false', function () {
-  assert.strictEqual(state.settings.smsNotifyFlipGoneCold, false,
-    'smsNotifyFlipGoneCold did not persist');
+  assert.strictEqual(
+    state.settings.smsNotifyFlipGoneCold,
+    false,
+    'smsNotifyFlipGoneCold did not persist'
+  );
 });
 
 Then('FCM does not deliver any notification for that event', function () {
-  assert.strictEqual(state.sendToDeviceCalls.length, 0,
-    `Expected no FCM deliveries but got: ${state.sendToDeviceCalls.join(', ')}`);
+  assert.strictEqual(
+    state.sendToDeviceCalls.length,
+    0,
+    `Expected no FCM deliveries but got: ${state.sendToDeviceCalls.join(', ')}`
+  );
 });
 
 Then('no SMS is sent to that user', function () {
-  assert.strictEqual(state.sentSms.length, 0,
-    `Expected no SMS but got ${state.sentSms.length}: ${JSON.stringify(state.sentSms)}`);
+  assert.strictEqual(
+    state.sentSms.length,
+    0,
+    `Expected no SMS but got ${state.sentSms.length}: ${JSON.stringify(state.sentSms)}`
+  );
 });
 
 Then('no SMS is sent to that user for the flip-turned-hot event', function () {
-  assert.strictEqual(state.sentSms.length, 0,
-    `Expected no SMS for flip-turned-hot but got: ${JSON.stringify(state.sentSms)}`);
+  assert.strictEqual(
+    state.sentSms.length,
+    0,
+    `Expected no SMS for flip-turned-hot but got: ${JSON.stringify(state.sentSms)}`
+  );
 });

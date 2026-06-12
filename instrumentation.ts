@@ -1,6 +1,6 @@
 /**
  * Next.js Instrumentation
- * 
+ *
  * This file runs once when the Next.js server starts (both in dev and prod).
  * Used to initialize Sentry and other monitoring tools.
  */
@@ -24,7 +24,7 @@ export async function onRequestError(
     routerKind: 'Pages Router' | 'App Router';
     routePath: string;
     routeType: 'render' | 'route' | 'action' | 'middleware';
-  },
+  }
 ) {
   // Sentry automatically captures this via its instrumentation
   // This hook is for custom error handling (e.g., logging to CloudWatch)

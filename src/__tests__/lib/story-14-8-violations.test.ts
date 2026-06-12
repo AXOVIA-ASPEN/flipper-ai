@@ -70,11 +70,21 @@ function scanFile(relPath: string): Violation[] {
   for (const { text, lineOffset } of classNameStrings) {
     const paletteMatch = text.match(PALETTE_RE);
     if (paletteMatch) {
-      violations.push({ file: relPath, line: lineOffset, match: paletteMatch[0], category: 'palette' });
+      violations.push({
+        file: relPath,
+        line: lineOffset,
+        match: paletteMatch[0],
+        category: 'palette',
+      });
     }
     const lightMatch = text.match(LIGHT_MODE_RE);
     if (lightMatch) {
-      violations.push({ file: relPath, line: lineOffset, match: lightMatch[0], category: 'light-mode' });
+      violations.push({
+        file: relPath,
+        line: lineOffset,
+        match: lightMatch[0],
+        category: 'light-mode',
+      });
     }
   }
   return violations;
@@ -84,11 +94,9 @@ describe('Story 14.8 palette + light-mode regression scan (AC #17)', () => {
   it.each(STORY_14_8_FILES)('%s contains no palette or light-mode className tokens', (relPath) => {
     const violations = scanFile(relPath);
     if (violations.length > 0) {
-      const lines = violations.map(
-        (v) => `  - ${v.file}:${v.line} → [${v.category}] ${v.match}`,
-      );
+      const lines = violations.map((v) => `  - ${v.file}:${v.line} → [${v.category}] ${v.match}`);
       throw new Error(
-        `Found ${violations.length} banned className token(s) in ${relPath}:\n${lines.join('\n')}`,
+        `Found ${violations.length} banned className token(s) in ${relPath}:\n${lines.join('\n')}`
       );
     }
     expect(violations).toHaveLength(0);

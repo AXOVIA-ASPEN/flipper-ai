@@ -22,13 +22,8 @@ import assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import {
-  computeEstimatedExpiry,
-  PLATFORM_EXPIRY_DAYS,
-} from '../../../src/lib/listing-expiry';
-import {
-  classifyHttpResponse,
-} from '../../../src/lib/listing-tracker';
+import { computeEstimatedExpiry, PLATFORM_EXPIRY_DAYS } from '../../../src/lib/listing-expiry';
+import { classifyHttpResponse } from '../../../src/lib/listing-tracker';
 
 // ---------------------------------------------------------------------------
 // Per-scenario state
@@ -107,26 +102,27 @@ Given('the SSE emitter source exists at {string}', function (relativePath: strin
 // AC-1: Sold Detection — structural test
 // ---------------------------------------------------------------------------
 
-Then(
-  'the tracker source exports detectSoldStatus',
-  function () {
-    const src = state.sourceContent ?? (() => {
+Then('the tracker source exports detectSoldStatus', function () {
+  const src =
+    state.sourceContent ??
+    (() => {
       throw new Error('sourceContent not set — call a source Given step first');
     })();
-    assert.match(
-      src,
-      /export\s+(async\s+)?function\s+detectSoldStatus|export\s*\{[^}]*detectSoldStatus/,
-      'Expected listing-tracker.ts to export detectSoldStatus'
-    );
-  }
-);
+  assert.match(
+    src,
+    /export\s+(async\s+)?function\s+detectSoldStatus|export\s*\{[^}]*detectSoldStatus/,
+    'Expected listing-tracker.ts to export detectSoldStatus'
+  );
+});
 
 Then(
   'the tracker source exports updateListingStateWithEvent with soldIndicator in StateChange',
   function () {
-    const src = state.sourceContent ?? (() => {
-      throw new Error('sourceContent not set');
-    })();
+    const src =
+      state.sourceContent ??
+      (() => {
+        throw new Error('sourceContent not set');
+      })();
     assert.match(
       src,
       /updateListingStateWithEvent/,
@@ -144,19 +140,18 @@ Then(
 // AC-2: Price Change Detection — pure function + structural tests
 // ---------------------------------------------------------------------------
 
-Then(
-  'the PriceChange interface includes a direction field',
-  function () {
-    const src = state.sourceContent ?? (() => {
+Then('the PriceChange interface includes a direction field', function () {
+  const src =
+    state.sourceContent ??
+    (() => {
       throw new Error('sourceContent not set');
     })();
-    assert.match(
-      src,
-      /direction\s*:\s*['"]?(increase|decrease)/,
-      'Expected PriceChange interface to include a direction field'
-    );
-  }
-);
+  assert.match(
+    src,
+    /direction\s*:\s*['"]?(increase|decrease)/,
+    'Expected PriceChange interface to include a direction field'
+  );
+});
 
 Then(
   'the tracker computes direction as {string} for positive price change',
@@ -190,38 +185,34 @@ Then(
   }
 );
 
-Then(
-  'the tracker exports isPriceChangeMeaningful to guard price-change events',
-  function () {
-    const src = state.sourceContent ?? (() => {
+Then('the tracker exports isPriceChangeMeaningful to guard price-change events', function () {
+  const src =
+    state.sourceContent ??
+    (() => {
       throw new Error('sourceContent not set');
     })();
-    // Verify via structural assertion
-    assert.match(
-      src,
-      /isPriceChangeMeaningful/,
-      'Expected listing-tracker.ts to export isPriceChangeMeaningful'
-    );
-    // Also verify via pure-function call: a 10% change on 100 → meaningful
-    const { isPriceChangeMeaningful } = require('../../../src/lib/listing-tracker');
-    assert.strictEqual(isPriceChangeMeaningful(100, 110, 5, 5), true);
-    assert.strictEqual(isPriceChangeMeaningful(1000, 1001, 5, 2), false);
-  }
-);
+  // Verify via structural assertion
+  assert.match(
+    src,
+    /isPriceChangeMeaningful/,
+    'Expected listing-tracker.ts to export isPriceChangeMeaningful'
+  );
+  // Also verify via pure-function call: a 10% change on 100 → meaningful
+  const { isPriceChangeMeaningful } = require('../../../src/lib/listing-tracker');
+  assert.strictEqual(isPriceChangeMeaningful(100, 110, 5, 5), true);
+  assert.strictEqual(isPriceChangeMeaningful(1000, 1001, 5, 2), false);
+});
 
 // ---------------------------------------------------------------------------
 // AC-3: Expiry Warning — pure function tests
 // ---------------------------------------------------------------------------
 
-Then(
-  'the source exports computeEstimatedExpiry',
-  function () {
-    assert.ok(
-      typeof computeEstimatedExpiry === 'function',
-      'Expected listing-expiry.ts to export computeEstimatedExpiry as a function'
-    );
-  }
-);
+Then('the source exports computeEstimatedExpiry', function () {
+  assert.ok(
+    typeof computeEstimatedExpiry === 'function',
+    'Expected listing-expiry.ts to export computeEstimatedExpiry as a function'
+  );
+});
 
 Then(
   'computeEstimatedExpiry returns a date {int} days after postedAt for {word}',
@@ -238,23 +229,20 @@ Then(
   }
 );
 
-Then(
-  'getExpiringListings filters listings outside the 24-hour window',
-  function () {
-    // Structural: verify the source queries within a bounded time window
-    assert.ok(state.sourceContent, 'sourceContent not set');
-    assert.match(
-      state.sourceContent,
-      /withinHours|3_600_000|3600000/,
-      'Expected getExpiringListings to use a time-window filter'
-    );
-    assert.match(
-      state.sourceContent,
-      /gte.*now|now.*gte|lte.*windowEnd|windowEnd.*lte/,
-      'Expected getExpiringListings to bound the query with gte/lte date range'
-    );
-  }
-);
+Then('getExpiringListings filters listings outside the 24-hour window', function () {
+  // Structural: verify the source queries within a bounded time window
+  assert.ok(state.sourceContent, 'sourceContent not set');
+  assert.match(
+    state.sourceContent,
+    /withinHours|3_600_000|3600000/,
+    'Expected getExpiringListings to use a time-window filter'
+  );
+  assert.match(
+    state.sourceContent,
+    /gte.*now|now.*gte|lte.*windowEnd|windowEnd.*lte/,
+    'Expected getExpiringListings to bound the query with gte/lte date range'
+  );
+});
 
 Then(
   'computeEstimatedExpiry returns null for {word} regardless of postedAt',

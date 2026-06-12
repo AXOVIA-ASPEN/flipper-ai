@@ -75,7 +75,11 @@ export function detectSoldStatus(pageContent: string, platform: string): boolean
   const lowerContent = pageContent.toLowerCase();
 
   const soldIndicators: Record<string, string[]> = {
-    CRAIGSLIST: ['this posting has been deleted', 'this posting has expired', 'no longer available'],
+    CRAIGSLIST: [
+      'this posting has been deleted',
+      'this posting has expired',
+      'no longer available',
+    ],
     FACEBOOK_MARKETPLACE: ['sold', 'no longer available', 'this listing is unavailable'],
     EBAY: ['this listing has ended', 'winning bid', 'sold for'],
     OFFERUP: ['sold', 'this item is no longer available', 'item sold'],
@@ -313,18 +317,15 @@ export { TRACKABLE_STATUSES, TERMINAL_STATUSES };
  * Distinguishes genuine listing removal from transient access-denied responses.
  */
 export type HttpResponseClassification =
-  | 'removed'        // HTTP 404/410, "deleted"/"flagged"/"removed" text → listing.unavailable
-  | 'rate_limited'   // HTTP 403/429, CAPTCHA, "blocked"/"verify" text → RateLimitError, no event
-  | 'ok';            // HTTP 200 with parseable content
+  | 'removed' // HTTP 404/410, "deleted"/"flagged"/"removed" text → listing.unavailable
+  | 'rate_limited' // HTTP 403/429, CAPTCHA, "blocked"/"verify" text → RateLimitError, no event
+  | 'ok'; // HTTP 200 with parseable content
 
 /**
  * Classify an HTTP response status + body to determine whether the listing
  * has been genuinely removed, we're being rate-limited, or the check succeeded.
  */
-export function classifyHttpResponse(
-  status: number,
-  body: string
-): HttpResponseClassification {
+export function classifyHttpResponse(status: number, body: string): HttpResponseClassification {
   // Genuine removal
   if (status === 404 || status === 410) return 'removed';
 
@@ -393,7 +394,7 @@ export function isPriceChangeMeaningful(
   minDeltaPercent: number
 ): boolean {
   const absChange = Math.abs(newPrice - oldPrice);
-  const threshold = Math.max(minDeltaAbsolute, oldPrice * minDeltaPercent / 100);
+  const threshold = Math.max(minDeltaAbsolute, (oldPrice * minDeltaPercent) / 100);
   return absChange >= threshold;
 }
 
@@ -403,7 +404,7 @@ export function isPriceChangeMeaningful(
 
 export interface PlatformParseStats {
   checked: number;
-  parsed: number;    // non-null price extraction
+  parsed: number; // non-null price extraction
   events: number;
   unavailable: number;
 }
@@ -524,7 +525,9 @@ export async function updateListingStateWithEvent(
       ...(change.changePercent !== undefined ? { changePercent: change.changePercent } : {}),
       ...(change.direction !== undefined ? { direction: change.direction } : {}),
       // listing.expiring
-      ...(change.estimatedExpiresAt !== undefined ? { estimatedExpiresAt: change.estimatedExpiresAt } : {}),
+      ...(change.estimatedExpiresAt !== undefined
+        ? { estimatedExpiresAt: change.estimatedExpiresAt }
+        : {}),
       ...(change.hoursRemaining !== undefined ? { hoursRemaining: change.hoursRemaining } : {}),
       ...(change.expiryDate !== undefined ? { expiryDate: change.expiryDate } : {}),
       // listing.unavailable

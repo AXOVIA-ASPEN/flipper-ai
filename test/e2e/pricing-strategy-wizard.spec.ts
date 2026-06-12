@@ -53,7 +53,7 @@ test.describe('Pricing Strategy Wizard', () => {
       };
 
       const feeRate = feeRates[platform] || 0.1;
-      const minPrice = buyPrice * (1 + targetROI / 100) / (1 - feeRate);
+      const minPrice = (buyPrice * (1 + targetROI / 100)) / (1 - feeRate);
       const optimalPrice = minPrice * 1.15; // 15% markup for competitiveness
       const maxPrice = optimalPrice * 1.3; // Upper bound
 
@@ -92,7 +92,9 @@ test.describe('Pricing Strategy Wizard', () => {
             },
           ],
           recommendations: [
-            'List at $' + Math.round(optimalPrice * 100) / 100 + ' for best balance of profit and sell speed',
+            'List at $' +
+              Math.round(optimalPrice * 100) / 100 +
+              ' for best balance of profit and sell speed',
             'Consider offering free shipping to increase competitiveness',
             'Monitor competitor pricing for first 48 hours',
           ],
@@ -133,9 +135,7 @@ test.describe('Pricing Strategy Wizard', () => {
     await expect(page.locator('[data-testid="max-competitive-price"]')).toBeVisible();
 
     // Verify numbers are realistic
-    const optimalPriceText = await page
-      .locator('[data-testid="optimal-price"]')
-      .textContent();
+    const optimalPriceText = await page.locator('[data-testid="optimal-price"]').textContent();
     expect(optimalPriceText).toMatch(/\$\d+\.\d{2}/);
 
     // Screenshot for visual verification
@@ -201,16 +201,12 @@ test.describe('Pricing Strategy Wizard', () => {
       await roiSlider.fill('30'); // Conservative
       await page.click('button:has-text("Calculate Pricing")');
       await page.waitForSelector('[data-testid="pricing-results"]');
-      const conservativePrice = await page
-        .locator('[data-testid="optimal-price"]')
-        .textContent();
+      const conservativePrice = await page.locator('[data-testid="optimal-price"]').textContent();
 
       await roiSlider.fill('80'); // Aggressive
       await page.click('button:has-text("Calculate Pricing")');
       await page.waitForSelector('[data-testid="pricing-results"]');
-      const aggressivePrice = await page
-        .locator('[data-testid="optimal-price"]')
-        .textContent();
+      const aggressivePrice = await page.locator('[data-testid="optimal-price"]').textContent();
 
       // Aggressive should be higher
       expect(aggressivePrice).not.toBe(conservativePrice);
@@ -377,7 +373,9 @@ test.describe('Pricing Strategy Wizard', () => {
       // Verify each platform shows optimal price
       for (let i = 0; i < platformCount; i++) {
         const row = platformRows.nth(i);
-        await expect(row.locator('td').first()).toContainText(/ebay|facebook|craigslist|offerup|mercari/i);
+        await expect(row.locator('td').first()).toContainText(
+          /ebay|facebook|craigslist|offerup|mercari/i
+        );
       }
     }
   });

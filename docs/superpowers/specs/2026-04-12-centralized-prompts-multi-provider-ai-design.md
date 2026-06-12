@@ -47,11 +47,8 @@ src/lib/ai/
 ```ts
 interface AIProvider {
   name: string;
-  isAvailable(): boolean;               // checks if API key is configured
-  complete(
-    messages: AIMessage[],
-    config: ModelConfig
-  ): Promise<AIResponse>;
+  isAvailable(): boolean; // checks if API key is configured
+  complete(messages: AIMessage[], config: ModelConfig): Promise<AIResponse>;
 }
 
 interface AIMessage {
@@ -113,35 +110,35 @@ Each prompt is a typed config object:
 
 ```ts
 interface PromptConfig {
-  name: string;                          // unique identifier
-  description: string;                   // human-readable purpose
-  provider: ProviderName;                // preferred provider
-  fallbacks: ProviderName[];             // ordered fallback list
-  model: string;                         // default model for preferred provider
+  name: string; // unique identifier
+  description: string; // human-readable purpose
+  provider: ProviderName; // preferred provider
+  fallbacks: ProviderName[]; // ordered fallback list
+  model: string; // default model for preferred provider
   temperature: number;
   maxTokens: number;
   responseFormat: 'json' | 'text';
-  systemPrompt: string;                  // system message text
-  buildUserPrompt: (context: any) => string;  // context → user message
+  systemPrompt: string; // system message text
+  buildUserPrompt: (context: any) => string; // context → user message
 }
 ```
 
 ## Per-Task Provider Routing
 
-| Prompt Name | Preferred | Fallbacks | Rationale |
-|---|---|---|---|
-| `flip-analysis` | gemini | groq, openai | Deep analysis, free tier sufficient |
-| `quick-discount-check` | gemini | groq, openai | Fast screening |
-| `claude-analysis` | anthropic | gemini, openai | Best reasoning, premium |
-| `negotiation-strategy` | gemini | groq, openai | Structured output |
-| `counter-offer-analysis` | groq | gemini, openai | Low latency for real-time |
-| `purchase-message` | groq | gemini, openai | Low latency for conversation |
-| `listing-title` | gemini | groq, openai | Creative + structured |
-| `listing-description` | gemini | groq, openai | Longer generation |
-| `api-description` | gemini | groq, openai | Same as listing-description |
-| `product-identification` | gemini | groq, openai | Classification task |
-| `logistics-classification` | gemini | groq, openai | Classification task |
-| `item-completeness` | openai | gemini | Vision required (gpt-4o) |
+| Prompt Name                | Preferred | Fallbacks      | Rationale                           |
+| -------------------------- | --------- | -------------- | ----------------------------------- |
+| `flip-analysis`            | gemini    | groq, openai   | Deep analysis, free tier sufficient |
+| `quick-discount-check`     | gemini    | groq, openai   | Fast screening                      |
+| `claude-analysis`          | anthropic | gemini, openai | Best reasoning, premium             |
+| `negotiation-strategy`     | gemini    | groq, openai   | Structured output                   |
+| `counter-offer-analysis`   | groq      | gemini, openai | Low latency for real-time           |
+| `purchase-message`         | groq      | gemini, openai | Low latency for conversation        |
+| `listing-title`            | gemini    | groq, openai   | Creative + structured               |
+| `listing-description`      | gemini    | groq, openai   | Longer generation                   |
+| `api-description`          | gemini    | groq, openai   | Same as listing-description         |
+| `product-identification`   | gemini    | groq, openai   | Classification task                 |
+| `logistics-classification` | gemini    | groq, openai   | Classification task                 |
+| `item-completeness`        | openai    | gemini         | Vision required (gpt-4o)            |
 
 ## Public API
 
@@ -182,8 +179,8 @@ const response = await openai.chat.completions.create({
   model: 'gpt-4o-mini',
   messages: [
     { role: 'system', content: 'You are a resale expert...' },
-    { role: 'user', content: `Analyze: ${listing.title}...` }
-  ]
+    { role: 'user', content: `Analyze: ${listing.title}...` },
+  ],
 });
 ```
 
@@ -197,18 +194,18 @@ const response = await completeAI('flip-analysis', { listing, marketData });
 
 ### Files to Migrate
 
-| File | Prompts Extracted | Changes |
-|---|---|---|
-| `src/lib/llm-analyzer.ts` | `flip-analysis`, `quick-discount-check` | Remove OpenAI import, use `completeAI` |
-| `src/lib/claude-analyzer.ts` | `claude-analysis` | Remove Anthropic import, use `completeAI` |
-| `src/lib/negotiation-strategy.ts` | `negotiation-strategy`, `counter-offer-analysis` | Remove OpenAI import, use `completeAI` |
-| `src/lib/message-generator.ts` | `purchase-message` | Remove OpenAI import, use `completeAI` |
-| `src/lib/title-generator.ts` | `listing-title` | Remove OpenAI import, use `completeAI` |
-| `src/lib/description-generator.ts` | `listing-description` | Remove OpenAI import, use `completeAI` |
-| `src/lib/llm-identifier.ts` | `product-identification` | Remove OpenAI import, use `completeAI` |
-| `src/lib/logistics-classifier.ts` | `logistics-classification` | Remove OpenAI import, use `completeAI` |
-| `src/lib/item-completeness-analyzer.ts` | `item-completeness` | Remove OpenAI import, use `completeAI` |
-| `app/api/listings/[id]/description/route.ts` | `api-description` | Remove OpenAI import, use `completeAI` |
+| File                                         | Prompts Extracted                                | Changes                                   |
+| -------------------------------------------- | ------------------------------------------------ | ----------------------------------------- |
+| `src/lib/llm-analyzer.ts`                    | `flip-analysis`, `quick-discount-check`          | Remove OpenAI import, use `completeAI`    |
+| `src/lib/claude-analyzer.ts`                 | `claude-analysis`                                | Remove Anthropic import, use `completeAI` |
+| `src/lib/negotiation-strategy.ts`            | `negotiation-strategy`, `counter-offer-analysis` | Remove OpenAI import, use `completeAI`    |
+| `src/lib/message-generator.ts`               | `purchase-message`                               | Remove OpenAI import, use `completeAI`    |
+| `src/lib/title-generator.ts`                 | `listing-title`                                  | Remove OpenAI import, use `completeAI`    |
+| `src/lib/description-generator.ts`           | `listing-description`                            | Remove OpenAI import, use `completeAI`    |
+| `src/lib/llm-identifier.ts`                  | `product-identification`                         | Remove OpenAI import, use `completeAI`    |
+| `src/lib/logistics-classifier.ts`            | `logistics-classification`                       | Remove OpenAI import, use `completeAI`    |
+| `src/lib/item-completeness-analyzer.ts`      | `item-completeness`                              | Remove OpenAI import, use `completeAI`    |
+| `app/api/listings/[id]/description/route.ts` | `api-description`                                | Remove OpenAI import, use `completeAI`    |
 
 ### Zero Breaking Changes
 

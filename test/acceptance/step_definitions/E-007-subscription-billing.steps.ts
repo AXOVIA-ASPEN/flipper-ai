@@ -216,7 +216,11 @@ When('the user attempts to access price history', async function () {
 // ── Then: Assertions ────────────────────────────────────────────────────────
 
 Then('the request is rejected with status {int}', function (expectedStatus: number) {
-  assert.strictEqual(responseStatus, expectedStatus, `Expected status ${expectedStatus} but got ${responseStatus}`);
+  assert.strictEqual(
+    responseStatus,
+    expectedStatus,
+    `Expected status ${expectedStatus} but got ${responseStatus}`
+  );
 });
 
 Then('the scan job is created successfully', function () {
@@ -224,10 +228,10 @@ Then('the scan job is created successfully', function () {
 });
 
 Then('the response contains upgrade message {string}', function (expectedText: string) {
-  const detail = (responseBody?.error as Record<string, unknown>)?.detail as string || '';
+  const detail = ((responseBody?.error as Record<string, unknown>)?.detail as string) || '';
   assert.ok(
     detail.includes(expectedText),
-    `Expected "${expectedText}" in response message "${detail}"`,
+    `Expected "${expectedText}" in response message "${detail}"`
   );
 });
 
@@ -245,45 +249,46 @@ Given('a user with email {string} on the PRO tier', function (_email: string) {
 
 When('a checkout.session.completed webhook fires for tier {string}', async function (tier: string) {
   // Verify the webhook handler actually calls prisma.user.update with the tier
-  const webhookSource = fs.readFileSync(
-    path.resolve('app/api/webhooks/stripe/route.ts'),
-    'utf-8',
-  );
+  const webhookSource = fs.readFileSync(path.resolve('app/api/webhooks/stripe/route.ts'), 'utf-8');
   // Verify updateUserTier is a real implementation (not console.log placeholder)
   assert.ok(
     webhookSource.includes('prisma.user.updateMany'),
-    'Webhook handler must update user tier via Prisma updateMany (not a console.log placeholder)',
+    'Webhook handler must update user tier via Prisma updateMany (not a console.log placeholder)'
   );
   // Verify the handler processes checkout.session.completed events
   assert.ok(
     webhookSource.includes('checkout.session.completed'),
-    'Webhook handler must handle checkout.session.completed events',
+    'Webhook handler must handle checkout.session.completed events'
   );
   // Simulate the expected outcome
   userTier = tier;
 });
 
 When('a customer.subscription.deleted webhook fires', async function () {
-  const webhookSource = fs.readFileSync(
-    path.resolve('app/api/webhooks/stripe/route.ts'),
-    'utf-8',
-  );
+  const webhookSource = fs.readFileSync(path.resolve('app/api/webhooks/stripe/route.ts'), 'utf-8');
   // Verify the handler processes subscription.deleted events
   assert.ok(
     webhookSource.includes('customer.subscription.deleted'),
-    'Webhook handler must handle customer.subscription.deleted events',
+    'Webhook handler must handle customer.subscription.deleted events'
   );
   // Verify downgrade to FREE on cancellation
   assert.ok(
     webhookSource.includes("'FREE'") || webhookSource.includes('"FREE"'),
-    'Webhook handler must downgrade to FREE tier on subscription cancellation',
+    'Webhook handler must downgrade to FREE tier on subscription cancellation'
   );
   userTier = 'FREE';
 });
 
-Then('the user\'s subscription tier is updated to {string} in the database', function (this: { testData?: Record<string, unknown> }, expectedTier: string) {
-  // Prefer cross-step World testData when set by checkout scenarios (story 7.2),
-  // fall back to local userTier for billing/webhook scenarios (story 7.1).
-  const actualTier = this.testData?.subscriptionTier ?? userTier;
-  assert.strictEqual(actualTier, expectedTier, `Expected tier ${expectedTier} but got ${actualTier}`);
-});
+Then(
+  "the user's subscription tier is updated to {string} in the database",
+  function (this: { testData?: Record<string, unknown> }, expectedTier: string) {
+    // Prefer cross-step World testData when set by checkout scenarios (story 7.2),
+    // fall back to local userTier for billing/webhook scenarios (story 7.1).
+    const actualTier = this.testData?.subscriptionTier ?? userTier;
+    assert.strictEqual(
+      actualTier,
+      expectedTier,
+      `Expected tier ${expectedTier} but got ${actualTier}`
+    );
+  }
+);

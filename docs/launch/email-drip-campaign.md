@@ -8,13 +8,13 @@
 
 **Trigger logic:**
 
-| # | Trigger                                                              | Send delay         |
-| - | -------------------------------------------------------------------- | ------------------ |
-| 1 | User completes signup (email verified)                               | Immediate          |
-| 2 | User has not run a scan after signup                                 | 48h after signup   |
-| 3 | User has run ≥1 scan but not added an opportunity                    | 5d after first scan |
-| 4 | User has added ≥1 opportunity but not upgraded                       | 10d after signup   |
-| 5 | Free-tier user, 14d after signup, has not upgraded                   | 14d after signup   |
+| #   | Trigger                                            | Send delay          |
+| --- | -------------------------------------------------- | ------------------- |
+| 1   | User completes signup (email verified)             | Immediate           |
+| 2   | User has not run a scan after signup               | 48h after signup    |
+| 3   | User has run ≥1 scan but not added an opportunity  | 5d after first scan |
+| 4   | User has added ≥1 opportunity but not upgraded     | 10d after signup    |
+| 5   | Free-tier user, 14d after signup, has not upgraded | 14d after signup    |
 
 ---
 
@@ -31,17 +31,15 @@
 > A few things to get the most out of the next 24 hours:
 >
 > 1. **Set up your first saved search.** ({{appUrl}}/scraper) Pick a category you actually flip in (electronics, furniture, tools, video games, collectibles all work well today; clothing is weak — that's on the list to fix). Use a tight zip-code radius for your first one.
->
 > 2. **Run it once and let it work.** The first scan can take 2-3 minutes — it's identifying each item and pulling eBay sold prices. Don't refresh; results will appear when each marketplace finishes.
->
 > 3. **Look for the green "Opportunity" badge.** Anything green is >50% below verified market value. That's the AI saying "this is worth your time."
 >
-> If after your first scan you have *zero* green badges, that usually means either (a) your search is too narrow, or (b) the category isn't well-tuned yet. Hit reply and I'll look at your saved search personally — it's the fastest way for me to debug the scoring.
+> If after your first scan you have _zero_ green badges, that usually means either (a) your search is too narrow, or (b) the category isn't well-tuned yet. Hit reply and I'll look at your saved search personally — it's the fastest way for me to debug the scoring.
 >
 > Welcome aboard. Hope you find a good flip this week.
 >
 > — Stephen
-> *(reply directly to this email — it goes to my inbox, not a ticketing system)*
+> _(reply directly to this email — it goes to my inbox, not a ticketing system)_
 
 ---
 
@@ -83,9 +81,10 @@
 > Two possibilities:
 >
 > **(a) Nothing in the results was good enough to flip.** That's usually a sign your saved search is too broad or the category isn't well-tuned. Common fixes:
->   - Narrow the price range (e.g. $50-$300 — most good flips live here)
->   - Pick a specific brand (e.g. "Nintendo" instead of "video games")
->   - Tighten the location radius
+>
+> - Narrow the price range (e.g. $50-$300 — most good flips live here)
+> - Pick a specific brand (e.g. "Nintendo" instead of "video games")
+> - Tighten the location radius
 >
 > **(b) You're not sure if a result is worth pursuing.** Pull up the opportunity detail — there's a "verified market value" line and a "sellability" score. If the AI says >70 sellability and >50% margin, it's almost certainly real. If you're hesitant, screenshot the listing and reply to this email — I'll give you my honest read.
 >
@@ -122,7 +121,7 @@
 >
 > — Stephen
 
-*(If `founderSlotsRemaining` <= 0, swap that paragraph for the annual plan offer at 20% off.)*
+_(If `founderSlotsRemaining` <= 0, swap that paragraph for the annual plan offer at 20% off.)_
 
 ---
 
@@ -139,7 +138,6 @@
 > Two questions, in order of usefulness:
 >
 > 1. **What's been the biggest annoyance?** Anything from "the scoring was wrong on this listing" to "I couldn't figure out how to do X" — every reply changes what I work on tomorrow.
->
 > 2. **Did you find a good flip during your two weeks?** If yes, tell me about it (I love these stories and the answer might end up as marketing copy with your permission). If no, what got in the way?
 >
 > Either way, no obligation. Free tier stays free as long as your account exists. If you ever come back and decide to upgrade, the Founder's Discount link is at {{appUrl}}/billing — but the slots may be gone by then.

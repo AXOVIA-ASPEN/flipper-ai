@@ -57,9 +57,7 @@ test.describe('Onboarding Wizard - Acceptance Tests', () => {
       // Should be on step 1
       await expect(page.getByText('Welcome to Flipper AI')).toBeVisible();
       await expect(page.getByText('🐧')).toBeVisible(); // Mascot
-      await expect(
-        page.getByText(/Start finding profitable flips in minutes/i)
-      ).toBeVisible();
+      await expect(page.getByText(/Start finding profitable flips in minutes/i)).toBeVisible();
 
       // Progress indicator should show 1/6
       await expect(page.getByText('Step 1 of 6')).toBeVisible();
@@ -236,9 +234,7 @@ test.describe('Onboarding Wizard - Acceptance Tests', () => {
   });
 
   test.describe('Given I am a returning user who abandoned onboarding', () => {
-    test('When I visit onboarding, Then I should resume from my saved step', async ({
-      page,
-    }) => {
+    test('When I visit onboarding, Then I should resume from my saved step', async ({ page }) => {
       // Override the onboarding status to step 3
       await page.route('**/api/user/onboarding', async (route, request) => {
         if (request.method() === 'GET') {
@@ -379,15 +375,15 @@ test.describe('Onboarding Wizard - Acceptance Tests', () => {
 
       // Should show error or stay on step 5
       const errorVisible =
-        (await page.getByText(/invalid.*zip|not found/i).isVisible().catch(() => false)) ||
-        (await page.getByText('Step 5 of 6').isVisible());
+        (await page
+          .getByText(/invalid.*zip|not found/i)
+          .isVisible()
+          .catch(() => false)) || (await page.getByText('Step 5 of 6').isVisible());
 
       expect(errorVisible).toBeTruthy();
     });
 
-    test('When I enter a valid ZIP code, Then I should be able to proceed', async ({
-      page,
-    }) => {
+    test('When I enter a valid ZIP code, Then I should be able to proceed', async ({ page }) => {
       await page.goto('/onboarding');
 
       // Navigate to location step

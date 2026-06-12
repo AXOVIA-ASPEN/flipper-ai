@@ -53,9 +53,7 @@ describe('Middleware CORS Handling', () => {
       const res = middleware(req);
 
       expect(res.status).toBe(204);
-      expect(res.headers.get('Access-Control-Allow-Origin')).toBe(
-        'https://axovia-flipper.web.app'
-      );
+      expect(res.headers.get('Access-Control-Allow-Origin')).toBe('https://axovia-flipper.web.app');
       expect(res.headers.get('Access-Control-Allow-Methods')).toContain('GET');
       expect(res.headers.get('Access-Control-Allow-Credentials')).toBe('true');
     });
@@ -78,9 +76,7 @@ describe('Middleware CORS Handling', () => {
       });
       const res = middleware(req);
 
-      expect(res.headers.get('Access-Control-Allow-Origin')).toBe(
-        'https://axovia-flipper.web.app'
-      );
+      expect(res.headers.get('Access-Control-Allow-Origin')).toBe('https://axovia-flipper.web.app');
       expect(res.headers.get('Access-Control-Allow-Credentials')).toBe('true');
     });
 
@@ -126,9 +122,7 @@ describe('Middleware CORS Handling', () => {
       const requestId = res.headers.get('X-Request-Id');
       expect(requestId).toBeTruthy();
       // UUID v4 format
-      expect(requestId).toMatch(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-      );
+      expect(requestId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
     });
 
     it('should set X-Request-Start timing header on API routes', () => {

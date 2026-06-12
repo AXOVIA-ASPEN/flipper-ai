@@ -126,7 +126,13 @@ const DIFFICULTY_ORDER = {
 export function analyzeListing(
   platform: MarketplacePlatform,
   listing: RawListing,
-  options?: { emitEvents?: boolean; userId?: string; feeRate?: number; opportunityThreshold?: number; opportunityMinProfit?: number }
+  options?: {
+    emitEvents?: boolean;
+    userId?: string;
+    feeRate?: number;
+    opportunityThreshold?: number;
+    opportunityMinProfit?: number;
+  }
 ): AnalyzedListing {
   // Detect category if not provided
   const detectedCategory =
@@ -254,7 +260,13 @@ export function processListings(
   platform: MarketplacePlatform,
   listings: RawListing[],
   criteria?: ViabilityCriteria,
-  options?: { emitEvents?: boolean; userId?: string; feeRate?: number; opportunityThreshold?: number; opportunityMinProfit?: number }
+  options?: {
+    emitEvents?: boolean;
+    userId?: string;
+    feeRate?: number;
+    opportunityThreshold?: number;
+    opportunityMinProfit?: number;
+  }
 ): {
   all: AnalyzedListing[];
   opportunities: AnalyzedListing[];
@@ -348,9 +360,12 @@ export function formatForStorage(listing: AnalyzedListing): Record<string, unkno
     status: sellabilityAnalysis ? 'OPPORTUNITY' : listing.isOpportunity ? 'OPPORTUNITY' : 'NEW',
 
     // Verified price data (Story 4.4)
-    verifiedMarketValue: verifiedPrice?.verifiedMarketValue ?? sellabilityAnalysis?.verifiedMarketValue ?? null,
-    trueDiscountPercent: verifiedPrice?.trueDiscountPercent ?? sellabilityAnalysis?.trueDiscountPercent ?? null,
-    marketDataSource: verifiedPrice?.marketDataSource ?? (sellabilityAnalysis ? 'ebay_scrape' : null),
+    verifiedMarketValue:
+      verifiedPrice?.verifiedMarketValue ?? sellabilityAnalysis?.verifiedMarketValue ?? null,
+    trueDiscountPercent:
+      verifiedPrice?.trueDiscountPercent ?? sellabilityAnalysis?.trueDiscountPercent ?? null,
+    marketDataSource:
+      verifiedPrice?.marketDataSource ?? (sellabilityAnalysis ? 'ebay_scrape' : null),
     marketDataDate: verifiedPrice?.marketDataDate ?? (sellabilityAnalysis ? new Date() : null),
     // Comparable sold item matching (Story 5.2)
     // Overwrite comparableSalesJson with enhanced format (includes soldDate + platform)
@@ -380,8 +395,10 @@ export function formatForStorage(listing: AnalyzedListing): Record<string, unkno
     // Story 5.4: Item completeness & seller reputation
     completenessLabel: listing.completenessAnalysis?.completenessLabel ?? null,
     sellerRating: listing.sellerReputation?.sellerRating ?? listing.sellerRating ?? null,
-    sellerReviewCount: listing.sellerReputation?.sellerReviewCount ?? listing.sellerReviewCount ?? null,
-    sellerAccountAgeDays: listing.sellerReputation?.sellerAccountAgeDays ?? listing.sellerAccountAgeDays ?? null,
+    sellerReviewCount:
+      listing.sellerReputation?.sellerReviewCount ?? listing.sellerReviewCount ?? null,
+    sellerAccountAgeDays:
+      listing.sellerReputation?.sellerAccountAgeDays ?? listing.sellerAccountAgeDays ?? null,
     // Story 5.5: Logistics and shipping analysis
     sizeCategory: listing.logisticsAnalysis?.sizeCategory ?? null,
     shippingEstimatesJson: listing.logisticsAnalysis?.shippingEstimates
@@ -393,7 +410,8 @@ export function formatForStorage(listing: AnalyzedListing): Record<string, unkno
     adjustedProfitMargin: listing.logisticsAnalysis?.adjustedProfitMargin ?? null,
     estimatedWeight: listing.logisticsAnalysis?.estimatedWeightLbs ?? null,
     // Claude Tier 2 takes priority; fall back to sellability confidence/reasoning (Story 5.1)
-    analysisConfidence: listing.claudeAnalysis?.confidence ?? sellabilityAnalysis?.confidence ?? null,
+    analysisConfidence:
+      listing.claudeAnalysis?.confidence ?? sellabilityAnalysis?.confidence ?? null,
     analysisReasoning: listing.claudeAnalysis?.reasoning ?? sellabilityAnalysis?.reasoning ?? null,
     // Story 4.3: LLM-derived identification fields persisted from llmIdentification
     identifiedBrand: llmIdentification?.brand ?? null,
@@ -460,7 +478,7 @@ export type FreeItemHandling = 'include_review' | 'auto_analyze' | 'skip';
 /** Default resale fee rates (as decimal) for each platform */
 export const PLATFORM_FEE_DEFAULTS: Record<string, number> = {
   EBAY: 0.13,
-  MERCARI: 0.10,
+  MERCARI: 0.1,
   FACEBOOK_MARKETPLACE: 0.05,
   OFFERUP: 0.129,
   CRAIGSLIST: 0,
@@ -594,7 +612,9 @@ export async function enrichWithVerifiedMarketPrice(
         const searchQuery = listing.llmIdentification?.searchQuery || listing.title;
         const category = listing.llmIdentification?.category || listing.category;
         const verifiedPrice = await lookupVerifiedMarketPrice(
-          searchQuery, listing.askingPrice, category
+          searchQuery,
+          listing.askingPrice,
+          category
         );
         enriched.push({ ...listing, verifiedPrice });
       } catch (err) {
@@ -637,7 +657,10 @@ export async function enrichWithSellabilityAnalysis(
       );
       if (!identification?.worthInvestigating) continue;
 
-      const marketData = await fetchMarketPrice(identification.searchQuery, identification.category);
+      const marketData = await fetchMarketPrice(
+        identification.searchQuery,
+        identification.category
+      );
       if (!marketData || marketData.salesCount === 0) continue;
 
       const quickCheck = quickDiscountCheck(listing.askingPrice, marketData);
@@ -703,7 +726,10 @@ export async function enrichWithDemandAnalysis(
       }
 
       if (!soldListings) {
-        const marketData = await fetchMarketPrice(searchQuery, listing.llmIdentification?.category || listing.category);
+        const marketData = await fetchMarketPrice(
+          searchQuery,
+          listing.llmIdentification?.category || listing.category
+        );
         soldListings = marketData?.soldListings ?? null;
       }
 
@@ -730,15 +756,11 @@ export async function enrichWithDemandAnalysis(
  * Priority: demand analyzer demandTrend > LLM sellabilityAnalysis.demandLevel.
  * When no demand data is available, adds "demand_unknown" tag.
  */
-export function applyDemandScoreAdjustments(
-  listings: AnalyzedListing[]
-): AnalyzedListing[] {
+export function applyDemandScoreAdjustments(listings: AnalyzedListing[]): AnalyzedListing[] {
   return listings.map((listing) => {
     // Resolve demand trend: demand analyzer (primary) > LLM demandLevel (fallback)
     const demandTrend: string | null =
-      listing.demandAnalysis?.demandTrend ??
-      listing.sellabilityAnalysis?.demandLevel ??
-      null;
+      listing.demandAnalysis?.demandTrend ?? listing.sellabilityAnalysis?.demandLevel ?? null;
 
     const expectedDaysToSell = listing.sellabilityAnalysis?.expectedDaysToSell ?? null;
     const discountPercent = listing.estimation.discountPercent;
@@ -791,10 +813,7 @@ export async function enrichOpportunitiesWithClaudeTier2(
         );
         return { ...listing, claudeAnalysis };
       } catch (error) {
-        console.error(
-          `Claude Tier 2 analysis failed for listing ${listing.externalId}:`,
-          error
-        );
+        console.error(`Claude Tier 2 analysis failed for listing ${listing.externalId}:`, error);
         return { ...listing, claudeAnalysis: null };
       }
     })
@@ -824,13 +843,7 @@ export async function enrichWithCompMatches(
       const model = listing.llmIdentification?.model ?? null;
       const category = listing.llmIdentification?.category || listing.category;
 
-      const compMatches = await findComparableSales(
-        searchQuery,
-        brand,
-        model,
-        category,
-        rawComps
-      );
+      const compMatches = await findComparableSales(searchQuery, brand, model, category, rawComps);
       enriched.push({ ...listing, compMatches });
     } catch (error) {
       console.error(`Comp matching failed for listing ${listing.externalId}:`, error);
@@ -945,11 +958,7 @@ export async function enrichWithCrossPlatformPrice(
     try {
       const searchQuery = listing.llmIdentification?.searchQuery || listing.title;
       const category = listing.llmIdentification?.category || listing.category;
-      const crossPlatformPrice = await fetchCrossPlatformPrice(
-        searchQuery,
-        category,
-        fetchers
-      );
+      const crossPlatformPrice = await fetchCrossPlatformPrice(searchQuery, category, fetchers);
 
       if (!crossPlatformPrice) {
         enriched.push({ ...listing, crossPlatformPrice: null });
@@ -958,13 +967,12 @@ export async function enrichWithCrossPlatformPrice(
 
       // Apply score override when verified data is available
       const effectiveFeeRate = feeRate ?? PLATFORM_FEE_DEFAULTS[listing.platform] ?? 0.13;
-      const { valueScore, overridden, verifiedMarketValue } =
-        applyPriceIntelligenceOverride(
-          listing.estimation.valueScore,
-          listing.askingPrice,
-          crossPlatformPrice,
-          effectiveFeeRate
-        );
+      const { valueScore, overridden, verifiedMarketValue } = applyPriceIntelligenceOverride(
+        listing.estimation.valueScore,
+        listing.askingPrice,
+        crossPlatformPrice,
+        effectiveFeeRate
+      );
 
       const updatedTags = [...listing.estimation.tags];
       if (overridden) updatedTags.push('price_intelligence_override');
@@ -980,18 +988,21 @@ export async function enrichWithCrossPlatformPrice(
         crossPlatformPrice,
         estimation: updatedEstimation,
         isOpportunity: valueScore >= 70,
-        verifiedPrice: overridden && verifiedMarketValue
-          ? {
-              ...(listing.verifiedPrice ?? {} as VerifiedPriceLookupResult),
-              verifiedMarketValue,
-              marketDataSource: 'cross_platform',
-              marketDataDate: crossPlatformPrice.fetchedAt,
-              trueDiscountPercent:
-                verifiedMarketValue > 0
-                  ? Math.round(((verifiedMarketValue - listing.askingPrice) / verifiedMarketValue) * 100)
-                  : 0,
-            }
-          : listing.verifiedPrice,
+        verifiedPrice:
+          overridden && verifiedMarketValue
+            ? {
+                ...(listing.verifiedPrice ?? ({} as VerifiedPriceLookupResult)),
+                verifiedMarketValue,
+                marketDataSource: 'cross_platform',
+                marketDataDate: crossPlatformPrice.fetchedAt,
+                trueDiscountPercent:
+                  verifiedMarketValue > 0
+                    ? Math.round(
+                        ((verifiedMarketValue - listing.askingPrice) / verifiedMarketValue) * 100
+                      )
+                    : 0,
+              }
+            : listing.verifiedPrice,
       });
     } catch (err) {
       console.error(
@@ -1031,28 +1042,33 @@ export async function rescueUndervaluedItems(
     try {
       const searchQuery = listing.llmIdentification?.searchQuery || listing.title;
       const category = listing.llmIdentification?.category || listing.category;
-      const crossPlatformPrice = await fetchCrossPlatformPrice(
-        searchQuery,
-        category,
-        fetchers
-      );
+      const crossPlatformPrice = await fetchCrossPlatformPrice(searchQuery, category, fetchers);
 
-      if (!crossPlatformPrice || !shouldRescueItem(listing.askingPrice, crossPlatformPrice, rescueThreshold)) {
-        result.push({ ...listing, crossPlatformPrice: crossPlatformPrice ?? listing.crossPlatformPrice });
+      if (
+        !crossPlatformPrice ||
+        !shouldRescueItem(listing.askingPrice, crossPlatformPrice, rescueThreshold)
+      ) {
+        result.push({
+          ...listing,
+          crossPlatformPrice: crossPlatformPrice ?? listing.crossPlatformPrice,
+        });
         continue;
       }
 
       // Re-score with verified data
       const effectiveFeeRate = feeRate ?? PLATFORM_FEE_DEFAULTS[listing.platform] ?? 0.13;
-      const { valueScore, verifiedMarketValue } =
-        applyPriceIntelligenceOverride(
-          listing.estimation.valueScore,
-          listing.askingPrice,
-          crossPlatformPrice,
-          effectiveFeeRate
-        );
+      const { valueScore, verifiedMarketValue } = applyPriceIntelligenceOverride(
+        listing.estimation.valueScore,
+        listing.askingPrice,
+        crossPlatformPrice,
+        effectiveFeeRate
+      );
 
-      const updatedTags = [...listing.estimation.tags, 'rescued_by_market_data', 'price_intelligence_override'];
+      const updatedTags = [
+        ...listing.estimation.tags,
+        'rescued_by_market_data',
+        'price_intelligence_override',
+      ];
 
       result.push({
         ...listing,
@@ -1066,22 +1082,21 @@ export async function rescueUndervaluedItems(
         },
         verifiedPrice: verifiedMarketValue
           ? {
-              ...(listing.verifiedPrice ?? {} as VerifiedPriceLookupResult),
+              ...(listing.verifiedPrice ?? ({} as VerifiedPriceLookupResult)),
               verifiedMarketValue,
               marketDataSource: 'cross_platform_rescue',
               marketDataDate: crossPlatformPrice.fetchedAt,
               trueDiscountPercent:
                 verifiedMarketValue > 0
-                  ? Math.round(((verifiedMarketValue - listing.askingPrice) / verifiedMarketValue) * 100)
+                  ? Math.round(
+                      ((verifiedMarketValue - listing.askingPrice) / verifiedMarketValue) * 100
+                    )
                   : 0,
             }
           : listing.verifiedPrice,
       });
     } catch (err) {
-      console.error(
-        `[rescueUndervaluedItems] Failed for listing ${listing.externalId}:`,
-        err
-      );
+      console.error(`[rescueUndervaluedItems] Failed for listing ${listing.externalId}:`, err);
       result.push(listing);
     }
   }

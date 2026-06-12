@@ -59,10 +59,9 @@ function LoginPageInner() {
   // attacks (FR-AUTH-ACCESS — never redirect to untrusted external URLs).
   const rawCallback = searchParams.get('callbackUrl');
   const callbackUrl =
-    rawCallback && rawCallback.startsWith('/') && !rawCallback.startsWith('//')
-      ? rawCallback
-      : '/';
-  const loggedOut = searchParams.get('loggedOut') === 'true' || searchParams.get('loggedOut') === '1';
+    rawCallback && rawCallback.startsWith('/') && !rawCallback.startsWith('//') ? rawCallback : '/';
+  const loggedOut =
+    searchParams.get('loggedOut') === 'true' || searchParams.get('loggedOut') === '1';
 
   const { signIn, signInWithGoogle, signInWithGitHub } = useFirebaseAuth();
 
@@ -126,7 +125,11 @@ function LoginPageInner() {
       router.refresh();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Something went wrong';
-      if (message.includes('auth/wrong-password') || message.includes('auth/user-not-found') || message.includes('auth/invalid-credential')) {
+      if (
+        message.includes('auth/wrong-password') ||
+        message.includes('auth/user-not-found') ||
+        message.includes('auth/invalid-credential')
+      ) {
         setErrorMessage('Invalid email or password');
         // Reset CAPTCHA on failed attempt
         setCaptchaToken(null);
@@ -182,7 +185,9 @@ function LoginPageInner() {
                 <span className="text-2xl font-bold fp-grad-purple">Flipper.ai</span>
               </div>
             </Link>
-            <h1 className="text-2xl font-bold mb-2" style={{ color: '#e2e8f0' }}>Welcome back</h1>
+            <h1 className="text-2xl font-bold mb-2" style={{ color: '#e2e8f0' }}>
+              Welcome back
+            </h1>
             <p style={{ color: '#94a3b8' }}>Sign in to find your next profitable flip</p>
           </div>
 
@@ -204,7 +209,9 @@ function LoginPageInner() {
           {errorMessage && (
             <div className="fp-alert-danger mx-8 mb-4 p-3 flex items-center gap-2" role="alert">
               <AlertCircle className="w-5 h-5 flex-shrink-0" style={{ color: '#f87171' }} />
-              <span className="text-sm" style={{ color: '#fca5a5' }}>{errorMessage}</span>
+              <span className="text-sm" style={{ color: '#fca5a5' }}>
+                {errorMessage}
+              </span>
             </div>
           )}
 
@@ -257,7 +264,9 @@ function LoginPageInner() {
                 <div className="w-full" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-transparent" style={{ color: '#475569' }}>or continue with email</span>
+                <span className="px-4 bg-transparent" style={{ color: '#475569' }}>
+                  or continue with email
+                </span>
               </div>
             </div>
           </div>
@@ -285,7 +294,9 @@ function LoginPageInner() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: '#e2e8f0' }}>Password</label>
+              <label className="block text-sm font-medium mb-2" style={{ color: '#e2e8f0' }}>
+                Password
+              </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5" style={{ color: '#475569' }} />
@@ -365,7 +376,11 @@ function LoginPageInner() {
           <div className="px-8 pb-8 text-center">
             <p className="text-sm" style={{ color: '#94a3b8' }}>
               Don&apos;t have an account?{' '}
-              <Link href="/register" className="font-medium hover:underline" style={{ color: '#a78bfa' }}>
+              <Link
+                href="/register"
+                className="font-medium hover:underline"
+                style={{ color: '#a78bfa' }}
+              >
                 Create one free
               </Link>
             </p>

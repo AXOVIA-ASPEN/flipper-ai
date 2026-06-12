@@ -44,18 +44,13 @@ import {
   type PostingResult,
   type PlatformPoster,
 } from '@/lib/posting-queue-processor';
-import {
-  captureListingImages,
-  saveImageMetadata,
-} from '@/lib/image-capture';
+import { captureListingImages, saveImageMetadata } from '@/lib/image-capture';
 
 const mockPrisma = db as jest.Mocked<typeof db>;
 const mockCaptureListingImages = captureListingImages as jest.MockedFunction<
   typeof captureListingImages
 >;
-const mockSaveImageMetadata = saveImageMetadata as jest.MockedFunction<
-  typeof saveImageMetadata
->;
+const mockSaveImageMetadata = saveImageMetadata as jest.MockedFunction<typeof saveImageMetadata>;
 
 const USER_ID = 'user-1';
 
@@ -251,9 +246,7 @@ describe('posting-queue-processor', () => {
     });
 
     it('handles poster throwing an exception', async () => {
-      const throwPoster: PlatformPoster = jest
-        .fn()
-        .mockRejectedValue(new Error('Network boom'));
+      const throwPoster: PlatformPoster = jest.fn().mockRejectedValue(new Error('Network boom'));
 
       registerPoster('TEST_THROW', throwPoster);
 
@@ -359,9 +352,7 @@ describe('posting-queue-processor', () => {
           'Fatal posting error'
       );
       expect(errorUpdate).toBeDefined();
-      expect(
-        (errorUpdate?.[0] as { data: { status: string } }).data.status
-      ).toBe('FAILED');
+      expect((errorUpdate?.[0] as { data: { status: string } }).data.status).toBe('FAILED');
     });
 
     it('concurrency guard bails out when item status changed after IN_PROGRESS mark', async () => {
@@ -409,9 +400,7 @@ describe('posting-queue-processor', () => {
       jest.useFakeTimers();
 
       // Poster that never resolves — must be interrupted by the timeout race.
-      const hungPoster: PlatformPoster = jest
-        .fn()
-        .mockReturnValue(new Promise(() => {}));
+      const hungPoster: PlatformPoster = jest.fn().mockReturnValue(new Promise(() => {}));
 
       registerPoster('TEST_TIMEOUT', hungPoster);
 
@@ -432,8 +421,7 @@ describe('posting-queue-processor', () => {
       const updateCalls = (mockPrisma.postingQueueItem.update as jest.Mock).mock.calls;
       const errorUpdate = updateCalls.find(
         (call: unknown[]) =>
-          (call[0] as { data: { errorMessage?: string } }).data.errorMessage ===
-          'Posting timed out'
+          (call[0] as { data: { errorMessage?: string } }).data.errorMessage === 'Posting timed out'
       );
       expect(errorUpdate).toBeDefined();
 
@@ -502,9 +490,7 @@ describe('posting-queue-processor', () => {
       const listingArg = (poster as jest.Mock).mock.calls[0][0];
       expect(Array.isArray(listingArg.images)).toBe(true);
       expect(listingArg.images).toHaveLength(2);
-      expect(listingArg.images[0].storageUrl).toBe(
-        'https://fb.storage/user-1/ebay/lst-1/0.jpg'
-      );
+      expect(listingArg.images[0].storageUrl).toBe('https://fb.storage/user-1/ebay/lst-1/0.jpg');
     });
 
     it('ownership assertion marks item FAILED when listing.userId mismatches', async () => {
@@ -575,12 +561,9 @@ describe('posting-queue-processor', () => {
 
       const result = await processQueue(USER_ID);
 
-      expect(mockCaptureListingImages).toHaveBeenCalledWith(
-        'lst-1',
-        USER_ID,
-        'CRAIGSLIST',
-        ['https://craigslist.example/a.jpg']
-      );
+      expect(mockCaptureListingImages).toHaveBeenCalledWith('lst-1', USER_ID, 'CRAIGSLIST', [
+        'https://craigslist.example/a.jpg',
+      ]);
       expect(mockSaveImageMetadata).toHaveBeenCalledWith(
         'lst-1',
         expect.arrayContaining([
@@ -605,9 +588,7 @@ describe('posting-queue-processor', () => {
       } as PostingResult);
       registerPoster('TEST_LEGACY_FAIL', poster);
 
-      mockCaptureListingImages.mockRejectedValue(
-        new Error('Original CDN returned 404')
-      );
+      mockCaptureListingImages.mockRejectedValue(new Error('Original CDN returned 404'));
 
       const item = makeMockItem({
         targetPlatform: 'TEST_LEGACY_FAIL',
@@ -772,12 +753,9 @@ describe('posting-queue-processor', () => {
       await processQueue(USER_ID);
 
       // Only the valid string URL should reach captureListingImages
-      expect(mockCaptureListingImages).toHaveBeenCalledWith(
-        'lst-1',
-        USER_ID,
-        'CRAIGSLIST',
-        ['https://valid.example/a.jpg']
-      );
+      expect(mockCaptureListingImages).toHaveBeenCalledWith('lst-1', USER_ID, 'CRAIGSLIST', [
+        'https://valid.example/a.jpg',
+      ]);
     });
 
     it('legacy fallback: budget timeout aborts gracefully without throwing', async () => {

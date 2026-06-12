@@ -28,9 +28,7 @@ test.describe('Feature: Error Handling & Edge Cases', () => {
       await page.route('**/api/search*', (route) =>
         route.fulfill({ status: 500, json: { error: 'Search service unavailable' } })
       );
-      await page.route('**/api/opportunities*', (route) =>
-        route.fulfill({ json: [] })
-      );
+      await page.route('**/api/opportunities*', (route) => route.fulfill({ json: [] }));
       await page.goto('/');
       await expect(page.locator('body')).toBeVisible();
     });
@@ -76,9 +74,7 @@ test.describe('Feature: Error Handling & Edge Cases', () => {
   test.describe('Scenario: Authentication edge cases', () => {
     test('redirects to login when session expires', async ({ page }) => {
       // Override mock to return no session
-      await page.route('**/api/auth/session', (route) =>
-        route.fulfill({ json: {} })
-      );
+      await page.route('**/api/auth/session', (route) => route.fulfill({ json: {} }));
       await page.goto('/');
       await expect(page.locator('body')).toBeVisible();
     });
@@ -96,11 +92,11 @@ test.describe('Feature: Error Handling & Edge Cases', () => {
     test('handles empty form submissions on auth page', async ({ page }) => {
       // Remove session mock so we hit the auth page
       await page.unrouteAll();
-      await page.route('**/api/auth/session', (route) =>
-        route.fulfill({ json: {} })
-      );
+      await page.route('**/api/auth/session', (route) => route.fulfill({ json: {} }));
       await page.route('**/api/auth/providers', (route) =>
-        route.fulfill({ json: { credentials: { id: 'credentials', name: 'Credentials', type: 'credentials' } } })
+        route.fulfill({
+          json: { credentials: { id: 'credentials', name: 'Credentials', type: 'credentials' } },
+        })
       );
       await page.goto('/auth/signin');
       // Try to submit without filling fields
@@ -115,9 +111,7 @@ test.describe('Feature: Error Handling & Edge Cases', () => {
 
   test.describe('Scenario: Empty states render properly', () => {
     test('shows empty state when no opportunities exist', async ({ page }) => {
-      await page.route('**/api/opportunities*', (route) =>
-        route.fulfill({ json: [] })
-      );
+      await page.route('**/api/opportunities*', (route) => route.fulfill({ json: [] }));
       await page.goto('/');
       await expect(page.locator('body')).toBeVisible();
       // Should show empty state or placeholder, not blank page
@@ -126,12 +120,8 @@ test.describe('Feature: Error Handling & Edge Cases', () => {
     });
 
     test('shows empty state when no notifications exist', async ({ page }) => {
-      await page.route('**/api/notifications*', (route) =>
-        route.fulfill({ json: [] })
-      );
-      await page.route('**/api/opportunities*', (route) =>
-        route.fulfill({ json: [] })
-      );
+      await page.route('**/api/notifications*', (route) => route.fulfill({ json: [] }));
+      await page.route('**/api/opportunities*', (route) => route.fulfill({ json: [] }));
       await page.goto('/');
       await expect(page.locator('body')).toBeVisible();
     });
@@ -150,9 +140,7 @@ test.describe('Feature: Error Handling & Edge Cases', () => {
         imageUrl: null,
         createdAt: new Date().toISOString(),
       }));
-      await page.route('**/api/opportunities*', (route) =>
-        route.fulfill({ json: manyOpps })
-      );
+      await page.route('**/api/opportunities*', (route) => route.fulfill({ json: manyOpps }));
       await page.goto('/');
       await expect(page.locator('body')).toBeVisible();
     });

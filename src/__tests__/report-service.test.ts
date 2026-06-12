@@ -445,7 +445,9 @@ describe('buildReport/reportToCSV - deeper branch coverage', () => {
       },
     ];
     const report = buildReport('user1', 'monthly', dateRange, items);
-    const elCat = report.summary.categoryBreakdown?.find((c: { name: string }) => c.name === 'Electronics');
+    const elCat = report.summary.categoryBreakdown?.find(
+      (c: { name: string }) => c.name === 'Electronics'
+    );
     expect(report.summary.bestCategory).toBe('Electronics');
   });
 
@@ -522,7 +524,7 @@ describe('buildReport/reportToCSV - deeper branch coverage', () => {
         category: 'Furniture',
         status: 'SOLD',
         purchasePrice: 50,
-        resalePrice: 80,  // profit 30 < electronics 200
+        resalePrice: 80, // profit 30 < electronics 200
         fees: 0,
         purchaseDate: new Date('2026-01-06'),
         resaleDate: new Date('2026-01-11'),

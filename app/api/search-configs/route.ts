@@ -60,7 +60,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Enforce search config limit
-    const user = await prisma.user.findUnique({ where: { id: userId }, select: { subscriptionTier: true } });
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { subscriptionTier: true },
+    });
     const currentCount = await prisma.searchConfig.count({ where: { userId } });
     const configCheck = checkSearchConfigLimit(user?.subscriptionTier, currentCount);
     if (!configCheck.allowed) {

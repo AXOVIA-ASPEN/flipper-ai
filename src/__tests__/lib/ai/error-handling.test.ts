@@ -60,7 +60,7 @@ function makePromptConfig(overrides: Partial<PromptConfig> = {}): PromptConfig {
 
 function makeProvider(
   name: 'openai' | 'gemini' | 'groq' | 'anthropic',
-  completeImpl?: AIProvider['complete'],
+  completeImpl?: AIProvider['complete']
 ): AIProvider {
   const response: AIResponse = {
     content: '{"ok":true}',
@@ -109,7 +109,12 @@ describe('callWithRetry', () => {
     const provider: AIProvider = { name: 'openai', isAvailable: () => true, complete: fail };
 
     await expect(
-      callWithRetry(provider, [{ role: 'user', content: 'x' }], { model: 'm', temperature: 0, maxTokens: 1 }, 3),
+      callWithRetry(
+        provider,
+        [{ role: 'user', content: 'x' }],
+        { model: 'm', temperature: 0, maxTokens: 1 },
+        3
+      )
     ).rejects.toBeInstanceOf(AIRateLimitError);
     expect(fail).toHaveBeenCalledTimes(3);
   });
@@ -126,7 +131,7 @@ describe('callWithRetry', () => {
       provider,
       [{ role: 'user', content: 'x' }],
       { model: 'm', temperature: 0, maxTokens: 1 },
-      3,
+      3
     );
     expect(result.content).toBe('ok');
     expect(complete).toHaveBeenCalledTimes(3);
@@ -139,7 +144,12 @@ describe('callWithRetry', () => {
     const provider: AIProvider = { name: 'openai', isAvailable: () => true, complete };
 
     await expect(
-      callWithRetry(provider, [{ role: 'user', content: 'x' }], { model: 'm', temperature: 0, maxTokens: 1 }, 3),
+      callWithRetry(
+        provider,
+        [{ role: 'user', content: 'x' }],
+        { model: 'm', temperature: 0, maxTokens: 1 },
+        3
+      )
     ).rejects.toBeInstanceOf(AIMalformedResponseError);
     expect(complete).toHaveBeenCalledTimes(1);
   });
@@ -151,7 +161,12 @@ describe('callWithRetry', () => {
     const provider: AIProvider = { name: 'openai', isAvailable: () => true, complete };
 
     await expect(
-      callWithRetry(provider, [{ role: 'user', content: 'x' }], { model: 'm', temperature: 0, maxTokens: 1 }, 3),
+      callWithRetry(
+        provider,
+        [{ role: 'user', content: 'x' }],
+        { model: 'm', temperature: 0, maxTokens: 1 },
+        3
+      )
     ).rejects.toBeInstanceOf(TypeError);
     expect(complete).toHaveBeenCalledTimes(1);
   });
@@ -164,7 +179,12 @@ describe('callWithRetry', () => {
     const provider: AIProvider = { name: 'openai', isAvailable: () => true, complete };
 
     const start = Date.now();
-    await callWithRetry(provider, [{ role: 'user', content: 'x' }], { model: 'm', temperature: 0, maxTokens: 1 }, 3);
+    await callWithRetry(
+      provider,
+      [{ role: 'user', content: 'x' }],
+      { model: 'm', temperature: 0, maxTokens: 1 },
+      3
+    );
     const elapsed = Date.now() - start;
 
     expect(elapsed).toBeGreaterThanOrEqual(900); // ~1000ms honored (allow jitter)
@@ -179,9 +199,11 @@ describe('completeAI runtime fallback', () => {
 
   it('falls back to next provider when preferred exhausts rate-limit retries', async () => {
     mockGetPrompt.mockReturnValue(makePromptConfig());
-    const failingOpenai = jest.fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
+    const failingOpenai = jest
+      .fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
       .mockRejectedValue(new AIRateLimitError('429', 'openai'));
-    const workingGemini = jest.fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
+    const workingGemini = jest
+      .fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
       .mockResolvedValue({ content: 'ok', model: 'gem', provider: 'gemini' });
 
     setupProviders({
@@ -197,9 +219,11 @@ describe('completeAI runtime fallback', () => {
 
   it('falls back on AITimeoutError', async () => {
     mockGetPrompt.mockReturnValue(makePromptConfig());
-    const failingOpenai = jest.fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
+    const failingOpenai = jest
+      .fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
       .mockRejectedValue(new AITimeoutError('fetch failed', 'openai'));
-    const workingGemini = jest.fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
+    const workingGemini = jest
+      .fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
       .mockResolvedValue({ content: 'ok', model: 'gem', provider: 'gemini' });
 
     setupProviders({
@@ -213,9 +237,11 @@ describe('completeAI runtime fallback', () => {
 
   it('falls back on AIMalformedResponseError (first attempt, no retry)', async () => {
     mockGetPrompt.mockReturnValue(makePromptConfig());
-    const failingOpenai = jest.fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
+    const failingOpenai = jest
+      .fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
       .mockRejectedValue(new AIMalformedResponseError('bad', 'openai', 'not-json'));
-    const workingGemini = jest.fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
+    const workingGemini = jest
+      .fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
       .mockResolvedValue({ content: 'ok', model: 'gem', provider: 'gemini' });
 
     setupProviders({
@@ -230,9 +256,11 @@ describe('completeAI runtime fallback', () => {
 
   it('throws last AIProviderError when all providers fail', async () => {
     mockGetPrompt.mockReturnValue(makePromptConfig());
-    const failOpenai = jest.fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
+    const failOpenai = jest
+      .fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
       .mockRejectedValue(new AIRateLimitError('429', 'openai'));
-    const failGemini = jest.fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
+    const failGemini = jest
+      .fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
       .mockRejectedValue(new AIProviderError('gemini down', 'gemini'));
 
     setupProviders({
@@ -245,9 +273,11 @@ describe('completeAI runtime fallback', () => {
 
   it('does NOT fall back on non-AI errors (bugs must propagate)', async () => {
     mockGetPrompt.mockReturnValue(makePromptConfig());
-    const buggyOpenai = jest.fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
+    const buggyOpenai = jest
+      .fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
       .mockRejectedValue(new TypeError('ctx.foo is undefined'));
-    const workingGemini = jest.fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
+    const workingGemini = jest
+      .fn<Promise<AIResponse>, [AIMessage[], ModelConfig]>()
       .mockResolvedValue({ content: 'ok', model: 'gem', provider: 'gemini' });
 
     setupProviders({

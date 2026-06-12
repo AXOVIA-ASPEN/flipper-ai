@@ -117,12 +117,9 @@ Given(
   }
 );
 
-When(
-  'I inspect the OAuth provider configuration',
-  async function (this: CustomWorld) {
-    console.log('✅ Inspecting OAuth provider configuration...');
-  }
-);
+When('I inspect the OAuth provider configuration', async function (this: CustomWorld) {
+  console.log('✅ Inspecting OAuth provider configuration...');
+});
 
 Then(
   'the module should export a {string} function',
@@ -151,12 +148,9 @@ Given('the Facebook auth files exist', async function (this: CustomWorld) {
   console.log('✅ Loaded Facebook auth files');
 });
 
-When(
-  'I inspect the Facebook token handling',
-  async function (this: CustomWorld) {
-    console.log('✅ Inspecting Facebook token handling...');
-  }
-);
+When('I inspect the Facebook token handling', async function (this: CustomWorld) {
+  console.log('✅ Inspecting Facebook token handling...');
+});
 
 Then(
   '{string} should extract the access token from the OAuth credential',
@@ -193,12 +187,9 @@ Given('the authentication source files', async function (this: CustomWorld) {
   console.log('✅ Loaded authentication source files');
 });
 
-When(
-  'I inspect the auth migration status',
-  async function (this: CustomWorld) {
-    console.log('✅ Inspecting auth migration status...');
-  }
-);
+When('I inspect the auth migration status', async function (this: CustomWorld) {
+  console.log('✅ Inspecting auth migration status...');
+});
 
 Then(
   '{string} should not be listed in package.json dependencies',
@@ -211,13 +202,10 @@ Then(
   }
 );
 
-Then(
-  '{string} route should not exist',
-  async function (this: CustomWorld, routePath: string) {
-    expect(fileExists(routePath)).toBe(false);
-    console.log(`✅ ${routePath} does not exist`);
-  }
-);
+Then('{string} route should not exist', async function (this: CustomWorld, routePath: string) {
+  expect(fileExists(routePath)).toBe(false);
+  console.log(`✅ ${routePath} does not exist`);
+});
 
 Then(
   '{string} should re-export from Firebase session module',
@@ -231,7 +219,12 @@ Then(
 
 Then(
   '{string} should use {string} instead of {string} from next-auth',
-  async function (this: CustomWorld, _filePath: string, firebaseProvider: string, _nextAuthProvider: string) {
+  async function (
+    this: CustomWorld,
+    _filePath: string,
+    firebaseProvider: string,
+    _nextAuthProvider: string
+  ) {
     expect(layoutContent).toContain(firebaseProvider);
     expect(layoutContent).not.toContain("from 'next-auth");
     console.log(`✅ layout.tsx uses ${firebaseProvider}`);
@@ -252,12 +245,9 @@ Given('the backend auth middleware files', async function (this: CustomWorld) {
   console.log('✅ Loaded backend auth middleware files');
 });
 
-When(
-  'I inspect the token validation implementation',
-  async function (this: CustomWorld) {
-    console.log('✅ Inspecting token validation implementation...');
-  }
-);
+When('I inspect the token validation implementation', async function (this: CustomWorld) {
+  console.log('✅ Inspecting token validation implementation...');
+});
 
 Then(
   '{string} should verify Bearer tokens via {string}',

@@ -52,13 +52,11 @@ function randomDelay(minMs: number, maxMs: number): Promise<void> {
 function getRandomViewport(): { width: number; height: number } {
   const width =
     Math.floor(
-      Math.random() *
-        (SCRAPER_CONFIG.VIEWPORT_MAX_WIDTH - SCRAPER_CONFIG.VIEWPORT_MIN_WIDTH + 1)
+      Math.random() * (SCRAPER_CONFIG.VIEWPORT_MAX_WIDTH - SCRAPER_CONFIG.VIEWPORT_MIN_WIDTH + 1)
     ) + SCRAPER_CONFIG.VIEWPORT_MIN_WIDTH;
   const height =
     Math.floor(
-      Math.random() *
-        (SCRAPER_CONFIG.VIEWPORT_MAX_HEIGHT - SCRAPER_CONFIG.VIEWPORT_MIN_HEIGHT + 1)
+      Math.random() * (SCRAPER_CONFIG.VIEWPORT_MAX_HEIGHT - SCRAPER_CONFIG.VIEWPORT_MIN_HEIGHT + 1)
     ) + SCRAPER_CONFIG.VIEWPORT_MIN_HEIGHT;
   return { width, height };
 }
@@ -120,9 +118,7 @@ export async function callMercariApi(
     const contentType = response.headers.get('content-type');
 
     if (isRateLimitOrBlock(response.status, contentType)) {
-      throw new RateLimitError(
-        `Mercari rate limit or block detected. Status: ${response.status}`
-      );
+      throw new RateLimitError(`Mercari rate limit or block detected. Status: ${response.status}`);
     }
 
     const errorText = await response.text();
@@ -203,63 +199,66 @@ export async function scrapeMercariWithPlaywright(
 
     // Extract listing data from rendered HTML
     // istanbul ignore next -- page.evaluate runs in browser context, not instrumented by Node.js
-    const rawItems = await page.evaluate(/* istanbul ignore next */ () => {
-      const items: Array<{
-        id: string;
-        name: string;
-        price: number;
-        imageUrl?: string;
-        url?: string;
-      }> = [];
+    const rawItems = await page.evaluate(
+      /* istanbul ignore next */ () => {
+        const items: Array<{
+          id: string;
+          name: string;
+          price: number;
+          imageUrl?: string;
+          url?: string;
+        }> = [];
 
-      // Try multiple selector patterns (Mercari UI changes)
-      const selectors = [
-        '[data-testid="ItemContainer"]',
-        '[class*="ItemContainer"]',
-        'a[href*="/item/"]',
-      ];
+        // Try multiple selector patterns (Mercari UI changes)
+        const selectors = [
+          '[data-testid="ItemContainer"]',
+          '[class*="ItemContainer"]',
+          'a[href*="/item/"]',
+        ];
 
-      let listingElements: Element[] = [];
-      for (const selector of selectors) {
-        const elements = document.querySelectorAll(selector);
-        if (elements.length > 0) {
-          listingElements = Array.from(elements);
-          break;
-        }
-      }
-
-      for (const el of listingElements.slice(0, 50)) {
-        try {
-          // Extract URL and ID
-          const linkEl = el.closest('a') || el.querySelector('a[href*="/item/"]');
-          const href = (linkEl as HTMLAnchorElement)?.href || '';
-          const idMatch = href.match(/\/item\/([^/]+)/);
-          const id = idMatch ? idMatch[1] : '';
-
-          // Extract title
-          const titleEl = el.querySelector('[class*="ItemName"], [data-testid="ItemName"]');
-          const name = titleEl?.textContent?.trim() || el.textContent?.trim()?.slice(0, 100) || '';
-
-          // Extract price
-          const priceEl = el.querySelector('[class*="ItemPrice"], [data-testid="ItemPrice"]');
-          const priceText = priceEl?.textContent || '';
-          const priceMatch = priceText.match(/\$?([\d,]+(?:\.\d{1,2})?)/);
-          const price = priceMatch ? parseFloat(priceMatch[1].replace(/,/g, '')) : 0;
-
-          // Extract image
-          const imgEl = el.querySelector('img');
-          const imageUrl = imgEl?.src || '';
-
-          if (id && name && price > 0) {
-            items.push({ id, name, price, imageUrl, url: href });
+        let listingElements: Element[] = [];
+        for (const selector of selectors) {
+          const elements = document.querySelectorAll(selector);
+          if (elements.length > 0) {
+            listingElements = Array.from(elements);
+            break;
           }
-        } catch {
-          // Skip problematic elements
         }
-      }
 
-      return items;
-    });
+        for (const el of listingElements.slice(0, 50)) {
+          try {
+            // Extract URL and ID
+            const linkEl = el.closest('a') || el.querySelector('a[href*="/item/"]');
+            const href = (linkEl as HTMLAnchorElement)?.href || '';
+            const idMatch = href.match(/\/item\/([^/]+)/);
+            const id = idMatch ? idMatch[1] : '';
+
+            // Extract title
+            const titleEl = el.querySelector('[class*="ItemName"], [data-testid="ItemName"]');
+            const name =
+              titleEl?.textContent?.trim() || el.textContent?.trim()?.slice(0, 100) || '';
+
+            // Extract price
+            const priceEl = el.querySelector('[class*="ItemPrice"], [data-testid="ItemPrice"]');
+            const priceText = priceEl?.textContent || '';
+            const priceMatch = priceText.match(/\$?([\d,]+(?:\.\d{1,2})?)/);
+            const price = priceMatch ? parseFloat(priceMatch[1].replace(/,/g, '')) : 0;
+
+            // Extract image
+            const imgEl = el.querySelector('img');
+            const imageUrl = imgEl?.src || '';
+
+            if (id && name && price > 0) {
+              items.push({ id, name, price, imageUrl, url: href });
+            }
+          } catch {
+            // Skip problematic elements
+          }
+        }
+
+        return items;
+      }
+    );
 
     // Convert raw extracted data to MercariItem format
     return rawItems.map((raw) => ({
@@ -293,9 +292,10 @@ export async function scrapeMercariWithPlaywright(
  *   If Playwright also fails → throw RateLimitError
  */
 export async function scrapeMercariSearch(params: ScrapeRequestBody): Promise<MercariItem[]> {
-  const limit = params.limit !== undefined
-    ? Math.min(params.limit, MAX_LIMIT)
-    : Math.min(DEFAULT_LIMIT, MAX_LIMIT);
+  const limit =
+    params.limit !== undefined
+      ? Math.min(params.limit, MAX_LIMIT)
+      : Math.min(DEFAULT_LIMIT, MAX_LIMIT);
 
   const apiBody = {
     keyword: params.keywords || '',
@@ -346,9 +346,7 @@ export async function scrapeMercariSearch(params: ScrapeRequestBody): Promise<Me
   } catch (playwrightError) {
     // Both API and Playwright failed
     if (lastError instanceof RateLimitError) {
-      throw new RateLimitError(
-        'Mercari rate limited and Playwright fallback also failed'
-      );
+      throw new RateLimitError('Mercari rate limited and Playwright fallback also failed');
     }
     // istanbul ignore next -- lastError is always set by the retry loop above
     throw lastError || playwrightError;
@@ -361,9 +359,10 @@ export async function scrapeMercariSearch(params: ScrapeRequestBody): Promise<Me
 export async function fetchMercariListings(params: ScrapeRequestBody): Promise<MercariItem[]> {
   return scrapeMercariSearch({
     ...params,
-    limit: params.limit !== undefined
-      ? Math.min(params.limit, MAX_LIMIT)
-      : Math.min(DEFAULT_LIMIT, MAX_LIMIT),
+    limit:
+      params.limit !== undefined
+        ? Math.min(params.limit, MAX_LIMIT)
+        : Math.min(DEFAULT_LIMIT, MAX_LIMIT),
   });
 }
 

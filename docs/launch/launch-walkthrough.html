@@ -21,880 +21,2659 @@
   Copyright © 2026 Axovia LLC. All Rights Reserved.
   ---
 -->
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Flipper.ai — Launch Control</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Sora:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
-<style>
-  :root{
-    --bg:#06080e;
-    --bg2:#080b14;
-    --panel:rgba(255,255,255,.035);
-    --panel-2:rgba(255,255,255,.055);
-    --border:rgba(255,255,255,.09);
-    --border-2:rgba(255,255,255,.16);
-    --ink:#e9eef7;
-    --ink-2:#aeb8cb;
-    --ink-3:#6d7892;
-    --go:#34d399;        /* money green – "go" */
-    --go-deep:#10b981;
-    --cyan:#38bdf8;
-    --amber:#fbbf24;     /* needs verification */
-    --rose:#fb7185;      /* destructive / blocker */
-    --violet:#a78bfa;
-    --radius:18px;
-    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
-  }
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{
-    margin:0;background:var(--bg);color:var(--ink);
-    font-family:'Sora',system-ui,sans-serif;font-weight:400;line-height:1.6;
-    -webkit-font-smoothing:antialiased;letter-spacing:.1px;
-    background-image:
-      radial-gradient(720px 520px at 12% -8%, rgba(52,211,153,.13), transparent 60%),
-      radial-gradient(680px 520px at 92% 4%, rgba(56,189,248,.10), transparent 60%),
-      radial-gradient(900px 700px at 50% 120%, rgba(167,139,250,.08), transparent 60%);
-    background-attachment:fixed;
-  }
-  /* grain overlay */
-  body::before{
-    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.04;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-  .wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 22px 140px}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flipper.ai — Launch Control</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Sora:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #06080e;
+        --bg2: #080b14;
+        --panel: rgba(255, 255, 255, 0.035);
+        --panel-2: rgba(255, 255, 255, 0.055);
+        --border: rgba(255, 255, 255, 0.09);
+        --border-2: rgba(255, 255, 255, 0.16);
+        --ink: #e9eef7;
+        --ink-2: #aeb8cb;
+        --ink-3: #6d7892;
+        --go: #34d399; /* money green – "go" */
+        --go-deep: #10b981;
+        --cyan: #38bdf8;
+        --amber: #fbbf24; /* needs verification */
+        --rose: #fb7185; /* destructive / blocker */
+        --violet: #a78bfa;
+        --radius: 18px;
+        --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: 'Sora', system-ui, sans-serif;
+        font-weight: 400;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        letter-spacing: 0.1px;
+        background-image:
+          radial-gradient(720px 520px at 12% -8%, rgba(52, 211, 153, 0.13), transparent 60%),
+          radial-gradient(680px 520px at 92% 4%, rgba(56, 189, 248, 0.1), transparent 60%),
+          radial-gradient(900px 700px at 50% 120%, rgba(167, 139, 250, 0.08), transparent 60%);
+        background-attachment: fixed;
+      }
+      /* grain overlay */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.04;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+      .wrap {
+        position: relative;
+        z-index: 1;
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 0 22px 140px;
+      }
 
-  /* ---------- header ---------- */
-  header.hero{padding:54px 0 26px}
-  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.34em;text-transform:uppercase;color:var(--go);margin:0 0 14px}
-  .hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(40px,7vw,76px);line-height:.96;margin:0;letter-spacing:-.02em}
-  .hero h1 .dim{color:var(--ink-3);-webkit-text-fill-color:transparent;-webkit-text-stroke:1.4px var(--border-2)}
-  .hero p.sub{color:var(--ink-2);max-width:64ch;margin:18px 0 0;font-size:16px}
+      /* ---------- header ---------- */
+      header.hero {
+        padding: 54px 0 26px;
+      }
+      .kicker {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.34em;
+        text-transform: uppercase;
+        color: var(--go);
+        margin: 0 0 14px;
+      }
+      .hero h1 {
+        font-family: 'Syne', sans-serif;
+        font-weight: 800;
+        font-size: clamp(40px, 7vw, 76px);
+        line-height: 0.96;
+        margin: 0;
+        letter-spacing: -0.02em;
+      }
+      .hero h1 .dim {
+        color: var(--ink-3);
+        -webkit-text-fill-color: transparent;
+        -webkit-text-stroke: 1.4px var(--border-2);
+      }
+      .hero p.sub {
+        color: var(--ink-2);
+        max-width: 64ch;
+        margin: 18px 0 0;
+        font-size: 16px;
+      }
 
-  /* progress dock */
-  .dock{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:center;margin-top:34px;
-    background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--border);
-    border-radius:var(--radius);padding:24px 26px;backdrop-filter:blur(14px);box-shadow:0 30px 80px -50px rgba(0,0,0,.9)}
-  .ring{position:relative;width:120px;height:120px}
-  .ring svg{transform:rotate(-90deg)}
-  .ring .pct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  .ring .pct b{font-family:'Syne';font-size:30px;font-weight:800;line-height:1}
-  .ring .pct span{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--ink-3);text-transform:uppercase;margin-top:4px}
-  .dock-meta{min-width:0}
-  .dock-meta .line{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:baseline}
-  .dock-meta .big{font-family:'Syne';font-weight:700;font-size:22px}
-  .dock-meta .tasks{color:var(--ink-2);font-family:var(--mono);font-size:13px}
-  .bar{height:9px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden;margin:14px 0 12px;border:1px solid var(--border)}
-  .bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--go-deep),var(--go) 55%,var(--cyan));transition:width .5s cubic-bezier(.4,0,.2,1);box-shadow:0 0 22px rgba(52,211,153,.55)}
-  .dock-actions{display:flex;gap:10px;flex-wrap:wrap}
-  .btn{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
-    background:var(--panel-2);border:1px solid var(--border-2);color:var(--ink-2);padding:9px 14px;border-radius:10px;transition:.18s}
-  .btn:hover{color:var(--ink);border-color:var(--go);box-shadow:0 0 0 1px rgba(52,211,153,.25)}
-  .btn.danger:hover{border-color:var(--rose);box-shadow:0 0 0 1px rgba(251,113,133,.25)}
+      /* progress dock */
+      .dock {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 26px;
+        align-items: center;
+        margin-top: 34px;
+        background: linear-gradient(180deg, var(--panel-2), var(--panel));
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px 26px;
+        backdrop-filter: blur(14px);
+        box-shadow: 0 30px 80px -50px rgba(0, 0, 0, 0.9);
+      }
+      .ring {
+        position: relative;
+        width: 120px;
+        height: 120px;
+      }
+      .ring svg {
+        transform: rotate(-90deg);
+      }
+      .ring .pct {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .ring .pct b {
+        font-family: 'Syne';
+        font-size: 30px;
+        font-weight: 800;
+        line-height: 1;
+      }
+      .ring .pct span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        color: var(--ink-3);
+        text-transform: uppercase;
+        margin-top: 4px;
+      }
+      .dock-meta {
+        min-width: 0;
+      }
+      .dock-meta .line {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 20px;
+        align-items: baseline;
+      }
+      .dock-meta .big {
+        font-family: 'Syne';
+        font-weight: 700;
+        font-size: 22px;
+      }
+      .dock-meta .tasks {
+        color: var(--ink-2);
+        font-family: var(--mono);
+        font-size: 13px;
+      }
+      .bar {
+        height: 9px;
+        border-radius: 99px;
+        background: rgba(255, 255, 255, 0.06);
+        overflow: hidden;
+        margin: 14px 0 12px;
+        border: 1px solid var(--border);
+      }
+      .bar i {
+        display: block;
+        height: 100%;
+        width: 0;
+        border-radius: 99px;
+        background: linear-gradient(90deg, var(--go-deep), var(--go) 55%, var(--cyan));
+        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 0 22px rgba(52, 211, 153, 0.55);
+      }
+      .dock-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .btn {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        cursor: pointer;
+        background: var(--panel-2);
+        border: 1px solid var(--border-2);
+        color: var(--ink-2);
+        padding: 9px 14px;
+        border-radius: 10px;
+        transition: 0.18s;
+      }
+      .btn:hover {
+        color: var(--ink);
+        border-color: var(--go);
+        box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.25);
+      }
+      .btn.danger:hover {
+        border-color: var(--rose);
+        box-shadow: 0 0 0 1px rgba(251, 113, 133, 0.25);
+      }
 
-  /* domain field */
-  .domain-field{margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-  .domain-field label{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
-  .domain-field input{font-family:var(--mono);font-size:14px;background:rgba(0,0,0,.35);border:1px solid var(--border-2);
-    color:var(--go);border-radius:10px;padding:9px 13px;min-width:240px;outline:none}
-  .domain-field input:focus{border-color:var(--go);box-shadow:0 0 0 3px rgba(52,211,153,.14)}
-  .dom{font-family:var(--mono);color:var(--go);font-weight:500}
+      /* domain field */
+      .domain-field {
+        margin-top: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .domain-field label {
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+      }
+      .domain-field input {
+        font-family: var(--mono);
+        font-size: 14px;
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid var(--border-2);
+        color: var(--go);
+        border-radius: 10px;
+        padding: 9px 13px;
+        min-width: 240px;
+        outline: none;
+      }
+      .domain-field input:focus {
+        border-color: var(--go);
+        box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.14);
+      }
+      .dom {
+        font-family: var(--mono);
+        color: var(--go);
+        font-weight: 500;
+      }
 
-  /* sticky mini progress */
-  .sticky{position:sticky;top:0;z-index:30;margin:0 -22px 0;padding:11px 22px;
-    background:rgba(6,8,14,.78);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);
-    display:flex;align-items:center;gap:16px;transform:translateY(-120%);transition:transform .3s}
-  .sticky.show{transform:none}
-  .sticky .s-bar{flex:1;height:6px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
-  .sticky .s-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--go-deep),var(--cyan));transition:width .5s}
-  .sticky .s-pct{font-family:var(--mono);font-size:12px;color:var(--go)}
-  .sticky .s-title{font-family:'Syne';font-weight:700;font-size:14px;letter-spacing:.02em}
+      /* sticky mini progress */
+      .sticky {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        margin: 0 -22px 0;
+        padding: 11px 22px;
+        background: rgba(6, 8, 14, 0.78);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transform: translateY(-120%);
+        transition: transform 0.3s;
+      }
+      .sticky.show {
+        transform: none;
+      }
+      .sticky .s-bar {
+        flex: 1;
+        height: 6px;
+        border-radius: 99px;
+        background: rgba(255, 255, 255, 0.07);
+        overflow: hidden;
+      }
+      .sticky .s-bar i {
+        display: block;
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, var(--go-deep), var(--cyan));
+        transition: width 0.5s;
+      }
+      .sticky .s-pct {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--go);
+      }
+      .sticky .s-title {
+        font-family: 'Syne';
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 0.02em;
+      }
 
-  /* TOC */
-  nav.toc{display:flex;flex-wrap:wrap;gap:9px;margin:30px 0 8px}
-  nav.toc a{font-family:var(--mono);font-size:12px;text-decoration:none;color:var(--ink-2);
-    border:1px solid var(--border);background:var(--panel);padding:8px 13px;border-radius:99px;transition:.16s;display:flex;align-items:center;gap:8px}
-  nav.toc a:hover{color:var(--ink);border-color:var(--border-2)}
-  nav.toc a .mini{font-size:10px;color:var(--ink-3)}
-  nav.toc a.complete{color:var(--go);border-color:rgba(52,211,153,.35)}
-  nav.toc a.complete .mini{color:var(--go)}
+      /* TOC */
+      nav.toc {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin: 30px 0 8px;
+      }
+      nav.toc a {
+        font-family: var(--mono);
+        font-size: 12px;
+        text-decoration: none;
+        color: var(--ink-2);
+        border: 1px solid var(--border);
+        background: var(--panel);
+        padding: 8px 13px;
+        border-radius: 99px;
+        transition: 0.16s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      nav.toc a:hover {
+        color: var(--ink);
+        border-color: var(--border-2);
+      }
+      nav.toc a .mini {
+        font-size: 10px;
+        color: var(--ink-3);
+      }
+      nav.toc a.complete {
+        color: var(--go);
+        border-color: rgba(52, 211, 153, 0.35);
+      }
+      nav.toc a.complete .mini {
+        color: var(--go);
+      }
 
-  /* ---------- decisions ---------- */
-  section.block{margin-top:44px;scroll-margin-top:70px}
-  .sec-head{display:flex;align-items:flex-end;gap:16px;margin-bottom:20px}
-  .sec-no{font-family:'Syne';font-weight:800;font-size:13px;color:var(--bg);background:var(--go);
-    border-radius:8px;padding:5px 9px;letter-spacing:.05em;line-height:1;box-shadow:0 0 24px rgba(52,211,153,.45)}
-  .sec-no.p1{background:var(--cyan);box-shadow:0 0 24px rgba(56,189,248,.4)}
-  .sec-no.gtm{background:var(--violet);box-shadow:0 0 24px rgba(167,139,250,.4)}
-  .sec-head h2{font-family:'Syne';font-weight:700;font-size:clamp(22px,3.4vw,32px);margin:0;letter-spacing:-.01em}
-  .sec-head .cnt{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink-3);white-space:nowrap}
-  .sec-head .cnt.done{color:var(--go)}
-  .sec-sub{color:var(--ink-2);font-size:14.5px;margin:-8px 0 22px;max-width:78ch}
+      /* ---------- decisions ---------- */
+      section.block {
+        margin-top: 44px;
+        scroll-margin-top: 70px;
+      }
+      .sec-head {
+        display: flex;
+        align-items: flex-end;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      .sec-no {
+        font-family: 'Syne';
+        font-weight: 800;
+        font-size: 13px;
+        color: var(--bg);
+        background: var(--go);
+        border-radius: 8px;
+        padding: 5px 9px;
+        letter-spacing: 0.05em;
+        line-height: 1;
+        box-shadow: 0 0 24px rgba(52, 211, 153, 0.45);
+      }
+      .sec-no.p1 {
+        background: var(--cyan);
+        box-shadow: 0 0 24px rgba(56, 189, 248, 0.4);
+      }
+      .sec-no.gtm {
+        background: var(--violet);
+        box-shadow: 0 0 24px rgba(167, 139, 250, 0.4);
+      }
+      .sec-head h2 {
+        font-family: 'Syne';
+        font-weight: 700;
+        font-size: clamp(22px, 3.4vw, 32px);
+        margin: 0;
+        letter-spacing: -0.01em;
+      }
+      .sec-head .cnt {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ink-3);
+        white-space: nowrap;
+      }
+      .sec-head .cnt.done {
+        color: var(--go);
+      }
+      .sec-sub {
+        color: var(--ink-2);
+        font-size: 14.5px;
+        margin: -8px 0 22px;
+        max-width: 78ch;
+      }
 
-  .decisions{display:grid;gap:16px}
-  .decision{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px 20px}
-  .decision h4{margin:0 0 4px;font-family:'Syne';font-weight:700;font-size:16px}
-  .decision .q{color:var(--ink-3);font-size:13px;margin:0 0 14px;font-family:var(--mono)}
-  .opts{display:flex;flex-wrap:wrap;gap:9px}
-  .opt{cursor:pointer;border:1px solid var(--border-2);background:rgba(255,255,255,.02);border-radius:10px;
-    padding:10px 14px;font-size:13.5px;color:var(--ink-2);transition:.16s;display:flex;gap:9px;align-items:center}
-  .opt:hover{border-color:var(--ink-3);color:var(--ink)}
-  .opt.sel{border-color:var(--go);color:var(--ink);background:rgba(52,211,153,.1);box-shadow:0 0 0 1px rgba(52,211,153,.3)}
-  .opt .tag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
-  .opt.sel .tag{color:var(--go)}
-  .opt.rec::after{content:"recommended";font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
-    color:var(--amber);border:1px solid rgba(251,191,36,.4);border-radius:6px;padding:2px 6px}
-  .decision .answer{margin-top:12px;font-family:var(--mono);font-size:12px;color:var(--ink-3)}
-  .decision .answer b{color:var(--go);font-weight:500}
-  .decision input.free{font-family:var(--mono);font-size:13px;background:rgba(0,0,0,.3);border:1px solid var(--border-2);
-    color:var(--ink);border-radius:9px;padding:8px 12px;width:100%;max-width:340px;outline:none;margin-top:4px}
-  .decision input.free:focus{border-color:var(--go)}
+      .decisions {
+        display: grid;
+        gap: 16px;
+      }
+      .decision {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px 20px;
+      }
+      .decision h4 {
+        margin: 0 0 4px;
+        font-family: 'Syne';
+        font-weight: 700;
+        font-size: 16px;
+      }
+      .decision .q {
+        color: var(--ink-3);
+        font-size: 13px;
+        margin: 0 0 14px;
+        font-family: var(--mono);
+      }
+      .opts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+      }
+      .opt {
+        cursor: pointer;
+        border: 1px solid var(--border-2);
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 13.5px;
+        color: var(--ink-2);
+        transition: 0.16s;
+        display: flex;
+        gap: 9px;
+        align-items: center;
+      }
+      .opt:hover {
+        border-color: var(--ink-3);
+        color: var(--ink);
+      }
+      .opt.sel {
+        border-color: var(--go);
+        color: var(--ink);
+        background: rgba(52, 211, 153, 0.1);
+        box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.3);
+      }
+      .opt .tag {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+      }
+      .opt.sel .tag {
+        color: var(--go);
+      }
+      .opt.rec::after {
+        content: 'recommended';
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--amber);
+        border: 1px solid rgba(251, 191, 36, 0.4);
+        border-radius: 6px;
+        padding: 2px 6px;
+      }
+      .decision .answer {
+        margin-top: 12px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ink-3);
+      }
+      .decision .answer b {
+        color: var(--go);
+        font-weight: 500;
+      }
+      .decision input.free {
+        font-family: var(--mono);
+        font-size: 13px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--border-2);
+        color: var(--ink);
+        border-radius: 9px;
+        padding: 8px 12px;
+        width: 100%;
+        max-width: 340px;
+        outline: none;
+        margin-top: 4px;
+      }
+      .decision input.free:focus {
+        border-color: var(--go);
+      }
 
-  /* ---------- task cards ---------- */
-  .tasks-list{display:grid;gap:14px}
-  .task{position:relative;background:linear-gradient(180deg,var(--panel),rgba(255,255,255,.02));
-    border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px 20px 60px;transition:.22s}
-  .task:hover{border-color:var(--border-2)}
-  .task.done{opacity:.62}
-  .task.done .t-title{text-decoration:line-through;text-decoration-color:var(--go-deep);color:var(--ink-2)}
-  .chk{position:absolute;left:18px;top:20px;width:26px;height:26px;border-radius:8px;cursor:pointer;
-    border:1.6px solid var(--border-2);background:rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;transition:.18s;padding:0}
-  .chk:hover{border-color:var(--go)}
-  .chk svg{width:15px;height:15px;stroke:var(--bg);stroke-width:3.4;fill:none;opacity:0;transform:scale(.4);transition:.18s}
-  .task.done .chk{background:var(--go);border-color:var(--go);box-shadow:0 0 20px rgba(52,211,153,.5)}
-  .task.done .chk svg{opacity:1;transform:none}
-  .t-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
-  .t-id{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
-  .t-title{font-family:'Syne';font-weight:700;font-size:17.5px;letter-spacing:-.01em}
-  .badge{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border-radius:6px;font-weight:500}
-  .badge.p0{color:var(--rose);background:rgba(251,113,133,.12);border:1px solid rgba(251,113,133,.3)}
-  .badge.p1{color:var(--cyan);background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.28)}
-  .badge.verify{color:var(--amber);background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3)}
-  .badge.danger{color:var(--rose);background:rgba(251,113,133,.12);border:1px solid rgba(251,113,133,.4)}
-  .badge.auto{color:var(--go);background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.4)}
-  .t-desc{color:var(--ink-2);font-size:14.5px;margin:9px 0 0}
-  .steps{margin:14px 0 0;padding:0;list-style:none;counter-reset:s;display:grid;gap:9px}
-  .steps li{position:relative;padding-left:30px;font-size:14px;color:var(--ink-2)}
-  .steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:1px;
-    font-family:var(--mono);font-size:11px;color:var(--go);border:1px solid rgba(52,211,153,.35);
-    width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:rgba(52,211,153,.06)}
-  .steps.plain{counter-reset:none}
-  .steps.plain li::before{content:"›";counter-increment:none;border:none;color:var(--ink-3);background:none;font-size:16px;top:-1px}
-  a.link{color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(56,189,248,.3);transition:.15s;word-break:break-word}
-  a.link:hover{color:#7dd3fc;border-color:var(--cyan)}
-  a.link::after{content:" ↗";font-size:.82em;opacity:.7;border:none}
-  code.kbd{font-family:var(--mono);font-size:12.5px;background:rgba(0,0,0,.4);border:1px solid var(--border);padding:2px 7px;border-radius:6px;color:var(--go)}
-  /* command block + copy */
-  .cmd{position:relative;margin:12px 0 0;background:rgba(0,0,0,.42);border:1px solid var(--border);border-radius:11px;overflow:hidden}
-  .cmd pre{margin:0;padding:14px 54px 14px 16px;overflow-x:auto;font-family:var(--mono);font-size:12.7px;color:#cfe9dd;line-height:1.7}
-  .cmd .copy{position:absolute;top:9px;right:9px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
-    background:var(--panel-2);border:1px solid var(--border-2);color:var(--ink-3);border-radius:7px;padding:6px 9px;cursor:pointer;transition:.15s}
-  .cmd .copy:hover{color:var(--go);border-color:var(--go)}
-  .cmd .copy.ok{color:var(--go);border-color:var(--go)}
-  .note{margin:12px 0 0;padding:11px 14px;border-radius:10px;font-size:13px;display:flex;gap:10px}
-  .note.warn{background:rgba(251,113,133,.07);border:1px solid rgba(251,113,133,.25);color:#fecdd3}
-  .note.tip{background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.22);color:#bae6fd}
-  .note .i{font-family:var(--mono);font-weight:700}
-  .linkrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-  .linkrow a{font-family:var(--mono);font-size:11.5px;text-decoration:none;color:var(--ink-2);
-    border:1px solid var(--border);background:var(--panel);padding:7px 11px;border-radius:8px;transition:.15s}
-  .linkrow a:hover{color:var(--cyan);border-color:var(--cyan)}
+      /* ---------- task cards ---------- */
+      .tasks-list {
+        display: grid;
+        gap: 14px;
+      }
+      .task {
+        position: relative;
+        background: linear-gradient(180deg, var(--panel), rgba(255, 255, 255, 0.02));
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px 22px 20px 60px;
+        transition: 0.22s;
+      }
+      .task:hover {
+        border-color: var(--border-2);
+      }
+      .task.done {
+        opacity: 0.62;
+      }
+      .task.done .t-title {
+        text-decoration: line-through;
+        text-decoration-color: var(--go-deep);
+        color: var(--ink-2);
+      }
+      .chk {
+        position: absolute;
+        left: 18px;
+        top: 20px;
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        cursor: pointer;
+        border: 1.6px solid var(--border-2);
+        background: rgba(0, 0, 0, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.18s;
+        padding: 0;
+      }
+      .chk:hover {
+        border-color: var(--go);
+      }
+      .chk svg {
+        width: 15px;
+        height: 15px;
+        stroke: var(--bg);
+        stroke-width: 3.4;
+        fill: none;
+        opacity: 0;
+        transform: scale(0.4);
+        transition: 0.18s;
+      }
+      .task.done .chk {
+        background: var(--go);
+        border-color: var(--go);
+        box-shadow: 0 0 20px rgba(52, 211, 153, 0.5);
+      }
+      .task.done .chk svg {
+        opacity: 1;
+        transform: none;
+      }
+      .t-head {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .t-id {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ink-3);
+      }
+      .t-title {
+        font-family: 'Syne';
+        font-weight: 700;
+        font-size: 17.5px;
+        letter-spacing: -0.01em;
+      }
+      .badge {
+        font-family: var(--mono);
+        font-size: 9.5px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-weight: 500;
+      }
+      .badge.p0 {
+        color: var(--rose);
+        background: rgba(251, 113, 133, 0.12);
+        border: 1px solid rgba(251, 113, 133, 0.3);
+      }
+      .badge.p1 {
+        color: var(--cyan);
+        background: rgba(56, 189, 248, 0.1);
+        border: 1px solid rgba(56, 189, 248, 0.28);
+      }
+      .badge.verify {
+        color: var(--amber);
+        background: rgba(251, 191, 36, 0.1);
+        border: 1px solid rgba(251, 191, 36, 0.3);
+      }
+      .badge.danger {
+        color: var(--rose);
+        background: rgba(251, 113, 133, 0.12);
+        border: 1px solid rgba(251, 113, 133, 0.4);
+      }
+      .badge.auto {
+        color: var(--go);
+        background: rgba(52, 211, 153, 0.12);
+        border: 1px solid rgba(52, 211, 153, 0.4);
+      }
+      .t-desc {
+        color: var(--ink-2);
+        font-size: 14.5px;
+        margin: 9px 0 0;
+      }
+      .steps {
+        margin: 14px 0 0;
+        padding: 0;
+        list-style: none;
+        counter-reset: s;
+        display: grid;
+        gap: 9px;
+      }
+      .steps li {
+        position: relative;
+        padding-left: 30px;
+        font-size: 14px;
+        color: var(--ink-2);
+      }
+      .steps li::before {
+        counter-increment: s;
+        content: counter(s);
+        position: absolute;
+        left: 0;
+        top: 1px;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--go);
+        border: 1px solid rgba(52, 211, 153, 0.35);
+        width: 20px;
+        height: 20px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(52, 211, 153, 0.06);
+      }
+      .steps.plain {
+        counter-reset: none;
+      }
+      .steps.plain li::before {
+        content: '›';
+        counter-increment: none;
+        border: none;
+        color: var(--ink-3);
+        background: none;
+        font-size: 16px;
+        top: -1px;
+      }
+      a.link {
+        color: var(--cyan);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(56, 189, 248, 0.3);
+        transition: 0.15s;
+        word-break: break-word;
+      }
+      a.link:hover {
+        color: #7dd3fc;
+        border-color: var(--cyan);
+      }
+      a.link::after {
+        content: ' ↗';
+        font-size: 0.82em;
+        opacity: 0.7;
+        border: none;
+      }
+      code.kbd {
+        font-family: var(--mono);
+        font-size: 12.5px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid var(--border);
+        padding: 2px 7px;
+        border-radius: 6px;
+        color: var(--go);
+      }
+      /* command block + copy */
+      .cmd {
+        position: relative;
+        margin: 12px 0 0;
+        background: rgba(0, 0, 0, 0.42);
+        border: 1px solid var(--border);
+        border-radius: 11px;
+        overflow: hidden;
+      }
+      .cmd pre {
+        margin: 0;
+        padding: 14px 54px 14px 16px;
+        overflow-x: auto;
+        font-family: var(--mono);
+        font-size: 12.7px;
+        color: #cfe9dd;
+        line-height: 1.7;
+      }
+      .cmd .copy {
+        position: absolute;
+        top: 9px;
+        right: 9px;
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        background: var(--panel-2);
+        border: 1px solid var(--border-2);
+        color: var(--ink-3);
+        border-radius: 7px;
+        padding: 6px 9px;
+        cursor: pointer;
+        transition: 0.15s;
+      }
+      .cmd .copy:hover {
+        color: var(--go);
+        border-color: var(--go);
+      }
+      .cmd .copy.ok {
+        color: var(--go);
+        border-color: var(--go);
+      }
+      .note {
+        margin: 12px 0 0;
+        padding: 11px 14px;
+        border-radius: 10px;
+        font-size: 13px;
+        display: flex;
+        gap: 10px;
+      }
+      .note.warn {
+        background: rgba(251, 113, 133, 0.07);
+        border: 1px solid rgba(251, 113, 133, 0.25);
+        color: #fecdd3;
+      }
+      .note.tip {
+        background: rgba(56, 189, 248, 0.06);
+        border: 1px solid rgba(56, 189, 248, 0.22);
+        color: #bae6fd;
+      }
+      .note .i {
+        font-family: var(--mono);
+        font-weight: 700;
+      }
+      .linkrow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .linkrow a {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        text-decoration: none;
+        color: var(--ink-2);
+        border: 1px solid var(--border);
+        background: var(--panel);
+        padding: 7px 11px;
+        border-radius: 8px;
+        transition: 0.15s;
+      }
+      .linkrow a:hover {
+        color: var(--cyan);
+        border-color: var(--cyan);
+      }
 
-  footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--border);color:var(--ink-3);font-size:12.5px;font-family:var(--mono);text-align:center}
-  ::selection{background:rgba(52,211,153,.3);color:#fff}
-  @media (max-width:720px){
-    .dock{grid-template-columns:1fr}.ring{margin:0 auto}
-    .task{padding-left:54px}.chk{left:14px}
-  }
-</style>
-</head>
-<body>
-
-<div class="sticky" id="sticky">
-  <span class="s-title">Launch&nbsp;Control</span>
-  <div class="s-bar"><i id="sBar"></i></div>
-  <span class="s-pct" id="sPct">0%</span>
-</div>
-
-<div class="wrap">
-  <header class="hero">
-    <p class="kicker">Flipper.ai · Path to v1</p>
-    <h1>Launch <span class="dim">Control</span></h1>
-    <p class="sub">Your interactive pre-flight checklist, generated from <code class="kbd">RELEASE_ROADMAP.md</code> and the <code class="kbd">docs/launch/</code> toolkit. Check off tasks as you go — progress and decisions save to this browser automatically. Set your domain once and every <span class="dom" data-token>your-domain.com</span> below updates.</p>
-
-    <div class="dock">
-      <div class="ring">
-        <svg width="120" height="120" viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="9"/>
-          <circle id="ringFill" cx="60" cy="60" r="52" fill="none" stroke="url(#g)" stroke-width="9" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
-          <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#10b981"/><stop offset="1" stop-color="#38bdf8"/></linearGradient></defs>
-        </svg>
-        <div class="pct"><b id="ringPct">0%</b><span>complete</span></div>
-      </div>
-      <div class="dock-meta">
-        <div class="line"><span class="big" id="phaseLine">Pre-flight</span><span class="tasks" id="taskLine">0 / 0 tasks done</span></div>
-        <div class="bar"><i id="mainBar"></i></div>
-        <div class="dock-actions">
-          <button class="btn" onclick="window.print()">⎙ Print / PDF</button>
-          <button class="btn" id="collapseDone">Hide done</button>
-          <button class="btn danger" id="resetBtn">↺ Reset progress</button>
-        </div>
-        <div class="domain-field">
-          <label for="domainInput">Your domain</label>
-          <input id="domainInput" type="text" placeholder="e.g. flipperai.app" autocomplete="off" spellcheck="false" />
-        </div>
-      </div>
+      footer {
+        margin-top: 60px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+        color: var(--ink-3);
+        font-size: 12.5px;
+        font-family: var(--mono);
+        text-align: center;
+      }
+      ::selection {
+        background: rgba(52, 211, 153, 0.3);
+        color: #fff;
+      }
+      @media (max-width: 720px) {
+        .dock {
+          grid-template-columns: 1fr;
+        }
+        .ring {
+          margin: 0 auto;
+        }
+        .task {
+          padding-left: 54px;
+        }
+        .chk {
+          left: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sticky" id="sticky">
+      <span class="s-title">Launch&nbsp;Control</span>
+      <div class="s-bar"><i id="sBar"></i></div>
+      <span class="s-pct" id="sPct">0%</span>
     </div>
 
-    <nav class="toc" id="toc"></nav>
-  </header>
+    <div class="wrap">
+      <header class="hero">
+        <p class="kicker">Flipper.ai · Path to v1</p>
+        <h1>Launch <span class="dim">Control</span></h1>
+        <p class="sub">
+          Your interactive pre-flight checklist, generated from
+          <code class="kbd">RELEASE_ROADMAP.md</code> and the
+          <code class="kbd">docs/launch/</code> toolkit. Check off tasks as you go — progress and
+          decisions save to this browser automatically. Set your domain once and every
+          <span class="dom" data-token>your-domain.com</span> below updates.
+        </p>
 
-  <!-- ============================ DECISIONS ============================ -->
-  <section class="block" id="decisions" data-noprogress>
-    <div class="sec-head"><span class="sec-no">D</span><h2>Open Decisions</h2></div>
-    <p class="sec-sub">Lock these in first — the rest of the plan branches off them. Selections are saved.</p>
-    <div class="decisions">
-      <div class="decision" data-dec="scope">
-        <h4>Q1 · Launch scope</h4>
-        <p class="q">Ship web first, or web + mobile in parallel?</p>
-        <div class="opts">
-          <div class="opt rec" data-val="A"><span class="tag">A</span> Ship web v1 now · mobile = v2</div>
-          <div class="opt" data-val="B"><span class="tag">B</span> Web v1 + start Epic 15 mobile</div>
+        <div class="dock">
+          <div class="ring">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <circle
+                cx="60"
+                cy="60"
+                r="52"
+                fill="none"
+                stroke="rgba(255,255,255,.07)"
+                stroke-width="9"
+              />
+              <circle
+                id="ringFill"
+                cx="60"
+                cy="60"
+                r="52"
+                fill="none"
+                stroke="url(#g)"
+                stroke-width="9"
+                stroke-linecap="round"
+                stroke-dasharray="326.7"
+                stroke-dashoffset="326.7"
+              />
+              <defs>
+                <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#10b981" />
+                  <stop offset="1" stop-color="#38bdf8" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="pct"><b id="ringPct">0%</b><span>complete</span></div>
+          </div>
+          <div class="dock-meta">
+            <div class="line">
+              <span class="big" id="phaseLine">Pre-flight</span
+              ><span class="tasks" id="taskLine">0 / 0 tasks done</span>
+            </div>
+            <div class="bar"><i id="mainBar"></i></div>
+            <div class="dock-actions">
+              <button class="btn" onclick="window.print()">⎙ Print / PDF</button>
+              <button class="btn" id="collapseDone">Hide done</button>
+              <button class="btn danger" id="resetBtn">↺ Reset progress</button>
+            </div>
+            <div class="domain-field">
+              <label for="domainInput">Your domain</label>
+              <input
+                id="domainInput"
+                type="text"
+                placeholder="e.g. flipperai.app"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+          </div>
         </div>
-        <div class="answer">Choice: <b data-answer>—</b></div>
-      </div>
-      <div class="decision" data-dec="reconcile">
-        <h4>Q2 · Branch reconciliation strategy</h4>
-        <p class="q">main ↔ django-main — see docs/launch/branch-reconciliation.md</p>
-        <div class="opts">
-          <div class="opt rec" data-val="A"><span class="tag">A</span> Force-reset <code class="kbd">main</code> → <code class="kbd">django-main</code></div>
-          <div class="opt" data-val="B"><span class="tag">B</span> Merge <code class="kbd">django-main</code> → <code class="kbd">main</code></div>
-          <div class="opt" data-val="C"><span class="tag">C</span> Rename <code class="kbd">django-main</code> → <code class="kbd">main</code></div>
+
+        <nav class="toc" id="toc"></nav>
+      </header>
+
+      <!-- ============================ DECISIONS ============================ -->
+      <section class="block" id="decisions" data-noprogress>
+        <div class="sec-head">
+          <span class="sec-no">D</span>
+          <h2>Open Decisions</h2>
         </div>
-        <div class="answer">Choice: <b data-answer>—</b></div>
-      </div>
-      <div class="decision" data-dec="domain">
-        <h4>Q3 · Domain</h4>
-        <p class="q">Decide once, then fill the field at the top of the page</p>
-        <input class="free" data-free type="text" placeholder="winning domain, e.g. flipperai.app" autocomplete="off" spellcheck="false" />
-        <div class="answer">Locked: <b data-answer>—</b></div>
-      </div>
-      <div class="decision" data-dec="monorepo">
-        <h4>Q4 · Monorepo conversion (Epic 15.1) timing</h4>
-        <p class="q">Convert repo to pnpm-workspace before or after web launch?</p>
-        <div class="opts">
-          <div class="opt rec" data-val="after"><span class="tag">›</span> After web launch (isolate risk)</div>
-          <div class="opt" data-val="before"><span class="tag">›</span> Before web launch</div>
+        <p class="sec-sub">
+          Lock these in first — the rest of the plan branches off them. Selections are saved.
+        </p>
+        <div class="decisions">
+          <div class="decision" data-dec="scope">
+            <h4>Q1 · Launch scope</h4>
+            <p class="q">Ship web first, or web + mobile in parallel?</p>
+            <div class="opts">
+              <div class="opt rec" data-val="A">
+                <span class="tag">A</span> Ship web v1 now · mobile = v2
+              </div>
+              <div class="opt" data-val="B">
+                <span class="tag">B</span> Web v1 + start Epic 15 mobile
+              </div>
+            </div>
+            <div class="answer">Choice: <b data-answer>—</b></div>
+          </div>
+          <div class="decision" data-dec="reconcile">
+            <h4>Q2 · Branch reconciliation strategy</h4>
+            <p class="q">main ↔ django-main — see docs/launch/branch-reconciliation.md</p>
+            <div class="opts">
+              <div class="opt rec" data-val="A">
+                <span class="tag">A</span> Force-reset <code class="kbd">main</code> →
+                <code class="kbd">django-main</code>
+              </div>
+              <div class="opt" data-val="B">
+                <span class="tag">B</span> Merge <code class="kbd">django-main</code> →
+                <code class="kbd">main</code>
+              </div>
+              <div class="opt" data-val="C">
+                <span class="tag">C</span> Rename <code class="kbd">django-main</code> →
+                <code class="kbd">main</code>
+              </div>
+            </div>
+            <div class="answer">Choice: <b data-answer>—</b></div>
+          </div>
+          <div class="decision" data-dec="domain">
+            <h4>Q3 · Domain</h4>
+            <p class="q">Decide once, then fill the field at the top of the page</p>
+            <input
+              class="free"
+              data-free
+              type="text"
+              placeholder="winning domain, e.g. flipperai.app"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <div class="answer">Locked: <b data-answer>—</b></div>
+          </div>
+          <div class="decision" data-dec="monorepo">
+            <h4>Q4 · Monorepo conversion (Epic 15.1) timing</h4>
+            <p class="q">Convert repo to pnpm-workspace before or after web launch?</p>
+            <div class="opts">
+              <div class="opt rec" data-val="after">
+                <span class="tag">›</span> After web launch (isolate risk)
+              </div>
+              <div class="opt" data-val="before"><span class="tag">›</span> Before web launch</div>
+            </div>
+            <div class="answer">Choice: <b data-answer>—</b></div>
+          </div>
         </div>
-        <div class="answer">Choice: <b data-answer>—</b></div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  <!-- ============================ ACCOUNT SETUP ============================ -->
-  <section class="block" id="accounts" data-phase="Accounts">
-    <div class="sec-head"><span class="sec-no" style="background:var(--cyan);box-shadow:0 0 24px rgba(56,189,248,.4)">A</span><h2>Account Setup</h2><span class="cnt" data-cnt></span></div>
-    <p class="sec-sub">Every external account/credential, tracked one row at a time. ✓ = wired into Secret Manager + mirrored to the local <code class="kbd">.secrets/</code> ledger. Paste a credential in chat and it gets wired + checked here.</p>
-    <div class="tasks-list">
+      <!-- ============================ ACCOUNT SETUP ============================ -->
+      <section class="block" id="accounts" data-phase="Accounts">
+        <div class="sec-head">
+          <span
+            class="sec-no"
+            style="background: var(--cyan); box-shadow: 0 0 24px rgba(56, 189, 248, 0.4)"
+            >A</span
+          >
+          <h2>Account Setup</h2>
+          <span class="cnt" data-cnt></span>
+        </div>
+        <p class="sec-sub">
+          Every external account/credential, tracked one row at a time. ✓ = wired into Secret
+          Manager + mirrored to the local <code class="kbd">.secrets/</code> ledger. Paste a
+          credential in chat and it gets wired + checked here.
+        </p>
+        <div class="tasks-list">
+          <div class="task" data-id="acct-firebase" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">A1</span><span class="t-title">Firebase</span
+              ><span class="badge auto">✓ done</span>
+            </div>
+            <p class="t-desc">
+              Admin SDK (server auth: <code class="kbd">CLIENT_EMAIL</code>+<code class="kbd"
+                >PRIVATE_KEY</code
+              >) · public web config · web-push VAPID key. Powers all authentication.
+            </p>
+          </div>
 
-      <div class="task" data-id="acct-firebase" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A1</span><span class="t-title">Firebase</span><span class="badge auto">✓ done</span></div>
-        <p class="t-desc">Admin SDK (server auth: <code class="kbd">CLIENT_EMAIL</code>+<code class="kbd">PRIVATE_KEY</code>) · public web config · web-push VAPID key. Powers all authentication.</p>
-      </div>
+          <div class="task" data-id="acct-google" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">A2</span><span class="t-title">Google Cloud</span
+              ><span class="badge auto">✓ done</span>
+            </div>
+            <p class="t-desc">
+              One project covers a lot: OAuth Web client (Google sign-in + Calendar), Maps API key,
+              Gemini AI key (<code class="kbd">GOOGLE_API_KEY</code>).
+            </p>
+          </div>
 
-      <div class="task" data-id="acct-google" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A2</span><span class="t-title">Google Cloud</span><span class="badge auto">✓ done</span></div>
-        <p class="t-desc">One project covers a lot: OAuth Web client (Google sign-in + Calendar), Maps API key, Gemini AI key (<code class="kbd">GOOGLE_API_KEY</code>).</p>
-      </div>
+          <div class="task" data-id="acct-groq" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">A3</span><span class="t-title">Groq</span
+              ><span class="badge auto">✓ done</span>
+            </div>
+            <p class="t-desc">
+              Primary AI provider (10 of 12 prompts). Promoted into
+              <code class="kbd">PRODUCTION_</code> scope.
+            </p>
+          </div>
 
-      <div class="task" data-id="acct-groq" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A3</span><span class="t-title">Groq</span><span class="badge auto">✓ done</span></div>
-        <p class="t-desc">Primary AI provider (10 of 12 prompts). Promoted into <code class="kbd">PRODUCTION_</code> scope.</p>
-      </div>
+          <div class="task" data-id="acct-hcaptcha" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">A4</span><span class="t-title">hCaptcha</span
+              ><span class="badge auto">✓ done</span>
+            </div>
+            <p class="t-desc">
+              Bot protection on login + register. Promoted from <code class="kbd">.env</code>.
+            </p>
+          </div>
 
-      <div class="task" data-id="acct-hcaptcha" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A4</span><span class="t-title">hCaptcha</span><span class="badge auto">✓ done</span></div>
-        <p class="t-desc">Bot protection on login + register. Promoted from <code class="kbd">.env</code>.</p>
-      </div>
+          <div class="task" data-id="acct-resend" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">A5</span><span class="t-title">Resend</span
+              ><span class="badge auto">✓ key</span><span class="badge verify">⚠ shared/temp</span>
+            </div>
+            <p class="t-desc">
+              Transactional email API key wired. <b>Still TODO:</b> verify
+              <code class="kbd">axovia.ai</code> domain (GoDaddy DNS) + set
+              <code class="kbd">EMAIL_FROM</code> + rotate to a dedicated key — see task 3.4.
+            </p>
+          </div>
 
-      <div class="task" data-id="acct-resend" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A5</span><span class="t-title">Resend</span><span class="badge auto">✓ key</span><span class="badge verify">⚠ shared/temp</span></div>
-        <p class="t-desc">Transactional email API key wired. <b>Still TODO:</b> verify <code class="kbd">axovia.ai</code> domain (GoDaddy DNS) + set <code class="kbd">EMAIL_FROM</code> + rotate to a dedicated key — see task 3.4.</p>
-      </div>
+          <div class="task" data-id="acct-sentry" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">A6</span><span class="t-title">Sentry</span
+              ><span class="badge auto">✓ done</span>
+            </div>
+            <p class="t-desc">
+              Fully wired: <b>DSN</b> (<code class="kbd">SENTRY_DSN</code>+<code class="kbd"
+                >NEXT_PUBLIC_SENTRY_DSN</code
+              >, error capture) + <b>auth token</b> + org <code class="kbd">realrandom</code> /
+              project <code class="kbd">flipper-ai</code> (source-map upload → readable stack
+              traces). Org/project are build-time CI env vars.
+            </p>
+            <div class="note tip">
+              <span class="i">i</span
+              ><span
+                >Minor cleanup later: the Sentry org slug <code class="kbd">realrandom</code> is a
+                client-name leftover — cosmetic, can rename in Sentry org settings.</span
+              >
+            </div>
+          </div>
 
-      <div class="task" data-id="acct-sentry" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A6</span><span class="t-title">Sentry</span><span class="badge auto">✓ done</span></div>
-        <p class="t-desc">Fully wired: <b>DSN</b> (<code class="kbd">SENTRY_DSN</code>+<code class="kbd">NEXT_PUBLIC_SENTRY_DSN</code>, error capture) + <b>auth token</b> + org <code class="kbd">realrandom</code> / project <code class="kbd">flipper-ai</code> (source-map upload → readable stack traces). Org/project are build-time CI env vars.</p>
-        <div class="note tip"><span class="i">i</span><span>Minor cleanup later: the Sentry org slug <code class="kbd">realrandom</code> is a client-name leftover — cosmetic, can rename in Sentry org settings.</span></div>
-      </div>
+          <div class="task" data-id="acct-firebase-auth" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">A7</span
+              ><span class="t-title">Firebase Console — enable sign-in methods</span
+              ><span class="badge auto">✓ done</span>
+            </div>
+            <p class="t-desc">
+              <b>Email/Password + Google both Enabled</b> in
+              <a
+                class="link"
+                href="https://console.firebase.google.com/project/axovia-flipper/authentication/providers"
+                target="_blank"
+                rel="noopener"
+                >Firebase → Auth → Sign-in method</a
+              >
+              — this is the actual switch that turns login on. Core auth is live. Later: add
+              <code class="kbd">flipper.axovia.ai</code> to Authorized domains when the subdomain is
+              wired (3.3).
+            </p>
+          </div>
 
-      <div class="task" data-id="acct-firebase-auth" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A7</span><span class="t-title">Firebase Console — enable sign-in methods</span><span class="badge auto">✓ done</span></div>
-        <p class="t-desc"><b>Email/Password + Google both Enabled</b> in <a class="link" href="https://console.firebase.google.com/project/axovia-flipper/authentication/providers" target="_blank" rel="noopener">Firebase → Auth → Sign-in method</a> — this is the actual switch that turns login on. Core auth is live. Later: add <code class="kbd">flipper.axovia.ai</code> to Authorized domains when the subdomain is wired (3.3).</p>
-      </div>
+          <div class="task" data-id="acct-github" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">A7b</span
+              ><span class="t-title">GitHub login — button hidden via flag</span
+              ><span class="badge auto">✓ resolved</span>
+            </div>
+            <p class="t-desc">
+              <b>Handled in code</b>: the GitHub button on login + register is now gated behind
+              <code class="kbd">NEXT_PUBLIC_ENABLE_GITHUB_AUTH</code> (default
+              <code class="kbd">false</code> = hidden), so no broken button — Email + Google only.
+              To enable GitHub later: create a GitHub OAuth app, enable the GitHub provider in
+              Firebase, then set the flag to <code class="kbd">true</code>. Verified:
+              <code class="kbd">make build</code> compiles <code class="kbd">/login</code>+<code
+                class="kbd"
+                >/register</code
+              >
+              clean.
+            </p>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://github.com/settings/developers"
+                target="_blank"
+                rel="noopener"
+                >GitHub OAuth Apps (for later)</a
+              >
+            </div>
+          </div>
 
-      <div class="task" data-id="acct-github" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A7b</span><span class="t-title">GitHub login — button hidden via flag</span><span class="badge auto">✓ resolved</span></div>
-        <p class="t-desc"><b>Handled in code</b>: the GitHub button on login + register is now gated behind <code class="kbd">NEXT_PUBLIC_ENABLE_GITHUB_AUTH</code> (default <code class="kbd">false</code> = hidden), so no broken button — Email + Google only. To enable GitHub later: create a GitHub OAuth app, enable the GitHub provider in Firebase, then set the flag to <code class="kbd">true</code>. Verified: <code class="kbd">make build</code> compiles <code class="kbd">/login</code>+<code class="kbd">/register</code> clean.</p>
-        <div class="linkrow"><a class="link" href="https://github.com/settings/developers" target="_blank" rel="noopener">GitHub OAuth Apps (for later)</a></div>
-      </div>
+          <div class="task" data-id="acct-facebook" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">A8</span><span class="t-title">Facebook</span
+              ><span class="badge auto">✓ done</span>
+            </div>
+            <p class="t-desc">
+              App ID + secret wired (<code class="kbd">FACEBOOK_APP_ID</code>/<code class="kbd"
+                >SECRET</code
+              >) — powers the Facebook Marketplace scraper. For FB <i>login</i>, also enable the
+              Facebook provider in Firebase Console → Auth → Sign-in method.
+            </p>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://console.firebase.google.com/project/axovia-flipper/authentication/providers"
+                target="_blank"
+                rel="noopener"
+                >Firebase → Sign-in method (for FB login)</a
+              >
+            </div>
+          </div>
 
-      <div class="task" data-id="acct-facebook" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A8</span><span class="t-title">Facebook</span><span class="badge auto">✓ done</span></div>
-        <p class="t-desc">App ID + secret wired (<code class="kbd">FACEBOOK_APP_ID</code>/<code class="kbd">SECRET</code>) — powers the Facebook Marketplace scraper. For FB <i>login</i>, also enable the Facebook provider in Firebase Console → Auth → Sign-in method.</p>
-        <div class="linkrow"><a class="link" href="https://console.firebase.google.com/project/axovia-flipper/authentication/providers" target="_blank" rel="noopener">Firebase → Sign-in method (for FB login)</a></div>
-      </div>
+          <div class="task" data-id="acct-openai" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">A9</span><span class="t-title">OpenAI</span
+              ><span class="badge auto">✓ key</span>
+            </div>
+            <p class="t-desc">
+              Key wired (<code class="kbd">OPENAI_API_KEY</code>). Primary for
+              <code class="kbd">itemCompleteness</code> image/vision (Groq's Llama can't read
+              images) + general AI fallback. With OpenAI + Gemini both real, image item-analysis is
+              covered. Add credits when ready.
+            </p>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://platform.openai.com/settings/organization/billing/overview"
+                target="_blank"
+                rel="noopener"
+                >OpenAI billing</a
+              >
+            </div>
+          </div>
 
-      <div class="task" data-id="acct-openai" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A9</span><span class="t-title">OpenAI</span><span class="badge auto">✓ key</span></div>
-        <p class="t-desc">Key wired (<code class="kbd">OPENAI_API_KEY</code>). Primary for <code class="kbd">itemCompleteness</code> image/vision (Groq's Llama can't read images) + general AI fallback. With OpenAI + Gemini both real, image item-analysis is covered. Add credits when ready.</p>
-        <div class="linkrow"><a class="link" href="https://platform.openai.com/settings/organization/billing/overview" target="_blank" rel="noopener">OpenAI billing</a></div>
-      </div>
+          <div class="task" data-id="acct-anthropic" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">A10</span><span class="t-title">Anthropic</span
+              ><span class="badge auto">✓ key</span>
+            </div>
+            <p class="t-desc">
+              Claude key wired (<code class="kbd">ANTHROPIC_API_KEY</code>+<code class="kbd"
+                >CLAUDE_API_KEY</code
+              >). Primary for Tier-2 structural analysis. <b>Add credits when ready</b> — until then
+              the Groq→Gemini→OpenAI fallback covers <code class="kbd">claudeAnalysis</code>, so
+              nothing breaks.
+            </p>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://console.anthropic.com/settings/billing"
+                target="_blank"
+                rel="noopener"
+                >Anthropic billing (add credits)</a
+              >
+            </div>
+          </div>
 
-      <div class="task" data-id="acct-anthropic" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A10</span><span class="t-title">Anthropic</span><span class="badge auto">✓ key</span></div>
-        <p class="t-desc">Claude key wired (<code class="kbd">ANTHROPIC_API_KEY</code>+<code class="kbd">CLAUDE_API_KEY</code>). Primary for Tier-2 structural analysis. <b>Add credits when ready</b> — until then the Groq→Gemini→OpenAI fallback covers <code class="kbd">claudeAnalysis</code>, so nothing breaks.</p>
-        <div class="linkrow"><a class="link" href="https://console.anthropic.com/settings/billing" target="_blank" rel="noopener">Anthropic billing (add credits)</a></div>
-      </div>
+          <div class="task" data-id="acct-ebay">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">A11</span><span class="t-title">eBay</span
+              ><span class="badge verify">⏳ pending eBay approval</span>
+            </div>
+            <p class="t-desc">
+              <b>Your part is done</b> — Developer Program account registered (<code class="kbd"
+                >stephen.boyett@silverlinesoftware.co</code
+              >). eBay is reviewing it; access is <b>pending approval (≥1 business day)</b>. Once
+              approved: create a production keyset → generate a Browse API OAuth token → paste it
+              for <code class="kbd">EBAY_OAUTH_TOKEN</code>. Powers the eBay scanner (1 of 5
+              platforms; others work without it).
+            </p>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://developer.ebay.com/my/keys"
+                target="_blank"
+                rel="noopener"
+                >eBay developer keys</a
+              >
+            </div>
+          </div>
 
-      <div class="task" data-id="acct-ebay">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A11</span><span class="t-title">eBay</span><span class="badge verify">⏳ pending eBay approval</span></div>
-        <p class="t-desc"><b>Your part is done</b> — Developer Program account registered (<code class="kbd">stephen.boyett@silverlinesoftware.co</code>). eBay is reviewing it; access is <b>pending approval (≥1 business day)</b>. Once approved: create a production keyset → generate a Browse API OAuth token → paste it for <code class="kbd">EBAY_OAUTH_TOKEN</code>. Powers the eBay scanner (1 of 5 platforms; others work without it).</p>
-        <div class="linkrow"><a class="link" href="https://developer.ebay.com/my/keys" target="_blank" rel="noopener">eBay developer keys</a></div>
-      </div>
+          <div class="task" data-id="acct-geoapify" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">A12</span><span class="t-title">Geoapify</span
+              ><span class="badge auto">✓ done</span>
+            </div>
+            <p class="t-desc">
+              Key wired (<code class="kbd">GEOAPIFY_API_KEY</code>). Geocoding for meeting/logistics
+              distance calcs (Epic 12).
+            </p>
+          </div>
 
-      <div class="task" data-id="acct-geoapify" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A12</span><span class="t-title">Geoapify</span><span class="badge auto">✓ done</span></div>
-        <p class="t-desc">Key wired (<code class="kbd">GEOAPIFY_API_KEY</code>). Geocoding for meeting/logistics distance calcs (Epic 12).</p>
-      </div>
+          <div class="task" data-id="acct-shippo" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">A13</span><span class="t-title">Shippo</span
+              ><span class="badge auto">✓ test key</span
+              ><span class="badge verify">live pending</span>
+            </div>
+            <p class="t-desc">
+              Real carrier shipping rates → subtracted from profit (<code class="kbd"
+                >adjustedProfitMargin = profit − shippingCost</code
+              >) so flip scores reflect <b>net</b> profit. <b>Test token wired</b> (sample rates);
+              <b>swap to live token</b> when it arrives for accurate rates. Falls back to null if
+              unkeyed — non-blocking.
+            </p>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://apps.goshippo.com/settings/api"
+                target="_blank"
+                rel="noopener"
+                >Shippo API (live token)</a
+              >
+            </div>
+          </div>
 
-      <div class="task" data-id="acct-shippo" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A13</span><span class="t-title">Shippo</span><span class="badge auto">✓ test key</span><span class="badge verify">live pending</span></div>
-        <p class="t-desc">Real carrier shipping rates → subtracted from profit (<code class="kbd">adjustedProfitMargin = profit − shippingCost</code>) so flip scores reflect <b>net</b> profit. <b>Test token wired</b> (sample rates); <b>swap to live token</b> when it arrives for accurate rates. Falls back to null if unkeyed — non-blocking.</p>
-        <div class="linkrow"><a class="link" href="https://apps.goshippo.com/settings/api" target="_blank" rel="noopener">Shippo API (live token)</a></div>
-      </div>
+          <div class="task" data-id="acct-twilio">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">A14</span><span class="t-title">Twilio</span
+              ><span class="badge p1">optional</span>
+            </div>
+            <p class="t-desc">
+              SMS notifications (SID + auth token + from-number). Also needs 10DLC registration to
+              send at scale (task 5.4).
+            </p>
+            <div class="linkrow">
+              <a class="link" href="https://console.twilio.com/" target="_blank" rel="noopener"
+                >Twilio Console</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <div class="task" data-id="acct-twilio">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">A14</span><span class="t-title">Twilio</span><span class="badge p1">optional</span></div>
-        <p class="t-desc">SMS notifications (SID + auth token + from-number). Also needs 10DLC registration to send at scale (task 5.4).</p>
-        <div class="linkrow"><a class="link" href="https://console.twilio.com/" target="_blank" rel="noopener">Twilio Console</a></div>
-      </div>
-    </div>
-  </section>
+      <!-- ============================ PHASE 0 ============================ -->
+      <section class="block" id="phase-0" data-phase="Repo Reconciliation">
+        <div class="sec-head">
+          <span class="sec-no">0</span>
+          <h2>Repo Reconciliation</h2>
+          <span class="cnt" data-cnt></span>
+        </div>
+        <p class="sec-sub">
+          The real P0. <code class="kbd">main</code> (GitHub default) is stale and diverged from
+          your live trunk <code class="kbd">django-main</code>. Nothing deploys cleanly until this
+          is resolved. <b>Back up before any force operation.</b>
+        </p>
+        <div class="tasks-list">
+          <div class="task" data-id="0-1" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">0.1</span
+              ><span class="t-title">Review &amp; merge the roadmap PR</span
+              ><span class="badge p0">P0</span><span class="badge auto">✓ done</span>
+            </div>
+            <p class="t-desc">
+              PR #1 (roadmap + 21-doc launch toolkit + this walkthrough) was
+              <b>squash-merged into <code class="kbd">django-main</code></b> as
+              <code class="kbd">fa5b044</code>.
+            </p>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://github.com/AXOVIA-ASPEN/flipper-ai/pull/1"
+                target="_blank"
+                rel="noopener"
+                >PR #1 (merged)</a
+              >
+            </div>
+          </div>
 
-  <!-- ============================ PHASE 0 ============================ -->
-  <section class="block" id="phase-0" data-phase="Repo Reconciliation">
-    <div class="sec-head"><span class="sec-no">0</span><h2>Repo Reconciliation</h2><span class="cnt" data-cnt></span></div>
-    <p class="sec-sub">The real P0. <code class="kbd">main</code> (GitHub default) is stale and diverged from your live trunk <code class="kbd">django-main</code>. Nothing deploys cleanly until this is resolved. <b>Back up before any force operation.</b></p>
-    <div class="tasks-list">
+          <div class="task" data-id="0-2" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">0.2</span
+              ><span class="t-title">Salvage the 2 remaining main-only commits</span
+              ><span class="badge p0">P0</span><span class="badge auto">✓ done</span>
+            </div>
+            <ol class="steps">
+              <li>
+                ✓ Gitignore tweak (<code class="kbd">1a8c58e</code>,
+                <code class="kbd">.claude/worktrees/</code>) cherry-picked onto the trunk.
+              </li>
+              <li>
+                ⊘ Story-3.6 scenarios (<code class="kbd">28208ba</code>) <b>skipped</b> —
+                FR-SCAN-06/07 already covered on trunk, so per the "only if net-new" rule it would
+                duplicate. Re-evaluate with the SM if you want them in E-003 specifically.
+              </li>
+            </ol>
+          </div>
 
-      <div class="task" data-id="0-1" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">0.1</span><span class="t-title">Review &amp; merge the roadmap PR</span><span class="badge p0">P0</span><span class="badge auto">✓ done</span></div>
-        <p class="t-desc">PR #1 (roadmap + 21-doc launch toolkit + this walkthrough) was <b>squash-merged into <code class="kbd">django-main</code></b> as <code class="kbd">fa5b044</code>.</p>
-        <div class="linkrow"><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/pull/1" target="_blank" rel="noopener">PR #1 (merged)</a></div>
-      </div>
+          <div class="task" data-id="0-3" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">0.3</span><span class="t-title">Back up old main</span
+              ><span class="badge danger">Safety</span><span class="badge auto">✓ done</span>
+            </div>
+            <p class="t-desc">
+              Old <code class="kbd">main</code> (<code class="kbd">1a8c58e</code>) archived to
+              <code class="kbd">backup/main-pre-reconcile-2026-06-10</code> before reconciliation.
+            </p>
+            <div class="cmd">
+              <pre>git push origin main:refs/heads/backup/main-pre-reconcile-2026-06-10</pre>
+              <button class="copy">copy</button>
+            </div>
+          </div>
 
-      <div class="task" data-id="0-2" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">0.2</span><span class="t-title">Salvage the 2 remaining main-only commits</span><span class="badge p0">P0</span><span class="badge auto">✓ done</span></div>
-        <ol class="steps">
-          <li>✓ Gitignore tweak (<code class="kbd">1a8c58e</code>, <code class="kbd">.claude/worktrees/</code>) cherry-picked onto the trunk.</li>
-          <li>⊘ Story-3.6 scenarios (<code class="kbd">28208ba</code>) <b>skipped</b> — FR-SCAN-06/07 already covered on trunk, so per the "only if net-new" rule it would duplicate. Re-evaluate with the SM if you want them in E-003 specifically.</li>
-        </ol>
-      </div>
+          <div class="task" data-id="0-4" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">0.4</span><span class="t-title">Reconcile main ↔ django-main</span
+              ><span class="badge danger">Destructive</span
+              ><span class="badge auto">✓ done (Option A)</span>
+            </div>
+            <p class="t-desc">
+              <b>Option A executed.</b> <code class="kbd">main</code> force-reset
+              <code class="kbd">1a8c58e → 63dc2ea</code> — it now matches the trunk. Done without
+              checkout (your <code class="kbd">django-main</code> WIP untouched).
+            </p>
+            <div class="cmd">
+              <pre>git push --force-with-lease origin django-main:main</pre>
+              <button class="copy">copy</button>
+            </div>
+            <div class="note tip">
+              <span class="i">✓</span
+              ><span
+                ><code class="kbd">main</code> and <code class="kbd">django-main</code> both at
+                <code class="kbd">63dc2ea</code>. Going forward, treat
+                <code class="kbd">main</code> as the trunk (and optionally retire
+                <code class="kbd">django-main</code>) to avoid re-diverging.</span
+              >
+            </div>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/django-main/docs/launch/branch-reconciliation.md"
+                target="_blank"
+                rel="noopener"
+                >branch-reconciliation.md</a
+              >
+            </div>
+          </div>
 
-      <div class="task" data-id="0-3" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">0.3</span><span class="t-title">Back up old main</span><span class="badge danger">Safety</span><span class="badge auto">✓ done</span></div>
-        <p class="t-desc">Old <code class="kbd">main</code> (<code class="kbd">1a8c58e</code>) archived to <code class="kbd">backup/main-pre-reconcile-2026-06-10</code> before reconciliation.</p>
-        <div class="cmd"><pre>git push origin main:refs/heads/backup/main-pre-reconcile-2026-06-10</pre><button class="copy">copy</button></div>
-      </div>
-
-      <div class="task" data-id="0-4" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">0.4</span><span class="t-title">Reconcile main ↔ django-main</span><span class="badge danger">Destructive</span><span class="badge auto">✓ done (Option A)</span></div>
-        <p class="t-desc"><b>Option A executed.</b> <code class="kbd">main</code> force-reset <code class="kbd">1a8c58e → 63dc2ea</code> — it now matches the trunk. Done without checkout (your <code class="kbd">django-main</code> WIP untouched).</p>
-        <div class="cmd"><pre>git push --force-with-lease origin django-main:main</pre><button class="copy">copy</button></div>
-        <div class="note tip"><span class="i">✓</span><span><code class="kbd">main</code> and <code class="kbd">django-main</code> both at <code class="kbd">63dc2ea</code>. Going forward, treat <code class="kbd">main</code> as the trunk (and optionally retire <code class="kbd">django-main</code>) to avoid re-diverging.</span></div>
-        <div class="linkrow"><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/django-main/docs/launch/branch-reconciliation.md" target="_blank" rel="noopener">branch-reconciliation.md</a></div>
-      </div>
-
-      <div class="task" data-id="0-5" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">0.5</span><span class="t-title">Archive &amp; delete stale branches</span><span class="badge p0">P0</span><span class="badge auto">✓ done</span></div>
-        <p class="t-desc">Both <code class="kbd">claude/*</code> branches pruned and archived to <code class="kbd">legacy/roadmap-NCkB5</code> and <code class="kbd">legacy/fr-coverage-e2e</code> (recoverable). <code class="kbd">roadmap/release-v1-plan</code> was auto-deleted on PR #1 merge.</p>
-        <div class="cmd"><pre>git push origin origin/claude/create-release-roadmap-NCkB5:refs/heads/legacy/roadmap-NCkB5
+          <div class="task" data-id="0-5" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">0.5</span
+              ><span class="t-title">Archive &amp; delete stale branches</span
+              ><span class="badge p0">P0</span><span class="badge auto">✓ done</span>
+            </div>
+            <p class="t-desc">
+              Both <code class="kbd">claude/*</code> branches pruned and archived to
+              <code class="kbd">legacy/roadmap-NCkB5</code> and
+              <code class="kbd">legacy/fr-coverage-e2e</code> (recoverable).
+              <code class="kbd">roadmap/release-v1-plan</code> was auto-deleted on PR #1 merge.
+            </p>
+            <div class="cmd">
+              <pre>
+git push origin origin/claude/create-release-roadmap-NCkB5:refs/heads/legacy/roadmap-NCkB5
 git push origin --delete claude/create-release-roadmap-NCkB5
 git push origin --delete claude/fr-coverage-e2e
-git fetch --all --prune</pre><button class="copy">copy</button></div>
-      </div>
+git fetch --all --prune</pre
+              >
+              <button class="copy">copy</button>
+            </div>
+          </div>
 
-      <div class="task" data-id="0-6" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">0.6</span><span class="t-title">Set GitHub default branch &amp; verify</span><span class="badge p0">P0</span><span class="badge auto">✓ done</span></div>
-        <ol class="steps">
-          <li>Default branch stays <code class="kbd">main</code> (Option A keeps the name — no rename needed).</li>
-          <li>Verified: <code class="kbd">origin/main</code> HEAD = <code class="kbd">63dc2ea</code> = trunk tip; local <code class="kbd">main</code> re-synced; <code class="kbd">origin/HEAD → main</code>.</li>
-        </ol>
-        <div class="cmd"><pre>git remote set-head origin -a
-git log --oneline main -3   # should show the django-main tip commit</pre><button class="copy">copy</button></div>
-        <div class="linkrow"><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/settings/branches" target="_blank" rel="noopener">Repo → Branch settings</a></div>
-      </div>
+          <div class="task" data-id="0-6" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">0.6</span
+              ><span class="t-title">Set GitHub default branch &amp; verify</span
+              ><span class="badge p0">P0</span><span class="badge auto">✓ done</span>
+            </div>
+            <ol class="steps">
+              <li>
+                Default branch stays <code class="kbd">main</code> (Option A keeps the name — no
+                rename needed).
+              </li>
+              <li>
+                Verified: <code class="kbd">origin/main</code> HEAD =
+                <code class="kbd">63dc2ea</code> = trunk tip; local
+                <code class="kbd">main</code> re-synced;
+                <code class="kbd">origin/HEAD → main</code>.
+              </li>
+            </ol>
+            <div class="cmd">
+              <pre>
+git remote set-head origin -a
+git log --oneline main -3   # should show the django-main tip commit</pre
+              >
+              <button class="copy">copy</button>
+            </div>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://github.com/AXOVIA-ASPEN/flipper-ai/settings/branches"
+                target="_blank"
+                rel="noopener"
+                >Repo → Branch settings</a
+              >
+            </div>
+          </div>
 
-      <div class="task" data-id="0-7">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">0.7</span><span class="t-title">Cut the release tag</span><span class="badge p0">P0</span></div>
-        <p class="t-desc">Locks in the reconciled state and triggers the tag-driven GitHub Actions release + deploy workflow.</p>
-        <div class="cmd"><pre>git tag v1.1.0
-git push origin v1.1.0</pre><button class="copy">copy</button></div>
-        <div class="note tip"><span class="i">i</span><span>Update <code class="kbd">VERSION.md</code> → <code class="kbd">1.1.0</code> and promote <code class="kbd">[Unreleased]</code> in <code class="kbd">CHANGELOG.md</code> before tagging.</span></div>
-      </div>
-    </div>
-  </section>
+          <div class="task" data-id="0-7">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">0.7</span><span class="t-title">Cut the release tag</span
+              ><span class="badge p0">P0</span>
+            </div>
+            <p class="t-desc">
+              Locks in the release. <b>Trigger reality (corrected):</b> the
+              <b>push to <code class="kbd">main</code></b> is what deploys (ci.yml → build-container
+              → deploy-cloud-run → health checks); the tag only creates the GitHub Release from the
+              CHANGELOG. So: merge the release commit to main, watch the deploy go green, then tag.
+            </p>
+            <div class="cmd">
+              <pre>
+git tag v1.1.0
+git push origin v1.1.0</pre
+              >
+              <button class="copy">copy</button>
+            </div>
+            <div class="note tip">
+              <span class="i">i</span
+              ><span
+                >Update <code class="kbd">VERSION.md</code> → <code class="kbd">1.1.0</code> and
+                promote <code class="kbd">[Unreleased]</code> in
+                <code class="kbd">CHANGELOG.md</code> before tagging.</span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
 
-  <!-- ============================ PHASE 1 ============================ -->
-  <section class="block" id="phase-1" data-phase="Deploy & Secrets">
-    <div class="sec-head"><span class="sec-no">1</span><h2>Production Deploy &amp; Secrets</h2><span class="cnt" data-cnt></span></div>
-    <p class="sec-sub">Seed every <code class="kbd">PROD_</code> secret in GCP Secret Manager, gate the deploy, and verify health. Project: <code class="kbd">axovia-flipper</code>. Full reference: <code class="kbd">gcp-secret-manager-checklist.md</code>.</p>
-    <div class="tasks-list">
+      <!-- ============================ PHASE 1 ============================ -->
+      <section class="block" id="phase-1" data-phase="Deploy & Secrets">
+        <div class="sec-head">
+          <span class="sec-no">1</span>
+          <h2>Production Deploy &amp; Secrets</h2>
+          <span class="cnt" data-cnt></span>
+        </div>
+        <p class="sec-sub">
+          Seed every <code class="kbd">PROD_</code> secret in GCP Secret Manager, gate the deploy,
+          and verify health. Project: <code class="kbd">axovia-flipper</code>. Full reference:
+          <code class="kbd">gcp-secret-manager-checklist.md</code>.
+        </p>
+        <div class="tasks-list">
+          <div class="task" data-id="1-1" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">1.1</span
+              ><span class="t-title">Seed all PRODUCTION_ secrets in Secret Manager</span
+              ><span class="badge p0">P0</span
+              ><span class="badge auto" id="secretTally">✓ core + fallbacks · 3 deferred</span>
+            </div>
+            <p class="t-desc">
+              <b>⚠️ Value audit (not just name-existence):</b> many "existing" prod secrets held
+              <code class="kbd">PLACEHOLDER</code> text, not real keys — caught by reading every
+              value. Real status below (project <code class="kbd">axovia-flipper</code>,
+              <code class="kbd">PRODUCTION_*</code>).
+            </p>
+            <ul class="steps plain">
+              <li>
+                ✅ <b>Real &amp; verified — core launch path covered</b> —
+                <code class="kbd">DATABASE_URL</code>, Firebase Admin + public config + VAPID,
+                <b>AI: <code class="kbd">GROQ</code> (primary) + Gemini (fallback)</b>,
+                <b>Google OAuth (login + calendar)</b>, <b>Resend</b> (⚠️ shared/temp key),
+                <code class="kbd">GOOGLE_MAPS_API_KEY</code>,
+                <code class="kbd">HCAPTCHA_SECRET_KEY</code>,
+                <code class="kbd">ENCRYPTION_SECRET</code>, <code class="kbd">AUTH_SECRET</code>,
+                internal tokens, <code class="kbd">APP_URL</code>=web.app
+              </li>
+              <li>
+                ✅ <b>Since wired</b> (this bullet was stale): Sentry DSN+auth (A6) · Facebook
+                id+secret (A8) · OpenAI (A9) · Anthropic (A10) · Geoapify (A12) · Shippo test (A13)
+                · <code class="kbd">NEXT_PUBLIC_APP_URL</code> + hCaptcha site key (⚠ test key —
+                paste the real one from the
+                <a
+                  class="link"
+                  href="https://dashboard.hcaptcha.com/sites"
+                  target="_blank"
+                  rel="noopener"
+                  >hCaptcha dashboard</a
+                >
+                before public launch)
+              </li>
+              <li>
+                ⬜ <b>Genuinely remaining</b>: <b>eBay</b> token (A11, pending eBay approval) ·
+                <b>GitHub OAuth</b> (deferred — button hidden via flag, A7b) ·
+                <b>Twilio</b> (optional, A14)
+              </li>
+              <li>
+                ⬜ <b>Optional feature secrets</b> —
+                <a
+                  class="link"
+                  href="https://myprojects.geoapify.com/"
+                  target="_blank"
+                  rel="noopener"
+                  >Geoapify</a
+                >
+                ·
+                <a
+                  class="link"
+                  href="https://apps.goshippo.com/settings/api"
+                  target="_blank"
+                  rel="noopener"
+                  >Shippo</a
+                >
+                ·
+                <a class="link" href="https://console.twilio.com/" target="_blank" rel="noopener"
+                  >Twilio</a
+                >
+                (SID/token/number)
+              </li>
+              <li>
+                🔒 <b>Decision-blocked</b> — <code class="kbd">STRIPE_SECRET_KEY</code>/<code
+                  class="kbd"
+                  >WEBHOOK</code
+                >/<code class="kbd">PRICE_*</code> (live mode · Phase 2)
+              </li>
+            </ul>
+            <div class="note tip">
+              <span class="i">✓</span
+              ><span
+                >Each pasted/generated credential is mirrored to the local gitignored ledger
+                <code class="kbd">.secrets/production-secrets.env</code> so nothing is lost to a
+                chat scrollback.</span
+              >
+            </div>
+            <div class="note warn">
+              <span class="i">!</span
+              ><span
+                ><b>Core soft launch is covered</b> (DB, Firebase auth, Groq+Gemini AI, Google
+                login, hCaptcha, encryption, APP_URL). Remaining pastes are secondary logins + AI
+                fallbacks + error tracking; Stripe is Phase-2/live-mode. Resend key is
+                shared/temporary — rotate at domain setup (3.4).</span
+              >
+            </div>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://console.cloud.google.com/security/secret-manager?project=axovia-flipper"
+                target="_blank"
+                rel="noopener"
+                >Secret Manager console</a
+              ><a
+                class="link"
+                href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/main/docs/launch/gcp-secret-manager-checklist.md"
+                target="_blank"
+                rel="noopener"
+                >Full secret checklist</a
+              >
+            </div>
+          </div>
 
-      <div class="task" data-id="1-1">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">1.1</span><span class="t-title">Seed all PROD_ secrets in Secret Manager</span><span class="badge p0">P0</span><span class="badge auto" id="secretTally">core ✓ · ~9 to paste</span></div>
-        <p class="t-desc"><b>⚠️ Value audit (not just name-existence):</b> many "existing" prod secrets held <code class="kbd">PLACEHOLDER</code> text, not real keys — caught by reading every value. Real status below (project <code class="kbd">axovia-flipper</code>, <code class="kbd">PRODUCTION_*</code>).</p>
-        <ul class="steps plain">
-          <li>✅ <b>Real &amp; verified — core launch path covered</b> — <code class="kbd">DATABASE_URL</code>, Firebase Admin + public config + VAPID, <b>AI: <code class="kbd">GROQ</code> (primary) + Gemini (fallback)</b>, <b>Google OAuth (login + calendar)</b>, <b>Resend</b> (⚠️ shared/temp key), <code class="kbd">GOOGLE_MAPS_API_KEY</code>, <code class="kbd">HCAPTCHA_SECRET_KEY</code>, <code class="kbd">ENCRYPTION_SECRET</code>, <code class="kbd">AUTH_SECRET</code>, internal tokens, <code class="kbd">APP_URL</code>=web.app</li>
-          <li>⬜ <b>Were placeholders — still to paste</b>: <b>OAuth logins</b> <a class="link" href="https://github.com/settings/developers" target="_blank" rel="noopener">GitHub</a>/<a class="link" href="https://developers.facebook.com/apps/" target="_blank" rel="noopener">Facebook</a> id+secret · <b>Errors</b> <a class="link" href="https://sentry.io/" target="_blank" rel="noopener">Sentry</a> DSN+auth · <b>AI fallback</b> <a class="link" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">OpenAI</a> + <a class="link" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Anthropic</a> · <b>eBay</b> token</li>
-          <li>⬜ <b>Optional feature secrets</b> — <a class="link" href="https://myprojects.geoapify.com/" target="_blank" rel="noopener">Geoapify</a> · <a class="link" href="https://apps.goshippo.com/settings/api" target="_blank" rel="noopener">Shippo</a> · <a class="link" href="https://console.twilio.com/" target="_blank" rel="noopener">Twilio</a> (SID/token/number)</li>
-          <li>🔒 <b>Decision-blocked</b> — <code class="kbd">STRIPE_SECRET_KEY</code>/<code class="kbd">WEBHOOK</code>/<code class="kbd">PRICE_*</code> (live mode · Phase 2)</li>
-        </ul>
-        <div class="note tip"><span class="i">✓</span><span>Each pasted/generated credential is mirrored to the local gitignored ledger <code class="kbd">.secrets/production-secrets.env</code> so nothing is lost to a chat scrollback.</span></div>
-        <div class="note warn"><span class="i">!</span><span><b>Core soft launch is covered</b> (DB, Firebase auth, Groq+Gemini AI, Google login, hCaptcha, encryption, APP_URL). Remaining pastes are secondary logins + AI fallbacks + error tracking; Stripe is Phase-2/live-mode. Resend key is shared/temporary — rotate at domain setup (3.4).</span></div>
-        <div class="linkrow"><a class="link" href="https://console.cloud.google.com/security/secret-manager?project=axovia-flipper" target="_blank" rel="noopener">Secret Manager console</a><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/main/docs/launch/gcp-secret-manager-checklist.md" target="_blank" rel="noopener">Full secret checklist</a></div>
-      </div>
+          <div class="task" data-id="1-2" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">1.2</span
+              ><span class="t-title">Run the pre-deploy secret gate</span
+              ><span class="badge p0">P0</span
+              ><span class="badge auto">✓ done — gate fixed + green</span>
+            </div>
+            <p class="t-desc">
+              <b>The gate itself was broken</b> — it checked <code class="kbd">PROD_*</code> names
+              that never existed (real prefix: <code class="kbd">PRODUCTION_*</code>), with name
+              drift beyond the prefix (<code class="kbd">DB_URL</code> vs
+              <code class="kbd">DATABASE_URL</code>…). Rewritten to canonical names from
+              <code class="kbd">config/secretmanager.yaml</code>; Stripe demoted to
+              warn-until-Phase-2. <b>Result: ✅ all required secrets present.</b> Same prefix bug
+              fixed in <code class="kbd">secretmanager.py</code> (<code class="kbd"
+                >SecretScope.PROD = "PRODUCTION"</code
+              >) + its tests.
+            </p>
+            <div class="cmd">
+              <pre>
+bash scripts/deploy/check-secrets.sh
+python scripts/secretmanager.py validate --env production</pre
+              >
+              <button class="copy">copy</button>
+            </div>
+          </div>
 
-      <div class="task" data-id="1-2">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">1.2</span><span class="t-title">Run the pre-deploy secret gate</span><span class="badge p0">P0</span></div>
-        <p class="t-desc">Confirms every required secret exists before deploying.</p>
-        <div class="cmd"><pre>bash scripts/deploy/check-secrets.sh
-python scripts/secretmanager.py validate --env production</pre><button class="copy">copy</button></div>
-      </div>
-
-      <div class="task" data-id="1-3">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">1.3</span><span class="t-title">Grant Cloud Run secretAccessor IAM</span><span class="badge p0">P0</span></div>
-        <div class="cmd"><pre>PROJECT=axovia-flipper
-SA="serviceAccount:&lt;CLOUD_RUN_SA&gt;@$PROJECT.iam.gserviceaccount.com"
-gcloud secrets list --project=$PROJECT --format="value(name)" --filter="name~^PROD_" | while read s; do
+          <div class="task" data-id="1-3" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">1.3</span
+              ><span class="t-title">Grant Cloud Run secretAccessor IAM</span
+              ><span class="badge p0">P0</span><span class="badge auto">✓ done — 73 grants</span>
+            </div>
+            <p class="t-desc">
+              Granted to the dedicated <code class="kbd">flipper-run@</code> SA (the one
+              <code class="kbd">flipper-staging</code> already uses; CI now pins it for
+              <code class="kbd">flipper-production</code> too) on every
+              <code class="kbd">PRODUCTION_*</code> + <code class="kbd">STAGING_*</code> secret — 73
+              grants, 0 failures.
+            </p>
+            <div class="cmd">
+              <pre>
+PROJECT=axovia-flipper
+SA="serviceAccount:flipper-run@$PROJECT.iam.gserviceaccount.com"
+gcloud secrets list --project=$PROJECT --format="value(name)" | grep -E "^(PRODUCTION|STAGING)_" | while read s; do
   gcloud secrets add-iam-policy-binding "$s" --member="$SA" \
     --role="roles/secretmanager.secretAccessor" --project=$PROJECT
-done</pre><button class="copy">copy</button></div>
-      </div>
+done</pre
+              >
+              <button class="copy">copy</button>
+            </div>
+          </div>
 
-      <div class="task" data-id="1-4">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">1.4</span><span class="t-title">Verify the deploy &amp; health endpoints</span><span class="badge verify">Verify</span></div>
-        <p class="t-desc">The v1.1.0 tag (0.7) triggers CI deploy to Cloud Run + Firebase Hosting. Confirm it landed healthy.</p>
-        <div class="cmd"><pre>curl -s <span class="dom" data-token>https://your-domain.com</span>/api/health
-curl -s <span class="dom" data-token>https://your-domain.com</span>/api/health/ready</pre><button class="copy">copy</button></div>
-        <div class="linkrow"><a class="link" href="https://console.cloud.google.com/run?project=axovia-flipper" target="_blank" rel="noopener">Cloud Run logs</a></div>
-      </div>
+          <div class="task" data-id="1-4">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">1.4</span
+              ><span class="t-title">Verify the deploy &amp; health endpoints</span
+              ><span class="badge verify">Verify</span>
+            </div>
+            <p class="t-desc">
+              The release-commit <b>push to main</b> (0.7) triggers CI deploy to Cloud Run +
+              Firebase Hosting — the pipeline runs liveness + readiness checks automatically
+              post-deploy. Confirm via the web.app URL too.
+            </p>
+            <div class="cmd">
+              <pre>curl -s <span class="dom" data-token>https://your-domain.com</span>/api/health
+curl -s <span class="dom" data-token>https://your-domain.com</span>/api/health/ready</pre>
+              <button class="copy">copy</button>
+            </div>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://console.cloud.google.com/run?project=axovia-flipper"
+                target="_blank"
+                rel="noopener"
+                >Cloud Run logs</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ PHASE 2 ============================ -->
+      <section class="block" id="phase-2" data-phase="Stripe Live">
+        <div class="sec-head">
+          <span class="sec-no">2</span>
+          <h2>Billing — Stripe Live Mode</h2>
+          <span class="cnt" data-cnt></span>
+        </div>
+        <p class="sec-sub">
+          Built and unit-tested; never run against a live card. Verify the full paid path
+          end-to-end. Reference: <code class="kbd">pricing-page-proposal.md</code>.
+        </p>
+        <div class="tasks-list">
+          <div class="task" data-id="2-1">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">2.1</span
+              ><span class="t-title">Create live-mode products &amp; prices</span
+              ><span class="badge p0">P0</span>
+            </div>
+            <ol class="steps">
+              <li>Toggle <b>Test mode → off</b> in the Stripe dashboard.</li>
+              <li>
+                Create products + price IDs for FREE / FLIPPER / PRO (+ any annual / Lifetime SKUs).
+              </li>
+              <li>Enable Stripe Tax for US states + EU VAT.</li>
+            </ol>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://dashboard.stripe.com/products"
+                target="_blank"
+                rel="noopener"
+                >Products</a
+              ><a
+                class="link"
+                href="https://dashboard.stripe.com/tax"
+                target="_blank"
+                rel="noopener"
+                >Stripe Tax</a
+              >
+            </div>
+          </div>
+
+          <div class="task" data-id="2-2">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">2.2</span><span class="t-title">Seed live Stripe secrets</span
+              ><span class="badge p0">P0</span>
+            </div>
+            <p class="t-desc">
+              <code class="kbd">PROD_STRIPE_SECRET_KEY</code>,
+              <code class="kbd">PROD_STRIPE_WEBHOOK_SECRET</code>, and each
+              <code class="kbd">PROD_STRIPE_PRICE_ID_*</code> into Secret Manager.
+            </p>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://dashboard.stripe.com/apikeys"
+                target="_blank"
+                rel="noopener"
+                >API keys (live)</a
+              >
+            </div>
+          </div>
+
+          <div class="task" data-id="2-3">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">2.3</span
+              ><span class="t-title">Register the live webhook endpoint</span
+              ><span class="badge p0">P0</span>
+            </div>
+            <p class="t-desc">
+              Endpoint URL: <span class="dom" data-token>https://your-domain.com</span
+              ><code class="kbd">/api/webhooks/stripe</code>. Subscribe to checkout / subscription /
+              invoice events, then reveal the signing secret into
+              <code class="kbd">PROD_STRIPE_WEBHOOK_SECRET</code>.
+            </p>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://dashboard.stripe.com/webhooks"
+                target="_blank"
+                rel="noopener"
+                >Webhooks</a
+              >
+            </div>
+          </div>
+
+          <div class="task" data-id="2-4">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">2.4</span
+              ><span class="t-title">End-to-end live test with a real card</span
+              ><span class="badge verify">Verify</span>
+            </div>
+            <ol class="steps">
+              <li>Sign up as a real user; upgrade with your own card.</li>
+              <li>
+                Confirm the subscription appears in Stripe and
+                <code class="kbd">checkout.session.completed</code> delivered
+                <code class="kbd">200</code>.
+              </li>
+              <li>
+                Verify the tier flipped in Cloud SQL; then refund yourself and verify downgrade.
+              </li>
+            </ol>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://dashboard.stripe.com/subscriptions"
+                target="_blank"
+                rel="noopener"
+                >Subscriptions</a
+              ><a
+                class="link"
+                href="https://console.cloud.google.com/sql?project=axovia-flipper"
+                target="_blank"
+                rel="noopener"
+                >Cloud SQL</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ PHASE 3 ============================ -->
+      <section class="block" id="phase-3" data-phase="Domain & Brand">
+        <div class="sec-head">
+          <span class="sec-no">3</span>
+          <h2>Domain &amp; Hosting</h2>
+          <span class="cnt" data-cnt></span>
+        </div>
+        <p class="sec-sub">
+          <b>Decided:</b> soft-launch on the Firebase URL
+          <code class="kbd">axovia-flipper.web.app</code> (zero domain work) → then wire the
+          <code class="kbd">flipper.axovia.ai</code> subdomain → later migrate to a dedicated domain
+          bought from early revenue. <b>axovia.ai DNS lives in GoDaddy.</b> Email sends from
+          <code class="kbd">axovia.ai</code> once its DNS is verified in Resend.
+        </p>
+        <div class="tasks-list">
+          <div class="task" data-id="3-1" data-done="true">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">3.1</span
+              ><span class="t-title">Hosting decision + interim APP_URL</span
+              ><span class="badge p0">P0</span><span class="badge auto">✓ done</span>
+            </div>
+            <p class="t-desc">
+              Interim host = <code class="kbd">axovia-flipper.web.app</code>.
+              <code class="kbd">PRODUCTION_APP_URL</code> wired to it. Future =
+              <code class="kbd">flipper.axovia.ai</code> (3.3), then a dedicated domain (3.5).
+            </p>
+          </div>
+
+          <div class="task" data-id="3-2">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">3.2</span
+              ><span class="t-title">Add OAuth redirect URIs for the web.app URL</span
+              ><span class="badge p0">P0</span>
+            </div>
+            <p class="t-desc">
+              Needed <b>now</b> so Google/GitHub/Facebook sign-in works on the interim URL. Add the
+              callback for each provider:
+            </p>
+            <ul class="steps plain">
+              <li>
+                <code class="kbd"
+                  >https://axovia-flipper.web.app/api/auth/callback/&lt;provider&gt;</code
+                >
+                + <code class="kbd">https://axovia-flipper.firebaseapp.com/__/auth/handler</code>
+              </li>
+              <li>
+                <a
+                  class="link"
+                  href="https://console.cloud.google.com/apis/credentials?project=axovia-flipper"
+                  target="_blank"
+                  rel="noopener"
+                  >Google</a
+                >
+                (edit the Web client → Authorized redirect URIs) ·
+                <a
+                  class="link"
+                  href="https://github.com/settings/developers"
+                  target="_blank"
+                  rel="noopener"
+                  >GitHub</a
+                >
+                ·
+                <a
+                  class="link"
+                  href="https://developers.facebook.com/apps/"
+                  target="_blank"
+                  rel="noopener"
+                  >Facebook</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="task" data-id="3-3">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">3.3</span
+              ><span class="t-title">Wire flipper.axovia.ai subdomain</span
+              ><span class="badge p1">Launch item</span>
+            </div>
+            <p class="t-desc">
+              The "real" interim home, no code changes (subdomain, not subpath). Steps:
+            </p>
+            <ul class="steps">
+              <li>
+                <a
+                  class="link"
+                  href="https://console.firebase.google.com/project/axovia-flipper/hosting/sites"
+                  target="_blank"
+                  rel="noopener"
+                  >Firebase Hosting</a
+                >
+                → Add custom domain → <code class="kbd">flipper.axovia.ai</code>
+              </li>
+              <li>
+                In
+                <a
+                  class="link"
+                  href="https://dcc.godaddy.com/control/portfolio/axovia.ai/settings?tab=dns"
+                  target="_blank"
+                  rel="noopener"
+                  >GoDaddy DNS (axovia.ai)</a
+                >
+                add the CNAME/A records Firebase shows; wait for verification + SSL
+              </li>
+              <li>
+                Update <code class="kbd">PRODUCTION_APP_URL</code>→<code class="kbd"
+                  >https://flipper.axovia.ai</code
+                >, set <code class="kbd">PRODUCTION_ALLOWED_ORIGINS</code>, add the new OAuth
+                redirect URIs (3.2), redeploy
+              </li>
+            </ul>
+          </div>
+
+          <div class="task" data-id="3-4">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">3.4</span
+              ><span class="t-title">Verify sending domain in Resend + set EMAIL_FROM</span
+              ><span class="badge p1">Launch item</span>
+            </div>
+            <p class="t-desc">
+              Until done, transactional email (verification, password reset, alerts) can't send to
+              real users. Steps:
+            </p>
+            <ul class="steps">
+              <li>
+                <a class="link" href="https://resend.com/domains" target="_blank" rel="noopener"
+                  >Resend → Domains</a
+                >
+                → add <code class="kbd">axovia.ai</code> → copy the TXT/DKIM records
+              </li>
+              <li>
+                Add those records in
+                <a
+                  class="link"
+                  href="https://dcc.godaddy.com/control/portfolio/axovia.ai/settings?tab=dns"
+                  target="_blank"
+                  rel="noopener"
+                  >GoDaddy DNS</a
+                >; wait for "Verified"
+              </li>
+              <li>
+                Set <code class="kbd">EMAIL_FROM = Flipper AI &lt;flipper@axovia.ai&gt;</code>
+              </li>
+              <li>
+                ⚠️ <b>Rotate the shared Resend key</b> → create a dedicated Flipper key (see
+                <code class="kbd">.secrets</code> ledger note)
+              </li>
+            </ul>
+          </div>
+
+          <div class="task" data-id="3-5">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">3.5</span
+              ><span class="t-title">Later: dedicated domain + social handles</span
+              ><span class="badge p1">Post-revenue</span>
+            </div>
+            <p class="t-desc">
+              Buy a standalone domain from early revenue, migrate hosting + email + OAuth + Stripe
+              webhook to it, and reserve matching social handles.
+            </p>
+            <div class="linkrow">
+              <a class="link" href="https://namecheckly.com/" target="_blank" rel="noopener"
+                >Namecheckly (handle check)</a
+              ><a
+                class="link"
+                href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/main/docs/launch/domain-and-brand-identity.md"
+                target="_blank"
+                rel="noopener"
+                >domain-and-brand-identity.md</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ PHASE 4 ============================ -->
+      <section class="block" id="phase-4" data-phase="Smoke Test">
+        <div class="sec-head">
+          <span class="sec-no">4</span>
+          <h2>Live Smoke Test</h2>
+          <span class="cnt" data-cnt></span>
+        </div>
+        <p class="sec-sub">
+          Walk the real product on the live deployment before inviting anyone. Keep Sentry, Stripe,
+          and Cloud Run logs open. Reference: <code class="kbd">pre-launch-smoke-test.md</code>.
+        </p>
+        <div class="tasks-list">
+          <div class="task" data-id="4-1">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">4.1</span><span class="t-title">Public surfaces load</span
+              ><span class="badge verify">Verify</span>
+            </div>
+            <p class="t-desc">
+              Each renders without 500: <code class="kbd">/</code>,
+              <code class="kbd">/pricing</code>, <code class="kbd">/login</code>,
+              <code class="kbd">/register</code> (hCaptcha visible),
+              <code class="kbd">/privacy</code>, <code class="kbd">/terms</code>,
+              <code class="kbd">/health</code>, <code class="kbd">/api/health</code>,
+              <code class="kbd">/api/health/ready</code>.
+            </p>
+          </div>
+
+          <div class="task" data-id="4-2">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">4.2</span
+              ><span class="t-title">Auth paths — Email, Google, GitHub</span
+              ><span class="badge verify">Verify</span>
+            </div>
+            <ol class="steps">
+              <li>
+                Email + password signup → onboarding wizard completes (welcome → marketplaces →
+                categories → budget → location).
+              </li>
+              <li>
+                Google OAuth — consent screen shows your brand, not
+                <code class="kbd">axovia-flipper</code>.
+              </li>
+              <li>GitHub OAuth round-trips back signed-in.</li>
+            </ol>
+            <div class="note tip">
+              <span class="i">i</span
+              ><span
+                >OAuth redirect-mismatch errors = production URI not added to the provider app (see
+                3.5).</span
+              >
+            </div>
+          </div>
+
+          <div class="task" data-id="4-3">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">4.3</span
+              ><span class="t-title">Re-verify all 5 scrapers on live sites</span
+              ><span class="badge p0">P0</span>
+            </div>
+            <p class="t-desc">
+              Selectors rot — Craigslist, eBay, Facebook, Mercari, OfferUp. Run a real scan per
+              platform and confirm listings + images land.
+            </p>
+          </div>
+
+          <div class="task" data-id="4-4">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">4.4</span><span class="t-title">Core journeys + failure modes</span
+              ><span class="badge verify">Verify</span>
+            </div>
+            <ul class="steps plain">
+              <li>
+                Opportunity → kanban → analytics; seller message generation; cross-platform listing
+                copy.
+              </li>
+              <li>
+                404 page renders (not 500); protected route while logged-out redirects to
+                <code class="kbd">/login</code>.
+              </li>
+              <li>Force a Sentry error and confirm it lands within 2 min.</li>
+            </ul>
+          </div>
+
+          <div class="task" data-id="4-5">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">4.5</span
+              ><span class="t-title">Run the automated smoke suite + Lighthouse</span
+              ><span class="badge p1">P1</span>
+            </div>
+            <div class="cmd">
+              <pre>BASE_URL=<span class="dom" data-token>https://your-domain.com</span> pnpm test:e2e -- --grep="smoke"</pre>
+              <button class="copy">copy</button>
+            </div>
+            <div class="linkrow">
+              <a class="link" href="https://pagespeed.web.dev/" target="_blank" rel="noopener"
+                >PageSpeed / Lighthouse</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ PHASE 5 ============================ -->
+      <section class="block" id="phase-5" data-phase="Hardening">
+        <div class="sec-head">
+          <span class="sec-no p1">5</span>
+          <h2>Hardening</h2>
+          <span class="cnt" data-cnt></span>
+        </div>
+        <p class="sec-sub">Strongly recommended before a public launch surge.</p>
+        <div class="tasks-list">
+          <div class="task" data-id="5-1">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">5.1</span
+              ><span class="t-title">Cloud SQL backups + restore runbook</span
+              ><span class="badge p1">P1</span>
+            </div>
+            <p class="t-desc">
+              Enable daily automated backups (≥7-day retention); document the restore procedure.
+            </p>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://console.cloud.google.com/sql/instances?project=axovia-flipper"
+                target="_blank"
+                rel="noopener"
+                >Cloud SQL → Backups</a
+              >
+            </div>
+          </div>
+
+          <div class="task" data-id="5-2">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">5.2</span><span class="t-title">Uptime monitoring</span
+              ><span class="badge p1">P1</span>
+            </div>
+            <p class="t-desc">
+              Set the <code class="kbd">PRODUCTION_URL</code> repo secret to activate the existing
+              health-check workflow, or add UptimeRobot.
+            </p>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://github.com/AXOVIA-ASPEN/flipper-ai/settings/secrets/actions"
+                target="_blank"
+                rel="noopener"
+                >Repo secrets</a
+              ><a class="link" href="https://uptimerobot.com/" target="_blank" rel="noopener"
+                >UptimeRobot</a
+              >
+            </div>
+          </div>
+
+          <div class="task" data-id="5-3">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">5.3</span
+              ><span class="t-title">Sentry release tracking + source maps</span
+              ><span class="badge p1">P1</span>
+            </div>
+            <div class="linkrow">
+              <a class="link" href="https://sentry.io/" target="_blank" rel="noopener">Sentry</a>
+            </div>
+          </div>
+
+          <div class="task" data-id="5-4">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">5.4</span><span class="t-title">Twilio 10DLC registration</span
+              ><span class="badge p1">P1</span>
+            </div>
+            <p class="t-desc">
+              Required to send transactional SMS at scale (brand → TCR → campaign → number).
+              Multi-week carrier approval — start early.
+            </p>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://console.twilio.com/us1/develop/sms/a2p-10dlc/brand-registration"
+                target="_blank"
+                rel="noopener"
+                >A2P brand registration</a
+              ><a
+                class="link"
+                href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/django-main/docs/launch/twilio-10dlc-checklist.md"
+                target="_blank"
+                rel="noopener"
+                >10DLC checklist</a
+              >
+            </div>
+          </div>
+
+          <div class="task" data-id="5-5">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">5.5</span
+              ><span class="t-title">Public pages: pricing · FAQ · status · changelog</span
+              ><span class="badge p1">P1</span>
+            </div>
+            <p class="t-desc">Specs are pre-written in the toolkit.</p>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://github.com/AXOVIA-ASPEN/flipper-ai/tree/main/docs/launch"
+                target="_blank"
+                rel="noopener"
+                >docs/launch/ specs</a
+              >
+            </div>
+          </div>
+
+          <div class="task" data-id="5-6">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">5.6</span
+              ><span class="t-title"
+                >Converge duplicate env-var names → one canonical per credential</span
+              ><span class="badge p1">Tech debt</span>
+            </div>
+            <p class="t-desc">
+              Some credentials are read under two env names — pick one canonical name each and
+              remove the alias so a single value isn't duplicated across Secret Manager + the
+              codebase. Known cases:
+            </p>
+            <ul class="steps plain">
+              <li>
+                <b>Anthropic:</b> <code class="kbd">ANTHROPIC_API_KEY</code> (canonical) vs
+                <code class="kbd">CLAUDE_API_KEY</code> (alias) — both read in
+                <code class="kbd">src/lib/ai/providers/anthropic.ts</code> (<code class="kbd"
+                  >ANTHROPIC || CLAUDE</code
+                >). Drop <code class="kbd">CLAUDE_API_KEY</code>.
+              </li>
+              <li>
+                <b>Gemini:</b> standardize on <code class="kbd">GOOGLE_API_KEY</code> (current) —
+                ensure no stray <code class="kbd">GEMINI_API_KEY</code> creeps in.
+              </li>
+              <li>
+                <b>Audit pass:</b> grep
+                <code class="kbd">process.env.*_KEY|_TOKEN|_SECRET</code> for any other dual-name
+                pairs; reconcile <code class="kbd">config/secretmanager.yaml</code> +
+                <code class="kbd">.env.example</code> + <code class="kbd">.secrets/</code> ledger to
+                the canonical set.
+              </li>
+            </ul>
+            <div class="note tip">
+              <span class="i">i</span
+              ><span
+                >Do this as a single cleanup PR after launch — low risk but touches secret config,
+                so isolate it. Keep the alias readable for one release (deprecation) before
+                deleting, to avoid a deploy gap.</span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ PHASE 6 ============================ -->
+      <section class="block" id="phase-6" data-phase="Go-To-Market">
+        <div class="sec-head">
+          <span class="sec-no gtm">6</span>
+          <h2>Go-To-Market &amp; Launch Day</h2>
+          <span class="cnt" data-cnt></span>
+        </div>
+        <p class="sec-sub">
+          All copy is pre-written in <code class="kbd">docs/launch/</code>. Reference:
+          <code class="kbd">launch-day-runbook.md</code> (hour-by-hour).
+        </p>
+        <div class="tasks-list">
+          <div class="task" data-id="6-1">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">6.1</span><span class="t-title">Soft beta → invite list</span
+              ><span class="badge p1">P1</span>
+            </div>
+            <p class="t-desc">
+              Use <code class="kbd">beta-invitation.md</code>; capture screenshots as marketing
+              assets.
+            </p>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/django-main/docs/launch/beta-invitation.md"
+                target="_blank"
+                rel="noopener"
+                >beta-invitation.md</a
+              >
+            </div>
+          </div>
+
+          <div class="task" data-id="6-2">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">6.2</span><span class="t-title">Schedule Product Hunt (T-7)</span
+              ><span class="badge p1">P1</span>
+            </div>
+            <p class="t-desc">
+              Schedule the post (hidden until launch); prep PH / Show HN / Reddit / Twitter copy.
+            </p>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://www.producthunt.com/posts/scheduled"
+                target="_blank"
+                rel="noopener"
+                >Schedule PH</a
+              ><a
+                class="link"
+                href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/django-main/docs/launch/product-hunt-listing.md"
+                target="_blank"
+                rel="noopener"
+                >PH copy</a
+              ><a
+                class="link"
+                href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/django-main/docs/launch/hacker-news-show-hn.md"
+                target="_blank"
+                rel="noopener"
+                >Show HN</a
+              >
+            </div>
+          </div>
+
+          <div class="task" data-id="6-3">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">6.3</span><span class="t-title">Launch day — run the runbook</span
+              ><span class="badge p1">P1</span>
+            </div>
+            <p class="t-desc">
+              T-24h verify Stripe webhook firing · 12:01 AM PT go-live · monitor PH rank &amp; 5xx
+              rate. Rollback lever: <code class="kbd">gcloud run services update-traffic</code> to
+              the previous revision.
+            </p>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/django-main/docs/launch/launch-day-runbook.md"
+                target="_blank"
+                rel="noopener"
+                >launch-day-runbook.md</a
+              >
+            </div>
+          </div>
+
+          <div class="task" data-id="6-4">
+            <button class="chk" aria-label="toggle">
+              <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg>
+            </button>
+            <div class="t-head">
+              <span class="t-id">6.4</span><span class="t-title">Growth engines (post-launch)</span
+              ><span class="badge p1">P1</span>
+            </div>
+            <p class="t-desc">
+              Referral, affiliate, free tools, SEO content calendar — specs ready to implement.
+            </p>
+            <div class="linkrow">
+              <a
+                class="link"
+                href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/django-main/docs/launch/referral-program-spec.md"
+                target="_blank"
+                rel="noopener"
+                >Referral</a
+              ><a
+                class="link"
+                href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/django-main/docs/launch/affiliate-program.md"
+                target="_blank"
+                rel="noopener"
+                >Affiliate</a
+              ><a
+                class="link"
+                href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/django-main/docs/launch/seo-content-calendar.md"
+                target="_blank"
+                rel="noopener"
+                >SEO calendar</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        Generated from RELEASE_ROADMAP.md v3 · accurate as of 2026-06-09 · progress stored locally
+        in your browser · Flipper.ai Launch Control
+      </footer>
     </div>
-  </section>
 
-  <!-- ============================ PHASE 2 ============================ -->
-  <section class="block" id="phase-2" data-phase="Stripe Live">
-    <div class="sec-head"><span class="sec-no">2</span><h2>Billing — Stripe Live Mode</h2><span class="cnt" data-cnt></span></div>
-    <p class="sec-sub">Built and unit-tested; never run against a live card. Verify the full paid path end-to-end. Reference: <code class="kbd">pricing-page-proposal.md</code>.</p>
-    <div class="tasks-list">
+    <script>
+      (function () {
+        'use strict';
+        var KEY = 'flipper-launch-walkthrough-v1';
+        var state = load();
+        function load() {
+          try {
+            return JSON.parse(localStorage.getItem(KEY)) || {};
+          } catch (e) {
+            return {};
+          }
+        }
+        function save() {
+          try {
+            localStorage.setItem(KEY, JSON.stringify(state));
+          } catch (e) {}
+        }
 
-      <div class="task" data-id="2-1">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">2.1</span><span class="t-title">Create live-mode products &amp; prices</span><span class="badge p0">P0</span></div>
-        <ol class="steps">
-          <li>Toggle <b>Test mode → off</b> in the Stripe dashboard.</li>
-          <li>Create products + price IDs for FREE / FLIPPER / PRO (+ any annual / Lifetime SKUs).</li>
-          <li>Enable Stripe Tax for US states + EU VAT.</li>
-        </ol>
-        <div class="linkrow"><a class="link" href="https://dashboard.stripe.com/products" target="_blank" rel="noopener">Products</a><a class="link" href="https://dashboard.stripe.com/tax" target="_blank" rel="noopener">Stripe Tax</a></div>
-      </div>
+        // ---- tasks ----
+        var tasks = [].slice.call(document.querySelectorAll('.task'));
+        state.tasks = state.tasks || {};
+        tasks.forEach(function (t) {
+          var id = t.dataset.id;
+          // seed: tasks pre-completed in the markup (data-done) start checked unless
+          // the user's saved state already has an explicit value for them.
+          if (!(id in state.tasks) && t.dataset.done === 'true') {
+            state.tasks[id] = true;
+          }
+          if (state.tasks[id]) t.classList.add('done');
+          var chk = t.querySelector('.chk');
+          chk.setAttribute('role', 'checkbox');
+          chk.setAttribute('aria-checked', state.tasks[id] ? 'true' : 'false');
+          chk.addEventListener('click', function () {
+            var now = !t.classList.contains('done');
+            t.classList.toggle('done', now);
+            chk.setAttribute('aria-checked', now ? 'true' : 'false');
+            state.tasks[id] = now;
+            save();
+            render();
+          });
+        });
 
-      <div class="task" data-id="2-2">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">2.2</span><span class="t-title">Seed live Stripe secrets</span><span class="badge p0">P0</span></div>
-        <p class="t-desc"><code class="kbd">PROD_STRIPE_SECRET_KEY</code>, <code class="kbd">PROD_STRIPE_WEBHOOK_SECRET</code>, and each <code class="kbd">PROD_STRIPE_PRICE_ID_*</code> into Secret Manager.</p>
-        <div class="linkrow"><a class="link" href="https://dashboard.stripe.com/apikeys" target="_blank" rel="noopener">API keys (live)</a></div>
-      </div>
+        save(); // persist any seeded (data-done) completions on first load
 
-      <div class="task" data-id="2-3">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">2.3</span><span class="t-title">Register the live webhook endpoint</span><span class="badge p0">P0</span></div>
-        <p class="t-desc">Endpoint URL: <span class="dom" data-token>https://your-domain.com</span><code class="kbd">/api/webhooks/stripe</code>. Subscribe to checkout / subscription / invoice events, then reveal the signing secret into <code class="kbd">PROD_STRIPE_WEBHOOK_SECRET</code>.</p>
-        <div class="linkrow"><a class="link" href="https://dashboard.stripe.com/webhooks" target="_blank" rel="noopener">Webhooks</a></div>
-      </div>
+        // ---- progress ----
+        var ringFill = document.getElementById('ringFill'),
+          C = 326.7;
+        function render() {
+          var done = tasks.filter(function (t) {
+            return t.classList.contains('done');
+          }).length;
+          var total = tasks.length,
+            pct = total ? Math.round((done / total) * 100) : 0;
+          document.getElementById('ringPct').textContent = pct + '%';
+          ringFill.style.strokeDashoffset = C - (C * pct) / 100;
+          document.getElementById('mainBar').style.width = pct + '%';
+          document.getElementById('taskLine').textContent = done + ' / ' + total + ' tasks done';
+          document.getElementById('sBar').style.width = pct + '%';
+          document.getElementById('sPct').textContent = pct + '%';
+          document.getElementById('phaseLine').textContent =
+            pct === 100 ? 'Cleared for launch ✦' : pct === 0 ? 'Pre-flight' : 'In progress';
+          // per-phase counts + TOC
+          document.querySelectorAll('section[data-phase]').forEach(function (sec) {
+            var ts = sec.querySelectorAll('.task'),
+              d = 0;
+            ts.forEach(function (t) {
+              if (t.classList.contains('done')) d++;
+            });
+            var cnt = sec.querySelector('[data-cnt]');
+            if (cnt) {
+              cnt.textContent = d + ' / ' + ts.length;
+              cnt.classList.toggle('done', d === ts.length && ts.length > 0);
+            }
+            var link = document.querySelector('nav.toc a[href="#' + sec.id + '"]');
+            if (link) {
+              var m = link.querySelector('.mini');
+              if (m) m.textContent = d + '/' + ts.length;
+              link.classList.toggle('complete', d === ts.length && ts.length > 0);
+            }
+          });
+        }
 
-      <div class="task" data-id="2-4">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">2.4</span><span class="t-title">End-to-end live test with a real card</span><span class="badge verify">Verify</span></div>
-        <ol class="steps">
-          <li>Sign up as a real user; upgrade with your own card.</li>
-          <li>Confirm the subscription appears in Stripe and <code class="kbd">checkout.session.completed</code> delivered <code class="kbd">200</code>.</li>
-          <li>Verify the tier flipped in Cloud SQL; then refund yourself and verify downgrade.</li>
-        </ol>
-        <div class="linkrow"><a class="link" href="https://dashboard.stripe.com/subscriptions" target="_blank" rel="noopener">Subscriptions</a><a class="link" href="https://console.cloud.google.com/sql?project=axovia-flipper" target="_blank" rel="noopener">Cloud SQL</a></div>
-      </div>
-    </div>
-  </section>
+        // ---- build TOC ----
+        var toc = document.getElementById('toc');
+        document.querySelectorAll('section.block').forEach(function (sec) {
+          var h = sec.querySelector('h2');
+          if (!h) return;
+          var a = document.createElement('a');
+          a.href = '#' + sec.id;
+          a.innerHTML = h.textContent + (sec.dataset.phase ? ' <span class="mini"></span>' : '');
+          toc.appendChild(a);
+        });
 
-  <!-- ============================ PHASE 3 ============================ -->
-  <section class="block" id="phase-3" data-phase="Domain & Brand">
-    <div class="sec-head"><span class="sec-no">3</span><h2>Domain &amp; Hosting</h2><span class="cnt" data-cnt></span></div>
-    <p class="sec-sub"><b>Decided:</b> soft-launch on the Firebase URL <code class="kbd">axovia-flipper.web.app</code> (zero domain work) → then wire the <code class="kbd">flipper.axovia.ai</code> subdomain → later migrate to a dedicated domain bought from early revenue. <b>axovia.ai DNS lives in GoDaddy.</b> Email sends from <code class="kbd">axovia.ai</code> once its DNS is verified in Resend.</p>
-    <div class="tasks-list">
+        // ---- copy buttons ----
+        document.querySelectorAll('.cmd .copy').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var pre = btn.parentElement.querySelector('pre');
+            var txt = pre.innerText;
+            navigator.clipboard.writeText(txt).then(function () {
+              btn.textContent = 'copied';
+              btn.classList.add('ok');
+              setTimeout(function () {
+                btn.textContent = 'copy';
+                btn.classList.remove('ok');
+              }, 1400);
+            });
+          });
+        });
 
-      <div class="task" data-id="3-1" data-done="true">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">3.1</span><span class="t-title">Hosting decision + interim APP_URL</span><span class="badge p0">P0</span><span class="badge auto">✓ done</span></div>
-        <p class="t-desc">Interim host = <code class="kbd">axovia-flipper.web.app</code>. <code class="kbd">PRODUCTION_APP_URL</code> wired to it. Future = <code class="kbd">flipper.axovia.ai</code> (3.3), then a dedicated domain (3.5).</p>
-      </div>
+        // ---- decisions ----
+        state.dec = state.dec || {};
+        document.querySelectorAll('.decision').forEach(function (d) {
+          var key = d.dataset.dec,
+            ans = d.querySelector('[data-answer]');
+          var free = d.querySelector('[data-free]');
+          function setAns(v) {
+            ans.textContent = v || '—';
+          }
+          if (free) {
+            if (state.dec[key]) free.value = state.dec[key];
+            setAns(state.dec[key]);
+            free.addEventListener('input', function () {
+              state.dec[key] = free.value.trim();
+              setAns(state.dec[key]);
+              save();
+            });
+          }
+          d.querySelectorAll('.opt').forEach(function (o) {
+            if (state.dec[key] === o.dataset.val) o.classList.add('sel');
+            if (state.dec[key]) setAns(labelOf(d, state.dec[key]));
+            o.addEventListener('click', function () {
+              d.querySelectorAll('.opt').forEach(function (x) {
+                x.classList.remove('sel');
+              });
+              o.classList.add('sel');
+              state.dec[key] = o.dataset.val;
+              setAns(labelOf(d, o.dataset.val));
+              save();
+            });
+          });
+        });
+        function labelOf(d, val) {
+          var o = d.querySelector('.opt[data-val="' + val + '"]');
+          return o ? o.textContent.trim() : val;
+        }
 
-      <div class="task" data-id="3-2">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">3.2</span><span class="t-title">Add OAuth redirect URIs for the web.app URL</span><span class="badge p0">P0</span></div>
-        <p class="t-desc">Needed <b>now</b> so Google/GitHub/Facebook sign-in works on the interim URL. Add the callback for each provider:</p>
-        <ul class="steps plain">
-          <li><code class="kbd">https://axovia-flipper.web.app/api/auth/callback/&lt;provider&gt;</code> + <code class="kbd">https://axovia-flipper.firebaseapp.com/__/auth/handler</code></li>
-          <li><a class="link" href="https://console.cloud.google.com/apis/credentials?project=axovia-flipper" target="_blank" rel="noopener">Google</a> (edit the Web client → Authorized redirect URIs) · <a class="link" href="https://github.com/settings/developers" target="_blank" rel="noopener">GitHub</a> · <a class="link" href="https://developers.facebook.com/apps/" target="_blank" rel="noopener">Facebook</a></li>
-        </ul>
-      </div>
+        // ---- domain token rewrite ----
+        var domainInput = document.getElementById('domainInput');
+        var domainFree = document.querySelector('.decision[data-dec="domain"] [data-free]');
+        function applyDomain(v) {
+          state.dec = state.dec || {};
+          state.dec.domain = v;
+          document.querySelectorAll('.dom[data-token]').forEach(function (el) {
+            var proto = el.textContent.indexOf('https://') === 0;
+            el.textContent = v
+              ? proto
+                ? 'https://' + v
+                : v
+              : proto
+                ? 'https://your-domain.com'
+                : 'your-domain.com';
+          });
+          save();
+        }
+        if (state.dec && state.dec.domain) {
+          domainInput.value = state.dec.domain;
+          applyDomain(state.dec.domain);
+        }
+        function syncDomain(v) {
+          v = v.trim();
+          domainInput.value = v;
+          if (domainFree) domainFree.value = v;
+          var da = document.querySelector('.decision[data-dec="domain"] [data-answer]');
+          if (da) da.textContent = v || '—';
+          applyDomain(v);
+        }
+        domainInput.addEventListener('input', function () {
+          syncDomain(domainInput.value);
+        });
+        if (domainFree)
+          domainFree.addEventListener('input', function () {
+            syncDomain(domainFree.value);
+          });
 
-      <div class="task" data-id="3-3">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">3.3</span><span class="t-title">Wire flipper.axovia.ai subdomain</span><span class="badge p1">Launch item</span></div>
-        <p class="t-desc">The "real" interim home, no code changes (subdomain, not subpath). Steps:</p>
-        <ul class="steps">
-          <li><a class="link" href="https://console.firebase.google.com/project/axovia-flipper/hosting/sites" target="_blank" rel="noopener">Firebase Hosting</a> → Add custom domain → <code class="kbd">flipper.axovia.ai</code></li>
-          <li>In <a class="link" href="https://dcc.godaddy.com/control/portfolio/axovia.ai/settings?tab=dns" target="_blank" rel="noopener">GoDaddy DNS (axovia.ai)</a> add the CNAME/A records Firebase shows; wait for verification + SSL</li>
-          <li>Update <code class="kbd">PRODUCTION_APP_URL</code>→<code class="kbd">https://flipper.axovia.ai</code>, set <code class="kbd">PRODUCTION_ALLOWED_ORIGINS</code>, add the new OAuth redirect URIs (3.2), redeploy</li>
-        </ul>
-      </div>
+        // ---- reset + hide done + sticky ----
+        document.getElementById('resetBtn').addEventListener('click', function () {
+          if (
+            !confirm(
+              'Reset all checkboxes, decisions, and the domain? This clears your saved progress.'
+            )
+          )
+            return;
+          state = {};
+          save();
+          location.reload();
+        });
+        var hideDone = false;
+        document.getElementById('collapseDone').addEventListener('click', function () {
+          hideDone = !hideDone;
+          this.textContent = hideDone ? 'Show done' : 'Hide done';
+          tasks.forEach(function (t) {
+            t.style.display = hideDone && t.classList.contains('done') ? 'none' : '';
+          });
+        });
+        var sticky = document.getElementById('sticky'),
+          hero = document.querySelector('.dock');
+        window.addEventListener(
+          'scroll',
+          function () {
+            sticky.classList.toggle('show', hero.getBoundingClientRect().bottom < 0);
+          },
+          { passive: true }
+        );
 
-      <div class="task" data-id="3-4">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">3.4</span><span class="t-title">Verify sending domain in Resend + set EMAIL_FROM</span><span class="badge p1">Launch item</span></div>
-        <p class="t-desc">Until done, transactional email (verification, password reset, alerts) can't send to real users. Steps:</p>
-        <ul class="steps">
-          <li><a class="link" href="https://resend.com/domains" target="_blank" rel="noopener">Resend → Domains</a> → add <code class="kbd">axovia.ai</code> → copy the TXT/DKIM records</li>
-          <li>Add those records in <a class="link" href="https://dcc.godaddy.com/control/portfolio/axovia.ai/settings?tab=dns" target="_blank" rel="noopener">GoDaddy DNS</a>; wait for "Verified"</li>
-          <li>Set <code class="kbd">EMAIL_FROM = Flipper AI &lt;flipper@axovia.ai&gt;</code></li>
-          <li>⚠️ <b>Rotate the shared Resend key</b> → create a dedicated Flipper key (see <code class="kbd">.secrets</code> ledger note)</li>
-        </ul>
-      </div>
-
-      <div class="task" data-id="3-5">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">3.5</span><span class="t-title">Later: dedicated domain + social handles</span><span class="badge p1">Post-revenue</span></div>
-        <p class="t-desc">Buy a standalone domain from early revenue, migrate hosting + email + OAuth + Stripe webhook to it, and reserve matching social handles.</p>
-        <div class="linkrow"><a class="link" href="https://namecheckly.com/" target="_blank" rel="noopener">Namecheckly (handle check)</a><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/main/docs/launch/domain-and-brand-identity.md" target="_blank" rel="noopener">domain-and-brand-identity.md</a></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================ PHASE 4 ============================ -->
-  <section class="block" id="phase-4" data-phase="Smoke Test">
-    <div class="sec-head"><span class="sec-no">4</span><h2>Live Smoke Test</h2><span class="cnt" data-cnt></span></div>
-    <p class="sec-sub">Walk the real product on the live deployment before inviting anyone. Keep Sentry, Stripe, and Cloud Run logs open. Reference: <code class="kbd">pre-launch-smoke-test.md</code>.</p>
-    <div class="tasks-list">
-
-      <div class="task" data-id="4-1">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">4.1</span><span class="t-title">Public surfaces load</span><span class="badge verify">Verify</span></div>
-        <p class="t-desc">Each renders without 500: <code class="kbd">/</code>, <code class="kbd">/pricing</code>, <code class="kbd">/login</code>, <code class="kbd">/register</code> (hCaptcha visible), <code class="kbd">/privacy</code>, <code class="kbd">/terms</code>, <code class="kbd">/health</code>, <code class="kbd">/api/health</code>, <code class="kbd">/api/health/ready</code>.</p>
-      </div>
-
-      <div class="task" data-id="4-2">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">4.2</span><span class="t-title">Auth paths — Email, Google, GitHub</span><span class="badge verify">Verify</span></div>
-        <ol class="steps">
-          <li>Email + password signup → onboarding wizard completes (welcome → marketplaces → categories → budget → location).</li>
-          <li>Google OAuth — consent screen shows your brand, not <code class="kbd">axovia-flipper</code>.</li>
-          <li>GitHub OAuth round-trips back signed-in.</li>
-        </ol>
-        <div class="note tip"><span class="i">i</span><span>OAuth redirect-mismatch errors = production URI not added to the provider app (see 3.5).</span></div>
-      </div>
-
-      <div class="task" data-id="4-3">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">4.3</span><span class="t-title">Re-verify all 5 scrapers on live sites</span><span class="badge p0">P0</span></div>
-        <p class="t-desc">Selectors rot — Craigslist, eBay, Facebook, Mercari, OfferUp. Run a real scan per platform and confirm listings + images land.</p>
-      </div>
-
-      <div class="task" data-id="4-4">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">4.4</span><span class="t-title">Core journeys + failure modes</span><span class="badge verify">Verify</span></div>
-        <ul class="steps plain">
-          <li>Opportunity → kanban → analytics; seller message generation; cross-platform listing copy.</li>
-          <li>404 page renders (not 500); protected route while logged-out redirects to <code class="kbd">/login</code>.</li>
-          <li>Force a Sentry error and confirm it lands within 2 min.</li>
-        </ul>
-      </div>
-
-      <div class="task" data-id="4-5">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">4.5</span><span class="t-title">Run the automated smoke suite + Lighthouse</span><span class="badge p1">P1</span></div>
-        <div class="cmd"><pre>BASE_URL=<span class="dom" data-token>https://your-domain.com</span> pnpm test:e2e -- --grep="smoke"</pre><button class="copy">copy</button></div>
-        <div class="linkrow"><a class="link" href="https://pagespeed.web.dev/" target="_blank" rel="noopener">PageSpeed / Lighthouse</a></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================ PHASE 5 ============================ -->
-  <section class="block" id="phase-5" data-phase="Hardening">
-    <div class="sec-head"><span class="sec-no p1">5</span><h2>Hardening</h2><span class="cnt" data-cnt></span></div>
-    <p class="sec-sub">Strongly recommended before a public launch surge.</p>
-    <div class="tasks-list">
-
-      <div class="task" data-id="5-1">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">5.1</span><span class="t-title">Cloud SQL backups + restore runbook</span><span class="badge p1">P1</span></div>
-        <p class="t-desc">Enable daily automated backups (≥7-day retention); document the restore procedure.</p>
-        <div class="linkrow"><a class="link" href="https://console.cloud.google.com/sql/instances?project=axovia-flipper" target="_blank" rel="noopener">Cloud SQL → Backups</a></div>
-      </div>
-
-      <div class="task" data-id="5-2">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">5.2</span><span class="t-title">Uptime monitoring</span><span class="badge p1">P1</span></div>
-        <p class="t-desc">Set the <code class="kbd">PRODUCTION_URL</code> repo secret to activate the existing health-check workflow, or add UptimeRobot.</p>
-        <div class="linkrow"><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/settings/secrets/actions" target="_blank" rel="noopener">Repo secrets</a><a class="link" href="https://uptimerobot.com/" target="_blank" rel="noopener">UptimeRobot</a></div>
-      </div>
-
-      <div class="task" data-id="5-3">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">5.3</span><span class="t-title">Sentry release tracking + source maps</span><span class="badge p1">P1</span></div>
-        <div class="linkrow"><a class="link" href="https://sentry.io/" target="_blank" rel="noopener">Sentry</a></div>
-      </div>
-
-      <div class="task" data-id="5-4">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">5.4</span><span class="t-title">Twilio 10DLC registration</span><span class="badge p1">P1</span></div>
-        <p class="t-desc">Required to send transactional SMS at scale (brand → TCR → campaign → number). Multi-week carrier approval — start early.</p>
-        <div class="linkrow"><a class="link" href="https://console.twilio.com/us1/develop/sms/a2p-10dlc/brand-registration" target="_blank" rel="noopener">A2P brand registration</a><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/django-main/docs/launch/twilio-10dlc-checklist.md" target="_blank" rel="noopener">10DLC checklist</a></div>
-      </div>
-
-      <div class="task" data-id="5-5">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">5.5</span><span class="t-title">Public pages: pricing · FAQ · status · changelog</span><span class="badge p1">P1</span></div>
-        <p class="t-desc">Specs are pre-written in the toolkit.</p>
-        <div class="linkrow"><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/tree/main/docs/launch" target="_blank" rel="noopener">docs/launch/ specs</a></div>
-      </div>
-
-      <div class="task" data-id="5-6">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">5.6</span><span class="t-title">Converge duplicate env-var names → one canonical per credential</span><span class="badge p1">Tech debt</span></div>
-        <p class="t-desc">Some credentials are read under two env names — pick one canonical name each and remove the alias so a single value isn't duplicated across Secret Manager + the codebase. Known cases:</p>
-        <ul class="steps plain">
-          <li><b>Anthropic:</b> <code class="kbd">ANTHROPIC_API_KEY</code> (canonical) vs <code class="kbd">CLAUDE_API_KEY</code> (alias) — both read in <code class="kbd">src/lib/ai/providers/anthropic.ts</code> (<code class="kbd">ANTHROPIC || CLAUDE</code>). Drop <code class="kbd">CLAUDE_API_KEY</code>.</li>
-          <li><b>Gemini:</b> standardize on <code class="kbd">GOOGLE_API_KEY</code> (current) — ensure no stray <code class="kbd">GEMINI_API_KEY</code> creeps in.</li>
-          <li><b>Audit pass:</b> grep <code class="kbd">process.env.*_KEY|_TOKEN|_SECRET</code> for any other dual-name pairs; reconcile <code class="kbd">config/secretmanager.yaml</code> + <code class="kbd">.env.example</code> + <code class="kbd">.secrets/</code> ledger to the canonical set.</li>
-        </ul>
-        <div class="note tip"><span class="i">i</span><span>Do this as a single cleanup PR after launch — low risk but touches secret config, so isolate it. Keep the alias readable for one release (deprecation) before deleting, to avoid a deploy gap.</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================ PHASE 6 ============================ -->
-  <section class="block" id="phase-6" data-phase="Go-To-Market">
-    <div class="sec-head"><span class="sec-no gtm">6</span><h2>Go-To-Market &amp; Launch Day</h2><span class="cnt" data-cnt></span></div>
-    <p class="sec-sub">All copy is pre-written in <code class="kbd">docs/launch/</code>. Reference: <code class="kbd">launch-day-runbook.md</code> (hour-by-hour).</p>
-    <div class="tasks-list">
-
-      <div class="task" data-id="6-1">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">6.1</span><span class="t-title">Soft beta → invite list</span><span class="badge p1">P1</span></div>
-        <p class="t-desc">Use <code class="kbd">beta-invitation.md</code>; capture screenshots as marketing assets.</p>
-        <div class="linkrow"><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/django-main/docs/launch/beta-invitation.md" target="_blank" rel="noopener">beta-invitation.md</a></div>
-      </div>
-
-      <div class="task" data-id="6-2">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">6.2</span><span class="t-title">Schedule Product Hunt (T-7)</span><span class="badge p1">P1</span></div>
-        <p class="t-desc">Schedule the post (hidden until launch); prep PH / Show HN / Reddit / Twitter copy.</p>
-        <div class="linkrow"><a class="link" href="https://www.producthunt.com/posts/scheduled" target="_blank" rel="noopener">Schedule PH</a><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/django-main/docs/launch/product-hunt-listing.md" target="_blank" rel="noopener">PH copy</a><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/django-main/docs/launch/hacker-news-show-hn.md" target="_blank" rel="noopener">Show HN</a></div>
-      </div>
-
-      <div class="task" data-id="6-3">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">6.3</span><span class="t-title">Launch day — run the runbook</span><span class="badge p1">P1</span></div>
-        <p class="t-desc">T-24h verify Stripe webhook firing · 12:01 AM PT go-live · monitor PH rank &amp; 5xx rate. Rollback lever: <code class="kbd">gcloud run services update-traffic</code> to the previous revision.</p>
-        <div class="linkrow"><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/django-main/docs/launch/launch-day-runbook.md" target="_blank" rel="noopener">launch-day-runbook.md</a></div>
-      </div>
-
-      <div class="task" data-id="6-4">
-        <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">6.4</span><span class="t-title">Growth engines (post-launch)</span><span class="badge p1">P1</span></div>
-        <p class="t-desc">Referral, affiliate, free tools, SEO content calendar — specs ready to implement.</p>
-        <div class="linkrow"><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/django-main/docs/launch/referral-program-spec.md" target="_blank" rel="noopener">Referral</a><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/django-main/docs/launch/affiliate-program.md" target="_blank" rel="noopener">Affiliate</a><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/django-main/docs/launch/seo-content-calendar.md" target="_blank" rel="noopener">SEO calendar</a></div>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    Generated from RELEASE_ROADMAP.md v3 · accurate as of 2026-06-09 · progress stored locally in your browser · Flipper.ai Launch Control
-  </footer>
-</div>
-
-<script>
-(function(){
-  "use strict";
-  var KEY="flipper-launch-walkthrough-v1";
-  var state=load();
-  function load(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}}
-  function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
-
-  // ---- tasks ----
-  var tasks=[].slice.call(document.querySelectorAll('.task'));
-  state.tasks=state.tasks||{};
-  tasks.forEach(function(t){
-    var id=t.dataset.id;
-    // seed: tasks pre-completed in the markup (data-done) start checked unless
-    // the user's saved state already has an explicit value for them.
-    if(!(id in state.tasks) && t.dataset.done==='true'){ state.tasks[id]=true; }
-    if(state.tasks[id]) t.classList.add('done');
-    var chk=t.querySelector('.chk');
-    chk.setAttribute('role','checkbox');
-    chk.setAttribute('aria-checked', state.tasks[id]?'true':'false');
-    chk.addEventListener('click',function(){
-      var now=!t.classList.contains('done');
-      t.classList.toggle('done',now);
-      chk.setAttribute('aria-checked',now?'true':'false');
-      state.tasks[id]=now; save(); render();
-    });
-  });
-
-  save(); // persist any seeded (data-done) completions on first load
-
-  // ---- progress ----
-  var ringFill=document.getElementById('ringFill'),C=326.7;
-  function render(){
-    var done=tasks.filter(function(t){return t.classList.contains('done')}).length;
-    var total=tasks.length, pct=total?Math.round(done/total*100):0;
-    document.getElementById('ringPct').textContent=pct+'%';
-    ringFill.style.strokeDashoffset=C-(C*pct/100);
-    document.getElementById('mainBar').style.width=pct+'%';
-    document.getElementById('taskLine').textContent=done+' / '+total+' tasks done';
-    document.getElementById('sBar').style.width=pct+'%';
-    document.getElementById('sPct').textContent=pct+'%';
-    document.getElementById('phaseLine').textContent=pct===100?'Cleared for launch ✦':(pct===0?'Pre-flight':'In progress');
-    // per-phase counts + TOC
-    document.querySelectorAll('section[data-phase]').forEach(function(sec){
-      var ts=sec.querySelectorAll('.task'), d=0;
-      ts.forEach(function(t){if(t.classList.contains('done'))d++});
-      var cnt=sec.querySelector('[data-cnt]');
-      if(cnt){cnt.textContent=d+' / '+ts.length; cnt.classList.toggle('done',d===ts.length&&ts.length>0);}
-      var link=document.querySelector('nav.toc a[href="#'+sec.id+'"]');
-      if(link){var m=link.querySelector('.mini'); if(m)m.textContent=d+'/'+ts.length; link.classList.toggle('complete',d===ts.length&&ts.length>0);}
-    });
-  }
-
-  // ---- build TOC ----
-  var toc=document.getElementById('toc');
-  document.querySelectorAll('section.block').forEach(function(sec){
-    var h=sec.querySelector('h2'); if(!h)return;
-    var a=document.createElement('a');a.href='#'+sec.id;
-    a.innerHTML=h.textContent+(sec.dataset.phase?' <span class="mini"></span>':'');
-    toc.appendChild(a);
-  });
-
-  // ---- copy buttons ----
-  document.querySelectorAll('.cmd .copy').forEach(function(btn){
-    btn.addEventListener('click',function(){
-      var pre=btn.parentElement.querySelector('pre');
-      var txt=pre.innerText;
-      navigator.clipboard.writeText(txt).then(function(){
-        btn.textContent='copied';btn.classList.add('ok');
-        setTimeout(function(){btn.textContent='copy';btn.classList.remove('ok')},1400);
-      });
-    });
-  });
-
-  // ---- decisions ----
-  state.dec=state.dec||{};
-  document.querySelectorAll('.decision').forEach(function(d){
-    var key=d.dataset.dec, ans=d.querySelector('[data-answer]');
-    var free=d.querySelector('[data-free]');
-    function setAns(v){ans.textContent=v||'—';}
-    if(free){
-      if(state.dec[key])free.value=state.dec[key];
-      setAns(state.dec[key]);
-      free.addEventListener('input',function(){state.dec[key]=free.value.trim();setAns(state.dec[key]);save();});
-    }
-    d.querySelectorAll('.opt').forEach(function(o){
-      if(state.dec[key]===o.dataset.val)o.classList.add('sel');
-      if(state.dec[key])setAns(labelOf(d,state.dec[key]));
-      o.addEventListener('click',function(){
-        d.querySelectorAll('.opt').forEach(function(x){x.classList.remove('sel')});
-        o.classList.add('sel');state.dec[key]=o.dataset.val;setAns(labelOf(d,o.dataset.val));save();
-      });
-    });
-  });
-  function labelOf(d,val){var o=d.querySelector('.opt[data-val="'+val+'"]');return o?o.textContent.trim():val;}
-
-  // ---- domain token rewrite ----
-  var domainInput=document.getElementById('domainInput');
-  var domainFree=document.querySelector('.decision[data-dec="domain"] [data-free]');
-  function applyDomain(v){
-    state.dec=state.dec||{}; state.dec.domain=v;
-    document.querySelectorAll('.dom[data-token]').forEach(function(el){
-      var proto=el.textContent.indexOf('https://')===0;
-      el.textContent=v?(proto?'https://'+v:v):(proto?'https://your-domain.com':'your-domain.com');
-    });
-    save();
-  }
-  if(state.dec&&state.dec.domain){domainInput.value=state.dec.domain;applyDomain(state.dec.domain);}
-  function syncDomain(v){v=v.trim();domainInput.value=v;if(domainFree)domainFree.value=v;
-    var da=document.querySelector('.decision[data-dec="domain"] [data-answer]');if(da)da.textContent=v||'—';applyDomain(v);}
-  domainInput.addEventListener('input',function(){syncDomain(domainInput.value)});
-  if(domainFree)domainFree.addEventListener('input',function(){syncDomain(domainFree.value)});
-
-  // ---- reset + hide done + sticky ----
-  document.getElementById('resetBtn').addEventListener('click',function(){
-    if(!confirm('Reset all checkboxes, decisions, and the domain? This clears your saved progress.'))return;
-    state={};save();location.reload();
-  });
-  var hideDone=false;
-  document.getElementById('collapseDone').addEventListener('click',function(){
-    hideDone=!hideDone;this.textContent=hideDone?'Show done':'Hide done';
-    tasks.forEach(function(t){t.style.display=(hideDone&&t.classList.contains('done'))?'none':''});
-  });
-  var sticky=document.getElementById('sticky'),hero=document.querySelector('.dock');
-  window.addEventListener('scroll',function(){
-    sticky.classList.toggle('show', hero.getBoundingClientRect().bottom<0);
-  },{passive:true});
-
-  render();
-})();
-</script>
-</body>
+        render();
+      })();
+    </script>
+  </body>
 </html>

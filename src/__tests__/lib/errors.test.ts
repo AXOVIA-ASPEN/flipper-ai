@@ -165,10 +165,13 @@ describe('Error Handling Module', () => {
     it('logs unexpected errors', () => {
       const spy = jest.spyOn(console, 'error').mockImplementation();
       handleError(new Error('unexpected'));
-      expect(spy).toHaveBeenCalledWith('Unhandled error:', expect.objectContaining({
-        message: 'unexpected',
-        stack: expect.any(String)
-      }));
+      expect(spy).toHaveBeenCalledWith(
+        'Unhandled error:',
+        expect.objectContaining({
+          message: 'unexpected',
+          stack: expect.any(String),
+        })
+      );
       spy.mockRestore();
     });
 

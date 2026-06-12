@@ -133,9 +133,7 @@ describe('Firebase Cloud Messaging — Server-side (Admin SDK)', () => {
       const { sendToDevice } = await import('@/lib/firebase/messaging-admin');
       const result = await sendToDevice('bad-token', { title: 'Test', body: 'Test' });
       expect(result).toBeNull();
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Stale FCM token detected')
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Stale FCM token detected'));
       consoleSpy.mockRestore();
     });
 
@@ -149,9 +147,7 @@ describe('Firebase Cloud Messaging — Server-side (Admin SDK)', () => {
       const { sendToDevice } = await import('@/lib/firebase/messaging-admin');
       const result = await sendToDevice('expired-token', { title: 'Test', body: 'Test' });
       expect(result).toBeNull();
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Stale FCM token detected')
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Stale FCM token detected'));
       consoleSpy.mockRestore();
     });
 

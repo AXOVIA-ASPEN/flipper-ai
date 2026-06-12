@@ -50,10 +50,7 @@ describe('Market Value Calculator', () => {
 
   describe('calculateVerifiedMarketValue', () => {
     test('returns null for insufficient data (< 3 sales)', async () => {
-      mockPriceHistoryFindMany.mockResolvedValue([
-        { soldPrice: 400 },
-        { soldPrice: 420 },
-      ]);
+      mockPriceHistoryFindMany.mockResolvedValue([{ soldPrice: 400 }, { soldPrice: 420 }]);
 
       const result = await calculateVerifiedMarketValue('iPhone 12', 'EBAY');
       expect(result).toBeNull();
@@ -231,9 +228,7 @@ describe('Market Value Calculator', () => {
       mockListingFindMany.mockResolvedValue(listings);
 
       // First listing: has market data → updated
-      mockListingFindUnique
-        .mockResolvedValueOnce(listings[0])
-        .mockResolvedValueOnce(listings[1]);
+      mockListingFindUnique.mockResolvedValueOnce(listings[0]).mockResolvedValueOnce(listings[1]);
 
       const prices5 = [90, 100, 110, 120, 130];
       mockPriceHistoryFindMany
@@ -269,9 +264,7 @@ describe('Market Value Calculator', () => {
       mockListingFindMany.mockResolvedValue([]);
       const result = await batchUpdateVerifiedValues();
       expect(result).toEqual({ updated: 0, skipped: 0, errors: 0 });
-      expect(mockListingFindMany).toHaveBeenCalledWith(
-        expect.objectContaining({ where: {} })
-      );
+      expect(mockListingFindMany).toHaveBeenCalledWith(expect.objectContaining({ where: {} }));
     });
   });
 
@@ -411,11 +404,46 @@ describe('lookupVerifiedMarketPrice', () => {
       outliersRemoved: 0,
       lowSampleSize: false,
       soldListings: [
-        { title: 'iPhone 14 Pro', price: 300, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },
-        { title: 'iPhone 14 Pro', price: 350, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },
-        { title: 'iPhone 14 Pro', price: 370, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },
-        { title: 'iPhone 14 Pro', price: 340, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },
-        { title: 'iPhone 14 Pro', price: 360, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },
+        {
+          title: 'iPhone 14 Pro',
+          price: 300,
+          soldDate: null,
+          condition: 'Used',
+          url: '',
+          shippingCost: 0,
+        },
+        {
+          title: 'iPhone 14 Pro',
+          price: 350,
+          soldDate: null,
+          condition: 'Used',
+          url: '',
+          shippingCost: 0,
+        },
+        {
+          title: 'iPhone 14 Pro',
+          price: 370,
+          soldDate: null,
+          condition: 'Used',
+          url: '',
+          shippingCost: 0,
+        },
+        {
+          title: 'iPhone 14 Pro',
+          price: 340,
+          soldDate: null,
+          condition: 'Used',
+          url: '',
+          shippingCost: 0,
+        },
+        {
+          title: 'iPhone 14 Pro',
+          price: 360,
+          soldDate: null,
+          condition: 'Used',
+          url: '',
+          shippingCost: 0,
+        },
       ],
     });
 
@@ -449,9 +477,30 @@ describe('lookupVerifiedMarketPrice', () => {
       outliersRemoved: 0,
       lowSampleSize: false,
       soldListings: [
-        { title: 'Widget A', price: 180, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },
-        { title: 'Widget B', price: 200, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },
-        { title: 'Widget C', price: 220, soldDate: null, condition: 'Used', url: '', shippingCost: 0 },
+        {
+          title: 'Widget A',
+          price: 180,
+          soldDate: null,
+          condition: 'Used',
+          url: '',
+          shippingCost: 0,
+        },
+        {
+          title: 'Widget B',
+          price: 200,
+          soldDate: null,
+          condition: 'Used',
+          url: '',
+          shippingCost: 0,
+        },
+        {
+          title: 'Widget C',
+          price: 220,
+          soldDate: null,
+          condition: 'Used',
+          url: '',
+          shippingCost: 0,
+        },
       ],
     });
 

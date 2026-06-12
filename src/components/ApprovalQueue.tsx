@@ -63,7 +63,9 @@ export default function ApprovalQueue({
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [loadingAction, setLoadingAction] = useState<Record<string, 'approve' | 'confirm' | 'edit' | 'reject' | null>>({});
+  const [loadingAction, setLoadingAction] = useState<
+    Record<string, 'approve' | 'confirm' | 'edit' | 'reject' | null>
+  >({});
   const [toast, setToast] = useState<string | null>(null);
 
   const isFree = subscriptionTier === 'FREE' || !subscriptionTier;
@@ -73,131 +75,142 @@ export default function ApprovalQueue({
     setTimeout(() => setToast(null), 4000);
   }, []);
 
-  const fetchMessages = useCallback(async (offset = 0, append = false) => {
-    try {
-      if (!append) setLoading(true);
-      else setLoadingMore(true);
-      setError(null);
+  const fetchMessages = useCallback(
+    async (offset = 0, append = false) => {
+      try {
+        if (!append) setLoading(true);
+        else setLoadingMore(true);
+        setError(null);
 
-      const params = new URLSearchParams({
-        status: 'DRAFT,PENDING_APPROVAL',
-        direction: 'OUTBOUND',
-        sortBy: 'createdAt',
-        sortOrder: 'desc',
-        limit: String(PAGE_SIZE),
-        offset: String(offset),
-      });
+        const params = new URLSearchParams({
+          status: 'DRAFT,PENDING_APPROVAL',
+          direction: 'OUTBOUND',
+          sortBy: 'createdAt',
+          sortOrder: 'desc',
+          limit: String(PAGE_SIZE),
+          offset: String(offset),
+        });
 
-      const res = await fetch(`/api/messages?${params}`);
-      const json = await res.json();
+        const res = await fetch(`/api/messages?${params}`);
+        const json = await res.json();
 
-      if (!res.ok || !json.success) {
-        throw new Error(json.error?.detail || 'Failed to fetch messages');
+        if (!res.ok || !json.success) {
+          throw new Error(json.error?.detail || 'Failed to fetch messages');
+        }
+
+        if (append) {
+          setMessages((prev) => [...prev, ...json.data]);
+        } else {
+          setMessages(json.data);
+        }
+        setTotal(json.pagination?.total ?? 0);
+        onCountChange(json.pagination?.total ?? 0);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load approval queue');
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
       }
-
-      if (append) {
-        setMessages(prev => [...prev, ...json.data]);
-      } else {
-        setMessages(json.data);
-      }
-      setTotal(json.pagination?.total ?? 0);
-      onCountChange(json.pagination?.total ?? 0);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load approval queue');
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-    }
-  }, [onCountChange]);
+    },
+    [onCountChange]
+  );
 
   useEffect(() => {
     fetchMessages();
   }, [fetchMessages]);
 
-  const handleAction = useCallback(async (
-    id: string,
-    action: 'approve' | 'confirm' | 'edit' | 'reject',
-    payload?: { body?: string; subject?: string | null },
-  ) => {
-    setLoadingAction(prev => ({ ...prev, [id]: action }));
-    try {
-      const res = await fetch(`/api/messages/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, ...payload }),
-      });
-
-      if (res.status === 401) {
-        window.location.href = '/login';
-        return;
-      }
-
-      const json = await res.json();
-
-      if (res.status === 409) {
-        showToast('Message already updated. Refreshing...');
-        await fetchMessages();
-        return;
-      }
-
-      if (res.status === 403) {
-        showToast('Plan does not include messaging. Upgrade.');
-        return;
-      }
-
-      if (!res.ok || !json.success) {
-        showToast(json.error?.detail || `Failed to ${action} message`);
-        return;
-      }
-
-      // Handle nextAction for approve → PENDING_APPROVAL
-      if (json.nextAction === 'confirm') {
-        showToast('Message approved. Confirm to send.');
-        // Update card status locally instead of removing
-        setMessages(prev => prev.map(m =>
-          m.id === id ? { ...m, status: 'PENDING_APPROVAL' } : m
-        ));
-        return;
-      }
-
-      // Success: optimistically remove card
-      if (action === 'edit') {
-        // Edit keeps the message in the queue — update locally
-        setMessages(prev => prev.map(m =>
-          m.id === id ? { ...m, body: payload?.body ?? m.body, subject: payload?.subject ?? m.subject } : m
-        ));
-        showToast('Message updated.');
-      } else if (action === 'reject' && json.data?.status === 'DRAFT') {
-        // Reject from PENDING_APPROVAL → back to DRAFT, keep in queue
-        setMessages(prev => prev.map(m =>
-          m.id === id ? { ...m, status: 'DRAFT' } : m
-        ));
-        showToast('Message returned to draft for editing.');
-      } else {
-        // Remove from queue (sent or terminal rejected)
-        setMessages(prev => prev.filter(m => m.id !== id));
-        setTotal(prev => {
-          const newTotal = prev - 1;
-          onCountChange(newTotal);
-          return newTotal;
+  const handleAction = useCallback(
+    async (
+      id: string,
+      action: 'approve' | 'confirm' | 'edit' | 'reject',
+      payload?: { body?: string; subject?: string | null }
+    ) => {
+      setLoadingAction((prev) => ({ ...prev, [id]: action }));
+      try {
+        const res = await fetch(`/api/messages/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action, ...payload }),
         });
-        if (action === 'reject') {
-          showToast('Message rejected.');
-        } else {
-          showToast('Message sent.');
+
+        if (res.status === 401) {
+          window.location.href = '/login';
+          return;
         }
+
+        const json = await res.json();
+
+        if (res.status === 409) {
+          showToast('Message already updated. Refreshing...');
+          await fetchMessages();
+          return;
+        }
+
+        if (res.status === 403) {
+          showToast('Plan does not include messaging. Upgrade.');
+          return;
+        }
+
+        if (!res.ok || !json.success) {
+          showToast(json.error?.detail || `Failed to ${action} message`);
+          return;
+        }
+
+        // Handle nextAction for approve → PENDING_APPROVAL
+        if (json.nextAction === 'confirm') {
+          showToast('Message approved. Confirm to send.');
+          // Update card status locally instead of removing
+          setMessages((prev) =>
+            prev.map((m) => (m.id === id ? { ...m, status: 'PENDING_APPROVAL' } : m))
+          );
+          return;
+        }
+
+        // Success: optimistically remove card
+        if (action === 'edit') {
+          // Edit keeps the message in the queue — update locally
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === id
+                ? { ...m, body: payload?.body ?? m.body, subject: payload?.subject ?? m.subject }
+                : m
+            )
+          );
+          showToast('Message updated.');
+        } else if (action === 'reject' && json.data?.status === 'DRAFT') {
+          // Reject from PENDING_APPROVAL → back to DRAFT, keep in queue
+          setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, status: 'DRAFT' } : m)));
+          showToast('Message returned to draft for editing.');
+        } else {
+          // Remove from queue (sent or terminal rejected)
+          setMessages((prev) => prev.filter((m) => m.id !== id));
+          setTotal((prev) => {
+            const newTotal = prev - 1;
+            onCountChange(newTotal);
+            return newTotal;
+          });
+          if (action === 'reject') {
+            showToast('Message rejected.');
+          } else {
+            showToast('Message sent.');
+          }
+        }
+      } catch {
+        showToast(`Failed to ${action} message. Please try again.`);
+      } finally {
+        setLoadingAction((prev) => ({ ...prev, [id]: null }));
       }
-    } catch {
-      showToast(`Failed to ${action} message. Please try again.`);
-    } finally {
-      setLoadingAction(prev => ({ ...prev, [id]: null }));
-    }
-  }, [fetchMessages, onCountChange, showToast]);
+    },
+    [fetchMessages, onCountChange, showToast]
+  );
 
   const handleApprove = useCallback((id: string) => handleAction(id, 'approve'), [handleAction]);
   const handleConfirm = useCallback((id: string) => handleAction(id, 'confirm'), [handleAction]);
-  const handleEdit = useCallback((id: string, body: string, subject: string | null) =>
-    handleAction(id, 'edit', { body, subject }), [handleAction]);
+  const handleEdit = useCallback(
+    (id: string, body: string, subject: string | null) =>
+      handleAction(id, 'edit', { body, subject }),
+    [handleAction]
+  );
   const handleReject = useCallback((id: string) => handleAction(id, 'reject'), [handleAction]);
 
   if (loading) {
@@ -231,9 +244,19 @@ export default function ApprovalQueue({
       {/* FREE tier banner */}
       {isFree && messages.length > 0 && (
         <div className="fp-alert-warn mb-4 p-4">
-          <p className="text-sm font-medium" style={{ color: '#fcd34d' }}>Messaging requires a Flipper plan</p>
-          <p className="text-xs mt-1" style={{ color: '#fde68a' }}>Upgrade your subscription to approve and send messages.</p>
-          <a href="/settings" className="text-xs hover:underline mt-2 inline-block" style={{ color: '#c4b5fd' }}>Upgrade plan &rarr;</a>
+          <p className="text-sm font-medium" style={{ color: '#fcd34d' }}>
+            Messaging requires a Flipper plan
+          </p>
+          <p className="text-xs mt-1" style={{ color: '#fde68a' }}>
+            Upgrade your subscription to approve and send messages.
+          </p>
+          <a
+            href="/settings"
+            className="text-xs hover:underline mt-2 inline-block"
+            style={{ color: '#c4b5fd' }}
+          >
+            Upgrade plan &rarr;
+          </a>
         </div>
       )}
 
@@ -246,7 +269,7 @@ export default function ApprovalQueue({
         />
       ) : (
         <div className="space-y-3">
-          {messages.map(message => (
+          {messages.map((message) => (
             <MessageApprovalCard
               key={message.id}
               message={message}

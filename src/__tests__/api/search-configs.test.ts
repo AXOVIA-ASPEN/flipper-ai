@@ -113,7 +113,7 @@ describe('Search Configs API', () => {
 
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-    expect(data.error.code).toBe('INTERNAL_ERROR');
+      expect(data.error.code).toBe('INTERNAL_ERROR');
     });
 
     it('should filter by userId when authenticated', async () => {
@@ -300,7 +300,7 @@ describe('Search Configs API', () => {
 
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-    expect(data.error.code).toBe('INTERNAL_ERROR');
+      expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 
@@ -365,7 +365,7 @@ describe('Search Configs API', () => {
 
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-    expect(data.error.code).toBe('INTERNAL_ERROR');
+      expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 
@@ -536,7 +536,7 @@ describe('Search Configs API', () => {
 
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-    expect(data.error.code).toBe('INTERNAL_ERROR');
+      expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 
@@ -585,7 +585,7 @@ describe('Search Configs API', () => {
 
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-    expect(data.error.code).toBe('INTERNAL_ERROR');
+      expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 });

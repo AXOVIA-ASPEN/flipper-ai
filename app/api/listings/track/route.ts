@@ -3,7 +3,15 @@ import { runTrackingCycle, getTrackableListings } from '@/lib/listing-tracker';
 import { getCurrentUserId } from '@/lib/auth';
 import prisma from '@/lib/db';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
+import {
+  handleError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  AppError,
+  ErrorCode,
+} from '@/lib/errors';
 // GET /api/listings/track - Get trackable listings count (scoped to the caller)
 export async function GET() {
   try {

@@ -73,12 +73,7 @@ describe('Story 14.1 — canonical design tokens in app/globals.css', () => {
   });
 
   describe('AC #2 — canonical animations with fp- prefix', () => {
-    const requiredKeyframes = [
-      'fp-slide-up',
-      'fp-toast-in',
-      'fp-shimmer',
-      'fp-border-spin',
-    ];
+    const requiredKeyframes = ['fp-slide-up', 'fp-toast-in', 'fp-shimmer', 'fp-border-spin'];
 
     it.each(requiredKeyframes)('declares @keyframes %s', (name) => {
       expect(css).toMatch(new RegExp(`@keyframes\\s+${name}\\b`));
@@ -100,7 +95,9 @@ describe('Story 14.1 — canonical design tokens in app/globals.css', () => {
   describe('AC #3 — .fp-btn-hot deep-purple CTA with ambient glow', () => {
     it('declares .fp-btn-hot with the canonical gradient and glow', () => {
       expect(css).toMatch(/\.fp-btn-hot\s*{[^}]*linear-gradient\(135deg,\s*#7c3aed,\s*#5b21b6\)/s);
-      expect(css).toMatch(/\.fp-btn-hot\s*{[^}]*box-shadow:\s*0 0 20px rgba\(109,40,217,0\.4\)/s);
+      expect(css).toMatch(
+        /\.fp-btn-hot\s*{[^}]*box-shadow:\s*0 0 20px rgba\(109,\s*40,\s*217,\s*0\.4\)/s
+      );
     });
   });
 
@@ -108,25 +105,27 @@ describe('Story 14.1 — canonical design tokens in app/globals.css', () => {
     it('declares .fp-hot-card and its ::before with fp-border-spin animation', () => {
       expect(css).toMatch(/\.fp-hot-card\s*{/);
       expect(css).toMatch(/\.fp-hot-card::before\s*{[\s\S]*?animation:\s*fp-border-spin\b/);
-      expect(css).toMatch(/background:\s*linear-gradient\(135deg,\s*#7c3aed,\s*#8b5cf6,\s*#5b21b6,\s*#7c3aed\)/);
+      expect(css).toMatch(
+        /background:\s*linear-gradient\(135deg,\s*#7c3aed,\s*#8b5cf6,\s*#5b21b6,\s*#7c3aed\)/
+      );
       expect(css).toMatch(/background-size:\s*200% 200%/);
     });
   });
 
   describe('AC #5 — purple range slider thumb scoped under .fp-content', () => {
     it('scopes range slider styling under .fp-content (not global)', () => {
-      expect(css).toMatch(/\.fp-content input\[type=range\]\s*{/);
+      expect(css).toMatch(/\.fp-content input\[type=['\"]?range['\"]?\]\s*{/);
     });
 
     it('declares webkit slider thumb with purple gradient', () => {
       expect(css).toMatch(
-        /\.fp-content input\[type=range\]::-webkit-slider-thumb\s*{[\s\S]*?linear-gradient\(135deg,\s*#8b5cf6,\s*#7c3aed\)/
+        /\.fp-content input\[type=['\"]?range['\"]?\]::-webkit-slider-thumb\s*{[\s\S]*?linear-gradient\(135deg,\s*#8b5cf6,\s*#7c3aed\)/
       );
     });
 
     it('declares Firefox slider thumb with purple gradient (cross-browser parity)', () => {
       expect(css).toMatch(
-        /\.fp-content input\[type=range\]::-moz-range-thumb\s*{[\s\S]*?linear-gradient\(135deg,\s*#8b5cf6,\s*#7c3aed\)/
+        /\.fp-content input\[type=['\"]?range['\"]?\]::-moz-range-thumb\s*{[\s\S]*?linear-gradient\(135deg,\s*#8b5cf6,\s*#7c3aed\)/
       );
     });
   });

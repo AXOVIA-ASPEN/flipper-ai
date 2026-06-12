@@ -71,7 +71,13 @@ describe('POST /api/checkout', () => {
   });
 
   it('returns 422 for invalid tier', async () => {
-    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: 'test@test.com', name: 'Test', firebaseUid: 'fb-1', image: null });
+    mockGetCurrentUser.mockResolvedValue({
+      id: 'user-1',
+      email: 'test@test.com',
+      name: 'Test',
+      firebaseUid: 'fb-1',
+      image: null,
+    });
     const res = await POST(makeRequest({ tier: 'INVALID' }));
     expect(res.status).toBe(422);
     const data = await res.json();
@@ -80,13 +86,25 @@ describe('POST /api/checkout', () => {
   });
 
   it('returns 422 for FREE tier', async () => {
-    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: 'test@test.com', name: 'Test', firebaseUid: 'fb-1', image: null });
+    mockGetCurrentUser.mockResolvedValue({
+      id: 'user-1',
+      email: 'test@test.com',
+      name: 'Test',
+      firebaseUid: 'fb-1',
+      image: null,
+    });
     const res = await POST(makeRequest({ tier: 'FREE' }));
     expect(res.status).toBe(422);
   });
 
   it('creates checkout session for FLIPPER tier', async () => {
-    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: 'test@test.com', name: 'Test', firebaseUid: 'fb-1', image: null });
+    mockGetCurrentUser.mockResolvedValue({
+      id: 'user-1',
+      email: 'test@test.com',
+      name: 'Test',
+      firebaseUid: 'fb-1',
+      image: null,
+    });
 
     const res = await POST(makeRequest({ tier: 'FLIPPER' }));
     const data = await res.json();
@@ -107,7 +125,13 @@ describe('POST /api/checkout', () => {
   });
 
   it('creates checkout session for PRO tier', async () => {
-    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: 'pro@test.com', name: 'Pro User', firebaseUid: 'fb-1', image: null });
+    mockGetCurrentUser.mockResolvedValue({
+      id: 'user-1',
+      email: 'pro@test.com',
+      name: 'Pro User',
+      firebaseUid: 'fb-1',
+      image: null,
+    });
 
     const res = await POST(makeRequest({ tier: 'PRO' }));
     const data = await res.json();
@@ -122,7 +146,13 @@ describe('POST /api/checkout', () => {
   });
 
   it('creates new Stripe customer if none exists', async () => {
-    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: 'new@test.com', name: 'New User', firebaseUid: 'fb-1', image: null });
+    mockGetCurrentUser.mockResolvedValue({
+      id: 'user-1',
+      email: 'new@test.com',
+      name: 'New User',
+      firebaseUid: 'fb-1',
+      image: null,
+    });
     mockCustomersList.mockResolvedValue({ data: [] });
     mockCustomersCreate.mockResolvedValue({ id: 'cus_new' });
 
@@ -134,7 +164,13 @@ describe('POST /api/checkout', () => {
   });
 
   it('reuses existing Stripe customer', async () => {
-    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: 'existing@test.com', name: 'Existing', firebaseUid: 'fb-1', image: null });
+    mockGetCurrentUser.mockResolvedValue({
+      id: 'user-1',
+      email: 'existing@test.com',
+      name: 'Existing',
+      firebaseUid: 'fb-1',
+      image: null,
+    });
     mockCustomersList.mockResolvedValue({ data: [{ id: 'cus_existing' }] });
 
     await POST(makeRequest({ tier: 'FLIPPER' }));
@@ -147,7 +183,13 @@ describe('POST /api/checkout', () => {
 
   it('returns 200 and still creates checkout when no DB user row matches email', async () => {
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
-    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: 'orphan@test.com', name: 'Orphan', firebaseUid: 'fb-1', image: null });
+    mockGetCurrentUser.mockResolvedValue({
+      id: 'user-1',
+      email: 'orphan@test.com',
+      name: 'Orphan',
+      firebaseUid: 'fb-1',
+      image: null,
+    });
     mockCustomersList.mockResolvedValue({ data: [{ id: 'cus_orphan' }] });
     mockUserUpdateMany.mockResolvedValue({ count: 0 });
 
@@ -162,7 +204,13 @@ describe('POST /api/checkout', () => {
   });
 
   it('returns 500 when checkout throws Error instance', async () => {
-    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: 'test@test.com', name: 'Test', firebaseUid: 'fb-1', image: null });
+    mockGetCurrentUser.mockResolvedValue({
+      id: 'user-1',
+      email: 'test@test.com',
+      name: 'Test',
+      firebaseUid: 'fb-1',
+      image: null,
+    });
     mockCustomersList.mockResolvedValue({ data: [] });
     mockCustomersCreate.mockResolvedValue({ id: 'cus_1' });
     mockCheckoutCreate.mockRejectedValue(new Error('Stripe unavailable'));
@@ -175,7 +223,13 @@ describe('POST /api/checkout', () => {
   });
 
   it('returns 500 when checkout throws non-Error', async () => {
-    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: 'test@test.com', name: 'Test', firebaseUid: 'fb-1', image: null });
+    mockGetCurrentUser.mockResolvedValue({
+      id: 'user-1',
+      email: 'test@test.com',
+      name: 'Test',
+      firebaseUid: 'fb-1',
+      image: null,
+    });
     mockCustomersList.mockResolvedValue({ data: [] });
     mockCustomersCreate.mockResolvedValue({ id: 'cus_1' });
     mockCheckoutCreate.mockRejectedValue('string error');

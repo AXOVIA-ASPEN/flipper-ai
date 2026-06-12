@@ -59,15 +59,16 @@ async function scrapeCraigslist(
   minPrice?: number,
   maxPrice?: number
 ): Promise<CraigslistItem[]> {
-  const browser = await chromium.launch({ 
+  const browser = await chromium.launch({
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
-  
+
   const context = await browser.newContext({
-    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    userAgent:
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   });
-  
+
   const page = await context.newPage();
 
   try {
@@ -85,7 +86,10 @@ async function scrapeCraigslist(
     await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
     await page
-      .waitForSelector('.cl-search-result, .result-row, .gallery-card, li.cl-static-search-result', { timeout: 10000 })
+      .waitForSelector(
+        '.cl-search-result, .result-row, .gallery-card, li.cl-static-search-result',
+        { timeout: 10000 }
+      )
       .catch(() => console.log('No standard listing selector found'));
 
     const listings = await page.evaluate(() => {
@@ -119,8 +123,11 @@ async function scrapeCraigslist(
 
       for (const el of listingElements.slice(0, 50)) {
         try {
-          const titleEl = el.querySelector('.posting-title, .result-title, .titlestring, a.posting-title, .label') as HTMLElement;
-          const title = titleEl?.innerText?.trim() || el.querySelector('a')?.innerText?.trim() || '';
+          const titleEl = el.querySelector(
+            '.posting-title, .result-title, .titlestring, a.posting-title, .label'
+          ) as HTMLElement;
+          const title =
+            titleEl?.innerText?.trim() || el.querySelector('a')?.innerText?.trim() || '';
 
           const linkEl = el.querySelector("a[href*='/']") as HTMLAnchorElement;
           const url = linkEl?.href || '';
@@ -128,7 +135,9 @@ async function scrapeCraigslist(
           const priceEl = el.querySelector('.priceinfo, .result-price, .price') as HTMLElement;
           const price = priceEl?.innerText?.trim() || '$0';
 
-          const locationEl = el.querySelector('.meta, .result-hood, .location, .supertitle') as HTMLElement;
+          const locationEl = el.querySelector(
+            '.meta, .result-hood, .location, .supertitle'
+          ) as HTMLElement;
           const location = locationEl?.innerText?.replace(/[()]/g, '').trim() || '';
 
           const imgEl = el.querySelector('img') as HTMLImageElement;
@@ -208,7 +217,7 @@ export async function handler(req: Request, res: Response) {
         success: true,
         message: `Scraped ${listings.length} listings from Craigslist`,
         jobId: job.id,
-        listings: listings.map(item => ({
+        listings: listings.map((item) => ({
           title: item.title,
           price: `$${item.price}`,
           location: item.location,

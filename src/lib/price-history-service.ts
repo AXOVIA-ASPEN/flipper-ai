@@ -2,11 +2,7 @@
 // Fetches sold listings and stores them for analysis
 
 import { prisma } from './db';
-import {
-  fetchMarketPrice,
-  type MarketPrice,
-  type SoldListing,
-} from './market-price';
+import { fetchMarketPrice, type MarketPrice, type SoldListing } from './market-price';
 
 export interface PriceHistoryQuery {
   productName: string;

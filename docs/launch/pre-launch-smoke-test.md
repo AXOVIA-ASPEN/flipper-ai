@@ -114,6 +114,7 @@ Use Account A. For each scraper, run a search and confirm ≥10 results return.
   - Result: ≥10 listings.
 
 **For each marketplace:** click into one listing detail. Confirm:
+
 - AI analysis ran (you see verifiedMarketValue, sellabilityScore, recommendedOffer/recommendedList populated)
 - Image displays from Firebase Storage (not the original marketplace URL)
 - "Add to Kanban" button works → opportunity appears in `IDENTIFIED` column
@@ -167,10 +168,12 @@ This is the moment of truth. Use Account A.
 - [ ] Subscription appears in Stripe dashboard: https://dashboard.stripe.com/subscriptions
 
 **Webhook verification:**
+
 - [ ] Stripe webhook event log shows `checkout.session.completed` event delivered (200 response): https://dashboard.stripe.com/webhooks → endpoint → "Recent events"
 - [ ] No `4xx`/`5xx` responses on any webhook events
 
 **Cloud SQL check:**
+
 - `User.subscriptionTier` = upgraded tier
 - `User.stripeCustomerId` is populated
 - `User.stripeSubscriptionId` is populated
@@ -187,6 +190,7 @@ After upgrading Account A:
 - [ ] Try a feature gated to PRO (AI negotiation, cross-platform listing, analytics export) — succeeds if PRO, gracefully gates if FLIPPER
 
 Switch to Account B (still FREE):
+
 - [ ] Try the same FLIPPER feature → should hit a tier-gate UI (not a 500 error)
 - [ ] Try to scan more than 10 times in 24h → 11th scan blocked with friendly upgrade prompt
 
@@ -197,8 +201,8 @@ Switch to Account B (still FREE):
 - [ ] **Email** — verify `welcome` email arrived for Account A (during §2)
 - [ ] **Email** — trigger a high-value opportunity (run a scan that finds one) → email alert lands within 60s
 - [ ] **SSE** — open `/dashboard` in one tab, run a scan in another. Watch real-time `listing.found` events render in the dashboard without refresh.
-- [ ] **Push (FCM)** — *only if FCM is enabled at launch*. Subscribe in browser → trigger an event → confirm browser notification arrives.
-- [ ] **SMS** — *only if Twilio is enabled and 10DLC registered*. Trigger any SMS event → confirm receipt on your real phone within 60s.
+- [ ] **Push (FCM)** — _only if FCM is enabled at launch_. Subscribe in browser → trigger an event → confirm browser notification arrives.
+- [ ] **SMS** — _only if Twilio is enabled and 10DLC registered_. Trigger any SMS event → confirm receipt on your real phone within 60s.
 
 ---
 
@@ -250,18 +254,18 @@ Confirm error handling is graceful:
 
 ## Common smoke-test failures and what they mean
 
-| Symptom                                                         | Likely cause                                                                  | Fix                                                                                              |
-| --------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| OAuth redirect URI mismatch error                               | Production redirect URI not added to Google/GitHub/FB OAuth app dashboard     | Add `https://<your-domain>/api/auth/callback/<provider>` to authorized redirects                  |
-| Verification email never arrives                                | Resend domain not verified, or `RESEND_FROM_DOMAIN` mismatched                | Resend dashboard → Domains → DNS records green → match secret value                              |
-| FB Marketplace scraper returns 0                                | FB updated DOM, or Stagehand env vars missing                                 | Check Sentry for selector errors; verify `GOOGLE_API_KEY` is set (Stagehand needs Gemini)         |
-| Stripe webhook returns 4xx                                      | Webhook signing secret mismatch, or wrong event types subscribed              | Stripe dashboard → endpoint → re-reveal signing secret → update Secret Manager → redeploy        |
-| `/api/health/ready` returns 503                                 | DB unreachable from Cloud Run                                                 | Cloud SQL Auth Proxy / Unix socket misconfigured; verify `DB_URL` format and IAM                  |
-| AI analysis never completes                                     | All AI providers failing or rate-limited                                      | Check `metrics.ts` per-provider success rates; add a fallback provider                            |
-| Image displays as broken icon                                   | Firebase Storage bucket public-read missing, or CDN URL malformed              | Check Storage rules at https://console.firebase.google.com/project/axovia-flipper/storage         |
-| Session expires immediately                                     | Cookie domain mismatch (e.g., set to `.example.com` but app at `app.example.com`) | Check `SESSION_COOKIE_DOMAIN` in env; should be exact match or unset                          |
-| 500 on first /api/auth/* request                                | Firebase Admin SDK private key has unescaped `\n`                              | Re-store the secret with proper line breaks                                                       |
-| User can scan unlimited times despite FREE tier                 | `tier-enforcement.ts` not reading from authenticated user, or DB out of sync  | Check `getCurrentUserSubscription()` — should hit DB, not cache, on tier-gated endpoints          |
+| Symptom                                         | Likely cause                                                                      | Fix                                                                                       |
+| ----------------------------------------------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| OAuth redirect URI mismatch error               | Production redirect URI not added to Google/GitHub/FB OAuth app dashboard         | Add `https://<your-domain>/api/auth/callback/<provider>` to authorized redirects          |
+| Verification email never arrives                | Resend domain not verified, or `RESEND_FROM_DOMAIN` mismatched                    | Resend dashboard → Domains → DNS records green → match secret value                       |
+| FB Marketplace scraper returns 0                | FB updated DOM, or Stagehand env vars missing                                     | Check Sentry for selector errors; verify `GOOGLE_API_KEY` is set (Stagehand needs Gemini) |
+| Stripe webhook returns 4xx                      | Webhook signing secret mismatch, or wrong event types subscribed                  | Stripe dashboard → endpoint → re-reveal signing secret → update Secret Manager → redeploy |
+| `/api/health/ready` returns 503                 | DB unreachable from Cloud Run                                                     | Cloud SQL Auth Proxy / Unix socket misconfigured; verify `DB_URL` format and IAM          |
+| AI analysis never completes                     | All AI providers failing or rate-limited                                          | Check `metrics.ts` per-provider success rates; add a fallback provider                    |
+| Image displays as broken icon                   | Firebase Storage bucket public-read missing, or CDN URL malformed                 | Check Storage rules at https://console.firebase.google.com/project/axovia-flipper/storage |
+| Session expires immediately                     | Cookie domain mismatch (e.g., set to `.example.com` but app at `app.example.com`) | Check `SESSION_COOKIE_DOMAIN` in env; should be exact match or unset                      |
+| 500 on first /api/auth/\* request               | Firebase Admin SDK private key has unescaped `\n`                                 | Re-store the secret with proper line breaks                                               |
+| User can scan unlimited times despite FREE tier | `tier-enforcement.ts` not reading from authenticated user, or DB out of sync      | Check `getCurrentUserSubscription()` — should hit DB, not cache, on tier-gated endpoints  |
 
 ---
 

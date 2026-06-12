@@ -47,8 +47,7 @@ Then('{string} is exported as a function', function (fnName: string) {
   const src = this.source || this.fileContent || this.routeContent || this.sourceContent || '';
   const where = this.filePath || '<unknown source>';
   assert.ok(
-    src.includes(`export async function ${fnName}`) ||
-      src.includes(`export function ${fnName}`),
+    src.includes(`export async function ${fnName}`) || src.includes(`export function ${fnName}`),
     `Expected "${fnName}" to be exported as a function in ${where}`
   );
 });
@@ -104,35 +103,26 @@ Then(
   }
 );
 
-Then(
-  'the Facebook route at {string} calls {string}',
-  function (filePath: string, fnName: string) {
-    const source = readSource(filePath);
-    assert.ok(
-      source.includes(fnName + '('),
-      `Expected Facebook route to call "${fnName}(" — found no invocation in ${filePath}`
-    );
-  }
-);
+Then('the Facebook route at {string} calls {string}', function (filePath: string, fnName: string) {
+  const source = readSource(filePath);
+  assert.ok(
+    source.includes(fnName + '('),
+    `Expected Facebook route to call "${fnName}(" — found no invocation in ${filePath}`
+  );
+});
 
-Then(
-  'the Mercari route at {string} calls {string}',
-  function (filePath: string, fnName: string) {
-    const source = readSource(filePath);
-    assert.ok(
-      source.includes(fnName + '('),
-      `Expected Mercari route to call "${fnName}(" — found no invocation in ${filePath}`
-    );
-  }
-);
+Then('the Mercari route at {string} calls {string}', function (filePath: string, fnName: string) {
+  const source = readSource(filePath);
+  assert.ok(
+    source.includes(fnName + '('),
+    `Expected Mercari route to call "${fnName}(" — found no invocation in ${filePath}`
+  );
+});
 
-Then(
-  'the OfferUp route at {string} calls {string}',
-  function (filePath: string, fnName: string) {
-    const source = readSource(filePath);
-    assert.ok(
-      source.includes(fnName + '('),
-      `Expected OfferUp route to call "${fnName}(" — found no invocation in ${filePath}`
-    );
-  }
-);
+Then('the OfferUp route at {string} calls {string}', function (filePath: string, fnName: string) {
+  const source = readSource(filePath);
+  assert.ok(
+    source.includes(fnName + '('),
+    `Expected OfferUp route to call "${fnName}(" — found no invocation in ${filePath}`
+  );
+});

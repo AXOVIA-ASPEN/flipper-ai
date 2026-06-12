@@ -170,17 +170,19 @@ describe('POST /api/listings/[id]/description', () => {
 
     const OpenAI = require('openai').default;
     const mockCreate = jest.fn().mockResolvedValue({
-      choices: [{
-        message: {
-          content: JSON.stringify({
-            title: 'Apple iPhone 15 Pro - Excellent Condition',
-            description: 'Great phone for sale',
-            highlights: ['Excellent condition', 'Apple'],
-            suggestedPrice: 900,
-            keywords: ['iphone', 'apple'],
-          }),
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              title: 'Apple iPhone 15 Pro - Excellent Condition',
+              description: 'Great phone for sale',
+              highlights: ['Excellent condition', 'Apple'],
+              suggestedPrice: 900,
+              keywords: ['iphone', 'apple'],
+            }),
+          },
         },
-      }],
+      ],
     });
     OpenAI.mockImplementation(() => ({
       chat: { completions: { create: mockCreate } },
@@ -200,15 +202,21 @@ describe('POST /api/listings/[id]/description', () => {
 
     const OpenAI = require('openai').default;
     OpenAI.mockImplementation(() => ({
-      chat: { completions: { create: jest.fn().mockResolvedValue({
-        choices: [{
-          message: {
-            // Minimal response: no title, highlights, suggestedPrice, keywords
-            content: JSON.stringify({ description: 'Good phone' }),
-          },
-        }],
-      })},
-    }}));
+      chat: {
+        completions: {
+          create: jest.fn().mockResolvedValue({
+            choices: [
+              {
+                message: {
+                  // Minimal response: no title, highlights, suggestedPrice, keywords
+                  content: JSON.stringify({ description: 'Good phone' }),
+                },
+              },
+            ],
+          }),
+        },
+      },
+    }));
 
     const res = await POST(makeRequest({ platform: 'ebay' }), routeParams);
     const json = await res.json();
@@ -227,7 +235,11 @@ describe('POST /api/listings/[id]/description', () => {
 
     const OpenAI = require('openai').default;
     OpenAI.mockImplementation(() => ({
-      chat: { completions: { create: jest.fn().mockResolvedValue({ choices: [{ message: { content: null } }] }) } },
+      chat: {
+        completions: {
+          create: jest.fn().mockResolvedValue({ choices: [{ message: { content: null } }] }),
+        },
+      },
     }));
 
     const res = await POST(makeRequest({ platform: 'ebay' }), routeParams);

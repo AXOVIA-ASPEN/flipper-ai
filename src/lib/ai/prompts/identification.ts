@@ -30,7 +30,8 @@ export const productIdentification: PromptConfig = {
     'You are a product identification expert. Always respond with valid JSON only, no markdown formatting.',
   buildUserPrompt: (context: Record<string, unknown>) => {
     const title = String(context.title ?? '');
-    const description = context.description != null ? String(context.description) : 'No description provided';
+    const description =
+      context.description != null ? String(context.description) : 'No description provided';
     const price = String(context.price ?? '');
     const category = String(context.category ?? 'Unknown');
 
@@ -115,7 +116,8 @@ export const itemCompleteness: PromptConfig = {
   systemPrompt: '',
   buildUserPrompt: (context: Record<string, unknown>) => {
     const title = String(context.title ?? '');
-    const description = context.description != null ? String(context.description) : 'No description provided.';
+    const description =
+      context.description != null ? String(context.description) : 'No description provided.';
     const category = String(context.category ?? '');
     const descText = description.slice(0, 500);
 

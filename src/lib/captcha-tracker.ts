@@ -67,7 +67,7 @@ export function requiresCaptcha(identifier: string): boolean {
   if (!attempt) return false;
 
   const now = Date.now();
-  
+
   // Reset if window expired
   if (now - attempt.firstAttemptAt > ATTEMPT_WINDOW_MS) {
     failedAttempts.delete(normalizedId);
@@ -96,7 +96,7 @@ export function getFailedAttemptCount(identifier: string): number {
   if (!attempt) return 0;
 
   const now = Date.now();
-  
+
   // Check if expired
   if (now - attempt.firstAttemptAt > ATTEMPT_WINDOW_MS) {
     failedAttempts.delete(normalizedId);
@@ -113,7 +113,7 @@ export function getFailedAttemptCount(identifier: string): number {
  */
 export async function verifyHCaptcha(token: string): Promise<boolean> {
   const secretKey = process.env.HCAPTCHA_SECRET_KEY;
-  
+
   if (!secretKey) {
     console.error('HCAPTCHA_SECRET_KEY not configured');
     return false;

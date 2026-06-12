@@ -24,8 +24,7 @@ const mockDb = db as any;
 const mockFindMany: jest.Mock = mockDb.notificationEvent.findMany;
 const mockCount: jest.Mock = mockDb.notificationEvent.count;
 
-const makeRequest = (url: string) =>
-  new NextRequest(new URL(url, 'http://localhost:3000'));
+const makeRequest = (url: string) => new NextRequest(new URL(url, 'http://localhost:3000'));
 
 const sampleEvent = {
   id: 'evt-1',
@@ -33,7 +32,12 @@ const sampleEvent = {
   listingId: 'lst-1',
   eventType: 'listing.sold',
   status: 'PENDING',
-  payload: { eventType: 'listing.sold', listingTitle: 'iPhone', listingUrl: 'http://x', platform: 'CRAIGSLIST' },
+  payload: {
+    eventType: 'listing.sold',
+    listingTitle: 'iPhone',
+    listingUrl: 'http://x',
+    platform: 'CRAIGSLIST',
+  },
   deduplicationKey: 'lst-1:listing.sold:2026-04-09T12:00:00.000Z',
   createdAt: new Date('2026-04-09T10:00:00.000Z'),
   processedAt: null,

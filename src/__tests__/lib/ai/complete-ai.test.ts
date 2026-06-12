@@ -50,8 +50,7 @@ function makePromptConfig(overrides: Partial<PromptConfig> = {}): PromptConfig {
     maxTokens: 2048,
     responseFormat: 'json',
     systemPrompt: 'You are a flip analysis expert.',
-    buildUserPrompt: (ctx: Record<string, unknown>) =>
-      `Analyze: ${ctx.title} at $${ctx.price}`,
+    buildUserPrompt: (ctx: Record<string, unknown>) => `Analyze: ${ctx.title} at $${ctx.price}`,
     ...overrides,
   };
 }
@@ -194,8 +193,6 @@ describe('completeAI', () => {
     const completeFn = provider.complete as jest.Mock;
     const [messages] = completeFn.mock.calls[0] as [AIMessage[], ModelConfig];
 
-    expect(messages).toEqual([
-      { role: 'user', content: 'Analyze: Lamp at $20' },
-    ]);
+    expect(messages).toEqual([{ role: 'user', content: 'Analyze: Lamp at $20' }]);
   });
 });

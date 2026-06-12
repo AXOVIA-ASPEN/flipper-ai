@@ -27,19 +27,19 @@
 
 ## The 11 commits on `main` not in `django-main`
 
-| Commit  | What it adds                                                 | django-main equivalent                                |
-| ------- | ------------------------------------------------------------ | ----------------------------------------------------- |
-| b605779 | API documentation section to README                          | Already covered in django-main's docs/api/ tree       |
-| c62148f | Generate comprehensive API documentation                     | django-main has more comprehensive docs               |
-| 9d7700f | [8.4] Message Approval Workflow                              | Story 8.4 done on django-main (refactored)            |
-| f128429 | Set up GitHub Actions CI/CD pipeline                         | django-main has more workflows (release.yml + others) |
-| 299f707 | Refactor E-004 step definitions                              | django-main reorganized step defs entirely            |
-| 8e89dcb | E-004 BDD step definitions for sellability                   | Same — superseded                                     |
-| 58064b3 | [8.2] AI Negotiation Strategy                                | Story 8.2 done on django-main                         |
-| 5824764 | Fix BDD test failures - offline server fallback              | Likely no longer relevant on django-main              |
-| bbda617 | [4.5] BDD scenarios for LLM Sellability                      | Story 4.5 done on django-main                         |
-| b731495 | [4.5] Configurable undervalue discount threshold             | Same                                                  |
-| a3a4aeb | [4.2] Platform-specific fees & opportunity threshold         | Story 4.2 done on django-main                         |
+| Commit  | What it adds                                         | django-main equivalent                                |
+| ------- | ---------------------------------------------------- | ----------------------------------------------------- |
+| b605779 | API documentation section to README                  | Already covered in django-main's docs/api/ tree       |
+| c62148f | Generate comprehensive API documentation             | django-main has more comprehensive docs               |
+| 9d7700f | [8.4] Message Approval Workflow                      | Story 8.4 done on django-main (refactored)            |
+| f128429 | Set up GitHub Actions CI/CD pipeline                 | django-main has more workflows (release.yml + others) |
+| 299f707 | Refactor E-004 step definitions                      | django-main reorganized step defs entirely            |
+| 8e89dcb | E-004 BDD step definitions for sellability           | Same — superseded                                     |
+| 58064b3 | [8.2] AI Negotiation Strategy                        | Story 8.2 done on django-main                         |
+| 5824764 | Fix BDD test failures - offline server fallback      | Likely no longer relevant on django-main              |
+| bbda617 | [4.5] BDD scenarios for LLM Sellability              | Story 4.5 done on django-main                         |
+| b731495 | [4.5] Configurable undervalue discount threshold     | Same                                                  |
+| a3a4aeb | [4.2] Platform-specific fees & opportunity threshold | Story 4.2 done on django-main                         |
 
 **Conclusion:** Everything meaningful on `main` has already been redone (usually better) on `django-main`. There is no work on `main` that needs to be saved before reconciliation.
 
@@ -134,12 +134,12 @@ git push origin --delete django-main
 **Cons:**
 
 - Conflicts during the merge. The most likely conflicts are:
-    - `package.json` (version + dependency drift)
-    - `prisma/schema.prisma` (model evolution)
-    - `_bmad-output/implementation-artifacts/sprint-status.yaml` (django-main has all-done; main has older state)
-    - `README.md` (badge versions, feature lists)
-    - `vercel.json` (django-main deleted it; main may have changes to it)
-    - `CLAUDE.md` (architecture descriptions — django-main is current)
+  - `package.json` (version + dependency drift)
+  - `prisma/schema.prisma` (model evolution)
+  - `_bmad-output/implementation-artifacts/sprint-status.yaml` (django-main has all-done; main has older state)
+  - `README.md` (badge versions, feature lists)
+  - `vercel.json` (django-main deleted it; main may have changes to it)
+  - `CLAUDE.md` (architecture descriptions — django-main is current)
 - Resolution decisions: in nearly every case, **prefer the django-main version**. The main-side changes have already been superseded by better implementations on django-main.
 
 ---
@@ -212,7 +212,7 @@ After whichever option you pick:
 
 ## What about the `claude/create-release-roadmap-NCkB5` branch?
 
-This branch (where you're reading this) was forked from the *old* `main`. It contains:
+This branch (where you're reading this) was forked from the _old_ `main`. It contains:
 
 - `RELEASE_ROADMAP.md`
 - `docs/launch/*` (this directory)

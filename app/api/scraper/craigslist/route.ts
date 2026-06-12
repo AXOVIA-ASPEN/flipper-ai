@@ -26,7 +26,14 @@ import { sseEmitter, shouldEmitProgress } from '@/lib/sse-emitter';
 import { hasExistingImages, captureListingImages } from '@/lib/image-capture';
 import { logger } from '@/lib/logger';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, RateLimitError } from '@/lib/errors';
+import {
+  handleError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  RateLimitError,
+} from '@/lib/errors';
 import { enforceTierLimits } from '@/lib/tier-enforcement';
 import { computeEstimatedExpiry } from '@/lib/listing-expiry';
 import { emitOpportunityFoundEvent } from '@/lib/notification-events';
@@ -118,75 +125,77 @@ async function scrapeCraigslistWithPlaywright(
 
     // Extract listings using page.evaluate
     // istanbul ignore next -- Browser-side DOM code runs in Playwright context, not Node.js
-    const listings = await page.evaluate(/* istanbul ignore next */ () => {
-      const items: Array<{
-        title: string;
-        price: string;
-        url: string;
-        location: string;
-        imageUrl?: string;
-      }> = [];
+    const listings = await page.evaluate(
+      /* istanbul ignore next */ () => {
+        const items: Array<{
+          title: string;
+          price: string;
+          url: string;
+          location: string;
+          imageUrl?: string;
+        }> = [];
 
-      // Try multiple selector patterns (Craigslist UI changes)
-      const selectors = [
-        '.cl-search-result',
-        '.result-row',
-        '.gallery-card',
-        'li.cl-static-search-result',
-      ];
+        // Try multiple selector patterns (Craigslist UI changes)
+        const selectors = [
+          '.cl-search-result',
+          '.result-row',
+          '.gallery-card',
+          'li.cl-static-search-result',
+        ];
 
-      let listingElements: Element[] = [];
-      for (const selector of selectors) {
-        const elements = document.querySelectorAll(selector);
-        if (elements.length > 0) {
-          listingElements = Array.from(elements);
-          break;
-        }
-      }
-
-      // If still no results, try the generic list item approach
-      if (listingElements.length === 0) {
-        listingElements = Array.from(document.querySelectorAll('[data-pid]'));
-      }
-
-      for (const el of listingElements.slice(0, 50)) {
-        // Limit to 50 listings
-        try {
-          // Extract title
-          const titleEl = el.querySelector(
-            '.posting-title, .result-title, .titlestring, a.posting-title, .label'
-          ) as HTMLElement;
-          const title =
-            titleEl?.innerText?.trim() || el.querySelector('a')?.innerText?.trim() || '';
-
-          // Extract URL
-          const linkEl = el.querySelector("a[href*='/']") as HTMLAnchorElement;
-          const url = linkEl?.href || '';
-
-          // Extract price
-          const priceEl = el.querySelector('.priceinfo, .result-price, .price') as HTMLElement;
-          const price = priceEl?.innerText?.trim() || '$0';
-
-          // Extract location
-          const locationEl = el.querySelector(
-            '.meta, .result-hood, .location, .supertitle'
-          ) as HTMLElement;
-          const location = locationEl?.innerText?.replace(/[()]/g, '').trim() || '';
-
-          // Extract image
-          const imgEl = el.querySelector('img') as HTMLImageElement;
-          const imageUrl = imgEl?.src || '';
-
-          if (title && url && !title.includes('sponsored')) {
-            items.push({ title, price, url, location, imageUrl });
+        let listingElements: Element[] = [];
+        for (const selector of selectors) {
+          const elements = document.querySelectorAll(selector);
+          if (elements.length > 0) {
+            listingElements = Array.from(elements);
+            break;
           }
-        } catch (e) {
-          // Skip problematic listings
         }
-      }
 
-      return items;
-    });
+        // If still no results, try the generic list item approach
+        if (listingElements.length === 0) {
+          listingElements = Array.from(document.querySelectorAll('[data-pid]'));
+        }
+
+        for (const el of listingElements.slice(0, 50)) {
+          // Limit to 50 listings
+          try {
+            // Extract title
+            const titleEl = el.querySelector(
+              '.posting-title, .result-title, .titlestring, a.posting-title, .label'
+            ) as HTMLElement;
+            const title =
+              titleEl?.innerText?.trim() || el.querySelector('a')?.innerText?.trim() || '';
+
+            // Extract URL
+            const linkEl = el.querySelector("a[href*='/']") as HTMLAnchorElement;
+            const url = linkEl?.href || '';
+
+            // Extract price
+            const priceEl = el.querySelector('.priceinfo, .result-price, .price') as HTMLElement;
+            const price = priceEl?.innerText?.trim() || '$0';
+
+            // Extract location
+            const locationEl = el.querySelector(
+              '.meta, .result-hood, .location, .supertitle'
+            ) as HTMLElement;
+            const location = locationEl?.innerText?.replace(/[()]/g, '').trim() || '';
+
+            // Extract image
+            const imgEl = el.querySelector('img') as HTMLImageElement;
+            const imageUrl = imgEl?.src || '';
+
+            if (title && url && !title.includes('sponsored')) {
+              items.push({ title, price, url, location, imageUrl });
+            }
+          } catch (e) {
+            // Skip problematic listings
+          }
+        }
+
+        return items;
+      }
+    );
 
     console.log(`Found ${listings.length} listings`);
 
@@ -427,7 +436,10 @@ export async function POST(request: NextRequest) {
               trueDiscountPercent = vpResult.trueDiscountPercent;
             }
           } catch (vpErr) {
-            console.error(`Verified price lookup error for Craigslist item ${item.externalId}:`, vpErr);
+            console.error(
+              `Verified price lookup error for Craigslist item ${item.externalId}:`,
+              vpErr
+            );
           }
         }
 
@@ -486,26 +498,34 @@ export async function POST(request: NextRequest) {
 
         // Step 6a: Item completeness & seller reputation enrichment (Story 5.4)
         // Craigslist has no seller rating data — completeness analysis only (if images available)
-        const [enriched54] = await enrichWithCompletenessAndReputation([{
-          externalId: item.externalId,
-          url: item.url,
-          title: item.title,
-          description: item.description,
-          askingPrice: item.price,
-          imageUrls: item.imageUrls,
-          platform: 'CRAIGSLIST',
-          category: identification?.category || detectedCategory,
-          estimation,
-          requestToBuy: '',
-          isOpportunity: true,
-        }]);
+        const [enriched54] = await enrichWithCompletenessAndReputation([
+          {
+            externalId: item.externalId,
+            url: item.url,
+            title: item.title,
+            description: item.description,
+            askingPrice: item.price,
+            imageUrls: item.imageUrls,
+            platform: 'CRAIGSLIST',
+            category: identification?.category || detectedCategory,
+            estimation,
+            requestToBuy: '',
+            isOpportunity: true,
+          },
+        ]);
         const completenessLabel = enriched54.completenessAnalysis?.completenessLabel ?? null;
 
         // Step 6b: Logistics & shipping cost analysis (Story 5.5)
         let logisticsAnalysis = null;
         try {
           logisticsAnalysis = await analyzeLogistics(
-            { title: item.title, description: item.description, category: identification?.category || detectedCategory, location: item.location, estimation },
+            {
+              title: item.title,
+              description: item.description,
+              category: identification?.category || detectedCategory,
+              location: item.location,
+              estimation,
+            },
             userSettings?.homeLocation ?? null,
             userSettings?.maxPickupRadiusMiles ?? 50
           );
@@ -517,7 +537,8 @@ export async function POST(request: NextRequest) {
         const requestToBuy = generatePurchaseMessage(
           item.title,
           item.price,
-          estimation.negotiable || (sellabilityAnalysis /* istanbul ignore next */ ?.recommendedOfferPrice !== undefined),
+          estimation.negotiable ||
+            sellabilityAnalysis /* istanbul ignore next */?.recommendedOfferPrice !== undefined,
           null
         );
 
@@ -572,7 +593,9 @@ export async function POST(request: NextRequest) {
           marketDataDate: marketData ? new Date() : null,
           comparableSalesJson: compMatchResult
             ? JSON.stringify(compMatchResult.comps)
-            : marketData ? JSON.stringify(marketData.soldListings.slice(0, 5)) : null,
+            : marketData
+              ? JSON.stringify(marketData.soldListings.slice(0, 5))
+              : null,
           compMatchConfidence: compMatchResult?.confidence ?? null,
 
           // LLM Sellability Analysis
@@ -591,7 +614,7 @@ export async function POST(request: NextRequest) {
 
           // Story 5.4: Item completeness & seller reputation
           completenessLabel,
-          sellerRating: null,           // Craigslist does not expose seller rating data
+          sellerRating: null, // Craigslist does not expose seller rating data
           sellerReviewCount: null,
           sellerAccountAgeDays: null,
 
@@ -789,7 +812,12 @@ export async function POST(request: NextRequest) {
         category: null,
         postedAt: l.postedAt ?? null,
       }));
-    const processedResults = processListings('CRAIGSLIST', rawForSummary, { minValueScore: opportunityThreshold }, { feeRate, opportunityThreshold });
+    const processedResults = processListings(
+      'CRAIGSLIST',
+      rawForSummary,
+      { minValueScore: opportunityThreshold },
+      { feeRate, opportunityThreshold }
+    );
     const summary = generateScanSummary(processedResults);
     // `analyzeListing` is referenced for marketplace-scanner unification traceability — see eBay route.
     void analyzeListing;
@@ -810,7 +838,7 @@ export async function POST(request: NextRequest) {
       summary,
       imagesCaptured,
       imagesFailed,
-      jobId: job /* istanbul ignore next */ ?.id,
+      jobId: job /* istanbul ignore next */?.id,
     });
   } catch (error) {
     console.error('Scraper error:', error);

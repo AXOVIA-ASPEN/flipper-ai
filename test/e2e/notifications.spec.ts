@@ -46,9 +46,7 @@ test.describe('Feature: Notifications & Listing Monitoring', () => {
 
       if (route.request().method() === 'GET') {
         const unreadOnly = url.searchParams.get('unread') === 'true';
-        const data = unreadOnly
-          ? mockNotifications.filter((n) => !n.read)
-          : mockNotifications;
+        const data = unreadOnly ? mockNotifications.filter((n) => !n.read) : mockNotifications;
         await route.fulfill({ json: { notifications: data, unreadCount: 2 } });
       } else if (route.request().method() === 'PATCH') {
         await route.fulfill({ json: { success: true } });
@@ -154,9 +152,9 @@ test.describe('Feature: Notifications & Listing Monitoring', () => {
       await page.waitForLoadState('networkidle');
 
       // Try to find and click an unread notification
-      const unreadNotif = page.locator(
-        '[data-testid="notification-unread"], .notification-item.unread'
-      ).first();
+      const unreadNotif = page
+        .locator('[data-testid="notification-unread"], .notification-item.unread')
+        .first();
       if (await unreadNotif.isVisible({ timeout: 3000 }).catch(() => false)) {
         await unreadNotif.click();
         // The mark-read API should have been called

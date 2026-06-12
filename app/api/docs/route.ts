@@ -10,7 +10,13 @@
 import { NextResponse } from 'next/server';
 import { openApiSpec } from '@/lib/openapi-spec';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import {
+  handleError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+} from '@/lib/errors';
 export const dynamic = 'force-static';
 
 export async function GET() {

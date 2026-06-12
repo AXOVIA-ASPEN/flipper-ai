@@ -109,12 +109,15 @@ Then('all OfferUp user agents should reference Chrome version 130 or higher', fu
   }
 });
 
-Then('it should block resource types including images, fonts, and analytics for speed', function () {
-  expect(this.fileContent).toContain('context.route');
-  expect(this.fileContent).toContain('route.abort()');
-  expect(this.fileContent).toMatch(/png|jpg|jpeg|gif|webp/);
-  expect(this.fileContent).toContain('analytics');
-});
+Then(
+  'it should block resource types including images, fonts, and analytics for speed',
+  function () {
+    expect(this.fileContent).toContain('context.route');
+    expect(this.fileContent).toContain('route.abort()');
+    expect(this.fileContent).toMatch(/png|jpg|jpeg|gif|webp/);
+    expect(this.fileContent).toContain('analytics');
+  }
+);
 
 // ==================== S-035: RawListing normalization ====================
 
@@ -133,16 +136,19 @@ Then('it should use the search location as fallback when listing location is emp
   expect(this.fileContent).toMatch(/item\.location\s*\|\|/);
 });
 
-Then('it should map externalId, url, title, askingPrice, condition, sellerName, imageUrls, and postedAt', function () {
-  expect(this.fileContent).toContain('externalId');
-  expect(this.fileContent).toContain('url: item.url');
-  expect(this.fileContent).toContain('title: item.title');
-  expect(this.fileContent).toContain('askingPrice: item.price');
-  expect(this.fileContent).toContain('condition');
-  expect(this.fileContent).toContain('sellerName');
-  expect(this.fileContent).toContain('imageUrls');
-  expect(this.fileContent).toContain('postedAt');
-});
+Then(
+  'it should map externalId, url, title, askingPrice, condition, sellerName, imageUrls, and postedAt',
+  function () {
+    expect(this.fileContent).toContain('externalId');
+    expect(this.fileContent).toContain('url: item.url');
+    expect(this.fileContent).toContain('title: item.title');
+    expect(this.fileContent).toContain('askingPrice: item.price');
+    expect(this.fileContent).toContain('condition');
+    expect(this.fileContent).toContain('sellerName');
+    expect(this.fileContent).toContain('imageUrls');
+    expect(this.fileContent).toContain('postedAt');
+  }
+);
 
 // ==================== S-037: Anti-detection measures ====================
 
@@ -199,9 +205,12 @@ Then('{string} should contain the OfferUp scraping logic', function (filePath: s
 
 // ==================== S-040: Marketplace scanner integration ====================
 
-Then('the OfferUp route uses {string} for database-ready listing storage', function (fnName: string) {
-  expect(this.fileContent).toContain(fnName);
-});
+Then(
+  'the OfferUp route uses {string} for database-ready listing storage',
+  function (fnName: string) {
+    expect(this.fileContent).toContain(fnName);
+  }
+);
 
 Then('the OfferUp route uses {string} for scan summary response', function (fnName: string) {
   expect(this.fileContent).toContain(fnName);
@@ -215,12 +224,15 @@ Then('it should emit SSE events via sseEmitter after DB save with DB-assigned ID
 
 // ==================== S-041: Concurrent job guard ====================
 
-Then('the route should check for existing RUNNING jobs with platform OFFERUP before starting', function () {
-  expect(this.fileContent).toContain('hasRunningJob');
-  expect(this.fileContent).toContain("'OFFERUP'");
-});
+Then(
+  'the route should check for existing RUNNING jobs with platform OFFERUP before starting',
+  function () {
+    expect(this.fileContent).toContain('hasRunningJob');
+    expect(this.fileContent).toContain("'OFFERUP'");
+  }
+);
 
-Then("it should throw ConflictError if a job is already running", function () {
+Then('it should throw ConflictError if a job is already running', function () {
   expect(this.fileContent).toContain('ConflictError');
 });
 
@@ -233,11 +245,14 @@ Then('it should wrap the scrape operation in Promise.race with a 60-second timeo
   expect(typesContent).toContain('SESSION_TIMEOUT_MS: 60_000');
 });
 
-Then('it should return a failure result with failureReason {string} when exceeded', function (reason: string) {
-  expect(this.fileContent).toContain('failureReason');
-  expect(this.fileContent).toContain(`'${reason}'`);
-  expect(this.fileContent).toContain('success: false');
-});
+Then(
+  'it should return a failure result with failureReason {string} when exceeded',
+  function (reason: string) {
+    expect(this.fileContent).toContain('failureReason');
+    expect(this.fileContent).toContain(`'${reason}'`);
+    expect(this.fileContent).toContain('success: false');
+  }
+);
 
 Then('it should always close the browser in a finally block', function () {
   expect(this.fileContent).toContain('finally');

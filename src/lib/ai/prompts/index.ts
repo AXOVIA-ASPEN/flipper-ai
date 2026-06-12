@@ -41,9 +41,7 @@ const PROMPTS = new Map<string, PromptConfig>();
 export function getPrompt(name: string): PromptConfig {
   const config = PROMPTS.get(name);
   if (!config) {
-    throw new Error(
-      `Unknown prompt: "${name}". Available: ${[...PROMPTS.keys()].join(', ')}`
-    );
+    throw new Error(`Unknown prompt: "${name}". Available: ${[...PROMPTS.keys()].join(', ')}`);
   }
   return config;
 }

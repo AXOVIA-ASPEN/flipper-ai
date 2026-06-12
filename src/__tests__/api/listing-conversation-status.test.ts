@@ -57,7 +57,7 @@ describe('GET /api/listings/[id]/conversation-status', () => {
       conversationStatus: 'pending',
     });
     mockMessageCount
-      .mockResolvedValueOnce(3)  // total message count
+      .mockResolvedValueOnce(3) // total message count
       .mockResolvedValueOnce(1); // unread count
     mockMessageFindFirst.mockResolvedValue({
       createdAt: new Date('2026-03-31T10:00:00Z'),
@@ -118,9 +118,7 @@ describe('GET /api/listings/[id]/conversation-status', () => {
       conversationStatus: null,
     });
     mockMessageCount.mockReset();
-    mockMessageCount
-      .mockResolvedValueOnce(0)
-      .mockResolvedValueOnce(0);
+    mockMessageCount.mockResolvedValueOnce(0).mockResolvedValueOnce(0);
     mockMessageFindFirst.mockResolvedValue(null);
 
     const res = await GET(createRequest('listing-1'), {

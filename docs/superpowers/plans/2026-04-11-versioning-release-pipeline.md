@@ -12,24 +12,26 @@
 
 ## File Map
 
-| File | Action | Purpose |
-|------|--------|---------|
-| `VERSION.md` | Create | Single source of truth for current version |
-| `CHANGELOG.md` | Create | Human-curated release notes (Keep a Changelog) |
-| `.github/workflows/release.yml` | Create | Tag-triggered GitHub Release automation |
-| `_bmad-output/project-context.md` | Modify | Full versioning spec for the team |
-| `CLAUDE.md` | Modify | Quick-reference versioning section |
+| File                              | Action | Purpose                                        |
+| --------------------------------- | ------ | ---------------------------------------------- |
+| `VERSION.md`                      | Create | Single source of truth for current version     |
+| `CHANGELOG.md`                    | Create | Human-curated release notes (Keep a Changelog) |
+| `.github/workflows/release.yml`   | Create | Tag-triggered GitHub Release automation        |
+| `_bmad-output/project-context.md` | Modify | Full versioning spec for the team              |
+| `CLAUDE.md`                       | Modify | Quick-reference versioning section             |
 
 ---
 
 ### Task 1: Create VERSION.md
 
 **Files:**
+
 - Create: `VERSION.md`
 
 - [ ] **Step 1: Create VERSION.md with initial version**
 
 File contents:
+
 ```
 1.0.0
 ```
@@ -46,11 +48,13 @@ git commit -m "chore: add VERSION.md — initial version 1.0.0"
 ### Task 2: Create CHANGELOG.md
 
 **Files:**
+
 - Create: `CHANGELOG.md`
 
 - [ ] **Step 1: Create CHANGELOG.md**
 
 File contents:
+
 ```markdown
 # Changelog
 
@@ -70,6 +74,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [1.0.0] - 2026-04-11
 
 ### Added
+
 - Initial release of Flipper.ai — AI-powered marketplace scraper for resale profit
 - Craigslist, Facebook Marketplace, eBay, OfferUp, and Mercari scrapers
 - AI-powered flip potential analysis (OpenAI)
@@ -91,6 +96,7 @@ git commit -m "chore: add CHANGELOG.md — Keep a Changelog format"
 ### Task 3: Create GitHub Actions release workflow
 
 **Files:**
+
 - Create: `.github/workflows/release.yml`
 
 - [ ] **Step 1: Ensure .github/workflows directory exists**
@@ -102,6 +108,7 @@ mkdir -p .github/workflows
 - [ ] **Step 2: Create release.yml**
 
 File contents:
+
 ```yaml
 name: Release
 
@@ -135,7 +142,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "Flipper.ai v${{ steps.changelog.outputs.version }}"
+          name: 'Flipper.ai v${{ steps.changelog.outputs.version }}'
           body_path: /tmp/release_notes.md
           draft: false
           prerelease: false
@@ -153,6 +160,7 @@ git commit -m "ci: add tag-triggered GitHub Release workflow"
 ### Task 4: Update project-context.md — add Versioning & Release Pipeline section
 
 **Files:**
+
 - Modify: `_bmad-output/project-context.md`
 
 - [ ] **Step 1: Append the Versioning & Release Pipeline section**
@@ -165,19 +173,22 @@ Add the following section at the end of `_bmad-output/project-context.md` (befor
 ## Versioning & Release Pipeline
 
 ### Version Scheme
+
 [Semantic Versioning](https://semver.org/) — `MAJOR.MINOR.PATCH`
 
-| Change type | Bump | Example |
-|-------------|------|---------|
-| Bug fixes, dependency updates, minor tweaks | `PATCH` | Fix Craigslist scraper timeout |
-| New features, non-breaking additions | `MINOR` | Add OfferUp scraper, new dashboard page |
+| Change type                                 | Bump    | Example                                  |
+| ------------------------------------------- | ------- | ---------------------------------------- |
+| Bug fixes, dependency updates, minor tweaks | `PATCH` | Fix Craigslist scraper timeout           |
+| New features, non-breaking additions        | `MINOR` | Add OfferUp scraper, new dashboard page  |
 | Breaking changes, major architecture shifts | `MAJOR` | Auth system rewrite, API incompatibility |
 
 ### Key Files
+
 - **`VERSION.md`** — single line, the current released version (e.g., `1.4.2`). Updated manually during release prep.
 - **`CHANGELOG.md`** — [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format. The `[Unreleased]` section at the top is updated as work is merged. At release time it is promoted to a versioned heading.
 
 ### CHANGELOG.md Conventions
+
 - `[Unreleased]` section is always present at the top
 - Categories to use (only include non-empty ones): `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`
 - Versioned headings format: `## [X.Y.Z] - YYYY-MM-DD`
@@ -185,6 +196,7 @@ Add the following section at the end of `_bmad-output/project-context.md` (befor
 
 ### Release Process (5 steps)
 ```
+
 1. Update CHANGELOG.md
    - Move all [Unreleased] items under: ## [X.Y.Z] - YYYY-MM-DD
    - Leave a fresh empty [Unreleased] section at the top
@@ -204,6 +216,7 @@ Add the following section at the end of `_bmad-output/project-context.md` (befor
 5. GitHub Actions creates the GitHub Release automatically
    - Parses CHANGELOG.md to extract release notes for this version
    - Creates release named "Flipper.ai vX.Y.Z"
+
 ```
 
 ### GitHub Actions
@@ -225,13 +238,14 @@ git commit -m "docs: add Versioning & Release Pipeline to project-context"
 ### Task 5: Update CLAUDE.md — add concise Versioning & Releases section
 
 **Files:**
+
 - Modify: `CLAUDE.md`
 
 - [ ] **Step 1: Add the Versioning & Releases section**
 
 Add the following section to `CLAUDE.md` after the `## Commands` section (before `## Architecture`):
 
-```markdown
+````markdown
 ## Versioning & Releases
 
 Full spec: `_bmad-output/project-context.md` → _Versioning & Release Pipeline_ section.
@@ -239,6 +253,7 @@ Full spec: `_bmad-output/project-context.md` → _Versioning & Release Pipeline_
 **Semver rules:** `PATCH` = bug fixes · `MINOR` = new features · `MAJOR` = breaking changes
 
 **Release steps:**
+
 ```bash
 # 1. Update CHANGELOG.md — promote [Unreleased] to ## [X.Y.Z] - YYYY-MM-DD
 # 2. Update VERSION.md — set to new version
@@ -249,22 +264,25 @@ git tag vX.Y.Z
 git push origin vX.Y.Z
 # GitHub Actions creates the GitHub Release automatically from the tag
 ```
+````
 
 **As you work:** add entries to the `[Unreleased]` section of `CHANGELOG.md` under the appropriate category (`Added`, `Changed`, `Fixed`, `Removed`, `Security`, `Deprecated`).
-```
+
+````
 
 - [ ] **Step 2: Commit**
 
 ```bash
 git add CLAUDE.md
 git commit -m "docs: add Versioning & Releases quick-reference to CLAUDE.md"
-```
+````
 
 ---
 
 ## Self-Review
 
 **Spec coverage check:**
+
 - ✅ VERSION.md created (Task 1)
 - ✅ CHANGELOG.md created with Keep a Changelog format (Task 2)
 - ✅ GitHub Actions tag-triggered workflow (Task 3)

@@ -125,13 +125,13 @@ psql $DATABASE_URL < backup_20260215.sql
 
 ## 5. Troubleshooting
 
-| Issue          | Check                     | Fix                                                  |
-| -------------- | ------------------------- | ---------------------------------------------------- |
-| 500 errors     | Logs, Sentry              | Check env vars, DB connection                        |
-| Slow responses | Network tab, DB queries   | Add indexes, optimize queries                        |
+| Issue          | Check                      | Fix                                                  |
+| -------------- | -------------------------- | ---------------------------------------------------- |
+| 500 errors     | Logs, Sentry               | Check env vars, DB connection                        |
+| Slow responses | Network tab, DB queries    | Add indexes, optimize queries                        |
 | Auth failures  | ENCRYPTION_SECRET, APP_URL | Regenerate secret, check URL                         |
-| Build failures | CI logs                   | `pnpm install --frozen-lockfile`, check Node version |
-| DB connection  | `prisma db pull`          | Check DATABASE_URL, firewall rules                   |
+| Build failures | CI logs                    | `pnpm install --frozen-lockfile`, check Node version |
+| DB connection  | `prisma db pull`           | Check DATABASE_URL, firewall rules                   |
 
 ### Common Commands
 

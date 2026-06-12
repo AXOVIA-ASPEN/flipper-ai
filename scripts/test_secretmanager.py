@@ -106,12 +106,12 @@ class TestSecretScope:
     def test_scope_values(self):
         assert SecretScope.ALL == "ALL"
         assert SecretScope.DEV == "DEV"
-        assert SecretScope.PROD == "PROD"
+        assert SecretScope.PROD == "PRODUCTION"
         assert SecretScope.STAGING == "STAGING"
 
     def test_scope_is_str_enum(self):
         # StrEnum values are usable as strings
-        assert f"prefix_{SecretScope.PROD}" == "prefix_PROD"
+        assert f"prefix_{SecretScope.PROD}" == "prefix_PRODUCTION"
 
 
 # ---------------------------------------------------------------------------

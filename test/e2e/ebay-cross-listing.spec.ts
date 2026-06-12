@@ -66,7 +66,12 @@ async function setupMocks(page: import('@playwright/test').Page) {
       json: {
         estimatedValue: 275,
         comparables: [
-          { title: 'Nintendo Switch OLED White', price: 265, platform: 'ebay', soldDate: '2026-02-10' },
+          {
+            title: 'Nintendo Switch OLED White',
+            price: 265,
+            platform: 'ebay',
+            soldDate: '2026-02-10',
+          },
           { title: 'Switch OLED Console', price: 279, platform: 'ebay', soldDate: '2026-02-12' },
         ],
       },
@@ -77,7 +82,8 @@ async function setupMocks(page: import('@playwright/test').Page) {
   await page.route(`**/api/listings/${MOCK_LISTING.id}/description`, async (route) => {
     await route.fulfill({
       json: {
-        description: 'Nintendo Switch OLED Model in excellent condition. Includes console, dock, Joy-Con controllers, and all original accessories.',
+        description:
+          'Nintendo Switch OLED Model in excellent condition. Includes console, dock, Joy-Con controllers, and all original accessories.',
       },
     });
   });
@@ -93,7 +99,9 @@ test.describe('Feature: eBay Cross-Listing Flow', () => {
     await setupMocks(page);
   });
 
-  test('Scenario: Given I submit an eBay draft listing via API, When the request succeeds, Then I should get draft status back', async ({ page }) => {
+  test('Scenario: Given I submit an eBay draft listing via API, When the request succeeds, Then I should get draft status back', async ({
+    page,
+  }) => {
     // Given I navigate to a page to activate route mocks
     await page.goto('/');
 
@@ -123,7 +131,9 @@ test.describe('Feature: eBay Cross-Listing Flow', () => {
     expect(result.body.sku).toBe('flipper-lst-001');
   });
 
-  test('Scenario: Given I publish an eBay listing, When publish=true, Then the listing should be active with an eBay URL', async ({ page }) => {
+  test('Scenario: Given I publish an eBay listing, When publish=true, Then the listing should be active with an eBay URL', async ({
+    page,
+  }) => {
     await page.goto('/');
 
     // When I create and immediately publish
@@ -152,7 +162,9 @@ test.describe('Feature: eBay Cross-Listing Flow', () => {
     expect(result.body.ebayUrl).toContain('ebay.com');
   });
 
-  test('Scenario: Given I request market value data, When comparables exist, Then I should see estimated value and comparable sales', async ({ page }) => {
+  test('Scenario: Given I request market value data, When comparables exist, Then I should see estimated value and comparable sales', async ({
+    page,
+  }) => {
     await page.goto('/');
 
     // When I fetch market value for the listing
@@ -169,7 +181,9 @@ test.describe('Feature: eBay Cross-Listing Flow', () => {
     expect(result.body.comparables[0].platform).toBe('ebay');
   });
 
-  test('Scenario: Given I need an optimized description, When I request AI generation, Then I should get a detailed product description', async ({ page }) => {
+  test('Scenario: Given I need an optimized description, When I request AI generation, Then I should get a detailed product description', async ({
+    page,
+  }) => {
     await page.goto('/');
 
     // When I request AI-generated description
@@ -185,7 +199,9 @@ test.describe('Feature: eBay Cross-Listing Flow', () => {
     expect(result.body.description.toLowerCase()).toContain('nintendo switch');
   });
 
-  test('Scenario: Given I submit an eBay listing without required fields, When validation runs, Then I should get an error', async ({ page }) => {
+  test('Scenario: Given I submit an eBay listing without required fields, When validation runs, Then I should get an error', async ({
+    page,
+  }) => {
     await page.goto('/');
 
     // When I submit with missing fields
@@ -203,7 +219,9 @@ test.describe('Feature: eBay Cross-Listing Flow', () => {
     expect(result.body.error).toBeTruthy();
   });
 
-  test('Scenario: Given I have a listing with AI analysis, When I view pricing suggestions, Then the suggested price should reflect market data', async ({ page }) => {
+  test('Scenario: Given I have a listing with AI analysis, When I view pricing suggestions, Then the suggested price should reflect market data', async ({
+    page,
+  }) => {
     await page.goto('/');
 
     // When I fetch the listing details
@@ -225,7 +243,9 @@ test.describe('Feature: eBay Cross-Listing Flow', () => {
     expect(result.body.aiAnalysis.demandScore).toBeGreaterThanOrEqual(7);
   });
 
-  test('Scenario: Given I complete the full cross-listing flow, When I go from listing to eBay publication, Then all steps should succeed', async ({ page }) => {
+  test('Scenario: Given I complete the full cross-listing flow, When I go from listing to eBay publication, Then all steps should succeed', async ({
+    page,
+  }) => {
     await page.goto('/');
 
     // Step 1: Get listing details
@@ -251,23 +271,26 @@ test.describe('Feature: eBay Cross-Listing Flow', () => {
     expect(desc.description).toBeTruthy();
 
     // Step 4: Create and publish on eBay
-    const ebayListing = await page.evaluate(async (data) => {
-      const res = await fetch('/api/listings/ebay', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      return res.json();
-    }, {
-      sku: `flipper-${listing.id}`,
-      title: listing.title,
-      description: desc.description,
-      categoryId: '139971',
-      condition: listing.condition,
-      price: marketValue.estimatedValue - 5, // Price slightly under market
-      imageUrls: listing.imageUrls,
-      publish: true,
-    });
+    const ebayListing = await page.evaluate(
+      async (data) => {
+        const res = await fetch('/api/listings/ebay', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        return res.json();
+      },
+      {
+        sku: `flipper-${listing.id}`,
+        title: listing.title,
+        description: desc.description,
+        categoryId: '139971',
+        condition: listing.condition,
+        price: marketValue.estimatedValue - 5, // Price slightly under market
+        imageUrls: listing.imageUrls,
+        publish: true,
+      }
+    );
 
     // Then the full flow should complete successfully
     expect(ebayListing.success).toBe(true);

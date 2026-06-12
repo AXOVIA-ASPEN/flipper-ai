@@ -62,8 +62,7 @@ const mockGenerateTitlesForAllPlatforms = jest.fn();
 jest.mock('@/lib/title-generator', () => ({
   generateAlgorithmicTitle: (...args: unknown[]) => mockGenerateAlgorithmicTitle(...args),
   generateLLMTitle: (...args: unknown[]) => mockGenerateLLMTitle(...args),
-  generateTitlesForAllPlatforms: (...args: unknown[]) =>
-    mockGenerateTitlesForAllPlatforms(...args),
+  generateTitlesForAllPlatforms: (...args: unknown[]) => mockGenerateTitlesForAllPlatforms(...args),
 }));
 
 const mockGenerateAlgorithmicDescription = jest.fn();
@@ -154,8 +153,8 @@ beforeEach(() => {
     titles: ['ebay', 'mercari', 'facebook', 'offerup'].map((p) => titleStub(p)),
     primary: 'Apple iPhone 14 256GB - ebay',
   });
-  mockGenerateAlgorithmicDescription.mockImplementation(
-    (_input: unknown, platform = 'generic') => descriptionStub(platform as string)
+  mockGenerateAlgorithmicDescription.mockImplementation((_input: unknown, platform = 'generic') =>
+    descriptionStub(platform as string)
   );
   mockGenerateLLMDescription.mockImplementation((_input: unknown, platform = 'ebay') =>
     Promise.resolve(descriptionStub(platform as string))
@@ -207,10 +206,7 @@ describe('POST /api/listings/[id]/generate-resale-content', () => {
   });
 
   it('platform="all" + useLLM=true loops over platforms via the LLM generators', async () => {
-    const res = await POST(
-      makeRequest({ platform: 'all', useLLM: true }),
-      makeParams('listing-1')
-    );
+    const res = await POST(makeRequest({ platform: 'all', useLLM: true }), makeParams('listing-1'));
     expect(res.status).toBe(200);
 
     // 4 platforms × {title, description}
@@ -261,10 +257,7 @@ describe('POST /api/listings/[id]/generate-resale-content', () => {
     );
     expect(res.status).toBe(200);
     expect(mockGenerateAlgorithmicTitle).toHaveBeenCalledWith(expect.any(Object), 'mercari');
-    expect(mockGenerateAlgorithmicDescription).toHaveBeenCalledWith(
-      expect.any(Object),
-      'mercari'
-    );
+    expect(mockGenerateAlgorithmicDescription).toHaveBeenCalledWith(expect.any(Object), 'mercari');
     expect(mockGenerateLLMTitle).not.toHaveBeenCalled();
   });
 
@@ -275,10 +268,7 @@ describe('POST /api/listings/[id]/generate-resale-content', () => {
     );
     expect(res.status).toBe(200);
     expect(mockGenerateAlgorithmicTitle).toHaveBeenCalledWith(expect.any(Object), 'generic');
-    expect(mockGenerateAlgorithmicDescription).toHaveBeenCalledWith(
-      expect.any(Object),
-      'generic'
-    );
+    expect(mockGenerateAlgorithmicDescription).toHaveBeenCalledWith(expect.any(Object), 'generic');
   });
 
   it('UPPERCASE platform input is normalized to lowercase before generators', async () => {
@@ -350,10 +340,7 @@ describe('POST /api/listings/[id]/generate-resale-content', () => {
 
   it('handles malformed JSON body by falling back to defaults', async () => {
     const req = new NextRequest(
-      new URL(
-        '/api/listings/listing-1/generate-resale-content',
-        'http://localhost:3000'
-      ),
+      new URL('/api/listings/listing-1/generate-resale-content', 'http://localhost:3000'),
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -402,10 +389,7 @@ describe('POST /api/listings/[id]/generate-resale-content', () => {
 
   it('returns 403 when the listing has no opportunity attached', async () => {
     mockListingFindFirst.mockResolvedValueOnce({ ...baseListing, opportunity: null });
-    const res = await POST(
-      makeRequest({ platform: 'ebay' }),
-      makeParams('listing-1')
-    );
+    const res = await POST(makeRequest({ platform: 'ebay' }), makeParams('listing-1'));
     expect(res.status).toBe(403);
     expect(mockGenerateLLMTitle).not.toHaveBeenCalled();
   });
@@ -415,10 +399,7 @@ describe('POST /api/listings/[id]/generate-resale-content', () => {
       ...baseListing,
       opportunity: { purchasePrice: null, status: 'IDENTIFIED' },
     });
-    const res = await POST(
-      makeRequest({ platform: 'ebay' }),
-      makeParams('listing-1')
-    );
+    const res = await POST(makeRequest({ platform: 'ebay' }), makeParams('listing-1'));
     expect(res.status).toBe(403);
   });
 

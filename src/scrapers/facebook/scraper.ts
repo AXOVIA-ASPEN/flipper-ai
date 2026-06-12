@@ -196,9 +196,7 @@ export function convertGraphApiToRawListing(
   void _kw;
   return {
     externalId: item.id,
-    url:
-      item.marketplace_listing_url ||
-      `https://www.facebook.com/marketplace/item/${item.id}`,
+    url: item.marketplace_listing_url || `https://www.facebook.com/marketplace/item/${item.id}`,
     title: item.name || '',
     description: item.description || null,
     askingPrice: parsePrice(item.price || '0'),
@@ -367,7 +365,12 @@ export async function scrapeFacebookMarketplace(
       totalFound: 0,
       scrapedAt: new Date(),
       config,
-      error: error instanceof Error ? error.message : error !== null && error !== undefined ? /* istanbul ignore next */ String(error) : /* istanbul ignore next */ 'Unknown error',
+      error:
+        error instanceof Error
+          ? error.message
+          : error !== null && error !== undefined
+            ? /* istanbul ignore next */ String(error)
+            : /* istanbul ignore next */ 'Unknown error',
     };
   } finally {
     /* istanbul ignore else -- stagehand is always initialized before this point */

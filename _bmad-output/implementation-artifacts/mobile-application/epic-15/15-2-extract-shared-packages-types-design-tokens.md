@@ -1,8 +1,8 @@
 # Story 15.2: Extract Shared `packages/types/` and `packages/design-tokens/`
 
-Status: ready-for-dev
-Blocked: false
-Blocked-Reason:
+Status: blocked
+Blocked: true
+Blocked-Reason: HUMAN REVIEW GATE — Stephen must review and approve the mobile architecture overview (docs/architecture/mobile-architecture-overview.html) before ANY Epic 15+ mobile development starts. Do not begin implementation while this gate is in place. To lift: after approval, set Blocked: false, clear this reason, set Status: ready-for-dev (all five Epic 15 stories carry this same gate).
 Trello-Card-ID: 6a16b889be39ba599825c87f
 
 <!-- Valid statuses: backlog | ready-for-dev | in-progress | blocked | review | done -->
@@ -100,7 +100,7 @@ Bar: the `Opportunity` type imported from `@shared/types` is structurally identi
   - `--color-text: #e2e8f0`, `--color-text-secondary: #94a3b8`
   - `--color-border: rgba(255,255,255,0.09)`
   - `--color-success: #34d399`, `--color-warning: #fbbf24`, `--color-error: #f87171`
-- `@shared/*` tsconfig alias was added in Story 15.1 (`packages/*/src/*`). This story creates the packages that alias points at.
+- `@shared/*` tsconfig alias was added in Story 15.1 (`packages/*/src` — single wildcard per ADR-15.1-C; TS5062 forbids two `*`). This story creates the packages that alias points at. **Consequence:** each package MUST expose its full public API through a `src/index.ts` barrel — deep imports (`@shared/types/listing`) do not resolve by design.
 
 ### Why `import type` only?
 

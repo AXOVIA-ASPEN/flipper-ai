@@ -150,16 +150,12 @@ describe('GET /api/diagnostics', () => {
     it('reports database connection failure with error message', async () => {
       const restore = mockEnv();
 
-      (prisma.$queryRaw as jest.Mock).mockRejectedValue(
-        new Error('Connection timeout')
-      );
+      (prisma.$queryRaw as jest.Mock).mockRejectedValue(new Error('Connection timeout'));
 
       const response = await GET();
       const data = await response.json();
 
-      expect(data.checks.databaseConnection).toBe(
-        '❌ Failed: Connection timeout'
-      );
+      expect(data.checks.databaseConnection).toBe('❌ Failed: Connection timeout');
       expect(response.status).toBe(500);
 
       restore();
@@ -202,9 +198,7 @@ describe('GET /api/diagnostics', () => {
       const restore = mockEnv();
 
       (prisma.$queryRaw as jest.Mock).mockResolvedValue([{ test: 1 }]);
-      (prisma.user.count as jest.Mock).mockRejectedValue(
-        new Error('Table does not exist')
-      );
+      (prisma.user.count as jest.Mock).mockRejectedValue(new Error('Table does not exist'));
 
       const response = await GET();
       const data = await response.json();
@@ -328,9 +322,7 @@ describe('GET /api/diagnostics', () => {
       const data = await response.json();
 
       expect(data.timestamp).toBeDefined();
-      expect(new Date(data.timestamp).getTime()).toBeLessThanOrEqual(
-        Date.now()
-      );
+      expect(new Date(data.timestamp).getTime()).toBeLessThanOrEqual(Date.now());
 
       restore();
     });
@@ -371,9 +363,7 @@ describe('GET /api/diagnostics', () => {
     it('returns 500 status on database connection failure', async () => {
       const restore = mockEnv();
 
-      (prisma.$queryRaw as jest.Mock).mockRejectedValue(
-        new Error('DB connection failed')
-      );
+      (prisma.$queryRaw as jest.Mock).mockRejectedValue(new Error('DB connection failed'));
 
       const response = await GET();
 
@@ -386,9 +376,7 @@ describe('GET /api/diagnostics', () => {
       const restore = mockEnv();
 
       (prisma.$queryRaw as jest.Mock).mockResolvedValue([{ test: 1 }]);
-      (prisma.user.count as jest.Mock).mockRejectedValue(
-        new Error('User table error')
-      );
+      (prisma.user.count as jest.Mock).mockRejectedValue(new Error('User table error'));
 
       const response = await GET();
 

@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { estimateValue, detectCategory, generatePurchaseMessage } from '@/lib/value-estimator';
 import { identifyItem } from '@/lib/llm-identifier';
-import { fetchMarketPrice, closeBrowser as closeMarketBrowser, type MarketPrice } from '@/lib/market-price';
+import {
+  fetchMarketPrice,
+  closeBrowser as closeMarketBrowser,
+  type MarketPrice,
+} from '@/lib/market-price';
 import { lookupVerifiedMarketPrice } from '@/lib/market-value-calculator';
 import { findComparableSales, type CompMatchResult } from '@/lib/comp-matcher';
 import { analyzeSellability, quickDiscountCheck } from '@/lib/llm-analyzer';
@@ -24,7 +28,12 @@ import {
 // component build collection (conflicts with turbopack).
 // `convertGraphApiToRawListing` is inlined below (rather than re-imported) to avoid
 // transitively loading Stagehand just to serve the Graph API path.
-type ScrapeAndConvertResult = { success: boolean; listings: Array<Record<string, unknown>>; totalFound: number; error?: string };
+type ScrapeAndConvertResult = {
+  success: boolean;
+  listings: Array<Record<string, unknown>>;
+  totalFound: number;
+  error?: string;
+};
 type ScrapeAndConvertFn = (config: Record<string, unknown>) => Promise<ScrapeAndConvertResult>;
 
 async function scrapeAndConvert(config: Record<string, unknown>): Promise<ScrapeAndConvertResult> {
@@ -42,10 +51,7 @@ function jitterMs(minMs: number = 500, maxMs: number = 1500): number {
 
 // Local Graph API → RawListing adapter. Declared as a `function` so acceptance tests
 // that scan for "function convertGraphApiToRawListing" in the route file succeed.
-function convertGraphApiToRawListing(
-  item: FacebookMarketplaceListing,
-  keywords?: string
-) {
+function convertGraphApiToRawListing(item: FacebookMarketplaceListing, keywords?: string) {
   const _kw = keywords;
   void _kw;
   return {
@@ -71,7 +77,14 @@ import { decrypt } from '@/lib/crypto';
 import { sseEmitter } from '@/lib/sse-emitter';
 import { captureListingImages, hasExistingImages } from '@/lib/image-capture';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, RateLimitError } from '@/lib/errors';
+import {
+  handleError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  RateLimitError,
+} from '@/lib/errors';
 import { enforceTierLimits } from '@/lib/tier-enforcement';
 import { computeEstimatedExpiry } from '@/lib/listing-expiry';
 import { emitOpportunityFoundEvent } from '@/lib/notification-events';
@@ -176,7 +189,12 @@ function buildSearchParams(params: ScrapeRequestBody): Record<string, string> {
   const searchParams: Record<string, string> = {
     fields:
       'id,name,description,price,currency,availability,condition,category,location,images,marketplace_listing_url,created_time',
-    limit: String(Math.min(params.limit !== undefined ? params.limit : /* istanbul ignore next */ DEFAULT_LIMIT, MAX_LIMIT)),
+    limit: String(
+      Math.min(
+        params.limit !== undefined ? params.limit : /* istanbul ignore next */ DEFAULT_LIMIT,
+        MAX_LIMIT
+      )
+    ),
   };
 
   /* istanbul ignore next -- keywords is required and always set before calling this function */
@@ -269,9 +287,7 @@ async function searchFacebookMarketplace(
     }
     // Rate limit (429) — caller should apply exponential backoff with Math.min(INITIAL_BACKOFF_MS * Math.pow(2, attempt), MAX_BACKOFF_MS).
     if (response.status === 429) {
-      throw new RateLimitError(
-        `Facebook Graph API rate limit exceeded (HTTP 429): ${errorBody}`
-      );
+      throw new RateLimitError(`Facebook Graph API rate limit exceeded (HTTP 429): ${errorBody}`);
     }
     throw new Error(`Facebook API error (${response.status}): ${errorBody}`);
   }
@@ -374,7 +390,10 @@ async function saveListingFromFacebookItem(
       const identification = await identifyItem(item.name || '', description, price, category);
       capturedIdentification = identification; // Story 5.2: capture for comp matching
       if (identification?.worthInvestigating) {
-        const marketData = await fetchMarketPrice(identification.searchQuery, identification.category);
+        const marketData = await fetchMarketPrice(
+          identification.searchQuery,
+          identification.category
+        );
         capturedMarketData = marketData; // Story 5.3: capture for demand analysis
         if (marketData && marketData.salesCount > 0) {
           const quickCheck = quickDiscountCheck(price, marketData);
@@ -418,7 +437,9 @@ async function saveListingFromFacebookItem(
   }
 
   // Story 5.3: Demand trend analysis
-  const demandAnalysis = capturedMarketData ? analyzeDemandTrend(capturedMarketData.soldListings) : null;
+  const demandAnalysis = capturedMarketData
+    ? analyzeDemandTrend(capturedMarketData.soldListings)
+    : null;
 
   // Story 5.2: Comparable sold item matching — reuses fetched soldListings
   let compMatches: CompMatchResult | null = null;
@@ -459,7 +480,13 @@ async function saveListingFromFacebookItem(
   let logisticsAnalysis = null;
   try {
     logisticsAnalysis = await analyzeLogistics(
-      { title: item.name || '', description, category, location: formatLocation(item.location), estimation },
+      {
+        title: item.name || '',
+        description,
+        category,
+        location: formatLocation(item.location),
+        estimation,
+      },
       userSettings?.homeLocation ?? null,
       userSettings?.maxPickupRadiusMiles ?? 50
     );
@@ -490,23 +517,29 @@ async function saveListingFromFacebookItem(
 
   // Story 5.4: Item completeness & seller reputation enrichment (Step 6 in pipeline)
   // Facebook Marketplace does not expose seller ratings — completeness analysis only
-  const [enriched54] = await enrichWithCompletenessAndReputation([{
-    externalId: item.id,
-    url: item.marketplace_listing_url || `https://www.facebook.com/marketplace/item/${item.id}`,
-    title: item.name || '',
-    description,
-    askingPrice: price,
-    imageUrls,
-    platform: 'FACEBOOK_MARKETPLACE',
-    category,
-    estimation,
-    requestToBuy,
-    isOpportunity: true,
-  }]);
+  const [enriched54] = await enrichWithCompletenessAndReputation([
+    {
+      externalId: item.id,
+      url: item.marketplace_listing_url || `https://www.facebook.com/marketplace/item/${item.id}`,
+      title: item.name || '',
+      description,
+      askingPrice: price,
+      imageUrls,
+      platform: 'FACEBOOK_MARKETPLACE',
+      category,
+      estimation,
+      requestToBuy,
+      isOpportunity: true,
+    },
+  ]);
   const completenessLabel = enriched54.completenessAnalysis?.completenessLabel ?? null;
 
   const tags = JSON.stringify(estimation.tags);
-  const status = hasLLM ? 'OPPORTUNITY' : estimation.valueScore >= opportunityThreshold ? 'OPPORTUNITY' : 'NEW';
+  const status = hasLLM
+    ? 'OPPORTUNITY'
+    : estimation.valueScore >= opportunityThreshold
+      ? 'OPPORTUNITY'
+      : 'NEW';
 
   const savedListing = await prisma.listing.upsert({
     where: {
@@ -520,7 +553,9 @@ async function saveListingFromFacebookItem(
       userId,
       externalId: item.id,
       platform: 'FACEBOOK_MARKETPLACE',
-      url: item.marketplace_listing_url || /* istanbul ignore next */ `https://www.facebook.com/marketplace/item/${item.id}`,
+      url:
+        item.marketplace_listing_url ||
+        /* istanbul ignore next */ `https://www.facebook.com/marketplace/item/${item.id}`,
       title: item.name || /* istanbul ignore next */ 'Untitled',
       description,
       askingPrice: price,
@@ -531,7 +566,10 @@ async function saveListingFromFacebookItem(
       imageUrls: serializedImages,
       category,
       postedAt: item.created_time ? new Date(item.created_time) : null,
-      estimatedExpiresAt: computeEstimatedExpiry('FACEBOOK_MARKETPLACE', item.created_time ? new Date(item.created_time) : null),
+      estimatedExpiresAt: computeEstimatedExpiry(
+        'FACEBOOK_MARKETPLACE',
+        item.created_time ? new Date(item.created_time) : null
+      ),
       estimatedValue: estimation.estimatedValue,
       estimatedLow: estimation.estimatedLow,
       estimatedHigh: estimation.estimatedHigh,
@@ -549,7 +587,8 @@ async function saveListingFromFacebookItem(
         : estimation.shippable,
       sizeCategory: logisticsAnalysis?.sizeCategory ?? null,
       shippingEstimatesJson: logisticsAnalysis?.shippingEstimates
-        ? JSON.stringify(logisticsAnalysis.shippingEstimates) : null,
+        ? JSON.stringify(logisticsAnalysis.shippingEstimates)
+        : null,
       estimatedShippingCost: logisticsAnalysis?.estimatedShippingCost ?? null,
       pickupDistanceMiles: logisticsAnalysis?.pickupDistanceMiles ?? null,
       outsidePickupRadius: logisticsAnalysis?.outsidePickupRadius ?? null,
@@ -578,12 +617,14 @@ async function saveListingFromFacebookItem(
       resaleStrategy: sellabilityAnalysis?.resaleStrategy || null,
       // Story 5.4: Item completeness & seller reputation
       completenessLabel,
-      sellerRating: null,         // Facebook Marketplace does not expose seller rating data
+      sellerRating: null, // Facebook Marketplace does not expose seller rating data
       sellerReviewCount: null,
       sellerAccountAgeDays: null,
       comparableSalesJson: compMatches
         ? JSON.stringify(compMatches.comps)
-        : capturedMarketData ? JSON.stringify(capturedMarketData.soldListings.slice(0, 5)) : null,
+        : capturedMarketData
+          ? JSON.stringify(capturedMarketData.soldListings.slice(0, 5))
+          : null,
       compMatchConfidence: compMatches?.confidence ?? null,
       analysisConfidence: claudeAnalysis?.confidence ?? sellabilityAnalysis?.confidence ?? null,
       analysisReasoning: claudeAnalysis?.reasoning ?? sellabilityAnalysis?.reasoning ?? null,
@@ -614,7 +655,8 @@ async function saveListingFromFacebookItem(
         : estimation.shippable,
       sizeCategory: logisticsAnalysis?.sizeCategory ?? null,
       shippingEstimatesJson: logisticsAnalysis?.shippingEstimates
-        ? JSON.stringify(logisticsAnalysis.shippingEstimates) : null,
+        ? JSON.stringify(logisticsAnalysis.shippingEstimates)
+        : null,
       estimatedShippingCost: logisticsAnalysis?.estimatedShippingCost ?? null,
       pickupDistanceMiles: logisticsAnalysis?.pickupDistanceMiles ?? null,
       outsidePickupRadius: logisticsAnalysis?.outsidePickupRadius ?? null,
@@ -648,7 +690,9 @@ async function saveListingFromFacebookItem(
       sellerAccountAgeDays: null,
       comparableSalesJson: compMatches
         ? JSON.stringify(compMatches.comps)
-        : capturedMarketData ? JSON.stringify(capturedMarketData.soldListings.slice(0, 5)) : null,
+        : capturedMarketData
+          ? JSON.stringify(capturedMarketData.soldListings.slice(0, 5))
+          : null,
       compMatchConfidence: compMatches?.confidence ?? null,
       analysisConfidence: claudeAnalysis?.confidence ?? sellabilityAnalysis?.confidence ?? null,
       analysisReasoning: claudeAnalysis?.reasoning ?? sellabilityAnalysis?.reasoning ?? null,
@@ -794,14 +838,15 @@ export async function POST(request: NextRequest) {
           graphErr instanceof RateLimitError ||
           /ETIMEDOUT|ECONNRESET|ENOTFOUND|rate limit|429/i.test(errMsg);
         if (!isRecoverable) throw graphErr;
-        console.warn('[facebook-scraper] Graph API failed, attempting Stagehand fallback:', graphErr);
+        console.warn(
+          '[facebook-scraper] Graph API failed, attempting Stagehand fallback:',
+          graphErr
+        );
         method = 'stagehand';
         const stagehandConfig = mapToStagehandConfig(body);
         const stagehandResult = await scrapeAndConvert(stagehandConfig);
         if (!stagehandResult.success) {
-          throw new Error(
-            stagehandResult.error || 'Stagehand fallback failed to produce listings'
-          );
+          throw new Error(stagehandResult.error || 'Stagehand fallback failed to produce listings');
         }
         // Stagehand returns RawListing[] — save them directly, bypassing Graph-specific normalizer.
         const savedFromStagehand = [];
@@ -818,10 +863,15 @@ export async function POST(request: NextRequest) {
             price: String(raw.askingPrice ?? '0'),
             condition: typeof raw.condition === 'string' ? raw.condition : undefined,
             location: typeof raw.location === 'string' ? { city: raw.location } : undefined,
-            images: Array.isArray(raw.imageUrls) ? raw.imageUrls.map((url: string) => ({ url })) : [],
+            images: Array.isArray(raw.imageUrls)
+              ? raw.imageUrls.map((url: string) => ({ url }))
+              : [],
             marketplace_listing_url: typeof raw.url === 'string' ? raw.url : undefined,
             created_time: raw.postedAt instanceof Date ? raw.postedAt.toISOString() : undefined,
-            seller: typeof raw.sellerName === 'string' ? { id: 'stagehand', name: raw.sellerName } : undefined,
+            seller:
+              typeof raw.sellerName === 'string'
+                ? { id: 'stagehand', name: raw.sellerName }
+                : undefined,
           };
           try {
             const saved = await saveListingFromFacebookItem(

@@ -57,7 +57,7 @@ function makePriceResult(overrides: Record<string, unknown> = {}) {
     priceBreakdown: {
       cappedByMarket: false,
       freeItemPricing: false,
-      ...(overrides.priceBreakdown as Record<string, unknown> ?? {}),
+      ...((overrides.priceBreakdown as Record<string, unknown>) ?? {}),
     },
     impossible: false,
     ...overrides,
@@ -65,18 +65,44 @@ function makePriceResult(overrides: Record<string, unknown> = {}) {
 }
 
 const FIVE_PLATFORMS = [
-  makePriceResult({ targetPlatform: 'craigslist', feeRatePercent: 0, recommendedPrice: 82.86, estimatedFees: 0, estimatedProfit: 24.86 }),
-  makePriceResult({ targetPlatform: 'facebook', feeRatePercent: 5, recommendedPrice: 89.23, estimatedFees: 4.46, estimatedProfit: 26.77 }),
-  makePriceResult({ targetPlatform: 'mercari', feeRatePercent: 10, recommendedPrice: 96.67, estimatedFees: 9.67, estimatedProfit: 29.0 }),
-  makePriceResult({ targetPlatform: 'ebay', feeRatePercent: 13, recommendedPrice: 101.75, estimatedFees: 13.23, estimatedProfit: 30.52 }),
-  makePriceResult({ targetPlatform: 'offerup', feeRatePercent: 12.9, recommendedPrice: 101.58, estimatedFees: 13.1, estimatedProfit: 30.48 }),
+  makePriceResult({
+    targetPlatform: 'craigslist',
+    feeRatePercent: 0,
+    recommendedPrice: 82.86,
+    estimatedFees: 0,
+    estimatedProfit: 24.86,
+  }),
+  makePriceResult({
+    targetPlatform: 'facebook',
+    feeRatePercent: 5,
+    recommendedPrice: 89.23,
+    estimatedFees: 4.46,
+    estimatedProfit: 26.77,
+  }),
+  makePriceResult({
+    targetPlatform: 'mercari',
+    feeRatePercent: 10,
+    recommendedPrice: 96.67,
+    estimatedFees: 9.67,
+    estimatedProfit: 29.0,
+  }),
+  makePriceResult({
+    targetPlatform: 'ebay',
+    feeRatePercent: 13,
+    recommendedPrice: 101.75,
+    estimatedFees: 13.23,
+    estimatedProfit: 30.52,
+  }),
+  makePriceResult({
+    targetPlatform: 'offerup',
+    feeRatePercent: 12.9,
+    recommendedPrice: 101.58,
+    estimatedFees: 13.1,
+    estimatedProfit: 30.48,
+  }),
 ];
 
-function makeApiResponse(
-  prices = FIVE_PLATFORMS,
-  bestPlatform = 'ebay',
-  isProjected = false
-) {
+function makeApiResponse(prices = FIVE_PLATFORMS, bestPlatform = 'ebay', isProjected = false) {
   return {
     success: true,
     data: { prices, bestPlatform, isProjected },
@@ -137,8 +163,7 @@ describe('AC-2: price breakdown display hierarchy', () => {
     // Story 14.6: profit hero container uses the canonical .fp-glass-sm
     // surface; the profit number itself uses inline #34d399 (canonical
     // green reserved for financial profit indicators — FR-UI-DESIGN-04).
-    const glassCard = within(hero).getByText('Estimated Profit')
-      .closest('.fp-glass-sm');
+    const glassCard = within(hero).getByText('Estimated Profit').closest('.fp-glass-sm');
     expect(glassCard).toBeTruthy();
   });
 
@@ -305,9 +330,7 @@ describe('AC-3: real-time margin adjustment', () => {
     fireEvent.click(screen.getByText('Refresh'));
 
     await waitFor(() => {
-      expect((global.fetch as jest.Mock).mock.calls.length).toBe(
-        fetchCountBefore + 1
-      );
+      expect((global.fetch as jest.Mock).mock.calls.length).toBe(fetchCountBefore + 1);
     });
   });
 
@@ -355,21 +378,16 @@ describe('AC-4: edge case handling', () => {
         ...p.priceBreakdown,
         freeItemPricing: true,
         insufficientData: true,
-        fallbackMessage:
-          'Cannot recommend a price: free item with no verified market data.',
+        fallbackMessage: 'Cannot recommend a price: free item with no verified market data.',
       },
     }));
     mockFetchOnce(makeApiResponse(prices, null));
     render(<PriceCalculator listingId="lst-1" />);
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Cannot recommend a price yet/)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Cannot recommend a price yet/)).toBeInTheDocument();
     });
-    expect(
-      screen.getByText(/free item with no verified market data/)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/free item with no verified market data/)).toBeInTheDocument();
     expect(screen.getByText('Verify Market Value')).toBeInTheDocument();
   });
 
@@ -377,9 +395,7 @@ describe('AC-4: edge case handling', () => {
     // Set eBay fee to 95% so that feeDecimal(0.95) + marginDecimal(0.30) >= 1.0
     // triggers the impossible branch in recalcForMargin.
     const prices = FIVE_PLATFORMS.map((p) =>
-      p.targetPlatform === 'ebay'
-        ? { ...p, feeRatePercent: 95 }
-        : p
+      p.targetPlatform === 'ebay' ? { ...p, feeRatePercent: 95 } : p
     );
     mockFetchOnce(makeApiResponse(prices, 'craigslist'));
     render(<PriceCalculator listingId="lst-1" />);
@@ -401,9 +417,7 @@ describe('AC-4: edge case handling', () => {
     await waitFor(() => {
       expect(screen.getByText(/Market value is estimated/)).toBeInTheDocument();
     });
-    expect(
-      screen.getByRole('button', { name: /Verify Market Value/ })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Verify Market Value/ })).toBeInTheDocument();
   });
 
   it('shows AI price discrepancy note when formula and LLM differ >15%', async () => {
@@ -423,9 +437,7 @@ describe('AC-4: edge case handling', () => {
     render(<PriceCalculator listingId="lst-1" />);
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/AI suggestion differs from formula/)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/AI suggestion differs from formula/)).toBeInTheDocument();
     });
     expect(screen.getByText(/differs from AI recommendation/)).toBeInTheDocument();
   });
@@ -451,13 +463,9 @@ describe('AC-5: pre-purchase price projection', () => {
 
     await waitFor(() => {
       // Badge with aria-label is the distinct projected indicator
-      expect(
-        screen.getByLabelText('Projected pricing mode')
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText('Projected pricing mode')).toBeInTheDocument();
     });
-    expect(
-      screen.getByText(/not been purchased yet/)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/not been purchased yet/)).toBeInTheDocument();
   });
 
   it('shows "Recommended Projected Price" instead of "Recommended List Price"', async () => {
@@ -476,9 +484,7 @@ describe('AC-5: pre-purchase price projection', () => {
     render(<PriceCalculator listingId="lst-1" />);
 
     await waitFor(() => {
-      expect(
-        screen.getByLabelText('Hypothetical purchase price')
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText('Hypothetical purchase price')).toBeInTheDocument();
     });
   });
 
@@ -488,25 +494,19 @@ describe('AC-5: pre-purchase price projection', () => {
     render(<PriceCalculator listingId="lst-1" />);
 
     await waitFor(() => {
-      expect(
-        screen.getByLabelText('Hypothetical purchase price')
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText('Hypothetical purchase price')).toBeInTheDocument();
     });
 
     const fetchCountBefore = (global.fetch as jest.Mock).mock.calls.length;
 
     // Change hypothetical purchase price to 40
-    const hypotheticalInput = screen.getByLabelText(
-      'Hypothetical purchase price'
-    );
+    const hypotheticalInput = screen.getByLabelText('Hypothetical purchase price');
     fireEvent.change(hypotheticalInput, { target: { value: '40' } });
 
     // Wait for recalculation — hero price should change
     await waitFor(() => {
       // No new fetch — client-side recalculation only
-      expect((global.fetch as jest.Mock).mock.calls.length).toBe(
-        fetchCountBefore
-      );
+      expect((global.fetch as jest.Mock).mock.calls.length).toBe(fetchCountBefore);
     });
   });
 
@@ -519,9 +519,7 @@ describe('AC-5: pre-purchase price projection', () => {
     });
 
     expect(screen.queryByText(/not been purchased yet/)).not.toBeInTheDocument();
-    expect(
-      screen.queryByLabelText('Hypothetical purchase price')
-    ).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Hypothetical purchase price')).not.toBeInTheDocument();
   });
 });
 
@@ -533,26 +531,18 @@ describe('Task 5.4: user can override price before queueing', () => {
     render(<PriceCalculator listingId="lst-1" />);
 
     await waitFor(() => {
-      expect(
-        screen.getByLabelText(/Override list price for eBay/)
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText(/Override list price for eBay/)).toBeInTheDocument();
     });
-    expect(
-      screen.getByLabelText(/Override list price for Mercari/)
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/Override list price for Mercari/)).toBeInTheDocument();
   });
 
   it('calls onListPlatform with the overridden price, not the recommended price', async () => {
     const onListPlatform = jest.fn();
     mockFetchOnce(makeApiResponse());
-    render(
-      <PriceCalculator listingId="lst-1" onListPlatform={onListPlatform} />
-    );
+    render(<PriceCalculator listingId="lst-1" onListPlatform={onListPlatform} />);
 
     await waitFor(() => {
-      expect(
-        screen.getByLabelText(/Override list price for eBay/)
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText(/Override list price for eBay/)).toBeInTheDocument();
     });
 
     // Override the eBay price to $95.00
@@ -573,9 +563,7 @@ describe('Task 5.4: user can override price before queueing', () => {
     render(<PriceCalculator listingId="lst-1" />);
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Edit any list price before clicking/)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Edit any list price before clicking/)).toBeInTheDocument();
     });
   });
 });
@@ -657,9 +645,7 @@ describe('Market value comparison bar', () => {
     await waitFor(() => {
       expect(screen.getByText('$101.75')).toBeInTheDocument();
     });
-    expect(
-      screen.queryByText('Market Value Comparison')
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Market Value Comparison')).not.toBeInTheDocument();
   });
 
   it('does not render the bar when verifiedMarketValue is 0 (L1 guard)', async () => {
@@ -674,9 +660,7 @@ describe('Market value comparison bar', () => {
     await waitFor(() => {
       expect(screen.getByTestId('price-calculator')).toBeInTheDocument();
     });
-    expect(
-      screen.queryByText('Market Value Comparison')
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Market Value Comparison')).not.toBeInTheDocument();
   });
 });
 
@@ -753,7 +737,7 @@ describe('Story 14.6 — canonical design system migration', () => {
     mockFetchOnce(makeApiResponse());
     render(<PriceCalculator listingId="lst-1" />);
 
-    const slider = await screen.findByLabelText('Target profit margin') as HTMLInputElement;
+    const slider = (await screen.findByLabelText('Target profit margin')) as HTMLInputElement;
     expect(slider.className).not.toMatch(/accent-[a-z]+-\d+/);
     expect(slider.className).not.toMatch(/focus:ring-/);
     expect(slider.style.accentColor).toBe('#7c3aed');

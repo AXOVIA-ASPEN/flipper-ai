@@ -14,7 +14,10 @@ const mockCompleteAI = jest.fn();
 jest.mock('@/lib/ai', () => ({
   completeAI: (...args: unknown[]) => mockCompleteAI(...args),
   AIProviderUnavailableError: class extends Error {
-    constructor() { super('No AI provider available'); this.name = 'AIProviderUnavailableError'; }
+    constructor() {
+      super('No AI provider available');
+      this.name = 'AIProviderUnavailableError';
+    }
   },
 }));
 
@@ -81,8 +84,22 @@ const MOCK_IDENTIFICATION: ItemIdentification = {
 const MOCK_MARKET_DATA: MarketPrice = {
   source: 'ebay_scrape',
   soldListings: [
-    { title: 'iPhone 12 128GB', price: 350, soldDate: new Date(), condition: 'Good', url: 'http://example.com', shippingCost: 0 },
-    { title: 'iPhone 12 128GB used', price: 320, soldDate: new Date(), condition: 'Good', url: 'http://example.com', shippingCost: 0 },
+    {
+      title: 'iPhone 12 128GB',
+      price: 350,
+      soldDate: new Date(),
+      condition: 'Good',
+      url: 'http://example.com',
+      shippingCost: 0,
+    },
+    {
+      title: 'iPhone 12 128GB used',
+      price: 320,
+      soldDate: new Date(),
+      condition: 'Good',
+      url: 'http://example.com',
+      shippingCost: 0,
+    },
   ],
   medianPrice: 335,
   lowPrice: 300,
@@ -388,9 +405,7 @@ describe('LLM Analyzer', () => {
     });
 
     test('should handle DB write errors gracefully', async () => {
-      (prisma.aiAnalysisCache.upsert as jest.Mock).mockRejectedValue(
-        new Error('DB write error')
-      );
+      (prisma.aiAnalysisCache.upsert as jest.Mock).mockRejectedValue(new Error('DB write error'));
 
       // Should not throw
       await expect(
@@ -465,10 +480,13 @@ describe('LLM Analyzer', () => {
       expect(result!.demandLevel).toBe('high');
       expect(result!.meetsThreshold).toBe(true);
       expect(mockCompleteAI).toHaveBeenCalledTimes(1);
-      expect(mockCompleteAI).toHaveBeenCalledWith('flipAnalysis', expect.objectContaining({
-        title: 'iPhone 12',
-        askingPrice: 200,
-      }));
+      expect(mockCompleteAI).toHaveBeenCalledWith(
+        'flipAnalysis',
+        expect.objectContaining({
+          title: 'iPhone 12',
+          askingPrice: 200,
+        })
+      );
     });
 
     test('should cache result when listingId is provided', async () => {
@@ -491,10 +509,7 @@ describe('LLM Analyzer', () => {
       );
 
       expect(prisma.aiAnalysisCache.upsert).toHaveBeenCalled();
-      expect(mockCacheSet).toHaveBeenCalledWith(
-        'openai:listing-to-cache',
-        expect.any(Object)
-      );
+      expect(mockCacheSet).toHaveBeenCalledWith('openai:listing-to-cache', expect.any(Object));
       // Verify askingPrice is passed to cache for price-delta invalidation
       const upsertArgs = (prisma.aiAnalysisCache.upsert as jest.Mock).mock.calls[0][0];
       expect(upsertArgs.create.analyzedAtPrice).toBe(200);
@@ -528,7 +543,12 @@ describe('LLM Analyzer', () => {
           model: 'gemini-2.0-flash',
         });
 
-      const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
+      const result = await analyzeSellability(
+        'iPhone 12',
+        200,
+        MOCK_IDENTIFICATION,
+        MOCK_MARKET_DATA
+      );
 
       expect(result).not.toBeNull();
       expect(result!.sellabilityScore).toBe(80);
@@ -550,7 +570,12 @@ describe('LLM Analyzer', () => {
           model: 'gemini-2.0-flash',
         });
 
-      const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
+      const result = await analyzeSellability(
+        'iPhone 12',
+        200,
+        MOCK_IDENTIFICATION,
+        MOCK_MARKET_DATA
+      );
 
       expect(result).toBeNull();
       expect(Sentry.captureException).toHaveBeenCalledWith(
@@ -568,7 +593,12 @@ describe('LLM Analyzer', () => {
         model: 'gemini-2.0-flash',
       });
 
-      const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
+      const result = await analyzeSellability(
+        'iPhone 12',
+        200,
+        MOCK_IDENTIFICATION,
+        MOCK_MARKET_DATA
+      );
 
       expect(result).toBeNull();
     });
@@ -577,7 +607,12 @@ describe('LLM Analyzer', () => {
       (prisma.aiAnalysisCache.findFirst as jest.Mock).mockResolvedValue(null);
       mockCompleteAI.mockRejectedValue(new Error('AI API error'));
 
-      const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
+      const result = await analyzeSellability(
+        'iPhone 12',
+        200,
+        MOCK_IDENTIFICATION,
+        MOCK_MARKET_DATA
+      );
 
       expect(result).toBeNull();
     });
@@ -591,9 +626,12 @@ describe('LLM Analyzer', () => {
 
       await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
 
-      expect(mockCompleteAI).toHaveBeenCalledWith('flipAnalysis', expect.objectContaining({
-        discountThreshold: 50,
-      }));
+      expect(mockCompleteAI).toHaveBeenCalledWith(
+        'flipAnalysis',
+        expect.objectContaining({
+          discountThreshold: 50,
+        })
+      );
     });
 
     test('should validate and default invalid demandLevel', async () => {
@@ -603,7 +641,12 @@ describe('LLM Analyzer', () => {
         model: 'gemini-2.0-flash',
       });
 
-      const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
+      const result = await analyzeSellability(
+        'iPhone 12',
+        200,
+        MOCK_IDENTIFICATION,
+        MOCK_MARKET_DATA
+      );
 
       expect(result).not.toBeNull();
       expect(result!.demandLevel).toBe('medium');
@@ -616,7 +659,12 @@ describe('LLM Analyzer', () => {
         model: 'gemini-2.0-flash',
       });
 
-      const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
+      const result = await analyzeSellability(
+        'iPhone 12',
+        200,
+        MOCK_IDENTIFICATION,
+        MOCK_MARKET_DATA
+      );
 
       expect(result).not.toBeNull();
       expect(result!.authenticityRisk).toBe('medium');
@@ -629,7 +677,12 @@ describe('LLM Analyzer', () => {
         model: 'gemini-2.0-flash',
       });
 
-      const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
+      const result = await analyzeSellability(
+        'iPhone 12',
+        200,
+        MOCK_IDENTIFICATION,
+        MOCK_MARKET_DATA
+      );
 
       expect(result).not.toBeNull();
       expect(result!.sellabilityScore).toBe(100);
@@ -642,7 +695,12 @@ describe('LLM Analyzer', () => {
         model: 'gemini-2.0-flash',
       });
 
-      const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
+      const result = await analyzeSellability(
+        'iPhone 12',
+        200,
+        MOCK_IDENTIFICATION,
+        MOCK_MARKET_DATA
+      );
 
       expect(result).not.toBeNull();
       expect(result!.verifiedMarketValue).toBe(MOCK_MARKET_DATA.medianPrice);
@@ -655,7 +713,12 @@ describe('LLM Analyzer', () => {
         model: 'gemini-2.0-flash',
       });
 
-      const result = await analyzeSellability('iPhone 12', 200, MOCK_IDENTIFICATION, MOCK_MARKET_DATA);
+      const result = await analyzeSellability(
+        'iPhone 12',
+        200,
+        MOCK_IDENTIFICATION,
+        MOCK_MARKET_DATA
+      );
 
       expect(result).not.toBeNull();
       expect(result!.meetsThreshold).toBe(false);

@@ -51,7 +51,10 @@ export async function GET(req: NextRequest) {
         },
         requests: getRequestStats(),
         database: {
-          status: await prisma.$queryRawUnsafe('SELECT 1').then(() => 'connected' as const).catch(() => 'disconnected' as const),
+          status: await prisma
+            .$queryRawUnsafe('SELECT 1')
+            .then(() => 'connected' as const)
+            .catch(() => 'disconnected' as const),
           maxConnections: parseInt(process.env.DB_MAX_CONNECTIONS || '2', 10),
         },
         db_performance: getDbPerformanceSummary(),

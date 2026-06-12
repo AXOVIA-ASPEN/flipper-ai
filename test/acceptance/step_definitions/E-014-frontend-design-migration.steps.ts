@@ -55,13 +55,16 @@ Then(
   }
 );
 
-Then('the body element should not have an inline background style', async function (this: CustomWorld) {
-  const inlineBg = await this.page.evaluate(() => {
-    const styleAttr = document.body.getAttribute('style') ?? '';
-    return /background\s*:/i.test(styleAttr);
-  });
-  expect(inlineBg).toBe(false);
-});
+Then(
+  'the body element should not have an inline background style',
+  async function (this: CustomWorld) {
+    const inlineBg = await this.page.evaluate(() => {
+      const styleAttr = document.body.getAttribute('style') ?? '';
+      return /background\s*:/i.test(styleAttr);
+    });
+    expect(inlineBg).toBe(false);
+  }
+);
 
 // ─── AC #7 — fp-bg-mesh and fp-content stacking order intact ─────────────────
 

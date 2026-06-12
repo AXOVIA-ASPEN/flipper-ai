@@ -56,12 +56,8 @@ async function setupMocks(page: import('@playwright/test').Page) {
   await page.route('**/api/opportunities**', (route) =>
     route.fulfill({ status: 200, json: mockOpportunities })
   );
-  await page.route('**/api/search-configs**', (route) =>
-    route.fulfill({ status: 200, json: [] })
-  );
-  await page.route('**/api/scraper/jobs**', (route) =>
-    route.fulfill({ status: 200, json: [] })
-  );
+  await page.route('**/api/search-configs**', (route) => route.fulfill({ status: 200, json: [] }));
+  await page.route('**/api/scraper/jobs**', (route) => route.fulfill({ status: 200, json: [] }));
   await page.route('**/api/analytics**', (route) =>
     route.fulfill({
       status: 200,
@@ -148,9 +144,7 @@ test.describe('Feature: Multi-Tab State Consistency', () => {
 
       // Then: tab2 should redirect to login on next navigation attempt
       // After cookies are cleared, mock unauthenticated state on tab2
-      await tab2.route('**/api/auth/session', (route) =>
-        route.fulfill({ status: 200, json: {} })
-      );
+      await tab2.route('**/api/auth/session', (route) => route.fulfill({ status: 200, json: {} }));
       await tab2.goto('/');
       await tab2.waitForLoadState('networkidle');
 
@@ -209,9 +203,7 @@ test.describe('Feature: Multi-Tab State Consistency', () => {
       await setupMocks(tab2);
       await tab2.goto('/');
       await tab2.waitForLoadState('networkidle');
-      const filterVal = await tab2.evaluate(() =>
-        localStorage.getItem('flipper-filter')
-      );
+      const filterVal = await tab2.evaluate(() => localStorage.getItem('flipper-filter'));
 
       // Then: value is shared
       expect(filterVal).toBe('craigslist');

@@ -20,11 +20,11 @@ import { ScoreRing, scoreColor } from '@/components/ui/ScoreRing';
 
 describe('scoreColor', () => {
   it.each([
-    [0,   '#f87171'],
-    [59,  '#f87171'],
-    [60,  '#fbbf24'],
-    [79,  '#fbbf24'],
-    [80,  '#34d399'],
+    [0, '#f87171'],
+    [59, '#f87171'],
+    [60, '#fbbf24'],
+    [79, '#fbbf24'],
+    [80, '#34d399'],
     [100, '#34d399'],
   ])('scoreColor(%i) returns %s', (score, expected) => {
     expect(scoreColor(score)).toBe(expected);
@@ -53,17 +53,26 @@ describe('ScoreRing', () => {
 
   it('clamps score above 100 to 100', () => {
     render(<ScoreRing score={150} />);
-    expect(screen.getByRole('img')).toHaveAttribute('aria-label', 'AI confidence score 100 out of 100');
+    expect(screen.getByRole('img')).toHaveAttribute(
+      'aria-label',
+      'AI confidence score 100 out of 100'
+    );
   });
 
   it('clamps score below 0 to 0', () => {
     render(<ScoreRing score={-5} />);
-    expect(screen.getByRole('img')).toHaveAttribute('aria-label', 'AI confidence score 0 out of 100');
+    expect(screen.getByRole('img')).toHaveAttribute(
+      'aria-label',
+      'AI confidence score 0 out of 100'
+    );
   });
 
   it('clamps NaN to 0', () => {
     render(<ScoreRing score={NaN} />);
-    expect(screen.getByRole('img')).toHaveAttribute('aria-label', 'AI confidence score 0 out of 100');
+    expect(screen.getByRole('img')).toHaveAttribute(
+      'aria-label',
+      'AI confidence score 0 out of 100'
+    );
   });
 
   it('renders the numeric label when showLabel is true (default)', () => {

@@ -60,17 +60,20 @@ graph TB
 ## Component Details
 
 ### Frontend
+
 - **Framework:** Next.js 16 with App Router & Turbopack
 - **Styling:** Tailwind CSS + shadcn/ui components
 - **State:** React hooks + server components
 - **Auth UI:** Firebase Auth (client-side sign-in + server session cookies)
 
 ### API Layer
+
 - **Pattern:** Next.js Route Handlers (`app/api/`)
 - **Auth:** Firebase Auth with `__session` cookie (5-day TTL)
 - **Validation:** Zod schemas for input validation
 
 ### Service Layer
+
 - **Claude Analyzer:** AI-powered listing analysis (brand, condition, market value)
 - **Image Service:** Image processing and analysis
 - **Price History:** Historical price tracking and trend analysis
@@ -78,6 +81,7 @@ graph TB
 - **Scraper Service:** Multi-platform listing scraper
 
 ### Data Layer
+
 - **ORM:** Prisma with PostgreSQL adapter
 - **Migrations:** Prisma Migrate for schema management
 - **Models:** User, Listing, Opportunity, PriceHistory, Settings

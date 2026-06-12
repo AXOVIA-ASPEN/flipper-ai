@@ -24,151 +24,136 @@ import { CustomWorld } from '../support/world';
 
 setDefaultTimeout(120 * 1000);
 
-Given(
-  'the analytics API returns seeded profit-loss data',
-  async function (this: CustomWorld) {
-    await this.page.route('**/api/analytics/profit-loss**', (route) => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          totalNetProfit: 1250.5,
-          totalInvested: 800,
-          totalRevenue: 2050.5,
-          completedDeals: 7,
-          avgProfitPerFlip: 178.64,
-          avgDaysHeld: 12,
-          successRate: 87,
-          overallROI: 156,
-          trends: [
-            { period: '2026-01', profit: 350, revenue: 600, costs: 250 },
-            { period: '2026-02', profit: 420, revenue: 720, costs: 300 },
-            { period: '2026-03', profit: 480.5, revenue: 730.5, costs: 250 },
-          ],
-          categoryBreakdown: [
-            { category: 'Electronics', totalProfit: 500, count: 3 },
-            { category: 'Tools', totalProfit: 350.5, count: 2 },
-            { category: 'Sporting', totalProfit: 400, count: 2 },
-          ],
-          platformBreakdown: [
-            { platform: 'CRAIGSLIST', count: 4, totalProfit: 700, avgProfit: 175, successRate: 100 },
-            { platform: 'OFFERUP', count: 3, totalProfit: 550.5, avgProfit: 183.5, successRate: 67 },
-          ],
-          bestDeal: {
-            id: 'deal-1',
-            title: 'Vintage iPhone bundle',
+Given('the analytics API returns seeded profit-loss data', async function (this: CustomWorld) {
+  await this.page.route('**/api/analytics/profit-loss**', (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        totalNetProfit: 1250.5,
+        totalInvested: 800,
+        totalRevenue: 2050.5,
+        completedDeals: 7,
+        avgProfitPerFlip: 178.64,
+        avgDaysHeld: 12,
+        successRate: 87,
+        overallROI: 156,
+        trends: [
+          { period: '2026-01', profit: 350, revenue: 600, costs: 250 },
+          { period: '2026-02', profit: 420, revenue: 720, costs: 300 },
+          { period: '2026-03', profit: 480.5, revenue: 730.5, costs: 250 },
+        ],
+        categoryBreakdown: [
+          { category: 'Electronics', totalProfit: 500, count: 3 },
+          { category: 'Tools', totalProfit: 350.5, count: 2 },
+          { category: 'Sporting', totalProfit: 400, count: 2 },
+        ],
+        platformBreakdown: [
+          { platform: 'CRAIGSLIST', count: 4, totalProfit: 700, avgProfit: 175, successRate: 100 },
+          { platform: 'OFFERUP', count: 3, totalProfit: 550.5, avgProfit: 183.5, successRate: 67 },
+        ],
+        bestDeal: {
+          id: 'deal-1',
+          title: 'Vintage iPhone bundle',
+          platform: 'CRAIGSLIST',
+          netProfit: 320,
+          roiPercent: 213,
+        },
+        worstDeal: {
+          id: 'deal-2',
+          title: 'Damaged toolset',
+          platform: 'OFFERUP',
+          netProfit: -45.5,
+          roiPercent: -23,
+        },
+        items: [
+          {
+            id: 'item-1',
+            title: 'iPhone bundle',
             platform: 'CRAIGSLIST',
+            status: 'SOLD',
+            purchasePrice: 150,
+            resalePrice: 470,
             netProfit: 320,
             roiPercent: 213,
+            daysHeld: 6,
           },
-          worstDeal: {
-            id: 'deal-2',
-            title: 'Damaged toolset',
-            platform: 'OFFERUP',
-            netProfit: -45.5,
-            roiPercent: -23,
-          },
-          items: [
-            {
-              id: 'item-1',
-              title: 'iPhone bundle',
-              platform: 'CRAIGSLIST',
-              status: 'SOLD',
-              purchasePrice: 150,
-              resalePrice: 470,
-              netProfit: 320,
-              roiPercent: 213,
-              daysHeld: 6,
-            },
-          ],
-        }),
-      });
+        ],
+      }),
     });
-  }
-);
+  });
+});
 
-Given(
-  'the analytics API returns no items',
-  async function (this: CustomWorld) {
-    await this.page.route('**/api/analytics/profit-loss**', (route) => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          totalNetProfit: 0,
-          totalInvested: 0,
-          totalRevenue: 0,
-          completedDeals: 0,
-          avgProfitPerFlip: 0,
-          avgDaysHeld: 0,
-          successRate: 0,
-          overallROI: 0,
-          trends: [],
-          categoryBreakdown: [],
-          platformBreakdown: [],
-          bestDeal: null,
-          worstDeal: null,
-          items: [],
-        }),
-      });
+Given('the analytics API returns no items', async function (this: CustomWorld) {
+  await this.page.route('**/api/analytics/profit-loss**', (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        totalNetProfit: 0,
+        totalInvested: 0,
+        totalRevenue: 0,
+        completedDeals: 0,
+        avgProfitPerFlip: 0,
+        avgDaysHeld: 0,
+        successRate: 0,
+        overallROI: 0,
+        trends: [],
+        categoryBreakdown: [],
+        platformBreakdown: [],
+        bestDeal: null,
+        worstDeal: null,
+        items: [],
+      }),
     });
-  }
-);
+  });
+});
 
-Given(
-  'the scraper jobs API returns no jobs',
-  async function (this: CustomWorld) {
-    await this.page.route('**/api/scraper-jobs**', (route) => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ jobs: [] }),
-      });
+Given('the scraper jobs API returns no jobs', async function (this: CustomWorld) {
+  await this.page.route('**/api/scraper-jobs**', (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ jobs: [] }),
     });
-  }
-);
+  });
+});
 
-Given(
-  'the search-configs API returns no configs',
-  async function (this: CustomWorld) {
-    await this.page.route('**/api/search-configs**', (route) => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ configs: [] }),
-      });
+Given('the search-configs API returns no configs', async function (this: CustomWorld) {
+  await this.page.route('**/api/search-configs**', (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ configs: [] }),
     });
-  }
-);
+  });
+});
 
 // ─── Story 14.9 stronger scenario bindings (post-review hardening) ─────────────
 
-Given(
-  'the scraper jobs API returns one COMPLETED job',
-  async function (this: CustomWorld) {
-    await this.page.route('**/api/scraper-jobs**', (route) => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          jobs: [
-            {
-              id: 'job-1',
-              platform: 'craigslist',
-              status: 'COMPLETED',
-              listingsFound: 5,
-              opportunitiesCount: 2,
-              createdAt: new Date().toISOString(),
-              completedAt: new Date().toISOString(),
-              location: 'tampa',
-              category: 'electronics',
-            },
-          ],
-        }),
-      });
+Given('the scraper jobs API returns one COMPLETED job', async function (this: CustomWorld) {
+  await this.page.route('**/api/scraper-jobs**', (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        jobs: [
+          {
+            id: 'job-1',
+            platform: 'craigslist',
+            status: 'COMPLETED',
+            listingsFound: 5,
+            opportunitiesCount: 2,
+            createdAt: new Date().toISOString(),
+            completedAt: new Date().toISOString(),
+            location: 'tampa',
+            category: 'electronics',
+          },
+        ],
+      }),
     });
-  }
-);
+  });
+});
 
 Given(
   'the analytics API responds slowly so the loading state is visible',
@@ -200,18 +185,18 @@ Given(
   }
 );
 
-Given(
-  'the analytics API returns an error',
-  async function (this: CustomWorld) {
-    await this.page.route('**/api/analytics/profit-loss**', (route) => {
-      route.fulfill({
-        status: 500,
-        contentType: 'application/json',
-        body: JSON.stringify({ success: false, error: { code: 'INTERNAL_ERROR', detail: 'simulated failure' } }),
-      });
+Given('the analytics API returns an error', async function (this: CustomWorld) {
+  await this.page.route('**/api/analytics/profit-loss**', (route) => {
+    route.fulfill({
+      status: 500,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', detail: 'simulated failure' },
+      }),
     });
-  }
-);
+  });
+});
 
 When(
   'I click the {string} job-history filter button',
@@ -220,67 +205,65 @@ When(
   }
 );
 
-When(
-  'I trigger an SSE progress event for the scraper page',
-  async function (this: CustomWorld) {
-    // Stall the platform scraper endpoints so the page stays in `loading=true` long enough
-    // for the progress indicator to mount and the gradient assertion to run. The component
-    // renders the progress bar (with the canonical inline purple-gradient style) the moment
-    // loading flips on, even before any SSE event arrives.
-    const stall = async (route: import('@playwright/test').Route) => {
-      await new Promise((r) => setTimeout(r, 4000));
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ success: true, data: { jobId: 'job-fixture', status: 'RUNNING' } }),
-      });
-    };
-    await this.page.route('**/api/scraper/craigslist', stall);
-    await this.page.route('**/api/scraper/offerup', stall);
-    await this.page.getByTestId('scraper-submit').click();
-    // Wait for the indicator to mount before downstream assertions run.
-    await this.page.getByTestId('scrape-progress-indicator').waitFor({ state: 'visible', timeout: 10000 });
+When('I trigger an SSE progress event for the scraper page', async function (this: CustomWorld) {
+  // Stall the platform scraper endpoints so the page stays in `loading=true` long enough
+  // for the progress indicator to mount and the gradient assertion to run. The component
+  // renders the progress bar (with the canonical inline purple-gradient style) the moment
+  // loading flips on, even before any SSE event arrives.
+  const stall = async (route: import('@playwright/test').Route) => {
+    await new Promise((r) => setTimeout(r, 4000));
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ success: true, data: { jobId: 'job-fixture', status: 'RUNNING' } }),
+    });
+  };
+  await this.page.route('**/api/scraper/craigslist', stall);
+  await this.page.route('**/api/scraper/offerup', stall);
+  await this.page.getByTestId('scraper-submit').click();
+  // Wait for the indicator to mount before downstream assertions run.
+  await this.page
+    .getByTestId('scrape-progress-indicator')
+    .waitFor({ state: 'visible', timeout: 10000 });
+});
+
+When('I click the {string} button on the page', async function (this: CustomWorld, label: string) {
+  // Match by aria-label (preferred for icon-only buttons) OR by accessible name (text content).
+  // Some buttons on the scraper page are icon-only with descriptive aria-label; others have text.
+  const ariaLabelMatch = this.page.locator(`button[aria-label="${label}"]`).first();
+  let target = ariaLabelMatch;
+  if ((await ariaLabelMatch.count()) === 0) {
+    target = this.page.getByRole('button', { name: label, exact: false }).first();
   }
-);
+  await expect(target).toBeVisible({ timeout: 10000 });
+  await target.scrollIntoViewIfNeeded().catch(() => undefined);
 
-When(
-  'I click the {string} button on the page',
-  async function (this: CustomWorld, label: string) {
-    // Match by aria-label (preferred for icon-only buttons) OR by accessible name (text content).
-    // Some buttons on the scraper page are icon-only with descriptive aria-label; others have text.
-    const ariaLabelMatch = this.page.locator(`button[aria-label="${label}"]`).first();
-    let target = ariaLabelMatch;
-    if ((await ariaLabelMatch.count()) === 0) {
-      target = this.page.getByRole('button', { name: label, exact: false }).first();
-    }
-    await expect(target).toBeVisible({ timeout: 10000 });
-    await target.scrollIntoViewIfNeeded().catch(() => undefined);
-
-    // Belt-and-braces click: try Playwright's actionability-checked click
-    // first (which produces a real user-input event React's synthetic event
-    // system reliably catches), then fall back to a DOM-level synthetic click
-    // and finally fire the React onClick handler directly. We need this layered
-    // approach because the scraper page's icon-only Save button sits inside a
-    // <form> and the React event delegation has been observed to swallow the
-    // first click under cold-start / hydration race timing — repeating the
-    // attempt on the same button is harmless (React's setShowSaveDialog(true)
-    // is idempotent) and gives us a deterministic state transition.
-    await target.click({ timeout: 5000 }).catch(() => undefined);
-    await this.page.waitForTimeout(150);
-    await target.evaluate((el) => (el as HTMLButtonElement).click()).catch(() => undefined);
-    await this.page.waitForTimeout(150);
-    // If the modal still hasn't materialized, dispatch a PointerEvent +
-    // MouseEvent sequence the React synthetic event system always picks up.
-    await target.evaluate((el) => {
+  // Belt-and-braces click: try Playwright's actionability-checked click
+  // first (which produces a real user-input event React's synthetic event
+  // system reliably catches), then fall back to a DOM-level synthetic click
+  // and finally fire the React onClick handler directly. We need this layered
+  // approach because the scraper page's icon-only Save button sits inside a
+  // <form> and the React event delegation has been observed to swallow the
+  // first click under cold-start / hydration race timing — repeating the
+  // attempt on the same button is harmless (React's setShowSaveDialog(true)
+  // is idempotent) and gives us a deterministic state transition.
+  await target.click({ timeout: 5000 }).catch(() => undefined);
+  await this.page.waitForTimeout(150);
+  await target.evaluate((el) => (el as HTMLButtonElement).click()).catch(() => undefined);
+  await this.page.waitForTimeout(150);
+  // If the modal still hasn't materialized, dispatch a PointerEvent +
+  // MouseEvent sequence the React synthetic event system always picks up.
+  await target
+    .evaluate((el) => {
       const opts = { bubbles: true, cancelable: true, view: window } as MouseEventInit;
       el.dispatchEvent(new MouseEvent('mousedown', opts));
       el.dispatchEvent(new MouseEvent('mouseup', opts));
       el.dispatchEvent(new MouseEvent('click', opts));
-    }).catch(() => undefined);
-    // Settle: let React flush whichever click landed.
-    await this.page.waitForTimeout(200);
-  }
-);
+    })
+    .catch(() => undefined);
+  // Settle: let React flush whichever click landed.
+  await this.page.waitForTimeout(200);
+});
 
 Then(
   'the data-testid {string} has computed background-image containing the canonical purple gradient',
@@ -342,4 +325,3 @@ Then(
     }
   }
 );
-

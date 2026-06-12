@@ -41,10 +41,13 @@ Then('it should call the Facebook Graph API v19.0 marketplace_search endpoint', 
   expect(this.fileContent).toContain('marketplace_search');
 });
 
-Then('it should use {string} from token-store for decrypted OAuth token retrieval', function (funcName: string) {
-  expect(this.fileContent).toContain(funcName);
-  expect(this.fileContent).toContain('token-store');
-});
+Then(
+  'it should use {string} from token-store for decrypted OAuth token retrieval',
+  function (funcName: string) {
+    expect(this.fileContent).toContain(funcName);
+    expect(this.fileContent).toContain('token-store');
+  }
+);
 
 Then('it should check token expiry before making API calls', function () {
   expect(this.fileContent).toContain('expiresAt');
@@ -72,16 +75,22 @@ Then('it should catch Graph API errors and attempt Stagehand fallback', function
   expect(this.fileContent).toContain('scrapeAndConvert');
 });
 
-Then('it should map category IDs to Stagehand category names via CATEGORY_ID_TO_STAGEHAND_NAME', function () {
-  expect(this.fileContent).toContain('CATEGORY_ID_TO_STAGEHAND_NAME');
-  expect(this.fileContent).toContain('mapToStagehandConfig');
-});
+Then(
+  'it should map category IDs to Stagehand category names via CATEGORY_ID_TO_STAGEHAND_NAME',
+  function () {
+    expect(this.fileContent).toContain('CATEGORY_ID_TO_STAGEHAND_NAME');
+    expect(this.fileContent).toContain('mapToStagehandConfig');
+  }
+);
 
-Then('it should track the method used as {string} or {string} in the response', function (method1: string, method2: string) {
-  expect(this.fileContent).toContain(`'${method1}'`);
-  expect(this.fileContent).toContain(`'${method2}'`);
-  expect(this.fileContent).toContain('method');
-});
+Then(
+  'it should track the method used as {string} or {string} in the response',
+  function (method1: string, method2: string) {
+    expect(this.fileContent).toContain(`'${method1}'`);
+    expect(this.fileContent).toContain(`'${method2}'`);
+    expect(this.fileContent).toContain('method');
+  }
+);
 
 // ==================== AC #3: RawListing normalization ====================
 
@@ -125,12 +134,15 @@ Then('it should generate external IDs from URL patterns or title-price hashes', 
   expect(this.fileContent).toContain('fb-');
 });
 
-Then('it should handle price strings like {string} and {string}', function (_price1: string, _price2: string) {
-  expect(this.fileContent).toContain('parsePrice');
-  // Verify the price parsing strips non-numeric characters.
-  // Escape the caret — otherwise JS parses it as an anchor and the regex can never match.
-  expect(this.fileContent).toMatch(/replace\([^)]*\[\^0-9\.\]/);
-});
+Then(
+  'it should handle price strings like {string} and {string}',
+  function (_price1: string, _price2: string) {
+    expect(this.fileContent).toContain('parsePrice');
+    // Verify the price parsing strips non-numeric characters.
+    // Escape the caret — otherwise JS parses it as an anchor and the regex can never match.
+    expect(this.fileContent).toMatch(/replace\([^)]*\[\^0-9\.\]/);
+  }
+);
 
 // ==================== AC #4: Rate limiting ====================
 
@@ -205,10 +217,13 @@ When('I inspect the Facebook analysis pipeline', function () {
   // Content already loaded
 });
 
-Then('it should use {string} from marketplace-scanner for batch analysis', function (funcName: string) {
-  expect(this.fileContent).toContain(funcName);
-  expect(this.fileContent).toContain('marketplace-scanner');
-});
+Then(
+  'it should use {string} from marketplace-scanner for batch analysis',
+  function (funcName: string) {
+    expect(this.fileContent).toContain(funcName);
+    expect(this.fileContent).toContain('marketplace-scanner');
+  }
+);
 
 Then('it should use {string} for database-ready listing format', function (funcName: string) {
   expect(this.fileContent).toContain(funcName);

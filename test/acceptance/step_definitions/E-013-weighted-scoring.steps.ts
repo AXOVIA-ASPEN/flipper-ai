@@ -31,13 +31,10 @@ interface ListingInput {
 
 // ==================== Given: Source file inspection ====================
 
-Given(
-  'the value-estimator source file at {string}',
-  function (filePath: string) {
-    const fullPath = path.resolve(process.cwd(), filePath);
-    this.sourceContent = fs.readFileSync(fullPath, 'utf-8');
-  }
-);
+Given('the value-estimator source file at {string}', function (filePath: string) {
+  const fullPath = path.resolve(process.cwd(), filePath);
+  this.sourceContent = fs.readFileSync(fullPath, 'utf-8');
+});
 
 // Reuse the listing-with-title-and-description Given from E-013 story 13.5
 // If not already defined, define it here:
@@ -68,25 +65,30 @@ Given(
       { title: 'Pioneer DDJ-400', price: 100, condition: 'like new', category: 'musical' },
       { title: 'Samsung Galaxy S24', price: 350, condition: 'excellent', category: 'electronics' },
       { title: 'Nike Air Max', price: 60, condition: 'new', category: 'clothing' },
-      { title: 'Rare coin collection', price: 200, condition: 'excellent', category: 'collectibles' },
+      {
+        title: 'Rare coin collection',
+        price: 200,
+        condition: 'excellent',
+        category: 'collectibles',
+      },
       { title: 'KitchenAid mixer', price: 150, condition: 'good', category: 'appliances' },
       { title: 'Sealed Nintendo game', price: 40, condition: 'new', category: 'video games' },
       { title: 'Winter tires set', price: 200, condition: 'good', category: 'automotive' },
       { title: 'Office desk', price: 75, condition: 'good', category: 'furniture' },
     ];
-    assert(this.diverseListings.length >= count, `Expected ${count}+ listings, got ${this.diverseListings.length}`);
+    assert(
+      this.diverseListings.length >= count,
+      `Expected ${count}+ listings, got ${this.diverseListings.length}`
+    );
   }
 );
 
 // ==================== When: Scoring ====================
 
-When(
-  'I inspect the estimateValue function scoring logic',
-  function () {
-    // Source was loaded in Given step — we just mark it for inspection
-    assert(this.sourceContent, 'Source content not loaded');
-  }
-);
+When('I inspect the estimateValue function scoring logic', function () {
+  // Source was loaded in Given step — we just mark it for inspection
+  assert(this.sourceContent, 'Source content not loaded');
+});
 
 When(
   /^the value estimator scores the listing at price (\d+) condition "([^"]*)" category "([^"]*)" with fee rate (\d+(?:\.\d+)?)$/,
@@ -102,46 +104,53 @@ When(
   }
 );
 
-When(
-  'the value estimator scores all listings',
-  function () {
-    this.diverseResults = this.diverseListings.map((item: ListingInput) =>
-      estimateValue(item.title, null, item.price, item.condition, item.category)
-    );
-  }
-);
+When('the value estimator scores all listings', function () {
+  this.diverseResults = this.diverseListings.map((item: ListingInput) =>
+    estimateValue(item.title, null, item.price, item.condition, item.category)
+  );
+});
 
 When(
   'both listings are scored with condition {string} and category {string}',
   function (condition: string, category: string) {
-    const inputs = this.listingInputs as Array<{ title: string; description: string; price: number }>;
+    const inputs = this.listingInputs as Array<{
+      title: string;
+      description: string;
+      price: number;
+    }>;
     assert(inputs && inputs.length >= 2, 'Need at least 2 listing inputs');
-    this.resultA = estimateValue(inputs[0].title, inputs[0].description || null, inputs[0].price, condition, category);
-    this.resultB = estimateValue(inputs[1].title, inputs[1].description || null, inputs[1].price, condition, category);
+    this.resultA = estimateValue(
+      inputs[0].title,
+      inputs[0].description || null,
+      inputs[0].price,
+      condition,
+      category
+    );
+    this.resultB = estimateValue(
+      inputs[1].title,
+      inputs[1].description || null,
+      inputs[1].price,
+      condition,
+      category
+    );
   }
 );
 
 // ==================== Then: Formula inspection ====================
 
-Then(
-  'the formula should compute marginScore from profitMargin',
-  function () {
-    assert(
-      this.sourceContent.includes('marginScore') && this.sourceContent.includes('profitMargin'),
-      'Source should contain marginScore computed from profitMargin'
-    );
-  }
-);
+Then('the formula should compute marginScore from profitMargin', function () {
+  assert(
+    this.sourceContent.includes('marginScore') && this.sourceContent.includes('profitMargin'),
+    'Source should contain marginScore computed from profitMargin'
+  );
+});
 
-Then(
-  'the formula should compute absoluteProfitScore using a logarithmic curve',
-  function () {
-    assert(
-      this.sourceContent.includes('absoluteProfitScore') && this.sourceContent.includes('Math.log10'),
-      'Source should contain absoluteProfitScore using Math.log10'
-    );
-  }
-);
+Then('the formula should compute absoluteProfitScore using a logarithmic curve', function () {
+  assert(
+    this.sourceContent.includes('absoluteProfitScore') && this.sourceContent.includes('Math.log10'),
+    'Source should contain absoluteProfitScore using Math.log10'
+  );
+});
 
 Then(
   /^the final weighted score should use ([\d.]+) weight for margin and ([\d.]+) for absolute profit$/,
@@ -158,61 +167,50 @@ Then(
 // `this.result` may be set by the local When (with fee rate) OR `this.lastResult`
 // may be set by E-013-brand-regex.steps.ts When (without fee rate). Read either.
 
-function currentResult(world: { result?: EstimationResult; lastResult?: EstimationResult }): EstimationResult {
+function currentResult(world: {
+  result?: EstimationResult;
+  lastResult?: EstimationResult;
+}): EstimationResult {
   const r = world.result ?? world.lastResult;
   assert(r, 'No estimation result on world — check that a When step ran first');
   return r;
 }
 
-Then(
-  'the profit potential should be negative',
-  function () {
-    const r = currentResult(this);
-    assert(r.profitPotential < 0, `Expected negative profit, got ${r.profitPotential}`);
-  }
-);
+Then('the profit potential should be negative', function () {
+  const r = currentResult(this);
+  assert(r.profitPotential < 0, `Expected negative profit, got ${r.profitPotential}`);
+});
 
-Then(
-  'the profit potential should be {int}',
-  function (expected: number) {
-    const r = currentResult(this);
-    assert.strictEqual(r.profitPotential, expected, `Expected profit ${expected}, got ${r.profitPotential}`);
-  }
-);
+Then('the profit potential should be {int}', function (expected: number) {
+  const r = currentResult(this);
+  assert.strictEqual(
+    r.profitPotential,
+    expected,
+    `Expected profit ${expected}, got ${r.profitPotential}`
+  );
+});
 
-Then(
-  /^the profit potential should be less than (\d+)$/,
-  function (threshold: number) {
-    const r = currentResult(this);
-    assert(r.profitPotential < threshold, `Expected profit < ${threshold}, got ${r.profitPotential}`);
-  }
-);
+Then(/^the profit potential should be less than (\d+)$/, function (threshold: number) {
+  const r = currentResult(this);
+  assert(r.profitPotential < threshold, `Expected profit < ${threshold}, got ${r.profitPotential}`);
+});
 
-Then(
-  /^the profit potential should be greater than (\d+)$/,
-  function (threshold: number) {
-    const r = currentResult(this);
-    assert(r.profitPotential > threshold, `Expected profit > ${threshold}, got ${r.profitPotential}`);
-  }
-);
+Then(/^the profit potential should be greater than (\d+)$/, function (threshold: number) {
+  const r = currentResult(this);
+  assert(r.profitPotential > threshold, `Expected profit > ${threshold}, got ${r.profitPotential}`);
+});
 
-Then(
-  /^the value score should be at most (\d+)$/,
-  function (max: number) {
-    const r = currentResult(this);
-    assert(r.valueScore <= max, `Expected score <= ${max}, got ${r.valueScore}`);
-  }
-);
+Then(/^the value score should be at most (\d+)$/, function (max: number) {
+  const r = currentResult(this);
+  assert(r.valueScore <= max, `Expected score <= ${max}, got ${r.valueScore}`);
+});
 
-Then(
-  'the value score should reflect the high-value boost',
-  function () {
-    const r = currentResult(this);
-    // The score should incorporate the +5 or +10 boost for high absolute profit.
-    // We verify by checking that the score is reasonable (> baseline for that profit level).
-    assert(r.valueScore > 50, `Expected boosted score > 50, got ${r.valueScore}`);
-  }
-);
+Then('the value score should reflect the high-value boost', function () {
+  const r = currentResult(this);
+  // The score should incorporate the +5 or +10 boost for high absolute profit.
+  // We verify by checking that the score is reasonable (> baseline for that profit level).
+  assert(r.valueScore > 50, `Expected boosted score > 50, got ${r.valueScore}`);
+});
 
 Then(
   /^the value score should be an integer between (\d+) and (\d+)$/,
@@ -241,13 +239,13 @@ Then(
   }
 );
 
-Then(
-  'the high-profit listing should score higher than the high-margin listing',
-  function () {
-    const a = this.resultA as EstimationResult;
-    const b = this.resultB as EstimationResult;
-    // First listing ($300 MacBook) should have higher profit than second ($5 cable)
-    assert(a.profitPotential > b.profitPotential, `Expected listing A profit > listing B profit`);
-    assert(a.valueScore > b.valueScore, `Expected listing A score (${a.valueScore}) > listing B score (${b.valueScore})`);
-  }
-);
+Then('the high-profit listing should score higher than the high-margin listing', function () {
+  const a = this.resultA as EstimationResult;
+  const b = this.resultB as EstimationResult;
+  // First listing ($300 MacBook) should have higher profit than second ($5 cable)
+  assert(a.profitPotential > b.profitPotential, `Expected listing A profit > listing B profit`);
+  assert(
+    a.valueScore > b.valueScore,
+    `Expected listing A score (${a.valueScore}) > listing B score (${b.valueScore})`
+  );
+});

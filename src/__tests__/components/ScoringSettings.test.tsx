@@ -214,11 +214,11 @@ describe('ScoringSettings', () => {
 
   it('disables buttons and inputs while saving', async () => {
     let resolvePatch: (v: unknown) => void;
-    const patchPromise = new Promise((r) => { resolvePatch = r; });
+    const patchPromise = new Promise((r) => {
+      resolvePatch = r;
+    });
 
-    mockFetch
-      .mockResolvedValueOnce(makeSettingsResponse())
-      .mockReturnValueOnce(patchPromise);
+    mockFetch.mockResolvedValueOnce(makeSettingsResponse()).mockReturnValueOnce(patchPromise);
 
     render(<ScoringSettings />);
 

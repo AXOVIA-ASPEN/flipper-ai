@@ -43,13 +43,25 @@ describe('POST /api/checkout/portal', () => {
   });
 
   it('returns 401 when session has no email', async () => {
-    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: null, name: null, firebaseUid: 'fb-1', image: null });
+    mockGetCurrentUser.mockResolvedValue({
+      id: 'user-1',
+      email: null,
+      name: null,
+      firebaseUid: 'fb-1',
+      image: null,
+    });
     const res = await POST();
     expect(res.status).toBe(401);
   });
 
   it('returns 404 when no Stripe customer found', async () => {
-    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: 'test@test.com', name: 'Test', firebaseUid: 'fb-1', image: null });
+    mockGetCurrentUser.mockResolvedValue({
+      id: 'user-1',
+      email: 'test@test.com',
+      name: 'Test',
+      firebaseUid: 'fb-1',
+      image: null,
+    });
     mockCustomersList.mockResolvedValue({ data: [] });
 
     const res = await POST();
@@ -59,7 +71,13 @@ describe('POST /api/checkout/portal', () => {
   });
 
   it('creates portal session and returns URL', async () => {
-    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: 'test@test.com', name: 'Test', firebaseUid: 'fb-1', image: null });
+    mockGetCurrentUser.mockResolvedValue({
+      id: 'user-1',
+      email: 'test@test.com',
+      name: 'Test',
+      firebaseUid: 'fb-1',
+      image: null,
+    });
     mockCustomersList.mockResolvedValue({ data: [{ id: 'cus_123' }] });
     mockPortalCreate.mockResolvedValue({ url: 'https://billing.stripe.com/session/xyz' });
 
@@ -74,7 +92,13 @@ describe('POST /api/checkout/portal', () => {
   });
 
   it('returns 500 when Stripe API throws', async () => {
-    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: 'test@test.com', name: 'Test', firebaseUid: 'fb-1', image: null });
+    mockGetCurrentUser.mockResolvedValue({
+      id: 'user-1',
+      email: 'test@test.com',
+      name: 'Test',
+      firebaseUid: 'fb-1',
+      image: null,
+    });
     mockCustomersList.mockRejectedValue(new Error('Stripe down'));
 
     const res = await POST();
@@ -85,7 +109,13 @@ describe('POST /api/checkout/portal', () => {
   });
 
   it('returns 500 when error has no message', async () => {
-    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: 'test@test.com', name: 'Test', firebaseUid: 'fb-1', image: null });
+    mockGetCurrentUser.mockResolvedValue({
+      id: 'user-1',
+      email: 'test@test.com',
+      name: 'Test',
+      firebaseUid: 'fb-1',
+      image: null,
+    });
     mockCustomersList.mockRejectedValue({});
 
     const res = await POST();

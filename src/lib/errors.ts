@@ -129,8 +129,7 @@ const USER_FRIENDLY_MESSAGES: Record<ErrorCode, string> = {
   [ErrorCode.FORBIDDEN]: "You don't have permission to access this resource.",
   [ErrorCode.NOT_FOUND]: 'The requested item could not be found.',
   [ErrorCode.CONFLICT]: 'This action conflicts with existing data.',
-  [ErrorCode.RATE_LIMITED]:
-    'Too many requests. Please wait a moment before trying again.',
+  [ErrorCode.RATE_LIMITED]: 'Too many requests. Please wait a moment before trying again.',
   [ErrorCode.VALIDATION_ERROR]: 'Please check your input and try again.',
   [ErrorCode.INTERNAL_ERROR]: 'Something went wrong. Our team has been notified.',
   [ErrorCode.SERVICE_UNAVAILABLE]:
@@ -160,16 +159,14 @@ function filterStackTrace(stack: string | undefined): string | undefined {
 /**
  * Get user-friendly error message with optional technical details.
  */
-export function getUserFriendlyMessage(
-  code: ErrorCode,
-  technicalMessage?: string
-): string {
-  const friendlyMessage = USER_FRIENDLY_MESSAGES[code] || USER_FRIENDLY_MESSAGES[ErrorCode.INTERNAL_ERROR];
-  
+export function getUserFriendlyMessage(code: ErrorCode, technicalMessage?: string): string {
+  const friendlyMessage =
+    USER_FRIENDLY_MESSAGES[code] || USER_FRIENDLY_MESSAGES[ErrorCode.INTERNAL_ERROR];
+
   if (process.env.NODE_ENV === 'development' && technicalMessage) {
     return `${friendlyMessage}\n\nTechnical details: ${technicalMessage}`;
   }
-  
+
   return friendlyMessage;
 }
 
@@ -199,7 +196,7 @@ export function handleError(error: unknown, instance?: string): NextResponse<Api
       message: error.message,
       stack: filterStackTrace(error.stack),
     });
-    
+
     const userMessage = getUserFriendlyMessage(ErrorCode.INTERNAL_ERROR, error.message);
     return errorResponse(ErrorCode.INTERNAL_ERROR, userMessage, undefined, instance);
   }
@@ -288,11 +285,9 @@ export const Errors = {
   validation: (message: string, details?: Record<string, unknown>) =>
     new ValidationError(message, details),
 
-  internal: (message = 'Internal server error') =>
-    new AppError(ErrorCode.INTERNAL_ERROR, message),
+  internal: (message = 'Internal server error') => new AppError(ErrorCode.INTERNAL_ERROR, message),
 
   configError: (message: string) => new ConfigurationError(message),
 
-  externalService: (service: string, message: string) =>
-    new ExternalServiceError(service, message),
+  externalService: (service: string, message: string) => new ExternalServiceError(service, message),
 } as const;

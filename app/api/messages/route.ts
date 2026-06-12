@@ -90,7 +90,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Enforce messaging feature gate
-    const user = await prisma.user.findUnique({ where: { id: userId }, select: { subscriptionTier: true } });
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { subscriptionTier: true },
+    });
     const featureCheck = checkFeatureAccess(user?.subscriptionTier, 'messaging');
     if (!featureCheck.allowed) {
       throw new ForbiddenError(featureCheck.reason);
@@ -146,21 +149,25 @@ export async function POST(request: NextRequest) {
     // Fire-and-forget: communication notifications (Story 10.4)
     if (message.direction === 'INBOUND' && message.status === 'DELIVERED') {
       /* istanbul ignore next -- fire-and-forget; rejection is intentionally swallowed */
-      void communicationNotificationService.notifyMessageReceived({
-        userId,
-        listingId: message.listingId,
-        listingTitle: message.listing?.title ?? null,
-        sellerName: message.sellerName ?? null,
-        messagePreview: message.body,
-      }).catch(() => {});
+      void communicationNotificationService
+        .notifyMessageReceived({
+          userId,
+          listingId: message.listingId,
+          listingTitle: message.listing?.title ?? null,
+          sellerName: message.sellerName ?? null,
+          messagePreview: message.body,
+        })
+        .catch(() => {});
     } else if (message.direction === 'OUTBOUND' && message.status === 'DRAFT') {
       /* istanbul ignore next -- fire-and-forget; rejection is intentionally swallowed */
-      void communicationNotificationService.notifyDraftReady({
-        userId,
-        listingId: message.listingId,
-        listingTitle: message.listing?.title ?? null,
-        draftPreview: message.body,
-      }).catch(() => {});
+      void communicationNotificationService
+        .notifyDraftReady({
+          userId,
+          listingId: message.listingId,
+          listingTitle: message.listing?.title ?? null,
+          draftPreview: message.body,
+        })
+        .catch(() => {});
     }
 
     return NextResponse.json({ success: true, data: message }, { status: 201 });

@@ -78,8 +78,10 @@ Then('it uses the {string} model for logistics classification', function (modelN
   // model string in the source or the prompt-config model declared in
   // src/lib/ai/prompts/identification.ts under `logisticsClassification`.
   if (this.source.includes(`'${modelName}'`)) return;
-  if (this.source.includes("completeAI('logisticsClassification'") ||
-      this.source.includes('completeAI("logisticsClassification"')) {
+  if (
+    this.source.includes("completeAI('logisticsClassification'") ||
+    this.source.includes('completeAI("logisticsClassification"')
+  ) {
     const promptModule = fs.readFileSync(
       path.join(process.cwd(), 'src/lib/ai/prompts/identification.ts'),
       'utf-8'
@@ -113,7 +115,7 @@ Then('it defines a CATEGORY_SIZE_DEFAULTS fallback map', function () {
 Then('it imports {string} from the shippo package', function (exportName: string) {
   assert.ok(
     this.source.includes(`import { ${exportName} } from 'shippo'`) ||
-    this.source.includes(`import {${exportName}} from 'shippo'`),
+      this.source.includes(`import {${exportName}} from 'shippo'`),
     `Expected "import { ${exportName} } from 'shippo'" in ${this.filePath}`
   );
 });
@@ -154,43 +156,35 @@ Then('it returns null gracefully when GEOAPIFY_API_KEY is not set', function () 
 Then('it imports {string} from the logistics-classifier', function (fnName: string) {
   assert.ok(
     this.source.includes(`from './logistics-classifier'`) ||
-    this.source.includes(`from "./logistics-classifier"`),
+      this.source.includes(`from "./logistics-classifier"`),
     `Expected import from logistics-classifier in ${this.filePath}`
   );
-  assert.ok(
-    this.source.includes(fnName),
-    `Expected "${fnName}" in ${this.filePath}`
-  );
+  assert.ok(this.source.includes(fnName), `Expected "${fnName}" in ${this.filePath}`);
 });
 
 Then('it imports {string} from the shipping-estimator', function (fnName: string) {
   assert.ok(
     this.source.includes(`from './shipping-estimator'`) ||
-    this.source.includes(`from "./shipping-estimator"`),
+      this.source.includes(`from "./shipping-estimator"`),
     `Expected import from shipping-estimator in ${this.filePath}`
   );
-  assert.ok(
-    this.source.includes(fnName),
-    `Expected "${fnName}" in ${this.filePath}`
-  );
+  assert.ok(this.source.includes(fnName), `Expected "${fnName}" in ${this.filePath}`);
 });
 
 Then('it imports {string} from the distance-calculator', function (fnName: string) {
   assert.ok(
     this.source.includes(`from './distance-calculator'`) ||
-    this.source.includes(`from "./distance-calculator"`),
+      this.source.includes(`from "./distance-calculator"`),
     `Expected import from distance-calculator in ${this.filePath}`
   );
-  assert.ok(
-    this.source.includes(fnName),
-    `Expected "${fnName}" in ${this.filePath}`
-  );
+  assert.ok(this.source.includes(fnName), `Expected "${fnName}" in ${this.filePath}`);
 });
 
 Then('it has a safe default fallback that never throws', function () {
   assert.ok(
-    this.source.includes('createSafeDefault') || this.source.includes('safeDefault') ||
-    (this.source.includes('catch') && this.source.includes('return')),
+    this.source.includes('createSafeDefault') ||
+      this.source.includes('safeDefault') ||
+      (this.source.includes('catch') && this.source.includes('return')),
     `Expected safe default fallback (catch block with return) in ${this.filePath}`
   );
 });
@@ -203,20 +197,14 @@ Then('it has a safe default fallback that never throws', function () {
 
 // ==================== Then: S-23 (UI logistics display) ====================
 
-Then(
-  'the Listing interface includes {string} as a nullable boolean',
-  function (fieldName: string) {
-    const src = this.fileContent || this.fileBody || this.source;
-    assert.ok(
-      src.includes(fieldName),
-      `Expected Listing interface to include "${fieldName}"`
-    );
-    assert.ok(
-      src.match(new RegExp(`${fieldName}\\s*:\\s*boolean\\s*\\|\\s*null`)),
-      `Expected "${fieldName}" to be typed as "boolean | null"`
-    );
-  }
-);
+Then('the Listing interface includes {string} as a nullable boolean', function (fieldName: string) {
+  const src = this.fileContent || this.fileBody || this.source;
+  assert.ok(src.includes(fieldName), `Expected Listing interface to include "${fieldName}"`);
+  assert.ok(
+    src.match(new RegExp(`${fieldName}\\s*:\\s*boolean\\s*\\|\\s*null`)),
+    `Expected "${fieldName}" to be typed as "boolean | null"`
+  );
+});
 
 Then('the page renders a size category row in the market details section', function () {
   const src = this.fileContent || this.fileBody;

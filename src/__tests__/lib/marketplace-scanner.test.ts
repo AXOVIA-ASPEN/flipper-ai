@@ -110,14 +110,16 @@ void mockEstimateValue;
 void mockDetectCategory;
 
 // Helper to build a minimal RawListing
-function makeRawListing(overrides: Partial<{
-  externalId: string;
-  title: string;
-  askingPrice: number;
-  description: string | null;
-  condition: string | null;
-  location: string | null;
-}> = {}) {
+function makeRawListing(
+  overrides: Partial<{
+    externalId: string;
+    title: string;
+    askingPrice: number;
+    description: string | null;
+    condition: string | null;
+    location: string | null;
+  }> = {}
+) {
   return {
     externalId: overrides.externalId ?? 'ext-001',
     url: 'https://example.com/listing/1',
@@ -259,7 +261,11 @@ describe('preFilterListings()', () => {
     });
 
     it('calls estimateValue with correct args', () => {
-      const listing = makeRawListing({ askingPrice: 0, description: 'Nice bike', condition: 'good' });
+      const listing = makeRawListing({
+        askingPrice: 0,
+        description: 'Nice bike',
+        condition: 'good',
+      });
       mockDetectCategoryTyped.mockReturnValue('sporting');
 
       preFilterListings('CRAIGSLIST', [listing], {
@@ -473,7 +479,7 @@ describe('getPlatformFeeRate()', () => {
   describe('PLATFORM_FEE_DEFAULTS', () => {
     it('exports correct default fee rates', () => {
       expect(PLATFORM_FEE_DEFAULTS['EBAY']).toBeCloseTo(0.13);
-      expect(PLATFORM_FEE_DEFAULTS['MERCARI']).toBeCloseTo(0.10);
+      expect(PLATFORM_FEE_DEFAULTS['MERCARI']).toBeCloseTo(0.1);
       expect(PLATFORM_FEE_DEFAULTS['FACEBOOK_MARKETPLACE']).toBeCloseTo(0.05);
       expect(PLATFORM_FEE_DEFAULTS['OFFERUP']).toBeCloseTo(0.129);
       expect(PLATFORM_FEE_DEFAULTS['CRAIGSLIST']).toBe(0);
@@ -488,7 +494,7 @@ describe('getPlatformFeeRate()', () => {
 
     it('returns default rate for MERCARI when userSettings is undefined', () => {
       const rate = getPlatformFeeRate('MERCARI', undefined);
-      expect(rate).toBeCloseTo(0.10);
+      expect(rate).toBeCloseTo(0.1);
     });
 
     it('returns default rate for CRAIGSLIST when userSettings is null', () => {
@@ -505,7 +511,7 @@ describe('getPlatformFeeRate()', () => {
   describe('with userSettings overrides', () => {
     it('converts user percentage to decimal for EBAY', () => {
       const rate = getPlatformFeeRate('EBAY', { feeRateEbay: 10.0 });
-      expect(rate).toBeCloseTo(0.10);
+      expect(rate).toBeCloseTo(0.1);
     });
 
     it('converts user percentage to decimal for MERCARI', () => {
@@ -545,7 +551,7 @@ describe('getPlatformFeeRate()', () => {
 
     it('rejects negative rates', () => {
       const rate = getPlatformFeeRate('MERCARI', { feeRateMercari: -5.0 });
-      expect(rate).toBeCloseTo(0.10);
+      expect(rate).toBeCloseTo(0.1);
     });
   });
 });
@@ -800,7 +806,10 @@ describe('enrichWithSellabilityAnalysis()', () => {
   });
 
   it('skips when sellabilityAnalysis.meetsThreshold is false', async () => {
-    mockAnalyzeSellability.mockResolvedValue({ ...defaultSellabilityAnalysis, meetsThreshold: false });
+    mockAnalyzeSellability.mockResolvedValue({
+      ...defaultSellabilityAnalysis,
+      meetsThreshold: false,
+    });
     const result = await enrichWithSellabilityAnalysis([makeAnalyzedListing()]);
     expect(result).toHaveLength(0);
   });
@@ -880,7 +889,10 @@ describe('formatForStorage() - Story 4.2/4.4/4.5 branches', () => {
   };
 
   it('sets status=OPPORTUNITY and llmAnalyzed=true when sellabilityAnalysis is set', () => {
-    const listing = makeAnalyzedListing({ isOpportunity: false, sellabilityAnalysis: baseSellabilityAnalysis });
+    const listing = makeAnalyzedListing({
+      isOpportunity: false,
+      sellabilityAnalysis: baseSellabilityAnalysis,
+    });
     const stored = formatForStorage(listing);
     expect(stored.status).toBe('OPPORTUNITY');
     expect(stored.llmAnalyzed).toBe(true);
@@ -1104,8 +1116,16 @@ describe('formatForStorage() - claudeAnalysis priority (Story 5.1)', () => {
 
   it('uses claudeAnalysis over sellabilityAnalysis even when sellabilityAnalysis has higher confidence', () => {
     const listing = makeAnalyzedListing({
-      sellabilityAnalysis: { ...baseSellabilityAnalysis, confidence: 'high', reasoning: 'Sell reasoning' },
-      claudeAnalysis: { ...defaultClaudeAnalysis, confidence: 'low', reasoning: 'Claude reasoning' },
+      sellabilityAnalysis: {
+        ...baseSellabilityAnalysis,
+        confidence: 'high',
+        reasoning: 'Sell reasoning',
+      },
+      claudeAnalysis: {
+        ...defaultClaudeAnalysis,
+        confidence: 'low',
+        reasoning: 'Claude reasoning',
+      },
     });
     const stored = formatForStorage(listing);
     expect(stored.analysisConfidence).toBe('low');
@@ -1283,7 +1303,7 @@ describe('formatForStorage() - completeness and seller reputation fields (Story 
       sellabilityScore: 85,
       demandLevel: 'high' as const,
       expectedDaysToSell: 7,
-      authenticityRisk: 'high' as const,  // escalated from 'low' by Story 5.4 enrichment
+      authenticityRisk: 'high' as const, // escalated from 'low' by Story 5.4 enrichment
       conditionRisk: 'low' as const,
       recommendedOfferPrice: 175,
       recommendedListPrice: 350,
@@ -1306,14 +1326,22 @@ describe('formatForStorage() - completeness and seller reputation fields (Story 
     // cannot do when sellabilityAnalysis is null).
     const listing = makeAnalyzedListing({
       sellabilityAnalysis: null,
-      sellerReputation: { ...fakeSellerReputation, isLowReputation: true, riskEscalation: true, sellerRating: 93 },
+      sellerReputation: {
+        ...fakeSellerReputation,
+        isLowReputation: true,
+        riskEscalation: true,
+        sellerRating: 93,
+      },
     });
     const stored = formatForStorage(listing);
     expect(stored.authenticityRisk).toBe('high');
   });
 
   it('returns authenticityRisk=null when riskEscalation is false and sellabilityAnalysis is null', () => {
-    const listing = makeAnalyzedListing({ sellabilityAnalysis: null, sellerReputation: fakeSellerReputation });
+    const listing = makeAnalyzedListing({
+      sellabilityAnalysis: null,
+      sellerReputation: fakeSellerReputation,
+    });
     const stored = formatForStorage(listing);
     expect(stored.authenticityRisk).toBeNull();
   });
@@ -1338,7 +1366,7 @@ describe('formatForStorage() - completeness and seller reputation fields (Story 
     };
     const listing = makeAnalyzedListing({
       sellabilityAnalysis: sellabilityWithMediumRisk,
-      sellerReputation: fakeSellerReputation,  // riskEscalation: false
+      sellerReputation: fakeSellerReputation, // riskEscalation: false
     });
     const stored = formatForStorage(listing);
     expect(stored.authenticityRisk).toBe('medium');
@@ -1483,7 +1511,10 @@ describe('enrichWithCompletenessAndReputation()', () => {
   });
 
   it('does NOT escalate when riskEscalation=false', async () => {
-    mockAnalyzeSellerReputation.mockReturnValue({ ...defaultSellerReputation, riskEscalation: false });
+    mockAnalyzeSellerReputation.mockReturnValue({
+      ...defaultSellerReputation,
+      riskEscalation: false,
+    });
     const listing = makeAnalyzedListing({
       sellabilityAnalysis: { ...baseSellabilityForReputation, authenticityRisk: 'low' },
     });
@@ -1588,7 +1619,11 @@ describe('enrichWithDemandAnalysis()', () => {
   });
 
   it('sets demandAnalysis to null when fetchMarketPrice returns no soldListings', async () => {
-    mockFetchMarketPrice.mockResolvedValue({ verifiedMarketValue: 300, salesCount: 0, soldListings: null });
+    mockFetchMarketPrice.mockResolvedValue({
+      verifiedMarketValue: 300,
+      salesCount: 0,
+      soldListings: null,
+    });
     const listing = makeAnalyzedListing();
     const result = await enrichWithDemandAnalysis([listing]);
 
@@ -1597,7 +1632,11 @@ describe('enrichWithDemandAnalysis()', () => {
 
   it('reuses comparableSalesJson from verifiedPrice when array length >= 5', async () => {
     const parsedSales = Array.from({ length: 5 }, (_, i) => ({
-      title: `Item ${i}`, price: 100, condition: null, url: null, soldDate: null,
+      title: `Item ${i}`,
+      price: 100,
+      condition: null,
+      url: null,
+      soldDate: null,
     }));
     const listing = makeAnalyzedListing({
       verifiedPrice: {
@@ -1619,7 +1658,9 @@ describe('enrichWithDemandAnalysis()', () => {
   });
 
   it('falls back to fetchMarketPrice when comparableSalesJson has < 5 items', async () => {
-    const parsedSales = [{ title: 'Item 1', price: 100, condition: null, url: null, soldDate: null }];
+    const parsedSales = [
+      { title: 'Item 1', price: 100, condition: null, url: null, soldDate: null },
+    ];
     const listing = makeAnalyzedListing({
       verifiedPrice: {
         verifiedMarketValue: 350,
@@ -1662,9 +1703,7 @@ describe('enrichWithDemandAnalysis()', () => {
     mockFetchMarketPrice
       .mockResolvedValueOnce({ soldListings: soldA, salesCount: 5 })
       .mockResolvedValueOnce({ soldListings: soldB, salesCount: 3 });
-    mockAnalyzeDemandTrend
-      .mockReturnValueOnce(demandA)
-      .mockReturnValueOnce(demandB);
+    mockAnalyzeDemandTrend.mockReturnValueOnce(demandA).mockReturnValueOnce(demandB);
 
     const listing1 = makeAnalyzedListing({ externalId: 'a', title: 'iPhone 14' });
     const listing2 = makeAnalyzedListing({ externalId: 'b', title: 'MacBook Air' });
@@ -1796,9 +1835,7 @@ describe('enrichWithCompMatches()', () => {
     const compA = { ...fakeCompResult, searchQuery: 'iPhone 14' };
     const compB = { ...fakeCompResult, searchQuery: 'MacBook Air', confidence: 'high' as const };
 
-    mockFindComparableSales
-      .mockResolvedValueOnce(compA)
-      .mockResolvedValueOnce(compB);
+    mockFindComparableSales.mockResolvedValueOnce(compA).mockResolvedValueOnce(compB);
 
     const listing1 = makeAnalyzedListing({ externalId: 'a', title: 'iPhone 14' });
     const listing2 = makeAnalyzedListing({ externalId: 'b', title: 'MacBook Air' });
@@ -1865,9 +1902,7 @@ describe('enrichWithLogisticsAnalysis()', () => {
     const logisticsA = { ...fakeLogisticsResult, estimatedShippingCost: 8 };
     const logisticsB = { ...fakeLogisticsResult, estimatedShippingCost: 15 };
 
-    mockAnalyzeLogistics
-      .mockResolvedValueOnce(logisticsA)
-      .mockResolvedValueOnce(logisticsB);
+    mockAnalyzeLogistics.mockResolvedValueOnce(logisticsA).mockResolvedValueOnce(logisticsB);
 
     const listing1 = makeAnalyzedListing({ externalId: 'a' });
     const listing2 = makeAnalyzedListing({ externalId: 'b' });
@@ -1897,7 +1932,11 @@ describe('enrichWithLogisticsAnalysis()', () => {
 
   it('preserves all other listing fields when attaching logisticsAnalysis', async () => {
     mockAnalyzeLogistics.mockResolvedValue(fakeLogisticsResult);
-    const listing = makeAnalyzedListing({ externalId: 'keep-fields', title: 'Test Item', askingPrice: 99 });
+    const listing = makeAnalyzedListing({
+      externalId: 'keep-fields',
+      title: 'Test Item',
+      askingPrice: 99,
+    });
 
     const result = await enrichWithLogisticsAnalysis([listing], null, 50);
 
@@ -1928,7 +1967,9 @@ describe('formatForStorage() — logistics fields', () => {
   it('serializes shippingEstimates to JSON when present', () => {
     const listing = makeAnalyzedListing({ logisticsAnalysis: fakeLogisticsResult });
     const stored = formatForStorage(listing);
-    expect(stored.shippingEstimatesJson).toBe(JSON.stringify(fakeLogisticsResult.shippingEstimates));
+    expect(stored.shippingEstimatesJson).toBe(
+      JSON.stringify(fakeLogisticsResult.shippingEstimates)
+    );
   });
 
   it('sets shippingEstimatesJson to null when shippingEstimates is null', () => {

@@ -29,14 +29,20 @@ describe('GET /api/posting-queue/[id]', () => {
 
   it('returns 401 when unauthenticated', async () => {
     (getAuthUserId as jest.Mock).mockResolvedValue(null);
-    const res = await GET(new NextRequest('http://localhost/api/posting-queue/1'), makeContext('1'));
+    const res = await GET(
+      new NextRequest('http://localhost/api/posting-queue/1'),
+      makeContext('1')
+    );
     expect(res.status).toBe(401);
   });
 
   it('returns 404 when item not found', async () => {
     (getAuthUserId as jest.Mock).mockResolvedValue('user-1');
     mockFindFirst.mockResolvedValue(null);
-    const res = await GET(new NextRequest('http://localhost/api/posting-queue/1'), makeContext('1'));
+    const res = await GET(
+      new NextRequest('http://localhost/api/posting-queue/1'),
+      makeContext('1')
+    );
     expect(res.status).toBe(404);
   });
 
@@ -49,7 +55,10 @@ describe('GET /api/posting-queue/[id]', () => {
       listing: { title: 'Test', images: [], imageUrls: null },
     };
     mockFindFirst.mockResolvedValue(item);
-    const res = await GET(new NextRequest('http://localhost/api/posting-queue/1'), makeContext('1'));
+    const res = await GET(
+      new NextRequest('http://localhost/api/posting-queue/1'),
+      makeContext('1')
+    );
     const data = await res.json();
     expect(res.status).toBe(200);
     expect(data.id).toBe('1');
@@ -134,7 +143,10 @@ describe('GET /api/posting-queue/[id]', () => {
 
   it('returns 500 on error', async () => {
     (getAuthUserId as jest.Mock).mockRejectedValue(new Error('fail'));
-    const res = await GET(new NextRequest('http://localhost/api/posting-queue/1'), makeContext('1'));
+    const res = await GET(
+      new NextRequest('http://localhost/api/posting-queue/1'),
+      makeContext('1')
+    );
     expect(res.status).toBe(500);
   });
 });

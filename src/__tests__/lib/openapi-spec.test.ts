@@ -23,13 +23,7 @@ describe('openApiSpec', () => {
   it('covers all 5 supported marketplaces in Platform enum', () => {
     const platform = openApiSpec.components.schemas.Platform;
     expect((platform as { enum: string[] }).enum).toEqual(
-      expect.arrayContaining([
-        'CRAIGSLIST',
-        'FACEBOOK_MARKETPLACE',
-        'EBAY',
-        'OFFERUP',
-        'MERCARI',
-      ])
+      expect.arrayContaining(['CRAIGSLIST', 'FACEBOOK_MARKETPLACE', 'EBAY', 'OFFERUP', 'MERCARI'])
     );
   });
 
@@ -115,9 +109,7 @@ describe('openApiSpec', () => {
   it('tags list matches tag names used in operations', () => {
     const definedTags = new Set(openApiSpec.tags.map((t) => t.name));
     for (const [, pathItem] of Object.entries(openApiSpec.paths)) {
-      for (const [method, op] of Object.entries(
-        pathItem as Record<string, { tags?: string[] }>
-      )) {
+      for (const [method, op] of Object.entries(pathItem as Record<string, { tags?: string[] }>)) {
         if (['get', 'post', 'put', 'patch', 'delete'].includes(method) && op.tags) {
           for (const tag of op.tags) {
             expect(definedTags.has(tag)).toBe(true);

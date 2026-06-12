@@ -58,11 +58,7 @@ export default function ThreadHeader({ listing, sellerName }: ThreadHeaderProps)
         style={{ background: 'rgba(255,255,255,0.04)' }}
       >
         {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={listing.title}
-            className="w-full h-full object-cover"
-          />
+          <img src={imageUrl} alt={listing.title} className="w-full h-full object-cover" />
         ) : (
           <div
             className="w-full h-full flex items-center justify-center text-2xl"
@@ -74,22 +70,14 @@ export default function ThreadHeader({ listing, sellerName }: ThreadHeaderProps)
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 mb-0.5">
-          <h2
-            className="text-lg font-semibold truncate"
-            style={{ color: '#e2e8f0' }}
-          >
+          <h2 className="text-lg font-semibold truncate" style={{ color: '#e2e8f0' }}>
             {listing.title}
           </h2>
-          <span
-            className={PLATFORM_COLORS[listing.platform] || 'fp-badge fp-badge-gray'}
-          >
+          <span className={PLATFORM_COLORS[listing.platform] || 'fp-badge fp-badge-gray'}>
             {listing.platform}
           </span>
         </div>
-        <div
-          className="flex items-center gap-2 text-sm"
-          style={{ color: '#94a3b8' }}
-        >
+        <div className="flex items-center gap-2 text-sm" style={{ color: '#94a3b8' }}>
           <span className="font-medium">${listing.askingPrice.toLocaleString()}</span>
           {sellerName && (
             <>

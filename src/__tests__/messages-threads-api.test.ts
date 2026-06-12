@@ -43,8 +43,7 @@ jest.mock('@/lib/db', () => ({
   },
 }));
 
-const createRequest = (url: string) =>
-  new NextRequest(new URL(url, 'http://localhost:3000'));
+const createRequest = (url: string) => new NextRequest(new URL(url, 'http://localhost:3000'));
 
 // ── Test Data ──────────────────────────────────────────────────────────────
 
@@ -97,9 +96,7 @@ const sampleLatestMessages = [
   },
 ];
 
-const sampleUnreadCounts = [
-  { listingId: 'listing-1', _count: 2 },
-];
+const sampleUnreadCounts = [{ listingId: 'listing-1', _count: 2 }];
 
 const sampleThreadMessages = [
   {
@@ -195,9 +192,7 @@ describe('GET /api/messages/threads', () => {
       .mockResolvedValueOnce([sampleGroupResult[0]]) // groupBy with filtered listingIds
       .mockResolvedValueOnce(sampleUnreadCounts); // unread counts
 
-    const res = await getThreads(
-      createRequest('/api/messages/threads?search=iPhone')
-    );
+    const res = await getThreads(createRequest('/api/messages/threads?search=iPhone'));
     const json = await res.json();
 
     expect(json.data).toHaveLength(1);
@@ -222,9 +217,7 @@ describe('GET /api/messages/threads', () => {
       .mockResolvedValueOnce([sampleGroupResult[1]]) // groupBy filtered
       .mockResolvedValueOnce([]); // unread counts
 
-    const res = await getThreads(
-      createRequest('/api/messages/threads?search=Bob')
-    );
+    const res = await getThreads(createRequest('/api/messages/threads?search=Bob'));
     const json = await res.json();
 
     expect(json.data).toHaveLength(1);
@@ -236,9 +229,7 @@ describe('GET /api/messages/threads', () => {
     mockFindMany.mockReset();
     mockFindMany.mockResolvedValueOnce([]); // seller name search returns nothing
 
-    const res = await getThreads(
-      createRequest('/api/messages/threads?search=nonexistent')
-    );
+    const res = await getThreads(createRequest('/api/messages/threads?search=nonexistent'));
     const json = await res.json();
 
     expect(json.data).toEqual([]);
@@ -246,9 +237,7 @@ describe('GET /api/messages/threads', () => {
   });
 
   it('supports pagination with limit and offset', async () => {
-    const res = await getThreads(
-      createRequest('/api/messages/threads?limit=1&offset=0')
-    );
+    const res = await getThreads(createRequest('/api/messages/threads?limit=1&offset=0'));
     const json = await res.json();
 
     expect(json.data).toHaveLength(1);
@@ -312,13 +301,8 @@ describe('GET /api/messages/threads', () => {
 
   it('truncates last message body to 100 characters', async () => {
     const longBody = 'A'.repeat(150);
-    mockFindMany.mockResolvedValue([
-      { ...sampleLatestMessages[0], body: longBody },
-    ]);
-    mockGroupBy
-      .mockReset()
-      .mockResolvedValueOnce([sampleGroupResult[0]])
-      .mockResolvedValueOnce([]);
+    mockFindMany.mockResolvedValue([{ ...sampleLatestMessages[0], body: longBody }]);
+    mockGroupBy.mockReset().mockResolvedValueOnce([sampleGroupResult[0]]).mockResolvedValueOnce([]);
 
     const res = await getThreads(createRequest('/api/messages/threads'));
     const json = await res.json();
@@ -328,9 +312,7 @@ describe('GET /api/messages/threads', () => {
   });
 
   it('caps limit at 100', async () => {
-    const res = await getThreads(
-      createRequest('/api/messages/threads?limit=500')
-    );
+    const res = await getThreads(createRequest('/api/messages/threads?limit=500'));
     const json = await res.json();
 
     expect(json.pagination.limit).toBe(100);
@@ -348,10 +330,9 @@ describe('GET /api/messages/threads/[listingId]', () => {
   });
 
   const callThreadDetail = (listingId: string) =>
-    getThreadDetail(
-      new Request(`http://localhost:3000/api/messages/threads/${listingId}`),
-      { params: Promise.resolve({ listingId }) }
-    );
+    getThreadDetail(new Request(`http://localhost:3000/api/messages/threads/${listingId}`), {
+      params: Promise.resolve({ listingId }),
+    });
 
   it('returns chronological messages for a listing', async () => {
     const res = await callThreadDetail('listing-1');
@@ -443,9 +424,7 @@ describe('GET /api/messages/threads/[listingId]', () => {
   });
 
   it('handles deleted listing (null listing relation)', async () => {
-    mockFindMany.mockResolvedValue([
-      { ...sampleThreadMessages[0], listing: null },
-    ]);
+    mockFindMany.mockResolvedValue([{ ...sampleThreadMessages[0], listing: null }]);
 
     const res = await callThreadDetail('listing-1');
     const json = await res.json();

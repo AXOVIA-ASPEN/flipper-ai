@@ -75,7 +75,13 @@ const mockMessage = {
   readAt: null,
   createdAt: new Date(),
   updatedAt: new Date(),
-  listing: { id: 'listing-1', title: 'iPhone 14', platform: 'craigslist', askingPrice: 500, updatedAt: new Date().toISOString() },
+  listing: {
+    id: 'listing-1',
+    title: 'iPhone 14',
+    platform: 'craigslist',
+    askingPrice: 500,
+    updatedAt: new Date().toISOString(),
+  },
 };
 
 describe('/api/messages/[id]', () => {
@@ -83,10 +89,16 @@ describe('/api/messages/[id]', () => {
     jest.clearAllMocks();
     mockGetAuthUserId.mockResolvedValue('user-1');
     // Default mocks for new dependencies
-    (mockPrisma.userSettings.findUnique as jest.Mock).mockResolvedValue({ messageApprovalRequired: false });
+    (mockPrisma.userSettings.findUnique as jest.Mock).mockResolvedValue({
+      messageApprovalRequired: false,
+    });
     (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({ subscriptionTier: 'FLIPPER' });
     (mockPrisma.message.updateMany as jest.Mock).mockResolvedValue({ count: 1 });
-    (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({ ...mockMessage, status: 'SENT', sentAt: new Date() });
+    (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({
+      ...mockMessage,
+      status: 'SENT',
+      sentAt: new Date(),
+    });
   });
 
   describe('GET', () => {
@@ -125,13 +137,19 @@ describe('/api/messages/[id]', () => {
 
     it('returns 401 when not authenticated', async () => {
       mockGetAuthUserId.mockResolvedValue(null);
-      const res = await PATCH(makeRequest('PATCH', { action: 'approve' }) as any, makeParams('msg-1'));
+      const res = await PATCH(
+        makeRequest('PATCH', { action: 'approve' }) as any,
+        makeParams('msg-1')
+      );
       expect(res.status).toBe(401);
     });
 
     it('returns 404 when message not found', async () => {
       (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue(null);
-      const res = await PATCH(makeRequest('PATCH', { action: 'approve' }) as any, makeParams('msg-999'));
+      const res = await PATCH(
+        makeRequest('PATCH', { action: 'approve' }) as any,
+        makeParams('msg-999')
+      );
       expect(res.status).toBe(404);
     });
 
@@ -141,22 +159,40 @@ describe('/api/messages/[id]', () => {
     });
 
     it('returns 422 for invalid action', async () => {
-      const res = await PATCH(makeRequest('PATCH', { action: 'invalid' }) as any, makeParams('msg-1'));
+      const res = await PATCH(
+        makeRequest('PATCH', { action: 'invalid' }) as any,
+        makeParams('msg-1')
+      );
       expect(res.status).toBe(422);
     });
 
     it('accepts confirm as a valid action', async () => {
-      (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue({ ...mockMessage, status: 'PENDING_APPROVAL' });
-      const res = await PATCH(makeRequest('PATCH', { action: 'confirm' }) as any, makeParams('msg-1'));
+      (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue({
+        ...mockMessage,
+        status: 'PENDING_APPROVAL',
+      });
+      const res = await PATCH(
+        makeRequest('PATCH', { action: 'confirm' }) as any,
+        makeParams('msg-1')
+      );
       expect(res.status).not.toBe(422);
     });
 
     // Approve: approval setting OFF → SENT
     it('approves a DRAFT message to SENT when approval not required', async () => {
-      (mockPrisma.userSettings.findUnique as jest.Mock).mockResolvedValue({ messageApprovalRequired: false });
-      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({ ...mockMessage, status: 'SENT', sentAt: new Date() });
+      (mockPrisma.userSettings.findUnique as jest.Mock).mockResolvedValue({
+        messageApprovalRequired: false,
+      });
+      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({
+        ...mockMessage,
+        status: 'SENT',
+        sentAt: new Date(),
+      });
 
-      const res = await PATCH(makeRequest('PATCH', { action: 'approve' }) as any, makeParams('msg-1'));
+      const res = await PATCH(
+        makeRequest('PATCH', { action: 'approve' }) as any,
+        makeParams('msg-1')
+      );
       const json = await res.json();
 
       expect(res.status).toBe(200);
@@ -171,10 +207,18 @@ describe('/api/messages/[id]', () => {
 
     // Approve: approval setting ON → PENDING_APPROVAL
     it('approves a DRAFT message to PENDING_APPROVAL when approval required', async () => {
-      (mockPrisma.userSettings.findUnique as jest.Mock).mockResolvedValue({ messageApprovalRequired: true });
-      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({ ...mockMessage, status: 'PENDING_APPROVAL' });
+      (mockPrisma.userSettings.findUnique as jest.Mock).mockResolvedValue({
+        messageApprovalRequired: true,
+      });
+      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({
+        ...mockMessage,
+        status: 'PENDING_APPROVAL',
+      });
 
-      const res = await PATCH(makeRequest('PATCH', { action: 'approve' }) as any, makeParams('msg-1'));
+      const res = await PATCH(
+        makeRequest('PATCH', { action: 'approve' }) as any,
+        makeParams('msg-1')
+      );
       const json = await res.json();
 
       expect(res.status).toBe(200);
@@ -188,10 +232,20 @@ describe('/api/messages/[id]', () => {
 
     // Confirm from PENDING_APPROVAL → SENT
     it('confirms a PENDING_APPROVAL message to SENT', async () => {
-      (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue({ ...mockMessage, status: 'PENDING_APPROVAL' });
-      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({ ...mockMessage, status: 'SENT', sentAt: new Date() });
+      (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue({
+        ...mockMessage,
+        status: 'PENDING_APPROVAL',
+      });
+      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({
+        ...mockMessage,
+        status: 'SENT',
+        sentAt: new Date(),
+      });
 
-      const res = await PATCH(makeRequest('PATCH', { action: 'confirm' }) as any, makeParams('msg-1'));
+      const res = await PATCH(
+        makeRequest('PATCH', { action: 'confirm' }) as any,
+        makeParams('msg-1')
+      );
       const json = await res.json();
 
       expect(res.status).toBe(200);
@@ -205,27 +259,45 @@ describe('/api/messages/[id]', () => {
 
     // Confirm on DRAFT → 409
     it('returns 409 when confirming a DRAFT message', async () => {
-      const res = await PATCH(makeRequest('PATCH', { action: 'confirm' }) as any, makeParams('msg-1'));
+      const res = await PATCH(
+        makeRequest('PATCH', { action: 'confirm' }) as any,
+        makeParams('msg-1')
+      );
       expect(res.status).toBe(409);
     });
 
     // Approve on PENDING_APPROVAL → 409
     it('returns 409 when approving a PENDING_APPROVAL message', async () => {
-      (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue({ ...mockMessage, status: 'PENDING_APPROVAL' });
-      const res = await PATCH(makeRequest('PATCH', { action: 'approve' }) as any, makeParams('msg-1'));
+      (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue({
+        ...mockMessage,
+        status: 'PENDING_APPROVAL',
+      });
+      const res = await PATCH(
+        makeRequest('PATCH', { action: 'approve' }) as any,
+        makeParams('msg-1')
+      );
       expect(res.status).toBe(409);
     });
 
     // Edit on PENDING_APPROVAL → 409
     it('returns 409 when editing a PENDING_APPROVAL message', async () => {
-      (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue({ ...mockMessage, status: 'PENDING_APPROVAL' });
-      const res = await PATCH(makeRequest('PATCH', { action: 'edit', body: 'new' }) as any, makeParams('msg-1'));
+      (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue({
+        ...mockMessage,
+        status: 'PENDING_APPROVAL',
+      });
+      const res = await PATCH(
+        makeRequest('PATCH', { action: 'edit', body: 'new' }) as any,
+        makeParams('msg-1')
+      );
       expect(res.status).toBe(409);
     });
 
     // Edit with empty body → 422
     it('returns 422 when editing with empty body', async () => {
-      const res = await PATCH(makeRequest('PATCH', { action: 'edit', body: '   ' }) as any, makeParams('msg-1'));
+      const res = await PATCH(
+        makeRequest('PATCH', { action: 'edit', body: '   ' }) as any,
+        makeParams('msg-1')
+      );
       expect(res.status).toBe(422);
     });
 
@@ -237,12 +309,19 @@ describe('/api/messages/[id]', () => {
 
     // Edit with HTML-only body (sanitizes to empty) → 422
     it('returns 422 when body is HTML-only and sanitizes to empty', async () => {
-      const res = await PATCH(makeRequest('PATCH', { action: 'edit', body: '<b></b>' }) as any, makeParams('msg-1'));
+      const res = await PATCH(
+        makeRequest('PATCH', { action: 'edit', body: '<b></b>' }) as any,
+        makeParams('msg-1')
+      );
       expect(res.status).toBe(422);
     });
 
     it('edits a message body and resets to DRAFT', async () => {
-      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({ ...mockMessage, body: 'Updated body', status: 'DRAFT' });
+      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({
+        ...mockMessage,
+        body: 'Updated body',
+        status: 'DRAFT',
+      });
 
       const res = await PATCH(
         makeRequest('PATCH', { action: 'edit', body: 'Updated body' }) as any,
@@ -255,7 +334,11 @@ describe('/api/messages/[id]', () => {
     });
 
     it('edits message subject', async () => {
-      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({ ...mockMessage, subject: 'New subject', status: 'DRAFT' });
+      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({
+        ...mockMessage,
+        subject: 'New subject',
+        status: 'DRAFT',
+      });
 
       const res = await PATCH(
         makeRequest('PATCH', { action: 'edit', subject: 'New subject' }) as any,
@@ -266,9 +349,15 @@ describe('/api/messages/[id]', () => {
 
     // Reject from DRAFT → REJECTED (terminal)
     it('rejects a DRAFT message to REJECTED', async () => {
-      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({ ...mockMessage, status: 'REJECTED' });
+      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({
+        ...mockMessage,
+        status: 'REJECTED',
+      });
 
-      const res = await PATCH(makeRequest('PATCH', { action: 'reject' }) as any, makeParams('msg-1'));
+      const res = await PATCH(
+        makeRequest('PATCH', { action: 'reject' }) as any,
+        makeParams('msg-1')
+      );
       const json = await res.json();
 
       expect(json.action).toBe('reject');
@@ -281,10 +370,19 @@ describe('/api/messages/[id]', () => {
 
     // Reject from PENDING_APPROVAL → DRAFT (recoverable)
     it('rejects a PENDING_APPROVAL message back to DRAFT', async () => {
-      (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue({ ...mockMessage, status: 'PENDING_APPROVAL' });
-      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({ ...mockMessage, status: 'DRAFT' });
+      (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue({
+        ...mockMessage,
+        status: 'PENDING_APPROVAL',
+      });
+      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({
+        ...mockMessage,
+        status: 'DRAFT',
+      });
 
-      const res = await PATCH(makeRequest('PATCH', { action: 'reject' }) as any, makeParams('msg-1'));
+      const res = await PATCH(
+        makeRequest('PATCH', { action: 'reject' }) as any,
+        makeParams('msg-1')
+      );
       const json = await res.json();
 
       expect(res.status).toBe(200);
@@ -298,19 +396,34 @@ describe('/api/messages/[id]', () => {
     // Race condition: updateMany returns count 0 → 409
     it('returns 409 on race condition (updateMany count 0)', async () => {
       (mockPrisma.message.updateMany as jest.Mock).mockResolvedValue({ count: 0 });
-      const res = await PATCH(makeRequest('PATCH', { action: 'approve' }) as any, makeParams('msg-1'));
+      const res = await PATCH(
+        makeRequest('PATCH', { action: 'approve' }) as any,
+        makeParams('msg-1')
+      );
       expect(res.status).toBe(409);
     });
 
     it('returns 409 for SENT status (approve)', async () => {
-      (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue({ ...mockMessage, status: 'SENT' });
-      const res = await PATCH(makeRequest('PATCH', { action: 'approve' }) as any, makeParams('msg-1'));
+      (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue({
+        ...mockMessage,
+        status: 'SENT',
+      });
+      const res = await PATCH(
+        makeRequest('PATCH', { action: 'approve' }) as any,
+        makeParams('msg-1')
+      );
       expect(res.status).toBe(409);
     });
 
     it('returns 409 for DELIVERED status (reject)', async () => {
-      (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue({ ...mockMessage, status: 'DELIVERED' });
-      const res = await PATCH(makeRequest('PATCH', { action: 'reject' }) as any, makeParams('msg-1'));
+      (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue({
+        ...mockMessage,
+        status: 'DELIVERED',
+      });
+      const res = await PATCH(
+        makeRequest('PATCH', { action: 'reject' }) as any,
+        makeParams('msg-1')
+      );
       expect(res.status).toBe(409);
     });
 
@@ -318,7 +431,10 @@ describe('/api/messages/[id]', () => {
       const { checkFeatureAccess } = require('@/lib/tier-enforcement');
       checkFeatureAccess.mockReturnValue({ allowed: false, reason: 'Upgrade required' });
 
-      const res = await PATCH(makeRequest('PATCH', { action: 'approve' }) as any, makeParams('msg-1'));
+      const res = await PATCH(
+        makeRequest('PATCH', { action: 'approve' }) as any,
+        makeParams('msg-1')
+      );
       expect(res.status).toBe(403);
 
       // Restore
@@ -327,7 +443,10 @@ describe('/api/messages/[id]', () => {
 
     it('handles server errors', async () => {
       (mockPrisma.message.updateMany as jest.Mock).mockRejectedValue(new Error('DB error'));
-      const res = await PATCH(makeRequest('PATCH', { action: 'approve' }) as any, makeParams('msg-1'));
+      const res = await PATCH(
+        makeRequest('PATCH', { action: 'approve' }) as any,
+        makeParams('msg-1')
+      );
       expect(res.status).toBe(500);
     });
   });
@@ -371,8 +490,17 @@ describe('/api/messages/[id]', () => {
       const { communicationNotificationService } = require('@/lib/communication-notification');
       (communicationNotificationService.notifyMessageSent as jest.Mock).mockClear();
 
-      (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue({ ...mockMessage, status: 'PENDING_APPROVAL', listingId: 'l-1' });
-      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({ ...mockMessage, status: 'SENT', listingId: 'l-1', sentAt: new Date() });
+      (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue({
+        ...mockMessage,
+        status: 'PENDING_APPROVAL',
+        listingId: 'l-1',
+      });
+      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({
+        ...mockMessage,
+        status: 'SENT',
+        listingId: 'l-1',
+        sentAt: new Date(),
+      });
 
       await PATCH(makeRequest('PATCH', { action: 'confirm' }) as any, makeParams('msg-1'));
 
@@ -388,8 +516,14 @@ describe('/api/messages/[id]', () => {
 
       (mockPrisma.message.findFirst as jest.Mock).mockResolvedValue(mockMessage);
       // findUnique must return DRAFT so the SENT check does not fire
-      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({ ...mockMessage, status: 'DRAFT' });
-      await PATCH(makeRequest('PATCH', { action: 'edit', body: 'updated body' }) as any, makeParams('msg-1'));
+      (mockPrisma.message.findUnique as jest.Mock).mockResolvedValue({
+        ...mockMessage,
+        status: 'DRAFT',
+      });
+      await PATCH(
+        makeRequest('PATCH', { action: 'edit', body: 'updated body' }) as any,
+        makeParams('msg-1')
+      );
 
       expect(communicationNotificationService.notifyMessageSent).not.toHaveBeenCalled();
     });

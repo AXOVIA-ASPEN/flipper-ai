@@ -42,7 +42,8 @@ describe('Firebase Admin SDK Initialization', () => {
 
   it('uses explicit credentials when FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY are set', async () => {
     process.env.FIREBASE_CLIENT_EMAIL = 'test@project.iam.gserviceaccount.com';
-    process.env.FIREBASE_PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----\\nMIIE\\n-----END PRIVATE KEY-----';
+    process.env.FIREBASE_PRIVATE_KEY =
+      '-----BEGIN PRIVATE KEY-----\\nMIIE\\n-----END PRIVATE KEY-----';
     process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET = 'test-bucket.firebasestorage.app';
 
     const mod = await import('@/lib/firebase/admin');

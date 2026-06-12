@@ -77,13 +77,10 @@ export default function OnboardingPage() {
       .finally(() => setLoading(false));
   }, [router]);
 
-  const goToStep = useCallback(
-    async (nextStep: number) => {
-      setStep(nextStep);
-      await saveStep(nextStep);
-    },
-    []
-  );
+  const goToStep = useCallback(async (nextStep: number) => {
+    setStep(nextStep);
+    await saveStep(nextStep);
+  }, []);
 
   const handleNext = useCallback(async () => {
     if (step < TOTAL_STEPS) {
@@ -118,8 +115,7 @@ export default function OnboardingPage() {
     );
   }
 
-  const isNextDisabled =
-    (step === 2 && marketplaces.length === 0);
+  const isNextDisabled = step === 2 && marketplaces.length === 0;
 
   return (
     <WizardLayout
@@ -134,20 +130,11 @@ export default function OnboardingPage() {
       showBack={step > 1}
     >
       {step === 1 && <StepWelcome />}
-      {step === 2 && (
-        <StepMarketplaces selected={marketplaces} onChange={setMarketplaces} />
-      )}
-      {step === 3 && (
-        <StepCategories selected={categories} onChange={setCategories} />
-      )}
+      {step === 2 && <StepMarketplaces selected={marketplaces} onChange={setMarketplaces} />}
+      {step === 3 && <StepCategories selected={categories} onChange={setCategories} />}
       {step === 4 && <StepBudget selected={budget} onChange={setBudget} />}
       {step === 5 && (
-        <StepLocation
-          zip={zip}
-          radius={radius}
-          onZipChange={setZip}
-          onRadiusChange={setRadius}
-        />
+        <StepLocation zip={zip} radius={radius} onZipChange={setZip} onRadiusChange={setRadius} />
       )}
       {step === 6 && <StepComplete onGoToDashboard={handleComplete} />}
     </WizardLayout>

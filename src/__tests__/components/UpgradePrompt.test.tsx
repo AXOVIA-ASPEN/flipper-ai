@@ -87,13 +87,7 @@ describe('UpgradePrompt', () => {
   });
 
   it('shows pricing in upgrade button', () => {
-    render(
-      <UpgradePrompt
-        currentTier="FREE"
-        feature="Feature"
-        message="Upgrade needed."
-      />
-    );
+    render(<UpgradePrompt currentTier="FREE" feature="Feature" message="Upgrade needed." />);
 
     expect(screen.getByText(/\$19\/mo/)).toBeInTheDocument();
   });
@@ -105,22 +99,19 @@ describe('UpgradePrompt', () => {
       json: () => Promise.resolve({ url: null }),
     });
 
-    render(
-      <UpgradePrompt
-        currentTier="FREE"
-        feature="Feature"
-        message="Upgrade needed."
-      />
-    );
+    render(<UpgradePrompt currentTier="FREE" feature="Feature" message="Upgrade needed." />);
 
     await user.click(screen.getByRole('button', { name: /Upgrade to Flipper/ }));
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith('/api/checkout', expect.objectContaining({
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tier: 'FLIPPER' }),
-      }));
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/checkout',
+        expect.objectContaining({
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tier: 'FLIPPER' }),
+        })
+      );
     });
   });
 
@@ -129,13 +120,7 @@ describe('UpgradePrompt', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
     mockFetch.mockRejectedValue(new Error('Network error'));
 
-    render(
-      <UpgradePrompt
-        currentTier="FREE"
-        feature="Feature"
-        message="Upgrade needed."
-      />
-    );
+    render(<UpgradePrompt currentTier="FREE" feature="Feature" message="Upgrade needed." />);
 
     await user.click(screen.getByRole('button', { name: /Upgrade to Flipper/ }));
 

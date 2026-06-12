@@ -239,9 +239,7 @@ test.describe('Feature: Dashboard Bulk Actions', () => {
         await deleteButton.click();
 
         // Then confirmation should appear
-        await expect(
-          page.getByText(/delete|confirm|are you sure/i).first()
-        ).toBeVisible();
+        await expect(page.getByText(/delete|confirm|are you sure/i).first()).toBeVisible();
       }
     });
   });
@@ -262,9 +260,7 @@ test.describe('Feature: Dashboard Bulk Actions', () => {
       await expect(
         page.getByRole('button', { name: /Add to Opportunities|Opportunities/i })
       ).toBeVisible();
-      await expect(
-        page.getByRole('button', { name: /Update Status|Status/i })
-      ).toBeVisible();
+      await expect(page.getByRole('button', { name: /Update Status|Status/i })).toBeVisible();
     });
   });
 });

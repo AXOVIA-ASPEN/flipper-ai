@@ -114,9 +114,7 @@ describe('OpenAIProvider', () => {
         usage: { prompt_tokens: 5, completion_tokens: 3 },
       });
 
-      const messages: AIMessage[] = [
-        { role: 'user', content: 'Hello' },
-      ];
+      const messages: AIMessage[] = [{ role: 'user', content: 'Hello' }];
 
       const provider = new OpenAIProvider();
       await provider.complete(messages, baseConfig);
@@ -127,7 +125,7 @@ describe('OpenAIProvider', () => {
           messages: [{ role: 'user', content: 'Hello' }],
           temperature: 0.3,
           max_tokens: 1024,
-        }),
+        })
       );
     });
 
@@ -147,7 +145,7 @@ describe('OpenAIProvider', () => {
       expect(mockCreate).toHaveBeenCalledWith(
         expect.objectContaining({
           response_format: { type: 'json_object' },
-        }),
+        })
       );
     });
 

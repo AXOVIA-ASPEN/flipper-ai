@@ -102,22 +102,19 @@ describe('Navigation — auth gating (FR-AUTH-ACCESS-02)', () => {
   describe('renders full nav for authenticated users on protected routes', () => {
     const authedUser = { uid: 'test-user-id', email: 'test@example.com' };
 
-    it.each([
-      '/dashboard',
-      '/opportunities',
-      '/messages',
-      '/posting-queue',
-      '/settings',
-    ])('renders nav on %s when user is authenticated', (path) => {
-      setPath(path);
-      setAuth({ user: authedUser });
-      render(<Navigation />);
-      expect(screen.getByText('Dashboard')).toBeInTheDocument();
-      expect(screen.getByText('Opportunities')).toBeInTheDocument();
-      expect(screen.getByText('Messages')).toBeInTheDocument();
-      expect(screen.getByText('Cross-Posts')).toBeInTheDocument();
-      expect(screen.getByText('Settings')).toBeInTheDocument();
-    });
+    it.each(['/dashboard', '/opportunities', '/messages', '/posting-queue', '/settings'])(
+      'renders nav on %s when user is authenticated',
+      (path) => {
+        setPath(path);
+        setAuth({ user: authedUser });
+        render(<Navigation />);
+        expect(screen.getByText('Dashboard')).toBeInTheDocument();
+        expect(screen.getByText('Opportunities')).toBeInTheDocument();
+        expect(screen.getByText('Messages')).toBeInTheDocument();
+        expect(screen.getByText('Cross-Posts')).toBeInTheDocument();
+        expect(screen.getByText('Settings')).toBeInTheDocument();
+      }
+    );
 
     it('Dashboard nav link points to /dashboard (not /)', () => {
       setPath('/dashboard');

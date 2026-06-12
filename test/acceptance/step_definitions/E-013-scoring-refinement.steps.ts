@@ -46,21 +46,36 @@ interface ScenarioWorld {
 Given(
   'an electronics listing priced at {int} with good condition',
   function (this: ScenarioWorld, price: number) {
-    this.listingInput = { title: 'Generic gadget', price, condition: 'good', category: 'electronics' };
+    this.listingInput = {
+      title: 'Generic gadget',
+      price,
+      condition: 'good',
+      category: 'electronics',
+    };
   }
 );
 
 Given(
   'a musical listing priced at {int} with new condition',
   function (this: ScenarioWorld, price: number) {
-    this.listingInput = { title: 'Generic instrument', price, condition: 'new', category: 'musical' };
+    this.listingInput = {
+      title: 'Generic instrument',
+      price,
+      condition: 'new',
+      category: 'musical',
+    };
   }
 );
 
 Given(
   'a generic collectibles listing priced at {int} with good condition',
   function (this: ScenarioWorld, price: number) {
-    this.listingInput = { title: 'Generic item', price, condition: 'good', category: 'collectibles' };
+    this.listingInput = {
+      title: 'Generic item',
+      price,
+      condition: 'good',
+      category: 'collectibles',
+    };
   }
 );
 
@@ -81,7 +96,13 @@ Given(
 Given(
   'a default-category listing with asking price {int}, new condition, {int}% fee',
   function (this: ScenarioWorld, price: number, feePct: number) {
-    this.listingInput = { title: 'Generic item', price, condition: 'new', category: 'default', feeRate: feePct / 100 };
+    this.listingInput = {
+      title: 'Generic item',
+      price,
+      condition: 'new',
+      category: 'default',
+      feeRate: feePct / 100,
+    };
   }
 );
 
@@ -123,19 +144,23 @@ Given(
     // default category (1.2-1.5), new (1.0), 0% fee → profitPotential ≈ round(0.35 * asking).
     // profit<25: asking=$57 → profit=20. profit>=25: asking=$143 → profit=51.
     const askingPrice = profit < 25 ? 57 : 143;
-    this.analyzed = analyzeListing('craigslist', {
-      title: 'Test item for profit floor',
-      externalId: 'profit-floor-test',
-      url: 'http://test',
-      askingPrice,
-      description: null,
-      condition: 'new',
-      category: 'default',
-    } as Parameters<typeof analyzeListing>[1], {
-      opportunityThreshold: 0,
-      opportunityMinProfit: 25,
-      feeRate: 0,
-    });
+    this.analyzed = analyzeListing(
+      'craigslist',
+      {
+        title: 'Test item for profit floor',
+        externalId: 'profit-floor-test',
+        url: 'http://test',
+        askingPrice,
+        description: null,
+        condition: 'new',
+        category: 'default',
+      } as Parameters<typeof analyzeListing>[1],
+      {
+        opportunityThreshold: 0,
+        opportunityMinProfit: 25,
+        feeRate: 0,
+      }
+    );
   }
 );
 
@@ -158,11 +183,21 @@ When('the scoring algorithm runs', function (this: ScenarioWorld) {
   this.estimation = estimateValue(li.title, null, li.price, li.condition, li.category, li.feeRate);
 
   // For brand-boost comparison scenarios, also score a generic version
-  const genericTitle = li.title.toLowerCase().includes('milwaukee') ? 'Generic drill' :
-                       li.title.toLowerCase().includes('fender') ? 'Generic guitar' :
-                       li.title.toLowerCase().includes('moog') ? 'Generic synthesizer' :
-                       'Generic item';
-  this.genericEstimation = estimateValue(genericTitle, null, li.price, li.condition, li.category, li.feeRate);
+  const genericTitle = li.title.toLowerCase().includes('milwaukee')
+    ? 'Generic drill'
+    : li.title.toLowerCase().includes('fender')
+      ? 'Generic guitar'
+      : li.title.toLowerCase().includes('moog')
+        ? 'Generic synthesizer'
+        : 'Generic item';
+  this.genericEstimation = estimateValue(
+    genericTitle,
+    null,
+    li.price,
+    li.condition,
+    li.category,
+    li.feeRate
+  );
 });
 
 When('the listing is analyzed', function (this: ScenarioWorld) {
@@ -192,25 +227,19 @@ When('the refinement log is inspected', function (this: ScenarioWorld) {
 
 // ==================== Then: Assertions ====================
 
-Then(
-  'the estimated low should be at least {int}',
-  function (this: ScenarioWorld, minLow: number) {
-    assert.ok(
-      this.estimation!.estimatedLow >= minLow,
-      `Expected estimatedLow >= ${minLow}, got ${this.estimation!.estimatedLow}`
-    );
-  }
-);
+Then('the estimated low should be at least {int}', function (this: ScenarioWorld, minLow: number) {
+  assert.ok(
+    this.estimation!.estimatedLow >= minLow,
+    `Expected estimatedLow >= ${minLow}, got ${this.estimation!.estimatedLow}`
+  );
+});
 
-Then(
-  'the estimated high should be at most {int}',
-  function (this: ScenarioWorld, maxHigh: number) {
-    assert.ok(
-      this.estimation!.estimatedHigh <= maxHigh,
-      `Expected estimatedHigh <= ${maxHigh}, got ${this.estimation!.estimatedHigh}`
-    );
-  }
-);
+Then('the estimated high should be at most {int}', function (this: ScenarioWorld, maxHigh: number) {
+  assert.ok(
+    this.estimation!.estimatedHigh <= maxHigh,
+    `Expected estimatedHigh <= ${maxHigh}, got ${this.estimation!.estimatedHigh}`
+  );
+});
 
 Then(
   'the estimated value should reflect a {float}x-{float}x markup',
@@ -238,25 +267,19 @@ Then('the resale difficulty should be EASY or VERY_EASY', function (this: Scenar
   );
 });
 
-Then(
-  'the tags should include {string}',
-  function (this: ScenarioWorld, tag: string) {
-    assert.ok(
-      this.estimation!.tags.includes(tag),
-      `Expected tags to include "${tag}", got: ${this.estimation!.tags.join(', ')}`
-    );
-  }
-);
+Then('the tags should include {string}', function (this: ScenarioWorld, tag: string) {
+  assert.ok(
+    this.estimation!.tags.includes(tag),
+    `Expected tags to include "${tag}", got: ${this.estimation!.tags.join(', ')}`
+  );
+});
 
-Then(
-  'a generic drill at the same price should score lower',
-  function (this: ScenarioWorld) {
-    assert.ok(
-      this.estimation!.valueScore > this.genericEstimation!.valueScore,
-      `Expected branded item (score=${this.estimation!.valueScore}) to outscore generic (score=${this.genericEstimation!.valueScore})`
-    );
-  }
-);
+Then('a generic drill at the same price should score lower', function (this: ScenarioWorld) {
+  assert.ok(
+    this.estimation!.valueScore > this.genericEstimation!.valueScore,
+    `Expected branded item (score=${this.estimation!.valueScore}) to outscore generic (score=${this.genericEstimation!.valueScore})`
+  );
+});
 
 Then('the vintage tag should be applied', function (this: ScenarioWorld) {
   assert.ok(
@@ -284,15 +307,12 @@ Then('the value score should be {int}', function (this: ScenarioWorld, expected:
   assert.strictEqual(this.estimation!.valueScore, expected);
 });
 
-Then(
-  'the profit potential should exceed {int}',
-  function (this: ScenarioWorld, threshold: number) {
-    assert.ok(
-      this.estimation!.profitPotential > threshold,
-      `Expected profitPotential > ${threshold}, got ${this.estimation!.profitPotential}`
-    );
-  }
-);
+Then('the profit potential should exceed {int}', function (this: ScenarioWorld, threshold: number) {
+  assert.ok(
+    this.estimation!.profitPotential > threshold,
+    `Expected profitPotential > ${threshold}, got ${this.estimation!.profitPotential}`
+  );
+});
 
 Then(
   'the value score should be {int} \\(capped)',
@@ -332,15 +352,15 @@ Then(
   }
 );
 
-Then('it should document the before\\/after backtesting comparison', function (this: ScenarioWorld) {
-  assert.ok(/before.*after|after.*before/i.test(this.refinementLogContent!));
-});
-
 Then(
-  'each should be categorized as electronics, not other',
+  'it should document the before\\/after backtesting comparison',
   function (this: ScenarioWorld) {
-    for (const cat of this.detectedCategories!) {
-      assert.strictEqual(cat, 'electronics', `Expected electronics, got ${cat}`);
-    }
+    assert.ok(/before.*after|after.*before/i.test(this.refinementLogContent!));
   }
 );
+
+Then('each should be categorized as electronics, not other', function (this: ScenarioWorld) {
+  for (const cat of this.detectedCategories!) {
+    assert.strictEqual(cat, 'electronics', `Expected electronics, got ${cat}`);
+  }
+});

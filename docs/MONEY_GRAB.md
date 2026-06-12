@@ -72,14 +72,14 @@ Flipper.ai is a **92% complete, production-ready** AI-powered marketplace arbitr
 
 ### Why This Will Work
 
-| Factor | Status |
-|--------|--------|
-| Product complete? | 92% — only Stripe config + DNS needed |
-| Market demand? | 10-15M US resellers, fastest-growing segment underserved |
-| Competition? | Nearest local-flip competitors <$1M ARR, <5K users |
-| Pricing validated? | $19-49/mo matches market willingness to pay |
-| Payment infrastructure? | Stripe fully integrated, tiers gated, webhooks wired |
-| Growth playbook? | YouTube affiliates + Reddit + paid ads — proven by every competitor |
+| Factor                  | Status                                                              |
+| ----------------------- | ------------------------------------------------------------------- |
+| Product complete?       | 92% — only Stripe config + DNS needed                               |
+| Market demand?          | 10-15M US resellers, fastest-growing segment underserved            |
+| Competition?            | Nearest local-flip competitors <$1M ARR, <5K users                  |
+| Pricing validated?      | $19-49/mo matches market willingness to pay                         |
+| Payment infrastructure? | Stripe fully integrated, tiers gated, webhooks wired                |
+| Growth playbook?        | YouTube affiliates + Reddit + paid ads — proven by every competitor |
 
 ### The Money Path (Fastest Route)
 
@@ -99,35 +99,35 @@ Month 4-6: Viral content + word of mouth + SEO. Target: $10K MRR.
 
 ### What's Shippable TODAY
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Landing page with pricing | DONE | Hero, features, 3 tiers, CTAs |
-| User registration & auth | DONE | Firebase Auth, email + OAuth (Google, GitHub, Facebook) |
-| Onboarding wizard | DONE | Preferences, marketplace selection |
-| 5 marketplace scrapers | DONE | Craigslist, eBay, Facebook, Mercari, OfferUp |
-| AI scoring & analysis | DONE | Claude + OpenAI, two-layer cache |
-| Value estimation engine | DONE | Algorithmic scoring 0-100, category multipliers, brand detection |
-| Market intelligence | DONE | Comparable sales, sold volume, demand analysis |
-| Full dashboard | DONE | Kanban lifecycle, filtering, analytics, real-time SSE |
-| Stripe checkout | DONE | Session creation, customer portal, webhooks |
-| Tier enforcement | DONE | Runtime gating on scans, marketplaces, features |
-| Email notifications | DONE | Welcome, payment failures, monitoring events |
-| User settings | DONE | Fees, notifications, preferences |
-| Messaging system | DONE | AI message gen, negotiation, approval workflow |
-| Meeting logistics | DONE | Google Calendar, Google Maps routes |
-| Push notifications | DONE | FCM push, Twilio SMS |
-| CI/CD pipeline | DONE | GitHub Actions -> Firebase Hosting + Cloud Run |
-| Error tracking | DONE | Sentry configured |
+| Feature                   | Status | Notes                                                            |
+| ------------------------- | ------ | ---------------------------------------------------------------- |
+| Landing page with pricing | DONE   | Hero, features, 3 tiers, CTAs                                    |
+| User registration & auth  | DONE   | Firebase Auth, email + OAuth (Google, GitHub, Facebook)          |
+| Onboarding wizard         | DONE   | Preferences, marketplace selection                               |
+| 5 marketplace scrapers    | DONE   | Craigslist, eBay, Facebook, Mercari, OfferUp                     |
+| AI scoring & analysis     | DONE   | Claude + OpenAI, two-layer cache                                 |
+| Value estimation engine   | DONE   | Algorithmic scoring 0-100, category multipliers, brand detection |
+| Market intelligence       | DONE   | Comparable sales, sold volume, demand analysis                   |
+| Full dashboard            | DONE   | Kanban lifecycle, filtering, analytics, real-time SSE            |
+| Stripe checkout           | DONE   | Session creation, customer portal, webhooks                      |
+| Tier enforcement          | DONE   | Runtime gating on scans, marketplaces, features                  |
+| Email notifications       | DONE   | Welcome, payment failures, monitoring events                     |
+| User settings             | DONE   | Fees, notifications, preferences                                 |
+| Messaging system          | DONE   | AI message gen, negotiation, approval workflow                   |
+| Meeting logistics         | DONE   | Google Calendar, Google Maps routes                              |
+| Push notifications        | DONE   | FCM push, Twilio SMS                                             |
+| CI/CD pipeline            | DONE   | GitHub Actions -> Firebase Hosting + Cloud Run                   |
+| Error tracking            | DONE   | Sentry configured                                                |
 
 ### What's Missing (Launch Blockers)
 
-| Blocker | Effort | Priority |
-|---------|--------|----------|
+| Blocker                                        | Effort | Priority |
+| ---------------------------------------------- | ------ | -------- |
 | Real Stripe price IDs (currently placeholders) | 30 min | CRITICAL |
-| Domain DNS pointing to Firebase Hosting | 1 hour | CRITICAL |
-| Email DNS for Resend (transactional emails) | 30 min | CRITICAL |
-| Production deployment verification | 1 hour | CRITICAL |
-| Billing flow smoke test | 1 hour | HIGH |
+| Domain DNS pointing to Firebase Hosting        | 1 hour | CRITICAL |
+| Email DNS for Resend (transactional emails)    | 30 min | CRITICAL |
+| Production deployment verification             | 1 hour | CRITICAL |
+| Billing flow smoke test                        | 1 hour | HIGH     |
 
 **Total time to launch: ~4 hours of configuration work.**
 
@@ -137,29 +137,29 @@ Month 4-6: Viral content + word of mouth + SEO. Target: $10K MRR.
 
 ### Direct Competitors (Local Marketplace Flipping)
 
-| Competitor | Est. Revenue | Users | Pricing | Weakness |
-|------------|-------------|-------|---------|----------|
-| **ProfitPath** | <$1M | 1-5K | $19-99/mo | Early stage, limited AI |
-| **Flipmine** | <$500K | <2K | ~$29/mo | Very early, small team |
-| **FlipAlerts** | <$500K | Small | $15-30/mo | Alert-only, no lifecycle |
-| **Hammoq** | ~$2M | 3-5K | ~$49/mo | Focus on listing, not sourcing |
+| Competitor     | Est. Revenue | Users | Pricing   | Weakness                       |
+| -------------- | ------------ | ----- | --------- | ------------------------------ |
+| **ProfitPath** | <$1M         | 1-5K  | $19-99/mo | Early stage, limited AI        |
+| **Flipmine**   | <$500K       | <2K   | ~$29/mo   | Very early, small team         |
+| **FlipAlerts** | <$500K       | Small | $15-30/mo | Alert-only, no lifecycle       |
+| **Hammoq**     | ~$2M         | 3-5K  | ~$49/mo   | Focus on listing, not sourcing |
 
 ### Adjacent Competitors (Amazon FBA Focus — Different Niche)
 
-| Competitor | Est. ARR | Users | Pricing |
-|------------|----------|-------|---------|
-| **Tactical Arbitrage** | $15-25M | 20-30K | $59-95/mo |
-| **Jungle Scout** | $50-70M | 500K+ | $29-84/mo |
-| **Helium 10** | $50-80M | 1M+ | $29-229/mo |
-| **SellerAmp** | $3-5M | 10-15K | $17-30/mo |
-| **BuyBotPro** | $2-4M | 5-10K | ~$30/mo |
+| Competitor             | Est. ARR | Users  | Pricing    |
+| ---------------------- | -------- | ------ | ---------- |
+| **Tactical Arbitrage** | $15-25M  | 20-30K | $59-95/mo  |
+| **Jungle Scout**       | $50-70M  | 500K+  | $29-84/mo  |
+| **Helium 10**          | $50-80M  | 1M+    | $29-229/mo |
+| **SellerAmp**          | $3-5M    | 10-15K | $17-30/mo  |
+| **BuyBotPro**          | $2-4M    | 5-10K  | ~$30/mo    |
 
 ### Cross-Listing Tools (Adjacent, Not Direct Competitors)
 
-| Tool | Est. ARR | Users | Pricing |
-|------|----------|-------|---------|
-| **List Perfectly** | $10-15M | 50K+ | $29-69/mo |
-| **Vendoo** | $8-12M | 30-40K | $10-45/mo |
+| Tool               | Est. ARR | Users  | Pricing   |
+| ------------------ | -------- | ------ | --------- |
+| **List Perfectly** | $10-15M  | 50K+   | $29-69/mo |
+| **Vendoo**         | $8-12M   | 30-40K | $10-45/mo |
 
 ### Our Competitive Moat
 
@@ -183,44 +183,47 @@ Month 4-6: Viral content + word of mouth + SEO. Target: $10K MRR.
 
 ### Current Tier Structure (Already Implemented)
 
-| Feature | FREE ($0) | FLIPPER ($19/mo) | PRO ($49/mo) |
-|---------|-----------|------------------|--------------|
-| Scans per day | 10 | Unlimited | Unlimited |
-| Marketplaces | 1 | 3 | All 5 |
-| Search configs | 3 | 20 | Unlimited |
-| Active jobs | 1 | 5 | 20 |
-| AI analysis | Basic | Full | Full |
-| Price history | No | Yes | Yes |
-| Messaging | No | Yes | Yes |
-| eBay cross-listing | No | No | Yes |
-| Meeting logistics | No | No | Yes |
+| Feature            | FREE ($0) | FLIPPER ($19/mo) | PRO ($49/mo) |
+| ------------------ | --------- | ---------------- | ------------ |
+| Scans per day      | 10        | Unlimited        | Unlimited    |
+| Marketplaces       | 1         | 3                | All 5        |
+| Search configs     | 3         | 20               | Unlimited    |
+| Active jobs        | 1         | 5                | 20           |
+| AI analysis        | Basic     | Full             | Full         |
+| Price history      | No        | Yes              | Yes          |
+| Messaging          | No        | Yes              | Yes          |
+| eBay cross-listing | No        | No               | Yes          |
+| Meeting logistics  | No        | No               | Yes          |
 
 ### Pricing Strategy Decisions
 
 **Keep current pricing.** Research validates $19-49/mo is the sweet spot:
+
 - Part-time flippers ($1-5K/mo revenue) pay $20-50/mo for tools
 - Full-time flippers ($5K+/mo) pay $50-150/mo
 - Our tiers map perfectly to these segments
 
 **Add annual billing at 20% discount:**
+
 - FLIPPER Annual: $182/year ($15.17/mo effective) — saves $46
 - PRO Annual: $470/year ($39.17/mo effective) — saves $118
 - Annual billing reduces churn and provides upfront cash
 
 **Add a "Founding Member" beta price (time-limited):**
+
 - FLIPPER Founding: $14/mo (locked for life) — creates urgency
 - PRO Founding: $39/mo (locked for life)
 - Cap at first 100 customers, then price goes to standard
 
 ### Revenue Math
 
-| Scenario | FLIPPER Users | PRO Users | MRR | ARR |
-|----------|-------------|-----------|-----|-----|
-| Minimum viable | 30 | 10 | $1,060 | $12,720 |
-| Month 3 target | 80 | 30 | $2,990 | $35,880 |
-| Month 6 target | 200 | 80 | $7,720 | $92,640 |
-| Month 12 target | 500 | 200 | $19,300 | $231,600 |
-| Scale target | 2,000 | 500 | $62,500 | $750,000 |
+| Scenario        | FLIPPER Users | PRO Users | MRR     | ARR      |
+| --------------- | ------------- | --------- | ------- | -------- |
+| Minimum viable  | 30            | 10        | $1,060  | $12,720  |
+| Month 3 target  | 80            | 30        | $2,990  | $35,880  |
+| Month 6 target  | 200           | 80        | $7,720  | $92,640  |
+| Month 12 target | 500           | 200       | $19,300 | $231,600 |
+| Scale target    | 2,000         | 500       | $62,500 | $750,000 |
 
 ### Lifetime Deal Strategy (Cash Injection — Month 2)
 
@@ -350,6 +353,7 @@ Month 4-6: Viral content + word of mouth + SEO. Target: $10K MRR.
 ### Track A: Use Flipper Yourself (Days 4-14)
 
 This is the single most important thing you can do. Using your own product:
+
 1. Proves it works (or reveals bugs before customers find them)
 2. Generates real profit stories for marketing content
 3. Creates screenshots and video footage for ads
@@ -370,13 +374,13 @@ This is the single most important thing you can do. Using your own product:
 
 #### Content You Need to Create from Flipping
 
-| Content Piece | Purpose | Platform |
-|--------------|---------|----------|
-| "I found X for $Y and sold it for $Z" stories (5-10) | Social proof | Reddit, Twitter, TikTok |
-| Before/after profit screenshots | Ads, landing page | All platforms |
-| 60-second "Flipper found this deal" screen recording | Product demo | YouTube, TikTok, landing page |
-| "My first week using AI to find flips" blog post | SEO, Reddit | Blog, Reddit |
-| Weekly P&L summary | Building in public | Twitter, Indie Hackers |
+| Content Piece                                        | Purpose            | Platform                      |
+| ---------------------------------------------------- | ------------------ | ----------------------------- |
+| "I found X for $Y and sold it for $Z" stories (5-10) | Social proof       | Reddit, Twitter, TikTok       |
+| Before/after profit screenshots                      | Ads, landing page  | All platforms                 |
+| 60-second "Flipper found this deal" screen recording | Product demo       | YouTube, TikTok, landing page |
+| "My first week using AI to find flips" blog post     | SEO, Reddit        | Blog, Reddit                  |
+| Weekly P&L summary                                   | Building in public | Twitter, Indie Hackers        |
 
 ### Track B: Soft Launch (Days 7-14)
 
@@ -402,6 +406,7 @@ This is the single most important thing you can do. Using your own product:
 **IMPORTANT: Reddit hates self-promotion. Follow this sequence exactly.**
 
 - [ ] **Step 1 (Day 8):** Post in r/Flipping — a VALUE post, not a product pitch:
+
   ```
   Title: "I analyzed 500 local marketplace listings with AI — here's
   what actually flips for profit in [your city]"
@@ -411,6 +416,7 @@ This is the single most important thing you can do. Using your own product:
   finds. Include specific examples with prices. Make it genuinely
   useful. Do NOT mention your tool in the post.
   ```
+
 - [ ] **Step 2 (Day 8-9):** Engage authentically with every comment. Answer questions. Be helpful.
 - [ ] **Step 3 (Day 9-10):** When someone inevitably asks "how did you do this?" or "what tool?":
   ```
@@ -431,6 +437,7 @@ This is the single most important thing you can do. Using your own product:
   - Goodwill / Thrift Flippers (40K+)
 - [ ] **Step 2:** Spend 2-3 days answering questions, commenting, being helpful
 - [ ] **Step 3:** Post a "case study" with your real flipping results:
+
   ```
   "This week I used AI to scan 5 marketplaces simultaneously.
   Found 12 items, bought 4, sold 3 so far for $187 total profit.
@@ -438,18 +445,19 @@ This is the single most important thing you can do. Using your own product:
 
   [Include before/after screenshots from your Flipper dashboard]
   ```
+
 - [ ] **Step 4:** When asked about the tool, share the link
 - [ ] **Step 5:** Offer a founding member discount to group members
 
 #### Early Metrics Target (End of Day 14)
 
-| Metric | Target |
-|--------|--------|
-| Registered users | 50-100 |
-| Paying customers | 5-15 |
-| MRR | $100-300 |
+| Metric                   | Target   |
+| ------------------------ | -------- |
+| Registered users         | 50-100   |
+| Paying customers         | 5-15     |
+| MRR                      | $100-300 |
 | Personal flipping profit | $200-500 |
-| Content pieces created | 10+ |
+| Content pieces created   | 10+      |
 
 ---
 
@@ -463,16 +471,16 @@ YouTube is the #1 growth channel for resale tools. Every major competitor grew t
 
 #### Target Influencers (Outreach List)
 
-| Channel | Subscribers | Focus | Contact Priority |
-|---------|-----------|-------|-----------------|
-| Hairy Tornado | ~300K+ | General flipping | HIGH |
-| Ralli Roots | ~250K+ | eBay reselling | HIGH |
-| Daily Refinement | ~200K+ | eBay/Amazon | MEDIUM |
-| Caleb Boxx | ~200K+ | eBay reselling | MEDIUM |
-| Hustle at Home Mom | ~100K+ | Part-time reselling | HIGH |
-| Reseller Rabbit | ~100K+ | Multi-platform | HIGH |
-| The Flipping Couple | ~50K+ | Couples reselling | MEDIUM |
-| Micro-influencers (10-50K subs) | Various | Various | HIGH (cheaper, better ROI) |
+| Channel                         | Subscribers | Focus               | Contact Priority           |
+| ------------------------------- | ----------- | ------------------- | -------------------------- |
+| Hairy Tornado                   | ~300K+      | General flipping    | HIGH                       |
+| Ralli Roots                     | ~250K+      | eBay reselling      | HIGH                       |
+| Daily Refinement                | ~200K+      | eBay/Amazon         | MEDIUM                     |
+| Caleb Boxx                      | ~200K+      | eBay reselling      | MEDIUM                     |
+| Hustle at Home Mom              | ~100K+      | Part-time reselling | HIGH                       |
+| Reseller Rabbit                 | ~100K+      | Multi-platform      | HIGH                       |
+| The Flipping Couple             | ~50K+       | Couples reselling   | MEDIUM                     |
+| Micro-influencers (10-50K subs) | Various     | Various             | HIGH (cheaper, better ROI) |
 
 #### Outreach Template
 
@@ -544,15 +552,15 @@ TikTok is the fastest organic growth channel for reselling content. "I bought X 
 
 #### Content Calendar (Post 1-2x daily)
 
-| Day | Content Type | Example |
-|-----|-------------|---------|
-| Mon | "AI found this deal" screen recording | Show Flipper finding a $200 item listed for $40 |
-| Tue | Before/after flip story | "Bought for $15 at Goodwill, sold for $95 on eBay" |
-| Wed | "Scan race" — how many deals in 60 seconds | Speed through AI scanning 5 marketplaces |
-| Thu | Tip/education | "3 categories that always flip for profit" |
-| Fri | Weekly profit summary | Show dashboard with week's P&L |
-| Sat | Live sourcing with the tool | Take phone to a thrift store, scan items live |
-| Sun | "Beginner's guide" format | "How to start flipping with $50 and AI" |
+| Day | Content Type                               | Example                                            |
+| --- | ------------------------------------------ | -------------------------------------------------- |
+| Mon | "AI found this deal" screen recording      | Show Flipper finding a $200 item listed for $40    |
+| Tue | Before/after flip story                    | "Bought for $15 at Goodwill, sold for $95 on eBay" |
+| Wed | "Scan race" — how many deals in 60 seconds | Speed through AI scanning 5 marketplaces           |
+| Thu | Tip/education                              | "3 categories that always flip for profit"         |
+| Fri | Weekly profit summary                      | Show dashboard with week's P&L                     |
+| Sat | Live sourcing with the tool                | Take phone to a thrift store, scan items live      |
+| Sun | "Beginner's guide" format                  | "How to start flipping with $50 and AI"            |
 
 #### Production Requirements
 
@@ -600,15 +608,15 @@ TikTok is the fastest organic growth channel for reselling content. "I bought X 
 
 ### Early Metrics Target (End of Day 30)
 
-| Metric | Target |
-|--------|--------|
-| Registered users | 200-500 |
-| Paying customers | 35-60 |
-| MRR | $800-1,500 |
-| YouTube affiliates onboarded | 3-5 |
-| TikTok followers | 500-2,000 |
+| Metric                           | Target              |
+| -------------------------------- | ------------------- |
+| Registered users                 | 200-500             |
+| Paying customers                 | 35-60               |
+| MRR                              | $800-1,500          |
+| YouTube affiliates onboarded     | 3-5                 |
+| TikTok followers                 | 500-2,000           |
 | Reddit karma from flipping posts | Positive reputation |
-| Personal flipping profit | $500-1,000 |
+| Personal flipping profit         | $500-1,000          |
 
 ---
 
@@ -627,17 +635,17 @@ TikTok is the fastest organic growth channel for reselling content. "I bought X 
   - Bidding: Maximize conversions (with target CPA of $50)
 - [ ] **Keywords to target:**
 
-  | Keyword | Est. CPC | Intent |
-  |---------|----------|--------|
-  | "reselling tools" | $3-5 | High |
-  | "flip finder app" | $2-4 | High |
-  | "what to flip for profit" | $1.50-3 | Medium |
-  | "craigslist flipping tool" | $1-2 | High |
-  | "marketplace arbitrage" | $3-5 | High |
-  | "best items to resell" | $2-4 | Medium |
-  | "facebook marketplace scanner" | $2-3 | High |
-  | "AI reselling tool" | $3-5 | High |
-  | "flip calculator" | $1.50-2.50 | Medium |
+  | Keyword                        | Est. CPC   | Intent |
+  | ------------------------------ | ---------- | ------ |
+  | "reselling tools"              | $3-5       | High   |
+  | "flip finder app"              | $2-4       | High   |
+  | "what to flip for profit"      | $1.50-3    | Medium |
+  | "craigslist flipping tool"     | $1-2       | High   |
+  | "marketplace arbitrage"        | $3-5       | High   |
+  | "best items to resell"         | $2-4       | Medium |
+  | "facebook marketplace scanner" | $2-3       | High   |
+  | "AI reselling tool"            | $3-5       | High   |
+  | "flip calculator"              | $1.50-2.50 | Medium |
 
 - [ ] **Ad copy template:**
   ```
@@ -705,16 +713,16 @@ TikTok is the fastest organic growth channel for reselling content. "I bought X 
 
 #### Blog Posts to Write (Target 1-2/week)
 
-| Post Title | Target Keyword | Est. Monthly Search |
-|-----------|---------------|-------------------|
-| "Best Items to Flip for Profit in 2026" | best items to resell | 5-10K |
-| "How to Make Money Flipping on Facebook Marketplace" | facebook marketplace flipping | 2-5K |
-| "Craigslist Flipping Guide: Find Underpriced Items" | craigslist flipping | 1-3K |
-| "Is Flipping Worth It? I Made $X in 30 Days" | is flipping worth it | 1-2K |
-| "Best Reselling Tools and Apps in 2026" | reselling tools | 500-1K |
-| "OfferUp vs Facebook Marketplace for Flipping" | offerup vs facebook marketplace | 500-1K |
-| "How to Use AI to Find Things to Flip" | ai reselling tool | 300-800 |
-| "Top 10 Categories That Always Flip for Profit" | what to flip for profit | 2-5K |
+| Post Title                                           | Target Keyword                  | Est. Monthly Search |
+| ---------------------------------------------------- | ------------------------------- | ------------------- |
+| "Best Items to Flip for Profit in 2026"              | best items to resell            | 5-10K               |
+| "How to Make Money Flipping on Facebook Marketplace" | facebook marketplace flipping   | 2-5K                |
+| "Craigslist Flipping Guide: Find Underpriced Items"  | craigslist flipping             | 1-3K                |
+| "Is Flipping Worth It? I Made $X in 30 Days"         | is flipping worth it            | 1-2K                |
+| "Best Reselling Tools and Apps in 2026"              | reselling tools                 | 500-1K              |
+| "OfferUp vs Facebook Marketplace for Flipping"       | offerup vs facebook marketplace | 500-1K              |
+| "How to Use AI to Find Things to Flip"               | ai reselling tool               | 300-800             |
+| "Top 10 Categories That Always Flip for Profit"      | what to flip for profit         | 2-5K                |
 
 #### Free Tool as SEO Magnet
 
@@ -726,16 +734,16 @@ TikTok is the fastest organic growth channel for reselling content. "I bought X 
 
 ### Month 2-3 Metrics Target
 
-| Metric | Month 2 | Month 3 |
-|--------|---------|---------|
-| Registered users | 500-1,000 | 1,000-2,000 |
-| Paying customers | 80-120 | 150-250 |
-| MRR | $2,000-3,500 | $3,500-6,000 |
-| LTD revenue (one-time) | $10,000-15,000 | — |
-| YouTube affiliates | 5-10 | 10-20 |
-| Blog posts published | 4-6 | 8-12 |
-| TikTok followers | 2,000-5,000 | 5,000-15,000 |
-| Ad spend | $1,500-2,000 | $2,000-3,000 |
+| Metric                 | Month 2        | Month 3      |
+| ---------------------- | -------------- | ------------ |
+| Registered users       | 500-1,000      | 1,000-2,000  |
+| Paying customers       | 80-120         | 150-250      |
+| MRR                    | $2,000-3,500   | $3,500-6,000 |
+| LTD revenue (one-time) | $10,000-15,000 | —            |
+| YouTube affiliates     | 5-10           | 10-20        |
+| Blog posts published   | 4-6            | 8-12         |
+| TikTok followers       | 2,000-5,000    | 5,000-15,000 |
+| Ad spend               | $1,500-2,000   | $2,000-3,000 |
 
 ---
 
@@ -745,16 +753,16 @@ TikTok is the fastest organic growth channel for reselling content. "I bought X 
 
 ### Product Expansion (Feature Roadmap for Retention & Upsell)
 
-| Feature | Tier | Impact | Effort |
-|---------|------|--------|--------|
-| **Browser extension** — one-click "analyze this listing" on any marketplace | PRO | Very High | 2-3 weeks |
-| **Mobile app** (React Native) — scan deals on the go, push alerts | PRO | Very High | 4-6 weeks |
-| **Real-time deal alerts** — push notification when a high-score item is posted | FLIPPER+ | High | 1-2 weeks |
-| **Automated cross-listing** — post to eBay directly from Flipper | PRO | High | 2-3 weeks |
-| **Team/multi-user accounts** — for reselling businesses | Enterprise ($99/mo) | Medium | 2-3 weeks |
-| **Inventory management** — track purchased items, storage, costs | PRO | Medium | 2-3 weeks |
-| **Tax reporting** — generate resale income reports for tax filing | PRO | Medium | 1-2 weeks |
-| **API access** — for power users who want to integrate with their tools | Enterprise | Low-Med | 1 week |
+| Feature                                                                        | Tier                | Impact    | Effort    |
+| ------------------------------------------------------------------------------ | ------------------- | --------- | --------- |
+| **Browser extension** — one-click "analyze this listing" on any marketplace    | PRO                 | Very High | 2-3 weeks |
+| **Mobile app** (React Native) — scan deals on the go, push alerts              | PRO                 | Very High | 4-6 weeks |
+| **Real-time deal alerts** — push notification when a high-score item is posted | FLIPPER+            | High      | 1-2 weeks |
+| **Automated cross-listing** — post to eBay directly from Flipper               | PRO                 | High      | 2-3 weeks |
+| **Team/multi-user accounts** — for reselling businesses                        | Enterprise ($99/mo) | Medium    | 2-3 weeks |
+| **Inventory management** — track purchased items, storage, costs               | PRO                 | Medium    | 2-3 weeks |
+| **Tax reporting** — generate resale income reports for tax filing              | PRO                 | Medium    | 1-2 weeks |
+| **API access** — for power users who want to integrate with their tools        | Enterprise          | Low-Med   | 1 week    |
 
 ### Enterprise Tier Introduction (Month 6+)
 
@@ -764,12 +772,12 @@ TikTok is the fastest organic growth channel for reselling content. "I bought X 
 
 ### Partnership Opportunities
 
-| Partner Type | Example | Value |
-|-------------|---------|-------|
-| Shipping platforms | Pirate Ship, ShipStation | Bundle discounts, referral revenue |
-| Listing tools | List Perfectly, Vendoo | Integration, co-marketing |
-| Reseller education | Courses, YouTube academies | Affiliate partnerships |
-| Local businesses | Consignment shops, pawn shops | B2B licensing deals |
+| Partner Type       | Example                       | Value                              |
+| ------------------ | ----------------------------- | ---------------------------------- |
+| Shipping platforms | Pirate Ship, ShipStation      | Bundle discounts, referral revenue |
+| Listing tools      | List Perfectly, Vendoo        | Integration, co-marketing          |
+| Reseller education | Courses, YouTube academies    | Affiliate partnerships             |
+| Local businesses   | Consignment shops, pawn shops | B2B licensing deals                |
 
 ### Community Building
 
@@ -781,13 +789,13 @@ TikTok is the fastest organic growth channel for reselling content. "I bought X 
 
 ### Long-Term Revenue Targets
 
-| Milestone | Timeline | MRR | ARR |
-|-----------|----------|-----|-----|
-| Ramen profitable | Month 3-4 | $3,000 | $36,000 |
-| Full-time income | Month 6-8 | $8,000 | $96,000 |
-| Hire first contractor | Month 9-12 | $15,000 | $180,000 |
-| Series A territory | Month 18-24 | $50,000 | $600,000 |
-| Market leader | Month 24-36 | $100,000+ | $1.2M+ |
+| Milestone             | Timeline    | MRR       | ARR      |
+| --------------------- | ----------- | --------- | -------- |
+| Ramen profitable      | Month 3-4   | $3,000    | $36,000  |
+| Full-time income      | Month 6-8   | $8,000    | $96,000  |
+| Hire first contractor | Month 9-12  | $15,000   | $180,000 |
+| Series A territory    | Month 18-24 | $50,000   | $600,000 |
+| Market leader         | Month 24-36 | $100,000+ | $1.2M+   |
 
 ---
 
@@ -808,38 +816,38 @@ TikTok is the fastest organic growth channel for reselling content. "I bought X 
 
 #### Best Categories for Quick Flips (Based on Flipper's AI Data)
 
-| Category | Avg Buy Price | Avg Sell Price | Avg Profit | Flip Speed |
-|----------|-------------|---------------|------------|------------|
-| Power tools | $15-40 | $50-150 | $30-80 | 3-7 days |
-| Kitchen appliances | $10-30 | $40-100 | $20-60 | 3-5 days |
-| Video game consoles | $30-80 | $80-200 | $30-80 | 1-3 days |
-| Exercise equipment | $20-60 | $80-250 | $40-150 | 5-14 days |
-| Mid-century furniture | $20-100 | $100-500 | $50-300 | 7-21 days |
-| Brand-name clothing (NWT) | $5-20 | $30-80 | $20-50 | 3-10 days |
-| Musical instruments | $30-100 | $100-400 | $50-200 | 7-14 days |
-| Small electronics | $5-20 | $25-75 | $15-40 | 1-5 days |
+| Category                  | Avg Buy Price | Avg Sell Price | Avg Profit | Flip Speed |
+| ------------------------- | ------------- | -------------- | ---------- | ---------- |
+| Power tools               | $15-40        | $50-150        | $30-80     | 3-7 days   |
+| Kitchen appliances        | $10-30        | $40-100        | $20-60     | 3-5 days   |
+| Video game consoles       | $30-80        | $80-200        | $30-80     | 1-3 days   |
+| Exercise equipment        | $20-60        | $80-250        | $40-150    | 5-14 days  |
+| Mid-century furniture     | $20-100       | $100-500       | $50-300    | 7-21 days  |
+| Brand-name clothing (NWT) | $5-20         | $30-80         | $20-50     | 3-10 days  |
+| Musical instruments       | $30-100       | $100-400       | $50-200    | 7-14 days  |
+| Small electronics         | $5-20         | $25-75         | $15-40     | 1-5 days   |
 
 #### Daily Routine
 
-| Time | Activity | Duration |
-|------|----------|----------|
-| 7:00 AM | Run Flipper scans on all marketplaces | 5 min |
-| 7:05 AM | Review AI-scored results (70+ priority) | 15 min |
-| 7:20 AM | Contact sellers for top items | 10 min |
-| 12:00 PM | Check responses, schedule pickups | 10 min |
-| 5:00 PM | Pick up purchased items (if local) | 30-60 min |
-| 8:00 PM | Clean, photograph, list on eBay/Mercari | 30-45 min |
-| 8:45 PM | Update Flipper lifecycle tracking | 5 min |
+| Time     | Activity                                | Duration  |
+| -------- | --------------------------------------- | --------- |
+| 7:00 AM  | Run Flipper scans on all marketplaces   | 5 min     |
+| 7:05 AM  | Review AI-scored results (70+ priority) | 15 min    |
+| 7:20 AM  | Contact sellers for top items           | 10 min    |
+| 12:00 PM | Check responses, schedule pickups       | 10 min    |
+| 5:00 PM  | Pick up purchased items (if local)      | 30-60 min |
+| 8:00 PM  | Clean, photograph, list on eBay/Mercari | 30-45 min |
+| 8:45 PM  | Update Flipper lifecycle tracking       | 5 min     |
 
 **Total daily time: 1.5-2.5 hours. Target: $100-300/week profit.**
 
 #### Income Targets from Personal Flipping
 
-| Month | Investment | Revenue | Profit | Cumulative Profit |
-|-------|-----------|---------|--------|-------------------|
-| Month 1 | $300 | $600-900 | $300-600 | $300-600 |
-| Month 2 | $500 | $1,000-1,500 | $500-1,000 | $800-1,600 |
-| Month 3 | $800 | $1,500-2,500 | $700-1,500 | $1,500-3,100 |
+| Month   | Investment | Revenue      | Profit     | Cumulative Profit |
+| ------- | ---------- | ------------ | ---------- | ----------------- |
+| Month 1 | $300       | $600-900     | $300-600   | $300-600          |
+| Month 2 | $500       | $1,000-1,500 | $500-1,000 | $800-1,600        |
+| Month 3 | $800       | $1,500-2,500 | $700-1,500 | $1,500-3,100      |
 
 ---
 
@@ -847,30 +855,30 @@ TikTok is the fastest organic growth channel for reselling content. "I bought X 
 
 ### Channel Priority Matrix
 
-| Channel | Cost | Time Investment | Expected ROI | Speed to Results |
-|---------|------|----------------|-------------|-----------------|
-| Reddit organic | Free | 5 hrs/week | Very High | 2-4 weeks |
-| TikTok organic | Free | 5 hrs/week | High | 4-8 weeks |
-| YouTube affiliates | Free (commission only) | 3 hrs/week | Very High | 4-8 weeks |
-| Facebook groups | Free | 3 hrs/week | High | 2-4 weeks |
-| Product Hunt | Free | 10 hrs (one-time) | Medium-High | 1 day |
-| Google Ads | $750/mo | 2 hrs/week | Medium | 1-2 weeks |
-| Facebook Ads | $500/mo | 2 hrs/week | Medium-High | 1-2 weeks |
-| SEO/blog | Free | 5 hrs/week | High | 3-6 months |
-| Indie Hackers | Free | 1 hr/week | Medium | 2-4 weeks |
-| Twitter/X | Free | 2 hrs/week | Low-Medium | 4-12 weeks |
+| Channel            | Cost                   | Time Investment   | Expected ROI | Speed to Results |
+| ------------------ | ---------------------- | ----------------- | ------------ | ---------------- |
+| Reddit organic     | Free                   | 5 hrs/week        | Very High    | 2-4 weeks        |
+| TikTok organic     | Free                   | 5 hrs/week        | High         | 4-8 weeks        |
+| YouTube affiliates | Free (commission only) | 3 hrs/week        | Very High    | 4-8 weeks        |
+| Facebook groups    | Free                   | 3 hrs/week        | High         | 2-4 weeks        |
+| Product Hunt       | Free                   | 10 hrs (one-time) | Medium-High  | 1 day            |
+| Google Ads         | $750/mo                | 2 hrs/week        | Medium       | 1-2 weeks        |
+| Facebook Ads       | $500/mo                | 2 hrs/week        | Medium-High  | 1-2 weeks        |
+| SEO/blog           | Free                   | 5 hrs/week        | High         | 3-6 months       |
+| Indie Hackers      | Free                   | 1 hr/week         | Medium       | 2-4 weeks        |
+| Twitter/X          | Free                   | 2 hrs/week        | Low-Medium   | 4-12 weeks       |
 
 ### Weekly Marketing Schedule
 
-| Day | Activity | Time |
-|-----|----------|------|
-| Monday | Write 1 blog post (SEO). Post TikTok. Check ad performance. | 2 hrs |
-| Tuesday | Engage in Reddit (answer questions, comment). Post TikTok. | 1.5 hrs |
-| Wednesday | Engage in Facebook groups. Follow up with YouTubers. Post TikTok. | 1.5 hrs |
-| Thursday | Create new ad creatives. Post TikTok. Respond to affiliate inquiries. | 1.5 hrs |
-| Friday | Building-in-public post (Twitter, IH). Post TikTok. Review metrics. | 1.5 hrs |
-| Saturday | Create longer-form content (YouTube video or detailed blog post). | 2 hrs |
-| Sunday | Plan next week's content. Batch-create TikTok videos. | 1.5 hrs |
+| Day       | Activity                                                              | Time    |
+| --------- | --------------------------------------------------------------------- | ------- |
+| Monday    | Write 1 blog post (SEO). Post TikTok. Check ad performance.           | 2 hrs   |
+| Tuesday   | Engage in Reddit (answer questions, comment). Post TikTok.            | 1.5 hrs |
+| Wednesday | Engage in Facebook groups. Follow up with YouTubers. Post TikTok.     | 1.5 hrs |
+| Thursday  | Create new ad creatives. Post TikTok. Respond to affiliate inquiries. | 1.5 hrs |
+| Friday    | Building-in-public post (Twitter, IH). Post TikTok. Review metrics.   | 1.5 hrs |
+| Saturday  | Create longer-form content (YouTube video or detailed blog post).     | 2 hrs   |
+| Sunday    | Plan next week's content. Batch-create TikTok videos.                 | 1.5 hrs |
 
 **Total marketing time: ~12 hours/week**
 
@@ -880,23 +888,23 @@ TikTok is the fastest organic growth channel for reselling content. "I bought X 
 
 ### Month 2 Budget (Conservative Start)
 
-| Channel | Monthly Budget | Expected Trials | Expected Paid | CAC |
-|---------|---------------|----------------|---------------|-----|
-| Google Ads | $750 | 15-20 | 4-5 | $150-190 |
-| Facebook/IG Ads | $500 | 15-25 | 4-6 | $85-125 |
-| YouTube Pre-Roll | $400 | 8-12 | 2-3 | $135-200 |
-| Affiliate commissions | ~$200 | 10-20 | 5-10 | $20-40 |
-| **Total** | **$1,850** | **48-77** | **15-24** | **$77-123** |
+| Channel               | Monthly Budget | Expected Trials | Expected Paid | CAC         |
+| --------------------- | -------------- | --------------- | ------------- | ----------- |
+| Google Ads            | $750           | 15-20           | 4-5           | $150-190    |
+| Facebook/IG Ads       | $500           | 15-25           | 4-6           | $85-125     |
+| YouTube Pre-Roll      | $400           | 8-12            | 2-3           | $135-200    |
+| Affiliate commissions | ~$200          | 10-20           | 5-10          | $20-40      |
+| **Total**             | **$1,850**     | **48-77**       | **15-24**     | **$77-123** |
 
 ### Month 3 Budget (Scale What Works)
 
-| Channel | Monthly Budget | Expected Trials | Expected Paid | CAC |
-|---------|---------------|----------------|---------------|-----|
-| Google Ads | $1,000 | 20-30 | 5-8 | $125-200 |
-| Facebook/IG Ads | $1,000 | 30-50 | 8-12 | $85-125 |
-| YouTube Pre-Roll | $500 | 10-15 | 3-4 | $125-165 |
-| Affiliate commissions | ~$500 | 20-40 | 10-20 | $25-50 |
-| **Total** | **$3,000** | **80-135** | **26-44** | **$68-115** |
+| Channel               | Monthly Budget | Expected Trials | Expected Paid | CAC         |
+| --------------------- | -------------- | --------------- | ------------- | ----------- |
+| Google Ads            | $1,000         | 20-30           | 5-8           | $125-200    |
+| Facebook/IG Ads       | $1,000         | 30-50           | 8-12          | $85-125     |
+| YouTube Pre-Roll      | $500           | 10-15           | 3-4           | $125-165    |
+| Affiliate commissions | ~$500          | 20-40           | 10-20         | $25-50      |
+| **Total**             | **$3,000**     | **80-135**      | **26-44**     | **$68-115** |
 
 ### Break-Even Analysis
 
@@ -914,19 +922,19 @@ TikTok is the fastest organic growth channel for reselling content. "I bought X 
 
 ### Commission Structure
 
-| Plan | Monthly Price | Affiliate Earns (30%) | Annual Value per Referral |
-|------|-------------|---------------------|--------------------------|
-| FLIPPER | $19/mo | $5.70/mo | $68.40/year |
-| PRO | $49/mo | $14.70/mo | $176.40/year |
+| Plan    | Monthly Price | Affiliate Earns (30%) | Annual Value per Referral |
+| ------- | ------------- | --------------------- | ------------------------- |
+| FLIPPER | $19/mo        | $5.70/mo              | $68.40/year               |
+| PRO     | $49/mo        | $14.70/mo             | $176.40/year              |
 
 ### Affiliate Tiers (Incentivize Volume)
 
-| Tier | Referrals | Commission | Bonus |
-|------|-----------|------------|-------|
-| **Starter** | 1-10 | 30% | — |
-| **Partner** | 11-50 | 35% | Featured on partners page |
-| **Champion** | 51-200 | 40% | Co-marketing, exclusive features |
-| **Ambassador** | 200+ | 40% + $500/mo bonus | Quarterly strategy calls, product input |
+| Tier           | Referrals | Commission          | Bonus                                   |
+| -------------- | --------- | ------------------- | --------------------------------------- |
+| **Starter**    | 1-10      | 30%                 | —                                       |
+| **Partner**    | 11-50     | 35%                 | Featured on partners page               |
+| **Champion**   | 51-200    | 40%                 | Co-marketing, exclusive features        |
+| **Ambassador** | 200+      | 40% + $500/mo bonus | Quarterly strategy calls, product input |
 
 ### Affiliate Calculator (For Outreach)
 
@@ -1044,41 +1052,41 @@ These are tasks for the AI agent (Claude Code) to implement.
 
 ### Conservative Scenario
 
-| Month | New Paid | Total Paid | Churn (6%) | Net Paid | MRR | Cumulative Rev |
-|-------|----------|-----------|------------|---------|-----|---------------|
-| 1 | 15 | 15 | 0 | 15 | $420 | $420 |
-| 2 | 30 | 45 | 1 | 44 | $1,230 | $1,650 |
-| 3 | 40 | 84 | 3 | 81 | $2,270 | $3,920 |
-| 4 | 50 | 131 | 5 | 126 | $3,530 | $7,450 |
-| 5 | 55 | 181 | 8 | 173 | $4,840 | $12,290 |
-| 6 | 60 | 233 | 10 | 223 | $6,240 | $18,530 |
+| Month | New Paid | Total Paid | Churn (6%) | Net Paid | MRR    | Cumulative Rev |
+| ----- | -------- | ---------- | ---------- | -------- | ------ | -------------- |
+| 1     | 15       | 15         | 0          | 15       | $420   | $420           |
+| 2     | 30       | 45         | 1          | 44       | $1,230 | $1,650         |
+| 3     | 40       | 84         | 3          | 81       | $2,270 | $3,920         |
+| 4     | 50       | 131        | 5          | 126      | $3,530 | $7,450         |
+| 5     | 55       | 181        | 8          | 173      | $4,840 | $12,290        |
+| 6     | 60       | 233        | 10         | 223      | $6,240 | $18,530        |
 
-*+ LTD revenue of ~$12,000 in Month 2*
+_+ LTD revenue of ~$12,000 in Month 2_
 
 ### Optimistic Scenario (Viral content or influencer hit)
 
-| Month | New Paid | Total Paid | Churn (5%) | Net Paid | MRR | Cumulative Rev |
-|-------|----------|-----------|------------|---------|-----|---------------|
-| 1 | 30 | 30 | 0 | 30 | $840 | $840 |
-| 2 | 60 | 90 | 2 | 88 | $2,460 | $3,300 |
-| 3 | 80 | 168 | 4 | 164 | $4,590 | $7,890 |
-| 4 | 100 | 264 | 8 | 256 | $7,170 | $15,060 |
-| 5 | 120 | 376 | 13 | 363 | $10,160 | $25,220 |
-| 6 | 140 | 503 | 18 | 485 | $13,580 | $38,800 |
+| Month | New Paid | Total Paid | Churn (5%) | Net Paid | MRR     | Cumulative Rev |
+| ----- | -------- | ---------- | ---------- | -------- | ------- | -------------- |
+| 1     | 30       | 30         | 0          | 30       | $840    | $840           |
+| 2     | 60       | 90         | 2          | 88       | $2,460  | $3,300         |
+| 3     | 80       | 168        | 4          | 164      | $4,590  | $7,890         |
+| 4     | 100      | 264        | 8          | 256      | $7,170  | $15,060        |
+| 5     | 120      | 376        | 13         | 363      | $10,160 | $25,220        |
+| 6     | 140      | 503        | 18         | 485      | $13,580 | $38,800        |
 
-*+ LTD revenue of ~$15,000 in Month 2*
+_+ LTD revenue of ~$15,000 in Month 2_
 
 ### Key Milestones
 
-| Milestone | Conservative | Optimistic |
-|-----------|-------------|-----------|
-| First paying customer | Day 7-10 | Day 4-7 |
-| $500 MRR | Month 2 | Month 1 |
-| $1,000 MRR | Month 2-3 | Month 1-2 |
-| Break even on ad spend | Month 3 | Month 2 |
-| $5,000 MRR | Month 6 | Month 4 |
-| $10,000 MRR | Month 10+ | Month 5-6 |
-| Ramen profitable ($3K/mo) | Month 4 | Month 2-3 |
+| Milestone                 | Conservative | Optimistic |
+| ------------------------- | ------------ | ---------- |
+| First paying customer     | Day 7-10     | Day 4-7    |
+| $500 MRR                  | Month 2      | Month 1    |
+| $1,000 MRR                | Month 2-3    | Month 1-2  |
+| Break even on ad spend    | Month 3      | Month 2    |
+| $5,000 MRR                | Month 6      | Month 4    |
+| $10,000 MRR               | Month 10+    | Month 5-6  |
+| Ramen profitable ($3K/mo) | Month 4      | Month 2-3  |
 
 ---
 
@@ -1086,46 +1094,46 @@ These are tasks for the AI agent (Claude Code) to implement.
 
 ### Technical Risks
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| Marketplace blocks scrapers | High | High | Rotate user agents, use proxy pools, eBay API as fallback |
-| AI API costs exceed revenue | Medium | Medium | Cache aggressively (24h TTL), quickDiscountCheck() for low-score items |
-| Database scaling under load | Low | Medium | Cloud SQL auto-scaling, connection pooling already configured |
-| Stripe webhook failures | Low | High | Retry logic, dead letter queue, manual reconciliation process |
-| CAPTCHA blocks (hCaptcha) | Medium | Low | Already integrated, monitor solve rates |
+| Risk                        | Likelihood | Impact | Mitigation                                                             |
+| --------------------------- | ---------- | ------ | ---------------------------------------------------------------------- |
+| Marketplace blocks scrapers | High       | High   | Rotate user agents, use proxy pools, eBay API as fallback              |
+| AI API costs exceed revenue | Medium     | Medium | Cache aggressively (24h TTL), quickDiscountCheck() for low-score items |
+| Database scaling under load | Low        | Medium | Cloud SQL auto-scaling, connection pooling already configured          |
+| Stripe webhook failures     | Low        | High   | Retry logic, dead letter queue, manual reconciliation process          |
+| CAPTCHA blocks (hCaptcha)   | Medium     | Low    | Already integrated, monitor solve rates                                |
 
 ### Business Risks
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| Low conversion rate (<2%) | Medium | High | A/B test landing page, add demo video, offer longer trials |
-| High churn (>8%/mo) | Medium | High | Onboarding emails, weekly digest, show ROI in dashboard |
-| Competitor copies features | Medium | Low | Move fast, build brand, community moat |
-| Facebook/CL changes TOS | Medium | Medium | Diversify across 5 platforms, eBay API is stable |
-| Negative reviews early | Low | High | Actively solicit feedback, fix bugs fast, personal support |
+| Risk                       | Likelihood | Impact | Mitigation                                                 |
+| -------------------------- | ---------- | ------ | ---------------------------------------------------------- |
+| Low conversion rate (<2%)  | Medium     | High   | A/B test landing page, add demo video, offer longer trials |
+| High churn (>8%/mo)        | Medium     | High   | Onboarding emails, weekly digest, show ROI in dashboard    |
+| Competitor copies features | Medium     | Low    | Move fast, build brand, community moat                     |
+| Facebook/CL changes TOS    | Medium     | Medium | Diversify across 5 platforms, eBay API is stable           |
+| Negative reviews early     | Low        | High   | Actively solicit feedback, fix bugs fast, personal support |
 
 ### Legal Risks
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| Marketplace TOS violations | Medium | Medium | Review each platform's TOS, scrape public data only |
-| User data privacy | Low | High | GDPR/CCPA compliance, clear privacy policy, data encryption |
-| Trademark issues ("Flipper") | Low | Medium | Check trademark database, have backup names ready |
+| Risk                         | Likelihood | Impact | Mitigation                                                  |
+| ---------------------------- | ---------- | ------ | ----------------------------------------------------------- |
+| Marketplace TOS violations   | Medium     | Medium | Review each platform's TOS, scrape public data only         |
+| User data privacy            | Low        | High   | GDPR/CCPA compliance, clear privacy policy, data encryption |
+| Trademark issues ("Flipper") | Low        | Medium | Check trademark database, have backup names ready           |
 
 ### Cost Management
 
-| Cost | Monthly | Notes |
-|------|---------|-------|
-| Firebase Hosting | $0 | Free tier: 10 GB/month transfer, 1 GB storage |
-| Cloud SQL (PostgreSQL) | $30-50 | Smallest instance sufficient initially |
-| OpenAI API | $50-200 | Depends on scan volume; caching reduces costs 70%+ |
-| Anthropic (Claude) API | $30-100 | Cached analysis reduces calls |
-| Firebase Auth | $0 | Free tier: 50K MAU |
-| Resend email | $0-20 | Free tier: 3K emails/mo |
-| Sentry | $0-26 | Free tier: 5K errors/mo |
-| Stripe fees | 2.9% + $0.30 | Standard processing, deducted from revenue |
-| Domain | $12/year | One-time |
-| **Total infrastructure** | **$120-400/mo** | **Profitable at ~15-20 paying customers** |
+| Cost                     | Monthly         | Notes                                              |
+| ------------------------ | --------------- | -------------------------------------------------- |
+| Firebase Hosting         | $0              | Free tier: 10 GB/month transfer, 1 GB storage      |
+| Cloud SQL (PostgreSQL)   | $30-50          | Smallest instance sufficient initially             |
+| OpenAI API               | $50-200         | Depends on scan volume; caching reduces costs 70%+ |
+| Anthropic (Claude) API   | $30-100         | Cached analysis reduces calls                      |
+| Firebase Auth            | $0              | Free tier: 50K MAU                                 |
+| Resend email             | $0-20           | Free tier: 3K emails/mo                            |
+| Sentry                   | $0-26           | Free tier: 5K errors/mo                            |
+| Stripe fees              | 2.9% + $0.30    | Standard processing, deducted from revenue         |
+| Domain                   | $12/year        | One-time                                           |
+| **Total infrastructure** | **$120-400/mo** | **Profitable at ~15-20 paying customers**          |
 
 ---
 
@@ -1133,19 +1141,19 @@ These are tasks for the AI agent (Claude Code) to implement.
 
 ### Metrics to Track Daily
 
-| Metric | Tool | Target (Month 1) |
-|--------|------|-------------------|
-| New signups | Firebase/DB | 5-15/day |
-| Trial starts | Stripe | 2-5/day |
-| Paid conversions | Stripe | 1-2/day |
-| MRR | Stripe Dashboard | $420-840 |
-| Churn | Stripe | <6%/month |
-| Active users (DAU) | Custom analytics | 30%+ of registered |
-| Scans per user/day | UsageRecord table | 3-5 avg |
-| AI analysis requests | OpenAI/Claude logs | Monitor cost |
-| Landing page visitors | Firebase/Google Analytics | 50-200/day |
-| Conversion rate (visitor to signup) | Calculated | >3% |
-| Conversion rate (free to paid) | Calculated | >5% (with trial) |
+| Metric                              | Tool                      | Target (Month 1)   |
+| ----------------------------------- | ------------------------- | ------------------ |
+| New signups                         | Firebase/DB               | 5-15/day           |
+| Trial starts                        | Stripe                    | 2-5/day            |
+| Paid conversions                    | Stripe                    | 1-2/day            |
+| MRR                                 | Stripe Dashboard          | $420-840           |
+| Churn                               | Stripe                    | <6%/month          |
+| Active users (DAU)                  | Custom analytics          | 30%+ of registered |
+| Scans per user/day                  | UsageRecord table         | 3-5 avg            |
+| AI analysis requests                | OpenAI/Claude logs        | Monitor cost       |
+| Landing page visitors               | Firebase/Google Analytics | 50-200/day         |
+| Conversion rate (visitor to signup) | Calculated                | >3%                |
+| Conversion rate (free to paid)      | Calculated                | >5% (with trial)   |
 
 ### Weekly Review Checklist
 
@@ -1162,47 +1170,48 @@ These are tasks for the AI agent (Claude Code) to implement.
 
 ## Appendix A: 30-Day Sprint Calendar
 
-| Day | Phase | Key Actions |
-|-----|-------|------------|
-| 1 | Ship | Configure Stripe products/prices |
-| 1 | Ship | Point domain DNS to Firebase Hosting |
-| 1 | Ship | Configure Resend email DNS |
-| 2 | Ship | Deploy to production |
-| 2 | Ship | Smoke test registration + billing flow |
-| 3 | Ship | Fix any production bugs. **PRODUCT IS LIVE.** |
-| 4 | Revenue | Start using Flipper yourself. Run first scans. |
-| 5 | Revenue | Contact sellers, make first purchases |
-| 6 | Revenue | Document everything (screenshots, videos) |
-| 7 | Revenue | Send 20-30 personal outreach messages |
-| 8 | Revenue | Post value content in r/Flipping |
-| 9 | Revenue | Engage Reddit comments. DM interested users. |
-| 10 | Revenue | Join + engage Facebook reseller groups |
-| 11 | Revenue | Post case study in Facebook groups |
-| 12 | Revenue | List first flip items on eBay/Mercari. Create TikTok account. |
-| 13 | Revenue | First TikTok video. Continue Reddit/FB engagement. |
-| 14 | Revenue | **CHECKPOINT: Review first 2 weeks. Count paying users.** |
-| 15 | Growth | Begin YouTube influencer outreach (20+ emails) |
-| 16 | Growth | Set up affiliate program (Rewardful/FirstPromoter) |
-| 17 | Growth | Prepare Product Hunt assets |
-| 18 | Growth | Start daily TikTok posting cadence |
-| 19 | Growth | Write first SEO blog post |
-| 20 | Growth | Build flip calculator SEO page |
-| 21 | Growth | Follow up with YouTubers. Onboard first affiliates. |
-| 22 | Growth | Set up Google Ads campaign |
-| 23 | Growth | Set up Facebook/IG Ads campaign |
-| 24 | Growth | Record Product Hunt demo video |
-| 25 | Growth | **PRODUCT HUNT LAUNCH DAY** |
-| 26 | Growth | Product Hunt follow-up. Post Indie Hackers story. |
-| 27 | Growth | Review ad performance. Adjust targeting/bids. |
-| 28 | Growth | Write second blog post. Continue TikTok. |
-| 29 | Growth | Contact churned users. Review all metrics. |
-| 30 | Growth | **MONTH 1 REVIEW. Target: $800-1,500 MRR.** |
+| Day | Phase   | Key Actions                                                   |
+| --- | ------- | ------------------------------------------------------------- |
+| 1   | Ship    | Configure Stripe products/prices                              |
+| 1   | Ship    | Point domain DNS to Firebase Hosting                          |
+| 1   | Ship    | Configure Resend email DNS                                    |
+| 2   | Ship    | Deploy to production                                          |
+| 2   | Ship    | Smoke test registration + billing flow                        |
+| 3   | Ship    | Fix any production bugs. **PRODUCT IS LIVE.**                 |
+| 4   | Revenue | Start using Flipper yourself. Run first scans.                |
+| 5   | Revenue | Contact sellers, make first purchases                         |
+| 6   | Revenue | Document everything (screenshots, videos)                     |
+| 7   | Revenue | Send 20-30 personal outreach messages                         |
+| 8   | Revenue | Post value content in r/Flipping                              |
+| 9   | Revenue | Engage Reddit comments. DM interested users.                  |
+| 10  | Revenue | Join + engage Facebook reseller groups                        |
+| 11  | Revenue | Post case study in Facebook groups                            |
+| 12  | Revenue | List first flip items on eBay/Mercari. Create TikTok account. |
+| 13  | Revenue | First TikTok video. Continue Reddit/FB engagement.            |
+| 14  | Revenue | **CHECKPOINT: Review first 2 weeks. Count paying users.**     |
+| 15  | Growth  | Begin YouTube influencer outreach (20+ emails)                |
+| 16  | Growth  | Set up affiliate program (Rewardful/FirstPromoter)            |
+| 17  | Growth  | Prepare Product Hunt assets                                   |
+| 18  | Growth  | Start daily TikTok posting cadence                            |
+| 19  | Growth  | Write first SEO blog post                                     |
+| 20  | Growth  | Build flip calculator SEO page                                |
+| 21  | Growth  | Follow up with YouTubers. Onboard first affiliates.           |
+| 22  | Growth  | Set up Google Ads campaign                                    |
+| 23  | Growth  | Set up Facebook/IG Ads campaign                               |
+| 24  | Growth  | Record Product Hunt demo video                                |
+| 25  | Growth  | **PRODUCT HUNT LAUNCH DAY**                                   |
+| 26  | Growth  | Product Hunt follow-up. Post Indie Hackers story.             |
+| 27  | Growth  | Review ad performance. Adjust targeting/bids.                 |
+| 28  | Growth  | Write second blog post. Continue TikTok.                      |
+| 29  | Growth  | Contact churned users. Review all metrics.                    |
+| 30  | Growth  | **MONTH 1 REVIEW. Target: $800-1,500 MRR.**                   |
 
 ---
 
 ## Appendix B: Copy & Paste Templates
 
 ### Email: Founding Member Invite
+
 ```
 Subject: You're invited — Flipper.ai Founding Member access
 
@@ -1223,6 +1232,7 @@ Check it out: [link]
 ```
 
 ### Tweet: Building in Public
+
 ```
 Week [X] of building Flipper.ai:
 
@@ -1241,6 +1251,7 @@ Try it free: [link]
 ```
 
 ### Reddit Post Template (Value-First)
+
 ```
 Title: I analyzed [X] marketplace listings with AI —
 here's what actually flips for profit in [City]
@@ -1270,45 +1281,46 @@ Happy to answer questions about methodology or specific categories.
 
 ## Appendix C: Tool & Service Links
 
-| Service | Purpose | Cost | Link |
-|---------|---------|------|------|
-| Stripe | Payment processing | 2.9% + $0.30 | stripe.com |
-| Rewardful | Affiliate program | $29/mo | getrewardful.com |
-| Firebase Hosting | Frontend hosting | Free tier | firebase.google.com |
-| Cloud Run | Backend API | Pay-per-use | cloud.google.com/run |
-| Resend | Transactional email | Free-$20/mo | resend.com |
-| Namecheap | Domain registration | ~$12/year | namecheap.com |
-| Canva | Ad/social graphics | Free | canva.com |
-| CapCut | TikTok video editing | Free | capcut.com |
-| Product Hunt | Launch platform | Free | producthunt.com |
-| Indie Hackers | Community/building in public | Free | indiehackers.com |
-| Google Ads | Paid search | $750+/mo | ads.google.com |
-| Meta Ads | Facebook/IG ads | $500+/mo | business.facebook.com |
+| Service          | Purpose                      | Cost         | Link                  |
+| ---------------- | ---------------------------- | ------------ | --------------------- |
+| Stripe           | Payment processing           | 2.9% + $0.30 | stripe.com            |
+| Rewardful        | Affiliate program            | $29/mo       | getrewardful.com      |
+| Firebase Hosting | Frontend hosting             | Free tier    | firebase.google.com   |
+| Cloud Run        | Backend API                  | Pay-per-use  | cloud.google.com/run  |
+| Resend           | Transactional email          | Free-$20/mo  | resend.com            |
+| Namecheap        | Domain registration          | ~$12/year    | namecheap.com         |
+| Canva            | Ad/social graphics           | Free         | canva.com             |
+| CapCut           | TikTok video editing         | Free         | capcut.com            |
+| Product Hunt     | Launch platform              | Free         | producthunt.com       |
+| Indie Hackers    | Community/building in public | Free         | indiehackers.com      |
+| Google Ads       | Paid search                  | $750+/mo     | ads.google.com        |
+| Meta Ads         | Facebook/IG ads              | $500+/mo     | business.facebook.com |
 
 ---
 
-*This plan was created by the full BMAD agent council: Mary (Analyst), John (PM), Winston (Architect), Amelia (Dev), Bob (SM), Barry (Quick Flow), Sally (UX), Quinn (QA), Murat (Test Architect), Paige (Technical Writer), and BMad Master. Each contributed their domain expertise to create a comprehensive, actionable path to profit.*
+_This plan was created by the full BMAD agent council: Mary (Analyst), John (PM), Winston (Architect), Amelia (Dev), Bob (SM), Barry (Quick Flow), Sally (UX), Quinn (QA), Murat (Test Architect), Paige (Technical Writer), and BMad Master. Each contributed their domain expertise to create a comprehensive, actionable path to profit._
 
 **The product is built. The market is waiting. Ship it.**
 
 ---
+
 ---
 
 # PART 2: ELICITATION FINDINGS & PLAN REVISIONS
 
-*Five advanced elicitation methods were applied to stress-test the plan above. Every finding below OVERRIDES the corresponding section in Part 1 where conflicts exist.*
+_Five advanced elicitation methods were applied to stress-test the plan above. Every finding below OVERRIDES the corresponding section in Part 1 where conflicts exist._
 
 ---
 
 ## 19. Elicitation Methods Applied
 
-| # | Method | Lead | Purpose |
-|---|--------|------|---------|
-| 1 | **Pre-Mortem Analysis** | John (PM) | "It's Day 30 and we failed — why?" |
-| 2 | **Assumption Mapping** | Mary (Analyst) | Rate every assumption by confidence x impact |
-| 3 | **Red Team Attack** | Murat (Test Architect) | Hostile competitor/skeptic attacks the plan |
-| 4 | **Empathy Mapping** | Sally (UX) | Deep persona analysis for 3 target users |
-| 5 | **Constraint Inversion** | Winston (Architect) | Flip every limitation to find hidden opportunities |
+| #   | Method                   | Lead                   | Purpose                                            |
+| --- | ------------------------ | ---------------------- | -------------------------------------------------- |
+| 1   | **Pre-Mortem Analysis**  | John (PM)              | "It's Day 30 and we failed — why?"                 |
+| 2   | **Assumption Mapping**   | Mary (Analyst)         | Rate every assumption by confidence x impact       |
+| 3   | **Red Team Attack**      | Murat (Test Architect) | Hostile competitor/skeptic attacks the plan        |
+| 4   | **Empathy Mapping**      | Sally (UX)             | Deep persona analysis for 3 target users           |
+| 5   | **Constraint Inversion** | Winston (Architect)    | Flip every limitation to find hidden opportunities |
 
 ---
 
@@ -1349,16 +1361,17 @@ These findings appeared in multiple independent analyses. They are near-certain 
 
 **REVISED Revenue Projections (Realistic Scenario — 10% churn):**
 
-| Month | New Paid | Total Paid | Churn (10%) | Net Paid | MRR | Cumulative Rev |
-|-------|----------|-----------|-------------|---------|-----|---------------|
-| 1 | 15 | 15 | 0 | 15 | $420 | $420 |
-| 2 | 30 | 45 | 2 | 43 | $1,200 | $1,620 |
-| 3 | 40 | 83 | 4 | 79 | $2,210 | $3,830 |
-| 4 | 50 | 129 | 8 | 121 | $3,390 | $7,220 |
-| 5 | 55 | 176 | 12 | 164 | $4,590 | $11,810 |
-| 6 | 60 | 224 | 16 | 208 | $5,820 | $17,630 |
+| Month | New Paid | Total Paid | Churn (10%) | Net Paid | MRR    | Cumulative Rev |
+| ----- | -------- | ---------- | ----------- | -------- | ------ | -------------- |
+| 1     | 15       | 15         | 0           | 15       | $420   | $420           |
+| 2     | 30       | 45         | 2           | 43       | $1,200 | $1,620         |
+| 3     | 40       | 83         | 4           | 79       | $2,210 | $3,830         |
+| 4     | 50       | 129        | 8           | 121      | $3,390 | $7,220         |
+| 5     | 55       | 176        | 12          | 164      | $4,590 | $11,810        |
+| 6     | 60       | 224        | 16          | 208      | $5,820 | $17,630        |
 
 **REVISED LTV calculations at 10% churn:**
+
 - FLIPPER LTV: $19 / 0.10 = **$190** (was $345)
 - PRO LTV: $49 / 0.10 = **$490** (was $891)
 - Blended LTV: (0.7 x $190) + (0.3 x $490) = **$280** (was $509)
@@ -1367,6 +1380,7 @@ These findings appeared in multiple independent analyses. They are near-certain 
 **IMPLICATION:** Paid ads must be MORE efficient, or deferred until churn improves. The plan must prioritize organic and affiliate channels over paid acquisition in Month 1-2.
 
 **Churn reduction actions to add:**
+
 - [ ] Track cohort retention weekly from Day 1 — if Week 4 retention is below 60%, the tier design needs reworking
 - [ ] Build churn-prediction triggers: user hasn't scanned in 3 days = automated "we found deals for you" email
 - [ ] Add "money saved" / "profit found" dashboard widget showing cumulative ROI
@@ -1380,12 +1394,14 @@ These findings appeared in multiple independent analyses. They are near-certain 
 **REVISED Free Tier Strategy:**
 
 **Option A (Recommended): Time-gated trial instead of feature-gated free**
+
 - 7 days of full FLIPPER access (all 3 marketplaces, unlimited scans, AI analysis)
 - After 7 days, drops to: 3 scans/day, 1 marketplace, no AI analysis detail (just the score number, not the explanation)
 - Credit card NOT required upfront (reduces friction for Nick)
 - Day 5 email: "Your trial ends in 2 days — you've found $X in opportunities so far"
 
 **Option B: Tightened freemium**
+
 - 5 scans/day (not 10), 1 marketplace
 - AI scores visible but analysis locked: "This item scored 87 — upgrade to see why and view comparable sales"
 - This creates the upgrade pull the current plan lacks
@@ -1399,17 +1415,18 @@ These findings appeared in multiple independent analyses. They are near-certain 
 **REVISED Bandwidth Allocation (First 30 days):**
 
 **CUT from Month 1:**
+
 - ~~TikTok daily posting~~ → Move to Month 2 (save 5 hrs/week)
 - ~~Google Ads~~ → Move to Month 2 after 50 organic customers prove PMF (save 2 hrs/week)
 - ~~YouTube pre-roll ads~~ → Move to Month 3 (save 1 hr/week)
 - ~~Product Hunt launch~~ → Move to Month 3-4 when you have social proof (save 10 hrs)
 
 **KEEP in Month 1 (Two channels only):**
+
 1. **Personal flipping + content creation** (10 hrs/week) — this generates both revenue AND marketing content
 2. **Facebook group engagement** (5 hrs/week) — most tolerant of tool sharing, highest conversion
 
-**ADD in Month 1:**
-3. **B2B cold outreach** (3 hrs/week) — see Finding 8 below
+**ADD in Month 1:** 3. **B2B cold outreach** (3 hrs/week) — see Finding 8 below
 
 **Total: ~18 hrs/week marketing + 10 hrs/week engineering/support = manageable for a solo founder**
 
@@ -1447,6 +1464,7 @@ These findings appeared in multiple independent analyses. They are near-certain 
 **Implementation Steps:**
 
 - [ ] **Day 14:** Email partnership teams at List Perfectly and Vendoo:
+
   ```
   Subject: Partnership Opportunity — Flipper.ai x [Vendoo/List Perfectly]
 
@@ -1469,6 +1487,7 @@ These findings appeared in multiple independent analyses. They are near-certain 
 
   — Stephen, Founder, Flipper.ai
   ```
+
 - [ ] **Week 3-4:** Build simple listing data export in Vendoo/LP import format
 - [ ] **Month 2:** Launch co-marketing campaign if partnership established
 
@@ -1486,6 +1505,7 @@ These findings appeared in multiple independent analyses. They are near-certain 
   - CTA: "Book a 15-Minute Demo"
   - Calendly link for scheduling
 - [ ] **Day 15-21:** Cold email 50 local consignment shops and pawn shops in your metro area:
+
   ```
   Subject: AI tool that finds underpriced items for your store
 
@@ -1504,6 +1524,7 @@ These findings appeared in multiple independent analyses. They are near-certain 
 
   — Stephen, Flipper.ai
   ```
+
 - [ ] **Price B2B at $99/mo** per location (new tier, not on public pricing page)
 - [ ] **Target:** 5 B2B customers by Month 2 = $495/mo from a segment with <3% churn
 
@@ -1572,12 +1593,12 @@ These findings appeared in multiple independent analyses. They are near-certain 
 
 **Current hero is generic. Add persona-targeted sections:**
 
-| Section | Target Persona | Headline |
-|---------|---------------|----------|
-| Hero (rotating or A/B) | All | "Stop Scrolling. Start Profiting." |
-| Section 2 | Sarah (side hustle) | "Find profitable deals in under 10 minutes — not 2 hours of browsing" |
-| Section 3 | Frank (full-time) | "Scan 5 marketplaces simultaneously. Scale without scaling your hours." |
-| Section 4 | Nick (beginner) | "Your first profitable flip starts here. AI tells you exactly what to buy." |
+| Section                | Target Persona      | Headline                                                                    |
+| ---------------------- | ------------------- | --------------------------------------------------------------------------- |
+| Hero (rotating or A/B) | All                 | "Stop Scrolling. Start Profiting."                                          |
+| Section 2              | Sarah (side hustle) | "Find profitable deals in under 10 minutes — not 2 hours of browsing"       |
+| Section 3              | Frank (full-time)   | "Scan 5 marketplaces simultaneously. Scale without scaling your hours."     |
+| Section 4              | Nick (beginner)     | "Your first profitable flip starts here. AI tells you exactly what to buy." |
 
 ### ROI Proof in Pricing Section
 
@@ -1594,6 +1615,7 @@ These findings appeared in multiple independent analyses. They are near-certain 
 **Original plan:** 200 seats at $79, Month 2.
 
 **Problems identified:**
+
 - LTD buyers are the most demanding, highest-support-cost SaaS customers
 - At $19/mo, a LTD breaks even in 4 months. After that, every month is pure loss.
 - You're selling $190 LTV (revised) for $79 — acceptable, but barely
@@ -1615,40 +1637,41 @@ These findings appeared in multiple independent analyses. They are near-certain 
 
 The original 30-day calendar is revised to reflect bandwidth constraints, scraper testing requirements, and channel prioritization.
 
-| Day | Phase | Key Actions |
-|-----|-------|------------|
-| 1 | Ship | Configure Stripe products/prices. Point domain DNS. Configure email DNS. |
-| 2 | Ship | Deploy to production. Smoke test registration + billing (10 full cycles). |
-| 3 | Ship | **Scraper stress test begins.** Run each scraper 50+ times. Log success rates. |
-| 4 | Ship | Continue scraper testing. Fix any production bugs. Set up proxy rotation. |
-| 5 | Ship | **Scraper results review.** All 5 platforms >80% success? If NO: fix before proceeding. |
-| 6 | Ship | Build scraper health endpoint. Build "Why this score" expandable. **GO/NO-GO DECISION.** |
-| 7 | Revenue | **PRODUCT IS LIVE.** Start using Flipper yourself. Run first scans. Document everything. |
-| 8 | Revenue | Contact sellers, make first purchases. Screenshot every step. |
-| 9 | Revenue | List flip items on eBay/Mercari. Create YouTube channel. Record first Short. |
-| 10 | Revenue | Send 20-30 personal outreach messages (founding member pricing). |
-| 11 | Revenue | Join Facebook reseller groups. Start engaging (no promotion yet). |
-| 12 | Revenue | Continue flipping. Post YouTube Short. Backtest 200 AI-scored items vs eBay solds. |
-| 13 | Revenue | Post first "value content" in Facebook groups (case study with screenshots). |
-| 14 | Revenue | **CHECKPOINT: Count paying users. Review scraper stability. Review AI accuracy.** |
-| 15 | Growth | Send partnership emails to List Perfectly + Vendoo. |
-| 16 | Growth | Cold email 25 local pawn shops / consignment stores (B2B). |
-| 17 | Growth | Set up affiliate program (Rewardful). Build `/business` B2B landing page. |
-| 18 | Growth | Cold email 25 more B2B targets. Follow up with partnerships. |
-| 19 | Growth | Write first SEO blog post. Build flip calculator page. |
-| 20 | Growth | Begin micro-influencer outreach (1-5K sub YouTubers, $200 flat fee offers). |
-| 21 | Growth | **CHECKPOINT: 50+ signups? Begin Facebook Ads ($500/mo test budget).** |
-| 22 | Growth | If 50+ organic users: start testing paid ads. If not: double down on Facebook groups. |
-| 23 | Growth | Build Daily Deal Digest email feature (automated morning email). |
-| 24 | Growth | Continue content + flipping. Post weekly YouTube recap. |
-| 25 | Growth | Contact every churned user personally. Implement top feedback. |
-| 26 | Growth | Review ad performance (if running). Kill channels with CAC > $100. |
-| 27 | Growth | Write second blog post. Continue B2B follow-ups. |
-| 28 | Growth | If 50+ paying users: prepare limited annual deal ($99/yr). |
-| 29 | Growth | Review all metrics. Plan Month 2 priorities. |
-| 30 | Growth | **MONTH 1 REVIEW. Target: $500-1,000 MRR (revised down from $800-1,500).** |
+| Day | Phase   | Key Actions                                                                              |
+| --- | ------- | ---------------------------------------------------------------------------------------- |
+| 1   | Ship    | Configure Stripe products/prices. Point domain DNS. Configure email DNS.                 |
+| 2   | Ship    | Deploy to production. Smoke test registration + billing (10 full cycles).                |
+| 3   | Ship    | **Scraper stress test begins.** Run each scraper 50+ times. Log success rates.           |
+| 4   | Ship    | Continue scraper testing. Fix any production bugs. Set up proxy rotation.                |
+| 5   | Ship    | **Scraper results review.** All 5 platforms >80% success? If NO: fix before proceeding.  |
+| 6   | Ship    | Build scraper health endpoint. Build "Why this score" expandable. **GO/NO-GO DECISION.** |
+| 7   | Revenue | **PRODUCT IS LIVE.** Start using Flipper yourself. Run first scans. Document everything. |
+| 8   | Revenue | Contact sellers, make first purchases. Screenshot every step.                            |
+| 9   | Revenue | List flip items on eBay/Mercari. Create YouTube channel. Record first Short.             |
+| 10  | Revenue | Send 20-30 personal outreach messages (founding member pricing).                         |
+| 11  | Revenue | Join Facebook reseller groups. Start engaging (no promotion yet).                        |
+| 12  | Revenue | Continue flipping. Post YouTube Short. Backtest 200 AI-scored items vs eBay solds.       |
+| 13  | Revenue | Post first "value content" in Facebook groups (case study with screenshots).             |
+| 14  | Revenue | **CHECKPOINT: Count paying users. Review scraper stability. Review AI accuracy.**        |
+| 15  | Growth  | Send partnership emails to List Perfectly + Vendoo.                                      |
+| 16  | Growth  | Cold email 25 local pawn shops / consignment stores (B2B).                               |
+| 17  | Growth  | Set up affiliate program (Rewardful). Build `/business` B2B landing page.                |
+| 18  | Growth  | Cold email 25 more B2B targets. Follow up with partnerships.                             |
+| 19  | Growth  | Write first SEO blog post. Build flip calculator page.                                   |
+| 20  | Growth  | Begin micro-influencer outreach (1-5K sub YouTubers, $200 flat fee offers).              |
+| 21  | Growth  | **CHECKPOINT: 50+ signups? Begin Facebook Ads ($500/mo test budget).**                   |
+| 22  | Growth  | If 50+ organic users: start testing paid ads. If not: double down on Facebook groups.    |
+| 23  | Growth  | Build Daily Deal Digest email feature (automated morning email).                         |
+| 24  | Growth  | Continue content + flipping. Post weekly YouTube recap.                                  |
+| 25  | Growth  | Contact every churned user personally. Implement top feedback.                           |
+| 26  | Growth  | Review ad performance (if running). Kill channels with CAC > $100.                       |
+| 27  | Growth  | Write second blog post. Continue B2B follow-ups.                                         |
+| 28  | Growth  | If 50+ paying users: prepare limited annual deal ($99/yr).                               |
+| 29  | Growth  | Review all metrics. Plan Month 2 priorities.                                             |
+| 30  | Growth  | **MONTH 1 REVIEW. Target: $500-1,000 MRR (revised down from $800-1,500).**               |
 
 **Key changes from original calendar:**
+
 - Days 3-6 added for scraper stress testing (was 0 days)
 - Product Hunt moved to Month 3+ (was Day 25)
 - TikTok daily posting moved to Month 2 (was Day 13)
@@ -1714,12 +1737,14 @@ Incorporating all elicitation findings, the technical priority order is:
 **This is a FUNDAMENTAL product design challenge, not a marketing problem.**
 
 **Short-term mitigations (Month 1-3):**
+
 - [ ] Track how many active users are in each metro area
 - [ ] Track how many users viewed the same listing
 - [ ] Add "X users viewed this" indicator (creates urgency, also sets expectations)
 - [ ] Focus on deal VOLUME — if the tool surfaces 50 deals/day in a metro, 10 users can each find unique opportunities
 
 **Long-term solutions (Month 6+):**
+
 - [ ] **Category personalization:** Different users get different categories prioritized based on their history
 - [ ] **Metro area user caps** on higher tiers: "Only 50 PRO users per metro" (creates scarcity AND protects value)
 - [ ] **Time-delayed results by tier:** PRO users see deals 15 minutes before FLIPPER users (justifies price)
@@ -1731,14 +1756,14 @@ Incorporating all elicitation findings, the technical priority order is:
 
 Before committing to paid advertising or public marketing, validate these assumptions:
 
-| # | Assumption | Validation Action | Timeline | Pass Criteria |
-|---|-----------|-------------------|----------|--------------|
-| 1 | Scrapers work reliably | 50+ test runs per platform | Days 3-6 | >80% success rate all platforms |
-| 2 | AI scoring is accurate | Backtest 200 items vs eBay solds | Days 7-12 | >75% of 70+ scored items would profit |
-| 3 | Free-to-paid converts | First 50 signups natural conversion | Days 7-21 | >3% conversion within 14 days |
-| 4 | Users find value quickly | Track time-to-first-result for first 20 users | Days 7-14 | <5 minutes to see scored results |
-| 5 | $19 pricing is right | Ask first 50 signups Van Westendorp survey | Day 21 | $19 falls in "acceptable" range |
-| 6 | Churn is manageable | Week-4 retention of first cohort | Day 28 | >60% still active at day 28 |
+| #   | Assumption               | Validation Action                             | Timeline  | Pass Criteria                         |
+| --- | ------------------------ | --------------------------------------------- | --------- | ------------------------------------- |
+| 1   | Scrapers work reliably   | 50+ test runs per platform                    | Days 3-6  | >80% success rate all platforms       |
+| 2   | AI scoring is accurate   | Backtest 200 items vs eBay solds              | Days 7-12 | >75% of 70+ scored items would profit |
+| 3   | Free-to-paid converts    | First 50 signups natural conversion           | Days 7-21 | >3% conversion within 14 days         |
+| 4   | Users find value quickly | Track time-to-first-result for first 20 users | Days 7-14 | <5 minutes to see scored results      |
+| 5   | $19 pricing is right     | Ask first 50 signups Van Westendorp survey    | Day 21    | $19 falls in "acceptable" range       |
+| 6   | Churn is manageable      | Week-4 retention of first cohort              | Day 28    | >60% still active at day 28           |
 
 **RULE: Do not spend $1 on paid advertising until assumptions 1-4 pass.** Everything else is noise until those numbers are real.
 
@@ -1751,6 +1776,7 @@ Before committing to paid advertising or public marketing, validate these assump
 **Problems:** Permanently discounts your best (most engaged, longest-retained) customers. Creates a revenue cap that can never grow.
 
 **REVISED:**
+
 - [ ] Founding member pricing: $14/mo for **12 months**, then reverts to standard $19/mo
 - [ ] Or: 25% lifetime discount ($14.25/mo) instead of locked rate — allows base price increases later
 - [ ] Cap at **50 seats** (not 100) — creates more urgency, less revenue sacrifice
@@ -1767,12 +1793,14 @@ The existing Go-To-Market Strategy document contains ideas not yet captured in t
 The affiliate program (Section 13) targets YouTubers and bloggers. A **user-to-user referral program** targets existing customers and is a separate, complementary growth loop.
 
 **Design:**
+
 - Referrer gets: 1 free month of their current plan for each successful referral
 - Referee gets: 20% off first month ($15.20 for FLIPPER, $39.20 for PRO)
 - Track with unique referral codes per user (generated in dashboard)
 - Cap at 6 free months per year (prevents gaming)
 
 **Implementation Checklist (AI Agent):**
+
 - [ ] Add referral code generation to user dashboard (`/settings` or `/referrals`)
 - [ ] Create `/api/referrals` route to track code usage
 - [ ] Apply referee discount at Stripe checkout via coupon
@@ -1787,12 +1815,14 @@ The affiliate program (Section 13) targets YouTubers and bloggers. A **user-to-u
 MONEY_GRAB includes a flip calculator (Section 8). The GTM doc additionally proposes a standalone **eBay Sold Price Checker** — a free tool that lets anyone look up what an item actually sold for on eBay.
 
 **Why this is valuable:**
+
 - "What is [item] worth" and "eBay sold prices" are high-volume search queries
 - This tool uses the eBay Browse API we already have integrated
 - Zero marginal cost to serve (API calls are cheap, results are cacheable)
 - Every visitor sees: "Want to find underpriced versions of this item automatically? Try Flipper.ai"
 
 **Implementation Checklist (AI Agent):**
+
 - [ ] Build `/tools/price-checker` page
   - Input: item name or eBay listing URL
   - Output: recent sold prices, average price, price range, days-to-sell
@@ -1805,6 +1835,7 @@ MONEY_GRAB includes a flip calculator (Section 8). The GTM doc additionally prop
 The GTM doc proposes a Discord server with a "Best Flips of the Week" contest. This was mentioned in Phase 4 but not detailed.
 
 **Implementation (Month 2 — after 50+ users):**
+
 - [ ] Create Flipper.ai Discord server with channels:
   - `#deals-found` — users share their best AI-scored finds
   - `#flips-completed` — before/after profit stories
@@ -1817,16 +1848,16 @@ The GTM doc proposes a Discord server with a "Best Flips of the Week" contest. T
 
 MONEY_GRAB Section 25 has a basic onboarding email sequence (Days 1, 3, 5, 7, 14). The GTM doc has sharper upgrade triggers. Merge both:
 
-| Day | Email | Purpose |
-|-----|-------|---------|
-| 0 | Welcome + onboarding video + "Run your first scan now" CTA | Activation |
-| 2 | "Your first scan — here's how to read AI scores" | Education |
-| 5 | "See what other Flipper users found this week" (real examples) | Social proof |
-| 7 | "You've found $X in opportunities — here's what you're missing on Free" | Upgrade nudge |
-| 10 | "50% off your first month of FLIPPER — early supporter exclusive" | Urgency |
-| 14 | "Your trial is ending — don't lose access to [features used]" | Loss aversion |
-| 21 | "Still on Free? Here's what you missed this week" (show gated results) | FOMO |
-| 30 | "Your first month recap — X deals found, $X potential profit" | ROI proof |
+| Day | Email                                                                   | Purpose       |
+| --- | ----------------------------------------------------------------------- | ------------- |
+| 0   | Welcome + onboarding video + "Run your first scan now" CTA              | Activation    |
+| 2   | "Your first scan — here's how to read AI scores"                        | Education     |
+| 5   | "See what other Flipper users found this week" (real examples)          | Social proof  |
+| 7   | "You've found $X in opportunities — here's what you're missing on Free" | Upgrade nudge |
+| 10  | "50% off your first month of FLIPPER — early supporter exclusive"       | Urgency       |
+| 14  | "Your trial is ending — don't lose access to [features used]"           | Loss aversion |
+| 21  | "Still on Free? Here's what you missed this week" (show gated results)  | FOMO          |
+| 30  | "Your first month recap — X deals found, $X potential profit"           | ROI proof     |
 
 **Key addition from GTM:** The Day 10 "50% off upgrade" is a powerful conversion lever missing from the original MONEY_GRAB plan. A one-time 50% off first month ($9.50 for FLIPPER) can push fence-sitters to convert.
 
@@ -1836,14 +1867,15 @@ The GTM doc defines specific activation targets missing from MONEY_GRAB:
 
 **Activation Metrics (Add to Section 18):**
 
-| Metric | Target | Why It Matters |
-|--------|--------|---------------|
-| Time to first scan | <5 minutes after signup | If onboarding is slow, users bounce |
-| First scan completion rate | >80% of signups | Measures onboarding friction |
-| "Aha moment" rate | >50% see a 70+ scored item in first session | If AI doesn't surface value fast, they leave |
-| Weekly active users | >60% of registered | Measures ongoing engagement |
+| Metric                     | Target                                      | Why It Matters                               |
+| -------------------------- | ------------------------------------------- | -------------------------------------------- |
+| Time to first scan         | <5 minutes after signup                     | If onboarding is slow, users bounce          |
+| First scan completion rate | >80% of signups                             | Measures onboarding friction                 |
+| "Aha moment" rate          | >50% see a 70+ scored item in first session | If AI doesn't surface value fast, they leave |
+| Weekly active users        | >60% of registered                          | Measures ongoing engagement                  |
 
 **Customer Support SLA (Add to Section 17 — Risk Mitigation):**
+
 - [ ] Respond to all user messages within **1 hour** during first 3 months
 - [ ] This is critical for early reputation. One unanswered support request from an early user = negative review that poisons the well.
 - [ ] Set up email notifications for support requests. Check 3x/day minimum.
@@ -1854,6 +1886,7 @@ The GTM doc defines specific activation targets missing from MONEY_GRAB:
 The GTM doc includes Reddit Ads ($100 test budget) which MONEY_GRAB missed entirely. Reddit allows targeting specific subreddits — this is uniquely valuable because r/Flipping users are the exact target.
 
 **Add to Section 12 (Ad Budgets):**
+
 - [ ] **Reddit Ads:** $100-200/month test budget
   - Target: r/Flipping, r/sidehustle, r/Reselling, r/eBay
   - Format: Promoted post (looks native, not banner ad)
@@ -1874,20 +1907,22 @@ From the GTM doc's "Common Mistakes" section — principles to keep top of mind:
 ### 29.8 Recommended Reading
 
 From the GTM doc — books directly relevant to this launch:
+
 - **"The Mom Test"** by Rob Fitzpatrick — how to talk to customers without leading them
 - **"Traction"** by Gabriel Weinberg — systematic approach to finding growth channels
 - **"Zero to Sold"** by Arvid Kahl — the definitive micro SaaS playbook
 
 ---
 
-*Part 2 findings were generated by 5 independent elicitation agents, each applying a distinct analytical method. Section 29 integrates unique ideas from the existing GO_TO_MARKET_STRATEGY.md. Where Part 2 conflicts with Part 1, Part 2 takes precedence.*
+_Part 2 findings were generated by 5 independent elicitation agents, each applying a distinct analytical method. Section 29 integrates unique ideas from the existing GO_TO_MARKET_STRATEGY.md. Where Part 2 conflicts with Part 1, Part 2 takes precedence._
 
 ---
+
 ---
 
 # PART 3: AI AUTOMATION STRATEGY
 
-*How to reduce the founder's weekly workload from 80+ hours to ~25 hours using Claude Code, built-in AI features, and minimal external tools.*
+_How to reduce the founder's weekly workload from 80+ hours to ~25 hours using Claude Code, built-in AI features, and minimal external tools._
 
 ---
 
@@ -1896,23 +1931,24 @@ From the GTM doc — books directly relevant to this launch:
 The elicitation (Section 20, Finding 4) identified a critical problem: the plan demands 80+ hours/week from a solo founder. AI automation is the answer — not by paying for a dozen SaaS tools, but by leveraging **Claude Code** (which you're already paying for) and the **OpenAI/Claude APIs already integrated into the product**.
 
 **Three tiers of automation (cheapest first):**
+
 1. **Claude Code as your AI employee** — use Claude Code sessions to generate content, write outreach, analyze data, and create marketing assets. Cost: $0 incremental (already subscribed).
 2. **Built-in AI features** — code built into Flipper.ai that auto-generates digests, reports, and retention emails. Cost: $0 incremental (uses existing API budget).
 3. **Minimal external tools** — only where Claude Code genuinely can't do the job (email sending infrastructure, workflow triggers). Cost: ~$48-73/mo.
 
 ### Claude Code Can Replace Most External Tools
 
-| External Tool | Monthly Cost | Claude Code Alternative | How |
-|--------------|-------------|----------------------|-----|
-| ~~Byword.ai ($99/mo)~~ | $99 | Claude Code writes blog posts | `/loop` or manual: "Write an SEO blog post about best items to flip in [City] using this data: [paste scan results]" |
-| ~~Typefully ($12.50/mo)~~ | $12.50 | Claude Code generates social posts | "Generate 7 Twitter posts for this week about Flipper.ai flipping results. Tone: authentic, building-in-public." |
-| ~~Opus Clip ($19/mo)~~ | $19 | Can't replace (video editing) | Keep if doing video content, or use free CapCut |
-| ~~AdCreative.ai ($29/mo)~~ | $29 | Claude Code writes ad copy | "Write 10 Facebook ad headline/description variants for Flipper.ai targeting resellers" |
-| ~~Surfer SEO ($99/mo)~~ | $99 | Claude Code + free keyword tools | Use Ubersuggest free tier for keywords, Claude Code for content optimization |
-| ~~Instantly.ai ($37/mo)~~ | $37 | Partially — Claude writes emails, you send manually or use free tier | Claude Code writes all personalized outreach. For sending at scale: Instantly free tier (50 emails/day) or Gmail + mail merge |
-| ~~Crisp ($25/mo)~~ | $25 | Built-in AI chatbot (Section 32) | Build it into the product using Vercel AI SDK + existing APIs |
-| Make.com ($10.59/mo) | $10.59 | Keep — workflow automation needs event triggers | Can't replace event-driven webhooks with Claude Code |
-| Beehiiv ($0) | $0 | Keep — free newsletter platform | No cost anyway |
+| External Tool              | Monthly Cost | Claude Code Alternative                                              | How                                                                                                                           |
+| -------------------------- | ------------ | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| ~~Byword.ai ($99/mo)~~     | $99          | Claude Code writes blog posts                                        | `/loop` or manual: "Write an SEO blog post about best items to flip in [City] using this data: [paste scan results]"          |
+| ~~Typefully ($12.50/mo)~~  | $12.50       | Claude Code generates social posts                                   | "Generate 7 Twitter posts for this week about Flipper.ai flipping results. Tone: authentic, building-in-public."              |
+| ~~Opus Clip ($19/mo)~~     | $19          | Can't replace (video editing)                                        | Keep if doing video content, or use free CapCut                                                                               |
+| ~~AdCreative.ai ($29/mo)~~ | $29          | Claude Code writes ad copy                                           | "Write 10 Facebook ad headline/description variants for Flipper.ai targeting resellers"                                       |
+| ~~Surfer SEO ($99/mo)~~    | $99          | Claude Code + free keyword tools                                     | Use Ubersuggest free tier for keywords, Claude Code for content optimization                                                  |
+| ~~Instantly.ai ($37/mo)~~  | $37          | Partially — Claude writes emails, you send manually or use free tier | Claude Code writes all personalized outreach. For sending at scale: Instantly free tier (50 emails/day) or Gmail + mail merge |
+| ~~Crisp ($25/mo)~~         | $25          | Built-in AI chatbot (Section 32)                                     | Build it into the product using Vercel AI SDK + existing APIs                                                                 |
+| Make.com ($10.59/mo)       | $10.59       | Keep — workflow automation needs event triggers                      | Can't replace event-driven webhooks with Claude Code                                                                          |
+| Beehiiv ($0)               | $0           | Keep — free newsletter platform                                      | No cost anyway                                                                                                                |
 
 **Revised external tool budget: $10.59-48/mo** (Make.com required, Beehiiv free, Instantly free tier optional, CapCut free for video)
 
@@ -1929,6 +1965,7 @@ Claude Code can be invoked in sessions or via `/loop` to perform these tasks on 
 **How to do it with Claude Code:**
 
 Every Monday, start a Claude Code session:
+
 ```
 "Write a 1500-word SEO blog post for the Flipper.ai blog.
 Topic: [topic from the SEO keyword list in MONEY_GRAB.md Section 8]
@@ -1940,6 +1977,7 @@ Output as markdown. Include a suggested title tag and meta description."
 ```
 
 Better yet — feed it real data from your scans:
+
 ```
 "Here are the top 20 items Flipper.ai found underpriced this week in Portland:
 [paste data from dashboard]
@@ -1953,6 +1991,7 @@ with analysis of each item's flip potential, estimated profit, and tips."
 ### 31.2 Social Media Content Batch (Replaces Typefully — saves $12.50/mo)
 
 **Every Sunday, one Claude Code session:**
+
 ```
 "Generate my social media content for the week for Flipper.ai.
 My results this week: [paste your flip data / achievements]
@@ -1975,6 +2014,7 @@ Copy-paste into native schedulers (Twitter's built-in scheduler is free, or use 
 **Claude Code writes all personalized emails. You send them.**
 
 **B2B Outreach (pawn shops / consignment stores):**
+
 ```
 "I need to email 25 pawn shops and consignment stores in [City].
 Here are their names and what I found about each:
@@ -1991,6 +2031,7 @@ Keep each email under 150 words. Tone: professional but casual."
 ```
 
 **Influencer Outreach:**
+
 ```
 "I need to email these YouTube flipping micro-influencers:
 [paste list: name, channel, subscriber count, recent video topic]
@@ -2005,6 +2046,7 @@ Tone: founder-to-creator, casual, not corporate."
 ```
 
 **Sending options (free or near-free):**
+
 - Gmail + Google Sheets mail merge (free, up to 500 emails/day) — use a Google Apps Script or "Yet Another Mail Merge" free tier
 - Instantly.ai free tier (50 emails/day) — sufficient for 25 B2B + 20 influencer emails
 - Or just send manually — 25 emails takes ~45 min when copy is pre-written by Claude
@@ -2078,6 +2120,7 @@ Keep it under 200 words. Be blunt."
 ### 31.7 Claude Code `/loop` for Recurring Tasks
 
 For truly recurring work, use Claude Code's `/loop` command:
+
 - `/loop 7d "Generate this week's social media content for Flipper.ai based on the latest scan results and metrics"` — weekly content generation
 - `/loop 1d "Check Flipper.ai Sentry for new errors and summarize any critical issues"` — daily monitoring
 
@@ -2092,12 +2135,14 @@ These use the OpenAI/Claude APIs already in the codebase. Zero new service costs
 **The single highest-ROI feature.** Transforms Flipper from "a tool you log into" to "a daily email that hands you money."
 
 **How it works:**
+
 1. Daily cron job at 6 AM per user's timezone
 2. Queries top-scoring opportunities matching user's saved categories + location
 3. Calls OpenAI to write a 2-3 sentence "why buy" blurb for each deal
 4. Sends via Resend as personalized React Email
 
 **AI Agent Implementation Checklist:**
+
 - [ ] Create `src/lib/ai-deal-digest.ts`
   - `generateDealDigest(userId)` → queries preferences + top opportunities
   - OpenAI structured output: `{ subject, deals: { headline, whyBuy, urgency }[] }`
@@ -2116,6 +2161,7 @@ These use the OpenAI/Claude APIs already in the codebase. Zero new service costs
 When user marks opportunity as SOLD, auto-generate shareable content.
 
 **AI Agent Implementation Checklist:**
+
 - [ ] Create `src/lib/ai-social-posts.ts`
   - `generateFlipPosts(opportunity)` → `{ twitter, instagram, tiktokScript }`
 - [ ] Add "Share Your Win" card on opportunity detail after SOLD status
@@ -2127,6 +2173,7 @@ When user marks opportunity as SOLD, auto-generate shareable content.
 Personalized Monday email: deals found, profit/loss, AI recommendations.
 
 **AI Agent Implementation Checklist:**
+
 - [ ] Create `src/lib/ai-report-generator.ts`
   - Queries 7-day user activity → OpenAI narrative
   - "Your best flip was [X] with 43% margin. Consider expanding to furniture — 52% margins in your area."
@@ -2139,6 +2186,7 @@ Personalized Monday email: deals found, profit/loss, AI recommendations.
 In-app chat widget replacing Crisp ($25/mo saved). Uses Vercel AI SDK.
 
 **AI Agent Implementation Checklist:**
+
 - [ ] `pnpm add ai @ai-sdk/openai`
 - [ ] Create `app/api/chat/route.ts` — streaming chat with `streamText()`
   - System prompt: user state, product docs, scoring methodology
@@ -2153,6 +2201,7 @@ In-app chat widget replacing Crisp ($25/mo saved). Uses Vercel AI SDK.
 Daily cron detects churn risk, AI writes personalized re-engagement.
 
 **AI Agent Implementation Checklist:**
+
 - [ ] Create `src/lib/retention-engine.ts`
   - Triggers: `inactive_3_days`, `found_not_purchased`, `scan_no_results`, `trial_day_5`
   - Per trigger: query context → OpenAI personalized email → send via Resend
@@ -2161,14 +2210,14 @@ Daily cron detects churn risk, AI writes personalized re-engagement.
 
 ### Build Order & Timeline
 
-| Day | Feature | Hours |
-|-----|---------|-------|
-| 1 | Daily Deal Digest | 4h |
-| 1-2 | Social Post Generator | 3h |
-| 2-3 | Weekly Flip Report | 8h |
-| 4-5 | Onboarding Chatbot | 12h |
-| 6 | Retention Nudge Engine | 10h |
-| **Total** | | **~37h** |
+| Day       | Feature                | Hours    |
+| --------- | ---------------------- | -------- |
+| 1         | Daily Deal Digest      | 4h       |
+| 1-2       | Social Post Generator  | 3h       |
+| 2-3       | Weekly Flip Report     | 8h       |
+| 4-5       | Onboarding Chatbot     | 12h      |
+| 6         | Retention Nudge Engine | 10h      |
+| **Total** |                        | **~37h** |
 
 Priorities 1-3 (~15 hours) deliver the most value and can be built in a weekend.
 
@@ -2178,36 +2227,36 @@ Priorities 1-3 (~15 hours) deliver the most value and can be built in a weekend.
 
 ### Morning (45 min)
 
-| Time | Task | Duration |
-|------|------|----------|
-| 7:00 AM | Deal Digest already sent automatically. Check your own top deals. | 5 min |
-| 7:05 AM | Check email replies from outreach (Claude Code wrote them, you sent them) | 15 min |
-| 7:20 AM | Check chatbot escalations (most support handled by built-in AI chatbot) | 10 min |
-| 7:30 AM | Check Stripe (Make.com Slack alerts for new subs/churn) | 5 min |
-| 7:35 AM | Review Sentry errors if any | 5 min |
+| Time    | Task                                                                      | Duration |
+| ------- | ------------------------------------------------------------------------- | -------- |
+| 7:00 AM | Deal Digest already sent automatically. Check your own top deals.         | 5 min    |
+| 7:05 AM | Check email replies from outreach (Claude Code wrote them, you sent them) | 15 min   |
+| 7:20 AM | Check chatbot escalations (most support handled by built-in AI chatbot)   | 10 min   |
+| 7:30 AM | Check Stripe (Make.com Slack alerts for new subs/churn)                   | 5 min    |
+| 7:35 AM | Review Sentry errors if any                                               | 5 min    |
 
 ### Midday (15 min)
 
-| Time | Task | Duration |
-|------|------|----------|
-| 12:00 PM | Publish blog post Claude Code wrote earlier this week | 15 min |
+| Time     | Task                                                  | Duration |
+| -------- | ----------------------------------------------------- | -------- |
+| 12:00 PM | Publish blog post Claude Code wrote earlier this week | 15 min   |
 
 ### Evening (1.5 hrs — the real work)
 
-| Time | Task | Duration |
-|------|------|----------|
-| 6:00 PM | Personal flipping — pick up items, photograph, list | 45 min |
-| 6:45 PM | Facebook group engagement (authentic, not promotional) | 30 min |
-| 7:15 PM | Strategic thinking — metrics, feature ideas, user feedback | 15 min |
+| Time    | Task                                                       | Duration |
+| ------- | ---------------------------------------------------------- | -------- |
+| 6:00 PM | Personal flipping — pick up items, photograph, list        | 45 min   |
+| 6:45 PM | Facebook group engagement (authentic, not promotional)     | 30 min   |
+| 7:15 PM | Strategic thinking — metrics, feature ideas, user feedback | 15 min   |
 
 ### Weekly Tasks (Claude Code Sessions)
 
-| Day | Claude Code Session | Duration |
-|-----|-------------------|----------|
-| Sunday | Generate all social media content for the week | 20 min |
-| Monday | Write 1 SEO blog post from scan data | 30 min |
-| Wednesday | Write B2B/influencer outreach batch (if needed) | 20 min |
-| Friday | Analyze weekly metrics + generate report | 15 min |
+| Day       | Claude Code Session                             | Duration |
+| --------- | ----------------------------------------------- | -------- |
+| Sunday    | Generate all social media content for the week  | 20 min   |
+| Monday    | Write 1 SEO blog post from scan data            | 30 min   |
+| Wednesday | Write B2B/influencer outreach batch (if needed) | 20 min   |
+| Friday    | Analyze weekly metrics + generate report        | 15 min   |
 
 **Total weekly time: ~20 hours** (2.5 hrs/day + 1.5 hrs Claude Code sessions)
 
@@ -2239,15 +2288,15 @@ Priorities 1-3 (~15 hours) deliver the most value and can be built in a weekend.
 
 ## 34. Total Cost: Ultra-Lean AI Stack
 
-| Item | Monthly Cost | Notes |
-|------|-------------|-------|
-| Make.com | $10.59 | Workflow automation (only external tool required) |
-| Beehiiv | $0 | Free newsletter platform |
-| CapCut | $0 | Free video editing (replaces Opus Clip) |
-| Buffer free tier | $0 | Social scheduling (3 channels) |
-| Claude Code subscription | Already paying | Your AI marketing department |
-| OpenAI API (in-product) | ~$50-150 | Deal digest, reports, chatbot, retention |
-| **TOTAL NEW SPEND** | **$10.59-60/mo** | **vs $282-382/mo for full external stack** |
+| Item                     | Monthly Cost     | Notes                                             |
+| ------------------------ | ---------------- | ------------------------------------------------- |
+| Make.com                 | $10.59           | Workflow automation (only external tool required) |
+| Beehiiv                  | $0               | Free newsletter platform                          |
+| CapCut                   | $0               | Free video editing (replaces Opus Clip)           |
+| Buffer free tier         | $0               | Social scheduling (3 channels)                    |
+| Claude Code subscription | Already paying   | Your AI marketing department                      |
+| OpenAI API (in-product)  | ~$50-150         | Deal digest, reports, chatbot, retention          |
+| **TOTAL NEW SPEND**      | **$10.59-60/mo** | **vs $282-382/mo for full external stack**        |
 
 **Break-even: ~3 paying customers cover the entire AI automation cost.**
 
@@ -2287,36 +2336,37 @@ Priorities 1-3 (~15 hours) deliver the most value and can be built in a weekend.
 
 ---
 
-*Part 3 completes the MONEY_GRAB playbook. By using Claude Code as your AI marketing department and building AI features into the product itself, total new spend is just ~$11-60/month. The founder works ~20 hours/week while AI handles content, support, outreach drafting, and retention — all from tools you're already paying for.*
+_Part 3 completes the MONEY_GRAB playbook. By using Claude Code as your AI marketing department and building AI features into the product itself, total new spend is just ~$11-60/month. The founder works ~20 hours/week while AI handles content, support, outreach drafting, and retention — all from tools you're already paying for._
 
 **Final motto: Claude Code is your co-founder. Use it.**
 
 ---
+
 ---
 
 # PART 4: THE DEFINITIVE EXECUTION PLAN
 
-*This is the ONLY section you need to read day-to-day. It resolves all contradictions from Parts 1-3, applies all 10 elicitation findings, and distills 2200 lines into the actions that actually matter. Parts 1-3 are reference material. Part 4 is your operating manual.*
+_This is the ONLY section you need to read day-to-day. It resolves all contradictions from Parts 1-3, applies all 10 elicitation findings, and distills 2200 lines into the actions that actually matter. Parts 1-3 are reference material. Part 4 is your operating manual._
 
 ---
 
 ## 36. Resolved Decisions (No More Contradictions)
 
-| Decision | FINAL Answer | Supersedes |
-|----------|-------------|-----------|
-| **Pricing** | FREE trial (7 days full access) → FLIPPER $19/mo → PRO $49/mo | Keep 2 paid tiers (already built). Via Negativa's 1-tier suggestion is noted — validate with data at Day 30. |
-| **Founding member pricing** | $14/mo for 12 months, then $19/mo. Cap: 50 seats. | Sections 4, 6 template (update to "12 months"), Section 28 |
-| **Lifetime deal** | SKIP for now. Offer $149/year annual plan instead. Same cash injection, no forever liability. | Sections 4, 8, 23 |
-| **Month 1 MRR target** | $500-1,000 | Sections 1 ($1K), 7 ($800-1,500) |
-| **Churn rate for all math** | 10% monthly (realistic for new SaaS) | Sections 12 (5.5%), 16 (6%) |
-| **Free tier design** | 7-day full FLIPPER trial, then: 3 scans/day, 1 marketplace, scores visible but AI analysis locked | Section 4 (10 scans), Section 20 Finding 3 |
-| **YouTube strategy** | Own channel from Day 4. Micro-influencers (1-5K) only, starting Day 28+. No big YouTubers until 100+ users. | Section 7 (Day 15 outreach to 300K creators) |
-| **Product Hunt** | Month 3-4 at earliest. Not in Month 1 plan. | Appendix A (Day 25) |
-| **Paid ads** | Not until 50 organic paying customers AND validated conversion data. | Section 8 (Day 22), Section 12 (Month 2) |
-| **AI features to build** | ONE: Daily Deal Digest (4 hours). Everything else defers to Month 2+. | Section 35 (37 hours, 5 features) |
-| **Marketing channels Month 1** | TWO only: (1) Personal flipping + Facebook groups. (2) B2B cold outreach. | Sections 7, 11 (10+ channels) |
-| **Metrics to track** | THREE: New signups, paid conversions, MRR. Everything else is noise until Month 3. | Section 18 (11 metrics) |
-| **Email drip** | THREE emails: Day 0 welcome, Day 5 "here's what you found," Day 7 trial ending + 50% off first month. | Section 29.4 (8 emails) |
+| Decision                       | FINAL Answer                                                                                                | Supersedes                                                                                                   |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **Pricing**                    | FREE trial (7 days full access) → FLIPPER $19/mo → PRO $49/mo                                               | Keep 2 paid tiers (already built). Via Negativa's 1-tier suggestion is noted — validate with data at Day 30. |
+| **Founding member pricing**    | $14/mo for 12 months, then $19/mo. Cap: 50 seats.                                                           | Sections 4, 6 template (update to "12 months"), Section 28                                                   |
+| **Lifetime deal**              | SKIP for now. Offer $149/year annual plan instead. Same cash injection, no forever liability.               | Sections 4, 8, 23                                                                                            |
+| **Month 1 MRR target**         | $500-1,000                                                                                                  | Sections 1 ($1K), 7 ($800-1,500)                                                                             |
+| **Churn rate for all math**    | 10% monthly (realistic for new SaaS)                                                                        | Sections 12 (5.5%), 16 (6%)                                                                                  |
+| **Free tier design**           | 7-day full FLIPPER trial, then: 3 scans/day, 1 marketplace, scores visible but AI analysis locked           | Section 4 (10 scans), Section 20 Finding 3                                                                   |
+| **YouTube strategy**           | Own channel from Day 4. Micro-influencers (1-5K) only, starting Day 28+. No big YouTubers until 100+ users. | Section 7 (Day 15 outreach to 300K creators)                                                                 |
+| **Product Hunt**               | Month 3-4 at earliest. Not in Month 1 plan.                                                                 | Appendix A (Day 25)                                                                                          |
+| **Paid ads**                   | Not until 50 organic paying customers AND validated conversion data.                                        | Section 8 (Day 22), Section 12 (Month 2)                                                                     |
+| **AI features to build**       | ONE: Daily Deal Digest (4 hours). Everything else defers to Month 2+.                                       | Section 35 (37 hours, 5 features)                                                                            |
+| **Marketing channels Month 1** | TWO only: (1) Personal flipping + Facebook groups. (2) B2B cold outreach.                                   | Sections 7, 11 (10+ channels)                                                                                |
+| **Metrics to track**           | THREE: New signups, paid conversions, MRR. Everything else is noise until Month 3.                          | Section 18 (11 metrics)                                                                                      |
+| **Email drip**                 | THREE emails: Day 0 welcome, Day 5 "here's what you found," Day 7 trial ending + 50% off first month.       | Section 29.4 (8 emails)                                                                                      |
 
 ---
 
@@ -2416,52 +2466,52 @@ These are the ONLY things that matter for the first 45 days. In order.
 
 ## 38. Definitive Calendar (Days 1-45)
 
-| Day | Action | Hours | Notes |
-|-----|--------|-------|-------|
-| 1 | Stripe config. Start scraper stress test (overnight runs). DNS setup. | 4h | Actions 1+2 in parallel |
-| 2 | Deploy to production. Smoke test billing (10 cycles). Continue scraper tests. | 3h | |
-| 3 | Scraper testing continues. Fix any failures. Set up proxy rotation. | 3h | |
-| 4 | Scraper testing. Create YouTube channel. Record first Short from demo. | 2h | |
-| 5 | **Scraper results review.** Backtest 200 AI scores vs eBay solds. | 3h | |
-| 6 | **GO/NO-GO DECISION.** If pass: proceed. If fail: fix scrapers (add 3-7 days). | 1h | Gate |
-| 7 | **PRODUCT LIVE.** Start using Flipper yourself. Run scans. Contact sellers. | 2h | Action 3 begins |
-| 8 | Buy first items. Screenshot everything. Document the process. | 2h | |
-| 9 | Continue flipping. Start personal outreach (first 10 messages). | 2h | Action 4 begins |
-| 10 | More outreach (10-20 more messages). List flip items on eBay/Mercari. | 2h | |
-| 11 | Join Facebook groups. Start engaging (comments, answers, NO promotion). | 1.5h | Action 5 begins |
-| 12 | Continue flipping + Facebook engagement. | 2h | |
-| 13 | Flipping + Facebook. Post first flip result on your YouTube channel. | 2h | |
-| 14 | **CHECKPOINT.** Count: signups, paying users, scraper uptime, flip P&L. | 1h | Expect: 3-10 paying users |
-| 15 | Post first case study in Facebook groups (real data, real screenshots). | 2h | |
-| 16 | Claude Code: write 25 B2B outreach emails. Send first batch. | 2h | Action 6 begins |
-| 17 | Send remaining 25 B2B emails. Follow up with Facebook group interest. | 1.5h | |
-| 18 | Continue flipping + engagement. Write 3 onboarding emails with Claude Code. | 2h | |
-| 19 | Implement 3-email drip sequence (Day 0, Day 5, Day 7). | 3h | Dev work |
-| 20 | **Build Daily Deal Digest (Sprint Day 1).** | 4h | Action 7 |
-| 21 | Test digest. Fix issues. Deploy. | 1h | |
-| 22 | B2B follow-ups (Day 7 for first batch). New Facebook case study. | 2h | |
-| 23 | Contact every churned user personally. Ask why. Implement top feedback. | 1h | |
-| 24 | Claude Code: write first SEO blog post from scan data. | 1h | |
-| 25 | Publish blog post. Continue flipping + engagement. | 1.5h | |
-| 26 | Send partnership emails to List Perfectly + Vendoo (one-way export only). | 1h | |
-| 27 | Weekly YouTube recap video (10 min record, upload). | 1h | |
-| 28 | **CHECKPOINT.** Signups, conversions, MRR, churn, digest open rate. | 1h | |
-| 29 | If 20+ paying users: plan Month 2 expansion (affiliates, micro-influencers). | 1h | |
-| 30 | **MONTH 1 REVIEW.** | 1h | Target: $500-1,000 MRR |
-| 31-45 | Continue channels that work. Add: affiliate program, micro-influencer outreach ($200 flat), Facebook Ads $500 test (only if 50+ organic users). | ~2.5h/day | Scale what works |
+| Day   | Action                                                                                                                                          | Hours     | Notes                     |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------------------------- |
+| 1     | Stripe config. Start scraper stress test (overnight runs). DNS setup.                                                                           | 4h        | Actions 1+2 in parallel   |
+| 2     | Deploy to production. Smoke test billing (10 cycles). Continue scraper tests.                                                                   | 3h        |                           |
+| 3     | Scraper testing continues. Fix any failures. Set up proxy rotation.                                                                             | 3h        |                           |
+| 4     | Scraper testing. Create YouTube channel. Record first Short from demo.                                                                          | 2h        |                           |
+| 5     | **Scraper results review.** Backtest 200 AI scores vs eBay solds.                                                                               | 3h        |                           |
+| 6     | **GO/NO-GO DECISION.** If pass: proceed. If fail: fix scrapers (add 3-7 days).                                                                  | 1h        | Gate                      |
+| 7     | **PRODUCT LIVE.** Start using Flipper yourself. Run scans. Contact sellers.                                                                     | 2h        | Action 3 begins           |
+| 8     | Buy first items. Screenshot everything. Document the process.                                                                                   | 2h        |                           |
+| 9     | Continue flipping. Start personal outreach (first 10 messages).                                                                                 | 2h        | Action 4 begins           |
+| 10    | More outreach (10-20 more messages). List flip items on eBay/Mercari.                                                                           | 2h        |                           |
+| 11    | Join Facebook groups. Start engaging (comments, answers, NO promotion).                                                                         | 1.5h      | Action 5 begins           |
+| 12    | Continue flipping + Facebook engagement.                                                                                                        | 2h        |                           |
+| 13    | Flipping + Facebook. Post first flip result on your YouTube channel.                                                                            | 2h        |                           |
+| 14    | **CHECKPOINT.** Count: signups, paying users, scraper uptime, flip P&L.                                                                         | 1h        | Expect: 3-10 paying users |
+| 15    | Post first case study in Facebook groups (real data, real screenshots).                                                                         | 2h        |                           |
+| 16    | Claude Code: write 25 B2B outreach emails. Send first batch.                                                                                    | 2h        | Action 6 begins           |
+| 17    | Send remaining 25 B2B emails. Follow up with Facebook group interest.                                                                           | 1.5h      |                           |
+| 18    | Continue flipping + engagement. Write 3 onboarding emails with Claude Code.                                                                     | 2h        |                           |
+| 19    | Implement 3-email drip sequence (Day 0, Day 5, Day 7).                                                                                          | 3h        | Dev work                  |
+| 20    | **Build Daily Deal Digest (Sprint Day 1).**                                                                                                     | 4h        | Action 7                  |
+| 21    | Test digest. Fix issues. Deploy.                                                                                                                | 1h        |                           |
+| 22    | B2B follow-ups (Day 7 for first batch). New Facebook case study.                                                                                | 2h        |                           |
+| 23    | Contact every churned user personally. Ask why. Implement top feedback.                                                                         | 1h        |                           |
+| 24    | Claude Code: write first SEO blog post from scan data.                                                                                          | 1h        |                           |
+| 25    | Publish blog post. Continue flipping + engagement.                                                                                              | 1.5h      |                           |
+| 26    | Send partnership emails to List Perfectly + Vendoo (one-way export only).                                                                       | 1h        |                           |
+| 27    | Weekly YouTube recap video (10 min record, upload).                                                                                             | 1h        |                           |
+| 28    | **CHECKPOINT.** Signups, conversions, MRR, churn, digest open rate.                                                                             | 1h        |                           |
+| 29    | If 20+ paying users: plan Month 2 expansion (affiliates, micro-influencers).                                                                    | 1h        |                           |
+| 30    | **MONTH 1 REVIEW.**                                                                                                                             | 1h        | Target: $500-1,000 MRR    |
+| 31-45 | Continue channels that work. Add: affiliate program, micro-influencer outreach ($200 flat), Facebook Ads $500 test (only if 50+ organic users). | ~2.5h/day | Scale what works          |
 
 ---
 
 ## 39. Pivot Decision Framework (If Things Go Wrong)
 
-| Scenario | Trigger | Action |
-|----------|---------|--------|
-| Scrapers fail (<80% success) | Day 5-6 | Halt marketing. Fix scrapers. Retest. If unfixable in 2 weeks, pivot to eBay-only (API, legal, stable). |
-| Zero paying users by Day 21 | Day 21 | Product problem, not marketing problem. Interview first 20 signups. Ask: "Why didn't you pay?" Fix the #1 answer. |
-| MRR is $0 by Day 30 | Day 30 | Stop all marketing. Spend 1 week doing 10 user interviews. The product may not solve a real problem at a price people pay. Validate before continuing. |
-| Churn exceeds 15%/month | Day 30+ | Freeze acquisition. Every dollar spent acquiring a user who churns in 2 months is lost. Fix retention first: contact every churned user, implement top 3 feedback items. |
-| B2B competes with B2C in same metro | Ongoing | Separate deal feeds by segment. Or: add B2B surcharge for "priority access" that funds metro exclusivity. |
-| Scraper breaks in production | Any day | Fix within 24 hours. If >48 hours: email affected users, offer 1 week free extension. Transparency > silence. |
+| Scenario                            | Trigger | Action                                                                                                                                                                   |
+| ----------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Scrapers fail (<80% success)        | Day 5-6 | Halt marketing. Fix scrapers. Retest. If unfixable in 2 weeks, pivot to eBay-only (API, legal, stable).                                                                  |
+| Zero paying users by Day 21         | Day 21  | Product problem, not marketing problem. Interview first 20 signups. Ask: "Why didn't you pay?" Fix the #1 answer.                                                        |
+| MRR is $0 by Day 30                 | Day 30  | Stop all marketing. Spend 1 week doing 10 user interviews. The product may not solve a real problem at a price people pay. Validate before continuing.                   |
+| Churn exceeds 15%/month             | Day 30+ | Freeze acquisition. Every dollar spent acquiring a user who churns in 2 months is lost. Fix retention first: contact every churned user, implement top 3 feedback items. |
+| B2B competes with B2C in same metro | Ongoing | Separate deal feeds by segment. Or: add B2B surcharge for "priority access" that funds metro exclusivity.                                                                |
+| Scraper breaks in production        | Any day | Fix within 24 hours. If >48 hours: email affected users, offer 1 week free extension. Transparency > silence.                                                            |
 
 ---
 
@@ -2534,8 +2584,8 @@ These rules prevent the hidden cascading failures identified by the Second-Order
 
 ---
 
-*Part 4 is the definitive execution plan. It resolves all 7 contradictions identified by MECE analysis, incorporates the Essential 7 from Pareto, applies all second-order rules, adds the missing legal/analytics/pivot frameworks, and cuts everything below the 80/20 line to Month 2+ backlogs.*
+_Part 4 is the definitive execution plan. It resolves all 7 contradictions identified by MECE analysis, incorporates the Essential 7 from Pareto, applies all second-order rules, adds the missing legal/analytics/pivot frameworks, and cuts everything below the 80/20 line to Month 2+ backlogs._
 
-*Parts 1-3 remain as reference for context, competitive intelligence, and detailed implementation checklists when you need them. But Day-to-day, you live in Part 4.*
+_Parts 1-3 remain as reference for context, competitive intelligence, and detailed implementation checklists when you need them. But Day-to-day, you live in Part 4._
 
 **The plan is complete. Configure Stripe. Deploy. Start flipping. Make money.**

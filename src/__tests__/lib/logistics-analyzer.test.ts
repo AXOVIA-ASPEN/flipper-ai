@@ -63,7 +63,11 @@ describe('analyzeLogistics()', () => {
 
     it('calls estimateShippingCosts with correct args', async () => {
       mockShipping.mockResolvedValue({
-        usps: 10, ups: 14, fedex: 15, lowestCost: 10, currency: 'USD',
+        usps: 10,
+        ups: 14,
+        fedex: 15,
+        lowestCost: 10,
+        currency: 'USD',
       });
 
       await analyzeLogistics(BASE_ITEM, 'Tampa, FL', 50);
@@ -76,7 +80,11 @@ describe('analyzeLogistics()', () => {
 
     it('sets estimatedShippingCost to lowestCost from ShippingEstimates', async () => {
       mockShipping.mockResolvedValue({
-        usps: 8, ups: 12, fedex: 15, lowestCost: 8, currency: 'USD',
+        usps: 8,
+        ups: 12,
+        fedex: 15,
+        lowestCost: 8,
+        currency: 'USD',
       });
 
       const result = await analyzeLogistics(BASE_ITEM, 'Tampa, FL', 50);
@@ -85,7 +93,11 @@ describe('analyzeLogistics()', () => {
 
     it('calculates adjustedProfitMargin = profitPotential - lowestCost', async () => {
       mockShipping.mockResolvedValue({
-        usps: 20, ups: null, fedex: null, lowestCost: 20, currency: 'USD',
+        usps: 20,
+        ups: null,
+        fedex: null,
+        lowestCost: 20,
+        currency: 'USD',
       });
 
       const result = await analyzeLogistics(BASE_ITEM, 'Tampa, FL', 50);
@@ -99,7 +111,13 @@ describe('analyzeLogistics()', () => {
     });
 
     it('sets adjustedProfitMargin = profitPotential when lowestCost is 0 (all carriers failed)', async () => {
-      mockShipping.mockResolvedValue({ usps: null, ups: null, fedex: null, lowestCost: 0, currency: 'USD' });
+      mockShipping.mockResolvedValue({
+        usps: null,
+        ups: null,
+        fedex: null,
+        lowestCost: 0,
+        currency: 'USD',
+      });
       const result = await analyzeLogistics(BASE_ITEM, 'Tampa, FL', 50);
       expect(result.adjustedProfitMargin).toBe(200); // 200 - 0
     });
@@ -110,33 +128,39 @@ describe('analyzeLogistics()', () => {
     });
 
     it('extracts ZIP from location for toZip param', async () => {
-      mockShipping.mockResolvedValue({ usps: 5, ups: null, fedex: null, lowestCost: 5, currency: 'USD' });
+      mockShipping.mockResolvedValue({
+        usps: 5,
+        ups: null,
+        fedex: null,
+        lowestCost: 5,
+        currency: 'USD',
+      });
       await analyzeLogistics({ ...BASE_ITEM, location: 'Chicago, IL 60601' }, 'Tampa, FL', 50);
-      expect(mockShipping).toHaveBeenCalledWith(
-        expect.any(Number),
-        expect.any(Object),
-        '60601'
-      );
+      expect(mockShipping).toHaveBeenCalledWith(expect.any(Number), expect.any(Object), '60601');
     });
 
     it('uses fallback ZIP 10001 when location has no ZIP', async () => {
-      mockShipping.mockResolvedValue({ usps: 5, ups: null, fedex: null, lowestCost: 5, currency: 'USD' });
+      mockShipping.mockResolvedValue({
+        usps: 5,
+        ups: null,
+        fedex: null,
+        lowestCost: 5,
+        currency: 'USD',
+      });
       await analyzeLogistics({ ...BASE_ITEM, location: 'Chicago, IL' }, 'Tampa, FL', 50);
-      expect(mockShipping).toHaveBeenCalledWith(
-        expect.any(Number),
-        expect.any(Object),
-        '10001'
-      );
+      expect(mockShipping).toHaveBeenCalledWith(expect.any(Number), expect.any(Object), '10001');
     });
 
     it('uses fallback ZIP 10001 when location is null', async () => {
-      mockShipping.mockResolvedValue({ usps: 5, ups: null, fedex: null, lowestCost: 5, currency: 'USD' });
+      mockShipping.mockResolvedValue({
+        usps: 5,
+        ups: null,
+        fedex: null,
+        lowestCost: 5,
+        currency: 'USD',
+      });
       await analyzeLogistics({ ...BASE_ITEM, location: null }, 'Tampa, FL', 50);
-      expect(mockShipping).toHaveBeenCalledWith(
-        expect.any(Number),
-        expect.any(Object),
-        '10001'
-      );
+      expect(mockShipping).toHaveBeenCalledWith(expect.any(Number), expect.any(Object), '10001');
     });
   });
 
@@ -146,7 +170,13 @@ describe('analyzeLogistics()', () => {
     });
 
     it('also calls estimateShippingCosts (fragile items are still shippable)', async () => {
-      mockShipping.mockResolvedValue({ usps: 25, ups: null, fedex: null, lowestCost: 25, currency: 'USD' });
+      mockShipping.mockResolvedValue({
+        usps: 25,
+        ups: null,
+        fedex: null,
+        lowestCost: 25,
+        currency: 'USD',
+      });
       const result = await analyzeLogistics(BASE_ITEM, 'Tampa, FL', 50);
       expect(mockShipping).toHaveBeenCalled();
       expect(result.sizeCategory).toBe('fragile_special_handling');
@@ -170,7 +200,9 @@ describe('analyzeLogistics()', () => {
 
     it('calls calculateDistance when userLocation and listing.location are both set', async () => {
       mockDistance.mockResolvedValue({
-        distanceMiles: 30, fromLocation: 'Tampa, FL', toLocation: 'Tampa, FL 33601',
+        distanceMiles: 30,
+        fromLocation: 'Tampa, FL',
+        toLocation: 'Tampa, FL 33601',
         calculationMethod: 'geoapify',
       });
 
@@ -180,7 +212,9 @@ describe('analyzeLogistics()', () => {
 
     it('flags outsidePickupRadius when distance exceeds maxPickupRadiusMiles', async () => {
       mockDistance.mockResolvedValue({
-        distanceMiles: 80, fromLocation: 'Tampa, FL', toLocation: 'Tampa, FL 33601',
+        distanceMiles: 80,
+        fromLocation: 'Tampa, FL',
+        toLocation: 'Tampa, FL 33601',
         calculationMethod: 'geoapify',
       });
 
@@ -191,7 +225,9 @@ describe('analyzeLogistics()', () => {
 
     it('does NOT flag outsidePickupRadius when within radius', async () => {
       mockDistance.mockResolvedValue({
-        distanceMiles: 25, fromLocation: 'Tampa, FL', toLocation: 'Tampa, FL 33601',
+        distanceMiles: 25,
+        fromLocation: 'Tampa, FL',
+        toLocation: 'Tampa, FL 33601',
         calculationMethod: 'geoapify',
       });
 
@@ -200,7 +236,12 @@ describe('analyzeLogistics()', () => {
     });
 
     it('sets adjustedProfitMargin = profitPotential (no shipping for local pickup)', async () => {
-      mockDistance.mockResolvedValue({ distanceMiles: 10, fromLocation: 'A', toLocation: 'B', calculationMethod: 'geoapify' });
+      mockDistance.mockResolvedValue({
+        distanceMiles: 10,
+        fromLocation: 'A',
+        toLocation: 'B',
+        calculationMethod: 'geoapify',
+      });
       const result = await analyzeLogistics(BASE_ITEM, 'Tampa, FL', 50);
       expect(result.adjustedProfitMargin).toBe(200);
     });

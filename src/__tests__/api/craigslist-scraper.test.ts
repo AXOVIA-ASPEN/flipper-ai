@@ -9,7 +9,15 @@ jest.mock('@/lib/auth-middleware', () => ({
 }));
 
 jest.mock('@/lib/auth', () => ({
-  getCurrentUser: jest.fn(() => Promise.resolve({ id: 'test-user-id', email: 'test@test.com', name: 'Test User', firebaseUid: 'fb-uid', image: null })),
+  getCurrentUser: jest.fn(() =>
+    Promise.resolve({
+      id: 'test-user-id',
+      email: 'test@test.com',
+      name: 'Test User',
+      firebaseUid: 'fb-uid',
+      image: null,
+    })
+  ),
   getCurrentUserId: jest.fn(() => Promise.resolve('test-user-id')),
 }));
 
@@ -131,7 +139,13 @@ jest.mock('@/lib/image-capture', () => ({
 
 // Mock logger to prevent real log output from cluttering test runs
 jest.mock('@/lib/logger', () => ({
-  logger: { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn(), fatal: jest.fn() },
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    fatal: jest.fn(),
+  },
 }));
 
 // Helper to create mock NextRequest
@@ -1138,12 +1152,12 @@ describe('Craigslist Scraper Helper Functions', () => {
       await POST(request);
 
       expect(mockAnalyzeSellability).toHaveBeenCalledWith(
-        expect.any(String),  // title
-        expect.any(Number),  // price
-        expect.any(Object),  // identification
-        expect.any(Object),  // marketData
-        40,                  // discountThreshold from userSettings
-        expect.any(Number)   // feeRate from userSettings
+        expect.any(String), // title
+        expect.any(Number), // price
+        expect.any(Object), // identification
+        expect.any(Object), // marketData
+        40, // discountThreshold from userSettings
+        expect.any(Number) // feeRate from userSettings
       );
 
       delete process.env.OPENAI_API_KEY;
@@ -1243,10 +1257,7 @@ describe('Craigslist Scraper - additional branch coverage', () => {
     const data = await response.json();
     expect(data.success).toBe(true);
     // URL should contain 'sss' as fallback path
-    expect(mockGoto).toHaveBeenCalledWith(
-      expect.stringContaining('/sss'),
-      expect.any(Object)
-    );
+    expect(mockGoto).toHaveBeenCalledWith(expect.stringContaining('/sss'), expect.any(Object));
   });
 
   it('uses fallback location when item.location is empty string', async () => {
@@ -1256,7 +1267,7 @@ describe('Craigslist Scraper - additional branch coverage', () => {
         title: 'No Location Item',
         price: '$200',
         url: 'https://tampa.craigslist.org/ela/d/no-location/9876543.html',
-        location: '',  // empty → fallback to search location
+        location: '', // empty → fallback to search location
         imageUrl: '',
       },
     ]);
@@ -1292,7 +1303,7 @@ describe('Craigslist Scraper - additional branch coverage', () => {
       ...createDefaultEstimation(),
       valueScore: 80,
       discountPercent: 60,
-      negotiable: true,  // ← triggers arm 0 short-circuit
+      negotiable: true, // ← triggers arm 0 short-circuit
     }));
 
     const request = createMockRequest('POST', '/api/scraper/craigslist', {

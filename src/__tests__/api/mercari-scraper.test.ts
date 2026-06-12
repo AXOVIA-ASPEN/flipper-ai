@@ -541,7 +541,10 @@ describe('Mercari Scraper - additional branch coverage', () => {
         price: 150,
         status: 'on_sale',
         updated: Math.floor(Date.now() / 1000),
-        photos: ['https://img.mercari.com/photos/photo1.jpg', 'https://img.mercari.com/photos/photo2.jpg'],
+        photos: [
+          'https://img.mercari.com/photos/photo1.jpg',
+          'https://img.mercari.com/photos/photo2.jpg',
+        ],
         // no thumbnails
       };
 
@@ -577,9 +580,9 @@ describe('Mercari Scraper - additional branch coverage', () => {
 
       // active: API call, fallback fetch; sold: caught internally → []
       mockFetch
-        .mockResolvedValueOnce(failResponse)     // active API call → triggers fallback
+        .mockResolvedValueOnce(failResponse) // active API call → triggers fallback
         .mockResolvedValueOnce(fallbackFailResponse) // active fallback web scrape fails
-        .mockResolvedValueOnce(failResponse);    // sold listings API call → caught, returns []
+        .mockResolvedValueOnce(failResponse); // sold listings API call → caught, returns []
 
       const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
         method: 'POST',
@@ -612,8 +615,8 @@ describe('Mercari Scraper - additional branch coverage', () => {
       //   fetch #2: sold API call (fails → caught internally → returns [])
       //   fetch #3: active fallback web scrape (succeeds → console.warn + return [])
       mockFetch
-        .mockResolvedValueOnce(failResponse)       // fetch #1: active API fails
-        .mockResolvedValueOnce(failResponse)       // fetch #2: sold API fails (caught internally)
+        .mockResolvedValueOnce(failResponse) // fetch #1: active API fails
+        .mockResolvedValueOnce(failResponse) // fetch #2: sold API fails (caught internally)
         .mockResolvedValueOnce(fallbackOkResponse); // fetch #3: fallback web scrape succeeds → []
 
       const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
@@ -639,7 +642,11 @@ describe('Mercari Scraper - extended branch coverage', () => {
     mockPrisma.scraperJob.create.mockResolvedValue({ id: 'job-ext' });
     mockPrisma.scraperJob.update.mockResolvedValue({});
     mockPrisma.listing.upsert.mockResolvedValue({
-      id: 'listing-ext', platform: 'MERCARI', externalId: 'm999', title: 'Ext Item', status: 'OPPORTUNITY',
+      id: 'listing-ext',
+      platform: 'MERCARI',
+      externalId: 'm999',
+      title: 'Ext Item',
+      status: 'OPPORTUNITY',
     });
     mockPrisma.priceHistory.createMany.mockResolvedValue({ count: 2 });
     require('@/lib/auth-middleware').getAuthUserId.mockResolvedValue('user-ext');
@@ -650,23 +657,25 @@ describe('Mercari Scraper - extended branch coverage', () => {
     const soldResponse = {
       ok: true,
       headers: { get: () => 'application/json' },
-      json: () => Promise.resolve({
-        result: 'SUCCESS',
-        items: [{ id: 'sold-1', name: 'Sold Item', price: 200, status: 'sold_out' }],
-      }),
+      json: () =>
+        Promise.resolve({
+          result: 'SUCCESS',
+          items: [{ id: 'sold-1', name: 'Sold Item', price: 200, status: 'sold_out' }],
+        }),
     };
     const activeResponse = {
       ok: true,
       headers: { get: () => 'application/json' },
-      json: () => Promise.resolve({
-        result: 'SUCCESS',
-        data: [{ id: 'active-1', name: 'Active Item', price: 100, status: 'on_sale' }],
-      }),
+      json: () =>
+        Promise.resolve({
+          result: 'SUCCESS',
+          data: [{ id: 'active-1', name: 'Active Item', price: 100, status: 'on_sale' }],
+        }),
     };
     // Promise.all order: active API, sold API
     mockFetch
-      .mockResolvedValueOnce(activeResponse)   // active API
-      .mockResolvedValueOnce(soldResponse);    // sold API (uses .items)
+      .mockResolvedValueOnce(activeResponse) // active API
+      .mockResolvedValueOnce(soldResponse); // sold API (uses .items)
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -705,9 +714,7 @@ describe('Mercari Scraper - extended branch coverage', () => {
       headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -737,9 +744,7 @@ describe('Mercari Scraper - extended branch coverage', () => {
       headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -761,14 +766,13 @@ describe('Mercari Scraper - extended branch coverage', () => {
     const soldResponse = {
       ok: true,
       headers: { get: () => 'application/json' },
-      json: () => Promise.resolve({
-        result: 'SUCCESS',
-        data: [soldItemMissingPrice, soldItemMissingName],
-      }),
+      json: () =>
+        Promise.resolve({
+          result: 'SUCCESS',
+          data: [soldItemMissingPrice, soldItemMissingName],
+        }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -798,9 +802,7 @@ describe('Mercari Scraper - extended branch coverage', () => {
       headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -829,9 +831,7 @@ describe('Mercari Scraper - extended branch coverage', () => {
       headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -852,22 +852,23 @@ describe('Mercari Scraper - extended branch coverage', () => {
     const soldResponse = {
       ok: true,
       headers: { get: () => 'application/json' },
-      json: () => Promise.resolve({
-        result: 'SUCCESS',
-        data: [{
-          id: 'sold-cat-1',
-          name: 'Categorized Sold Item',
-          price: 120,
-          status: 'sold_out',
-          rootCategory: { id: '3', name: 'Electronics' },
-          updated: Math.floor(Date.now() / 1000) - 86400,
-          itemCondition: { id: '4', name: 'Good' },
-        }],
-      }),
+      json: () =>
+        Promise.resolve({
+          result: 'SUCCESS',
+          data: [
+            {
+              id: 'sold-cat-1',
+              name: 'Categorized Sold Item',
+              price: 120,
+              status: 'sold_out',
+              rootCategory: { id: '3', name: 'Electronics' },
+              updated: Math.floor(Date.now() / 1000) - 86400,
+              itemCondition: { id: '4', name: 'Good' },
+            },
+          ],
+        }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -880,8 +881,8 @@ describe('Mercari Scraper - extended branch coverage', () => {
   it('filters out items with missing id or name', async () => {
     // Covers: !item.id || !item.name continue (skips invalid items)
     const badItems = [
-      { id: '', name: 'No ID', price: 50, status: 'on_sale' },       // no id
-      { id: 'has-id', name: '', price: 50, status: 'on_sale' },       // no name
+      { id: '', name: 'No ID', price: 50, status: 'on_sale' }, // no id
+      { id: 'has-id', name: '', price: 50, status: 'on_sale' }, // no name
       { id: 'valid-1', name: 'Valid Item', price: 50, status: 'on_sale' }, // valid
     ];
     const activeResponse = {
@@ -894,9 +895,7 @@ describe('Mercari Scraper - extended branch coverage', () => {
       headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -917,19 +916,18 @@ describe('Mercari Scraper - extended branch coverage', () => {
     const activeResponse = {
       ok: true,
       headers: { get: () => 'application/json' },
-      json: () => Promise.resolve({
-        result: 'SUCCESS',
-        data: [{ id: 'throw-1', name: 'Throw Item', price: 50, status: 'on_sale' }],
-      }),
+      json: () =>
+        Promise.resolve({
+          result: 'SUCCESS',
+          data: [{ id: 'throw-1', name: 'Throw Item', price: 50, status: 'on_sale' }],
+        }),
     };
     const soldResponse = {
       ok: true,
       headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -952,9 +950,7 @@ describe('Mercari Scraper - extended branch coverage', () => {
       headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -970,12 +966,11 @@ describe('Mercari Scraper - extended branch coverage', () => {
     const htmlResponse = {
       ok: false,
       status: 503,
-      headers: { get: (h: string) => h === 'content-type' ? 'text/html; charset=utf-8' : null },
+      headers: { get: (h: string) => (h === 'content-type' ? 'text/html; charset=utf-8' : null) },
       text: () => Promise.resolve('<html>Service Unavailable</html>'),
     };
     // Both fetch calls (active + sold) fail with HTML block
-    mockFetch
-      .mockResolvedValue(htmlResponse);
+    mockFetch.mockResolvedValue(htmlResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -1076,9 +1071,7 @@ describe('Mercari Scraper - extended branch coverage', () => {
       headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -1109,9 +1102,7 @@ describe('Mercari Scraper - extended branch coverage', () => {
       headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -1140,9 +1131,7 @@ describe('Mercari Scraper - extended branch coverage', () => {
       headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -1173,9 +1162,7 @@ describe('Mercari Scraper - extended branch coverage', () => {
       headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -1214,9 +1201,7 @@ describe('Mercari Scraper - extended branch coverage', () => {
       headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -1251,9 +1236,7 @@ describe('Mercari Scraper - extended branch coverage', () => {
       headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -1284,9 +1267,7 @@ describe('Mercari Scraper - extended branch coverage', () => {
       headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -1316,9 +1297,7 @@ describe('Mercari Scraper - extended branch coverage', () => {
       headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 'SUCCESS', data: [] }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -1354,9 +1333,7 @@ describe('Mercari Scraper - extended branch coverage', () => {
       headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 'SUCCESS', data: [soldItem] }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -1390,9 +1367,7 @@ describe('Mercari Scraper - extended branch coverage', () => {
       headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 'SUCCESS', data: [soldItemNoPrice] }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -1429,9 +1404,7 @@ describe('Mercari Scraper - extended branch coverage', () => {
       headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 'SUCCESS', data: [soldItemNoName] }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -1467,9 +1440,7 @@ describe('Mercari Scraper - extended branch coverage', () => {
       headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 'SUCCESS', data: [soldItemNoDates] }),
     };
-    mockFetch
-      .mockResolvedValueOnce(activeResponse)
-      .mockResolvedValueOnce(soldResponse);
+    mockFetch.mockResolvedValueOnce(activeResponse).mockResolvedValueOnce(soldResponse);
 
     const request = new NextRequest('http://localhost:3000/api/scraper/mercari', {
       method: 'POST',
@@ -1566,11 +1537,12 @@ describe('Mercari scraper - LLM sellability pipeline (Story 4.5)', () => {
 
     (prisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-llm' });
     (prisma.scraperJob.update as jest.Mock).mockResolvedValue({});
-    (prisma.listing.upsert as jest.Mock).mockResolvedValue({ id: 'listing-llm', status: 'OPPORTUNITY' });
+    (prisma.listing.upsert as jest.Mock).mockResolvedValue({
+      id: 'listing-llm',
+      status: 'OPPORTUNITY',
+    });
 
-    mockFetch
-      .mockResolvedValueOnce(activeApiResponse)
-      .mockResolvedValueOnce(soldApiResponse);
+    mockFetch.mockResolvedValueOnce(activeApiResponse).mockResolvedValueOnce(soldApiResponse);
   });
 
   afterEach(() => {
@@ -1634,7 +1606,10 @@ describe('Mercari scraper - LLM sellability pipeline (Story 4.5)', () => {
   });
 
   it('skips item when analyzeSellability returns meetsThreshold=false', async () => {
-    mockAnalyzeSellability.mockResolvedValue({ ...defaultSellabilityResult, meetsThreshold: false });
+    mockAnalyzeSellability.mockResolvedValue({
+      ...defaultSellabilityResult,
+      meetsThreshold: false,
+    });
 
     const res = await POST(makeRequest());
     expect(res.status).toBe(200);
@@ -1665,12 +1640,12 @@ describe('Mercari scraper - LLM sellability pipeline (Story 4.5)', () => {
     expect(res.status).toBe(200);
 
     expect(mockAnalyzeSellability).toHaveBeenCalledWith(
-      expect.any(String),   // title
-      expect.any(Number),   // price
-      expect.any(Object),   // identification
-      expect.any(Object),   // marketData
-      45,                   // discountThreshold from userSettings
-      expect.any(Number)    // feeRate from userSettings
+      expect.any(String), // title
+      expect.any(Number), // price
+      expect.any(Object), // identification
+      expect.any(Object), // marketData
+      45, // discountThreshold from userSettings
+      expect.any(Number) // feeRate from userSettings
     );
   });
 });

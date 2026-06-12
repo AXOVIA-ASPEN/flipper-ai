@@ -162,7 +162,10 @@ export function getSystemHealth(): {
   let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
   if (recentErrors >= config.errorRateThreshold || memPct >= config.memoryUsageThreshold) {
     status = 'unhealthy';
-  } else if (recentErrors >= config.errorRateThreshold / 2 || memPct >= config.memoryUsageThreshold * 0.8) {
+  } else if (
+    recentErrors >= config.errorRateThreshold / 2 ||
+    memPct >= config.memoryUsageThreshold * 0.8
+  ) {
     status = 'degraded';
   }
 

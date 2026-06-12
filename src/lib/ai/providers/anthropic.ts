@@ -61,8 +61,7 @@ export class AnthropicProvider implements AIProvider {
       throw mapSdkError(err, 'anthropic');
     }
 
-    const content =
-      response.content[0]?.type === 'text' ? response.content[0].text : '';
+    const content = response.content[0]?.type === 'text' ? response.content[0].text : '';
     assertJsonParseable(content, 'anthropic', config.responseFormat);
 
     const usage = response.usage;

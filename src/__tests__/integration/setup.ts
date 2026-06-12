@@ -7,6 +7,7 @@
 
 import '@testing-library/jest-dom';
 import Database from 'better-sqlite3';
+import fs from 'fs';
 import path from 'path';
 
 // Set test environment
@@ -19,6 +20,21 @@ const db = new Database(dbPath);
 // Enable foreign keys
 db.pragma('foreign_keys = ON');
 
+// Bootstrap the schema from the checked-in SQLite DDL (generated from
+// prisma/schema.prisma via `prisma migrate diff` with a sqlite provider).
+// Statement-by-statement with existing-object errors tolerated, so a
+// pre-existing test.db keeps working without a drop.
+const ddl = fs.readFileSync(path.join(__dirname, 'schema.sqlite.sql'), 'utf8');
+for (const statement of ddl.split(';')) {
+  const sql = statement.trim();
+  if (!sql) continue;
+  try {
+    db.exec(sql);
+  } catch (e) {
+    if (!/already exists/.test((e as Error).message)) throw e;
+  }
+}
+
 /**
  * Create a Prisma-like client interface for testing
  * This wraps better-sqlite3 to provide the same API as Prisma
@@ -27,9 +43,7 @@ db.pragma('foreign_keys = ON');
  * Build a SQLite WHERE clause from a Prisma-style where object.
  * Supports: equality, { gte }, { lte }, { contains }, { OR: [...] }, null checks
  */
-function buildWhereClause(
-  where: Record<string, unknown>
-): { clause: string; params: unknown[] } {
+function buildWhereClause(where: Record<string, unknown>): { clause: string; params: unknown[] } {
   const conditions: string[] = [];
   const params: unknown[] = [];
 
@@ -202,11 +216,15 @@ function createTestClient() {
         // Support both platform_externalId and platform_externalId_userId compound keys
         const key = args.where.platform_externalId_userId ?? args.where.platform_externalId;
         const existing = key
-          ? (args.where.platform_externalId_userId && key.userId != null
-            ? db.prepare('SELECT * FROM Listing WHERE platform = ? AND externalId = ? AND userId = ?')
+          ? args.where.platform_externalId_userId && key.userId != null
+            ? db
+                .prepare(
+                  'SELECT * FROM Listing WHERE platform = ? AND externalId = ? AND userId = ?'
+                )
                 .get(key.platform, key.externalId, key.userId)
-            : db.prepare('SELECT * FROM Listing WHERE platform = ? AND externalId = ?')
-                .get(key.platform, key.externalId))
+            : db
+                .prepare('SELECT * FROM Listing WHERE platform = ? AND externalId = ?')
+                .get(key.platform, key.externalId)
           : null;
 
         const serializeValues = (obj: Record<string, unknown>) => {
@@ -409,7 +427,11 @@ function createTestClient() {
         return result.count;
       },
 
-      aggregate: async (args?: { where?: Record<string, unknown>; _sum?: Record<string, boolean>; _count?: boolean }) => {
+      aggregate: async (args?: {
+        where?: Record<string, unknown>;
+        _sum?: Record<string, boolean>;
+        _count?: boolean;
+      }) => {
         const params: unknown[] = [];
         const conditions: string[] = [];
         let hasListingJoin = false;
@@ -442,11 +464,18 @@ function createTestClient() {
         if (conditions.length > 0) aggregateSql += ' WHERE ' + conditions.join(' AND ');
 
         const result = db.prepare(aggregateSql).get(...params) as {
-          count: number; sumActualProfit: number; sumPurchasePrice: number; sumResalePrice: number;
+          count: number;
+          sumActualProfit: number;
+          sumPurchasePrice: number;
+          sumResalePrice: number;
         };
         return {
           _count: result.count,
-          _sum: { actualProfit: result.sumActualProfit, purchasePrice: result.sumPurchasePrice, resalePrice: result.sumResalePrice },
+          _sum: {
+            actualProfit: result.sumActualProfit,
+            purchasePrice: result.sumPurchasePrice,
+            resalePrice: result.sumResalePrice,
+          },
         };
       },
 
@@ -530,7 +559,9 @@ function createTestClient() {
           }
           const keys = Object.keys(data);
           const placeholders = keys.map(() => '?').join(', ');
-          db.prepare(`INSERT INTO Opportunity (${keys.join(', ')}) VALUES (${placeholders})`).run(...Object.values(data));
+          db.prepare(`INSERT INTO Opportunity (${keys.join(', ')}) VALUES (${placeholders})`).run(
+            ...Object.values(data)
+          );
           count++;
         }
         return { count };
@@ -591,7 +622,9 @@ function createTestClient() {
           else if (typeof v === 'boolean') serialized[k] = v ? 1 : 0;
           else serialized[k] = v;
         }
-        const updates = Object.entries(serialized).map(([key]) => `${key} = ?`).join(', ');
+        const updates = Object.entries(serialized)
+          .map(([key]) => `${key} = ?`)
+          .join(', ');
         const sql = `UPDATE ScraperJob SET ${updates} WHERE id = ?`;
         db.prepare(sql).run(...Object.values(serialized), args.where.id);
         return db.prepare('SELECT * FROM ScraperJob WHERE id = ?').get(args.where.id);
@@ -628,11 +661,13 @@ function createTestClient() {
 
         const rows = db.prepare(sql).all(...params) as Record<string, unknown>[];
         // Convert SQLite integer boolean back to JS boolean
-        return rows.map(row => ({ ...row, enabled: Boolean(row.enabled) }));
+        return rows.map((row) => ({ ...row, enabled: Boolean(row.enabled) }));
       },
 
       findUnique: async (args: { where: { id: string } }) => {
-        const row = db.prepare('SELECT * FROM SearchConfig WHERE id = ?').get(args.where.id) as Record<string, unknown> | undefined;
+        const row = db.prepare('SELECT * FROM SearchConfig WHERE id = ?').get(args.where.id) as
+          | Record<string, unknown>
+          | undefined;
         if (!row) return null;
         return { ...row, enabled: Boolean(row.enabled) };
       },
@@ -669,7 +704,9 @@ function createTestClient() {
           else if (typeof v === 'boolean') data[k] = v ? 1 : 0;
           else data[k] = v;
         }
-        const updates = Object.entries(data).map(([key]) => `${key} = ?`).join(', ');
+        const updates = Object.entries(data)
+          .map(([key]) => `${key} = ?`)
+          .join(', ');
         const sql = `UPDATE SearchConfig SET ${updates} WHERE id = ?`;
         db.prepare(sql).run(...Object.values(data), args.where.id);
         const row = db
@@ -724,7 +761,13 @@ function ensureTestUser(): void {
     db.prepare(
       `INSERT INTO User (id, email, name, createdAt, updatedAt)
        VALUES (?, ?, ?, ?, ?)`
-    ).run('test-user-id', 'test@example.com', 'Test User', new Date().toISOString(), new Date().toISOString());
+    ).run(
+      'test-user-id',
+      'test@example.com',
+      'Test User',
+      new Date().toISOString(),
+      new Date().toISOString()
+    );
   }
 }
 

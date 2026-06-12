@@ -23,30 +23,24 @@ function readSourceFile(relativePath: string): string {
 
 // ==================== Given ====================
 
-Given(
-  'the llm-identifier module is integrated in {string}',
-  function (filePath: string) {
-    const content = readSourceFile(filePath);
-    // After the Story 5.x refactor, the LLM-integration entrypoint is
-    // `enrichWithSellabilityAnalysis` (which itself awaits identifyItem and
-    // analyzeSellability). Accept either the legacy `enrichOpportunitiesWithLLM`
-    // name or the canonical post-refactor `enrichWithSellabilityAnalysis`.
-    const hasIntegration =
-      content.includes('enrichOpportunitiesWithLLM') ||
-      content.includes('enrichWithSellabilityAnalysis');
-    expect(hasIntegration).toBe(true);
-    this.fileContent = content;
-  }
-);
+Given('the llm-identifier module is integrated in {string}', function (filePath: string) {
+  const content = readSourceFile(filePath);
+  // After the Story 5.x refactor, the LLM-integration entrypoint is
+  // `enrichWithSellabilityAnalysis` (which itself awaits identifyItem and
+  // analyzeSellability). Accept either the legacy `enrichOpportunitiesWithLLM`
+  // name or the canonical post-refactor `enrichWithSellabilityAnalysis`.
+  const hasIntegration =
+    content.includes('enrichOpportunitiesWithLLM') ||
+    content.includes('enrichWithSellabilityAnalysis');
+  expect(hasIntegration).toBe(true);
+  this.fileContent = content;
+});
 
-Given(
-  'the eBay scraper route file at {string}',
-  function (filePath: string) {
-    const content = readSourceFile(filePath);
-    expect(content).toContain('enrichOpportunitiesWithLLM');
-    this.fileContent = content;
-  }
-);
+Given('the eBay scraper route file at {string}', function (filePath: string) {
+  const content = readSourceFile(filePath);
+  expect(content).toContain('enrichOpportunitiesWithLLM');
+  this.fileContent = content;
+});
 
 // ==================== When ====================
 
@@ -69,9 +63,7 @@ When('I inspect the enrichOpportunitiesWithLLM function body', function () {
     'export async function enrichOpportunitiesWithLLM',
     'export async function enrichWithSellabilityAnalysis',
   ];
-  const fnStart = candidates
-    .map((c) => this.fileContent.indexOf(c))
-    .find((idx) => idx > -1) ?? -1;
+  const fnStart = candidates.map((c) => this.fileContent.indexOf(c)).find((idx) => idx > -1) ?? -1;
   expect(fnStart).toBeGreaterThan(-1);
   const fnRest = this.fileContent.substring(fnStart);
   const nextExportIdx = fnRest.indexOf('\nexport ', 1);
@@ -90,7 +82,9 @@ Then('"enrichOpportunitiesWithLLM" is exported as an async function', function (
   // Either the legacy name OR the canonical post-refactor name must be exported
   // as an async function — both wire identifyItem into the analyzed-listing flow.
   const hasLegacy = this.fileContent.includes('export async function enrichOpportunitiesWithLLM');
-  const hasCanonical = this.fileContent.includes('export async function enrichWithSellabilityAnalysis');
+  const hasCanonical = this.fileContent.includes(
+    'export async function enrichWithSellabilityAnalysis'
+  );
   expect(hasLegacy || hasCanonical).toBe(true);
 });
 
@@ -159,10 +153,7 @@ Then('it imports enrichOpportunitiesWithLLM from marketplace-scanner', function 
   expect(this.fileContent).toContain('marketplace-scanner');
 });
 
-Then(
-  'it calls enrichOpportunitiesWithLLM on the opportunities array',
-  function () {
-    expect(this.fnBody).toContain('enrichOpportunitiesWithLLM(');
-    expect(this.fnBody).toContain('processedResults.opportunities');
-  }
-);
+Then('it calls enrichOpportunitiesWithLLM on the opportunities array', function () {
+  expect(this.fnBody).toContain('enrichOpportunitiesWithLLM(');
+  expect(this.fnBody).toContain('processedResults.opportunities');
+});

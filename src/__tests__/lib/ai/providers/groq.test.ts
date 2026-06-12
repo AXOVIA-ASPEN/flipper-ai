@@ -100,7 +100,7 @@ describe('GroqProvider', () => {
         expect.objectContaining({
           baseURL: 'https://api.groq.com/openai/v1',
           apiKey: 'gsk_test',
-        }),
+        })
       );
     });
 
@@ -152,7 +152,7 @@ describe('GroqProvider', () => {
           ],
           temperature: 0.3,
           max_tokens: 1024,
-        }),
+        })
       );
     });
 
@@ -172,7 +172,7 @@ describe('GroqProvider', () => {
       expect(mockCreate).toHaveBeenCalledWith(
         expect.objectContaining({
           response_format: { type: 'json_object' },
-        }),
+        })
       );
     });
 

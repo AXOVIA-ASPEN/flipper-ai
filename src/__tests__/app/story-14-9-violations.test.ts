@@ -29,7 +29,8 @@ const FILES = [
   'app/terms/page.tsx',
 ];
 
-const PALETTE_RE = /(bg|text|border|from|to|via|ring)-(blue|cyan|teal|sky|indigo|fuchsia|pink|rose|emerald|amber|yellow|red|orange|green)-\d+/;
+const PALETTE_RE =
+  /(bg|text|border|from|to|via|ring)-(blue|cyan|teal|sky|indigo|fuchsia|pink|rose|emerald|amber|yellow|red|orange|green)-\d+/;
 const LIGHTMODE_RE = /bg-(white|gray-\d+)/;
 const CLASSNAME_RE = /className=(?:\{`[^`]*`\}|\{["'][^"']*["']\}|"[^"]*"|'[^']*')/g;
 

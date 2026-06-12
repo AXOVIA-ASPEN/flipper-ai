@@ -110,7 +110,10 @@ injectMockModule(resolve(projectRoot, 'src/lib/db'), {
   __esModule: true,
   default: {
     user: {
-      updateMany: async (args: { where: Record<string, unknown>; data: Record<string, unknown> }) => {
+      updateMany: async (args: {
+        where: Record<string, unknown>;
+        data: Record<string, unknown>;
+      }) => {
         mockState.updateManyCalls.push(args);
         return mockState.updateManyResult;
       },
@@ -183,13 +186,10 @@ Given('an incoming Stripe webhook request with no signature header', function ()
   noSignatureHeader = true;
 });
 
-Given(
-  'the STRIPE_WEBHOOK_SECRET environment variable is empty in production',
-  function () {
-    // webhookSecret is already '' (cleared at module load above).
-    // The When step sets NODE_ENV='production' to trigger the guard.
-  }
-);
+Given('the STRIPE_WEBHOOK_SECRET environment variable is empty in production', function () {
+  // webhookSecret is already '' (cleared at module load above).
+  // The When step sets NODE_ENV='production' to trigger the guard.
+});
 
 Given('a Stripe customer with no email address', function () {
   mockState.customerRetrieveResult = { email: null, name: null };
@@ -314,61 +314,49 @@ Then('the webhook responds with status {int}', function (expectedStatus: number)
   );
 });
 
-Then(
-  'the user\'s tier in the database is updated to {string}',
-  function (expectedTier: string) {
-    assert.ok(
-      mockState.updateManyCalls.length > 0,
-      'Expected at least one prisma.user.updateMany call'
-    );
-    const lastCall = mockState.updateManyCalls[mockState.updateManyCalls.length - 1];
-    assert.strictEqual(
-      lastCall.data.subscriptionTier,
-      expectedTier,
-      `Expected tier "${expectedTier}" in DB update, got "${lastCall.data.subscriptionTier}"`
-    );
-  }
-);
+Then("the user's tier in the database is updated to {string}", function (expectedTier: string) {
+  assert.ok(
+    mockState.updateManyCalls.length > 0,
+    'Expected at least one prisma.user.updateMany call'
+  );
+  const lastCall = mockState.updateManyCalls[mockState.updateManyCalls.length - 1];
+  assert.strictEqual(
+    lastCall.data.subscriptionTier,
+    expectedTier,
+    `Expected tier "${expectedTier}" in DB update, got "${lastCall.data.subscriptionTier}"`
+  );
+});
 
-Then(
-  'a payment failure notification email is sent to {string}',
-  function (expectedEmail: string) {
-    assert.ok(
-      mockState.sendPaymentFailedCalls.length > 0,
-      'Expected emailService.sendPaymentFailed to be called'
-    );
-    const lastCall = mockState.sendPaymentFailedCalls[mockState.sendPaymentFailedCalls.length - 1];
-    assert.strictEqual(
-      lastCall.email,
-      expectedEmail,
-      `Email should be sent to "${expectedEmail}", was sent to "${lastCall.email}"`
-    );
-  }
-);
+Then('a payment failure notification email is sent to {string}', function (expectedEmail: string) {
+  assert.ok(
+    mockState.sendPaymentFailedCalls.length > 0,
+    'Expected emailService.sendPaymentFailed to be called'
+  );
+  const lastCall = mockState.sendPaymentFailedCalls[mockState.sendPaymentFailedCalls.length - 1];
+  assert.strictEqual(
+    lastCall.email,
+    expectedEmail,
+    `Email should be sent to "${expectedEmail}", was sent to "${lastCall.email}"`
+  );
+});
 
-Then(
-  'a payment failure warning is logged for {string}',
-  function (_expectedEmail: string) {
-    // The real handler logs via console.warn before sending email.
-    // A successful 200 response proves the warn-then-email path was executed.
-    assert.strictEqual(webhookResponseStatus, 200);
-  }
-);
+Then('a payment failure warning is logged for {string}', function (_expectedEmail: string) {
+  // The real handler logs via console.warn before sending email.
+  // A successful 200 response proves the warn-then-email path was executed.
+  assert.strictEqual(webhookResponseStatus, 200);
+});
 
-Then(
-  'the email failure is logged but does not cause a webhook error',
-  function () {
-    assert.ok(
-      mockState.sendPaymentFailedError !== null,
-      'Email send should have been configured to fail'
-    );
-    assert.strictEqual(
-      webhookResponseStatus,
-      200,
-      'Webhook should still return 200 despite email failure'
-    );
-  }
-);
+Then('the email failure is logged but does not cause a webhook error', function () {
+  assert.ok(
+    mockState.sendPaymentFailedError !== null,
+    'Email send should have been configured to fail'
+  );
+  assert.strictEqual(
+    webhookResponseStatus,
+    200,
+    'Webhook should still return 200 despite email failure'
+  );
+});
 
 Then('a security warning is logged for invalid signature', function () {
   // The real handler logs via console.error when constructEvent throws.
@@ -384,9 +372,5 @@ Then('the response indicates the service is misconfigured', function () {
 });
 
 Then('no database update is performed', function () {
-  assert.strictEqual(
-    mockState.updateManyCalls.length,
-    0,
-    'No database update should be performed'
-  );
+  assert.strictEqual(mockState.updateManyCalls.length, 0, 'No database update should be performed');
 });

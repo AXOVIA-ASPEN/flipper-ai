@@ -27,8 +27,12 @@ describe('firebase.json Configuration', () => {
   });
 
   describe('hosting.public', () => {
-    it('should point to "out" directory (static export)', () => {
-      expect(config.hosting.public).toBe('out');
+    it('should point to the placeholder dir (all traffic proxies to Cloud Run)', () => {
+      // Hosting serves no static build — the ** rewrite proxies everything to
+      // the flipper-production Cloud Run service. The public dir exists only
+      // because Firebase Hosting requires one; any file in it would shadow
+      // the rewrite for its path.
+      expect(config.hosting.public).toBe('config/hosting-public');
     });
   });
 
@@ -43,70 +47,53 @@ describe('firebase.json Configuration', () => {
   });
 
   describe('rewrites', () => {
-    it('should have API rewrite to Cloud Run before catch-all', () => {
-      const apiRewrite = config.hosting.rewrites[0];
-      expect(apiRewrite.source).toBe('/api/**');
-      expect(apiRewrite.run).toBeDefined();
-      expect(apiRewrite.run?.serviceId).toBe('flipper-ai-backend');
-      expect(apiRewrite.run?.region).toBe('us-central1');
+    it('should proxy ALL traffic to the flipper-production Cloud Run service', () => {
+      const proxy = config.hosting.rewrites[0];
+      expect(proxy.source).toBe('**');
+      expect(proxy.run).toBeDefined();
+      expect(proxy.run?.serviceId).toBe('flipper-production');
+      expect(proxy.run?.region).toBe('us-central1');
     });
 
-    it('should have SPA catch-all rewrite after API rewrite', () => {
-      const catchAll = config.hosting.rewrites[1];
-      expect(catchAll.source).toBe('**');
-      expect(catchAll.destination).toBe('/index.html');
+    it('should have no static destination rewrites (Next.js serves every page)', () => {
+      expect(config.hosting.rewrites).toHaveLength(1);
+      expect(config.hosting.rewrites.every((r) => r.destination === undefined)).toBe(true);
     });
 
     it('should NOT include pinTag in Cloud Run rewrite', () => {
-      const apiRewrite = config.hosting.rewrites[0];
-      expect(apiRewrite.run).not.toHaveProperty('pinTag');
+      const proxy = config.hosting.rewrites[0];
+      expect(proxy.run).not.toHaveProperty('pinTag');
     });
   });
 
   describe('cache headers', () => {
     it('should set immutable cache for JS/CSS files', () => {
-      const jsCssHeader = config.hosting.headers.find(
-        (h) => h.source.includes('.@(js|css)')
-      );
+      const jsCssHeader = config.hosting.headers.find((h) => h.source.includes('.@(js|css)'));
       expect(jsCssHeader).toBeDefined();
-      const cacheControl = jsCssHeader!.headers.find(
-        (h) => h.key === 'Cache-Control'
-      );
+      const cacheControl = jsCssHeader!.headers.find((h) => h.key === 'Cache-Control');
       expect(cacheControl?.value).toContain('max-age=31536000');
       expect(cacheControl?.value).toContain('immutable');
     });
 
     it('should set immutable cache for image files', () => {
-      const imgHeader = config.hosting.headers.find(
-        (h) => h.source.includes('jpg|jpeg')
-      );
+      const imgHeader = config.hosting.headers.find((h) => h.source.includes('jpg|jpeg'));
       expect(imgHeader).toBeDefined();
-      const cacheControl = imgHeader!.headers.find(
-        (h) => h.key === 'Cache-Control'
-      );
+      const cacheControl = imgHeader!.headers.find((h) => h.key === 'Cache-Control');
       expect(cacheControl?.value).toContain('max-age=31536000');
     });
 
     it('should set short cache for HTML files', () => {
-      const htmlHeader = config.hosting.headers.find(
-        (h) => h.source.includes('.html')
-      );
+      const htmlHeader = config.hosting.headers.find((h) => h.source.includes('.html'));
       expect(htmlHeader).toBeDefined();
-      const cacheControl = htmlHeader!.headers.find(
-        (h) => h.key === 'Cache-Control'
-      );
+      const cacheControl = htmlHeader!.headers.find((h) => h.key === 'Cache-Control');
       expect(cacheControl?.value).toContain('max-age=300');
       expect(cacheControl?.value).toContain('s-maxage=600');
     });
 
     it('should set CORS headers for font files', () => {
-      const fontHeader = config.hosting.headers.find(
-        (h) => h.source.includes('woff')
-      );
+      const fontHeader = config.hosting.headers.find((h) => h.source.includes('woff'));
       expect(fontHeader).toBeDefined();
-      const cors = fontHeader!.headers.find(
-        (h) => h.key === 'Access-Control-Allow-Origin'
-      );
+      const cors = fontHeader!.headers.find((h) => h.key === 'Access-Control-Allow-Origin');
       expect(cors?.value).toBe('*');
     });
   });

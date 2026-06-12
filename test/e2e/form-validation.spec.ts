@@ -21,9 +21,7 @@ test.describe('Feature: Form Validation', () => {
 
         // Browser native validation should prevent submission — email field should be invalid
         const emailInput = page.getByLabel(/Email/i);
-        const isInvalid = await emailInput.evaluate(
-          (el: HTMLInputElement) => !el.validity.valid
-        );
+        const isInvalid = await emailInput.evaluate((el: HTMLInputElement) => !el.validity.valid);
         expect(isInvalid).toBe(true);
       }
     });
@@ -43,9 +41,7 @@ test.describe('Feature: Form Validation', () => {
       if (await submitBtn.isVisible()) {
         await submitBtn.click();
 
-        const isInvalid = await emailInput.evaluate(
-          (el: HTMLInputElement) => !el.validity.valid
-        );
+        const isInvalid = await emailInput.evaluate((el: HTMLInputElement) => !el.validity.valid);
         expect(isInvalid).toBe(true);
       }
     });
@@ -64,9 +60,7 @@ test.describe('Feature: Form Validation', () => {
         // At least the name or email field should be invalid
         const nameInput = page.getByLabel(/Name/i);
         if (await nameInput.isVisible()) {
-          const isInvalid = await nameInput.evaluate(
-            (el: HTMLInputElement) => !el.validity.valid
-          );
+          const isInvalid = await nameInput.evaluate((el: HTMLInputElement) => !el.validity.valid);
           expect(isInvalid).toBe(true);
         }
       }
@@ -143,7 +137,9 @@ test.describe('Feature: Form Validation', () => {
 
           // Check for validation error or that the value is corrected
           const value = await thresholdInput.inputValue();
-          const hasError = await page.locator('[role="alert"], .error, .text-red, .text-destructive').count();
+          const hasError = await page
+            .locator('[role="alert"], .error, .text-red, .text-destructive')
+            .count();
           // Either the value was rejected or an error is shown
           expect(value === '-10' ? hasError > 0 : true).toBe(true);
         }
@@ -181,7 +177,9 @@ test.describe('Feature: Form Validation', () => {
       await page.waitForLoadState('networkidle');
 
       // Look for API key input and validate button
-      const apiKeyInput = page.locator('input[type="password"], input[name*="api"], input[placeholder*="API"]').first();
+      const apiKeyInput = page
+        .locator('input[type="password"], input[name*="api"], input[placeholder*="API"]')
+        .first();
       if (await apiKeyInput.isVisible()) {
         await apiKeyInput.fill('test-api-key-12345');
 

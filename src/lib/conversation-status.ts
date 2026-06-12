@@ -48,10 +48,7 @@ const VALID_TRANSITIONS: Record<string, ConversationStatus[]> = {
 /**
  * Check if a state transition is valid.
  */
-function isValidTransition(
-  from: string | null,
-  to: ConversationStatus
-): boolean {
+function isValidTransition(from: string | null, to: ConversationStatus): boolean {
   const key = from ?? 'null';
   const allowed = VALID_TRANSITIONS[key];
   return allowed ? allowed.includes(to) : false;
@@ -119,10 +116,7 @@ export async function updateConversationStatus(
  * Transition to 'pending' — only if currently null (first outbound message).
  * Fire-and-forget safe: silently ignores invalid transitions.
  */
-export async function transitionToPending(
-  listingId: string,
-  userId: string
-): Promise<void> {
+export async function transitionToPending(listingId: string, userId: string): Promise<void> {
   const listing = await prisma.listing.findFirst({
     where: { id: listingId, userId },
     select: { conversationStatus: true },
@@ -142,10 +136,7 @@ export async function transitionToPending(
  * Transition to 'responded' — only if currently 'pending'.
  * Fire-and-forget safe: silently ignores invalid transitions.
  */
-export async function transitionToResponded(
-  listingId: string,
-  userId: string
-): Promise<void> {
+export async function transitionToResponded(listingId: string, userId: string): Promise<void> {
   const listing = await prisma.listing.findFirst({
     where: { id: listingId, userId },
     select: { conversationStatus: true },
@@ -165,10 +156,7 @@ export async function transitionToResponded(
  * Transition to 'purchased' — from any state (terminal state).
  * Fire-and-forget safe: silently ignores if already purchased.
  */
-export async function transitionToPurchased(
-  listingId: string,
-  userId: string
-): Promise<void> {
+export async function transitionToPurchased(listingId: string, userId: string): Promise<void> {
   const listing = await prisma.listing.findFirst({
     where: { id: listingId, userId },
     select: { conversationStatus: true },

@@ -147,23 +147,27 @@ gcloud run services describe flipper-web --region us-east1 --format='value(statu
 ## 🔧 Troubleshooting Quick Fixes
 
 ### "Firebase login failed"
+
 ```bash
 firebase logout
 firebase login --reauth
 ```
 
 ### "gcloud not authenticated"
+
 ```bash
 gcloud auth application-default login
 ```
 
 ### "Function deployment timeout"
+
 ```bash
 # Increase timeout
 gcloud functions deploy scrapeCraigslist --timeout=540s
 ```
 
 ### "Prisma client not found"
+
 ```bash
 cd functions
 npm run prisma:generate
@@ -171,6 +175,7 @@ npm run build
 ```
 
 ### "Database connection failed"
+
 ```bash
 # Check DATABASE_URL secret
 gcloud secrets versions access latest --secret=DATABASE_URL
@@ -180,6 +185,7 @@ gcloud sql instances list
 ```
 
 ### "CORS errors in browser"
+
 ```bash
 # Check function logs
 gcloud functions logs read scrapeCraigslist --region=us-east1 --limit=50
@@ -217,6 +223,7 @@ done
 ## 📈 Monitoring
 
 ### View Logs
+
 ```bash
 # All functions
 gcloud functions logs read --region=us-east1 --limit=100
@@ -229,11 +236,13 @@ gcloud functions logs read scrapeCraigslist --region=us-east1 --follow
 ```
 
 ### Performance Dashboard
+
 1. Go to https://console.cloud.google.com/functions?project=axovia-flipper
 2. Click on each function
 3. View: Metrics, Logs, Testing
 
 ### Set Up Alerts (Optional but recommended)
+
 ```bash
 # Error rate alert
 gcloud alpha monitoring policies create \
@@ -249,6 +258,7 @@ gcloud alpha monitoring policies create \
 ## 💡 Tips for Success
 
 1. **Test locally first**: Use Firebase emulators before deploying
+
    ```bash
    cd functions
    npm run serve
@@ -271,6 +281,7 @@ gcloud alpha monitoring policies create \
 ## 🎯 Success Criteria
 
 ✅ **You're successful when:**
+
 - All scrapers work via Cloud Functions
 - Response times < 5s (p95)
 - Error rate < 1%
@@ -286,6 +297,7 @@ gcloud alpha monitoring policies create \
 - **Stack Overflow**: Tag with `firebase`, `google-cloud-functions`
 
 **Stuck?** Check:
+
 1. Cloud Logs: https://console.cloud.google.com/logs?project=axovia-flipper
 2. Function details: https://console.cloud.google.com/functions?project=axovia-flipper
 3. Billing: https://console.cloud.google.com/billing?project=axovia-flipper

@@ -39,7 +39,10 @@ Given(
     const body =
       status === 404
         ? { success: false, error: { code: 'NOT_FOUND', detail: 'Listing not found' } }
-        : { success: false, error: { code: 'SERVICE_UNAVAILABLE', detail: 'Listing fetch failed' } };
+        : {
+            success: false,
+            error: { code: 'SERVICE_UNAVAILABLE', detail: 'Listing fetch failed' },
+          };
     await this.page.route(`**/api/listings/${id}`, (route) =>
       route.fulfill({
         status,
@@ -69,13 +72,10 @@ Given(
   }
 );
 
-Then(
-  'I should see the error banner',
-  async function (this: CustomWorld) {
-    const banner = this.page.locator('[data-testid="error-banner"]');
-    await expect(banner.first()).toBeVisible({ timeout: 30000 });
-  }
-);
+Then('I should see the error banner', async function (this: CustomWorld) {
+  const banner = this.page.locator('[data-testid="error-banner"]');
+  await expect(banner.first()).toBeVisible({ timeout: 30000 });
+});
 
 Then(
   'I should see the empty state with title matching {string}',
@@ -87,13 +87,10 @@ Then(
   }
 );
 
-Then(
-  'no error banner should be present',
-  async function (this: CustomWorld) {
-    const banner = this.page.locator('[data-testid="error-banner"]');
-    await expect(banner).toHaveCount(0);
-  }
-);
+Then('no error banner should be present', async function (this: CustomWorld) {
+  const banner = this.page.locator('[data-testid="error-banner"]');
+  await expect(banner).toHaveCount(0);
+});
 
 When(
   'I click the {string} button on the error banner',
@@ -103,69 +100,58 @@ When(
   }
 );
 
-Then(
-  'a second GET to the listing API should have been issued',
-  async function (this: CustomWorld) {
-    const counter = (this.testData.requestCounts as Map<string, number>) ?? new Map();
-    const count = Array.from(counter.values()).reduce((a, b) => a + b, 0);
-    expect(count, `expected ≥2 listing API calls, observed ${count}`).toBeGreaterThanOrEqual(2);
-  }
-);
+Then('a second GET to the listing API should have been issued', async function (this: CustomWorld) {
+  const counter = (this.testData.requestCounts as Map<string, number>) ?? new Map();
+  const count = Array.from(counter.values()).reduce((a, b) => a + b, 0);
+  expect(count, `expected ≥2 listing API calls, observed ${count}`).toBeGreaterThanOrEqual(2);
+});
 
 // ─── AC #13 — Messages page EmptyState role/aria (S-85) ──────────────────────
 
-Given(
-  'the messages API returns zero threads',
-  async function (this: CustomWorld) {
-    await this.page.route('**/api/messages?**', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          success: true,
-          data: { messages: [] },
-          pagination: { total: 0, limit: 0, offset: 0 },
-        }),
-      })
-    );
-    // /api/messages/threads returns the thread array directly under `data` —
-    // see app/api/messages/threads/route.ts:192. Returning a wrapper object
-    // crashes MessagesPage with `threads.filter is not a function`.
-    await this.page.route('**/api/messages/threads**', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          success: true,
-          data: [],
-          pagination: { total: 0, limit: 20, offset: 0 },
-        }),
-      })
-    );
-    await this.page.route('**/api/user/settings', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          success: true,
-          data: {
-            user: { subscriptionTier: 'PRO' },
-            messageApprovalRequired: false,
-          },
-        }),
-      })
-    );
-  }
-);
+Given('the messages API returns zero threads', async function (this: CustomWorld) {
+  await this.page.route('**/api/messages?**', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        success: true,
+        data: { messages: [] },
+        pagination: { total: 0, limit: 0, offset: 0 },
+      }),
+    })
+  );
+  // /api/messages/threads returns the thread array directly under `data` —
+  // see app/api/messages/threads/route.ts:192. Returning a wrapper object
+  // crashes MessagesPage with `threads.filter is not a function`.
+  await this.page.route('**/api/messages/threads**', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        success: true,
+        data: [],
+        pagination: { total: 0, limit: 20, offset: 0 },
+      }),
+    })
+  );
+  await this.page.route('**/api/user/settings', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        success: true,
+        data: {
+          user: { subscriptionTier: 'PRO' },
+          messageApprovalRequired: false,
+        },
+      }),
+    })
+  );
+});
 
 Then(
   'an element with testid {string} has role {string} and aria-live {string}',
-  async function (
-    this: CustomWorld,
-    testId: string,
-    role: string,
-    ariaLive: string
-  ) {
+  async function (this: CustomWorld, testId: string, role: string, ariaLive: string) {
     const el = this.page.locator(`[data-testid="${testId}"]`).first();
     await expect(el).toBeVisible({ timeout: 30000 });
     await expect(el).toHaveAttribute('role', role);
@@ -307,32 +293,29 @@ Given(
   }
 );
 
-Given(
-  'the opportunities PATCH endpoint counts requests',
-  async function (this: CustomWorld) {
-    const patches: { id: string; status: string }[] = [];
-    this.testData.opportunityPatches = patches;
-    await this.page.route('**/api/opportunities/*', (route) => {
-      const req = route.request();
-      if (req.method() !== 'PATCH') return route.fallback();
-      const url = new URL(req.url());
-      const id = url.pathname.split('/').filter(Boolean).pop() ?? '';
-      let body: Record<string, unknown> = {};
-      try {
-        body = (req.postDataJSON() as Record<string, unknown>) ?? {};
-      } catch {
-        body = {};
-      }
-      const status = typeof body.status === 'string' ? body.status : '';
-      patches.push({ id, status });
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ success: true, data: { id, status } }),
-      });
+Given('the opportunities PATCH endpoint counts requests', async function (this: CustomWorld) {
+  const patches: { id: string; status: string }[] = [];
+  this.testData.opportunityPatches = patches;
+  await this.page.route('**/api/opportunities/*', (route) => {
+    const req = route.request();
+    if (req.method() !== 'PATCH') return route.fallback();
+    const url = new URL(req.url());
+    const id = url.pathname.split('/').filter(Boolean).pop() ?? '';
+    let body: Record<string, unknown> = {};
+    try {
+      body = (req.postDataJSON() as Record<string, unknown>) ?? {};
+    } catch {
+      body = {};
+    }
+    const status = typeof body.status === 'string' ? body.status : '';
+    patches.push({ id, status });
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ success: true, data: { id, status } }),
     });
-  }
-);
+  });
+});
 
 When('I switch to the Kanban view', async function (this: CustomWorld) {
   // OpportunitiesPage wraps content in <Suspense fallback={<LoadingSkeleton/>}>.
@@ -341,15 +324,11 @@ When('I switch to the Kanban view', async function (this: CustomWorld) {
   // visibility / detached-element checks otherwise. The page renders the
   // group twice (likely React StrictMode double-render in dev); use .first()
   // and visibility polling instead of strict-mode resolution.
-  const toggleGroup = this.page
-    .locator('[role="group"][aria-label="View mode"]')
-    .first();
+  const toggleGroup = this.page.locator('[role="group"][aria-label="View mode"]').first();
   await this.page.waitForFunction(
     () => {
       const groups = document.querySelectorAll('[role="group"][aria-label="View mode"]');
-      return Array.from(groups).some(
-        (el) => (el as HTMLElement).offsetParent !== null
-      );
+      return Array.from(groups).some((el) => (el as HTMLElement).offsetParent !== null);
     },
     { timeout: 30000 }
   );

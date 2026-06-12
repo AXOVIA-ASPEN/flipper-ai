@@ -90,9 +90,7 @@ const mockSettings = {
   },
 };
 
-function mockFetch(
-  ...responses: Array<{ ok: boolean; json: () => Promise<unknown> }>
-) {
+function mockFetch(...responses: Array<{ ok: boolean; json: () => Promise<unknown> }>) {
   let call = 0;
   (global.fetch as jest.Mock).mockImplementation(() => {
     const res = responses[call] ?? responses[responses.length - 1];
@@ -187,8 +185,7 @@ describe('NotificationSettings', () => {
     await waitFor(() => expect(screen.getByText('New Opportunity Found')).toBeInTheDocument());
 
     // Component uses aria-disabled + CSS rather than HTML disabled attribute
-    const pushButtons = screen
-      .getAllByRole('switch', { name: /push notification/i });
+    const pushButtons = screen.getAllByRole('switch', { name: /push notification/i });
     pushButtons.forEach((btn) => expect(btn).toHaveAttribute('aria-disabled', 'true'));
   });
 
@@ -219,9 +216,7 @@ describe('NotificationSettings', () => {
     render(<NotificationSettings />);
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/email notifications are turned off/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/email notifications are turned off/i)).toBeInTheDocument();
     });
   });
 
@@ -356,9 +351,7 @@ describe('NotificationSettings', () => {
     );
 
     await waitFor(() => {
-      expect(mockShowToast).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'success' })
-      );
+      expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({ type: 'success' }));
     });
   });
 
@@ -376,9 +369,7 @@ describe('NotificationSettings', () => {
     );
 
     await waitFor(() => {
-      expect(mockShowToast).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'error' })
-      );
+      expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
     });
   });
 
@@ -395,9 +386,7 @@ describe('NotificationSettings', () => {
     fireEvent.click(screen.getByDisplayValue('daily'));
 
     await waitFor(() => {
-      expect(mockShowToast).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'error' })
-      );
+      expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
     });
   });
 
@@ -408,15 +397,17 @@ describe('NotificationSettings', () => {
     );
     render(<NotificationSettings />);
 
-    await waitFor(() => expect(screen.getByLabelText(/hours before cold flip alert/i)).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByLabelText(/hours before cold flip alert/i)).toBeInTheDocument()
+    );
 
-    fireEvent.change(screen.getByLabelText(/hours before cold flip alert/i), { target: { value: '48' } });
+    fireEvent.change(screen.getByLabelText(/hours before cold flip alert/i), {
+      target: { value: '48' },
+    });
     fireEvent.blur(screen.getByLabelText(/hours before cold flip alert/i));
 
     await waitFor(() => {
-      expect(mockShowToast).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'error' })
-      );
+      expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
     });
     // Must NOT show success toast when save fails
     const successCalls = mockShowToast.mock.calls.filter(
@@ -436,9 +427,13 @@ describe('NotificationSettings', () => {
     );
     render(<NotificationSettings />);
 
-    await waitFor(() => expect(screen.getByLabelText(/hours before cold flip alert/i)).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByLabelText(/hours before cold flip alert/i)).toBeInTheDocument()
+    );
 
-    fireEvent.change(screen.getByLabelText(/hours before cold flip alert/i), { target: { value: '48' } });
+    fireEvent.change(screen.getByLabelText(/hours before cold flip alert/i), {
+      target: { value: '48' },
+    });
     fireEvent.blur(screen.getByLabelText(/hours before cold flip alert/i));
 
     await waitFor(() => {
@@ -485,7 +480,9 @@ describe('NotificationSettings', () => {
     mockFetch({ ok: true, json: async () => mockSettings });
     render(<NotificationSettings />);
 
-    await waitFor(() => expect(screen.getByLabelText(/hours before cold flip alert/i)).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByLabelText(/hours before cold flip alert/i)).toBeInTheDocument()
+    );
 
     const input = screen.getByLabelText(/hours before cold flip alert/i);
     fireEvent.change(input, { target: { value: '200' } });
@@ -542,8 +539,8 @@ describe('NotificationSettings', () => {
     await waitFor(() => expect(screen.getByText('New Opportunity Found')).toBeInTheDocument());
 
     const switches = screen.getAllByRole('switch');
-    const emailSwitches = switches.filter(
-      (btn) => btn.getAttribute('aria-label')?.includes('email notification')
+    const emailSwitches = switches.filter((btn) =>
+      btn.getAttribute('aria-label')?.includes('email notification')
     );
     expect(emailSwitches.length).toBeGreaterThan(0);
     emailSwitches.forEach((btn) => {
@@ -663,8 +660,7 @@ describe('NotificationSettings', () => {
     // Match per-event SMS ToggleButtons ("Toggle … SMS notification") but NOT
     // the master SMS toggle button ("Toggle SMS notifications"), which uses the
     // HTML disabled attribute instead of aria-disabled.
-    const smsButtons = screen
-      .getAllByRole('switch', { name: /toggle .+ sms notification/i });
+    const smsButtons = screen.getAllByRole('switch', { name: /toggle .+ sms notification/i });
     expect(smsButtons.length).toBeGreaterThan(0);
     smsButtons.forEach((btn) => expect(btn).toHaveAttribute('aria-disabled', 'true'));
   });
@@ -678,9 +674,7 @@ describe('NotificationSettings', () => {
     render(<NotificationSettings />);
 
     await waitFor(() => {
-      expect(mockShowToast).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'error' })
-      );
+      expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
     });
   });
 });

@@ -30,7 +30,7 @@ async function scrapeOfferUp(
 ): Promise<OfferUpItem[]> {
   const browser = await chromium.launch({
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
 
   const context = await browser.newContext({
@@ -145,7 +145,7 @@ export async function handler(req: Request, res: Response) {
         success: true,
         message: `Scraped ${listings.length} listings from OfferUp`,
         jobId: job.id,
-        listings: listings.map(item => ({
+        listings: listings.map((item) => ({
           title: item.title,
           price: `$${item.price}`,
           location: item.location,

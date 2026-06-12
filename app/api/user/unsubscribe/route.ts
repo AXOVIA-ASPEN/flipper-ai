@@ -10,27 +10,35 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { logger } from '@/lib/logger';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
+import {
+  handleError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  AppError,
+  ErrorCode,
+} from '@/lib/errors';
 export async function GET(request: NextRequest) {
   try {
-  const { searchParams } = new URL(request.url);
-  const token = searchParams.get('token');
+    const { searchParams } = new URL(request.url);
+    const token = searchParams.get('token');
 
-  if (!token) {
-    throw new ValidationError('Missing token');
-  }
+    if (!token) {
+      throw new ValidationError('Missing token');
+    }
 
-  let email: string;
-  try {
-    email = Buffer.from(token, 'base64url').toString('utf-8');
-  } catch {
-    throw new ValidationError('Invalid token');
-  }
+    let email: string;
+    try {
+      email = Buffer.from(token, 'base64url').toString('utf-8');
+    } catch {
+      throw new ValidationError('Invalid token');
+    }
 
-  // Basic email validation
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    throw new ValidationError('Invalid token');
-  }
+    // Basic email validation
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      throw new ValidationError('Invalid token');
+    }
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
       select: { id: true, settings: { select: { id: true } } },
@@ -120,8 +128,8 @@ function unsubscribeHtml(success: boolean): string {
   const appUrl = process.env.APP_URL || 'https://flipper-ai.app';
   const title = success ? 'Unsubscribed Successfully' : 'Something Went Wrong';
   const message = success
-    ? 'You\'ve been unsubscribed from all Flipper AI email notifications. You can re-enable them at any time in your account settings.'
-    : 'We couldn\'t process your unsubscribe request. Please try again or manage your preferences in the app.';
+    ? "You've been unsubscribed from all Flipper AI email notifications. You can re-enable them at any time in your account settings."
+    : "We couldn't process your unsubscribe request. Please try again or manage your preferences in the app.";
 
   return `<!DOCTYPE html>
 <html lang="en">

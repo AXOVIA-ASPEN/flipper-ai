@@ -20,14 +20,8 @@ import { Given, When, Then } from '@cucumber/cucumber';
 import assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
-import {
-  generateAlgorithmicTitle,
-  generateLLMTitle,
-} from '../../../src/lib/title-generator';
-import type {
-  TitleGeneratorInput,
-  GeneratedTitle,
-} from '../../../src/lib/title-generator';
+import { generateAlgorithmicTitle, generateLLMTitle } from '../../../src/lib/title-generator';
+import type { TitleGeneratorInput, GeneratedTitle } from '../../../src/lib/title-generator';
 import {
   generateAlgorithmicDescription,
   generateLLMDescription,
@@ -64,13 +58,7 @@ Given(
 
 Given(
   'a purchased item with brand {string} model {string} variant {string} condition {string} and asking price {int}',
-  function (
-    brand: string,
-    model: string,
-    variant: string,
-    condition: string,
-    askingPrice: number
-  ) {
+  function (brand: string, model: string, variant: string, condition: string, askingPrice: number) {
     titleInput = {
       brand: brand || null,
       model: model || null,
@@ -117,12 +105,9 @@ When(
   }
 );
 
-When(
-  'the description generator runs for platform {string}',
-  function (platform: string) {
-    generatedDescription = generateAlgorithmicDescription(descInput, platform);
-  }
-);
+When('the description generator runs for platform {string}', function (platform: string) {
+  generatedDescription = generateAlgorithmicDescription(descInput, platform);
+});
 
 When(
   'the description generator runs for platform {string} using LLM mode',
@@ -152,20 +137,14 @@ Then('the generated title contains {string}', function (substring: string) {
 
 Then('a title is still produced', function () {
   assert.ok(generatedTitle, 'Expected a generated title (algorithmic fallback)');
-  assert.ok(
-    generatedTitle!.title.length > 0,
-    'Expected non-empty title from algorithmic fallback'
-  );
+  assert.ok(generatedTitle!.title.length > 0, 'Expected non-empty title from algorithmic fallback');
 });
 
 // ── Then: description assertions ─────────────────────────────────────────────
 
 Then('the generated description is non-empty', function () {
   assert.ok(generatedDescription, 'Expected a generated description');
-  assert.ok(
-    generatedDescription!.description.trim().length > 0,
-    'Expected non-empty description'
-  );
+  assert.ok(generatedDescription!.description.trim().length > 0, 'Expected non-empty description');
 });
 
 Then('the generated description mentions the condition', function () {
@@ -185,10 +164,7 @@ Then('the generated description mentions {string}', function (phrase: string) {
 });
 
 Then('a description is still produced', function () {
-  assert.ok(
-    generatedDescription,
-    'Expected a generated description (algorithmic fallback)'
-  );
+  assert.ok(generatedDescription, 'Expected a generated description (algorithmic fallback)');
   assert.ok(
     generatedDescription!.description.length > 0,
     'Expected non-empty description from algorithmic fallback'
@@ -200,11 +176,7 @@ Then('a description is still produced', function () {
 Then('both the title and description are mutable strings', function () {
   assert.ok(generatedTitle, 'Expected a generated title');
   assert.ok(generatedDescription, 'Expected a generated description');
-  assert.strictEqual(
-    typeof generatedTitle!.title,
-    'string',
-    'Title must be a string'
-  );
+  assert.strictEqual(typeof generatedTitle!.title, 'string', 'Title must be a string');
   assert.strictEqual(
     typeof generatedDescription!.description,
     'string',
@@ -218,10 +190,7 @@ Given(
   'the resale content generation API endpoint exists at {string}',
   function (routePath: string) {
     const fullPath = path.resolve(process.cwd(), routePath);
-    assert.ok(
-      fs.existsSync(fullPath),
-      `Expected API route file to exist at ${routePath}`
-    );
+    assert.ok(fs.existsSync(fullPath), `Expected API route file to exist at ${routePath}`);
   }
 );
 
@@ -233,13 +202,7 @@ Then(
       'app/api/listings/[id]/generate-resale-content/route.ts'
     );
     const content = fs.readFileSync(routePath, 'utf-8');
-    for (const key of [
-      'titles',
-      'descriptions',
-      'primary',
-      'source',
-      'warnings',
-    ]) {
+    for (const key of ['titles', 'descriptions', 'primary', 'source', 'warnings']) {
       assert.ok(
         new RegExp(`\\b${key}\\b`).test(content),
         `Expected route to include "${key}" in its response shape`
@@ -250,10 +213,7 @@ Then(
 
 Given('the posting queue route exists at {string}', function (routePath: string) {
   const fullPath = path.resolve(process.cwd(), routePath);
-  assert.ok(
-    fs.existsSync(fullPath),
-    `Expected posting queue route to exist at ${routePath}`
-  );
+  assert.ok(fs.existsSync(fullPath), `Expected posting queue route to exist at ${routePath}`);
 });
 
 Then(

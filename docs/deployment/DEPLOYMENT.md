@@ -16,6 +16,7 @@
 ## Prerequisites
 
 ### Required Tools
+
 - **Node.js 18+**: `node -v` should show v18 or higher
 - **Docker**: For containerization
 - **gcloud CLI**: For Google Cloud deployments
@@ -26,6 +27,7 @@
 Create environment-specific files:
 
 **`.env.staging`** - Staging environment
+
 ```bash
 # Database
 DATABASE_URL="postgresql://..."
@@ -48,6 +50,7 @@ RESEND_API_KEY="re_..."
 ```
 
 **`.env.production`** - Production environment
+
 ```bash
 # Same structure as staging, but with production keys
 DATABASE_URL="postgresql://..."
@@ -60,6 +63,7 @@ APP_URL="https://flipper.axovia.ai"
 The deployment script performs these steps automatically:
 
 ### 1. Pre-flight Checks ✓
+
 - Verifies Node.js version (18+)
 - Checks environment file exists
 - Validates all required environment variables are set
@@ -67,6 +71,7 @@ The deployment script performs these steps automatically:
 - Records current commit and branch
 
 ### 2. Tests & Quality ✓
+
 - Installs dependencies (`npm ci`)
 - Runs ESLint linting
 - Runs TypeScript type checking
@@ -76,22 +81,26 @@ The deployment script performs these steps automatically:
 - Runs E2E tests (Playwright)
 
 ### 3. Build ✓
+
 - Cleans previous builds
 - Builds Next.js application for production
 - Verifies build artifacts created successfully
 
 ### 4. Database Migration ✓
+
 - Tests database connectivity
 - Runs Prisma migrations (`migrate deploy`)
 - Verifies database schema matches code
 
 ### 5. Docker Image ✓
+
 - Builds Docker image with production optimizations
 - Tags with: `{env}-{commit}-{timestamp}` and `{env}-latest`
 - Tests image locally (spins up container, health check, tears down)
 - Pushes to Google Container Registry (production only)
 
 ### 6. Cloud Run Deployment ✓
+
 - Deploys to Google Cloud Run
 - Configuration:
   - **Memory**: 2GB
@@ -102,6 +111,7 @@ The deployment script performs these steps automatically:
 - Retrieves and saves service URL
 
 ### 7. Post-Deployment Verification ✓
+
 - Health check (`/api/health`)
 - Smoke tests:
   - User registration
@@ -110,6 +120,7 @@ The deployment script performs these steps automatically:
 - Verifies all services responding correctly
 
 ### 8. Manifest & Logging ✓
+
 - Creates deployment manifest JSON with:
   - Timestamp
   - Git commit & branch
@@ -128,6 +139,7 @@ If something goes wrong:
 ```
 
 This:
+
 1. Reads the previous Docker image tag
 2. Re-deploys that image to Cloud Run
 3. Verifies health checks pass
@@ -145,6 +157,7 @@ export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/..."
 ```
 
 You'll receive:
+
 - ✅ Success: "Deployment succeeded (production) - Commit: abc123"
 - ❌ Failure: "Deployment failed - rolled back to image:tag"
 
@@ -156,6 +169,7 @@ export EMAIL_NOTIFICATION="devops@axovia.ai"
 ```
 
 You'll receive email with:
+
 - Subject: "Flipper AI: Deployment Success: production"
 - Body: Deployment summary + log file path
 
@@ -164,6 +178,7 @@ You'll receive email with:
 If you need to deploy manually (not recommended):
 
 ### 1. Build & Test Locally
+
 ```bash
 npm ci
 npm run lint
@@ -172,27 +187,32 @@ npm run build
 ```
 
 ### 2. Database Migration
+
 ```bash
 npx prisma migrate deploy
 ```
 
 ### 3. Build Docker Image
+
 ```bash
 docker build -t gcr.io/axovia-flipper/flipper-web:v1.0.0 .
 ```
 
 ### 4. Test Locally
+
 ```bash
 docker run -p 3000:3000 --env-file .env.production gcr.io/axovia-flipper/flipper-web:v1.0.0
 curl http://localhost:3200/api/health
 ```
 
 ### 5. Push to Registry
+
 ```bash
 docker push gcr.io/axovia-flipper/flipper-web:v1.0.0
 ```
 
 ### 6. Deploy to Cloud Run
+
 ```bash
 gcloud run deploy flipper-production \
   --image gcr.io/axovia-flipper/flipper-web:v1.0.0 \
@@ -204,6 +224,7 @@ gcloud run deploy flipper-production \
 ```
 
 ### 7. Verify
+
 ```bash
 SERVICE_URL=$(gcloud run services describe flipper-production --region us-east1 --format='value(status.url)')
 curl $SERVICE_URL/api/health
@@ -212,6 +233,7 @@ curl $SERVICE_URL/api/health
 ## Environments
 
 ### Staging
+
 - **URL**: https://staging.flipper.axovia.ai
 - **Purpose**: Pre-production testing
 - **Database**: Separate staging DB
@@ -219,6 +241,7 @@ curl $SERVICE_URL/api/health
 - **Deploy frequency**: On every PR merge to `main`
 
 ### Production
+
 - **URL**: https://flipper.axovia.ai
 - **Purpose**: Live user traffic
 - **Database**: Production DB with backups
@@ -230,6 +253,7 @@ curl $SERVICE_URL/api/health
 After deployment, monitor:
 
 ### Cloud Run Metrics (GCP Console)
+
 - Request count
 - Request latency (p50, p95, p99)
 - Error rate
@@ -237,6 +261,7 @@ After deployment, monitor:
 - Memory/CPU usage
 
 ### Application Logs
+
 ```bash
 # View Cloud Run logs
 gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=flipper-production" --limit 50
@@ -246,10 +271,12 @@ gcloud alpha logging tail "resource.type=cloud_run_revision AND resource.labels.
 ```
 
 ### Sentry (Error Tracking)
+
 - Dashboard: https://sentry.io/organizations/axovia/projects/flipper/
 - Real-time errors, performance, releases
 
 ### Database Health
+
 ```bash
 # Check connection pool
 npx prisma db execute --file=<(echo "SELECT count(*) FROM pg_stat_activity;")
@@ -261,6 +288,7 @@ npx prisma db execute --file=<(echo "SELECT * FROM pg_stat_statements ORDER BY m
 ## Troubleshooting
 
 ### Deployment Failed: "Tests failed"
+
 ```bash
 # Run tests locally to see failure
 npm run test:coverage
@@ -272,6 +300,7 @@ git add -A && git commit -m "fix: resolved test failures"
 ```
 
 ### Deployment Failed: "Docker build failed"
+
 ```bash
 # Check Dockerfile syntax
 docker build -t test-image .
@@ -281,6 +310,7 @@ npm install
 ```
 
 ### Deployment Failed: "Database migration failed"
+
 ```bash
 # Check database connectivity
 npx prisma db execute --file=<(echo "SELECT 1;")
@@ -293,6 +323,7 @@ npx prisma migrate reset --force
 ```
 
 ### Health Check Failing After Deploy
+
 ```bash
 # Check Cloud Run logs
 gcloud logging read "resource.type=cloud_run_revision" --limit 50
@@ -305,6 +336,7 @@ gcloud run services describe flipper-production --region us-east1 --format=json 
 ```
 
 ### Rollback Not Working
+
 ```bash
 # Manually rollback to specific revision
 gcloud run services update-traffic flipper-production --to-revisions=flipper-production-00042-abc=100
@@ -316,6 +348,7 @@ gcloud run deploy flipper-production --image=gcr.io/axovia-flipper/flipper-web:p
 ## CI/CD Integration (GitHub Actions)
 
 **`.github/workflows/deploy-staging.yml`**
+
 ```yaml
 name: Deploy to Staging
 
@@ -329,18 +362,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-      
+
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v1
         with:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           project_id: axovia-flipper
-      
+
       - name: Deploy to Staging
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
@@ -351,6 +384,7 @@ jobs:
 ## Best Practices
 
 1. **Always deploy to staging first**
+
    ```bash
    ./scripts/deploy-production.sh staging
    # Test thoroughly
@@ -392,6 +426,7 @@ Current production costs: **~$30-50/month**
 - Storage: <$5/mo
 
 To reduce costs:
+
 - Set `min-instances: 0` in staging (scales to zero)
 - Use **Cloud Scheduler** to warm up instances before peak hours
 - Enable **auto-pause** for Cloud SQL in staging

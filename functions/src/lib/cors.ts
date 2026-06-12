@@ -8,7 +8,7 @@ export function handleCORS(req: Request, res: Response): boolean {
   const origin = req.headers.origin || '*';
   res.set('Access-Control-Allow-Origin', origin);
   res.set('Access-Control-Allow-Credentials', 'true');
-  
+
   // Handle preflight
   if (req.method === 'OPTIONS') {
     res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -17,18 +17,14 @@ export function handleCORS(req: Request, res: Response): boolean {
     res.status(204).send('');
     return true;
   }
-  
+
   return false;
 }
 
 /**
  * Validate request method
  */
-export function validateMethod(
-  req: Request,
-  res: Response,
-  allowedMethods: string[]
-): boolean {
+export function validateMethod(req: Request, res: Response, allowedMethods: string[]): boolean {
   if (!allowedMethods.includes(req.method)) {
     res.status(405).json({ error: `Method ${req.method} not allowed` });
     return false;
@@ -39,17 +35,11 @@ export function validateMethod(
 /**
  * Extract and validate request body
  */
-export function validateBody<T>(
-  req: Request,
-  res: Response,
-  requiredFields: string[]
-): T | null {
+export function validateBody<T>(req: Request, res: Response, requiredFields: string[]): T | null {
   const body = req.body as T;
-  
-  const missingFields = requiredFields.filter(
-    field => !(field in (body as any))
-  );
-  
+
+  const missingFields = requiredFields.filter((field) => !(field in (body as any)));
+
   if (missingFields.length > 0) {
     res.status(400).json({
       error: 'Missing required fields',
@@ -57,6 +47,6 @@ export function validateBody<T>(
     });
     return null;
   }
-  
+
   return body;
 }

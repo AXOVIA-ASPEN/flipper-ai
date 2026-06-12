@@ -126,13 +126,7 @@ describe('captureListingImages', () => {
 
     await captureListingImages(LISTING_ID, USER_ID, PLATFORM, [url]);
 
-    expect(mockBuildStoragePath).toHaveBeenCalledWith(
-      USER_ID,
-      PLATFORM,
-      LISTING_ID,
-      0,
-      'png'
-    );
+    expect(mockBuildStoragePath).toHaveBeenCalledWith(USER_ID, PLATFORM, LISTING_ID, 0, 'png');
   });
 
   it('defaults extension to jpg for URLs without recognised extension', async () => {
@@ -141,13 +135,7 @@ describe('captureListingImages', () => {
 
     await captureListingImages(LISTING_ID, USER_ID, PLATFORM, [url]);
 
-    expect(mockBuildStoragePath).toHaveBeenCalledWith(
-      USER_ID,
-      PLATFORM,
-      LISTING_ID,
-      0,
-      'jpg'
-    );
+    expect(mockBuildStoragePath).toHaveBeenCalledWith(USER_ID, PLATFORM, LISTING_ID, 0, 'jpg');
   });
 
   it('normalises jpeg to jpg', async () => {
@@ -156,13 +144,7 @@ describe('captureListingImages', () => {
 
     await captureListingImages(LISTING_ID, USER_ID, PLATFORM, [url]);
 
-    expect(mockBuildStoragePath).toHaveBeenCalledWith(
-      USER_ID,
-      PLATFORM,
-      LISTING_ID,
-      0,
-      'jpg'
-    );
+    expect(mockBuildStoragePath).toHaveBeenCalledWith(USER_ID, PLATFORM, LISTING_ID, 0, 'jpg');
   });
 
   it('handles URLs with query strings', async () => {
@@ -171,13 +153,7 @@ describe('captureListingImages', () => {
 
     await captureListingImages(LISTING_ID, USER_ID, PLATFORM, [url]);
 
-    expect(mockBuildStoragePath).toHaveBeenCalledWith(
-      USER_ID,
-      PLATFORM,
-      LISTING_ID,
-      0,
-      'webp'
-    );
+    expect(mockBuildStoragePath).toHaveBeenCalledWith(USER_ID, PLATFORM, LISTING_ID, 0, 'webp');
   });
 
   it('preserves imageIndex in captured data', async () => {

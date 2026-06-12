@@ -19,12 +19,12 @@ import { fetchMarketPrice, filterOutliers } from './market-price';
 export interface VerifiedPriceLookupResult {
   verifiedMarketValue: number;
   trueDiscountPercent: number;
-  marketDataSource: string;        // 'ebay_sold' or 'ebay_scrape'
+  marketDataSource: string; // 'ebay_sold' or 'ebay_scrape'
   marketDataDate: Date;
   confidence: 'low' | 'medium' | 'high';
   dataPoints: number;
   soldPriceRange: { min: number; max: number; median: number; average: number };
-  comparableSalesJson: string | null;  // JSON array of top 5 SoldListing
+  comparableSalesJson: string | null; // JSON array of top 5 SoldListing
 }
 
 /**
@@ -55,7 +55,7 @@ export async function lookupVerifiedMarketPrice(
       confidence: dbResult.confidence,
       dataPoints: dbResult.dataPoints,
       soldPriceRange: dbResult.soldPriceRange,
-      comparableSalesJson: null,  // PriceHistory doesn't store individual listing details
+      comparableSalesJson: null, // PriceHistory doesn't store individual listing details
     };
   }
 
@@ -95,15 +95,18 @@ export async function lookupVerifiedMarketPrice(
       confidence,
       dataPoints: soldListings.length,
       soldPriceRange: { min, max, median, average },
-      comparableSalesJson: soldListings.length > 0
-        ? JSON.stringify(soldListings.slice(0, 5).map((s) => ({
-            title: s.title,
-            price: s.price,
-            condition: s.condition,
-            url: s.url,
-            shippingCost: s.shippingCost,
-          })))
-        : null,
+      comparableSalesJson:
+        soldListings.length > 0
+          ? JSON.stringify(
+              soldListings.slice(0, 5).map((s) => ({
+                title: s.title,
+                price: s.price,
+                condition: s.condition,
+                url: s.url,
+                shippingCost: s.shippingCost,
+              }))
+            )
+          : null,
     };
   } catch (error) {
     console.error(`Playwright market price lookup failed for "${searchQuery}":`, error);

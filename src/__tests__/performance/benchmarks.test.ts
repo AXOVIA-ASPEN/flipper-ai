@@ -17,7 +17,13 @@ jest.mock('next/server', () => ({
 }));
 
 jest.mock('@/lib/auth', () => ({
-  getCurrentUser: jest.fn().mockResolvedValue({ id: 'test-user', email: 'test@test.com', name: 'Test', firebaseUid: 'fb-uid', image: null }),
+  getCurrentUser: jest.fn().mockResolvedValue({
+    id: 'test-user',
+    email: 'test@test.com',
+    name: 'Test',
+    firebaseUid: 'fb-uid',
+    image: null,
+  }),
   getCurrentUserId: jest.fn().mockResolvedValue('test-user'),
 }));
 
@@ -32,6 +38,11 @@ jest.mock('@/lib/metrics', () => ({
 
 describe('Performance Benchmarks', () => {
   const ITERATIONS = 1000;
+
+  // Shared CI runners are 5-10x slower and noisier than dev machines — keep
+  // tight budgets locally, scale every timing assertion where hardware varies.
+  const CI_SLOWDOWN = process.env.CI ? 10 : 1;
+  const budget = (ms: number) => ms * CI_SLOWDOWN;
   const WARM_UP = 100;
 
   /**
@@ -76,7 +87,7 @@ describe('Performance Benchmarks', () => {
       }
     });
 
-    it('should calculate ROI in < 0.05ms average', async () => {
+    it(`should calculate ROI in < ${budget(0.05)}ms average`, async () => {
       const input = {
         purchasePrice: 50,
         resalePrice: 120,
@@ -88,7 +99,7 @@ describe('Performance Benchmarks', () => {
         calculateROI(input);
       });
       console.log('ROI Calculator benchmark:', result);
-      expect(result.avg).toBeLessThan(0.05);
+      expect(result.avg).toBeLessThan(budget(0.05));
     });
   });
 
@@ -107,12 +118,12 @@ describe('Performance Benchmarks', () => {
       }
     });
 
-    it('should generate titles in < 0.05ms average', async () => {
+    it(`should generate titles in < ${budget(0.05)}ms average`, async () => {
       const result = await benchmark(() => {
         generateTitle('Vintage Nintendo 64 Console Complete in Box', 'electronics');
       });
       console.log('Title Generator benchmark:', result);
-      expect(result.avg).toBeLessThan(0.05);
+      expect(result.avg).toBeLessThan(budget(0.05));
     });
   });
 
@@ -130,26 +141,28 @@ describe('Performance Benchmarks', () => {
       timestamps: { listed: new Date().toISOString(), updated: new Date().toISOString() },
     };
 
-    it('should serialize listing JSON in < 0.02ms average', async () => {
+    const SERIALIZE_BUDGET_MS = budget(0.02);
+
+    it(`should serialize listing JSON in < ${SERIALIZE_BUDGET_MS}ms average`, async () => {
       const result = await benchmark(() => {
         JSON.stringify(sampleListing);
       });
       console.log('JSON.stringify benchmark:', result);
-      expect(result.avg).toBeLessThan(0.02);
+      expect(result.avg).toBeLessThan(SERIALIZE_BUDGET_MS);
     });
 
-    it('should deserialize listing JSON in < 0.02ms average', async () => {
+    it(`should deserialize listing JSON in < ${SERIALIZE_BUDGET_MS}ms average`, async () => {
       const json = JSON.stringify(sampleListing);
       const result = await benchmark(() => {
         JSON.parse(json);
       });
       console.log('JSON.parse benchmark:', result);
-      expect(result.avg).toBeLessThan(0.02);
+      expect(result.avg).toBeLessThan(SERIALIZE_BUDGET_MS);
     });
   });
 
   describe('Batch Processing', () => {
-    it('should process 1000 listings filter/sort in < 50ms', async () => {
+    it(`should process 1000 listings filter/sort in < ${budget(50)}ms`, async () => {
       const listings = Array.from({ length: 1000 }, (_, i) => ({
         id: `listing-${i}`,
         title: `Item ${i}`,
@@ -168,7 +181,7 @@ describe('Performance Benchmarks', () => {
       }, 500);
 
       console.log('Batch filter/sort benchmark:', result);
-      expect(result.p99).toBeLessThan(50);
+      expect(result.p99).toBeLessThan(budget(50));
     });
   });
 

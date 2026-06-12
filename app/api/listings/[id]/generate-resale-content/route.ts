@@ -44,10 +44,7 @@ import {
   generateDescriptionsForAllPlatforms,
 } from '@/lib/description-generator';
 import type { TitleGeneratorInput, GeneratedTitle } from '@/lib/title-generator';
-import type {
-  DescriptionGeneratorInput,
-  GeneratedDescription,
-} from '@/lib/description-generator';
+import type { DescriptionGeneratorInput, GeneratedDescription } from '@/lib/description-generator';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -159,10 +156,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // app/listings/[id]/page.tsx is cosmetic only (trivially bypassed by a
     // direct HTTP call). The story's Dev Note G8 specifies this exact gate.
     const RESALE_ELIGIBLE_STATUSES = new Set(['PURCHASED', 'LISTED', 'SOLD']);
-    if (
-      !listing.opportunity ||
-      !RESALE_ELIGIBLE_STATUSES.has(listing.opportunity.status)
-    ) {
+    if (!listing.opportunity || !RESALE_ELIGIBLE_STATUSES.has(listing.opportunity.status)) {
       throw new ForbiddenError(
         'Resale content generation is only available once the opportunity has been purchased.'
       );
@@ -171,8 +165,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Build generator inputs directly from listing data — fromIdentification()
     // signatures differ between modules and require ItemIdentification, not raw
     // listing fields, so we build inputs manually to keep parity.
-    const condition =
-      listing.identifiedCondition || listing.condition || 'good';
+    const condition = listing.identifiedCondition || listing.condition || 'good';
 
     const titleInput: TitleGeneratorInput = {
       brand: listing.identifiedBrand || null,
@@ -181,7 +174,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       condition,
       category: listing.category || null,
       keywords: listing.tags
-        ? listing.tags.split(',').map((t) => t.trim()).filter(Boolean)
+        ? listing.tags
+            .split(',')
+            .map((t) => t.trim())
+            .filter(Boolean)
         : [],
     };
 
@@ -203,9 +199,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const warnings: string[] = [];
     if (!listing.identifiedBrand && !listing.identifiedModel) {
-      warnings.push(
-        'Listing has not been AI-analyzed. Run analysis first for better results.'
-      );
+      warnings.push('Listing has not been AI-analyzed. Run analysis first for better results.');
     }
 
     const lower = requestedPlatform.toLowerCase();
@@ -248,10 +242,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     // The "primary" content surfaces first to users — pick eBay when
     // available (most-trafficked resale platform), otherwise the first item.
-    const primaryTitle =
-      titles.find((t) => t.platform === 'ebay') ?? titles[0];
-    const primaryDescription =
-      descriptions.find((d) => d.platform === 'ebay') ?? descriptions[0];
+    const primaryTitle = titles.find((t) => t.platform === 'ebay') ?? titles[0];
+    const primaryDescription = descriptions.find((d) => d.platform === 'ebay') ?? descriptions[0];
 
     return NextResponse.json({
       success: true,

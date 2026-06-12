@@ -137,7 +137,12 @@ describe('GET /api/analytics/export', () => {
     const req = new NextRequest('http://localhost/api/analytics/export?format=csv');
     await GET(req);
 
-    expect(getProfitLossAnalytics).toHaveBeenCalledWith('user-123', 'monthly', undefined, undefined);
+    expect(getProfitLossAnalytics).toHaveBeenCalledWith(
+      'user-123',
+      'monthly',
+      undefined,
+      undefined
+    );
   });
 
   it('passes weekly granularity when specified', async () => {
@@ -155,7 +160,12 @@ describe('GET /api/analytics/export', () => {
     );
     await GET(req);
 
-    expect(getProfitLossAnalytics).toHaveBeenCalledWith('user-123', 'monthly', '2026-01-01', '2026-01-31');
+    expect(getProfitLossAnalytics).toHaveBeenCalledWith(
+      'user-123',
+      'monthly',
+      '2026-01-01',
+      '2026-01-31'
+    );
   });
 
   it('passes only dateFrom when dateTo is absent', async () => {
@@ -164,7 +174,12 @@ describe('GET /api/analytics/export', () => {
     );
     await GET(req);
 
-    expect(getProfitLossAnalytics).toHaveBeenCalledWith('user-123', 'monthly', '2026-01-01', undefined);
+    expect(getProfitLossAnalytics).toHaveBeenCalledWith(
+      'user-123',
+      'monthly',
+      '2026-01-01',
+      undefined
+    );
   });
 
   it('returns 500 on service error', async () => {
