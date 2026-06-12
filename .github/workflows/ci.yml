@@ -368,6 +368,10 @@ jobs:
 
   security:
     runs-on: ubuntu-latest
+    env:
+      # Prisma 7's prisma.config.ts requires DATABASE_URL at postinstall
+      # (prisma generate) even for jobs that never touch a database.
+      DATABASE_URL: 'file:./dev.db'
     steps:
       - uses: actions/checkout@v4
 
