@@ -7,6 +7,7 @@
 
 import '@testing-library/jest-dom';
 import Database from 'better-sqlite3';
+import fs from 'fs';
 import path from 'path';
 
 // Set test environment
@@ -18,6 +19,21 @@ const db = new Database(dbPath);
 
 // Enable foreign keys
 db.pragma('foreign_keys = ON');
+
+// Bootstrap the schema from the checked-in SQLite DDL (generated from
+// prisma/schema.prisma via `prisma migrate diff` with a sqlite provider).
+// Statement-by-statement with existing-object errors tolerated, so a
+// pre-existing test.db keeps working without a drop.
+const ddl = fs.readFileSync(path.join(__dirname, 'schema.sqlite.sql'), 'utf8');
+for (const statement of ddl.split(';')) {
+  const sql = statement.trim();
+  if (!sql) continue;
+  try {
+    db.exec(sql);
+  } catch (e) {
+    if (!/already exists/.test((e as Error).message)) throw e;
+  }
+}
 
 /**
  * Create a Prisma-like client interface for testing
