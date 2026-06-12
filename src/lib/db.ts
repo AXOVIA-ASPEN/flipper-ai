@@ -1,5 +1,8 @@
-import { PrismaClient as PrismaClientBase } from '@prisma/client';
-import type { PrismaClient } from '../generated/prisma';
+// Import the runtime class from the generated output (schema.prisma sets
+// output = src/generated/prisma). The '@prisma/client' facade only carries
+// PrismaClient when the client is generated into node_modules — with a
+// custom output it has no such export on a fresh install (Prisma 7).
+import { PrismaClient } from '../generated/prisma';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 const globalForPrisma = globalThis as unknown as {
@@ -21,10 +24,10 @@ function createPrismaClient(): PrismaClient {
     idleTimeoutMillis: 30_000,
   });
 
-  return new PrismaClientBase({
+  return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-  }) as unknown as PrismaClient;
+  });
 }
 
 // Lazy singleton — createPrismaClient() is only called on first property access,
