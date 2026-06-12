@@ -530,6 +530,9 @@ jobs:
     # WIF provider into job env and branch on that instead.
     env:
       GCP_WIF_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      # Placeholder for Prisma 7's postinstall prisma generate; the migrate
+      # step overrides it at shell level with the real URL from Secret Manager.
+      DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/placeholder'
     steps:
       - uses: actions/checkout@v4
 
