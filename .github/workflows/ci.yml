@@ -256,9 +256,10 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate
 
-      - name: Setup Database
-        run: npx prisma db push
-
+      # No `prisma db push` here: `pnpm build` runs `prisma migrate deploy`,
+      # which must own schema creation (db push first would leave a non-empty
+      # schema without migration history -> P3005). This also exercises the
+      # real production provisioning path on every CI run.
       - name: Build Project
         run: pnpm build
 
@@ -306,9 +307,10 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate
 
-      - name: Setup Database
-        run: npx prisma db push
-
+      # No `prisma db push` here: `pnpm build` runs `prisma migrate deploy`,
+      # which must own schema creation (db push first would leave a non-empty
+      # schema without migration history -> P3005). This also exercises the
+      # real production provisioning path on every CI run.
       - name: Build Project
         run: pnpm build
 
@@ -373,9 +375,10 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate
 
-      - name: Setup Database
-        run: npx prisma db push
-
+      # No `prisma db push` here: `pnpm build` runs `prisma migrate deploy`,
+      # which must own schema creation (db push first would leave a non-empty
+      # schema without migration history -> P3005). This also exercises the
+      # real production provisioning path on every CI run.
       - name: Build Project
         run: pnpm build
 
