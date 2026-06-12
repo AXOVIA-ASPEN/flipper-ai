@@ -41,7 +41,8 @@ story_location: _bmad-output/implementation-artifacts
 
 development_status:
   # Epic 1: Production Infrastructure & Secure Deployment
-  epic-1: done
+  # Note: reopened 2026-06-12 — story 1-10 added by the superpowers-spec plan-integration audit
+  epic-1: in-progress
   1-1-gcp-project-setup-secret-manager-module: done
   1-2-cloud-sql-database-provisioning: done
   1-3-containerize-deploy-to-cloud-run: done
@@ -51,6 +52,7 @@ development_status:
   1-7-firebase-cloud-messaging-setup: done
   1-8-github-actions-ci-cd-pipeline: done
   1-9-health-check-monitoring-endpoints: done
+  1-10-versioning-release-pipeline: ready-for-dev
   epic-1-retrospective: optional
 
   # Epic 2: User Registration, Auth & Onboarding
@@ -155,7 +157,8 @@ development_status:
 
   # Epic 13: AI Scoring Algorithm Improvements
   # Note: This epic exists in sprint-status.yaml and has story artifacts but is not formally documented in epics.md epic list
-  epic-13: done
+  # Note: reopened 2026-06-12 — story 13-9 added by the superpowers-spec plan-integration audit
+  epic-13: in-progress
   13-1-iqr-outlier-filtering-ebay-sold-prices: done
   13-2-structured-json-llm-response: done
   13-3-cache-invalidation-price-changes: done
@@ -164,6 +167,7 @@ development_status:
   13-6-demand-velocity-tier1-integration: done
   13-7-collaborative-scoring-refinement-session: done
   13-8-cross-platform-price-intelligence: done
+  13-9-centralized-prompts-multi-provider-ai: ready-for-dev
   epic-13-retrospective: optional
 
   # Epic 14: Frontend Design System Migration
@@ -180,13 +184,34 @@ development_status:
   14-10-accessibility-file-header-sweep: done
   epic-14-retrospective: optional
 
+  # Epic 31: Legal Compliance & Data-Acquisition Hardening
+  # Created 2026-06-12 from the legality + competitive research. Gates production launch.
+  # Numbered 31 because Epic 30 is reserved for the Python LangGraph AI-layer conversion (decided 2026-06-11).
+  # Stories specified with complete requirements (ready-for-dev); awaiting sprint planning.
+  # Several ACs depend on licensed-counsel review (eBay license, ToS arbitration, user-initiated FB architecture).
+  epic-31: backlog
+  31-1-user-initiated-facebook-acquisition: ready-for-dev
+  31-2-anti-detection-rollback: ready-for-dev
+  31-3-stop-on-notice-controls: ready-for-dev
+  31-4-ebay-api-license-compliance: ready-for-dev
+  31-5-listing-data-hygiene: ready-for-dev
+  31-6-compliance-docs-tos-policy: ready-for-dev
+  epic-31-retrospective: optional
+
   # Epic 15: Mobile Foundation, Monorepo & Expo Bootstrap (Phase A)
+  #
+  # 🚫 HUMAN REVIEW GATE (set 2026-06-12): ALL Epic 15+ mobile development is
+  # BLOCKED until Stephen reviews and approves the mobile architecture overview
+  # at docs/architecture/mobile-architecture-overview.html. Agents MUST NOT
+  # start any mobile story (Epics 15-29) while this gate is in place.
+  # To lift: Stephen approves -> set the five stories below back to
+  # ready-for-dev and clear Blocked/Blocked-Reason in each story file.
   epic-15: in-progress
-  15-1-convert-repo-to-pnpm-workspace-monorepo: ready-for-dev
-  15-2-extract-shared-packages-types-design-tokens: ready-for-dev
-  15-3-bootstrap-mobile-workspace-expo: ready-for-dev
-  15-4-mobile-lint-format-test-scaffolding: ready-for-dev
-  15-5-top-level-mobile-makefile-targets: ready-for-dev
+  15-1-convert-repo-to-pnpm-workspace-monorepo: blocked
+  15-2-extract-shared-packages-types-design-tokens: blocked
+  15-3-bootstrap-mobile-workspace-expo: blocked
+  15-4-mobile-lint-format-test-scaffolding: blocked
+  15-5-top-level-mobile-makefile-targets: blocked
   epic-15-retrospective: optional
 
   # Epic 16: Mobile CI/CD — EAS Build + Firebase App Distribution + TestFlight (Phase A)

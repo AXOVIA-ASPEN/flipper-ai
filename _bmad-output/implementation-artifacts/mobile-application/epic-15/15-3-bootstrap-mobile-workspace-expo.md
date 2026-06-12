@@ -1,8 +1,8 @@
 # Story 15.3: Bootstrap `mobile/` Workspace with Expo + Expo Router + NativeWind
 
-Status: ready-for-dev
-Blocked: false
-Blocked-Reason:
+Status: blocked
+Blocked: true
+Blocked-Reason: HUMAN REVIEW GATE — Stephen must review and approve the mobile architecture overview (docs/architecture/mobile-architecture-overview.html) before ANY Epic 15+ mobile development starts. Do not begin implementation while this gate is in place. To lift: after approval, set Blocked: false, clear this reason, set Status: ready-for-dev (all five Epic 15 stories carry this same gate).
 Trello-Card-ID: 6a16b88f26eb9e3799eda732
 
 <!-- Valid statuses: backlog | ready-for-dev | in-progress | blocked | review | done -->
@@ -23,7 +23,7 @@ This is the last **plumbing** story before features begin (Epic 16 = CI/CD, Epic
 
 1. Bootstrap `mobile/` with `create-expo-app` (TypeScript template + expo-router). Entry is `mobile/app/_layout.tsx`; `mobile/app/index.tsx` renders the "Hello Flipper Mobile" screen.
 2. Configure NativeWind v4 in `mobile/tailwind.config.ts`, consuming `@shared/design-tokens` so `className="fp-glass fp-btn-primary"`-style utilities resolve to native styles matching the web's visual output.
-3. Wire `mobile/tsconfig.json` to extend the base config, with `@/*` → `mobile/src/*` and `@shared/*` → `packages/*/src/*`; `pnpm --filter mobile typecheck` exits 0.
+3. Wire `mobile/tsconfig.json` to extend the base config, with `@/*` → `mobile/src/*` and `@shared/*` → `packages/*/src` (single wildcard per ADR-15.1-C — TS5062 forbids two `*`); `pnpm --filter mobile typecheck` exits 0.
 4. Enforce the canonical JSDoc file header on every `mobile/**/*.{ts,tsx}`.
 
 Bar: `pnpm --filter mobile dev` starts Metro; the screen renders on both platforms (Maestro smoke flow); `pnpm --filter mobile typecheck` is clean; headers present.
@@ -34,7 +34,7 @@ Bar: `pnpm --filter mobile dev` starts Metro; the screen renders on both platfor
 
 2. **NativeWind resolves shared tokens to native styles** — Given the shared design tokens (`@shared/design-tokens`, Story 15.2), when NativeWind v4 is configured in `mobile/tailwind.config.ts` consuming those tokens, then className strings (e.g. `className="fp-glass fp-btn-primary"`, or the token-backed utilities `bg-background text-text`) resolve to native styles whose color values match the web's canonical output — `background` resolves to `#080b14`, primary to `#7c3aed` — sampled via a component snapshot/render test. `FR-MOBILE-FOUNDATION-06`
 
-3. **TypeScript strict passes** — Given TypeScript strict mode, when `pnpm --filter mobile typecheck` runs, then it exits 0 with zero errors. `mobile/tsconfig.json` extends the project base, declares `@/*` → `mobile/src/*` and `@shared/*` → `packages/*/src/*`, and `strict: true`. `FR-MOBILE-FOUNDATION-03`
+3. **TypeScript strict passes** — Given TypeScript strict mode, when `pnpm --filter mobile typecheck` runs, then it exits 0 with zero errors. `mobile/tsconfig.json` extends the project base, declares `@/*` → `mobile/src/*` and `@shared/*` → `packages/*/src` (single wildcard per ADR-15.1-C), and `strict: true`. `FR-MOBILE-FOUNDATION-03`
 
 4. **File headers on every mobile source file** — Given the project File Header Standard, when any `.ts`/`.tsx` file is created under `mobile/`, then it begins with the canonical JSDoc file header: `@file`, `@author Stephen Boyett`, `@description`, and `@Copyright © 2026 Axovia LLC. All Rights Reserved.` (TS/TSX use the `@`-prefixed JSDoc tag form). `FR-MOBILE-FOUNDATION-07`
 
@@ -56,7 +56,7 @@ Bar: `pnpm --filter mobile dev` starts Metro; the screen renders on both platfor
   - [ ] 1.4 `pnpm install` at the root resolves the `mobile` workspace; `pnpm --filter mobile dev` (alias for `expo start`) starts Metro without error.
 
 - [ ] **Task 2: Configure TypeScript** (AC #3)
-  - [ ] 2.1 Create/adjust `mobile/tsconfig.json` extending `expo/tsconfig.base` AND the project base where compatible; `strict: true`; `paths`: `@/*` → `./src/*` (i.e. `mobile/src/*`), `@shared/*` → `../packages/*/src/*`. No `baseUrl` unless Expo's base requires one (if it does, mirror Expo's default).
+  - [ ] 2.1 Create/adjust `mobile/tsconfig.json` extending `expo/tsconfig.base` AND the project base where compatible; `strict: true`; `paths`: `@/*` → `./src/*` (i.e. `mobile/src/*`), `@shared/*` → `../packages/*/src` (single wildcard per ADR-15.1-C — two `*` in a substitution is a TS5062 config error). No `baseUrl` unless Expo's base requires one (if it does, mirror Expo's default).
   - [ ] 2.2 Create `mobile/src/` for non-route code (components, hooks, lib). Add a tiny pure util (e.g. `mobile/src/lib/greeting.ts`) to anchor the Jest sample test in Story 15.4 and prove `@/*` resolution.
   - [ ] 2.3 Add `typecheck` script to `mobile/package.json`: `tsc --noEmit`. `pnpm --filter mobile typecheck` exits 0.
 

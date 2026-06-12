@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<!--
+  file: docs/architecture/mobile-architecture-overview.html
+  author: Stephen Boyett
+
+  description:
+      Self-contained, Flipper-branded HTML overview of the planned Flipper.ai
+      mobile application architecture (Epics 15-29, Phases A-D). Covers the
+      tech stack with decision reasoning, system context, monorepo code
+      architecture, screen catalog with phone-frame mockups, navigation map
+      and deep links, key runtime flows (auth bridge, scan/SSE, push, IAP,
+      offline queue), CI/CD release pipeline, architecture decision records,
+      the full epic + story catalog with sprint status, requirements
+      inventory summary, testing strategy, and the phased release roadmap.
+      All diagrams are inline HTML/CSS/SVG - no external runtime dependencies
+      beyond the Plus Jakarta Sans webfont.
+
+  See Also:
+      _bmad-output/planning-artifacts/epics-mobile-app.md   (canonical plan)
+      _bmad-output/implementation-artifacts/sprint-status.yaml
+      docs/client-facing/previews/index.html                (screen mockup deck)
+      docs/architecture/ARCHITECTURE.md                     (web/backend architecture)
+
+  - - -
+  Copyright © 2026 Axovia LLC. All Rights Reserved.
+  - - -
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Flipper.ai Mobile — Architecture Overview (Epics 15–29)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --canvas: #f2f3f8;
+    --surface: #ffffff;
+    --ink: #1c2334;
+    --muted: #7b8396;
+    --line: #e3e7f1;
+    --navy: #0b1428;
+    --primary: #7c3aed;
+    --primary-deep: #6d28d9;
+    --primary-soft: #ede9fe;
+    --primary-tint: #f5f3ff;
+    --primary-text: #5b21b6;
+    --green: #14b87d;
+    --green-soft: #e3f7ef;
+    --amber: #ff9837;
+    --amber-soft: #fff1e3;
+    --rose: #e23b6b;
+    --rose-soft: #fdeaf0;
+    --blue: #3b82f6;
+    --blue-soft: #e7effd;
+
+    /* Flipper dark product theme (mirrors app/globals.css) */
+    --screen-bg: #080b14;
+    --screen-bg-2: #111827;
+    --screen-bg-3: #1f2937;
+    --screen-text: #f1f5f9;
+    --screen-text-2: #cbd5e1;
+    --screen-text-muted: #94a3b8;
+    --screen-border: rgba(255,255,255,0.09);
+    --fp-purple: #7c3aed;
+    --fp-purple-bright: #8b5cf6;
+    --fp-purple-deep: #6d28d9;
+    --fp-lavender: #c4b5fd;
+    --fp-green: #34d399;
+    --fp-red: #f87171;
+    --fp-yellow: #fbbf24;
+    --fp-glass-bg: rgba(255,255,255,0.04);
+    --fp-glass-border: rgba(255,255,255,0.09);
+    --fp-glow-purple: rgba(109,40,217,0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+  }
+  a { color: var(--primary-text); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code, .mono {
+    font-family: "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    font-size: 0.86em;
+    background: var(--primary-tint);
+    color: var(--primary-text);
+    padding: 1px 6px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .dark code, .dark .mono { background: rgba(139,92,246,0.14); color: var(--fp-lavender); }
+
+  /* ===== top nav ===== */
+  .topnav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(11,20,40,0.94);
+    backdrop-filter: blur(10px);
+    color: #e7e9f3;
+    display: flex; align-items: center; gap: 18px;
+    padding: 10px 28px;
+    flex-wrap: wrap;
+    box-shadow: 0 6px 24px rgba(11,20,40,0.25);
+  }
+  .topnav .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 15px; }
+  .brandMark {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    display: grid; place-items: center;
+    color: #fff; font-size: 15px; font-weight: 800;
+    box-shadow: 0 0 18px var(--fp-glow-purple);
+  }
+  .topnav nav { display: flex; gap: 4px; flex-wrap: wrap; }
+  .topnav nav a {
+    color: #aeb6cc; font-size: 12.5px; font-weight: 600;
+    padding: 5px 10px; border-radius: 8px;
+  }
+  .topnav nav a:hover { color: #fff; background: rgba(139,92,246,0.18); text-decoration: none; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 36px 28px 80px; }
+
+  /* ===== hero ===== */
+  .hero {
+    background: radial-gradient(1100px 420px at 18% -10%, rgba(124,58,237,0.55), transparent 60%),
+                radial-gradient(900px 420px at 95% 0%, rgba(52,211,153,0.18), transparent 55%),
+                var(--navy);
+    border-radius: 22px;
+    color: #f3f4fb;
+    padding: 46px 46px 38px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+    background-size: 44px 44px;
+    pointer-events: none;
+  }
+  .hero > * { position: relative; z-index: 1; }
+  .hero .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--fp-lavender);
+    background: rgba(139,92,246,0.16);
+    border: 1px solid rgba(139,92,246,0.35);
+    padding: 6px 12px; border-radius: 999px;
+  }
+  .hero h1 { font-size: 38px; line-height: 1.12; margin: 18px 0 10px; font-weight: 800; max-width: 850px; }
+  .hero h1 .grad {
+    background: linear-gradient(95deg, #c4b5fd, #8b5cf6 55%, #34d399);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero p.lead { font-size: 16px; color: #c0c7da; max-width: 820px; margin: 0 0 26px; }
+  .statRow { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+  .stat {
+    background: var(--fp-glass-bg);
+    border: 1px solid var(--fp-glass-border);
+    border-radius: 14px; padding: 14px 16px;
+  }
+  .stat b { display: block; font-size: 24px; font-weight: 800; color: #fff; }
+  .stat span { font-size: 12px; color: var(--screen-text-muted); font-weight: 600; }
+  .stat.glow b { color: var(--fp-lavender); text-shadow: 0 0 24px var(--fp-glow-purple); }
+
+  .metaLine { margin-top: 22px; font-size: 12.5px; color: #8d96b0; display: flex; gap: 18px; flex-wrap: wrap; }
+  .metaLine b { color: #c0c7da; font-weight: 700; }
+
+  /* ===== sections ===== */
+  section.card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 38px 42px;
+    margin-top: 30px;
+    box-shadow: 0 10px 30px rgba(28,35,52,0.05);
+  }
+  .secEyebrow {
+    font-size: 11.5px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--primary); margin-bottom: 6px;
+  }
+  section.card h2 { font-size: 26px; font-weight: 800; margin: 0 0 8px; letter-spacing: -0.01em; }
+  section.card .secLead { color: var(--muted); font-size: 14.5px; max-width: 880px; margin: 0 0 24px; }
+  section.card h3 { font-size: 17px; font-weight: 800; margin: 30px 0 10px; }
+
+  /* ===== generic tables ===== */
+  table.t {
+    width: 100%; border-collapse: collapse; font-size: 13.5px;
+    border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+  }
+  table.t th {
+    text-align: left; font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); background: #f7f8fc;
+    padding: 10px 14px; border-bottom: 1px solid var(--line);
+  }
+  table.t td { padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.t tr:last-child td { border-bottom: none; }
+  table.t td.kc { font-weight: 700; white-space: nowrap; }
+
+  .pill {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    padding: 3px 9px; border-radius: 999px; white-space: nowrap;
+  }
+  .pill.purple { background: var(--primary-soft); color: var(--primary-text); }
+  .pill.green  { background: var(--green-soft); color: #0c7a54; }
+  .pill.amber  { background: var(--amber-soft); color: #b05c0a; }
+  .pill.rose   { background: var(--rose-soft); color: #ad2350; }
+  .pill.blue   { background: var(--blue-soft); color: #1d4fb8; }
+  .pill.slate  { background: #eceff6; color: #57607a; }
+  .pill.dark   { background: #1f2937; color: #cbd5e1; }
+
+  /* ===== dark diagram panel ===== */
+  .dark {
+    background:
+      radial-gradient(900px 300px at 15% -20%, rgba(124,58,237,0.30), transparent 60%),
+      var(--screen-bg);
+    border-radius: 16px;
+    border: 1px solid #232b3d;
+    color: var(--screen-text);
+    padding: 28px;
+    overflow-x: auto;
+  }
+  .dark .dTitle { font-size: 12px; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; color: var(--fp-lavender); margin-bottom: 18px; }
+
+  .node {
+    background: var(--fp-glass-bg);
+    border: 1px solid var(--fp-glass-border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 12.5px;
+  }
+  .node > b { display: block; font-size: 13px; color: #fff; margin-bottom: 3px; }
+  .node > span { color: var(--screen-text-muted); font-size: 11.5px; line-height: 1.45; display: block; }
+  .node .pill { vertical-align: 1px; }
+  .node.hot { border-color: rgba(139,92,246,0.55); box-shadow: 0 0 26px rgba(109,40,217,0.28); }
+  .node.green { border-color: rgba(52,211,153,0.4); }
+  .node.amber { border-color: rgba(251,191,36,0.4); }
+
+  .arrowLabel { font-size: 10.5px; color: var(--fp-lavender); font-weight: 700; letter-spacing: 0.04em; }
+
+  /* system context grid */
+  .ctxGrid { display: grid; grid-template-columns: 250px 64px 290px 64px 250px; align-items: stretch; gap: 14px 0; min-width: 940px; }
+  .ctxCol { display: flex; flex-direction: column; gap: 12px; justify-content: center; }
+  .ctxArrows { display: flex; flex-direction: column; justify-content: center; gap: 26px; align-items: center; }
+  .hArrow { display: flex; flex-direction: column; align-items: center; gap: 3px; width: 100%; }
+  .hArrow .shaft { width: 100%; height: 2px; background: linear-gradient(90deg, rgba(139,92,246,0.15), rgba(139,92,246,0.85)); position: relative; }
+  .hArrow .shaft::after { content: ""; position: absolute; right: -1px; top: -4px; border: 5px solid transparent; border-left-color: var(--fp-purple-bright); }
+  .hArrow.rev .shaft { background: linear-gradient(270deg, rgba(139,92,246,0.15), rgba(139,92,246,0.85)); }
+  .hArrow.rev .shaft::after { right: auto; left: -1px; border-left-color: transparent; border-right-color: var(--fp-purple-bright); }
+
+  /* monorepo tree */
+  .tree {
+    font-family: "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    font-size: 12.5px; line-height: 1.75;
+    color: var(--screen-text-2);
+    white-space: pre;
+  }
+  .tree .d { color: var(--fp-lavender); font-weight: 700; }
+  .tree .f { color: var(--screen-text-2); }
+  .tree .c { color: #5b6478; }
+  .tree .new { color: var(--fp-green); font-weight: 700; }
+
+  /* ===== phone mockups ===== */
+  .phoneRow { display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: 18px; margin-top: 8px; }
+  .phoneCard { text-align: center; }
+  .phone {
+    width: 100%; max-width: 200px; margin: 0 auto;
+    aspect-ratio: 9 / 16;
+    background: var(--screen-bg);
+    border-radius: 26px;
+    border: 6px solid #10182b;
+    box-shadow: 0 18px 40px rgba(11,20,40,0.35), 0 0 34px rgba(109,40,217,0.18);
+    overflow: hidden;
+    position: relative;
+    display: flex; flex-direction: column;
+    text-align: left;
+  }
+  .phone .notch {
+    width: 78px; height: 13px; background: #10182b;
+    border-radius: 0 0 9px 9px; margin: 0 auto; flex: 0 0 auto;
+  }
+  .pBody { flex: 1; padding: 9px 10px 6px; display: flex; flex-direction: column; gap: 7px; overflow: hidden; }
+  .pH { font-size: 9.5px; font-weight: 800; color: var(--screen-text); display: flex; justify-content: space-between; align-items: center; }
+  .pH .dot { width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(135deg,#8b5cf6,#6d28d9); }
+  .pGlass {
+    background: var(--fp-glass-bg);
+    border: 1px solid var(--fp-glass-border);
+    border-radius: 9px; padding: 7px 8px;
+  }
+  .pGlass .t1 { font-size: 8.5px; font-weight: 700; color: var(--screen-text); }
+  .pGlass .t2 { font-size: 7.5px; color: var(--screen-text-muted); }
+  .pTab {
+    flex: 0 0 auto;
+    border-top: 1px solid var(--screen-border);
+    background: rgba(8,11,20,0.9);
+    display: flex; justify-content: space-around; align-items: center;
+    padding: 6px 4px 8px;
+  }
+  .pTab i { width: 13px; height: 13px; border-radius: 4px; background: #2a3346; display: block; }
+  .pTab i.on { background: linear-gradient(135deg,#8b5cf6,#6d28d9); box-shadow: 0 0 10px var(--fp-glow-purple); }
+  .barRow { display: flex; align-items: flex-end; gap: 3px; height: 34px; }
+  .barRow i { flex: 1; border-radius: 3px 3px 0 0; background: linear-gradient(180deg, #8b5cf6, rgba(124,58,237,0.25)); display: block; }
+  .scoreDot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; font-size: 7px; font-weight: 800; color: #04110b; background: var(--fp-green); text-align: center; line-height: 16px; }
+  .phoneCard h4 { margin: 12px 0 2px; font-size: 13.5px; font-weight: 800; }
+  .phoneCard p { margin: 0; font-size: 11.5px; color: var(--muted); }
+  .phoneCard .pill { margin-top: 6px; }
+
+  .msgB { border-radius: 8px; padding: 5px 7px; font-size: 7.5px; max-width: 82%; }
+  .msgB.in { background: var(--screen-bg-3); color: var(--screen-text-2); align-self: flex-start; }
+  .msgB.out { background: linear-gradient(135deg,#8b5cf6,#6d28d9); color: #fff; align-self: flex-end; }
+
+  /* kanban mini */
+  .kb { display: flex; gap: 5px; flex: 1; }
+  .kbCol { flex: 1; background: rgba(255,255,255,0.03); border: 1px solid var(--fp-glass-border); border-radius: 7px; padding: 4px; display: flex; flex-direction: column; gap: 4px; }
+  .kbCol .kh { font-size: 6px; font-weight: 800; color: var(--fp-lavender); text-transform: uppercase; letter-spacing: 0.02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .kbCard { background: var(--screen-bg-2); border: 1px solid var(--screen-border); border-radius: 5px; height: 22px; }
+  .kbCard.hot { border-color: rgba(139,92,246,0.6); box-shadow: 0 0 8px rgba(109,40,217,0.5); }
+
+  /* ===== navigation map ===== */
+  .navMap { display: grid; gap: 14px; min-width: 880px; }
+  .navTabsRow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .navTab {
+    background: linear-gradient(160deg, rgba(139,92,246,0.16), rgba(139,92,246,0.05));
+    border: 1px solid rgba(139,92,246,0.45);
+    border-radius: 12px; padding: 10px 12px; text-align: center;
+  }
+  .navTab b { color: #fff; font-size: 13px; display: block; }
+  .navTab span { font-size: 10.5px; color: var(--fp-lavender); }
+  .navStack { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .stackCol { display: flex; flex-direction: column; gap: 8px; }
+  .stackItem {
+    background: var(--fp-glass-bg); border: 1px solid var(--fp-glass-border);
+    border-radius: 9px; padding: 7px 10px; font-size: 11.5px; color: var(--screen-text-2);
+  }
+  .stackItem em { color: var(--screen-text-muted); font-style: normal; font-size: 10px; display: block; }
+  .modalLayer {
+    border: 1px dashed rgba(251,191,36,0.5); border-radius: 12px; padding: 12px 14px;
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  }
+  .modalLayer .lbl { font-size: 10.5px; font-weight: 800; color: var(--fp-yellow); text-transform: uppercase; letter-spacing: 0.1em; margin-right: 4px; }
+  .modalChip { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.35); color: #fde68a; font-size: 11px; padding: 4px 10px; border-radius: 999px; }
+
+  /* ===== flow (sequence) ===== */
+  .flow { display: flex; flex-direction: column; gap: 0; counter-reset: step; }
+  .fStep { display: grid; grid-template-columns: 40px 1fr; gap: 14px; position: relative; padding-bottom: 18px; }
+  .fStep::before {
+    counter-increment: step; content: counter(step);
+    width: 28px; height: 28px; border-radius: 50%;
+    background: linear-gradient(135deg,#8b5cf6,#6d28d9);
+    color: #fff; font-weight: 800; font-size: 12.5px;
+    display: grid; place-items: center;
+    box-shadow: 0 0 16px var(--fp-glow-purple);
+    z-index: 1;
+  }
+  .fStep::after {
+    content: ""; position: absolute; left: 13.5px; top: 28px; bottom: 0;
+    width: 1.5px; background: rgba(139,92,246,0.3);
+  }
+  .fStep:last-child::after { display: none; }
+  .fStep .fBody { font-size: 13px; color: var(--screen-text-2); padding-top: 4px; }
+  .fStep .fBody b { color: #fff; }
+
+  .flowCols { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+  @media (max-width: 900px) { .flowCols { grid-template-columns: 1fr; } }
+
+  /* ===== pipeline ===== */
+  .pipe { display: flex; align-items: stretch; gap: 0; min-width: 980px; }
+  .pipeStage { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .pipeHead {
+    font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--fp-lavender); text-align: center;
+  }
+  .pipeJoin { display: flex; align-items: center; padding: 0 6px; margin-top: 26px; }
+  .pipeJoin .shaft { width: 26px; height: 2px; background: rgba(139,92,246,0.7); position: relative; }
+  .pipeJoin .shaft::after { content: ""; position: absolute; right: -1px; top: -4px; border: 5px solid transparent; border-left-color: var(--fp-purple-bright); }
+
+  /* ===== epic catalog ===== */
+  .phaseBand {
+    display: flex; align-items: center; gap: 12px; margin: 30px 0 14px;
+  }
+  .phaseBadge {
+    font-size: 13px; font-weight: 800; color: #fff;
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    border-radius: 10px; padding: 6px 14px;
+    box-shadow: 0 6px 18px rgba(109,40,217,0.35);
+    white-space: nowrap;
+  }
+  .phaseBand .pDesc { font-size: 13px; color: var(--muted); }
+  .phaseBand .pDesc b { color: var(--ink); }
+  .epicGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 980px) { .epicGrid { grid-template-columns: 1fr; } }
+  .epic {
+    border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px;
+    background: #fbfbfe;
+  }
+  .epic header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .epic .eNum { font-size: 11px; font-weight: 800; color: var(--primary); letter-spacing: 0.08em; }
+  .epic h4 { margin: 2px 0 6px; font-size: 15.5px; font-weight: 800; line-height: 1.3; }
+  .epic .eGoal { font-size: 12.5px; color: #565f76; margin: 0 0 10px; }
+  .epic ul { margin: 0 0 10px; padding-left: 18px; font-size: 12.5px; color: #3c4456; }
+  .epic ul li { margin: 3px 0; }
+  .epic .eFr { font-size: 11px; color: var(--muted); }
+  .epic .eFr code { font-size: 10.5px; }
+
+  /* ===== timeline ===== */
+  .timeline { display: grid; grid-template-columns: 2fr 6fr 10fr 3fr; gap: 10px; min-width: 880px; }
+  .tlPhase { border-radius: 13px; padding: 14px 16px; color: #fff; position: relative; overflow: hidden; }
+  .tlPhase .w { font-size: 10.5px; opacity: 0.85; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+  .tlPhase b { display: block; font-size: 14.5px; margin: 2px 0 4px; }
+  .tlPhase span { font-size: 11.5px; opacity: 0.92; display: block; line-height: 1.4; }
+  .tlA { background: linear-gradient(135deg, #6d28d9, #5b21b6); }
+  .tlB { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+  .tlC { background: linear-gradient(135deg, #7c3aed, #4f46e5); }
+  .tlD { background: linear-gradient(135deg, #14b87d, #0c8f66); }
+  .milestones { display: grid; grid-template-columns: 2fr 6fr 10fr 3fr; gap: 10px; min-width: 880px; margin-top: 10px; }
+  .ms { font-size: 11.5px; color: var(--muted); padding: 0 4px; }
+  .ms b { color: var(--ink); display: block; font-size: 12px; }
+
+  /* ===== ADR ===== */
+  details.adr {
+    border: 1px solid var(--line); border-radius: 12px; margin-bottom: 10px;
+    background: #fbfbfe; overflow: hidden;
+  }
+  details.adr summary {
+    cursor: pointer; padding: 14px 18px; font-weight: 700; font-size: 14px;
+    display: flex; align-items: center; gap: 12px; list-style: none;
+  }
+  details.adr summary::-webkit-details-marker { display: none; }
+  details.adr summary .adrNum {
+    flex: 0 0 auto; font-size: 11px; font-weight: 800; color: var(--primary-text);
+    background: var(--primary-soft); border-radius: 7px; padding: 3px 8px;
+  }
+  details.adr summary::after { content: "+"; margin-left: auto; color: var(--muted); font-size: 18px; font-weight: 400; }
+  details.adr[open] summary::after { content: "–"; }
+  details.adr .adrBody { padding: 0 18px 16px 18px; font-size: 13px; color: #3c4456; }
+  details.adr .adrBody p { margin: 8px 0; }
+  details.adr .adrBody .lab { font-size: 10.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--primary); }
+
+  .callout {
+    border-left: 4px solid var(--primary);
+    background: var(--primary-tint);
+    border-radius: 0 12px 12px 0;
+    padding: 14px 18px; font-size: 13.5px; color: #3d3354;
+    margin: 18px 0;
+  }
+  .callout.warn { border-color: var(--amber); background: var(--amber-soft); color: #6b4216; }
+  .callout.good { border-color: var(--green); background: var(--green-soft); color: #134e3a; }
+  .callout b { font-weight: 800; }
+
+  .twoCol { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+  @media (max-width: 900px) { .twoCol { grid-template-columns: 1fr; } }
+
+  .toc { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+  .toc a {
+    display: flex; gap: 10px; align-items: baseline;
+    border: 1px solid var(--line); border-radius: 11px;
+    padding: 11px 14px; font-size: 13px; font-weight: 600; color: var(--ink);
+    background: #fbfbfe;
+  }
+  .toc a:hover { border-color: var(--primary); background: var(--primary-tint); text-decoration: none; }
+  .toc a .n { color: var(--primary); font-weight: 800; font-size: 12px; }
+
+  footer.pageFoot {
+    margin-top: 44px; padding-top: 22px; border-top: 1px solid var(--line);
+    font-size: 12px; color: var(--muted);
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+
+  .srcList { font-size: 12.5px; color: var(--muted); }
+  .srcList code { font-size: 11.5px; }
+
+  @media print {
+    .topnav { display: none; }
+    section.card { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="brand"><span class="brandMark">F</span> Flipper.ai · Mobile Architecture</div>
+  <nav aria-label="Sections">
+    <a href="#summary">Summary</a>
+    <a href="#stack">Tech Stack</a>
+    <a href="#system">System</a>
+    <a href="#code">Code</a>
+    <a href="#screens">Screens</a>
+    <a href="#navigation">Navigation</a>
+    <a href="#flows">Flows</a>
+    <a href="#data">Data</a>
+    <a href="#cicd">CI/CD</a>
+    <a href="#adr">Decisions</a>
+    <a href="#epics">Epics</a>
+    <a href="#requirements">Requirements</a>
+    <a href="#testing">Testing</a>
+    <a href="#roadmap">Roadmap</a>
+  </nav>
+</header>
+
+<div class="wrap">
+
+  <!-- ================= HERO ================= -->
+  <section class="hero" id="top">
+    <span class="eyebrow">Architecture Overview · Epics 15–29 · Phases A–D</span>
+    <h1>Flipper.ai <span class="grad">Mobile v2.0</span> — the full plan, on one page</h1>
+    <p class="lead">
+      A native iOS + Android app built with Expo / React Native inside the existing monorepo —
+      reusing the Cloud&nbsp;Run backend, the Firebase identity, the Prisma data model, and the canonical
+      dark-glassmorphism design language. This document covers the entire mobile track: tech stack and the
+      reasoning behind every choice, code architecture, screens &amp; navigation, runtime flows, CI/CD,
+      and all 15 epics with their 80 stories.
+    </p>
+    <div class="statRow">
+      <div class="stat glow"><b>15</b><span>Epics (15 → 29)</span></div>
+      <div class="stat glow"><b>80</b><span>Stories</span></div>
+      <div class="stat"><b>123</b><span>Mobile FRs</span></div>
+      <div class="stat"><b>20</b><span>Mobile NFRs</span></div>
+      <div class="stat"><b>4</b><span>Release phases A–D</span></div>
+      <div class="stat"><b>≈21 wk</b><span>Kickoff → GA</span></div>
+      <div class="stat"><b>v2.0.0</b><span>App Store + Play GA</span></div>
+    </div>
+    <div class="metaLine">
+      <span>Author <b>Stephen Boyett</b> · Axovia</span>
+      <span>Generated <b>2026-06-12</b></span>
+      <span>Status <b>Epic 15 in progress (5 stories ready-for-dev) · Epics 16–29 backlog</b></span>
+      <span>Canonical plan <b>_bmad-output/planning-artifacts/epics-mobile-app.md</b></span>
+    </div>
+  </section>
+
+  <!-- ================= TOC ================= -->
+  <section class="card">
+    <div class="secEyebrow">Contents</div>
+    <h2>How to read this document</h2>
+    <p class="secLead">Top-to-bottom tells the whole story; each section also stands alone. Jump anywhere:</p>
+    <div class="toc">
+      <a href="#summary"><span class="n">01</span> Executive summary &amp; principles</a>
+      <a href="#stack"><span class="n">02</span> Tech stack &amp; reasoning</a>
+      <a href="#system"><span class="n">03</span> System context diagram</a>
+      <a href="#code"><span class="n">04</span> Code architecture &amp; monorepo</a>
+      <a href="#screens"><span class="n">05</span> Screen catalog &amp; mockups</a>
+      <a href="#navigation"><span class="n">06</span> Navigation map &amp; deep links</a>
+      <a href="#flows"><span class="n">07</span> Key runtime flows</a>
+      <a href="#data"><span class="n">08</span> Data, caching &amp; offline</a>
+      <a href="#cicd"><span class="n">09</span> CI/CD release pipeline</a>
+      <a href="#adr"><span class="n">10</span> Design decisions (ADRs)</a>
+      <a href="#epics"><span class="n">11</span> Epic catalog — all 15 epics</a>
+      <a href="#requirements"><span class="n">12</span> Requirements inventory</a>
+      <a href="#testing"><span class="n">13</span> Testing &amp; quality gates</a>
+      <a href="#roadmap"><span class="n">14</span> Roadmap &amp; milestones</a>
+    </div>
+  </section>
+
+  <!-- ================= 01 SUMMARY ================= -->
+  <section class="card" id="summary">
+    <div class="secEyebrow">01 · Executive Summary</div>
+    <h2>What we're building, and the four rules that shape it</h2>
+    <p class="secLead">
+      Flipper.ai today is a Next.js 16 web app on Cloud Run that scrapes five marketplaces, scores flip
+      opportunities with AI, and tracks every flip from discovery to profit. The mobile track ships that same
+      product as a native iOS + Android app — <b>not a companion, a peer</b> — so users can scan, negotiate,
+      and close deals from a parking lot.
+    </p>
+
+    <div class="twoCol">
+      <div>
+        <h3>Guiding principles</h3>
+        <table class="t">
+          <tr><td class="kc">1. Pipeline before product</td>
+            <td>Epic 16 (CI/CD) lands before any feature epic. From Phase A onward, every merged story is on testers' phones within minutes — no "big bang" integration at the end.</td></tr>
+          <tr><td class="kc">2. One backend, zero forks</td>
+            <td>Mobile is a new <i>client</i> of the existing Cloud Run API. Backend changes are strictly additive: Bearer-token auth, a <code>DeviceToken</code> model, a RevenueCat webhook, a min-version endpoint, a push channel in the dispatcher.</td></tr>
+          <tr><td class="kc">3. One identity, one design language</td>
+            <td>Same Firebase project (same <code>User.firebaseUid</code>), same Prisma tier source-of-truth, and the same <code>fp-*</code> dark-glassmorphism tokens — extracted to <code>packages/design-tokens/</code> and rendered natively via NativeWind.</td></tr>
+          <tr><td class="kc">4. Real AI, never mocked</td>
+            <td>Project-wide policy: tests exercise the real Groq → Gemini → OpenAI fallback chain through the backend <code>/api/*</code> endpoints. No stubs, no escape hatches — on mobile exactly as on web.</td></tr>
+        </table>
+      </div>
+      <div>
+        <h3>The four release phases</h3>
+        <table class="t">
+          <tr><td class="kc"><span class="pill purple">Phase A</span></td>
+            <td><b>Rails up</b> — Epics 15–17 (17 stories, ≈2 wk). Monorepo, EAS pipeline, auth bridge. A stub-but-real binary lands on TestFlight + Firebase App Distribution.</td></tr>
+          <tr><td class="kc"><span class="pill purple">Phase B</span></td>
+            <td><b>Lovable beta</b> — Epics 18–21 (25 stories, ≈6 wk). Shell, scanning, lifecycle Kanban, push. <b>First product-grade closed beta.</b></td></tr>
+          <tr><td class="kc"><span class="pill purple">Phase C</span></td>
+            <td><b>Feature parity</b> — Epics 22–27 (28 stories, ≈10 wk). Messaging, reposting, analytics, IAP, settings + a11y, meetups. <b>Open beta, parity with web.</b></td></tr>
+          <tr><td class="kc"><span class="pill green">Phase D</span></td>
+            <td><b>Launch</b> — Epics 28–29 (10 stories, ≈3 wk). Camera, offline, tablet, store GA. <b>v2.0.0 on both stores.</b></td></tr>
+        </table>
+        <div class="callout good" style="margin-bottom:0;">
+          <b>Where we are today (2026-06-12):</b> Epic 15 is <b>in progress</b> — all five foundation stories are
+          <code>ready-for-dev</code>. Epics 16–29 are fully planned and sit in the backlog.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 02 STACK ================= -->
+  <section class="card" id="stack">
+    <div class="secEyebrow">02 · Tech Stack</div>
+    <h2>Every layer, and why it was chosen</h2>
+    <p class="secLead">
+      The stack optimizes for one thing: a single TypeScript-fluent team shipping two native platforms
+      from one codebase, with maximum reuse of what the web app already proved.
+    </p>
+    <table class="t">
+      <tr><th style="width:170px;">Layer</th><th style="width:300px;">Choice</th><th>Why this, specifically</th></tr>
+      <tr><td class="kc">App framework</td>
+        <td><b>Expo SDK 53+ (managed)</b> · React Native · React</td>
+        <td>One TS codebase for iOS + Android; managed workflow offloads native project config, signing, and upgrades to Expo tooling. Bare RN or Swift/Kotlin would double maintenance; Flutter would abandon the shared TypeScript types.</td></tr>
+      <tr><td class="kc">Navigation</td>
+        <td><b>expo-router</b> (file-based)</td>
+        <td>Mirrors the Next.js App Router mental model the codebase already uses — route groups <code>(auth)</code>/<code>(tabs)</code> map 1:1 to the web structure, so web engineers are productive on day one.</td></tr>
+      <tr><td class="kc">Language</td>
+        <td><b>TypeScript strict</b></td>
+        <td>Same compiler settings as web; domain types (<code>Listing</code>, <code>Opportunity</code>, <code>ScraperJob</code>, …) imported from <code>packages/types/</code> — zero type duplication between platforms.</td></tr>
+      <tr><td class="kc">Styling</td>
+        <td><b>NativeWind v4</b> + <code>packages/design-tokens/</code></td>
+        <td>The canonical <code>fp-glass</code>/<code>fp-glow-card</code>/<code>fp-btn-*</code> utilities become NativeWind classes fed by the same token module that feeds the web Tailwind config. Purple <code>#7c3aed</code> on dark <code>#080b14</code> everywhere.</td></tr>
+      <tr><td class="kc">Server state</td>
+        <td><b>TanStack Query</b> + <b>react-native-mmkv</b> persister</td>
+        <td>Declarative cache for every API resource; the MMKV-persisted cache renders the last 200 listings / 50 opportunities / 20 jobs instantly on cold launch (FR-MOBILE-SCAN-10) and powers offline reads in Phase D.</td></tr>
+      <tr><td class="kc">Auth</td>
+        <td><b>Firebase Auth</b> + <b>expo-secure-store</b> + <b>expo-local-authentication</b></td>
+        <td>Same Firebase project as web → identical UIDs. ID tokens live only in Keychain/Keystore (never AsyncStorage), auto-refresh via <code>onIdTokenChanged()</code>; optional Face ID / fingerprint unlock of the cached session.</td></tr>
+      <tr><td class="kc">Real-time</td>
+        <td><b>SSE</b> (<code>/api/events</code>) foreground · <b>Expo Push</b> (APNs + FCM) background</td>
+        <td>Foreground reuses the exact SSE stream the web app consumes (polling fallback on flaky cellular); background events arrive as push through Expo's service, which fans out to APNs and FCM from one API.</td></tr>
+      <tr><td class="kc">Payments</td>
+        <td><b>RevenueCat</b> (<code>react-native-purchases</code>) over StoreKit 2 + Play Billing</td>
+        <td>Apple/Google policy forbids Stripe Checkout for mobile-originated digital purchases. RevenueCat abstracts receipt validation on both stores; its webhook updates the same <code>User.subscriptionTier</code> field Stripe updates for web.</td></tr>
+      <tr><td class="kc">Gestures &amp; motion</td>
+        <td><b>react-native-gesture-handler</b> + <b>react-native-reanimated</b> + <b>expo-haptics</b></td>
+        <td>Swipe-to-advance lifecycle stages, pinch-to-zoom galleries, and 55fps+ Kanban scroll need the native-thread gesture/animation pipeline; haptics make stage transitions and sold-celebrations feel physical.</td></tr>
+      <tr><td class="kc">Charts</td>
+        <td><b>victory-native</b> (or react-native-svg-charts)</td>
+        <td>SVG-based profit-over-time and marketplace-breakdown charts that accept the shared design tokens for color and type.</td></tr>
+      <tr><td class="kc">Native capabilities</td>
+        <td><b>Expo modules</b>: notifications, camera, calendar, location, sharing, image-picker, linking, mail-composer, application</td>
+        <td>Each Phase C/D native feature (geofenced reminders, OS calendar, share-extension capture, multi-shot camera) ships as a managed Expo module — no custom native code to maintain.</td></tr>
+      <tr><td class="kc">Observability</td>
+        <td><b>Sentry</b> (Expo plugin)</td>
+        <td>Crash + error tracking with release/version tags matching each EAS build; source maps upload automatically per build; PII scrubbed in <code>beforeSend</code>. Target: ≥99.5% crash-free users.</td></tr>
+      <tr><td class="kc">Build &amp; release</td>
+        <td><b>EAS Build + Submit + Update</b> · GitHub Actions · TestFlight + Firebase App Distribution</td>
+        <td>Three build profiles (development / preview / production), tag-triggered store releases (<code>mobile-vX.Y.Z</code>), and OTA JavaScript updates with 10→25→50→100% phased rollout and a 5-minute rollback path.</td></tr>
+      <tr><td class="kc">Testing</td>
+        <td><b>Jest</b> (unit) · <b>Maestro</b> (E2E) · <b>Cucumber/Gherkin</b> (acceptance)</td>
+        <td>Unit coverage ≥80% statements on new modules; Maestro YAML flows run on iOS Simulator + Android Emulator in CI (smoke ≤8 min); Gherkin features <code>E-015…E-029</code> with triple tagging share the web's traceability matrix.</td></tr>
+      <tr><td class="kc">Backend (unchanged)</td>
+        <td><b>Next.js on Cloud Run</b> · Prisma/PostgreSQL · Firebase · Groq-primary AI router</td>
+        <td>The entire scraping, scoring, AI, messaging, and billing engine stays where it is. Mobile consumes <code>/api/scraper/*</code>, <code>/api/listings</code>, <code>/api/opportunities</code>, <code>/api/messages/*</code>, <code>/api/analytics/*</code>, <code>/api/events</code> exactly as the web client does.</td></tr>
+    </table>
+  </section>
+
+  <!-- ================= 03 SYSTEM ================= -->
+  <section class="card" id="system">
+    <div class="secEyebrow">03 · System Context</div>
+    <h2>One backend, two clients, five marketplaces</h2>
+    <p class="secLead">
+      The mobile app slots in beside the web app as a second client of the same API surface. Everything
+      below the API line already exists and is in production for web; <span class="pill green">new</span>
+      marks the only additive pieces the mobile track introduces.
+    </p>
+    <div class="dark">
+      <div class="dTitle">System context — Flipper.ai with the mobile client</div>
+      <div class="ctxGrid">
+        <div class="ctxCol">
+          <div class="node hot">
+            <b>📱 Mobile App <span class="pill green" style="margin-left:4px;">new</span></b>
+            <span>Expo / React Native, iOS + Android. expo-router, NativeWind, TanStack Query + MMKV. Firebase Auth → Bearer tokens.</span>
+          </div>
+          <div class="node">
+            <b>💻 Web App</b>
+            <span>Next.js 16 App Router on Firebase Hosting. Firebase Auth → <code>__session</code> cookie.</span>
+          </div>
+          <div class="node green">
+            <b>🔔 Expo Push Service <span class="pill green" style="margin-left:4px;">new</span></b>
+            <span>Receives pushes from the backend dispatcher, fans out to APNs (iOS) and FCM (Android).</span>
+          </div>
+        </div>
+        <div class="ctxArrows">
+          <div class="hArrow"><span class="arrowLabel">HTTPS · Bearer / cookie</span><div class="shaft"></div></div>
+          <div class="hArrow rev"><span class="arrowLabel">SSE /api/events</span><div class="shaft"></div></div>
+          <div class="hArrow rev"><span class="arrowLabel">push payloads</span><div class="shaft"></div></div>
+        </div>
+        <div class="ctxCol">
+          <div class="node hot">
+            <b>☁️ Cloud Run — Next.js API</b>
+            <span>Route handlers in <code>app/api/*</code>: scraper, listings, opportunities, messages, posting-queue, analytics, auth, webhooks. <code>getCurrentUserId()</code> accepts <code>__session</code> cookie <i>or</i> <code>Authorization: Bearer</code> <span class="pill green">new</span>.</span>
+          </div>
+          <div class="node">
+            <b>🧠 AI Router — <code>src/lib/ai/</code></b>
+            <span>Groq primary (10/12 prompts) → Gemini → OpenAI fallbacks; Anthropic Claude for Tier-2 structural analysis. Never mocked, anywhere.</span>
+          </div>
+          <div class="node">
+            <b>🗄️ PostgreSQL + Prisma</b>
+            <span>Opportunity lifecycle, listings, messages, posting jobs, tiers. Only mobile schema addition: <code>DeviceToken</code> <span class="pill green">new</span>.</span>
+          </div>
+        </div>
+        <div class="ctxArrows">
+          <div class="hArrow"><span class="arrowLabel">Playwright / REST</span><div class="shaft"></div></div>
+          <div class="hArrow"><span class="arrowLabel">webhooks in</span><div class="shaft"></div></div>
+          <div class="hArrow"><span class="arrowLabel">SDK / API</span><div class="shaft"></div></div>
+        </div>
+        <div class="ctxCol">
+          <div class="node">
+            <b>🛒 Marketplaces</b>
+            <span>Craigslist · Facebook · OfferUp · Mercari (Playwright scrapers) · eBay (Browse API).</span>
+          </div>
+          <div class="node green">
+            <b>💳 Billing</b>
+            <span>Stripe (web) + RevenueCat <span class="pill green">new</span> → <code>/api/webhooks/revenuecat</code> → same <code>User.subscriptionTier</code>.</span>
+          </div>
+          <div class="node">
+            <b>🔥 Firebase</b>
+            <span>Auth (shared UIDs web ↔ mobile) · Storage (listing + captured photos) · App Distribution (Android testers).</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout">
+      <b>The architectural bet:</b> every hard problem (scraping, scoring, AI negotiation, posting, billing
+      reconciliation) stays solved once, server-side. The mobile app's job is to be the best possible
+      <i>field client</i> for that engine — fast, offline-tolerant, and push-connected.
+    </div>
+  </section>
+
+  <!-- ================= 04 CODE ================= -->
+  <section class="card" id="code">
+    <div class="secEyebrow">04 · Code Architecture</div>
+    <h2>Monorepo layout — one repo, three workspaces</h2>
+    <p class="secLead">
+      Epic 15 converts the repo to a pnpm workspace monorepo. The web app keeps its split
+      <code>app/</code> + <code>src/</code> layout untouched; mobile and shared packages are added beside it.
+    </p>
+    <div class="twoCol">
+      <div class="dark">
+        <div class="dTitle">Repository layout after Epic 15</div>
+<div class="tree"><span class="d">flipper-ai/</span>
+├── <span class="d">app/</span>                  <span class="c"># Next.js App Router (web pages + API) — unchanged</span>
+│   └── <span class="d">api/</span>              <span class="c"># the single API surface BOTH clients call</span>
+├── <span class="d">src/</span>                  <span class="c"># web components, lib/, scrapers/ — unchanged</span>
+├── <span class="new">mobile/</span>               <span class="c"># NEW — Expo workspace</span>
+│   ├── <span class="d">app/</span>              <span class="c"># expo-router file-based routes</span>
+│   │   ├── <span class="f">_layout.tsx</span>   <span class="c"># root: providers, auth gate, splash</span>
+│   │   ├── <span class="d">(auth)/</span>       <span class="c"># login, register, reset, onboarding</span>
+│   │   └── <span class="d">(tabs)/</span>       <span class="c"># Dashboard · Scanner · Opportunities · Messages · More</span>
+│   ├── <span class="d">src/</span>
+│   │   ├── <span class="d">components/</span>   <span class="c"># Screen, ScoreRing, LoadingSkeleton, ErrorBanner…</span>
+│   │   ├── <span class="d">lib/</span>          <span class="c"># api-client (Bearer), sse, push, iap, offline-queue</span>
+│   │   ├── <span class="d">hooks/</span>        <span class="c"># useListings, useOpportunities, useScanJob…</span>
+│   │   └── <span class="d">__tests__/</span>    <span class="c"># Jest unit tests</span>
+│   ├── <span class="d">assets/</span>           <span class="c"># splash, adaptive icons</span>
+│   ├── <span class="f">app.config.ts</span>     <span class="c"># reads mobile/VERSION.md</span>
+│   ├── <span class="f">eas.json</span>          <span class="c"># development / preview / production profiles</span>
+│   ├── <span class="f">VERSION.md</span> · <span class="f">CHANGELOG.md</span> · <span class="f">PRIVACY.md</span>
+│   └── <span class="d">docs/</span>             <span class="c"># RELEASE_PLAYBOOK.md, STORE_SUBMISSION_CHECKLIST.md</span>
+├── <span class="new">packages/</span>             <span class="c"># NEW — shared, framework-agnostic</span>
+│   ├── <span class="d">types/</span>            <span class="c"># Listing, Opportunity, ScraperJob, User, Message…</span>
+│   └── <span class="d">design-tokens/</span>    <span class="c"># colors, spacing, radii, glass alphas → Tailwind + NativeWind</span>
+├── <span class="d">test/acceptance/</span>      <span class="c"># Gherkin features E-001…E-029 (web + mobile, one tree)</span>
+├── <span class="f">pnpm-workspace.yaml</span>   <span class="c"># NEW — root, mobile/, packages/*</span>
+└── <span class="f">Makefile</span>              <span class="c"># + make mobile-dev / mobile-build-* / mobile-test…</span></div>
+      </div>
+      <div>
+        <h3>Module boundaries</h3>
+        <table class="t">
+          <tr><th>Rule</th><th>Enforced by</th></tr>
+          <tr><td><b>Domain types flow one way:</b> <code>packages/types</code> → web <i>and</i> mobile. Neither app defines a domain type locally.</td><td>FR-MOBILE-FOUNDATION-04; lint + review</td></tr>
+          <tr><td><b>Design tokens are the only styling source:</b> <code>packages/design-tokens</code> feeds Tailwind (web) and NativeWind (mobile). No hard-coded hex in screens.</td><td>FR-MOBILE-FOUNDATION-05/06</td></tr>
+          <tr><td><b>Mobile never touches the database.</b> All data access goes through <code>app/api/*</code> route handlers over HTTPS.</td><td>Architecture (AR-MOB-01)</td></tr>
+          <tr><td><b>Path aliases match web:</b> <code>@/*</code> → <code>mobile/src/*</code>, <code>@shared/*</code> → <code>packages/*/src/*</code>.</td><td>FR-MOBILE-FOUNDATION-03</td></tr>
+          <tr><td><b>Every <code>.ts/.tsx</code> file carries the canonical JSDoc file header</b> (<code>@file</code>, <code>@author</code>, <code>@description</code>, <code>@Copyright</code>).</td><td>FR-MOBILE-FOUNDATION-07</td></tr>
+        </table>
+        <h3>Backend changes — the complete (short) list</h3>
+        <table class="t">
+          <tr><th>Change</th><th>Epic</th></tr>
+          <tr><td><code>getCurrentUserId()</code> accepts <code>Authorization: Bearer &lt;Firebase ID token&gt;</code> via Admin SDK <code>verifyIdToken()</code>, alongside the <code>__session</code> cookie</td><td>17.1</td></tr>
+          <tr><td><code>DeviceToken</code> Prisma model + <code>POST /api/users/me/devices</code> (platform, token, app version, lastSeenAt)</td><td>21.1–21.2</td></tr>
+          <tr><td><code>MobilePushChannel</code> added to the existing notification dispatcher (Epics 10/11) → Expo Push API</td><td>21.2</td></tr>
+          <tr><td><code>POST /api/webhooks/revenuecat</code> → updates <code>User.subscriptionTier</code> (mirrors the Stripe webhook)</td><td>25.2</td></tr>
+          <tr><td><code>GET /api/mobile/min-version</code> → force-upgrade gate per platform</td><td>29.5</td></tr>
+        </table>
+        <p style="font-size:12.5px;color:var(--muted);margin-top:10px;">
+          That's it. No schema changes beyond <code>DeviceToken</code>, no new services, no new infrastructure.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 05 SCREENS ================= -->
+  <section class="card" id="screens">
+    <div class="secEyebrow">05 · Screens</div>
+    <h2>The screen catalog — 17 screens across five tabs, an auth stack &amp; a modal layer</h2>
+    <p class="secLead">
+      Six hero screens below give the feel; the full table maps every screen to its tab and epic —
+      15 of them have high-fidelity mockups in the <a href="../client-facing/previews/index.html">client preview deck</a>.
+      All screens share the <code>&lt;Screen&gt;</code> wrapper: dark mesh background, safe-area insets,
+      pull-to-refresh, skeleton loading states.
+    </p>
+
+    <div class="phoneRow">
+      <!-- Scanner -->
+      <div class="phoneCard">
+        <div class="phone"><div class="notch"></div>
+          <div class="pBody">
+            <div class="pH">Scanner <span class="dot"></span></div>
+            <div class="pGlass"><div class="t1">🔍 "nintendo switch"</div><div class="t2">Craigslist · FB · eBay · OfferUp</div></div>
+            <div style="display:flex;gap:4px;">
+              <span style="background:rgba(139,92,246,0.18);border:1px solid rgba(139,92,246,0.45);color:#c4b5fd;font-size:7px;padding:2px 6px;border-radius:99px;">vintage amps</span>
+              <span style="background:rgba(139,92,246,0.18);border:1px solid rgba(139,92,246,0.45);color:#c4b5fd;font-size:7px;padding:2px 6px;border-radius:99px;">ps5 bundles</span>
+            </div>
+            <div class="pGlass" style="border-color:rgba(139,92,246,0.5);box-shadow:0 0 12px rgba(109,40,217,0.4);">
+              <div class="t1">⚡ Scanning Facebook…</div><div class="t2">▰▰▰▰▱ 23 listings found · 0:42</div>
+            </div>
+            <div class="pGlass"><div class="t1">eBay ✓ done</div><div class="t2">41 listings · 3 hot</div></div>
+          </div>
+          <div class="pTab"><i></i><i class="on"></i><i></i><i></i><i></i></div>
+        </div>
+        <h4>Scanner</h4><p>One-tap scans, saved-search chips, live job progress via SSE</p>
+        <span class="pill purple">Epic 19</span>
+      </div>
+
+      <!-- Listings feed -->
+      <div class="phoneCard">
+        <div class="phone"><div class="notch"></div>
+          <div class="pBody">
+            <div class="pH">Listings <span class="dot"></span></div>
+            <div class="pGlass" style="display:flex;gap:6px;align-items:center;border-color:rgba(139,92,246,0.55);box-shadow:0 0 12px rgba(109,40,217,0.45);">
+              <span class="scoreDot">92</span>
+              <div><div class="t1">Herman Miller Aeron — $140</div><div class="t2">2.1 mi · 14 min ago</div></div>
+            </div>
+            <div class="pGlass" style="display:flex;gap:6px;align-items:center;">
+              <span class="scoreDot" style="background:#fbbf24;">78</span>
+              <div><div class="t1">Switch OLED bundle — $180</div><div class="t2">5.4 mi · 1 h ago</div></div>
+            </div>
+            <div class="pGlass" style="display:flex;gap:6px;align-items:center;">
+              <span class="scoreDot" style="background:#fbbf24;">71</span>
+              <div><div class="t1">DeWalt drill set — $65</div><div class="t2">3.0 mi · 2 h ago</div></div>
+            </div>
+            <div class="pGlass" style="display:flex;gap:6px;align-items:center;">
+              <span class="scoreDot" style="background:#94a3b8;">54</span>
+              <div><div class="t1">IKEA desk — $40</div><div class="t2">1.2 mi · 3 h ago</div></div>
+            </div>
+          </div>
+          <div class="pTab"><i></i><i class="on"></i><i></i><i></i><i></i></div>
+        </div>
+        <h4>Listings Feed</h4><p>Infinite scroll, score-coded cards, ≥85 gets the hot-card glow</p>
+        <span class="pill purple">Epic 19</span>
+      </div>
+
+      <!-- Listing detail -->
+      <div class="phoneCard">
+        <div class="phone"><div class="notch"></div>
+          <div class="pBody">
+            <div class="pH">‹ Detail <span class="dot"></span></div>
+            <div style="height:48px;border-radius:9px;background:linear-gradient(135deg,#1f2937,#111827);display:grid;place-items:center;color:#475569;font-size:8px;">📷 gallery · pinch to zoom</div>
+            <div class="pGlass"><div class="t1">Score 92 · Est. profit $210</div><div class="t2">brand ✓ · condition ✓ · risk low</div></div>
+            <div class="pGlass"><div class="t1">Comparables (sold)</div><div class="t2">$310 · $295 · $340 on eBay</div></div>
+            <div style="display:flex;gap:5px;">
+              <div style="flex:1;background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-radius:8px;color:#fff;font-size:8px;font-weight:700;text-align:center;padding:6px 0;">★ Save Opportunity</div>
+              <div style="background:rgba(255,255,255,0.06);border:1px solid var(--fp-glass-border);border-radius:8px;color:#94a3b8;font-size:8px;text-align:center;padding:6px 8px;">Pass</div>
+            </div>
+          </div>
+          <div class="pTab"><i></i><i class="on"></i><i></i><i></i><i></i></div>
+        </div>
+        <h4>Listing Detail</h4><p>Gallery, score breakdown, sold comparables, save / pass</p>
+        <span class="pill purple">Epic 19</span>
+      </div>
+
+      <!-- Kanban -->
+      <div class="phoneCard">
+        <div class="phone"><div class="notch"></div>
+          <div class="pBody">
+            <div class="pH">Flips <span class="dot"></span></div>
+            <div class="kb">
+              <div class="kbCol"><div class="kh">Identified</div><div class="kbCard hot"></div><div class="kbCard"></div><div class="kbCard"></div></div>
+              <div class="kbCol"><div class="kh">Purchased</div><div class="kbCard"></div><div class="kbCard"></div></div>
+              <div class="kbCol"><div class="kh">Listed</div><div class="kbCard hot"></div></div>
+              <div class="kbCol"><div class="kh">Sold</div><div class="kbCard" style="border-color:rgba(52,211,153,0.5);"></div></div>
+            </div>
+            <div class="pGlass"><div class="t1">← swipe to advance</div><div class="t2">long-press for actions · toggle card-stack view</div></div>
+          </div>
+          <div class="pTab"><i></i><i></i><i class="on"></i><i></i><i></i></div>
+        </div>
+        <h4>Opportunities</h4><p>Kanban ↔ card-stack toggle, swipe stage transitions</p>
+        <span class="pill purple">Epic 20</span>
+      </div>
+
+      <!-- Thread -->
+      <div class="phoneCard">
+        <div class="phone"><div class="notch"></div>
+          <div class="pBody" style="gap:5px;">
+            <div class="pH">‹ Aeron · FB <span class="dot"></span></div>
+            <div class="msgB in">Is the chair still available?</div>
+            <div class="msgB out">Yes! Could do $120 cash today if you can pick up.</div>
+            <div class="msgB in">Would you take $100?</div>
+            <div class="pGlass" style="border-color:rgba(52,211,153,0.4);">
+              <div class="t1" style="color:#6ee7b7;">🤖 Strategy: counter at $115</div>
+              <div class="t2">anchor on same-day pickup</div>
+            </div>
+            <div class="pGlass"><div class="t1">Draft: "I can meet at $115 if…"</div><div class="t2">✓ Approve &amp; Send · ✎ Edit · ⟳ Alternates</div></div>
+          </div>
+          <div class="pTab"><i></i><i></i><i></i><i class="on"></i><i></i></div>
+        </div>
+        <h4>Thread + AI Drafts</h4><p>Chat view, negotiation strategy inline, approval workflow</p>
+        <span class="pill purple">Epic 22</span>
+      </div>
+
+      <!-- Analytics -->
+      <div class="phoneCard">
+        <div class="phone"><div class="notch"></div>
+          <div class="pBody">
+            <div class="pH">Analytics <span class="dot"></span></div>
+            <div style="display:flex;gap:5px;">
+              <div class="pGlass" style="flex:1;"><div class="t1" style="color:#6ee7b7;">$4,820</div><div class="t2">profit YTD</div></div>
+              <div class="pGlass" style="flex:1;"><div class="t1">37</div><div class="t2">flips done</div></div>
+            </div>
+            <div class="pGlass">
+              <div class="t1">Profit over time · 90d</div>
+              <div class="barRow"><i style="height:30%;"></i><i style="height:45%;"></i><i style="height:38%;"></i><i style="height:62%;"></i><i style="height:55%;"></i><i style="height:78%;"></i><i style="height:95%;"></i></div>
+            </div>
+            <div class="pGlass"><div class="t1">🟢 Inventory health</div><div class="t2">no items held &gt; 30 days</div></div>
+          </div>
+          <div class="pTab"><i></i><i></i><i></i><i></i><i class="on"></i></div>
+        </div>
+        <h4>Analytics</h4><p>Profit tiles, charts, inventory-health gauge, share-sheet export</p>
+        <span class="pill purple">Epic 24</span>
+      </div>
+    </div>
+
+    <h3>Complete screen inventory</h3>
+    <table class="t">
+      <tr><th>Screen</th><th>Lives under</th><th>What it does</th><th>Epic</th><th>Mockup</th></tr>
+      <tr><td class="kc">Sign-In / Sign-Up</td><td><code>(auth)</code> stack</td><td>Email/password + Google + Apple (required by App Store policy), password reset, hCaptcha/App Check</td><td>17</td><td><a href="../client-facing/previews/01-sign-in.html">01</a></td></tr>
+      <tr><td class="kc">Onboarding Wizard</td><td><code>(auth)</code> stack</td><td>6-step touch-first reflow of web onboarding; swipe between steps; syncs to <code>/api/onboarding/*</code> so web ↔ mobile share state</td><td>17</td><td><a href="../client-facing/previews/02-onboarding.html">02</a></td></tr>
+      <tr><td class="kc">Dashboard</td><td>Tab 1</td><td>Home tab established by the shell (Story 18.1) — landing surface for jobs, hot opportunities, and recent activity</td><td>18</td><td>—</td></tr>
+      <tr><td class="kc">Scanner</td><td>Tab 2</td><td>Trigger scrapes on any of the 5 marketplaces, saved-search quick-pick chips, live job progress</td><td>19</td><td><a href="../client-facing/previews/03-scanner.html">03</a></td></tr>
+      <tr><td class="kc">Listings Feed</td><td>Tab 2 stack</td><td>Infinite-scroll results, score-coded rows, pull-to-refresh re-runs last scan, filter sheet</td><td>19</td><td><a href="../client-facing/previews/04-listings-feed.html">04</a></td></tr>
+      <tr><td class="kc">Listing Detail</td><td>Tab 2 stack</td><td>Swipeable gallery with pinch-zoom, score breakdown, comparable solds, save-as-opportunity / pass</td><td>19</td><td><a href="../client-facing/previews/05-listing-detail.html">05</a></td></tr>
+      <tr><td class="kc">Opportunities</td><td>Tab 3</td><td>Kanban (IDENTIFIED → PURCHASED → LISTED → SOLD) ↔ swipeable card stack; stage prompts capture prices</td><td>20</td><td><a href="../client-facing/previews/06-opportunities.html">06</a></td></tr>
+      <tr><td class="kc">Sold Celebration</td><td>Modal</td><td>Profit math (sale − cost − fees), celebratory haptic, animated checkmark, "$$$" badge</td><td>20</td><td><a href="../client-facing/previews/07-sold-celebration.html">07</a></td></tr>
+      <tr><td class="kc">Inventory / Activity</td><td>Tab 3 stack</td><td>PURCHASED + LISTED subset with cost basis, days-held, profit projections; per-flip activity timeline</td><td>20</td><td>—</td></tr>
+      <tr><td class="kc">Inbox</td><td>Tab 4</td><td>Unified threads across all marketplaces, unread badges, swipe to set ACTIVE / STALLED / CLOSED</td><td>22</td><td><a href="../client-facing/previews/08-inbox.html">08</a></td></tr>
+      <tr><td class="kc">Thread Detail</td><td>Tab 4 stack</td><td>Chat bubbles, AI message generation (6 types), long-press alternates, approve-&amp;-send workflow, inline negotiation strategy</td><td>22</td><td><a href="../client-facing/previews/09-thread.html">09</a></td></tr>
+      <tr><td class="kc">Posting Composer / Queue</td><td>More tab</td><td>AI title + description with inline edit, optimal-price slider (±25%), multi-marketplace select, real-time posting status</td><td>23</td><td><a href="../client-facing/previews/10-posting-composer.html">10</a></td></tr>
+      <tr><td class="kc">Analytics</td><td>More tab</td><td>Profit tiles (lifetime/MTD/YTD), profit-over-time chart, marketplace/category breakdown, inventory-health gauge, CSV/PDF export</td><td>24</td><td><a href="../client-facing/previews/11-analytics.html">11</a></td></tr>
+      <tr><td class="kc">Subscription</td><td>More tab</td><td>FREE / FLIPPER / PRO via RevenueCat IAP, restore purchases, OS-level manage links, web-Stripe reconciliation</td><td>25</td><td><a href="../client-facing/previews/12-subscription.html">12</a></td></tr>
+      <tr><td class="kc">Settings</td><td>Tab 5 (More)</td><td>Account, notifications (per-event × per-channel + quiet hours), appearance, marketplaces, privacy, about, delete account, feedback</td><td>26</td><td><a href="../client-facing/previews/13-settings.html">13</a></td></tr>
+      <tr><td class="kc">Meetup</td><td>From opportunity</td><td>OS / Google calendar event, maps deep link for directions, geofenced "10 minutes away" reminder</td><td>27</td><td><a href="../client-facing/previews/14-meetup.html">14</a></td></tr>
+      <tr><td class="kc">Camera Capture</td><td>Modal</td><td>In-app multi-shot camera (≤12 photos), flash + crop, upload pipeline to Firebase Storage</td><td>28</td><td><a href="../client-facing/previews/15-camera.html">15</a></td></tr>
+    </table>
+  </section>
+
+  <!-- ================= 06 NAVIGATION ================= -->
+  <section class="card" id="navigation">
+    <div class="secEyebrow">06 · Navigation</div>
+    <h2>Navigation map — five tabs, two stacks, one modal layer</h2>
+    <p class="secLead">
+      File-based routing with expo-router: the <code>(auth)</code> group handles unauthenticated flows, the
+      <code>(tabs)</code> group is the signed-in shell (FR-MOBILE-SHELL-01). An <code>AuthGuard</code> root
+      layout redirects by session state — mirroring the web's <code>FirebaseAuthProvider</code>.
+    </p>
+    <div class="dark">
+      <div class="dTitle">Signed-in shell — mobile/app/(tabs)/</div>
+      <div class="navMap">
+        <div class="navTabsRow">
+          <div class="navTab"><b>🏠 Dashboard</b><span>index</span></div>
+          <div class="navTab"><b>🔍 Scanner</b><span>scanner/</span></div>
+          <div class="navTab"><b>📦 Opportunities</b><span>opportunities/</span></div>
+          <div class="navTab"><b>💬 Messages</b><span>messages/</span></div>
+          <div class="navTab"><b>⋯ More</b><span>more/</span></div>
+        </div>
+        <div class="navStack">
+          <div class="stackCol">
+            <div class="stackItem">Summary tiles<em>jobs · hot opps · activity</em></div>
+          </div>
+          <div class="stackCol">
+            <div class="stackItem">Job detail<em>scanner/run/[jobId]</em></div>
+            <div class="stackItem">Listings feed<em>scanner/listings</em></div>
+            <div class="stackItem">Listing detail<em>scanner/listings/[id]</em></div>
+          </div>
+          <div class="stackCol">
+            <div class="stackItem">Kanban / card stack<em>view toggle persisted</em></div>
+            <div class="stackItem">Opportunity activity<em>opportunities/[id]</em></div>
+            <div class="stackItem">Inventory view<em>opportunities/inventory</em></div>
+          </div>
+          <div class="stackCol">
+            <div class="stackItem">Unified inbox<em>messages/index</em></div>
+            <div class="stackItem">Thread detail<em>messages/[threadId]</em></div>
+          </div>
+          <div class="stackCol">
+            <div class="stackItem">Analytics<em>more/analytics</em></div>
+            <div class="stackItem">Posting queue<em>more/posting-queue</em></div>
+            <div class="stackItem">Settings<em>more/settings</em></div>
+            <div class="stackItem">Subscription<em>more/subscription</em></div>
+          </div>
+        </div>
+        <div class="modalLayer">
+          <span class="lbl">Modal layer</span>
+          <span class="modalChip">Filter sheet (score · price · distance · category · condition)</span>
+          <span class="modalChip">Stage prompts (PURCHASED / LISTED / SOLD)</span>
+          <span class="modalChip">Sold celebration</span>
+          <span class="modalChip">Camera capture</span>
+          <span class="modalChip">Meetup scheduler</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="twoCol" style="margin-top:24px;">
+      <div>
+        <h3>Deep links (FR-MOBILE-SHELL-10)</h3>
+        <table class="t">
+          <tr><th>Link</th><th>Opens</th></tr>
+          <tr><td><code>flipper://opportunities/:id</code></td><td>Opportunity activity screen</td></tr>
+          <tr><td><code>flipper://messages/:threadId</code></td><td>Thread detail</td></tr>
+          <tr><td><code>flipper://scanner/run/:jobId</code></td><td>Live job progress</td></tr>
+          <tr><td><code>flipper://settings</code></td><td>Settings root</td></tr>
+          <tr><td><code>https://flipper.ai/m/*</code></td><td>Universal links (Apple AASA + Android App Links) → same routes</td></tr>
+        </table>
+        <p style="font-size:12.5px;color:var(--muted);">Every push notification payload carries a deep-link route — tapping a notification always lands on the relevant screen, never the home tab.</p>
+      </div>
+      <div>
+        <h3>Navigation principles</h3>
+        <table class="t">
+          <tr><td class="kc">Thumb-first</td><td>Primary CTAs reachable one-handed on a 6.7&quot; device (UX-MOB-03); touch targets ≥44pt / 48dp.</td></tr>
+          <tr><td class="kc">Gesture-native</td><td>Swipe advances lifecycle stages, swipe sets conversation status, pull-to-refresh everywhere data lives.</td></tr>
+          <tr><td class="kc">State-restoring</td><td>Splash holds until auth hydrates from secure storage — users never see a login flash; cold launch lands where the data already is (MMKV cache).</td></tr>
+          <tr><td class="kc">Accessible</td><td>Reduced-motion honored (glow/score-ring animations shorten or disable); VoiceOver/TalkBack order is logical on every screen.</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 07 FLOWS ================= -->
+  <section class="card" id="flows">
+    <div class="secEyebrow">07 · Key Runtime Flows</div>
+    <h2>Four flows that define the architecture</h2>
+    <p class="secLead">
+      These sequences are where mobile genuinely differs from web — everything else is the same API
+      contract with a native skin.
+    </p>
+    <div class="flowCols">
+      <div class="dark">
+        <div class="dTitle">🔐 Auth bridge — Firebase ID token → Bearer (Epic 17)</div>
+        <div class="flow">
+          <div class="fStep"><div class="fBody"><b>Sign in</b> with email/password, Google, or Apple via the Firebase SDK — same Firebase project as web, so the UID is identical on both platforms.</div></div>
+          <div class="fStep"><div class="fBody">SDK returns an <b>ID token</b>; it is written to <b>expo-secure-store</b> (iOS Keychain / Android Keystore) — never AsyncStorage (NFR-MOB-SEC-01).</div></div>
+          <div class="fStep"><div class="fBody">Every API call sends <code>Authorization: Bearer &lt;token&gt;</code>. <code>onIdTokenChanged()</code> refreshes silently and rewrites secure storage.</div></div>
+          <div class="fStep"><div class="fBody">Backend <code>getCurrentUserId()</code> now checks <b>cookie OR Bearer</b>: Bearer path verifies via Admin SDK <code>verifyIdToken()</code> → looks up <code>User.firebaseUid</code> → returns the Prisma user id. Web is untouched.</div></div>
+          <div class="fStep"><div class="fBody">Optional <b>biometric unlock</b> (Face ID / fingerprint) gates the cached session — it never replaces the Firebase credential.</div></div>
+        </div>
+      </div>
+      <div class="dark">
+        <div class="dTitle">📡 Scan with live progress — SSE first, polling fallback (Epic 19)</div>
+        <div class="flow">
+          <div class="fStep"><div class="fBody">User taps a marketplace (or a saved-search chip) → <code>POST /api/scraper/start</code> — the very same endpoint the web Scanner uses.</div></div>
+          <div class="fStep"><div class="fBody">App subscribes to <b>SSE <code>/api/events</code></b> for job progress (listings-found counts, completion). On flaky cellular, it falls back to short-interval polling of <code>/api/scraper/jobs/:id</code>.</div></div>
+          <div class="fStep"><div class="fBody">Results stream into the <b>listings feed</b>; scores ≥85 get the hot-card glow; ≥70 become opportunity candidates (same thresholds as web).</div></div>
+          <div class="fStep"><div class="fBody">Feed pages are written to the <b>MMKV-persisted TanStack Query cache</b> — next cold launch renders instantly before any network call.</div></div>
+          <div class="fStep"><div class="fBody">One tap saves a listing as an Opportunity (<code>POST /api/opportunities</code>) with a success haptic; pass marks <code>passedAt</code> so it never resurfaces.</div></div>
+        </div>
+      </div>
+      <div class="dark">
+        <div class="dTitle">🔔 Push notification — event → pocket (Epic 21)</div>
+        <div class="flow">
+          <div class="fStep"><div class="fBody">On login, the app registers its <b>Expo push token</b>: <code>POST /api/users/me/devices</code> → <code>DeviceToken</code> row (platform, token, app version, lastSeenAt).</div></div>
+          <div class="fStep"><div class="fBody">A user-facing event fires server-side (new hot opportunity, inbound message, flip sold, price drop — the full FR-NOTIFY-01..11 set).</div></div>
+          <div class="fStep"><div class="fBody">The existing dispatcher (email Epic 10, web FCM Epic 11) routes through the new <b>MobilePushChannel</b> — honoring per-event × per-channel preferences and server-enforced quiet hours.</div></div>
+          <div class="fStep"><div class="fBody"><b>Expo Push API</b> fans out to APNs (iOS) + FCM (Android). Payload carries title, body, deep-link route, and an iOS action category.</div></div>
+          <div class="fStep"><div class="fBody">Background: OS tray + badge counts; action buttons ("Mark Sold", "Approve &amp; Send") hit the backend via background fetch. Foreground: in-app toast with tap-to-navigate; SSE keeps screens live without push.</div></div>
+        </div>
+      </div>
+      <div class="dark">
+        <div class="dTitle">💳 IAP entitlement sync — RevenueCat ↔ Stripe (Epic 25)</div>
+        <div class="flow">
+          <div class="fStep"><div class="fBody">Mobile reads the user's tier from <code>/api/users/me</code> — <b>Prisma is the single source of truth</b>, fed by Stripe (web) and RevenueCat (mobile).</div></div>
+          <div class="fStep"><div class="fBody">FREE users see IAP offers: FLIPPER / PRO, monthly + annual (<code>flipper_monthly_v1</code>… SKUs identical in both stores). Purchase runs through StoreKit 2 / Play Billing via <code>react-native-purchases</code>.</div></div>
+          <div class="fStep"><div class="fBody">RevenueCat validates the receipt and fires its webhook → <code>POST /api/webhooks/revenuecat</code> → updates <code>User.subscriptionTier</code>, mirroring the Stripe webhook handler.</div></div>
+          <div class="fStep"><div class="fBody"><b>Double-billing guard:</b> users with an active web Stripe subscription are never offered IAP unless they explicitly migrate. Feature gates render client-side as UX but are enforced server-side as authority.</div></div>
+          <div class="fStep"><div class="fBody">"Restore Purchases" (App Store requirement) and OS-level manage/cancel deep links live in Settings → Subscription.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 08 DATA ================= -->
+  <section class="card" id="data">
+    <div class="secEyebrow">08 · Data, Caching &amp; Offline</div>
+    <h2>Three cache layers between the user and the network</h2>
+    <p class="secLead">
+      A flipper's phone is offline in basements, garages, and parking ramps — exactly where deals close.
+      The data layer is designed so the app reads instantly, writes optimistically, and reconciles honestly.
+    </p>
+    <div class="dark">
+      <div class="dTitle">Read &amp; write paths</div>
+      <div class="ctxGrid" style="grid-template-columns: 240px 64px 280px 64px 280px;">
+        <div class="ctxCol">
+          <div class="node hot"><b>UI — screens &amp; components</b><span>Render from TanStack Query state; skeletons while fetching; optimistic updates on mutation.</span></div>
+        </div>
+        <div class="ctxArrows">
+          <div class="hArrow"><span class="arrowLabel">read / mutate</span><div class="shaft"></div></div>
+          <div class="hArrow rev"><span class="arrowLabel">hydrate</span><div class="shaft"></div></div>
+        </div>
+        <div class="ctxCol">
+          <div class="node"><b>L1 · TanStack Query (memory)</b><span>Per-resource queries with stale-while-revalidate; mutation rollback on failure.</span></div>
+          <div class="node green"><b>L2 · MMKV persistence</b><span>Last 200 listings · 50 opportunities · 20 jobs survive restarts → instant cold launch (FR-MOBILE-SCAN-10).</span></div>
+          <div class="node amber"><b>Write-through queue (Phase D)</b><span>Offline lifecycle edits queue in MMKV and replay on reconnect; rollback toast if the server rejects (FR-MOBILE-POLISH-01/02).</span></div>
+        </div>
+        <div class="ctxArrows">
+          <div class="hArrow"><span class="arrowLabel">HTTPS Bearer</span><div class="shaft"></div></div>
+          <div class="hArrow rev"><span class="arrowLabel">SSE / push</span><div class="shaft"></div></div>
+        </div>
+        <div class="ctxCol">
+          <div class="node"><b>Cloud Run API</b><span>Authoritative state in PostgreSQL via Prisma. Tier gates, dedup keys, lifecycle rules all enforced here.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="twoCol" style="margin-top:24px;">
+      <div>
+        <h3>What persists where</h3>
+        <table class="t">
+          <tr><th>Data</th><th>Store</th><th>Why</th></tr>
+          <tr><td>Firebase ID token</td><td><code>expo-secure-store</code></td><td>Hardware-backed Keychain/Keystore only (NFR-MOB-SEC-01)</td></tr>
+          <tr><td>Listings / opportunities / jobs cache</td><td>MMKV (TanStack persister)</td><td>Fast binary storage; instant launch render</td></tr>
+          <tr><td>Offline write queue</td><td>MMKV</td><td>Survives kills; replays in order on reconnect</td></tr>
+          <tr><td>UI preferences (view toggle, filters, theme override, haptics)</td><td>AsyncStorage</td><td>Non-sensitive, low-churn</td></tr>
+          <tr><td>Everything authoritative</td><td>PostgreSQL (server)</td><td>Mobile never owns truth — it caches it</td></tr>
+        </table>
+      </div>
+      <div>
+        <h3>Performance &amp; security targets (NFRs)</h3>
+        <table class="t">
+          <tr><td class="kc">Cold start</td><td>≤ 2.5 s to first interactive frame (Pixel 5 / iPhone 12, warm cache)</td></tr>
+          <tr><td class="kc">Warm start</td><td>≤ 800 ms</td></tr>
+          <tr><td class="kc">Scroll</td><td>≥ 55 fps on Kanban and listings feed</td></tr>
+          <tr><td class="kc">Size</td><td>JS bundle ≤ 8 MB; install ≤ 80 MB</td></tr>
+          <tr><td class="kc">Stability</td><td>≥ 99.5% crash-free users (rolling 7-day, Sentry)</td></tr>
+          <tr><td class="kc">Transport</td><td>HTTPS-only, cleartext disabled both platforms; certificate pinning on <code>api.flipper.ai</code> with documented rotation</td></tr>
+          <tr><td class="kc">Hygiene</td><td>No tokens/PII in logs or Sentry (beforeSend filter); <code>pnpm audit</code> green in CI</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 09 CICD ================= -->
+  <section class="card" id="cicd">
+    <div class="secEyebrow">09 · CI/CD</div>
+    <h2>Release pipeline — merge to testers in minutes, tag to stores in one command</h2>
+    <p class="secLead">
+      Epic 16 builds this before any feature exists — the "fastest-path keystone." Three GitHub Actions
+      workflows plus EAS, with OTA updates filling the gap between binary releases.
+    </p>
+    <div class="dark">
+      <div class="dTitle">Binary pipeline</div>
+      <div class="pipe">
+        <div class="pipeStage">
+          <div class="pipeHead">Pull request</div>
+          <div class="node"><b>mobile-ci.yml</b><span>on PR touching <code>mobile/**</code> or <code>packages/**</code>: ESLint · <code>tsc --noEmit</code> · Jest · <code>expo doctor</code>. Maestro smoke pack runs on iOS sim + Android emu (≤8 min, NFR-MOB-TEST-03)</span></div>
+        </div>
+        <div class="pipeJoin"><div class="shaft"></div></div>
+        <div class="pipeStage">
+          <div class="pipeHead">Merge to main</div>
+          <div class="node"><b>mobile-preview-build.yml</b><span><code>eas build --profile preview --platform all</code>; build URLs posted back to the commit/PR</span></div>
+        </div>
+        <div class="pipeJoin"><div class="shaft"></div></div>
+        <div class="pipeStage">
+          <div class="pipeHead">Auto-distribute</div>
+          <div class="node green"><b>Testers' phones</b><span>iOS → TestFlight internal group · Android → Firebase App Distribution groups. Sentry source maps uploaded per build.</span></div>
+        </div>
+        <div class="pipeJoin"><div class="shaft"></div></div>
+        <div class="pipeStage">
+          <div class="pipeHead">Tag mobile-vX.Y.Z</div>
+          <div class="node"><b>mobile-production-release.yml</b><span><code>eas build --profile production</code> → <code>eas submit</code> both stores; changelog section auto-extracted → GitHub Release + store "What's New"</span></div>
+        </div>
+        <div class="pipeJoin"><div class="shaft"></div></div>
+        <div class="pipeStage">
+          <div class="pipeHead">Stores</div>
+          <div class="node hot"><b>App Store + Google Play</b><span>Phased rollout 10% → 25% → 50% → 100%, crash monitoring gates each step</span></div>
+        </div>
+      </div>
+      <div style="margin-top:18px; border-top:1px dashed rgba(139,92,246,0.3); padding-top:16px;" class="pipe">
+        <div class="pipeStage">
+          <div class="pipeHead">Between binaries</div>
+          <div class="node amber"><b>EAS Update (OTA)</b><span>JS/asset hot-fixes on channels <code>development</code> / <code>preview</code> / <code>production</code>; production gated by the same phased rollout</span></div>
+        </div>
+        <div class="pipeJoin"><div class="shaft"></div></div>
+        <div class="pipeStage">
+          <div class="pipeHead">Emergency</div>
+          <div class="node amber"><b><code>make mobile-rollback</code></b><span>Republish prior update id — documented in <code>RELEASE_PLAYBOOK.md</code>; target ≤5 min to rollback, ≤30 min for a hot-fix</span></div>
+        </div>
+        <div class="pipeJoin"><div class="shaft"></div></div>
+        <div class="pipeStage">
+          <div class="pipeHead">Safety net</div>
+          <div class="node"><b>Force upgrade</b><span><code>/api/mobile/min-version</code> — devices below minimum see an upgrade screen deep-linking to their store (Story 29.5)</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="twoCol" style="margin-top:24px;">
+      <div>
+        <h3>Versioning</h3>
+        <table class="t">
+          <tr><td class="kc">Source of truth</td><td><code>mobile/VERSION.md</code> — read by <code>app.config.ts</code> into <code>expo.version</code>, iOS <code>buildNumber</code>, Android <code>versionCode</code></td></tr>
+          <tr><td class="kc">Changelog</td><td><code>mobile/CHANGELOG.md</code>, Keep-a-Changelog format, <code>[Unreleased]</code> promoted on release — identical to the web convention</td></tr>
+          <tr><td class="kc">Tags</td><td><code>mobile-vX.Y.Z</code> — independent of web release tags; semver rules; major bumps require a user-data migration plan</td></tr>
+        </table>
+      </div>
+      <div>
+        <h3>Release cadence targets</h3>
+        <table class="t">
+          <tr><td class="kc">OTA hot-fix</td><td>≤ 30 minutes from decision to devices</td></tr>
+          <tr><td class="kc">OTA rollback</td><td>≤ 5 minutes</td></tr>
+          <tr><td class="kc">iOS binary</td><td>≤ 7 days through TestFlight + App Review</td></tr>
+          <tr><td class="kc">Android binary</td><td>≤ 3 days through Play Console</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 10 ADR ================= -->
+  <section class="card" id="adr">
+    <div class="secEyebrow">10 · Design Decisions</div>
+    <h2>Architecture Decision Records — the "why" behind each call</h2>
+    <p class="secLead">Twelve decisions shape this plan. Each one lists the choice, the reasoning, and what was rejected.</p>
+
+    <details class="adr" open>
+      <summary><span class="adrNum">ADR-01</span> Expo managed workflow + EAS, not bare React Native or native Swift/Kotlin</summary>
+      <div class="adrBody">
+        <p><span class="lab">Decision</span><br/>Build with Expo SDK 53+ managed workflow; EAS handles builds, signing, submission, and OTA updates.</p>
+        <p><span class="lab">Reasoning</span><br/>One TypeScript codebase covers both platforms with the team's existing React skills. Managed workflow eliminates Xcode/Gradle project maintenance, EAS owns code-signing credentials, and every native need in the plan (camera, calendar, geofencing, notifications, secure storage, share extension) is covered by maintained Expo modules.</p>
+        <p><span class="lab">Rejected</span><br/>Native Swift + Kotlin: two codebases, no shared types. Flutter: abandons the TypeScript type-sharing with <code>packages/types/</code>. Bare RN: all the native maintenance with none of the EAS leverage.</p>
+      </div>
+    </details>
+    <details class="adr">
+      <summary><span class="adrNum">ADR-02</span> Monorepo with pnpm workspaces, not a separate mobile repo</summary>
+      <div class="adrBody">
+        <p><span class="lab">Decision</span><br/>Add <code>mobile/</code> and <code>packages/</code> workspaces beside the existing Next.js root (Story 15.1).</p>
+        <p><span class="lab">Reasoning</span><br/>Domain types and design tokens are shared by import, not by copy — a change to <code>Opportunity</code> breaks both compiles immediately rather than drifting silently. One PR can update API + mobile consumer atomically; one CI config; one set of conventions (lint, headers, changelog).</p>
+        <p><span class="lab">Rejected</span><br/>Separate repo: guarantees type drift, doubles release ceremony, splits the acceptance-test tree that must stay unified (<code>test/acceptance/</code>).</p>
+      </div>
+    </details>
+    <details class="adr">
+      <summary><span class="adrNum">ADR-03</span> Reuse the existing backend wholesale — additive changes only</summary>
+      <div class="adrBody">
+        <p><span class="lab">Decision</span><br/>Mobile is a pure client of the existing Cloud Run API. Five additive changes total (Bearer auth, DeviceToken, push channel, RevenueCat webhook, min-version endpoint). No BFF, no GraphQL gateway, no mobile-specific API tier.</p>
+        <p><span class="lab">Reasoning</span><br/>The API already serves a responsive web client with the same shapes mobile needs; the RFC 7807 error envelope and retryable flags translate directly. A BFF would add a deployment, a contract, and a failure mode while saving nothing.</p>
+        <p><span class="lab">Rejected</span><br/>GraphQL/BFF layer: real cost, speculative benefit at this product size.</p>
+      </div>
+    </details>
+    <details class="adr">
+      <summary><span class="adrNum">ADR-04</span> Bearer-token session bridge rather than cookie sessions on mobile</summary>
+      <div class="adrBody">
+        <p><span class="lab">Decision</span><br/><code>getCurrentUserId()</code> accepts <code>Authorization: Bearer &lt;Firebase ID token&gt;</code> (verified via Admin SDK) alongside the existing <code>__session</code> cookie (Story 17.1).</p>
+        <p><span class="lab">Reasoning</span><br/>Native HTTP stacks don't share the browser cookie jar, and the 5-day session cookie model fits browsers, not apps. Firebase ID tokens refresh silently via the SDK, live in hardware-backed secure storage, and carry the same UID — so the user row resolution (<code>firebaseUid</code> → Prisma id) is unchanged.</p>
+        <p><span class="lab">Rejected</span><br/>Replicating cookie session issuance on mobile (fragile webview dance); a parallel API-key scheme (second identity system to audit).</p>
+      </div>
+    </details>
+    <details class="adr">
+      <summary><span class="adrNum">ADR-05</span> NativeWind v4 consuming shared design tokens, not StyleSheet or styled-components</summary>
+      <div class="adrBody">
+        <p><span class="lab">Decision</span><br/>Extract color/spacing/radius/typography/glass-alpha tokens to <code>packages/design-tokens/</code>; expose the canonical <code>fp-*</code> utility set (glass, glow-card, hot-card, btn, badge, grad, alert) as NativeWind classes.</p>
+        <p><span class="lab">Reasoning</span><br/>The dark-glassmorphism language (purple <code>#7c3aed</code> on <code>#080b14</code>) is the brand. One token source means web and mobile can't diverge, and web engineers already think in these utility names.</p>
+        <p><span class="lab">Rejected</span><br/>StyleSheet objects (token duplication, no utility ergonomics); styled-components (runtime cost, different idiom from web Tailwind).</p>
+      </div>
+    </details>
+    <details class="adr">
+      <summary><span class="adrNum">ADR-06</span> Pipeline-first sequencing — Epic 16 lands before any feature epic</summary>
+      <div class="adrBody">
+        <p><span class="lab">Decision</span><br/>Phase A ships monorepo (15) → CI/CD (16) → auth (17) before the first screen of product UI exists.</p>
+        <p><span class="lab">Reasoning</span><br/>Mobile release friction (signing, review queues, store policy) is the schedule risk — so it's retired first, while the surface area is a stub. From Epic 18 onward, every merged story reaches testers' phones within minutes, making beta feedback continuous instead of milestone-gated.</p>
+        <p><span class="lab">Rejected</span><br/>Features-first with a "release hardening" phase at the end — the classic way mobile launches slip by quarters.</p>
+      </div>
+    </details>
+    <details class="adr">
+      <summary><span class="adrNum">ADR-07</span> SSE in foreground + push in background, with polling fallback</summary>
+      <div class="adrBody">
+        <p><span class="lab">Decision</span><br/>Foreground real-time reuses the web's SSE <code>/api/events</code> stream; background events arrive as Expo push (APNs/FCM); flaky-cellular degrades SSE to short-interval polling.</p>
+        <p><span class="lab">Reasoning</span><br/>SSE already exists and is proven on web — no new server infra. Push is the only reliable background channel on mobile OSes. WebSockets would add a second bidirectional protocol for no additional capability the product needs.</p>
+        <p><span class="lab">Rejected</span><br/>WebSockets (new infra, same outcome); push-only (foreground latency and permission dependence); polling-only (battery + staleness).</p>
+      </div>
+    </details>
+    <details class="adr">
+      <summary><span class="adrNum">ADR-08</span> RevenueCat for IAP, with Prisma tier as the single source of truth</summary>
+      <div class="adrBody">
+        <p><span class="lab">Decision</span><br/>Subscriptions purchased on mobile go through RevenueCat (<code>react-native-purchases</code>) over StoreKit 2 / Play Billing; its webhook updates <code>User.subscriptionTier</code> exactly as Stripe's does. Web-Stripe subscribers are never offered IAP (double-billing guard).</p>
+        <p><span class="lab">Reasoning</span><br/>Store policy mandates IAP for mobile-originated digital subscriptions — Stripe Checkout in a webview is a rejection. RevenueCat removes receipt-validation servers from scope and gives one dashboard across both stores. Keeping entitlement authority in Prisma means feature gates read one field regardless of payment rail.</p>
+        <p><span class="lab">Rejected</span><br/>Direct StoreKit/Billing integration (receipt validation + cross-store reconciliation becomes our code); webview Stripe (policy violation).</p>
+      </div>
+    </details>
+    <details class="adr">
+      <summary><span class="adrNum">ADR-09</span> TanStack Query + MMKV for state; offline as Phase D polish, not a Phase A constraint</summary>
+      <div class="adrBody">
+        <p><span class="lab">Decision</span><br/>All server state lives in TanStack Query with an MMKV persister from Epic 19; the offline write-through queue and full optimistic-UI pattern land in Epic 28.</p>
+        <p><span class="lab">Reasoning</span><br/>Persisted queries give 90% of the perceived-offline value (instant launch, readable history) for 10% of the complexity. Full write-queue semantics (ordering, conflict rollback) are genuinely hard — scheduling them after the data model has stabilized in beta avoids building sync logic on moving sand.</p>
+        <p><span class="lab">Rejected</span><br/>Redux + custom persistence (boilerplate without cache semantics); offline-first from day one (highest-risk work at the point of least knowledge).</p>
+      </div>
+    </details>
+    <details class="adr">
+      <summary><span class="adrNum">ADR-10</span> Maestro for mobile E2E, keeping Gherkin acceptance in the shared tree</summary>
+      <div class="adrBody">
+        <p><span class="lab">Decision</span><br/>UI-visible ACs are verified by Maestro YAML flows on iOS Simulator + Android Emulator in CI; Gherkin feature files <code>E-015…E-029</code> live in the same <code>test/acceptance/features/</code> tree and traceability matrix as web.</p>
+        <p><span class="lab">Reasoning</span><br/>Maestro's declarative flows are fast to write, stable in CI, and run both platforms — the ≤8-minute smoke budget is realistic. One acceptance tree preserves the FR → story → scenario traceability discipline already enforced on web.</p>
+        <p><span class="lab">Rejected</span><br/>Detox (heavier setup, flake-prone on CI emulators); Appium (slow, verbose); splitting mobile acceptance into a second matrix (kills single-source traceability).</p>
+      </div>
+    </details>
+    <details class="adr">
+      <summary><span class="adrNum">ADR-11</span> Real AI calls in every test layer — the never-mock policy extends to mobile</summary>
+      <div class="adrBody">
+        <p><span class="lab">Decision</span><br/>Mobile tests that touch AI features exercise the real backend <code>/api/*</code> endpoints, which route through the live Groq → Gemini → OpenAI chain (Anthropic for Tier-2 analysis). No stubs, no fixtures, no interception.</p>
+        <p><span class="lab">Reasoning</span><br/>AI behaviour <i>is</i> the product for message generation, scoring, and listing copy — a mocked response validates nothing. Rate-limit pressure is handled at the root: Groq-primary routing, retry/backoff tuning, <code>@serial</code> sequencing, response caching in <code>AiAnalysisCache</code>.</p>
+        <p><span class="lab">Rejected</span><br/>Any mock/stub/escape-hatch pattern — explicitly forbidden in CLAUDE.md, and the mobile DoD restates it per story.</p>
+      </div>
+    </details>
+    <details class="adr">
+      <summary><span class="adrNum">ADR-12</span> Phased store rollout with OTA rollback and server-side force-upgrade</summary>
+      <div class="adrBody">
+        <p><span class="lab">Decision</span><br/>Production releases roll out 10% → 25% → 50% → 100% on both stores, with Sentry crash-free-rate gates between steps; <code>make mobile-rollback</code> republishes the prior OTA update; <code>/api/mobile/min-version</code> can force-upgrade stragglers.</p>
+        <p><span class="lab">Reasoning</span><br/>Mobile mistakes are sticky — a bad binary lives on devices until users update. Phasing caps the blast radius, OTA rollback fixes JS-level regressions in minutes, and the min-version gate ends support for broken versions deterministically.</p>
+        <p><span class="lab">Rejected</span><br/>100% releases with hotfix-by-review (review latency makes incidents day-scale instead of minute-scale).</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ================= 11 EPICS ================= -->
+  <section class="card" id="epics">
+    <div class="secEyebrow">11 · Epic Catalog</div>
+    <h2>All 15 epics, all 80 stories</h2>
+    <p class="secLead">
+      Statuses reflect <code>sprint-status.yaml</code> as of 2026-06-12. Each epic lists its goal,
+      its stories, and the FR families it covers.
+    </p>
+
+    <!-- PHASE A -->
+    <div class="phaseBand"><span class="phaseBadge">Phase A — Rails up</span><span class="pDesc"><b>Epics 15–17 · 17 stories · ≈2 weeks.</b> Ends with a stub-but-real binary on TestFlight + Firebase App Distribution.</span></div>
+    <div class="epicGrid">
+      <div class="epic">
+        <header><div><div class="eNum">EPIC 15 · <span class="pill amber">in progress</span></div><h4>Mobile Foundation, Monorepo &amp; Expo Bootstrap</h4></div></header>
+        <p class="eGoal">Develop and build a native iOS + Android app from a single <code>mobile/</code> workspace, sharing types and design tokens with web, inheriting every project convention.</p>
+        <ul>
+          <li>15.1 Convert repo to pnpm workspace monorepo <span class="pill blue">ready-for-dev</span></li>
+          <li>15.2 Extract shared <code>packages/types/</code> + <code>packages/design-tokens/</code> <span class="pill blue">ready-for-dev</span></li>
+          <li>15.3 Bootstrap <code>mobile/</code> with Expo + expo-router + NativeWind <span class="pill blue">ready-for-dev</span></li>
+          <li>15.4 Mobile lint, format &amp; test scaffolding <span class="pill blue">ready-for-dev</span></li>
+          <li>15.5 Top-level mobile Makefile targets <span class="pill blue">ready-for-dev</span></li>
+        </ul>
+        <div class="eFr">Covers <code>FR-MOBILE-FOUNDATION-01..10</code></div>
+      </div>
+      <div class="epic">
+        <header><div><div class="eNum">EPIC 16 · <span class="pill slate">backlog</span></div><h4>Mobile CI/CD — EAS Build + Firebase App Distribution + TestFlight</h4></div></header>
+        <p class="eGoal">Every merge to main puts a signed build on testers' phones automatically; production releases are one tag away. The fastest-path keystone.</p>
+        <ul>
+          <li>16.1 EAS build profiles &amp; credentials setup</li>
+          <li>16.2 GitHub Actions <code>mobile-ci.yml</code> — PR validation</li>
+          <li>16.3 GitHub Actions <code>mobile-preview-build.yml</code> — auto preview on main</li>
+          <li>16.4 Auto-distribution to Firebase App Distribution + TestFlight internal</li>
+          <li>16.5 Versioning, CHANGELOG &amp; tag-triggered production release</li>
+          <li>16.6 EAS Update (OTA), phased rollout &amp; rollback playbook</li>
+        </ul>
+        <div class="eFr">Covers <code>FR-RELEASE-MOBILE-01..11, 13</code></div>
+      </div>
+      <div class="epic">
+        <header><div><div class="eNum">EPIC 17 · <span class="pill slate">backlog</span></div><h4>Mobile Auth &amp; Session Bridge — Firebase ID Tokens</h4></div></header>
+        <p class="eGoal">Sign-up, sign-in (email + Google + Apple), reset, onboarding, biometric unlock — same Firebase identity and backend contract as web.</p>
+        <ul>
+          <li>17.1 Backend Bearer-token acceptance in <code>getCurrentUserId()</code></li>
+          <li>17.2 Mobile Firebase Auth provider &amp; secure token storage</li>
+          <li>17.3 Sign-up, sign-in, password-reset flows</li>
+          <li>17.4 Biometric re-authentication</li>
+          <li>17.5 Mobile onboarding wizard (touch-first reflow)</li>
+          <li>17.6 Auth event Sentry breadcrumbs &amp; diagnostics</li>
+        </ul>
+        <div class="eFr">Covers <code>FR-MOBILE-AUTH-01..10</code></div>
+      </div>
+    </div>
+
+    <!-- PHASE B -->
+    <div class="phaseBand"><span class="phaseBadge">Phase B — Lovable beta</span><span class="pDesc"><b>Epics 18–21 · 25 stories · ≈6 weeks.</b> Ends with the first product-grade closed beta — a real user flips a real item end-to-end.</span></div>
+    <div class="epicGrid">
+      <div class="epic">
+        <header><div><div class="eNum">EPIC 18 · <span class="pill slate">backlog</span></div><h4>Mobile Shell, Navigation &amp; Design System</h4></div></header>
+        <p class="eGoal">The polished dark-glassmorphism shell: five tabs, safe areas, splash, deep links, haptics, light/dark, error boundary.</p>
+        <ul>
+          <li>18.1 Tab navigation &amp; root layout</li>
+          <li>18.2 <code>&lt;Screen&gt;</code> wrapper, safe areas &amp; pull-to-refresh</li>
+          <li>18.3 Canonical NativeWind utility class library</li>
+          <li>18.4 Shared state components + toast provider</li>
+          <li>18.5 Splash, app icon, error boundary, light/dark mode</li>
+          <li>18.6 Deep links, reduced-motion &amp; haptic feedback</li>
+        </ul>
+        <div class="eFr">Covers <code>FR-MOBILE-SHELL-01..12</code></div>
+      </div>
+      <div class="epic">
+        <header><div><div class="eNum">EPIC 19 · <span class="pill slate">backlog</span></div><h4>Mobile Marketplace Scanning, Listings &amp; Opportunities</h4></div></header>
+        <p class="eGoal">Trigger scans, watch live progress, browse a thumb-first feed, drill into details, save or pass — the discovery loop, in the field.</p>
+        <ul>
+          <li>19.1 Scanner screen &amp; saved-search quick-picks</li>
+          <li>19.2 Live job progress via SSE + polling fallback</li>
+          <li>19.3 Listings feed — infinite scroll &amp; pull-to-refresh</li>
+          <li>19.4 Filter sheet — score, price, distance, category, condition</li>
+          <li>19.5 Listing detail — gallery, score breakdown, comparable sold</li>
+          <li>19.6 Save as opportunity &amp; pass-on-listing</li>
+          <li>19.7 Persistent cache for instant feed on launch</li>
+        </ul>
+        <div class="eFr">Covers <code>FR-MOBILE-SCAN-01..10</code></div>
+      </div>
+      <div class="epic">
+        <header><div><div class="eNum">EPIC 20 · <span class="pill slate">backlog</span></div><h4>Mobile Flip Lifecycle, Kanban &amp; Swipeable Cards</h4></div></header>
+        <p class="eGoal">IDENTIFIED → PURCHASED → LISTED → SOLD on a native Kanban or card stack, with swipe transitions, price capture, and the sold celebration.</p>
+        <ul>
+          <li>20.1 Opportunities screen — Kanban + card-stack toggle</li>
+          <li>20.2 Swipe / long-press stage transitions</li>
+          <li>20.3 PURCHASED prompt — price, date, notes</li>
+          <li>20.4 LISTED prompt + optional cross-platform posting</li>
+          <li>20.5 SOLD celebration &amp; profit calculation</li>
+          <li>20.6 Inventory view, activity timeline &amp; real-time updates</li>
+        </ul>
+        <div class="eFr">Covers <code>FR-MOBILE-LIFECYCLE-01..08</code></div>
+      </div>
+      <div class="epic">
+        <header><div><div class="eNum">EPIC 21 · <span class="pill slate">backlog</span></div><h4>Mobile Push Notifications &amp; Real-Time Updates</h4></div></header>
+        <p class="eGoal">Every web alert event reaches iOS + Android as push with deep links, action buttons, badges, preferences, and quiet hours. <b>Closes Phase B → closed beta.</b></p>
+        <ul>
+          <li>21.1 Permission request &amp; device token registration</li>
+          <li>21.2 Backend dispatcher — mobile push channel</li>
+          <li>21.3 Deep-linking notification taps &amp; foreground toasts</li>
+          <li>21.4 Notification action buttons &amp; background actions</li>
+          <li>21.5 Badge counts &amp; notification preferences UI</li>
+          <li>21.6 Foreground SSE real-time updates</li>
+        </ul>
+        <div class="eFr">Covers <code>FR-MOBILE-NOTIFY-01..10</code></div>
+      </div>
+    </div>
+
+    <!-- PHASE C -->
+    <div class="phaseBand"><span class="phaseBadge">Phase C — Feature parity</span><span class="pDesc"><b>Epics 22–27 · 28 stories · ≈10 weeks.</b> Ends with open beta — mobile is a peer of the web app, not a companion.</span></div>
+    <div class="epicGrid">
+      <div class="epic">
+        <header><div><div class="eNum">EPIC 22 · <span class="pill slate">backlog</span></div><h4>Mobile Messaging, Negotiation &amp; Inbox</h4></div></header>
+        <p class="eGoal">Unified inbox, chat-style threads, AI-drafted messages with the approval workflow, and inline negotiation strategy.</p>
+        <ul>
+          <li>22.1 Unified inbox</li>
+          <li>22.2 Chat-style thread detail with AI message alternates</li>
+          <li>22.3 AI message generation with type picker</li>
+          <li>22.4 Approval workflow &amp; negotiation strategy inline</li>
+          <li>22.5 Inbound real-time updates &amp; conversation status</li>
+        </ul>
+        <div class="eFr">Covers <code>FR-MOBILE-MSG-01..07</code></div>
+      </div>
+      <div class="epic">
+        <header><div><div class="eNum">EPIC 23 · <span class="pill slate">backlog</span></div><h4>Mobile Cross-Platform Resale Posting Queue</h4></div></header>
+        <p class="eGoal">AI titles + descriptions, optimal-price slider, multi-marketplace posting, and live per-platform status — from a phone.</p>
+        <ul>
+          <li>23.1 Posting queue screen</li>
+          <li>23.2 AI title &amp; description generation with inline edit</li>
+          <li>23.3 Optimal price recommendation with adjustment slider</li>
+          <li>23.4 Multi-marketplace post &amp; photo picker / capture</li>
+          <li>23.5 Real-time posting status &amp; per-platform confirmations</li>
+        </ul>
+        <div class="eFr">Covers <code>FR-MOBILE-RELIST-01..06</code></div>
+      </div>
+      <div class="epic">
+        <header><div><div class="eNum">EPIC 24 · <span class="pill slate">backlog</span></div><h4>Mobile Analytics, Reports &amp; Insights</h4></div></header>
+        <p class="eGoal">Profit tiles, time-series and breakdown charts, inventory-health gauge, and share-sheet report export.</p>
+        <ul>
+          <li>24.1 Analytics summary tiles</li>
+          <li>24.2 Profit-over-time chart with range toggle</li>
+          <li>24.3 Marketplace/category breakdown &amp; inventory health gauge</li>
+          <li>24.4 Export report via native share sheet</li>
+        </ul>
+        <div class="eFr">Covers <code>FR-MOBILE-ANALYTICS-01..05</code></div>
+      </div>
+      <div class="epic">
+        <header><div><div class="eNum">EPIC 25 · <span class="pill slate">backlog</span></div><h4>Mobile Subscription &amp; Billing (RevenueCat IAP)</h4></div></header>
+        <p class="eGoal">FREE / FLIPPER / PRO via StoreKit + Play Billing, entitlement sync to Prisma, web-Stripe reconciliation, restore purchases.</p>
+        <ul>
+          <li>25.1 RevenueCat configuration &amp; product catalog</li>
+          <li>25.2 Backend <code>/api/webhooks/revenuecat</code> &amp; entitlement sync</li>
+          <li>25.3 Web-IAP reconciliation — avoid double billing</li>
+          <li>25.4 OS-level subscription management &amp; restore purchases</li>
+          <li>25.5 Tier-based feature gating in mobile UX</li>
+        </ul>
+        <div class="eFr">Covers <code>FR-MOBILE-BILLING-01..07</code></div>
+      </div>
+      <div class="epic">
+        <header><div><div class="eNum">EPIC 26 · <span class="pill slate">backlog</span></div><h4>Mobile Settings, Notification Preferences &amp; Accessibility</h4></div></header>
+        <p class="eGoal">Full settings surface plus the WCAG AA accessibility sweep — labels, roles, touch targets, contrast, dynamic type, alt text.</p>
+        <ul>
+          <li>26.1 Settings screen — sectioned layout</li>
+          <li>26.2 Account management — profile, linked accounts, sign-out</li>
+          <li>26.3 Privacy, about, feedback &amp; delete-account affordance</li>
+          <li>26.4 Accessibility — labels, roles, touch targets</li>
+          <li>26.5 Color contrast, dynamic type &amp; alt text on listing images</li>
+        </ul>
+        <div class="eFr">Covers <code>FR-MOBILE-SETTINGS-01..07</code> + <code>FR-MOBILE-A11Y-01..05</code></div>
+      </div>
+      <div class="epic">
+        <header><div><div class="eNum">EPIC 27 · <span class="pill slate">backlog</span></div><h4>Mobile Meeting, Logistics &amp; Native Integrations</h4></div></header>
+        <p class="eGoal">OS calendar meetups, maps directions, geofenced reminders, share sheet, and quick-capture from other apps. <b>Closes Phase C → open beta.</b></p>
+        <ul>
+          <li>27.1 Calendar integration (OS calendar + optional Google)</li>
+          <li>27.2 Maps &amp; directions deep link</li>
+          <li>27.3 Geofence "10 minutes away" reminder</li>
+          <li>27.4 Share sheet &amp; share-extension quick capture</li>
+        </ul>
+        <div class="eFr">Covers <code>FR-MOBILE-MEET-01..05</code></div>
+      </div>
+    </div>
+
+    <!-- PHASE D -->
+    <div class="phaseBand"><span class="phaseBadge" style="background:linear-gradient(135deg,#14b87d,#0c8f66);">Phase D — Launch</span><span class="pDesc"><b>Epics 28–29 · 10 stories · ≈3 weeks.</b> Ends with v2.0.0 GA on the App Store and Google Play.</span></div>
+    <div class="epicGrid">
+      <div class="epic">
+        <header><div><div class="eNum">EPIC 28 · <span class="pill slate">backlog</span></div><h4>Mobile Camera Capture, Offline &amp; Native Polish</h4></div></header>
+        <p class="eGoal">In-app multi-shot camera with the Firebase Storage pipeline, offline read cache + write-through queue, optimistic UI, tablet Kanban, OS search indexing.</p>
+        <ul>
+          <li>28.1 In-app camera with multi-shot capture</li>
+          <li>28.2 Firebase Storage upload pipeline for captured photos</li>
+          <li>28.3 Offline mode — read cache + write-through queue</li>
+          <li>28.4 Optimistic UI with rollback toasts</li>
+          <li>28.5 Tablet support &amp; Spotlight / App Indexing</li>
+        </ul>
+        <div class="eFr">Covers <code>FR-MOBILE-CAMERA-01..02</code> + <code>FR-MOBILE-POLISH-01..04</code></div>
+      </div>
+      <div class="epic">
+        <header><div><div class="eNum">EPIC 29 · <span class="pill slate">backlog</span></div><h4>Mobile Production Launch — App Store + Google Play GA</h4></div></header>
+        <p class="eGoal">Store listings, privacy labels, compliance checklist, phased rollout with crash monitoring, and the force-upgrade safety net. <b>v2.0.0 GA.</b></p>
+        <ul>
+          <li>29.1 App Store Connect + Play Console listing assets</li>
+          <li>29.2 App privacy nutrition label &amp; data safety form</li>
+          <li>29.3 Pre-submission compliance checklist &amp; final production build</li>
+          <li>29.4 Phased rollout, crash monitoring &amp; post-launch playbook</li>
+          <li>29.5 Minimum-version enforcement &amp; force-upgrade path</li>
+        </ul>
+        <div class="eFr">Covers <code>FR-RELEASE-MOBILE-12, 14, 15</code></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 12 REQUIREMENTS ================= -->
+  <section class="card" id="requirements">
+    <div class="secEyebrow">12 · Requirements Inventory</div>
+    <h2>123 functional requirements in 16 families, 20 NFRs in 5</h2>
+    <p class="secLead">
+      Mobile FRs/NFRs are additive to the canonical web inventory in <code>epics.md</code>. Every FR and NFR
+      below must appear in at least one tagged Gherkin scenario in the shared traceability matrix —
+      any gap blocks story completion.
+    </p>
+    <div class="twoCol">
+      <div>
+        <h3>Functional requirement families</h3>
+        <table class="t">
+          <tr><th>Family</th><th style="width:54px;">Count</th><th>Epic</th></tr>
+          <tr><td><code>FR-MOBILE-FOUNDATION</code> — monorepo, Expo, tokens, conventions</td><td>10</td><td>15</td></tr>
+          <tr><td><code>FR-RELEASE-MOBILE</code> — EAS, CI, OTA, versioning, store compliance</td><td>15</td><td>16, 29</td></tr>
+          <tr><td><code>FR-MOBILE-AUTH</code> — Firebase auth, Bearer bridge, biometric, onboarding</td><td>10</td><td>17</td></tr>
+          <tr><td><code>FR-MOBILE-SHELL</code> — tabs, Screen wrapper, tokens, splash, deep links, haptics</td><td>12</td><td>18</td></tr>
+          <tr><td><code>FR-MOBILE-SCAN</code> — scanner, SSE, feed, filters, detail, cache</td><td>10</td><td>19</td></tr>
+          <tr><td><code>FR-MOBILE-LIFECYCLE</code> — Kanban, swipe stages, prompts, inventory</td><td>8</td><td>20</td></tr>
+          <tr><td><code>FR-MOBILE-NOTIFY</code> — push, tokens, badges, preferences, quiet hours</td><td>10</td><td>21</td></tr>
+          <tr><td><code>FR-MOBILE-MSG</code> — inbox, threads, AI drafts, approval, strategy</td><td>7</td><td>22</td></tr>
+          <tr><td><code>FR-MOBILE-RELIST</code> — posting queue, AI copy, pricing, multi-post</td><td>6</td><td>23</td></tr>
+          <tr><td><code>FR-MOBILE-ANALYTICS</code> — tiles, charts, export, health gauge</td><td>5</td><td>24</td></tr>
+          <tr><td><code>FR-MOBILE-BILLING</code> — RevenueCat IAP, reconciliation, gating</td><td>7</td><td>25</td></tr>
+          <tr><td><code>FR-MOBILE-SETTINGS</code> — settings surface, delete account, feedback</td><td>7</td><td>26</td></tr>
+          <tr><td><code>FR-MOBILE-A11Y</code> — labels, contrast, dynamic type, alt text</td><td>5</td><td>26</td></tr>
+          <tr><td><code>FR-MOBILE-MEET</code> — calendar, maps, geofence, share, quick capture</td><td>5</td><td>27</td></tr>
+          <tr><td><code>FR-MOBILE-CAMERA</code> — multi-shot capture, upload pipeline</td><td>2</td><td>28</td></tr>
+          <tr><td><code>FR-MOBILE-POLISH</code> — offline queue, optimistic UI, tablet, OS search</td><td>4</td><td>28</td></tr>
+        </table>
+      </div>
+      <div>
+        <h3>Non-functional requirement families</h3>
+        <table class="t">
+          <tr><th>Family</th><th style="width:54px;">Count</th><th>Headlines</th></tr>
+          <tr><td><code>NFR-MOB-PERF</code></td><td>5</td><td>Cold ≤2.5s · warm ≤800ms · ≥55fps · bundle ≤8MB / install ≤80MB · crash-free ≥99.5%</td></tr>
+          <tr><td><code>NFR-MOB-SEC</code></td><td>5</td><td>Secure-store-only tokens · HTTPS-only · cert pinning · no PII in logs · CVE-clean deps</td></tr>
+          <tr><td><code>NFR-MOB-A11Y</code></td><td>2</td><td>WCAG AA every screen · platform touch-target minimums</td></tr>
+          <tr><td><code>NFR-MOB-RELEASE</code></td><td>4</td><td>OTA hot-fix ≤30min / rollback ≤5min · GitHub Release per binary · store-policy compliance · visible version in About</td></tr>
+          <tr><td><code>NFR-MOB-TEST</code></td><td>4</td><td>≥80%/70% unit coverage · AC-level E2E · both-platform CI ≤8min smoke · single traceability matrix</td></tr>
+        </table>
+        <h3>Cross-cutting policies</h3>
+        <table class="t">
+          <tr><td class="kc">POL-01</td><td>AI never mocked — mobile tests hit the real provider chain via backend endpoints</td></tr>
+          <tr><td class="kc">POL-02</td><td>Canonical file header on every <code>.ts/.tsx</code> in <code>mobile/</code></td></tr>
+          <tr><td class="kc">POL-03</td><td>Trello (<code>trello-axovia</code>) mirrors story state for all 80 stories</td></tr>
+          <tr><td class="kc">AR-MOB-01..04</td><td>Backend unchanged except <code>DeviceToken</code>; shared Firebase project; Bearer bridge; SSE as canonical real-time channel</td></tr>
+          <tr><td class="kc">UX-MOB-01..04</td><td>Canonical <code>fp-*</code> design language; ≥44pt/48dp targets; thumb-first CTAs; skeletons on every data screen</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 13 TESTING ================= -->
+  <section class="card" id="testing">
+    <div class="secEyebrow">13 · Testing &amp; Quality</div>
+    <h2>The quality gate every story passes — no exceptions</h2>
+    <p class="secLead">
+      The mobile DoD mirrors the web DoD: traceable acceptance tests at the right level, both platforms,
+      real AI, and zero regression on the existing web suites.
+    </p>
+    <div class="twoCol">
+      <div>
+        <h3>Test pyramid</h3>
+        <table class="t">
+          <tr><th>Level</th><th>Tooling</th><th>Scope &amp; gates</th></tr>
+          <tr><td class="kc">Unit</td><td>Jest (<code>mobile/src/__tests__/</code>)</td><td>All new business logic; ≥80% statements / 70% branches on new modules</td></tr>
+          <tr><td class="kc">E2E</td><td>Maestro flows</td><td>Every UI-visible AC, on iOS Simulator AND Android Emulator; smoke pack ≤8 min in CI</td></tr>
+          <tr><td class="kc">Acceptance</td><td>Cucumber/Gherkin</td><td>One feature file per epic: <code>E-015-mobile-foundation.feature</code> … <code>E-029-mobile-launch.feature</code>, in the shared <code>test/acceptance/features/</code> tree</td></tr>
+          <tr><td class="kc">Static</td><td>ESLint flat config · <code>tsc</code> strict · <code>expo doctor</code> · <code>pnpm audit</code></td><td>Zero errors, zero warnings from <code>expo doctor</code>, no critical CVEs</td></tr>
+          <tr><td class="kc">Regression</td><td><code>make test</code> + <code>make test-acceptance</code></td><td>Full web suites stay green on every mobile PR</td></tr>
+        </table>
+        <div class="callout" style="margin-bottom:0;">
+          <b>Triple tagging, enforced:</b> every Gherkin scenario carries
+          <code>@E-NNN-S-YYY</code> (epic-scoped scenario id) + <code>@story-X-Y</code> +
+          <code>@FR-…</code>/<code>@NFR-MOB-…</code> — feeding the single requirements-traceability
+          matrix shared with web. A missing tag is a DoD failure.
+        </div>
+      </div>
+      <div>
+        <h3>Per-story DoD highlights</h3>
+        <table class="t">
+          <tr><td>✅ Every AC verified on <b>both</b> iOS Simulator and Android Emulator</td></tr>
+          <tr><td>✅ Test level matches the AC — UI-visible ACs get Maestro/E2E, logic ACs get Jest; a mocked service call never satisfies a UI AC</td></tr>
+          <tr><td>✅ EAS preview build succeeds for both platforms before review</td></tr>
+          <tr><td>✅ Sentry source maps verified uploaded for the test build</td></tr>
+          <tr><td>✅ VoiceOver / TalkBack navigation order logical; touch targets ≥44pt/48dp; contrast ≥ WCAG AA</td></tr>
+          <tr><td>✅ AI-touching stories exercise the real Groq → Gemini → OpenAI chain — never mocked</td></tr>
+          <tr><td>✅ File headers on every new <code>.ts/.tsx</code>; CHANGELOG entry for user-visible changes</td></tr>
+          <tr><td>✅ Traceability matrix updated; Trello card moved on the <code>trello-axovia</code> board</td></tr>
+        </table>
+        <h3>Why this much rigor on a mobile app?</h3>
+        <p style="font-size:13px;color:#3c4456;">
+          Web mistakes deploy forward in minutes; mobile mistakes live in pockets until users choose to
+          update. The DoD front-loads the cost of correctness because the rollback story
+          (OTA ≤5 min, phased rollout, force-upgrade) only covers JS — a broken native binary
+          is a week-long incident. Cheap insurance, bought per-story.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 14 ROADMAP ================= -->
+  <section class="card" id="roadmap">
+    <div class="secEyebrow">14 · Roadmap</div>
+    <h2>Kickoff to GA in ≈21 weeks — first tester binary at week 2</h2>
+    <p class="secLead">
+      Column widths are proportional to estimated duration. Each phase ends with a named, demonstrable
+      release milestone — no invisible progress.
+    </p>
+    <div style="overflow-x:auto;">
+      <div class="timeline">
+        <div class="tlPhase tlA"><div class="w">≈2 wk · epics 15–17</div><b>Phase A — Rails up</b><span>Monorepo · EAS pipeline · auth bridge. 17 stories.</span></div>
+        <div class="tlPhase tlB"><div class="w">≈6 wk · epics 18–21</div><b>Phase B — Lovable beta</b><span>Shell · scanning · lifecycle · push. 25 stories.</span></div>
+        <div class="tlPhase tlC"><div class="w">≈10 wk · epics 22–27</div><b>Phase C — Feature parity</b><span>Messaging · reposting · analytics · IAP · settings + a11y · meetups. 28 stories.</span></div>
+        <div class="tlPhase tlD"><div class="w">≈3 wk · epics 28–29</div><b>Phase D — Launch</b><span>Camera · offline · tablet · GA. 10 stories.</span></div>
+      </div>
+      <div class="milestones">
+        <div class="ms"><b>🚂 Stub binary ships</b>TestFlight + Firebase App Distribution prove the rails end-to-end</div>
+        <div class="ms"><b>🔒 Closed beta</b>A real user flips a real item entirely on mobile</div>
+        <div class="ms"><b>🌐 Open beta</b>Feature parity — mobile is a peer of the web app</div>
+        <div class="ms"><b>🚀 v2.0.0 GA</b>Phased rollout on both stores, crash gates, rollback playbook</div>
+      </div>
+    </div>
+    <div class="callout warn">
+      <b>Critical-path note:</b> Phase A is the keystone. Nothing in Phases B–D is allowed to start
+      before the pipeline ships builds automatically — that ordering is what keeps "it works on my
+      simulator" from ever becoming the integration strategy.
+    </div>
+  </section>
+
+  <!-- ================= SOURCES ================= -->
+  <section class="card">
+    <div class="secEyebrow">Appendix</div>
+    <h2>Sources &amp; related documents</h2>
+    <p class="srcList">
+      This overview is a faithful rendering of the canonical planning artifacts — when in doubt, those win:<br/><br/>
+      📄 <code>_bmad-output/planning-artifacts/epics-mobile-app.md</code> — the complete mobile epic &amp; story breakdown (FRs, NFRs, ACs, DoD)<br/>
+      📄 <code>_bmad-output/implementation-artifacts/sprint-status.yaml</code> — live story status (Epic 15 in progress as of 2026-06-12)<br/>
+      📄 <code>_bmad-output/implementation-artifacts/mobile-application/epic-15/</code> — Epic 15 story files (5, all ready-for-dev)<br/>
+      🖼️ <a href="../client-facing/previews/index.html"><code>docs/client-facing/previews/</code></a> — high-fidelity mockup deck (15 screen mockups + FR catalog + roadmap)<br/>
+      🏗️ <a href="./ARCHITECTURE.md"><code>docs/architecture/ARCHITECTURE.md</code></a> — web/backend system architecture<br/>
+      📄 <code>_bmad-output/planning-artifacts/epics.md</code> — web epics 1–14 + canonical FR/NFR inventory<br/>
+      📄 <code>CLAUDE.md</code> + <code>_bmad-output/project-context.md</code> — project-wide policy (never-mock-AI, file headers, port 3200, DoD)
+    </p>
+  </section>
+
+  <footer class="pageFoot">
+    <span>Flipper.ai Mobile v2.0 · Architecture Overview · Epics 15–29</span>
+    <span>© 2026 Axovia LLC. All Rights Reserved.</span>
+  </footer>
+
+</div>
+</body>
+</html>
