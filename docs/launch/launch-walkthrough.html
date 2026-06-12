@@ -465,7 +465,7 @@ git log --oneline main -3   # should show the django-main tip commit</pre><butto
       <div class="task" data-id="0-7">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
         <div class="t-head"><span class="t-id">0.7</span><span class="t-title">Cut the release tag</span><span class="badge p0">P0</span></div>
-        <p class="t-desc">Locks in the reconciled state and triggers the tag-driven GitHub Actions release + deploy workflow.</p>
+        <p class="t-desc">Locks in the release. <b>Trigger reality (corrected):</b> the <b>push to <code class="kbd">main</code></b> is what deploys (ci.yml → build-container → deploy-cloud-run → health checks); the tag only creates the GitHub Release from the CHANGELOG. So: merge the release commit to main, watch the deploy go green, then tag.</p>
         <div class="cmd"><pre>git tag v1.1.0
 git push origin v1.1.0</pre><button class="copy">copy</button></div>
         <div class="note tip"><span class="i">i</span><span>Update <code class="kbd">VERSION.md</code> → <code class="kbd">1.1.0</code> and promote <code class="kbd">[Unreleased]</code> in <code class="kbd">CHANGELOG.md</code> before tagging.</span></div>
@@ -479,13 +479,14 @@ git push origin v1.1.0</pre><button class="copy">copy</button></div>
     <p class="sec-sub">Seed every <code class="kbd">PROD_</code> secret in GCP Secret Manager, gate the deploy, and verify health. Project: <code class="kbd">axovia-flipper</code>. Full reference: <code class="kbd">gcp-secret-manager-checklist.md</code>.</p>
     <div class="tasks-list">
 
-      <div class="task" data-id="1-1">
+      <div class="task" data-id="1-1" data-done="true">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">1.1</span><span class="t-title">Seed all PROD_ secrets in Secret Manager</span><span class="badge p0">P0</span><span class="badge auto" id="secretTally">core ✓ · ~9 to paste</span></div>
+        <div class="t-head"><span class="t-id">1.1</span><span class="t-title">Seed all PRODUCTION_ secrets in Secret Manager</span><span class="badge p0">P0</span><span class="badge auto" id="secretTally">✓ core + fallbacks · 3 deferred</span></div>
         <p class="t-desc"><b>⚠️ Value audit (not just name-existence):</b> many "existing" prod secrets held <code class="kbd">PLACEHOLDER</code> text, not real keys — caught by reading every value. Real status below (project <code class="kbd">axovia-flipper</code>, <code class="kbd">PRODUCTION_*</code>).</p>
         <ul class="steps plain">
           <li>✅ <b>Real &amp; verified — core launch path covered</b> — <code class="kbd">DATABASE_URL</code>, Firebase Admin + public config + VAPID, <b>AI: <code class="kbd">GROQ</code> (primary) + Gemini (fallback)</b>, <b>Google OAuth (login + calendar)</b>, <b>Resend</b> (⚠️ shared/temp key), <code class="kbd">GOOGLE_MAPS_API_KEY</code>, <code class="kbd">HCAPTCHA_SECRET_KEY</code>, <code class="kbd">ENCRYPTION_SECRET</code>, <code class="kbd">AUTH_SECRET</code>, internal tokens, <code class="kbd">APP_URL</code>=web.app</li>
-          <li>⬜ <b>Were placeholders — still to paste</b>: <b>OAuth logins</b> <a class="link" href="https://github.com/settings/developers" target="_blank" rel="noopener">GitHub</a>/<a class="link" href="https://developers.facebook.com/apps/" target="_blank" rel="noopener">Facebook</a> id+secret · <b>Errors</b> <a class="link" href="https://sentry.io/" target="_blank" rel="noopener">Sentry</a> DSN+auth · <b>AI fallback</b> <a class="link" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">OpenAI</a> + <a class="link" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Anthropic</a> · <b>eBay</b> token</li>
+          <li>✅ <b>Since wired</b> (this bullet was stale): Sentry DSN+auth (A6) · Facebook id+secret (A8) · OpenAI (A9) · Anthropic (A10) · Geoapify (A12) · Shippo test (A13) · <code class="kbd">NEXT_PUBLIC_APP_URL</code> + hCaptcha site key (⚠ test key — paste the real one from the <a class="link" href="https://dashboard.hcaptcha.com/sites" target="_blank" rel="noopener">hCaptcha dashboard</a> before public launch)</li>
+          <li>⬜ <b>Genuinely remaining</b>: <b>eBay</b> token (A11, pending eBay approval) · <b>GitHub OAuth</b> (deferred — button hidden via flag, A7b) · <b>Twilio</b> (optional, A14)</li>
           <li>⬜ <b>Optional feature secrets</b> — <a class="link" href="https://myprojects.geoapify.com/" target="_blank" rel="noopener">Geoapify</a> · <a class="link" href="https://apps.goshippo.com/settings/api" target="_blank" rel="noopener">Shippo</a> · <a class="link" href="https://console.twilio.com/" target="_blank" rel="noopener">Twilio</a> (SID/token/number)</li>
           <li>🔒 <b>Decision-blocked</b> — <code class="kbd">STRIPE_SECRET_KEY</code>/<code class="kbd">WEBHOOK</code>/<code class="kbd">PRICE_*</code> (live mode · Phase 2)</li>
         </ul>
@@ -494,20 +495,21 @@ git push origin v1.1.0</pre><button class="copy">copy</button></div>
         <div class="linkrow"><a class="link" href="https://console.cloud.google.com/security/secret-manager?project=axovia-flipper" target="_blank" rel="noopener">Secret Manager console</a><a class="link" href="https://github.com/AXOVIA-ASPEN/flipper-ai/blob/main/docs/launch/gcp-secret-manager-checklist.md" target="_blank" rel="noopener">Full secret checklist</a></div>
       </div>
 
-      <div class="task" data-id="1-2">
+      <div class="task" data-id="1-2" data-done="true">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">1.2</span><span class="t-title">Run the pre-deploy secret gate</span><span class="badge p0">P0</span></div>
-        <p class="t-desc">Confirms every required secret exists before deploying.</p>
+        <div class="t-head"><span class="t-id">1.2</span><span class="t-title">Run the pre-deploy secret gate</span><span class="badge p0">P0</span><span class="badge auto">✓ done — gate fixed + green</span></div>
+        <p class="t-desc"><b>The gate itself was broken</b> — it checked <code class="kbd">PROD_*</code> names that never existed (real prefix: <code class="kbd">PRODUCTION_*</code>), with name drift beyond the prefix (<code class="kbd">DB_URL</code> vs <code class="kbd">DATABASE_URL</code>…). Rewritten to canonical names from <code class="kbd">config/secretmanager.yaml</code>; Stripe demoted to warn-until-Phase-2. <b>Result: ✅ all required secrets present.</b> Same prefix bug fixed in <code class="kbd">secretmanager.py</code> (<code class="kbd">SecretScope.PROD = "PRODUCTION"</code>) + its tests.</p>
         <div class="cmd"><pre>bash scripts/deploy/check-secrets.sh
 python scripts/secretmanager.py validate --env production</pre><button class="copy">copy</button></div>
       </div>
 
-      <div class="task" data-id="1-3">
+      <div class="task" data-id="1-3" data-done="true">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
-        <div class="t-head"><span class="t-id">1.3</span><span class="t-title">Grant Cloud Run secretAccessor IAM</span><span class="badge p0">P0</span></div>
+        <div class="t-head"><span class="t-id">1.3</span><span class="t-title">Grant Cloud Run secretAccessor IAM</span><span class="badge p0">P0</span><span class="badge auto">✓ done — 73 grants</span></div>
+        <p class="t-desc">Granted to the dedicated <code class="kbd">flipper-run@</code> SA (the one <code class="kbd">flipper-staging</code> already uses; CI now pins it for <code class="kbd">flipper-production</code> too) on every <code class="kbd">PRODUCTION_*</code> + <code class="kbd">STAGING_*</code> secret — 73 grants, 0 failures.</p>
         <div class="cmd"><pre>PROJECT=axovia-flipper
-SA="serviceAccount:&lt;CLOUD_RUN_SA&gt;@$PROJECT.iam.gserviceaccount.com"
-gcloud secrets list --project=$PROJECT --format="value(name)" --filter="name~^PROD_" | while read s; do
+SA="serviceAccount:flipper-run@$PROJECT.iam.gserviceaccount.com"
+gcloud secrets list --project=$PROJECT --format="value(name)" | grep -E "^(PRODUCTION|STAGING)_" | while read s; do
   gcloud secrets add-iam-policy-binding "$s" --member="$SA" \
     --role="roles/secretmanager.secretAccessor" --project=$PROJECT
 done</pre><button class="copy">copy</button></div>
@@ -516,7 +518,7 @@ done</pre><button class="copy">copy</button></div>
       <div class="task" data-id="1-4">
         <button class="chk" aria-label="toggle"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
         <div class="t-head"><span class="t-id">1.4</span><span class="t-title">Verify the deploy &amp; health endpoints</span><span class="badge verify">Verify</span></div>
-        <p class="t-desc">The v1.1.0 tag (0.7) triggers CI deploy to Cloud Run + Firebase Hosting. Confirm it landed healthy.</p>
+        <p class="t-desc">The release-commit <b>push to main</b> (0.7) triggers CI deploy to Cloud Run + Firebase Hosting — the pipeline runs liveness + readiness checks automatically post-deploy. Confirm via the web.app URL too.</p>
         <div class="cmd"><pre>curl -s <span class="dom" data-token>https://your-domain.com</span>/api/health
 curl -s <span class="dom" data-token>https://your-domain.com</span>/api/health/ready</pre><button class="copy">copy</button></div>
         <div class="linkrow"><a class="link" href="https://console.cloud.google.com/run?project=axovia-flipper" target="_blank" rel="noopener">Cloud Run logs</a></div>
