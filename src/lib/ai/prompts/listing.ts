@@ -134,10 +134,14 @@ export const apiDescription: PromptConfig = {
 
     const platformGuidelines: Record<string, string> = {
       ebay: 'eBay: Use item specifics format, mention condition accurately, include measurements/specs, use keywords for search. Max ~4000 chars.',
-      mercari: 'Mercari: Concise and friendly, highlight condition clearly, mention shipping. Max ~1000 chars.',
-      facebook: 'Facebook Marketplace: Casual tone, mention local pickup, highlight key features. Max ~4000 chars.',
-      offerup: 'OfferUp: Short and punchy, condition-focused, price justification. Max ~3000 chars.',
-      craigslist: 'Craigslist: Detailed, include all specs, mention firm/OBO, describe condition honestly. No limit.',
+      mercari:
+        'Mercari: Concise and friendly, highlight condition clearly, mention shipping. Max ~1000 chars.',
+      facebook:
+        'Facebook Marketplace: Casual tone, mention local pickup, highlight key features. Max ~4000 chars.',
+      offerup:
+        'OfferUp: Short and punchy, condition-focused, price justification. Max ~3000 chars.',
+      craigslist:
+        'Craigslist: Detailed, include all specs, mention firm/OBO, describe condition honestly. No limit.',
     };
 
     return `Generate an optimized resale listing description for the following item.

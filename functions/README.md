@@ -5,12 +5,14 @@ Cloud Functions for CPU-intensive scraping operations.
 ## Architecture
 
 ### Playwright Functions (Docker)
+
 - **scrapeCraigslist** - Scrapes Craigslist using Playwright
 - **scrapeOfferup** - Scrapes OfferUp using Playwright
 
 These use custom Docker containers with Chromium pre-installed.
 
 ### API Functions (Standard)
+
 - **scrapeEbay** - Scrapes eBay using official API
 - **scrapeFacebook** - Scrapes Facebook Marketplace (placeholder)
 - **scrapeMercari** - Scrapes Mercari (placeholder)
@@ -18,6 +20,7 @@ These use custom Docker containers with Chromium pre-installed.
 These use standard Cloud Functions runtime.
 
 ### Utility Functions
+
 - **health** - Health check endpoint
 
 ## Development

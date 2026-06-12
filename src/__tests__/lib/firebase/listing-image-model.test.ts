@@ -22,7 +22,8 @@ const sampleImage = {
   imageIndex: 0,
   originalUrl: 'https://example.com/image.jpg',
   storagePath: 'user1/ebay/listing-1/0.jpg',
-  storageUrl: 'https://storage.googleapis.com/axovia-flipper.firebasestorage.app/user1/ebay/listing-1/0.jpg',
+  storageUrl:
+    'https://storage.googleapis.com/axovia-flipper.firebasestorage.app/user1/ebay/listing-1/0.jpg',
   fileSize: 102400,
   contentType: 'image/jpeg',
   width: 800,
@@ -44,7 +45,8 @@ describe('ListingImage Model Operations', () => {
         imageIndex: 0,
         originalUrl: 'https://example.com/image.jpg',
         storagePath: 'user1/ebay/listing-1/0.jpg',
-        storageUrl: 'https://storage.googleapis.com/axovia-flipper.firebasestorage.app/user1/ebay/listing-1/0.jpg',
+        storageUrl:
+          'https://storage.googleapis.com/axovia-flipper.firebasestorage.app/user1/ebay/listing-1/0.jpg',
         fileSize: 102400,
         contentType: 'image/jpeg',
         width: 800,

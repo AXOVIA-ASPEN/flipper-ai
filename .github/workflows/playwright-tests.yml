@@ -2,9 +2,9 @@ name: 🎭 Playwright Tests (Non-Blocking)
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
   workflow_dispatch:
 
 # IMPORTANT: This workflow is NON-BLOCKING
@@ -15,212 +15,212 @@ jobs:
   test:
     timeout-minutes: 15
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: 📥 Checkout code
-      uses: actions/checkout@v4
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
 
-    - name: 🟢 Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
-    - name: 📦 Install dependencies
-      run: npm ci --legacy-peer-deps
+      - name: 📦 Install dependencies
+        run: npm ci --legacy-peer-deps
 
-    - name: 🎭 Install Playwright browsers
-      run: npx playwright install --with-deps chromium
+      - name: 🎭 Install Playwright browsers
+        run: npx playwright install --with-deps chromium
 
-    - name: 🔨 Build Next.js app
-      run: npm run build
-      env:
-        # Build-time env vars
-        DATABASE_URL: file:./dev.db
-        ENCRYPTION_SECRET: test-secret-for-ci-build-only
-        APP_URL: http://localhost:3200
+      - name: 🔨 Build Next.js app
+        run: npm run build
+        env:
+          # Build-time env vars
+          DATABASE_URL: file:./dev.db
+          ENCRYPTION_SECRET: test-secret-for-ci-build-only
+          APP_URL: http://localhost:3200
 
-    - name: 🎭 Run Playwright acceptance tests
-      continue-on-error: true  # 🚨 NON-BLOCKING - Remove this line to block releases
-      run: npm run test:acceptance
-      env:
-        # Runtime env vars (webServer in playwright.config.ts will start server)
-        DATABASE_URL: file:./dev.db
-        ENCRYPTION_SECRET: test-secret-for-ci-build-only
-        APP_URL: http://localhost:3200
-        BASE_URL: http://localhost:3200
+      - name: 🎭 Run Playwright acceptance tests
+        continue-on-error: true # 🚨 NON-BLOCKING - Remove this line to block releases
+        run: npm run test:acceptance
+        env:
+          # Runtime env vars (webServer in playwright.config.ts will start server)
+          DATABASE_URL: file:./dev.db
+          ENCRYPTION_SECRET: test-secret-for-ci-build-only
+          APP_URL: http://localhost:3200
+          BASE_URL: http://localhost:3200
 
-    - name: 📊 Upload test results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: playwright-results
-        path: |
-          playwright-report/
-          test-results/
-        retention-days: 7
+      - name: 📊 Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-results
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
 
-    - name: 📸 Upload user journey screenshots
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: user-journey-screenshots
-        path: playwright-report/user-journey/
-        retention-days: 30
+      - name: 📸 Upload user journey screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: user-journey-screenshots
+          path: playwright-report/user-journey/
+          retention-days: 30
 
-    - name: 📝 Comment test results on PR
-      if: github.event_name == 'pull_request' && always()
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const fs = require('fs');
-          const reportPath = 'playwright-report/index.html';
-          
-          let message = '## 🎭 Playwright Test Results\n\n';
-          
-          if (fs.existsSync(reportPath)) {
-            message += '✅ Test report generated. Download artifacts to view.\n\n';
-            message += '**Note:** Tests are non-blocking - failures won\'t prevent deployment.\n';
-          } else {
-            message += '⚠️ No test report found.\n';
-          }
-          
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: message
-          });
+      - name: 📝 Comment test results on PR
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = 'playwright-report/index.html';
+
+            let message = '## 🎭 Playwright Test Results\n\n';
+
+            if (fs.existsSync(reportPath)) {
+              message += '✅ Test report generated. Download artifacts to view.\n\n';
+              message += '**Note:** Tests are non-blocking - failures won\'t prevent deployment.\n';
+            } else {
+              message += '⚠️ No test report found.\n';
+            }
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: message
+            });
 
   # Optional: Separate job to run full E2E suite (even more comprehensive)
   e2e-full:
     timeout-minutes: 30
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'  # Only on PRs
-    continue-on-error: true  # Non-blocking
-    
+    if: github.event_name == 'pull_request' # Only on PRs
+    continue-on-error: true # Non-blocking
+
     steps:
-    - name: 📥 Checkout code
-      uses: actions/checkout@v4
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
 
-    - name: 🟢 Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
-    - name: 📦 Install dependencies
-      run: npm ci --legacy-peer-deps
+      - name: 📦 Install dependencies
+        run: npm ci --legacy-peer-deps
 
-    - name: 🎭 Install Playwright browsers (all)
-      run: npx playwright install --with-deps
+      - name: 🎭 Install Playwright browsers (all)
+        run: npx playwright install --with-deps
 
-    - name: 🔨 Build Next.js app
-      run: npm run build
-      env:
-        DATABASE_URL: file:./dev.db
-        ENCRYPTION_SECRET: test-secret-for-ci-build-only
-        APP_URL: http://localhost:3200
+      - name: 🔨 Build Next.js app
+        run: npm run build
+        env:
+          DATABASE_URL: file:./dev.db
+          ENCRYPTION_SECRET: test-secret-for-ci-build-only
+          APP_URL: http://localhost:3200
 
-    - name: 🎭 Run ALL E2E tests (chromium + firefox + webkit)
-      continue-on-error: true
-      run: npm run test:e2e
-      env:
-        # webServer in playwright.config.ts auto-starts server
-        DATABASE_URL: file:./dev.db
-        ENCRYPTION_SECRET: test-secret-for-ci-build-only
-        APP_URL: http://localhost:3200
-        BASE_URL: http://localhost:3200
+      - name: 🎭 Run ALL E2E tests (chromium + firefox + webkit)
+        continue-on-error: true
+        run: npm run test:e2e
+        env:
+          # webServer in playwright.config.ts auto-starts server
+          DATABASE_URL: file:./dev.db
+          ENCRYPTION_SECRET: test-secret-for-ci-build-only
+          APP_URL: http://localhost:3200
+          BASE_URL: http://localhost:3200
 
-    - name: 📊 Upload comprehensive test results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: e2e-full-results
-        path: |
-          playwright-report/
-          test-results/
-        retention-days: 14
+      - name: 📊 Upload comprehensive test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-full-results
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
 
-    - name: 📸 Upload user journey screenshots (E2E)
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: e2e-user-journey-screenshots
-        path: playwright-report/user-journey/
-        retention-days: 30
+      - name: 📸 Upload user journey screenshots (E2E)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-user-journey-screenshots
+          path: playwright-report/user-journey/
+          retention-days: 30
 
   # Visual Regression Testing
   visual-regression:
     timeout-minutes: 15
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: 📥 Checkout code
-      uses: actions/checkout@v4
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
 
-    - name: 🟢 Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
-    - name: 📦 Install dependencies
-      run: npm ci --legacy-peer-deps
+      - name: 📦 Install dependencies
+        run: npm ci --legacy-peer-deps
 
-    - name: 🎭 Install Playwright browsers
-      run: npx playwright install --with-deps chromium
+      - name: 🎭 Install Playwright browsers
+        run: npx playwright install --with-deps chromium
 
-    - name: 🔨 Build Next.js app
-      run: npm run build
-      env:
-        DATABASE_URL: file:./dev.db
-        ENCRYPTION_SECRET: test-secret-for-ci-build-only
-        APP_URL: http://localhost:3200
+      - name: 🔨 Build Next.js app
+        run: npm run build
+        env:
+          DATABASE_URL: file:./dev.db
+          ENCRYPTION_SECRET: test-secret-for-ci-build-only
+          APP_URL: http://localhost:3200
 
-    - name: 📸 Run Visual Regression Tests
-      run: npx playwright test e2e/visual/ --project=chromium
-      env:
-        DATABASE_URL: file:./dev.db
-        ENCRYPTION_SECRET: test-secret-for-ci-build-only
-        APP_URL: http://localhost:3200
-        BASE_URL: http://localhost:3200
+      - name: 📸 Run Visual Regression Tests
+        run: npx playwright test e2e/visual/ --project=chromium
+        env:
+          DATABASE_URL: file:./dev.db
+          ENCRYPTION_SECRET: test-secret-for-ci-build-only
+          APP_URL: http://localhost:3200
+          BASE_URL: http://localhost:3200
 
-    - name: 📊 Upload visual test results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: visual-regression-results
-        path: |
-          playwright-report/
-          test-results/
-        retention-days: 7
+      - name: 📊 Upload visual test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-regression-results
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
 
-    - name: 🖼️ Upload screenshot diffs (on failure)
-      uses: actions/upload-artifact@v4
-      if: failure()
-      with:
-        name: visual-regression-diffs
-        path: test-results/**/diff-*.png
-        retention-days: 14
+      - name: 🖼️ Upload screenshot diffs (on failure)
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: visual-regression-diffs
+          path: test-results/**/diff-*.png
+          retention-days: 14
 
-    - name: 📝 Comment visual regression results on PR
-      if: github.event_name == 'pull_request' && failure()
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const message = '## 📸 Visual Regression Test Results\n\n' +
-            '⚠️ **Visual changes detected!**\n\n' +
-            'Screenshot diffs have been uploaded as artifacts. ' +
-            'Please review the changes and update baselines if intentional:\n\n' +
-            '```bash\n' +
-            'npx playwright test e2e/visual/ --update-snapshots\n' +
-            '```\n\n' +
-            'Download the `visual-regression-diffs` artifact to see what changed.';
-          
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: message
-          });
+      - name: 📝 Comment visual regression results on PR
+        if: github.event_name == 'pull_request' && failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const message = '## 📸 Visual Regression Test Results\n\n' +
+              '⚠️ **Visual changes detected!**\n\n' +
+              'Screenshot diffs have been uploaded as artifacts. ' +
+              'Please review the changes and update baselines if intentional:\n\n' +
+              '```bash\n' +
+              'npx playwright test e2e/visual/ --update-snapshots\n' +
+              '```\n\n' +
+              'Download the `visual-regression-diffs` artifact to see what changed.';
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: message
+            });

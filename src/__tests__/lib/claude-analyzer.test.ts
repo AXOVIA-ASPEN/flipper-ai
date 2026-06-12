@@ -13,7 +13,10 @@ const mockCompleteAI = jest.fn();
 jest.mock('@/lib/ai', () => ({
   completeAI: (...args: unknown[]) => mockCompleteAI(...args),
   AIProviderUnavailableError: class extends Error {
-    constructor() { super('No AI provider available'); this.name = 'AIProviderUnavailableError'; }
+    constructor() {
+      super('No AI provider available');
+      this.name = 'AIProviderUnavailableError';
+    }
   },
 }));
 
@@ -237,13 +240,15 @@ describe('Claude Analyzer', () => {
     test('should throw error on rate limit', async () => {
       mockCompleteAI.mockRejectedValue(new Error('Rate limit exceeded'));
 
-      await expect(analyzeListingData('Test Item', null, 100)).rejects.toThrow('Rate limit exceeded');
+      await expect(analyzeListingData('Test Item', null, 100)).rejects.toThrow(
+        'Rate limit exceeded'
+      );
     });
 
     test('should throw error on API error', async () => {
       mockCompleteAI.mockRejectedValue(
-          Object.assign(new Error('Something went wrong'), { message: 'Something went wrong' })
-        );
+        Object.assign(new Error('Something went wrong'), { message: 'Something went wrong' })
+      );
 
       await expect(analyzeListingData('Test Item', null, 100)).rejects.toThrow();
     });
@@ -303,21 +308,28 @@ describe('Claude Analyzer', () => {
     });
 
     test('should include price context in analysis', async () => {
-      mockCompleteAI.mockResolvedValue(makeAIResponse(JSON.stringify({
-              category: 'electronics',
-              condition: 'new',
-              keyFeatures: [],
-              potentialIssues: [],
-              flippabilityScore: 90,
-              confidence: 'high',
-              reasoning: 'Great deal',
-            })));
+      mockCompleteAI.mockResolvedValue(
+        makeAIResponse(
+          JSON.stringify({
+            category: 'electronics',
+            condition: 'new',
+            keyFeatures: [],
+            potentialIssues: [],
+            flippabilityScore: 90,
+            confidence: 'high',
+            reasoning: 'Great deal',
+          })
+        )
+      );
       await analyzeListingData('iPhone 15 Pro', 'Brand new sealed', 800, ['image1.jpg']);
 
-      expect(mockCompleteAI).toHaveBeenCalledWith('claudeAnalysis', expect.objectContaining({
-        askingPrice: 800,
-        imageCount: 1,
-      }));
+      expect(mockCompleteAI).toHaveBeenCalledWith(
+        'claudeAnalysis',
+        expect.objectContaining({
+          askingPrice: 800,
+          imageCount: 1,
+        })
+      );
     });
   });
 
@@ -529,10 +541,20 @@ describe('Claude Analyzer', () => {
       });
 
       const mockResponse = {
-        content: [{ type: 'text', text: JSON.stringify({
-          category: 'test', condition: 'good', keyFeatures: [], potentialIssues: [],
-          flippabilityScore: 70, confidence: 'medium', reasoning: 'No images',
-        }) }],
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              category: 'test',
+              condition: 'good',
+              keyFeatures: [],
+              potentialIssues: [],
+              flippabilityScore: 70,
+              confidence: 'medium',
+              reasoning: 'No images',
+            }),
+          },
+        ],
       };
       mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
 
@@ -632,18 +654,20 @@ describe('Claude Analyzer', () => {
       });
 
       const mockResponse = {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            category: 'electronics',
-            condition: 'excellent',
-            keyFeatures: ['Fresh result'],
-            potentialIssues: [],
-            flippabilityScore: 90,
-            confidence: 'high',
-            reasoning: 'API populated L1',
-          }),
-        }],
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              category: 'electronics',
+              condition: 'excellent',
+              keyFeatures: ['Fresh result'],
+              potentialIssues: [],
+              flippabilityScore: 90,
+              confidence: 'high',
+              reasoning: 'API populated L1',
+            }),
+          },
+        ],
       };
 
       mockCompleteAI.mockResolvedValue(makeAIResponse(mockResponse.content[0].text));
@@ -955,9 +979,12 @@ describe('Claude Analyzer', () => {
         'img3.jpg',
       ]);
 
-      expect(mockCompleteAI).toHaveBeenCalledWith('claudeAnalysis', expect.objectContaining({
-        imageCount: 3,
-      }));
+      expect(mockCompleteAI).toHaveBeenCalledWith(
+        'claudeAnalysis',
+        expect.objectContaining({
+          imageCount: 3,
+        })
+      );
       expect(result.confidence).toBe('high');
     });
   });
@@ -967,19 +994,36 @@ describe('Claude Analyzer', () => {
       delete process.env.ANTHROPIC_API_KEY;
       process.env.CLAUDE_API_KEY = 'claude-fallback-key';
       // analyzeListingData should use CLAUDE_API_KEY (not throw)
-      mockCompleteAI.mockResolvedValue(makeAIResponse(JSON.stringify({
-          category: 'Electronics', condition: 'good', brand: 'Apple', model: 'Test',
-          estimatedValue: 100, estimatedLow: 80, estimatedHigh: 120,
-          profitPotential: 50, isFairDeal: true, isGoodDeal: false, isExcellentDeal: false,
-          confidence: 0.8, reasoning: 'test', tags: [], keywords: [],
-        })));
+      mockCompleteAI.mockResolvedValue(
+        makeAIResponse(
+          JSON.stringify({
+            category: 'Electronics',
+            condition: 'good',
+            brand: 'Apple',
+            model: 'Test',
+            estimatedValue: 100,
+            estimatedLow: 80,
+            estimatedHigh: 120,
+            profitPotential: 50,
+            isFairDeal: true,
+            isGoodDeal: false,
+            isExcellentDeal: false,
+            confidence: 0.8,
+            reasoning: 'test',
+            tags: [],
+            keywords: [],
+          })
+        )
+      );
       const result = await analyzeListingData('Test', 'desc', 100);
       expect(result).toBeDefined();
       delete process.env.CLAUDE_API_KEY;
     });
 
     test('throws when no AI provider is available', async () => {
-      const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as { AIProviderUnavailableError: new () => Error };
+      const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as {
+        AIProviderUnavailableError: new () => Error;
+      };
       mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
       await expect(analyzeListingData('Test', 'desc', 100)).rejects.toThrow(
         'No AI provider available'
@@ -998,12 +1042,8 @@ describe('Claude Analyzer', () => {
     });
 
     test('should propagate API error with status and message', async () => {
-      mockCompleteAI.mockRejectedValue(
-          Object.assign(new Error('Invalid model'), { status: 400 })
-        );
-      await expect(analyzeListingData('Test Item', 'desc', 100)).rejects.toThrow(
-        'Invalid model'
-      );
+      mockCompleteAI.mockRejectedValue(Object.assign(new Error('Invalid model'), { status: 400 }));
+      await expect(analyzeListingData('Test Item', 'desc', 100)).rejects.toThrow('Invalid model');
     });
 
     test('should propagate non-Error thrown object', async () => {
@@ -1047,15 +1087,19 @@ describe('Claude Analyzer', () => {
     };
 
     test('should default missing fields in parsed response', async () => {
-      mockCompleteAI.mockResolvedValue(makeAIResponse(mockValidResponse({
-              category: null,
-              condition: null,
-              keyFeatures: 'not-an-array',
-              potentialIssues: null,
-              flippabilityScore: null,
-              confidence: 'invalid-value',
-              reasoning: null,
-            })));
+      mockCompleteAI.mockResolvedValue(
+        makeAIResponse(
+          mockValidResponse({
+            category: null,
+            condition: null,
+            keyFeatures: 'not-an-array',
+            potentialIssues: null,
+            flippabilityScore: null,
+            confidence: 'invalid-value',
+            reasoning: null,
+          })
+        )
+      );
       const result = await analyzeListingData('Test', 'desc', 50);
       expect(result.category).toBe('other');
       expect(result.condition).toBe('good');
@@ -1067,19 +1111,25 @@ describe('Claude Analyzer', () => {
     });
 
     test('should clamp flippabilityScore to 0-100 range', async () => {
-      mockCompleteAI.mockResolvedValue(makeAIResponse(mockValidResponse({ flippabilityScore: 150 })));
+      mockCompleteAI.mockResolvedValue(
+        makeAIResponse(mockValidResponse({ flippabilityScore: 150 }))
+      );
       const result = await analyzeListingData('Test', 'desc', 50);
       expect(result.flippabilityScore).toBe(100);
     });
 
     test('should clamp negative flippabilityScore to 0', async () => {
-      mockCompleteAI.mockResolvedValue(makeAIResponse(mockValidResponse({ flippabilityScore: -10 })));
+      mockCompleteAI.mockResolvedValue(
+        makeAIResponse(mockValidResponse({ flippabilityScore: -10 }))
+      );
       const result = await analyzeListingData('Test', 'desc', 50);
       expect(result.flippabilityScore).toBe(0);
     });
 
     test('should throw when response has no JSON', async () => {
-      mockCompleteAI.mockResolvedValue(makeAIResponse('This is just plain text with no JSON at all'));
+      mockCompleteAI.mockResolvedValue(
+        makeAIResponse('This is just plain text with no JSON at all')
+      );
       await expect(analyzeListingData('Test', 'desc', 50)).rejects.toThrow(
         'Failed to parse Claude response'
       );

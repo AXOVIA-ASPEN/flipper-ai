@@ -3,6 +3,7 @@
 ## Pre-Deployment
 
 - [ ] **Backup Database**
+
   ```bash
   pg_dump $DATABASE_URL > backup-$(date +%Y%m%d).sql
   ```
@@ -22,13 +23,16 @@
 ## Phase 1: Cloud Functions (Week 1)
 
 ### Day 1-2: Setup
+
 - [ ] **Install function dependencies**
+
   ```bash
   cd functions
   npm install
   ```
 
 - [ ] **Generate Prisma client**
+
   ```bash
   npm run prisma:generate
   ```
@@ -39,13 +43,16 @@
   ```
 
 ### Day 2-3: Environment Variables
+
 - [ ] **Migrate secrets to Secret Manager**
+
   ```bash
   cd ..
   ./scripts/migrate-env-to-firebase.sh
   ```
 
 - [ ] **Verify secrets created**
+
   ```bash
   gcloud secrets list --project=axovia-flipper
   ```
@@ -58,18 +65,22 @@
   ```
 
 ### Day 3-4: Deploy Functions
+
 - [ ] **Deploy standard functions first (eBay)**
+
   ```bash
   cd functions
   firebase deploy --only functions:scrapeEbay,functions:health
   ```
 
 - [ ] **Test eBay function**
+
   ```bash
   curl https://us-east1-axovia-flipper.cloudfunctions.net/health
   ```
 
 - [ ] **Deploy Docker functions (Craigslist)**
+
   ```bash
   gcloud functions deploy scrapeCraigslist \
     --gen2 --runtime=nodejs20 --region=us-east1 \
@@ -79,6 +90,7 @@
   ```
 
 - [ ] **Test Craigslist function**
+
   ```bash
   curl -X POST https://us-east1-axovia-flipper.cloudfunctions.net/scrapeCraigslist \
     -H "Content-Type: application/json" \
@@ -91,13 +103,16 @@
   ```
 
 ### Day 4-5: Integration
+
 - [ ] **Update Next.js environment**
+
   ```bash
   # Add to .env.production
   NEXT_PUBLIC_FUNCTIONS_URL=https://us-east1-axovia-flipper.cloudfunctions.net
   ```
 
 - [ ] **Test locally with Cloud Functions**
+
   ```bash
   npm run dev
   # Test scraper from UI
@@ -111,7 +126,9 @@
 ## Phase 2: Database Migration (Week 1-2)
 
 ### Option A: Cloud SQL (Recommended)
+
 - [ ] **Create Cloud SQL instance**
+
   ```bash
   gcloud sql instances create flipper-db \
     --database-version=POSTGRES_15 \
@@ -120,11 +137,13 @@
   ```
 
 - [ ] **Create database**
+
   ```bash
   gcloud sql databases create flipper --instance=flipper-db
   ```
 
 - [ ] **Set password**
+
   ```bash
   gcloud sql users set-password postgres \
     --instance=flipper-db \
@@ -132,6 +151,7 @@
   ```
 
 - [ ] **Update DATABASE_URL**
+
   ```bash
   # Update in Secret Manager
   echo -n "postgresql://user:pass@/flipper?host=/cloudsql/axovia-flipper:us-east1:flipper-db" | \
@@ -139,6 +159,7 @@
   ```
 
 - [ ] **Run migrations**
+
   ```bash
   npx prisma migrate deploy
   ```
@@ -153,12 +174,15 @@
 ## Phase 3: Next.js Deployment (Week 2)
 
 ### Option A: Cloud Run (Recommended)
+
 - [ ] **Build Docker image**
+
   ```bash
   docker build -t gcr.io/axovia-flipper/flipper-web .
   ```
 
 - [ ] **Test locally**
+
   ```bash
   docker run -p 3000:3000 \
     --env-file .env.production \
@@ -166,11 +190,13 @@
   ```
 
 - [ ] **Push to Container Registry**
+
   ```bash
   docker push gcr.io/axovia-flipper/flipper-web
   ```
 
 - [ ] **Deploy to Cloud Run**
+
   ```bash
   gcloud run deploy flipper-web \
     --image gcr.io/axovia-flipper/flipper-web \
@@ -189,7 +215,9 @@
   ```
 
 ### Option B: Firebase Hosting (Alternative)
+
 - [ ] **Build production**
+
   ```bash
   npm run build
   ```
@@ -202,6 +230,7 @@
 ## Phase 4: Testing (Week 2-3)
 
 ### Smoke Tests
+
 - [ ] **User authentication**
   - [ ] Login works
   - [ ] Session persists
@@ -226,7 +255,9 @@
   - [ ] Navigation works
 
 ### Load Tests
+
 - [ ] **Run load tests**
+
   ```bash
   npm run test:load
   ```
@@ -237,7 +268,9 @@
   - [ ] Verify latency acceptable
 
 ### E2E Tests
+
 - [ ] **Run Playwright tests**
+
   ```bash
   npm run test:e2e
   ```
@@ -247,6 +280,7 @@
 ## Phase 5: DNS & Domain (Week 3)
 
 - [ ] **Point domain to Cloud Run**
+
   ```bash
   gcloud run domain-mappings create \
     --service flipper-web \
@@ -271,6 +305,7 @@
   - [ ] Cloud Run crashes
 
 - [ ] **Set up logging**
+
   ```bash
   gcloud logging sinks create flipper-errors \
     bigquery.googleapis.com/projects/axovia-flipper/datasets/logs \

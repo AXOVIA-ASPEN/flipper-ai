@@ -99,9 +99,7 @@ function StatusIcon({ status }: { status: ServiceStatus }) {
 
 function StatusBadge({ status }: { status: ServiceStatus }) {
   return (
-    <span className={statusBadgeClass(status)}>
-      {status === 'loading' ? 'checking…' : status}
-    </span>
+    <span className={statusBadgeClass(status)}>{status === 'loading' ? 'checking…' : status}</span>
   );
 }
 
@@ -119,7 +117,9 @@ function ServiceRow({ service }: { service: ServiceCheck }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <StatusIcon status={service.status} />
         <span style={{ fontSize: 13, fontWeight: 500, color: TEXT_PRIMARY }}>{service.name}</span>
-        {service.message && <span style={{ fontSize: 12, color: TEXT_SECONDARY }}>{service.message}</span>}
+        {service.message && (
+          <span style={{ fontSize: 12, color: TEXT_SECONDARY }}>{service.message}</span>
+        )}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         {service.latency !== undefined && (
@@ -240,9 +240,7 @@ export default function HealthPage() {
     } catch {
       setServices((prev) =>
         prev.map((s) =>
-          s.name === 'Authentication (Firebase)'
-            ? { ...s, status: 'offline', message: 'error' }
-            : s
+          s.name === 'Authentication (Firebase)' ? { ...s, status: 'offline', message: 'error' } : s
         )
       );
     }
@@ -330,9 +328,25 @@ export default function HealthPage() {
 
   return (
     <div style={{ minHeight: '100vh', padding: 24, color: TEXT_PRIMARY }}>
-      <div style={{ maxWidth: 1024, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div
+        style={{
+          maxWidth: 1024,
+          margin: '0 auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 24,
+        }}
+      >
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 16,
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div
               style={{
@@ -347,7 +361,9 @@ export default function HealthPage() {
               <Activity className="h-6 w-6" style={{ color: 'white' }} />
             </div>
             <div>
-              <h1 style={{ fontSize: 20, fontWeight: 700, color: TEXT_PRIMARY }}>Flipper AI System Status</h1>
+              <h1 style={{ fontSize: 20, fontWeight: 700, color: TEXT_PRIMARY }}>
+                Flipper AI System Status
+              </h1>
               <p style={{ fontSize: 13, color: TEXT_SECONDARY }}>
                 Last updated: {lastRefresh.toLocaleTimeString()} · Auto-refreshes every 30s
               </p>
@@ -379,13 +395,21 @@ export default function HealthPage() {
           }}
         >
           <Server className="h-6 w-6" style={{ color: overallBorderColor }} />
-          <span style={{ fontSize: 18, fontWeight: 600, color: TEXT_PRIMARY, flex: 1 }}>{overallText}</span>
+          <span style={{ fontSize: 18, fontWeight: 600, color: TEXT_PRIMARY, flex: 1 }}>
+            {overallText}
+          </span>
           <StatusBadge status={overallStatus} />
         </div>
 
         {/* Metrics Grid */}
         {health && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+              gap: 16,
+            }}
+          >
             <MetricCard
               title="Uptime"
               value={formatUptime(health.uptime)}
@@ -415,7 +439,13 @@ export default function HealthPage() {
 
         {/* Memory metrics panel */}
         {metrics && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+              gap: 16,
+            }}
+          >
             <MetricCard
               title="Heap Used"
               value={`${metrics.memory?.heapUsedMB ?? 0} MB`}
@@ -440,7 +470,16 @@ export default function HealthPage() {
         {/* Recent Errors */}
         {metrics && metrics.recent_errors && metrics.recent_errors.length > 0 && (
           <div className="fp-glass" style={{ padding: 0, borderLeft: `4px solid ${DANGER_RED}` }}>
-            <div className="fp-glass-sm" style={{ padding: 16, borderRadius: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div
+              className="fp-glass-sm"
+              style={{
+                padding: 16,
+                borderRadius: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
               <XCircle className="h-4 w-4" style={{ color: DANGER_RED }} />
               <h2 style={{ fontWeight: 600, color: TEXT_PRIMARY }}>
                 Recent Errors ({metrics.recent_errors.length})
@@ -448,13 +487,41 @@ export default function HealthPage() {
             </div>
             <div style={{ padding: '0 16px' }}>
               {metrics.recent_errors.slice(-5).map((err, i) => (
-                <div key={i} style={{ padding: '8px 0', borderTop: i === 0 ? 'none' : `1px solid ${DIVIDER}` }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                    <span style={{ fontSize: 13, color: DANGER_RED_SOFT, fontFamily: 'ui-monospace, monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 480 }}>
+                <div
+                  key={i}
+                  style={{ padding: '8px 0', borderTop: i === 0 ? 'none' : `1px solid ${DIVIDER}` }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 8,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 13,
+                        color: DANGER_RED_SOFT,
+                        fontFamily: 'ui-monospace, monospace',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        maxWidth: 480,
+                      }}
+                    >
                       {err.message}
                     </span>
                     {err.route && (
-                      <span style={{ fontSize: 12, color: TEXT_SECONDARY, fontFamily: 'ui-monospace, monospace' }}>{err.route}</span>
+                      <span
+                        style={{
+                          fontSize: 12,
+                          color: TEXT_SECONDARY,
+                          fontFamily: 'ui-monospace, monospace',
+                        }}
+                      >
+                        {err.route}
+                      </span>
                     )}
                   </div>
                   <div style={{ fontSize: 12, color: TEXT_SECONDARY, marginTop: 2 }}>
@@ -481,7 +548,13 @@ export default function HealthPage() {
         {/* Quick Links */}
         <div className="fp-glass" style={{ padding: 16 }}>
           <h2 style={{ fontWeight: 600, color: TEXT_PRIMARY, marginBottom: 12 }}>Quick Links</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 8 }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+              gap: 8,
+            }}
+          >
             {[
               { label: '📊 API Docs', href: '/docs' },
               { label: '🔍 OpenAPI Spec', href: '/api/docs' },

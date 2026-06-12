@@ -84,8 +84,16 @@ describe('notification-events', () => {
     it('produces identical keys for two events within the same hour', () => {
       const t1 = new Date('2026-04-08T10:05:00Z');
       const t2 = new Date('2026-04-08T10:59:59Z');
-      const k1 = buildDeduplicationKey('listing-2', NotificationEventType.LISTING_PRICE_CHANGED, t1);
-      const k2 = buildDeduplicationKey('listing-2', NotificationEventType.LISTING_PRICE_CHANGED, t2);
+      const k1 = buildDeduplicationKey(
+        'listing-2',
+        NotificationEventType.LISTING_PRICE_CHANGED,
+        t1
+      );
+      const k2 = buildDeduplicationKey(
+        'listing-2',
+        NotificationEventType.LISTING_PRICE_CHANGED,
+        t2
+      );
       expect(k1).toBe(k2);
     });
 
@@ -141,7 +149,9 @@ describe('notification-events', () => {
       const tx = makeTx({ create: createMock });
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await expect(createNotificationEvent(tx as any, baseInput)).rejects.toThrow('Connection lost');
+      await expect(createNotificationEvent(tx as any, baseInput)).rejects.toThrow(
+        'Connection lost'
+      );
     });
 
     it('includes price change values in payload for LISTING_PRICE_CHANGED events', async () => {
@@ -430,8 +440,9 @@ describe('notification-events', () => {
         'u1'
       );
 
-      const payload = (create.mock.calls[0][0] as { data: { payload: { flippabilityLabel: string } } })
-        .data.payload;
+      const payload = (
+        create.mock.calls[0][0] as { data: { payload: { flippabilityLabel: string } } }
+      ).data.payload;
       expect(payload.flippabilityLabel).toBe('Excellent');
     });
 
@@ -452,8 +463,9 @@ describe('notification-events', () => {
         'u1'
       );
 
-      const payload = (create.mock.calls[0][0] as { data: { payload: { flippabilityLabel: string } } })
-        .data.payload;
+      const payload = (
+        create.mock.calls[0][0] as { data: { payload: { flippabilityLabel: string } } }
+      ).data.payload;
       expect(payload.flippabilityLabel).toBe('Great');
     });
 
@@ -474,8 +486,9 @@ describe('notification-events', () => {
         'u1'
       );
 
-      const payload = (create.mock.calls[0][0] as { data: { payload: { flippabilityLabel: string } } })
-        .data.payload;
+      const payload = (
+        create.mock.calls[0][0] as { data: { payload: { flippabilityLabel: string } } }
+      ).data.payload;
       expect(payload.flippabilityLabel).toBe('Good');
     });
 
@@ -496,8 +509,9 @@ describe('notification-events', () => {
         'u1'
       );
 
-      const payload = (create.mock.calls[0][0] as { data: { payload: { flippabilityLabel: string } } })
-        .data.payload;
+      const payload = (
+        create.mock.calls[0][0] as { data: { payload: { flippabilityLabel: string } } }
+      ).data.payload;
       expect(payload.flippabilityLabel).toBe('Fair');
     });
 
@@ -518,8 +532,9 @@ describe('notification-events', () => {
         'u1'
       );
 
-      const payload = (create.mock.calls[0][0] as { data: { payload: { imageUrl: string | null } } })
-        .data.payload;
+      const payload = (
+        create.mock.calls[0][0] as { data: { payload: { imageUrl: string | null } } }
+      ).data.payload;
       expect(payload.imageUrl).toBe('https://img.example.com/first.jpg');
     });
 
@@ -540,8 +555,9 @@ describe('notification-events', () => {
         'u1'
       );
 
-      const payload = (create.mock.calls[0][0] as { data: { payload: { imageUrl: string | null } } })
-        .data.payload;
+      const payload = (
+        create.mock.calls[0][0] as { data: { payload: { imageUrl: string | null } } }
+      ).data.payload;
       expect(payload.imageUrl).toBeNull();
     });
 
@@ -556,20 +572,22 @@ describe('notification-events', () => {
         'u1'
       );
 
-      const payload = (create.mock.calls[0][0] as {
-        data: {
-          payload: {
-            platform: string;
-            askingPrice: number;
-            estimatedValue: number;
-            profitPotential: number;
-            valueScore: number;
-            flippabilityLabel: string;
-            listingTitle: string;
-            imageUrl: string | null;
+      const payload = (
+        create.mock.calls[0][0] as {
+          data: {
+            payload: {
+              platform: string;
+              askingPrice: number;
+              estimatedValue: number;
+              profitPotential: number;
+              valueScore: number;
+              flippabilityLabel: string;
+              listingTitle: string;
+              imageUrl: string | null;
+            };
           };
-        };
-      }).data.payload;
+        }
+      ).data.payload;
 
       expect(payload.platform).toBe('Unknown');
       expect(payload.askingPrice).toBe(0);
@@ -648,7 +666,13 @@ describe('notification-events', () => {
 
       await expect(
         emitOpportunityFoundEvent(
-          { id: 'l-str-err', title: 'String Error', price: 10, platform: 'CRAIGSLIST', imageUrls: null },
+          {
+            id: 'l-str-err',
+            title: 'String Error',
+            price: 10,
+            platform: 'CRAIGSLIST',
+            imageUrls: null,
+          },
           'user-str-err'
         )
       ).resolves.toBeUndefined();
@@ -757,24 +781,28 @@ describe('notification-events', () => {
       const create = getMockedCreate();
       create.mockRejectedValueOnce({ code: 'P2002' });
 
-      await expect(createMessageNotificationEvent({
-        userId: 'user-m6',
-        listingId: 'listing-m6',
-        eventType: NotificationEventType.MESSAGE_SENT,
-        payload: {},
-      })).resolves.toBeUndefined();
+      await expect(
+        createMessageNotificationEvent({
+          userId: 'user-m6',
+          listingId: 'listing-m6',
+          eventType: NotificationEventType.MESSAGE_SENT,
+          payload: {},
+        })
+      ).resolves.toBeUndefined();
     });
 
     it('rethrows non-P2002 errors', async () => {
       const create = getMockedCreate();
       create.mockRejectedValueOnce(new Error('DB connection lost'));
 
-      await expect(createMessageNotificationEvent({
-        userId: 'user-m7',
-        listingId: 'listing-m7',
-        eventType: NotificationEventType.MESSAGE_RECEIVED,
-        payload: {},
-      })).rejects.toThrow('DB connection lost');
+      await expect(
+        createMessageNotificationEvent({
+          userId: 'user-m7',
+          listingId: 'listing-m7',
+          eventType: NotificationEventType.MESSAGE_RECEIVED,
+          payload: {},
+        })
+      ).rejects.toThrow('DB connection lost');
     });
   });
 });

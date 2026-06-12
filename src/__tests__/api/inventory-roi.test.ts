@@ -232,8 +232,18 @@ describe('GET /api/inventory/roi', () => {
         listing: { title: 'Check Input', platform: 'CRAIGSLIST' },
       },
     ]);
-    mockCalculateROI.mockReturnValue({ profit: 135, roiPercent: 135, annualizedROI: 3285, daysHeld: 15 });
-    mockCalculatePortfolioROI.mockReturnValue({ totalInvested: 100, totalRevenue: 250, totalProfit: 135, avgROI: 135 });
+    mockCalculateROI.mockReturnValue({
+      profit: 135,
+      roiPercent: 135,
+      annualizedROI: 3285,
+      daysHeld: 15,
+    });
+    mockCalculatePortfolioROI.mockReturnValue({
+      totalInvested: 100,
+      totalRevenue: 250,
+      totalProfit: 135,
+      avgROI: 135,
+    });
 
     await GET(makeReq());
 

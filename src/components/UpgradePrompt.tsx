@@ -70,8 +70,19 @@ export default function UpgradePrompt({
     <div className="fp-glass p-4" data-testid="upgrade-prompt">
       <div className="flex items-start gap-3">
         <div className="mt-0.5 shrink-0" style={{ color: '#8b5cf6' }}>
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
+            />
           </svg>
         </div>
         <div className="flex-1">
@@ -82,12 +93,10 @@ export default function UpgradePrompt({
             {message}
           </p>
           <div className="mt-3">
-            <button
-              onClick={handleUpgrade}
-              disabled={loading}
-              className="fp-btn-primary"
-            >
-              {loading ? 'Redirecting...' : `Upgrade to ${TIER_PRICING[targetTier].label !== 'Free' ? `${targetTier.charAt(0) + targetTier.slice(1).toLowerCase()} (${pricing.label})` : targetTier}`}
+            <button onClick={handleUpgrade} disabled={loading} className="fp-btn-primary">
+              {loading
+                ? 'Redirecting...'
+                : `Upgrade to ${TIER_PRICING[targetTier].label !== 'Free' ? `${targetTier.charAt(0) + targetTier.slice(1).toLowerCase()} (${pricing.label})` : targetTier}`}
             </button>
           </div>
         </div>

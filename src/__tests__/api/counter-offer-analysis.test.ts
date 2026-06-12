@@ -145,10 +145,7 @@ describe('POST /api/listings/[id]/counter-offer-analysis', () => {
   });
 
   it('returns 422 when counterOfferPrice is missing', async () => {
-    const res = await POST(
-      createRequest({ ourPreviousOffer: 80 }),
-      makeParams('listing-1')
-    );
+    const res = await POST(createRequest({ ourPreviousOffer: 80 }), makeParams('listing-1'));
     expect(res.status).toBe(422);
   });
 
@@ -177,10 +174,7 @@ describe('POST /api/listings/[id]/counter-offer-analysis', () => {
   });
 
   it('returns 422 when ourPreviousOffer is missing', async () => {
-    const res = await POST(
-      createRequest({ counterOfferPrice: 95 }),
-      makeParams('listing-1')
-    );
+    const res = await POST(createRequest({ counterOfferPrice: 95 }), makeParams('listing-1'));
     expect(res.status).toBe(422);
   });
 

@@ -9,7 +9,15 @@ jest.mock('@/lib/auth-middleware', () => ({
 }));
 
 jest.mock('@/lib/auth', () => ({
-  getCurrentUser: jest.fn(() => Promise.resolve({ id: 'test-user-id', email: 'test@test.com', name: 'Test User', firebaseUid: 'fb-uid', image: null })),
+  getCurrentUser: jest.fn(() =>
+    Promise.resolve({
+      id: 'test-user-id',
+      email: 'test@test.com',
+      name: 'Test User',
+      firebaseUid: 'fb-uid',
+      image: null,
+    })
+  ),
   getCurrentUserId: jest.fn(() => Promise.resolve('test-user-id')),
 }));
 
@@ -76,8 +84,9 @@ describe('POST /api/posting-queue', () => {
   it('creates batch queue items for multiple platforms', async () => {
     const listing = { id: 'lst-1', platform: 'CRAIGSLIST', userId: 'test-user-id' };
     mockPrisma.listing.findFirst.mockResolvedValue(listing);
-    mockPrisma.postingQueueItem.upsert.mockImplementation(({ create }: { create: Record<string, unknown> }) =>
-      Promise.resolve({ id: `pq-${create.targetPlatform}`, ...create })
+    mockPrisma.postingQueueItem.upsert.mockImplementation(
+      ({ create }: { create: Record<string, unknown> }) =>
+        Promise.resolve({ id: `pq-${create.targetPlatform}`, ...create })
     );
 
     const res = await POST(
@@ -242,7 +251,9 @@ describe('GET /api/posting-queue', () => {
         id: 'pq-1',
         listing: {
           id: 'lst-1',
-          images: [{ id: 'img-1', imageIndex: 0, storageUrl: 'https://x', contentType: 'image/jpeg' }],
+          images: [
+            { id: 'img-1', imageIndex: 0, storageUrl: 'https://x', contentType: 'image/jpeg' },
+          ],
           imageUrls: null,
         },
       },
@@ -304,7 +315,9 @@ describe('GET /api/posting-queue', () => {
     mockPrisma.postingQueueItem.count.mockResolvedValue(0);
 
     const res = await GET(
-      makeRequest('http://localhost:3000/api/posting-queue?status=PENDING&targetPlatform=EBAY&listingId=lst-1')
+      makeRequest(
+        'http://localhost:3000/api/posting-queue?status=PENDING&targetPlatform=EBAY&listingId=lst-1'
+      )
     );
     expect(res.status).toBe(200);
     expect(mockPrisma.postingQueueItem.findMany).toHaveBeenCalledWith(

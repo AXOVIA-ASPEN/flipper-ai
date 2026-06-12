@@ -195,17 +195,35 @@ describe('Value Estimator', () => {
       // --- Negative pattern tests (Story 13.5) ---
 
       it('should NOT boost for "compatible with Nintendo Switch"', () => {
-        const result = estimateValue('Phone case compatible with Nintendo Switch', null, 10, 'new', 'electronics');
+        const result = estimateValue(
+          'Phone case compatible with Nintendo Switch',
+          null,
+          10,
+          'new',
+          'electronics'
+        );
         expect(result.tags).not.toContain('nintendo');
       });
 
       it('should boost for genuine "Nintendo Switch OLED"', () => {
-        const result = estimateValue('Nintendo Switch OLED 64GB', null, 300, 'excellent', 'video games');
+        const result = estimateValue(
+          'Nintendo Switch OLED 64GB',
+          null,
+          300,
+          'excellent',
+          'video games'
+        );
         expect(result.tags).toContain('nintendo');
       });
 
       it('should NOT boost for "vintage-style" design items', () => {
-        const result = estimateValue('Modern lamp, vintage-style design', null, 50, 'new', 'furniture');
+        const result = estimateValue(
+          'Modern lamp, vintage-style design',
+          null,
+          50,
+          'new',
+          'furniture'
+        );
         expect(result.tags).not.toContain('vintage');
       });
 
@@ -238,13 +256,25 @@ describe('Value Estimator', () => {
       });
 
       it('should still apply risk keywords from description', () => {
-        const result = estimateValue('PS5 Console', 'slightly scratched on top, works great', 400, 'good', 'video games');
+        const result = estimateValue(
+          'PS5 Console',
+          'slightly scratched on top, works great',
+          400,
+          'good',
+          'video games'
+        );
         expect(result.tags).toContain('cosmetic-wear');
         expect(result.tags).toContain('sony');
       });
 
       it('should apply risk from description even when title is clean', () => {
-        const result = estimateValue('Gaming Console', 'Broken, for parts only', 200, 'poor', 'video games');
+        const result = estimateValue(
+          'Gaming Console',
+          'Broken, for parts only',
+          200,
+          'poor',
+          'video games'
+        );
         expect(result.tags).toContain('for-parts');
       });
 
@@ -258,50 +288,98 @@ describe('Value Estimator', () => {
       // --- Session 2 brand boost tests (Story 13.7, 2026-04-17) ---
 
       it('should boost for Taylor guitar (not Taylor Swift)', () => {
-        const guitarResult = estimateValue('Taylor 214ce Acoustic Guitar', null, 500, 'good', 'musical');
+        const guitarResult = estimateValue(
+          'Taylor 214ce Acoustic Guitar',
+          null,
+          500,
+          'good',
+          'musical'
+        );
         expect(guitarResult.tags).toContain('guitar-brand');
 
-        const swiftResult = estimateValue('Taylor Swift concert tickets', null, 200, 'new', 'default');
+        const swiftResult = estimateValue(
+          'Taylor Swift concert tickets',
+          null,
+          200,
+          'new',
+          'default'
+        );
         expect(swiftResult.tags).not.toContain('guitar-brand');
       });
 
       it('should boost for Ibanez/Squier/Epiphone/PRS guitars', () => {
-        expect(estimateValue('Ibanez RG550', null, 400, 'good', 'musical').tags).toContain('guitar-brand');
-        expect(estimateValue('Squier Stratocaster', null, 200, 'good', 'musical').tags).toContain('guitar-brand');
-        expect(estimateValue('Epiphone Les Paul', null, 300, 'good', 'musical').tags).toContain('guitar-brand');
-        expect(estimateValue('PRS Custom 24', null, 1000, 'excellent', 'musical').tags).toContain('guitar-brand');
+        expect(estimateValue('Ibanez RG550', null, 400, 'good', 'musical').tags).toContain(
+          'guitar-brand'
+        );
+        expect(estimateValue('Squier Stratocaster', null, 200, 'good', 'musical').tags).toContain(
+          'guitar-brand'
+        );
+        expect(estimateValue('Epiphone Les Paul', null, 300, 'good', 'musical').tags).toContain(
+          'guitar-brand'
+        );
+        expect(estimateValue('PRS Custom 24', null, 1000, 'excellent', 'musical').tags).toContain(
+          'guitar-brand'
+        );
       });
 
       it('should boost for pro audio gear (DBX, Drawmer, Panamax, Furman)', () => {
-        expect(estimateValue('DBX 166XL Compressor', null, 200, 'good', 'musical').tags).toContain('pro-audio');
-        expect(estimateValue('Furman power conditioner', null, 100, 'good', 'musical').tags).toContain('pro-audio');
+        expect(estimateValue('DBX 166XL Compressor', null, 200, 'good', 'musical').tags).toContain(
+          'pro-audio'
+        );
+        expect(
+          estimateValue('Furman power conditioner', null, 100, 'good', 'musical').tags
+        ).toContain('pro-audio');
       });
 
       it('should boost for gaming PC components (RTX, Radeon, Ryzen)', () => {
-        expect(estimateValue('RTX 4070 graphics card', null, 400, 'good', 'electronics').tags).toContain('gaming-pc');
-        expect(estimateValue('Ryzen 7 7800X3D processor', null, 300, 'new', 'electronics').tags).toContain('gaming-pc');
-        expect(estimateValue('Radeon RX 7900 XTX', null, 600, 'good', 'electronics').tags).toContain('gaming-pc');
+        expect(
+          estimateValue('RTX 4070 graphics card', null, 400, 'good', 'electronics').tags
+        ).toContain('gaming-pc');
+        expect(
+          estimateValue('Ryzen 7 7800X3D processor', null, 300, 'new', 'electronics').tags
+        ).toContain('gaming-pc');
+        expect(
+          estimateValue('Radeon RX 7900 XTX', null, 600, 'good', 'electronics').tags
+        ).toContain('gaming-pc');
       });
 
       it('should boost for premium golf brands (PING, Cobra, TaylorMade, Callaway, Titleist)', () => {
-        expect(estimateValue('PING G430 driver', null, 300, 'good', 'sports').tags).toContain('premium-golf');
-        expect(estimateValue('Callaway Paradym irons', null, 500, 'good', 'sports').tags).toContain('premium-golf');
-        expect(estimateValue('Titleist Pro V1 golf balls', null, 40, 'new', 'sports').tags).toContain('premium-golf');
+        expect(estimateValue('PING G430 driver', null, 300, 'good', 'sports').tags).toContain(
+          'premium-golf'
+        );
+        expect(estimateValue('Callaway Paradym irons', null, 500, 'good', 'sports').tags).toContain(
+          'premium-golf'
+        );
+        expect(
+          estimateValue('Titleist Pro V1 golf balls', null, 40, 'new', 'sports').tags
+        ).toContain('premium-golf');
       });
 
       it('should boost for premium network gear (Ubiquiti, UniFi, Nighthawk)', () => {
-        expect(estimateValue('Ubiquiti UniFi AP', null, 150, 'good', 'electronics').tags).toContain('premium-network');
-        expect(estimateValue('Netgear Nighthawk router', null, 200, 'good', 'electronics').tags).toContain('premium-network');
+        expect(estimateValue('Ubiquiti UniFi AP', null, 150, 'good', 'electronics').tags).toContain(
+          'premium-network'
+        );
+        expect(
+          estimateValue('Netgear Nighthawk router', null, 200, 'good', 'electronics').tags
+        ).toContain('premium-network');
       });
 
       it('should boost for designer furniture (mid-century, Eames, Kartell)', () => {
-        expect(estimateValue('Mid-century modern credenza', null, 400, 'good', 'furniture').tags).toContain('designer-furniture');
-        expect(estimateValue('Eames lounge chair replica', null, 800, 'good', 'furniture').tags).toContain('designer-furniture');
+        expect(
+          estimateValue('Mid-century modern credenza', null, 400, 'good', 'furniture').tags
+        ).toContain('designer-furniture');
+        expect(
+          estimateValue('Eames lounge chair replica', null, 800, 'good', 'furniture').tags
+        ).toContain('designer-furniture');
       });
 
       it('should boost for professional trade tools (Greenlee, Klein)', () => {
-        expect(estimateValue('Greenlee wire puller', null, 150, 'good', 'tools').tags).toContain('trade-tools');
-        expect(estimateValue('Klein pliers set', null, 80, 'good', 'tools').tags).toContain('trade-tools');
+        expect(estimateValue('Greenlee wire puller', null, 150, 'good', 'tools').tags).toContain(
+          'trade-tools'
+        );
+        expect(estimateValue('Klein pliers set', null, 80, 'good', 'tools').tags).toContain(
+          'trade-tools'
+        );
       });
 
       // --- End Session 2 brand boost tests ---
@@ -540,7 +618,13 @@ describe('Value Estimator', () => {
 
       it('should cap score at 10 for items with negative profit', () => {
         // $1000 broken item with risk penalties → deeply negative profit
-        const result = estimateValue('Broken item', 'For parts only, not working', 1000, 'poor', 'electronics');
+        const result = estimateValue(
+          'Broken item',
+          'For parts only, not working',
+          1000,
+          'poor',
+          'electronics'
+        );
         expect(result.profitPotential).toBeLessThan(0);
         expect(result.valueScore).toBeLessThanOrEqual(10);
       });
@@ -581,7 +665,13 @@ describe('Value Estimator', () => {
         // For asking=200, new condition (1.0):
         // estLow=200*1.4*1.0*2.197=615, estHigh=200*2.2*1.0*2.197=967
         // profitLow=615*0.87-200=335, profitHigh=967*0.87-200=641, avg=488 → >$300
-        const bigWin = estimateValue('Vintage Rare Limited Edition sealed', null, 200, 'new', 'collectibles');
+        const bigWin = estimateValue(
+          'Vintage Rare Limited Edition sealed',
+          null,
+          200,
+          'new',
+          'collectibles'
+        );
         expect(bigWin.profitPotential).toBeGreaterThan(300);
         expect(bigWin.valueScore).toBeGreaterThanOrEqual(0);
         expect(bigWin.valueScore).toBeLessThanOrEqual(100);
@@ -617,7 +707,14 @@ describe('Value Estimator', () => {
       it('should score $100-profit items higher than $10-profit items (Task 3.4)', () => {
         // Compare two items with different absolute profits
         const lowProfit = estimateValue('Generic item', null, 30, 'new', 'default', 0);
-        const highProfit = estimateValue('Collectible treasure', null, 50, 'new', 'collectibles', 0);
+        const highProfit = estimateValue(
+          'Collectible treasure',
+          null,
+          50,
+          'new',
+          'collectibles',
+          0
+        );
         expect(highProfit.profitPotential).toBeGreaterThan(lowProfit.profitPotential);
         expect(highProfit.valueScore).toBeGreaterThan(lowProfit.valueScore);
       });
@@ -649,8 +746,8 @@ describe('Value Estimator', () => {
           { title: 'Yamaha keyboard', price: 120, cond: 'good', cat: 'musical' },
         ];
 
-        const scores = items.map((item) =>
-          estimateValue(item.title, null, item.price, item.cond, item.cat).valueScore
+        const scores = items.map(
+          (item) => estimateValue(item.title, null, item.price, item.cond, item.cat).valueScore
         );
 
         // All scores within valid range
@@ -1252,7 +1349,7 @@ describe('Value Estimator', () => {
 
     it('should heavily penalize low_liquidity (zero sales)', () => {
       const adjusted = applyDemandAdjustment(70, 'low_liquidity', null, 30);
-      expect(adjusted).toBe(Math.round(70 * 0.70)); // 49
+      expect(adjusted).toBe(Math.round(70 * 0.7)); // 49
       expect(adjusted).toBeLessThan(60);
     });
 

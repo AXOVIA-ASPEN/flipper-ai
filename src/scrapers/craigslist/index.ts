@@ -10,15 +10,6 @@ export {
   toRawListing,
 } from './scraper';
 
-export type {
-  CraigslistItem,
-  CraigslistSearchParams,
-  CraigslistScrapeResult,
-} from './types';
+export type { CraigslistItem, CraigslistSearchParams, CraigslistScrapeResult } from './types';
 
-export {
-  CATEGORY_PATHS,
-  SUPPORTED_LOCATIONS,
-  USER_AGENTS,
-  SCRAPER_CONFIG,
-} from './types';
+export { CATEGORY_PATHS, SUPPORTED_LOCATIONS, USER_AGENTS, SCRAPER_CONFIG } from './types';

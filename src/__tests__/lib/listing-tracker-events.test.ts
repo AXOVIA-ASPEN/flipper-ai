@@ -61,7 +61,9 @@ describe('listing-tracker — event payload enrichment (Story 10.2)', () => {
     });
 
     it('classifies "flagged for removal" body text as removed', () => {
-      expect(classifyHttpResponse(200, 'This listing has been flagged for removal')).toBe('removed');
+      expect(classifyHttpResponse(200, 'This listing has been flagged for removal')).toBe(
+        'removed'
+      );
     });
 
     it('classifies "listing has been removed" body text as removed', () => {
@@ -77,7 +79,9 @@ describe('listing-tracker — event payload enrichment (Story 10.2)', () => {
     });
 
     it('classifies CAPTCHA body text as rate_limited', () => {
-      expect(classifyHttpResponse(200, 'Please verify you are human with a CAPTCHA')).toBe('rate_limited');
+      expect(classifyHttpResponse(200, 'Please verify you are human with a CAPTCHA')).toBe(
+        'rate_limited'
+      );
     });
 
     it('classifies normal page as ok', () => {

@@ -124,7 +124,7 @@ test.describe('Feature: Tooltip Interactions & User Guidance', () => {
 
       // When I hover over a "Mark as opportunity" button
       const opportunityButton = page.locator('button[title="Mark as opportunity"]').first();
-      
+
       // Only test if the button exists (may not show if already marked)
       const buttonCount = await opportunityButton.count();
       if (buttonCount > 0) {
@@ -146,7 +146,7 @@ test.describe('Feature: Tooltip Interactions & User Guidance', () => {
 
       // When I locate the "Select all" checkbox
       const selectAllCheckbox = page.locator('input[aria-label="Select all listings"]');
-      
+
       const checkboxCount = await selectAllCheckbox.count();
       if (checkboxCount > 0) {
         await expect(selectAllCheckbox).toBeVisible();
@@ -211,7 +211,7 @@ test.describe('Feature: Tooltip Interactions & User Guidance', () => {
 
       // When I hover over the save search button
       const saveButton = page.locator('button[title="Save this search"]');
-      
+
       const buttonCount = await saveButton.count();
       if (buttonCount > 0) {
         await expect(saveButton).toBeVisible();
@@ -232,7 +232,7 @@ test.describe('Feature: Tooltip Interactions & User Guidance', () => {
 
       // When I hover over a delete button for saved searches
       const deleteButton = page.locator('button[title="Delete"]').first();
-      
+
       const buttonCount = await deleteButton.count();
       if (buttonCount > 0) {
         await expect(deleteButton).toBeVisible();
@@ -253,7 +253,7 @@ test.describe('Feature: Tooltip Interactions & User Guidance', () => {
 
       // When I hover over the refresh button
       const refreshButton = page.locator('button[title="Refresh"]');
-      
+
       const buttonCount = await refreshButton.count();
       if (buttonCount > 0) {
         await expect(refreshButton).toBeVisible();
@@ -276,7 +276,7 @@ test.describe('Feature: Tooltip Interactions & User Guidance', () => {
 
       // When I hover over an enable/disable toggle
       const toggleButton = page.locator('button[title="Enable"], button[title="Disable"]').first();
-      
+
       const buttonCount = await toggleButton.count();
       if (buttonCount > 0) {
         await expect(toggleButton).toBeVisible();
@@ -333,7 +333,7 @@ test.describe('Feature: Tooltip Interactions & User Guidance', () => {
       // Then checkboxes should have aria-label for accessibility
       const selectCheckboxes = page.locator('input[aria-label*="Select"]');
       const count = await selectCheckboxes.count();
-      
+
       // At least one checkbox should exist (select all or individual)
       expect(count).toBeGreaterThan(0);
 

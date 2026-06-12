@@ -324,10 +324,7 @@ export async function updateCalendarEvent(
  * Delete a calendar event.
  * Treats 404 as success (idempotent).
  */
-export async function deleteCalendarEvent(
-  accessToken: string,
-  eventId: string
-): Promise<void> {
+export async function deleteCalendarEvent(accessToken: string, eventId: string): Promise<void> {
   const calendar = buildCalendarClient(accessToken);
 
   try {

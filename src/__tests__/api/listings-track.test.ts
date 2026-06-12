@@ -61,8 +61,22 @@ describe('GET /api/listings/track', () => {
 
   it('returns trackable listings with count', async () => {
     mockGetTrackable.mockResolvedValue([
-      { id: '1', title: 'iPhone 14', platform: 'ebay', status: 'ACTIVE', askingPrice: 500, url: 'https://ebay.com/1' },
-      { id: '2', title: 'PS5', platform: 'craigslist', status: 'ACTIVE', askingPrice: 300, url: 'https://cl.com/2' },
+      {
+        id: '1',
+        title: 'iPhone 14',
+        platform: 'ebay',
+        status: 'ACTIVE',
+        askingPrice: 500,
+        url: 'https://ebay.com/1',
+      },
+      {
+        id: '2',
+        title: 'PS5',
+        platform: 'craigslist',
+        status: 'ACTIVE',
+        askingPrice: 300,
+        url: 'https://cl.com/2',
+      },
     ] as any);
 
     const res = await GET();
@@ -157,7 +171,14 @@ describe('POST /api/listings/track', () => {
 
   it('handles dryRun mode', async () => {
     mockGetTrackable.mockResolvedValue([
-      { id: '1', title: 'iPhone 14', url: 'https://ebay.com/1', platform: 'ebay', status: 'ACTIVE', askingPrice: 500 },
+      {
+        id: '1',
+        title: 'iPhone 14',
+        url: 'https://ebay.com/1',
+        platform: 'ebay',
+        status: 'ACTIVE',
+        askingPrice: 500,
+      },
     ] as any);
 
     const req = makeRequest({ dryRun: true });

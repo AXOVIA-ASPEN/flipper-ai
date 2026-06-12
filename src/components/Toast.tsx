@@ -58,8 +58,13 @@ export default function Toast({ id, type, title, message, duration = 5000, onClo
       aria-live="assertive"
       className="animate-slide-in-right"
       style={{
-        display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 16px',
-        borderRadius: 12, minWidth: 320, maxWidth: 420,
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 12,
+        padding: '12px 16px',
+        borderRadius: 12,
+        minWidth: 320,
+        maxWidth: 420,
         background: 'rgba(12,16,28,0.95)',
         border: '1px solid rgba(255,255,255,0.08)',
         borderLeft: `3px solid ${accent.border}`,
@@ -78,8 +83,12 @@ export default function Toast({ id, type, title, message, duration = 5000, onClo
         className="fp-icon-btn"
         style={{ flexShrink: 0, color: '#475569' }}
         aria-label="Close notification"
-        onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#94a3b8'; }}
-        onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#475569'; }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLButtonElement).style.color = '#94a3b8';
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLButtonElement).style.color = '#475569';
+        }}
       >
         <X size={14} />
       </button>

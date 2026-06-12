@@ -76,9 +76,7 @@ export async function findComparableSales(
       soldListings = marketData.soldListings;
     }
 
-    const filtered = soldListings.filter((s) =>
-      filterByBrandModel(s.title, brand, model)
-    );
+    const filtered = soldListings.filter((s) => filterByBrandModel(s.title, brand, model));
 
     const comps: ComparableSale[] = filtered.map((s) => ({
       title: s.title,

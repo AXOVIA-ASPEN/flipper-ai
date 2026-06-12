@@ -64,8 +64,7 @@ export async function GET(
       : null;
 
     // Get seller name from the most recent message that has one
-    const sellerName =
-      [...messages].reverse().find((m) => m.sellerName)?.sellerName || null;
+    const sellerName = [...messages].reverse().find((m) => m.sellerName)?.sellerName || null;
 
     // Count unread messages
     const unreadCount = messages.filter(

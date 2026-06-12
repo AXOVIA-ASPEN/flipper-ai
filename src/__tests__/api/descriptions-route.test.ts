@@ -108,7 +108,10 @@ describe('POST /api/descriptions', () => {
   });
 
   it('handles all valid platforms', async () => {
-    mockDescGen.generateAlgorithmicDescription.mockReturnValue({ title: 't', description: 'd' } as any);
+    mockDescGen.generateAlgorithmicDescription.mockReturnValue({
+      title: 't',
+      description: 'd',
+    } as any);
     for (const platform of ['ebay', 'mercari', 'facebook', 'offerup', 'generic']) {
       const res = await POST(makeRequest({ ...validBody, platform }));
       expect(res.status).toBe(200);
@@ -184,7 +187,9 @@ describe('POST /api/descriptions - branch coverage', () => {
       hasConditionDetails: true,
       hasShippingNote: true,
     });
-    const result = await POST(makeRequest({ condition: 'Good', askingPrice: 50, includeSpecs: false }));
+    const result = await POST(
+      makeRequest({ condition: 'Good', askingPrice: 50, includeSpecs: false })
+    );
     expect(result.status).toBe(200);
   });
 });

@@ -59,6 +59,7 @@ curl -X POST https://axovia-flipper.web.app/api/auth/register \
 ### 1. Fixed Test Mocks (`src/__tests__/api/register.test.ts`)
 
 **Before:**
+
 ```typescript
 jest.mock('@/lib/db', () => ({
   user: {
@@ -69,6 +70,7 @@ jest.mock('@/lib/db', () => ({
 ```
 
 **After:**
+
 ```typescript
 jest.mock('@/lib/db', () => ({
   user: {
@@ -76,7 +78,7 @@ jest.mock('@/lib/db', () => ({
     create: mockUserCreate,
   },
   userSettings: {
-    create: mockUserSettingsCreate,  // ✅ Now mocked!
+    create: mockUserSettingsCreate, // ✅ Now mocked!
   },
 }));
 ```
@@ -84,6 +86,7 @@ jest.mock('@/lib/db', () => ({
 ### 2. Added Error Handling (`app/api/auth/register/route.ts`)
 
 **Before:**
+
 ```typescript
 await prisma.userSettings.create({
   data: { userId: user.id, ... },
@@ -91,6 +94,7 @@ await prisma.userSettings.create({
 ```
 
 **After:**
+
 ```typescript
 try {
   await prisma.userSettings.create({
@@ -105,6 +109,7 @@ try {
 ```
 
 **Benefits:**
+
 - Clear error message indicating migration issue
 - Prevents orphaned user records
 - Detailed logging for debugging
@@ -112,13 +117,14 @@ try {
 ### 3. Added Test Coverage
 
 New test case:
+
 ```typescript
 it('returns 500 when UserSettings creation fails', async () => {
   mockUserCreate.mockResolvedValue({ id: 'user-4', ... });
   mockUserSettingsCreate.mockRejectedValue(
     new Error('relation "UserSettings" does not exist')
   );
-  
+
   const res = await POST(createRequest({ ... }));
   expect(res.status).toBe(500);
   expect(data.error).toContain('Failed to create account');
@@ -166,6 +172,7 @@ npx prisma migrate resolve --rolled-back 20260218064426_init
 ## Prevention
 
 **Going Forward:**
+
 1. Always run `npx prisma migrate deploy` in CI/CD pipeline
 2. Add database migration step to deployment scripts
 3. Run integration tests against production-like database

@@ -307,7 +307,7 @@ describe('recordError - timestamp pruning (while loop body)', () => {
     // Record an error at "now"
     const startTime = Date.now();
     jest.setSystemTime(startTime);
-    
+
     const { recordError, configureMonitoring } = require('@/lib/monitoring');
     configureMonitoring({ errorRateThreshold: 9999 }); // Don't trigger alert
 
@@ -319,7 +319,7 @@ describe('recordError - timestamp pruning (while loop body)', () => {
 
     // Record another error - this will prune old entries via the while loop
     recordError('error at t=2min');
-    
+
     jest.useRealTimers();
     // No assertion needed - just verifying no crash and loop body executed
   });

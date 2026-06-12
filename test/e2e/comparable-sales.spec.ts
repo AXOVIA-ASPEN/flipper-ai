@@ -30,14 +30,44 @@ const mockOpportunities = [
       priceReasoning: 'Listed at 57% below market value.',
       notes: null,
       comparableUrls: JSON.stringify([
-        { url: 'https://ebay.com/itm/111', label: 'Sony XM5 - Like New', platform: 'eBay', type: 'active' },
-        { url: 'https://mercari.com/item/222', label: 'Sony WH-1000XM5 Mint', platform: 'Mercari', type: 'active' },
-        { url: 'https://facebook.com/item/333', label: 'XM5 Headphones', platform: 'Facebook', type: 'active' },
+        {
+          url: 'https://ebay.com/itm/111',
+          label: 'Sony XM5 - Like New',
+          platform: 'eBay',
+          type: 'active',
+        },
+        {
+          url: 'https://mercari.com/item/222',
+          label: 'Sony WH-1000XM5 Mint',
+          platform: 'Mercari',
+          type: 'active',
+        },
+        {
+          url: 'https://facebook.com/item/333',
+          label: 'XM5 Headphones',
+          platform: 'Facebook',
+          type: 'active',
+        },
       ]),
       comparableSalesJson: JSON.stringify([
-        { title: 'Sony WH-1000XM5 - Excellent', price: 265, soldAt: '2026-02-10T14:30:00Z', url: 'https://ebay.com/itm/sold/444' },
-        { title: 'Sony XM5 Headphones LNIB', price: 290, soldAt: '2026-02-08T09:15:00Z', url: 'https://ebay.com/itm/sold/555' },
-        { title: 'WH-1000XM5 Like New w/ Case', price: 275, soldAt: '2026-02-05T18:00:00Z', url: null },
+        {
+          title: 'Sony WH-1000XM5 - Excellent',
+          price: 265,
+          soldAt: '2026-02-10T14:30:00Z',
+          url: 'https://ebay.com/itm/sold/444',
+        },
+        {
+          title: 'Sony XM5 Headphones LNIB',
+          price: 290,
+          soldAt: '2026-02-08T09:15:00Z',
+          url: 'https://ebay.com/itm/sold/555',
+        },
+        {
+          title: 'WH-1000XM5 Like New w/ Case',
+          price: 275,
+          soldAt: '2026-02-05T18:00:00Z',
+          url: null,
+        },
       ]),
     },
   },
@@ -91,7 +121,9 @@ test.describe('Comparable Sales Analysis', () => {
   });
 
   test.describe('Feature: View Comparable Active Listings', () => {
-    test('Scenario: Given an opportunity with comparable URLs, When I view its details, Then I see comparable listings with platform info', async ({ page }) => {
+    test('Scenario: Given an opportunity with comparable URLs, When I view its details, Then I see comparable listings with platform info', async ({
+      page,
+    }) => {
       // When I click on the opportunity with comparables
       const card = page.getByText('Sony WH-1000XM5 Headphones');
       await card.click();
@@ -110,7 +142,9 @@ test.describe('Comparable Sales Analysis', () => {
       await expect(page.getByText('Facebook', { exact: false }).first()).toBeVisible();
     });
 
-    test('Scenario: Given comparable listings, When I click one, Then it opens in a new tab', async ({ page }) => {
+    test('Scenario: Given comparable listings, When I click one, Then it opens in a new tab', async ({
+      page,
+    }) => {
       // When I view the opportunity detail
       await page.getByText('Sony WH-1000XM5 Headphones').click();
       await expect(page.getByText('Comparable Listings')).toBeVisible();
@@ -123,7 +157,9 @@ test.describe('Comparable Sales Analysis', () => {
   });
 
   test.describe('Feature: View Comparable Sold Listings', () => {
-    test('Scenario: Given an opportunity with sold comps, When I view details, Then I see sold prices and dates', async ({ page }) => {
+    test('Scenario: Given an opportunity with sold comps, When I view details, Then I see sold prices and dates', async ({
+      page,
+    }) => {
       // When I open the opportunity detail
       await page.getByText('Sony WH-1000XM5 Headphones').click();
 
@@ -141,7 +177,9 @@ test.describe('Comparable Sales Analysis', () => {
       await expect(page.getByText('$275')).toBeVisible();
     });
 
-    test('Scenario: Given a sold comp with a URL, When displayed, Then it shows a View link', async ({ page }) => {
+    test('Scenario: Given a sold comp with a URL, When displayed, Then it shows a View link', async ({
+      page,
+    }) => {
       // When I open the opportunity detail
       await page.getByText('Sony WH-1000XM5 Headphones').click();
       await expect(page.getByText('Comparable Sold Listings')).toBeVisible();
@@ -152,7 +190,9 @@ test.describe('Comparable Sales Analysis', () => {
       expect(await viewLinks.count()).toBeGreaterThanOrEqual(2);
     });
 
-    test('Scenario: Given a sold comp without a URL, When displayed, Then no View link appears for it', async ({ page }) => {
+    test('Scenario: Given a sold comp without a URL, When displayed, Then no View link appears for it', async ({
+      page,
+    }) => {
       // When I open the opportunity detail
       await page.getByText('Sony WH-1000XM5 Headphones').click();
       await expect(page.getByText('Comparable Sold Listings')).toBeVisible();
@@ -167,7 +207,9 @@ test.describe('Comparable Sales Analysis', () => {
   });
 
   test.describe('Feature: Opportunity Without Comparables', () => {
-    test('Scenario: Given an opportunity with no comparable data, When I view details, Then comparable sections are hidden', async ({ page }) => {
+    test('Scenario: Given an opportunity with no comparable data, When I view details, Then comparable sections are hidden', async ({
+      page,
+    }) => {
       // When I click on the opportunity without comps
       await page.getByText('Vintage Lamp').click();
 
@@ -178,12 +220,16 @@ test.describe('Comparable Sales Analysis', () => {
   });
 
   test.describe('Feature: Comparable Data Validates Profit Analysis', () => {
-    test('Scenario: Given sold comps averaging $277, When viewing a $120 listing, Then analysis reasoning is shown', async ({ page }) => {
+    test('Scenario: Given sold comps averaging $277, When viewing a $120 listing, Then analysis reasoning is shown', async ({
+      page,
+    }) => {
       // When I view the opportunity with comps
       await page.getByText('Sony WH-1000XM5 Headphones').click();
 
       // Then the analysis reasoning should be visible
-      await expect(page.getByText('Strong flip opportunity based on comparable sales data.')).toBeVisible();
+      await expect(
+        page.getByText('Strong flip opportunity based on comparable sales data.')
+      ).toBeVisible();
 
       // And the price reasoning should be visible
       await expect(page.getByText('Listed at 57% below market value.')).toBeVisible();

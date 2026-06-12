@@ -22,7 +22,13 @@ import {
   AIRateLimitError,
   AITimeoutError,
 } from './providers';
-import type { AIResponse, AIProvider, AIMessage, ModelConfig, ProviderName } from './providers/types';
+import type {
+  AIResponse,
+  AIProvider,
+  AIMessage,
+  ModelConfig,
+  ProviderName,
+} from './providers/types';
 
 // Re-exports for consumers
 export {
@@ -55,7 +61,7 @@ export async function callWithRetry(
   provider: AIProvider,
   messages: AIMessage[],
   config: ModelConfig,
-  maxAttempts: number = MAX_ATTEMPTS_PER_PROVIDER,
+  maxAttempts: number = MAX_ATTEMPTS_PER_PROVIDER
 ): Promise<AIResponse> {
   let lastError: unknown;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -99,15 +105,13 @@ export async function callWithRetry(
  */
 export async function completeAI(
   taskName: string,
-  context: Record<string, unknown>,
+  context: Record<string, unknown>
 ): Promise<AIResponse> {
   const prompt = getPrompt(taskName);
   const providerNames: ProviderName[] = [prompt.provider, ...prompt.fallbacks];
 
   const messages: AIMessage[] = [
-    ...(prompt.systemPrompt
-      ? [{ role: 'system' as const, content: prompt.systemPrompt }]
-      : []),
+    ...(prompt.systemPrompt ? [{ role: 'system' as const, content: prompt.systemPrompt }] : []),
     { role: 'user' as const, content: prompt.buildUserPrompt(context) },
   ];
 
@@ -144,4 +148,3 @@ export async function completeAI(
   }
   throw lastError;
 }
-

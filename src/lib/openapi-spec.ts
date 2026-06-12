@@ -1715,7 +1715,11 @@ export const openApiSpec = {
         summary: 'Profit & loss analytics',
         operationId: 'getProfitLoss',
         parameters: [
-          { name: 'period', in: 'query', schema: { type: 'string', enum: ['week', 'month', 'quarter', 'year', 'all'] } },
+          {
+            name: 'period',
+            in: 'query',
+            schema: { type: 'string', enum: ['week', 'month', 'quarter', 'year', 'all'] },
+          },
           { name: 'platform', in: 'query', schema: { $ref: '#/components/schemas/Platform' } },
         ],
         responses: {

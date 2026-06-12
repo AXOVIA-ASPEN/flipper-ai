@@ -2,11 +2,11 @@ import { test, expect } from '@playwright/test';
 
 /**
  * Feature: Price History UI & Market Analysis
- * 
+ *
  * As a flipper
  * I want to view price history and market trends for listings
  * So I can make informed decisions about profitability
- * 
+ *
  * Author: Stephen Boyett
  * Company: Axovia AI
  */
@@ -68,7 +68,7 @@ test.describe('Feature: Price History UI', () => {
     // Mock price history data
     await page.route('**/api/price-history*', async (route) => {
       const url = route.request().url();
-      
+
       if (route.request().method() === 'POST') {
         // POST endpoint - triggers new market data fetch
         await route.fulfill({
@@ -173,11 +173,10 @@ test.describe('Feature: Price History UI', () => {
     await page.waitForURL(/\/opportunities\/listing-/);
 
     // Then: Price history section should be visible
-    const priceHistorySection = page.locator('[data-testid="price-history"]').or(
-      page.locator('text=Price History').locator('..').locator('..')
-    ).or(
-      page.getByRole('heading', { name: /price history|market trends/i }).locator('..')
-    );
+    const priceHistorySection = page
+      .locator('[data-testid="price-history"]')
+      .or(page.locator('text=Price History').locator('..').locator('..'))
+      .or(page.getByRole('heading', { name: /price history|market trends/i }).locator('..'));
 
     await expect(priceHistorySection).toBeVisible({ timeout: 10000 });
   });
@@ -194,11 +193,11 @@ test.describe('Feature: Price History UI', () => {
 
     // Then: Chart should be visible (Canvas or SVG)
     const chart = page.locator('canvas, svg[class*="chart"], [data-testid="price-chart"]');
-    const hasChart = await chart.count() > 0;
+    const hasChart = (await chart.count()) > 0;
 
     // If no chart element, check for any visual price history display
     if (!hasChart) {
-      const priceHistoryVisible = await page.locator('text=/\\$\\d+/').count() > 0;
+      const priceHistoryVisible = (await page.locator('text=/\\$\\d+/').count()) > 0;
       expect(priceHistoryVisible).toBeTruthy();
     } else {
       await expect(chart.first()).toBeVisible();
@@ -224,8 +223,8 @@ test.describe('Feature: Price History UI', () => {
 
     // Check for market value display
     const marketValueSection = page.locator('text=/market value|avg.*price|typical.*price/i');
-    const hasMarketValue = await marketValueSection.count() > 0;
-    
+    const hasMarketValue = (await marketValueSection.count()) > 0;
+
     if (hasMarketValue) {
       await expect(marketValueSection.first()).toBeVisible();
     }
@@ -240,14 +239,14 @@ test.describe('Feature: Price History UI', () => {
 
     // When: Hover over a chart element or price data point
     const chartElement = page.locator('canvas, svg[class*="chart"]').first();
-    const hasChart = await chartElement.count() > 0;
+    const hasChart = (await chartElement.count()) > 0;
 
     if (hasChart) {
       await chartElement.hover({ position: { x: 100, y: 100 } });
 
       // Then: Tooltip should appear with details
       const tooltip = page.locator('[role="tooltip"], .tooltip, [class*="tooltip"]');
-      
+
       // Tooltips might not appear in mocked environment, so just verify chart is interactive
       await expect(chartElement).toBeVisible();
     } else {
@@ -267,19 +266,20 @@ test.describe('Feature: Price History UI', () => {
     let refreshButtonClicked = false;
 
     // When: User clicks refresh button (if available)
-    const refreshButton = page.locator('[data-testid="refresh-price-history"]').or(
-      page.getByRole('button', { name: /refresh|update.*price|fetch.*data/i })
-    );
+    const refreshButton = page
+      .locator('[data-testid="refresh-price-history"]')
+      .or(page.getByRole('button', { name: /refresh|update.*price|fetch.*data/i }));
 
-    const hasRefreshButton = await refreshButton.count() > 0;
+    const hasRefreshButton = (await refreshButton.count()) > 0;
 
     if (hasRefreshButton) {
       // Set up request listener to verify POST is called
-      const requestPromise = page.waitForRequest(
-        (request) =>
-          request.url().includes('/api/price-history') && request.method() === 'POST',
-        { timeout: 5000 }
-      ).catch(() => null);
+      const requestPromise = page
+        .waitForRequest(
+          (request) => request.url().includes('/api/price-history') && request.method() === 'POST',
+          { timeout: 5000 }
+        )
+        .catch(() => null);
 
       await refreshButton.first().click();
       refreshButtonClicked = true;
@@ -331,7 +331,7 @@ test.describe('Feature: Price History UI', () => {
 
     // Message might appear, or UI might just not show price history section
     const messageCount = await noDataMessage.count();
-    const hasPriceHistory = await page.locator('[data-testid="price-history"]').count() > 0;
+    const hasPriceHistory = (await page.locator('[data-testid="price-history"]').count()) > 0;
 
     // Either there's a "no data" message OR the price history section is hidden/empty
     expect(messageCount > 0 || !hasPriceHistory).toBeTruthy();
@@ -386,23 +386,23 @@ test.describe('Feature: Price History UI', () => {
     await page.waitForLoadState('networkidle');
 
     // When: Date filter is available
-    const dateFilter = page.locator('[data-testid="date-range-filter"]').or(
-      page.getByLabel(/date.*range|filter.*date/i)
-    );
+    const dateFilter = page
+      .locator('[data-testid="date-range-filter"]')
+      .or(page.getByLabel(/date.*range|filter.*date/i));
 
-    const hasDateFilter = await dateFilter.count() > 0;
+    const hasDateFilter = (await dateFilter.count()) > 0;
 
     if (hasDateFilter) {
       // Select "Last 30 days" or similar option
       const filterOption = page.locator('text=/last.*30.*days|30.*day/i').first();
-      const hasOption = await filterOption.count() > 0;
+      const hasOption = (await filterOption.count()) > 0;
 
       if (hasOption) {
         await filterOption.click();
 
         // Then: Chart/data should update
         await page.waitForTimeout(500);
-        
+
         // Verify some price data is still visible
         const priceData = page.locator('text=/\\$\\d+/');
         expect(await priceData.count()).toBeGreaterThan(0);
@@ -433,10 +433,12 @@ test.describe('Feature: Price History UI', () => {
     expect(await profitAmount.count()).toBeGreaterThan(0);
 
     // May have visual indicator (green text, badge, etc.)
-    const positiveIndicator = page.locator('[class*="positive"], [class*="profit"], [class*="success"]');
-    const hasIndicator = await positiveIndicator.count() > 0;
+    const positiveIndicator = page.locator(
+      '[class*="positive"], [class*="profit"], [class*="success"]'
+    );
+    const hasIndicator = (await positiveIndicator.count()) > 0;
 
     // Indicator is optional, just verify profit is shown
-    expect(hasIndicator || await profitAmount.count() > 0).toBeTruthy();
+    expect(hasIndicator || (await profitAmount.count()) > 0).toBeTruthy();
   });
 });

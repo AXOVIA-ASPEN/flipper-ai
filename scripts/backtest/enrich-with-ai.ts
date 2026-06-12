@@ -30,7 +30,9 @@ import { identifyItem } from '../../src/lib/llm-identifier';
 import { getAvailableProviders } from '../../src/lib/ai';
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL!, max: 2 });
-const prisma = new PrismaClientBase({ adapter }) as ReturnType<() => InstanceType<typeof PrismaClientBase>>;
+const prisma = new PrismaClientBase({ adapter }) as ReturnType<
+  () => InstanceType<typeof PrismaClientBase>
+>;
 
 const BACKTEST_USER_ID = 'backtest-seed';
 
@@ -46,7 +48,12 @@ interface EnrichmentResult {
   llmBrand: string | null;
   llmCategory: string | null;
   llmConfidence: string | null;
-  agreement: 'agree_opportunity' | 'agree_pass' | 'llm_says_pass' | 'llm_says_investigate' | 'llm_error';
+  agreement:
+    | 'agree_opportunity'
+    | 'agree_pass'
+    | 'llm_says_pass'
+    | 'llm_says_investigate'
+    | 'llm_error';
   error: string | null;
 }
 
@@ -195,23 +202,39 @@ async function main() {
 
   const total = results.length;
   console.log(`Total items enriched: ${total}`);
-  console.log(`  Algorithm OPPORTUNITY + LLM agrees (investigate):   ${counts.agree_opportunity} (${Math.round((counts.agree_opportunity / total) * 100)}%)`);
-  console.log(`  Algorithm PASS + LLM agrees (skip):                 ${counts.agree_pass} (${Math.round((counts.agree_pass / total) * 100)}%)`);
-  console.log(`  Algorithm OPPORTUNITY but LLM says pass:            ${counts.llm_says_pass} (${Math.round((counts.llm_says_pass / total) * 100)}%)   ← FALSE POSITIVES`);
-  console.log(`  Algorithm PASS but LLM says investigate:            ${counts.llm_says_investigate} (${Math.round((counts.llm_says_investigate / total) * 100)}%)   ← FALSE NEGATIVES`);
-  console.log(`  LLM errors:                                         ${counts.llm_error} (${Math.round((counts.llm_error / total) * 100)}%)`);
+  console.log(
+    `  Algorithm OPPORTUNITY + LLM agrees (investigate):   ${counts.agree_opportunity} (${Math.round((counts.agree_opportunity / total) * 100)}%)`
+  );
+  console.log(
+    `  Algorithm PASS + LLM agrees (skip):                 ${counts.agree_pass} (${Math.round((counts.agree_pass / total) * 100)}%)`
+  );
+  console.log(
+    `  Algorithm OPPORTUNITY but LLM says pass:            ${counts.llm_says_pass} (${Math.round((counts.llm_says_pass / total) * 100)}%)   ← FALSE POSITIVES`
+  );
+  console.log(
+    `  Algorithm PASS but LLM says investigate:            ${counts.llm_says_investigate} (${Math.round((counts.llm_says_investigate / total) * 100)}%)   ← FALSE NEGATIVES`
+  );
+  console.log(
+    `  LLM errors:                                         ${counts.llm_error} (${Math.round((counts.llm_error / total) * 100)}%)`
+  );
 
   // Agreement rate
   const analyzableCount = total - counts.llm_error;
   const agreement = counts.agree_opportunity + counts.agree_pass;
-  console.log(`\nOverall agreement rate (excluding errors): ${agreement}/${analyzableCount} = ${Math.round((agreement / analyzableCount) * 100)}%`);
+  console.log(
+    `\nOverall agreement rate (excluding errors): ${agreement}/${analyzableCount} = ${Math.round((agreement / analyzableCount) * 100)}%`
+  );
 
   // Show false positives (algorithm said opportunity, LLM says pass)
   console.log('\n\n=== FALSE POSITIVES (Algorithm says opportunity, LLM says pass) ===\n');
   const falsePositives = results.filter((r) => r.agreement === 'llm_says_pass');
   for (const fp of falsePositives.slice(0, 15)) {
-    console.log(`  [${fp.algorithmicScore}] $${fp.askingPrice} profit=$${fp.algorithmicProfit} | ${fp.category} | ${fp.title.slice(0, 70)}`);
-    console.log(`    LLM: brand=${fp.llmBrand}, category=${fp.llmCategory}, confidence=${fp.llmConfidence}`);
+    console.log(
+      `  [${fp.algorithmicScore}] $${fp.askingPrice} profit=$${fp.algorithmicProfit} | ${fp.category} | ${fp.title.slice(0, 70)}`
+    );
+    console.log(
+      `    LLM: brand=${fp.llmBrand}, category=${fp.llmCategory}, confidence=${fp.llmConfidence}`
+    );
   }
   if (falsePositives.length > 15) console.log(`  ... and ${falsePositives.length - 15} more`);
 
@@ -219,8 +242,12 @@ async function main() {
   console.log('\n\n=== FALSE NEGATIVES (Algorithm says pass, LLM says investigate) ===\n');
   const falseNegatives = results.filter((r) => r.agreement === 'llm_says_investigate');
   for (const fn of falseNegatives.slice(0, 15)) {
-    console.log(`  [${fn.algorithmicScore}] $${fn.askingPrice} profit=$${fn.algorithmicProfit} | ${fn.category} | ${fn.title.slice(0, 70)}`);
-    console.log(`    LLM: brand=${fn.llmBrand}, category=${fn.llmCategory}, confidence=${fn.llmConfidence}`);
+    console.log(
+      `  [${fn.algorithmicScore}] $${fn.askingPrice} profit=$${fn.algorithmicProfit} | ${fn.category} | ${fn.title.slice(0, 70)}`
+    );
+    console.log(
+      `    LLM: brand=${fn.llmBrand}, category=${fn.llmCategory}, confidence=${fn.llmConfidence}`
+    );
   }
   if (falseNegatives.length > 15) console.log(`  ... and ${falseNegatives.length - 15} more`);
 
@@ -228,7 +255,10 @@ async function main() {
   const fs = await import('fs');
   const reportPath = 'reports/backtest-session2-results.json';
   await fs.promises.mkdir('reports', { recursive: true });
-  await fs.promises.writeFile(reportPath, JSON.stringify({ timestamp: new Date().toISOString(), counts, total, results }, null, 2));
+  await fs.promises.writeFile(
+    reportPath,
+    JSON.stringify({ timestamp: new Date().toISOString(), counts, total, results }, null, 2)
+  );
   console.log(`\nFull results saved to: ${reportPath}`);
 }
 

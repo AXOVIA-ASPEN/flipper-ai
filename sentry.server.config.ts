@@ -23,10 +23,7 @@ Sentry.init({
   release: process.env.GIT_COMMIT_SHA || process.env.K_REVISION,
 
   // Performance Monitoring
-  integrations: [
-    Sentry.httpIntegration(),
-    Sentry.prismaIntegration(),
-  ],
+  integrations: [Sentry.httpIntegration(), Sentry.prismaIntegration()],
 
   // Configure the scope for the SDK
   beforeSend(event, hint) {
@@ -34,7 +31,11 @@ Sentry.init({
     if (event.exception) {
       const error = hint.originalException;
       // Example: ignore database connection errors in development
-      if (process.env.NODE_ENV === 'development' && error instanceof Error && error.message.includes('ECONNREFUSED')) {
+      if (
+        process.env.NODE_ENV === 'development' &&
+        error instanceof Error &&
+        error.message.includes('ECONNREFUSED')
+      ) {
         return null;
       }
     }

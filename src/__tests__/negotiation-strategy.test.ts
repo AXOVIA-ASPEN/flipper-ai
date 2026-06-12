@@ -379,9 +379,7 @@ describe('negotiation-strategy', () => {
     });
 
     it('clamps offer > asking to askingPrice * 0.95', async () => {
-      mockCreate.mockResolvedValue(
-        mockStrategyAIResponse({ initialOfferPrice: 500 })
-      );
+      mockCreate.mockResolvedValue(mockStrategyAIResponse({ initialOfferPrice: 500 }));
       const { generateNegotiationStrategy } = await importModule();
 
       const result = await generateNegotiationStrategy(baseInput);
@@ -401,9 +399,7 @@ describe('negotiation-strategy', () => {
     });
 
     it('validates confidence enum — invalid becomes medium', async () => {
-      mockCreate.mockResolvedValue(
-        mockStrategyAIResponse({ confidence: 'super_high' })
-      );
+      mockCreate.mockResolvedValue(mockStrategyAIResponse({ confidence: 'super_high' }));
       const { generateNegotiationStrategy } = await importModule();
 
       const result = await generateNegotiationStrategy(baseInput);
@@ -424,9 +420,7 @@ describe('negotiation-strategy', () => {
     });
 
     it('rejects Infinity values', async () => {
-      mockCreate.mockResolvedValue(
-        mockStrategyAIResponse({ initialOfferPrice: Infinity })
-      );
+      mockCreate.mockResolvedValue(mockStrategyAIResponse({ initialOfferPrice: Infinity }));
       const { generateNegotiationStrategy } = await importModule();
 
       const result = await generateNegotiationStrategy(baseInput);
@@ -437,9 +431,7 @@ describe('negotiation-strategy', () => {
     });
 
     it('defaults tactics to array when LLM returns non-array', async () => {
-      mockCreate.mockResolvedValue(
-        mockStrategyAIResponse({ negotiationTactics: 'just a string' })
-      );
+      mockCreate.mockResolvedValue(mockStrategyAIResponse({ negotiationTactics: 'just a string' }));
       const { generateNegotiationStrategy } = await importModule();
 
       const result = await generateNegotiationStrategy(baseInput);

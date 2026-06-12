@@ -1,6 +1,6 @@
 /**
  * Cloud Functions for Flipper AI Scrapers
- * 
+ *
  * Separates CPU-intensive scraping from Next.js API routes
  * - Craigslist & OfferUp use Playwright (Docker container with Chromium)
  * - eBay, Facebook, Mercari use API calls (standard Cloud Function)

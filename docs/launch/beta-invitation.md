@@ -33,7 +33,7 @@ Use for usernames you've seen in r/Flipping but don't know personally.
 > Stephen
 > founder@<your-domain>
 
-**Why this works:** Specific reference to *their* post (proves you're not spamming), specific scope ("~15 active flippers"), no asks beyond feedback, easy out.
+**Why this works:** Specific reference to _their_ post (proves you're not spamming), specific scope ("~15 active flippers"), no asks beyond feedback, easy out.
 
 ---
 
@@ -142,7 +142,6 @@ When someone says yes:
 > [name] — you've been on the beta two weeks now. Two questions:
 >
 > 1. **Did you flip anything because of Flipper.ai?** If yes — even a small win — I'd love to hear about it. With your permission, the story might end up on the website (with your username/face if you want, or anonymous if not — your call).
->
 > 2. **What's the biggest thing that should change before public launch?** Brutally honest answers please. The whole point of a beta is finding what's wrong.
 >
 > Your Lifetime Founder code (free PRO forever) is attached either way: `LIFETIME-{{userCode}}`. Apply at <appUrl>/billing once we go public.

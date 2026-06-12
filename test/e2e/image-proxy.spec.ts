@@ -62,11 +62,11 @@ test.describe('Image Proxy API', () => {
       request,
     }) => {
       // Use a well-known, stable public image
-      const imageUrl = 'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png';
-      const response = await request.get(
-        `${proxyEndpoint}?url=${encodeURIComponent(imageUrl)}`,
-        { maxRedirects: 0 }
-      );
+      const imageUrl =
+        'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png';
+      const response = await request.get(`${proxyEndpoint}?url=${encodeURIComponent(imageUrl)}`, {
+        maxRedirects: 0,
+      });
       // Should return 200 (proxied) or 302 (cached redirect)
       expect([200, 302]).toContain(response.status());
 
@@ -93,10 +93,9 @@ test.describe('Image Proxy API', () => {
       request,
     }) => {
       const badUrl = 'https://httpbin.org/status/404';
-      const response = await request.get(
-        `${proxyEndpoint}?url=${encodeURIComponent(badUrl)}`,
-        { maxRedirects: 0 }
-      );
+      const response = await request.get(`${proxyEndpoint}?url=${encodeURIComponent(badUrl)}`, {
+        maxRedirects: 0,
+      });
       expect([302, 404, 500]).toContain(response.status());
     });
   });
@@ -105,7 +104,8 @@ test.describe('Image Proxy API', () => {
     test('Scenario: Given cache=false parameter, When I request the proxy, Then the image is fetched without caching', async ({
       request,
     }) => {
-      const imageUrl = 'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png';
+      const imageUrl =
+        'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png';
       const response = await request.get(
         `${proxyEndpoint}?url=${encodeURIComponent(imageUrl)}&cache=false`,
         { maxRedirects: 0 }

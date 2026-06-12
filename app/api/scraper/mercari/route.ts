@@ -13,7 +13,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { estimateValue, detectCategory, generatePurchaseMessage } from '@/lib/value-estimator';
 import { identifyItem } from '@/lib/llm-identifier';
-import { fetchMarketPrice, closeBrowser as closeMarketBrowser, type MarketPrice } from '@/lib/market-price';
+import {
+  fetchMarketPrice,
+  closeBrowser as closeMarketBrowser,
+  type MarketPrice,
+} from '@/lib/market-price';
 import { lookupVerifiedMarketPrice } from '@/lib/market-value-calculator';
 import { findComparableSales, type CompMatchResult } from '@/lib/comp-matcher';
 import { analyzeSellability, quickDiscountCheck } from '@/lib/llm-analyzer';
@@ -34,7 +38,15 @@ import {
 // Module-level import for scraper unification (Story 3.4 architecture)
 import * as mercariModule from '@/scrapers/mercari';
 import { analyzeLogistics } from '@/lib/logistics-analyzer';
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, RateLimitError, ExternalServiceError } from '@/lib/errors';
+import {
+  handleError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  RateLimitError,
+  ExternalServiceError,
+} from '@/lib/errors';
 import { enforceTierLimits } from '@/lib/tier-enforcement';
 import { computeEstimatedExpiry } from '@/lib/listing-expiry';
 import { emitOpportunityFoundEvent } from '@/lib/notification-events';
@@ -249,7 +261,10 @@ async function scrapeMercariSearch(params: ScrapeRequestBody): Promise<MercariIt
       priceMax: params.maxPrice,
       sort: sortBy,
       status: ['on_sale'],
-      length: params.limit !== undefined ? Math.min(params.limit, MAX_LIMIT) : /* istanbul ignore next */ Math.min(DEFAULT_LIMIT, MAX_LIMIT),
+      length:
+        params.limit !== undefined
+          ? Math.min(params.limit, MAX_LIMIT)
+          : /* istanbul ignore next */ Math.min(DEFAULT_LIMIT, MAX_LIMIT),
     });
 
     /* istanbul ignore next -- defensive; API always returns data or items array */
@@ -286,7 +301,10 @@ async function scrapeMercariSearch(params: ScrapeRequestBody): Promise<MercariIt
 async function fetchMercariListings(params: ScrapeRequestBody): Promise<MercariItem[]> {
   return scrapeMercariSearch({
     ...params,
-    limit: params.limit !== undefined ? Math.min(params.limit, MAX_LIMIT) : /* istanbul ignore next */ Math.min(DEFAULT_LIMIT, MAX_LIMIT),
+    limit:
+      params.limit !== undefined
+        ? Math.min(params.limit, MAX_LIMIT)
+        : /* istanbul ignore next */ Math.min(DEFAULT_LIMIT, MAX_LIMIT),
   });
 }
 
@@ -296,7 +314,7 @@ async function fetchMercariListings(params: ScrapeRequestBody): Promise<MercariI
 async function fetchSoldListings(params: ScrapeRequestBody): Promise<MercariItem[]> {
   try {
     const apiResponse = await callMercariApi('/search', 'POST', {
-            keyword: params.keywords || /* istanbul ignore next */ '',
+      keyword: params.keywords || /* istanbul ignore next */ '',
       categoryId: params.categoryId ? [params.categoryId] : [],
       status: ['sold_out'], // Only sold items
       sort: 'created_time',
@@ -367,7 +385,7 @@ async function saveListingFromMercariItem(
   userId: string,
   discountThreshold: number = 50,
   hasLLM: boolean = false,
-  feeRate: number = 0.10,
+  feeRate: number = 0.1,
   opportunityThreshold: number = 70,
   userSettings?: { homeLocation: string | null; maxPickupRadiusMiles: number | null } | null,
   jobId?: string
@@ -381,7 +399,14 @@ async function saveListingFromMercariItem(
   const category = item.rootCategory?.name || detectCategory(item.name, description) || 'other';
 
   // Get value estimation using user's platform fee rate (Mercari default: 10%)
-  const estimation = estimateValue(item.name, description, item.price, condition || null, category, feeRate);
+  const estimation = estimateValue(
+    item.name,
+    description,
+    item.price,
+    condition || null,
+    category,
+    feeRate
+  );
 
   // Build notes
   const sellerNote = buildSellerNote(item);
@@ -422,7 +447,10 @@ async function saveListingFromMercariItem(
       const identification = await identifyItem(item.name, description, item.price, category);
       capturedIdentification = identification; // Story 5.2: capture for comp matching
       if (identification?.worthInvestigating) {
-        const marketData = await fetchMarketPrice(identification.searchQuery, identification.category);
+        const marketData = await fetchMarketPrice(
+          identification.searchQuery,
+          identification.category
+        );
         capturedMarketData = marketData; // Story 5.3: capture for demand analysis
         if (marketData && marketData.salesCount > 0) {
           const quickCheck = quickDiscountCheck(item.price, marketData);
@@ -466,7 +494,9 @@ async function saveListingFromMercariItem(
   }
 
   // Story 5.3: Demand trend analysis
-  const demandAnalysis = capturedMarketData ? analyzeDemandTrend(capturedMarketData.soldListings) : null;
+  const demandAnalysis = capturedMarketData
+    ? analyzeDemandTrend(capturedMarketData.soldListings)
+    : null;
 
   // Story 5.2: Comparable sold item matching — reuses fetched soldListings
   let compMatches: CompMatchResult | null = null;
@@ -541,30 +571,36 @@ async function saveListingFromMercariItem(
   const claudeAnalysis = claudeEnriched.claudeAnalysis;
 
   // Step 6: Item completeness & seller reputation enrichment (Story 5.4)
-  const [enriched54] = await enrichWithCompletenessAndReputation([{
-    externalId: item.id,
-    url: itemUrl,
-    title: item.name,
-    description,
-    askingPrice: item.price,
-    imageUrls,
-    platform: 'MERCARI',
-    category,
-    estimation,
-    requestToBuy,
-    isOpportunity: true,
-    sellerRating,
-    sellerReviewCount,
-    sellerAccountAgeDays: null, // Not available via Mercari API
-  }]);
+  const [enriched54] = await enrichWithCompletenessAndReputation([
+    {
+      externalId: item.id,
+      url: itemUrl,
+      title: item.name,
+      description,
+      askingPrice: item.price,
+      imageUrls,
+      platform: 'MERCARI',
+      category,
+      estimation,
+      requestToBuy,
+      isOpportunity: true,
+      sellerRating,
+      sellerReviewCount,
+      sellerAccountAgeDays: null, // Not available via Mercari API
+    },
+  ]);
   const completenessLabel = enriched54.completenessAnalysis?.completenessLabel ?? null;
   // Escalate authenticityRisk to 'high' when seller has low reputation (AC #4)
   const escalatedAuthenticityRisk = enriched54.sellerReputation?.riskEscalation
     ? 'high'
-    : sellabilityAnalysis?.authenticityRisk ?? null;
+    : (sellabilityAnalysis?.authenticityRisk ?? null);
 
   const tags = JSON.stringify(estimation.tags);
-  const status = hasLLM ? 'OPPORTUNITY' : estimation.valueScore >= opportunityThreshold ? 'OPPORTUNITY' : 'NEW';
+  const status = hasLLM
+    ? 'OPPORTUNITY'
+    : estimation.valueScore >= opportunityThreshold
+      ? 'OPPORTUNITY'
+      : 'NEW';
 
   // Determine posted date
   const postedAt = item.created
@@ -614,7 +650,8 @@ async function saveListingFromMercariItem(
         : item.shippingMethod !== undefined,
       sizeCategory: logisticsAnalysis?.sizeCategory ?? null,
       shippingEstimatesJson: logisticsAnalysis?.shippingEstimates
-        ? JSON.stringify(logisticsAnalysis.shippingEstimates) : null,
+        ? JSON.stringify(logisticsAnalysis.shippingEstimates)
+        : null,
       estimatedShippingCost: logisticsAnalysis?.estimatedShippingCost ?? null,
       pickupDistanceMiles: logisticsAnalysis?.pickupDistanceMiles ?? null,
       outsidePickupRadius: logisticsAnalysis?.outsidePickupRadius ?? null,
@@ -648,7 +685,9 @@ async function saveListingFromMercariItem(
       sellerAccountAgeDays: null,
       comparableSalesJson: compMatches
         ? JSON.stringify(compMatches.comps)
-        : capturedMarketData ? JSON.stringify(capturedMarketData.soldListings.slice(0, 5)) : null,
+        : capturedMarketData
+          ? JSON.stringify(capturedMarketData.soldListings.slice(0, 5))
+          : null,
       compMatchConfidence: compMatches?.confidence ?? null,
       analysisConfidence: claudeAnalysis?.confidence ?? sellabilityAnalysis?.confidence ?? null,
       analysisReasoning: claudeAnalysis?.reasoning ?? sellabilityAnalysis?.reasoning ?? null,
@@ -680,7 +719,8 @@ async function saveListingFromMercariItem(
         : item.shippingMethod !== undefined,
       sizeCategory: logisticsAnalysis?.sizeCategory ?? null,
       shippingEstimatesJson: logisticsAnalysis?.shippingEstimates
-        ? JSON.stringify(logisticsAnalysis.shippingEstimates) : null,
+        ? JSON.stringify(logisticsAnalysis.shippingEstimates)
+        : null,
       estimatedShippingCost: logisticsAnalysis?.estimatedShippingCost ?? null,
       pickupDistanceMiles: logisticsAnalysis?.pickupDistanceMiles ?? null,
       outsidePickupRadius: logisticsAnalysis?.outsidePickupRadius ?? null,
@@ -714,7 +754,9 @@ async function saveListingFromMercariItem(
       sellerAccountAgeDays: null,
       comparableSalesJson: compMatches
         ? JSON.stringify(compMatches.comps)
-        : capturedMarketData ? JSON.stringify(capturedMarketData.soldListings.slice(0, 5)) : null,
+        : capturedMarketData
+          ? JSON.stringify(capturedMarketData.soldListings.slice(0, 5))
+          : null,
       compMatchConfidence: compMatches?.confidence ?? null,
       analysisConfidence: claudeAnalysis?.confidence ?? sellabilityAnalysis?.confidence ?? null,
       analysisReasoning: claudeAnalysis?.reasoning ?? sellabilityAnalysis?.reasoning ?? null,
@@ -911,7 +953,16 @@ export async function POST(request: NextRequest) {
         const item = activeListings[i];
         try {
           if (!item.id || !item.name) continue;
-          const listing = await saveListingFromMercariItem(item, userId, discountThreshold, hasLLM, feeRate, opportunityThreshold, userSettings, scraperJob.id);
+          const listing = await saveListingFromMercariItem(
+            item,
+            userId,
+            discountThreshold,
+            hasLLM,
+            feeRate,
+            opportunityThreshold,
+            userSettings,
+            scraperJob.id
+          );
           if (!listing) continue;
 
           // Story 3.9: Capture images to Firebase Storage after saving listing (dedup guard).
@@ -957,7 +1008,9 @@ export async function POST(request: NextRequest) {
 
       // Update scraper job status
       const completedAt = new Date();
-      const opportunitiesFound = savedListings.filter((listing) => listing.status === 'OPPORTUNITY').length;
+      const opportunitiesFound = savedListings.filter(
+        (listing) => listing.status === 'OPPORTUNITY'
+      ).length;
       await prisma.scraperJob.update({
         where: { id: scraperJob.id },
         data: {
@@ -998,7 +1051,12 @@ export async function POST(request: NextRequest) {
           category: l.rootCategory?.name ?? null,
           postedAt: null,
         }));
-      const processedResults = processListings('MERCARI', rawForSummary, { minValueScore: opportunityThreshold }, { feeRate, opportunityThreshold });
+      const processedResults = processListings(
+        'MERCARI',
+        rawForSummary,
+        { minValueScore: opportunityThreshold },
+        { feeRate, opportunityThreshold }
+      );
       const summary = generateScanSummary(processedResults);
       // References to canonical helpers (marketplace-scanner unification traceability).
       void analyzeListing;

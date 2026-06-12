@@ -92,13 +92,22 @@ export default function MeetingModal({
 
       const json = (await res.json()) as {
         success: boolean;
-        data?: { meetingTime: string; meetingLocation: string; meetingType: string; calendarEventId: string | null };
+        data?: {
+          meetingTime: string;
+          meetingLocation: string;
+          meetingType: string;
+          calendarEventId: string | null;
+        };
         error?: { code?: string };
       };
 
       if (!res.ok || !json.success) {
         if (json.error?.code === 'CALENDAR_AUTH_REQUIRED') {
-          showToast({ type: 'error', title: 'Calendar auth required', message: 'Reconnect Google Calendar in Settings.' });
+          showToast({
+            type: 'error',
+            title: 'Calendar auth required',
+            message: 'Reconnect Google Calendar in Settings.',
+          });
           // Still close — meeting data was saved (storage is decoupled)
           onClose();
           return;
@@ -112,10 +121,18 @@ export default function MeetingModal({
         meetingType: json.data?.meetingType ?? null,
         calendarEventId: json.data?.calendarEventId ?? null,
       });
-      showToast({ type: 'success', title: 'Meeting scheduled', message: 'Your meeting has been saved.' });
+      showToast({
+        type: 'success',
+        title: 'Meeting scheduled',
+        message: 'Your meeting has been saved.',
+      });
       onClose();
     } catch {
-      showToast({ type: 'error', title: 'Error', message: 'Failed to save meeting. Please try again.' });
+      showToast({
+        type: 'error',
+        title: 'Error',
+        message: 'Failed to save meeting. Please try again.',
+      });
     } finally {
       setSaving(false);
     }
@@ -147,7 +164,11 @@ export default function MeetingModal({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="meeting-datetime" className="block text-sm font-medium mb-1" style={{ color: '#e2e8f0' }}>
+            <label
+              htmlFor="meeting-datetime"
+              className="block text-sm font-medium mb-1"
+              style={{ color: '#e2e8f0' }}
+            >
               Date & Time
             </label>
             <input
@@ -161,7 +182,11 @@ export default function MeetingModal({
           </div>
 
           <div>
-            <label htmlFor="meeting-location" className="block text-sm font-medium mb-1" style={{ color: '#e2e8f0' }}>
+            <label
+              htmlFor="meeting-location"
+              className="block text-sm font-medium mb-1"
+              style={{ color: '#e2e8f0' }}
+            >
               Location
             </label>
             <input
@@ -178,7 +203,11 @@ export default function MeetingModal({
           {/* meetingType — auto-derived, editable only when status is PURCHASED */}
           {isAmbiguous && (
             <div>
-              <label htmlFor="meeting-type" className="block text-sm font-medium mb-1" style={{ color: '#e2e8f0' }}>
+              <label
+                htmlFor="meeting-type"
+                className="block text-sm font-medium mb-1"
+                style={{ color: '#e2e8f0' }}
+              >
                 Meeting Type
               </label>
               <select
@@ -194,11 +223,7 @@ export default function MeetingModal({
           )}
 
           <div className="flex gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="fp-btn-ghost flex-1 justify-center"
-            >
+            <button type="button" onClick={onClose} className="fp-btn-ghost flex-1 justify-center">
               Cancel
             </button>
             <button

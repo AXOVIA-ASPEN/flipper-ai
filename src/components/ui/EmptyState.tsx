@@ -61,11 +61,9 @@ export function EmptyState({
     >
       {icon}
       <h3 style={{ color: '#e2e8f0', fontSize: 20, fontWeight: 600, marginBottom: 8 }}>{title}</h3>
-      {message && (
-        <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 24 }}>{message}</p>
-      )}
-      {action && (
-        action.href ? (
+      {message && <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 24 }}>{message}</p>}
+      {action &&
+        (action.href ? (
           <Link href={action.href} className={btnClass} style={{ textDecoration: 'none' }}>
             {action.label}
           </Link>
@@ -73,8 +71,7 @@ export function EmptyState({
           <button type="button" className={btnClass} onClick={action.onClick}>
             {action.label}
           </button>
-        )
-      )}
+        ))}
     </div>
   );
 }

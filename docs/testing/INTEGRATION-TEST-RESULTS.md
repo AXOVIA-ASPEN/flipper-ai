@@ -13,21 +13,22 @@ Flipper AI has a comprehensive integration test suite that validates all 6 core 
 
 ## Test Suite Summary
 
-| Suite | Tests | Status | Duration |
-|-------|-------|--------|----------|
-| `/api/listings` | 12 | ✅ PASS | ~1.2s |
-| `/api/listings/[id]` | 9 | ✅ PASS | ~1.0s |
-| `/api/opportunities` | 15 | ✅ PASS | ~2.8s |
-| `/api/opportunities/[id]` | 9 | ✅ PASS | ~0.6s |
-| `/api/scraper-jobs` | 16 | ✅ PASS | ~1.5s |
-| `/api/search-configs` | 16 | ✅ PASS | ~1.3s |
-| **TOTAL** | **77** | **✅ ALL PASS** | **~8.4s** |
+| Suite                     | Tests  | Status          | Duration  |
+| ------------------------- | ------ | --------------- | --------- |
+| `/api/listings`           | 12     | ✅ PASS         | ~1.2s     |
+| `/api/listings/[id]`      | 9      | ✅ PASS         | ~1.0s     |
+| `/api/opportunities`      | 15     | ✅ PASS         | ~2.8s     |
+| `/api/opportunities/[id]` | 9      | ✅ PASS         | ~0.6s     |
+| `/api/scraper-jobs`       | 16     | ✅ PASS         | ~1.5s     |
+| `/api/search-configs`     | 16     | ✅ PASS         | ~1.3s     |
+| **TOTAL**                 | **77** | **✅ ALL PASS** | **~8.4s** |
 
 ---
 
 ## Detailed Results
 
 ### `/api/listings` (12/12 ✅)
+
 - ✅ Return empty array when no listings exist
 - ✅ Return paginated listings
 - ✅ Respect limit and offset parameters
@@ -42,6 +43,7 @@ Flipper AI has a comprehensive integration test suite that validates all 6 core 
 - ✅ Store imageUrls as JSON string
 
 ### `/api/listings/[id]` (9/9 ✅)
+
 - ✅ Return a single listing by id
 - ✅ Return 404 for non-existent listing
 - ✅ Include opportunity relation
@@ -53,6 +55,7 @@ Flipper AI has a comprehensive integration test suite that validates all 6 core 
 - ✅ Return error for non-existent listing (P2025)
 
 ### `/api/opportunities` (15/15 ✅)
+
 - ✅ Return empty array when no opportunities exist
 - ✅ Return opportunities with stats (totalProfit, totalInvested, totalRevenue)
 - ✅ Filter by status
@@ -70,6 +73,7 @@ Flipper AI has a comprehensive integration test suite that validates all 6 core 
 - ✅ Return empty when no opportunities match filters
 
 ### `/api/opportunities/[id]` (9/9 ✅)
+
 - ✅ Return a single opportunity by id
 - ✅ Return 404 for non-existent opportunity
 - ✅ Include listing relation
@@ -81,6 +85,7 @@ Flipper AI has a comprehensive integration test suite that validates all 6 core 
 - ✅ Return 404 for non-existent opportunity
 
 ### `/api/scraper-jobs` (16/16 ✅)
+
 - ✅ Return empty array when no jobs exist
 - ✅ Return all scraper jobs
 - ✅ Filter by status
@@ -99,6 +104,7 @@ Flipper AI has a comprehensive integration test suite that validates all 6 core 
 - ✅ Delete a scraper job
 
 ### `/api/search-configs` (16/16 ✅)
+
 - ✅ Return empty array when no configs exist
 - ✅ Return all search configs
 - ✅ Filter by enabled status
@@ -123,30 +129,38 @@ Flipper AI has a comprehensive integration test suite that validates all 6 core 
 The integration test infrastructure required several fixes to work correctly on this environment:
 
 ### 1. native `better-sqlite3` Bindings
+
 **Problem:** `better-sqlite3` native bindings weren't compiled for Node.js v22.22.0 (ABI 127).  
 **Fix:** Rebuilt the package in-place:
+
 ```bash
 cd node_modules/.pnpm/better-sqlite3@12.5.0/node_modules/better-sqlite3 && npm rebuild
 ```
 
 ### 2. Test Database Schema
+
 **Problem:** `test.db` existed but had no tables.  
 **Fix:** Extracted schema from `dev.db` (which has migrations applied) and applied to `test.db` via Python script.
 
 ### 3. ESM Transformation for auth packages (historical, pre-Firebase Auth migration)
+
 **Problem:** `jest.integration.config.js` had a narrow `transformIgnorePatterns` that excluded auth packages from transpilation.  
 **Fix:** Updated transform patterns. (This issue is no longer relevant — the project has since migrated to Firebase Auth.)
 
 ### 4. Auth Mock for Integration Tests
+
 **Problem:** Tests calling auth-protected endpoints returned 401 because the auth mock returned `undefined`.  
 **Fix:** Added auth mock to `integration/setup.ts`. (Auth is now Firebase Auth; mocks target `src/lib/firebase/session.ts`.)
 
 ### 5. Value Estimator Business Logic Bypass
+
 **Problem:** The POST `/api/listings` route enforces a 70% discount threshold. Test data with asking prices ~$100 wouldn't pass, returning 200 "skipped" instead of 201.  
 **Fix:** Mocked `@/lib/value-estimator` in integration setup to always return `discountPercent: 80` (above threshold), isolating API layer from business logic in integration tests.
 
 ### 6. Test Client SQLite Compatibility
+
 **Problem:** The `testPrisma` custom client (in `setup.ts`) had multiple gaps vs. Prisma's actual API:
+
 - No handling for `OR` operator (used for user-scoped queries)
 - No handling for `gte`/`lte` operators in `opportunity.count`
 - No handling for nested relation filters (`where.listing = { platform: ... }`)
@@ -156,13 +170,15 @@ cd node_modules/.pnpm/better-sqlite3@12.5.0/node_modules/better-sqlite3 && npm r
 - `SearchConfig.findMany` didn't convert 0/1 back to boolean
 
 **Fix:** Complete refactor of the test client with:
+
 - `buildWhereClause()` helper supporting `OR`, `gte`, `lte`, `contains`, `IS NULL`
-- JOIN-based queries for nested listing filters in opportunity queries  
+- JOIN-based queries for nested listing filters in opportunity queries
 - Value serialization in all INSERT/UPDATE paths
 - Missing methods added (`createMany`, `deleteMany` with where)
 - Proper FK-friendly reset with test user re-creation
 
 ### 7. FK Constraint on Test User
+
 **Problem:** `SQLITE_CONSTRAINT_FOREIGNKEY` — Listing table requires `userId` FK to `User` table, but no test user existed after `resetDatabase()`.  
 **Fix:** Added `ensureTestUser()` function called after every `resetDatabase()`.
 
@@ -188,6 +204,7 @@ npx jest --config jest.integration.config.js --verbose
 Integration tests do NOT run as part of the default coverage report (`pnpm test:coverage`). They test the full API layer end-to-end with a live SQLite database. For unit test coverage, see the main README.
 
 **Unit test coverage (as of Feb 17, 2026):**
+
 - Statements: 99.64%
 - Branches: 98.22%
 - Functions: 99.79%

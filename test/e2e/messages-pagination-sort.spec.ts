@@ -67,8 +67,7 @@ test.describe('Feature: Thread Inbox Pagination, Search & Filter', () => {
         const q = search.toLowerCase();
         filtered = filtered.filter(
           (t) =>
-            t.listing.title.toLowerCase().includes(q) ||
-            (t.sellerName?.toLowerCase().includes(q))
+            t.listing.title.toLowerCase().includes(q) || t.sellerName?.toLowerCase().includes(q)
         );
       }
 
@@ -87,7 +86,10 @@ test.describe('Feature: Thread Inbox Pagination, Search & Filter', () => {
     // User settings (for approval tab)
     await page.route('**/api/user/settings', async (route) => {
       await route.fulfill({
-        json: { success: true, data: { user: { subscriptionTier: 'PRO' }, messageApprovalRequired: false } },
+        json: {
+          success: true,
+          data: { user: { subscriptionTier: 'PRO' }, messageApprovalRequired: false },
+        },
       });
     });
 

@@ -204,7 +204,7 @@ A reference table comparing all 5 marketplaces' fee structures, with a price-poi
 
 ### What it does
 
-A live-updated table showing the top 20 most profitable resale categories *right now* (last 30 days), based on your aggregate scoring data.
+A live-updated table showing the top 20 most profitable resale categories _right now_ (last 30 days), based on your aggregate scoring data.
 
 ### UX flow
 
@@ -317,7 +317,7 @@ A 5-question quiz: "How much capital do you have?", "How much time per week?", "
 
 ### UX flow
 
-5-question wizard, then a results page with a personalized strategy report. Email-gate the *full* report (great for free-to-email-list conversion).
+5-question wizard, then a results page with a personalized strategy report. Email-gate the _full_ report (great for free-to-email-list conversion).
 
 ### Conversion mechanic
 
@@ -371,7 +371,7 @@ If you can build one per week:
 ## What NOT to do
 
 - ❌ Hide tools behind email signup. Defeats the purpose.
-- ❌ Make tools feel like "free trials with disabled features". They should feel *complete and useful at zero cost*.
+- ❌ Make tools feel like "free trials with disabled features". They should feel _complete and useful at zero cost_.
 - ❌ Build all 7 before shipping any. Ship tool 2 in week 1, observe traffic, iterate.
 - ❌ Forget to add tool URLs to your sitemap (`app/sitemap.ts`).
 - ❌ Build a tool that competes with the core product. e.g., a "free unlimited marketplace scanner" would cannibalize Pro.

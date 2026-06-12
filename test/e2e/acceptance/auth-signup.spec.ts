@@ -15,9 +15,7 @@ test.describe('Sign Up - Acceptance Tests', () => {
 
     // Verify heading
     await expect(page.getByText('Create your account')).toBeVisible();
-    await expect(
-      page.getByText('Start finding profitable flips today')
-    ).toBeVisible();
+    await expect(page.getByText('Start finding profitable flips today')).toBeVisible();
 
     // Verify form fields
     await expect(page.getByLabel(/full name/i)).toBeVisible();
@@ -25,15 +23,10 @@ test.describe('Sign Up - Acceptance Tests', () => {
     await expect(page.getByLabel(/password/i)).toBeVisible();
 
     // Verify submit button
-    await expect(
-      page.getByRole('button', { name: /create account/i })
-    ).toBeVisible();
+    await expect(page.getByRole('button', { name: /create account/i })).toBeVisible();
   });
 
-  test('should successfully create account with valid data', async ({
-    page,
-    context,
-  }) => {
+  test('should successfully create account with valid data', async ({ page, context }) => {
     // Generate unique email
     const timestamp = Date.now();
     const testEmail = `test-${timestamp}@example.com`;
@@ -52,10 +45,7 @@ test.describe('Sign Up - Acceptance Tests', () => {
     // Verify user is logged in (check for session cookie)
     const cookies = await context.cookies();
     const sessionCookie = cookies.find(
-      (c) =>
-        c.name.includes('session') ||
-        c.name.includes('__session') ||
-        c.name.includes('token')
+      (c) => c.name.includes('session') || c.name.includes('__session') || c.name.includes('token')
     );
     expect(sessionCookie).toBeDefined();
   });
@@ -66,9 +56,7 @@ test.describe('Sign Up - Acceptance Tests', () => {
 
     // HTML5 validation should prevent submission
     const nameInput = page.getByLabel(/full name/i);
-    const isValid = await nameInput.evaluate((input: HTMLInputElement) =>
-      input.checkValidity()
-    );
+    const isValid = await nameInput.evaluate((input: HTMLInputElement) => input.checkValidity());
 
     expect(isValid).toBe(false);
   });
@@ -82,9 +70,7 @@ test.describe('Sign Up - Acceptance Tests', () => {
 
     // HTML5 validation should catch invalid email
     const emailInput = page.getByLabel(/email/i);
-    const isValid = await emailInput.evaluate((input: HTMLInputElement) =>
-      input.checkValidity()
-    );
+    const isValid = await emailInput.evaluate((input: HTMLInputElement) => input.checkValidity());
 
     expect(isValid).toBe(false);
   });
@@ -209,17 +195,13 @@ test.describe('Sign Up - Acceptance Tests', () => {
 
     // Submit button should be full width on mobile
     const submitButton = page.getByRole('button', { name: /create account/i });
-    const buttonWidth = await submitButton.evaluate(
-      (el) => el.getBoundingClientRect().width
-    );
+    const buttonWidth = await submitButton.evaluate((el) => el.getBoundingClientRect().width);
 
     // Should be nearly full width (minus padding)
     expect(buttonWidth).toBeGreaterThan(300);
   });
 
-  test('should not submit form on Enter key in email field', async ({
-    page,
-  }) => {
+  test('should not submit form on Enter key in email field', async ({ page }) => {
     // This prevents accidental submission before password is entered
     await page.getByLabel(/full name/i).fill('Test User');
     await page.getByLabel(/email/i).fill('test@example.com');
@@ -239,9 +221,7 @@ test.describe('Sign Up - Acceptance Tests', () => {
 
     // Name field should be focused
     const nameInput = page.getByLabel(/full name/i);
-    const isFocused = await nameInput.evaluate(
-      (el) => el === document.activeElement
-    );
+    const isFocused = await nameInput.evaluate((el) => el === document.activeElement);
 
     expect(isFocused).toBe(true);
   });

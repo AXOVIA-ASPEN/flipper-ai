@@ -52,11 +52,13 @@ jest.mock('@/lib/logger', () => ({
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 const mockSmsSend = smsService.send as jest.MockedFunction<typeof smsService.send>;
 
-function mockSettings(overrides: {
-  phoneNumber?: string | null;
-  phoneVerified?: boolean;
-  smsNotifications?: boolean;
-} = {}) {
+function mockSettings(
+  overrides: {
+    phoneNumber?: string | null;
+    phoneVerified?: boolean;
+    smsNotifications?: boolean;
+  } = {}
+) {
   const phoneNumber = overrides.phoneNumber === undefined ? '+12025551234' : overrides.phoneNumber;
   const phoneVerified = overrides.phoneVerified ?? true;
   const smsNotifications = overrides.smsNotifications ?? true;
@@ -77,7 +79,14 @@ function mockSettings(overrides: {
   (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(
     phoneNumber
       ? { settings: { phoneNumber, phoneVerified, smsNotifications, ...perEventDefaults } }
-      : { settings: { phoneNumber: null, phoneVerified: false, smsNotifications: false, ...perEventDefaults } }
+      : {
+          settings: {
+            phoneNumber: null,
+            phoneVerified: false,
+            smsNotifications: false,
+            ...perEventDefaults,
+          },
+        }
   );
 }
 

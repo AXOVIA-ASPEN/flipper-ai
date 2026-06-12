@@ -85,9 +85,7 @@ describe('GET /api/usage', () => {
   it('returns usage data for FLIPPER user with null scan limit', async () => {
     (getAuthUserId as jest.Mock).mockResolvedValue('user-456');
     mockUserFindUnique.mockResolvedValue({ subscriptionTier: 'FLIPPER' });
-    mockUsageRecordFindMany.mockResolvedValue([
-      { type: 'SCAN', count: 25 },
-    ]);
+    mockUsageRecordFindMany.mockResolvedValue([{ type: 'SCAN', count: 25 }]);
 
     const response = await GET(makeRequest());
     const data = await response.json();

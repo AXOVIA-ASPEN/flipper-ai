@@ -65,48 +65,32 @@ describe('firebase.json Configuration', () => {
 
   describe('cache headers', () => {
     it('should set immutable cache for JS/CSS files', () => {
-      const jsCssHeader = config.hosting.headers.find(
-        (h) => h.source.includes('.@(js|css)')
-      );
+      const jsCssHeader = config.hosting.headers.find((h) => h.source.includes('.@(js|css)'));
       expect(jsCssHeader).toBeDefined();
-      const cacheControl = jsCssHeader!.headers.find(
-        (h) => h.key === 'Cache-Control'
-      );
+      const cacheControl = jsCssHeader!.headers.find((h) => h.key === 'Cache-Control');
       expect(cacheControl?.value).toContain('max-age=31536000');
       expect(cacheControl?.value).toContain('immutable');
     });
 
     it('should set immutable cache for image files', () => {
-      const imgHeader = config.hosting.headers.find(
-        (h) => h.source.includes('jpg|jpeg')
-      );
+      const imgHeader = config.hosting.headers.find((h) => h.source.includes('jpg|jpeg'));
       expect(imgHeader).toBeDefined();
-      const cacheControl = imgHeader!.headers.find(
-        (h) => h.key === 'Cache-Control'
-      );
+      const cacheControl = imgHeader!.headers.find((h) => h.key === 'Cache-Control');
       expect(cacheControl?.value).toContain('max-age=31536000');
     });
 
     it('should set short cache for HTML files', () => {
-      const htmlHeader = config.hosting.headers.find(
-        (h) => h.source.includes('.html')
-      );
+      const htmlHeader = config.hosting.headers.find((h) => h.source.includes('.html'));
       expect(htmlHeader).toBeDefined();
-      const cacheControl = htmlHeader!.headers.find(
-        (h) => h.key === 'Cache-Control'
-      );
+      const cacheControl = htmlHeader!.headers.find((h) => h.key === 'Cache-Control');
       expect(cacheControl?.value).toContain('max-age=300');
       expect(cacheControl?.value).toContain('s-maxage=600');
     });
 
     it('should set CORS headers for font files', () => {
-      const fontHeader = config.hosting.headers.find(
-        (h) => h.source.includes('woff')
-      );
+      const fontHeader = config.hosting.headers.find((h) => h.source.includes('woff'));
       expect(fontHeader).toBeDefined();
-      const cors = fontHeader!.headers.find(
-        (h) => h.key === 'Access-Control-Allow-Origin'
-      );
+      const cors = fontHeader!.headers.find((h) => h.key === 'Access-Control-Allow-Origin');
       expect(cors?.value).toBe('*');
     });
   });

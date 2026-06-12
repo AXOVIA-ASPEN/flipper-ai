@@ -62,9 +62,7 @@ async function mockListingsAPI(page: import('@playwright/test').Page) {
       filtered = filtered.filter((l) => l.category === category);
     }
     if (platform && platform !== 'all') {
-      filtered = filtered.filter(
-        (l) => l.platform.toLowerCase() === platform.toLowerCase()
-      );
+      filtered = filtered.filter((l) => l.platform.toLowerCase() === platform.toLowerCase());
     }
     if (location && location !== '') {
       filtered = filtered.filter((l) => l.location === location);
@@ -210,9 +208,7 @@ test.describe('Filter & URL Parameter Persistence', () => {
       await page.waitForLoadState('networkidle');
 
       // Check for active filter count indicator
-      const filterCount = page.locator(
-        '[data-testid="active-filter-count"], .filter-count'
-      );
+      const filterCount = page.locator('[data-testid="active-filter-count"], .filter-count');
       if (await filterCount.isVisible()) {
         const text = await filterCount.textContent();
         expect(text).toContain('2');

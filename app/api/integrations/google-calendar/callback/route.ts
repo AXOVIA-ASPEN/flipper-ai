@@ -55,9 +55,7 @@ export async function GET(request: NextRequest) {
     // Store encrypted tokens
     await storeToken(userId, accessToken, refreshToken, expiresAt, email || null);
 
-    return NextResponse.redirect(
-      new URL('/settings?tab=integrations&connected=true', request.url)
-    );
+    return NextResponse.redirect(new URL('/settings?tab=integrations&connected=true', request.url));
   } catch {
     return NextResponse.redirect(
       new URL('/settings?tab=integrations&error=auth_failed', request.url)

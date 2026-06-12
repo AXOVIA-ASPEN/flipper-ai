@@ -141,10 +141,9 @@ describe('useFilterParams', () => {
       result.current.setFilter('platforms', 'CRAIGSLIST,EBAY');
     });
 
-    expect(mockPush).toHaveBeenCalledWith(
-      expect.stringContaining('platforms=CRAIGSLIST%2CEBAY'),
-      { scroll: false }
-    );
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('platforms=CRAIGSLIST%2CEBAY'), {
+      scroll: false,
+    });
   });
 
   it('setFilter updates a single filter and pushes URL', () => {

@@ -96,9 +96,7 @@ export function buildReport(
     resaleDate: Date | null;
   }>
 ): PerformanceReport {
-  const sold = items.filter(
-    (i) => i.status === 'SOLD' && i.resalePrice != null
-  );
+  const sold = items.filter((i) => i.status === 'SOLD' && i.resalePrice != null);
   const purchased = items.filter(
     (i) => i.purchaseDate >= dateRange.start && i.purchaseDate <= dateRange.end
   );
@@ -123,12 +121,9 @@ export function buildReport(
       return Math.max(0, diff);
     });
   const avgDaysToSell =
-    daysToSell.length > 0
-      ? daysToSell.reduce((a, b) => a + b, 0) / daysToSell.length
-      : 0;
+    daysToSell.length > 0 ? daysToSell.reduce((a, b) => a + b, 0) / daysToSell.length : 0;
 
-  const avgROI =
-    totalCost > 0 ? ((totalRevenue - totalCost - totalFees) / totalCost) * 100 : 0;
+  const avgROI = totalCost > 0 ? ((totalRevenue - totalCost - totalFees) / totalCost) * 100 : 0;
 
   // Category breakdown
   const categoryMap = new Map<string, { count: number; profit: number }>();

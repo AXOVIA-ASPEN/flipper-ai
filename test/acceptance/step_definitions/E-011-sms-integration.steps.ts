@@ -174,11 +174,18 @@ delete require.cache[smsNotificationServicePath];
 // hoists `import` statements to the top of the module, which would defeat
 // the cache eviction above.
 /* eslint-disable @typescript-eslint/no-require-imports */
-const smsNotificationServiceModule = require(smsNotificationServicePath) as typeof import('../../../src/lib/sms-notification-service');
+const smsNotificationServiceModule = require(
+  smsNotificationServicePath
+) as typeof import('../../../src/lib/sms-notification-service');
 const { SmsNotificationService, SMS_MAX_LENGTH } = smsNotificationServiceModule;
-const { SmsService } = require('../../../src/lib/sms-service') as typeof import('../../../src/lib/sms-service');
+const { SmsService } =
+  require('../../../src/lib/sms-service') as typeof import('../../../src/lib/sms-service');
 /* eslint-enable @typescript-eslint/no-require-imports */
-import type { SmsProvider, SendSmsResult, SmsService as SmsServiceType } from '../../../src/lib/sms-service';
+import type {
+  SmsProvider,
+  SendSmsResult,
+  SmsService as SmsServiceType,
+} from '../../../src/lib/sms-service';
 import type { SmsNotificationService as SmsNotificationServiceType } from '../../../src/lib/sms-notification-service';
 
 // ---------------------------------------------------------------------------
@@ -437,10 +444,7 @@ Then('the SMS body is 160 characters or fewer', function () {
 });
 
 Then('the SMS body ends with a truncation marker', function () {
-  assert.ok(
-    state.sentSms[0].body.includes('…'),
-    'Expected truncation marker "…" in SMS body'
-  );
+  assert.ok(state.sentSms[0].body.includes('…'), 'Expected truncation marker "…" in SMS body');
 });
 
 Then('the notification call completes without throwing', function () {

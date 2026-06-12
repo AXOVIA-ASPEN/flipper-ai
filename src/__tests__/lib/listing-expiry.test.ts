@@ -139,7 +139,16 @@ describe('listing-expiry', () => {
     it('returns listings mapped with non-null estimatedExpiresAt', async () => {
       const fakeExpiry = new Date('2026-04-09T18:00:00.000Z');
       (mockPrisma.listing.findMany as jest.Mock).mockResolvedValueOnce([
-        { id: 'l1', title: 'Test', platform: 'CRAIGSLIST', url: 'http://x', askingPrice: 100, userId: 'u1', estimatedExpiresAt: fakeExpiry, postedAt: null },
+        {
+          id: 'l1',
+          title: 'Test',
+          platform: 'CRAIGSLIST',
+          url: 'http://x',
+          askingPrice: 100,
+          userId: 'u1',
+          estimatedExpiresAt: fakeExpiry,
+          postedAt: null,
+        },
       ]);
 
       const result = await getExpiringListings(24);

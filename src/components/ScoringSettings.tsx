@@ -132,7 +132,9 @@ export default function ScoringSettings() {
   if (loading) {
     return (
       <div className="fp-glass-sm p-6">
-        <h2 className="text-2xl font-semibold mb-4" style={{ color: '#e2e8f0' }}>Scoring &amp; Fees</h2>
+        <h2 className="text-2xl font-semibold mb-4" style={{ color: '#e2e8f0' }}>
+          Scoring &amp; Fees
+        </h2>
         <p style={{ color: '#94a3b8' }}>Loading...</p>
       </div>
     );
@@ -141,7 +143,9 @@ export default function ScoringSettings() {
   if (!settings) {
     return (
       <div className="fp-glass-sm p-6">
-        <h2 className="text-2xl font-semibold mb-4" style={{ color: '#e2e8f0' }}>Scoring &amp; Fees</h2>
+        <h2 className="text-2xl font-semibold mb-4" style={{ color: '#e2e8f0' }}>
+          Scoring &amp; Fees
+        </h2>
         <p style={{ color: '#fca5a5' }}>{error || 'Failed to load settings'}</p>
       </div>
     );
@@ -150,12 +154,10 @@ export default function ScoringSettings() {
   return (
     <div className="fp-glass-sm p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-semibold" style={{ color: '#e2e8f0' }}>Scoring &amp; Fees</h2>
-        <button
-          onClick={handleResetToDefaults}
-          disabled={saving}
-          className="fp-btn-ghost"
-        >
+        <h2 className="text-2xl font-semibold" style={{ color: '#e2e8f0' }}>
+          Scoring &amp; Fees
+        </h2>
+        <button onClick={handleResetToDefaults} disabled={saving} className="fp-btn-ghost">
           Reset to Defaults
         </button>
       </div>
@@ -227,9 +229,12 @@ export default function ScoringSettings() {
 
         {/* Platform Fee Rates */}
         <div className="pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-          <h3 className="font-medium mb-1" style={{ color: '#e2e8f0' }}>Platform Selling Fee Rates (%)</h3>
+          <h3 className="font-medium mb-1" style={{ color: '#e2e8f0' }}>
+            Platform Selling Fee Rates (%)
+          </h3>
           <p className="text-xs mb-4" style={{ color: '#94a3b8' }}>
-            Enter the selling fee percentage for each platform (0–50). These are used to calculate profit estimates.
+            Enter the selling fee percentage for each platform (0–50). These are used to calculate
+            profit estimates.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {PLATFORM_FEE_LABELS.map(({ key, label }) => (
@@ -264,7 +269,12 @@ export default function ScoringSettings() {
                     disabled={saving}
                     className="fp-input w-full pr-8"
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: '#475569' }}>%</span>
+                  <span
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-sm"
+                    style={{ color: '#475569' }}
+                  >
+                    %
+                  </span>
                 </div>
               </div>
             ))}
@@ -273,12 +283,20 @@ export default function ScoringSettings() {
 
         {/* Holding Cost Rate */}
         <div className="pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-          <h3 className="font-medium mb-1" style={{ color: '#e2e8f0' }}>Holding Cost Rate ($/day)</h3>
+          <h3 className="font-medium mb-1" style={{ color: '#e2e8f0' }}>
+            Holding Cost Rate ($/day)
+          </h3>
           <p className="text-xs mb-3" style={{ color: '#94a3b8' }}>
-            Daily cost to hold purchased inventory (storage, opportunity cost). Used in the Inventory view.
+            Daily cost to hold purchased inventory (storage, opportunity cost). Used in the
+            Inventory view.
           </p>
           <div className="relative max-w-xs">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: '#475569' }}>$</span>
+            <span
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-sm"
+              style={{ color: '#475569' }}
+            >
+              $
+            </span>
             <input
               id="holding-cost-daily-rate"
               type="number"

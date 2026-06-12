@@ -68,13 +68,14 @@ describe('getListingImageUrl', () => {
   });
 
   it('returns first image storageUrl when multiple images exist', () => {
-    const listing = makeListing(null, makeImages([
-      'https://storage.googleapis.com/bucket/0.jpg',
-      'https://storage.googleapis.com/bucket/1.jpg',
-    ]));
-    expect(getListingImageUrl(listing)).toBe(
-      'https://storage.googleapis.com/bucket/0.jpg'
+    const listing = makeListing(
+      null,
+      makeImages([
+        'https://storage.googleapis.com/bucket/0.jpg',
+        'https://storage.googleapis.com/bucket/1.jpg',
+      ])
     );
+    expect(getListingImageUrl(listing)).toBe('https://storage.googleapis.com/bucket/0.jpg');
   });
 
   it('returns imageIndex=0 URL when images are returned out of order', () => {
@@ -86,9 +87,7 @@ describe('getListingImageUrl', () => {
     // Shuffle: put index=2 first
     const shuffled = [images[2], images[0], images[1]];
     const listing = makeListing(null, shuffled);
-    expect(getListingImageUrl(listing)).toBe(
-      'https://storage.googleapis.com/bucket/0.jpg'
-    );
+    expect(getListingImageUrl(listing)).toBe('https://storage.googleapis.com/bucket/0.jpg');
   });
 });
 
@@ -116,10 +115,7 @@ describe('getAllListingImageUrls', () => {
   });
 
   it('falls back to parsed imageUrls when images array is empty', () => {
-    const listing = makeListing(
-      '["https://external.com/a.jpg","https://external.com/b.jpg"]',
-      []
-    );
+    const listing = makeListing('["https://external.com/a.jpg","https://external.com/b.jpg"]', []);
     expect(getAllListingImageUrls(listing)).toEqual([
       'https://external.com/a.jpg',
       'https://external.com/b.jpg',

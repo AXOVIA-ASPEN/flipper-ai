@@ -29,7 +29,15 @@ const EXCLUDED_GLOBS = [
   '**/.next/**',
   '**/node_modules/**',
 ];
-const REQUIRED_TAGS = ['@file', '@author', '@company', '@date', '@version', '@brief', '@description'];
+const REQUIRED_TAGS = [
+  '@file',
+  '@author',
+  '@company',
+  '@date',
+  '@version',
+  '@brief',
+  '@description',
+];
 
 describe('Story 14.10 — canonical JSDoc file headers (AC #7, final gate)', () => {
   test('every TSX file under app/ and src/components/ has all 7 canonical @-tags in the first 30 lines', async () => {

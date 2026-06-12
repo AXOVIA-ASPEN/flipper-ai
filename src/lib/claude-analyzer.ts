@@ -68,7 +68,11 @@ async function getCachedAnalysis(listingId: string): Promise<ClaudeAnalysisResul
 /**
  * Store analysis result in cache (L2 DB then L1 in-memory)
  */
-async function cacheAnalysis(listingId: string, result: ClaudeAnalysisResult, askingPrice?: number): Promise<void> {
+async function cacheAnalysis(
+  listingId: string,
+  result: ClaudeAnalysisResult,
+  askingPrice?: number
+): Promise<void> {
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + CACHE_DURATION_HOURS);
 
@@ -257,9 +261,7 @@ export async function batchAnalyzeListings(
       failed++;
       errors.push({
         listingId,
-      error: error instanceof Error
-        ? error.message
-        : /* istanbul ignore next */ 'Unknown error',
+        error: error instanceof Error ? error.message : /* istanbul ignore next */ 'Unknown error',
       });
     }
 

@@ -58,10 +58,7 @@ function sendToAnalytics(metric: WebVitalMetric): void {
 export function WebVitals(): null {
   useEffect(() => {
     // Dynamically import web-vitals; gracefully skip if not installed
-    const loadVitals = new Function(
-      'cb',
-      `import('web-vitals').then(m => cb(m)).catch(() => {})`
-    );
+    const loadVitals = new Function('cb', `import('web-vitals').then(m => cb(m)).catch(() => {})`);
     loadVitals((mod: Record<string, (fn: typeof sendToAnalytics) => void>) => {
       mod.onCLS?.(sendToAnalytics);
       mod.onFID?.(sendToAnalytics);

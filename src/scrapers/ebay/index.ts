@@ -14,14 +14,6 @@ export {
   convertEbayItemsToNormalized,
 } from './scraper';
 
-export type {
-  EbayItemSummary,
-  EbaySearchResponse,
-  EbayScraperConfig,
-} from './types';
+export type { EbayItemSummary, EbaySearchResponse, EbayScraperConfig } from './types';
 
-export {
-  SUPPORTED_CATEGORIES,
-  SUPPORTED_CONDITIONS,
-  EBAY_API_DEFAULTS,
-} from './types';
+export { SUPPORTED_CATEGORIES, SUPPORTED_CONDITIONS, EBAY_API_DEFAULTS } from './types';

@@ -22,7 +22,8 @@ BeforeAll(async function () {
   // tabIndex={-1} on <main> exists exclusively for WebKit). Honor BROWSER env
   // var: BROWSER=webkit (or firefox) overrides the default Chromium launcher.
   const browserType = (process.env.BROWSER || 'chromium').toLowerCase();
-  const launcher = browserType === 'webkit' ? webkit : browserType === 'firefox' ? firefox : chromium;
+  const launcher =
+    browserType === 'webkit' ? webkit : browserType === 'firefox' ? firefox : chromium;
   browser = await launcher.launch({
     headless: true, // Always headless on server (no X display)
     slowMo: process.env.SLOW_MO ? parseInt(process.env.SLOW_MO) : 0,

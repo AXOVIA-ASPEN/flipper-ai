@@ -35,10 +35,7 @@ import { hasValidToken } from '@/lib/google-calendar-token-store';
 import { logger } from '@/lib/logger';
 
 // POST /api/opportunities/[id]/meeting
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userId = await getCurrentUserId();
     if (!userId) throw new UnauthorizedError('Unauthorized');

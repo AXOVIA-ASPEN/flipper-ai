@@ -66,8 +66,24 @@ const mockAnalyticsData = {
     { period: 'Feb 2026', revenue: 1200, costs: 900, profit: 300, itemsSold: 2, itemsPurchased: 4 },
   ],
   categoryBreakdown: [
-    { category: 'Electronics', count: 4, totalInvested: 800, totalRevenue: 1400, totalProfit: 450, avgROI: 56.25, avgDaysToSell: 10 },
-    { category: 'Fashion', count: 2, totalInvested: 300, totalRevenue: 500, totalProfit: 150, avgROI: 50, avgDaysToSell: 14 },
+    {
+      category: 'Electronics',
+      count: 4,
+      totalInvested: 800,
+      totalRevenue: 1400,
+      totalProfit: 450,
+      avgROI: 56.25,
+      avgDaysToSell: 10,
+    },
+    {
+      category: 'Fashion',
+      count: 2,
+      totalInvested: 300,
+      totalRevenue: 500,
+      totalProfit: 150,
+      avgROI: 50,
+      avgDaysToSell: 14,
+    },
   ],
 };
 

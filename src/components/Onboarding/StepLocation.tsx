@@ -56,10 +56,7 @@ export default function StepLocation({ zip, radius, onZipChange, onRadiusChange 
 
       {/* Radius */}
       <div>
-        <label
-          className="block text-sm font-medium mb-2"
-          style={{ color: '#94a3b8' }}
-        >
+        <label className="block text-sm font-medium mb-2" style={{ color: '#94a3b8' }}>
           Search Radius
         </label>
         <div className="flex flex-wrap gap-2">

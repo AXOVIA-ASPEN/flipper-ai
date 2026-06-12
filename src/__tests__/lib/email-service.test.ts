@@ -5,7 +5,13 @@
  * so no real emails are sent during testing.
  */
 
-import { EmailService, NullProvider, type EmailProvider, type SendEmailParams, type SendEmailResult } from '@/lib/email-service';
+import {
+  EmailService,
+  NullProvider,
+  type EmailProvider,
+  type SendEmailParams,
+  type SendEmailResult,
+} from '@/lib/email-service';
 
 // ---------------------------------------------------------------------------
 // Mock provider
@@ -390,11 +396,15 @@ describe('URL generation', () => {
 describe('ResendProvider', () => {
   it('sends successfully via Resend client', async () => {
     const mockSend = jest.fn().mockResolvedValue({ data: { id: 'res-123' }, error: null });
-    jest.mock('resend', () => ({
-      Resend: jest.fn().mockImplementation(() => ({
-        emails: { send: mockSend },
-      })),
-    }), { virtual: true });
+    jest.mock(
+      'resend',
+      () => ({
+        Resend: jest.fn().mockImplementation(() => ({
+          emails: { send: mockSend },
+        })),
+      }),
+      { virtual: true }
+    );
 
     // Use ResendProvider directly with a mock
     const { ResendProvider } = await import('@/lib/email-service');
@@ -502,7 +512,7 @@ describe('NullProvider - array recipients branch', () => {
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
     const result = await provider.send({
-      to: ['alice@example.com', 'bob@example.com'],  // array → hits join branch
+      to: ['alice@example.com', 'bob@example.com'], // array → hits join branch
       subject: 'Array Recipients Test',
       html: '<p>Hi team</p>',
     });
@@ -576,7 +586,9 @@ describe('EmailService.sendOpportunityFound()', () => {
 
     const email = mockProvider.lastEmail!;
     expect(email.headers).toBeDefined();
-    expect(email.headers!['List-Unsubscribe']).toMatch(/^<https:\/\/.+\/api\/user\/unsubscribe\?token=.+>$/);
+    expect(email.headers!['List-Unsubscribe']).toMatch(
+      /^<https:\/\/.+\/api\/user\/unsubscribe\?token=.+>$/
+    );
     expect(email.headers!['List-Unsubscribe-Post']).toBe('List-Unsubscribe=One-Click');
   });
 
@@ -789,7 +801,9 @@ describe('EmailService.sendFlipSold()', () => {
 
     const email = mockProvider.lastEmail!;
     expect(email.headers).toBeDefined();
-    expect(email.headers!['List-Unsubscribe']).toMatch(/^<https:\/\/.+\/api\/user\/unsubscribe\?token=.+>$/);
+    expect(email.headers!['List-Unsubscribe']).toMatch(
+      /^<https:\/\/.+\/api\/user\/unsubscribe\?token=.+>$/
+    );
     expect(email.headers!['List-Unsubscribe-Post']).toBe('List-Unsubscribe=One-Click');
   });
 

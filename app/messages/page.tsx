@@ -56,7 +56,9 @@ function MessagesPageInner() {
   const { user: firebaseUser, loading: authLoading } = useFirebaseAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialTab: TabType = isTabType(searchParams.get('tab')) ? (searchParams.get('tab') as TabType) : 'all';
+  const initialTab: TabType = isTabType(searchParams.get('tab'))
+    ? (searchParams.get('tab') as TabType)
+    : 'all';
   const [threads, setThreads] = useState<ThreadSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -90,7 +92,9 @@ function MessagesPageInner() {
   useEffect(() => {
     async function fetchApprovalCount() {
       try {
-        const res = await fetch('/api/messages?status=DRAFT,PENDING_APPROVAL&direction=OUTBOUND&limit=0');
+        const res = await fetch(
+          '/api/messages?status=DRAFT,PENDING_APPROVAL&direction=OUTBOUND&limit=0'
+        );
         const json = await res.json();
         if (res.ok && json.success) {
           setApprovalCount(json.pagination?.total ?? 0);
@@ -158,8 +162,24 @@ function MessagesPageInner() {
 
   if (authLoading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
-        <div style={{ width: 32, height: 32, borderRadius: '50%', border: '2px solid transparent', borderBottomColor: '#8b5cf6', animation: 'spin 1s linear infinite' }} />
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '100vh',
+        }}
+      >
+        <div
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: '50%',
+            border: '2px solid transparent',
+            borderBottomColor: '#8b5cf6',
+            animation: 'spin 1s linear infinite',
+          }}
+        />
       </div>
     );
   }
@@ -167,155 +187,227 @@ function MessagesPageInner() {
   return (
     <div style={{ minHeight: '100vh', padding: '32px 24px' }}>
       <div style={{ maxWidth: 1152, margin: '0 auto' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-        <div>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#e2e8f0', letterSpacing: '-0.02em' }}>Messages</h1>
-          <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>
-            {tab === 'all'
-              ? `${total} conversation${total !== 1 ? 's' : ''}`
-              : tab === 'approval'
-                ? `${approvalCount} pending approval`
-                : `${filteredThreads.length} ${tab} thread${filteredThreads.length !== 1 ? 's' : ''}`}
-            {totalUnread > 0 && (
-              <span style={{ marginLeft: 8, color: '#8b5cf6', fontWeight: 600 }}>
-                ({totalUnread} unread)
-              </span>
-            )}
-          </p>
-        </div>
-        <button
-          onClick={() => router.push('/')}
-          className="fp-btn-ghost"
-          style={{ fontSize: 13 }}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 24,
+          }}
         >
-          &larr; Back to Dashboard
-        </button>
-      </div>
-
-      {/* Error banner */}
-      {error && (
-        <div style={{ marginBottom: 16, padding: '12px 16px', border: '1px solid rgba(248,113,113,0.3)', borderRadius: 10, background: 'rgba(248,113,113,0.08)', fontSize: 13, color: '#f87171' }}>
-          {error}
+          <div>
+            <h1
+              style={{ fontSize: 28, fontWeight: 800, color: '#e2e8f0', letterSpacing: '-0.02em' }}
+            >
+              Messages
+            </h1>
+            <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>
+              {tab === 'all'
+                ? `${total} conversation${total !== 1 ? 's' : ''}`
+                : tab === 'approval'
+                  ? `${approvalCount} pending approval`
+                  : `${filteredThreads.length} ${tab} thread${filteredThreads.length !== 1 ? 's' : ''}`}
+              {totalUnread > 0 && (
+                <span style={{ marginLeft: 8, color: '#8b5cf6', fontWeight: 600 }}>
+                  ({totalUnread} unread)
+                </span>
+              )}
+            </p>
+          </div>
           <button
-            onClick={fetchThreads}
-            style={{ marginLeft: 8, textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', color: '#f87171', fontSize: 13 }}
+            onClick={() => router.push('/')}
+            className="fp-btn-ghost"
+            style={{ fontSize: 13 }}
           >
-            Retry
+            &larr; Back to Dashboard
           </button>
         </div>
-      )}
 
-      {/* Tabs */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 16, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-        {([
-          { key: 'all' as TabType, label: 'All' },
-          { key: 'inbox' as TabType, label: 'Inbox' },
-          { key: 'sent' as TabType, label: 'Sent' },
-          { key: 'approval' as TabType, label: `Approval${approvalCount > 0 ? ` (${approvalCount})` : ''}` },
-        ]).map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
+        {/* Error banner */}
+        {error && (
+          <div
             style={{
-              padding: '8px 16px',
+              marginBottom: 16,
+              padding: '12px 16px',
+              border: '1px solid rgba(248,113,113,0.3)',
+              borderRadius: 10,
+              background: 'rgba(248,113,113,0.08)',
               fontSize: 13,
-              fontWeight: 500,
-              color: tab === t.key ? '#8b5cf6' : '#64748b',
-              background: 'none',
-              border: 'none',
-              borderBottom: tab === t.key ? '2px solid #8b5cf6' : '2px solid transparent',
-              cursor: 'pointer',
-              transition: 'color 0.15s',
+              color: '#f87171',
             }}
           >
-            {t.label}
-          </button>
-        ))}
-      </div>
+            {error}
+            <button
+              onClick={fetchThreads}
+              style={{
+                marginLeft: 8,
+                textDecoration: 'underline',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#f87171',
+                fontSize: 13,
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        )}
 
-      {/* Approval tab content */}
-      {tab === 'approval' ? (
-        <ApprovalQueue
-          subscriptionTier={subscriptionTier}
-          messageApprovalRequired={messageApprovalRequired}
-          onCountChange={setApprovalCount}
-        />
-      ) : (
-      <>
-      {/* Search */}
-      <div style={{ marginBottom: 16 }}>
-        <input
-          type="text"
-          placeholder="Search by listing title or seller name..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+        {/* Tabs */}
+        <div
           style={{
-            width: '100%',
-            padding: '10px 16px',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: 10,
-            background: 'rgba(255,255,255,0.05)',
-            color: '#e2e8f0',
-            fontSize: 14,
-            outline: 'none',
-            boxSizing: 'border-box',
+            display: 'flex',
+            gap: 4,
+            marginBottom: 16,
+            borderBottom: '1px solid rgba(255,255,255,0.08)',
           }}
-        />
-      </div>
-
-      {/* Thread list */}
-      {loading ? (
-        <LoadingSkeleton variant="list" rows={5} />
-      ) : filteredThreads.length === 0 ? (
-        <EmptyState
-          icon={<div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(139,92,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}><span style={{ fontSize: 40 }}>💬</span></div>}
-          title={search ? 'No matching threads' : 'No messages yet'}
-          message={search ? 'Try a different search term.' : 'When you contact sellers about listings, your conversation threads will appear here.'}
-          action={!search ? { label: 'Browse Opportunities', href: '/opportunities' } : undefined}
-        />
-      ) : (
-        <div className="fp-glass" style={{ display: 'flex', flexDirection: 'column', gap: 0, overflow: 'hidden' }}>
-          {filteredThreads.map((thread) => (
-            <ThreadItem
-              key={thread.listingId}
-              listingId={thread.listingId}
-              listing={thread.listing}
-              lastMessage={thread.lastMessage}
-              sellerName={thread.sellerName}
-              messageCount={thread.messageCount}
-              unreadCount={thread.unreadCount}
-              lastMessageAt={thread.lastMessageAt}
-            />
+        >
+          {[
+            { key: 'all' as TabType, label: 'All' },
+            { key: 'inbox' as TabType, label: 'Inbox' },
+            { key: 'sent' as TabType, label: 'Sent' },
+            {
+              key: 'approval' as TabType,
+              label: `Approval${approvalCount > 0 ? ` (${approvalCount})` : ''}`,
+            },
+          ].map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              style={{
+                padding: '8px 16px',
+                fontSize: 13,
+                fontWeight: 500,
+                color: tab === t.key ? '#8b5cf6' : '#64748b',
+                background: 'none',
+                border: 'none',
+                borderBottom: tab === t.key ? '2px solid #8b5cf6' : '2px solid transparent',
+                cursor: 'pointer',
+                transition: 'color 0.15s',
+              }}
+            >
+              {t.label}
+            </button>
           ))}
         </div>
-      )}
 
-      {/* Pagination — only shown on "All" tab since Inbox/Sent filter client-side */}
-      {tab === 'all' && total > limit && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-          <button
-            onClick={() => setOffset(Math.max(0, offset - limit))}
-            disabled={offset === 0}
-            className="fp-btn-ghost"
-            style={{ fontSize: 13, opacity: offset === 0 ? 0.4 : 1 }}
-          >
-            &larr; Previous
-          </button>
-          <span style={{ fontSize: 13, color: '#94a3b8' }}>
-            {offset + 1}&ndash;{Math.min(offset + limit, total)} of {total}
-          </span>
-          <button
-            onClick={() => setOffset(offset + limit)}
-            disabled={offset + limit >= total}
-            className="fp-btn-ghost"
-            style={{ fontSize: 13, opacity: offset + limit >= total ? 0.4 : 1 }}
-          >
-            Next &rarr;
-          </button>
-        </div>
-      )}
-      </>
-      )}
+        {/* Approval tab content */}
+        {tab === 'approval' ? (
+          <ApprovalQueue
+            subscriptionTier={subscriptionTier}
+            messageApprovalRequired={messageApprovalRequired}
+            onCountChange={setApprovalCount}
+          />
+        ) : (
+          <>
+            {/* Search */}
+            <div style={{ marginBottom: 16 }}>
+              <input
+                type="text"
+                placeholder="Search by listing title or seller name..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 16px',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: 10,
+                  background: 'rgba(255,255,255,0.05)',
+                  color: '#e2e8f0',
+                  fontSize: 14,
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            {/* Thread list */}
+            {loading ? (
+              <LoadingSkeleton variant="list" rows={5} />
+            ) : filteredThreads.length === 0 ? (
+              <EmptyState
+                icon={
+                  <div
+                    style={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: '50%',
+                      background: 'rgba(139,92,246,0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: '0 auto 16px',
+                    }}
+                  >
+                    <span style={{ fontSize: 40 }}>💬</span>
+                  </div>
+                }
+                title={search ? 'No matching threads' : 'No messages yet'}
+                message={
+                  search
+                    ? 'Try a different search term.'
+                    : 'When you contact sellers about listings, your conversation threads will appear here.'
+                }
+                action={
+                  !search ? { label: 'Browse Opportunities', href: '/opportunities' } : undefined
+                }
+              />
+            ) : (
+              <div
+                className="fp-glass"
+                style={{ display: 'flex', flexDirection: 'column', gap: 0, overflow: 'hidden' }}
+              >
+                {filteredThreads.map((thread) => (
+                  <ThreadItem
+                    key={thread.listingId}
+                    listingId={thread.listingId}
+                    listing={thread.listing}
+                    lastMessage={thread.lastMessage}
+                    sellerName={thread.sellerName}
+                    messageCount={thread.messageCount}
+                    unreadCount={thread.unreadCount}
+                    lastMessageAt={thread.lastMessageAt}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Pagination — only shown on "All" tab since Inbox/Sent filter client-side */}
+            {tab === 'all' && total > limit && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginTop: 16,
+                  paddingTop: 16,
+                  borderTop: '1px solid rgba(255,255,255,0.08)',
+                }}
+              >
+                <button
+                  onClick={() => setOffset(Math.max(0, offset - limit))}
+                  disabled={offset === 0}
+                  className="fp-btn-ghost"
+                  style={{ fontSize: 13, opacity: offset === 0 ? 0.4 : 1 }}
+                >
+                  &larr; Previous
+                </button>
+                <span style={{ fontSize: 13, color: '#94a3b8' }}>
+                  {offset + 1}&ndash;{Math.min(offset + limit, total)} of {total}
+                </span>
+                <button
+                  onClick={() => setOffset(offset + limit)}
+                  disabled={offset + limit >= total}
+                  className="fp-btn-ghost"
+                  style={{ fontSize: 13, opacity: offset + limit >= total ? 0.4 : 1 }}
+                >
+                  Next &rarr;
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

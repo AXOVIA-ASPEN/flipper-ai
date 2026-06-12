@@ -11,7 +11,10 @@ const mockCompleteAI = jest.fn();
 jest.mock('@/lib/ai', () => ({
   completeAI: (...args: unknown[]) => mockCompleteAI(...args),
   AIProviderUnavailableError: class extends Error {
-    constructor() { super('No AI provider available'); this.name = 'AIProviderUnavailableError'; }
+    constructor() {
+      super('No AI provider available');
+      this.name = 'AIProviderUnavailableError';
+    }
   },
 }));
 
@@ -119,7 +122,10 @@ describe('description-generator', () => {
       const result = generateDescriptionsForAllPlatforms(baseInput);
       expect(result.descriptions).toHaveLength(4);
       expect(result.descriptions.map((d) => d.platform)).toEqual([
-        'ebay', 'mercari', 'facebook', 'offerup',
+        'ebay',
+        'mercari',
+        'facebook',
+        'offerup',
       ]);
     });
 
@@ -186,7 +192,9 @@ describe('description-generator', () => {
     });
 
     it('falls back to algorithmic when no AI provider available', async () => {
-      const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as { AIProviderUnavailableError: new () => Error };
+      const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as {
+        AIProviderUnavailableError: new () => Error;
+      };
       mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
       const result = await generateLLMDescription(baseInput, 'ebay');
       expect(result.description).toContain('Sony WH-1000XM5 Black');
@@ -223,7 +231,11 @@ describe('description-generator', () => {
     });
 
     it('handles empty LLM response', async () => {
-      mockCompleteAI.mockResolvedValue({ content: '', provider: 'gemini', model: 'gemini-2.0-flash' });
+      mockCompleteAI.mockResolvedValue({
+        content: '',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
+      });
 
       const result = await generateLLMDescription(baseInput, 'ebay');
       expect(result.description).toBe('');
@@ -239,7 +251,9 @@ describe('description-generator', () => {
     });
 
     it('uses generic style for unknown platform (falls back)', async () => {
-      const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as { AIProviderUnavailableError: new () => Error };
+      const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as {
+        AIProviderUnavailableError: new () => Error;
+      };
       mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
       const result = await generateLLMDescription(baseInput, 'unknown-platform');
       expect(result.description).toContain('Sony WH-1000XM5 Black');
@@ -260,12 +274,15 @@ describe('description-generator', () => {
         sellerNotes: 'Barely used',
       };
       await generateLLMDescription(input, 'ebay');
-      expect(mockCompleteAI).toHaveBeenCalledWith('listingDescription', expect.objectContaining({
-        defects: ['Minor scratch'],
-        features: ['Bluetooth 5.3'],
-        includesAccessories: ['Case'],
-        sellerNotes: 'Barely used',
-      }));
+      expect(mockCompleteAI).toHaveBeenCalledWith(
+        'listingDescription',
+        expect.objectContaining({
+          defects: ['Minor scratch'],
+          features: ['Bluetooth 5.3'],
+          includesAccessories: ['Case'],
+          sellerNotes: 'Barely used',
+        })
+      );
     });
 
     it('handles input with no brand/model/variant', async () => {
@@ -284,9 +301,12 @@ describe('description-generator', () => {
         askingPrice: 25,
       };
       await generateLLMDescription(input, 'facebook');
-      expect(mockCompleteAI).toHaveBeenCalledWith('listingDescription', expect.objectContaining({
-        platform: 'facebook',
-      }));
+      expect(mockCompleteAI).toHaveBeenCalledWith(
+        'listingDescription',
+        expect.objectContaining({
+          platform: 'facebook',
+        })
+      );
     });
   });
 });
@@ -296,7 +316,14 @@ describe('description-generator', () => {
 describe('generateAlgorithmicDescription - branch coverage', () => {
   it('falls back to PLATFORM_STYLES.generic for unknown platform', () => {
     const result = generateAlgorithmicDescription(
-      { brand: 'Nike', model: 'Air Max', variant: null, condition: 'good', category: 'Shoes', askingPrice: 50 },
+      {
+        brand: 'Nike',
+        model: 'Air Max',
+        variant: null,
+        condition: 'good',
+        category: 'Shoes',
+        askingPrice: 50,
+      },
       'unknown-marketplace'
     );
     expect(result.description).toBeTruthy();
@@ -305,7 +332,14 @@ describe('generateAlgorithmicDescription - branch coverage', () => {
 
   it('falls back condition text for unknown condition', () => {
     const result = generateAlgorithmicDescription(
-      { brand: 'Nike', model: null, variant: null, condition: 'custom-condition', category: null, askingPrice: 10 },
+      {
+        brand: 'Nike',
+        model: null,
+        variant: null,
+        condition: 'custom-condition',
+        category: null,
+        askingPrice: 10,
+      },
       'ebay'
     );
     expect(result.description).toContain('custom-condition');
@@ -313,7 +347,14 @@ describe('generateAlgorithmicDescription - branch coverage', () => {
 
   it('uses facebook/offerup local pickup shipping note', () => {
     const result = generateAlgorithmicDescription(
-      { brand: 'Test', model: 'Item', variant: null, condition: 'good', category: null, askingPrice: 10 },
+      {
+        brand: 'Test',
+        model: 'Item',
+        variant: null,
+        condition: 'good',
+        category: null,
+        askingPrice: 10,
+      },
       'offerup'
     );
     expect(result.description).toContain('Local pickup');
@@ -321,7 +362,14 @@ describe('generateAlgorithmicDescription - branch coverage', () => {
 
   it('uses default shipping note for non-local platforms', () => {
     const result = generateAlgorithmicDescription(
-      { brand: 'Test', model: 'Item', variant: null, condition: 'good', category: null, askingPrice: 10 },
+      {
+        brand: 'Test',
+        model: 'Item',
+        variant: null,
+        condition: 'good',
+        category: null,
+        askingPrice: 10,
+      },
       'ebay'
     );
     expect(result.description).toContain('Ships quickly');
@@ -332,8 +380,12 @@ describe('generateDescriptionsForAllPlatforms - branch coverage', () => {
   it('uses first description as fallback primary when ebay missing', () => {
     // All 4 platforms are always generated; just verify primary exists
     const result = generateDescriptionsForAllPlatforms({
-      brand: null, model: null, variant: null,
-      condition: 'good', category: null, askingPrice: 5,
+      brand: null,
+      model: null,
+      variant: null,
+      condition: 'good',
+      category: null,
+      askingPrice: 5,
     });
     expect(result.primary).toBeTruthy();
   });
@@ -345,9 +397,20 @@ describe('generateLLMDescription - branch coverage', () => {
   });
 
   it('detects condition details in LLM response', async () => {
-    mockCompleteAI.mockResolvedValue({ content: 'Item in excellent used condition, ships quickly.', provider: 'gemini', model: 'gemini-2.0-flash' });
+    mockCompleteAI.mockResolvedValue({
+      content: 'Item in excellent used condition, ships quickly.',
+      provider: 'gemini',
+      model: 'gemini-2.0-flash',
+    });
     const result = await generateLLMDescription(
-      { brand: 'Sony', model: 'TV', variant: null, condition: 'good', category: null, askingPrice: 100 },
+      {
+        brand: 'Sony',
+        model: 'TV',
+        variant: null,
+        condition: 'good',
+        category: null,
+        askingPrice: 100,
+      },
       'ebay'
     );
     expect(result.hasConditionDetails).toBe(true);
@@ -376,34 +439,57 @@ describe('description-generator - default parameter branches', () => {
   });
 
   it('generateLLMDescription uses "ebay" default when no platform arg', async () => {
-    mockCompleteAI.mockResolvedValue({ content: 'Test description.', provider: 'gemini', model: 'gemini-2.0-flash' });
+    mockCompleteAI.mockResolvedValue({
+      content: 'Test description.',
+      provider: 'gemini',
+      model: 'gemini-2.0-flash',
+    });
     const result = await generateLLMDescription(baseInput2);
     expect(result.platform).toBe('ebay');
   });
 
   it('generateLLMDescription handles empty content', async () => {
-    mockCompleteAI.mockResolvedValue({ content: '', provider: 'gemini', model: 'gemini-2.0-flash' });
+    mockCompleteAI.mockResolvedValue({
+      content: '',
+      provider: 'gemini',
+      model: 'gemini-2.0-flash',
+    });
     const result = await generateLLMDescription(baseInput2, 'ebay');
     expect(result.description).toBe('');
   });
 
   it('generateLLMDescription includes originalPrice in context', async () => {
-    mockCompleteAI.mockResolvedValue({ content: 'Great headphones retailing for $350.', provider: 'gemini', model: 'gemini-2.0-flash' });
+    mockCompleteAI.mockResolvedValue({
+      content: 'Great headphones retailing for $350.',
+      provider: 'gemini',
+      model: 'gemini-2.0-flash',
+    });
     const result = await generateLLMDescription({ ...baseInput2, originalPrice: 350 }, 'ebay');
     expect(result.description).toContain('headphones');
-    expect(mockCompleteAI).toHaveBeenCalledWith('listingDescription', expect.objectContaining({
-      originalPrice: 350,
-    }));
+    expect(mockCompleteAI).toHaveBeenCalledWith(
+      'listingDescription',
+      expect.objectContaining({
+        originalPrice: 350,
+      })
+    );
   });
 
   it('generateLLMDescription uses PLATFORM_STYLES.generic for unknown platform', async () => {
-    mockCompleteAI.mockResolvedValue({ content: 'Item available for sale with quick shipping.', provider: 'gemini', model: 'gemini-2.0-flash' });
+    mockCompleteAI.mockResolvedValue({
+      content: 'Item available for sale with quick shipping.',
+      provider: 'gemini',
+      model: 'gemini-2.0-flash',
+    });
     const result = await generateLLMDescription(baseInput2, 'custom-platform');
     expect(result.description).toBeTruthy();
   });
 
   it('generateLLMDescription: optional fields undefined → passes through to context', async () => {
-    mockCompleteAI.mockResolvedValue({ content: 'Generic item for sale.', provider: 'gemini', model: 'gemini-2.0-flash' });
+    mockCompleteAI.mockResolvedValue({
+      content: 'Generic item for sale.',
+      provider: 'gemini',
+      model: 'gemini-2.0-flash',
+    });
     const minimalInput: import('@/lib/description-generator').DescriptionGeneratorInput = {
       brand: null,
       model: null,
@@ -419,8 +505,11 @@ describe('description-generator - default parameter branches', () => {
     };
     const result = await generateLLMDescription(minimalInput, 'ebay');
     expect(result.description).toBe('Generic item for sale.');
-    expect(mockCompleteAI).toHaveBeenCalledWith('listingDescription', expect.objectContaining({
-      category: 'General',
-    }));
+    expect(mockCompleteAI).toHaveBeenCalledWith(
+      'listingDescription',
+      expect.objectContaining({
+        category: 'General',
+      })
+    );
   });
 });

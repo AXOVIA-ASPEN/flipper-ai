@@ -50,7 +50,7 @@ describe('POST /api/reports/generate', () => {
   it('returns 401 when user is not authenticated', async () => {
     const { getAuthUserId } = require('@/lib/auth-middleware');
     (getAuthUserId as jest.Mock).mockResolvedValueOnce(null);
-    
+
     const req = makeRequest('/api/reports/generate', {
       method: 'POST',
       body: JSON.stringify({ period: 'weekly' }),
@@ -121,11 +121,7 @@ describe('POST /api/reports/generate', () => {
     });
     const res = await POST(req);
     expect(res.status).toBe(200);
-    expect(getDateRange).toHaveBeenCalledWith(
-      'custom',
-      expect.any(Date),
-      expect.any(Date)
-    );
+    expect(getDateRange).toHaveBeenCalledWith('custom', expect.any(Date), expect.any(Date));
   });
 
   it('returns CSV when format=csv', async () => {
@@ -188,12 +184,22 @@ describe('GET /api/reports/generate', () => {
     const req = makeRequest('/api/reports/generate?period=monthly&userId=u-42');
     await GET(req);
     expect(getDateRange).toHaveBeenCalledWith('monthly');
-    expect(buildReport).toHaveBeenCalledWith('u-42', 'monthly', expect.any(Object), expect.any(Array));
+    expect(buildReport).toHaveBeenCalledWith(
+      'u-42',
+      'monthly',
+      expect.any(Object),
+      expect.any(Array)
+    );
   });
 
   it('defaults userId to anonymous', async () => {
     const req = makeRequest('/api/reports/generate');
     await GET(req);
-    expect(buildReport).toHaveBeenCalledWith('anonymous', expect.any(String), expect.any(Object), expect.any(Array));
+    expect(buildReport).toHaveBeenCalledWith(
+      'anonymous',
+      expect.any(String),
+      expect.any(Object),
+      expect.any(Array)
+    );
   });
 });

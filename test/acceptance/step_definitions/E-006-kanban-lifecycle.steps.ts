@@ -85,9 +85,7 @@ Then(
   function (status1: string, status2: string, status3: string) {
     const content: string = this.fileContent;
     // Verify handleKanbanStatusChange contains the intercept condition
-    const intercepts = [status1, status2, status3].every((s) =>
-      content.includes(`'${s}'`)
-    );
+    const intercepts = [status1, status2, status3].every((s) => content.includes(`'${s}'`));
     if (!intercepts) {
       throw new Error(
         `handleKanbanStatusChange does not intercept ${status1}, ${status2}, ${status3}`
@@ -104,7 +102,9 @@ Then('it calls updateOpportunity directly for other statuses', function () {
   const content: string = this.fileContent;
   // Verify the else branch calls updateOpportunity directly
   if (!content.includes('updateOpportunity(id, { status: newStatus })')) {
-    throw new Error('handleKanbanStatusChange does not call updateOpportunity directly for other statuses');
+    throw new Error(
+      'handleKanbanStatusChange does not call updateOpportunity directly for other statuses'
+    );
   }
 });
 
@@ -129,29 +129,30 @@ Then('it calls updateOpportunity directly with status {string}', function (statu
   const content: string = this.fileContent;
   // Verify the else branch calls updateOpportunity
   if (!content.includes(`updateOpportunity(id, { status: newStatus })`)) {
-    throw new Error(`handleKanbanStatusChange does not call updateOpportunity for ${status} (non-intercepted) statuses`);
+    throw new Error(
+      `handleKanbanStatusChange does not call updateOpportunity for ${status} (non-intercepted) statuses`
+    );
   }
 });
 
 // ==================== Then: PURCHASED modal (S-12) ====================
 
-Then(
-  'it renders when pendingKanbanMove targetStatus is {string}',
-  function (targetStatus: string) {
-    const content: string = this.fileContent;
-    const pattern = new RegExp(
-      `pendingKanbanMove\\??\\.targetStatus\\s*===\\s*['"]${targetStatus}['"]`
-    );
-    if (!pattern.test(content)) {
-      throw new Error(`Modal for targetStatus "${targetStatus}" not found`);
-    }
+Then('it renders when pendingKanbanMove targetStatus is {string}', function (targetStatus: string) {
+  const content: string = this.fileContent;
+  const pattern = new RegExp(
+    `pendingKanbanMove\\??\\.targetStatus\\s*===\\s*['"]${targetStatus}['"]`
+  );
+  if (!pattern.test(content)) {
+    throw new Error(`Modal for targetStatus "${targetStatus}" not found`);
   }
-);
+});
 
 Then('it has a required purchase price input', function () {
   const content: string = this.fileContent;
   if (!content.includes('modal-purchase-price')) {
-    throw new Error('PURCHASED modal does not have a purchase price input (id: modal-purchase-price)');
+    throw new Error(
+      'PURCHASED modal does not have a purchase price input (id: modal-purchase-price)'
+    );
   }
 });
 
@@ -166,7 +167,11 @@ Then(
   'confirming calls updateOpportunity with status {string} and purchasePrice and purchaseDate',
   function (status: string) {
     const content: string = this.fileContent;
-    if (!content.includes(`status: '${status}'`) || !content.includes('purchasePrice') || !content.includes('purchaseDate')) {
+    if (
+      !content.includes(`status: '${status}'`) ||
+      !content.includes('purchasePrice') ||
+      !content.includes('purchaseDate')
+    ) {
       throw new Error(
         `PURCHASED modal confirm does not call updateOpportunity with status=${status}, purchasePrice, purchaseDate`
       );
@@ -219,7 +224,8 @@ Then(
     const hasResalePrice = content.includes('resalePrice');
     const hasFees = content.includes('payload.fees');
     const hasResaleDate = content.includes('resaleDate');
-    const hasPurchasePrice = content.includes('payload.purchasePrice') || content.includes('opp?.purchasePrice');
+    const hasPurchasePrice =
+      content.includes('payload.purchasePrice') || content.includes('opp?.purchasePrice');
     if (!hasStatus || !hasResalePrice || !hasFees || !hasResaleDate || !hasPurchasePrice) {
       throw new Error(
         `SOLD modal confirm missing required fields: status=${hasStatus}, resalePrice=${hasResalePrice}, fees=${hasFees}, resaleDate=${hasResaleDate}, purchasePrice=${hasPurchasePrice}`

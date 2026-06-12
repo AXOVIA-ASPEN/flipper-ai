@@ -59,7 +59,9 @@ function renderWithProviders(node: React.ReactElement): { container: HTMLElement
 function expectCanonicalSurface(container: HTMLElement, file: string) {
   const found = container.querySelector('.fp-glass, .fp-glass-sm, .fp-glow-card');
   if (!found) {
-    throw new Error(`${file}: no canonical glass surface (.fp-glass / .fp-glass-sm / .fp-glow-card) rendered`);
+    throw new Error(
+      `${file}: no canonical glass surface (.fp-glass / .fp-glass-sm / .fp-glow-card) rendered`
+    );
   }
   expect(found).toBeTruthy();
 }
@@ -120,7 +122,9 @@ describe('Story 14.8 — smoke render coverage (Task 15.3)', () => {
     // ApprovalQueue's initial loading state renders a LoadingSkeleton — wraps in fp-glass-sm.
     // Even if not yet loaded, the empty-state EmptyState wrapper or the surrounding card
     // produces a fp-glass-* element. Allow either.
-    const surface = container.querySelector('.fp-glass, .fp-glass-sm, [data-testid="approval-queue-loading"]');
+    const surface = container.querySelector(
+      '.fp-glass, .fp-glass-sm, [data-testid="approval-queue-loading"]'
+    );
     expect(surface).toBeTruthy();
   });
 
@@ -179,7 +183,11 @@ describe('Story 14.8 — smoke render coverage (Task 15.3)', () => {
       },
     };
     const { container } = renderWithProviders(
-      <QueueItemCard item={item as Parameters<typeof QueueItemCard>[0]['item']} onRetry={jest.fn()} onCancel={jest.fn()} />
+      <QueueItemCard
+        item={item as Parameters<typeof QueueItemCard>[0]['item']}
+        onRetry={jest.fn()}
+        onCancel={jest.fn()}
+      />
     );
     expectCanonicalSurface(container, 'QueueItemCard');
   });

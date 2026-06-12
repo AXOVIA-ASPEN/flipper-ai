@@ -20,7 +20,17 @@ import * as path from 'path';
 
 const ANALYTICS_PAGE = path.resolve(__dirname, '../../../app/analytics/page.tsx');
 
-const CANONICAL_TOKENS = ['#34d399', '#7c3aed', '#8b5cf6', '#c4b5fd', '#a78bfa', '#f87171', '#fca5a5', '#fbbf24', '#94a3b8'];
+const CANONICAL_TOKENS = [
+  '#34d399',
+  '#7c3aed',
+  '#8b5cf6',
+  '#c4b5fd',
+  '#a78bfa',
+  '#f87171',
+  '#fca5a5',
+  '#fbbf24',
+  '#94a3b8',
+];
 
 describe('analytics page Recharts series colors (Story 14.9 AC #1)', () => {
   let source: string;
@@ -33,7 +43,8 @@ describe('analytics page Recharts series colors (Story 14.9 AC #1)', () => {
     // Every series-color JSX identifier must resolve to a canonical token. The page
     // declares them as module-level constants at the top of the file; we extract those
     // declarations and assert each maps to a canonical hex.
-    const constRe = /const (PROFIT_GREEN|PURPLE_PRIMARY|PURPLE_TERTIARY|DANGER_RED|TEXT_SECONDARY)\s*=\s*['"](#[0-9a-fA-F]{6})['"]/g;
+    const constRe =
+      /const (PROFIT_GREEN|PURPLE_PRIMARY|PURPLE_TERTIARY|DANGER_RED|TEXT_SECONDARY)\s*=\s*['"](#[0-9a-fA-F]{6})['"]/g;
     const matches = [...source.matchAll(constRe)];
     expect(matches.length).toBeGreaterThanOrEqual(4);
     matches.forEach((m) => {
@@ -43,9 +54,7 @@ describe('analytics page Recharts series colors (Story 14.9 AC #1)', () => {
 
   it('Recharts <Line>/<Bar> series wire stroke/fill props to canonical color constants', () => {
     // Every <Line stroke=…/> and <Bar fill=…/> must reference one of the canonical token names.
-    const seriesProps = [
-      ...source.matchAll(/<(Line|Bar)\b[^/]*?(?:stroke|fill)=\{(\w+)\}/g),
-    ];
+    const seriesProps = [...source.matchAll(/<(Line|Bar)\b[^/]*?(?:stroke|fill)=\{(\w+)\}/g)];
     expect(seriesProps.length).toBeGreaterThanOrEqual(5);
     const allowed = new Set(['PROFIT_GREEN', 'PURPLE_PRIMARY', 'PURPLE_TERTIARY', 'DANGER_RED']);
     seriesProps.forEach((m) => {
@@ -68,7 +77,8 @@ describe('analytics page Recharts series colors (Story 14.9 AC #1)', () => {
 
   it('Tooltip canonical contentStyle is applied to every <Tooltip> (pre-mortem P-3)', () => {
     const tooltipCount = (source.match(/<Tooltip/g) || []).length;
-    const contentStyleApplications = (source.match(/contentStyle=\{TOOLTIP_CONTENT_STYLE\}/g) || []).length;
+    const contentStyleApplications = (source.match(/contentStyle=\{TOOLTIP_CONTENT_STYLE\}/g) || [])
+      .length;
     // Story 14.9 ships exactly three charts (Trends LineChart, Profit-by-Category BarChart,
     // Platform Performance BarChart). Pinning the count surfaces accidental drift if a chart
     // is added/removed without updating the contentStyle wiring.

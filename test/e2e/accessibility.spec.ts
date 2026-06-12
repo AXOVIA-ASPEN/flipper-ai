@@ -133,7 +133,14 @@ test.describe('Feature: Accessibility Compliance (WCAG 2.1 AA)', () => {
 /**
  * Format axe violations into a readable string for test output.
  */
-function formatViolations(violations: { id: string; impact?: string | null; description: string; nodes: { html: string }[] }[]): string {
+function formatViolations(
+  violations: {
+    id: string;
+    impact?: string | null;
+    description: string;
+    nodes: { html: string }[];
+  }[]
+): string {
   if (violations.length === 0) return 'None';
   return violations
     .map(

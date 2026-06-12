@@ -70,7 +70,10 @@ export function withFirebaseAuth<T>(
 
     if (!authUser) {
       return NextResponse.json(
-        { success: false, error: { code: 'UNAUTHORIZED', detail: 'Invalid or missing authentication' } },
+        {
+          success: false,
+          error: { code: 'UNAUTHORIZED', detail: 'Invalid or missing authentication' },
+        },
         { status: 401 }
       );
     }

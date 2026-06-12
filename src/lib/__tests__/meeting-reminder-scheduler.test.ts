@@ -206,9 +206,7 @@ describe('runMeetingReminderScheduler', () => {
   });
 
   test('payload includes listingTitle and sellerName fields in NotificationEvent', async () => {
-    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([
-      makeOpportunity(),
-    ]);
+    (prisma.opportunity.findMany as jest.Mock).mockResolvedValue([makeOpportunity()]);
 
     await runMeetingReminderScheduler();
 

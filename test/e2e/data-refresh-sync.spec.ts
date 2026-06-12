@@ -110,9 +110,11 @@ test.describe('Feature: Data Refresh & State Synchronization', () => {
       await page.waitForLoadState('networkidle');
 
       // Verify initial data loaded
-      await expect(page.getByText('Vintage Guitar')).toBeVisible({ timeout: 5000 }).catch(() => {
-        // Page may render differently; just verify page loaded
-      });
+      await expect(page.getByText('Vintage Guitar'))
+        .toBeVisible({ timeout: 5000 })
+        .catch(() => {
+          // Page may render differently; just verify page loaded
+        });
 
       // When: click refresh button (if it exists)
       const refreshBtn = page.getByRole('button', { name: /refresh|reload|sync/i });
@@ -155,7 +157,9 @@ test.describe('Feature: Data Refresh & State Synchronization', () => {
 
       // Then: loading state should be visible (spinner, skeleton, or loading text)
       const loadingIndicator = page
-        .locator('[class*="animate-spin"], [class*="skeleton"], [class*="loading"], [role="progressbar"]')
+        .locator(
+          '[class*="animate-spin"], [class*="skeleton"], [class*="loading"], [role="progressbar"]'
+        )
         .first();
       const loadingText = page.getByText(/loading|fetching|please wait/i).first();
 
@@ -190,7 +194,9 @@ test.describe('Feature: Data Refresh & State Synchronization', () => {
       await page.waitForLoadState('networkidle');
 
       // Then: some kind of error/empty state should be shown
-      const errorIndicator = page.getByText(/error|failed|try again|no listings|something went wrong/i).first();
+      const errorIndicator = page
+        .getByText(/error|failed|try again|no listings|something went wrong/i)
+        .first();
       const emptyState = page.getByText(/no results|no data|empty/i).first();
 
       const _hasErrorHandling =

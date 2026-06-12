@@ -9,10 +9,7 @@ const ACCEPTANCE_DIR = 'test/acceptance';
 module.exports = {
   default: {
     paths: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
-    require: [
-      `${ACCEPTANCE_DIR}/step_definitions/**/*.ts`,
-      `${ACCEPTANCE_DIR}/support/**/*.ts`,
-    ],
+    require: [`${ACCEPTANCE_DIR}/step_definitions/**/*.ts`, `${ACCEPTANCE_DIR}/support/**/*.ts`],
     requireModule: ['tsx/cjs'],
     format: [
       'progress-bar',
@@ -33,16 +30,9 @@ module.exports = {
   // parallel: 0 = run in main process only (avoids ERR_IPC_CHANNEL_CLOSED with workers).
   pretty: {
     paths: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
-    require: [
-      `${ACCEPTANCE_DIR}/step_definitions/**/*.ts`,
-      `${ACCEPTANCE_DIR}/support/**/*.ts`,
-    ],
+    require: [`${ACCEPTANCE_DIR}/step_definitions/**/*.ts`, `${ACCEPTANCE_DIR}/support/**/*.ts`],
     requireModule: ['tsx/cjs'],
-    format: [
-      'pretty',
-      'html:reports/cucumber-report.html',
-      'json:reports/cucumber-report.json',
-    ],
+    format: ['pretty', 'html:reports/cucumber-report.html', 'json:reports/cucumber-report.json'],
     formatOptions: {
       snippetInterface: 'async-await',
       colorsEnabled: true,
@@ -54,10 +44,7 @@ module.exports = {
 
   ci: {
     paths: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
-    require: [
-      `${ACCEPTANCE_DIR}/step_definitions/**/*.ts`,
-      `${ACCEPTANCE_DIR}/support/**/*.ts`,
-    ],
+    require: [`${ACCEPTANCE_DIR}/step_definitions/**/*.ts`, `${ACCEPTANCE_DIR}/support/**/*.ts`],
     requireModule: ['tsx/cjs'],
     format: ['json:reports/cucumber-report.json', 'junit:reports/cucumber-report.xml'],
     retry: 2,
@@ -67,10 +54,7 @@ module.exports = {
 
   dev: {
     paths: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
-    require: [
-      `${ACCEPTANCE_DIR}/step_definitions/**/*.ts`,
-      `${ACCEPTANCE_DIR}/support/**/*.ts`,
-    ],
+    require: [`${ACCEPTANCE_DIR}/step_definitions/**/*.ts`, `${ACCEPTANCE_DIR}/support/**/*.ts`],
     requireModule: ['tsx/cjs'],
     format: ['pretty', 'html:reports/cucumber-report.html'],
     formatOptions: {
@@ -86,10 +70,7 @@ module.exports = {
   // @wip scenarios are excluded by default — run `make test-ac TAGS=@wip` to run them explicitly.
   acceptance: {
     paths: [`${ACCEPTANCE_DIR}/features/**/*.feature`],
-    require: [
-      `${ACCEPTANCE_DIR}/step_definitions/**/*.ts`,
-      `${ACCEPTANCE_DIR}/support/**/*.ts`,
-    ],
+    require: [`${ACCEPTANCE_DIR}/step_definitions/**/*.ts`, `${ACCEPTANCE_DIR}/support/**/*.ts`],
     requireModule: ['tsx/cjs'],
     tags: 'not @wip',
     format: [

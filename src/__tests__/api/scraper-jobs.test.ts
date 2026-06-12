@@ -88,9 +88,7 @@ describe('Scraper Jobs API', () => {
       expect(mockFindMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            OR: expect.arrayContaining([
-              expect.objectContaining({ userId: 'user-123' }),
-            ]),
+            OR: expect.arrayContaining([expect.objectContaining({ userId: 'user-123' })]),
           }),
         })
       );
@@ -180,7 +178,7 @@ describe('Scraper Jobs API', () => {
 
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-    expect(data.error.code).toBe('INTERNAL_ERROR');
+      expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 
@@ -298,7 +296,7 @@ describe('Scraper Jobs API', () => {
 
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-    expect(data.error.code).toBe('INTERNAL_ERROR');
+      expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 
@@ -345,7 +343,7 @@ describe('Scraper Jobs API', () => {
 
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-    expect(data.error.code).toBe('INTERNAL_ERROR');
+      expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 
@@ -444,7 +442,7 @@ describe('Scraper Jobs API', () => {
 
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-    expect(data.error.code).toBe('INTERNAL_ERROR');
+      expect(data.error.code).toBe('INTERNAL_ERROR');
     });
 
     it('records scan usage once when transitioning to COMPLETED', async () => {
@@ -500,7 +498,7 @@ describe('Scraper Jobs API', () => {
 
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-    expect(data.error.code).toBe('INTERNAL_ERROR');
+      expect(data.error.code).toBe('INTERNAL_ERROR');
     });
   });
 });
@@ -578,7 +576,9 @@ describe('POST /api/scraper-jobs - tier enforcement', () => {
       { platform: 'EBAY' },
       { platform: 'OFFERUP' },
     ]);
-    const request = createMockRequest('POST', '/api/scraper-jobs', { platform: 'FACEBOOK_MARKETPLACE' });
+    const request = createMockRequest('POST', '/api/scraper-jobs', {
+      platform: 'FACEBOOK_MARKETPLACE',
+    });
     const response = await POST(request);
     const data = await response.json();
 
@@ -593,7 +593,9 @@ describe('POST /api/scraper-jobs - tier enforcement', () => {
       { platform: 'EBAY' },
       { platform: 'OFFERUP' },
     ]);
-    const request = createMockRequest('POST', '/api/scraper-jobs', { platform: 'FACEBOOK_MARKETPLACE' });
+    const request = createMockRequest('POST', '/api/scraper-jobs', {
+      platform: 'FACEBOOK_MARKETPLACE',
+    });
     const response = await POST(request);
 
     expect(response.status).toBe(201);
@@ -622,8 +624,8 @@ describe('PATCH /api/scraper-jobs/[id] - null date branches', () => {
     mockUpdate.mockResolvedValue({ id: 'job-null-dates' });
 
     const request = createMockRequest('PATCH', '/api/scraper-jobs/job-null-dates', {
-      startedAt: null,     // falsy → sets null (covers line 54 null branch)
-      completedAt: null,   // falsy → sets null (covers line 57 null branch)
+      startedAt: null, // falsy → sets null (covers line 54 null branch)
+      completedAt: null, // falsy → sets null (covers line 57 null branch)
     });
     await PATCH(request, { params: Promise.resolve({ id: 'job-null-dates' }) });
 

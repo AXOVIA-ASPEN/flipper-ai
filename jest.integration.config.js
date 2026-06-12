@@ -20,8 +20,7 @@ const config = {
   globalSetup: undefined,
   globalTeardown: undefined,
   // Transform ESM-only packages (Prisma adapters)
-  transformIgnorePatterns: [
-    '/node_modules/(?!(@prisma/adapter-libsql|@libsql)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(@prisma/adapter-libsql|@libsql)/)'],
   // Use experimental ESM support for import.meta
   extensionsToTreatAsEsm: [],
 };

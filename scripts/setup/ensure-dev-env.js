@@ -31,13 +31,14 @@ function main() {
   const currentUrl = databaseUrlMatch ? databaseUrlMatch[1].trim().replace(/^["']|["']$/g, '') : '';
 
   const needsDefault =
-    !currentUrl ||
-    currentUrl === 'file:./dev.db' ||
-    currentUrl === 'your-database-url';
+    !currentUrl || currentUrl === 'file:./dev.db' || currentUrl === 'your-database-url';
 
   if (needsDefault) {
     if (content.match(/^\s*DATABASE_URL\s*=/m)) {
-      content = content.replace(/^\s*DATABASE_URL\s*=.*/m, `DATABASE_URL="${DEFAULT_DATABASE_URL}"`);
+      content = content.replace(
+        /^\s*DATABASE_URL\s*=.*/m,
+        `DATABASE_URL="${DEFAULT_DATABASE_URL}"`
+      );
     } else {
       content = content.replace(
         /(# ---- Database ----)/,

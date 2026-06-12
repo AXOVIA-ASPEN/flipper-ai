@@ -208,12 +208,9 @@ When('I inspect the ownership check logic', function () {
   // Content already loaded in Given step
 });
 
-Then(
-  'it should call {string} to load the config before updating',
-  function (method: string) {
-    expect(this.fileContent).toContain(method);
-  }
-);
+Then('it should call {string} to load the config before updating', function (method: string) {
+  expect(this.fileContent).toContain(method);
+});
 
 Then(
   'it should throw {string} when {string} does not match the authenticated userId',

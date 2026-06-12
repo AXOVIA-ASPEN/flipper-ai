@@ -12,15 +12,6 @@ export {
   withRetry,
 } from './scraper';
 
-export type {
-  OfferUpItem,
-  OfferUpSearchParams,
-  OfferUpScrapeResult,
-} from './types';
+export type { OfferUpItem, OfferUpSearchParams, OfferUpScrapeResult } from './types';
 
-export {
-  CATEGORY_MAPPING,
-  SUPPORTED_LOCATIONS,
-  USER_AGENTS,
-  SCRAPER_CONFIG,
-} from './types';
+export { CATEGORY_MAPPING, SUPPORTED_LOCATIONS, USER_AGENTS, SCRAPER_CONFIG } from './types';

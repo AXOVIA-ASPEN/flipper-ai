@@ -97,8 +97,12 @@ test.describe('Kanban Drag and Drop', () => {
 
       // Then the kanban board should show cards in their respective columns
       // Verify the "New" column has our mock items
-      await expect(page.getByText('iPhone 14 Pro', { exact: false })).toBeVisible({ timeout: 5000 });
-      await expect(page.getByText('MacBook Air M2', { exact: false })).toBeVisible({ timeout: 5000 });
+      await expect(page.getByText('iPhone 14 Pro', { exact: false })).toBeVisible({
+        timeout: 5000,
+      });
+      await expect(page.getByText('MacBook Air M2', { exact: false })).toBeVisible({
+        timeout: 5000,
+      });
 
       // And the "Contacted" column should have the PS5 listing
       await expect(page.getByText('PS5 Bundle', { exact: false })).toBeVisible({ timeout: 5000 });
@@ -155,11 +159,7 @@ test.describe('Kanban Drag and Drop', () => {
       // Then the New column should show 2 cards (opp-1, opp-2)
       // And the Contacted column should show 1 card (opp-3)
       // Verify by checking that all three cards are visible
-      const cards = [
-        'iPhone 14 Pro',
-        'MacBook Air M2',
-        'PS5 Bundle',
-      ];
+      const cards = ['iPhone 14 Pro', 'MacBook Air M2', 'PS5 Bundle'];
 
       for (const cardTitle of cards) {
         await expect(page.getByText(cardTitle, { exact: false })).toBeVisible({ timeout: 5000 });
@@ -182,7 +182,9 @@ test.describe('Kanban Drag and Drop', () => {
       // Then columns like "Purchased", "Listed", and "Sold" should be visible but empty
       const emptyColumns = ['Purchased', 'Listed', 'Sold'];
       for (const colName of emptyColumns) {
-        await expect(page.getByText(colName, { exact: false }).first()).toBeVisible({ timeout: 5000 });
+        await expect(page.getByText(colName, { exact: false }).first()).toBeVisible({
+          timeout: 5000,
+        });
       }
     });
   });

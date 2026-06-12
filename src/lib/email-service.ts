@@ -171,10 +171,10 @@ class ResendProvider implements EmailProvider {
 /** No-op provider — logs to console; used in dev/test when no key is set. */
 class NullProvider implements EmailProvider {
   async send(params: SendEmailParams): Promise<SendEmailResult> {
-    logger.info(
-      '[EmailService][NullProvider] Email would have been sent (no RESEND_API_KEY)',
-      { to: params.to, subject: params.subject }
-    );
+    logger.info('[EmailService][NullProvider] Email would have been sent (no RESEND_API_KEY)', {
+      to: params.to,
+      subject: params.subject,
+    });
     console.log('\n📧 [EmailService] Email not sent — no provider configured.');
     console.log(`   To:      ${Array.isArray(params.to) ? params.to.join(', ') : params.to}`);
     console.log(`   Subject: ${params.subject}`);
@@ -220,10 +220,7 @@ export class EmailService {
   /**
    * Send a welcome email to a newly registered user.
    */
-  async sendWelcome(opts: {
-    name?: string;
-    email: string;
-  }): Promise<SendEmailResult> {
+  async sendWelcome(opts: { name?: string; email: string }): Promise<SendEmailResult> {
     const emailOpts: WelcomeEmailOptions = {
       name: opts.name,
       email: opts.email,
@@ -243,7 +240,9 @@ export class EmailService {
   /**
    * Send the daily opportunities digest.
    */
-  async sendDigest(opts: Omit<DigestEmailOptions, 'appUrl' | 'unsubscribeUrl' | 'settingsUrl'>): Promise<SendEmailResult> {
+  async sendDigest(
+    opts: Omit<DigestEmailOptions, 'appUrl' | 'unsubscribeUrl' | 'settingsUrl'>
+  ): Promise<SendEmailResult> {
     const emailOpts: DigestEmailOptions = {
       ...opts,
       appUrl: this.appUrl,
@@ -331,10 +330,7 @@ export class EmailService {
   /**
    * Send a payment failure notification.
    */
-  async sendPaymentFailed(opts: {
-    name?: string;
-    email: string;
-  }): Promise<SendEmailResult> {
+  async sendPaymentFailed(opts: { name?: string; email: string }): Promise<SendEmailResult> {
     const emailOpts: PaymentFailedEmailOptions = {
       name: opts.name,
       email: opts.email,
@@ -595,8 +591,7 @@ export class EmailService {
 function createEmailService(): EmailService {
   const resendApiKey = process.env.RESEND_API_KEY;
   const appUrl = process.env.APP_URL || 'http://localhost:3000';
-  const fromAddress =
-    process.env.EMAIL_FROM || 'Flipper AI <notifications@flipper-ai.app>';
+  const fromAddress = process.env.EMAIL_FROM || 'Flipper AI <notifications@flipper-ai.app>';
 
   let provider: EmailProvider;
 

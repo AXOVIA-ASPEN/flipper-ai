@@ -238,14 +238,11 @@ describe('POST /api/listings/[id]/optimal-price', () => {
   it('handles a malformed POST body by treating it as an empty object', async () => {
     // Construct a request with an invalid JSON body so request.json() throws
     // and the route falls back to {}.
-    const req = new NextRequest(
-      'http://localhost/api/listings/listing-1/optimal-price',
-      {
-        method: 'POST',
-        body: 'not-json',
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+    const req = new NextRequest('http://localhost/api/listings/listing-1/optimal-price', {
+      method: 'POST',
+      body: 'not-json',
+      headers: { 'Content-Type': 'application/json' },
+    });
     const res = await POST(req, params());
     expect(res.status).toBe(200);
   });

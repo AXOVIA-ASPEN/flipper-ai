@@ -87,9 +87,7 @@ test.describe('SEO: Homepage Meta Tags', () => {
     expect(title.toLowerCase()).toContain('flipper');
 
     // Then: Meta description should exist and be meaningful
-    const metaDescription = await page
-      .locator('meta[name="description"]')
-      .getAttribute('content');
+    const metaDescription = await page.locator('meta[name="description"]').getAttribute('content');
     expect(metaDescription).toBeTruthy();
     expect(metaDescription!.length).toBeGreaterThan(50);
     expect(metaDescription!.length).toBeLessThan(160); // SEO best practice
@@ -173,9 +171,7 @@ test.describe('SEO: Login and Register Pages', () => {
     expect(title.toLowerCase()).toMatch(/login|sign in|flipper/);
 
     // Then: Meta description should exist
-    const metaDescription = await page
-      .locator('meta[name="description"]')
-      .getAttribute('content');
+    const metaDescription = await page.locator('meta[name="description"]').getAttribute('content');
     expect(metaDescription).toBeTruthy();
   });
 
@@ -190,9 +186,7 @@ test.describe('SEO: Login and Register Pages', () => {
     expect(title.toLowerCase()).toMatch(/register|sign up|flipper/);
 
     // Then: Meta description should exist
-    const metaDescription = await page
-      .locator('meta[name="description"]')
-      .getAttribute('content');
+    const metaDescription = await page.locator('meta[name="description"]').getAttribute('content');
     expect(metaDescription).toBeTruthy();
   });
 

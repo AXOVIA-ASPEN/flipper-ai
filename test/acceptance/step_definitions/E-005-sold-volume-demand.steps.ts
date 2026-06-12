@@ -26,7 +26,14 @@ function daysAgo(n: number): Date {
 
 // Minimal object matching SoldListing shape (only soldDate is used by analyzeDemandTrend)
 function makeListing(soldDate: Date | null) {
-  return { title: 'Test', price: 100, condition: 'Used', url: 'https://example.com', shippingCost: 0, soldDate };
+  return {
+    title: 'Test',
+    price: 100,
+    condition: 'Used',
+    url: 'https://example.com',
+    shippingCost: 0,
+    soldDate,
+  };
 }
 
 // ==================== Given ====================

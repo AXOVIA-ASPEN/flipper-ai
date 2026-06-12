@@ -7,6 +7,7 @@ Comprehensive end-to-end tests for all user-facing features using Playwright.
 ## 🎯 Test Coverage
 
 ### ✅ Landing Page (`landing-page.spec.ts`)
+
 - Hero section with branding
 - CTA buttons and navigation
 - Feature cards (all 6 features)
@@ -18,6 +19,7 @@ Comprehensive end-to-end tests for all user-facing features using Playwright.
 - No console errors
 
 ### ✅ Sign Up (`auth-signup.spec.ts`)
+
 - Form display with all fields
 - Successful account creation
 - Validation errors (missing fields, invalid email, weak password)
@@ -31,6 +33,7 @@ Comprehensive end-to-end tests for all user-facing features using Playwright.
 - Autofocus behavior
 
 ### ✅ OAuth Authentication (`auth-oauth.spec.ts`)
+
 - **Google OAuth:**
   - Configuration check
   - Button display with logo
@@ -52,6 +55,7 @@ Comprehensive end-to-end tests for all user-facing features using Playwright.
   - Provider downtime
 
 ### ✅ Login (`auth-login.spec.ts`)
+
 - Form display
 - Successful login with valid credentials
 - Error for invalid email
@@ -66,6 +70,7 @@ Comprehensive end-to-end tests for all user-facing features using Playwright.
 - Session persistence
 
 ### ✅ Dashboard (`dashboard.spec.ts`)
+
 - Redirect to login if not authenticated
 - Display for authenticated users
 - Navigation menu
@@ -77,6 +82,7 @@ Comprehensive end-to-end tests for all user-facing features using Playwright.
 - Responsive design
 
 ### ✅ Theme Settings (`theme-settings.spec.ts`)
+
 - Display all 6 theme options
 - Active theme indicator
 - Theme switching
@@ -97,11 +103,13 @@ Comprehensive end-to-end tests for all user-facing features using Playwright.
 ## 🚀 Running Tests
 
 ### Run All Acceptance Tests
+
 ```bash
 npx playwright test e2e/acceptance/
 ```
 
 ### Run Specific Test Suite
+
 ```bash
 # Landing page tests
 npx playwright test e2e/acceptance/landing-page.spec.ts
@@ -119,16 +127,19 @@ npx playwright test e2e/acceptance/theme-settings.spec.ts
 ```
 
 ### Run in UI Mode (Interactive)
+
 ```bash
 npx playwright test e2e/acceptance/ --ui
 ```
 
 ### Run in Headed Mode (See Browser)
+
 ```bash
 npx playwright test e2e/acceptance/ --headed
 ```
 
 ### Run Specific Browser
+
 ```bash
 npx playwright test e2e/acceptance/ --project=chromium
 npx playwright test e2e/acceptance/ --project=firefox
@@ -142,6 +153,7 @@ npx playwright test e2e/acceptance/ --project=webkit
 ### 1. Environment Variables
 
 Create `.env.test` file:
+
 ```bash
 # Base URL for tests
 PLAYWRIGHT_TEST_BASE_URL=http://localhost:3000
@@ -163,6 +175,7 @@ GITHUB_CLIENT_SECRET=your_github_client_secret
 ### 2. Test Database Setup
 
 **Option A: Use separate test database**
+
 ```bash
 # Create test database
 createdb flipper_ai_test
@@ -172,6 +185,7 @@ DATABASE_URL=postgresql://localhost/flipper_ai_test npx prisma migrate deploy
 ```
 
 **Option B: Use production database (risky)**
+
 ```bash
 # Tests will create/delete test users
 # Make sure you're okay with this!
@@ -180,6 +194,7 @@ DATABASE_URL=postgresql://localhost/flipper_ai_test npx prisma migrate deploy
 ### 3. Create Test User (Required)
 
 Some tests expect a test user to exist:
+
 ```typescript
 Email: test@example.com
 Password: Password123!
@@ -187,6 +202,7 @@ Name: Test User
 ```
 
 **Create via API:**
+
 ```bash
 curl -X POST http://localhost:3000/api/auth/signup \
   -H "Content-Type: application/json" \
@@ -198,6 +214,7 @@ curl -X POST http://localhost:3000/api/auth/signup \
 ```
 
 **Or create manually:**
+
 1. Start dev server: `npm run dev`
 2. Go to: http://localhost:3000/auth/signup
 3. Create account with credentials above
@@ -218,12 +235,14 @@ OAuth tests are **skipped by default** unless credentials are configured.
    - Add redirect URI: `http://localhost:3000/api/auth/callback/google`
 
 2. **Add to `.env.test`:**
+
    ```bash
    GOOGLE_CLIENT_ID=your_client_id
    GOOGLE_CLIENT_SECRET=your_client_secret
    ```
 
 3. **Run tests:**
+
    ```bash
    npx playwright test e2e/acceptance/auth-oauth.spec.ts
    ```
@@ -256,6 +275,7 @@ OAuth tests are **skipped by default** unless credentials are configured.
 ### CI/CD Integration
 
 Add to GitHub Actions:
+
 ```yaml
 name: E2E Acceptance Tests
 
@@ -278,6 +298,7 @@ jobs:
 ### View Test Reports
 
 After running tests:
+
 ```bash
 npx playwright show-report
 ```
@@ -297,6 +318,7 @@ npx playwright test --reporter=html
 **Problem:** Login tests fail because test@example.com doesn't exist
 
 **Fix:**
+
 ```bash
 # Create test user via signup page or API
 curl -X POST http://localhost:3000/api/auth/signup \
@@ -315,18 +337,21 @@ curl -X POST http://localhost:3000/api/auth/signup \
 **Problem:** "Sign in with Google wasn't working"
 
 **Diagnosis:**
+
 ```bash
 # Run OAuth tests in headed mode to see what happens
 npx playwright test e2e/acceptance/auth-oauth.spec.ts --headed
 ```
 
 **Possible causes:**
+
 1. **GOOGLE_CLIENT_ID not set** → Set in env vars
 2. **Redirect URI mismatch** → Must match exactly in Google Console
 3. **OAuth app not published** → Publish app in Google Console
 4. **NEXTAUTH_URL wrong** → Must match deployment URL
 
 **Fix:**
+
 1. Check Cloud Run env vars have GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET
 2. Verify redirect URI: `https://axovia-flipper.web.app/api/auth/callback/google`
 3. Check Google Console → OAuth consent screen → Publishing status
@@ -338,6 +363,7 @@ npx playwright test e2e/acceptance/auth-oauth.spec.ts --headed
 **Problem:** Tests take too long or never complete
 
 **Fix:**
+
 ```bash
 # Increase timeout
 npx playwright test --timeout=60000
@@ -353,6 +379,7 @@ timeout: 60000
 **Problem:** Dev server not running on :3000
 
 **Fix:**
+
 ```bash
 # Make sure dev server is running
 npm run dev
@@ -370,6 +397,7 @@ PORT=3001 npm run dev
 **All tests passing = Deployment ready!** ✅
 
 **Minimum passing tests for production:**
+
 - ✅ Landing page loads (no errors)
 - ✅ Signup works (creates account)
 - ✅ Login works (authenticates user)
@@ -377,6 +405,7 @@ PORT=3001 npm run dev
 - ✅ Theme switching works
 
 **Nice to have:**
+
 - ✅ OAuth working (Google + GitHub)
 - ✅ All validation errors handled
 - ✅ Mobile responsive
@@ -387,6 +416,7 @@ PORT=3001 npm run dev
 ## 🎯 Running Before Deploy
 
 **Pre-deployment checklist:**
+
 ```bash
 # 1. Run all acceptance tests
 npx playwright test e2e/acceptance/
@@ -398,6 +428,7 @@ npx playwright test e2e/acceptance/
 ```
 
 **Expected results:**
+
 - **Passing:** 90%+ of tests
 - **Failing:** OAuth tests (if not configured)
 - **Skipped:** Manual OAuth flows
@@ -407,6 +438,7 @@ npx playwright test e2e/acceptance/
 ## 📝 Adding New Tests
 
 **Test structure:**
+
 ```typescript
 import { test, expect } from '@playwright/test';
 
@@ -429,6 +461,7 @@ test.describe('Feature Name - Acceptance Tests', () => {
 ```
 
 **Best practices:**
+
 - Descriptive test names
 - Use `test.beforeEach` for setup
 - Use data-testid for stable selectors

@@ -62,7 +62,9 @@ import { ForbiddenError } from '@/lib/errors';
 // Helpers
 // ---------------------------------------------------------------------------
 
-function makeRequest(opportunityId: string = 'opp_123'): [NextRequest, { params: Promise<{ id: string }> }] {
+function makeRequest(
+  opportunityId: string = 'opp_123'
+): [NextRequest, { params: Promise<{ id: string }> }] {
   const req = new NextRequest(`http://localhost/api/opportunities/${opportunityId}/maps-route`);
   const ctx = { params: Promise.resolve({ id: opportunityId }) };
   return [req, ctx];
@@ -70,7 +72,7 @@ function makeRequest(opportunityId: string = 'opp_123'): [NextRequest, { params:
 
 const NOW = new Date('2026-04-11T14:00:00Z');
 const FUTURE_MEETING = new Date('2026-04-11T17:00:00Z'); // 3h from now
-const PAST_MEETING = new Date('2026-04-11T10:00:00Z');   // 4h ago
+const PAST_MEETING = new Date('2026-04-11T10:00:00Z'); // 4h ago
 
 const MOCK_OPPORTUNITY = {
   id: 'opp_123',
@@ -90,8 +92,10 @@ const MOCK_ROUTE = {
   distanceMeters: 24140,
   durationText: '30 mins',
   distanceText: '15.0 mi',
-  deepLinkUrl: 'https://www.google.com/maps/dir/?api=1&origin=123%20Main%20St%2C%20Seattle%2C%20WA&destination=456%20Oak%20Ave%2C%20Bellevue%2C%20WA&travelmode=driving',
-  mapsSearchUrl: 'https://www.google.com/maps/search/?api=1&query=456%20Oak%20Ave%2C%20Bellevue%2C%20WA',
+  deepLinkUrl:
+    'https://www.google.com/maps/dir/?api=1&origin=123%20Main%20St%2C%20Seattle%2C%20WA&destination=456%20Oak%20Ave%2C%20Bellevue%2C%20WA&travelmode=driving',
+  mapsSearchUrl:
+    'https://www.google.com/maps/search/?api=1&query=456%20Oak%20Ave%2C%20Bellevue%2C%20WA',
 };
 
 // ---------------------------------------------------------------------------
@@ -218,9 +222,7 @@ describe('GET /api/opportunities/[id]/maps-route', () => {
     expect(body.data.state).toBe('ok');
 
     const departureTime = new Date(body.data.departureTime);
-    const expectedDeparture = new Date(
-      FUTURE_MEETING.getTime() - 1800 * 1000 - 10 * 60 * 1000
-    );
+    const expectedDeparture = new Date(FUTURE_MEETING.getTime() - 1800 * 1000 - 10 * 60 * 1000);
     expect(departureTime.getTime()).toBe(expectedDeparture.getTime());
   });
 

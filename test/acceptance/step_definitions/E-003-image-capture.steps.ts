@@ -62,12 +62,9 @@ Then('it should import {string} from {string}', function (symbol: string, module
   expect(this.fileContent).toContain(module);
 });
 
-Then(
-  'it should use {string} for parallel independent image processing',
-  function (method: string) {
-    expect(this.fileContent).toContain(method);
-  }
-);
+Then('it should use {string} for parallel independent image processing', function (method: string) {
+  expect(this.fileContent).toContain(method);
+});
 
 Then(
   'it should return an {string} with {string} and {string} arrays',
@@ -103,13 +100,10 @@ Then(
   }
 );
 
-Then(
-  /^"width" and "height" should be set to null \(deferred dimension extraction\)$/,
-  function () {
-    expect(this.fileContent).toContain('width: null');
-    expect(this.fileContent).toContain('height: null');
-  }
-);
+Then(/^"width" and "height" should be set to null \(deferred dimension extraction\)$/, function () {
+  expect(this.fileContent).toContain('width: null');
+  expect(this.fileContent).toContain('height: null');
+});
 
 Then(
   'the {string} model at {string} should have a foreign key to {string} with cascade delete',
@@ -141,10 +135,13 @@ Then('it should return null when neither images nor imageUrls are available', fu
   expect(this.fileContent).toContain('return null');
 });
 
-Then('{string} should use {string} for image display', function (filePath: string, funcName: string) {
-  const content = readFile(filePath);
-  expect(content).toContain(funcName);
-});
+Then(
+  '{string} should use {string} for image display',
+  function (filePath: string, funcName: string) {
+    const content = readFile(filePath);
+    expect(content).toContain(funcName);
+  }
+);
 
 Then('image capture failures should be logged via the logger module', function () {
   // Route imports image-capture and logger

@@ -16,11 +16,11 @@ Post this on Product Hunt launch morning, ~6 AM PT (catches both East Coast and 
 >
 > Here's how it works, what's hard about it, and the numbers I'm betting it on. 🧵
 
-*(Reply with the PH link in the first reply, not the original tweet — Twitter algo throttles tweets with external links in the lead post.)*
+_(Reply with the PH link in the first reply, not the original tweet — Twitter algo throttles tweets with external links in the lead post.)_
 
 ### 2/12 — The problem
 
-> Flipping items for resale is a real side hustle for ~50M Americans. The bottleneck is *finding deals*, not buying or selling them.
+> Flipping items for resale is a real side hustle for ~50M Americans. The bottleneck is _finding deals_, not buying or selling them.
 >
 > Most flippers spend 6-10 hours/week scrolling Craigslist, FB Marketplace, OfferUp. 90% of that time is filtering junk listings.
 >
@@ -36,9 +36,9 @@ Post this on Product Hunt launch morning, ~6 AM PT (catches both East Coast and 
 
 ### 4/12 — The actual approach (3 layers)
 
-> 1) **Scrape** — 5 marketplaces continuously
-> 2) **Identify** — small LLM extracts brand/model/year/condition from the listing
-> 3) **Verify** — pull *real* eBay sold-listing prices for that exact item
+> 1. **Scrape** — 5 marketplaces continuously
+> 2. **Identify** — small LLM extracts brand/model/year/condition from the listing
+> 3. **Verify** — pull _real_ eBay sold-listing prices for that exact item
 >
 > Only items priced >50% below verified market value hit my dashboard.
 
@@ -53,6 +53,7 @@ Post this on Product Hunt launch morning, ~6 AM PT (catches both East Coast and 
 ### 6/12 — The architecture
 
 > Stack:
+>
 > - Next.js 16 + React 19 + TypeScript strict
 > - Cloud Run + Cloud SQL Postgres + Firebase Hosting/Auth
 > - Prisma ORM, Stripe billing
@@ -64,6 +65,7 @@ Post this on Product Hunt launch morning, ~6 AM PT (catches both East Coast and 
 ### 7/12 — The scoring math
 
 > Score = weighted sum of:
+>
 > - Verified margin (after platform fees)
 > - Sold volume in last 30/60/90d (demand)
 > - Days-to-sell distribution
@@ -93,9 +95,9 @@ Post this on Product Hunt launch morning, ~6 AM PT (catches both East Coast and 
 
 ### 10/12 — What I'd love help with
 
-> 1) Tell me where the scoring disagrees with you. Bad scores are how I tune the model.
-> 2) Marketplaces I missed: Poshmark, StockX, GOAT, Reverb. What should I add next?
-> 3) If you're a flipper, run a saved search and screenshot the top result. I'll respond to every screenshot today.
+> 1. Tell me where the scoring disagrees with you. Bad scores are how I tune the model.
+> 2. Marketplaces I missed: Poshmark, StockX, GOAT, Reverb. What should I add next?
+> 3. If you're a flipper, run a saved search and screenshot the top result. I'll respond to every screenshot today.
 
 ### 11/12 — Thanks
 
@@ -135,6 +137,7 @@ One tweet per day for 30 days, written in advance, scheduled in Buffer/Typefully
 ### Day 1 (post-launch)
 
 > Day 1 of running Flipper.ai publicly:
+>
 > - 47 signups
 > - 2 paid (1 FLIPPER, 1 PRO)
 > - $68 MRR
@@ -162,8 +165,9 @@ One tweet per day for 30 days, written in advance, scheduled in Buffer/Typefully
 ### Day 4-5
 
 > Two screenshots side by side:
-> 1) The original v0 dashboard (ugly, January)
-> 2) Today's dashboard (glassmorphism, May)
+>
+> 1. The original v0 dashboard (ugly, January)
+> 2. Today's dashboard (glassmorphism, May)
 >
 > Same product, [N]x the conversion rate.
 
@@ -178,6 +182,7 @@ One tweet per day for 30 days, written in advance, scheduled in Buffer/Typefully
 ### Day 7
 
 > First-week numbers:
+>
 > - 184 signups
 > - 11 paid ($382 MRR)
 > - 3 churned (no shows after free trial)
@@ -193,7 +198,7 @@ One tweet per day for 30 days, written in advance, scheduled in Buffer/Typefully
 > - **A real flip a user found this week** (with permission + screenshots)
 > - **A line of code or design decision you're proud of** (engineers RT this)
 > - **A failure** (people share failures more than wins on Twitter)
-> - **A counter-intuitive metric** (e.g., "users who do nothing on day 1 are *more* likely to convert than users who run 10 scans" — if true)
+> - **A counter-intuitive metric** (e.g., "users who do nothing on day 1 are _more_ likely to convert than users who run 10 scans" — if true)
 > - **An ask** (a feature you're considering, what should you build next)
 > - **A thank-you** (call out a user by handle if they shared something you used)
 > - **A cost / revenue / churn update** (transparency wins on indie Twitter)
@@ -211,5 +216,5 @@ One tweet per day for 30 days, written in advance, scheduled in Buffer/Typefully
 1. **Hooks matter.** The first 8 words of every tweet decide whether anyone reads tweet #2. Lead with a number, a contrarian claim, or a specific thing.
 2. **Numbers > adjectives.** "47 signups, $68 MRR" beats "great launch day".
 3. **One image per thread minimum.** A dashboard screenshot inside the thread (not just the first tweet) keeps the algo engaged.
-4. **Reply to every reply for the first 24 hours.** Even one-word replies. Twitter weighs your *response rate* heavily.
+4. **Reply to every reply for the first 24 hours.** Even one-word replies. Twitter weighs your _response rate_ heavily.
 5. **Don't @-spam big accounts.** One thank-you tweet at the end of the launch thread is fine; tagging @levelsio in tweet #1 is begging.

@@ -37,7 +37,10 @@ const mockCreateCalendarEvent = jest.fn();
 const mockUpdateCalendarEvent = jest.fn();
 const mockDeleteCalendarEvent = jest.fn();
 const MockCalendarAuthRequiredError = class extends Error {
-  constructor(msg?: string) { super(msg); this.name = 'CalendarAuthRequiredError'; }
+  constructor(msg?: string) {
+    super(msg);
+    this.name = 'CalendarAuthRequiredError';
+  }
 };
 
 jest.mock('@/lib/google-calendar', () => ({
@@ -97,7 +100,14 @@ describe('POST /api/opportunities/[id]/meeting', () => {
 
   it('returns 401 when unauthenticated', async () => {
     mockGetCurrentUserId.mockResolvedValue(null);
-    const res = await POST(makeRequest({ meetingTime: '2026-05-01T14:00:00Z', meetingLocation: 'Park', timezone: 'UTC' }), { params });
+    const res = await POST(
+      makeRequest({
+        meetingTime: '2026-05-01T14:00:00Z',
+        meetingLocation: 'Park',
+        timezone: 'UTC',
+      }),
+      { params }
+    );
     expect(res.status).toBe(401);
   });
 
@@ -107,7 +117,9 @@ describe('POST /api/opportunities/[id]/meeting', () => {
   });
 
   it('returns 422 when meetingLocation is missing', async () => {
-    const res = await POST(makeRequest({ meetingTime: '2026-05-01T14:00:00Z', timezone: 'UTC' }), { params });
+    const res = await POST(makeRequest({ meetingTime: '2026-05-01T14:00:00Z', timezone: 'UTC' }), {
+      params,
+    });
     expect(res.status).toBe(422);
   });
 
@@ -126,12 +138,15 @@ describe('POST /api/opportunities/[id]/meeting', () => {
       return Promise.resolve('gcal-new-event');
     });
 
-    await POST(makeRequest({
-      meetingTime: '2026-05-01T14:00:00Z',
-      meetingLocation: '456 Oak Ave',
-      meetingType: 'buy',
-      timezone: 'America/Los_Angeles',
-    }), { params });
+    await POST(
+      makeRequest({
+        meetingTime: '2026-05-01T14:00:00Z',
+        meetingLocation: '456 Oak Ave',
+        meetingType: 'buy',
+        timezone: 'America/Los_Angeles',
+      }),
+      { params }
+    );
 
     // DB update must come first
     expect(callOrder[0]).toBe('db-update');
@@ -141,11 +156,14 @@ describe('POST /api/opportunities/[id]/meeting', () => {
   it('stores meeting without error when Google Calendar not connected', async () => {
     mockHasValidToken.mockResolvedValue(false);
 
-    const res = await POST(makeRequest({
-      meetingTime: '2026-05-01T14:00:00Z',
-      meetingLocation: '456 Oak Ave',
-      timezone: 'America/Los_Angeles',
-    }), { params });
+    const res = await POST(
+      makeRequest({
+        meetingTime: '2026-05-01T14:00:00Z',
+        meetingLocation: '456 Oak Ave',
+        timezone: 'America/Los_Angeles',
+      }),
+      { params }
+    );
 
     expect(res.status).toBe(200);
     expect(mockCreateCalendarEvent).not.toHaveBeenCalled();
@@ -161,17 +179,26 @@ describe('POST /api/opportunities/[id]/meeting', () => {
     // updateCalendarEvent returns new ID (stale → re-created)
     mockUpdateCalendarEvent.mockResolvedValue('new-event-id');
 
-    await POST(makeRequest({
-      meetingTime: '2026-05-01T14:00:00Z',
-      meetingLocation: '456 Oak Ave',
-      meetingType: 'buy',
-      timezone: 'America/Los_Angeles',
-    }), { params });
+    await POST(
+      makeRequest({
+        meetingTime: '2026-05-01T14:00:00Z',
+        meetingLocation: '456 Oak Ave',
+        meetingType: 'buy',
+        timezone: 'America/Los_Angeles',
+      }),
+      { params }
+    );
 
-    expect(mockUpdateCalendarEvent).toHaveBeenCalledWith('access-token', 'old-event-id', expect.any(Object));
+    expect(mockUpdateCalendarEvent).toHaveBeenCalledWith(
+      'access-token',
+      'old-event-id',
+      expect.any(Object)
+    );
     // Should persist the new event ID
     expect(mockUpdate).toHaveBeenLastCalledWith(
-      expect.objectContaining({ data: expect.objectContaining({ calendarEventId: 'new-event-id' }) })
+      expect.objectContaining({
+        data: expect.objectContaining({ calendarEventId: 'new-event-id' }),
+      })
     );
   });
 
@@ -179,11 +206,14 @@ describe('POST /api/opportunities/[id]/meeting', () => {
     mockHasValidToken.mockResolvedValue(true);
     mockEnsureValidToken.mockRejectedValue(new MockCalendarAuthRequiredError());
 
-    const res = await POST(makeRequest({
-      meetingTime: '2026-05-01T14:00:00Z',
-      meetingLocation: '456 Oak Ave',
-      timezone: 'UTC',
-    }), { params });
+    const res = await POST(
+      makeRequest({
+        meetingTime: '2026-05-01T14:00:00Z',
+        meetingLocation: '456 Oak Ave',
+        timezone: 'UTC',
+      }),
+      { params }
+    );
 
     expect(res.status).toBe(401);
     const json = await res.json();

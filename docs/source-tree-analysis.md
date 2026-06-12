@@ -125,14 +125,14 @@ flipper-ai/
 
 ## Critical Folders
 
-| Folder | Purpose | Key Files |
-|--------|---------|-----------|
-| `app/api/scraper/` | Core scraping endpoints for 5 marketplaces | craigslist/route.ts, ebay/route.ts |
-| `src/lib/` | All business logic: AI analysis, value estimation, services | value-estimator.ts, claude-analyzer.ts, llm-*.ts |
-| `src/components/` | All React UI components | KanbanBoard.tsx, Navigation.tsx |
-| `prisma/` | Database schema and migrations | schema.prisma (13 models) |
-| `src/__tests__/` | Complete test suite (100+ files) | api/, lib/, integration/, security/ |
-| `e2e/` | Playwright E2E tests (60+ specs) | acceptance/, visual/, pages/ |
+| Folder             | Purpose                                                     | Key Files                                         |
+| ------------------ | ----------------------------------------------------------- | ------------------------------------------------- |
+| `app/api/scraper/` | Core scraping endpoints for 5 marketplaces                  | craigslist/route.ts, ebay/route.ts                |
+| `src/lib/`         | All business logic: AI analysis, value estimation, services | value-estimator.ts, claude-analyzer.ts, llm-\*.ts |
+| `src/components/`  | All React UI components                                     | KanbanBoard.tsx, Navigation.tsx                   |
+| `prisma/`          | Database schema and migrations                              | schema.prisma (13 models)                         |
+| `src/__tests__/`   | Complete test suite (100+ files)                            | api/, lib/, integration/, security/               |
+| `e2e/`             | Playwright E2E tests (60+ specs)                            | acceptance/, visual/, pages/                      |
 
 ## Entry Points
 

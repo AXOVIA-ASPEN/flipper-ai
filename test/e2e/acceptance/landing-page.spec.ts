@@ -11,14 +11,10 @@ test.describe('Landing Page - Acceptance Tests', () => {
     await expect(page.getByText('Flipper.ai')).toBeVisible();
 
     // Verify hero headline
-    await expect(
-      page.getByText('Find Hidden Profits in Every Marketplace')
-    ).toBeVisible();
+    await expect(page.getByText('Find Hidden Profits in Every Marketplace')).toBeVisible();
 
     // Verify tagline
-    await expect(
-      page.getByText(/AI-powered marketplace scanner/i)
-    ).toBeVisible();
+    await expect(page.getByText(/AI-powered marketplace scanner/i)).toBeVisible();
   });
 
   test('should display CTA buttons in header', async ({ page }) => {
@@ -32,19 +28,21 @@ test.describe('Landing Page - Acceptance Tests', () => {
     await expect(loginLink).toBeVisible();
   });
 
-  test('should navigate to signup page when clicking Get Started', async ({
-    page,
-  }) => {
-    await page.getByRole('button', { name: /get started/i }).first().click();
+  test('should navigate to signup page when clicking Get Started', async ({ page }) => {
+    await page
+      .getByRole('button', { name: /get started/i })
+      .first()
+      .click();
 
     // Should navigate to signup
     await expect(page).toHaveURL(/\/auth\/signup/);
   });
 
-  test('should navigate to login page when clicking Log In', async ({
-    page,
-  }) => {
-    await page.getByRole('link', { name: /log in/i }).first().click();
+  test('should navigate to login page when clicking Log In', async ({ page }) => {
+    await page
+      .getByRole('link', { name: /log in/i })
+      .first()
+      .click();
 
     // Should navigate to login
     await expect(page).toHaveURL(/\/auth\/login/);
@@ -81,9 +79,7 @@ test.describe('Landing Page - Acceptance Tests', () => {
   });
 
   test('should have working email capture in hero CTA', async ({ page }) => {
-    const emailInput = page
-      .getByPlaceholder(/enter your email/i)
-      .first();
+    const emailInput = page.getByPlaceholder(/enter your email/i).first();
     await expect(emailInput).toBeVisible();
 
     // Type email
@@ -108,9 +104,7 @@ test.describe('Landing Page - Acceptance Tests', () => {
     await expect(page.getByRole('link', { name: /contact/i })).toBeVisible();
 
     // Copyright
-    await expect(
-      page.getByText(/© 2026 Flipper\.ai by Axovia AI/i)
-    ).toBeVisible();
+    await expect(page.getByText(/© 2026 Flipper\.ai by Axovia AI/i)).toBeVisible();
   });
 
   test('should have responsive design on mobile', async ({ page }) => {
@@ -128,9 +122,7 @@ test.describe('Landing Page - Acceptance Tests', () => {
     await expect(pricingCards).toBeVisible();
   });
 
-  test('should have all CTA buttons that navigate to signup', async ({
-    page,
-  }) => {
+  test('should have all CTA buttons that navigate to signup', async ({ page }) => {
     // Count all "Get Started" / "Start Free" buttons
     const ctaButtons = page.getByRole('button', {
       name: /get started|start free|start pro trial/i,
@@ -140,9 +132,7 @@ test.describe('Landing Page - Acceptance Tests', () => {
     expect(count).toBeGreaterThan(3); // Hero, pricing tiers, bottom CTA
 
     // Click the bottom CTA
-    await page
-      .getByRole('button', { name: /start your free trial/i })
-      .click();
+    await page.getByRole('button', { name: /start your free trial/i }).click();
 
     await expect(page).toHaveURL(/\/auth\/signup/);
   });
@@ -153,10 +143,7 @@ test.describe('Landing Page - Acceptance Tests', () => {
 
     // Check meta description exists
     const metaDescription = page.locator('meta[name="description"]');
-    await expect(metaDescription).toHaveAttribute(
-      'content',
-      /marketplace|flipping|AI/i
-    );
+    await expect(metaDescription).toHaveAttribute('content', /marketplace|flipping|AI/i);
   });
 
   test('should load without console errors', async ({ page }) => {
@@ -187,17 +174,13 @@ test.describe('Landing Page - Acceptance Tests', () => {
     const proCard = page.locator('text=Pro').locator('..');
 
     // Get initial border color
-    const initialBorder = await proCard.evaluate((el) =>
-      window.getComputedStyle(el).border
-    );
+    const initialBorder = await proCard.evaluate((el) => window.getComputedStyle(el).border);
 
     // Hover over card
     await proCard.hover();
 
     // Border should change on hover (has hover:scale-105 or similar)
-    const hoveredTransform = await proCard.evaluate((el) =>
-      window.getComputedStyle(el).transform
-    );
+    const hoveredTransform = await proCard.evaluate((el) => window.getComputedStyle(el).transform);
 
     expect(hoveredTransform).not.toBe('none'); // Should have transform on hover
   });

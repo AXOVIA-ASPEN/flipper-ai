@@ -72,7 +72,11 @@ export default function LogisticsSettings() {
 
   if (loading) {
     return (
-      <div className="fp-glass-sm p-6 text-sm" style={{ color: '#94a3b8' }} data-testid="logistics-loading">
+      <div
+        className="fp-glass-sm p-6 text-sm"
+        style={{ color: '#94a3b8' }}
+        data-testid="logistics-loading"
+      >
         Loading logistics settings…
       </div>
     );
@@ -80,14 +84,20 @@ export default function LogisticsSettings() {
 
   return (
     <div className="fp-glass-sm p-6">
-      <h2 className="text-xl font-semibold mb-1" style={{ color: '#e2e8f0' }}>Logistics & Pickup Settings</h2>
+      <h2 className="text-xl font-semibold mb-1" style={{ color: '#e2e8f0' }}>
+        Logistics & Pickup Settings
+      </h2>
       <p className="text-sm mb-6" style={{ color: '#94a3b8' }}>
         Used to estimate pickup distances and filter out-of-range local-only items.
       </p>
 
       <div className="space-y-5">
         <div>
-          <label htmlFor="homeLocation" className="block text-sm font-medium mb-1" style={{ color: '#e2e8f0' }}>
+          <label
+            htmlFor="homeLocation"
+            className="block text-sm font-medium mb-1"
+            style={{ color: '#e2e8f0' }}
+          >
             Home Location
           </label>
           <input
@@ -104,7 +114,11 @@ export default function LogisticsSettings() {
         </div>
 
         <div>
-          <label htmlFor="maxPickupRadiusMiles" className="block text-sm font-medium mb-1" style={{ color: '#e2e8f0' }}>
+          <label
+            htmlFor="maxPickupRadiusMiles"
+            className="block text-sm font-medium mb-1"
+            style={{ color: '#e2e8f0' }}
+          >
             Max Pickup Radius (miles)
           </label>
           <input
@@ -132,11 +146,7 @@ export default function LogisticsSettings() {
         </p>
       )}
 
-      <button
-        onClick={handleSave}
-        disabled={saving}
-        className="fp-btn-primary mt-5"
-      >
+      <button onClick={handleSave} disabled={saving} className="fp-btn-primary mt-5">
         {saving ? 'Saving…' : 'Save Logistics Settings'}
       </button>
     </div>

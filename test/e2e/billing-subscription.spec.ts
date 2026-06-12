@@ -7,7 +7,10 @@ import { test, expect } from '@playwright/test';
  */
 
 // Helper: mock session with a specific subscription tier
-async function mockSessionWithTier(page: import('@playwright/test').Page, tier: 'FREE' | 'FLIPPER' | 'PRO') {
+async function mockSessionWithTier(
+  page: import('@playwright/test').Page,
+  tier: 'FREE' | 'FLIPPER' | 'PRO'
+) {
   await page.route('**/api/auth/session', async (route) => {
     await route.fulfill({
       json: {
@@ -24,7 +27,10 @@ async function mockSessionWithTier(page: import('@playwright/test').Page, tier: 
 }
 
 // Helper: mock the subscription/billing API endpoints
-async function mockBillingAPIs(page: import('@playwright/test').Page, tier: 'FREE' | 'FLIPPER' | 'PRO') {
+async function mockBillingAPIs(
+  page: import('@playwright/test').Page,
+  tier: 'FREE' | 'FLIPPER' | 'PRO'
+) {
   await page.route('**/api/subscription', async (route) => {
     if (route.request().method() === 'GET') {
       await route.fulfill({
@@ -64,10 +70,10 @@ async function mockBillingAPIs(page: import('@playwright/test').Page, tier: 'FRE
 }
 
 test.describe('Billing & Subscription', () => {
-
   test.describe('Feature: Free Tier Limitations', () => {
-
-    test('Scenario: Given I am on the free tier, Then I should see usage limits', async ({ page }) => {
+    test('Scenario: Given I am on the free tier, Then I should see usage limits', async ({
+      page,
+    }) => {
       // Given I am logged in on the free tier
       await mockSessionWithTier(page, 'FREE');
       await mockBillingAPIs(page, 'FREE');
@@ -82,7 +88,9 @@ test.describe('Billing & Subscription', () => {
       expect(pageContent).toBeTruthy();
     });
 
-    test('Scenario: Given I am on the free tier, Then premium features should be gated', async ({ page }) => {
+    test('Scenario: Given I am on the free tier, Then premium features should be gated', async ({
+      page,
+    }) => {
       // Given I am logged in on the free tier
       await mockSessionWithTier(page, 'FREE');
       await mockBillingAPIs(page, 'FREE');
@@ -115,8 +123,9 @@ test.describe('Billing & Subscription', () => {
   });
 
   test.describe('Feature: Upgrade to Paid Tier', () => {
-
-    test('Scenario: Given I am on free tier, When I click upgrade, Then I am redirected to checkout', async ({ page }) => {
+    test('Scenario: Given I am on free tier, When I click upgrade, Then I am redirected to checkout', async ({
+      page,
+    }) => {
       // Given I am logged in as a free user
       await mockSessionWithTier(page, 'FREE');
       await mockBillingAPIs(page, 'FREE');
@@ -147,8 +156,9 @@ test.describe('Billing & Subscription', () => {
   });
 
   test.describe('Feature: Subscription Management', () => {
-
-    test('Scenario: Given I am on the Flipper plan, When I view billing, Then I see my plan details', async ({ page }) => {
+    test('Scenario: Given I am on the Flipper plan, When I view billing, Then I see my plan details', async ({
+      page,
+    }) => {
       // Given I am logged in as a Flipper-tier user
       await mockSessionWithTier(page, 'FLIPPER');
       await mockBillingAPIs(page, 'FLIPPER');
@@ -163,7 +173,9 @@ test.describe('Billing & Subscription', () => {
       expect(body).toBeTruthy();
     });
 
-    test('Scenario: Given I am a Pro user, Then I have access to all features', async ({ page }) => {
+    test('Scenario: Given I am a Pro user, Then I have access to all features', async ({
+      page,
+    }) => {
       // Given I am logged in as a Pro user
       await mockSessionWithTier(page, 'PRO');
       await mockBillingAPIs(page, 'PRO');
@@ -186,8 +198,9 @@ test.describe('Billing & Subscription', () => {
   });
 
   test.describe('Feature: Cancel Subscription', () => {
-
-    test('Scenario: Given I am on a paid plan, When I cancel, Then I revert to free tier', async ({ page }) => {
+    test('Scenario: Given I am on a paid plan, When I cancel, Then I revert to free tier', async ({
+      page,
+    }) => {
       // Given I am logged in as a Flipper-tier user
       await mockSessionWithTier(page, 'FLIPPER');
       await mockBillingAPIs(page, 'FLIPPER');
@@ -199,7 +212,11 @@ test.describe('Billing & Subscription', () => {
           await route.fulfill({ json: { success: true, tier: 'FREE' } });
         } else {
           await route.fulfill({
-            json: { tier: 'FLIPPER', scansToday: 0, limits: { scansPerDay: null, maxMarketplaces: 3, maxSearchConfigs: 20 } },
+            json: {
+              tier: 'FLIPPER',
+              scansToday: 0,
+              limits: { scansPerDay: null, maxMarketplaces: 3, maxSearchConfigs: 20 },
+            },
           });
         }
       });
@@ -214,8 +231,9 @@ test.describe('Billing & Subscription', () => {
   });
 
   test.describe('Feature: Access Control for Premium Features', () => {
-
-    test('Scenario: Given I am on free tier, When I try to access messaging, Then I see an upgrade prompt or redirect', async ({ page }) => {
+    test('Scenario: Given I am on free tier, When I try to access messaging, Then I see an upgrade prompt or redirect', async ({
+      page,
+    }) => {
       // Given I am logged in as a free user (messaging not available)
       await mockSessionWithTier(page, 'FREE');
       await mockBillingAPIs(page, 'FREE');
@@ -237,7 +255,9 @@ test.describe('Billing & Subscription', () => {
       expect(body).toBeTruthy();
     });
 
-    test('Scenario: Given I am on free tier, When I exceed scan limit, Then I am blocked', async ({ page }) => {
+    test('Scenario: Given I am on free tier, When I exceed scan limit, Then I am blocked', async ({
+      page,
+    }) => {
       // Given I am on the free tier and have used all 10 scans today
       await mockSessionWithTier(page, 'FREE');
 

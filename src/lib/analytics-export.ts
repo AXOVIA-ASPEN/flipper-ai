@@ -1,9 +1,19 @@
 import type { ProfitLossItem } from '@/lib/analytics-service';
 
 const CSV_HEADERS = [
-  'Title', 'Platform', 'Category', 'Status',
-  'Purchase Price', 'Sale Price', 'Fees', 'Gross Profit', 'Net Profit',
-  'ROI %', 'Days Held', 'Purchase Date', 'Sale Date',
+  'Title',
+  'Platform',
+  'Category',
+  'Status',
+  'Purchase Price',
+  'Sale Price',
+  'Fees',
+  'Gross Profit',
+  'Net Profit',
+  'ROI %',
+  'Days Held',
+  'Purchase Date',
+  'Sale Date',
 ];
 
 export function escapeCsvField(value: string | number | null | undefined): string {

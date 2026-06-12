@@ -176,7 +176,7 @@ describe('Cross-Platform Price Intelligence', () => {
       const fb = buildPlatformData('facebook', 'active', [100], 100);
       const cl = buildPlatformData('craigslist', 'active', [100], 100);
 
-      expect(mercari!.feeRate).toBe(0.10);
+      expect(mercari!.feeRate).toBe(0.1);
       expect(fb!.feeRate).toBe(0.05);
       expect(cl!.feeRate).toBe(0.0);
       expect(cl!.netMedianPrice).toBe(100); // 0% fee
@@ -191,11 +191,46 @@ describe('Cross-Platform Price Intelligence', () => {
     test('returns aggregated data from eBay sold listings', async () => {
       mockFetchMarketPrice.mockResolvedValue({
         soldListings: [
-          { title: 'Item', price: 100, shippingCost: 10, condition: 'Good', url: '', soldDate: null },
-          { title: 'Item', price: 120, shippingCost: 0, condition: 'Good', url: '', soldDate: null },
-          { title: 'Item', price: 130, shippingCost: 5, condition: 'Good', url: '', soldDate: null },
-          { title: 'Item', price: 110, shippingCost: 0, condition: 'Good', url: '', soldDate: null },
-          { title: 'Item', price: 115, shippingCost: 0, condition: 'Good', url: '', soldDate: null },
+          {
+            title: 'Item',
+            price: 100,
+            shippingCost: 10,
+            condition: 'Good',
+            url: '',
+            soldDate: null,
+          },
+          {
+            title: 'Item',
+            price: 120,
+            shippingCost: 0,
+            condition: 'Good',
+            url: '',
+            soldDate: null,
+          },
+          {
+            title: 'Item',
+            price: 130,
+            shippingCost: 5,
+            condition: 'Good',
+            url: '',
+            soldDate: null,
+          },
+          {
+            title: 'Item',
+            price: 110,
+            shippingCost: 0,
+            condition: 'Good',
+            url: '',
+            soldDate: null,
+          },
+          {
+            title: 'Item',
+            price: 115,
+            shippingCost: 0,
+            condition: 'Good',
+            url: '',
+            soldDate: null,
+          },
         ],
       });
 
@@ -219,7 +254,14 @@ describe('Cross-Platform Price Intelligence', () => {
       // eBay sold at $200
       mockFetchMarketPrice.mockResolvedValue({
         soldListings: [
-          { title: 'Item', price: 200, shippingCost: 0, condition: 'Good', url: '', soldDate: null },
+          {
+            title: 'Item',
+            price: 200,
+            shippingCost: 0,
+            condition: 'Good',
+            url: '',
+            soldDate: null,
+          },
         ],
       });
 
@@ -238,13 +280,22 @@ describe('Cross-Platform Price Intelligence', () => {
       // eBay succeeds
       mockFetchMarketPrice.mockResolvedValue({
         soldListings: [
-          { title: 'Item', price: 100, shippingCost: 0, condition: 'Good', url: '', soldDate: null },
+          {
+            title: 'Item',
+            price: 100,
+            shippingCost: 0,
+            condition: 'Good',
+            url: '',
+            soldDate: null,
+          },
         ],
       });
 
       const result = await fetchCrossPlatformPrice('test item', undefined, {
         // Mercari throws
-        mercariSoldFn: async () => { throw new Error('Mercari down'); },
+        mercariSoldFn: async () => {
+          throw new Error('Mercari down');
+        },
         // FB returns data
         facebookPricesFn: async () => [90, 95],
       });
@@ -273,7 +324,14 @@ describe('Cross-Platform Price Intelligence', () => {
       // eBay returns fast
       mockFetchMarketPrice.mockResolvedValue({
         soldListings: [
-          { title: 'Item', price: 100, shippingCost: 0, condition: 'Good', url: '', soldDate: null },
+          {
+            title: 'Item',
+            price: 100,
+            shippingCost: 0,
+            condition: 'Good',
+            url: '',
+            soldDate: null,
+          },
         ],
       });
 
@@ -291,7 +349,14 @@ describe('Cross-Platform Price Intelligence', () => {
     test('skips platforms with no fetcher provided', async () => {
       mockFetchMarketPrice.mockResolvedValue({
         soldListings: [
-          { title: 'Item', price: 100, shippingCost: 0, condition: 'Good', url: '', soldDate: null },
+          {
+            title: 'Item',
+            price: 100,
+            shippingCost: 0,
+            condition: 'Good',
+            url: '',
+            soldDate: null,
+          },
         ],
       });
 
@@ -348,8 +413,11 @@ describe('Cross-Platform Price Intelligence', () => {
 
     test('overrides low Tier 1 score when verified data shows profit', () => {
       // Guitar at $300 scored 10 by Tier 1. Verified value = $600.
-      const { valueScore, overridden, verifiedMarketValue } =
-        applyPriceIntelligenceOverride(10, 300, mockResult);
+      const { valueScore, overridden, verifiedMarketValue } = applyPriceIntelligenceOverride(
+        10,
+        300,
+        mockResult
+      );
 
       expect(overridden).toBe(true);
       expect(verifiedMarketValue).toBe(600);
@@ -359,16 +427,14 @@ describe('Cross-Platform Price Intelligence', () => {
 
     test('does not override when confidence is low', () => {
       const lowConfResult = { ...mockResult, confidence: 'low' as const };
-      const { valueScore, overridden } =
-        applyPriceIntelligenceOverride(10, 300, lowConfResult);
+      const { valueScore, overridden } = applyPriceIntelligenceOverride(10, 300, lowConfResult);
 
       expect(overridden).toBe(false);
       expect(valueScore).toBe(10); // unchanged
     });
 
     test('does not override when cross-platform result is null', () => {
-      const { valueScore, overridden } =
-        applyPriceIntelligenceOverride(50, 100, null);
+      const { valueScore, overridden } = applyPriceIntelligenceOverride(50, 100, null);
 
       expect(overridden).toBe(false);
       expect(valueScore).toBe(50);
@@ -377,8 +443,7 @@ describe('Cross-Platform Price Intelligence', () => {
     test('produces correct score for overpriced item', () => {
       // Item at $500, verified value only $300
       const cheapResult = { ...mockResult, verifiedMarketValue: 300 };
-      const { valueScore, overridden } =
-        applyPriceIntelligenceOverride(80, 500, cheapResult);
+      const { valueScore, overridden } = applyPriceIntelligenceOverride(80, 500, cheapResult);
 
       expect(overridden).toBe(true);
       // Profit = 300 * 0.87 - 500 = -239 → should cap at 10
@@ -388,8 +453,7 @@ describe('Cross-Platform Price Intelligence', () => {
     test('applies high-value boost for large profit', () => {
       // Item at $100, verified value $800 → profit = $596
       const highResult = { ...mockResult, verifiedMarketValue: 800 };
-      const { valueScore } =
-        applyPriceIntelligenceOverride(30, 100, highResult);
+      const { valueScore } = applyPriceIntelligenceOverride(30, 100, highResult);
 
       // $596 profit > $300 → +10 boost → should be very high
       expect(valueScore).toBeGreaterThan(85);
@@ -397,8 +461,7 @@ describe('Cross-Platform Price Intelligence', () => {
 
     test('handles zero verified market value', () => {
       const zeroResult = { ...mockResult, verifiedMarketValue: 0 };
-      const { valueScore, overridden } =
-        applyPriceIntelligenceOverride(50, 100, zeroResult);
+      const { valueScore, overridden } = applyPriceIntelligenceOverride(50, 100, zeroResult);
 
       expect(overridden).toBe(false);
       expect(valueScore).toBe(50);

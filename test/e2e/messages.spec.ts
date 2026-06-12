@@ -150,7 +150,10 @@ function setupMockRoutes(page: import('@playwright/test').Page) {
     // User settings (for approval tab)
     page.route('**/api/user/settings', async (route) => {
       await route.fulfill({
-        json: { success: true, data: { user: { subscriptionTier: 'PRO' }, messageApprovalRequired: false } },
+        json: {
+          success: true,
+          data: { user: { subscriptionTier: 'PRO' }, messageApprovalRequired: false },
+        },
       });
     }),
 

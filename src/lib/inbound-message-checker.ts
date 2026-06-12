@@ -44,10 +44,7 @@ export interface ListingData {
 
 /** Platform-specific message checker interface */
 interface PlatformMessageChecker {
-  checkForReplies(
-    listing: ListingData,
-    userId: string
-  ): Promise<InboundCheckResult>;
+  checkForReplies(listing: ListingData, userId: string): Promise<InboundCheckResult>;
 }
 
 /**
@@ -88,11 +85,7 @@ const PLATFORM_CHECKERS: Record<string, PlatformMessageChecker> = {
  * The trade-off is body-whitespace sensitivity, which is acceptable for a
  * soft-dedup guard against the adapter replaying the same fetch.
  */
-async function isDuplicate(
-  listingId: string,
-  userId: string,
-  body: string
-): Promise<boolean> {
+async function isDuplicate(listingId: string, userId: string, body: string): Promise<boolean> {
   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
   const existing = await prisma.message.findFirst({

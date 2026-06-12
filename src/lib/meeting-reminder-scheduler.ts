@@ -50,12 +50,12 @@ export interface DepartureReminderPayload {
   listingId: string;
   listingTitle: string;
   sellerName?: string;
-  meetingTime: string;           // ISO 8601
+  meetingTime: string; // ISO 8601
   meetingLocation: string;
-  deepLinkUrl: string;           // Google Maps web deep link
-  durationText: string;          // "30 mins" — or "Unknown" if degraded
-  departureTime: string;         // ISO 8601
-  routeDegraded: boolean;        // true = API not available
+  deepLinkUrl: string; // Google Maps web deep link
+  durationText: string; // "30 mins" — or "Unknown" if degraded
+  departureTime: string; // ISO 8601
+  routeDegraded: boolean; // true = API not available
 }
 
 // ---------------------------------------------------------------------------
@@ -259,10 +259,12 @@ export async function runMeetingReminderScheduler(): Promise<MeetingReminderRunS
         } catch (err) {
           // P2002 = duplicate constraint — already created, proceed with dispatch
           if (
-            !(err !== null &&
-            typeof err === 'object' &&
-            'code' in err &&
-            (err as { code: string }).code === 'P2002')
+            !(
+              err !== null &&
+              typeof err === 'object' &&
+              'code' in err &&
+              (err as { code: string }).code === 'P2002'
+            )
           ) {
             throw err;
           }
@@ -281,16 +283,18 @@ export async function runMeetingReminderScheduler(): Promise<MeetingReminderRunS
           ? `Time to leave for your ${listingTitle} meetup — travel time unavailable, allow extra time`
           : `Leave by ${departureDisplayTime} for your ${listingTitle} meetup`;
 
-        pushNotificationService.sendToUser(opp.userId, {
-          title: 'Time to leave for your meetup',
-          body: reminderMsg,
-          data: payload as unknown as Record<string, string>,
-        }).catch((err: unknown) => {
-          logger.error('meeting.reminder.push_failed', {
-            opportunityId: opp.id,
-            error: err instanceof Error ? err.message : String(err),
+        pushNotificationService
+          .sendToUser(opp.userId, {
+            title: 'Time to leave for your meetup',
+            body: reminderMsg,
+            data: payload as unknown as Record<string, string>,
+          })
+          .catch((err: unknown) => {
+            logger.error('meeting.reminder.push_failed', {
+              opportunityId: opp.id,
+              error: err instanceof Error ? err.message : String(err),
+            });
           });
-        });
       }
 
       // --- Email ---
@@ -299,30 +303,32 @@ export async function runMeetingReminderScheduler(): Promise<MeetingReminderRunS
           ? `Time to leave for your ${listingTitle} meetup — travel time unavailable, allow extra time`
           : `Leave by ${departureDisplayTime} for your ${listingTitle} meetup`;
 
-        emailService.send({
-          to: opp.user.email,
-          subject: `Leave now — your ${listingTitle} meeting starts at ${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' }).format(meetingTime)}`,
-          html: `<p>${emailBody}</p><p><a href="${deepLinkUrl}">Open in Google Maps</a></p>`,
-          text: emailBody,
-        }).catch((err: unknown) => {
-          logger.error('meeting.reminder.email_failed', {
-            opportunityId: opp.id,
-            error: err instanceof Error ? err.message : String(err),
+        emailService
+          .send({
+            to: opp.user.email,
+            subject: `Leave now — your ${listingTitle} meeting starts at ${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' }).format(meetingTime)}`,
+            html: `<p>${emailBody}</p><p><a href="${deepLinkUrl}">Open in Google Maps</a></p>`,
+            text: emailBody,
+          })
+          .catch((err: unknown) => {
+            logger.error('meeting.reminder.email_failed', {
+              opportunityId: opp.id,
+              error: err instanceof Error ? err.message : String(err),
+            });
           });
-        });
       }
 
       // --- SMS ---
       if (settings.smsNotifications && settings.phoneVerified && settings.phoneNumber) {
-        const location = meetingLocation.length > 30
-          ? meetingLocation.slice(0, 27) + '…'
-          : meetingLocation;
-        const title = listingTitle.length > 20
-          ? listingTitle.slice(0, 17) + '…'
-          : listingTitle;
+        const location =
+          meetingLocation.length > 30 ? meetingLocation.slice(0, 27) + '…' : meetingLocation;
+        const title = listingTitle.length > 20 ? listingTitle.slice(0, 17) + '…' : listingTitle;
 
-        const smsBody = `Flipper: Leave by ${departureDisplayTime} for your ${title} meetup at ${location} ${deepLinkUrl}`
-          .slice(0, 160);
+        const smsBody =
+          `Flipper: Leave by ${departureDisplayTime} for your ${title} meetup at ${location} ${deepLinkUrl}`.slice(
+            0,
+            160
+          );
 
         smsService.send(settings.phoneNumber, smsBody).catch((err: unknown) => {
           logger.error('meeting.reminder.sms_failed', {

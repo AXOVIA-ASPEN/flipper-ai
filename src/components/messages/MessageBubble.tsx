@@ -52,9 +52,7 @@ export default function MessageBubble({
           >
             {isOutbound ? '↑ Sent' : '↓ Received'}
           </span>
-          <span className={STATUS_COLORS[status] || 'fp-badge fp-badge-gray'}>
-            {status}
-          </span>
+          <span className={STATUS_COLORS[status] || 'fp-badge fp-badge-gray'}>{status}</span>
         </div>
 
         {/* Subject line */}

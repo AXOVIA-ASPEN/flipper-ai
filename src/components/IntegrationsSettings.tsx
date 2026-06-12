@@ -56,13 +56,29 @@ export default function IntegrationsSettings() {
     try {
       const res = await fetch('/api/integrations/google-calendar', { method: 'DELETE' });
       if (res.ok) {
-        setStatus((prev) => ({ configured: prev?.configured ?? false, connected: false, email: null }));
-        showToast({ type: 'info', title: 'Disconnected', message: 'Google Calendar disconnected.' });
+        setStatus((prev) => ({
+          configured: prev?.configured ?? false,
+          connected: false,
+          email: null,
+        }));
+        showToast({
+          type: 'info',
+          title: 'Disconnected',
+          message: 'Google Calendar disconnected.',
+        });
       } else {
-        showToast({ type: 'error', title: 'Error', message: 'Failed to disconnect Google Calendar. Please try again.' });
+        showToast({
+          type: 'error',
+          title: 'Error',
+          message: 'Failed to disconnect Google Calendar. Please try again.',
+        });
       }
     } catch {
-      showToast({ type: 'error', title: 'Error', message: 'Failed to disconnect Google Calendar. Please try again.' });
+      showToast({
+        type: 'error',
+        title: 'Error',
+        message: 'Failed to disconnect Google Calendar. Please try again.',
+      });
     } finally {
       setDisconnecting(false);
     }
@@ -70,12 +86,16 @@ export default function IntegrationsSettings() {
 
   return (
     <div className="fp-glass-sm p-6">
-      <h2 className="text-xl font-semibold mb-4" style={{ color: '#e2e8f0' }}>Integrations</h2>
+      <h2 className="text-xl font-semibold mb-4" style={{ color: '#e2e8f0' }}>
+        Integrations
+      </h2>
 
       <div className="flex items-center justify-between py-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-medium" style={{ color: '#e2e8f0' }}>Google Calendar</span>
+            <span className="font-medium" style={{ color: '#e2e8f0' }}>
+              Google Calendar
+            </span>
             {status?.connected && (
               <span className="fp-badge fp-badge-green inline-flex items-center gap-1 text-xs font-medium">
                 <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
@@ -90,7 +110,9 @@ export default function IntegrationsSettings() {
             )}
           </div>
           {status?.connected && status.email && (
-            <p className="text-sm mt-0.5" style={{ color: '#94a3b8' }}>{status.email}</p>
+            <p className="text-sm mt-0.5" style={{ color: '#94a3b8' }}>
+              {status.email}
+            </p>
           )}
           {!status?.connected && (
             <p className="text-sm mt-1" style={{ color: '#94a3b8' }}>
@@ -101,11 +123,7 @@ export default function IntegrationsSettings() {
 
         <div>
           {status?.connected ? (
-            <button
-              onClick={handleDisconnect}
-              disabled={disconnecting}
-              className="fp-btn-danger"
-            >
+            <button onClick={handleDisconnect} disabled={disconnecting} className="fp-btn-danger">
               {disconnecting ? 'Disconnecting…' : 'Disconnect'}
             </button>
           ) : status?.configured === false ? (
@@ -116,10 +134,7 @@ export default function IntegrationsSettings() {
               Not configured
             </span>
           ) : (
-            <a
-              href="/api/integrations/google-calendar/connect"
-              className="fp-btn-primary"
-            >
+            <a href="/api/integrations/google-calendar/connect" className="fp-btn-primary">
               Connect Google Calendar
             </a>
           )}

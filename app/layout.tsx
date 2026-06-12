@@ -47,7 +47,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <a href="#main" className="fp-skip-link">Skip to main content</a>
+        <a href="#main" className="fp-skip-link">
+          Skip to main content
+        </a>
         <div className="fp-bg-mesh" aria-hidden="true" />
         <div className="fp-bg-grid" aria-hidden="true" />
         <FirebaseAuthProvider>

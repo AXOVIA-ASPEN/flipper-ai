@@ -91,9 +91,7 @@ describe('useSseEvents', () => {
   });
 
   it('receives listing.found events', () => {
-    const { result } = renderHook(() =>
-      useSseEvents({ eventTypes: ['listing.found'] })
-    );
+    const { result } = renderHook(() => useSseEvents({ eventTypes: ['listing.found'] }));
     act(() => {
       MockEventSource.instances[0].triggerOpen();
       MockEventSource.instances[0].dispatchEvent('listing.found', {
@@ -103,15 +101,11 @@ describe('useSseEvents', () => {
     });
     expect(result.current.events).toHaveLength(1);
     expect(result.current.events[0].type).toBe('listing.found');
-    expect((result.current.events[0].data as Record<string, unknown>).title).toBe(
-      'PlayStation 5'
-    );
+    expect((result.current.events[0].data as Record<string, unknown>).title).toBe('PlayStation 5');
   });
 
   it('receives alert.high-value events', () => {
-    const { result } = renderHook(() =>
-      useSseEvents({ eventTypes: ['alert.high-value'] })
-    );
+    const { result } = renderHook(() => useSseEvents({ eventTypes: ['alert.high-value'] }));
     act(() => {
       MockEventSource.instances[0].triggerOpen();
       MockEventSource.instances[0].dispatchEvent('alert.high-value', { score: 95 });
@@ -167,9 +161,7 @@ describe('useSseEvents', () => {
   });
 
   it('auto-reconnects after error (default behavior)', () => {
-    renderHook(() =>
-      useSseEvents({ reconnectDelayMs: 100, maxReconnectDelayMs: 200 })
-    );
+    renderHook(() => useSseEvents({ reconnectDelayMs: 100, maxReconnectDelayMs: 200 }));
     act(() => {
       MockEventSource.instances[0].triggerError();
     });
@@ -236,7 +228,9 @@ describe('useSseEvents', () => {
     act(() => {
       MockEventSource.instances[0].triggerOpen();
       // Manually fire with broken JSON
-      const handlers = (MockEventSource.instances[0] as unknown as { listeners: Map<string, ESListener[]> }).listeners;
+      const handlers = (
+        MockEventSource.instances[0] as unknown as { listeners: Map<string, ESListener[]> }
+      ).listeners;
       const listingHandlers = handlers?.get('listing.found') ?? [];
       listingHandlers.forEach((h) => h({ data: 'not-valid-json' } as MessageEvent));
     });

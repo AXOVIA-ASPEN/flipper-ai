@@ -25,7 +25,15 @@ const FILES_TO_CHECK = [
   'app/terms/page.tsx',
 ];
 
-const REQUIRED_TAGS = ['@file', '@author', '@company', '@date', '@version', '@brief', '@description'];
+const REQUIRED_TAGS = [
+  '@file',
+  '@author',
+  '@company',
+  '@date',
+  '@version',
+  '@brief',
+  '@description',
+];
 
 describe('Story 14.9 — canonical JSDoc file headers (AC #10)', () => {
   test.each(FILES_TO_CHECK)('%s has all required @-tags in the first 30 lines', (relPath) => {

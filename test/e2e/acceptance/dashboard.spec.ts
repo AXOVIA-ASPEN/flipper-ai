@@ -20,10 +20,7 @@ test.describe('Dashboard - Acceptance Tests', () => {
     await expect(page).toHaveURL(/\/auth\/login/, { timeout: 5000 });
   });
 
-  test('should display dashboard for authenticated users', async ({
-    page,
-    context,
-  }) => {
+  test('should display dashboard for authenticated users', async ({ page, context }) => {
     // First login
     await page.goto('/auth/login');
 
@@ -132,16 +129,13 @@ test.describe('Dashboard - Acceptance Tests', () => {
     const pageText = await page.textContent('body');
 
     // Check for email or "Test User" (depending on signup data)
-    const hasUserInfo =
-      pageText?.includes('test@example.com') || pageText?.includes('Test User');
+    const hasUserInfo = pageText?.includes('test@example.com') || pageText?.includes('Test User');
 
     // If no user info visible, that's okay (might be in dropdown)
     console.log('User info visible:', hasUserInfo);
   });
 
-  test('should load without console errors when authenticated', async ({
-    page,
-  }) => {
+  test('should load without console errors when authenticated', async ({ page }) => {
     const consoleErrors: string[] = [];
 
     page.on('console', (msg) => {
@@ -161,10 +155,7 @@ test.describe('Dashboard - Acceptance Tests', () => {
 
     // Filter out expected errors (like missing API data)
     const realErrors = consoleErrors.filter(
-      (err) =>
-        !err.includes('404') &&
-        !err.includes('favicon') &&
-        !err.includes('analytics')
+      (err) => !err.includes('404') && !err.includes('favicon') && !err.includes('analytics')
     );
 
     expect(realErrors.length).toBeLessThanOrEqual(2); // Allow minor errors

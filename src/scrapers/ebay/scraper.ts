@@ -1,26 +1,15 @@
 // eBay Browse API Scraper Module
 // Uses eBay Browse API v1 for searching listings — no browser scraping needed
 
-import {
-  EbayItemSummary,
-  EbaySearchResponse,
-  EbayScraperConfig,
-  EBAY_API_DEFAULTS,
-} from './types';
+import { EbayItemSummary, EbaySearchResponse, EbayScraperConfig, EBAY_API_DEFAULTS } from './types';
 import { type RawListing } from '@/lib/marketplace-scanner';
 import { detectCategory } from '@/lib/value-estimator';
-import {
-  ExternalServiceError,
-  RateLimitError,
-  ConfigurationError,
-} from '@/lib/errors';
+import { ExternalServiceError, RateLimitError, ConfigurationError } from '@/lib/errors';
 
-const EBAY_API_BASE_URL =
-  process.env.EBAY_BROWSE_API_BASE_URL || EBAY_API_DEFAULTS.BASE_URL;
+const EBAY_API_BASE_URL = process.env.EBAY_BROWSE_API_BASE_URL || EBAY_API_DEFAULTS.BASE_URL;
 // Default marketplace header value is 'EBAY_US' (see EBAY_API_DEFAULTS.MARKETPLACE_ID in types.ts).
 // Override via EBAY_MARKETPLACE_ID env var to target another eBay region.
-const EBAY_MARKETPLACE_ID =
-  process.env.EBAY_MARKETPLACE_ID || EBAY_API_DEFAULTS.MARKETPLACE_ID; // default: 'EBAY_US'
+const EBAY_MARKETPLACE_ID = process.env.EBAY_MARKETPLACE_ID || EBAY_API_DEFAULTS.MARKETPLACE_ID; // default: 'EBAY_US'
 
 /**
  * Build eBay filter string for Browse API v1.
@@ -100,9 +89,7 @@ export async function callEbayApi(
     }
 
     if (response.status === 429) {
-      throw new RateLimitError(
-        'eBay Browse API rate limit exceeded. Please try again later.'
-      );
+      throw new RateLimitError('eBay Browse API rate limit exceeded. Please try again later.');
     }
 
     throw new ExternalServiceError(

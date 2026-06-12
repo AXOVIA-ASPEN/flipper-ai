@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { metrics } from '@/lib/metrics';
 
-
 /**
  * Health check endpoint - lightweight liveness probe
  * GET /api/health

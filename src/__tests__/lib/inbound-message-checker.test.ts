@@ -93,10 +93,7 @@ describe('inbound-message-checker', () => {
     it('all stubs return found: false with empty messages', async () => {
       const checkers = getPlatformCheckers();
       for (const [platform, checker] of Object.entries(checkers)) {
-        const result = await checker.checkForReplies(
-          { ...sampleListing, platform },
-          'user-1'
-        );
+        const result = await checker.checkForReplies({ ...sampleListing, platform }, 'user-1');
         expect(result.found).toBe(false);
         expect(result.messages).toEqual([]);
         expect(result.platform).toBe(platform);

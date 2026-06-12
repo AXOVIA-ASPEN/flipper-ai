@@ -37,12 +37,7 @@ export class AIProviderError extends Error {
 export class AIRateLimitError extends AIProviderError {
   readonly retryAfterMs?: number;
 
-  constructor(
-    message: string,
-    provider: ProviderName,
-    retryAfterMs?: number,
-    cause?: unknown
-  ) {
+  constructor(message: string, provider: ProviderName, retryAfterMs?: number, cause?: unknown) {
     super(message, provider, cause);
     this.name = 'AIRateLimitError';
     this.retryAfterMs = retryAfterMs;
@@ -66,12 +61,7 @@ export class AITimeoutError extends AIProviderError {
 export class AIMalformedResponseError extends AIProviderError {
   readonly rawContent: string;
 
-  constructor(
-    message: string,
-    provider: ProviderName,
-    rawContent: string,
-    cause?: unknown
-  ) {
+  constructor(message: string, provider: ProviderName, rawContent: string, cause?: unknown) {
     super(message, provider, cause);
     this.name = 'AIMalformedResponseError';
     this.rawContent = rawContent;
@@ -84,9 +74,7 @@ export class AIMalformedResponseError extends AIProviderError {
  */
 export class AIProviderUnavailableError extends Error {
   constructor(tried: ProviderName[]) {
-    super(
-      `No AI provider available. Tried: ${tried.join(', ')}. Configure at least one API key.`
-    );
+    super(`No AI provider available. Tried: ${tried.join(', ')}. Configure at least one API key.`);
     this.name = 'AIProviderUnavailableError';
   }
 }

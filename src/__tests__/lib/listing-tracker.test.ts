@@ -50,7 +50,9 @@ describe('listing-tracker', () => {
 
   describe('detectSoldStatus', () => {
     it('detects Craigslist deleted posting', () => {
-      expect(detectSoldStatus('This posting has been deleted by its author', 'CRAIGSLIST')).toBe(true);
+      expect(detectSoldStatus('This posting has been deleted by its author', 'CRAIGSLIST')).toBe(
+        true
+      );
     });
 
     it('detects Craigslist expired posting', () => {
@@ -66,7 +68,9 @@ describe('listing-tracker', () => {
     });
 
     it('detects Facebook Marketplace sold', () => {
-      expect(detectSoldStatus('This item has been marked as Sold', 'FACEBOOK_MARKETPLACE')).toBe(true);
+      expect(detectSoldStatus('This item has been marked as Sold', 'FACEBOOK_MARKETPLACE')).toBe(
+        true
+      );
     });
 
     it('detects Facebook unavailable listing', () => {
@@ -195,7 +199,16 @@ describe('listing-tracker', () => {
 
     it('returns listing data including lastMonitoredAt', async () => {
       const mockListings = [
-        { id: '1', title: 'iPhone', platform: 'EBAY', url: 'https://ebay.com/1', askingPrice: 500, status: 'NEW', userId: 'u1', lastMonitoredAt: null },
+        {
+          id: '1',
+          title: 'iPhone',
+          platform: 'EBAY',
+          url: 'https://ebay.com/1',
+          askingPrice: 500,
+          status: 'NEW',
+          userId: 'u1',
+          lastMonitoredAt: null,
+        },
       ];
       (mockPrisma.listing.findMany as jest.Mock).mockResolvedValue(mockListings);
 
@@ -216,7 +229,10 @@ describe('listing-tracker', () => {
 
     it('detects sold status change', async () => {
       (mockPrisma.listing.findUnique as jest.Mock).mockResolvedValue(mockListing);
-      (mockPrisma.listing.update as jest.Mock).mockResolvedValue({ ...mockListing, status: 'SOLD' });
+      (mockPrisma.listing.update as jest.Mock).mockResolvedValue({
+        ...mockListing,
+        status: 'SOLD',
+      });
 
       const result = await processListingCheck('listing-1', true, null, 500);
 
@@ -230,7 +246,10 @@ describe('listing-tracker', () => {
     });
 
     it('does not mark already-sold listing as sold again', async () => {
-      (mockPrisma.listing.findUnique as jest.Mock).mockResolvedValue({ ...mockListing, status: 'SOLD' });
+      (mockPrisma.listing.findUnique as jest.Mock).mockResolvedValue({
+        ...mockListing,
+        status: 'SOLD',
+      });
 
       const result = await processListingCheck('listing-1', true, null, 500);
       expect(result.statusChange).toBeNull();
@@ -238,7 +257,10 @@ describe('listing-tracker', () => {
 
     it('detects price decrease', async () => {
       (mockPrisma.listing.findUnique as jest.Mock).mockResolvedValue(mockListing);
-      (mockPrisma.listing.update as jest.Mock).mockResolvedValue({ ...mockListing, askingPrice: 400 });
+      (mockPrisma.listing.update as jest.Mock).mockResolvedValue({
+        ...mockListing,
+        askingPrice: 400,
+      });
 
       const result = await processListingCheck('listing-1', false, 400, 500);
 
@@ -250,7 +272,10 @@ describe('listing-tracker', () => {
 
     it('detects price increase', async () => {
       (mockPrisma.listing.findUnique as jest.Mock).mockResolvedValue(mockListing);
-      (mockPrisma.listing.update as jest.Mock).mockResolvedValue({ ...mockListing, askingPrice: 600 });
+      (mockPrisma.listing.update as jest.Mock).mockResolvedValue({
+        ...mockListing,
+        askingPrice: 600,
+      });
 
       const result = await processListingCheck('listing-1', false, 600, 500);
 
@@ -267,7 +292,10 @@ describe('listing-tracker', () => {
 
     it('does not check price when sold', async () => {
       (mockPrisma.listing.findUnique as jest.Mock).mockResolvedValue(mockListing);
-      (mockPrisma.listing.update as jest.Mock).mockResolvedValue({ ...mockListing, status: 'SOLD' });
+      (mockPrisma.listing.update as jest.Mock).mockResolvedValue({
+        ...mockListing,
+        status: 'SOLD',
+      });
 
       const result = await processListingCheck('listing-1', true, 400, 500);
 
@@ -279,7 +307,9 @@ describe('listing-tracker', () => {
     it('throws for non-existent listing', async () => {
       (mockPrisma.listing.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await expect(processListingCheck('bad-id', false, null, 500)).rejects.toThrow('Listing bad-id not found');
+      await expect(processListingCheck('bad-id', false, null, 500)).rejects.toThrow(
+        'Listing bad-id not found'
+      );
     });
 
     it('appends to existing notes on price change', async () => {
@@ -300,14 +330,32 @@ describe('listing-tracker', () => {
   describe('runTrackingCycle', () => {
     it('checks all trackable listings', async () => {
       const listings = [
-        { id: '1', title: 'Item 1', platform: 'EBAY', url: 'https://ebay.com/1', askingPrice: 100, status: 'NEW', userId: null },
-        { id: '2', title: 'Item 2', platform: 'CRAIGSLIST', url: 'https://cl.com/2', askingPrice: 200, status: 'OPPORTUNITY', userId: null },
+        {
+          id: '1',
+          title: 'Item 1',
+          platform: 'EBAY',
+          url: 'https://ebay.com/1',
+          askingPrice: 100,
+          status: 'NEW',
+          userId: null,
+        },
+        {
+          id: '2',
+          title: 'Item 2',
+          platform: 'CRAIGSLIST',
+          url: 'https://cl.com/2',
+          askingPrice: 200,
+          status: 'OPPORTUNITY',
+          userId: null,
+        },
       ];
       (mockPrisma.listing.findMany as jest.Mock).mockResolvedValue(listings);
-      (mockPrisma.listing.findUnique as jest.Mock).mockImplementation(({ where }: { where: { id: string } }) => {
-        const l = listings.find((x) => x.id === where.id);
-        return Promise.resolve(l ? { ...l, notes: null } : null);
-      });
+      (mockPrisma.listing.findUnique as jest.Mock).mockImplementation(
+        ({ where }: { where: { id: string } }) => {
+          const l = listings.find((x) => x.id === where.id);
+          return Promise.resolve(l ? { ...l, notes: null } : null);
+        }
+      );
 
       const fetchPage = jest.fn().mockResolvedValue('Active listing $100');
 
@@ -319,7 +367,15 @@ describe('listing-tracker', () => {
 
     it('records errors for failed fetches', async () => {
       (mockPrisma.listing.findMany as jest.Mock).mockResolvedValue([
-        { id: '1', title: 'Item', platform: 'EBAY', url: 'https://ebay.com/1', askingPrice: 100, status: 'NEW', userId: null },
+        {
+          id: '1',
+          title: 'Item',
+          platform: 'EBAY',
+          url: 'https://ebay.com/1',
+          askingPrice: 100,
+          status: 'NEW',
+          userId: null,
+        },
       ]);
 
       const fetchPage = jest.fn().mockResolvedValue(null);
@@ -331,10 +387,21 @@ describe('listing-tracker', () => {
 
     it('detects sold listings in cycle', async () => {
       const listings = [
-        { id: '1', title: 'Sold Item', platform: 'EBAY', url: 'https://ebay.com/1', askingPrice: 100, status: 'NEW', userId: null },
+        {
+          id: '1',
+          title: 'Sold Item',
+          platform: 'EBAY',
+          url: 'https://ebay.com/1',
+          askingPrice: 100,
+          status: 'NEW',
+          userId: null,
+        },
       ];
       (mockPrisma.listing.findMany as jest.Mock).mockResolvedValue(listings);
-      (mockPrisma.listing.findUnique as jest.Mock).mockResolvedValue({ ...listings[0], notes: null });
+      (mockPrisma.listing.findUnique as jest.Mock).mockResolvedValue({
+        ...listings[0],
+        notes: null,
+      });
       (mockPrisma.listing.update as jest.Mock).mockResolvedValue({});
 
       const fetchPage = jest.fn().mockResolvedValue('This listing has ended');
@@ -356,7 +423,15 @@ describe('listing-tracker', () => {
 
     it('handles fetch exceptions gracefully', async () => {
       (mockPrisma.listing.findMany as jest.Mock).mockResolvedValue([
-        { id: '1', title: 'Item', platform: 'EBAY', url: 'https://ebay.com/1', askingPrice: 100, status: 'NEW', userId: null },
+        {
+          id: '1',
+          title: 'Item',
+          platform: 'EBAY',
+          url: 'https://ebay.com/1',
+          askingPrice: 100,
+          status: 'NEW',
+          userId: null,
+        },
       ]);
 
       const fetchPage = jest.fn().mockRejectedValue(new Error('Network error'));
@@ -400,7 +475,15 @@ describe('listing-tracker - additional branch coverage', () => {
   it('handles non-Error throw in tracking cycle error handler', async () => {
     // Covers: error instanceof Error ? error.message : String(error) (String branch, line 243)
     (mockPrisma.listing.findMany as jest.Mock).mockResolvedValue([
-      { id: 'listing-1', title: 'Test Item', platform: 'EBAY', url: 'https://ebay.com/1', askingPrice: 100, status: 'NEW', userId: null },
+      {
+        id: 'listing-1',
+        title: 'Test Item',
+        platform: 'EBAY',
+        url: 'https://ebay.com/1',
+        askingPrice: 100,
+        status: 'NEW',
+        userId: null,
+      },
     ]);
 
     // Throw a non-Error object to trigger String(error) branch
@@ -425,7 +508,9 @@ describe('listing-tracker - Story 10.1 additions', () => {
     });
 
     it('returns "removed" for 200 with "deleted" text', () => {
-      expect(classifyHttpResponse(200, 'this posting has been deleted by its author')).toBe('removed');
+      expect(classifyHttpResponse(200, 'this posting has been deleted by its author')).toBe(
+        'removed'
+      );
     });
 
     it('returns "rate_limited" for HTTP 403', () => {
@@ -437,7 +522,9 @@ describe('listing-tracker - Story 10.1 additions', () => {
     });
 
     it('returns "rate_limited" for 200 with CAPTCHA content', () => {
-      expect(classifyHttpResponse(200, 'Please complete the captcha to continue')).toBe('rate_limited');
+      expect(classifyHttpResponse(200, 'Please complete the captcha to continue')).toBe(
+        'rate_limited'
+      );
     });
 
     it('returns "rate_limited" for 200 with "blocked" text', () => {
@@ -618,7 +705,9 @@ describe('listing-tracker - Story 10.1 additions', () => {
 
     it('calls createNotificationEvent for user with userId', async () => {
       const tx = makeTx();
-      const { createNotificationEvent: createMock } = jest.requireMock('@/lib/notification-events') as {
+      const { createNotificationEvent: createMock } = jest.requireMock(
+        '@/lib/notification-events'
+      ) as {
         createNotificationEvent: jest.Mock;
       };
       createMock.mockClear();
@@ -640,7 +729,9 @@ describe('listing-tracker - Story 10.1 additions', () => {
 
     it('includes expiryDate in payload for expiring events', async () => {
       const tx = makeTx();
-      const { createNotificationEvent: createMock } = jest.requireMock('@/lib/notification-events') as {
+      const { createNotificationEvent: createMock } = jest.requireMock(
+        '@/lib/notification-events'
+      ) as {
         createNotificationEvent: jest.Mock;
       };
       createMock.mockClear();

@@ -86,9 +86,7 @@ export default function ResaleContentEditor({
   initialDescription = '',
   onSave,
 }: ResaleContentEditorProps) {
-  const initialPlatformKey: PlatformKey = isPlatformKey(initialPlatform)
-    ? initialPlatform
-    : 'ebay';
+  const initialPlatformKey: PlatformKey = isPlatformKey(initialPlatform) ? initialPlatform : 'ebay';
 
   const [platform, setPlatform] = useState<PlatformKey>(initialPlatformKey);
   const [useLLM, setUseLLM] = useState(true);
@@ -120,11 +118,9 @@ export default function ResaleContentEditor({
       // For platform="all" we'd get many; we asked for a specific platform so
       // pick the matching entry (or fall back to primary).
       const matchingTitle =
-        json.data.titles.find((t) => t.platform === platform) ??
-        json.data.titles[0];
+        json.data.titles.find((t) => t.platform === platform) ?? json.data.titles[0];
       const matchingDescription =
-        json.data.descriptions.find((d) => d.platform === platform) ??
-        json.data.descriptions[0];
+        json.data.descriptions.find((d) => d.platform === platform) ?? json.data.descriptions[0];
 
       setTitle(matchingTitle?.title ?? json.data.primary.title);
       setDescription(matchingDescription?.description ?? json.data.primary.description);
@@ -198,7 +194,10 @@ export default function ResaleContentEditor({
       </div>
 
       {warnings.length > 0 && (
-        <ul className="fp-alert-warn text-xs rounded p-2 list-disc list-inside" style={{ color: '#fcd34d' }}>
+        <ul
+          className="fp-alert-warn text-xs rounded p-2 list-disc list-inside"
+          style={{ color: '#fcd34d' }}
+        >
           {warnings.map((w) => (
             <li key={w}>{w}</li>
           ))}
@@ -213,7 +212,11 @@ export default function ResaleContentEditor({
 
       <div>
         <div className="flex items-center justify-between mb-1">
-          <label htmlFor="resale-title" className="text-sm font-medium" style={{ color: '#e2e8f0' }}>
+          <label
+            htmlFor="resale-title"
+            className="text-sm font-medium"
+            style={{ color: '#e2e8f0' }}
+          >
             Title
           </label>
           <span className="text-xs" style={{ color: titleOver ? '#fca5a5' : '#94a3b8' }}>

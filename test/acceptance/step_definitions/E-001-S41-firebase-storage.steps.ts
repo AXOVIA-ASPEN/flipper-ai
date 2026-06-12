@@ -31,12 +31,9 @@ let secretsPyContent: string;
 
 // ==================== S-41: Firebase Storage bucket configuration ====================
 
-When(
-  'I inspect the Firebase Storage configuration',
-  async function (this: CustomWorld) {
-    console.log('✅ Inspecting Firebase Storage configuration...');
-  }
-);
+When('I inspect the Firebase Storage configuration', async function (this: CustomWorld) {
+  console.log('✅ Inspecting Firebase Storage configuration...');
+});
 
 Then(
   '{string} should include {string} set to {string}',
@@ -104,22 +101,16 @@ Then(
   }
 );
 
-Then(
-  'write access should require {string}',
-  async function (this: CustomWorld, condition: string) {
-    expect(storageRulesContent).toContain(condition);
-    console.log(`✅ Write access requires: ${condition}`);
-  }
-);
+Then('write access should require {string}', async function (this: CustomWorld, condition: string) {
+  expect(storageRulesContent).toContain(condition);
+  console.log(`✅ Write access requires: ${condition}`);
+});
 
 // ==================== S-43: Security rules — unauthorized access denied ====================
 
-When(
-  'I inspect the security rules for unauthorized access',
-  async function (this: CustomWorld) {
-    console.log('✅ Inspecting security rules for unauthorized access...');
-  }
-);
+When('I inspect the security rules for unauthorized access', async function (this: CustomWorld) {
+  console.log('✅ Inspecting security rules for unauthorized access...');
+});
 
 Then(
   'the catch-all rule should deny all read and write access',
@@ -145,37 +136,30 @@ Then(
   }
 );
 
-Then(
-  'write access should enforce file size under 5MB',
-  async function (this: CustomWorld) {
-    expect(storageRulesContent).toContain('request.resource.size < 5 * 1024 * 1024');
-    console.log('✅ Write access enforces 5MB file size limit');
-  }
-);
+Then('write access should enforce file size under 5MB', async function (this: CustomWorld) {
+  expect(storageRulesContent).toContain('request.resource.size < 5 * 1024 * 1024');
+  console.log('✅ Write access enforces 5MB file size limit');
+});
 
 // ==================== S-44: Storage path follows structured convention ====================
 
-Given(
-  'the storage helper at {string}',
-  async function (this: CustomWorld, helperPath: string) {
-    storageTsContent = readProjectFile(helperPath);
-    console.log(`✅ Loaded storage helper from ${helperPath}`);
-  }
-);
+Given('the storage helper at {string}', async function (this: CustomWorld, helperPath: string) {
+  storageTsContent = readProjectFile(helperPath);
+  console.log(`✅ Loaded storage helper from ${helperPath}`);
+});
 
-When(
-  'I inspect the buildStoragePath function',
-  async function (this: CustomWorld) {
-    expect(storageTsContent).toContain('buildStoragePath');
-    console.log('✅ Inspecting buildStoragePath function...');
-  }
-);
+When('I inspect the buildStoragePath function', async function (this: CustomWorld) {
+  expect(storageTsContent).toContain('buildStoragePath');
+  console.log('✅ Inspecting buildStoragePath function...');
+});
 
 Then(
   'it should generate paths in the format {string}',
   async function (this: CustomWorld, _format: string) {
     // Verify the function uses template literal with userId/platform/listingId/imageIndex.ext
-    expect(storageTsContent).toMatch(/\$\{userId\}\/\$\{platform\}\/\$\{listingId\}\/\$\{imageIndex\}\.\$\{ext\}/);
+    expect(storageTsContent).toMatch(
+      /\$\{userId\}\/\$\{platform\}\/\$\{listingId\}\/\$\{imageIndex\}\.\$\{ext\}/
+    );
     console.log('✅ buildStoragePath generates structured paths');
   }
 );
@@ -209,15 +193,12 @@ Then(
 
 // 'the Prisma schema at {string}' defined in E-001-S48-cloud-sql-database.steps.ts
 
-When(
-  'I inspect the ListingImage model',
-  async function (this: CustomWorld) {
-    // Load schema inline since the Given step is in another file's scope
-    (this as any)._prismaSchema = readProjectFile('prisma/schema.prisma');
-    expect((this as any)._prismaSchema).toContain('model ListingImage');
-    console.log('✅ Inspecting ListingImage model...');
-  }
-);
+When('I inspect the ListingImage model', async function (this: CustomWorld) {
+  // Load schema inline since the Given step is in another file's scope
+  (this as any)._prismaSchema = readProjectFile('prisma/schema.prisma');
+  expect((this as any)._prismaSchema).toContain('model ListingImage');
+  console.log('✅ Inspecting ListingImage model...');
+});
 
 Then(
   'it should have fields for storagePath, storageUrl, originalUrl, fileSize, and contentType',
@@ -230,15 +211,12 @@ Then(
   }
 );
 
-Then(
-  'it should have optional fields for width and height',
-  async function (this: CustomWorld) {
-    const schema = (this as any)._prismaSchema;
-    expect(schema).toMatch(/width\s+Int\?/);
-    expect(schema).toMatch(/height\s+Int\?/);
-    console.log('✅ ListingImage has optional width and height fields');
-  }
-);
+Then('it should have optional fields for width and height', async function (this: CustomWorld) {
+  const schema = (this as any)._prismaSchema;
+  expect(schema).toMatch(/width\s+Int\?/);
+  expect(schema).toMatch(/height\s+Int\?/);
+  console.log('✅ ListingImage has optional width and height fields');
+});
 
 Then(
   'it should have a foreign key relation to Listing with cascade delete',
@@ -273,12 +251,9 @@ Then(
 
 // ==================== S-47: Storage helper utilities ====================
 
-When(
-  'I inspect the exported functions',
-  async function (this: CustomWorld) {
-    console.log('✅ Inspecting storage helper exported functions...');
-  }
-);
+When('I inspect the exported functions', async function (this: CustomWorld) {
+  console.log('✅ Inspecting storage helper exported functions...');
+});
 
 Then(
   'it should export {string} for bucket access',

@@ -6,7 +6,12 @@ import {
   hasRunningJob,
   scrapeCraigslist,
 } from '@/scrapers/craigslist';
-import { USER_AGENTS, SCRAPER_CONFIG, CATEGORY_PATHS, SUPPORTED_LOCATIONS } from '@/scrapers/craigslist';
+import {
+  USER_AGENTS,
+  SCRAPER_CONFIG,
+  CATEGORY_PATHS,
+  SUPPORTED_LOCATIONS,
+} from '@/scrapers/craigslist';
 
 // Mock Prisma
 const mockFindFirst = jest.fn();
@@ -93,7 +98,7 @@ describe('Craigslist Scraper Module', () => {
     });
 
     it('parses "$12.50" with cents', () => {
-      expect(parsePrice('$12.50')).toBe(12.50);
+      expect(parsePrice('$12.50')).toBe(12.5);
     });
 
     it('parses "$10,500.99" with commas and cents', () => {
@@ -128,9 +133,9 @@ describe('Craigslist Scraper Module', () => {
     });
 
     it('extracts ID from URL with different category path', () => {
-      expect(
-        extractListingId('https://sfbay.craigslist.org/sfc/fuo/d/couch/1234567890.html')
-      ).toBe('1234567890');
+      expect(extractListingId('https://sfbay.craigslist.org/sfc/fuo/d/couch/1234567890.html')).toBe(
+        '1234567890'
+      );
     });
 
     it('extracts ID from URL with path-only numeric segment', () => {
@@ -143,9 +148,9 @@ describe('Craigslist Scraper Module', () => {
     });
 
     it('handles URL with multiple numeric segments (takes .html match first)', () => {
-      expect(
-        extractListingId('https://city.craigslist.org/d/title-123/7777777777.html')
-      ).toBe('7777777777');
+      expect(extractListingId('https://city.craigslist.org/d/title-123/7777777777.html')).toBe(
+        '7777777777'
+      );
     });
   });
 
@@ -396,18 +401,16 @@ describe('Craigslist Scraper Module', () => {
     it('launches browser with anti-detection args', async () => {
       mockGoto.mockResolvedValue(undefined);
       mockWaitForSelector.mockResolvedValue(undefined);
-      mockEvaluate
-        .mockResolvedValueOnce(200)
-        .mockResolvedValueOnce([
-          {
-            title: 'Test',
-            price: '$100',
-            url: 'https://test.craigslist.org/1234.html',
-            location: 'Test',
-            imageUrl: '',
-            description: '',
-          },
-        ]);
+      mockEvaluate.mockResolvedValueOnce(200).mockResolvedValueOnce([
+        {
+          title: 'Test',
+          price: '$100',
+          url: 'https://test.craigslist.org/1234.html',
+          location: 'Test',
+          imageUrl: '',
+          description: '',
+        },
+      ]);
 
       await scrapeCraigslist({ location: 'sarasota', category: 'electronics' });
 
@@ -420,18 +423,16 @@ describe('Craigslist Scraper Module', () => {
     it('sets navigator.webdriver override via addInitScript', async () => {
       mockGoto.mockResolvedValue(undefined);
       mockWaitForSelector.mockResolvedValue(undefined);
-      mockEvaluate
-        .mockResolvedValueOnce(200)
-        .mockResolvedValueOnce([
-          {
-            title: 'Test',
-            price: '$100',
-            url: 'https://test.craigslist.org/1234.html',
-            location: 'Test',
-            imageUrl: '',
-            description: '',
-          },
-        ]);
+      mockEvaluate.mockResolvedValueOnce(200).mockResolvedValueOnce([
+        {
+          title: 'Test',
+          price: '$100',
+          url: 'https://test.craigslist.org/1234.html',
+          location: 'Test',
+          imageUrl: '',
+          description: '',
+        },
+      ]);
 
       await scrapeCraigslist({ location: 'sarasota', category: 'electronics' });
 
@@ -444,18 +445,16 @@ describe('Craigslist Scraper Module', () => {
         .mockRejectedValueOnce(new Error('Timeout exceeded'))
         .mockResolvedValueOnce(undefined);
       mockWaitForSelector.mockResolvedValue(undefined);
-      mockEvaluate
-        .mockResolvedValueOnce(200)
-        .mockResolvedValueOnce([
-          {
-            title: 'Test After Retry',
-            price: '$50',
-            url: 'https://test.craigslist.org/5555.html',
-            location: 'Test',
-            imageUrl: '',
-            description: '',
-          },
-        ]);
+      mockEvaluate.mockResolvedValueOnce(200).mockResolvedValueOnce([
+        {
+          title: 'Test After Retry',
+          price: '$50',
+          url: 'https://test.craigslist.org/5555.html',
+          location: 'Test',
+          imageUrl: '',
+          description: '',
+        },
+      ]);
 
       const result = await scrapeCraigslist({
         location: 'sarasota',
@@ -511,7 +510,8 @@ describe('Craigslist Scraper Module', () => {
       mockEvaluate
         .mockResolvedValueOnce(403) // first rate limit check — blocked
         .mockResolvedValueOnce(200) // second check after backoff — OK
-        .mockResolvedValueOnce([    // listings extraction
+        .mockResolvedValueOnce([
+          // listings extraction
           {
             title: 'Test After Backoff',
             price: '$100',
@@ -535,18 +535,16 @@ describe('Craigslist Scraper Module', () => {
     it('uses randomized viewport dimensions', async () => {
       mockGoto.mockResolvedValue(undefined);
       mockWaitForSelector.mockResolvedValue(undefined);
-      mockEvaluate
-        .mockResolvedValueOnce(200)
-        .mockResolvedValueOnce([
-          {
-            title: 'Test',
-            price: '$100',
-            url: 'https://test.craigslist.org/1234.html',
-            location: 'Test',
-            imageUrl: '',
-            description: '',
-          },
-        ]);
+      mockEvaluate.mockResolvedValueOnce(200).mockResolvedValueOnce([
+        {
+          title: 'Test',
+          price: '$100',
+          url: 'https://test.craigslist.org/1234.html',
+          location: 'Test',
+          imageUrl: '',
+          description: '',
+        },
+      ]);
 
       await scrapeCraigslist({ location: 'sarasota', category: 'electronics' });
 
@@ -562,26 +560,24 @@ describe('Craigslist Scraper Module', () => {
     it('parses condition from listing text', async () => {
       mockGoto.mockResolvedValue(undefined);
       mockWaitForSelector.mockResolvedValue(undefined);
-      mockEvaluate
-        .mockResolvedValueOnce(200)
-        .mockResolvedValueOnce([
-          {
-            title: 'Brand New iPhone 15',
-            price: '$800',
-            url: 'https://test.craigslist.org/a1.html',
-            location: 'Test',
-            imageUrl: '',
-            description: 'Still sealed in box',
-          },
-          {
-            title: 'Used Laptop for parts',
-            price: '$50',
-            url: 'https://test.craigslist.org/a2.html',
-            location: 'Test',
-            imageUrl: '',
-            description: 'Broken screen, as-is',
-          },
-        ]);
+      mockEvaluate.mockResolvedValueOnce(200).mockResolvedValueOnce([
+        {
+          title: 'Brand New iPhone 15',
+          price: '$800',
+          url: 'https://test.craigslist.org/a1.html',
+          location: 'Test',
+          imageUrl: '',
+          description: 'Still sealed in box',
+        },
+        {
+          title: 'Used Laptop for parts',
+          price: '$50',
+          url: 'https://test.craigslist.org/a2.html',
+          location: 'Test',
+          imageUrl: '',
+          description: 'Broken screen, as-is',
+        },
+      ]);
 
       const result = await scrapeCraigslist({ location: 'sarasota', category: 'electronics' });
 

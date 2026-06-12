@@ -1,7 +1,7 @@
 /**
  * Diagnostics API Route
  * GET /api/diagnostics - Test database connection and Prisma setup
- * 
+ *
  * This endpoint helps debug deployment issues by testing:
  * - Prisma client initialization
  * - Database connectivity

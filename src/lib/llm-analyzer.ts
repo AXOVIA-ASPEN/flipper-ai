@@ -198,7 +198,16 @@ async function analyzeSellabilityUncached(
   feeRate?: number,
   listingId?: string
 ): Promise<SellabilityAnalysis | null> {
-  return analyzeSellability(title, askingPrice, identification, marketData, discountThreshold, feeRate, listingId, true);
+  return analyzeSellability(
+    title,
+    askingPrice,
+    identification,
+    marketData,
+    discountThreshold,
+    feeRate,
+    listingId,
+    true
+  );
 }
 
 export async function analyzeSellability(
@@ -214,15 +223,25 @@ export async function analyzeSellability(
 ): Promise<SellabilityAnalysis | null> {
   // Check cache FIRST — cached results are valid regardless of which provider generated them
   if (listingId && !skipCacheCheck) {
-    const { analysis: cached, staleAnalysis } = await getCachedSellabilityAnalysis(listingId, askingPrice);
+    const { analysis: cached, staleAnalysis } = await getCachedSellabilityAnalysis(
+      listingId,
+      askingPrice
+    );
     if (cached && !staleAnalysis) return cached;
     if (cached && staleAnalysis) {
       // Serve stale but trigger background refresh (if not already refreshing)
       if (!isRefreshing(listingId)) {
         setRefreshing(listingId, true);
         // Fire-and-forget background refresh — skip cache check to avoid recursion
-        analyzeSellabilityUncached(title, askingPrice, identification, marketData, discountThreshold, feeRate, listingId)
-          .finally(() => setRefreshing(listingId, false));
+        analyzeSellabilityUncached(
+          title,
+          askingPrice,
+          identification,
+          marketData,
+          discountThreshold,
+          feeRate,
+          listingId
+        ).finally(() => setRefreshing(listingId, false));
       }
       return cached;
     }
@@ -375,7 +394,13 @@ export async function runFullAnalysis(
   discountThreshold?: number
 ): Promise<FullAnalysisResult | null> {
   // Run sellability analysis
-  const analysis = await analyzeSellability(title, askingPrice, identification, marketData, discountThreshold);
+  const analysis = await analyzeSellability(
+    title,
+    askingPrice,
+    identification,
+    marketData,
+    discountThreshold
+  );
 
   if (!analysis) {
     return null;

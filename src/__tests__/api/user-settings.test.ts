@@ -550,17 +550,30 @@ describe('PATCH /api/user/settings', () => {
   });
 
   it('should update feeRateFacebook, feeRateOfferup, and feeRateCraigslist', async () => {
-    const updated = { ...mockUser.settings, feeRateFacebook: 3.0, feeRateOfferup: 11.0, feeRateCraigslist: 0.5 };
+    const updated = {
+      ...mockUser.settings,
+      feeRateFacebook: 3.0,
+      feeRateOfferup: 11.0,
+      feeRateCraigslist: 0.5,
+    };
     mockUpdateSettings.mockResolvedValue(updated);
 
-    const req = createMockRequest('PATCH', { feeRateFacebook: 3.0, feeRateOfferup: 11.0, feeRateCraigslist: 0.5 });
+    const req = createMockRequest('PATCH', {
+      feeRateFacebook: 3.0,
+      feeRateOfferup: 11.0,
+      feeRateCraigslist: 0.5,
+    });
     const response = await PATCH(req);
     const data = await response.json();
 
     expect(data.success).toBe(true);
     expect(mockUpdateSettings).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: expect.objectContaining({ feeRateFacebook: 3.0, feeRateOfferup: 11.0, feeRateCraigslist: 0.5 }),
+        data: expect.objectContaining({
+          feeRateFacebook: 3.0,
+          feeRateOfferup: 11.0,
+          feeRateCraigslist: 0.5,
+        }),
       })
     );
   });

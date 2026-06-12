@@ -33,15 +33,21 @@ export default function StepWelcome({ name }: { name?: string }) {
       <div className="grid grid-cols-3 gap-4 text-center">
         <div className="fp-glass-sm p-4 rounded-xl">
           <div className="text-2xl mb-1">🔍</div>
-          <p className="text-xs font-medium" style={{ color: '#94a3b8' }}>Scan marketplaces</p>
+          <p className="text-xs font-medium" style={{ color: '#94a3b8' }}>
+            Scan marketplaces
+          </p>
         </div>
         <div className="fp-glass-sm p-4 rounded-xl">
           <div className="text-2xl mb-1">💡</div>
-          <p className="text-xs font-medium" style={{ color: '#94a3b8' }}>AI-powered insights</p>
+          <p className="text-xs font-medium" style={{ color: '#94a3b8' }}>
+            AI-powered insights
+          </p>
         </div>
         <div className="fp-glass-sm p-4 rounded-xl">
           <div className="text-2xl mb-1">💰</div>
-          <p className="text-xs font-medium" style={{ color: '#94a3b8' }}>Track profits</p>
+          <p className="text-xs font-medium" style={{ color: '#94a3b8' }}>
+            Track profits
+          </p>
         </div>
       </div>
     </div>

@@ -232,11 +232,21 @@ describe('validateExternalUrl', () => {
   const fallback = 'https://app.flipper.ai/opportunities';
 
   it('allows known platform domains', () => {
-    expect(validateExternalUrl('https://www.ebay.com/item/123', fallback)).toBe('https://www.ebay.com/item/123');
-    expect(validateExternalUrl('https://mercari.com/listing/abc', fallback)).toBe('https://mercari.com/listing/abc');
-    expect(validateExternalUrl('https://craigslist.org/search', fallback)).toBe('https://craigslist.org/search');
-    expect(validateExternalUrl('https://offerup.com/item/1', fallback)).toBe('https://offerup.com/item/1');
-    expect(validateExternalUrl('https://facebook.com/marketplace/1', fallback)).toBe('https://facebook.com/marketplace/1');
+    expect(validateExternalUrl('https://www.ebay.com/item/123', fallback)).toBe(
+      'https://www.ebay.com/item/123'
+    );
+    expect(validateExternalUrl('https://mercari.com/listing/abc', fallback)).toBe(
+      'https://mercari.com/listing/abc'
+    );
+    expect(validateExternalUrl('https://craigslist.org/search', fallback)).toBe(
+      'https://craigslist.org/search'
+    );
+    expect(validateExternalUrl('https://offerup.com/item/1', fallback)).toBe(
+      'https://offerup.com/item/1'
+    );
+    expect(validateExternalUrl('https://facebook.com/marketplace/1', fallback)).toBe(
+      'https://facebook.com/marketplace/1'
+    );
   });
 
   it('rejects unknown domains with fallback', () => {
@@ -355,7 +365,10 @@ describe('flipGoneColdEmailHtml', () => {
   });
 
   it('escapes XSS in listingTitle', () => {
-    const html = flipGoneColdEmailHtml({ ...coldOpts, listingTitle: '<img src=x onerror=alert(1)>' });
+    const html = flipGoneColdEmailHtml({
+      ...coldOpts,
+      listingTitle: '<img src=x onerror=alert(1)>',
+    });
     expect(html).not.toContain('<img');
     expect(html).toContain('&lt;img');
   });
@@ -411,7 +424,10 @@ describe('flipTurnedHotEmailHtml', () => {
   });
 
   it('escapes XSS in latestMessagePreview', () => {
-    const html = flipTurnedHotEmailHtml({ ...hotOpts, latestMessagePreview: '<script>evil()</script>' });
+    const html = flipTurnedHotEmailHtml({
+      ...hotOpts,
+      latestMessagePreview: '<script>evil()</script>',
+    });
     expect(html).not.toContain('<script>');
     expect(html).toContain('&lt;script&gt;');
   });
@@ -468,7 +484,12 @@ describe('priceChangeAlertEmailHtml', () => {
   });
 
   it('uses DANGER_COLOR for price increase', () => {
-    const html = priceChangeAlertEmailHtml({ ...priceChangeOpts, direction: 'increase', oldPrice: 650, newPrice: 800 });
+    const html = priceChangeAlertEmailHtml({
+      ...priceChangeOpts,
+      direction: 'increase',
+      oldPrice: 650,
+      newPrice: 800,
+    });
     expect(html).toContain('#dc2626'); // DANGER_COLOR
     expect(html).toContain('↑ Price Increase');
   });

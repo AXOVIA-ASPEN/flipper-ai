@@ -22,29 +22,32 @@ When('I inspect the GET handler for format=csv', function () {
   // context already loaded
 });
 
-Then(
-  'it calls getProfitLossAnalytics with the user\'s ID and granularity',
-  function () {
-    assert.ok(this.fileContent.includes('getProfitLossAnalytics'), 'Expected source to contain getProfitLossAnalytics');
-    assert.ok(this.fileContent.includes('userId'), 'Expected source to contain userId');
-    assert.ok(this.fileContent.includes('granularity'), 'Expected source to contain granularity');
-  }
-);
+Then("it calls getProfitLossAnalytics with the user's ID and granularity", function () {
+  assert.ok(
+    this.fileContent.includes('getProfitLossAnalytics'),
+    'Expected source to contain getProfitLossAnalytics'
+  );
+  assert.ok(this.fileContent.includes('userId'), 'Expected source to contain userId');
+  assert.ok(this.fileContent.includes('granularity'), 'Expected source to contain granularity');
+});
 
-Then(
-  'it returns a response with Content-Type {string}',
-  function (contentType: string) {
-    assert.ok(this.fileContent.includes(contentType), `Expected source to contain "${contentType}"`);
-  }
-);
+Then('it returns a response with Content-Type {string}', function (contentType: string) {
+  assert.ok(this.fileContent.includes(contentType), `Expected source to contain "${contentType}"`);
+});
 
 Then(
   'it sets Content-Disposition to attachment with filename matching {string}',
   function (pattern: string) {
-    assert.ok(this.fileContent.includes('Content-Disposition'), 'Expected source to contain Content-Disposition');
+    assert.ok(
+      this.fileContent.includes('Content-Disposition'),
+      'Expected source to contain Content-Disposition'
+    );
     assert.ok(this.fileContent.includes('attachment'), 'Expected source to contain attachment');
     // pattern "flipper-report-YYYY-MM-DD.csv" → check the template string
-    assert.ok(this.fileContent.includes('flipper-report-'), 'Expected source to contain flipper-report-');
+    assert.ok(
+      this.fileContent.includes('flipper-report-'),
+      'Expected source to contain flipper-report-'
+    );
     assert.ok(this.fileContent.includes('.csv'), 'Expected source to contain .csv');
     void pattern;
   }
@@ -64,40 +67,49 @@ When('I inspect the buildCsvContent function', function () {
   // context already loaded
 });
 
-Then(
-  'the first row contains headers: {string}',
-  function (expectedHeaders: string) {
-    // Verify all expected headers are declared in the source
-    const headers = expectedHeaders.split(',');
-    for (const header of headers) {
-      assert.ok(this.fileContent.includes(header.trim()), `Expected source to contain header "${header.trim()}"`);
-    }
+Then('the first row contains headers: {string}', function (expectedHeaders: string) {
+  // Verify all expected headers are declared in the source
+  const headers = expectedHeaders.split(',');
+  for (const header of headers) {
+    assert.ok(
+      this.fileContent.includes(header.trim()),
+      `Expected source to contain header "${header.trim()}"`
+    );
   }
-);
+});
 
 Then(
   'each subsequent row contains one deal with values mapped from ProfitLossItem fields',
   function () {
     assert.ok(this.fileContent.includes('items.map'), 'Expected source to contain items.map');
     assert.ok(this.fileContent.includes('item.title'), 'Expected source to contain item.title');
-    assert.ok(this.fileContent.includes('item.platform'), 'Expected source to contain item.platform');
-    assert.ok(this.fileContent.includes('item.purchasePrice'), 'Expected source to contain item.purchasePrice');
-    assert.ok(this.fileContent.includes('item.netProfit'), 'Expected source to contain item.netProfit');
+    assert.ok(
+      this.fileContent.includes('item.platform'),
+      'Expected source to contain item.platform'
+    );
+    assert.ok(
+      this.fileContent.includes('item.purchasePrice'),
+      'Expected source to contain item.purchasePrice'
+    );
+    assert.ok(
+      this.fileContent.includes('item.netProfit'),
+      'Expected source to contain item.netProfit'
+    );
   }
 );
 
 Then('null values are represented as empty fields', function () {
   // escapeCsvField returns '' for null
-  assert.ok(this.fileContent.includes("if (value === null || value === undefined) return ''"), 'Expected null handling logic');
+  assert.ok(
+    this.fileContent.includes("if (value === null || value === undefined) return ''"),
+    'Expected null handling logic'
+  );
 });
 
-Then(
-  'fields containing commas or double-quotes are properly escaped per RFC 4180',
-  function () {
-    assert.ok(this.fileContent.includes('replace(/"/g'), 'Expected CSV quote escaping');
-    assert.ok(this.fileContent.includes('""'), 'Expected double-quote escape sequence');
-  }
-);
+Then('fields containing commas or double-quotes are properly escaped per RFC 4180', function () {
+  assert.ok(this.fileContent.includes('replace(/"/g'), 'Expected CSV quote escaping');
+  assert.ok(this.fileContent.includes('""'), 'Expected double-quote escape sequence');
+});
 
 // ---------------------------------------------------------------------------
 // S-27: format=pdf returns 400
@@ -107,13 +119,13 @@ When('I inspect the GET handler for format=pdf', function () {
   // context already loaded from the Given step
 });
 
-Then(
-  'it returns a 400 response with error {string}',
-  function (errorMessage: string) {
-    assert.ok(this.fileContent.includes('400'), 'Expected source to contain 400 status');
-    assert.ok(this.fileContent.includes(errorMessage), `Expected source to contain "${errorMessage}"`);
-  }
-);
+Then('it returns a 400 response with error {string}', function (errorMessage: string) {
+  assert.ok(this.fileContent.includes('400'), 'Expected source to contain 400 status');
+  assert.ok(
+    this.fileContent.includes(errorMessage),
+    `Expected source to contain "${errorMessage}"`
+  );
+});
 
 // ---------------------------------------------------------------------------
 // S-28: Export buttons in analytics page
@@ -130,10 +142,14 @@ Then('it renders an {string} button', function (buttonLabel: string) {
 Then(
   /^the Export CSV button triggers a fetch to \/api\/analytics\/export\?format=csv$/,
   function () {
-    assert.ok(this.fileContent.includes('/api/analytics/export'), 'Expected fetch to analytics export endpoint');
+    assert.ok(
+      this.fileContent.includes('/api/analytics/export'),
+      'Expected fetch to analytics export endpoint'
+    );
     // Accept literal `format=csv` in a string OR a URLSearchParams call passing
     // `format: 'csv'` (the canonical pattern after the URLSearchParams refactor).
-    const hasCsvParam = this.fileContent.includes('format=csv') ||
+    const hasCsvParam =
+      this.fileContent.includes('format=csv') ||
       /URLSearchParams\([\s\S]*?format:\s*['"]csv['"]/.test(this.fileContent);
     assert.ok(hasCsvParam, 'Expected format=csv parameter (literal or URLSearchParams field)');
   }
@@ -142,10 +158,16 @@ Then(
 Then(
   'the Export PDF button uses dynamic import of analytics-pdf-export to generate the PDF client-side',
   function () {
-    assert.ok(this.fileContent.includes('analytics-pdf-export'), 'Expected analytics-pdf-export import');
-    assert.ok(this.fileContent.includes('generateAnalyticsPdf'), 'Expected generateAnalyticsPdf call');
+    assert.ok(
+      this.fileContent.includes('analytics-pdf-export'),
+      'Expected analytics-pdf-export import'
+    );
+    assert.ok(
+      this.fileContent.includes('generateAnalyticsPdf'),
+      'Expected generateAnalyticsPdf call'
+    );
     // Dynamic import pattern
-    assert.ok(this.fileContent.includes("await import("), 'Expected dynamic import pattern');
+    assert.ok(this.fileContent.includes('await import('), 'Expected dynamic import pattern');
   }
 );
 
@@ -157,13 +179,13 @@ When('I inspect the handleExportCsv function', function () {
   // context already loaded
 });
 
-Then(
-  'the fetch URL includes the current granularity as a query parameter',
-  function () {
-    assert.ok(this.fileContent.includes('granularity'), 'Expected granularity parameter');
-    assert.ok(this.fileContent.includes('/api/analytics/export'), 'Expected analytics export endpoint');
-  }
-);
+Then('the fetch URL includes the current granularity as a query parameter', function () {
+  assert.ok(this.fileContent.includes('granularity'), 'Expected granularity parameter');
+  assert.ok(
+    this.fileContent.includes('/api/analytics/export'),
+    'Expected analytics export endpoint'
+  );
+});
 
 Then(
   'changing granularity to {string} causes the export URL to include {string}',
@@ -173,6 +195,9 @@ Then(
     // and appends via: fetch(`/api/analytics/export?${params}`)
     assert.ok(this.fileContent.includes('URLSearchParams'), 'Expected URLSearchParams usage');
     assert.ok(this.fileContent.includes('granularity'), 'Expected granularity parameter');
-    assert.ok(this.fileContent.includes('/api/analytics/export?${params}'), 'Expected parameterized export URL');
+    assert.ok(
+      this.fileContent.includes('/api/analytics/export?${params}'),
+      'Expected parameterized export URL'
+    );
   }
 );

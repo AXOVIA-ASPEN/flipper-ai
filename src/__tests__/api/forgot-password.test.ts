@@ -84,7 +84,12 @@ function createRequest(body: object, ip = '127.0.0.1') {
 describe('POST /api/auth/forgot-password', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockRateLimit.mockReturnValue({ allowed: true, remaining: 4, limit: 5, resetAt: Date.now() + 900000 });
+    mockRateLimit.mockReturnValue({
+      allowed: true,
+      remaining: 4,
+      limit: 5,
+      resetAt: Date.now() + 900000,
+    });
     mockUserFindUnique.mockResolvedValue(TEST_USER);
     mockTokenCount.mockResolvedValue(0);
     mockTokenCreate.mockResolvedValue({ id: 'token-1', userId: TEST_USER.id });
@@ -143,7 +148,9 @@ describe('POST /api/auth/forgot-password', () => {
 
     expect(mockSendPasswordReset).toHaveBeenCalledWith(
       expect.objectContaining({
-        resetUrl: expect.stringMatching(/^https:\/\/flipper\.ai\/reset-password\?token=[a-f0-9]{64}$/),
+        resetUrl: expect.stringMatching(
+          /^https:\/\/flipper\.ai\/reset-password\?token=[a-f0-9]{64}$/
+        ),
       })
     );
 
@@ -191,7 +198,12 @@ describe('POST /api/auth/forgot-password', () => {
   });
 
   it('returns 429 on IP-based rate limit', async () => {
-    mockRateLimit.mockReturnValue({ allowed: false, remaining: 0, limit: 5, resetAt: Date.now() + 60000 });
+    mockRateLimit.mockReturnValue({
+      allowed: false,
+      remaining: 0,
+      limit: 5,
+      resetAt: Date.now() + 60000,
+    });
 
     const res = await POST(createRequest({ email: 'test@example.com' }, '10.0.0.99'));
     const data = await res.json();

@@ -147,9 +147,7 @@ export async function GET(
 
     // Compute departure time using buffer (meetingTime is guaranteed non-null after the guard above)
     const departureTime = new Date(
-      opportunity.meetingTime.getTime()
-        - route.durationSeconds * 1000
-        - bufferMinutes * 60 * 1000
+      opportunity.meetingTime.getTime() - route.durationSeconds * 1000 - bufferMinutes * 60 * 1000
     );
     const departureIsPast = departureTime < new Date();
 
@@ -170,4 +168,3 @@ export async function GET(
     return handleError(error);
   }
 }
-

@@ -18,9 +18,7 @@ test.describe('Password Reset', () => {
 
       // Should show an email input and submit button
       await expect(page.getByLabel(/Email/i)).toBeVisible();
-      await expect(
-        page.getByRole('button', { name: /Reset|Send|Submit/i })
-      ).toBeVisible();
+      await expect(page.getByRole('button', { name: /Reset|Send|Submit/i })).toBeVisible();
     });
 
     test('Scenario: Given a user on the forgot password page, When they submit an empty email, Then validation prevents submission', async ({
@@ -42,9 +40,7 @@ test.describe('Password Reset', () => {
       const emailInput = page.getByLabel(/Email/i);
       const isInvalid =
         (await emailInput.getAttribute('aria-invalid')) === 'true' ||
-        (await emailInput.evaluate(
-          (el: HTMLInputElement) => !el.validity.valid
-        ));
+        (await emailInput.evaluate((el: HTMLInputElement) => !el.validity.valid));
       expect(isInvalid).toBeTruthy();
     });
 
@@ -78,9 +74,9 @@ test.describe('Password Reset', () => {
       await page.getByRole('button', { name: /Reset|Send|Submit/i }).click();
 
       // Should show a success/confirmation message
-      await expect(
-        page.getByText(/sent|check your email|reset link|instructions/i)
-      ).toBeVisible({ timeout: 5000 });
+      await expect(page.getByText(/sent|check your email|reset link|instructions/i)).toBeVisible({
+        timeout: 5000,
+      });
     });
 
     test('Scenario: Given a user on the forgot password page, When they submit an invalid email format, Then an error appears', async ({
@@ -101,10 +97,11 @@ test.describe('Password Reset', () => {
       const emailInput = page.getByLabel(/Email/i);
       const isInvalid =
         (await emailInput.getAttribute('aria-invalid')) === 'true' ||
-        (await emailInput.evaluate(
-          (el: HTMLInputElement) => !el.validity.valid
-        )) ||
-        (await page.getByText(/invalid|valid email/i).isVisible().catch(() => false));
+        (await emailInput.evaluate((el: HTMLInputElement) => !el.validity.valid)) ||
+        (await page
+          .getByText(/invalid|valid email/i)
+          .isVisible()
+          .catch(() => false));
       expect(isInvalid).toBeTruthy();
     });
   });
@@ -141,14 +138,12 @@ test.describe('Password Reset', () => {
         // Fill mismatched passwords
         await passwordFields.first().fill('NewPassword123!');
         await passwordFields.nth(1).fill('DifferentPassword456!');
-        await page
-          .getByRole('button', { name: /Reset|Update|Change|Submit|Save/i })
-          .click();
+        await page.getByRole('button', { name: /Reset|Update|Change|Submit|Save/i }).click();
 
         // Should show mismatch error
-        await expect(
-          page.getByText(/match|mismatch|don't match|do not match/i)
-        ).toBeVisible({ timeout: 3000 });
+        await expect(page.getByText(/match|mismatch|don't match|do not match/i)).toBeVisible({
+          timeout: 3000,
+        });
       }
     });
 
@@ -173,17 +168,17 @@ test.describe('Password Reset', () => {
         await passwordFields.nth(1).fill('NewSecurePassword123!');
       }
 
-      await page
-        .getByRole('button', { name: /Reset|Update|Change|Submit|Save/i })
-        .click();
+      await page.getByRole('button', { name: /Reset|Update|Change|Submit|Save/i }).click();
 
       // Should redirect to login or show success
-      await expect(page).toHaveURL(/login|signin|success/i, { timeout: 5000 }).catch(async () => {
-        // Or show a success message on the same page
-        await expect(
-          page.getByText(/success|updated|changed|reset complete/i)
-        ).toBeVisible({ timeout: 3000 });
-      });
+      await expect(page)
+        .toHaveURL(/login|signin|success/i, { timeout: 5000 })
+        .catch(async () => {
+          // Or show a success message on the same page
+          await expect(page.getByText(/success|updated|changed|reset complete/i)).toBeVisible({
+            timeout: 3000,
+          });
+        });
     });
   });
 
@@ -216,15 +211,11 @@ test.describe('Password Reset', () => {
         if (fieldCount >= 2) {
           await passwordFields.nth(1).fill('NewPassword123!');
         }
-        await page
-          .getByRole('button', { name: /Reset|Update|Change|Submit|Save/i })
-          .click();
+        await page.getByRole('button', { name: /Reset|Update|Change|Submit|Save/i }).click();
       }
 
       // Should show an error about invalid/expired token
-      await expect(
-        page.getByText(/expired|invalid|error|failed/i)
-      ).toBeVisible({ timeout: 5000 });
+      await expect(page.getByText(/expired|invalid|error|failed/i)).toBeVisible({ timeout: 5000 });
     });
   });
 });

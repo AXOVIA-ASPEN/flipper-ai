@@ -4,14 +4,14 @@
 
 ## What’s in place
 
-| Location | Purpose |
-|----------|--------|
-| **.bmad/project.yaml** | Project name, type, tech stack, key dirs, commands, doc pointers |
-| **.bmad/conventions.md** | Coding style, testing, git/PRs, security, BMAD workflow |
-| **.bmad/templates/** | PRD, technical spec, and user story templates |
-| **_bmad-output/planning-artifacts/prd/** | Product requirements (PRD.md) |
-| **docs/architecture/** | Technical specs (ARCHITECTURE.md) |
-| **_bmad-output/implementation-artifacts/** | User stories organized by epic |
+| Location                                    | Purpose                                                          |
+| ------------------------------------------- | ---------------------------------------------------------------- |
+| **.bmad/project.yaml**                      | Project name, type, tech stack, key dirs, commands, doc pointers |
+| **.bmad/conventions.md**                    | Coding style, testing, git/PRs, security, BMAD workflow          |
+| **.bmad/templates/**                        | PRD, technical spec, and user story templates                    |
+| **\_bmad-output/planning-artifacts/prd/**   | Product requirements (PRD.md)                                    |
+| **docs/architecture/**                      | Technical specs (ARCHITECTURE.md)                                |
+| **\_bmad-output/implementation-artifacts/** | User stories organized by epic                                   |
 
 ## Quick reference
 
@@ -21,17 +21,17 @@
 
 ## Suggested next steps
 
-1. **Sprint 0 (optional)**  
-   - Add 2–3 user stories in `_bmad-output/implementation-artifacts/` for the next epic.  
+1. **Sprint 0 (optional)**
+   - Add 2–3 user stories in `_bmad-output/implementation-artifacts/` for the next epic.
    - Reference them from your project board or backlog.
 
-2. **First sprint**  
-   - Pick a story from `_bmad-output/implementation-artifacts/`.  
-   - If it’s non-trivial, add a short technical spec under `docs/architecture/` using `.bmad/templates/technical-spec.md`.  
+2. **First sprint**
+   - Pick a story from `_bmad-output/implementation-artifacts/`.
+   - If it’s non-trivial, add a short technical spec under `docs/architecture/` using `.bmad/templates/technical-spec.md`.
    - Implement, test, and link PRs to the story.
 
-3. **Keep BMAD in sync**  
-   - When stack or structure changes, update `.bmad/project.yaml`.  
+3. **Keep BMAD in sync**
+   - When stack or structure changes, update `.bmad/project.yaml`.
    - When team norms change, update `.bmad/conventions.md` and `AGENTS.md` as needed.
 
 No extra tooling is required; BMAD runs on markdown and YAML in the repo.

@@ -50,7 +50,7 @@ export interface CrossPlatformPriceResult {
 
 const PLATFORM_FEES: Record<string, number> = {
   ebay: 0.13,
-  mercari: 0.10,
+  mercari: 0.1,
   facebook: 0.05,
   offerup: 0.129,
   craigslist: 0.0,
@@ -106,9 +106,7 @@ export function buildPlatformData(
 
   const sorted = [...filteredPrices].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
-  const medianPrice = sorted.length % 2 !== 0
-    ? sorted[mid]
-    : (sorted[mid - 1] + sorted[mid]) / 2;
+  const medianPrice = sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
 
   const feeRate = PLATFORM_FEES[platform] ?? 0;
   const netPrices = filteredPrices.map((p) => Math.round(p * (1 - feeRate)));
@@ -302,9 +300,7 @@ export async function fetchCrossPlatformPrice(
 
   // Run all fetchers in parallel with per-platform timeouts
   const results = await withTimeout(
-    Promise.allSettled(
-      platformFetchers.map((fn) => withTimeout(fn(), PLATFORM_TIMEOUT_MS))
-    ),
+    Promise.allSettled(platformFetchers.map((fn) => withTimeout(fn(), PLATFORM_TIMEOUT_MS))),
     TOTAL_TIMEOUT_MS
   );
 
@@ -334,10 +330,11 @@ export async function fetchCrossPlatformPrice(
  * Build a CrossPlatformPriceResult from cached PriceHistory records.
  * Returns null if cache is empty or stale.
  */
-async function buildResultFromCache(
-  searchQuery: string
-): Promise<CrossPlatformPriceResult | null> {
-  const platformConfigs: { platform: PlatformPriceData['platform']; dataType: 'sold' | 'active' }[] = [
+async function buildResultFromCache(searchQuery: string): Promise<CrossPlatformPriceResult | null> {
+  const platformConfigs: {
+    platform: PlatformPriceData['platform'];
+    dataType: 'sold' | 'active';
+  }[] = [
     { platform: 'ebay', dataType: 'sold' },
     { platform: 'mercari', dataType: 'sold' },
     { platform: 'facebook', dataType: 'active' },
@@ -424,9 +421,10 @@ export function applyPriceIntelligenceOverride(
 
   // Use the same weighted formula from Story 13.4
   const marginScore = Math.min(100, Math.max(0, Math.round(profitMargin * 100 + 50)));
-  const absoluteProfitScore = Math.min(100, Math.round(
-    Math.log10(Math.max(1, profitPotential)) * 33.33
-  ));
+  const absoluteProfitScore = Math.min(
+    100,
+    Math.round(Math.log10(Math.max(1, profitPotential)) * 33.33)
+  );
   let valueScore = Math.round(marginScore * 0.4 + absoluteProfitScore * 0.6);
   valueScore = Math.min(100, Math.max(0, valueScore));
 

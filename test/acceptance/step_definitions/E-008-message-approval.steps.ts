@@ -45,48 +45,61 @@ Given('the message dispatcher at {string}', function (filePath: string) {
 
 // ── AC1: Draft Status on Creation ──
 
-Then('OUTBOUND messages are created with default status {string}', function (expectedStatus: string) {
-  // Verify POST route defaults OUTBOUND to DRAFT
-  assert.ok(
-    this.routeContent.includes(`direction === 'OUTBOUND' ? '${expectedStatus}'`),
-    `POST route should default OUTBOUND to ${expectedStatus}`
-  );
-});
+Then(
+  'OUTBOUND messages are created with default status {string}',
+  function (expectedStatus: string) {
+    // Verify POST route defaults OUTBOUND to DRAFT
+    assert.ok(
+      this.routeContent.includes(`direction === 'OUTBOUND' ? '${expectedStatus}'`),
+      `POST route should default OUTBOUND to ${expectedStatus}`
+    );
+  }
+);
 
 // ── AC2: Approve with Optional Approval Gate ──
 
-Then('approve action on DRAFT with messageApprovalRequired false sets status to {string}', function (expectedStatus: string) {
-  // Verify approve handler routes to SENT when approval not required
-  assert.ok(
-    this.routeContent.includes(`status: '${expectedStatus}', sentAt:`),
-    `Approve should set status to ${expectedStatus} with sentAt when approval not required`
-  );
-});
+Then(
+  'approve action on DRAFT with messageApprovalRequired false sets status to {string}',
+  function (expectedStatus: string) {
+    // Verify approve handler routes to SENT when approval not required
+    assert.ok(
+      this.routeContent.includes(`status: '${expectedStatus}', sentAt:`),
+      `Approve should set status to ${expectedStatus} with sentAt when approval not required`
+    );
+  }
+);
 
-Then('approve action on DRAFT with messageApprovalRequired true sets status to {string}', function (expectedStatus: string) {
-  // Verify approve handler routes to PENDING_APPROVAL when approval required
-  assert.ok(
-    this.routeContent.includes(`status: '${expectedStatus}'`),
-    `Approve should set status to ${expectedStatus} when approval required`
-  );
-  assert.ok(
-    this.routeContent.includes('messageApprovalRequired'),
-    'Approve handler should check messageApprovalRequired setting'
-  );
-});
+Then(
+  'approve action on DRAFT with messageApprovalRequired true sets status to {string}',
+  function (expectedStatus: string) {
+    // Verify approve handler routes to PENDING_APPROVAL when approval required
+    assert.ok(
+      this.routeContent.includes(`status: '${expectedStatus}'`),
+      `Approve should set status to ${expectedStatus} when approval required`
+    );
+    assert.ok(
+      this.routeContent.includes('messageApprovalRequired'),
+      'Approve handler should check messageApprovalRequired setting'
+    );
+  }
+);
 
 // ── AC3: Confirm Send from Pending ──
 
-Then('confirm action on PENDING_APPROVAL sets status to {string} with sentAt timestamp', function (expectedStatus: string) {
-  assert.ok(
-    this.routeContent.includes("case 'confirm':"),
-    'PATCH route must handle confirm action'
-  );
-  assert.ok(
-    this.routeContent.includes("PENDING_APPROVAL") && this.routeContent.includes(`status: '${expectedStatus}'`),
-    `Confirm should transition PENDING_APPROVAL to ${expectedStatus}`
-  );
-});
+Then(
+  'confirm action on PENDING_APPROVAL sets status to {string} with sentAt timestamp',
+  function (expectedStatus: string) {
+    assert.ok(
+      this.routeContent.includes("case 'confirm':"),
+      'PATCH route must handle confirm action'
+    );
+    assert.ok(
+      this.routeContent.includes('PENDING_APPROVAL') &&
+        this.routeContent.includes(`status: '${expectedStatus}'`),
+      `Confirm should transition PENDING_APPROVAL to ${expectedStatus}`
+    );
+  }
+);
 
 Then('confirm action on DRAFT returns status {int}', function (expectedStatus: number) {
   // Verify ConflictError is thrown for confirm on DRAFT
@@ -115,16 +128,16 @@ Then('dispatchMessage does not call prisma message update', function () {
 
 // ── AC5: Edit Keeps Draft Status ──
 
-Then('edit action on DRAFT updates body and keeps status {string}', function (expectedStatus: string) {
-  assert.ok(
-    this.routeContent.includes("case 'edit':"),
-    'PATCH route must handle edit action'
-  );
-  assert.ok(
-    this.routeContent.includes(`status: '${expectedStatus}'`),
-    `Edit should keep status as ${expectedStatus}`
-  );
-});
+Then(
+  'edit action on DRAFT updates body and keeps status {string}',
+  function (expectedStatus: string) {
+    assert.ok(this.routeContent.includes("case 'edit':"), 'PATCH route must handle edit action');
+    assert.ok(
+      this.routeContent.includes(`status: '${expectedStatus}'`),
+      `Edit should keep status as ${expectedStatus}`
+    );
+  }
+);
 
 Then('edit action on PENDING_APPROVAL returns status {int}', function (expectedStatus: number) {
   assert.ok(
@@ -133,13 +146,17 @@ Then('edit action on PENDING_APPROVAL returns status {int}', function (expectedS
   );
 });
 
-Then('reject action on PENDING_APPROVAL sets status to {string}', function (expectedStatus: string) {
-  // Reject from PENDING_APPROVAL should return to DRAFT (recoverable)
-  assert.ok(
-    this.routeContent.includes("PENDING_APPROVAL") && this.routeContent.includes(`status: '${expectedStatus}'`),
-    `Reject from PENDING_APPROVAL should set status to ${expectedStatus}`
-  );
-});
+Then(
+  'reject action on PENDING_APPROVAL sets status to {string}',
+  function (expectedStatus: string) {
+    // Reject from PENDING_APPROVAL should return to DRAFT (recoverable)
+    assert.ok(
+      this.routeContent.includes('PENDING_APPROVAL') &&
+        this.routeContent.includes(`status: '${expectedStatus}'`),
+      `Reject from PENDING_APPROVAL should set status to ${expectedStatus}`
+    );
+  }
+);
 
 Then('reject action on DRAFT sets status to {string}', function (expectedStatus: string) {
   assert.ok(
@@ -161,19 +178,22 @@ Then('GET response includes messageApprovalRequired field', function () {
 Then('PATCH accepts and persists messageApprovalRequired boolean', function () {
   const src = this.fileContent || this.routeContent || '';
   assert.ok(
-    src.includes('messageApprovalRequired') &&
-    src.includes('Boolean(messageApprovalRequired)'),
+    src.includes('messageApprovalRequired') && src.includes('Boolean(messageApprovalRequired)'),
     'PATCH should accept and persist messageApprovalRequired as boolean'
   );
 });
 
 // ── Multi-status GET ──
 
-Then('GET with status {string} returns messages matching either status', function (statusParam: string) {
-  const statuses = statusParam.split(',');
-  assert.ok(statuses.length > 1, 'Should be comma-separated');
-  assert.ok(
-    this.routeContent.includes("status.includes(',')") || this.routeContent.includes('status.split'),
-    'GET handler should support comma-separated status parameter'
-  );
-});
+Then(
+  'GET with status {string} returns messages matching either status',
+  function (statusParam: string) {
+    const statuses = statusParam.split(',');
+    assert.ok(statuses.length > 1, 'Should be comma-separated');
+    assert.ok(
+      this.routeContent.includes("status.includes(',')") ||
+        this.routeContent.includes('status.split'),
+      'GET handler should support comma-separated status parameter'
+    );
+  }
+);

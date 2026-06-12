@@ -19,9 +19,7 @@ import { ConfigurationError, ExternalServiceError } from '@/lib/errors';
 // Helpers
 // ---------------------------------------------------------------------------
 
-function mockFetchWith(
-  responses: Array<{ status: number; body?: object }>
-): jest.SpyInstance {
+function mockFetchWith(responses: Array<{ status: number; body?: object }>): jest.SpyInstance {
   let callCount = 0;
   return jest.spyOn(global, 'fetch').mockImplementation(async (url: RequestInfo | URL) => {
     const r = responses[callCount] ?? responses[responses.length - 1];
@@ -119,11 +117,7 @@ describe('getRoute', () => {
 
   test('retries on 429 up to 3 attempts then throws ExternalServiceError', async () => {
     process.env.GOOGLE_MAPS_API_KEY = 'test-key';
-    const fetchSpy = mockFetchWith([
-      { status: 429 },
-      { status: 429 },
-      { status: 429 },
-    ]);
+    const fetchSpy = mockFetchWith([{ status: 429 }, { status: 429 }, { status: 429 }]);
 
     // Override sleep to avoid waiting in tests
     jest.spyOn(global, 'setTimeout').mockImplementation((fn: TimerHandler) => {

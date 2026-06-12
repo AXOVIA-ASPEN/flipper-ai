@@ -26,7 +26,7 @@ const mockDraftResponse = {
   id: 'draft-1',
   opportunityId: 'opp-1',
   content:
-    'Hi John, I saw your listing for the Vintage Nintendo 64 Console. I\'m very interested and would love to take a look. Would you be available for a pickup this week? Please let me know a good time. Thanks!',
+    "Hi John, I saw your listing for the Vintage Nintendo 64 Console. I'm very interested and would love to take a look. Would you be available for a pickup this week? Please let me know a good time. Thanks!",
   tone: 'friendly',
   generatedAt: new Date().toISOString(),
 };
@@ -119,7 +119,12 @@ test.describe('Feature: Automated Seller Communication', () => {
       await expect(draftArea.first()).toBeVisible({ timeout: 5000 });
 
       // And: The message should contain key elements
-      const draftText = await draftArea.first().textContent() ?? await draftArea.first().inputValue().catch(() => '');
+      const draftText =
+        (await draftArea.first().textContent()) ??
+        (await draftArea
+          .first()
+          .inputValue()
+          .catch(() => ''));
       expect(draftText).toContain('John');
       expect(draftText).toContain('Nintendo 64');
       expect(draftText).toContain('pickup');
@@ -152,7 +157,9 @@ test.describe('Feature: Automated Seller Communication', () => {
   });
 
   test.describe('Scenario: User edits AI-drafted message before sending', () => {
-    test('Given an AI draft, When I edit and send, Then modified message is sent', async ({ page }) => {
+    test('Given an AI draft, When I edit and send, Then modified message is sent', async ({
+      page,
+    }) => {
       await page.goto('/opportunities/opp-1');
 
       // Trigger draft
@@ -165,15 +172,23 @@ test.describe('Feature: Automated Seller Communication', () => {
       const editableArea = page.locator(
         'textarea[data-testid="draft-message"], [contenteditable="true"], textarea.draft-editor, textarea'
       );
-      if (await editableArea.first().isVisible({ timeout: 3000 }).catch(() => false)) {
+      if (
+        await editableArea
+          .first()
+          .isVisible({ timeout: 3000 })
+          .catch(() => false)
+      ) {
         await editableArea.first().click();
         // Append custom text
         await editableArea.first().press('End');
         await editableArea.first().type(' I am available Saturday afternoon.');
 
         const value =
-          (await editableArea.first().inputValue().catch(() => '')) ||
-          (await editableArea.first().textContent() ?? '');
+          (await editableArea
+            .first()
+            .inputValue()
+            .catch(() => '')) ||
+          ((await editableArea.first().textContent()) ?? '');
         expect(value).toContain('Saturday afternoon');
       }
     });
@@ -195,7 +210,12 @@ test.describe('Feature: Automated Seller Communication', () => {
         const draftArea = page.locator('[data-testid="draft-message"], .draft-message, textarea');
         await expect(draftArea.first()).toBeVisible({ timeout: 5000 });
 
-        const text = await draftArea.first().textContent() ?? await draftArea.first().inputValue().catch(() => '');
+        const text =
+          (await draftArea.first().textContent()) ??
+          (await draftArea
+            .first()
+            .inputValue()
+            .catch(() => ''));
         // Should contain a dollar amount (negotiation)
         expect(text).toMatch(/\$\d+/);
       }

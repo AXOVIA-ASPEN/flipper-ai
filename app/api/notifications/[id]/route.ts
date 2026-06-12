@@ -26,10 +26,7 @@ import {
   ValidationError,
 } from '@/lib/errors';
 
-export async function PATCH(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const userId = await getCurrentUserId();
     if (!userId) throw new UnauthorizedError('Unauthorized');

@@ -62,7 +62,9 @@ export default function Navigation() {
         }
       })
       .catch(() => {});
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [pathname, authed]);
 
   // Hide navigation on public routes and for unauthenticated users
@@ -72,22 +74,52 @@ export default function Navigation() {
   }
 
   const navItems = [
-    { href: '/dashboard',     label: 'Dashboard',     icon: Home },
+    { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/opportunities', label: 'Opportunities', icon: TrendingUp },
-    { href: '/messages',      label: 'Messages',      icon: MessageSquare },
-    { href: '/posting-queue', label: 'Cross-Posts',   icon: Send },
-    { href: '/settings',      label: 'Settings',      icon: Settings },
+    { href: '/messages', label: 'Messages', icon: MessageSquare },
+    { href: '/posting-queue', label: 'Cross-Posts', icon: Send },
+    { href: '/settings', label: 'Settings', icon: Settings },
   ];
 
   return (
     <nav className="fp-glass-nav sticky top-0 z-50">
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
+      <div
+        style={{
+          maxWidth: 1280,
+          margin: '0 auto',
+          padding: '0 24px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          height: 56,
+        }}
+      >
         {/* Logo */}
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-          <div style={{ width: 32, height: 32, borderRadius: 10, background: 'linear-gradient(135deg,#7c3aed,#5b21b6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14, color: 'white', boxShadow: '0 0 16px rgba(124,58,237,0.4)', flexShrink: 0 }}>
+        <Link
+          href="/"
+          style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}
+        >
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 10,
+              background: 'linear-gradient(135deg,#7c3aed,#5b21b6)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 800,
+              fontSize: 14,
+              color: 'white',
+              boxShadow: '0 0 16px rgba(124,58,237,0.4)',
+              flexShrink: 0,
+            }}
+          >
             F
           </div>
-          <span style={{ fontWeight: 800, fontSize: 17, letterSpacing: '-0.02em', color: '#e2e8f0' }}>
+          <span
+            style={{ fontWeight: 800, fontSize: 17, letterSpacing: '-0.02em', color: '#e2e8f0' }}
+          >
             Flipper<span className="fp-grad-purple">.ai</span>
           </span>
         </Link>
@@ -107,7 +139,19 @@ export default function Navigation() {
                 <span className="hidden md:inline">{item.label}</span>
                 {item.href === '/messages' && unreadCount > 0 && (
                   <span
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 18, height: 18, padding: '0 4px', fontSize: 10, fontWeight: 700, color: 'white', background: '#7c3aed', borderRadius: 9999 }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minWidth: 18,
+                      height: 18,
+                      padding: '0 4px',
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: 'white',
+                      background: '#7c3aed',
+                      borderRadius: 9999,
+                    }}
                     aria-label={`${unreadCount} unread message${unreadCount !== 1 ? 's' : ''}`}
                   >
                     {unreadCount}

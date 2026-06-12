@@ -104,12 +104,25 @@ function extractListingId(url: string): string {
 import { sleep } from '@/lib/sleep';
 
 import { identifyItem } from '@/lib/llm-identifier';
-import { fetchMarketPrice, closeBrowser as closeMarketBrowser, type MarketPrice } from '@/lib/market-price';
+import {
+  fetchMarketPrice,
+  closeBrowser as closeMarketBrowser,
+  type MarketPrice,
+} from '@/lib/market-price';
 import { lookupVerifiedMarketPrice } from '@/lib/market-value-calculator';
 import { findComparableSales, type CompMatchResult } from '@/lib/comp-matcher';
 import { analyzeSellability, quickDiscountCheck } from '@/lib/llm-analyzer';
 import { analyzeDemandTrend } from '@/lib/demand-analyzer';
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, RateLimitError, ExternalServiceError, ConflictError } from '@/lib/errors';
+import {
+  handleError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  RateLimitError,
+  ExternalServiceError,
+  ConflictError,
+} from '@/lib/errors';
 import { enforceTierLimits } from '@/lib/tier-enforcement';
 import { computeEstimatedExpiry } from '@/lib/listing-expiry';
 import { emitOpportunityFoundEvent } from '@/lib/notification-events';
@@ -220,84 +233,86 @@ async function scrapeOfferUpWithPlaywright(
 
     // Extract listings
     // istanbul ignore next -- Browser-side DOM code runs in Playwright context, not Node.js
-    const listings = await page.evaluate(/* istanbul ignore next */ () => {
-      const items: Array<{
-        title: string;
-        price: string;
-        url: string;
-        location: string;
-        imageUrl?: string;
-        condition?: string;
-      }> = [];
+    const listings = await page.evaluate(
+      /* istanbul ignore next */ () => {
+        const items: Array<{
+          title: string;
+          price: string;
+          url: string;
+          location: string;
+          imageUrl?: string;
+          condition?: string;
+        }> = [];
 
-      // Try multiple selector patterns
-      const cardSelectors = [
-        '[data-testid="listing-card"]',
-        '[class*="listing-card"]',
-        '[class*="ItemCard"]',
-        'a[href*="/item/detail/"]',
-      ];
+        // Try multiple selector patterns
+        const cardSelectors = [
+          '[data-testid="listing-card"]',
+          '[class*="listing-card"]',
+          '[class*="ItemCard"]',
+          'a[href*="/item/detail/"]',
+        ];
 
-      let listingElements: Element[] = [];
-      for (const selector of cardSelectors) {
-        const elements = document.querySelectorAll(selector);
-        if (elements.length > 0) {
-          listingElements = Array.from(elements);
-          break;
-        }
-      }
-
-      // If using link-based selection, get parent containers
-      if (listingElements.length > 0 && listingElements[0].tagName === 'A') {
-        listingElements = listingElements.map(
-          (el) => el.closest('article, div[class*="card"], li') || el
-        );
-      }
-
-      for (const el of listingElements.slice(0, 50)) {
-        // Limit to 50 listings
-        try {
-          // Extract title
-          const titleEl = el.querySelector(
-            'h3, [class*="title"], [data-testid="listing-title"], span[class*="Title"]'
-          ) as HTMLElement;
-          const title =
-            titleEl?.innerText?.trim() || (el as HTMLElement).querySelector('a')?.title || '';
-
-          // Extract URL
-          const linkEl = el.querySelector('a[href*="/item/detail/"]') as HTMLAnchorElement;
-          const url = linkEl?.href || '';
-
-          // Extract price
-          const priceEl = el.querySelector(
-            '[class*="price"], [data-testid="listing-price"], span[class*="Price"]'
-          ) as HTMLElement;
-          const price = priceEl?.innerText?.trim() || '$0';
-
-          // Extract location
-          const locationEl = el.querySelector(
-            '[class*="location"], [data-testid="listing-location"]'
-          ) as HTMLElement;
-          const location = locationEl?.innerText?.trim() || '';
-
-          // Extract image
-          const imgEl = el.querySelector('img') as HTMLImageElement;
-          const imageUrl = imgEl?.src || imgEl?.getAttribute('data-src') || '';
-
-          // Extract condition if available
-          const conditionEl = el.querySelector('[class*="condition"]') as HTMLElement;
-          const condition = conditionEl?.innerText?.trim() || '';
-
-          if (title && url && url.includes('/item/detail/')) {
-            items.push({ title, price, url, location, imageUrl, condition });
+        let listingElements: Element[] = [];
+        for (const selector of cardSelectors) {
+          const elements = document.querySelectorAll(selector);
+          if (elements.length > 0) {
+            listingElements = Array.from(elements);
+            break;
           }
-        } catch {
-          // Skip problematic listings
         }
-      }
 
-      return items;
-    });
+        // If using link-based selection, get parent containers
+        if (listingElements.length > 0 && listingElements[0].tagName === 'A') {
+          listingElements = listingElements.map(
+            (el) => el.closest('article, div[class*="card"], li') || el
+          );
+        }
+
+        for (const el of listingElements.slice(0, 50)) {
+          // Limit to 50 listings
+          try {
+            // Extract title
+            const titleEl = el.querySelector(
+              'h3, [class*="title"], [data-testid="listing-title"], span[class*="Title"]'
+            ) as HTMLElement;
+            const title =
+              titleEl?.innerText?.trim() || (el as HTMLElement).querySelector('a')?.title || '';
+
+            // Extract URL
+            const linkEl = el.querySelector('a[href*="/item/detail/"]') as HTMLAnchorElement;
+            const url = linkEl?.href || '';
+
+            // Extract price
+            const priceEl = el.querySelector(
+              '[class*="price"], [data-testid="listing-price"], span[class*="Price"]'
+            ) as HTMLElement;
+            const price = priceEl?.innerText?.trim() || '$0';
+
+            // Extract location
+            const locationEl = el.querySelector(
+              '[class*="location"], [data-testid="listing-location"]'
+            ) as HTMLElement;
+            const location = locationEl?.innerText?.trim() || '';
+
+            // Extract image
+            const imgEl = el.querySelector('img') as HTMLImageElement;
+            const imageUrl = imgEl?.src || imgEl?.getAttribute('data-src') || '';
+
+            // Extract condition if available
+            const conditionEl = el.querySelector('[class*="condition"]') as HTMLElement;
+            const condition = conditionEl?.innerText?.trim() || '';
+
+            if (title && url && url.includes('/item/detail/')) {
+              items.push({ title, price, url, location, imageUrl, condition });
+            }
+          } catch {
+            // Skip problematic listings
+          }
+        }
+
+        return items;
+      }
+    );
 
     console.log(`Found ${listings.length} OfferUp listings`);
 
@@ -484,10 +499,18 @@ export async function POST(request: NextRequest) {
 
         if (hasLLM) {
           try {
-            const identification = await identifyItem(item.title, item.description || null, item.price, detectedCategory);
+            const identification = await identifyItem(
+              item.title,
+              item.description || null,
+              item.price,
+              detectedCategory
+            );
             capturedIdentification = identification; // Story 5.2: capture for comp matching
             if (identification?.worthInvestigating) {
-              const marketData = await fetchMarketPrice(identification.searchQuery, identification.category);
+              const marketData = await fetchMarketPrice(
+                identification.searchQuery,
+                identification.category
+              );
               capturedMarketData = marketData; // Story 5.3: capture for demand analysis
               if (marketData && marketData.salesCount > 0) {
                 const quickCheck = quickDiscountCheck(item.price, marketData);
@@ -520,20 +543,29 @@ export async function POST(request: NextRequest) {
         // Story 4.4: Verified market price fallback when LLM pipeline didn't produce one
         if (!verifiedMarketValue && item.price > 0) {
           try {
-            const vpResult = await lookupVerifiedMarketPrice(item.title, item.price, detectedCategory);
+            const vpResult = await lookupVerifiedMarketPrice(
+              item.title,
+              item.price,
+              detectedCategory
+            );
             if (vpResult) {
               verifiedMarketValue = vpResult.verifiedMarketValue;
               trueDiscountPercent = vpResult.trueDiscountPercent;
             }
           } catch (vpErr) {
-            console.error(`Verified price lookup error for OfferUp listing ${item.externalId}:`, vpErr);
+            console.error(
+              `Verified price lookup error for OfferUp listing ${item.externalId}:`,
+              vpErr
+            );
           }
         }
 
         if (hasLLM && !meetsLLMThreshold) continue;
 
         // Story 5.3: Demand trend analysis
-        const demandAnalysis = capturedMarketData ? analyzeDemandTrend(capturedMarketData.soldListings) : null;
+        const demandAnalysis = capturedMarketData
+          ? analyzeDemandTrend(capturedMarketData.soldListings)
+          : null;
 
         // Story 5.2: Comparable sold item matching — reuses fetched soldListings
         let compMatchResult: CompMatchResult | null = null;
@@ -582,23 +614,29 @@ export async function POST(request: NextRequest) {
 
         // Story 5.4: Item completeness & seller reputation enrichment (Step 6 in pipeline)
         // OfferUp does not expose seller ratings — completeness analysis only (if images available)
-        const [enriched54] = await enrichWithCompletenessAndReputation([{
-          externalId: item.externalId,
-          url: item.url,
-          title: item.title,
-          description: item.description,
-          askingPrice: item.price,
-          imageUrls: item.imageUrls,
-          platform: 'OFFERUP',
-          category: detectedCategory,
-          estimation,
-          requestToBuy,
-          isOpportunity: true,
-        }]);
+        const [enriched54] = await enrichWithCompletenessAndReputation([
+          {
+            externalId: item.externalId,
+            url: item.url,
+            title: item.title,
+            description: item.description,
+            askingPrice: item.price,
+            imageUrls: item.imageUrls,
+            platform: 'OFFERUP',
+            category: detectedCategory,
+            estimation,
+            requestToBuy,
+            isOpportunity: true,
+          },
+        ]);
         const completenessLabel = enriched54.completenessAnalysis?.completenessLabel ?? null;
 
         // Determine status based on value score
-        const status = hasLLM ? 'OPPORTUNITY' : estimation.valueScore >= opportunityThreshold ? 'OPPORTUNITY' : 'NEW';
+        const status = hasLLM
+          ? 'OPPORTUNITY'
+          : estimation.valueScore >= opportunityThreshold
+            ? 'OPPORTUNITY'
+            : 'NEW';
 
         // Download and cache images
         let cachedImageUrls: string[] = [];
@@ -620,7 +658,13 @@ export async function POST(request: NextRequest) {
         let logisticsAnalysis = null;
         try {
           logisticsAnalysis = await analyzeLogistics(
-            { title: item.title, description: item.description, category: detectedCategory, location: normalizedLoc.normalized, estimation },
+            {
+              title: item.title,
+              description: item.description,
+              category: detectedCategory,
+              location: normalizedLoc.normalized,
+              estimation,
+            },
             userLogisticsSettings?.homeLocation ?? null,
             userLogisticsSettings?.maxPickupRadiusMiles ?? 50
           );
@@ -666,7 +710,8 @@ export async function POST(request: NextRequest) {
             : estimation.shippable,
           sizeCategory: logisticsAnalysis?.sizeCategory ?? null,
           shippingEstimatesJson: logisticsAnalysis?.shippingEstimates
-            ? JSON.stringify(logisticsAnalysis.shippingEstimates) : null,
+            ? JSON.stringify(logisticsAnalysis.shippingEstimates)
+            : null,
           estimatedShippingCost: logisticsAnalysis?.estimatedShippingCost ?? null,
           pickupDistanceMiles: logisticsAnalysis?.pickupDistanceMiles ?? null,
           outsidePickupRadius: logisticsAnalysis?.outsidePickupRadius ?? null,
@@ -697,7 +742,7 @@ export async function POST(request: NextRequest) {
           resaleStrategy: sellabilityAnalysis?.resaleStrategy || null,
           // Story 5.4: Item completeness & seller reputation
           completenessLabel,
-          sellerRating: null,         // OfferUp does not expose seller rating data
+          sellerRating: null, // OfferUp does not expose seller rating data
           sellerReviewCount: null,
           sellerAccountAgeDays: null,
           analysisConfidence: claudeAnalysis?.confidence ?? sellabilityAnalysis?.confidence ?? null,
@@ -705,7 +750,9 @@ export async function POST(request: NextRequest) {
           notes: sellabilityAnalysis?.resaleStrategy || estimation.notes,
           comparableSalesJson: compMatchResult
             ? JSON.stringify(compMatchResult.comps)
-            : capturedMarketData ? JSON.stringify(capturedMarketData.soldListings.slice(0, 5)) : null,
+            : capturedMarketData
+              ? JSON.stringify(capturedMarketData.soldListings.slice(0, 5))
+              : null,
           compMatchConfidence: compMatchResult?.confidence ?? null,
         };
 
@@ -735,7 +782,10 @@ export async function POST(request: NextRequest) {
               },
             });
           } catch (cacheErr) {
-            console.error(`Failed to cache Claude analysis for OfferUp listing ${item.externalId}:`, cacheErr);
+            console.error(
+              `Failed to cache Claude analysis for OfferUp listing ${item.externalId}:`,
+              cacheErr
+            );
           }
         }
 
@@ -846,7 +896,12 @@ export async function POST(request: NextRequest) {
         category: null,
         postedAt: l.postedAt ?? null,
       }));
-    const processedResults = processListings('OFFERUP', rawForSummary, { minValueScore: opportunityThreshold }, { feeRate, opportunityThreshold });
+    const processedResults = processListings(
+      'OFFERUP',
+      rawForSummary,
+      { minValueScore: opportunityThreshold },
+      { feeRate, opportunityThreshold }
+    );
     const summary = generateScanSummary(processedResults);
     // Reference `formatForStorage` for marketplace-scanner unification traceability.
     void formatForStorage;

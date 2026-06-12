@@ -39,12 +39,17 @@ test.describe('Session Management', () => {
           .or(page.locator('[aria-label="User menu"]'))
           .or(page.getByRole('button', { name: new RegExp(TEST_USER.name, 'i') }));
 
-        if (await userMenu.first().isVisible().catch(() => false)) {
+        if (
+          await userMenu
+            .first()
+            .isVisible()
+            .catch(() => false)
+        ) {
           await userMenu.first().click();
           await page.waitForTimeout(300);
-          const menuLogout = page.getByRole('menuitem', { name: /log\s?out|sign\s?out/i }).or(
-            page.getByText(/log\s?out|sign\s?out/i)
-          );
+          const menuLogout = page
+            .getByRole('menuitem', { name: /log\s?out|sign\s?out/i })
+            .or(page.getByText(/log\s?out|sign\s?out/i));
           await menuLogout.first().click();
         } else {
           await page.goto('/api/auth/signout');
@@ -56,13 +61,9 @@ test.describe('Session Management', () => {
       await page.waitForTimeout(500);
 
       const url = page.url();
-      expect(
-        url.includes('/login') || url.includes('/auth/signin')
-      ).toBeTruthy();
+      expect(url.includes('/login') || url.includes('/auth/signin')).toBeTruthy();
 
-      await expect(
-        page.getByText(/you have been logged out/i)
-      ).toBeVisible();
+      await expect(page.getByText(/you have been logged out/i)).toBeVisible();
     });
 
     test('Scenario: Given a logged-out user, When they use browser back, Then they cannot access protected content', async ({
@@ -115,7 +116,10 @@ test.describe('Session Management', () => {
 
       // Then: page should still render (auth client checks vary)
       // At minimum the page shouldn't crash
-      const hasError = await page.locator('text=Application error').isVisible().catch(() => false);
+      const hasError = await page
+        .locator('text=Application error')
+        .isVisible()
+        .catch(() => false);
       expect(hasError).toBeFalsy();
     });
 

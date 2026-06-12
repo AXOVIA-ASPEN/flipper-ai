@@ -17,10 +17,7 @@ import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
 import { handleError, UnauthorizedError, NotFoundError } from '@/lib/errors';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {

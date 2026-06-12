@@ -111,9 +111,7 @@ test.describe('Feature: Inventory ROI Tracking', () => {
         return res.json();
       });
 
-      const soldItem = response.items.find(
-        (i: { status: string }) => i.status === 'SOLD'
-      );
+      const soldItem = response.items.find((i: { status: string }) => i.status === 'SOLD');
       expect(soldItem).toBeDefined();
       expect(soldItem.profit).toBeGreaterThan(0);
       expect(soldItem.roiPercent).toBeGreaterThan(0);

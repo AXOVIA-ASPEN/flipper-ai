@@ -201,7 +201,7 @@ describe('rate-limiter', () => {
     jest.useFakeTimers();
 
     const longPath = '/api/auth/register'; // 300s window
-    const shortPath = '/api/listings';     // 60s window
+    const shortPath = '/api/listings'; // 60s window
 
     // t=0: Create a short-window entry (expires at t=60s)
     rateLimit('short-cleanup-ip', shortPath, 'short-user');
@@ -219,7 +219,7 @@ describe('rate-limiter', () => {
     const r = rateLimit('long-cleanup-ip', longPath, 'long-user');
     // Should be the 2nd request in the same window (count=2), not 1st (count=1)
     expect(r.allowed).toBe(true);
-    const maxRemaining = (5 * 2) - 1; // limit * 2 - 1 for first user request
+    const maxRemaining = 5 * 2 - 1; // limit * 2 - 1 for first user request
     expect(r.remaining).toBeLessThanOrEqual(maxRemaining);
 
     jest.useRealTimers();

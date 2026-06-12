@@ -5,8 +5,4 @@
  * Re-exports session utilities for backward compatibility with existing imports.
  */
 
-export {
-  getCurrentUser,
-  getCurrentUserId,
-  requireAuth,
-} from '@/lib/firebase/session';
+export { getCurrentUser, getCurrentUserId, requireAuth } from '@/lib/firebase/session';

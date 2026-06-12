@@ -5,11 +5,13 @@ const isExport = process.env.NEXT_OUTPUT === 'export';
 
 const nextConfig = {
   output: isExport ? 'export' : 'standalone',
-  ...(isExport ? {} : {
-    outputFileTracingIncludes: {
-      '/*': ['./node_modules/.prisma/client/**/*'],
-    },
-  }),
+  ...(isExport
+    ? {}
+    : {
+        outputFileTracingIncludes: {
+          '/*': ['./node_modules/.prisma/client/**/*'],
+        },
+      }),
   images: {
     unoptimized: isExport,
   },
@@ -17,7 +19,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
-  
+
   // Security headers for production deployment
   async headers() {
     return [
@@ -27,31 +29,31 @@ const nextConfig = {
         headers: [
           {
             key: 'X-DNS-Prefetch-Control',
-            value: 'on'
+            value: 'on',
           },
           {
             key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload'
+            value: 'max-age=63072000; includeSubDomains; preload',
           },
           {
             key: 'X-Frame-Options',
-            value: 'DENY'
+            value: 'DENY',
           },
           {
             key: 'X-Content-Type-Options',
-            value: 'nosniff'
+            value: 'nosniff',
           },
           {
             key: 'X-XSS-Protection',
-            value: '1; mode=block'
+            value: '1; mode=block',
           },
           {
             key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin'
+            value: 'strict-origin-when-cross-origin',
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()'
+            value: 'camera=(), microphone=(), geolocation=()',
           },
           {
             key: 'Content-Security-Policy',
@@ -89,33 +91,33 @@ const nextConfig = {
               "frame-ancestors 'self'",
               "base-uri 'self'",
               "form-action 'self'",
-            ].join('; ')
+            ].join('; '),
           },
         ],
       },
     ];
   },
-  
+
   // Sentry tree-shaking configuration
   sentry: {
     hideSourceMaps: true,
     widenClientFileUpload: true,
   },
-}
+};
 
 // Sentry Webpack Plugin options for source map uploads
 const sentryWebpackPluginOptions = {
   // Suppresses source map uploading logs during build
   silent: true,
-  
+
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
-  
+
   // Auth token for uploading source maps (required in CI/production)
   authToken: process.env.SENTRY_AUTH_TOKEN,
-  
+
   // Only upload source maps in CI or when explicitly enabled
   dryRun: !process.env.SENTRY_AUTH_TOKEN || process.env.CI !== 'true',
 };

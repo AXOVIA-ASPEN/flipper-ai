@@ -56,13 +56,22 @@ export async function POST(req: NextRequest) {
     // Validate password complexity
     if (!/[A-Z]/.test(newPassword)) {
       return NextResponse.json(
-        { success: false, error: { code: 'VALIDATION_ERROR', detail: 'Password must contain at least 1 uppercase letter.' } },
+        {
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            detail: 'Password must contain at least 1 uppercase letter.',
+          },
+        },
         { status: 422 }
       );
     }
     if (!/[0-9]/.test(newPassword)) {
       return NextResponse.json(
-        { success: false, error: { code: 'VALIDATION_ERROR', detail: 'Password must contain at least 1 number.' } },
+        {
+          success: false,
+          error: { code: 'VALIDATION_ERROR', detail: 'Password must contain at least 1 number.' },
+        },
         { status: 422 }
       );
     }
@@ -78,7 +87,10 @@ export async function POST(req: NextRequest) {
 
     if (!storedToken) {
       return NextResponse.json(
-        { success: false, error: { code: 'BAD_REQUEST', detail: 'Invalid or already used reset token.' } },
+        {
+          success: false,
+          error: { code: 'BAD_REQUEST', detail: 'Invalid or already used reset token.' },
+        },
         { status: 400 }
       );
     }
@@ -87,7 +99,13 @@ export async function POST(req: NextRequest) {
     if (storedToken.expiresAt < new Date()) {
       await prisma.passwordResetToken.delete({ where: { id: storedToken.id } });
       return NextResponse.json(
-        { success: false, error: { code: 'BAD_REQUEST', detail: 'This reset link has expired. Please request a new one.' } },
+        {
+          success: false,
+          error: {
+            code: 'BAD_REQUEST',
+            detail: 'This reset link has expired. Please request a new one.',
+          },
+        },
         { status: 400 }
       );
     }
@@ -100,7 +118,10 @@ export async function POST(req: NextRequest) {
     if (count === 0) {
       // Another request consumed the token first
       return NextResponse.json(
-        { success: false, error: { code: 'BAD_REQUEST', detail: 'This reset token has already been used.' } },
+        {
+          success: false,
+          error: { code: 'BAD_REQUEST', detail: 'This reset token has already been used.' },
+        },
         { status: 400 }
       );
     }
@@ -109,7 +130,10 @@ export async function POST(req: NextRequest) {
     const firebaseUid = storedToken.user.firebaseUid;
     if (!firebaseUid) {
       return NextResponse.json(
-        { success: false, error: { code: 'BAD_REQUEST', detail: 'Account not linked to authentication provider.' } },
+        {
+          success: false,
+          error: { code: 'BAD_REQUEST', detail: 'Account not linked to authentication provider.' },
+        },
         { status: 400 }
       );
     }
@@ -120,14 +144,11 @@ export async function POST(req: NextRequest) {
     try {
       await adminAuth.revokeRefreshTokens(firebaseUid);
     } catch (revokeErr) {
-      captureError(
-        revokeErr instanceof Error ? revokeErr : new Error(String(revokeErr)),
-        {
-          route: '/api/auth/reset-password',
-          action: 'revoke_sessions',
-          userId: storedToken.userId,
-        }
-      );
+      captureError(revokeErr instanceof Error ? revokeErr : new Error(String(revokeErr)), {
+        route: '/api/auth/reset-password',
+        action: 'revoke_sessions',
+        userId: storedToken.userId,
+      });
       logger.warn('Failed to revoke refresh tokens after password reset', {
         userId: storedToken.userId,
       });
@@ -147,14 +168,11 @@ export async function POST(req: NextRequest) {
         text: passwordChangedEmailText(),
       })
       .catch((emailErr: unknown) => {
-        captureError(
-          emailErr instanceof Error ? emailErr : new Error(String(emailErr)),
-          {
-            route: '/api/auth/reset-password',
-            action: 'send_password_changed_email',
-            userId: storedToken.userId,
-          }
-        );
+        captureError(emailErr instanceof Error ? emailErr : new Error(String(emailErr)), {
+          route: '/api/auth/reset-password',
+          action: 'send_password_changed_email',
+          userId: storedToken.userId,
+        });
       });
 
     return NextResponse.json({

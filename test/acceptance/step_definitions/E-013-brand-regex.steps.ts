@@ -52,24 +52,18 @@ When(
 
 // ==================== Then: Tag Assertions ====================
 
-Then(
-  /^the result tags should contain "([^"]*)"$/,
-  function (tag: string) {
-    const result: EstimationResult = this.lastResult;
-    assert(
-      result.tags.includes(tag),
-      `Expected tags to contain "${tag}", but got: [${result.tags.join(', ')}]`
-    );
-  }
-);
+Then(/^the result tags should contain "([^"]*)"$/, function (tag: string) {
+  const result: EstimationResult = this.lastResult;
+  assert(
+    result.tags.includes(tag),
+    `Expected tags to contain "${tag}", but got: [${result.tags.join(', ')}]`
+  );
+});
 
-Then(
-  /^the result tags should not contain "([^"]*)"$/,
-  function (tag: string) {
-    const result: EstimationResult = this.lastResult;
-    assert(
-      !result.tags.includes(tag),
-      `Expected tags NOT to contain "${tag}", but got: [${result.tags.join(', ')}]`
-    );
-  }
-);
+Then(/^the result tags should not contain "([^"]*)"$/, function (tag: string) {
+  const result: EstimationResult = this.lastResult;
+  assert(
+    !result.tags.includes(tag),
+    `Expected tags NOT to contain "${tag}", but got: [${result.tags.join(', ')}]`
+  );
+});

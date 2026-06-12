@@ -31,10 +31,7 @@ Then('it renders a {string} summary card using totalNetProfit', function (label:
     currentFileContent.includes('totalNetProfit'),
     `Expected totalNetProfit reference in analytics page`
   );
-  assert.ok(
-    currentFileContent.includes(label),
-    `Expected label "${label}" in analytics page`
-  );
+  assert.ok(currentFileContent.includes(label), `Expected label "${label}" in analytics page`);
 });
 
 Then('it renders a {string} summary card using completedDeals', function (label: string) {
@@ -42,10 +39,7 @@ Then('it renders a {string} summary card using completedDeals', function (label:
     currentFileContent.includes('completedDeals'),
     `Expected completedDeals reference in analytics page`
   );
-  assert.ok(
-    currentFileContent.includes(label),
-    `Expected label "${label}" in analytics page`
-  );
+  assert.ok(currentFileContent.includes(label), `Expected label "${label}" in analytics page`);
 });
 
 Then('it renders an {string} summary card using avgProfitPerFlip', function (label: string) {
@@ -53,72 +47,79 @@ Then('it renders an {string} summary card using avgProfitPerFlip', function (lab
     currentFileContent.includes('avgProfitPerFlip'),
     `Expected avgProfitPerFlip reference in analytics page`
   );
-  assert.ok(
-    currentFileContent.includes(label),
-    `Expected label "${label}" in analytics page`
-  );
+  assert.ok(currentFileContent.includes(label), `Expected label "${label}" in analytics page`);
 });
 
-Then('it renders a {string} summary card using successRate with sold-of-total subtitle', function (label: string) {
-  assert.ok(
-    currentFileContent.includes('successRate'),
-    `Expected successRate reference in analytics page`
-  );
-  assert.ok(
-    currentFileContent.includes(label),
-    `Expected label "${label}" in analytics page`
-  );
-  assert.ok(
-    currentFileContent.includes('sold of') || currentFileContent.includes('of ${data.items.length}'),
-    `Expected sold-of-total subtitle in analytics page`
-  );
-});
+Then(
+  'it renders a {string} summary card using successRate with sold-of-total subtitle',
+  function (label: string) {
+    assert.ok(
+      currentFileContent.includes('successRate'),
+      `Expected successRate reference in analytics page`
+    );
+    assert.ok(currentFileContent.includes(label), `Expected label "${label}" in analytics page`);
+    assert.ok(
+      currentFileContent.includes('sold of') ||
+        currentFileContent.includes('of ${data.items.length}'),
+      `Expected sold-of-total subtitle in analytics page`
+    );
+  }
+);
 
 // S-22: Chart visualizations
 When('I inspect the chart sections', function () {
   assert.ok(currentFileContent.length > 0, 'File content should not be empty');
 });
 
-Then('it renders a {string} section with a LineChart using trends data', function (sectionLabel: string) {
-  assert.ok(
-    currentFileContent.includes(sectionLabel),
-    `Expected section "${sectionLabel}" in analytics page`
-  );
-  assert.ok(
-    currentFileContent.includes('LineChart'),
-    `Expected LineChart component in analytics page`
-  );
-  assert.ok(
-    currentFileContent.includes('data.trends'),
-    `Expected trends data reference in analytics page`
-  );
-});
+Then(
+  'it renders a {string} section with a LineChart using trends data',
+  function (sectionLabel: string) {
+    assert.ok(
+      currentFileContent.includes(sectionLabel),
+      `Expected section "${sectionLabel}" in analytics page`
+    );
+    assert.ok(
+      currentFileContent.includes('LineChart'),
+      `Expected LineChart component in analytics page`
+    );
+    assert.ok(
+      currentFileContent.includes('data.trends'),
+      `Expected trends data reference in analytics page`
+    );
+  }
+);
 
-Then('it renders a {string} section with a BarChart using categoryBreakdown data', function (sectionLabel: string) {
-  assert.ok(
-    currentFileContent.includes(sectionLabel),
-    `Expected section "${sectionLabel}" in analytics page`
-  );
-  assert.ok(
-    currentFileContent.includes('BarChart'),
-    `Expected BarChart component in analytics page`
-  );
-  assert.ok(
-    currentFileContent.includes('categoryBreakdown'),
-    `Expected categoryBreakdown data reference in analytics page`
-  );
-});
+Then(
+  'it renders a {string} section with a BarChart using categoryBreakdown data',
+  function (sectionLabel: string) {
+    assert.ok(
+      currentFileContent.includes(sectionLabel),
+      `Expected section "${sectionLabel}" in analytics page`
+    );
+    assert.ok(
+      currentFileContent.includes('BarChart'),
+      `Expected BarChart component in analytics page`
+    );
+    assert.ok(
+      currentFileContent.includes('categoryBreakdown'),
+      `Expected categoryBreakdown data reference in analytics page`
+    );
+  }
+);
 
-Then('it renders a {string} section with a BarChart using platformBreakdown data', function (sectionLabel: string) {
-  assert.ok(
-    currentFileContent.includes(sectionLabel),
-    `Expected section "${sectionLabel}" in analytics page`
-  );
-  assert.ok(
-    currentFileContent.includes('platformBreakdown'),
-    `Expected platformBreakdown data reference in analytics page`
-  );
-});
+Then(
+  'it renders a {string} section with a BarChart using platformBreakdown data',
+  function (sectionLabel: string) {
+    assert.ok(
+      currentFileContent.includes(sectionLabel),
+      `Expected section "${sectionLabel}" in analytics page`
+    );
+    assert.ok(
+      currentFileContent.includes('platformBreakdown'),
+      `Expected platformBreakdown data reference in analytics page`
+    );
+  }
+);
 
 Then('it renders a {string} card showing the highest-profit item', function (cardLabel: string) {
   assert.ok(
@@ -156,14 +157,12 @@ Then('it renders guidance text directing the user to the Opportunities page', fu
 Then('it renders a link to {string} labelled {string}', function (href: string, label: string) {
   // Accept either a literal `<a href="..."` element or a component prop
   // wiring like `href: '...'` (used by shared EmptyState action prop).
-  const hasHref = currentFileContent.includes(`href="${href}"`) ||
+  const hasHref =
+    currentFileContent.includes(`href="${href}"`) ||
     currentFileContent.includes(`href: '${href}'`) ||
     currentFileContent.includes(`href: "${href}"`);
   assert.ok(hasHref, `Expected href="${href}" (or href: '${href}') in analytics page`);
-  assert.ok(
-    currentFileContent.includes(label),
-    `Expected link label "${label}" in analytics page`
-  );
+  assert.ok(currentFileContent.includes(label), `Expected link label "${label}" in analytics page`);
 });
 
 // S-24: Date range filter
@@ -172,14 +171,8 @@ When('I inspect the date range filter implementation', function () {
 });
 
 Then('it renders dateFrom and dateTo date inputs', function () {
-  assert.ok(
-    currentFileContent.includes('dateFrom'),
-    `Expected dateFrom state in analytics page`
-  );
-  assert.ok(
-    currentFileContent.includes('dateTo'),
-    `Expected dateTo state in analytics page`
-  );
+  assert.ok(currentFileContent.includes('dateFrom'), `Expected dateFrom state in analytics page`);
+  assert.ok(currentFileContent.includes('dateTo'), `Expected dateTo state in analytics page`);
   assert.ok(
     currentFileContent.includes('type="date"'),
     `Expected date input elements in analytics page`
@@ -207,20 +200,17 @@ Then('it renders a {string} button when either date is set', function (buttonLab
   );
 });
 
-Then('the API route at {string} forwards dateFrom and dateTo to getProfitLossAnalytics', function (apiPath: string) {
-  const apiFilePath = path.join(ROOT, apiPath);
-  assert.ok(fs.existsSync(apiFilePath), `API route not found: ${apiFilePath}`);
-  const apiContent = fs.readFileSync(apiFilePath, 'utf8');
-  assert.ok(
-    apiContent.includes('dateFrom'),
-    `Expected dateFrom param in API route`
-  );
-  assert.ok(
-    apiContent.includes('dateTo'),
-    `Expected dateTo param in API route`
-  );
-  assert.ok(
-    apiContent.includes('getProfitLossAnalytics'),
-    `Expected getProfitLossAnalytics call in API route`
-  );
-});
+Then(
+  'the API route at {string} forwards dateFrom and dateTo to getProfitLossAnalytics',
+  function (apiPath: string) {
+    const apiFilePath = path.join(ROOT, apiPath);
+    assert.ok(fs.existsSync(apiFilePath), `API route not found: ${apiFilePath}`);
+    const apiContent = fs.readFileSync(apiFilePath, 'utf8');
+    assert.ok(apiContent.includes('dateFrom'), `Expected dateFrom param in API route`);
+    assert.ok(apiContent.includes('dateTo'), `Expected dateTo param in API route`);
+    assert.ok(
+      apiContent.includes('getProfitLossAnalytics'),
+      `Expected getProfitLossAnalytics call in API route`
+    );
+  }
+);

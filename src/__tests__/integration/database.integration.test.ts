@@ -1,9 +1,9 @@
 /**
  * Database Integration Tests
- * 
+ *
  * Tests database schema validation and critical relationships
  * with a real SQLite database to catch production migration issues.
- * 
+ *
  * @group integration
  */
 
@@ -259,9 +259,7 @@ describe('Database Migration Validation', () => {
   describe('Schema Validation', () => {
     it('should have all required tables', () => {
       const tables = db
-        .prepare(
-          "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-        )
+        .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
         .all() as Array<{ name: string }>;
 
       const tableNames = tables.map((t) => t.name);
@@ -312,16 +310,20 @@ describe('Database Migration Validation', () => {
       // Start transaction
       const createUser = db.transaction(() => {
         // Create user
-        db.prepare(`
+        db.prepare(
+          `
           INSERT INTO User (id, email, password, subscriptionTier, onboardingComplete, onboardingStep, createdAt, updatedAt)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `).run(userId, 'newuser@example.com', 'securepass123', 'FREE', 0, 0, now, now);
+        `
+        ).run(userId, 'newuser@example.com', 'securepass123', 'FREE', 0, 0, now, now);
 
         // Create settings
-        db.prepare(`
+        db.prepare(
+          `
           INSERT INTO UserSettings (id, userId, discountThreshold, autoAnalyze, emailNotifications, createdAt, updatedAt)
           VALUES (?, ?, ?, ?, ?, ?, ?)
-        `).run('settings-' + now, userId, 50, 1, 1, now, now);
+        `
+        ).run('settings-' + now, userId, 50, 1, 1, now, now);
       });
 
       createUser();
@@ -346,17 +348,21 @@ describe('Database Migration Validation', () => {
       const email = 'duplicate@example.com';
 
       // Create first user
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO User (id, email, password, createdAt, updatedAt)
         VALUES (?, ?, ?, ?, ?)
-      `).run('user-1-' + now, email, 'pass123', now, now);
+      `
+      ).run('user-1-' + now, email, 'pass123', now, now);
 
       // Try to create second user with same email
       expect(() => {
-        db.prepare(`
+        db.prepare(
+          `
           INSERT INTO User (id, email, password, createdAt, updatedAt)
           VALUES (?, ?, ?, ?, ?)
-        `).run('user-2-' + now, email, 'pass456', now, now);
+        `
+        ).run('user-2-' + now, email, 'pass456', now, now);
       }).toThrow(/UNIQUE constraint failed/);
     });
 
@@ -364,10 +370,12 @@ describe('Database Migration Validation', () => {
       const now = Date.now();
       const userId = 'user-defaults-' + now;
 
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO User (id, email, password, createdAt, updatedAt)
         VALUES (?, ?, ?, ?, ?)
-      `).run(userId, 'defaults@example.com', 'test123', now, now);
+      `
+      ).run(userId, 'defaults@example.com', 'test123', now, now);
 
       const user = db.prepare('SELECT * FROM User WHERE id = ?').get(userId) as any;
 
@@ -384,15 +392,19 @@ describe('Database Migration Validation', () => {
       const settingsId = 'settings-' + now;
 
       // Create user and settings
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO User (id, email, password, createdAt, updatedAt)
         VALUES (?, ?, ?, ?, ?)
-      `).run(userId, 'cascade1@example.com', 'test123', now, now);
+      `
+      ).run(userId, 'cascade1@example.com', 'test123', now, now);
 
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO UserSettings (id, userId, discountThreshold, createdAt, updatedAt)
         VALUES (?, ?, ?, ?, ?)
-      `).run(settingsId, userId, 50, now, now);
+      `
+      ).run(settingsId, userId, 50, now, now);
 
       // Verify settings exist
       let settings = db.prepare('SELECT * FROM UserSettings WHERE id = ?').get(settingsId);
@@ -412,16 +424,20 @@ describe('Database Migration Validation', () => {
       const sessionId = 'session-' + now;
 
       // Create user
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO User (id, email, password, createdAt, updatedAt)
         VALUES (?, ?, ?, ?, ?)
-      `).run(userId, 'cascade2@example.com', 'test123', now, now);
+      `
+      ).run(userId, 'cascade2@example.com', 'test123', now, now);
 
       // Create session
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO Session (id, userId, sessionToken, expires)
         VALUES (?, ?, ?, ?)
-      `).run(sessionId, userId, 'test-token-123', now + 86400000);
+      `
+      ).run(sessionId, userId, 'test-token-123', now + 86400000);
 
       // Delete user
       db.prepare('DELETE FROM User WHERE id = ?').run(userId);
@@ -438,22 +454,37 @@ describe('Database Migration Validation', () => {
       const opportunityId = 'opportunity-' + now;
 
       // Create user
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO User (id, email, password, createdAt, updatedAt)
         VALUES (?, ?, ?, ?, ?)
-      `).run(userId, 'cascade3@example.com', 'test123', now, now);
+      `
+      ).run(userId, 'cascade3@example.com', 'test123', now, now);
 
       // Create listing
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO Listing (id, userId, externalId, platform, url, title, askingPrice, scrapedAt)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `).run(listingId, userId, 'cascade-test-1', 'craigslist', 'https://example.com/cascade', 'Cascade Test', 100, now);
+      `
+      ).run(
+        listingId,
+        userId,
+        'cascade-test-1',
+        'craigslist',
+        'https://example.com/cascade',
+        'Cascade Test',
+        100,
+        now
+      );
 
       // Create opportunity
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO Opportunity (id, userId, listingId, status, createdAt, updatedAt)
         VALUES (?, ?, ?, ?, ?, ?)
-      `).run(opportunityId, userId, listingId, 'IDENTIFIED', now, now);
+      `
+      ).run(opportunityId, userId, listingId, 'IDENTIFIED', now, now);
 
       // Delete listing
       db.prepare('DELETE FROM Listing WHERE id = ?').run(listingId);
@@ -471,15 +502,19 @@ describe('Database Migration Validation', () => {
       const settingsId = 'settings-' + now;
 
       // Create user and settings
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO User (id, email, password, createdAt, updatedAt)
         VALUES (?, ?, ?, ?, ?)
-      `).run(userId, 'relationship1@example.com', 'test123', now, now);
+      `
+      ).run(userId, 'relationship1@example.com', 'test123', now, now);
 
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO UserSettings (id, userId, llmModel, discountThreshold, createdAt, updatedAt)
         VALUES (?, ?, ?, ?, ?, ?)
-      `).run(settingsId, userId, 'gpt-4o-mini', 60, now, now);
+      `
+      ).run(settingsId, userId, 'gpt-4o-mini', 60, now, now);
 
       // Verify link
       const settings = db.prepare('SELECT * FROM UserSettings WHERE userId = ?').get(userId) as any;
@@ -489,10 +524,12 @@ describe('Database Migration Validation', () => {
 
       // Try to create duplicate settings (should fail - unique constraint)
       expect(() => {
-        db.prepare(`
+        db.prepare(
+          `
           INSERT INTO UserSettings (id, userId, llmModel, createdAt, updatedAt)
           VALUES (?, ?, ?, ?, ?)
-        `).run('settings-duplicate-' + now, userId, 'gpt-4', now, now);
+        `
+        ).run('settings-duplicate-' + now, userId, 'gpt-4', now, now);
       }).toThrow(/UNIQUE constraint failed/);
     });
 
@@ -501,21 +538,45 @@ describe('Database Migration Validation', () => {
       const userId = 'user-rel-2-' + now;
 
       // Create user
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO User (id, email, password, createdAt, updatedAt)
         VALUES (?, ?, ?, ?, ?)
-      `).run(userId, 'relationship2@example.com', 'test123', now, now);
+      `
+      ).run(userId, 'relationship2@example.com', 'test123', now, now);
 
       // Create multiple listings
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO Listing (id, userId, externalId, platform, url, title, askingPrice, scrapedAt)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `).run('listing-1-' + now, userId, 'rel-test-1', 'craigslist', 'https://example.com/1', 'Item 1', 50, now);
+      `
+      ).run(
+        'listing-1-' + now,
+        userId,
+        'rel-test-1',
+        'craigslist',
+        'https://example.com/1',
+        'Item 1',
+        50,
+        now
+      );
 
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO Listing (id, userId, externalId, platform, url, title, askingPrice, scrapedAt)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `).run('listing-2-' + now, userId, 'rel-test-2', 'craigslist', 'https://example.com/2', 'Item 2', 100, now);
+      `
+      ).run(
+        'listing-2-' + now,
+        userId,
+        'rel-test-2',
+        'craigslist',
+        'https://example.com/2',
+        'Item 2',
+        100,
+        now
+      );
 
       // Verify listings
       const listings = db.prepare('SELECT * FROM Listing WHERE userId = ?').all(userId);
@@ -530,34 +591,53 @@ describe('Database Migration Validation', () => {
       const opportunityId = 'opportunity-' + now;
 
       // Create user
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO User (id, email, password, createdAt, updatedAt)
         VALUES (?, ?, ?, ?, ?)
-      `).run(userId, 'relationship3@example.com', 'test123', now, now);
+      `
+      ).run(userId, 'relationship3@example.com', 'test123', now, now);
 
       // Create listing
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO Listing (id, userId, externalId, platform, url, title, askingPrice, scrapedAt)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `).run(listingId, userId, 'rel-opp-1', 'craigslist', 'https://example.com/opp', 'Opportunity Test', 75, now);
+      `
+      ).run(
+        listingId,
+        userId,
+        'rel-opp-1',
+        'craigslist',
+        'https://example.com/opp',
+        'Opportunity Test',
+        75,
+        now
+      );
 
       // Create opportunity
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO Opportunity (id, userId, listingId, purchasePrice, status, createdAt, updatedAt)
         VALUES (?, ?, ?, ?, ?, ?, ?)
-      `).run(opportunityId, userId, listingId, 60, 'PURCHASED', now, now);
+      `
+      ).run(opportunityId, userId, listingId, 60, 'PURCHASED', now, now);
 
       // Verify relationship
-      const opportunity = db.prepare('SELECT * FROM Opportunity WHERE listingId = ?').get(listingId) as any;
+      const opportunity = db
+        .prepare('SELECT * FROM Opportunity WHERE listingId = ?')
+        .get(listingId) as any;
       expect(opportunity).toBeDefined();
       expect(opportunity.id).toBe(opportunityId);
 
       // Try to create duplicate opportunity (should fail - unique listingId)
       expect(() => {
-        db.prepare(`
+        db.prepare(
+          `
           INSERT INTO Opportunity (id, userId, listingId, status, createdAt, updatedAt)
           VALUES (?, ?, ?, ?, ?, ?)
-        `).run('opportunity-duplicate-' + now, userId, listingId, 'IDENTIFIED', now, now);
+        `
+        ).run('opportunity-duplicate-' + now, userId, listingId, 'IDENTIFIED', now, now);
       }).toThrow(/UNIQUE constraint failed/);
     });
   });
@@ -570,23 +650,47 @@ describe('Database Migration Validation', () => {
       const listingId2 = 'listing-2-' + now;
 
       // Create user
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO User (id, email, password, createdAt, updatedAt)
         VALUES (?, ?, ?, ?, ?)
-      `).run(userId, 'unique1@example.com', 'test123', now, now);
+      `
+      ).run(userId, 'unique1@example.com', 'test123', now, now);
 
       // Create first listing
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO Listing (id, userId, externalId, platform, url, title, askingPrice, scrapedAt)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `).run(listingId1, userId, 'unique-123', 'craigslist', 'https://example.com/unique', 'Unique Test', 100, now);
+      `
+      ).run(
+        listingId1,
+        userId,
+        'unique-123',
+        'craigslist',
+        'https://example.com/unique',
+        'Unique Test',
+        100,
+        now
+      );
 
       // Try to create duplicate
       expect(() => {
-        db.prepare(`
+        db.prepare(
+          `
           INSERT INTO Listing (id, userId, externalId, platform, url, title, askingPrice, scrapedAt)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `).run(listingId2, userId, 'unique-123', 'craigslist', 'https://example.com/unique2', 'Unique Test 2', 100, now);
+        `
+        ).run(
+          listingId2,
+          userId,
+          'unique-123',
+          'craigslist',
+          'https://example.com/unique2',
+          'Unique Test 2',
+          100,
+          now
+        );
       }).toThrow(/UNIQUE constraint failed/);
     });
 
@@ -596,23 +700,29 @@ describe('Database Migration Validation', () => {
       const sessionToken = 'unique-token-456';
 
       // Create user
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO User (id, email, password, createdAt, updatedAt)
         VALUES (?, ?, ?, ?, ?)
-      `).run(userId, 'unique2@example.com', 'test123', now, now);
+      `
+      ).run(userId, 'unique2@example.com', 'test123', now, now);
 
       // Create first session
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO Session (id, userId, sessionToken, expires)
         VALUES (?, ?, ?, ?)
-      `).run('session-1-' + now, userId, sessionToken, now + 86400000);
+      `
+      ).run('session-1-' + now, userId, sessionToken, now + 86400000);
 
       // Try to create session with same token
       expect(() => {
-        db.prepare(`
+        db.prepare(
+          `
           INSERT INTO Session (id, userId, sessionToken, expires)
           VALUES (?, ?, ?, ?)
-        `).run('session-2-' + now, userId, sessionToken, now + 86400000);
+        `
+        ).run('session-2-' + now, userId, sessionToken, now + 86400000);
       }).toThrow(/UNIQUE constraint failed/);
     });
   });
@@ -623,10 +733,12 @@ describe('Database Migration Validation', () => {
       const userId = 'user-index-1-' + now;
 
       // Create user
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO User (id, email, password, createdAt, updatedAt)
         VALUES (?, ?, ?, ?, ?)
-      `).run(userId, 'index1@example.com', 'test123', now, now);
+      `
+      ).run(userId, 'index1@example.com', 'test123', now, now);
 
       // Create many listings
       const insertStmt = db.prepare(`

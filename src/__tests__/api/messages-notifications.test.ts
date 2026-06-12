@@ -88,7 +88,9 @@ function makeParams(id: string) {
   return { params: Promise.resolve({ id }) };
 }
 
-const mockNotify = communicationNotificationService as jest.Mocked<typeof communicationNotificationService>;
+const mockNotify = communicationNotificationService as jest.Mocked<
+  typeof communicationNotificationService
+>;
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -220,7 +222,13 @@ describe('Communication notification triggers — PATCH /api/messages/[id]', () 
     readAt: null,
     createdAt: new Date(),
     updatedAt: new Date(),
-    listing: { id: 'listing-10', title: 'Vintage Watch', platform: 'craigslist', askingPrice: 200, updatedAt: new Date() },
+    listing: {
+      id: 'listing-10',
+      title: 'Vintage Watch',
+      platform: 'craigslist',
+      askingPrice: 200,
+      updatedAt: new Date(),
+    },
   };
 
   beforeEach(() => {

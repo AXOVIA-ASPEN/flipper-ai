@@ -167,9 +167,7 @@ interface ListingCheckResult {
   parseSuccess: boolean; // true if price was extractable (canary metric)
 }
 
-async function checkHtmlPlatformListing(
-  listing: TrackableListing
-): Promise<ListingCheckResult> {
+async function checkHtmlPlatformListing(listing: TrackableListing): Promise<ListingCheckResult> {
   const userAgent =
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 
@@ -216,12 +214,18 @@ async function checkEbayListingsBatch(
     return match ? match[1] : null;
   });
 
-  const validPairs = listings.map((l, i) => ({ listing: l, itemId: itemIds[i] }))
+  const validPairs = listings
+    .map((l, i) => ({ listing: l, itemId: itemIds[i] }))
     .filter((p): p is { listing: TrackableListing; itemId: string } => p.itemId !== null);
 
   if (validPairs.length === 0) {
     listings.forEach((l) =>
-      results.set(l.id, { isSold: false, isUnavailable: false, currentPrice: null, parseSuccess: false })
+      results.set(l.id, {
+        isSold: false,
+        isUnavailable: false,
+        currentPrice: null,
+        parseSuccess: false,
+      })
     );
     return results;
   }
@@ -229,10 +233,14 @@ async function checkEbayListingsBatch(
   try {
     const token = getEbayToken();
     const idFilter = validPairs.map((p) => `item_id:${p.itemId}`).join(',');
-    const apiResponse = await callEbayApi('/item_summary/search', {
-      filter: idFilter,
-      limit: String(validPairs.length),
-    }, token);
+    const apiResponse = await callEbayApi(
+      '/item_summary/search',
+      {
+        filter: idFilter,
+        limit: String(validPairs.length),
+      },
+      token
+    );
 
     const foundIds = new Set<string>();
     if (Array.isArray(apiResponse?.itemSummaries)) {
@@ -366,13 +374,13 @@ async function processOneListing(
       // eBay is handled in batch — this path is fallback for single items
       const batchResult = await checkEbayListingsBatch([listing]);
       result = batchResult.get(listing.id) ?? {
-        isSold: false, isUnavailable: false, currentPrice: null, parseSuccess: false,
+        isSold: false,
+        isUnavailable: false,
+        currentPrice: null,
+        parseSuccess: false,
       };
     } else {
-      result = await withRetry(
-        () => checkHtmlPlatformListing(listing),
-        CONFIG.maxRetries
-      );
+      result = await withRetry(() => checkHtmlPlatformListing(listing), CONFIG.maxRetries);
     }
 
     const { isSold, isUnavailable, unavailableReason, currentPrice, parseSuccess } = result;
@@ -411,10 +419,19 @@ async function processOneListing(
     }
 
     // Update parse stats BEFORE deciding whether to commit the transaction
-    updatePlatformParseStats(platformStats, platform, parseSuccess, change !== null, wasUnavailable);
+    updatePlatformParseStats(
+      platformStats,
+      platform,
+      parseSuccess,
+      change !== null,
+      wasUnavailable
+    );
 
     // Anomaly check BEFORE committing — suppresses mass false-positive unavailable events
-    if (isUnavailable && isAnomalyThresholdExceeded(platformStats[platform], CONFIG.anomalyThresholdPercent)) {
+    if (
+      isUnavailable &&
+      isAnomalyThresholdExceeded(platformStats[platform], CONFIG.anomalyThresholdPercent)
+    ) {
       logger.error('Possible selector breakage — suppressing unavailable event', {
         platform,
         unavailableCount: platformStats[platform].unavailable,
@@ -436,11 +453,17 @@ async function processOneListing(
       eventsCreated.count++;
       // SSE emission: fire-and-forget after DB commit
       if (listing.userId) {
-        sseEmitter.emit({
-          type: change.type as import('@/lib/sse-emitter').SseEventType,
-          data: { ...change, listingId: listing.id, listingTitle: listing.title },
-          id: listing.id,
-        }).catch(/* istanbul ignore next -- fire-and-forget SSE; rejection is intentionally a no-op */ () => {/* no-op */});
+        sseEmitter
+          .emit({
+            type: change.type as import('@/lib/sse-emitter').SseEventType,
+            data: { ...change, listingId: listing.id, listingTitle: listing.title },
+            id: listing.id,
+          })
+          .catch(
+            /* istanbul ignore next -- fire-and-forget SSE; rejection is intentionally a no-op */ () => {
+              /* no-op */
+            }
+          );
       }
     } else {
       // No state change — still update lastMonitoredAt
@@ -535,7 +558,10 @@ export class MonitoringJobService {
           listingsChecked: summary.listingsChecked,
           eventsCreated: summary.eventsCreated + summary.expiryEventsCreated,
           errorsEncountered: summary.errorsEncountered,
-          platformStats: { ...summary.platformStats, _meta: { expiryEventsCreated: summary.expiryEventsCreated } } as Prisma.InputJsonValue,
+          platformStats: {
+            ...summary.platformStats,
+            _meta: { expiryEventsCreated: summary.expiryEventsCreated },
+          } as Prisma.InputJsonValue,
           skippedPlatforms: summary.skippedPlatforms as Prisma.InputJsonValue,
           completedEarly: summary.completedEarly,
           canaryWarning: summary.canaryWarning,
@@ -663,22 +689,30 @@ export class MonitoringJobService {
 
             for (const listing of batch) {
               const result = batchResults.get(listing.id) ?? {
-                isSold: false, isUnavailable: false, currentPrice: null, parseSuccess: false,
+                isSold: false,
+                isUnavailable: false,
+                currentPrice: null,
+                parseSuccess: false,
               };
               const { isSold, isUnavailable, currentPrice, parseSuccess } = result;
 
               let change: StateChange | null = null;
-              if (isSold) change = { type: NotificationEventType.LISTING_SOLD, soldIndicator: 'sold' };
-              else if (isUnavailable) change = { type: NotificationEventType.LISTING_UNAVAILABLE, reason: 'removed' };
+              if (isSold)
+                change = { type: NotificationEventType.LISTING_SOLD, soldIndicator: 'sold' };
+              else if (isUnavailable)
+                change = { type: NotificationEventType.LISTING_UNAVAILABLE, reason: 'removed' };
               else if (
                 currentPrice !== null &&
                 currentPrice !== listing.askingPrice &&
                 isPriceChangeMeaningful(
-                  listing.askingPrice, currentPrice,
-                  CONFIG.priceChangeMinDelta, CONFIG.priceChangeMinPercent
+                  listing.askingPrice,
+                  currentPrice,
+                  CONFIG.priceChangeMinDelta,
+                  CONFIG.priceChangeMinPercent
                 )
               ) {
-                const rawEbayPct = ((currentPrice - listing.askingPrice) / listing.askingPrice) * 100;
+                const rawEbayPct =
+                  ((currentPrice - listing.askingPrice) / listing.askingPrice) * 100;
                 const ebayChangePercent = Math.round(rawEbayPct * 100) / 100;
                 change = {
                   type: NotificationEventType.LISTING_PRICE_CHANGED,
@@ -690,39 +724,68 @@ export class MonitoringJobService {
                 };
               }
 
-              updatePlatformParseStats(platformStats, platform, parseSuccess, change !== null, isUnavailable);
+              updatePlatformParseStats(
+                platformStats,
+                platform,
+                parseSuccess,
+                change !== null,
+                isUnavailable
+              );
 
               // Anomaly check BEFORE committing — suppresses mass false-positive unavailable events
-              if (isUnavailable && isAnomalyThresholdExceeded(platformStats[platform], CONFIG.anomalyThresholdPercent)) {
+              if (
+                isUnavailable &&
+                isAnomalyThresholdExceeded(platformStats[platform], CONFIG.anomalyThresholdPercent)
+              ) {
                 canaryWarning = true;
-                logger.error('Possible selector breakage — suppressing unavailable event (eBay batch)', {
-                  platform,
-                  unavailableCount: platformStats[platform].unavailable,
-                  totalChecked: platformStats[platform].checked,
+                logger.error(
+                  'Possible selector breakage — suppressing unavailable event (eBay batch)',
+                  {
+                    platform,
+                    unavailableCount: platformStats[platform].unavailable,
+                    totalChecked: platformStats[platform].checked,
+                  }
+                );
+                await prisma.listing.update({
+                  where: { id: listing.id },
+                  data: { lastMonitoredAt: new Date() },
                 });
-                await prisma.listing.update({ where: { id: listing.id }, data: { lastMonitoredAt: new Date() } });
                 listingsChecked++;
                 continue;
               }
 
               if (change !== null) {
                 try {
-                  await prisma.$transaction((tx) => updateListingStateWithEvent(tx, listing.id, listing, change!));
+                  await prisma.$transaction((tx) =>
+                    updateListingStateWithEvent(tx, listing.id, listing, change!)
+                  );
                   eventsCreated.count++;
                   // SSE emission: fire-and-forget after DB commit
                   if (listing.userId) {
-                    sseEmitter.emit({
-                      type: change.type as import('@/lib/sse-emitter').SseEventType,
-                      data: { ...change, listingId: listing.id, listingTitle: listing.title },
-                      id: listing.id,
-                    }).catch(/* istanbul ignore next -- fire-and-forget SSE; rejection is intentionally a no-op */ () => {/* no-op */});
+                    sseEmitter
+                      .emit({
+                        type: change.type as import('@/lib/sse-emitter').SseEventType,
+                        data: { ...change, listingId: listing.id, listingTitle: listing.title },
+                        id: listing.id,
+                      })
+                      .catch(
+                        /* istanbul ignore next -- fire-and-forget SSE; rejection is intentionally a no-op */ () => {
+                          /* no-op */
+                        }
+                      );
                   }
                 } catch (err) {
                   errorsEncountered++;
-                  logger.warn('Failed to persist listing state change', { listingId: listing.id, error: String(err) });
+                  logger.warn('Failed to persist listing state change', {
+                    listingId: listing.id,
+                    error: String(err),
+                  });
                 }
               } else {
-                await prisma.listing.update({ where: { id: listing.id }, data: { lastMonitoredAt: new Date() } });
+                await prisma.listing.update({
+                  where: { id: listing.id },
+                  data: { lastMonitoredAt: new Date() },
+                });
               }
               listingsChecked++;
             }
@@ -825,7 +888,9 @@ export class MonitoringJobService {
             }
           }
         } catch (backfillErr) {
-          logger.warn('Lazy backfill of estimatedExpiresAt failed — continuing', { error: String(backfillErr) });
+          logger.warn('Lazy backfill of estimatedExpiresAt failed — continuing', {
+            error: String(backfillErr),
+          });
         }
 
         const expiringListings = await getExpiringListings(24);
@@ -849,14 +914,23 @@ export class MonitoringJobService {
             );
             expiryEventsCreated++;
             // SSE emission: fire-and-forget after DB commit
-            sseEmitter.emit({
-              type: 'listing.expiring',
-              data: { ...expiryChange, listingId: listing.id, listingTitle: listing.title },
-              id: listing.id,
-            }).catch(/* istanbul ignore next -- fire-and-forget SSE; rejection is intentionally a no-op */ () => {/* no-op */});
+            sseEmitter
+              .emit({
+                type: 'listing.expiring',
+                data: { ...expiryChange, listingId: listing.id, listingTitle: listing.title },
+                id: listing.id,
+              })
+              .catch(
+                /* istanbul ignore next -- fire-and-forget SSE; rejection is intentionally a no-op */ () => {
+                  /* no-op */
+                }
+              );
           } catch (err) {
             // P2002 deduplication is handled inside createNotificationEvent — other errors are logged
-            logger.warn('Failed to create expiry event', { listingId: listing.id, error: String(err) });
+            logger.warn('Failed to create expiry event', {
+              listingId: listing.id,
+              error: String(err),
+            });
           }
         }
       } catch (err) {
@@ -879,7 +953,13 @@ export class MonitoringJobService {
       };
 
       await this.completeJob(jobId, summary);
-      logger.info('Monitoring run completed', { jobId, durationMs, listingsChecked, eventsCreated: eventsCreated.count, expiryEventsCreated });
+      logger.info('Monitoring run completed', {
+        jobId,
+        durationMs,
+        listingsChecked,
+        eventsCreated: eventsCreated.count,
+        expiryEventsCreated,
+      });
 
       return summary;
     } catch (err) {
@@ -887,7 +967,11 @@ export class MonitoringJobService {
       const errorMessage = err instanceof Error ? err.message : String(err);
       logger.error('Monitoring run failed', { jobId, error: errorMessage });
       /* istanbul ignore next -- best-effort; if failJob itself throws the original error still propagates */
-      await this.failJob(jobId, errorMessage).catch(/* istanbul ignore next -- best-effort; if failJob itself throws the original error still propagates */ () => {/* best-effort */});
+      await this.failJob(jobId, errorMessage).catch(
+        /* istanbul ignore next -- best-effort; if failJob itself throws the original error still propagates */ () => {
+          /* best-effort */
+        }
+      );
       throw err;
     }
   }

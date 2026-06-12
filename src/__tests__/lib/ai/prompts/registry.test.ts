@@ -180,21 +180,16 @@ describe('Prompt Registry', () => {
     expect(typeof config.buildUserPrompt).toBe('function');
   });
 
-  it.each(ALL_PROMPT_NAMES)(
-    'buildUserPrompt for "%s" returns a non-empty string',
-    (name) => {
-      const config = getPrompt(name);
-      const ctx = SAMPLE_CONTEXTS[name] || {};
-      const result = config.buildUserPrompt(ctx);
-      expect(typeof result).toBe('string');
-      expect(result.length).toBeGreaterThan(0);
-    }
-  );
+  it.each(ALL_PROMPT_NAMES)('buildUserPrompt for "%s" returns a non-empty string', (name) => {
+    const config = getPrompt(name);
+    const ctx = SAMPLE_CONTEXTS[name] || {};
+    const result = config.buildUserPrompt(ctx);
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
+  });
 
   it('getPrompt() throws for unknown prompt name', () => {
-    expect(() => getPrompt('nonexistent')).toThrow(
-      /Unknown prompt: "nonexistent"/
-    );
+    expect(() => getPrompt('nonexistent')).toThrow(/Unknown prompt: "nonexistent"/);
   });
 
   it('getPrompt() error message lists available prompts', () => {

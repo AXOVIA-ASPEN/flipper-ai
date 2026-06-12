@@ -17,15 +17,10 @@ jest.mock('@/lib/posting-queue-processor', () => ({
   registerPoster: jest.fn(),
 }));
 
-import {
-  ensurePostersRegistered,
-  __resetForTests,
-} from '@/lib/platform-posters';
+import { ensurePostersRegistered, __resetForTests } from '@/lib/platform-posters';
 import { registerPoster } from '@/lib/posting-queue-processor';
 
-const mockRegisterPoster = registerPoster as jest.MockedFunction<
-  typeof registerPoster
->;
+const mockRegisterPoster = registerPoster as jest.MockedFunction<typeof registerPoster>;
 
 describe('platform-posters', () => {
   beforeEach(() => {
@@ -37,9 +32,7 @@ describe('platform-posters', () => {
     ensurePostersRegistered();
 
     expect(mockRegisterPoster).toHaveBeenCalledTimes(4);
-    const registeredPlatforms = mockRegisterPoster.mock.calls.map(
-      ([platform]) => platform
-    );
+    const registeredPlatforms = mockRegisterPoster.mock.calls.map(([platform]) => platform);
     expect(registeredPlatforms).toEqual(
       expect.arrayContaining(['EBAY', 'FACEBOOK_MARKETPLACE', 'MERCARI', 'OFFERUP'])
     );

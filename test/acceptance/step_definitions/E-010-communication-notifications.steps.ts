@@ -203,10 +203,7 @@ Then('no email is sent', function () {
 });
 
 Then('the email subject contains {string}', function (expectedPart: string) {
-  assert.ok(
-    state.capturedEmails.length > 0,
-    'No emails captured — cannot check subject'
-  );
+  assert.ok(state.capturedEmails.length > 0, 'No emails captured — cannot check subject');
   const subject = state.capturedEmails[0].subject;
   assert.ok(
     subject.toLowerCase().includes(expectedPart.toLowerCase()),
@@ -244,10 +241,7 @@ Then('the email body contains the listing title {string}', function (listingTitl
 Then('the email body contains a link to the thread', function () {
   assert.ok(state.capturedEmails.length > 0, 'No emails captured');
   const html = state.capturedEmails[0].html;
-  assert.ok(
-    html.includes('/messages'),
-    `Expected email body to contain a link to /messages`
-  );
+  assert.ok(html.includes('/messages'), `Expected email body to contain a link to /messages`);
 });
 
 Then('the email body contains a review link', function () {

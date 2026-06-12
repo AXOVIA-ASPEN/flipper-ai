@@ -34,13 +34,7 @@ Given(
 
 When('the algorithmic scoring engine evaluates the listing', function () {
   const category = detectCategory(this.title, this.description);
-  this.result = estimateValue(
-    this.title,
-    this.description,
-    this.price,
-    this.condition,
-    category
-  );
+  this.result = estimateValue(this.title, this.description, this.price, this.condition, category);
   this.detectedCategory = category;
 });
 
@@ -68,28 +62,19 @@ Then('the detected category should be {string}', function (expected: string) {
 
 Then('the result tags should include {string}', function (tag: string) {
   const tags: string[] = this.result.tags;
-  assert(
-    tags.includes(tag),
-    `Expected tags to include '${tag}', but got: [${tags.join(', ')}]`
-  );
+  assert(tags.includes(tag), `Expected tags to include '${tag}', but got: [${tags.join(', ')}]`);
 });
 
 // ==================== Then: Estimated Value Assertions ====================
 
 Then('the estimated value should be at least {int}', function (minimum: number) {
   const value = this.result.estimatedValue;
-  assert(
-    value >= minimum,
-    `Expected estimated value >= ${minimum}, got ${value}`
-  );
+  assert(value >= minimum, `Expected estimated value >= ${minimum}, got ${value}`);
 });
 
 Then('the estimated value should be at most {int}', function (maximum: number) {
   const value = this.result.estimatedValue;
-  assert(
-    value <= maximum,
-    `Expected estimated value <= ${maximum}, got ${value}`
-  );
+  assert(value <= maximum, `Expected estimated value <= ${maximum}, got ${value}`);
 });
 
 Then('the estimated value should be between {int} and {int}', function (min: number, max: number) {
@@ -102,27 +87,18 @@ Then('the estimated value should be between {int} and {int}', function (min: num
 
 Then('the estimated low value should be at least {int}', function (minimum: number) {
   const value = this.result.estimatedLow;
-  assert(
-    value >= minimum,
-    `Expected estimatedLow >= ${minimum}, got ${value}`
-  );
+  assert(value >= minimum, `Expected estimatedLow >= ${minimum}, got ${value}`);
 });
 
 Then('the estimated high value should be at least {int}', function (minimum: number) {
   const value = this.result.estimatedHigh;
-  assert(
-    value >= minimum,
-    `Expected estimatedHigh >= ${minimum}, got ${value}`
-  );
+  assert(value >= minimum, `Expected estimatedHigh >= ${minimum}, got ${value}`);
 });
 
 Then(
   'the estimated value should be greater than the asking price of {int}',
   function (askingPrice: number) {
     const value = this.result.estimatedValue;
-    assert(
-      value > askingPrice,
-      `Expected estimated value > ${askingPrice}, got ${value}`
-    );
+    assert(value > askingPrice, `Expected estimated value > ${askingPrice}, got ${value}`);
   }
 );

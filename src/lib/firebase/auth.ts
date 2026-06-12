@@ -48,7 +48,7 @@ async function exchangeTokenForSession(idToken: string, name?: string): Promise<
   const response = await fetch('/api/auth/session', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ idToken, ...(/* istanbul ignore next */ name && { name }) }),
+    body: JSON.stringify({ idToken, .../* istanbul ignore next */ (name && { name }) }),
   });
 
   if (!response.ok) {
@@ -57,10 +57,7 @@ async function exchangeTokenForSession(idToken: string, name?: string): Promise<
   }
 }
 
-export async function signInWithEmail(
-  email: string,
-  password: string
-): Promise<UserCredential> {
+export async function signInWithEmail(email: string, password: string): Promise<UserCredential> {
   const auth = getFirebaseAuth();
   const credential = await signInWithEmailAndPassword(auth, email, password);
   const idToken = await credential.user.getIdToken();

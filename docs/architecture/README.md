@@ -2,6 +2,8 @@
 
 Main architecture doc: [ARCHITECTURE.md](./ARCHITECTURE.md).
 
+Mobile app (Epics 15–29) architecture overview: [mobile-architecture-overview.html](./mobile-architecture-overview.html) — open in a browser; covers tech stack + reasoning, system context, monorepo layout, screens & navigation, runtime flows, CI/CD pipeline, ADRs, the full epic/story catalog, and the phased roadmap.
+
 Use this folder for:
 
 - Feature-level technical specs

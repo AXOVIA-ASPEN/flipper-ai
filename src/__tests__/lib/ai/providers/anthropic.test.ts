@@ -105,9 +105,7 @@ describe('AnthropicProvider', () => {
         usage: { input_tokens: 12, output_tokens: 6 },
       });
 
-      const messages: AIMessage[] = [
-        { role: 'user', content: 'Hello' },
-      ];
+      const messages: AIMessage[] = [{ role: 'user', content: 'Hello' }];
 
       const provider = new AnthropicProvider();
       const result = await provider.complete(messages, baseConfig);
@@ -140,7 +138,7 @@ describe('AnthropicProvider', () => {
         expect.objectContaining({
           system: 'You are a helpful assistant',
           messages: [{ role: 'user', content: 'Hello' }],
-        }),
+        })
       );
     });
 
@@ -151,9 +149,7 @@ describe('AnthropicProvider', () => {
         usage: { input_tokens: 5, output_tokens: 3 },
       });
 
-      const messages: AIMessage[] = [
-        { role: 'user', content: 'Hello' },
-      ];
+      const messages: AIMessage[] = [{ role: 'user', content: 'Hello' }];
 
       const provider = new AnthropicProvider();
       await provider.complete(messages, baseConfig);
@@ -176,9 +172,7 @@ describe('AnthropicProvider', () => {
       const provider = new AnthropicProvider();
       await provider.complete([{ role: 'user', content: 'Hi' }], baseConfig);
 
-      expect(Anthropic).toHaveBeenCalledWith(
-        expect.objectContaining({ apiKey: 'sk-ant-primary' }),
-      );
+      expect(Anthropic).toHaveBeenCalledWith(expect.objectContaining({ apiKey: 'sk-ant-primary' }));
     });
 
     test('falls back to CLAUDE_API_KEY when ANTHROPIC_API_KEY missing', async () => {
@@ -196,7 +190,7 @@ describe('AnthropicProvider', () => {
       await provider.complete([{ role: 'user', content: 'Hi' }], baseConfig);
 
       expect(Anthropic).toHaveBeenCalledWith(
-        expect.objectContaining({ apiKey: 'sk-ant-fallback' }),
+        expect.objectContaining({ apiKey: 'sk-ant-fallback' })
       );
     });
 

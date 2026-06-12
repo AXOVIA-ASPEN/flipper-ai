@@ -116,23 +116,20 @@ Given(
   }
 );
 
-Given(
-  'a free item with verified market value {int}',
-  function (verifiedMarketValue: number) {
-    state = freshState();
-    state.listing = {
-      id: 'listing-1',
-      userId: 'user-1',
-      askingPrice: 0,
-      estimatedShippingCost: 0,
-      verifiedMarketValue,
-      recommendedList: null,
-      compMatchConfidence: 'high',
-      opportunity: { purchasePrice: 0, status: 'PURCHASED' },
-    };
-    installPrismaStubs();
-  }
-);
+Given('a free item with verified market value {int}', function (verifiedMarketValue: number) {
+  state = freshState();
+  state.listing = {
+    id: 'listing-1',
+    userId: 'user-1',
+    askingPrice: 0,
+    estimatedShippingCost: 0,
+    verifiedMarketValue,
+    recommendedList: null,
+    compMatchConfidence: 'high',
+    opportunity: { purchasePrice: 0, status: 'PURCHASED' },
+  };
+  installPrismaStubs();
+});
 
 Given(
   'a listing with no opportunity and asking price {int} and shipping cost {int}',
@@ -152,14 +149,11 @@ Given(
   }
 );
 
-Given(
-  'the optimal price API endpoint exists at {string}',
-  function (relativePath: string) {
-    const absolute = path.resolve(__dirname, '..', '..', '..', relativePath);
-    assert.ok(fs.existsSync(absolute), `Expected file at ${relativePath}`);
-    this.routeContent = fs.readFileSync(absolute, 'utf-8');
-  }
-);
+Given('the optimal price API endpoint exists at {string}', function (relativePath: string) {
+  const absolute = path.resolve(__dirname, '..', '..', '..', relativePath);
+  assert.ok(fs.existsSync(absolute), `Expected file at ${relativePath}`);
+  this.routeContent = fs.readFileSync(absolute, 'utf-8');
+});
 
 // ── When ─────────────────────────────────────────────────────────────────────
 
@@ -202,12 +196,7 @@ When(
     state.result = await calculateOptimalListingPrice({
       listingId: 'listing-1',
       userId: 'user-1',
-      targetPlatform: platform as
-        | 'ebay'
-        | 'mercari'
-        | 'facebook'
-        | 'offerup'
-        | 'craigslist',
+      targetPlatform: platform as 'ebay' | 'mercari' | 'facebook' | 'offerup' | 'craigslist',
       targetMarginPercent: marginPercent,
     });
   }

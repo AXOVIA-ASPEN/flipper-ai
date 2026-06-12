@@ -54,9 +54,7 @@ describe('detectColdFlips', () => {
       {
         id: 'listing-1',
         title: 'Sony PS5',
-        messages: [
-          { createdAt: hoursAgo(30), direction: 'INBOUND', sellerName: 'Bob' },
-        ],
+        messages: [{ createdAt: hoursAgo(30), direction: 'INBOUND', sellerName: 'Bob' }],
       },
     ]);
     const result = await detectColdFlips('user-1', 24);
@@ -71,9 +69,7 @@ describe('detectColdFlips', () => {
       {
         id: 'listing-2',
         title: 'Nintendo Switch',
-        messages: [
-          { createdAt: hoursAgo(50), direction: 'OUTBOUND', sellerName: 'Alice' },
-        ],
+        messages: [{ createdAt: hoursAgo(50), direction: 'OUTBOUND', sellerName: 'Alice' }],
       },
     ]);
     const result = await detectColdFlips('user-1', 24); // 2x = 48h, 50h > 48h
@@ -86,9 +82,7 @@ describe('detectColdFlips', () => {
       {
         id: 'listing-3',
         title: 'iPhone 14',
-        messages: [
-          { createdAt: hoursAgo(10), direction: 'INBOUND', sellerName: null },
-        ],
+        messages: [{ createdAt: hoursAgo(10), direction: 'INBOUND', sellerName: null }],
       },
     ]);
     const result = await detectColdFlips('user-1', 24);

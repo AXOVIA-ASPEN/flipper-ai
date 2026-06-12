@@ -5,24 +5,48 @@ import { getAuthUserId } from '@/lib/auth-middleware';
 import { logger } from '@/lib/logger';
 import { invalidateUserRouteCache } from '@/lib/maps-service';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
+import {
+  handleError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  AppError,
+  ErrorCode,
+} from '@/lib/errors';
 // Story 12.1: Google Calendar integration status
 import { hasValidToken as hasGoogleCalendarToken } from '@/lib/google-calendar-token-store';
 
 // Story 11.3: Per-event push and SMS toggle field names — used for loop-driven Boolean coercion.
 // Exported so tests can import this constant for parameterised coverage.
 export const PUSH_SMS_TOGGLE_FIELDS = [
-  'pushNotifyNewDeals', 'pushNotifySoldItems', 'pushNotifyMessageReceived',
-  'pushNotifyDraftReady', 'pushNotifyMessageSent', 'pushNotifyReviewReceived',
-  'pushNotifyFlipGoneCold', 'pushNotifyFlipTurnedHot', 'pushNotifyPriceDrops',
-  'pushNotifyExpiring', 'pushNotifyListingUnavailable', 'pushNotifyWeeklyDigest',
-  'smsNotifyNewDeals', 'smsNotifySoldItems', 'smsNotifyMessageReceived',
-  'smsNotifyDraftReady', 'smsNotifyMessageSent', 'smsNotifyReviewReceived',
-  'smsNotifyFlipGoneCold', 'smsNotifyFlipTurnedHot', 'smsNotifyPriceDrops',
-  'smsNotifyExpiring', 'smsNotifyListingUnavailable', 'smsNotifyWeeklyDigest',
+  'pushNotifyNewDeals',
+  'pushNotifySoldItems',
+  'pushNotifyMessageReceived',
+  'pushNotifyDraftReady',
+  'pushNotifyMessageSent',
+  'pushNotifyReviewReceived',
+  'pushNotifyFlipGoneCold',
+  'pushNotifyFlipTurnedHot',
+  'pushNotifyPriceDrops',
+  'pushNotifyExpiring',
+  'pushNotifyListingUnavailable',
+  'pushNotifyWeeklyDigest',
+  'smsNotifyNewDeals',
+  'smsNotifySoldItems',
+  'smsNotifyMessageReceived',
+  'smsNotifyDraftReady',
+  'smsNotifyMessageSent',
+  'smsNotifyReviewReceived',
+  'smsNotifyFlipGoneCold',
+  'smsNotifyFlipTurnedHot',
+  'smsNotifyPriceDrops',
+  'smsNotifyExpiring',
+  'smsNotifyListingUnavailable',
+  'smsNotifyWeeklyDigest',
 ] as const;
 
-type PushSmsToggleField = typeof PUSH_SMS_TOGGLE_FIELDS[number];
+type PushSmsToggleField = (typeof PUSH_SMS_TOGGLE_FIELDS)[number];
 /**
  * Get or create the current user with settings
  * Requires authentication — returns null if no session
@@ -176,16 +200,39 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
 
     const {
-      openaiApiKey, llmModel, discountThreshold, autoAnalyze,
-      emailNotifications, notifyNewDeals, notifyPriceDrops,
-      notifySoldItems, notifyExpiring, notifyWeeklyDigest, notifyFrequency,
-      opportunityThreshold, feeRateEbay, feeRateMercari, feeRateFacebook, feeRateOfferup, feeRateCraigslist,
-      homeLocation, maxPickupRadiusMiles, holdingCostDailyRate,
-      messageApprovalRequired, pushNotifications,
-      smsNotifications, removePhoneNumber,
-      notifyMessageReceived, notifyDraftReady, notifyMessageSent,
-      notifyReviewReceived, notifyFlipGoneCold, notifyFlipTurnedHot, notifyPriceChanges,
-      flipGoneColdHours, flipTurnedHotCount,
+      openaiApiKey,
+      llmModel,
+      discountThreshold,
+      autoAnalyze,
+      emailNotifications,
+      notifyNewDeals,
+      notifyPriceDrops,
+      notifySoldItems,
+      notifyExpiring,
+      notifyWeeklyDigest,
+      notifyFrequency,
+      opportunityThreshold,
+      feeRateEbay,
+      feeRateMercari,
+      feeRateFacebook,
+      feeRateOfferup,
+      feeRateCraigslist,
+      homeLocation,
+      maxPickupRadiusMiles,
+      holdingCostDailyRate,
+      messageApprovalRequired,
+      pushNotifications,
+      smsNotifications,
+      removePhoneNumber,
+      notifyMessageReceived,
+      notifyDraftReady,
+      notifyMessageSent,
+      notifyReviewReceived,
+      notifyFlipGoneCold,
+      notifyFlipTurnedHot,
+      notifyPriceChanges,
+      flipGoneColdHours,
+      flipTurnedHotCount,
       notifyListingUnavailable,
       meetingDepartureBufferMinutes,
       notifyMeetingReminder,
@@ -217,7 +264,13 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Validate fee rates if provided
-    const feeFields = { feeRateEbay, feeRateMercari, feeRateFacebook, feeRateOfferup, feeRateCraigslist };
+    const feeFields = {
+      feeRateEbay,
+      feeRateMercari,
+      feeRateFacebook,
+      feeRateOfferup,
+      feeRateCraigslist,
+    };
     for (const [field, value] of Object.entries(feeFields)) {
       if (value !== undefined) {
         const rate = Number(value);
@@ -231,7 +284,10 @@ export async function PATCH(request: NextRequest) {
     const validFrequencies = ['instant', 'daily', 'weekly'];
     if (notifyFrequency !== undefined && !validFrequencies.includes(notifyFrequency)) {
       return NextResponse.json(
-        { success: false, error: `Invalid notification frequency. Must be one of: ${validFrequencies.join(', ')}` },
+        {
+          success: false,
+          error: `Invalid notification frequency. Must be one of: ${validFrequencies.join(', ')}`,
+        },
         { status: 400 }
       );
     }
@@ -394,28 +450,48 @@ export async function PATCH(request: NextRequest) {
       const prev = user.settings?.notifyReviewReceived;
       updateData.notifyReviewReceived = Boolean(notifyReviewReceived);
       if (prev !== undefined && prev !== updateData.notifyReviewReceived) {
-        logger.info('settings.notification_preference_changed', { userId: user.id, field: 'notifyReviewReceived', oldValue: prev, newValue: updateData.notifyReviewReceived });
+        logger.info('settings.notification_preference_changed', {
+          userId: user.id,
+          field: 'notifyReviewReceived',
+          oldValue: prev,
+          newValue: updateData.notifyReviewReceived,
+        });
       }
     }
     if (notifyFlipGoneCold !== undefined) {
       const prev = user.settings?.notifyFlipGoneCold;
       updateData.notifyFlipGoneCold = Boolean(notifyFlipGoneCold);
       if (prev !== undefined && prev !== updateData.notifyFlipGoneCold) {
-        logger.info('settings.notification_preference_changed', { userId: user.id, field: 'notifyFlipGoneCold', oldValue: prev, newValue: updateData.notifyFlipGoneCold });
+        logger.info('settings.notification_preference_changed', {
+          userId: user.id,
+          field: 'notifyFlipGoneCold',
+          oldValue: prev,
+          newValue: updateData.notifyFlipGoneCold,
+        });
       }
     }
     if (notifyFlipTurnedHot !== undefined) {
       const prev = user.settings?.notifyFlipTurnedHot;
       updateData.notifyFlipTurnedHot = Boolean(notifyFlipTurnedHot);
       if (prev !== undefined && prev !== updateData.notifyFlipTurnedHot) {
-        logger.info('settings.notification_preference_changed', { userId: user.id, field: 'notifyFlipTurnedHot', oldValue: prev, newValue: updateData.notifyFlipTurnedHot });
+        logger.info('settings.notification_preference_changed', {
+          userId: user.id,
+          field: 'notifyFlipTurnedHot',
+          oldValue: prev,
+          newValue: updateData.notifyFlipTurnedHot,
+        });
       }
     }
     if (notifyPriceChanges !== undefined) {
       const prev = user.settings?.notifyPriceChanges;
       updateData.notifyPriceChanges = Boolean(notifyPriceChanges);
       if (prev !== undefined && prev !== updateData.notifyPriceChanges) {
-        logger.info('settings.notification_preference_changed', { userId: user.id, field: 'notifyPriceChanges', oldValue: prev, newValue: updateData.notifyPriceChanges });
+        logger.info('settings.notification_preference_changed', {
+          userId: user.id,
+          field: 'notifyPriceChanges',
+          oldValue: prev,
+          newValue: updateData.notifyPriceChanges,
+        });
       }
     }
     if (flipGoneColdHours !== undefined) {
@@ -426,7 +502,12 @@ export async function PATCH(request: NextRequest) {
       const prev = user.settings?.flipGoneColdHours;
       updateData.flipGoneColdHours = hours;
       if (prev !== undefined && prev !== hours) {
-        logger.info('settings.notification_preference_changed', { userId: user.id, field: 'flipGoneColdHours', oldValue: prev, newValue: hours });
+        logger.info('settings.notification_preference_changed', {
+          userId: user.id,
+          field: 'flipGoneColdHours',
+          oldValue: prev,
+          newValue: hours,
+        });
       }
     }
     if (flipTurnedHotCount !== undefined) {
@@ -437,7 +518,12 @@ export async function PATCH(request: NextRequest) {
       const prev = user.settings?.flipTurnedHotCount;
       updateData.flipTurnedHotCount = count;
       if (prev !== undefined && prev !== count) {
-        logger.info('settings.notification_preference_changed', { userId: user.id, field: 'flipTurnedHotCount', oldValue: prev, newValue: count });
+        logger.info('settings.notification_preference_changed', {
+          userId: user.id,
+          field: 'flipTurnedHotCount',
+          oldValue: prev,
+          newValue: count,
+        });
       }
     }
 

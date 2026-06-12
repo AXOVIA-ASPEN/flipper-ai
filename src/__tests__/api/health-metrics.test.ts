@@ -128,7 +128,13 @@ describe('GET /api/health/metrics', () => {
     });
 
     it('allows access with valid authenticated session', async () => {
-      mockGetCurrentUser.mockResolvedValue({ id: 'user-1', email: 'test@test.com', name: 'Test', firebaseUid: 'fb-1', image: null });
+      mockGetCurrentUser.mockResolvedValue({
+        id: 'user-1',
+        email: 'test@test.com',
+        name: 'Test',
+        firebaseUid: 'fb-1',
+        image: null,
+      });
       const req = makeRequest();
       const res = await GET(req);
       expect(res.status).toBe(200);

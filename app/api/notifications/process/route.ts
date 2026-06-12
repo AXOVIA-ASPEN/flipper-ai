@@ -154,7 +154,10 @@ export async function POST(request: NextRequest) {
     // Check API key is configured
     if (!process.env.NOTIFICATION_PROCESSOR_API_KEY) {
       return NextResponse.json(
-        { success: false, error: { code: 'SERVICE_UNAVAILABLE', detail: 'Notification processor not configured' } },
+        {
+          success: false,
+          error: { code: 'SERVICE_UNAVAILABLE', detail: 'Notification processor not configured' },
+        },
         { status: 503 }
       );
     }
@@ -163,7 +166,10 @@ export async function POST(request: NextRequest) {
     if (isAuthRateLimited(ip)) {
       logger.warn('notification.auth.rate_limited', { ip });
       return NextResponse.json(
-        { success: false, error: { code: 'RATE_LIMITED', detail: 'Too many failed auth attempts' } },
+        {
+          success: false,
+          error: { code: 'RATE_LIMITED', detail: 'Too many failed auth attempts' },
+        },
         { status: 429 }
       );
     }
@@ -183,7 +189,10 @@ export async function POST(request: NextRequest) {
     if (!jobId) {
       logger.info('notification.concurrent_run_blocked');
       return NextResponse.json(
-        { success: false, error: { code: 'CONFLICT', detail: 'Another notification processing run is active' } },
+        {
+          success: false,
+          error: { code: 'CONFLICT', detail: 'Another notification processing run is active' },
+        },
         { status: 409 }
       );
     }

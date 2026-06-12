@@ -167,10 +167,13 @@ Then('getCachedSellabilityAnalysis uses cache key prefix {string}', function (pr
   expect(content).toContain(prefix);
 });
 
-Then('cacheSellabilityAnalysis upserts with analysisType {string}', function (analysisType: string) {
-  const content: string = this.fileContent;
-  expect(content).toContain(`analysisType: '${analysisType}'`);
-});
+Then(
+  'cacheSellabilityAnalysis upserts with analysisType {string}',
+  function (analysisType: string) {
+    const content: string = this.fileContent;
+    expect(content).toContain(`analysisType: '${analysisType}'`);
+  }
+);
 
 // ==================== Then: S-033 (algorithmic fallback) ====================
 

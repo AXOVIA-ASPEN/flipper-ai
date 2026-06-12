@@ -179,8 +179,7 @@ function recalcForMargin(
       priceBreakdown: {
         ...base.priceBreakdown,
         cappedByMarket: false,
-        impossibleReason:
-          'Target margin plus platform fees cannot equal or exceed 100%',
+        impossibleReason: 'Target margin plus platform fees cannot equal or exceed 100%',
       },
     };
   }
@@ -196,7 +195,11 @@ function recalcForMargin(
     );
   } else {
     recommendedPrice = roundCents(costBasis / (1 - feeDecimal - marginDecimal));
-    if (base.marketDataAvailable && base.verifiedMarketValue !== null && base.verifiedMarketValue > 0) {
+    if (
+      base.marketDataAvailable &&
+      base.verifiedMarketValue !== null &&
+      base.verifiedMarketValue > 0
+    ) {
       const cap = roundCents(base.verifiedMarketValue * marketCapPercent);
       if (recommendedPrice > cap) {
         recommendedPrice = cap;
@@ -211,9 +214,7 @@ function recalcForMargin(
 
   const estimatedFees = roundCents(recommendedPrice * feeDecimal);
   const purchasePortion = isFreeItem ? 0 : Math.max(costBasis - shipping, 0);
-  const estimatedProfit = roundCents(
-    recommendedPrice - estimatedFees - purchasePortion - shipping
-  );
+  const estimatedProfit = roundCents(recommendedPrice - estimatedFees - purchasePortion - shipping);
 
   // Free-item path can still produce a loss when shipping > net proceeds.
   // Mirror the server-side check so the slider never silently flips a
@@ -245,22 +246,16 @@ export default function PriceCalculator({
   sourcePlatform,
   onListPlatform,
 }: PriceCalculatorProps) {
-  const [serverPrices, setServerPrices] = useState<ServerPriceResult[] | null>(
-    null
-  );
+  const [serverPrices, setServerPrices] = useState<ServerPriceResult[] | null>(null);
   const [isProjected, setIsProjected] = useState<boolean>(false);
   const [marginPercent, setMarginPercent] = useState<number>(DEFAULT_MARGIN);
-  const [marginInputValue, setMarginInputValue] = useState<string>(
-    String(DEFAULT_MARGIN)
-  );
+  const [marginInputValue, setMarginInputValue] = useState<string>(String(DEFAULT_MARGIN));
   /**
    * User-entered hypothetical purchase price (projected mode only). Null
    * means "use server-supplied cost basis as-is". Editing this value
    * triggers a client-side recalculation across all platforms.
    */
-  const [hypotheticalPurchasePrice, setHypotheticalPurchasePrice] = useState<
-    number | null
-  >(null);
+  const [hypotheticalPurchasePrice, setHypotheticalPurchasePrice] = useState<number | null>(null);
   const [hypotheticalInputValue, setHypotheticalInputValue] = useState<string>('');
   /**
    * Per-platform user-edited list prices. When set, the "List on X" button
@@ -272,10 +267,7 @@ export default function PriceCalculator({
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  const normalizedSource = useMemo(
-    () => normalizeSourcePlatform(sourcePlatform),
-    [sourcePlatform]
-  );
+  const normalizedSource = useMemo(() => normalizeSourcePlatform(sourcePlatform), [sourcePlatform]);
 
   const fetchPrices = useCallback(async () => {
     setLoading(true);
@@ -294,9 +286,7 @@ export default function PriceCalculator({
       // platform row (they all share the same costBasis).
       if (json.data.prices.length > 0) {
         const sample = json.data.prices[0];
-        const impliedPurchase = roundCents(
-          sample.costBasis - sample.estimatedShippingCost
-        );
+        const impliedPurchase = roundCents(sample.costBasis - sample.estimatedShippingCost);
         setHypotheticalInputValue(String(impliedPurchase));
       }
       setOverridePrices({});
@@ -316,9 +306,7 @@ export default function PriceCalculator({
   // platform's headroom, minus 1 for safety.
   const dynamicMaxMargin = useMemo(() => {
     if (!serverPrices || serverPrices.length === 0) return FALLBACK_MAX_MARGIN;
-    const maxFeeDecimal = Math.max(
-      ...serverPrices.map((p) => p.feeRatePercent / 100)
-    );
+    const maxFeeDecimal = Math.max(...serverPrices.map((p) => p.feeRatePercent / 100));
     const headroom = Math.floor((1 - maxFeeDecimal) * 100) - 1;
     return Math.max(MIN_MARGIN, Math.min(FALLBACK_MAX_MARGIN, headroom));
   }, [serverPrices]);
@@ -343,9 +331,7 @@ export default function PriceCalculator({
     const next = serverPrices.map((p) => {
       let costOverride: number | undefined;
       if (isProjected && hypotheticalPurchasePrice !== null) {
-        costOverride = roundCents(
-          hypotheticalPurchasePrice + p.estimatedShippingCost
-        );
+        costOverride = roundCents(hypotheticalPurchasePrice + p.estimatedShippingCost);
       }
       return recalcForMargin(p, marginPercent, 0.95, costOverride);
     });
@@ -372,9 +358,7 @@ export default function PriceCalculator({
   const heroProfit = possible?.estimatedProfit ?? 0;
   const heroPrice = possible?.recommendedPrice ?? 0;
 
-  const insufficientData = visibleRecalculated.every(
-    (p) => p.priceBreakdown.insufficientData
-  );
+  const insufficientData = visibleRecalculated.every((p) => p.priceBreakdown.insufficientData);
   const showEstimatedBanner =
     !insufficientData && possible !== undefined && !possible.marketDataAvailable;
 
@@ -446,11 +430,7 @@ export default function PriceCalculator({
 
   if (error) {
     return (
-      <div
-        className="fp-glass p-6 rounded-lg"
-        role="alert"
-        data-testid="price-calculator-error"
-      >
+      <div className="fp-glass p-6 rounded-lg" role="alert" data-testid="price-calculator-error">
         <div className="flex items-start justify-between gap-3">
           <p style={{ color: '#fca5a5' }}>{error}</p>
           <button
@@ -479,24 +459,13 @@ export default function PriceCalculator({
   // Surface a single banner instead of pretending the table has prices.
   if (insufficientData) {
     return (
-      <div
-        className="fp-glass p-6 rounded-lg space-y-4"
-        data-testid="price-calculator"
-      >
-        <div
-          className="fp-alert-warn px-4 py-3"
-          role="alert"
-          style={{ color: '#fcd34d' }}
-        >
+      <div className="fp-glass p-6 rounded-lg space-y-4" data-testid="price-calculator">
+        <div className="fp-alert-warn px-4 py-3" role="alert" style={{ color: '#fcd34d' }}>
           <strong className="block mb-1">⚠ Cannot recommend a price yet</strong>
           {visibleRecalculated[0]?.priceBreakdown.fallbackMessage ??
             'Insufficient data to compute an optimal listing price.'}
         </div>
-        <button
-          type="button"
-          onClick={fetchPrices}
-          className="fp-btn-ghost text-xs px-3 py-1.5"
-        >
+        <button type="button" onClick={fetchPrices} className="fp-btn-ghost text-xs px-3 py-1.5">
           Verify Market Value
         </button>
       </div>
@@ -504,10 +473,7 @@ export default function PriceCalculator({
   }
 
   return (
-    <div
-      className="fp-glass p-6 rounded-lg space-y-6"
-      data-testid="price-calculator"
-    >
+    <div className="fp-glass p-6 rounded-lg space-y-6" data-testid="price-calculator">
       {/* Projected banner — pre-purchase mode (AC-5) */}
       {isProjected && (
         <div className="fp-alert-warn px-4 py-3 space-y-2" style={{ color: '#fcd34d' }}>
@@ -520,8 +486,8 @@ export default function PriceCalculator({
               ◇ Projected
             </span>
             <span className="text-sm" style={{ color: '#fcd34d' }}>
-              This listing has not been purchased yet. Pricing uses a hypothetical
-              cost basis you can override below.
+              This listing has not been purchased yet. Pricing uses a hypothetical cost basis you
+              can override below.
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -555,8 +521,8 @@ export default function PriceCalculator({
         >
           <div className="text-sm">
             <strong className="block mb-0.5">Market value is estimated</strong>
-            Pricing is based on algorithmic estimates rather than verified sold-comparable
-            data. Verify the market value for the most accurate recommendation.
+            Pricing is based on algorithmic estimates rather than verified sold-comparable data.
+            Verify the market value for the most accurate recommendation.
           </div>
           <button
             type="button"
@@ -581,10 +547,7 @@ export default function PriceCalculator({
           >
             Estimated Profit
           </div>
-          <div
-            className="fp-metric-num mt-1 text-4xl font-extrabold"
-            style={{ color: '#34d399' }}
-          >
+          <div className="fp-metric-num mt-1 text-4xl font-extrabold" style={{ color: '#34d399' }}>
             {formatUsd(heroProfit)}
           </div>
           <div className="mt-1 text-xs" style={{ color: '#94a3b8' }}>
@@ -598,10 +561,7 @@ export default function PriceCalculator({
           >
             Recommended {isProjected ? 'Projected' : 'List'} Price
           </div>
-          <div
-            className="fp-metric-num mt-1 text-3xl font-bold"
-            style={{ color: '#c4b5fd' }}
-          >
+          <div className="fp-metric-num mt-1 text-3xl font-bold" style={{ color: '#c4b5fd' }}>
             {formatUsd(heroPrice)}
           </div>
           <div className="mt-1 text-xs" style={{ color: '#94a3b8' }}>
@@ -667,19 +627,13 @@ export default function PriceCalculator({
 
       {/* Per-platform table */}
       <div>
-        <h3
-          className="text-sm font-semibold mb-2"
-          style={{ color: '#e2e8f0' }}
-        >
+        <h3 className="text-sm font-semibold mb-2" style={{ color: '#e2e8f0' }}>
           Platform Comparison
         </h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr
-                className="text-left text-xs uppercase"
-                style={{ color: '#94a3b8' }}
-              >
+              <tr className="text-left text-xs uppercase" style={{ color: '#94a3b8' }}>
                 <th className="py-2 pr-4">Platform</th>
                 <th className="py-2 pr-4 text-right">List Price</th>
                 <th className="py-2 pr-4 text-right">Fees</th>
@@ -704,10 +658,7 @@ export default function PriceCalculator({
                         : {}),
                     }}
                   >
-                    <td
-                      className="py-3 pr-4 font-medium"
-                      style={{ color: '#e2e8f0' }}
-                    >
+                    <td className="py-3 pr-4 font-medium" style={{ color: '#e2e8f0' }}>
                       {PLATFORM_LABELS[p.targetPlatform] ?? p.targetPlatform}
                       {p.targetPlatform === bestPlatform && !p.impossible && (
                         <span
@@ -718,10 +669,7 @@ export default function PriceCalculator({
                         </span>
                       )}
                     </td>
-                    <td
-                      className="py-3 pr-4 text-right"
-                      style={{ color: '#e2e8f0' }}
-                    >
+                    <td className="py-3 pr-4 text-right" style={{ color: '#e2e8f0' }}>
                       {p.impossible ? (
                         '—'
                       ) : (
@@ -730,21 +678,14 @@ export default function PriceCalculator({
                           min={0}
                           step={0.01}
                           value={overrideValue}
-                          onChange={(e) =>
-                            handleOverrideChange(p.targetPlatform, e.target.value)
-                          }
+                          onChange={(e) => handleOverrideChange(p.targetPlatform, e.target.value)}
                           aria-label={`Override list price for ${PLATFORM_LABELS[p.targetPlatform] ?? p.targetPlatform}`}
                           className="fp-input w-24 text-right"
                         />
                       )}
                     </td>
-                    <td
-                      className="py-3 pr-4 text-right"
-                      style={{ color: '#94a3b8' }}
-                    >
-                      {p.impossible
-                        ? '—'
-                        : `${formatUsd(p.estimatedFees)} (${p.feeRatePercent}%)`}
+                    <td className="py-3 pr-4 text-right" style={{ color: '#94a3b8' }}>
+                      {p.impossible ? '—' : `${formatUsd(p.estimatedFees)} (${p.feeRatePercent}%)`}
                     </td>
                     <td className="py-3 pr-4 text-right">
                       {p.impossible ? (
@@ -766,9 +707,7 @@ export default function PriceCalculator({
                     <td className="py-3 pr-4">
                       <button
                         type="button"
-                        onClick={() =>
-                          handleListClick(p.targetPlatform, p.recommendedPrice)
-                        }
+                        onClick={() => handleListClick(p.targetPlatform, p.recommendedPrice)}
                         disabled={p.impossible || submitting !== null}
                         className="fp-btn-primary text-xs px-3 py-1.5"
                       >
@@ -784,136 +723,108 @@ export default function PriceCalculator({
           </table>
         </div>
         <p className="mt-2 text-xs" style={{ color: '#94a3b8' }}>
-          Edit any list price before clicking &ldquo;List on …&rdquo; to override the recommendation.
+          Edit any list price before clicking &ldquo;List on …&rdquo; to override the
+          recommendation.
         </p>
       </div>
 
       {/* Loss warning (AC-4) */}
       {visibleRecalculated.some((p) => p.lossWarning) && (
-        <div
-          className="fp-alert-danger px-4 py-3 text-sm"
-          style={{ color: '#fca5a5' }}
-        >
+        <div className="fp-alert-danger px-4 py-3 text-sm" style={{ color: '#fca5a5' }}>
           <strong className="block mb-1">⚠ Selling at competitive price results in a loss.</strong>
           {visibleRecalculated
             .filter((p) => p.lossWarning && p.priceBreakdown.lossAmount !== undefined)
             .map((p) => (
               <div key={p.targetPlatform}>
-                {PLATFORM_LABELS[p.targetPlatform] ?? p.targetPlatform}:&nbsp;
-                loss of {formatUsd(p.priceBreakdown.lossAmount as number)} at competitive price.
+                {PLATFORM_LABELS[p.targetPlatform] ?? p.targetPlatform}:&nbsp; loss of{' '}
+                {formatUsd(p.priceBreakdown.lossAmount as number)} at competitive price.
               </div>
             ))}
-          <div
-            className="mt-1 text-xs"
-            style={{ color: '#fca5a5', opacity: 0.8 }}
-          >
+          <div className="mt-1 text-xs" style={{ color: '#fca5a5', opacity: 0.8 }}>
             Consider listing at a higher price (above market) or accepting the loss.
           </div>
         </div>
       )}
 
       {/* Market value comparison bar — 3-color: green=below, yellow=at, red=above */}
-      {possible &&
-        possible.verifiedMarketValue !== null &&
-        possible.verifiedMarketValue > 0 && (
-          <div>
-            <h3
-              className="text-sm font-semibold mb-2"
-              style={{ color: '#e2e8f0' }}
-            >
-              Market Value Comparison
-            </h3>
-            {(() => {
-              const market = possible.verifiedMarketValue as number;
-              const ratio = heroPrice / market;
-              // Visual position is clamped 0..1 of the bar width.
-              const positionPct = Math.min(100, Math.max(0, ratio * 100));
-              // Choose state from where the user's price sits relative to
-              // market: well below (green), within ±5% of market (yellow),
-              // or above market (red).
-              let state: 'below' | 'at' | 'above';
-              if (ratio < 0.95) state = 'below';
-              else if (ratio <= 1.05) state = 'at';
-              else state = 'above';
-              const stateLabel = {
-                below: 'Below market — competitive',
-                at: 'At market value',
-                above: 'Above market — may be hard to sell',
-              }[state];
-              const barFill = {
-                below: '#34d399',
-                at: '#fbbf24',
-                above: '#f87171',
-              }[state];
-              const stateTextColor = {
-                below: '#6ee7b7',
-                at: '#fcd34d',
-                above: '#fca5a5',
-              }[state];
-              return (
-                <>
+      {possible && possible.verifiedMarketValue !== null && possible.verifiedMarketValue > 0 && (
+        <div>
+          <h3 className="text-sm font-semibold mb-2" style={{ color: '#e2e8f0' }}>
+            Market Value Comparison
+          </h3>
+          {(() => {
+            const market = possible.verifiedMarketValue as number;
+            const ratio = heroPrice / market;
+            // Visual position is clamped 0..1 of the bar width.
+            const positionPct = Math.min(100, Math.max(0, ratio * 100));
+            // Choose state from where the user's price sits relative to
+            // market: well below (green), within ±5% of market (yellow),
+            // or above market (red).
+            let state: 'below' | 'at' | 'above';
+            if (ratio < 0.95) state = 'below';
+            else if (ratio <= 1.05) state = 'at';
+            else state = 'above';
+            const stateLabel = {
+              below: 'Below market — competitive',
+              at: 'At market value',
+              above: 'Above market — may be hard to sell',
+            }[state];
+            const barFill = {
+              below: '#34d399',
+              at: '#fbbf24',
+              above: '#f87171',
+            }[state];
+            const stateTextColor = {
+              below: '#6ee7b7',
+              at: '#fcd34d',
+              above: '#fca5a5',
+            }[state];
+            return (
+              <>
+                <div
+                  className="relative h-6 rounded overflow-hidden"
+                  style={{ background: 'rgba(255,255,255,0.06)' }}
+                  role="img"
+                  aria-label={`Your price ${formatUsd(heroPrice)} is ${stateLabel.toLowerCase()} (verified market value ${formatUsd(market)})`}
+                >
+                  {/* Market reference line at 95% of bar width */}
                   <div
-                    className="relative h-6 rounded overflow-hidden"
-                    style={{ background: 'rgba(255,255,255,0.06)' }}
-                    role="img"
-                    aria-label={`Your price ${formatUsd(heroPrice)} is ${stateLabel.toLowerCase()} (verified market value ${formatUsd(market)})`}
-                  >
-                    {/* Market reference line at 95% of bar width */}
-                    <div
-                      className="absolute top-0 h-full w-0.5 z-10"
-                      style={{ left: '95%', background: 'rgba(255,255,255,0.4)' }}
-                      aria-hidden="true"
-                      title="Verified market value"
-                    />
-                    <div
-                      className="absolute top-0 left-0 h-full"
-                      style={{ width: `${positionPct}%`, background: barFill }}
-                      aria-hidden="true"
-                    />
-                  </div>
+                    className="absolute top-0 h-full w-0.5 z-10"
+                    style={{ left: '95%', background: 'rgba(255,255,255,0.4)' }}
+                    aria-hidden="true"
+                    title="Verified market value"
+                  />
                   <div
-                    className="mt-1 flex justify-between text-xs"
-                    style={{ color: '#94a3b8' }}
-                  >
-                    <span>Your: {formatUsd(heroPrice)}</span>
-                    <span
-                      className="font-semibold"
-                      style={{ color: stateTextColor }}
-                    >
-                      {stateLabel}
-                    </span>
-                    <span>Market: {formatUsd(market)}</span>
-                  </div>
-                </>
-              );
-            })()}
-          </div>
-        )}
+                    className="absolute top-0 left-0 h-full"
+                    style={{ width: `${positionPct}%`, background: barFill }}
+                    aria-hidden="true"
+                  />
+                </div>
+                <div className="mt-1 flex justify-between text-xs" style={{ color: '#94a3b8' }}>
+                  <span>Your: {formatUsd(heroPrice)}</span>
+                  <span className="font-semibold" style={{ color: stateTextColor }}>
+                    {stateLabel}
+                  </span>
+                  <span>Market: {formatUsd(market)}</span>
+                </div>
+              </>
+            );
+          })()}
+        </div>
+      )}
 
       {/* AI vs formula discrepancy */}
       {possible?.priceBreakdown.priceDiscrepancyNote && (
-        <div
-          className="fp-alert-warn px-4 py-3 text-sm"
-          style={{ color: '#fcd34d' }}
-        >
+        <div className="fp-alert-warn px-4 py-3 text-sm" style={{ color: '#fcd34d' }}>
           <strong className="block mb-1">AI suggestion differs from formula</strong>
           {possible.priceBreakdown.priceDiscrepancyNote}
         </div>
       )}
 
       {/* Refresh control */}
-      <div
-        className="flex items-center justify-between text-xs"
-        style={{ color: '#94a3b8' }}
-      >
-        <span>
-          {lastUpdated ? `Last updated ${lastUpdated.toLocaleTimeString()}` : ''}
-        </span>
-        <button
-          type="button"
-          onClick={fetchPrices}
-          className="fp-btn-ghost text-xs px-3 py-1.5"
-        >
+      <div className="flex items-center justify-between text-xs" style={{ color: '#94a3b8' }}>
+        <span>{lastUpdated ? `Last updated ${lastUpdated.toLocaleTimeString()}` : ''}</span>
+        <button type="button" onClick={fetchPrices} className="fp-btn-ghost text-xs px-3 py-1.5">
           Refresh
         </button>
       </div>

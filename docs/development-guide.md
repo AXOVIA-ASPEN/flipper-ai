@@ -10,6 +10,7 @@
 - **Playwright browsers** (installed via `npx playwright install`)
 
 ### Optional
+
 - **OpenAI API key** — Enables LLM-powered item identification and analysis
 - **Anthropic API key** — Enables Claude-based item analysis
 - **Stripe keys** — Enables subscription billing
@@ -97,6 +98,7 @@ pnpm format           # Prettier formatting
 ## Environment Variables
 
 ### Required
+
 ```bash
 DATABASE_URL=              # PostgreSQL connection string (PostgreSQL is required — SQLite is not supported)
 FIREBASE_CLIENT_EMAIL=     # Firebase Admin SDK service account email
@@ -105,6 +107,7 @@ APP_URL=                   # App base URL (http://localhost:3200 for dev)
 ```
 
 ### AI Integration (Optional)
+
 ```bash
 OPENAI_API_KEY=        # Enables GPT-4o-mini analysis, descriptions, titles
 ANTHROPIC_API_KEY=     # Enables Claude Sonnet item analysis
@@ -113,6 +116,7 @@ GOOGLE_API_KEY=        # Enables Stagehand (Gemini) for Facebook scraping
 ```
 
 ### External Services (Optional)
+
 ```bash
 STRIPE_SECRET_KEY=     # Stripe billing
 STRIPE_WEBHOOK_SECRET= # Stripe webhook verification
@@ -132,9 +136,11 @@ See `.env.example` for the complete template.
 ## Database
 
 ### Schema Location
+
 `prisma/schema.prisma` — 13 models (Listing, Opportunity, User, etc.)
 
 ### Common Operations
+
 ```bash
 npx prisma generate    # Regenerate Prisma client after schema changes
 npx prisma migrate dev # Create and apply migration
@@ -144,6 +150,7 @@ npx prisma db seed     # Run seed script (prisma/seed.ts)
 ```
 
 ### Prisma Client
+
 Generated to `src/generated/prisma/`. Singleton instance at `src/lib/db.ts`.
 
 ---
@@ -152,18 +159,19 @@ Generated to `src/generated/prisma/`. Singleton instance at `src/lib/db.ts`.
 
 ### Test Pyramid
 
-| Level | Tool | Command | Location |
-|-------|------|---------|----------|
-| Unit | Jest | `make test` | `src/__tests__/lib/`, `src/__tests__/api/` |
-| Component | Jest + Testing Library | `make test` | `src/__tests__/components/` |
-| Integration | Jest + Prisma | `pnpm test:integration` | `src/__tests__/integration/` |
-| Security | Jest | `make test` | `src/__tests__/security/` |
-| Performance | Jest + Autocannon | `pnpm test:perf` | `src/__tests__/performance/` |
-| E2E | Playwright | `make test-e2e` | `e2e/` |
-| Visual | Playwright | `make test-e2e` | `e2e/visual/` |
-| BDD | Cucumber | `make test-acceptance` | `features/` |
+| Level       | Tool                   | Command                 | Location                                   |
+| ----------- | ---------------------- | ----------------------- | ------------------------------------------ |
+| Unit        | Jest                   | `make test`             | `src/__tests__/lib/`, `src/__tests__/api/` |
+| Component   | Jest + Testing Library | `make test`             | `src/__tests__/components/`                |
+| Integration | Jest + Prisma          | `pnpm test:integration` | `src/__tests__/integration/`               |
+| Security    | Jest                   | `make test`             | `src/__tests__/security/`                  |
+| Performance | Jest + Autocannon      | `pnpm test:perf`        | `src/__tests__/performance/`               |
+| E2E         | Playwright             | `make test-e2e`         | `e2e/`                                     |
+| Visual      | Playwright             | `make test-e2e`         | `e2e/visual/`                              |
+| BDD         | Cucumber               | `make test-acceptance`  | `features/`                                |
 
 ### Test Configuration
+
 - `jest.config.js` — Main Jest config (SWC transform, jsdom environment)
 - `jest.integration.config.js` — Integration test config
 - `playwright.config.ts` — Playwright E2E config
@@ -174,11 +182,13 @@ Generated to `src/generated/prisma/`. Singleton instance at `src/lib/db.ts`.
 ## Code Quality
 
 ### Linting & Formatting
+
 - **ESLint** — `eslint.config.mjs` (flat config)
 - **Prettier** — `.prettierrc.js`
 - **Pre-commit hooks** — Husky + lint-staged (auto-lint on commit)
 
 ### TypeScript
+
 - **Strict mode** enabled
 - **Path aliases**: `@/*` → `./src/*`
 - **Target**: ES2017
@@ -188,19 +198,23 @@ Generated to `src/generated/prisma/`. Singleton instance at `src/lib/db.ts`.
 ## Project Structure Conventions
 
 ### API Routes
+
 All API routes follow Next.js App Router pattern:
+
 - `app/api/<resource>/route.ts` — Collection endpoints (GET list, POST create)
 - `app/api/<resource>/[id]/route.ts` — Single resource (GET, PATCH, DELETE)
 - Export named HTTP methods: `export async function GET(request) { ... }`
 - Return `NextResponse.json({ success, data/message })`
 
 ### Components
+
 - Located in `src/components/`
 - Custom hooks in `src/hooks/`
 - Contexts in `src/contexts/`
 - No external component library — all custom-built with Tailwind
 
 ### Business Logic
+
 - All services in `src/lib/`
 - Database access through Prisma singleton (`src/lib/db.ts`)
 - Error handling via custom `AppError` class (`src/lib/errors.ts`)
@@ -210,15 +224,18 @@ All API routes follow Next.js App Router pattern:
 ## Deployment
 
 ### Firebase Hosting + Cloud Run (Primary)
+
 ```bash
 firebase deploy --only hosting   # Deploy frontend to Firebase Hosting
 gcloud run deploy flipper-web \  # Deploy backend to Cloud Run
   --image gcr.io/axovia-flipper/flipper-web \
   --region us-east1
 ```
+
 See `firebase.json` and Cloud Run configuration for details.
 
 ### Docker
+
 ```bash
 docker build -t flipper-ai .
 docker compose -f config/docker/docker-compose.yml up      # Local Docker dev
@@ -226,7 +243,9 @@ docker compose -f config/docker/docker-compose.prod.yml up  # Production
 ```
 
 ### CI/CD
+
 GitHub Actions workflows in `.github/workflows/`:
+
 - `ci.yml` — Lint, test, build on every PR
 - `deploy-firebase.yml` — Firebase Hosting + Cloud Run deployment
 - `playwright-tests.yml` — E2E test pipeline
@@ -237,17 +256,20 @@ GitHub Actions workflows in `.github/workflows/`:
 ## Common Development Tasks
 
 ### Adding a New API Endpoint
+
 1. Create route file: `app/api/<resource>/route.ts`
 2. Export HTTP method handlers
 3. Add Zod validation schema in `src/lib/validations.ts`
 4. Add tests in `src/__tests__/api/`
 
 ### Adding a New Component
+
 1. Create component in `src/components/`
 2. Add tests in `src/__tests__/components/`
 3. Use `useThemeClasses()` hook for theme-aware styling
 
 ### Adding a New Scraper
+
 1. Create route in `app/api/scraper/<platform>/route.ts`
 2. Implement scraping logic (Playwright or API)
 3. Use `marketplace-scanner.ts` for centralized viability analysis

@@ -52,9 +52,7 @@ Then(
 
 Then('{string} should be an optional string', function (varName: string) {
   const src = this.envSource as string;
-  const pattern = new RegExp(
-    `${varName}\\s*:\\s*z\\.string\\(\\)[^,\\n]*\\.optional\\(\\)`
-  );
+  const pattern = new RegExp(`${varName}\\s*:\\s*z\\.string\\(\\)[^,\\n]*\\.optional\\(\\)`);
   expect(pattern.test(src)).toBe(true);
 });
 
@@ -85,20 +83,20 @@ When('I inspect the service worker configuration', function () {
   // Source already loaded in Given.
 });
 
-Then(
-  'it should import Firebase compat SDK via {string}',
-  function (importMethod: string) {
-    expect(this.swSource).toContain(importMethod);
-    expect(this.swSource).toContain('firebase-app-compat');
-    expect(this.swSource).toContain('firebase-messaging-compat');
-  }
-);
+Then('it should import Firebase compat SDK via {string}', function (importMethod: string) {
+  expect(this.swSource).toContain(importMethod);
+  expect(this.swSource).toContain('firebase-app-compat');
+  expect(this.swSource).toContain('firebase-messaging-compat');
+});
 
 Then(
   'the Firebase version should match the installed {string} package version',
   function (pkgName: string) {
     const pkg = JSON.parse(readSource('package.json'));
-    const version = (pkg.dependencies?.[pkgName] || pkg.devDependencies?.[pkgName] || '').replace(/^[\^~]/, '');
+    const version = (pkg.dependencies?.[pkgName] || pkg.devDependencies?.[pkgName] || '').replace(
+      /^[\^~]/,
+      ''
+    );
     expect(version.length).toBeGreaterThan(0);
     // Service worker pins to a specific firebasejs CDN version. Verify the
     // installed firebase package version appears in the SW's importScripts URLs.
@@ -120,7 +118,9 @@ Then('it should call {string} with a notification handler', function (call: stri
   // notifications surface even when the app tab isn't focused.
   expect(this.swSource).toContain(call);
   // Confirm the handler is a callback (function expression or arrow).
-  const pattern = new RegExp(`${call.replace(/[.[\]()*+?^${}|\\]/g, '\\$&')}\\s*\\(\\s*(?:function|\\([^)]*\\)\\s*=>)`);
+  const pattern = new RegExp(
+    `${call.replace(/[.[\]()*+?^${}|\\]/g, '\\$&')}\\s*\\(\\s*(?:function|\\([^)]*\\)\\s*=>)`
+  );
   expect(pattern.test(this.swSource)).toBe(true);
 });
 
@@ -159,48 +159,36 @@ Then(
   }
 );
 
-Then(
-  'it should export {string} that returns a boolean',
-  function (exportName: string) {
-    const src = this.clientMessagingSource as string;
-    expect(src).toContain(`export async function ${exportName}`);
-    expect(src).toMatch(new RegExp(`${exportName}[\\s\\S]*?Promise<\\s*boolean\\s*>`));
-  }
-);
+Then('it should export {string} that returns a boolean', function (exportName: string) {
+  const src = this.clientMessagingSource as string;
+  expect(src).toContain(`export async function ${exportName}`);
+  expect(src).toMatch(new RegExp(`${exportName}[\\s\\S]*?Promise<\\s*boolean\\s*>`));
+});
 
-Then(
-  'it should export {string} that passes VAPID key to getToken',
-  function (exportName: string) {
-    const src = this.clientMessagingSource as string;
-    expect(src).toContain(`export async function ${exportName}`);
-    expect(src).toMatch(/getToken\s*\([^)]*VAPID/i);
-  }
-);
+Then('it should export {string} that passes VAPID key to getToken', function (exportName: string) {
+  const src = this.clientMessagingSource as string;
+  expect(src).toContain(`export async function ${exportName}`);
+  expect(src).toMatch(/getToken\s*\([^)]*VAPID/i);
+});
 
-Then(
-  'it should export {string} that wraps onMessage',
-  function (exportName: string) {
-    const src = this.clientMessagingSource as string;
-    expect(
-      src.includes(`export function ${exportName}`) ||
-        src.includes(`export async function ${exportName}`)
-    ).toBe(true);
-    expect(src).toContain('onMessage(');
-  }
-);
+Then('it should export {string} that wraps onMessage', function (exportName: string) {
+  const src = this.clientMessagingSource as string;
+  expect(
+    src.includes(`export function ${exportName}`) ||
+      src.includes(`export async function ${exportName}`)
+  ).toBe(true);
+  expect(src).toContain('onMessage(');
+});
 
-Then(
-  'all exports should return null or no-op when browser APIs are unavailable',
-  function () {
-    const src = this.clientMessagingSource as string;
-    // Defensive guards must check window/navigator availability.
-    const hasWindowGuard = /typeof window === ['"]undefined['"]/i.test(src);
-    const hasNavigatorGuard = /navigator|isSupported\s*\(/i.test(src);
-    expect(hasWindowGuard || hasNavigatorGuard).toBe(true);
-    // Must return null on the SSR/unsupported path.
-    expect(src).toContain('return null');
-  }
-);
+Then('all exports should return null or no-op when browser APIs are unavailable', function () {
+  const src = this.clientMessagingSource as string;
+  // Defensive guards must check window/navigator availability.
+  const hasWindowGuard = /typeof window === ['"]undefined['"]/i.test(src);
+  const hasNavigatorGuard = /navigator|isSupported\s*\(/i.test(src);
+  expect(hasWindowGuard || hasNavigatorGuard).toBe(true);
+  // Must return null on the SSR/unsupported path.
+  expect(src).toContain('return null');
+});
 
 // ─── S-39: Server-side FCM module ───────────────────────────────────────────
 
@@ -212,14 +200,11 @@ When('I inspect the server SDK integration', function () {
   // Source already loaded.
 });
 
-Then(
-  'it should export {string} that initializes from Admin SDK',
-  function (exportName: string) {
-    const src = this.serverMessagingSource as string;
-    expect(src).toContain(`export function ${exportName}`);
-    expect(src).toContain("from 'firebase-admin/messaging'");
-  }
-);
+Then('it should export {string} that initializes from Admin SDK', function (exportName: string) {
+  const src = this.serverMessagingSource as string;
+  expect(src).toContain(`export function ${exportName}`);
+  expect(src).toContain("from 'firebase-admin/messaging'");
+});
 
 Then(
   'it should export {string} using the modern {string} API with token at top level',
@@ -239,42 +224,33 @@ Then(
   }
 );
 
-Then(
-  'it should export the {string} interface',
-  function (interfaceName: string) {
-    const src = this.serverMessagingSource as string;
-    expect(src).toContain(`export interface ${interfaceName}`);
-  }
-);
+Then('it should export the {string} interface', function (interfaceName: string) {
+  const src = this.serverMessagingSource as string;
+  expect(src).toContain(`export interface ${interfaceName}`);
+});
 
-Then(
-  'it should handle {string} errors for stale token detection',
-  function (errorCode: string) {
-    const src = this.serverMessagingSource as string;
-    expect(src).toContain(errorCode);
-  }
-);
+Then('it should handle {string} errors for stale token detection', function (errorCode: string) {
+  const src = this.serverMessagingSource as string;
+  expect(src).toContain(errorCode);
+});
 
 // Use a regex pattern (not cucumber expression) so the literal parentheses in
 // the step text aren't interpreted as cucumber's optional-group syntax.
-Then(
-  /^it should not reference browser globals \(window, navigator, self\)$/,
-  function () {
-    const src = this.serverMessagingSource as string;
-    // Strip comments + string literals to avoid false positives from the
-    // module's own JSDoc / log messages that mention these names.
-    const stripped = src
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/\/\/.*$/gm, '')
-      .replace(/'(?:[^'\\]|\\.)*'/g, "''")
-      .replace(/"(?:[^"\\]|\\.)*"/g, '""')
-      .replace(/`(?:[^`\\]|\\.)*`/g, '``');
-    for (const global of ['window', 'navigator', 'self']) {
-      const pattern = new RegExp(`\\b${global}\\b`);
-      expect(pattern.test(stripped)).toBe(false);
-    }
+Then(/^it should not reference browser globals \(window, navigator, self\)$/, function () {
+  const src = this.serverMessagingSource as string;
+  // Strip comments + string literals to avoid false positives from the
+  // module's own JSDoc / log messages that mention these names.
+  const stripped = src
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/\/\/.*$/gm, '')
+    .replace(/'(?:[^'\\]|\\.)*'/g, "''")
+    .replace(/"(?:[^"\\]|\\.)*"/g, '""')
+    .replace(/`(?:[^`\\]|\\.)*`/g, '``');
+  for (const global of ['window', 'navigator', 'self']) {
+    const pattern = new RegExp(`\\b${global}\\b`);
+    expect(pattern.test(stripped)).toBe(false);
   }
-);
+});
 
 // ─── S-40: Service worker registration module ───────────────────────────────
 
@@ -307,20 +283,19 @@ Then(
     // Strip quotes from literal API names so both the unquoted phrase
     // ("serviceWorker in navigator") and the quoted-property form
     // ("'serviceWorker' in navigator") satisfy the contract.
-    const normalized = src.replace(/'serviceWorker'/g, 'serviceWorker').replace(/"serviceWorker"/g, 'serviceWorker');
+    const normalized = src
+      .replace(/'serviceWorker'/g, 'serviceWorker')
+      .replace(/"serviceWorker"/g, 'serviceWorker');
     expect(normalized.includes(guard1) || src.includes(guard1)).toBe(true);
     expect(normalized.includes(guard2) || src.includes(guard2)).toBe(true);
   }
 );
 
-Then(
-  'the service worker should NOT be auto-registered on application load',
-  function () {
-    const src = this.swRegSource as string;
-    // The module exports a function but must NOT call it at top level.
-    // Equivalently: there should be no top-level `registerFCMServiceWorker()`
-    // call (only the function declaration itself).
-    const callPattern = /^(?!export )\s*registerFCMServiceWorker\s*\(/m;
-    expect(callPattern.test(src)).toBe(false);
-  }
-);
+Then('the service worker should NOT be auto-registered on application load', function () {
+  const src = this.swRegSource as string;
+  // The module exports a function but must NOT call it at top level.
+  // Equivalently: there should be no top-level `registerFCMServiceWorker()`
+  // call (only the function declaration itself).
+  const callPattern = /^(?!export )\s*registerFCMServiceWorker\s*\(/m;
+  expect(callPattern.test(src)).toBe(false);
+});

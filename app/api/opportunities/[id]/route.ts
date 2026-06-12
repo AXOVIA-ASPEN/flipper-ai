@@ -21,12 +21,13 @@ import prisma from '@/lib/db';
 import { handleError, NotFoundError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { getCurrentUserId } from '@/lib/auth';
 import { transitionToPurchased } from '@/lib/conversation-status';
-import { deleteCalendarEvent, ensureValidToken, CalendarAuthRequiredError } from '@/lib/google-calendar';
-import { hasValidToken } from '@/lib/google-calendar-token-store';
 import {
-  createFlipNotificationEvent,
-  NotificationEventType,
-} from '@/lib/notification-events';
+  deleteCalendarEvent,
+  ensureValidToken,
+  CalendarAuthRequiredError,
+} from '@/lib/google-calendar';
+import { hasValidToken } from '@/lib/google-calendar-token-store';
+import { createFlipNotificationEvent, NotificationEventType } from '@/lib/notification-events';
 import { logger } from '@/lib/logger';
 import type { Prisma } from '@/generated/prisma';
 
@@ -44,9 +45,7 @@ const UPDATABLE_FIELDS = [
   'notes',
 ] as const satisfies readonly (keyof Prisma.OpportunityUpdateInput)[];
 
-function pickUpdatableFields(
-  body: Record<string, unknown>
-): Prisma.OpportunityUpdateInput {
+function pickUpdatableFields(body: Record<string, unknown>): Prisma.OpportunityUpdateInput {
   const out: Prisma.OpportunityUpdateInput = {};
   for (const key of UPDATABLE_FIELDS) {
     if (body[key] !== undefined) {
@@ -59,10 +58,7 @@ function pickUpdatableFields(
 }
 
 // GET /api/opportunities/[id] - Get a single opportunity
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userId = await getCurrentUserId();
     if (!userId) {
@@ -96,10 +92,7 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
 };
 
 // PATCH /api/opportunities/[id] - Update an opportunity
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userId = await getCurrentUserId();
     if (!userId) {
@@ -128,9 +121,7 @@ export async function PATCH(
       if (previousStatus !== newStatus) {
         const allowed = VALID_TRANSITIONS[previousStatus];
         if (allowed && !allowed.includes(newStatus)) {
-          throw new ValidationError(
-            `Invalid status transition: ${previousStatus} → ${newStatus}`
-          );
+          throw new ValidationError(`Invalid status transition: ${previousStatus} → ${newStatus}`);
         }
       }
     }
@@ -218,9 +209,7 @@ export async function PATCH(
           payload: {
             listingTitle,
             destinationPlatform:
-              (body.resalePlatform as string) ??
-              opportunity.resalePlatform ??
-              'Unknown',
+              (body.resalePlatform as string) ?? opportunity.resalePlatform ?? 'Unknown',
             listingUrl: (body.resaleUrl as string) ?? opportunity.resaleUrl ?? null,
           },
         }).catch((err) =>
@@ -236,21 +225,16 @@ export async function PATCH(
       // flip.sold
       if (newStatus === 'SOLD' && previousStatus !== 'SOLD') {
         const resalePrice =
-          typeof body.resalePrice === 'number'
-            ? body.resalePrice
-            : opportunity.resalePrice;
+          typeof body.resalePrice === 'number' ? body.resalePrice : opportunity.resalePrice;
 
         if (resalePrice != null && typeof resalePrice === 'number') {
           const purchasePrice = opportunity.purchasePrice ?? 0;
           const fees = opportunity.fees ?? 0;
           const actualProfit = resalePrice - purchasePrice - fees;
-          const roiPercent =
-            purchasePrice > 0 ? (actualProfit / purchasePrice) * 100 : 0;
+          const roiPercent = purchasePrice > 0 ? (actualProfit / purchasePrice) * 100 : 0;
           const purchaseDate = opportunity.purchaseDate;
           const daysToFlip = purchaseDate
-            ? Math.floor(
-                (Date.now() - new Date(purchaseDate).getTime()) / (1000 * 60 * 60 * 24)
-              )
+            ? Math.floor((Date.now() - new Date(purchaseDate).getTime()) / (1000 * 60 * 60 * 24))
             : undefined;
 
           createFlipNotificationEvent({

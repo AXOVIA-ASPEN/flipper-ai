@@ -9,7 +9,9 @@ import { mockAuthSession } from './fixtures/auth';
 
 test.describe('Navigation & Routing', () => {
   test.describe('Feature: Unauthenticated Route Protection', () => {
-    test('Scenario: Unauthenticated user visiting /dashboard is redirected to login', async ({ page }) => {
+    test('Scenario: Unauthenticated user visiting /dashboard is redirected to login', async ({
+      page,
+    }) => {
       // Given I am not logged in
       // When I navigate to a protected route
       await page.goto('/dashboard');
@@ -17,9 +19,7 @@ test.describe('Navigation & Routing', () => {
       await page.waitForLoadState('networkidle');
       const url = page.url();
       const hasAuthRedirect =
-        url.includes('/login') ||
-        url.includes('/auth') ||
-        url.includes('/signin');
+        url.includes('/login') || url.includes('/auth') || url.includes('/signin');
       const hasLoginContent = await page
         .getByRole('button', { name: /sign in|log in|login/i })
         .isVisible()
@@ -27,14 +27,13 @@ test.describe('Navigation & Routing', () => {
       expect(hasAuthRedirect || hasLoginContent).toBeTruthy();
     });
 
-    test('Scenario: Unauthenticated user visiting /settings is redirected to login', async ({ page }) => {
+    test('Scenario: Unauthenticated user visiting /settings is redirected to login', async ({
+      page,
+    }) => {
       await page.goto('/settings');
       await page.waitForLoadState('networkidle');
       const url = page.url();
-      const redirected =
-        url.includes('/login') ||
-        url.includes('/auth') ||
-        url.includes('/signin');
+      const redirected = url.includes('/login') || url.includes('/auth') || url.includes('/signin');
       const hasLoginUI = await page
         .getByRole('button', { name: /sign in|log in|login/i })
         .isVisible()
@@ -95,7 +94,7 @@ test.describe('Navigation & Routing', () => {
         const status = response?.status() ?? 0;
         expect(
           status < 500,
-          `${route.name} (${route.path}) returned server error ${status}`,
+          `${route.name} (${route.path}) returned server error ${status}`
         ).toBeTruthy();
       }
     });
@@ -151,8 +150,7 @@ test.describe('Navigation & Routing', () => {
       const status = response?.status() ?? 0;
       const bodyText = await page.textContent('body');
       const has404Indicator =
-        status === 404 ||
-        /not found|404|page.*doesn.t exist/i.test(bodyText ?? '');
+        status === 404 || /not found|404|page.*doesn.t exist/i.test(bodyText ?? '');
       expect(has404Indicator, 'Expected 404 page or not-found message').toBeTruthy();
     });
   });
@@ -169,10 +167,7 @@ test.describe('Navigation & Routing', () => {
         await page.goto(route);
         await page.waitForLoadState('networkidle');
         const title = await page.title();
-        expect(
-          title.length,
-          `Page ${route} should have a non-empty title`,
-        ).toBeGreaterThan(0);
+        expect(title.length, `Page ${route} should have a non-empty title`).toBeGreaterThan(0);
       }
     });
   });

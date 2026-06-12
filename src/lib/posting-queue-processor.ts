@@ -22,10 +22,7 @@
  */
 
 import prisma from '@/lib/db';
-import type {
-  PostingQueueItem,
-  ListingImage,
-} from '@/generated/prisma';
+import type { PostingQueueItem, ListingImage } from '@/generated/prisma';
 import type { ListingWithImages } from '@/lib/image-helpers';
 import {
   captureListingImages as captureListingImagesImpl,
@@ -111,10 +108,7 @@ async function runPosterWithTimeout(
   return Promise.race<PostingResult>([
     poster(listing, item),
     new Promise<PostingResult>((_, reject) => {
-      setTimeout(
-        () => reject(new Error('Posting timed out')),
-        POSTER_TIMEOUT_MS
-      );
+      setTimeout(() => reject(new Error('Posting timed out')), POSTER_TIMEOUT_MS);
     }),
   ]);
 }
@@ -144,9 +138,7 @@ function parseLegacyImageUrls(imageUrls: string | null): string[] {
  * On success, persists the newly uploaded ListingImage records so a subsequent
  * run can skip the fallback entirely.
  */
-async function hydrateLegacyImages(
-  listing: ListingWithImages
-): Promise<ListingWithImages> {
+async function hydrateLegacyImages(listing: ListingWithImages): Promise<ListingWithImages> {
   // Callers are expected to guard with `listing.images.length === 0`, so we
   // skip the defensive re-check here and go straight to the ownership guard.
   if (!listing.userId) return listing;
@@ -161,16 +153,16 @@ async function hydrateLegacyImages(
   let timer!: ReturnType<typeof setTimeout>;
 
   try {
-    const capture = await Promise.race<
-      Awaited<ReturnType<typeof captureListingImagesImpl>>
-    >([
-      imageCaptureOverrides.captureListingImages(listing.id, listing.userId, listing.platform, legacyUrls),
+    const capture = await Promise.race<Awaited<ReturnType<typeof captureListingImagesImpl>>>([
+      imageCaptureOverrides.captureListingImages(
+        listing.id,
+        listing.userId,
+        listing.platform,
+        legacyUrls
+      ),
       new Promise((_, reject) => {
         timer = setTimeout(
-          () =>
-            reject(
-              new Error(`Legacy image download exceeded ${budgetMs}ms budget`)
-            ),
+          () => reject(new Error(`Legacy image download exceeded ${budgetMs}ms budget`)),
           budgetMs
         );
       }),
@@ -350,10 +342,7 @@ async function recoverStuckItems(userId: string): Promise<void> {
  * @param userId - Authenticated user's Prisma id (cuid)
  * @param batchSize - Maximum number of items to process in one run
  */
-export async function processQueue(
-  userId: string,
-  batchSize = 10
-): Promise<ProcessResult> {
+export async function processQueue(userId: string, batchSize = 10): Promise<ProcessResult> {
   await recoverStuckItems(userId);
 
   const now = new Date();

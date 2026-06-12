@@ -4,7 +4,8 @@ import { handleCORS, validateMethod, validateBody } from '../lib/cors';
 
 const prisma = new PrismaClient();
 
-const EBAY_API_BASE_URL = process.env.EBAY_BROWSE_API_BASE_URL || 'https://api.ebay.com/buy/browse/v1';
+const EBAY_API_BASE_URL =
+  process.env.EBAY_BROWSE_API_BASE_URL || 'https://api.ebay.com/buy/browse/v1';
 const EBAY_MARKETPLACE_ID = process.env.EBAY_MARKETPLACE_ID || 'EBAY_US';
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
@@ -52,17 +53,17 @@ interface EbaySearchResponse {
 
 function buildFilterString(params: ScrapeRequest) {
   const filters: string[] = ['buyingOptions:{FIXED_PRICE}'];
-  
+
   if (params.minPrice !== undefined || params.maxPrice !== undefined) {
     const min = params.minPrice ?? 0;
     const max = params.maxPrice ?? '*';
     filters.push(`price:[${min}..${max}]`);
   }
-  
+
   if (params.condition) {
     filters.push(`conditions:{${params.condition}}`);
   }
-  
+
   return filters.join(',');
 }
 
@@ -71,7 +72,7 @@ async function callEbayApi(
   searchParams: Record<string, string>
 ): Promise<EbaySearchResponse> {
   const token = process.env.EBAY_OAUTH_TOKEN;
-  
+
   if (!token) {
     throw new Error('Missing EBAY_OAUTH_TOKEN environment variable');
   }
@@ -108,7 +109,7 @@ async function scrapeEbay(params: ScrapeRequest) {
     category_ids: params.categoryId || '',
     filter: buildFilterString(params),
   });
-  
+
   return response.itemSummaries ?? [];
 }
 
@@ -181,7 +182,7 @@ export async function handler(req: Request, res: Response) {
       });
 
       // Format response
-      const listings = items.map(item => ({
+      const listings = items.map((item) => ({
         externalId: item.itemId,
         title: item.title,
         description: item.shortDescription || item.description,
@@ -189,7 +190,7 @@ export async function handler(req: Request, res: Response) {
         url: item.itemWebUrl,
         condition: item.condition,
         imageUrl: item.image?.imageUrl,
-        additionalImages: item.additionalImages?.map(img => img.imageUrl) || [],
+        additionalImages: item.additionalImages?.map((img) => img.imageUrl) || [],
         location: formatLocation(item),
         seller: item.seller?.username,
         sellerFeedback: item.seller?.feedbackPercentage,

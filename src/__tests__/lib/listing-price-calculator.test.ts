@@ -234,8 +234,7 @@ describe('calculateOptimalListingPrice', () => {
     });
     expect(result.estimatedShippingCost).toBe(12);
     // profit = price - fees - purchasePrice - shipping
-    const expectedProfit =
-      result.recommendedPrice - result.estimatedFees - 50 - 12;
+    const expectedProfit = result.recommendedPrice - result.estimatedFees - 50 - 12;
     expect(result.estimatedProfit).toBeCloseTo(expectedProfit, 1);
   });
 

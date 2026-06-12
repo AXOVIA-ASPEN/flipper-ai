@@ -3,6 +3,7 @@
 ## Overview
 
 This guide covers the migration of Flipper AI from Vercel to Firebase, using:
+
 - **Firebase App Hosting** for Next.js frontend
 - **Cloud Functions (2nd gen)** for Playwright-based scrapers
 - **Firestore** or **Cloud SQL** for database (TBD)
@@ -12,7 +13,7 @@ This guide covers the migration of Flipper AI from Vercel to Firebase, using:
 1. **Firebase CLI**: `npm install -g firebase-tools`
 2. **gcloud CLI**: [Install](https://cloud.google.com/sdk/docs/install)
 3. **Firebase project**: `axovia-flipper` (already created)
-4. **Authentication**: 
+4. **Authentication**:
    ```bash
    firebase login
    gcloud auth login
@@ -66,6 +67,7 @@ chmod +x deploy.sh
 ```
 
 This deploys:
+
 - ✅ `scrapeCraigslist` (Docker, 2GB RAM)
 - ✅ `scrapeOfferup` (Docker, 2GB RAM)
 - ✅ `scrapeEbay` (Standard)
@@ -134,6 +136,7 @@ done
 ### Option A: Keep Prisma + Cloud SQL (Recommended)
 
 1. Create Cloud SQL instance:
+
 ```bash
 gcloud sql instances create flipper-db \
   --database-version=POSTGRES_15 \
@@ -142,16 +145,19 @@ gcloud sql instances create flipper-db \
 ```
 
 2. Create database:
+
 ```bash
 gcloud sql databases create flipper --instance=flipper-db
 ```
 
 3. Update DATABASE_URL:
+
 ```env
 DATABASE_URL="postgresql://user:pass@/flipper?host=/cloudsql/axovia-flipper:us-east1:flipper-db"
 ```
 
 4. Run migrations:
+
 ```bash
 npx prisma migrate deploy
 ```
@@ -242,6 +248,7 @@ Once Firebase is stable:
 ## Rollback Plan
 
 > **Note:** Migration is complete. Vercel has been decommissioned. For rollbacks, use Cloud Run revision management:
+
 ```bash
 gcloud run services update-traffic flipper-web --to-revisions=PREVIOUS_REVISION=100 --region=us-east1
 ```
@@ -249,11 +256,13 @@ gcloud run services update-traffic flipper-web --to-revisions=PREVIOUS_REVISION=
 ## Cost Comparison
 
 ### Vercel
+
 - **Hobby**: $20/mo (limit: 100GB bandwidth)
 - **Pro**: $20/mo per member
 - **Function duration**: 10s max (Hobby), 60s (Pro)
 
 ### Firebase/GCP
+
 - **Cloud Functions**: ~$0.40/million invocations
 - **Cloud Run**: ~$0.24/million requests
 - **Cloud SQL**: $7/mo (db-f1-micro)
@@ -281,6 +290,7 @@ Monitor at: https://console.firebase.google.com/project/axovia-flipper
 ### Alerts
 
 Set up alerts for:
+
 - Function errors
 - High latency
 - Resource limits

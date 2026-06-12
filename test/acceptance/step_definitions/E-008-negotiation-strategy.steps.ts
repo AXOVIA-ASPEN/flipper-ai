@@ -113,11 +113,7 @@ When(
   'the counter-offer of {int} is analyzed against our previous offer of {int}',
   function (counterPrice: number, ourOffer: number) {
     // Use the actual library fallback counter-offer analysis (algorithmic, no OpenAI)
-    counterOfferResult = generateFallbackCounterAnalysis(
-      negotiationInput,
-      counterPrice,
-      ourOffer
-    );
+    counterOfferResult = generateFallbackCounterAnalysis(negotiationInput, counterPrice, ourOffer);
   }
 );
 
@@ -234,7 +230,7 @@ Then('the strategy is marked as fallback', function () {
 
 Then('the initial offer reflects aging listing discount', function () {
   // For a listing aged 20 days: base 0.85 - 0.05 = 0.80 (80% of asking)
-  const expectedOffer = Math.round(negotiationInput.askingPrice * 0.80);
+  const expectedOffer = Math.round(negotiationInput.askingPrice * 0.8);
   assert.strictEqual(
     negotiationStrategy.initialOfferPrice,
     expectedOffer,

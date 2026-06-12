@@ -17,13 +17,8 @@ import { Given, When, Then } from '@cucumber/cucumber';
 import assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
-import {
-  CONVERSATION_STATUSES,
-} from '../../../src/lib/conversation-status';
-import {
-  checkForReplies,
-  getPlatformCheckers,
-} from '../../../src/lib/inbound-message-checker';
+import { CONVERSATION_STATUSES } from '../../../src/lib/conversation-status';
+import { checkForReplies, getPlatformCheckers } from '../../../src/lib/inbound-message-checker';
 import type { ListingData } from '../../../src/lib/inbound-message-checker';
 
 // Shared scenario state
@@ -120,16 +115,16 @@ Then(
   }
 );
 
-Then('inbound messages are created with direction {string} and status {string}', function (
-  direction: string,
-  status: string
-) {
-  const source = fs.readFileSync(serviceFilePath, 'utf-8');
-  const directionRegex = new RegExp(`direction:\\s*['"\`]${direction}['"\`]`);
-  const statusRegex = new RegExp(`status:\\s*['"\`]${status}['"\`]`);
-  assert.match(source, directionRegex, `Service creates messages with direction ${direction}`);
-  assert.match(source, statusRegex, `Service creates messages with status ${status}`);
-});
+Then(
+  'inbound messages are created with direction {string} and status {string}',
+  function (direction: string, status: string) {
+    const source = fs.readFileSync(serviceFilePath, 'utf-8');
+    const directionRegex = new RegExp(`direction:\\s*['"\`]${direction}['"\`]`);
+    const statusRegex = new RegExp(`status:\\s*['"\`]${status}['"\`]`);
+    assert.match(source, directionRegex, `Service creates messages with direction ${direction}`);
+    assert.match(source, statusRegex, `Service creates messages with status ${status}`);
+  }
+);
 
 Then('transition from {string} to {string} is valid', function (from: string, to: string) {
   // Validate transition rules by reading the source and checking VALID_TRANSITIONS
@@ -139,7 +134,11 @@ Then('transition from {string} to {string} is valid', function (from: string, to
   assert.match(source, new RegExp(to), `Source references "${to}" state`);
   // Verify the to state appears in the allowed list for from state
   const transitionRegex = new RegExp(`${from}:\\s*\\[.*?['"\`]${to}['"\`]`);
-  assert.match(source, transitionRegex, `Transition ${from} → ${to} is defined in VALID_TRANSITIONS`);
+  assert.match(
+    source,
+    transitionRegex,
+    `Transition ${from} → ${to} is defined in VALID_TRANSITIONS`
+  );
 });
 
 Then('the service calls transitionToResponded when new inbound messages are stored', function () {
@@ -162,17 +161,20 @@ Then('the transition is fire-and-forget', function () {
   assert.match(routeSource, /\.catch\(\s*\(\)\s*=>\s*\{\s*\}\s*\)/);
 });
 
-Then('each platform has a dedicated checker that can be replaced with a real implementation', function () {
-  const checkers = getPlatformCheckers();
-  const platforms = Object.keys(checkers);
-  assert.ok(platforms.length >= 5, 'At least 5 platform checkers exist');
-  for (const platform of platforms) {
-    assert.ok(
-      typeof checkers[platform].checkForReplies === 'function',
-      `${platform} checker has checkForReplies method`
-    );
+Then(
+  'each platform has a dedicated checker that can be replaced with a real implementation',
+  function () {
+    const checkers = getPlatformCheckers();
+    const platforms = Object.keys(checkers);
+    assert.ok(platforms.length >= 5, 'At least 5 platform checkers exist');
+    for (const platform of platforms) {
+      assert.ok(
+        typeof checkers[platform].checkForReplies === 'function',
+        `${platform} checker has checkForReplies method`
+      );
+    }
   }
-});
+);
 
 Then('all stub checkers return found false with empty messages array', async function () {
   const checkers = getPlatformCheckers();

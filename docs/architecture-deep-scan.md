@@ -42,26 +42,26 @@ Built as a Next.js 16 full-stack monolith with React 19, Prisma ORM (PostgreSQL)
 
 ## Technology Stack
 
-| Category | Technology | Version | Purpose |
-|----------|-----------|---------|---------|
-| Framework | Next.js | 16.1.6 | Full-stack web framework (App Router) |
-| UI | React | 19.2.3 | Component-based UI |
-| Language | TypeScript | ^5 | Type safety |
-| Styling | Tailwind CSS | ^4 | Utility-first CSS |
-| ORM | Prisma | ^7.4.0 | Database access layer |
-| Database | PostgreSQL | - | Primary data store |
-| Auth | Firebase Auth | firebase ^12.10.0, firebase-admin ^13.7.0 | Authentication (session cookies + OAuth) |
-| Payments | Stripe | ^20.3.1 | Subscription billing |
-| AI (Primary) | OpenAI SDK | ^4.73.0 | GPT-4o-mini for identification, analysis, descriptions |
-| AI (Secondary) | Anthropic SDK | ^0.74.0 | Claude Sonnet for item analysis |
-| AI (Browser) | Stagehand | ^3.0.6 | AI-powered browser automation (Gemini) |
-| Scraping | Playwright | ^1.57.0 | Headless browser automation |
-| Monitoring | Sentry | ^10.39.0 | Error tracking & performance |
-| Email | Resend | ^6.9.2 | Transactional email |
-| Validation | Zod | ^4.2.1 | Schema validation |
-| Drag & Drop | @hello-pangea/dnd | ^18.0.1 | Kanban board interactions |
-| Testing | Jest + Playwright + Cucumber | Various | Full test pyramid |
-| Package Manager | pnpm | - | Dependency management |
+| Category        | Technology                   | Version                                   | Purpose                                                |
+| --------------- | ---------------------------- | ----------------------------------------- | ------------------------------------------------------ |
+| Framework       | Next.js                      | 16.1.6                                    | Full-stack web framework (App Router)                  |
+| UI              | React                        | 19.2.3                                    | Component-based UI                                     |
+| Language        | TypeScript                   | ^5                                        | Type safety                                            |
+| Styling         | Tailwind CSS                 | ^4                                        | Utility-first CSS                                      |
+| ORM             | Prisma                       | ^7.4.0                                    | Database access layer                                  |
+| Database        | PostgreSQL                   | -                                         | Primary data store                                     |
+| Auth            | Firebase Auth                | firebase ^12.10.0, firebase-admin ^13.7.0 | Authentication (session cookies + OAuth)               |
+| Payments        | Stripe                       | ^20.3.1                                   | Subscription billing                                   |
+| AI (Primary)    | OpenAI SDK                   | ^4.73.0                                   | GPT-4o-mini for identification, analysis, descriptions |
+| AI (Secondary)  | Anthropic SDK                | ^0.74.0                                   | Claude Sonnet for item analysis                        |
+| AI (Browser)    | Stagehand                    | ^3.0.6                                    | AI-powered browser automation (Gemini)                 |
+| Scraping        | Playwright                   | ^1.57.0                                   | Headless browser automation                            |
+| Monitoring      | Sentry                       | ^10.39.0                                  | Error tracking & performance                           |
+| Email           | Resend                       | ^6.9.2                                    | Transactional email                                    |
+| Validation      | Zod                          | ^4.2.1                                    | Schema validation                                      |
+| Drag & Drop     | @hello-pangea/dnd            | ^18.0.1                                   | Kanban board interactions                              |
+| Testing         | Jest + Playwright + Cucumber | Various                                   | Full test pyramid                                      |
+| Package Manager | pnpm                         | -                                         | Dependency management                                  |
 
 ---
 
@@ -109,46 +109,48 @@ IDENTIFIED → CONTACTED → PURCHASED → LISTED → SOLD
 
 ### Three-Tier AI Pipeline
 
-| Tier | Model | Provider | Purpose | Fallback |
-|------|-------|----------|---------|----------|
-| 1. Item Identification | gpt-4o-mini | OpenAI | Extract brand, model, condition | Skip |
-| 2. Item Analysis | claude-sonnet-4-5 | Anthropic | Structural analysis, flippability | Algorithmic scoring |
-| 3. Sellability Analysis | gpt-4o-mini | OpenAI | Market verification, pricing | Algorithmic scoring |
+| Tier                    | Model             | Provider  | Purpose                           | Fallback            |
+| ----------------------- | ----------------- | --------- | --------------------------------- | ------------------- |
+| 1. Item Identification  | gpt-4o-mini       | OpenAI    | Extract brand, model, condition   | Skip                |
+| 2. Item Analysis        | claude-sonnet-4-5 | Anthropic | Structural analysis, flippability | Algorithmic scoring |
+| 3. Sellability Analysis | gpt-4o-mini       | OpenAI    | Market verification, pricing      | Algorithmic scoring |
 
 ### Content Generation
 
-| Feature | Model | Fallback |
-|---------|-------|----------|
-| Resale Descriptions | gpt-4o-mini | Algorithmic templates |
-| Listing Titles | gpt-4o-mini | Algorithmic construction |
-| Purchase Messages | Algorithmic | Always algorithmic |
+| Feature             | Model       | Fallback                 |
+| ------------------- | ----------- | ------------------------ |
+| Resale Descriptions | gpt-4o-mini | Algorithmic templates    |
+| Listing Titles      | gpt-4o-mini | Algorithmic construction |
+| Purchase Messages   | Algorithmic | Always algorithmic       |
 
 ### AI Analysis Caching
+
 - Results cached in `AiAnalysisCache` table with 24-hour TTL
 - Batch processing with rate limiting (200ms-1s delays)
 
 ### Key AI Files
-| File | Model | Purpose |
-|------|-------|---------|
-| `src/lib/claude-analyzer.ts` | Claude Sonnet 4.5 | Structural listing analysis, flippability scoring |
-| `src/lib/llm-identifier.ts` | GPT-4o-mini | Product identification (brand, model, variant) |
-| `src/lib/llm-analyzer.ts` | GPT-4o-mini | Sellability analysis with market data |
-| `src/lib/description-generator.ts` | GPT-4o-mini | Platform-specific resale descriptions |
-| `src/lib/title-generator.ts` | GPT-4o-mini | SEO-optimized listing titles |
-| `src/lib/market-price.ts` | None (Playwright) | eBay sold price data extraction |
-| `src/lib/value-estimator.ts` | None (algorithmic) | Core flip scoring (0-100) |
+
+| File                               | Model              | Purpose                                           |
+| ---------------------------------- | ------------------ | ------------------------------------------------- |
+| `src/lib/claude-analyzer.ts`       | Claude Sonnet 4.5  | Structural listing analysis, flippability scoring |
+| `src/lib/llm-identifier.ts`        | GPT-4o-mini        | Product identification (brand, model, variant)    |
+| `src/lib/llm-analyzer.ts`          | GPT-4o-mini        | Sellability analysis with market data             |
+| `src/lib/description-generator.ts` | GPT-4o-mini        | Platform-specific resale descriptions             |
+| `src/lib/title-generator.ts`       | GPT-4o-mini        | SEO-optimized listing titles                      |
+| `src/lib/market-price.ts`          | None (Playwright)  | eBay sold price data extraction                   |
+| `src/lib/value-estimator.ts`       | None (algorithmic) | Core flip scoring (0-100)                         |
 
 ---
 
 ## Scraper Architecture
 
-| Platform | Method | Anti-Detection | Rate Limiting |
-|----------|--------|----------------|---------------|
-| Craigslist | Playwright (Chromium) | Custom UA, selector fallbacks | 1s between LLM calls |
-| eBay | Browse API v1 (OAuth) | Official API | Token-based |
-| Facebook | Graph API + Stagehand (Gemini) | OAuth, AI browser automation | API rate limits |
-| Mercari | Internal API + Playwright | Browser-like headers | Detects 429, 1s delays |
-| OfferUp | Playwright (Chromium) | Anti-automation flags, resource blocking | 2s delay, exponential backoff |
+| Platform   | Method                         | Anti-Detection                           | Rate Limiting                 |
+| ---------- | ------------------------------ | ---------------------------------------- | ----------------------------- |
+| Craigslist | Playwright (Chromium)          | Custom UA, selector fallbacks            | 1s between LLM calls          |
+| eBay       | Browse API v1 (OAuth)          | Official API                             | Token-based                   |
+| Facebook   | Graph API + Stagehand (Gemini) | OAuth, AI browser automation             | API rate limits               |
+| Mercari    | Internal API + Playwright      | Browser-like headers                     | Detects 429, 1s delays        |
+| OfferUp    | Playwright (Chromium)          | Anti-automation flags, resource blocking | 2s delay, exponential backoff |
 
 ---
 
@@ -172,6 +174,7 @@ IDENTIFIED → CONTACTED → PURCHASED → LISTED → SOLD
 **Features:** Message, AiAnalysisCache, PostingQueueItem
 
 ### Key Relationships
+
 ```
 User 1──* Listing 1──1 Opportunity
   │          ├──* Message
@@ -185,37 +188,37 @@ User 1──* Listing 1──1 Opportunity
 
 ## Deployment Architecture
 
-| Platform | Purpose | Config |
-|----------|---------|--------|
-| Firebase Hosting | Frontend static hosting | `firebase.json` |
-| Cloud Run | Backend (Next.js server) | `Dockerfile`, `docker-compose.prod.yml` |
-| Docker | Containerized deployment | `Dockerfile`, `docker-compose.prod.yml` |
-| GitHub Actions | CI/CD (5 workflows) | `.github/workflows/` |
+| Platform         | Purpose                  | Config                                  |
+| ---------------- | ------------------------ | --------------------------------------- |
+| Firebase Hosting | Frontend static hosting  | `firebase.json`                         |
+| Cloud Run        | Backend (Next.js server) | `Dockerfile`, `docker-compose.prod.yml` |
+| Docker           | Containerized deployment | `Dockerfile`, `docker-compose.prod.yml` |
+| GitHub Actions   | CI/CD (5 workflows)      | `.github/workflows/`                    |
 
 ---
 
 ## Monitoring & Observability
 
-| Tool | Purpose |
-|------|---------|
-| Sentry | Error tracking, performance, source maps |
-| Firebase Analytics | Web analytics, Core Web Vitals |
-| Custom Metrics | `/api/health/metrics` |
-| Health Probes | `/api/health`, `/api/health/ready` |
-| Structured Logging | pino via `logger.ts` |
+| Tool               | Purpose                                  |
+| ------------------ | ---------------------------------------- |
+| Sentry             | Error tracking, performance, source maps |
+| Firebase Analytics | Web analytics, Core Web Vitals           |
+| Custom Metrics     | `/api/health/metrics`                    |
+| Health Probes      | `/api/health`, `/api/health/ready`       |
+| Structured Logging | pino via `logger.ts`                     |
 
 ---
 
 ## Testing Strategy
 
-| Level | Tool | Count |
-|-------|------|-------|
-| Unit | Jest | ~70 files |
-| Component | Jest + Testing Library | ~14 files |
-| Integration | Jest + Prisma | ~8 files |
-| Security | Jest | 3 files |
-| E2E | Playwright | ~60 specs |
-| BDD | Cucumber | 9 features |
+| Level       | Tool                   | Count      |
+| ----------- | ---------------------- | ---------- |
+| Unit        | Jest                   | ~70 files  |
+| Component   | Jest + Testing Library | ~14 files  |
+| Integration | Jest + Prisma          | ~8 files   |
+| Security    | Jest                   | 3 files    |
+| E2E         | Playwright             | ~60 specs  |
+| BDD         | Cucumber               | 9 features |
 
 ---
 

@@ -34,9 +34,7 @@ describe('getCorsHeaders - CORS origin validation', () => {
   it('should allow Firebase Hosting firebaseapp.com origin', () => {
     const getCorsHeaders = loadGetCorsHeaders();
     const headers = getCorsHeaders('https://axovia-flipper.firebaseapp.com');
-    expect(headers['Access-Control-Allow-Origin']).toBe(
-      'https://axovia-flipper.firebaseapp.com'
-    );
+    expect(headers['Access-Control-Allow-Origin']).toBe('https://axovia-flipper.firebaseapp.com');
   });
 
   it('should allow localhost:3000 in development', () => {

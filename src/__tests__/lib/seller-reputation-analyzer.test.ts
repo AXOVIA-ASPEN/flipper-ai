@@ -46,7 +46,11 @@ describe('analyzeSellerReputation()', () => {
   describe('EBAY thresholds (minRating: 97%)', () => {
     it('returns isLowReputation=false for rating exactly at threshold (97)', () => {
       const result = analyzeSellerReputation('EBAY', 97, 500, null);
-      expect(result).toMatchObject({ sellerRating: 97, isLowReputation: false, riskEscalation: false });
+      expect(result).toMatchObject({
+        sellerRating: 97,
+        isLowReputation: false,
+        riskEscalation: false,
+      });
     });
 
     it('returns isLowReputation=false for rating well above threshold (99.5)', () => {
@@ -82,7 +86,11 @@ describe('analyzeSellerReputation()', () => {
   describe('MERCARI thresholds (minRating: 4.0 / 5.0)', () => {
     it('returns isLowReputation=false for rating exactly at threshold (4.0)', () => {
       const result = analyzeSellerReputation('MERCARI', 4.0, 80, null);
-      expect(result).toMatchObject({ sellerRating: 4.0, isLowReputation: false, riskEscalation: false });
+      expect(result).toMatchObject({
+        sellerRating: 4.0,
+        isLowReputation: false,
+        riskEscalation: false,
+      });
     });
 
     it('returns isLowReputation=false for rating above threshold (4.8)', () => {

@@ -2,11 +2,11 @@ import { test, expect } from '@playwright/test';
 
 /**
  * BDD E2E Tests: Profit/Loss Chart Visualization
- * 
+ *
  * Feature: Visual profit/loss chart
  * As a flipper, I want to see a visual chart of my profit/loss over time
  * So I can track my business performance and identify trends
- * 
+ *
  * Based on: features/05-dashboard-tracking.feature
  * Author: ASPEN (Axovia AI)
  * Date: 2026-02-18
@@ -54,25 +54,24 @@ test.describe('Profit/Loss Chart Visualization - BDD Tests', () => {
       await page.goto('/analytics');
 
       // When I view the profit/loss chart section
-      const chartSection = page.locator('[data-testid="profit-loss-chart"]').or(
-        page.locator('section').filter({ hasText: /profit.*chart|cumulative profit/i })
-      ).or(
-        page.locator('.chart-container, #profit-chart').first()
-      );
+      const chartSection = page
+        .locator('[data-testid="profit-loss-chart"]')
+        .or(page.locator('section').filter({ hasText: /profit.*chart|cumulative profit/i }))
+        .or(page.locator('.chart-container, #profit-chart').first());
 
       // Then I should see a line chart
-      const chartCanvas = page.locator('canvas').or(
-        page.locator('svg').filter({ has: page.locator('path[stroke]') })
-      );
-      
+      const chartCanvas = page
+        .locator('canvas')
+        .or(page.locator('svg').filter({ has: page.locator('path[stroke]') }));
+
       // Wait for chart to render (either canvas or SVG)
       await expect(chartCanvas.first()).toBeVisible({ timeout: 10000 });
 
       // And I should see chart labels or axis markers
-      const chartLabels = page.locator('[role="img"]').or(
-        page.locator('text').filter({ hasText: /2026-W\d{2}|Jan|Feb|Week/ })
-      );
-      
+      const chartLabels = page
+        .locator('[role="img"]')
+        .or(page.locator('text').filter({ hasText: /2026-W\d{2}|Jan|Feb|Week/ }));
+
       // At least one time period label should be visible
       await expect(chartLabels.first()).toBeVisible({ timeout: 5000 });
     });
@@ -87,7 +86,7 @@ test.describe('Profit/Loss Chart Visualization - BDD Tests', () => {
       const weekLabel2 = page.getByText(/W02|Jan 12|2026-01-12/i);
 
       // At least some week labels should be visible
-      const hasWeekLabels = await weekLabel1.or(weekLabel2).count() > 0;
+      const hasWeekLabels = (await weekLabel1.or(weekLabel2).count()) > 0;
       expect(hasWeekLabels).toBeTruthy();
     });
 
@@ -98,7 +97,7 @@ test.describe('Profit/Loss Chart Visualization - BDD Tests', () => {
       // Then the Y-axis should show dollar amounts
       // Look for currency formatting or axis labels
       const dollarLabel = page.locator('text').filter({ hasText: /\$|profit|revenue/i });
-      
+
       // Should have profit-related labels
       await expect(dollarLabel.first()).toBeVisible({ timeout: 5000 });
     });
@@ -108,30 +107,28 @@ test.describe('Profit/Loss Chart Visualization - BDD Tests', () => {
       await page.goto('/analytics');
 
       // When I hover over a data point on the chart
-      const chartArea = page.locator('canvas').or(
-        page.locator('svg path[stroke]').first()
-      ).first();
-      
+      const chartArea = page.locator('canvas').or(page.locator('svg path[stroke]').first()).first();
+
       await chartArea.waitFor({ state: 'visible', timeout: 10000 });
-      
+
       // Hover in the middle of the chart area
       await chartArea.hover({ position: { x: 200, y: 100 } });
 
       // Then I should see a tooltip with weekly breakdown
-      const tooltip = page.locator('[role="tooltip"]').or(
-        page.locator('.tooltip, .chart-tooltip, [class*="tooltip"]')
-      );
+      const tooltip = page
+        .locator('[role="tooltip"]')
+        .or(page.locator('.tooltip, .chart-tooltip, [class*="tooltip"]'));
 
       // Wait a moment for tooltip to appear
       await page.waitForTimeout(500);
 
       // Tooltip should appear on hover (if implemented)
-      const tooltipVisible = await tooltip.count() > 0;
-      
+      const tooltipVisible = (await tooltip.count()) > 0;
+
       // Note: If tooltip doesn't exist yet, this documents the expected behavior
       if (tooltipVisible) {
         await expect(tooltip.first()).toBeVisible();
-        
+
         // Tooltip should show profit/revenue/cost details
         const tooltipText = await tooltip.first().textContent();
         expect(tooltipText).toMatch(/(profit|revenue|cost|\$)/i);
@@ -143,15 +140,14 @@ test.describe('Profit/Loss Chart Visualization - BDD Tests', () => {
       await page.goto('/analytics');
 
       // Then I should see a trend indicator
-      const trendIndicator = page.locator('[data-testid="trend-indicator"]').or(
-        page.locator('text').filter({ hasText: /↑|↓|improving|declining|trending/i })
-      ).or(
-        page.locator('.trend-up, .trend-down, [class*="trend"]')
-      );
+      const trendIndicator = page
+        .locator('[data-testid="trend-indicator"]')
+        .or(page.locator('text').filter({ hasText: /↑|↓|improving|declining|trending/i }))
+        .or(page.locator('.trend-up, .trend-down, [class*="trend"]'));
 
       // Trend indicator should be present (either ↑, ↓, or text)
-      const hasTrendIndicator = await trendIndicator.count() > 0;
-      
+      const hasTrendIndicator = (await trendIndicator.count()) > 0;
+
       if (hasTrendIndicator) {
         await expect(trendIndicator.first()).toBeVisible();
       } else {
@@ -171,12 +167,12 @@ test.describe('Profit/Loss Chart Visualization - BDD Tests', () => {
 
       // And negative values should be visually distinguishable
       // (e.g., different color, below baseline, or marked somehow)
-      const negativeIndicator = page.locator('[class*="negative"], [class*="loss"]').or(
-        page.locator('text').filter({ hasText: /-\$50/ })
-      );
+      const negativeIndicator = page
+        .locator('[class*="negative"], [class*="loss"]')
+        .or(page.locator('text').filter({ hasText: /-\$50/ }));
 
       // Check if negative values are styled differently
-      const hasNegativeIndicator = await negativeIndicator.count() > 0;
+      const hasNegativeIndicator = (await negativeIndicator.count()) > 0;
       if (hasNegativeIndicator) {
         await expect(negativeIndicator.first()).toBeVisible();
       }
@@ -191,11 +187,11 @@ test.describe('Profit/Loss Chart Visualization - BDD Tests', () => {
       const monthlyBtn = page.getByRole('button', { name: /monthly|month/i });
 
       // Then time period controls should be available
-      const hasToggle = await weeklyBtn.or(monthlyBtn).count() > 0;
+      const hasToggle = (await weeklyBtn.or(monthlyBtn).count()) > 0;
 
       if (hasToggle) {
         // And clicking should update the chart data
-        const visibleBtn = await weeklyBtn.count() > 0 ? weeklyBtn : monthlyBtn;
+        const visibleBtn = (await weeklyBtn.count()) > 0 ? weeklyBtn : monthlyBtn;
         await visibleBtn.first().click();
 
         // Chart should re-render with new granularity
@@ -237,14 +233,17 @@ test.describe('Profit/Loss Chart Visualization - BDD Tests', () => {
       await page.goto('/analytics');
 
       // Then I should see a loading indicator
-      const loadingIndicator = page.locator('[data-testid="chart-loading"]').or(
-        page.locator('.loading, .spinner, [class*="loading"]').filter({ hasText: /loading|chart/i })
-      ).or(
-        page.locator('text').filter({ hasText: /loading.*chart/i })
-      );
+      const loadingIndicator = page
+        .locator('[data-testid="chart-loading"]')
+        .or(
+          page
+            .locator('.loading, .spinner, [class*="loading"]')
+            .filter({ hasText: /loading|chart/i })
+        )
+        .or(page.locator('text').filter({ hasText: /loading.*chart/i }));
 
       // Loading state should appear briefly
-      const hasLoadingState = await loadingIndicator.count() > 0;
+      const hasLoadingState = (await loadingIndicator.count()) > 0;
       if (hasLoadingState) {
         await expect(loadingIndicator.first()).toBeVisible();
       }
@@ -272,12 +271,12 @@ test.describe('Profit/Loss Chart Visualization - BDD Tests', () => {
       await page.goto('/analytics');
 
       // Then I should see an empty state message
-      const emptyState = page.locator('[data-testid="chart-empty-state"]').or(
-        page.locator('text').filter({ hasText: /no data|no sales|start tracking/i })
-      );
+      const emptyState = page
+        .locator('[data-testid="chart-empty-state"]')
+        .or(page.locator('text').filter({ hasText: /no data|no sales|start tracking/i }));
 
       // Empty state should be visible
-      const hasEmptyState = await emptyState.count() > 0;
+      const hasEmptyState = (await emptyState.count()) > 0;
       if (hasEmptyState) {
         await expect(emptyState.first()).toBeVisible();
       } else {

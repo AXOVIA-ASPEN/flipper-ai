@@ -8,12 +8,12 @@
 
 ## The decision: hosted or self-built
 
-| Approach                | Setup time | Cost              | Pros                                   | Cons                                    |
-| ----------------------- | ---------- | ----------------- | -------------------------------------- | --------------------------------------- |
-| **Better Stack Status**  | 30 min      | Free → $19/mo      | Best free tier, beautiful design, integrates with Better Stack uptime monitor | Branded as Better Stack on free tier    |
-| **Statuspage.io**        | 1 hour      | $29/mo and up      | The category leader, very polished     | No free tier, expensive for early stage |
-| **Instatus**             | 30 min      | Free → $20/mo      | Good free tier, decent design          | Less polished than Better Stack          |
-| **Self-built (`/health` page)** | 1-2 days | Free + dev time | Full control, single brand, embeds in app | Maintenance overhead, no historical incident data UI by default |
+| Approach                        | Setup time | Cost            | Pros                                                                          | Cons                                                            |
+| ------------------------------- | ---------- | --------------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| **Better Stack Status**         | 30 min     | Free → $19/mo   | Best free tier, beautiful design, integrates with Better Stack uptime monitor | Branded as Better Stack on free tier                            |
+| **Statuspage.io**               | 1 hour     | $29/mo and up   | The category leader, very polished                                            | No free tier, expensive for early stage                         |
+| **Instatus**                    | 30 min     | Free → $20/mo   | Good free tier, decent design                                                 | Less polished than Better Stack                                 |
+| **Self-built (`/health` page)** | 1-2 days   | Free + dev time | Full control, single brand, embeds in app                                     | Maintenance overhead, no historical incident data UI by default |
 
 **Recommendation:** Better Stack Status (https://betterstack.com/status-page) on free tier at launch. Migrate to self-built only if you need pixel-perfect brand control or are post-launch with engineering capacity.
 
@@ -23,21 +23,21 @@
 
 ### Components (visible to users)
 
-| Component                         | What it represents                                       | Health check source                                |
-| --------------------------------- | -------------------------------------------------------- | -------------------------------------------------- |
-| **Web app**                       | The main `https://<domain>` site                          | HTTP 200 on `/` every 60s                           |
-| **API**                           | API routes responding correctly                           | HTTP 200 on `/api/health` every 60s                |
-| **Authentication**                | Login / signup flows                                      | HTTP 200 on `/api/health/ready` (verifies Firebase Admin SDK reachability) |
-| **Database**                      | Cloud SQL Postgres                                        | Pingable from `/api/health/ready`                   |
-| **AI analysis pipeline**          | Multi-provider AI service                                 | Synthetic test analysis every 5 min                |
-| **eBay scanner**                  | eBay Browse API integration                               | Synthetic search every 15 min                       |
-| **Craigslist scanner**            | Craigslist scraper                                        | Synthetic search every 15 min                       |
-| **Facebook Marketplace scanner**  | FB Marketplace scraper (Stagehand)                        | Synthetic search every 30 min (more expensive)      |
-| **OfferUp scanner**               | OfferUp scraper                                           | Synthetic search every 15 min                       |
-| **Mercari scanner**               | Mercari scraper                                           | Synthetic search every 15 min                       |
-| **Email delivery**                | Resend                                                    | Send-and-check synthetic email every 30 min        |
-| **Push notifications**            | FCM                                                       | Optional — only if you ship FCM at launch          |
-| **Payments**                      | Stripe webhook reception                                  | Synthetic test webhook every 60 min                |
+| Component                        | What it represents                 | Health check source                                                        |
+| -------------------------------- | ---------------------------------- | -------------------------------------------------------------------------- |
+| **Web app**                      | The main `https://<domain>` site   | HTTP 200 on `/` every 60s                                                  |
+| **API**                          | API routes responding correctly    | HTTP 200 on `/api/health` every 60s                                        |
+| **Authentication**               | Login / signup flows               | HTTP 200 on `/api/health/ready` (verifies Firebase Admin SDK reachability) |
+| **Database**                     | Cloud SQL Postgres                 | Pingable from `/api/health/ready`                                          |
+| **AI analysis pipeline**         | Multi-provider AI service          | Synthetic test analysis every 5 min                                        |
+| **eBay scanner**                 | eBay Browse API integration        | Synthetic search every 15 min                                              |
+| **Craigslist scanner**           | Craigslist scraper                 | Synthetic search every 15 min                                              |
+| **Facebook Marketplace scanner** | FB Marketplace scraper (Stagehand) | Synthetic search every 30 min (more expensive)                             |
+| **OfferUp scanner**              | OfferUp scraper                    | Synthetic search every 15 min                                              |
+| **Mercari scanner**              | Mercari scraper                    | Synthetic search every 15 min                                              |
+| **Email delivery**               | Resend                             | Send-and-check synthetic email every 30 min                                |
+| **Push notifications**           | FCM                                | Optional — only if you ship FCM at launch                                  |
+| **Payments**                     | Stripe webhook reception           | Synthetic test webhook every 60 min                                        |
 
 ### Internal-only metrics (not on public page)
 
@@ -50,12 +50,12 @@
 
 ## Incident severity levels
 
-| Severity     | Definition                                                          | User communication                                  |
-| ------------ | ------------------------------------------------------------------- | --------------------------------------------------- |
-| **Operational** | All systems normal                                               | Green dots                                           |
-| **Degraded**    | Service available but slower or partially impaired               | Yellow + brief description on status page only      |
-| **Partial outage** | Some users / features affected; majority working              | Yellow + status page banner + email subscribers     |
-| **Major outage**   | Service unavailable for most users                            | Red + status page banner + email subscribers + Twitter post + in-app banner |
+| Severity           | Definition                                         | User communication                                                          |
+| ------------------ | -------------------------------------------------- | --------------------------------------------------------------------------- |
+| **Operational**    | All systems normal                                 | Green dots                                                                  |
+| **Degraded**       | Service available but slower or partially impaired | Yellow + brief description on status page only                              |
+| **Partial outage** | Some users / features affected; majority working   | Yellow + status page banner + email subscribers                             |
+| **Major outage**   | Service unavailable for most users                 | Red + status page banner + email subscribers + Twitter post + in-app banner |
 
 ---
 
@@ -236,10 +236,10 @@ Publish at `/changelog/postmortems/<incident-slug>.md` and link from the status 
 
 ## Public-facing copy
 
-**Status page header:** *"Flipper.ai status — current and historical service health"*
+**Status page header:** _"Flipper.ai status — current and historical service health"_
 
-**"All systems operational" message:** *"All systems operational. Last incident: {{N}} days ago."*
+**"All systems operational" message:** _"All systems operational. Last incident: {{N}} days ago."_
 
 **During an incident:** Already covered in templates above.
 
-**Footer of status page:** *"Subscribe to status updates → [email form]"*  *"Status page maintained by Stephen Boyett, founder of Flipper.ai. Have a question? Email support@<domain>."*
+**Footer of status page:** _"Subscribe to status updates → [email form]"_ _"Status page maintained by Stephen Boyett, founder of Flipper.ai. Have a question? Email support@<domain>."_

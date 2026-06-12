@@ -142,16 +142,13 @@ When(
 
 // ==================== Then: Score Assertions ====================
 
-Then(
-  'the adjusted score should be {int}',
-  function (this: DemandScenarioState, expected: number) {
-    assert.strictEqual(
-      this.adjustedScore,
-      expected,
-      `Expected adjusted score ${expected}, got ${this.adjustedScore}`
-    );
-  }
-);
+Then('the adjusted score should be {int}', function (this: DemandScenarioState, expected: number) {
+  assert.strictEqual(
+    this.adjustedScore,
+    expected,
+    `Expected adjusted score ${expected}, got ${this.adjustedScore}`
+  );
+});
 
 Then(
   'the adjusted score should be greater than {int}',
@@ -193,29 +190,27 @@ Then(
   }
 );
 
-Then(
-  'the listing tags should contain {string}',
-  function (this: DemandScenarioState, tag: string) {
-    assert.ok(
-      this.tags.includes(tag),
-      `Expected tags to contain "${tag}", got [${this.tags.join(', ')}]`
-    );
-  }
-);
+Then('the listing tags should contain {string}', function (this: DemandScenarioState, tag: string) {
+  assert.ok(
+    this.tags.includes(tag),
+    `Expected tags to contain "${tag}", got [${this.tags.join(', ')}]`
+  );
+});
 
 // ==================== Given/When/Then: Badge Mapping (AC #5) ====================
 // Note: Given('the value-estimator module at {string}') is owned by
 // E-004-platform-fees-threshold.steps.ts (sets this.fileContent). We reuse it here.
 
-When('I inspect the getDemandBadge function', function (this: DemandScenarioState & { fileContent?: string }) {
-  const src = (this as { fileContent?: string; sourceContent?: string }).fileContent
-    || this.sourceContent
-    || '';
-  assert.ok(
-    src.includes('getDemandBadge'),
-    'getDemandBadge function not found in source'
-  );
-});
+When(
+  'I inspect the getDemandBadge function',
+  function (this: DemandScenarioState & { fileContent?: string }) {
+    const src =
+      (this as { fileContent?: string; sourceContent?: string }).fileContent ||
+      this.sourceContent ||
+      '';
+    assert.ok(src.includes('getDemandBadge'), 'getDemandBadge function not found in source');
+  }
+);
 
 Then(
   '{string} should map to badge label {string}',

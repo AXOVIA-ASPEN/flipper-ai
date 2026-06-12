@@ -76,27 +76,24 @@ Then('it accepts discountThreshold as an optional 5th parameter', function () {
   expect(this.fnBody).toContain('discountThreshold?');
 });
 
-Then(
-  'the buildAnalysisPrompt function embeds discountThreshold in the prompt text',
-  function () {
-    // After the AI-router refactor, the prompt builder lives in
-    // `src/lib/ai/prompts/flip-analysis.ts` as `flipAnalysis.buildUserPrompt`,
-    // and the discountThreshold value is threaded through `completeAI`'s
-    // context. Verify either the legacy local function OR the canonical
-    // prompt-config entrypoint embeds discountThreshold via a template literal.
-    let bodyToCheck: string;
-    const localStart = this.fileContent.indexOf('function buildAnalysisPrompt');
-    if (localStart > -1) {
-      bodyToCheck = this.fileContent.substring(localStart, localStart + 1500);
-    } else {
-      const promptModule = readSourceFile('src/lib/ai/prompts/flip-analysis.ts');
-      const builderStart = promptModule.indexOf('flipAnalysis');
-      bodyToCheck = builderStart > -1 ? promptModule.substring(builderStart) : promptModule;
-    }
-    expect(bodyToCheck).toContain('discountThreshold');
-    expect(bodyToCheck).toContain('${discountThreshold}');
+Then('the buildAnalysisPrompt function embeds discountThreshold in the prompt text', function () {
+  // After the AI-router refactor, the prompt builder lives in
+  // `src/lib/ai/prompts/flip-analysis.ts` as `flipAnalysis.buildUserPrompt`,
+  // and the discountThreshold value is threaded through `completeAI`'s
+  // context. Verify either the legacy local function OR the canonical
+  // prompt-config entrypoint embeds discountThreshold via a template literal.
+  let bodyToCheck: string;
+  const localStart = this.fileContent.indexOf('function buildAnalysisPrompt');
+  if (localStart > -1) {
+    bodyToCheck = this.fileContent.substring(localStart, localStart + 1500);
+  } else {
+    const promptModule = readSourceFile('src/lib/ai/prompts/flip-analysis.ts');
+    const builderStart = promptModule.indexOf('flipAnalysis');
+    bodyToCheck = builderStart > -1 ? promptModule.substring(builderStart) : promptModule;
   }
-);
+  expect(bodyToCheck).toContain('discountThreshold');
+  expect(bodyToCheck).toContain('${discountThreshold}');
+});
 
 Then(
   'the meetsThreshold field in the prompt uses the configured threshold not a hardcoded value',
@@ -115,13 +112,10 @@ Then(
 
 // ==================== Then: S-25 (Craigslist reads discountThreshold) ====================
 
-Then(
-  'it reads discountThreshold from userSettings with fallback to 50',
-  function () {
-    expect(this.fnBody).toContain('discountThreshold');
-    expect(this.fnBody).toMatch(/discountThreshold\s*[=:][^=].*50/s);
-  }
-);
+Then('it reads discountThreshold from userSettings with fallback to 50', function () {
+  expect(this.fnBody).toContain('discountThreshold');
+  expect(this.fnBody).toMatch(/discountThreshold\s*[=:][^=].*50/s);
+});
 
 Then('it passes discountThreshold to the analyzeSellability call', function () {
   expect(this.fnBody).toContain('analyzeSellability(');
@@ -179,9 +173,7 @@ Then('it maps analysisReasoning from sellabilityAnalysis', function () {
 // ==================== Then: S-28 (enrichWithSellabilityAnalysis export + eBay usage) ====================
 
 Then('"enrichWithSellabilityAnalysis" is exported as an async function', function () {
-  expect(this.fileContent).toContain(
-    'export async function enrichWithSellabilityAnalysis'
-  );
+  expect(this.fileContent).toContain('export async function enrichWithSellabilityAnalysis');
 });
 
 Then(
@@ -193,13 +185,10 @@ Then(
   }
 );
 
-Then(
-  'the eBay scraper route calls enrichWithSellabilityAnalysis when LLM is active',
-  function () {
-    const ebayContent = readSourceFile('app/api/scraper/ebay/route.ts');
-    expect(ebayContent).toContain('enrichWithSellabilityAnalysis(');
-    // Must be inside an if (hasLLM) branch
-    expect(ebayContent).toContain('hasLLM');
-    expect(ebayContent).toMatch(/if\s*\(hasLLM\)/);
-  }
-);
+Then('the eBay scraper route calls enrichWithSellabilityAnalysis when LLM is active', function () {
+  const ebayContent = readSourceFile('app/api/scraper/ebay/route.ts');
+  expect(ebayContent).toContain('enrichWithSellabilityAnalysis(');
+  // Must be inside an if (hasLLM) branch
+  expect(ebayContent).toContain('hasLLM');
+  expect(ebayContent).toMatch(/if\s*\(hasLLM\)/);
+});

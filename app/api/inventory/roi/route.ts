@@ -3,7 +3,15 @@ import prisma from '@/lib/db';
 import { getAuthUserId } from '@/lib/auth-middleware';
 import { calculateROI, calculatePortfolioROI, ROIInput } from '@/lib/roi-calculator';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
+import {
+  handleError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  AppError,
+  ErrorCode,
+} from '@/lib/errors';
 /**
  * GET /api/inventory/roi - Get ROI data for user's purchased items
  */

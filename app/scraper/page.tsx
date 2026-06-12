@@ -142,20 +142,26 @@ interface SearchConfig {
   lastRun: string | null;
 }
 
-function inferCurrentTier(errorDetail: string, details?: Record<string, unknown>): SubscriptionTier {
+function inferCurrentTier(
+  errorDetail: string,
+  details?: Record<string, unknown>
+): SubscriptionTier {
   if (details?.tier && typeof details.tier === 'string') {
     const tier = details.tier as SubscriptionTier;
     if (['FREE', 'FLIPPER', 'PRO'].includes(tier)) return tier;
   }
-  if (errorDetail.includes('FREE plan') || errorDetail.includes('Upgrade to FLIPPER')) return 'FREE';
-  if (errorDetail.includes('FLIPPER plan') || errorDetail.includes('Upgrade to PRO')) return 'FLIPPER';
+  if (errorDetail.includes('FREE plan') || errorDetail.includes('Upgrade to FLIPPER'))
+    return 'FREE';
+  if (errorDetail.includes('FLIPPER plan') || errorDetail.includes('Upgrade to PRO'))
+    return 'FLIPPER';
   return 'FREE';
 }
 
 function inferFeatureName(errorDetail: string): string {
   if (errorDetail.includes('scan limit') || errorDetail.includes('scans')) return 'Scanning';
   if (errorDetail.includes('marketplace')) return 'Marketplaces';
-  if (errorDetail.includes('Search config') || errorDetail.includes('search config')) return 'Saved Searches';
+  if (errorDetail.includes('Search config') || errorDetail.includes('search config'))
+    return 'Saved Searches';
   return 'Feature';
 }
 
@@ -467,12 +473,19 @@ export default function ScraperPage() {
   const locations = platform === 'offerup' ? offerupLocations : craigslistLocations;
 
   return (
-    <div style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden', color: TEXT_PRIMARY }}>
+    <div
+      style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden', color: TEXT_PRIMARY }}
+    >
       {/* Header */}
       <header className="fp-glass-nav" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
         <div style={{ maxWidth: 1024, margin: '0 auto', padding: '0 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', height: 64, gap: 16 }}>
-            <Link href="/" className="fp-btn-ghost" aria-label="Back to dashboard" style={{ padding: 8 }}>
+            <Link
+              href="/"
+              className="fp-btn-ghost"
+              aria-label="Back to dashboard"
+              style={{ padding: 8 }}
+            >
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div
@@ -490,7 +503,9 @@ export default function ScraperPage() {
               <Search className="w-6 h-6" style={{ color: 'white' }} />
             </div>
             <div>
-              <h1 style={{ fontSize: 20, fontWeight: 700, color: TEXT_PRIMARY }}>Scrape Listings</h1>
+              <h1 style={{ fontSize: 20, fontWeight: 700, color: TEXT_PRIMARY }}>
+                Scrape Listings
+              </h1>
               <p style={{ fontSize: 12, color: TEXT_SECONDARY }}>
                 Find deals on {platform === 'offerup' ? 'OfferUp' : 'Craigslist'}
               </p>
@@ -505,14 +520,26 @@ export default function ScraperPage() {
         {configMessage && (
           <div
             className={configMessage.type === 'success' ? 'fp-alert-success' : 'fp-alert-danger'}
-            style={{ position: 'fixed', top: 80, right: 16, zIndex: 50, padding: 16, display: 'flex', alignItems: 'center', gap: 8, maxWidth: 360 }}
+            style={{
+              position: 'fixed',
+              top: 80,
+              right: 16,
+              zIndex: 50,
+              padding: 16,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              maxWidth: 360,
+            }}
           >
             {configMessage.type === 'success' ? (
               <CheckCircle className="w-5 h-5" style={{ color: PROFIT_GREEN }} />
             ) : (
               <AlertCircle className="w-5 h-5" style={{ color: DANGER_RED }} />
             )}
-            <span style={{ color: TEXT_PRIMARY, fontSize: 13, fontWeight: 600 }}>{configMessage.text}</span>
+            <span style={{ color: TEXT_PRIMARY, fontSize: 13, fontWeight: 600 }}>
+              {configMessage.text}
+            </span>
           </div>
         )}
 
@@ -530,7 +557,10 @@ export default function ScraperPage() {
               <span>Saved Searches</span>
               <ChevronDown
                 className="w-4 h-4"
-                style={{ transition: 'transform 0.2s', transform: showSavedConfigs ? 'rotate(180deg)' : 'none' }}
+                style={{
+                  transition: 'transform 0.2s',
+                  transform: showSavedConfigs ? 'rotate(180deg)' : 'none',
+                }}
               />
             </button>
             {showSavedConfigs && (
@@ -548,7 +578,9 @@ export default function ScraperPage() {
                 }}
               >
                 <div className="fp-glass-sm" style={{ padding: 8, borderRadius: 0 }}>
-                  <span style={{ fontSize: 12, color: TEXT_SECONDARY }}>Click to load search parameters</span>
+                  <span style={{ fontSize: 12, color: TEXT_SECONDARY }}>
+                    Click to load search parameters
+                  </span>
                 </div>
                 <div style={{ maxHeight: 240, overflowY: 'auto' }}>
                   {savedConfigs.map((config) => (
@@ -568,16 +600,29 @@ export default function ScraperPage() {
                       }}
                       data-fp-row-hover="true"
                     >
-                      <div style={{ fontWeight: 500, color: TEXT_PRIMARY, fontSize: 13 }}>{config.name}</div>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 4, fontSize: 12, color: TEXT_SECONDARY }}>
+                      <div style={{ fontWeight: 500, color: TEXT_PRIMARY, fontSize: 13 }}>
+                        {config.name}
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          gap: 8,
+                          marginTop: 4,
+                          fontSize: 12,
+                          color: TEXT_SECONDARY,
+                        }}
+                      >
                         <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                           <MapPin className="w-3 h-3" />
-                          {locations.find((l) => l.value === config.location)?.label || config.location}
+                          {locations.find((l) => l.value === config.location)?.label ||
+                            config.location}
                         </span>
                         {config.category && (
                           <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                             <Tag className="w-3 h-3" />
-                            {categories.find((c) => c.value === config.category)?.label || config.category}
+                            {categories.find((c) => c.value === config.category)?.label ||
+                              config.category}
                           </span>
                         )}
                       </div>
@@ -587,7 +632,13 @@ export default function ScraperPage() {
                 <div className="fp-glass-sm" style={{ padding: 8, borderRadius: 0 }}>
                   <Link
                     href="/settings"
-                    style={{ display: 'block', textAlign: 'center', fontSize: 12, color: PURPLE_ACCENT, textDecoration: 'none' }}
+                    style={{
+                      display: 'block',
+                      textAlign: 'center',
+                      fontSize: 12,
+                      color: PURPLE_ACCENT,
+                      textDecoration: 'none',
+                    }}
                     className="hover:underline"
                   >
                     Manage in Settings →
@@ -600,9 +651,17 @@ export default function ScraperPage() {
 
         {/* Scraper Form */}
         <form onSubmit={handleSubmit} className="fp-glass" style={{ padding: 24 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 24 }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: 24,
+            }}
+          >
             <div>
-              <label style={FORM_LABEL_STYLE} htmlFor="scraper-platform">Platform</label>
+              <label style={FORM_LABEL_STYLE} htmlFor="scraper-platform">
+                Platform
+              </label>
               <select
                 id="scraper-platform"
                 value={platform}
@@ -611,7 +670,9 @@ export default function ScraperPage() {
               >
                 <option value="craigslist">Craigslist</option>
                 <option value="offerup">OfferUp</option>
-                <option value="facebook" disabled>Facebook Marketplace (coming soon)</option>
+                <option value="facebook" disabled>
+                  Facebook Marketplace (coming soon)
+                </option>
               </select>
             </div>
 
@@ -706,7 +767,14 @@ export default function ScraperPage() {
               type="submit"
               disabled={loading}
               className="fp-btn-primary"
-              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 24px' }}
+              style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                padding: '12px 24px',
+              }}
               data-testid="scraper-submit"
             >
               {loading ? (
@@ -727,7 +795,12 @@ export default function ScraperPage() {
               className="fp-btn-ghost"
               title="Save this search"
               aria-label="Save this search configuration"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px' }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '12px 16px',
+              }}
             >
               <Bookmark className="w-5 h-5" />
             </button>
@@ -735,126 +808,151 @@ export default function ScraperPage() {
         </form>
 
         {/* Story 3.7: Real-time scrape progress indicator (SSE-driven) */}
-        {loading && (() => {
-          const platformUpper = platform.toUpperCase();
-          const platformEvents = sseEvents.filter((e) => {
-            const d = (e.data as { platform?: string })?.platform;
-            return !d || d === platformUpper;
-          });
-          const latestProgress = platformEvents.find((e) => e.type === 'job.progress');
-          const progressData = (latestProgress?.data as SseJobProgressData) || {};
-          const percentage = progressData.percentage ?? 0;
-          const current = progressData.current ?? 0;
-          const total = progressData.total ?? null;
-          const listingsFound = progressData.listingsFound ?? 0;
-          const complete = platformEvents.find((e) => e.type === 'job.complete');
-          const failed = platformEvents.find((e) => e.type === 'job.failed');
-          const liveListings = platformEvents.filter((e) => e.type === 'listing.found').slice(0, 20);
+        {loading &&
+          (() => {
+            const platformUpper = platform.toUpperCase();
+            const platformEvents = sseEvents.filter((e) => {
+              const d = (e.data as { platform?: string })?.platform;
+              return !d || d === platformUpper;
+            });
+            const latestProgress = platformEvents.find((e) => e.type === 'job.progress');
+            const progressData = (latestProgress?.data as SseJobProgressData) || {};
+            const percentage = progressData.percentage ?? 0;
+            const current = progressData.current ?? 0;
+            const total = progressData.total ?? null;
+            const listingsFound = progressData.listingsFound ?? 0;
+            const complete = platformEvents.find((e) => e.type === 'job.complete');
+            const failed = platformEvents.find((e) => e.type === 'job.failed');
+            const liveListings = platformEvents
+              .filter((e) => e.type === 'listing.found')
+              .slice(0, 20);
 
-          let borderColor = 'rgba(255,255,255,0.1)';
-          if (complete) borderColor = 'rgba(52,211,153,0.5)';
-          else if (failed) borderColor = 'rgba(248,113,113,0.5)';
+            let borderColor = 'rgba(255,255,255,0.1)';
+            if (complete) borderColor = 'rgba(52,211,153,0.5)';
+            else if (failed) borderColor = 'rgba(248,113,113,0.5)';
 
-          const effectivePercentage = complete ? 100 : percentage;
-          const phaseLabel = platformEvents.length === 0
-            ? `Connecting to ${platformUpper}...`
-            : failed
-              ? 'Scan Failed'
-              : complete
-                ? 'Scan Complete!'
-                : `Scanning ${platformUpper}...`;
+            const effectivePercentage = complete ? 100 : percentage;
+            const phaseLabel =
+              platformEvents.length === 0
+                ? `Connecting to ${platformUpper}...`
+                : failed
+                  ? 'Scan Failed'
+                  : complete
+                    ? 'Scan Complete!'
+                    : `Scanning ${platformUpper}...`;
 
-          const progressFill = failed ? PROGRESS_FILL_FAILED : PROGRESS_FILL_RUNNING;
+            const progressFill = failed ? PROGRESS_FILL_FAILED : PROGRESS_FILL_RUNNING;
 
-          return (
-            <div
-              data-testid="scrape-progress-indicator"
-              className="fp-glass"
-              style={{ marginTop: 24, padding: 24, borderColor, transition: 'border-color 0.5s' }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                {failed ? (
-                  <AlertCircle className="w-5 h-5" style={{ color: DANGER_RED }} />
-                ) : complete ? (
-                  <CheckCircle className="w-5 h-5" style={{ color: PROFIT_GREEN }} />
-                ) : (
-                  <Loader2 className="w-5 h-5 animate-spin" style={{ color: RUNNING_PURPLE }} />
-                )}
-                <span
-                  data-testid="scrape-progress-platform"
-                  style={{ fontWeight: 500, color: TEXT_PRIMARY }}
-                >
-                  {phaseLabel}
-                </span>
-              </div>
-
+            return (
               <div
-                style={{
-                  width: '100%',
-                  height: 12,
-                  borderRadius: 9999,
-                  background: PROGRESS_TRACK,
-                  overflow: 'hidden',
-                }}
+                data-testid="scrape-progress-indicator"
+                className="fp-glass"
+                style={{ marginTop: 24, padding: 24, borderColor, transition: 'border-color 0.5s' }}
               >
-                <div
-                  data-testid="scrape-progress-bar"
-                  style={{
-                    height: '100%',
-                    borderRadius: 9999,
-                    width: `${effectivePercentage}%`,
-                    background: progressFill,
-                    transition: 'width 0.5s ease-out',
-                  }}
-                />
-              </div>
-
-              <div
-                data-testid="sse-progress-region"
-                aria-live="polite"
-                aria-atomic="true"
-                style={{ marginTop: 12, fontSize: 13, color: TEXT_SECONDARY, display: 'flex', flexWrap: 'wrap', gap: 16 }}
-              >
-                <span data-testid="scrape-progress-percentage">
-                  {effectivePercentage}%
-                </span>
-                {total !== null && (
-                  <span>{current}/{total} processed</span>
-                )}
-                <span style={{ color: PROFIT_GREEN }}>{listingsFound} opportunities</span>
-              </div>
-
-              {failed && (
-                <p
-                  style={{ marginTop: 12, fontSize: 13, color: DANGER_RED_SOFT }}
-                  data-testid="scrape-progress-error"
-                >
-                  {(failed.data as SseJobFailedData).errorMessage ?? 'Scrape failed'}
-                </p>
-              )}
-
-              {liveListings.length > 0 && (
-                <div style={{ marginTop: 16 }} data-testid="scrape-progress-listings">
-                  <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: TEXT_SECONDARY, marginBottom: 8 }}>
-                    Latest finds:
-                  </p>
-                  {liveListings.map((ev, idx) => {
-                    const d = ev.data as SseListingFoundData;
-                    const price = d.price ?? d.askingPrice;
-                    return (
-                      <div
-                        key={idx}
-                        style={{ fontSize: 13, color: TEXT_PRIMARY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                      >
-                        • {d.title ?? 'Listing'} {price !== undefined && `— $${price}`}
-                      </div>
-                    );
-                  })}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                  {failed ? (
+                    <AlertCircle className="w-5 h-5" style={{ color: DANGER_RED }} />
+                  ) : complete ? (
+                    <CheckCircle className="w-5 h-5" style={{ color: PROFIT_GREEN }} />
+                  ) : (
+                    <Loader2 className="w-5 h-5 animate-spin" style={{ color: RUNNING_PURPLE }} />
+                  )}
+                  <span
+                    data-testid="scrape-progress-platform"
+                    style={{ fontWeight: 500, color: TEXT_PRIMARY }}
+                  >
+                    {phaseLabel}
+                  </span>
                 </div>
-              )}
-            </div>
-          );
-        })()}
+
+                <div
+                  style={{
+                    width: '100%',
+                    height: 12,
+                    borderRadius: 9999,
+                    background: PROGRESS_TRACK,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    data-testid="scrape-progress-bar"
+                    style={{
+                      height: '100%',
+                      borderRadius: 9999,
+                      width: `${effectivePercentage}%`,
+                      background: progressFill,
+                      transition: 'width 0.5s ease-out',
+                    }}
+                  />
+                </div>
+
+                <div
+                  data-testid="sse-progress-region"
+                  aria-live="polite"
+                  aria-atomic="true"
+                  style={{
+                    marginTop: 12,
+                    fontSize: 13,
+                    color: TEXT_SECONDARY,
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 16,
+                  }}
+                >
+                  <span data-testid="scrape-progress-percentage">{effectivePercentage}%</span>
+                  {total !== null && (
+                    <span>
+                      {current}/{total} processed
+                    </span>
+                  )}
+                  <span style={{ color: PROFIT_GREEN }}>{listingsFound} opportunities</span>
+                </div>
+
+                {failed && (
+                  <p
+                    style={{ marginTop: 12, fontSize: 13, color: DANGER_RED_SOFT }}
+                    data-testid="scrape-progress-error"
+                  >
+                    {(failed.data as SseJobFailedData).errorMessage ?? 'Scrape failed'}
+                  </p>
+                )}
+
+                {liveListings.length > 0 && (
+                  <div style={{ marginTop: 16 }} data-testid="scrape-progress-listings">
+                    <p
+                      style={{
+                        fontSize: 11,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.06em',
+                        color: TEXT_SECONDARY,
+                        marginBottom: 8,
+                      }}
+                    >
+                      Latest finds:
+                    </p>
+                    {liveListings.map((ev, idx) => {
+                      const d = ev.data as SseListingFoundData;
+                      const price = d.price ?? d.askingPrice;
+                      return (
+                        <div
+                          key={idx}
+                          style={{
+                            fontSize: 13,
+                            color: TEXT_PRIMARY,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          • {d.title ?? 'Listing'} {price !== undefined && `— $${price}`}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
         {/* Save Config Dialog */}
         {showSaveDialog && (
@@ -873,10 +971,21 @@ export default function ScraperPage() {
             aria-modal="true"
             aria-labelledby="save-config-title"
           >
-            <div className="fp-glass" style={{ padding: 24, maxWidth: 448, width: '100%', margin: '0 16px' }}>
+            <div
+              className="fp-glass"
+              style={{ padding: 24, maxWidth: 448, width: '100%', margin: '0 16px' }}
+            >
               <h3
                 id="save-config-title"
-                style={{ fontSize: 18, fontWeight: 600, color: TEXT_PRIMARY, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}
+                style={{
+                  fontSize: 18,
+                  fontWeight: 600,
+                  color: TEXT_PRIMARY,
+                  marginBottom: 16,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
               >
                 <Save className="w-5 h-5" style={{ color: PURPLE_ACCENT }} />
                 Save Search Configuration
@@ -894,12 +1003,23 @@ export default function ScraperPage() {
                 autoFocus
                 aria-label="Search configuration name"
               />
-              <div style={{ fontSize: 12, color: TEXT_SECONDARY, marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: TEXT_SECONDARY,
+                  marginBottom: 16,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 4,
+                }}
+              >
                 <p>Location: {locations.find((l) => l.value === location)?.label}</p>
                 <p>Category: {categories.find((c) => c.value === category)?.label}</p>
                 {keywords && <p>Keywords: {keywords}</p>}
                 {(minPrice || maxPrice) && (
-                  <p>Price: ${minPrice || '0'} - ${maxPrice || '∞'}</p>
+                  <p>
+                    Price: ${minPrice || '0'} - ${maxPrice || '∞'}
+                  </p>
                 )}
               </div>
               <div style={{ display: 'flex', gap: 12 }}>
@@ -908,7 +1028,13 @@ export default function ScraperPage() {
                   onClick={handleSaveConfig}
                   disabled={savingConfig || !saveConfigName.trim()}
                   className="fp-btn-primary"
-                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                  style={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                  }}
                   data-testid="save-config-submit"
                 >
                   {savingConfig ? (
@@ -966,7 +1092,9 @@ export default function ScraperPage() {
                   {result.savedCount} listings saved to database
                 </p>
               )}
-              {result.error && <p style={{ marginTop: 4, fontSize: 13, color: TEXT_SECONDARY }}>{result.error}</p>}
+              {result.error && (
+                <p style={{ marginTop: 4, fontSize: 13, color: TEXT_SECONDARY }}>{result.error}</p>
+              )}
             </div>
 
             {/* Scraped Listings Preview */}
@@ -981,7 +1109,13 @@ export default function ScraperPage() {
                   {result.listings.slice(0, 10).map((listing, index) => (
                     <div
                       key={index}
-                      style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 16, borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                      style={{
+                        padding: 16,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 16,
+                        borderTop: '1px solid rgba(255,255,255,0.06)',
+                      }}
                       data-fp-row-hover="true"
                     >
                       {listing.imageUrl ? (
@@ -989,18 +1123,38 @@ export default function ScraperPage() {
                         <img
                           src={listing.imageUrl}
                           alt={listing.title}
-                          style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)' }}
+                          style={{
+                            width: 64,
+                            height: 64,
+                            objectFit: 'cover',
+                            borderRadius: 8,
+                            border: '1px solid rgba(255,255,255,0.1)',
+                          }}
                         />
                       ) : (
                         <div
                           className="fp-glass-sm"
-                          style={{ width: 64, height: 64, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                          style={{
+                            width: 64,
+                            height: 64,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
                         >
                           <Package className="w-6 h-6" style={{ color: TEXT_SECONDARY }} />
                         </div>
                       )}
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontWeight: 500, color: TEXT_PRIMARY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <p
+                          style={{
+                            fontWeight: 500,
+                            color: TEXT_PRIMARY,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
                           {listing.title}
                         </p>
                         <p style={{ fontSize: 13, color: TEXT_SECONDARY }}>{listing.location}</p>
@@ -1021,7 +1175,16 @@ export default function ScraperPage() {
                   ))}
                 </div>
                 {result.listings.length > 10 && (
-                  <div className="fp-glass-sm" style={{ padding: 16, textAlign: 'center', color: TEXT_SECONDARY, borderRadius: 0, fontSize: 13 }}>
+                  <div
+                    className="fp-glass-sm"
+                    style={{
+                      padding: 16,
+                      textAlign: 'center',
+                      color: TEXT_SECONDARY,
+                      borderRadius: 0,
+                      fontSize: 13,
+                    }}
+                  >
                     +{result.listings.length - 10} more listings saved
                   </div>
                 )}
@@ -1034,7 +1197,12 @@ export default function ScraperPage() {
                 <Link
                   href="/"
                   className="fp-btn-primary"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    textDecoration: 'none',
+                  }}
                 >
                   View Dashboard
                   <ArrowLeft className="w-4 h-4" style={{ transform: 'rotate(180deg)' }} />
@@ -1048,7 +1216,13 @@ export default function ScraperPage() {
         <div className="fp-glass" style={{ marginTop: 32, padding: 0, overflow: 'hidden' }}>
           <div
             className="fp-glass-sm"
-            style={{ padding: 16, borderRadius: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+            style={{
+              padding: 16,
+              borderRadius: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <History className="w-5 h-5" style={{ color: PURPLE_ACCENT }} />
@@ -1068,9 +1242,25 @@ export default function ScraperPage() {
           {/* Filters */}
           <div
             className="fp-glass-sm"
-            style={{ padding: 12, borderRadius: 0, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12, borderTop: '1px solid rgba(255,255,255,0.06)' }}
+            style={{
+              padding: 12,
+              borderRadius: 0,
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: 12,
+              borderTop: '1px solid rgba(255,255,255,0.06)',
+            }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: TEXT_SECONDARY }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                fontSize: 12,
+                color: TEXT_SECONDARY,
+              }}
+            >
               <Filter className="w-3.5 h-3.5" />
               <span>Filters:</span>
             </div>
@@ -1152,7 +1342,11 @@ export default function ScraperPage() {
           ) : jobs.length === 0 ? (
             <div style={{ padding: 24 }}>
               <EmptyState
-                title={jobStatusFilter || jobDateFilter ? 'No jobs match the current filters' : 'No scraper jobs yet'}
+                title={
+                  jobStatusFilter || jobDateFilter
+                    ? 'No jobs match the current filters'
+                    : 'No scraper jobs yet'
+                }
                 message={
                   jobStatusFilter || jobDateFilter
                     ? 'Try clearing the filters to see all jobs.'
@@ -1165,7 +1359,13 @@ export default function ScraperPage() {
               {jobs.map((job) => (
                 <div
                   key={job.id}
-                  style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 16, borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                  style={{
+                    padding: 16,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 16,
+                    borderTop: '1px solid rgba(255,255,255,0.06)',
+                  }}
                   data-fp-row-hover="true"
                 >
                   <div style={{ color: getStatusColor(job.status) }}>
@@ -1176,7 +1376,15 @@ export default function ScraperPage() {
                       <span style={{ fontWeight: 500, color: TEXT_PRIMARY }}>{job.platform}</span>
                       <span className={getStatusBadgeClass(job.status)}>{job.status}</span>
                     </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, fontSize: 12, color: TEXT_SECONDARY }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: 8,
+                        fontSize: 12,
+                        color: TEXT_SECONDARY,
+                      }}
+                    >
                       {job.location && (
                         <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                           <MapPin className="w-3 h-3" />
@@ -1195,11 +1403,15 @@ export default function ScraperPage() {
                       </span>
                     </div>
                     {job.errorMessage && (
-                      <p style={{ fontSize: 12, color: DANGER_RED_SOFT, marginTop: 4 }}>{job.errorMessage}</p>
+                      <p style={{ fontSize: 12, color: DANGER_RED_SOFT, marginTop: 4 }}>
+                        {job.errorMessage}
+                      </p>
                     )}
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <p style={{ fontSize: 13, color: TEXT_PRIMARY }}>{job.listingsFound} listings</p>
+                    <p style={{ fontSize: 13, color: TEXT_PRIMARY }}>
+                      {job.listingsFound} listings
+                    </p>
                     {job.opportunitiesFound > 0 && (
                       <p style={{ fontSize: 12, color: PROFIT_GREEN }}>
                         {job.opportunitiesFound} opportunities

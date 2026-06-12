@@ -54,6 +54,7 @@ Or follow the manual steps below.
 4. **Application type:** Web application
 5. **Name:** Flipper AI Web
 6. **Authorized JavaScript origins:**
+
    ```
    http://localhost:3200
    https://axovia-flipper.web.app
@@ -61,6 +62,7 @@ Or follow the manual steps below.
 
 7. **Authorized redirect URIs:**
    Firebase Auth handles OAuth callbacks automatically. Add your Firebase Auth domain:
+
    ```
    https://axovia-flipper.firebaseapp.com/__/auth/handler
    ```
@@ -71,12 +73,14 @@ Or follow the manual steps below.
 ### Step 4: Add to Environment Variables
 
 **Local development (`.env.local`):**
+
 ```bash
 GOOGLE_CLIENT_ID=your_google_client_id_here
 GOOGLE_CLIENT_SECRET=your_google_client_secret_here
 ```
 
 **Production (GCP Secret Manager):**
+
 ```bash
 echo -n "your_google_client_id_here" | gcloud secrets create GOOGLE_CLIENT_ID --data-file=-
 echo -n "your_google_client_secret_here" | gcloud secrets create GOOGLE_CLIENT_SECRET --data-file=-
@@ -92,7 +96,7 @@ echo -n "your_google_client_secret_here" | gcloud secrets create GOOGLE_CLIENT_S
 2. Click **"New OAuth App"**
 3. Fill in:
    - **Application name:** Flipper AI
-   - **Homepage URL:** 
+   - **Homepage URL:**
      - Dev: `http://localhost:3200`
      - Prod: `https://axovia-flipper.web.app`
    - **Application description:** AI-powered marketplace flipping tool
@@ -111,12 +115,14 @@ echo -n "your_google_client_secret_here" | gcloud secrets create GOOGLE_CLIENT_S
 ### Step 3: Add to Environment Variables
 
 **Local development (`.env.local`):**
+
 ```bash
 GITHUB_CLIENT_ID=your_github_client_id_here
 GITHUB_CLIENT_SECRET=your_github_client_secret_here
 ```
 
 **Production (GCP Secret Manager):**
+
 ```bash
 echo -n "your_github_client_id_here" | gcloud secrets create GITHUB_CLIENT_ID --data-file=-
 echo -n "your_github_client_secret_here" | gcloud secrets create GITHUB_CLIENT_SECRET --data-file=-
@@ -129,6 +135,7 @@ echo -n "your_github_client_secret_here" | gcloud secrets create GITHUB_CLIENT_S
 After deploying to Firebase Hosting + Cloud Run, update your OAuth callback URLs:
 
 ### Google Console
+
 1. Go to: https://console.developers.google.com
 2. Navigate to **Credentials** → your OAuth client
 3. Ensure the Firebase Auth handler is in **Authorized redirect URIs**:
@@ -137,6 +144,7 @@ After deploying to Firebase Hosting + Cloud Run, update your OAuth callback URLs
    ```
 
 ### GitHub Settings
+
 1. Go to: https://github.com/settings/developers
 2. Click on your OAuth app
 3. Update **Authorization callback URL** to the Firebase Auth handler:
@@ -151,6 +159,7 @@ After deploying to Firebase Hosting + Cloud Run, update your OAuth callback URLs
 ### Local Testing
 
 1. Start dev server:
+
    ```bash
    npm run dev
    ```
@@ -164,6 +173,7 @@ After deploying to Firebase Hosting + Cloud Run, update your OAuth callback URLs
 ### Production Testing
 
 1. Deploy to production:
+
    ```bash
    firebase deploy --only hosting
    ```
@@ -190,6 +200,7 @@ npx playwright test e2e/acceptance/auth-oauth.spec.ts --headed
 ```
 
 **Expected results:**
+
 - ✅ OAuth buttons display correctly
 - ✅ OAuth configuration detected
 - ✅ Security checks pass (CSRF, HTTPS)
@@ -204,10 +215,11 @@ npx playwright test e2e/acceptance/auth-oauth.spec.ts --headed
 **Possible causes:**
 
 1. **Missing credentials**
+
    ```bash
    # Check .env.local
    cat .env.local | grep GOOGLE
-   
+
    # Should show:
    # GOOGLE_CLIENT_ID=...
    # GOOGLE_CLIENT_SECRET=...
@@ -222,10 +234,11 @@ npx playwright test e2e/acceptance/auth-oauth.spec.ts --headed
    - Click **"Publish App"** (for external users)
 
 4. **APP_URL mismatch**
+
    ```bash
    # In .env.local (dev)
    APP_URL=http://localhost:3200
-   
+
    # In production
    APP_URL=https://axovia-flipper.web.app
    ```
@@ -255,6 +268,7 @@ npx playwright test e2e/acceptance/auth-oauth.spec.ts --headed
 **OAuth tests are skipped by default** unless credentials are configured.
 
 **To run OAuth tests:**
+
 1. Set up credentials (see steps above)
 2. Run tests in headed mode to manually complete OAuth flow:
    ```bash
@@ -283,6 +297,7 @@ npx playwright test e2e/acceptance/auth-oauth.spec.ts --headed
 ```
 
 **Verify production secrets:**
+
 ```bash
 gcloud secrets list --project=axovia-flipper
 ```

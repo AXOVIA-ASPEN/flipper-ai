@@ -127,12 +127,16 @@ describe('marketplace-scanner', () => {
       // default category (1.2-1.5), new condition (1.0), feeRate=0, asking=57
       // estLow=68, estHigh=86, profitLow=11, profitHigh=29, profitPotential=20
       // valueScore with $20 profit exceeds 70 threshold, but profit < $25
-      const result = analyzeListing('CRAIGSLIST', makeListing({
-        title: 'Generic item',
-        askingPrice: 57,
-        condition: 'new',
-        category: null,
-      }), { opportunityThreshold: 0, feeRate: 0 });
+      const result = analyzeListing(
+        'CRAIGSLIST',
+        makeListing({
+          title: 'Generic item',
+          askingPrice: 57,
+          condition: 'new',
+          category: null,
+        }),
+        { opportunityThreshold: 0, feeRate: 0 }
+      );
       expect(result.estimation.profitPotential).toBeLessThan(25);
       expect(result.isOpportunity).toBe(false);
     });
@@ -140,24 +144,32 @@ describe('marketplace-scanner', () => {
     it('should accept opportunity when profit meets $25 default floor', () => {
       // default category (1.2-1.5), new condition (1.0), feeRate=0, asking=143
       // profitPotential ≈ 50 → exceeds $25 floor
-      const result = analyzeListing('CRAIGSLIST', makeListing({
-        title: 'Generic item',
-        askingPrice: 143,
-        condition: 'new',
-        category: null,
-      }), { opportunityThreshold: 0, feeRate: 0 });
+      const result = analyzeListing(
+        'CRAIGSLIST',
+        makeListing({
+          title: 'Generic item',
+          askingPrice: 143,
+          condition: 'new',
+          category: null,
+        }),
+        { opportunityThreshold: 0, feeRate: 0 }
+      );
       expect(result.estimation.profitPotential).toBeGreaterThanOrEqual(25);
       expect(result.isOpportunity).toBe(true);
     });
 
     it('should use custom opportunityMinProfit when provided', () => {
       // With opportunityMinProfit=100, a $50 profit item should be rejected
-      const result = analyzeListing('CRAIGSLIST', makeListing({
-        title: 'Generic item',
-        askingPrice: 143,
-        condition: 'new',
-        category: null,
-      }), { opportunityThreshold: 0, feeRate: 0, opportunityMinProfit: 100 });
+      const result = analyzeListing(
+        'CRAIGSLIST',
+        makeListing({
+          title: 'Generic item',
+          askingPrice: 143,
+          condition: 'new',
+          category: null,
+        }),
+        { opportunityThreshold: 0, feeRate: 0, opportunityMinProfit: 100 }
+      );
       expect(result.estimation.profitPotential).toBeGreaterThanOrEqual(25);
       expect(result.estimation.profitPotential).toBeLessThan(100);
       expect(result.isOpportunity).toBe(false);
@@ -165,12 +177,16 @@ describe('marketplace-scanner', () => {
 
     it('should use custom opportunityMinProfit=0 to disable profit floor', () => {
       // With opportunityMinProfit=0, even tiny profit should be accepted
-      const result = analyzeListing('CRAIGSLIST', makeListing({
-        title: 'Generic item',
-        askingPrice: 57,
-        condition: 'new',
-        category: null,
-      }), { opportunityThreshold: 0, feeRate: 0, opportunityMinProfit: 0 });
+      const result = analyzeListing(
+        'CRAIGSLIST',
+        makeListing({
+          title: 'Generic item',
+          askingPrice: 57,
+          condition: 'new',
+          category: null,
+        }),
+        { opportunityThreshold: 0, feeRate: 0, opportunityMinProfit: 0 }
+      );
       expect(result.estimation.profitPotential).toBeGreaterThanOrEqual(0);
       expect(result.isOpportunity).toBe(true);
     });
@@ -555,8 +571,11 @@ describe('marketplace-scanner - emitEvents functionality', () => {
   });
 
   it('works with emitEvents option in processListings', () => {
-    const listings = [makeListing({ externalId: 'batch-1' }), makeListing({ externalId: 'batch-2' })];
-    
+    const listings = [
+      makeListing({ externalId: 'batch-1' }),
+      makeListing({ externalId: 'batch-2' }),
+    ];
+
     processListings('MERCARI', listings, undefined, { emitEvents: true, userId: 'batch-user' });
 
     // Should emit once per listing

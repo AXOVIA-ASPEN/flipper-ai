@@ -138,11 +138,7 @@ test.describe('Performance & Core Web Vitals', () => {
         const status = response.status();
         const url = response.url();
         // Ignore API calls that may 401/404 without auth, and favicon
-        if (
-          status >= 500 &&
-          !url.includes('/api/') &&
-          !url.includes('favicon')
-        ) {
+        if (status >= 500 && !url.includes('/api/') && !url.includes('favicon')) {
           failedRequests.push({ url, status });
         }
       });

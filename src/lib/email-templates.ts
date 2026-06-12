@@ -114,8 +114,16 @@ export function welcomeEmailHtml(opts: WelcomeEmailOptions): string {
 
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom:28px;">
       ${[
-        ['🔍', 'Scan Marketplaces', 'Search eBay, Craigslist, Facebook Marketplace & more simultaneously.'],
-        ['🤖', 'AI Price Analysis', 'Our AI identifies undervalued items and estimates resale profit.'],
+        [
+          '🔍',
+          'Scan Marketplaces',
+          'Search eBay, Craigslist, Facebook Marketplace & more simultaneously.',
+        ],
+        [
+          '🤖',
+          'AI Price Analysis',
+          'Our AI identifies undervalued items and estimates resale profit.',
+        ],
         ['🔔', 'Instant Alerts', 'Get notified when deals matching your saved searches appear.'],
         ['📊', 'Profit Tracking', 'Track your inventory, ROI, and performance over time.'],
       ]
@@ -288,7 +296,10 @@ export function digestEmailHtml(opts: DigestEmailOptions): string {
     </p>
   `;
 
-  return baseLayout(body, `Your daily Flipper AI digest — ${opts.opportunities.length} opportunities found.`)
+  return baseLayout(
+    body,
+    `Your daily Flipper AI digest — ${opts.opportunities.length} opportunities found.`
+  )
     .replace(/\{\{unsubscribe_url\}\}/g, opts.unsubscribeUrl)
     .replace(/\{\{settings_url\}\}/g, opts.settingsUrl)
     .replace(/\{\{app_url\}\}/g, opts.appUrl);
@@ -595,7 +606,10 @@ export function scanSummaryEmailHtml(opts: ScanSummaryEmailOptions): string {
     </div>
   `;
 
-  return baseLayout(body, `Scan complete: ${opts.opportunitiesFound} opportunities found for "${opts.query}"`)
+  return baseLayout(
+    body,
+    `Scan complete: ${opts.opportunitiesFound} opportunities found for "${opts.query}"`
+  )
     .replace(/\{\{unsubscribe_url\}\}/g, opts.unsubscribeUrl)
     .replace(/\{\{settings_url\}\}/g, opts.settingsUrl)
     .replace(/\{\{app_url\}\}/g, opts.appUrl);
@@ -611,7 +625,10 @@ export function scanSummaryEmailText(opts: ScanSummaryEmailOptions): string {
     `Scan time: ${opts.duration}s`,
   ];
   if (opts.topOpportunity) {
-    lines.push('', `Top opportunity: ${opts.topOpportunity.title} — $${opts.topOpportunity.price.toFixed(0)} (+$${opts.topOpportunity.profit.toFixed(0)} est. profit)`);
+    lines.push(
+      '',
+      `Top opportunity: ${opts.topOpportunity.title} — $${opts.topOpportunity.price.toFixed(0)} (+$${opts.topOpportunity.profit.toFixed(0)} est. profit)`
+    );
   }
   lines.push('', `View results: ${opts.appUrl}/opportunities?scan=${opts.scanId}`);
   lines.push('', '---', `Unsubscribe: ${opts.unsubscribeUrl}`, `Preferences: ${opts.settingsUrl}`);
@@ -688,7 +705,10 @@ export function paymentFailedEmailHtml(opts: PaymentFailedEmailOptions): string 
     </p>
   `;
 
-  return baseLayout(body, 'Action needed: Update your payment method to keep finding profitable flips')
+  return baseLayout(
+    body,
+    'Action needed: Update your payment method to keep finding profitable flips'
+  )
     .replace(/\{\{unsubscribe_url\}\}/g, opts.unsubscribeUrl)
     .replace(/\{\{settings_url\}\}/g, opts.settingsUrl)
     .replace(/\{\{app_url\}\}/g, opts.appUrl);
@@ -844,7 +864,10 @@ export function opportunityFoundEmailHtml(opts: OpportunityFoundEmailOptions): s
     </p>
   `;
 
-  return baseLayout(body, `New opportunity: ${opts.itemTitle} for $${buyPrice} — est. +$${profit} profit`)
+  return baseLayout(
+    body,
+    `New opportunity: ${opts.itemTitle} for $${buyPrice} — est. +$${profit} profit`
+  )
     .replace(/\{\{unsubscribe_url\}\}/g, opts.unsubscribeUrl)
     .replace(/\{\{settings_url\}\}/g, opts.settingsUrl)
     .replace(/\{\{app_url\}\}/g, opts.appUrl);
@@ -1083,7 +1106,8 @@ export function flipSoldEmailHtml(opts: FlipSoldEmailOptions): string {
   const profit = (opts.actualProfit ?? 0).toFixed(2);
   const roi = (opts.roiPercent ?? 0).toFixed(0);
   const purchasePrice = (opts.purchasePrice ?? 0).toFixed(2);
-  const daysLabel = opts.daysToFlip != null ? `${opts.daysToFlip} day${opts.daysToFlip === 1 ? '' : 's'}` : null;
+  const daysLabel =
+    opts.daysToFlip != null ? `${opts.daysToFlip} day${opts.daysToFlip === 1 ? '' : 's'}` : null;
 
   const body = `
     <h1 style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:${TEXT_PRIMARY};">Flip Sold! 🎉</h1>
@@ -1159,7 +1183,10 @@ export function flipSoldEmailText(opts: FlipSoldEmailOptions): string {
   const profit = (opts.actualProfit ?? 0).toFixed(2);
   const roi = (opts.roiPercent ?? 0).toFixed(0);
   const purchasePrice = (opts.purchasePrice ?? 0).toFixed(2);
-  const daysLabel = opts.daysToFlip != null ? `Time to Flip: ${opts.daysToFlip} day${opts.daysToFlip === 1 ? '' : 's'}` : '';
+  const daysLabel =
+    opts.daysToFlip != null
+      ? `Time to Flip: ${opts.daysToFlip} day${opts.daysToFlip === 1 ? '' : 's'}`
+      : '';
 
   return `Flip Sold! 🎉
 
@@ -1229,10 +1256,14 @@ export interface ReviewReceivedEmailOptions {
 
 export function reviewReceivedEmailHtml(opts: ReviewReceivedEmailOptions): string {
   const displayName = opts.name ? opts.name.split(' ')[0] : undefined;
-  const greeting = displayName ? `<p style="margin:0 0 16px 0;font-size:16px;color:${TEXT_SECONDARY};">Hi ${escapeHtml(displayName)},</p>` : '';
+  const greeting = displayName
+    ? `<p style="margin:0 0 16px 0;font-size:16px;color:${TEXT_SECONDARY};">Hi ${escapeHtml(displayName)},</p>`
+    : '';
   const rating = Math.max(1, Math.min(5, Math.round(opts.rating)));
-  const stars = Array.from({ length: 5 }, (_, i) =>
-    `<span style="color:${WARNING_COLOR};font-size:20px;">${i < rating ? '&#9733;' : '&#9734;'}</span>`
+  const stars = Array.from(
+    { length: 5 },
+    (_, i) =>
+      `<span style="color:${WARNING_COLOR};font-size:20px;">${i < rating ? '&#9733;' : '&#9734;'}</span>`
   ).join('');
   const reviewer = escapeHtml(opts.reviewerName ?? 'A buyer');
   const reviewPreview = escapeHtml(opts.reviewText.slice(0, 200));
@@ -1271,7 +1302,15 @@ export function reviewReceivedEmailText(opts: ReviewReceivedEmailOptions): strin
 
   const lines: string[] = [`New Review Received — ${opts.platform}`];
   if (displayName) lines.push(`Hi ${displayName},`);
-  lines.push('', `Rating: ${rating}/5 stars`, `From: ${reviewer}`, '', `"${reviewPreview}"`, '', `View Review: ${validatedReviewUrl}`);
+  lines.push(
+    '',
+    `Rating: ${rating}/5 stars`,
+    `From: ${reviewer}`,
+    '',
+    `"${reviewPreview}"`,
+    '',
+    `View Review: ${validatedReviewUrl}`
+  );
   lines.push('', '---', `Unsubscribe: ${opts.unsubscribeUrl}`, `Preferences: ${opts.settingsUrl}`);
   return lines.join('\n');
 }
@@ -1295,15 +1334,17 @@ export interface FlipGoneColdEmailOptions {
 
 export function flipGoneColdEmailHtml(opts: FlipGoneColdEmailOptions): string {
   const displayName = opts.name ? opts.name.split(' ')[0] : undefined;
-  const greeting = displayName ? `<p style="margin:0 0 16px 0;font-size:16px;color:${TEXT_SECONDARY};">Hi ${escapeHtml(displayName)},</p>` : '';
+  const greeting = displayName
+    ? `<p style="margin:0 0 16px 0;font-size:16px;color:${TEXT_SECONDARY};">Hi ${escapeHtml(displayName)},</p>`
+    : '';
   const title = escapeHtml(opts.listingTitle);
   const sellerDisplay = escapeHtml(opts.sellerName ?? 'the seller');
-  const headline = opts.coldReason === 'user_not_replied'
-    ? "You haven't responded"
-    : "Seller hasn't responded";
-  const subtext = opts.coldReason === 'user_not_replied'
-    ? `${sellerDisplay} is waiting for your reply on this flip.`
-    : `You sent a message and ${sellerDisplay} hasn't responded yet.`;
+  const headline =
+    opts.coldReason === 'user_not_replied' ? "You haven't responded" : "Seller hasn't responded";
+  const subtext =
+    opts.coldReason === 'user_not_replied'
+      ? `${sellerDisplay} is waiting for your reply on this flip.`
+      : `You sent a message and ${sellerDisplay} hasn't responded yet.`;
 
   const body = `
     ${greeting}
@@ -1323,9 +1364,10 @@ export function flipGoneColdEmailHtml(opts: FlipGoneColdEmailOptions): string {
     </div>
   `;
 
-  const preview = opts.coldReason === 'user_not_replied'
-    ? `No response for ${opts.hoursSinceLastResponse}h on ${title}`
-    : `Seller hasn't responded for ${opts.hoursSinceLastResponse}h on ${title}`;
+  const preview =
+    opts.coldReason === 'user_not_replied'
+      ? `No response for ${opts.hoursSinceLastResponse}h on ${title}`
+      : `Seller hasn't responded for ${opts.hoursSinceLastResponse}h on ${title}`;
 
   return baseLayout(body, preview)
     .replace(/\{\{unsubscribe_url\}\}/g, opts.unsubscribeUrl)
@@ -1336,9 +1378,8 @@ export function flipGoneColdEmailHtml(opts: FlipGoneColdEmailOptions): string {
 export function flipGoneColdEmailText(opts: FlipGoneColdEmailOptions): string {
   const displayName = opts.name ? opts.name.split(' ')[0] : null;
   const sellerDisplay = opts.sellerName ?? 'the seller';
-  const headline = opts.coldReason === 'user_not_replied'
-    ? "You haven't responded"
-    : "Seller hasn't responded";
+  const headline =
+    opts.coldReason === 'user_not_replied' ? "You haven't responded" : "Seller hasn't responded";
 
   const lines: string[] = [headline];
   if (displayName) lines.push(`Hi ${displayName},`);
@@ -1373,7 +1414,9 @@ export interface FlipTurnedHotEmailOptions {
 
 export function flipTurnedHotEmailHtml(opts: FlipTurnedHotEmailOptions): string {
   const displayName = opts.name ? opts.name.split(' ')[0] : undefined;
-  const greeting = displayName ? `<p style="margin:0 0 16px 0;font-size:16px;color:${TEXT_SECONDARY};">Hi ${escapeHtml(displayName)},</p>` : '';
+  const greeting = displayName
+    ? `<p style="margin:0 0 16px 0;font-size:16px;color:${TEXT_SECONDARY};">Hi ${escapeHtml(displayName)},</p>`
+    : '';
   const title = escapeHtml(opts.listingTitle);
   const preview = escapeHtml(opts.latestMessagePreview.slice(0, 200));
   const sellerDisplay = escapeHtml(opts.sellerName ?? 'the seller');
@@ -1447,14 +1490,17 @@ export interface PriceChangeAlertEmailOptions {
 
 export function priceChangeAlertEmailHtml(opts: PriceChangeAlertEmailOptions): string {
   const displayName = opts.name ? opts.name.split(' ')[0] : undefined;
-  const greeting = displayName ? `<p style="margin:0 0 16px 0;font-size:16px;color:${TEXT_SECONDARY};">Hi ${escapeHtml(displayName)},</p>` : '';
+  const greeting = displayName
+    ? `<p style="margin:0 0 16px 0;font-size:16px;color:${TEXT_SECONDARY};">Hi ${escapeHtml(displayName)},</p>`
+    : '';
   const title = escapeHtml(opts.listingTitle);
   const changeColor = opts.direction === 'decrease' ? SUCCESS_COLOR : DANGER_COLOR;
   const changeLabel = opts.direction === 'decrease' ? '↓ Price Decrease' : '↑ Price Increase';
   const changePct = Math.abs(opts.changePercent).toFixed(1);
-  const profitLine = opts.updatedProfitMargin != null
-    ? `<p style="margin:12px 0 0 0;font-size:14px;color:${TEXT_SECONDARY};">Updated profit margin: <strong style="color:${SUCCESS_COLOR};">$${opts.updatedProfitMargin.toFixed(2)}</strong></p>`
-    : '';
+  const profitLine =
+    opts.updatedProfitMargin != null
+      ? `<p style="margin:12px 0 0 0;font-size:14px;color:${TEXT_SECONDARY};">Updated profit margin: <strong style="color:${SUCCESS_COLOR};">$${opts.updatedProfitMargin.toFixed(2)}</strong></p>`
+      : '';
   const bgColor = opts.direction === 'decrease' ? '#f0fdf4' : '#fff1f2';
   const borderColor = opts.direction === 'decrease' ? '#bbf7d0' : '#fecdd3';
 
@@ -1499,7 +1545,7 @@ export function priceChangeAlertEmailText(opts: PriceChangeAlertEmailOptions): s
     '',
     `Listing: ${opts.listingTitle}`,
     `Platform: ${opts.platform}`,
-    `Price ${direction}: $${opts.oldPrice.toFixed(2)} → $${opts.newPrice.toFixed(2)} (${changePct}%)`,
+    `Price ${direction}: $${opts.oldPrice.toFixed(2)} → $${opts.newPrice.toFixed(2)} (${changePct}%)`
   );
   if (opts.updatedProfitMargin != null) {
     lines.push(`Updated profit margin: $${opts.updatedProfitMargin.toFixed(2)}`);

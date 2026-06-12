@@ -235,9 +235,7 @@ describe('POST /api/auth/session', () => {
   });
 
   it('returns 403 when Origin header is from a disallowed host', async () => {
-    const res = await POST(
-      createRequest({ idToken: 'valid-token' }, 'https://evil.example.com')
-    );
+    const res = await POST(createRequest({ idToken: 'valid-token' }, 'https://evil.example.com'));
     const data = await res.json();
 
     expect(res.status).toBe(403);
@@ -253,9 +251,7 @@ describe('POST /api/auth/session', () => {
   });
 
   it('allows requests from localhost origin', async () => {
-    const res = await POST(
-      createRequest({ idToken: 'valid-token' }, 'http://localhost:3000')
-    );
+    const res = await POST(createRequest({ idToken: 'valid-token' }, 'http://localhost:3000'));
 
     expect(res.status).toBe(200);
   });

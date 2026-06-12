@@ -60,7 +60,9 @@ Then('it filters opportunities to those with status {string}', function (status:
     content.includes(`status === "${status}"`) ||
     content.includes(`opp.status === "${status}"`);
   if (!hasStatusFilter) {
-    throw new Error(`Expected opportunities page to filter by status "${status}" but found none in ${this.filePath}`);
+    throw new Error(
+      `Expected opportunities page to filter by status "${status}" but found none in ${this.filePath}`
+    );
   }
 });
 
@@ -85,12 +87,17 @@ Then('each inventory card shows the days held computed from purchaseDate', funct
   }
 });
 
-Then('each inventory card shows the carrying cost computed using calculateCarryingCost', function () {
-  const content: string = this.fileContent;
-  if (!content.includes('calculateCarryingCost') && !content.includes('carryingCost')) {
-    throw new Error('Expected inventory cards to compute and display carryingCost using calculateCarryingCost');
+Then(
+  'each inventory card shows the carrying cost computed using calculateCarryingCost',
+  function () {
+    const content: string = this.fileContent;
+    if (!content.includes('calculateCarryingCost') && !content.includes('carryingCost')) {
+      throw new Error(
+        'Expected inventory cards to compute and display carryingCost using calculateCarryingCost'
+      );
+    }
   }
-});
+);
 
 Then('each inventory card shows the market value from listing.estimatedValue', function () {
   const content: string = this.fileContent;
@@ -99,12 +106,17 @@ Then('each inventory card shows the market value from listing.estimatedValue', f
   }
 });
 
-Then('when no PURCHASED items exist it renders {string} empty state text', function (emptyText: string) {
-  const content: string = this.fileContent;
-  if (!content.includes(emptyText)) {
-    throw new Error(`Expected inventory empty state to include text "${emptyText}" in ${this.filePath}`);
+Then(
+  'when no PURCHASED items exist it renders {string} empty state text',
+  function (emptyText: string) {
+    const content: string = this.fileContent;
+    if (!content.includes(emptyText)) {
+      throw new Error(
+        `Expected inventory empty state to include text "${emptyText}" in ${this.filePath}`
+      );
+    }
   }
-});
+);
 
 // ==================== Then — S-31: Aging inventory ====================
 
@@ -124,12 +136,17 @@ Then('it returns true for daysHeld of {int}', function (days: number) {
   }
 });
 
-Then('the opportunities page applies an {string} badge when isAgingInventory returns true', function (badgeText: string) {
-  const content = readSourceFile('app/opportunities/page.tsx');
-  if (!content.includes(badgeText) || !content.includes('isAgingInventory')) {
-    throw new Error(`Expected opportunities page to apply "${badgeText}" badge using isAgingInventory`);
+Then(
+  'the opportunities page applies an {string} badge when isAgingInventory returns true',
+  function (badgeText: string) {
+    const content = readSourceFile('app/opportunities/page.tsx');
+    if (!content.includes(badgeText) || !content.includes('isAgingInventory')) {
+      throw new Error(
+        `Expected opportunities page to apply "${badgeText}" badge using isAgingInventory`
+      );
+    }
   }
-});
+);
 
 Then('the carrying cost is rendered with bold red styling when the item is aging', function () {
   const content = readSourceFile('app/opportunities/page.tsx');
@@ -141,7 +158,9 @@ Then('the carrying cost is rendered with bold red styling when the item is aging
     /aging\s*\?\s*['"]#(f87171|ef4444|dc2626|b91c1c|fb7185|f43f5e)['"]/i.test(content) &&
     /aging\s*\?\s*7\d\d/.test(content);
   if (!hasTwClasses && !hasInlineRedBold) {
-    throw new Error('Expected aging inventory carrying cost to be rendered red + bold (Tailwind classes OR inline style)');
+    throw new Error(
+      'Expected aging inventory carrying cost to be rendered red + bold (Tailwind classes OR inline style)'
+    );
   }
 });
 
@@ -150,30 +169,41 @@ Then('the carrying cost is rendered with bold red styling when the item is aging
 Then('it imports useSseEvents from {string}', function (importPath: string) {
   const content: string = this.fileContent;
   if (!content.includes('useSseEvents') || !content.includes(importPath)) {
-    throw new Error(`Expected dashboard to import useSseEvents from "${importPath}" in ${this.filePath}`);
+    throw new Error(
+      `Expected dashboard to import useSseEvents from "${importPath}" in ${this.filePath}`
+    );
   }
 });
 
-Then('it subscribes to {string}, {string}, and {string} event types', function (e1: string, e2: string, e3: string) {
-  const content: string = this.fileContent;
-  if (!content.includes(e1) || !content.includes(e2) || !content.includes(e3)) {
-    throw new Error(`Expected dashboard to subscribe to SSE event types: ${e1}, ${e2}, ${e3}`);
+Then(
+  'it subscribes to {string}, {string}, and {string} event types',
+  function (e1: string, e2: string, e3: string) {
+    const content: string = this.fileContent;
+    if (!content.includes(e1) || !content.includes(e2) || !content.includes(e3)) {
+      throw new Error(`Expected dashboard to subscribe to SSE event types: ${e1}, ${e2}, ${e3}`);
+    }
   }
-});
+);
 
-Then('it has a useEffect that calls fetchListings when the most recent event receivedAt timestamp changes', function () {
-  const content: string = this.fileContent;
-  if (!content.includes('receivedAt') || !content.includes('fetchListings')) {
-    throw new Error('Expected dashboard to call fetchListings on SSE event receivedAt change');
+Then(
+  'it has a useEffect that calls fetchListings when the most recent event receivedAt timestamp changes',
+  function () {
+    const content: string = this.fileContent;
+    if (!content.includes('receivedAt') || !content.includes('fetchListings')) {
+      throw new Error('Expected dashboard to call fetchListings on SSE event receivedAt change');
+    }
   }
-});
+);
 
-Then('it renders a connection status indicator showing {string} when isConnected is true', function (label: string) {
-  const content: string = this.fileContent;
-  if (!content.includes(label) || !content.includes('isConnected')) {
-    throw new Error(`Expected dashboard to show "${label}" when isConnected is true`);
+Then(
+  'it renders a connection status indicator showing {string} when isConnected is true',
+  function (label: string) {
+    const content: string = this.fileContent;
+    if (!content.includes(label) || !content.includes('isConnected')) {
+      throw new Error(`Expected dashboard to show "${label}" when isConnected is true`);
+    }
   }
-});
+);
 
 Then('it renders a {string} indicator when isConnected is false', function (label: string) {
   const content: string = this.fileContent;
@@ -192,11 +222,14 @@ Then('it renders a non-blocking amber banner when lastError is not null', functi
   if (!content.includes('lastError')) {
     throw new Error('Expected dashboard to gate the SSE banner on lastError');
   }
-  const hasAmberCue = content.includes('amber') ||
+  const hasAmberCue =
+    content.includes('amber') ||
     content.includes('fp-alert-warn') ||
     /#(fcd34d|fbbf24|f59e0b|d97706)/i.test(content);
   if (!hasAmberCue) {
-    throw new Error('Expected dashboard SSE banner to use an amber styling cue (Tailwind, fp-alert-warn, or amber color hex)');
+    throw new Error(
+      'Expected dashboard SSE banner to use an amber styling cue (Tailwind, fp-alert-warn, or amber color hex)'
+    );
   }
 });
 
@@ -204,7 +237,8 @@ Then('the banner includes a dismiss button that hides the banner', function () {
   const content: string = this.fileContent;
   // Accept literal "Dismiss" / "dismiss" or the conventional state setter
   // `setSseErrorDismissed(true)` used by the dashboard banner.
-  const hasDismiss = content.includes('Dismiss') ||
+  const hasDismiss =
+    content.includes('Dismiss') ||
     content.includes('dismiss') ||
     content.includes('SseErrorDismissed');
   if (!hasDismiss) {
@@ -212,9 +246,16 @@ Then('the banner includes a dismiss button that hides the banner', function () {
   }
 });
 
-Then('the useSseEvents hook at {string} implements exponential backoff reconnection internally', function (filePath: string) {
-  const content = readSourceFile(filePath);
-  if (!content.includes('exponential') && !content.includes('currentDelay') && !content.includes('backoff')) {
-    throw new Error(`Expected ${filePath} to implement exponential backoff reconnection`);
+Then(
+  'the useSseEvents hook at {string} implements exponential backoff reconnection internally',
+  function (filePath: string) {
+    const content = readSourceFile(filePath);
+    if (
+      !content.includes('exponential') &&
+      !content.includes('currentDelay') &&
+      !content.includes('backoff')
+    ) {
+      throw new Error(`Expected ${filePath} to implement exponential backoff reconnection`);
+    }
   }
-});
+);

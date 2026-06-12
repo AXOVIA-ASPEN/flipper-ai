@@ -106,7 +106,10 @@ function escapeHtml(text: string): string {
     .replace(/'/g, '&#39;');
 }
 
-function resolveFooter(html: string, opts: { unsubscribeUrl: string; settingsUrl: string; appUrl: string }): string {
+function resolveFooter(
+  html: string,
+  opts: { unsubscribeUrl: string; settingsUrl: string; appUrl: string }
+): string {
   return html
     .replace(/\{\{unsubscribe_url\}\}/g, opts.unsubscribeUrl)
     .replace(/\{\{settings_url\}\}/g, opts.settingsUrl)
@@ -301,7 +304,10 @@ export function messageSentEmailHtml(opts: MessageSentEmailOptions): string {
   `;
 
   return resolveFooter(
-    baseLayout(body, `Message sent for "${listingTitleSafe}" — delivery status: ${deliveryStatusSafe}`),
+    baseLayout(
+      body,
+      `Message sent for "${listingTitleSafe}" — delivery status: ${deliveryStatusSafe}`
+    ),
     opts
   );
 }

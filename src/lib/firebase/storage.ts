@@ -68,7 +68,9 @@ export function buildStoragePath(
  */
 function validateContentType(contentType: string): asserts contentType is AllowedContentType {
   if (!ALLOWED_CONTENT_TYPES.includes(contentType as AllowedContentType)) {
-    throw new ValidationError(`Invalid image content type: ${contentType}. Allowed: ${ALLOWED_CONTENT_TYPES.join(', ')}`);
+    throw new ValidationError(
+      `Invalid image content type: ${contentType}. Allowed: ${ALLOWED_CONTENT_TYPES.join(', ')}`
+    );
   }
 }
 
@@ -159,7 +161,8 @@ export async function uploadImageFromUrl(
     );
   }
 
-  const contentType = response.headers.get('content-type')?.split(';')[0] || 'application/octet-stream';
+  const contentType =
+    response.headers.get('content-type')?.split(';')[0] || 'application/octet-stream';
   validateContentType(contentType);
 
   const arrayBuffer = await response.arrayBuffer();
@@ -253,10 +256,13 @@ export async function deleteListingImages(
   const failed = results.filter((r) => r.status === 'rejected').length;
 
   if (failed > 0) {
-    logger.error(
-      `Failed to delete ${failed}/${files.length} images for listing ${listingId}`,
-      { userId, platform, listingId, deleted: files.length - failed, failed }
-    );
+    logger.error(`Failed to delete ${failed}/${files.length} images for listing ${listingId}`, {
+      userId,
+      platform,
+      listingId,
+      deleted: files.length - failed,
+      failed,
+    });
   }
 
   return { deleted: files.length - failed, failed };

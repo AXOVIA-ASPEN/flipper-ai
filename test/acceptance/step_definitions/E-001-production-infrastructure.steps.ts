@@ -44,16 +44,13 @@ When('I inspect the project build configuration', async function (this: CustomWo
   console.log('✅ Inspecting build configuration...');
 });
 
-Then(
-  'next.config.js should have "output" set to "standalone"',
-  async function (this: CustomWorld) {
-    // next.config.js uses a conditional: output: isExport ? 'export' : 'standalone'
-    // Verify that standalone is the default output mode (non-export builds)
-    expect(nextConfigContent).toContain("'standalone'");
-    expect(nextConfigContent).toMatch(/output:.*'standalone'/);
-    console.log('✅ next.config.js has output: standalone (default for non-export builds)');
-  }
-);
+Then('next.config.js should have "output" set to "standalone"', async function (this: CustomWorld) {
+  // next.config.js uses a conditional: output: isExport ? 'export' : 'standalone'
+  // Verify that standalone is the default output mode (non-export builds)
+  expect(nextConfigContent).toContain("'standalone'");
+  expect(nextConfigContent).toMatch(/output:.*'standalone'/);
+  console.log('✅ next.config.js has output: standalone (default for non-export builds)');
+});
 
 Then(
   'the Dockerfile should exist at {string}',
@@ -122,21 +119,15 @@ Then(
 
 // ==================== AC-2: Image pushed and deployed to Cloud Run ====================
 
-Given(
-  'the Dockerfile at {string}',
-  async function (this: CustomWorld, dockerfilePath: string) {
-    dockerfileContent = readProjectFile(dockerfilePath);
-    console.log(`✅ Loaded Dockerfile: ${dockerfilePath}`);
-  }
-);
+Given('the Dockerfile at {string}', async function (this: CustomWorld, dockerfilePath: string) {
+  dockerfileContent = readProjectFile(dockerfilePath);
+  console.log(`✅ Loaded Dockerfile: ${dockerfilePath}`);
+});
 
-Given(
-  'the deploy script at {string}',
-  async function (this: CustomWorld, scriptPath: string) {
-    deployScriptContent = readProjectFile(scriptPath);
-    console.log(`✅ Loaded deploy script: ${scriptPath}`);
-  }
-);
+Given('the deploy script at {string}', async function (this: CustomWorld, scriptPath: string) {
+  deployScriptContent = readProjectFile(scriptPath);
+  console.log(`✅ Loaded deploy script: ${scriptPath}`);
+});
 
 When('I inspect the deploy script configuration', async function (this: CustomWorld) {
   console.log('✅ Inspecting deploy script configuration...');
@@ -150,21 +141,15 @@ Then(
   }
 );
 
-Then(
-  'it should tag images for {string}',
-  async function (this: CustomWorld, registry: string) {
-    expect(deployScriptContent).toContain(registry);
-    console.log(`✅ Deploy script tags images for: ${registry}`);
-  }
-);
+Then('it should tag images for {string}', async function (this: CustomWorld, registry: string) {
+  expect(deployScriptContent).toContain(registry);
+  console.log(`✅ Deploy script tags images for: ${registry}`);
+});
 
-Then(
-  'it should deploy using {string}',
-  async function (this: CustomWorld, deployCmd: string) {
-    expect(deployScriptContent).toContain(deployCmd);
-    console.log(`✅ Deploy script uses: ${deployCmd}`);
-  }
-);
+Then('it should deploy using {string}', async function (this: CustomWorld, deployCmd: string) {
+  expect(deployScriptContent).toContain(deployCmd);
+  console.log(`✅ Deploy script uses: ${deployCmd}`);
+});
 
 Then(
   'it should include a post-deploy health check against {string}',
@@ -176,12 +161,9 @@ Then(
 
 // ==================== AC-3: Auto-scaling from 0 to N ====================
 
-When(
-  'I inspect the Cloud Run scaling configuration',
-  async function (this: CustomWorld) {
-    console.log('✅ Inspecting Cloud Run scaling configuration...');
-  }
-);
+When('I inspect the Cloud Run scaling configuration', async function (this: CustomWorld) {
+  console.log('✅ Inspecting Cloud Run scaling configuration...');
+});
 
 Then(
   'the deploy command should set {string} to a value greater than {int}',
@@ -224,22 +206,23 @@ Then(
 
 // ==================== AC-5: Secrets via Secret Manager ====================
 
-When(
-  'I inspect the configuration for secret handling',
-  async function (this: CustomWorld) {
-    console.log('✅ Inspecting secret handling...');
-  }
-);
+When('I inspect the configuration for secret handling', async function (this: CustomWorld) {
+  console.log('✅ Inspecting secret handling...');
+});
 
 Then(
   'the Dockerfile should not contain any secret environment variables',
   async function (this: CustomWorld) {
     const envLines = dockerfileContent
       .split('\n')
-      .filter((line) => line.startsWith('ENV ') && !line.includes('DATABASE_URL="postgresql://build'));
+      .filter(
+        (line) => line.startsWith('ENV ') && !line.includes('DATABASE_URL="postgresql://build')
+      );
 
     for (const line of envLines) {
-      expect(line).not.toMatch(/AUTH_SECRET|NEXTAUTH_SECRET|API_KEY|STRIPE_SECRET|ENCRYPTION_SECRET/i);
+      expect(line).not.toMatch(
+        /AUTH_SECRET|NEXTAUTH_SECRET|API_KEY|STRIPE_SECRET|ENCRYPTION_SECRET/i
+      );
     }
     console.log('✅ No secret environment variables in Dockerfile');
   }
@@ -325,9 +308,7 @@ When(
       // `next start` with output: 'standalone' returns HTML for API routes locally.
       // In production (Cloud Run), standalone server.js serves JSON correctly.
       // Verify the health route handler exists by checking the route file on disk.
-      const healthRouteExists = fs.existsSync(
-        path.join(PROJECT_ROOT, 'app/api/health/route.ts')
-      );
+      const healthRouteExists = fs.existsSync(path.join(PROJECT_ROOT, 'app/api/health/route.ts'));
       expect(healthRouteExists).toBe(true);
       healthResponse = { status: 'ok', _localFallback: true };
       console.log(
@@ -340,22 +321,16 @@ When(
   }
 );
 
-Then(
-  'the health check should return a successful response',
-  async function (this: CustomWorld) {
-    expect(healthResponse).toBeTruthy();
-    expect(healthResponse.status).toBeDefined();
-    console.log(`✅ Health check response: ${JSON.stringify(healthResponse).slice(0, 200)}`);
-  }
-);
+Then('the health check should return a successful response', async function (this: CustomWorld) {
+  expect(healthResponse).toBeTruthy();
+  expect(healthResponse.status).toBeDefined();
+  console.log(`✅ Health check response: ${JSON.stringify(healthResponse).slice(0, 200)}`);
+});
 
-Then(
-  'the response should include a status indicator',
-  async function (this: CustomWorld) {
-    expect(healthResponse.status).toBeTruthy();
-    console.log(`✅ Health status: ${healthResponse.status}`);
-  }
-);
+Then('the response should include a status indicator', async function (this: CustomWorld) {
+  expect(healthResponse.status).toBeTruthy();
+  console.log(`✅ Health status: ${healthResponse.status}`);
+});
 
 // ==================== Story 1.5: Firebase Hosting & CORS Configuration ====================
 
@@ -387,8 +362,8 @@ Then(
 Then(
   'JS and CSS files should have {string} set to {string}',
   async function (this: CustomWorld, headerKey: string, headerValue: string) {
-    const rule = firebaseConfig.hosting.headers.find(
-      (h: { source: string }) => h.source.includes('.@(js|css)')
+    const rule = firebaseConfig.hosting.headers.find((h: { source: string }) =>
+      h.source.includes('.@(js|css)')
     );
     expect(rule).toBeDefined();
     const header = rule.headers.find((h: { key: string }) => h.key === headerKey);
@@ -400,8 +375,8 @@ Then(
 Then(
   'image files should have {string} set to {string}',
   async function (this: CustomWorld, headerKey: string, headerValue: string) {
-    const rule = firebaseConfig.hosting.headers.find(
-      (h: { source: string }) => h.source.includes('jpg|jpeg')
+    const rule = firebaseConfig.hosting.headers.find((h: { source: string }) =>
+      h.source.includes('jpg|jpeg')
     );
     expect(rule).toBeDefined();
     const header = rule.headers.find((h: { key: string }) => h.key === headerKey);
@@ -413,8 +388,8 @@ Then(
 Then(
   'HTML files should have {string} set to {string}',
   async function (this: CustomWorld, headerKey: string, headerValue: string) {
-    const rule = firebaseConfig.hosting.headers.find(
-      (h: { source: string }) => h.source.includes('.html')
+    const rule = firebaseConfig.hosting.headers.find((h: { source: string }) =>
+      h.source.includes('.html')
     );
     expect(rule).toBeDefined();
     const header = rule.headers.find((h: { key: string }) => h.key === headerKey);
@@ -426,8 +401,8 @@ Then(
 Then(
   'font files should include {string} set to {string}',
   async function (this: CustomWorld, headerKey: string, headerValue: string) {
-    const rule = firebaseConfig.hosting.headers.find(
-      (h: { source: string }) => h.source.includes('woff')
+    const rule = firebaseConfig.hosting.headers.find((h: { source: string }) =>
+      h.source.includes('woff')
     );
     expect(rule).toBeDefined();
     const header = rule.headers.find((h: { key: string }) => h.key === headerKey);
@@ -561,9 +536,7 @@ Then(
   async function (this: CustomWorld) {
     const rewrites = firebaseConfig.hosting.rewrites;
     const apiIndex = rewrites.findIndex((r: { source: string }) => r.source === '/api/**');
-    const catchAllIndex = rewrites.findIndex(
-      (r: { source: string }) => r.source === '**'
-    );
+    const catchAllIndex = rewrites.findIndex((r: { source: string }) => r.source === '**');
     expect(apiIndex).toBeLessThan(catchAllIndex);
     console.log(`✅ API rewrite (index ${apiIndex}) before catch-all (index ${catchAllIndex})`);
   }

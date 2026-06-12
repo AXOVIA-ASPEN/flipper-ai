@@ -63,9 +63,7 @@ export default function CrossPostModal({
   const [existing, setExisting] = useState<ExistingQueueItem[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [price, setPrice] = useState<string>(
-    askingPrice != null ? String(askingPrice) : ''
-  );
+  const [price, setPrice] = useState<string>(askingPrice != null ? String(askingPrice) : '');
   const [submitting, setSubmitting] = useState(false);
 
   // Platforms the user can choose from: all resale targets except the source.
@@ -84,9 +82,7 @@ export default function CrossPostModal({
     return set;
   }, [existing]);
 
-  const allQueued =
-    existing !== null &&
-    availablePlatforms.every((p) => alreadyQueued.has(p.key));
+  const allQueued = existing !== null && availablePlatforms.every((p) => alreadyQueued.has(p.key));
 
   useEffect(() => {
     let cancelled = false;
@@ -157,7 +153,7 @@ export default function CrossPostModal({
         throw new Error(detail);
       }
       const json = await res.json();
-      const count = json.count ?? (json.items?.length ?? selected.size);
+      const count = json.count ?? json.items?.length ?? selected.size;
       showToast({
         type: 'success',
         title: 'Cross-posts queued',
@@ -197,11 +193,7 @@ export default function CrossPostModal({
             >
               Cross-post listing
             </h2>
-            <p
-              className="mt-1 truncate text-sm"
-              style={{ color: '#94a3b8' }}
-              title={listingTitle}
-            >
+            <p className="mt-1 truncate text-sm" style={{ color: '#94a3b8' }} title={listingTitle}>
               {listingTitle}
             </p>
           </div>
@@ -267,7 +259,9 @@ export default function CrossPostModal({
                         <span className="fp-badge fp-badge-yellow text-xs">Enterprise</span>
                       )}
                       {isAlreadyQueued && (
-                        <span className="text-xs italic" style={{ color: '#94a3b8' }}>Already queued</span>
+                        <span className="text-xs italic" style={{ color: '#94a3b8' }}>
+                          Already queued
+                        </span>
                       )}
                     </label>
                   );
@@ -301,11 +295,7 @@ export default function CrossPostModal({
           className="flex items-center justify-end gap-2 p-4"
           style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
         >
-          <button
-            type="button"
-            onClick={onClose}
-            className="fp-btn-ghost"
-          >
+          <button type="button" onClick={onClose} className="fp-btn-ghost">
             Close
           </button>
           {!allQueued && (

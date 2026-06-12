@@ -60,9 +60,8 @@ export function calculateROI(input: ROIInput): ROIResult {
   const roiPercent = (netProfit / purchasePrice) * 100;
 
   // Annualized ROI (avoid division by zero)
-  const annualizedROI = daysHeld > 0
-    ? ((1 + netProfit / purchasePrice) ** (365 / daysHeld) - 1) * 100
-    : roiPercent;
+  const annualizedROI =
+    daysHeld > 0 ? ((1 + netProfit / purchasePrice) ** (365 / daysHeld) - 1) * 100 : roiPercent;
 
   return {
     daysHeld,
@@ -117,7 +116,8 @@ export function calculatePortfolioROI(items: ROIInput[]): {
   const totalCarryingCosts = results.reduce((sum, r) => sum + r.result.totalCarryingCost, 0);
   const totalGrossProfit = totalRevenue - totalInvested;
   const totalNetProfit = totalGrossProfit - totalFees - totalCarryingCosts;
-  const overallROI = totalInvested > 0 ? (totalNetProfit / totalInvested) * 100 : /* istanbul ignore next */ 0;
+  const overallROI =
+    totalInvested > 0 ? (totalNetProfit / totalInvested) * 100 : /* istanbul ignore next */ 0;
   const avgDaysHeld = results.reduce((sum, r) => sum + r.result.daysHeld, 0) / results.length;
   const completedCount = results.filter((r) => r.result.isComplete).length;
   const activeCount = results.length - completedCount;

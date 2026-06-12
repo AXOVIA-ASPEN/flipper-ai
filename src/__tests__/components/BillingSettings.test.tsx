@@ -137,9 +137,9 @@ describe('BillingSettings', () => {
     it('skeleton has three placeholder cards', () => {
       render(<BillingSettings />);
       const skeleton = screen.getByTestId('billing-skeleton');
-      const cards = within(skeleton).getAllByRole('generic').filter(
-        el => el.classList.contains('animate-pulse')
-      );
+      const cards = within(skeleton)
+        .getAllByRole('generic')
+        .filter((el) => el.classList.contains('animate-pulse'));
       expect(cards.length).toBeGreaterThanOrEqual(3);
     });
   });
@@ -334,7 +334,9 @@ describe('BillingSettings', () => {
       await waitFor(() => {
         expect(screen.getByText('Manage Billing')).toBeInTheDocument();
       });
-      expect(screen.queryByText('One good flip pays for a year of Flipper')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('One good flip pays for a year of Flipper')
+      ).not.toBeInTheDocument();
     });
 
     it('does not show trust signals for paid users', async () => {
@@ -400,10 +402,13 @@ describe('BillingSettings', () => {
       await user.click(screen.getByText(/Upgrade to Flipper/));
 
       await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith('/api/checkout', expect.objectContaining({
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-        }));
+        expect(mockFetch).toHaveBeenCalledWith(
+          '/api/checkout',
+          expect.objectContaining({
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+          })
+        );
       });
     });
 
@@ -426,9 +431,12 @@ describe('BillingSettings', () => {
       await user.click(screen.getByText(/Upgrade to Flipper/));
 
       await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith('/api/checkout', expect.objectContaining({
-          method: 'POST',
-        }));
+        expect(mockFetch).toHaveBeenCalledWith(
+          '/api/checkout',
+          expect.objectContaining({
+            method: 'POST',
+          })
+        );
       });
     });
 
@@ -537,9 +545,7 @@ describe('BillingSettings', () => {
       });
 
       const buttons = screen.getAllByRole('button');
-      const upgradeButtons = buttons.filter(
-        btn => btn.hasAttribute('disabled')
-      );
+      const upgradeButtons = buttons.filter((btn) => btn.hasAttribute('disabled'));
       expect(upgradeButtons.length).toBeGreaterThanOrEqual(1);
 
       // Resolve to clean up

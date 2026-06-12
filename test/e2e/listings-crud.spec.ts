@@ -124,10 +124,10 @@ test.describe('Feature: Listings CRUD Management', () => {
       await page.goto('/opportunities');
 
       // Look for a status filter (dropdown, tabs, or buttons)
-      const statusFilter =
-        page.getByRole('combobox', { name: /status/i }).or(
-        page.getByRole('tab', { name: /active/i })).or(
-        page.getByRole('button', { name: /active/i }));
+      const statusFilter = page
+        .getByRole('combobox', { name: /status/i })
+        .or(page.getByRole('tab', { name: /active/i }))
+        .or(page.getByRole('button', { name: /active/i }));
 
       if (await statusFilter.first().isVisible()) {
         await statusFilter.first().click();

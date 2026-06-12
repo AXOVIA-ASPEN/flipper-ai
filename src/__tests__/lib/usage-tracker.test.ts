@@ -29,12 +29,7 @@ jest.mock('@/lib/db', () => ({
   },
 }));
 
-import {
-  recordUsage,
-  getMonthlyUsage,
-  getUsageDisplay,
-  getMonthStart,
-} from '@/lib/usage-tracker';
+import { recordUsage, getMonthlyUsage, getUsageDisplay, getMonthStart } from '@/lib/usage-tracker';
 
 describe('usage-tracker', () => {
   beforeEach(() => {

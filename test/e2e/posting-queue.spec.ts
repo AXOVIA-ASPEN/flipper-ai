@@ -83,9 +83,7 @@ test.describe('Feature: Posting Queue Management', () => {
       if (method === 'GET') {
         const url = new URL(route.request().url());
         const status = url.searchParams.get('status');
-        const items = status
-          ? mockQueueItems.filter((i) => i.status === status)
-          : mockQueueItems;
+        const items = status ? mockQueueItems.filter((i) => i.status === status) : mockQueueItems;
         await route.fulfill({
           json: { items, total: items.length, limit: 20, offset: 0 },
         });

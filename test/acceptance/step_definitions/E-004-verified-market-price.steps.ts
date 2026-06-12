@@ -32,14 +32,11 @@ Given('the market-value-calculator module at {string}', function (filePath: stri
   this.fileContent = content;
 });
 
-Given(
-  'the market-price-enrichment module is integrated in {string}',
-  function (filePath: string) {
-    const content = readSourceFile(filePath);
-    expect(content).toContain('enrichWithVerifiedMarketPrice');
-    this.fileContent = content;
-  }
-);
+Given('the market-price-enrichment module is integrated in {string}', function (filePath: string) {
+  const content = readSourceFile(filePath);
+  expect(content).toContain('enrichWithVerifiedMarketPrice');
+  this.fileContent = content;
+});
 
 Given('the Facebook scraper route file at {string}', function (filePath: string) {
   const content = readSourceFile(filePath);
@@ -65,9 +62,7 @@ When('I inspect the market-value-calculator exported functions', function () {
 });
 
 When('I inspect the lookupVerifiedMarketPrice function body', function () {
-  const fnStart = this.fileContent.indexOf(
-    'export async function lookupVerifiedMarketPrice'
-  );
+  const fnStart = this.fileContent.indexOf('export async function lookupVerifiedMarketPrice');
   expect(fnStart).toBeGreaterThan(-1);
   const fnRest = this.fileContent.substring(fnStart);
   const nextExportIdx = fnRest.indexOf('\nexport ', 1);
@@ -96,9 +91,7 @@ When('I inspect the mini-stat card for market value', function () {
 // ==================== Then: S-16 (market-value-calculator exports) ====================
 
 Then('"lookupVerifiedMarketPrice" is exported as an async function', function () {
-  expect(this.fileContent).toContain(
-    'export async function lookupVerifiedMarketPrice'
-  );
+  expect(this.fileContent).toContain('export async function lookupVerifiedMarketPrice');
 });
 
 // Note: '"VerifiedPriceLookupResult" is exported as an interface' is matched by the
@@ -106,19 +99,13 @@ Then('"lookupVerifiedMarketPrice" is exported as an async function', function ()
 
 // ==================== Then: S-17 (two-step lookup implementation) ====================
 
-Then(
-  'it calls calculateVerifiedMarketValue as the first lookup step',
-  function () {
-    expect(this.fnBody).toContain('calculateVerifiedMarketValue(');
-  }
-);
+Then('it calls calculateVerifiedMarketValue as the first lookup step', function () {
+  expect(this.fnBody).toContain('calculateVerifiedMarketValue(');
+});
 
-Then(
-  'it calls fetchMarketPrice as the fallback when DB has insufficient data',
-  function () {
-    expect(this.fnBody).toContain('fetchMarketPrice(');
-  }
-);
+Then('it calls fetchMarketPrice as the fallback when DB has insufficient data', function () {
+  expect(this.fnBody).toContain('fetchMarketPrice(');
+});
 
 Then('it returns null for empty searchQuery', function () {
   expect(this.fnBody).toContain('searchQuery');
@@ -135,18 +122,13 @@ Then('it returns null for askingPrice <= 0', function () {
 // ==================== Then: S-18 (marketplace-scanner enrichWithVerifiedMarketPrice) ====================
 
 Then('"enrichWithVerifiedMarketPrice" is exported as an async function', function () {
-  expect(this.fileContent).toContain(
-    'export async function enrichWithVerifiedMarketPrice'
-  );
+  expect(this.fileContent).toContain('export async function enrichWithVerifiedMarketPrice');
 });
 
-Then(
-  'the module imports lookupVerifiedMarketPrice from market-value-calculator',
-  function () {
-    expect(this.fileContent).toContain('lookupVerifiedMarketPrice');
-    expect(this.fileContent).toContain('market-value-calculator');
-  }
-);
+Then('the module imports lookupVerifiedMarketPrice from market-value-calculator', function () {
+  expect(this.fileContent).toContain('lookupVerifiedMarketPrice');
+  expect(this.fileContent).toContain('market-value-calculator');
+});
 
 Then('the module imports closeBrowser from market-price', function () {
   expect(this.fileContent).toContain('closeBrowser');
@@ -178,30 +160,21 @@ Then('it maps comparableSalesJson from verifiedPrice', function () {
 
 // ==================== Then: S-20 (eBay scraper uses enrichWithVerifiedMarketPrice) ====================
 
-Then(
-  'it imports enrichWithVerifiedMarketPrice from marketplace-scanner',
-  function () {
-    expect(this.fileContent).toContain('enrichWithVerifiedMarketPrice');
-    expect(this.fileContent).toContain('marketplace-scanner');
-  }
-);
+Then('it imports enrichWithVerifiedMarketPrice from marketplace-scanner', function () {
+  expect(this.fileContent).toContain('enrichWithVerifiedMarketPrice');
+  expect(this.fileContent).toContain('marketplace-scanner');
+});
 
-Then(
-  'it calls enrichWithVerifiedMarketPrice on the enriched opportunities array',
-  function () {
-    expect(this.fnBody).toContain('enrichWithVerifiedMarketPrice(');
-  }
-);
+Then('it calls enrichWithVerifiedMarketPrice on the enriched opportunities array', function () {
+  expect(this.fnBody).toContain('enrichWithVerifiedMarketPrice(');
+});
 
 // ==================== Then: S-21 (Facebook scraper inline verified price lookup) ====================
 
-Then(
-  'it imports lookupVerifiedMarketPrice from market-value-calculator',
-  function () {
-    expect(this.fileContent).toContain('lookupVerifiedMarketPrice');
-    expect(this.fileContent).toContain('market-value-calculator');
-  }
-);
+Then('it imports lookupVerifiedMarketPrice from market-value-calculator', function () {
+  expect(this.fileContent).toContain('lookupVerifiedMarketPrice');
+  expect(this.fileContent).toContain('market-value-calculator');
+});
 
 Then('it imports closeBrowser from market-price', function () {
   expect(this.fileContent).toContain('closeBrowser');
@@ -214,29 +187,21 @@ Then('it calls closeBrowser after the listings processing loop', function () {
   // Stagehand browser cleanup). Accept either name as evidence the cleanup
   // hook ran after the listings loop.
   const fnBody: string = this.fnBody;
-  const callsCleanup =
-    fnBody.includes('closeBrowser()') ||
-    fnBody.includes('closeMarketBrowser()');
+  const callsCleanup = fnBody.includes('closeBrowser()') || fnBody.includes('closeMarketBrowser()');
   expect(callsCleanup).toBe(true);
 });
 
 // ==================== Then: S-22 (Dashboard UI shows "Verified Value") ====================
 
-Then(
-  'the Listing interface includes verifiedMarketValue as nullable number',
-  function () {
-    expect(this.interfaceBody).toContain('verifiedMarketValue');
-    expect(this.interfaceBody).toMatch(/verifiedMarketValue\s*:\s*number\s*\|\s*null/);
-  }
-);
+Then('the Listing interface includes verifiedMarketValue as nullable number', function () {
+  expect(this.interfaceBody).toContain('verifiedMarketValue');
+  expect(this.interfaceBody).toMatch(/verifiedMarketValue\s*:\s*number\s*\|\s*null/);
+});
 
-Then(
-  'the Listing interface includes trueDiscountPercent as nullable number',
-  function () {
-    expect(this.interfaceBody).toContain('trueDiscountPercent');
-    expect(this.interfaceBody).toMatch(/trueDiscountPercent\s*:\s*number\s*\|\s*null/);
-  }
-);
+Then('the Listing interface includes trueDiscountPercent as nullable number', function () {
+  expect(this.interfaceBody).toContain('trueDiscountPercent');
+  expect(this.interfaceBody).toMatch(/trueDiscountPercent\s*:\s*number\s*\|\s*null/);
+});
 
 Then(
   'the value card label shows "Verified Value" when verifiedMarketValue is not null',
@@ -248,20 +213,14 @@ Then(
 
 // ==================== Then: S-23 (Opportunities page mini-stat card) ====================
 
-Then(
-  'it shows "Verified Value" label when verifiedMarketValue is not null',
-  function () {
-    expect(this.fileBody).toContain('Verified Value');
-    expect(this.fileBody).toContain('verifiedMarketValue');
-  }
-);
+Then('it shows "Verified Value" label when verifiedMarketValue is not null', function () {
+  expect(this.fileBody).toContain('Verified Value');
+  expect(this.fileBody).toContain('verifiedMarketValue');
+});
 
-Then(
-  'it displays verifiedMarketValue when available falling back to estimatedValue',
-  function () {
-    expect(this.fileBody).toContain('verifiedMarketValue');
-    expect(this.fileBody).toContain('estimatedValue');
-    // The nullish coalescing operator is used to fall back
-    expect(this.fileBody).toMatch(/verifiedMarketValue\s*\?\?/);
-  }
-);
+Then('it displays verifiedMarketValue when available falling back to estimatedValue', function () {
+  expect(this.fileBody).toContain('verifiedMarketValue');
+  expect(this.fileBody).toContain('estimatedValue');
+  // The nullish coalescing operator is used to fall back
+  expect(this.fileBody).toMatch(/verifiedMarketValue\s*\?\?/);
+});

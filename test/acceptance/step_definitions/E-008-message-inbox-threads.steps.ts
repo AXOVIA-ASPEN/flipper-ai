@@ -58,13 +58,13 @@ Then('each thread includes listing details, last message preview, and message co
   );
 });
 
-Given('a thread with listing {string} has {int} messages', function (
-  _listingTitle: string,
-  _messageCount: number
-) {
-  // Context setup — validated in assertions below
-  threadData = { listingTitle: _listingTitle, messageCount: _messageCount };
-});
+Given(
+  'a thread with listing {string} has {int} messages',
+  function (_listingTitle: string, _messageCount: number) {
+    // Context setup — validated in assertions below
+    threadData = { listingTitle: _listingTitle, messageCount: _messageCount };
+  }
+);
 
 When('the thread list is fetched', function () {
   // Validate the endpoint implementation handles thread list correctly
@@ -144,20 +144,14 @@ Given(
 );
 
 When('the thread detail is fetched', function () {
-  const fullPath = path.join(
-    projectRoot,
-    'app/api/messages/threads/[listingId]/route.ts'
-  );
+  const fullPath = path.join(projectRoot, 'app/api/messages/threads/[listingId]/route.ts');
   detailRouteFileContent = fs.readFileSync(fullPath, 'utf-8');
 });
 
 Then('the response includes listing title, platform, and asking price', function () {
   assert.ok(detailRouteFileContent.includes('title'), 'Response must include listing title');
   assert.ok(detailRouteFileContent.includes('platform'), 'Response must include platform');
-  assert.ok(
-    detailRouteFileContent.includes('askingPrice'),
-    'Response must include asking price'
-  );
+  assert.ok(detailRouteFileContent.includes('askingPrice'), 'Response must include asking price');
 });
 
 Then('the listing details are displayed in the thread header', function () {
@@ -280,24 +274,18 @@ Then('the thread shows an unreadCount of {int}', function (_count: number) {
 });
 
 When('a user opens a thread', function () {
-  const fullPath = path.join(
-    projectRoot,
-    'app/api/messages/threads/[listingId]/route.ts'
-  );
+  const fullPath = path.join(projectRoot, 'app/api/messages/threads/[listingId]/route.ts');
   detailRouteFileContent = fs.readFileSync(fullPath, 'utf-8');
 });
 
-Then(
-  'all INBOUND messages with null readAt are marked with current timestamp',
-  function () {
-    assert.ok(
-      detailRouteFileContent.includes('updateMany') &&
-        detailRouteFileContent.includes('INBOUND') &&
-        detailRouteFileContent.includes('readAt: null'),
-      'Thread detail must mark INBOUND messages as read via updateMany'
-    );
-  }
-);
+Then('all INBOUND messages with null readAt are marked with current timestamp', function () {
+  assert.ok(
+    detailRouteFileContent.includes('updateMany') &&
+      detailRouteFileContent.includes('INBOUND') &&
+      detailRouteFileContent.includes('readAt: null'),
+    'Thread detail must mark INBOUND messages as read via updateMany'
+  );
+});
 
 Then('the read marking is fire-and-forget for performance', function () {
   // Fire-and-forget pattern: .catch(() => {}) without await before response

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 /**
  * Messages - Acceptance Tests
- * 
+ *
  * Critical user flow: Communicating with sellers
  * - View conversations
  * - Read messages
@@ -311,17 +311,17 @@ test.describe('Messages - Acceptance Tests', () => {
 
     test('Then should display AI template button', async ({ page }) => {
       // Should show AI template button/icon
-      const aiButton = page.getByRole('button', { name: /ai template/i }).or(
-        page.getByRole('button', { name: /template/i })
-      );
+      const aiButton = page
+        .getByRole('button', { name: /ai template/i })
+        .or(page.getByRole('button', { name: /template/i }));
       await expect(aiButton).toBeVisible();
     });
 
     test('Then should display template options when clicked', async ({ page }) => {
       // Click AI template button
-      const aiButton = page.getByRole('button', { name: /ai template/i }).or(
-        page.getByRole('button', { name: /template/i })
-      );
+      const aiButton = page
+        .getByRole('button', { name: /ai template/i })
+        .or(page.getByRole('button', { name: /template/i }));
       await aiButton.click();
 
       // Should show template options
@@ -334,30 +334,34 @@ test.describe('Messages - Acceptance Tests', () => {
       const messageInput = page.getByPlaceholder(/type a message/i);
 
       // Click AI template button
-      const aiButton = page.getByRole('button', { name: /ai template/i }).or(
-        page.getByRole('button', { name: /template/i })
-      );
+      const aiButton = page
+        .getByRole('button', { name: /ai template/i })
+        .or(page.getByRole('button', { name: /template/i }));
       await aiButton.click();
 
       // Select a template
       await page.getByText('Price Negotiation').click();
 
       // Should populate input with template content
-      await expect(messageInput).toHaveValue('Would you consider a lower price? I can pick up today.');
+      await expect(messageInput).toHaveValue(
+        'Would you consider a lower price? I can pick up today.'
+      );
     });
 
     test('Then should allow editing template before sending', async ({ page }) => {
       const messageInput = page.getByPlaceholder(/type a message/i);
 
       // Use template
-      const aiButton = page.getByRole('button', { name: /ai template/i }).or(
-        page.getByRole('button', { name: /template/i })
-      );
+      const aiButton = page
+        .getByRole('button', { name: /ai template/i })
+        .or(page.getByRole('button', { name: /template/i }));
       await aiButton.click();
       await page.getByText('Initial Inquiry').click();
 
       // Edit the template text
-      await messageInput.fill("Hi! Is this item still available? I'm very interested. Can you do $750?");
+      await messageInput.fill(
+        "Hi! Is this item still available? I'm very interested. Can you do $750?"
+      );
 
       // Should have edited text
       await expect(messageInput).toHaveValue(/Can you do \$750/);
@@ -396,7 +400,9 @@ test.describe('Messages - Acceptance Tests', () => {
   test.describe('Accessibility', () => {
     test('Then should have proper ARIA labels', async ({ page }) => {
       // Check for accessible conversation list
-      const conversationList = page.getByRole('list').or(page.getByRole('region', { name: /conversations/i }));
+      const conversationList = page
+        .getByRole('list')
+        .or(page.getByRole('region', { name: /conversations/i }));
       await expect(conversationList).toBeVisible();
     });
 
@@ -435,9 +441,9 @@ test.describe('Messages - Acceptance Tests', () => {
       await page.reload();
 
       // Should show error message
-      await expect(page.getByText(/error loading conversations/i).or(
-        page.getByText(/something went wrong/i)
-      )).toBeVisible();
+      await expect(
+        page.getByText(/error loading conversations/i).or(page.getByText(/something went wrong/i))
+      ).toBeVisible();
     });
 
     test('Then should handle network errors', async ({ page }) => {
@@ -449,9 +455,7 @@ test.describe('Messages - Acceptance Tests', () => {
       await page.reload();
 
       // Should show error or retry option
-      await expect(page.getByText(/error/i).or(
-        page.getByText(/retry/i)
-      )).toBeVisible();
+      await expect(page.getByText(/error/i).or(page.getByText(/retry/i))).toBeVisible();
     });
   });
 

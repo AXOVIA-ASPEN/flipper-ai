@@ -38,8 +38,14 @@ export async function POST(req: NextRequest) {
     const rl = rateLimit(ip, '/api/auth/forgot-password');
     if (!rl.allowed) {
       return NextResponse.json(
-        { success: false, error: { code: 'RATE_LIMITED', detail: 'Too many requests. Please try again later.' } },
-        { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } }
+        {
+          success: false,
+          error: { code: 'RATE_LIMITED', detail: 'Too many requests. Please try again later.' },
+        },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) },
+        }
       );
     }
 
@@ -70,7 +76,13 @@ export async function POST(req: NextRequest) {
 
     if (recentTokenCount >= 3) {
       return NextResponse.json(
-        { success: false, error: { code: 'RATE_LIMITED', detail: 'Too many reset requests. Please try again later.' } },
+        {
+          success: false,
+          error: {
+            code: 'RATE_LIMITED',
+            detail: 'Too many reset requests. Please try again later.',
+          },
+        },
         { status: 429 }
       );
     }

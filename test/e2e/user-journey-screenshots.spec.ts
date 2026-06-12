@@ -46,7 +46,9 @@ test.describe('Full User Journey — Visual Documentation', () => {
     await page.screenshot({ path: file, fullPage: true });
     await expect(page).toHaveURL(/login/);
     // Verify key elements visible
-    await expect(page.locator('input[type="email"], input[name="email"]').first()).toBeVisible().catch(() => {});
+    await expect(page.locator('input[type="email"], input[name="email"]').first())
+      .toBeVisible()
+      .catch(() => {});
     console.log(`📸 Screenshot saved: ${file}`);
   });
 
@@ -72,13 +74,21 @@ test.describe('Full User Journey — Visual Documentation', () => {
         json: { url: '/login?loggedOut=true' },
       });
     });
-    const userMenu = page.getByRole('button', { name: /user menu|profile|account|menu/i }).or(
-      page.locator('[aria-label="User menu"]')
-    );
-    if (await userMenu.first().isVisible().catch(() => false)) {
+    const userMenu = page
+      .getByRole('button', { name: /user menu|profile|account|menu/i })
+      .or(page.locator('[aria-label="User menu"]'));
+    if (
+      await userMenu
+        .first()
+        .isVisible()
+        .catch(() => false)
+    ) {
       await userMenu.first().click();
       await page.waitForTimeout(300);
-      await page.getByRole('menuitem', { name: /log\s?out|sign\s?out/i }).first().click();
+      await page
+        .getByRole('menuitem', { name: /log\s?out|sign\s?out/i })
+        .first()
+        .click();
     } else {
       await page.getByRole('button', { name: /log\s?out|sign\s?out/i }).click();
     }
@@ -180,7 +190,8 @@ test.describe('Full User Journey — Visual Documentation', () => {
           condition: 'good',
           category: 'electronics',
           status: 'NEW',
-          description: 'Classic film camera, fully functional with original lens. Includes 50mm lens and original strap.',
+          description:
+            'Classic film camera, fully functional with original lens. Includes 50mm lens and original strap.',
           postedAt: new Date().toISOString(),
           createdAt: new Date().toISOString(),
           imageUrls: '[]',
@@ -197,8 +208,12 @@ test.describe('Full User Journey — Visual Documentation', () => {
             estimatedValue: 280,
             profitPotential: 120,
             recommendation: 'BUY',
-            reasoning: 'Canon AE-1 cameras are highly sought after by film photography enthusiasts. Market value typically ranges from $200-$350 in good condition.',
-            risks: ['Condition dependent on shutter function', 'Film camera market can be volatile'],
+            reasoning:
+              'Canon AE-1 cameras are highly sought after by film photography enthusiasts. Market value typically ranges from $200-$350 in good condition.',
+            risks: [
+              'Condition dependent on shutter function',
+              'Film camera market can be volatile',
+            ],
             suggestedOfferPrice: 100,
           },
         },
@@ -235,7 +250,7 @@ test.describe('Full User Journey — Visual Documentation', () => {
                 id: 'msg-2',
                 listingId: 'journey-1',
                 direction: 'INBOUND',
-                content: "Yes, still available. Best offer?",
+                content: 'Yes, still available. Best offer?',
                 platform: 'CRAIGSLIST',
                 createdAt: new Date(Date.now() - 1800000).toISOString(),
               },
@@ -330,7 +345,7 @@ test.describe('Full User Journey — Visual Documentation', () => {
       await route.fulfill({
         json: {
           totalFlips: 12,
-          totalProfit: 1847.50,
+          totalProfit: 1847.5,
           avgProfitPerFlip: 153.96,
           successRate: 91.7,
           bestFlip: {
@@ -398,19 +413,28 @@ test.describe('Full User Journey — Visual Documentation', () => {
     // Mobile login
     await page.goto('/login');
     await page.waitForLoadState('networkidle');
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'mobile-01-login.png'), fullPage: true });
+    await page.screenshot({
+      path: path.join(SCREENSHOT_DIR, 'mobile-01-login.png'),
+      fullPage: true,
+    });
 
     // Mobile dashboard
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(500);
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'mobile-02-dashboard.png'), fullPage: true });
+    await page.screenshot({
+      path: path.join(SCREENSHOT_DIR, 'mobile-02-dashboard.png'),
+      fullPage: true,
+    });
 
     // Mobile opportunities
     await page.goto('/opportunities');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(500);
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'mobile-03-opportunities.png'), fullPage: true });
+    await page.screenshot({
+      path: path.join(SCREENSHOT_DIR, 'mobile-03-opportunities.png'),
+      fullPage: true,
+    });
 
     console.log('📸 Mobile screenshots saved to', SCREENSHOT_DIR);
   });
@@ -427,36 +451,54 @@ test.describe('Complete E2E Journey — Login to Flip', () => {
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(500);
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'journey-01-start.png'), fullPage: true });
+    await page.screenshot({
+      path: path.join(SCREENSHOT_DIR, 'journey-01-start.png'),
+      fullPage: true,
+    });
 
     // Step 2: Navigate to scraper
     await page.goto('/scraper');
     await page.waitForLoadState('networkidle');
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'journey-02-scraper.png'), fullPage: true });
+    await page.screenshot({
+      path: path.join(SCREENSHOT_DIR, 'journey-02-scraper.png'),
+      fullPage: true,
+    });
 
     // Step 3: Navigate to opportunities
     await page.goto('/opportunities');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(500);
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'journey-03-opportunities.png'), fullPage: true });
+    await page.screenshot({
+      path: path.join(SCREENSHOT_DIR, 'journey-03-opportunities.png'),
+      fullPage: true,
+    });
 
     // Step 4: Navigate to kanban
     await page.goto('/kanban');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(500);
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'journey-04-kanban.png'), fullPage: true });
+    await page.screenshot({
+      path: path.join(SCREENSHOT_DIR, 'journey-04-kanban.png'),
+      fullPage: true,
+    });
 
     // Step 5: Navigate to messages
     await page.goto('/messages');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(500);
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'journey-05-messages.png'), fullPage: true });
+    await page.screenshot({
+      path: path.join(SCREENSHOT_DIR, 'journey-05-messages.png'),
+      fullPage: true,
+    });
 
     // Step 6: Navigate to reports
     await page.goto('/reports');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(500);
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'journey-06-reports.png'), fullPage: true });
+    await page.screenshot({
+      path: path.join(SCREENSHOT_DIR, 'journey-06-reports.png'),
+      fullPage: true,
+    });
 
     console.log('✅ Full E2E journey screenshots captured in', SCREENSHOT_DIR);
 

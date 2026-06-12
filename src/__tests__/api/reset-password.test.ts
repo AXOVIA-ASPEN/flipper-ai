@@ -98,10 +98,12 @@ describe('POST /api/auth/reset-password', () => {
   });
 
   it('resets password successfully with valid token', async () => {
-    const res = await POST(createRequest({
-      token: validToken.rawToken,
-      password: 'NewPassword1',
-    }));
+    const res = await POST(
+      createRequest({
+        token: validToken.rawToken,
+        password: 'NewPassword1',
+      })
+    );
     const data = await res.json();
 
     expect(res.status).toBe(200);
@@ -110,19 +112,23 @@ describe('POST /api/auth/reset-password', () => {
   });
 
   it('updates password in Firebase Auth', async () => {
-    await POST(createRequest({
-      token: validToken.rawToken,
-      password: 'NewPassword1',
-    }));
+    await POST(
+      createRequest({
+        token: validToken.rawToken,
+        password: 'NewPassword1',
+      })
+    );
 
     expect(mockUpdateUser).toHaveBeenCalledWith('firebase-uid-1', { password: 'NewPassword1' });
   });
 
   it('revokes all sessions after password update (AC #6)', async () => {
-    await POST(createRequest({
-      token: validToken.rawToken,
-      password: 'NewPassword1',
-    }));
+    await POST(
+      createRequest({
+        token: validToken.rawToken,
+        password: 'NewPassword1',
+      })
+    );
 
     expect(mockRevokeRefreshTokens).toHaveBeenCalledWith('firebase-uid-1');
   });
@@ -130,10 +136,12 @@ describe('POST /api/auth/reset-password', () => {
   it('handles revocation failure non-fatally', async () => {
     mockRevokeRefreshTokens.mockRejectedValue(new Error('Firebase unavailable'));
 
-    const res = await POST(createRequest({
-      token: validToken.rawToken,
-      password: 'NewPassword1',
-    }));
+    const res = await POST(
+      createRequest({
+        token: validToken.rawToken,
+        password: 'NewPassword1',
+      })
+    );
     const data = await res.json();
 
     // Should still succeed
@@ -158,10 +166,12 @@ describe('POST /api/auth/reset-password', () => {
       user: TEST_USER,
     });
 
-    const res = await POST(createRequest({
-      token: validToken.rawToken,
-      password: 'NewPassword1',
-    }));
+    const res = await POST(
+      createRequest({
+        token: validToken.rawToken,
+        password: 'NewPassword1',
+      })
+    );
     const data = await res.json();
 
     expect(res.status).toBe(400);
@@ -180,10 +190,12 @@ describe('POST /api/auth/reset-password', () => {
       user: TEST_USER,
     });
 
-    await POST(createRequest({
-      token: validToken.rawToken,
-      password: 'NewPassword1',
-    }));
+    await POST(
+      createRequest({
+        token: validToken.rawToken,
+        password: 'NewPassword1',
+      })
+    );
 
     expect(mockTokenDelete).toHaveBeenCalledWith({ where: { id: 'token-expired' } });
   });
@@ -191,10 +203,12 @@ describe('POST /api/auth/reset-password', () => {
   it('returns 400 for invalid/unknown token', async () => {
     mockTokenFindFirst.mockResolvedValue(null);
 
-    const res = await POST(createRequest({
-      token: 'invalid-token-value',
-      password: 'NewPassword1',
-    }));
+    const res = await POST(
+      createRequest({
+        token: 'invalid-token-value',
+        password: 'NewPassword1',
+      })
+    );
     const data = await res.json();
 
     expect(res.status).toBe(400);
@@ -205,10 +219,12 @@ describe('POST /api/auth/reset-password', () => {
     // First request consumes the token (count=1), second gets count=0
     mockTokenDeleteMany.mockResolvedValue({ count: 0 });
 
-    const res = await POST(createRequest({
-      token: validToken.rawToken,
-      password: 'NewPassword1',
-    }));
+    const res = await POST(
+      createRequest({
+        token: validToken.rawToken,
+        password: 'NewPassword1',
+      })
+    );
     const data = await res.json();
 
     expect(res.status).toBe(400);
@@ -216,10 +232,12 @@ describe('POST /api/auth/reset-password', () => {
   });
 
   it('returns 422 for weak password (too short)', async () => {
-    const res = await POST(createRequest({
-      token: validToken.rawToken,
-      password: 'Short1',
-    }));
+    const res = await POST(
+      createRequest({
+        token: validToken.rawToken,
+        password: 'Short1',
+      })
+    );
     const data = await res.json();
 
     expect(res.status).toBe(422);
@@ -229,10 +247,12 @@ describe('POST /api/auth/reset-password', () => {
   it('returns 422 for over-length password (>128 chars)', async () => {
     const longPassword = 'A1' + 'a'.repeat(127);
 
-    const res = await POST(createRequest({
-      token: validToken.rawToken,
-      password: longPassword,
-    }));
+    const res = await POST(
+      createRequest({
+        token: validToken.rawToken,
+        password: longPassword,
+      })
+    );
     const data = await res.json();
 
     expect(res.status).toBe(422);
@@ -240,10 +260,12 @@ describe('POST /api/auth/reset-password', () => {
   });
 
   it('returns 422 for password without uppercase', async () => {
-    const res = await POST(createRequest({
-      token: validToken.rawToken,
-      password: 'nouppercase1',
-    }));
+    const res = await POST(
+      createRequest({
+        token: validToken.rawToken,
+        password: 'nouppercase1',
+      })
+    );
     const data = await res.json();
 
     expect(res.status).toBe(422);
@@ -251,10 +273,12 @@ describe('POST /api/auth/reset-password', () => {
   });
 
   it('returns 422 for password without number', async () => {
-    const res = await POST(createRequest({
-      token: validToken.rawToken,
-      password: 'NoNumberHere',
-    }));
+    const res = await POST(
+      createRequest({
+        token: validToken.rawToken,
+        password: 'NoNumberHere',
+      })
+    );
     const data = await res.json();
 
     expect(res.status).toBe(422);
@@ -262,10 +286,12 @@ describe('POST /api/auth/reset-password', () => {
   });
 
   it('deletes all remaining tokens for user after successful reset', async () => {
-    await POST(createRequest({
-      token: validToken.rawToken,
-      password: 'NewPassword1',
-    }));
+    await POST(
+      createRequest({
+        token: validToken.rawToken,
+        password: 'NewPassword1',
+      })
+    );
 
     // deleteMany called twice: once for atomic consumption, once for cleanup
     const deleteCalls = mockTokenDeleteMany.mock.calls;
@@ -274,10 +300,12 @@ describe('POST /api/auth/reset-password', () => {
   });
 
   it('sends password-changed notification email', async () => {
-    await POST(createRequest({
-      token: validToken.rawToken,
-      password: 'NewPassword1',
-    }));
+    await POST(
+      createRequest({
+        token: validToken.rawToken,
+        password: 'NewPassword1',
+      })
+    );
 
     expect(mockSendEmail).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -311,10 +339,12 @@ describe('POST /api/auth/reset-password', () => {
       user: { ...TEST_USER, firebaseUid: null },
     });
 
-    const res = await POST(createRequest({
-      token: validToken.rawToken,
-      password: 'NewPassword1',
-    }));
+    const res = await POST(
+      createRequest({
+        token: validToken.rawToken,
+        password: 'NewPassword1',
+      })
+    );
     const data = await res.json();
 
     expect(res.status).toBe(400);
@@ -322,9 +352,11 @@ describe('POST /api/auth/reset-password', () => {
   });
 
   it('returns 422 when token is missing from body', async () => {
-    const res = await POST(createRequest({
-      password: 'NewPassword1',
-    }));
+    const res = await POST(
+      createRequest({
+        password: 'NewPassword1',
+      })
+    );
     const data = await res.json();
 
     expect(res.status).toBe(422);
@@ -348,10 +380,12 @@ describe('POST /api/auth/reset-password', () => {
       },
     });
 
-    const res = await POST(createRequest({
-      token: validToken.rawToken,
-      password: 'NewPassword1',
-    }));
+    const res = await POST(
+      createRequest({
+        token: validToken.rawToken,
+        password: 'NewPassword1',
+      })
+    );
     const data = await res.json();
 
     expect(res.status).toBe(200);
@@ -372,10 +406,12 @@ describe('POST /api/auth/reset-password', () => {
     });
     mockTokenDeleteMany.mockResolvedValue({ count: 1 });
 
-    const res = await POST(createRequest({
-      token: rawToken,
-      password: 'ValidPass1',
-    }));
+    const res = await POST(
+      createRequest({
+        token: rawToken,
+        password: 'ValidPass1',
+      })
+    );
 
     expect(res.status).toBe(200);
     // Verify findFirst was called with the computed hash
@@ -397,10 +433,12 @@ describe('POST /api/auth/reset-password', () => {
   it('handles email notification failure non-fatally (fire-and-forget error)', async () => {
     mockSendEmail.mockRejectedValue(new Error('SMTP error'));
 
-    const res = await POST(createRequest({
-      token: validToken.rawToken,
-      password: 'NewPassword1',
-    }));
+    const res = await POST(
+      createRequest({
+        token: validToken.rawToken,
+        password: 'NewPassword1',
+      })
+    );
     const data = await res.json();
 
     // Allow microtask queue to flush for fire-and-forget
@@ -420,10 +458,12 @@ describe('POST /api/auth/reset-password', () => {
   it('wraps non-Error thrown by revokeRefreshTokens (line 124 instanceof false branch)', async () => {
     mockRevokeRefreshTokens.mockRejectedValue('string-revoke-error');
 
-    const res = await POST(createRequest({
-      token: validToken.rawToken,
-      password: 'NewPassword1',
-    }));
+    const res = await POST(
+      createRequest({
+        token: validToken.rawToken,
+        password: 'NewPassword1',
+      })
+    );
     const data = await res.json();
 
     // revokeRefreshTokens failure is non-fatal — reset should still succeed
@@ -445,25 +485,27 @@ describe('POST /api/auth/reset-password', () => {
       user: { ...TEST_USER, name: null },
     });
 
-    const res = await POST(createRequest({
-      token: validToken.rawToken,
-      password: 'NewPassword1',
-    }));
+    const res = await POST(
+      createRequest({
+        token: validToken.rawToken,
+        password: 'NewPassword1',
+      })
+    );
 
     expect(res.status).toBe(200);
     // emailService.send is called with html from passwordChangedEmailHtml(undefined)
-    expect(mockSendEmail).toHaveBeenCalledWith(
-      expect.objectContaining({ to: 'test@example.com' })
-    );
+    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({ to: 'test@example.com' }));
   });
 
   it('wraps non-Error thrown by emailService.send (line 151 instanceof false branch)', async () => {
     mockSendEmail.mockRejectedValue('string-smtp-error');
 
-    const res = await POST(createRequest({
-      token: validToken.rawToken,
-      password: 'NewPassword1',
-    }));
+    const res = await POST(
+      createRequest({
+        token: validToken.rawToken,
+        password: 'NewPassword1',
+      })
+    );
     const data = await res.json();
 
     // Allow fire-and-forget microtask to flush

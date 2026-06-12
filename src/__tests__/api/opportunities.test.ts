@@ -46,8 +46,7 @@ jest.mock('@/lib/conversation-status', () => ({
 // Mock notification events (Story 10.3)
 const mockCreateFlipNotificationEvent = jest.fn();
 jest.mock('@/lib/notification-events', () => ({
-  createFlipNotificationEvent: (...args: unknown[]) =>
-    mockCreateFlipNotificationEvent(...args),
+  createFlipNotificationEvent: (...args: unknown[]) => mockCreateFlipNotificationEvent(...args),
   NotificationEventType: {
     OPPORTUNITY_FOUND: 'opportunity.found',
     FLIP_PURCHASED: 'flip.purchased',
@@ -68,11 +67,13 @@ jest.mock('@/lib/logger', () => ({
 
 // Helper: set up GET /api/opportunities mocks
 // GET uses: findMany (paginated), count, findMany (all matching for stats)
-function setupOpportunityGetMocks(opts: {
-  opportunities?: unknown[];
-  total?: number;
-  allMatching?: Array<{ purchasePrice: number | null; resalePrice: number | null }>;
-} = {}) {
+function setupOpportunityGetMocks(
+  opts: {
+    opportunities?: unknown[];
+    total?: number;
+    allMatching?: Array<{ purchasePrice: number | null; resalePrice: number | null }>;
+  } = {}
+) {
   const { opportunities = [], total = 0, allMatching = [] } = opts;
   mockFindMany.mockResolvedValueOnce(opportunities).mockResolvedValueOnce(allMatching);
   mockOpportunityCount.mockResolvedValueOnce(total);
@@ -322,9 +323,7 @@ describe('Opportunities API', () => {
         total: 50,
         totalPages: 5,
       });
-      expect(mockFindMany).toHaveBeenCalledWith(
-        expect.objectContaining({ skip: 10, take: 10 })
-      );
+      expect(mockFindMany).toHaveBeenCalledWith(expect.objectContaining({ skip: 10, take: 10 }));
     });
 
     it('should default page to 1 when page param is NaN', async () => {
@@ -858,14 +857,24 @@ describe('Opportunities API', () => {
           id: 'opp1',
           status: 'CONTACTED',
           userId: 'test-user-id',
-          listing: { id: 'listing1', title: 'Vintage Lamp', platform: 'CRAIGSLIST', profitPotential: 80 },
+          listing: {
+            id: 'listing1',
+            title: 'Vintage Lamp',
+            platform: 'CRAIGSLIST',
+            profitPotential: 80,
+          },
         });
         mockUpdate.mockResolvedValue({
           id: 'opp1',
           status: 'PURCHASED',
           userId: 'test-user-id',
           purchasePrice: 50,
-          listing: { id: 'listing1', title: 'Vintage Lamp', platform: 'CRAIGSLIST', profitPotential: 80 },
+          listing: {
+            id: 'listing1',
+            title: 'Vintage Lamp',
+            platform: 'CRAIGSLIST',
+            profitPotential: 80,
+          },
         });
 
         const request = createMockRequest('PATCH', '/api/opportunities/opp1', {

@@ -105,8 +105,7 @@ export async function GET(request: NextRequest) {
     const stats = {
       totalOpportunities: total,
       totalProfit: allMatching.reduce(
-        (sum, o) =>
-          sum + (o.resalePrice && o.purchasePrice ? o.resalePrice - o.purchasePrice : 0),
+        (sum, o) => sum + (o.resalePrice && o.purchasePrice ? o.resalePrice - o.purchasePrice : 0),
         0
       ),
       totalInvested: allMatching.reduce((sum, o) => sum + (o.purchasePrice || 0), 0),

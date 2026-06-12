@@ -73,12 +73,7 @@ describe('Story 14.1 — canonical design tokens in app/globals.css', () => {
   });
 
   describe('AC #2 — canonical animations with fp- prefix', () => {
-    const requiredKeyframes = [
-      'fp-slide-up',
-      'fp-toast-in',
-      'fp-shimmer',
-      'fp-border-spin',
-    ];
+    const requiredKeyframes = ['fp-slide-up', 'fp-toast-in', 'fp-shimmer', 'fp-border-spin'];
 
     it.each(requiredKeyframes)('declares @keyframes %s', (name) => {
       expect(css).toMatch(new RegExp(`@keyframes\\s+${name}\\b`));
@@ -108,7 +103,9 @@ describe('Story 14.1 — canonical design tokens in app/globals.css', () => {
     it('declares .fp-hot-card and its ::before with fp-border-spin animation', () => {
       expect(css).toMatch(/\.fp-hot-card\s*{/);
       expect(css).toMatch(/\.fp-hot-card::before\s*{[\s\S]*?animation:\s*fp-border-spin\b/);
-      expect(css).toMatch(/background:\s*linear-gradient\(135deg,\s*#7c3aed,\s*#8b5cf6,\s*#5b21b6,\s*#7c3aed\)/);
+      expect(css).toMatch(
+        /background:\s*linear-gradient\(135deg,\s*#7c3aed,\s*#8b5cf6,\s*#5b21b6,\s*#7c3aed\)/
+      );
       expect(css).toMatch(/background-size:\s*200% 200%/);
     });
   });

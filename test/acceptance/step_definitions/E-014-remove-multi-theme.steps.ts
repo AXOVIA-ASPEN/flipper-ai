@@ -136,17 +136,14 @@ Then('zero theme-pattern matches are found', function (this: CustomWorld) {
   );
 });
 
-Then(
-  'the source file {string} does not exist',
-  function (this: CustomWorld, relPath: string) {
-    const absPath = path.join(process.cwd(), relPath);
-    assert.strictEqual(
-      fs.existsSync(absPath),
-      false,
-      `Expected ${relPath} to be deleted but it still exists`
-    );
-  }
-);
+Then('the source file {string} does not exist', function (this: CustomWorld, relPath: string) {
+  const absPath = path.join(process.cwd(), relPath);
+  assert.strictEqual(
+    fs.existsSync(absPath),
+    false,
+    `Expected ${relPath} to be deleted but it still exists`
+  );
+});
 
 Then(
   '{string} does not contain the string {string}',
@@ -173,19 +170,16 @@ Then(
 
 // ─── Then steps — Playwright E2E ─────────────────────────────────────────────
 
-Then(
-  'the page renders without uncaught console errors',
-  function (this: CustomWorld) {
-    const errors: string[] = (this._consoleErrors || []).filter(
-      (e: string) => !IGNORABLE_CONSOLE_PATTERNS.some((p) => e.includes(p))
-    );
-    assert.strictEqual(
-      errors.length,
-      0,
-      `Unexpected console errors on page load:\n${errors.join('\n')}`
-    );
-  }
-);
+Then('the page renders without uncaught console errors', function (this: CustomWorld) {
+  const errors: string[] = (this._consoleErrors || []).filter(
+    (e: string) => !IGNORABLE_CONSOLE_PATTERNS.some((p) => e.includes(p))
+  );
+  assert.strictEqual(
+    errors.length,
+    0,
+    `Unexpected console errors on page load:\n${errors.join('\n')}`
+  );
+});
 
 Then(
   'no element with a data-testid starting with {string} is present in the DOM',

@@ -278,7 +278,9 @@ describe('ebay-inventory - additional branch coverage', () => {
         status: 400,
         ok: false,
         json: async () => ({
-          errors: [{ longMessage: 'Offer is not in publishable state', message: 'Not publishable' }],
+          errors: [
+            { longMessage: 'Offer is not in publishable state', message: 'Not publishable' },
+          ],
         }),
       });
 
@@ -321,7 +323,15 @@ describe('ebay-inventory - additional branch coverage', () => {
         status: 404,
         ok: false,
         json: async () => ({
-          errors: [{ longMessage: null, message: 'Not found', errorId: 1, domain: 'API', category: 'REQUEST' }],
+          errors: [
+            {
+              longMessage: null,
+              message: 'Not found',
+              errorId: 1,
+              domain: 'API',
+              category: 'REQUEST',
+            },
+          ],
         }),
       });
 
@@ -345,7 +355,8 @@ describe('ebay-inventory - deeper branch coverage', () => {
       // Inventory create 204, offer create 201
       mockFetch.mockResolvedValueOnce({ status: 204, ok: true });
       mockFetch.mockResolvedValueOnce({
-        status: 201, ok: true,
+        status: 201,
+        ok: true,
         json: async () => ({ offerId: 'offer-abc' }),
       });
 
@@ -409,7 +420,8 @@ describe('ebay-inventory - targeted branch coverage', () => {
     // quantity explicitly provided → ?? 1 takes left branch (existing quantity)
     mockFetch.mockResolvedValueOnce({ status: 204, ok: true });
     mockFetch.mockResolvedValueOnce({
-      status: 201, ok: true,
+      status: 201,
+      ok: true,
       json: async () => ({ offerId: 'offer-qty' }),
     });
     const result = await createDraftListing({ ...validInput, quantity: 3 });
@@ -422,7 +434,8 @@ describe('ebay-inventory - targeted branch coverage', () => {
   it('uses explicit quantity in createOffer (line 187 cond-expr branch)', async () => {
     mockFetch.mockResolvedValueOnce({ status: 204, ok: true });
     mockFetch.mockResolvedValueOnce({
-      status: 201, ok: true,
+      status: 201,
+      ok: true,
       json: async () => ({ offerId: 'offer-qty2' }),
     });
     const result = await createDraftListing({ ...validInput, quantity: 5 });
@@ -434,7 +447,8 @@ describe('ebay-inventory - targeted branch coverage', () => {
   it('uses explicit currency (not USD fallback) in createOffer (line 212 branch)', async () => {
     mockFetch.mockResolvedValueOnce({ status: 204, ok: true });
     mockFetch.mockResolvedValueOnce({
-      status: 201, ok: true,
+      status: 201,
+      ok: true,
       json: async () => ({ offerId: 'offer-curr' }),
     });
     const result = await createDraftListing({ ...validInput, currency: 'CAD' });
@@ -445,7 +459,8 @@ describe('ebay-inventory - targeted branch coverage', () => {
 
   it('uses longMessage in createInventoryItem error (line 172 cond-expr)', async () => {
     mockFetch.mockResolvedValueOnce({
-      status: 400, ok: false,
+      status: 400,
+      ok: false,
       json: async () => ({
         errors: [{ longMessage: 'Detailed error message', message: 'Short msg' }],
       }),
@@ -457,7 +472,8 @@ describe('ebay-inventory - targeted branch coverage', () => {
 
   it('falls back to HTTP status when errors array is null in createInventoryItem (line 172 binary-expr)', async () => {
     mockFetch.mockResolvedValueOnce({
-      status: 500, ok: false,
+      status: 500,
+      ok: false,
       json: async () => ({ errors: null }),
     });
     const result = await createDraftListing(validInput);
@@ -468,7 +484,8 @@ describe('ebay-inventory - targeted branch coverage', () => {
   it('uses longMessage in createOffer error (line 255 cond-expr)', async () => {
     mockFetch.mockResolvedValueOnce({ status: 204, ok: true }); // inventory ok
     mockFetch.mockResolvedValueOnce({
-      status: 400, ok: false,
+      status: 400,
+      ok: false,
       json: async () => ({
         errors: [{ longMessage: 'Offer detailed error', message: 'Short' }],
       }),

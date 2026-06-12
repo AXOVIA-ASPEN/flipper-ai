@@ -177,9 +177,11 @@ async function scrapeWithBrowser(
   const page = await context.newPage();
 
   // Override navigator.webdriver to avoid headless detection
-  await page.addInitScript(/* istanbul ignore next */ () => {
-    Object.defineProperty(navigator, 'webdriver', { get: () => false });
-  });
+  await page.addInitScript(
+    /* istanbul ignore next */ () => {
+      Object.defineProperty(navigator, 'webdriver', { get: () => false });
+    }
+  );
 
   const searchUrl = buildSearchUrl(params);
   console.log(`[craigslist-scraper] Navigating to: ${searchUrl}`);
@@ -226,13 +228,15 @@ async function scrapeWithBrowser(
 
   // Rate limit detection with exponential backoff on 403/429
   for (let backoffAttempt = 0; ; backoffAttempt++) {
-    const statusCode = await page.evaluate(/* istanbul ignore next */ () => {
-      const bodyText = document.body?.innerText || '';
-      if (bodyText.includes('blocked') || bodyText.includes('This IP has been')) {
-        return 403;
+    const statusCode = await page.evaluate(
+      /* istanbul ignore next */ () => {
+        const bodyText = document.body?.innerText || '';
+        if (bodyText.includes('blocked') || bodyText.includes('This IP has been')) {
+          return 403;
+        }
+        return 200;
       }
-      return 200;
-    });
+    );
 
     if (statusCode === 200) break;
 
@@ -276,10 +280,9 @@ async function scrapeWithBrowser(
 
   // Wait for listings to load
   await page
-    .waitForSelector(
-      '.cl-search-result, .result-row, .gallery-card, li.cl-static-search-result',
-      { timeout: SCRAPER_CONFIG.SELECTOR_WAIT_TIMEOUT_MS }
-    )
+    .waitForSelector('.cl-search-result, .result-row, .gallery-card, li.cl-static-search-result', {
+      timeout: SCRAPER_CONFIG.SELECTOR_WAIT_TIMEOUT_MS,
+    })
     .catch(() => {
       console.log('[craigslist-scraper] No standard listing selector found, trying fallback');
     });
@@ -289,81 +292,83 @@ async function scrapeWithBrowser(
 
   // Extract listings using page.evaluate for in-browser DOM extraction
   // istanbul ignore next -- Browser-side DOM code runs in Playwright context, not Node.js
-  const rawListings = await page.evaluate(/* istanbul ignore next */ () => {
-    const items: Array<{
-      title: string;
-      price: string;
-      url: string;
-      location: string;
-      imageUrl?: string;
-      description?: string;
-    }> = [];
+  const rawListings = await page.evaluate(
+    /* istanbul ignore next */ () => {
+      const items: Array<{
+        title: string;
+        price: string;
+        url: string;
+        location: string;
+        imageUrl?: string;
+        description?: string;
+      }> = [];
 
-    // Try multiple selector patterns (Craigslist UI changes)
-    const selectors = [
-      '.cl-search-result',
-      '.result-row',
-      '.gallery-card',
-      'li.cl-static-search-result',
-    ];
+      // Try multiple selector patterns (Craigslist UI changes)
+      const selectors = [
+        '.cl-search-result',
+        '.result-row',
+        '.gallery-card',
+        'li.cl-static-search-result',
+      ];
 
-    let listingElements: Element[] = [];
-    for (const selector of selectors) {
-      const elements = document.querySelectorAll(selector);
-      if (elements.length > 0) {
-        listingElements = Array.from(elements);
-        break;
-      }
-    }
-
-    // Fallback: generic data-pid approach
-    if (listingElements.length === 0) {
-      listingElements = Array.from(document.querySelectorAll('[data-pid]'));
-    }
-
-    for (const el of listingElements.slice(0, 50)) {
-      try {
-        // Extract title
-        const titleEl = el.querySelector(
-          '.posting-title, .result-title, .titlestring, a.posting-title, .label'
-        ) as HTMLElement;
-        const title =
-          titleEl?.innerText?.trim() || el.querySelector('a')?.innerText?.trim() || '';
-
-        // Extract URL
-        const linkEl = el.querySelector("a[href*='/']") as HTMLAnchorElement;
-        const url = linkEl?.href || '';
-
-        // Extract price
-        const priceEl = el.querySelector('.priceinfo, .result-price, .price') as HTMLElement;
-        const price = priceEl?.innerText?.trim() || '$0';
-
-        // Extract location
-        const locationEl = el.querySelector(
-          '.meta, .result-hood, .location, .supertitle'
-        ) as HTMLElement;
-        const location = locationEl?.innerText?.replace(/[()]/g, '').trim() || '';
-
-        // Extract image
-        const imgEl = el.querySelector('img') as HTMLImageElement;
-        const imageUrl = imgEl?.src || '';
-
-        // Extract description snippet from search results (not full listing description —
-        // full descriptions require detail page visits, planned for a future enhancement)
-        const descEl = el.querySelector('.result-snippet, .description') as HTMLElement;
-        const description = descEl?.innerText?.trim() || '';
-
-        // Filter out sponsored listings
-        if (title && url && !title.includes('sponsored')) {
-          items.push({ title, price, url, location, imageUrl, description });
+      let listingElements: Element[] = [];
+      for (const selector of selectors) {
+        const elements = document.querySelectorAll(selector);
+        if (elements.length > 0) {
+          listingElements = Array.from(elements);
+          break;
         }
-      } catch {
-        // Skip problematic listings
       }
-    }
 
-    return items;
-  });
+      // Fallback: generic data-pid approach
+      if (listingElements.length === 0) {
+        listingElements = Array.from(document.querySelectorAll('[data-pid]'));
+      }
+
+      for (const el of listingElements.slice(0, 50)) {
+        try {
+          // Extract title
+          const titleEl = el.querySelector(
+            '.posting-title, .result-title, .titlestring, a.posting-title, .label'
+          ) as HTMLElement;
+          const title =
+            titleEl?.innerText?.trim() || el.querySelector('a')?.innerText?.trim() || '';
+
+          // Extract URL
+          const linkEl = el.querySelector("a[href*='/']") as HTMLAnchorElement;
+          const url = linkEl?.href || '';
+
+          // Extract price
+          const priceEl = el.querySelector('.priceinfo, .result-price, .price') as HTMLElement;
+          const price = priceEl?.innerText?.trim() || '$0';
+
+          // Extract location
+          const locationEl = el.querySelector(
+            '.meta, .result-hood, .location, .supertitle'
+          ) as HTMLElement;
+          const location = locationEl?.innerText?.replace(/[()]/g, '').trim() || '';
+
+          // Extract image
+          const imgEl = el.querySelector('img') as HTMLImageElement;
+          const imageUrl = imgEl?.src || '';
+
+          // Extract description snippet from search results (not full listing description —
+          // full descriptions require detail page visits, planned for a future enhancement)
+          const descEl = el.querySelector('.result-snippet, .description') as HTMLElement;
+          const description = descEl?.innerText?.trim() || '';
+
+          // Filter out sponsored listings
+          if (title && url && !title.includes('sponsored')) {
+            items.push({ title, price, url, location, imageUrl, description });
+          }
+        } catch {
+          // Skip problematic listings
+        }
+      }
+
+      return items;
+    }
+  );
 
   console.log(`[craigslist-scraper] Found ${rawListings.length} listings`);
 

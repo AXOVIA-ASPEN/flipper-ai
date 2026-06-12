@@ -258,20 +258,23 @@ Given('an unauthenticated user', function () {
 
 // ── When steps ──────────────────────────────────────────────────────────────
 
-When('the user posts to {string} with tier {string}', async function (endpoint: string, tier: string) {
-  if (endpoint === '/api/checkout') {
-    const req = makeCheckoutRequest({ tier });
-    const res = await checkoutPOST(req);
-    checkoutResponseStatus = res.status;
-    checkoutResponseBody = await res.json() as Record<string, unknown>;
+When(
+  'the user posts to {string} with tier {string}',
+  async function (endpoint: string, tier: string) {
+    if (endpoint === '/api/checkout') {
+      const req = makeCheckoutRequest({ tier });
+      const res = await checkoutPOST(req);
+      checkoutResponseStatus = res.status;
+      checkoutResponseBody = (await res.json()) as Record<string, unknown>;
+    }
   }
-});
+);
 
 When('the user posts to {string}', async function (endpoint: string) {
   if (endpoint === '/api/checkout/portal') {
     const res = await portalPOST();
     checkoutResponseStatus = res.status;
-    checkoutResponseBody = await res.json() as Record<string, unknown>;
+    checkoutResponseBody = (await res.json()) as Record<string, unknown>;
   }
 });
 
@@ -300,7 +303,7 @@ When(
     const req = makeCheckoutRequest({ tier });
     const res = await checkoutPOST(req);
     checkoutResponseStatus = res.status;
-    checkoutResponseBody = await res.json() as Record<string, unknown>;
+    checkoutResponseBody = (await res.json()) as Record<string, unknown>;
 
     // After a real checkout.session.completed webhook, the tier would be updated.
     // We verify the checkout session was created with the correct success_url
@@ -326,7 +329,7 @@ When('the user cancels the Stripe Checkout page', async function () {
   const req = makeCheckoutRequest({ tier: 'FLIPPER' });
   const res = await checkoutPOST(req);
   checkoutResponseStatus = res.status;
-  checkoutResponseBody = await res.json() as Record<string, unknown>;
+  checkoutResponseBody = (await res.json()) as Record<string, unknown>;
 
   // Extract the cancel redirect params from the session creation call
   if (res.status === 200 && mockState.checkoutCreateCalls.length > 0) {

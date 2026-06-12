@@ -53,12 +53,14 @@ export default async function ChangelogPage() {
 ```
 
 **Pros:**
+
 - Single source of truth: `CHANGELOG.md` already exists and is maintained by your release workflow
 - No CMS, no DB
 - Renders at build time (SSG) — fast, SEO-friendly, free to host
 - Auto-updates on every deploy after a release
 
 **Cons:**
+
 - Updating the changelog mid-cycle requires a deploy. (Acceptable — releases are infrequent.)
 
 ### Approach 2 — Linear / GitHub Issues integration
@@ -128,6 +130,7 @@ Add a small "Get changelog updates by email" form at the top of the page:
 When a new version ships, send the latest entry as an email digest. Use Resend with a "List-Unsubscribe" header.
 
 **Subscriber benefits:**
+
 - Builds a list of engaged users (high-value retargeting audience)
 - Re-engagement channel for churned users (they may resubscribe when they see new features)
 
@@ -148,7 +151,9 @@ export async function GET() {
         <title>Flipper.ai Changelog</title>
         <link>https://<domain>/changelog</link>
         <description>What's new in Flipper.ai</description>
-        ${releases.map(r => `
+        ${releases
+          .map(
+            (r) => `
           <item>
             <title>${r.version} — ${r.date}</title>
             <link>https://<domain>/changelog#${r.version}</link>
@@ -156,7 +161,9 @@ export async function GET() {
             <description><![CDATA[${r.html}]]></description>
             <guid>${r.version}</guid>
           </item>
-        `).join('')}
+        `
+          )
+          .join('')}
       </channel>
     </rss>`;
 
@@ -174,7 +181,7 @@ You already follow Keep a Changelog conventions. Some additional rules:
 
 1. **One bullet per change.** Not "Improved performance and added a feature and fixed bugs." Three bullets.
 2. **User-facing language.** "Faster Craigslist scans (3x throughput)" beats "Refactored Playwright pool concurrency."
-3. **Acknowledgments.** When a user reports a bug that ships in a fix, credit them: *"Fixed: Craigslist 'pets' category causing parser to choke (thanks @reddit_username)"*. People who get credited become advocates.
+3. **Acknowledgments.** When a user reports a bug that ships in a fix, credit them: _"Fixed: Craigslist 'pets' category causing parser to choke (thanks @reddit_username)"_. People who get credited become advocates.
 4. **Don't hide breaking changes.** If something changes that affects user workflows, lead with it under **Removed** or **Changed**.
 5. **Skip internal-only changes.** Refactors, dep upgrades, CI improvements don't belong in a customer-facing changelog. Keep those in commit messages.
 

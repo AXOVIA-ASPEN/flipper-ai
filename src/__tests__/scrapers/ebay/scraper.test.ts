@@ -14,11 +14,7 @@ import {
   SUPPORTED_CONDITIONS,
 } from '@/scrapers/ebay';
 import type { EbayItemSummary } from '@/scrapers/ebay';
-import {
-  ExternalServiceError,
-  RateLimitError,
-  ConfigurationError,
-} from '@/lib/errors';
+import { ExternalServiceError, RateLimitError, ConfigurationError } from '@/lib/errors';
 
 // Mock value-estimator (used by convertEbayItemsToNormalized for detectCategory fallback)
 jest.mock('@/lib/value-estimator', () => ({
@@ -102,10 +98,7 @@ describe('eBay Scraper Module', () => {
     });
 
     it('combines all filters', () => {
-      const result = buildFilterString(
-        { minPrice: 5, maxPrice: 200, condition: 'NEW' },
-        true
-      );
+      const result = buildFilterString({ minPrice: 5, maxPrice: 200, condition: 'NEW' }, true);
       expect(result).toBe(
         'buyingOptions:{FIXED_PRICE},soldItemsOnly:true,price:[5..200],conditions:{NEW}'
       );
@@ -187,13 +180,13 @@ describe('eBay Scraper Module', () => {
         text: () => Promise.resolve('Unauthorized'),
       });
 
-      await expect(
-        callEbayApi('/item_summary/search', { q: 'test' }, 'bad-token')
-      ).rejects.toThrow(ExternalServiceError);
+      await expect(callEbayApi('/item_summary/search', { q: 'test' }, 'bad-token')).rejects.toThrow(
+        ExternalServiceError
+      );
 
-      await expect(
-        callEbayApi('/item_summary/search', { q: 'test' }, 'bad-token')
-      ).rejects.toThrow('OAuth token expired or invalid');
+      await expect(callEbayApi('/item_summary/search', { q: 'test' }, 'bad-token')).rejects.toThrow(
+        'OAuth token expired or invalid'
+      );
     });
 
     it('throws ExternalServiceError on 403 (forbidden)', async () => {
@@ -203,9 +196,9 @@ describe('eBay Scraper Module', () => {
         text: () => Promise.resolve('Forbidden'),
       });
 
-      await expect(
-        callEbayApi('/item_summary/search', { q: 'test' }, 'bad-token')
-      ).rejects.toThrow(ExternalServiceError);
+      await expect(callEbayApi('/item_summary/search', { q: 'test' }, 'bad-token')).rejects.toThrow(
+        ExternalServiceError
+      );
     });
 
     it('throws RateLimitError on 429', async () => {
@@ -215,9 +208,9 @@ describe('eBay Scraper Module', () => {
         text: () => Promise.resolve('Rate limited'),
       });
 
-      await expect(
-        callEbayApi('/item_summary/search', { q: 'test' }, 'token')
-      ).rejects.toThrow(RateLimitError);
+      await expect(callEbayApi('/item_summary/search', { q: 'test' }, 'token')).rejects.toThrow(
+        RateLimitError
+      );
     });
 
     it('throws ExternalServiceError on 500 server error', async () => {
@@ -227,12 +220,12 @@ describe('eBay Scraper Module', () => {
         text: () => Promise.resolve('Internal Server Error'),
       });
 
-      await expect(
-        callEbayApi('/item_summary/search', { q: 'test' }, 'token')
-      ).rejects.toThrow(ExternalServiceError);
-      await expect(
-        callEbayApi('/item_summary/search', { q: 'test' }, 'token')
-      ).rejects.toThrow('Request failed with status 500');
+      await expect(callEbayApi('/item_summary/search', { q: 'test' }, 'token')).rejects.toThrow(
+        ExternalServiceError
+      );
+      await expect(callEbayApi('/item_summary/search', { q: 'test' }, 'token')).rejects.toThrow(
+        'Request failed with status 500'
+      );
     });
 
     it('sets search params correctly on the URL', async () => {

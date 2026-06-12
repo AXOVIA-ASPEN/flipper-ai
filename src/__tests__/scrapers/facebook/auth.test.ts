@@ -103,9 +103,7 @@ describe('Facebook Authentication', () => {
         }),
       });
 
-      await expect(exchangeCodeForToken(mockConfig, 'invalid-code')).rejects.toThrow(
-        'Bad Request'
-      );
+      await expect(exchangeCodeForToken(mockConfig, 'invalid-code')).rejects.toThrow('Bad Request');
     });
 
     it('should fall back to statusText when error object is missing', async () => {
@@ -116,9 +114,7 @@ describe('Facebook Authentication', () => {
         json: async () => ({}),
       });
 
-      await expect(exchangeCodeForToken(mockConfig, 'invalid-code')).rejects.toThrow(
-        'Bad Request'
-      );
+      await expect(exchangeCodeForToken(mockConfig, 'invalid-code')).rejects.toThrow('Bad Request');
     });
 
     it('should include correct query parameters in fetch URL', async () => {
@@ -168,9 +164,9 @@ describe('Facebook Authentication', () => {
         }),
       });
 
-      await expect(
-        exchangeForLongLivedToken(mockConfig, 'bad-token')
-      ).rejects.toThrow('Invalid OAuth access token');
+      await expect(exchangeForLongLivedToken(mockConfig, 'bad-token')).rejects.toThrow(
+        'Invalid OAuth access token'
+      );
     });
 
     it('should fall back to statusText when error.message is missing', async () => {
@@ -181,9 +177,9 @@ describe('Facebook Authentication', () => {
         json: async () => ({ error: {} }),
       });
 
-      await expect(
-        exchangeForLongLivedToken(mockConfig, 'bad-token')
-      ).rejects.toThrow('Bad Request');
+      await expect(exchangeForLongLivedToken(mockConfig, 'bad-token')).rejects.toThrow(
+        'Bad Request'
+      );
     });
 
     it('should fall back to statusText when error object is missing entirely', async () => {
@@ -194,9 +190,9 @@ describe('Facebook Authentication', () => {
         json: async () => ({}),
       });
 
-      await expect(
-        exchangeForLongLivedToken(mockConfig, 'bad-token')
-      ).rejects.toThrow('Internal Server Error');
+      await expect(exchangeForLongLivedToken(mockConfig, 'bad-token')).rejects.toThrow(
+        'Internal Server Error'
+      );
     });
 
     it('should include fb_exchange_token grant_type in request', async () => {

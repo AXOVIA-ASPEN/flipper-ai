@@ -26,10 +26,7 @@ test.describe('Login - Acceptance Tests', () => {
     await expect(page.getByRole('link', { name: /forgot password/i })).toBeVisible();
   });
 
-  test('should successfully log in with valid credentials', async ({
-    page,
-    context,
-  }) => {
+  test('should successfully log in with valid credentials', async ({ page, context }) => {
     // First, create a test account (or use existing)
     // For this test, we'll assume an account exists
     // In real scenarios, you'd use a test database with known users
@@ -48,10 +45,7 @@ test.describe('Login - Acceptance Tests', () => {
     // Verify session cookie exists
     const cookies = await context.cookies();
     const hasSession = cookies.some(
-      (c) =>
-        c.name.includes('session') ||
-        c.name.includes('__session') ||
-        c.name.includes('token')
+      (c) => c.name.includes('session') || c.name.includes('__session') || c.name.includes('token')
     );
 
     expect(hasSession).toBe(true);
@@ -138,9 +132,7 @@ test.describe('Login - Acceptance Tests', () => {
     await page.getByLabel(/password/i).fill('Password123!');
 
     const emailInput = page.getByLabel(/email/i);
-    const isValid = await emailInput.evaluate((input: HTMLInputElement) =>
-      input.checkValidity()
-    );
+    const isValid = await emailInput.evaluate((input: HTMLInputElement) => input.checkValidity());
 
     expect(isValid).toBe(false);
   });
@@ -166,9 +158,7 @@ test.describe('Login - Acceptance Tests', () => {
     await expect(page.getByLabel(/password/i)).toBeVisible();
 
     const submitButton = page.getByRole('button', { name: /log in/i });
-    const buttonWidth = await submitButton.evaluate(
-      (el) => el.getBoundingClientRect().width
-    );
+    const buttonWidth = await submitButton.evaluate((el) => el.getBoundingClientRect().width);
 
     expect(buttonWidth).toBeGreaterThan(300);
   });
@@ -178,9 +168,7 @@ test.describe('Login - Acceptance Tests', () => {
     await page.waitForTimeout(100);
 
     const emailInput = page.getByLabel(/email/i);
-    const isFocused = await emailInput.evaluate(
-      (el) => el === document.activeElement
-    );
+    const isFocused = await emailInput.evaluate((el) => el === document.activeElement);
 
     expect(isFocused).toBe(true);
   });
@@ -192,16 +180,12 @@ test.describe('Login - Acceptance Tests', () => {
     await emailInput.focus();
     await emailInput.press('Tab');
 
-    const passwordFocused = await passwordInput.evaluate(
-      (el) => el === document.activeElement
-    );
+    const passwordFocused = await passwordInput.evaluate((el) => el === document.activeElement);
 
     expect(passwordFocused).toBe(true);
   });
 
-  test('should submit form on Enter key in password field', async ({
-    page,
-  }) => {
+  test('should submit form on Enter key in password field', async ({ page }) => {
     await page.getByLabel(/email/i).fill('test@example.com');
     await page.getByLabel(/password/i).fill('Password123!');
 

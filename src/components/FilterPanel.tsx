@@ -64,13 +64,14 @@ export default function FilterPanel({
     <div className="fp-glass" style={{ padding: 24, marginBottom: 24 }}>
       {/* Active filter chips */}
       {activeFilterCount > 0 && (
-        <div className="flex flex-wrap gap-2 pb-2 border-b border-white/10" style={{ marginBottom: 16 }}>
+        <div
+          className="flex flex-wrap gap-2 pb-2 border-b border-white/10"
+          style={{ marginBottom: 16 }}
+        >
           {activePlatforms.map((p) => (
             <button
               key={p}
-              onClick={() =>
-                setFilter('platforms', toggleMultiSelectValue(filters.platforms, p))
-              }
+              onClick={() => setFilter('platforms', toggleMultiSelectValue(filters.platforms, p))}
               className="fp-badge fp-badge-purple flex items-center gap-1"
             >
               {p} <span style={{ opacity: 0.7 }}>×</span>
@@ -79,9 +80,7 @@ export default function FilterPanel({
           {activeCategories.map((c) => (
             <button
               key={c}
-              onClick={() =>
-                setFilter('categories', toggleMultiSelectValue(filters.categories, c))
-              }
+              onClick={() => setFilter('categories', toggleMultiSelectValue(filters.categories, c))}
               className="fp-badge fp-badge-purple flex items-center gap-1"
             >
               {c} <span style={{ opacity: 0.7 }}>×</span>
@@ -90,9 +89,7 @@ export default function FilterPanel({
           {activeStatuses.map((s) => (
             <button
               key={s}
-              onClick={() =>
-                setFilter('statuses', toggleMultiSelectValue(filters.statuses, s))
-              }
+              onClick={() => setFilter('statuses', toggleMultiSelectValue(filters.statuses, s))}
               className="fp-badge fp-badge-purple flex items-center gap-1"
             >
               {s} <span style={{ opacity: 0.7 }}>×</span>
@@ -112,7 +109,8 @@ export default function FilterPanel({
               onClick={() => setFilters({ minProfit: '', maxProfit: '' })}
               className="fp-badge fp-badge-purple flex items-center gap-1"
             >
-              Profit: ${filters.minProfit || '0'}–{filters.maxProfit ? `$${filters.maxProfit}` : '∞'}{' '}
+              Profit: ${filters.minProfit || '0'}–
+              {filters.maxProfit ? `$${filters.maxProfit}` : '∞'}{' '}
               <span style={{ opacity: 0.7 }}>×</span>
             </button>
           )}
@@ -129,10 +127,7 @@ export default function FilterPanel({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Platform multi-select */}
         <div>
-          <label
-            className="block mb-2"
-            style={{ color: '#94a3b8', fontSize: 12, fontWeight: 600 }}
-          >
+          <label className="block mb-2" style={{ color: '#94a3b8', fontSize: 12, fontWeight: 600 }}>
             Platform
           </label>
           <div className="flex flex-wrap gap-1">
@@ -142,17 +137,27 @@ export default function FilterPanel({
                 <button
                   key={platform.value}
                   onClick={() =>
-                    setFilter('platforms', toggleMultiSelectValue(filters.platforms, platform.value))
+                    setFilter(
+                      'platforms',
+                      toggleMultiSelectValue(filters.platforms, platform.value)
+                    )
                   }
                   className={`px-2 py-1 rounded-lg border text-xs font-medium transition-all duration-200 ${
-                    active
-                      ? 'shadow-sm'
-                      : 'hover:opacity-90'
+                    active ? 'shadow-sm' : 'hover:opacity-90'
                   }`}
                   style={
                     active
-                      ? { background: 'rgba(124,58,237,0.4)', borderColor: 'rgba(167,139,250,0.6)', color: '#c4b5fd', boxShadow: '0 0 12px rgba(124,58,237,0.3)' }
-                      : { background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.6)' }
+                      ? {
+                          background: 'rgba(124,58,237,0.4)',
+                          borderColor: 'rgba(167,139,250,0.6)',
+                          color: '#c4b5fd',
+                          boxShadow: '0 0 12px rgba(124,58,237,0.3)',
+                        }
+                      : {
+                          background: 'rgba(255,255,255,0.04)',
+                          borderColor: 'rgba(255,255,255,0.2)',
+                          color: 'rgba(255,255,255,0.6)',
+                        }
                   }
                 >
                   {platform.label}
@@ -164,15 +169,14 @@ export default function FilterPanel({
 
         {/* Score range slider */}
         <div>
-          <label
-            className="block mb-2"
-            style={{ color: '#94a3b8', fontSize: 12, fontWeight: 600 }}
-          >
+          <label className="block mb-2" style={{ color: '#94a3b8', fontSize: 12, fontWeight: 600 }}>
             Score: {filters.minScore || '0'} – {filters.maxScore || '100'}
           </label>
           <div className="space-y-2">
             <div className="flex gap-2 items-center">
-              <span className="text-xs w-6" style={{ color: '#64748b' }}>Min</span>
+              <span className="text-xs w-6" style={{ color: '#64748b' }}>
+                Min
+              </span>
               <input
                 type="range"
                 min="0"
@@ -192,7 +196,9 @@ export default function FilterPanel({
               />
             </div>
             <div className="flex gap-2 items-center">
-              <span className="text-xs w-6" style={{ color: '#64748b' }}>Max</span>
+              <span className="text-xs w-6" style={{ color: '#64748b' }}>
+                Max
+              </span>
               <input
                 type="range"
                 min="0"
@@ -216,10 +222,7 @@ export default function FilterPanel({
 
         {/* Profit range */}
         <div>
-          <label
-            className="block mb-2"
-            style={{ color: '#94a3b8', fontSize: 12, fontWeight: 600 }}
-          >
+          <label className="block mb-2" style={{ color: '#94a3b8', fontSize: 12, fontWeight: 600 }}>
             Profit Range ($)
           </label>
           <div className="flex gap-2 items-center">
@@ -230,7 +233,9 @@ export default function FilterPanel({
               onChange={(e) => setFilter('minProfit', e.target.value)}
               className="fp-input w-full"
             />
-            <span className="text-xs" style={{ color: '#475569' }}>–</span>
+            <span className="text-xs" style={{ color: '#475569' }}>
+              –
+            </span>
             <input
               type="number"
               placeholder="Max $"
@@ -243,10 +248,7 @@ export default function FilterPanel({
 
         {/* Category multi-select */}
         <div>
-          <label
-            className="block mb-2"
-            style={{ color: '#94a3b8', fontSize: 12, fontWeight: 600 }}
-          >
+          <label className="block mb-2" style={{ color: '#94a3b8', fontSize: 12, fontWeight: 600 }}>
             Category
           </label>
           <div className="flex flex-wrap gap-1">
@@ -259,14 +261,21 @@ export default function FilterPanel({
                     setFilter('categories', toggleMultiSelectValue(filters.categories, cat))
                   }
                   className={`px-2 py-1 rounded-lg border text-xs font-medium transition-all duration-200 ${
-                    active
-                      ? 'shadow-sm'
-                      : 'hover:opacity-90'
+                    active ? 'shadow-sm' : 'hover:opacity-90'
                   }`}
                   style={
                     active
-                      ? { background: 'rgba(124,58,237,0.4)', borderColor: 'rgba(167,139,250,0.6)', color: '#c4b5fd', boxShadow: '0 0 12px rgba(124,58,237,0.3)' }
-                      : { background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.6)' }
+                      ? {
+                          background: 'rgba(124,58,237,0.4)',
+                          borderColor: 'rgba(167,139,250,0.6)',
+                          color: '#c4b5fd',
+                          boxShadow: '0 0 12px rgba(124,58,237,0.3)',
+                        }
+                      : {
+                          background: 'rgba(255,255,255,0.04)',
+                          borderColor: 'rgba(255,255,255,0.2)',
+                          color: 'rgba(255,255,255,0.6)',
+                        }
                   }
                 >
                   {cat}
@@ -295,14 +304,21 @@ export default function FilterPanel({
                       setFilter('statuses', toggleMultiSelectValue(filters.statuses, option.value))
                     }
                     className={`px-2 py-1 rounded-lg border text-xs font-medium transition-all duration-200 ${
-                      active
-                        ? 'shadow-sm'
-                        : 'hover:opacity-90'
+                      active ? 'shadow-sm' : 'hover:opacity-90'
                     }`}
                     style={
                       active
-                        ? { background: 'rgba(124,58,237,0.4)', borderColor: 'rgba(167,139,250,0.6)', color: '#c4b5fd', boxShadow: '0 0 12px rgba(124,58,237,0.3)' }
-                        : { background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.6)' }
+                        ? {
+                            background: 'rgba(124,58,237,0.4)',
+                            borderColor: 'rgba(167,139,250,0.6)',
+                            color: '#c4b5fd',
+                            boxShadow: '0 0 12px rgba(124,58,237,0.3)',
+                          }
+                        : {
+                            background: 'rgba(255,255,255,0.04)',
+                            borderColor: 'rgba(255,255,255,0.2)',
+                            color: 'rgba(255,255,255,0.6)',
+                          }
                     }
                   >
                     {option.label}

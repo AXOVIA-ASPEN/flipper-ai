@@ -120,13 +120,9 @@ describe('Firebase Storage Helpers', () => {
     });
 
     it('rejects invalid content type', async () => {
-      await expect(
-        uploadImage(JPEG_MAGIC, 'path', 'application/pdf')
-      ).rejects.toThrow(AppError);
+      await expect(uploadImage(JPEG_MAGIC, 'path', 'application/pdf')).rejects.toThrow(AppError);
 
-      await expect(
-        uploadImage(JPEG_MAGIC, 'path', 'application/pdf')
-      ).rejects.toMatchObject({
+      await expect(uploadImage(JPEG_MAGIC, 'path', 'application/pdf')).rejects.toMatchObject({
         code: ErrorCode.VALIDATION_ERROR,
       });
     });
@@ -138,41 +134,29 @@ describe('Firebase Storage Helpers', () => {
       bigBuffer[1] = 0xd8;
       bigBuffer[2] = 0xff;
 
-      await expect(
-        uploadImage(bigBuffer, 'path', 'image/jpeg')
-      ).rejects.toThrow(AppError);
+      await expect(uploadImage(bigBuffer, 'path', 'image/jpeg')).rejects.toThrow(AppError);
 
-      await expect(
-        uploadImage(bigBuffer, 'path', 'image/jpeg')
-      ).rejects.toMatchObject({
+      await expect(uploadImage(bigBuffer, 'path', 'image/jpeg')).rejects.toMatchObject({
         code: ErrorCode.VALIDATION_ERROR,
       });
     });
 
     it('rejects empty file', async () => {
-      await expect(
-        uploadImage(Buffer.alloc(0), 'path', 'image/jpeg')
-      ).rejects.toThrow(AppError);
+      await expect(uploadImage(Buffer.alloc(0), 'path', 'image/jpeg')).rejects.toThrow(AppError);
     });
 
     it('rejects magic bytes mismatch', async () => {
       // PNG magic bytes declared as JPEG
-      await expect(
-        uploadImage(PNG_MAGIC, 'path', 'image/jpeg')
-      ).rejects.toThrow(AppError);
+      await expect(uploadImage(PNG_MAGIC, 'path', 'image/jpeg')).rejects.toThrow(AppError);
 
-      await expect(
-        uploadImage(PNG_MAGIC, 'path', 'image/jpeg')
-      ).rejects.toMatchObject({
+      await expect(uploadImage(PNG_MAGIC, 'path', 'image/jpeg')).rejects.toMatchObject({
         code: ErrorCode.VALIDATION_ERROR,
       });
     });
 
     it('rejects file too small to validate magic bytes', async () => {
       const tiny = Buffer.from([0xff, 0xd8]); // Only 2 bytes, JPEG needs 3
-      await expect(
-        uploadImage(tiny, 'path', 'image/jpeg')
-      ).rejects.toThrow(AppError);
+      await expect(uploadImage(tiny, 'path', 'image/jpeg')).rejects.toThrow(AppError);
     });
   });
 
@@ -187,10 +171,14 @@ describe('Firebase Storage Helpers', () => {
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
         headers: new Headers({ 'content-type': 'image/jpeg' }),
-        arrayBuffer: jest.fn().mockResolvedValue(JPEG_MAGIC.buffer.slice(
-          JPEG_MAGIC.byteOffset,
-          JPEG_MAGIC.byteOffset + JPEG_MAGIC.byteLength
-        )),
+        arrayBuffer: jest
+          .fn()
+          .mockResolvedValue(
+            JPEG_MAGIC.buffer.slice(
+              JPEG_MAGIC.byteOffset,
+              JPEG_MAGIC.byteOffset + JPEG_MAGIC.byteLength
+            )
+          ),
       });
 
       const result = await uploadImageFromUrl(
@@ -208,10 +196,14 @@ describe('Firebase Storage Helpers', () => {
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
         headers: new Headers({ 'content-type': 'image/png; charset=utf-8' }),
-        arrayBuffer: jest.fn().mockResolvedValue(PNG_MAGIC.buffer.slice(
-          PNG_MAGIC.byteOffset,
-          PNG_MAGIC.byteOffset + PNG_MAGIC.byteLength
-        )),
+        arrayBuffer: jest
+          .fn()
+          .mockResolvedValue(
+            PNG_MAGIC.buffer.slice(
+              PNG_MAGIC.byteOffset,
+              PNG_MAGIC.byteOffset + PNG_MAGIC.byteLength
+            )
+          ),
       });
 
       const result = await uploadImageFromUrl('https://example.com/img.png', 'path/img.png');
@@ -225,9 +217,9 @@ describe('Firebase Storage Helpers', () => {
         statusText: 'Not Found',
       });
 
-      await expect(
-        uploadImageFromUrl('https://example.com/missing.jpg', 'path')
-      ).rejects.toThrow(AppError);
+      await expect(uploadImageFromUrl('https://example.com/missing.jpg', 'path')).rejects.toThrow(
+        AppError
+      );
 
       await expect(
         uploadImageFromUrl('https://example.com/missing.jpg', 'path')
@@ -257,9 +249,9 @@ describe('Firebase Storage Helpers', () => {
         arrayBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(100)),
       });
 
-      await expect(
-        uploadImageFromUrl('https://example.com/page.html', 'path')
-      ).rejects.toThrow(AppError);
+      await expect(uploadImageFromUrl('https://example.com/page.html', 'path')).rejects.toThrow(
+        AppError
+      );
     });
   });
 
@@ -288,15 +280,11 @@ describe('Firebase Storage Helpers', () => {
     it('wraps storage errors in AppError', async () => {
       mockDelete.mockRejectedValueOnce(new Error('Permission denied'));
 
-      await expect(
-        deleteImage('user1/ebay/listing1/0.jpg')
-      ).rejects.toThrow(AppError);
+      await expect(deleteImage('user1/ebay/listing1/0.jpg')).rejects.toThrow(AppError);
 
       mockDelete.mockRejectedValueOnce(new Error('Permission denied'));
 
-      await expect(
-        deleteImage('user1/ebay/listing1/0.jpg')
-      ).rejects.toMatchObject({
+      await expect(deleteImage('user1/ebay/listing1/0.jpg')).rejects.toMatchObject({
         code: ErrorCode.EXTERNAL_SERVICE_ERROR,
       });
     });
@@ -324,10 +312,7 @@ describe('Firebase Storage Helpers', () => {
       const mockFileDelete1 = jest.fn().mockResolvedValue(undefined);
       const mockFileDelete2 = jest.fn().mockResolvedValue(undefined);
       mockGetFiles.mockResolvedValueOnce([
-        [
-          { delete: mockFileDelete1 },
-          { delete: mockFileDelete2 },
-        ],
+        [{ delete: mockFileDelete1 }, { delete: mockFileDelete2 }],
       ]);
 
       const result = await deleteListingImages('user1', 'ebay', 'listing1');
@@ -357,11 +342,7 @@ describe('Firebase Storage Helpers', () => {
       const mockFileDelete3 = jest.fn().mockResolvedValue(undefined);
 
       mockGetFiles.mockResolvedValueOnce([
-        [
-          { delete: mockFileDelete1 },
-          { delete: mockFileDelete2 },
-          { delete: mockFileDelete3 },
-        ],
+        [{ delete: mockFileDelete1 }, { delete: mockFileDelete2 }, { delete: mockFileDelete3 }],
       ]);
 
       const result = await deleteListingImages('user1', 'ebay', 'listing1');
@@ -372,7 +353,12 @@ describe('Firebase Storage Helpers', () => {
       expect(result).toEqual({ deleted: 2, failed: 1 });
       expect(logger.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to delete 1/3'),
-        expect.objectContaining({ userId: 'user1', platform: 'ebay', listingId: 'listing1', failed: 1 })
+        expect.objectContaining({
+          userId: 'user1',
+          platform: 'ebay',
+          listingId: 'listing1',
+          failed: 1,
+        })
       );
     });
   });

@@ -1,7 +1,13 @@
 // Tests for market-price.ts utility functions (parseEbayPrice, median, parseSoldDate, buildEbaySoldUrl)
 // These are pure functions that don't need Playwright mocking
 
-import { parseEbayPrice, median, parseSoldDate, buildEbaySoldUrl, filterOutliers } from '../lib/market-price';
+import {
+  parseEbayPrice,
+  median,
+  parseSoldDate,
+  buildEbaySoldUrl,
+  filterOutliers,
+} from '../lib/market-price';
 
 describe('parseEbayPrice', () => {
   it('parses standard dollar price', () => {
@@ -301,7 +307,9 @@ describe('filterOutliers', () => {
 
   it('works with max scraper output (20 items) without being overly aggressive', () => {
     // Realistic eBay data: mostly $80-120, one collector premium at $250
-    const prices = [80, 85, 90, 92, 95, 98, 100, 102, 105, 108, 110, 112, 115, 118, 120, 122, 125, 130, 140, 250];
+    const prices = [
+      80, 85, 90, 92, 95, 98, 100, 102, 105, 108, 110, 112, 115, 118, 120, 122, 125, 130, 140, 250,
+    ];
     const result = filterOutliers(prices);
 
     // The $250 should be removed as outlier, rest should stay

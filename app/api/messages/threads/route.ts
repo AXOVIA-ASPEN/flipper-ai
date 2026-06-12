@@ -142,17 +142,11 @@ export async function GET(request: NextRequest) {
       _count: true,
     });
 
-    const unreadMap = new Map(
-      unreadCounts.map((u) => [u.listingId, u._count])
-    );
+    const unreadMap = new Map(unreadCounts.map((u) => [u.listingId, u._count]));
 
-    const countMap = new Map(
-      groupResult.map((g) => [g.listingId, g._count])
-    );
+    const countMap = new Map(groupResult.map((g) => [g.listingId, g._count]));
 
-    const maxDateMap = new Map(
-      groupResult.map((g) => [g.listingId, g._max.createdAt])
-    );
+    const maxDateMap = new Map(groupResult.map((g) => [g.listingId, g._max.createdAt]));
 
     // Build thread summaries
     const threads: ThreadSummary[] = latestMessages.map((msg) => ({

@@ -19,10 +19,7 @@
  * time is not guaranteed to survive.
  */
 
-import {
-  registerPoster,
-  type PlatformPoster,
-} from '@/lib/posting-queue-processor';
+import { registerPoster, type PlatformPoster } from '@/lib/posting-queue-processor';
 
 /**
  * Build a stub PlatformPoster that always reports "not yet implemented" so

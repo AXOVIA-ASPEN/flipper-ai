@@ -8,7 +8,10 @@ const mockCompleteAI = jest.fn();
 jest.mock('@/lib/ai', () => ({
   completeAI: (...args: unknown[]) => mockCompleteAI(...args),
   AIProviderUnavailableError: class extends Error {
-    constructor() { super('No AI provider available'); this.name = 'AIProviderUnavailableError'; }
+    constructor() {
+      super('No AI provider available');
+      this.name = 'AIProviderUnavailableError';
+    }
   },
 }));
 
@@ -74,13 +77,15 @@ describe('classifyItemLogistics()', () => {
 
   describe('LLM path — with AI provider', () => {
     it('returns classification from LLM response', async () => {
-      mockCompleteAI.mockResolvedValue(makeAIResponse({
-        sizeCategory: 'small_shippable',
-        estimatedWeightLbs: 3.5,
-        estimatedDimensionsInches: { length: 10, width: 8, height: 4 },
-        classificationReasoning: 'Small electronics item',
-        confidence: 'high',
-      }));
+      mockCompleteAI.mockResolvedValue(
+        makeAIResponse({
+          sizeCategory: 'small_shippable',
+          estimatedWeightLbs: 3.5,
+          estimatedDimensionsInches: { length: 10, width: 8, height: 4 },
+          classificationReasoning: 'Small electronics item',
+          confidence: 'high',
+        })
+      );
 
       const result = await classifyItemLogistics('Camera lens', 'Canon 50mm', 'electronics');
       expect(result.sizeCategory).toBe('small_shippable');
@@ -96,52 +101,60 @@ describe('classifyItemLogistics()', () => {
     });
 
     it('clamps estimatedWeightLbs to 200 when LLM returns huge value', async () => {
-      mockCompleteAI.mockResolvedValue(makeAIResponse({
-        sizeCategory: 'large_local_only',
-        estimatedWeightLbs: 9999,
-        estimatedDimensionsInches: { length: 100, width: 50, height: 50 },
-        classificationReasoning: 'Very heavy',
-        confidence: 'high',
-      }));
+      mockCompleteAI.mockResolvedValue(
+        makeAIResponse({
+          sizeCategory: 'large_local_only',
+          estimatedWeightLbs: 9999,
+          estimatedDimensionsInches: { length: 100, width: 50, height: 50 },
+          classificationReasoning: 'Very heavy',
+          confidence: 'high',
+        })
+      );
 
       const result = await classifyItemLogistics('Giant item', null, 'furniture');
       expect(result.estimatedWeightLbs).toBe(200);
     });
 
     it('coerces invalid sizeCategory to small_shippable', async () => {
-      mockCompleteAI.mockResolvedValue(makeAIResponse({
-        sizeCategory: 'invalid_category',
-        estimatedWeightLbs: 2,
-        estimatedDimensionsInches: { length: 10, width: 8, height: 4 },
-        classificationReasoning: 'Unknown',
-        confidence: 'low',
-      }));
+      mockCompleteAI.mockResolvedValue(
+        makeAIResponse({
+          sizeCategory: 'invalid_category',
+          estimatedWeightLbs: 2,
+          estimatedDimensionsInches: { length: 10, width: 8, height: 4 },
+          classificationReasoning: 'Unknown',
+          confidence: 'low',
+        })
+      );
 
       const result = await classifyItemLogistics('Item', null, 'other');
       expect(result.sizeCategory).toBe('small_shippable');
     });
 
     it('coerces invalid confidence to medium', async () => {
-      mockCompleteAI.mockResolvedValue(makeAIResponse({
-        sizeCategory: 'small_shippable',
-        estimatedWeightLbs: 2,
-        estimatedDimensionsInches: { length: 10, width: 8, height: 4 },
-        classificationReasoning: 'Test',
-        confidence: 'super_high',
-      }));
+      mockCompleteAI.mockResolvedValue(
+        makeAIResponse({
+          sizeCategory: 'small_shippable',
+          estimatedWeightLbs: 2,
+          estimatedDimensionsInches: { length: 10, width: 8, height: 4 },
+          classificationReasoning: 'Test',
+          confidence: 'super_high',
+        })
+      );
 
       const result = await classifyItemLogistics('Item', null, 'other');
       expect(result.confidence).toBe('medium');
     });
 
     it('defaults dimensions to minimum of 1 when missing from response', async () => {
-      mockCompleteAI.mockResolvedValue(makeAIResponse({
-        sizeCategory: 'small_shippable',
-        estimatedWeightLbs: 1,
-        estimatedDimensionsInches: null,
-        classificationReasoning: 'No dims',
-        confidence: 'low',
-      }));
+      mockCompleteAI.mockResolvedValue(
+        makeAIResponse({
+          sizeCategory: 'small_shippable',
+          estimatedWeightLbs: 1,
+          estimatedDimensionsInches: null,
+          classificationReasoning: 'No dims',
+          confidence: 'low',
+        })
+      );
 
       const result = await classifyItemLogistics('Item', null, 'other');
       expect(result.estimatedDimensionsInches.length).toBeGreaterThanOrEqual(1);
@@ -151,26 +164,30 @@ describe('classifyItemLogistics()', () => {
 
     it('clamps estimatedWeightLbs to 0.1 minimum for sub-minimum values', async () => {
       // Use 0.05 — non-zero (won't trigger the || 5 fallback) but below the 0.1 minimum clamp
-      mockCompleteAI.mockResolvedValue(makeAIResponse({
-        sizeCategory: 'small_shippable',
-        estimatedWeightLbs: 0.05,
-        estimatedDimensionsInches: { length: 5, width: 3, height: 1 },
-        classificationReasoning: 'Very light',
-        confidence: 'high',
-      }));
+      mockCompleteAI.mockResolvedValue(
+        makeAIResponse({
+          sizeCategory: 'small_shippable',
+          estimatedWeightLbs: 0.05,
+          estimatedDimensionsInches: { length: 5, width: 3, height: 1 },
+          classificationReasoning: 'Very light',
+          confidence: 'high',
+        })
+      );
 
       const result = await classifyItemLogistics('Tiny item', null, 'electronics');
       expect(result.estimatedWeightLbs).toBe(0.1);
     });
 
     it('returns empty string for classificationReasoning when LLM omits it', async () => {
-      mockCompleteAI.mockResolvedValue(makeAIResponse({
-        sizeCategory: 'small_shippable',
-        estimatedWeightLbs: 2,
-        estimatedDimensionsInches: { length: 8, width: 6, height: 3 },
-        // classificationReasoning intentionally omitted — hits the || '' branch
-        confidence: 'medium',
-      }));
+      mockCompleteAI.mockResolvedValue(
+        makeAIResponse({
+          sizeCategory: 'small_shippable',
+          estimatedWeightLbs: 2,
+          estimatedDimensionsInches: { length: 8, width: 6, height: 3 },
+          // classificationReasoning intentionally omitted — hits the || '' branch
+          confidence: 'medium',
+        })
+      );
 
       const result = await classifyItemLogistics('Widget', 'A small widget', 'electronics');
       expect(result.classificationReasoning).toBe('');
@@ -178,13 +195,15 @@ describe('classifyItemLogistics()', () => {
 
     it('falls back to weight default of 5 when LLM returns zero for estimatedWeightLbs', async () => {
       // 0 is falsy, so `Number(0) || 5` evaluates to 5
-      mockCompleteAI.mockResolvedValue(makeAIResponse({
-        sizeCategory: 'small_shippable',
-        estimatedWeightLbs: 0,
-        estimatedDimensionsInches: { length: 8, width: 6, height: 3 },
-        classificationReasoning: 'Zero weight',
-        confidence: 'low',
-      }));
+      mockCompleteAI.mockResolvedValue(
+        makeAIResponse({
+          sizeCategory: 'small_shippable',
+          estimatedWeightLbs: 0,
+          estimatedDimensionsInches: { length: 8, width: 6, height: 3 },
+          classificationReasoning: 'Zero weight',
+          confidence: 'low',
+        })
+      );
 
       const result = await classifyItemLogistics('Weightless thing', null, 'electronics');
       // 0 || 5 = 5, then Math.max(0.1, Math.min(200, 5)) = 5

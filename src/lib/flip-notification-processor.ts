@@ -66,7 +66,10 @@ const MAX_RETRIES = parseInt(process.env.NOTIFICATION_PROCESSOR_MAX_RETRIES ?? '
 /* istanbul ignore next -- trivial env var defaults */
 const SEND_DELAY_MS = parseInt(process.env.NOTIFICATION_PROCESSOR_SEND_DELAY_MS ?? '100', 10);
 /* istanbul ignore next -- trivial env var defaults */
-const MAX_DURATION_MS = parseInt(process.env.NOTIFICATION_PROCESSOR_MAX_DURATION_MS ?? '240000', 10);
+const MAX_DURATION_MS = parseInt(
+  process.env.NOTIFICATION_PROCESSOR_MAX_DURATION_MS ?? '240000',
+  10
+);
 /* istanbul ignore next -- trivial env var defaults */
 const MAX_EMAILS_PER_USER_PER_HOUR = parseInt(
   process.env.NOTIFICATION_PROCESSOR_MAX_EMAILS_PER_USER_PER_HOUR ?? '10',
@@ -80,10 +83,7 @@ const PROVIDER_FAILURE_THRESHOLD = parseInt(
 /* istanbul ignore next -- trivial env var defaults */
 const MAX_EVENT_AGE_HOURS = parseInt(process.env.NOTIFICATION_MAX_EVENT_AGE_HOURS ?? '48', 10);
 /* istanbul ignore next -- trivial env var defaults */
-const OPPORTUNITY_DIGEST_THRESHOLD = parseInt(
-  process.env.OPPORTUNITY_DIGEST_THRESHOLD ?? '5',
-  10
-);
+const OPPORTUNITY_DIGEST_THRESHOLD = parseInt(process.env.OPPORTUNITY_DIGEST_THRESHOLD ?? '5', 10);
 
 // ---------------------------------------------------------------------------
 // Result type
@@ -277,9 +277,7 @@ export async function processFlipLifecycleNotifications(): Promise<ProcessingRes
     },
     _count: { id: true },
   });
-  const recentEmailsByUser = new Map(
-    recentSendCounts.map((r) => [r.userId, r._count.id])
-  );
+  const recentEmailsByUser = new Map(recentSendCounts.map((r) => [r.userId, r._count.id]));
 
   // Process each event
   for (const { event, isDigest, digestEvents } of eventsToProcess) {
@@ -307,7 +305,10 @@ export async function processFlipLifecycleNotifications(): Promise<ProcessingRes
     try {
       // Check user existence
       if (!event.user) {
-        await markProcessed(event.id, 'PENDING', { processedAction: 'skipped', skippedReason: 'user_deleted' });
+        await markProcessed(event.id, 'PENDING', {
+          processedAction: 'skipped',
+          skippedReason: 'user_deleted',
+        });
         result.skipped.userDeleted++;
         result.processed++;
         logEventProcessed(event, 'skipped', 'user_deleted', eventStartTime);
@@ -323,9 +324,15 @@ export async function processFlipLifecycleNotifications(): Promise<ProcessingRes
 
       const skipDigestOrSingle = async (reason: string): Promise<void> => {
         if (isDigest && digestEvents) {
-          await markDigestProcessed(digestEvents, { processedAction: 'skipped', skippedReason: reason });
+          await markDigestProcessed(digestEvents, {
+            processedAction: 'skipped',
+            skippedReason: reason,
+          });
         } else {
-          await markProcessed(event.id, event.status, { processedAction: 'skipped', skippedReason: reason });
+          await markProcessed(event.id, event.status, {
+            processedAction: 'skipped',
+            skippedReason: reason,
+          });
         }
       };
 
@@ -364,7 +371,8 @@ export async function processFlipLifecycleNotifications(): Promise<ProcessingRes
       }
 
       // Per-user rate limiting
-      const recentCount = (recentEmailsByUser.get(event.userId) ?? 0) +
+      const recentCount =
+        (recentEmailsByUser.get(event.userId) ?? 0) +
         (userEmailCountThisRun.get(event.userId) ?? 0);
       if (recentCount >= MAX_EMAILS_PER_USER_PER_HOUR) {
         // Leave PENDING — do not mark as FAILED and do NOT count as processed.
@@ -377,7 +385,10 @@ export async function processFlipLifecycleNotifications(): Promise<ProcessingRes
       // Idempotency guard — check if already sent (resendMessageId exists)
       const payload = event.payload as EventPayload;
       if (payload.resendMessageId) {
-        await markProcessed(event.id, event.status, { processedAction: 'skipped', skippedReason: 'already_sent' });
+        await markProcessed(event.id, event.status, {
+          processedAction: 'skipped',
+          skippedReason: 'already_sent',
+        });
         result.processed++;
         logEventProcessed(event, 'skipped', 'already_sent', eventStartTime);
         continue;
@@ -438,10 +449,7 @@ export async function processFlipLifecycleNotifications(): Promise<ProcessingRes
         }
         result.sent++;
         result.processed += skipCount;
-        userEmailCountThisRun.set(
-          event.userId,
-          (userEmailCountThisRun.get(event.userId) ?? 0) + 1
-        );
+        userEmailCountThisRun.set(event.userId, (userEmailCountThisRun.get(event.userId) ?? 0) + 1);
         consecutiveFailures = 0;
         logEventProcessed(event, 'sent', undefined, eventStartTime, sendResult.messageId);
       } else {
@@ -515,7 +523,7 @@ export async function processFlipLifecycleNotifications(): Promise<ProcessingRes
     logger.error('notification.delivery.degraded', {
       sent: result.sent,
       failed: result.failed,
-      failureRate: (result.failed / (result.sent + result.failed) * 100).toFixed(1) + '%',
+      failureRate: ((result.failed / (result.sent + result.failed)) * 100).toFixed(1) + '%',
     });
   }
 
@@ -566,7 +574,10 @@ async function markProcessed(
       await prisma.notificationEvent.updateMany({
         where: { id: eventId, status: 'PROCESSED' },
         data: {
-          payload: { ...(current?.payload as object ?? {}), ...metadata } as unknown as Prisma.InputJsonValue,
+          payload: {
+            ...((current?.payload as object) ?? {}),
+            ...metadata,
+          } as unknown as Prisma.InputJsonValue,
         },
       });
     } catch {
@@ -595,7 +606,7 @@ async function markDigestProcessed(
           where: { id: e.id, status: 'PROCESSED' },
           data: {
             payload: {
-              ...(e.payload as object ?? {}),
+              ...((e.payload as object) ?? {}),
               ...metadata,
             } as unknown as Prisma.InputJsonValue,
           },
@@ -743,16 +754,21 @@ async function sendLifecycleEmail(
  * Fire-and-forget — errors are swallowed by pushNotificationService itself.
  * Gated internally by per-event pushNotify* toggle.
  */
-async function dispatchLifecyclePush(
-  event: { eventType: string; payload: unknown; userId: string }
-): Promise<void> {
+async function dispatchLifecyclePush(event: {
+  eventType: string;
+  payload: unknown;
+  userId: string;
+}): Promise<void> {
   const payload = event.payload as EventPayload;
   const title = payload.listingTitle ?? 'Unknown Item';
   switch (event.eventType) {
     case 'opportunity.found':
       return pushNotificationService.sendToUser(
         event.userId,
-        { title: '🎯 New Flip Opportunity', body: `${title} — Est. profit $${Math.round(payload.profitPotential ?? 0)}` },
+        {
+          title: '🎯 New Flip Opportunity',
+          body: `${title} — Est. profit $${Math.round(payload.profitPotential ?? 0)}`,
+        },
         'newDeals'
       );
     case 'flip.purchased':
@@ -770,7 +786,10 @@ async function dispatchLifecyclePush(
     case 'flip.sold':
       return pushNotificationService.sendToUser(
         event.userId,
-        { title: '💰 Flip Sold!', body: `${title} sold for $${Math.round(payload.salePrice ?? 0)}` },
+        {
+          title: '💰 Flip Sold!',
+          body: `${title} sold for $${Math.round(payload.salePrice ?? 0)}`,
+        },
         'soldItems'
       );
     /* istanbul ignore next -- defensive: findMany filters by FLIP_EVENT_TYPES, unreachable */
@@ -784,9 +803,11 @@ async function dispatchLifecyclePush(
  * Fire-and-forget — errors are swallowed by smsNotificationService itself.
  * Skips digest dispatch because SMS isn't suitable for multi-item summaries.
  */
-async function dispatchLifecycleSms(
-  event: { eventType: string; payload: unknown; userId: string }
-): Promise<void> {
+async function dispatchLifecycleSms(event: {
+  eventType: string;
+  payload: unknown;
+  userId: string;
+}): Promise<void> {
   const payload = event.payload as EventPayload;
   const listingTitle = payload.listingTitle ?? 'Unknown Item';
 
@@ -837,9 +858,8 @@ async function sendDigestEmail(
     price: p.askingPrice ?? 0,
     estimatedResaleValue: p.estimatedValue ?? 0,
     profit: p.profitPotential ?? 0,
-    profitPercent: p.askingPrice && p.askingPrice > 0
-      ? ((p.profitPotential ?? 0) / p.askingPrice) * 100
-      : 0,
+    profitPercent:
+      p.askingPrice && p.askingPrice > 0 ? ((p.profitPotential ?? 0) / p.askingPrice) * 100 : 0,
     marketplace: p.platform ?? 'Unknown',
     url: '', // No direct URL from payload
   }));

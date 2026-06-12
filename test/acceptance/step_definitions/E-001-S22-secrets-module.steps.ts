@@ -49,25 +49,25 @@ let secretManagerContent: string;
 
 // ==================== S-22: YAML config structure ====================
 
-Given(
-  'the secrets config at {string}',
-  async function (this: CustomWorld, configPath: string) {
-    yamlContent = readProjectFile(configPath);
-    yamlConfig = yaml.load(yamlContent) as YamlConfig;
-    console.log(`Loaded secrets config from ${configPath}`);
-  }
-);
+Given('the secrets config at {string}', async function (this: CustomWorld, configPath: string) {
+  yamlContent = readProjectFile(configPath);
+  yamlConfig = yaml.load(yamlContent) as YamlConfig;
+  console.log(`Loaded secrets config from ${configPath}`);
+});
 
-When(
-  'I inspect the YAML structure',
-  async function (this: CustomWorld) {
-    console.log('Inspecting YAML structure...');
-  }
-);
+When('I inspect the YAML structure', async function (this: CustomWorld) {
+  console.log('Inspecting YAML structure...');
+});
 
 Then(
   'the config should have environment scopes {string}, {string}, {string}, and {string}',
-  async function (this: CustomWorld, scope1: string, scope2: string, scope3: string, scope4: string) {
+  async function (
+    this: CustomWorld,
+    scope1: string,
+    scope2: string,
+    scope3: string,
+    scope4: string
+  ) {
     const environments = yamlConfig['stored-secrets'].environments;
     const envKeys = Object.keys(environments);
     for (const scope of [scope1, scope2, scope3, scope4]) {
@@ -108,20 +108,14 @@ Given(
   }
 );
 
-When(
-  'I inspect the EnvSecretManager class',
-  async function (this: CustomWorld) {
-    console.log('Inspecting EnvSecretManager class...');
-  }
-);
+When('I inspect the EnvSecretManager class', async function (this: CustomWorld) {
+  console.log('Inspecting EnvSecretManager class...');
+});
 
-Then(
-  'it should define an EnvSecretManager class',
-  async function (this: CustomWorld) {
-    expect(secretManagerContent).toContain('class EnvSecretManager');
-    console.log('EnvSecretManager class found');
-  }
-);
+Then('it should define an EnvSecretManager class', async function (this: CustomWorld) {
+  expect(secretManagerContent).toContain('class EnvSecretManager');
+  console.log('EnvSecretManager class found');
+});
 
 Then(
   'it should have a load_into_environ method for container startup',
@@ -141,33 +135,24 @@ Then(
 
 // ==================== S-24: SecretScope enum ====================
 
-When(
-  'I inspect the SecretScope enum',
-  async function (this: CustomWorld) {
-    console.log('Inspecting SecretScope enum...');
-  }
-);
+When('I inspect the SecretScope enum', async function (this: CustomWorld) {
+  console.log('Inspecting SecretScope enum...');
+});
 
-Then(
-  'it should define values ALL, DEV, PROD, and STAGING',
-  async function (this: CustomWorld) {
-    expect(secretManagerContent).toContain('class SecretScope');
-    expect(secretManagerContent).toMatch(/ALL\s*=\s*"ALL"/);
-    expect(secretManagerContent).toMatch(/DEV\s*=\s*"DEV"/);
-    expect(secretManagerContent).toMatch(/PROD\s*=\s*"PROD"/);
-    expect(secretManagerContent).toMatch(/STAGING\s*=\s*"STAGING"/);
-    console.log('SecretScope enum defines ALL, DEV, PROD, STAGING');
-  }
-);
+Then('it should define values ALL, DEV, PROD, and STAGING', async function (this: CustomWorld) {
+  expect(secretManagerContent).toContain('class SecretScope');
+  expect(secretManagerContent).toMatch(/ALL\s*=\s*"ALL"/);
+  expect(secretManagerContent).toMatch(/DEV\s*=\s*"DEV"/);
+  expect(secretManagerContent).toMatch(/PROD\s*=\s*"PROD"/);
+  expect(secretManagerContent).toMatch(/STAGING\s*=\s*"STAGING"/);
+  console.log('SecretScope enum defines ALL, DEV, PROD, STAGING');
+});
 
 // ==================== S-25: YAML secret entries ====================
 
-When(
-  'I inspect the secret entries',
-  async function (this: CustomWorld) {
-    console.log('Inspecting secret entries...');
-  }
-);
+When('I inspect the secret entries', async function (this: CustomWorld) {
+  console.log('Inspecting secret entries...');
+});
 
 Then(
   'each entry should have a {string} field for the environment variable name',
@@ -215,12 +200,9 @@ Given('the project codebase', async function (this: CustomWorld) {
   console.log('Project codebase context loaded');
 });
 
-When(
-  'I search for secret configuration files',
-  async function (this: CustomWorld) {
-    console.log('Searching for secret configuration files...');
-  }
-);
+When('I search for secret configuration files', async function (this: CustomWorld) {
+  console.log('Searching for secret configuration files...');
+});
 
 Then(
   '{string} should be the canonical secret config',
@@ -254,12 +236,9 @@ Then(
 
 // ==================== S-27: CLI subcommands ====================
 
-When(
-  'I inspect the CLI entry point',
-  async function (this: CustomWorld) {
-    console.log('Inspecting CLI entry point...');
-  }
-);
+When('I inspect the CLI entry point', async function (this: CustomWorld) {
+  console.log('Inspecting CLI entry point...');
+});
 
 Then(
   'the module should support {string} subcommand',
@@ -280,46 +259,34 @@ Given(
   }
 );
 
-When(
-  'I inspect the Firebase secret entries',
-  async function (this: CustomWorld) {
-    console.log('Inspecting Firebase secret entries...');
-  }
-);
+When('I inspect the Firebase secret entries', async function (this: CustomWorld) {
+  console.log('Inspecting Firebase secret entries...');
+});
 
-Then(
-  'it should include {string}',
-  async function (this: CustomWorld, secretName: string) {
-    const environments = yamlConfig['stored-secrets'].environments;
-    const allNames: string[] = [];
-    for (const [, entries] of Object.entries(environments)) {
-      if (entries === null) continue;
-      for (const config of Object.values(entries)) {
-        allNames.push((config as SecretEntry).name);
-      }
+Then('it should include {string}', async function (this: CustomWorld, secretName: string) {
+  const environments = yamlConfig['stored-secrets'].environments;
+  const allNames: string[] = [];
+  for (const [, entries] of Object.entries(environments)) {
+    if (entries === null) continue;
+    for (const config of Object.values(entries)) {
+      allNames.push((config as SecretEntry).name);
     }
-    expect(allNames).toContain(secretName);
-    console.log(`Config includes secret: ${secretName}`);
   }
-);
+  expect(allNames).toContain(secretName);
+  console.log(`Config includes secret: ${secretName}`);
+});
 
 // ==================== S-16: Firebase secrets in Secret Manager (updated ref) ====================
 
-Given(
-  'the secrets configuration',
-  async function (this: CustomWorld) {
-    yamlContent = readProjectFile('config/secretmanager.yaml');
-    yamlConfig = yaml.load(yamlContent) as YamlConfig;
-    console.log('Loaded secrets configuration from config/secretmanager.yaml');
-  }
-);
+Given('the secrets configuration', async function (this: CustomWorld) {
+  yamlContent = readProjectFile('config/secretmanager.yaml');
+  yamlConfig = yaml.load(yamlContent) as YamlConfig;
+  console.log('Loaded secrets configuration from config/secretmanager.yaml');
+});
 
-When(
-  'I inspect the secret storage for Firebase credentials',
-  async function (this: CustomWorld) {
-    console.log('Inspecting secret storage for Firebase credentials...');
-  }
-);
+When('I inspect the secret storage for Firebase credentials', async function (this: CustomWorld) {
+  console.log('Inspecting secret storage for Firebase credentials...');
+});
 
 Then(
   '{string} should include Firebase admin credentials in its secret entries',

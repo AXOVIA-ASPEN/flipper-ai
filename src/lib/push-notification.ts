@@ -86,11 +86,17 @@ interface PushSettings {
 /** Minimal interface required from the prisma client — allows test injection. */
 interface PrismaLike {
   deviceToken: {
-    findMany: (args: { where: { userId: string }; select: { id: boolean; token: boolean } }) => Promise<Array<{ id: string; token: string }>>;
+    findMany: (args: {
+      where: { userId: string };
+      select: { id: boolean; token: boolean };
+    }) => Promise<Array<{ id: string; token: string }>>;
     deleteMany: (args: { where: { id: { in: string[] } } }) => Promise<{ count: number }>;
   };
   userSettings: {
-    findUnique: (args: { where: { userId: string }; select: Record<string, boolean> }) => Promise<PushSettings | null>;
+    findUnique: (args: {
+      where: { userId: string };
+      select: Record<string, boolean>;
+    }) => Promise<PushSettings | null>;
   };
 }
 
@@ -122,7 +128,11 @@ export class PushNotificationService {
    * @param eventKey Optional event key for per-event gating. When omitted the
    *   method falls back to master-toggle-only behaviour (backwards compatible).
    */
-  async sendToUser(userId: string, payload: NotificationPayload, eventKey?: PushEventKey): Promise<void> {
+  async sendToUser(
+    userId: string,
+    payload: NotificationPayload,
+    eventKey?: PushEventKey
+  ): Promise<void> {
     try {
       const tokens = await this.db.deviceToken.findMany({
         where: { userId },

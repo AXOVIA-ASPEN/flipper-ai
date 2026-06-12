@@ -6,7 +6,15 @@ import { updateListingWithMarketValue } from '@/lib/price-history-service';
 import { getCurrentUserId } from '@/lib/auth';
 import prisma from '@/lib/db';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
+import {
+  handleError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  AppError,
+  ErrorCode,
+} from '@/lib/errors';
 // POST /api/listings/[id]/market-value
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -43,7 +51,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   } catch (error) {
     console.error('Error updating listing market value:', error);
 
-    if (error instanceof Error && !(error instanceof AppError) && error.message.includes('not found')) {
+    if (
+      error instanceof Error &&
+      !(error instanceof AppError) &&
+      error.message.includes('not found')
+    ) {
       return NextResponse.json({ error: error.message }, { status: 404 });
     }
 

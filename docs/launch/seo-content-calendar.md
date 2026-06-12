@@ -7,6 +7,7 @@ The single most underrated SaaS growth lever is **a content engine that publishe
 **Total output of this calendar:** 8 posts in 4 weeks. By month 6 (with continued cadence), you'll have ~50 published posts, ~80% of organic traffic will route through them, and individual posts will start ranking for thousands of monthly searches.
 
 **Where they live:** `app/blog/[slug]/page.tsx` — Next.js MDX-rendered blog. Each post:
+
 - Has `og:image` (use https://htmlcsstoimage.com/ or generate via Vercel OG)
 - Has structured data (`Article` + `Author` + `Organization`)
 - Is in the sitemap and submitted to Search Console
@@ -19,16 +20,16 @@ The single most underrated SaaS growth lever is **a content engine that publishe
 
 I picked these based on **commercial intent + low-medium competition**. Verify in Ahrefs / Ubersuggest / Google Keyword Planner before committing.
 
-| Post # | Target keyword                                    | Monthly volume (US, est.) | Difficulty | Intent             |
-| ------ | ------------------------------------------------- | ------------------------- | ---------- | ------------------ |
-| 1      | best apps for flipping items                       | 1,200                     | Low        | Commercial         |
-| 2      | how to flip items on facebook marketplace          | 8,500                     | Medium     | Informational      |
-| 3      | how to find deals on craigslist                    | 4,400                     | Low-Med    | Informational      |
-| 4      | ebay vs mercari fees                               | 1,900                     | Low        | Commercial         |
-| 5      | most profitable items to flip 2026                 | 6,500                     | Medium     | Informational      |
-| 6      | how much money can you make flipping items         | 2,800                     | Low        | Informational      |
-| 7      | beginners guide to reselling                       | 3,200                     | Low-Med    | Informational      |
-| 8      | reselling software comparison                      | 480                       | Low        | Commercial         |
+| Post # | Target keyword                             | Monthly volume (US, est.) | Difficulty | Intent        |
+| ------ | ------------------------------------------ | ------------------------- | ---------- | ------------- |
+| 1      | best apps for flipping items               | 1,200                     | Low        | Commercial    |
+| 2      | how to flip items on facebook marketplace  | 8,500                     | Medium     | Informational |
+| 3      | how to find deals on craigslist            | 4,400                     | Low-Med    | Informational |
+| 4      | ebay vs mercari fees                       | 1,900                     | Low        | Commercial    |
+| 5      | most profitable items to flip 2026         | 6,500                     | Medium     | Informational |
+| 6      | how much money can you make flipping items | 2,800                     | Low        | Informational |
+| 7      | beginners guide to reselling               | 3,200                     | Low-Med    | Informational |
+| 8      | reselling software comparison              | 480                       | Low        | Commercial    |
 
 **Why these:**
 
@@ -244,12 +245,12 @@ This is a **data journalism piece** — pull aggregate statistics from Flipper.a
 7. **Comparison table** (sortable if possible)
 8. **Buyer personas:**
    - Cross-poster who already finds inventory: probably Vendoo or Crosslist
-   - Solo flipper who needs *finding* + *cross-listing*: Flipper.ai
+   - Solo flipper who needs _finding_ + _cross-listing_: Flipper.ai
    - Small reseller team: List Perfectly
    - Enterprise feed seller: BeezUp
 9. **CTA**
 
-**Why it ranks:** Direct commercial intent, you're competing for purchase decisions. Honest comparison earns trust *and* SEO juice (search engines reward comparison content over self-promotion).
+**Why it ranks:** Direct commercial intent, you're competing for purchase decisions. Honest comparison earns trust _and_ SEO juice (search engines reward comparison content over self-promotion).
 
 ---
 
@@ -258,10 +259,12 @@ This is a **data journalism piece** — pull aggregate statistics from Flipper.a
 After the launch month, switch to **1 deep post + 1 quick-win post per week**:
 
 **Deep posts (Tuesdays):**
+
 - Long-form, 2,000+ words, target a keyword with >2,000 monthly searches
 - Examples: "How to flip tools on Facebook Marketplace", "iPhone flipping guide 2026", "Vintage camera flipping playbook"
 
 **Quick-win posts (Thursdays):**
+
 - 800-1,200 words, target a long-tail keyword with 200-500 searches
 - Examples: "Are vinyl records still profitable to flip?", "How to spot fake Lego sets", "Can you flip a couch on Facebook Marketplace?"
 

@@ -28,10 +28,7 @@ import { checkFeatureAccess } from '@/lib/tier-enforcement';
 import { generateNegotiationStrategy } from '@/lib/negotiation-strategy';
 import type { NegotiationStrategyInput } from '@/lib/negotiation-strategy';
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userId = await getAuthUserId();
     if (!userId) {
@@ -84,9 +81,7 @@ export async function POST(
     const strategyInput: NegotiationStrategyInput = {
       listingId: listing.id,
       askingPrice: Number(listing.askingPrice),
-      verifiedMarketValue: listing.verifiedMarketValue
-        ? Number(listing.verifiedMarketValue)
-        : null,
+      verifiedMarketValue: listing.verifiedMarketValue ? Number(listing.verifiedMarketValue) : null,
       estimatedValue: listing.estimatedValue ? Number(listing.estimatedValue) : null,
       condition: listing.condition,
       daysListed: listing.daysListed,
@@ -94,9 +89,7 @@ export async function POST(
       demandLevel: listing.demandLevel,
       sellabilityScore: listing.sellabilityScore,
       platform: listing.platform,
-      recommendedOffer: listing.recommendedOffer
-        ? Number(listing.recommendedOffer)
-        : null,
+      recommendedOffer: listing.recommendedOffer ? Number(listing.recommendedOffer) : null,
       marketDataDate: listing.marketDataDate ?? null,
     };
 

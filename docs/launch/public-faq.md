@@ -2,7 +2,7 @@
 
 Render this at `https://<domain>/faq`. Also use it as the source-of-truth for support email canned responses.
 
-**Maintenance:** Add a new question every time a real user asks something that wasn't here. The FAQ should *grow* over time.
+**Maintenance:** Add a new question every time a real user asks something that wasn't here. The FAQ should _grow_ over time.
 
 ---
 
@@ -41,6 +41,7 @@ The first scan can be slower; subsequent scans of the same search are faster due
 ### What do the paid tiers include?
 
 See the full [pricing page](/pricing). Short version:
+
 - **Hustler** ($19/mo or $179/yr) — all 5 marketplaces, unlimited scans, push alerts, AI message drafting
 - **Pro** ($49/mo or $469/yr) — adds AI negotiation, cross-platform listing, SMS, all-time analytics, CSV/PDF export
 - **Lifetime Founder** ($299 once, capped at 100 seats) — Pro tier forever, plus future Pro features included automatically
@@ -91,7 +92,7 @@ We pull recent eBay sold listings (last 60 days by default), filter outliers usi
 
 ### Why does the same item sometimes show different scores?
 
-The score depends on many inputs, including listing-specific text (which can change), market data (which updates daily), and your platform fee settings. Re-scoring is intentional: we want the score to reflect what's *actually* true right now, not what was true when you first saw the item.
+The score depends on many inputs, including listing-specific text (which can change), market data (which updates daily), and your platform fee settings. Re-scoring is intentional: we want the score to reflect what's _actually_ true right now, not what was true when you first saw the item.
 
 ### Can I customize the scoring weights?
 
@@ -188,6 +189,7 @@ Be honest if asked directly. Many sellers don't care; some do. The few who refus
 ### My scan returned 0 results — what now?
 
 Most common causes:
+
 1. **Search too narrow.** Try broader keywords or a wider radius.
 2. **Marketplace temporarily blocked you.** Wait 30 minutes and try again. If persistent, contact support.
 3. **Marketplace updated something.** We monitor and fix selector breakage usually within 24 hours.
@@ -199,6 +201,7 @@ Cancel and re-run. If it happens twice in a row, it's a bug — please email us 
 ### A real high-value listing isn't being flagged as an opportunity
 
 Two possibilities:
+
 1. **Verified market value is low** because we couldn't find good comp sales. Try a more specific search query.
 2. **Sellability or risk score is dragging it down.** Open the listing detail to see the breakdown — sometimes the AI sees something you don't (e.g., listing language flagged as "no returns" or "as-is no warranty").
 

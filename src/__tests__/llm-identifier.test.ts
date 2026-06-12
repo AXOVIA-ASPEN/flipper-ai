@@ -5,7 +5,10 @@ const mockCompleteAI = jest.fn();
 jest.mock('@/lib/ai', () => ({
   completeAI: (...args: unknown[]) => mockCompleteAI(...args),
   AIProviderUnavailableError: class extends Error {
-    constructor() { super('No AI provider available'); this.name = 'AIProviderUnavailableError'; }
+    constructor() {
+      super('No AI provider available');
+      this.name = 'AIProviderUnavailableError';
+    }
   },
 }));
 
@@ -34,7 +37,9 @@ describe('llm-identifier', () => {
 
   describe('identifyItem', () => {
     it('returns null when no AI provider available', async () => {
-      const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as { AIProviderUnavailableError: new () => Error };
+      const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as {
+        AIProviderUnavailableError: new () => Error;
+      };
       mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
       const result = await identifyItem('iPhone 14 Pro', 'Good condition', 200, 'electronics');
       expect(result).toBeNull();
@@ -63,7 +68,11 @@ describe('llm-identifier', () => {
 
   describe('identifyItem edge cases', () => {
     it('returns null when LLM response has no JSON', async () => {
-      mockCompleteAI.mockResolvedValue({ content: 'No JSON here, just text', provider: 'gemini', model: 'gemini-2.0-flash' });
+      mockCompleteAI.mockResolvedValue({
+        content: 'No JSON here, just text',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
+      });
 
       const result = await identifyItem('Test Item', null, 100, null);
       expect(result).toBeNull();
@@ -77,7 +86,11 @@ describe('llm-identifier', () => {
     });
 
     it('returns null when response content is empty', async () => {
-      mockCompleteAI.mockResolvedValue({ content: '', provider: 'gemini', model: 'gemini-2.0-flash' });
+      mockCompleteAI.mockResolvedValue({
+        content: '',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
+      });
 
       const result = await identifyItem('Test Item', null, 100, null);
       expect(result).toBeNull();
@@ -113,7 +126,12 @@ describe('llm-identifier', () => {
     it('handles all valid condition values', async () => {
       for (const cond of ['new', 'like_new', 'good', 'fair', 'poor']) {
         mockCompleteAI.mockResolvedValue({
-          content: JSON.stringify({ brand: 'Test', condition: cond, searchQuery: 'test', category: 'test' }),
+          content: JSON.stringify({
+            brand: 'Test',
+            condition: cond,
+            searchQuery: 'test',
+            category: 'test',
+          }),
           provider: 'gemini',
           model: 'gemini-2.0-flash',
         });
@@ -134,7 +152,12 @@ describe('llm-identifier', () => {
 
     it('handles year as string number', async () => {
       mockCompleteAI.mockResolvedValue({
-        content: JSON.stringify({ brand: 'Sony', year: '2023', condition: 'good', searchQuery: 'Sony TV' }),
+        content: JSON.stringify({
+          brand: 'Sony',
+          year: '2023',
+          condition: 'good',
+          searchQuery: 'Sony TV',
+        }),
         provider: 'gemini',
         model: 'gemini-2.0-flash',
       });

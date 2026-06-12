@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserId } from '@/lib/auth-middleware';
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
+import {
+  handleError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  AppError,
+  ErrorCode,
+} from '@/lib/errors';
 import {
   createDraftListing,
   publishOffer,
@@ -28,7 +36,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (!process.env.EBAY_OAUTH_TOKEN) {
-      throw new AppError(ErrorCode.INTERNAL_ERROR, 'eBay integration not configured (missing EBAY_OAUTH_TOKEN)');
+      throw new AppError(
+        ErrorCode.INTERNAL_ERROR,
+        'eBay integration not configured (missing EBAY_OAUTH_TOKEN)'
+      );
     }
 
     const body = await request.json();

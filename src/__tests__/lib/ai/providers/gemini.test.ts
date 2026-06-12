@@ -92,9 +92,7 @@ describe('GeminiProvider', () => {
         },
       });
 
-      const messages: AIMessage[] = [
-        { role: 'user', content: 'Hello' },
-      ];
+      const messages: AIMessage[] = [{ role: 'user', content: 'Hello' }];
 
       const provider = new GeminiProvider();
       const result = await provider.complete(messages, baseConfig);
@@ -110,8 +108,9 @@ describe('GeminiProvider', () => {
 
     test('maps system message to systemInstruction', async () => {
       const { GoogleGenerativeAI } = require('@google/generative-ai');
-      const mockGetModel = GoogleGenerativeAI.mock.results[0]?.value?.getGenerativeModel
-        ?? jest.fn().mockReturnValue({ generateContent: mockGenerateContent });
+      const mockGetModel =
+        GoogleGenerativeAI.mock.results[0]?.value?.getGenerativeModel ??
+        jest.fn().mockReturnValue({ generateContent: mockGenerateContent });
 
       // Reset to capture the call
       GoogleGenerativeAI.mockClear();
@@ -138,7 +137,7 @@ describe('GeminiProvider', () => {
       expect(mockGetModel).toHaveBeenCalledWith(
         expect.objectContaining({
           systemInstruction: 'You are helpful',
-        }),
+        })
       );
     });
 
@@ -195,7 +194,7 @@ describe('GeminiProvider', () => {
           generationConfig: expect.objectContaining({
             responseMimeType: 'application/json',
           }),
-        }),
+        })
       );
     });
 

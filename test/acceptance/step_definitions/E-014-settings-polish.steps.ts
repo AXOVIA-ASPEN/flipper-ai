@@ -256,45 +256,39 @@ Given(
   }
 );
 
-Given(
-  'the invoices endpoint returns a single paid invoice',
-  async function (this: CustomWorld) {
-    await this.page.route('**/api/invoices', (route) => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          success: true,
-          data: [
-            {
-              id: 'in_test_1',
-              number: 'INV-001',
-              createdAt: Math.floor(Date.now() / 1000),
-              amount: 4900,
-              currency: 'usd',
-              status: 'paid',
-              hostedInvoiceUrl: 'https://stripe.example/invoice/1',
-              invoicePdfUrl: 'https://stripe.example/invoice/1.pdf',
-            },
-          ],
-        }),
-      });
+Given('the invoices endpoint returns a single paid invoice', async function (this: CustomWorld) {
+  await this.page.route('**/api/invoices', (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        success: true,
+        data: [
+          {
+            id: 'in_test_1',
+            number: 'INV-001',
+            createdAt: Math.floor(Date.now() / 1000),
+            amount: 4900,
+            currency: 'usd',
+            status: 'paid',
+            hostedInvoiceUrl: 'https://stripe.example/invoice/1',
+            invoicePdfUrl: 'https://stripe.example/invoice/1.pdf',
+          },
+        ],
+      }),
     });
-  }
-);
+  });
+});
 
-Given(
-  'the invoices endpoint returns no invoices',
-  async function (this: CustomWorld) {
-    await this.page.route('**/api/invoices', (route) => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ success: true, data: [] }),
-      });
+Given('the invoices endpoint returns no invoices', async function (this: CustomWorld) {
+  await this.page.route('**/api/invoices', (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ success: true, data: [] }),
     });
-  }
-);
+  });
+});
 
 Given(
   'the messages approval endpoint returns no pending approvals',
@@ -309,18 +303,15 @@ Given(
   }
 );
 
-Given(
-  'the messages approval endpoint returns a 500 error',
-  async function (this: CustomWorld) {
-    await this.page.route('**/api/messages?**', (route) => {
-      route.fulfill({
-        status: 500,
-        contentType: 'application/json',
-        body: JSON.stringify({ success: false, error: { detail: 'Internal Server Error' } }),
-      });
+Given('the messages approval endpoint returns a 500 error', async function (this: CustomWorld) {
+  await this.page.route('**/api/messages?**', (route) => {
+    route.fulfill({
+      status: 500,
+      contentType: 'application/json',
+      body: JSON.stringify({ success: false, error: { detail: 'Internal Server Error' } }),
     });
-  }
-);
+  });
+});
 
 Then(
   'the page contains at least one element with class {string}',
@@ -334,7 +325,10 @@ Then(
       // Fall through to count-based assertion below for the canonical error.
     }
     const count = await locator.count();
-    expect(count, `expected ≥1 .${className} on ${this.page.url()}, found ${count}`).toBeGreaterThan(0);
+    expect(
+      count,
+      `expected ≥1 .${className} on ${this.page.url()}, found ${count}`
+    ).toBeGreaterThan(0);
   }
 );
 
@@ -380,7 +374,10 @@ Then(
       // Make the failure surface the actual violation list — Playwright's
       // expect(...).toBe() drops the second-arg label, so we throw explicitly.
       const detail = blocking
-        .map((v) => `  [${v.impact}] ${v.id}: ${v.description}\n    nodes: ${v.nodes.map((n) => n.target.join(', ')).join(' | ')}`)
+        .map(
+          (v) =>
+            `  [${v.impact}] ${v.id}: ${v.description}\n    nodes: ${v.nodes.map((n) => n.target.join(', ')).join(' | ')}`
+        )
         .join('\n');
       throw new Error(
         `axe-core found ${blocking.length} critical/serious violation(s) inside ${selector}:\n${detail}`
@@ -390,30 +387,24 @@ Then(
   }
 );
 
-When(
-  'I press Tab {int} times',
-  async function (this: CustomWorld, n: number) {
-    for (let i = 0; i < n; i += 1) {
-      await this.page.keyboard.press('Tab');
-    }
+When('I press Tab {int} times', async function (this: CustomWorld, n: number) {
+  for (let i = 0; i < n; i += 1) {
+    await this.page.keyboard.press('Tab');
   }
-);
+});
 
 When('I press Escape', async function (this: CustomWorld) {
   await this.page.keyboard.press('Escape');
 });
 
-Then(
-  'focus is inside the element {string}',
-  async function (this: CustomWorld, selector: string) {
-    const inside = await this.page.evaluate((sel) => {
-      const el = document.querySelector(sel);
-      const active = document.activeElement;
-      return el && active ? el.contains(active) : false;
-    }, selector);
-    expect(inside, `expected focus to be inside ${selector}, but it is not`).toBe(true);
-  }
-);
+Then('focus is inside the element {string}', async function (this: CustomWorld, selector: string) {
+  const inside = await this.page.evaluate((sel) => {
+    const el = document.querySelector(sel);
+    const active = document.activeElement;
+    return el && active ? el.contains(active) : false;
+  }, selector);
+  expect(inside, `expected focus to be inside ${selector}, but it is not`).toBe(true);
+});
 
 Then(
   'the data-testid {string} is visible on the page',

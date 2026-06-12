@@ -47,13 +47,10 @@ When('I inspect the instance configuration', async function (this: CustomWorld) 
   console.log('✅ Inspecting Cloud SQL instance configuration...');
 });
 
-Then(
-  'the instance tier should be {string}',
-  async function (this: CustomWorld, tier: string) {
-    expect(cloudSqlDocContent).toContain(tier);
-    console.log(`✅ Instance tier: ${tier}`);
-  }
-);
+Then('the instance tier should be {string}', async function (this: CustomWorld, tier: string) {
+  expect(cloudSqlDocContent).toContain(tier);
+  console.log(`✅ Instance tier: ${tier}`);
+});
 
 Then(
   'automated daily backups should be enabled with 7-day retention',
@@ -64,14 +61,11 @@ Then(
   }
 );
 
-Then(
-  'point-in-time recovery should be enabled',
-  async function (this: CustomWorld) {
-    expect(cloudSqlDocContent).toMatch(/point-in-time recovery/i);
-    expect(cloudSqlDocContent).toMatch(/enabled/i);
-    console.log('✅ Point-in-time recovery enabled');
-  }
-);
+Then('point-in-time recovery should be enabled', async function (this: CustomWorld) {
+  expect(cloudSqlDocContent).toMatch(/point-in-time recovery/i);
+  expect(cloudSqlDocContent).toMatch(/enabled/i);
+  console.log('✅ Point-in-time recovery enabled');
+});
 
 Then(
   'a maintenance window should be configured for Sunday 03:00 UTC',
@@ -85,38 +79,27 @@ Then(
 
 // ==================== S-49: Prisma schema migrates with all models ====================
 
-Given(
-  'the Prisma schema at {string}',
-  async function (this: CustomWorld, schemaPath: string) {
-    prismaSchemaContent = readProjectFile(schemaPath);
-    console.log(`✅ Loaded Prisma schema: ${schemaPath}`);
-  }
-);
+Given('the Prisma schema at {string}', async function (this: CustomWorld, schemaPath: string) {
+  prismaSchemaContent = readProjectFile(schemaPath);
+  console.log(`✅ Loaded Prisma schema: ${schemaPath}`);
+});
 
-Given(
-  'the build script in {string}',
-  async function (this: CustomWorld, pkgPath: string) {
-    packageJsonContent = readProjectFile(pkgPath);
-    packageJson = JSON.parse(packageJsonContent);
-    console.log(`✅ Loaded package.json: ${pkgPath}`);
-  }
-);
+Given('the build script in {string}', async function (this: CustomWorld, pkgPath: string) {
+  packageJsonContent = readProjectFile(pkgPath);
+  packageJson = JSON.parse(packageJsonContent);
+  console.log(`✅ Loaded package.json: ${pkgPath}`);
+});
 
-When(
-  'I inspect the database migration configuration',
-  async function (this: CustomWorld) {
-    expect(prismaSchemaContent).toBeTruthy();
-    expect(packageJson).toBeTruthy();
-    console.log('✅ Inspecting database migration configuration...');
-  }
-);
+When('I inspect the database migration configuration', async function (this: CustomWorld) {
+  expect(prismaSchemaContent).toBeTruthy();
+  expect(packageJson).toBeTruthy();
+  console.log('✅ Inspecting database migration configuration...');
+});
 
 Then(
   'the datasource provider should be {string}',
   async function (this: CustomWorld, provider: string) {
-    expect(prismaSchemaContent).toMatch(
-      new RegExp(`provider\\s*=\\s*"${provider}"`)
-    );
+    expect(prismaSchemaContent).toMatch(new RegExp(`provider\\s*=\\s*"${provider}"`));
     console.log(`✅ Datasource provider: ${provider}`);
   }
 );
@@ -152,13 +135,10 @@ Then(
 
 // ==================== S-50: Cloud Run connects via Unix socket ====================
 
-When(
-  'I inspect the Cloud Run connection configuration',
-  async function (this: CustomWorld) {
-    expect(cloudSqlDocContent).toBeTruthy();
-    console.log('✅ Inspecting Cloud Run connection configuration...');
-  }
-);
+When('I inspect the Cloud Run connection configuration', async function (this: CustomWorld) {
+  expect(cloudSqlDocContent).toBeTruthy();
+  console.log('✅ Inspecting Cloud Run connection configuration...');
+});
 
 Then(
   'the production DATABASE_URL should use a Unix socket path via {string}',
@@ -181,9 +161,7 @@ Then(
   async function (this: CustomWorld, flag: string) {
     expect(cloudSqlDocContent).toContain(flag);
     // Verify the --set-secrets line references DATABASE_URL
-    const setSecretsMatch = cloudSqlDocContent.match(
-      /--set-secrets=.*DATABASE_URL/
-    );
+    const setSecretsMatch = cloudSqlDocContent.match(/--set-secrets=.*DATABASE_URL/);
     expect(setSecretsMatch).not.toBeNull();
     console.log(`✅ Deploy uses ${flag} for DATABASE_URL`);
   }
@@ -191,30 +169,22 @@ Then(
 
 // ==================== S-51: DATABASE_URL in Secret Manager ====================
 
-Given(
-  'the environment configuration files',
-  async function (this: CustomWorld) {
-    envExampleContent = readProjectFile('.env.example');
-    envProductionContent = readProjectFile('.env.production.example');
-    console.log('✅ Loaded environment configuration files');
-  }
-);
+Given('the environment configuration files', async function (this: CustomWorld) {
+  envExampleContent = readProjectFile('.env.example');
+  envProductionContent = readProjectFile('.env.production.example');
+  console.log('✅ Loaded environment configuration files');
+});
 
-When(
-  'I inspect where DATABASE_URL is defined',
-  async function (this: CustomWorld) {
-    expect(envProductionContent).toBeTruthy();
-    console.log('✅ Inspecting DATABASE_URL locations...');
-  }
-);
+When('I inspect where DATABASE_URL is defined', async function (this: CustomWorld) {
+  expect(envProductionContent).toBeTruthy();
+  console.log('✅ Inspecting DATABASE_URL locations...');
+});
 
 Then(
   '{string} should contain placeholder values not real credentials',
   async function (this: CustomWorld, fileName: string) {
     const content =
-      fileName === '.env.production.example'
-        ? envProductionContent
-        : envExampleContent;
+      fileName === '.env.production.example' ? envProductionContent : envExampleContent;
     // Verify it contains CHANGE_ME or PASSWORD placeholders, not real credentials
     expect(content).toMatch(/CHANGE_ME|PASSWORD/);
     // Verify no real-looking passwords (long random strings) are in the file
@@ -254,13 +224,10 @@ Given(
   }
 );
 
-When(
-  'I inspect the connection pool settings',
-  async function (this: CustomWorld) {
-    expect(dbModuleContent).toBeTruthy();
-    console.log('✅ Inspecting connection pool settings...');
-  }
-);
+When('I inspect the connection pool settings', async function (this: CustomWorld) {
+  expect(dbModuleContent).toBeTruthy();
+  console.log('✅ Inspecting connection pool settings...');
+});
 
 Then(
   'the PrismaPg adapter should be configured with max connections of {int}',
@@ -276,9 +243,7 @@ Then(
 Then(
   'the connection timeout should be set to {int} milliseconds',
   async function (this: CustomWorld, timeoutMs: number) {
-    const match = dbModuleContent.match(
-      /connectionTimeoutMillis:\s*([\d_]+)/
-    );
+    const match = dbModuleContent.match(/connectionTimeoutMillis:\s*([\d_]+)/);
     expect(match).not.toBeNull();
     const value = parseInt(match![1].replace(/_/g, ''), 10);
     expect(value).toBe(timeoutMs);
@@ -289,9 +254,7 @@ Then(
 Then(
   'the idle timeout should be set to {int} milliseconds',
   async function (this: CustomWorld, timeoutMs: number) {
-    const match = dbModuleContent.match(
-      /idleTimeoutMillis:\s*([\d_]+)/
-    );
+    const match = dbModuleContent.match(/idleTimeoutMillis:\s*([\d_]+)/);
     expect(match).not.toBeNull();
     const value = parseInt(match![1].replace(/_/g, ''), 10);
     expect(value).toBe(timeoutMs);

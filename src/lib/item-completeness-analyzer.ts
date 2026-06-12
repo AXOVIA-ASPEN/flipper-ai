@@ -4,10 +4,10 @@
 import { completeAI } from '@/lib/ai';
 
 export interface CompletenessAnalysisResult {
-  completenessLabel: string;       // Human-readable: "Complete with box", "Missing charger", etc.
+  completenessLabel: string; // Human-readable: "Complete with box", "Missing charger", etc.
   hasOriginalPackaging: boolean;
-  missingParts: string[];          // e.g., ["charger", "manual"]
-  cosmeticDamage: string | null;   // e.g., "Screen crack", null if none
+  missingParts: string[]; // e.g., ["charger", "manual"]
+  cosmeticDamage: string | null; // e.g., "Screen crack", null if none
   functionalDamage: string | null; // e.g., "Button not responsive", null if none
   analysisConfidence: 'low' | 'medium' | 'high';
 }
@@ -53,7 +53,8 @@ export async function analyzeItemCompleteness(
       hasOriginalPackaging: parsed.hasOriginalPackaging,
       missingParts: parsed.missingParts.filter((p: unknown) => typeof p === 'string'),
       cosmeticDamage: typeof parsed.cosmeticDamage === 'string' ? parsed.cosmeticDamage : null,
-      functionalDamage: typeof parsed.functionalDamage === 'string' ? parsed.functionalDamage : null,
+      functionalDamage:
+        typeof parsed.functionalDamage === 'string' ? parsed.functionalDamage : null,
       analysisConfidence: parsed.analysisConfidence as 'low' | 'medium' | 'high',
     };
   } catch (err) {

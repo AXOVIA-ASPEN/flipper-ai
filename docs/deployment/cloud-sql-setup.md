@@ -2,16 +2,16 @@
 
 ## Instance Details
 
-| Property | Value |
-|----------|-------|
-| Instance name | `flipper-ai-postgres` |
-| Project | `axovia-flipper` |
-| Region | `us-east1` |
-| Database version | PostgreSQL 16 |
-| Tier | `db-f1-micro` (shared vCPU, 0.6 GB RAM) |
-| Database | `flipper_ai` |
-| User | `flipper` |
-| Connection name | `axovia-flipper:us-east1:flipper-ai-postgres` |
+| Property         | Value                                         |
+| ---------------- | --------------------------------------------- |
+| Instance name    | `flipper-ai-postgres`                         |
+| Project          | `axovia-flipper`                              |
+| Region           | `us-east1`                                    |
+| Database version | PostgreSQL 16                                 |
+| Tier             | `db-f1-micro` (shared vCPU, 0.6 GB RAM)       |
+| Database         | `flipper_ai`                                  |
+| User             | `flipper`                                     |
+| Connection name  | `axovia-flipper:us-east1:flipper-ai-postgres` |
 
 ## Connection Strings
 

@@ -122,7 +122,7 @@ describe('assertJsonParseable', () => {
 
   it('throws AIMalformedResponseError for invalid JSON when responseFormat is json', () => {
     expect(() => assertJsonParseable('not valid json', 'gemini', 'json')).toThrow(
-      AIMalformedResponseError,
+      AIMalformedResponseError
     );
   });
 

@@ -262,9 +262,7 @@ describe('POST /api/auth/register', () => {
 
     await POST(createRequest({ idToken: 'valid-token' }));
 
-    expect(mockSendWelcome).toHaveBeenCalledWith(
-      expect.objectContaining({ name: undefined })
-    );
+    expect(mockSendWelcome).toHaveBeenCalledWith(expect.objectContaining({ name: undefined }));
   });
 
   it('captures non-Error thrown from sendWelcome catch (line 57 instanceof false branch)', async () => {

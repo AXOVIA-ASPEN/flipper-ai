@@ -17,12 +17,14 @@ Successfully prepared Flipper AI for migration from **Vercel** to **Firebase/GCP
 Created 5 Cloud Functions for scraping operations:
 
 #### Playwright-Based (Docker Containers)
+
 - **`scrapeCraigslist`** - Full browser automation for Craigslist
 - **`scrapeOfferup`** - Full browser automation for OfferUp
 
 **Resources**: 2GB RAM, 300s timeout, Chromium included
 
 #### API-Based (Standard Functions)
+
 - **`scrapeEbay`** - Uses eBay Browse API
 - **`scrapeFacebook`** - Placeholder for Facebook Marketplace
 - **`scrapeMercari`** - Placeholder for Mercari API
@@ -30,6 +32,7 @@ Created 5 Cloud Functions for scraping operations:
 **Resources**: 512MB RAM, 60s timeout
 
 #### Utility
+
 - **`health`** - Health check endpoint
 
 ### 2. Project Structure
@@ -70,11 +73,13 @@ Created Cloud Functions client library:
 - **`src/app/api/scraper/*/route.v2.ts`** - Updated API routes
 
 New flow:
+
 ```
 User → Next.js API Route → Cloud Function → Database
 ```
 
 Old flow:
+
 ```
 User → Next.js API Route (Playwright runs here) → Database
 ```
@@ -91,22 +96,26 @@ User → Next.js API Route (Playwright runs here) → Database
 ## 🔑 Key Benefits
 
 ### Performance
+
 - ✅ **Dedicated resources** for scraping (2GB RAM vs shared)
 - ✅ **No 60s timeout limit** on Vercel (now 300s)
 - ✅ **Horizontal scaling** - each scraper scales independently
 - ✅ **Better cold start** - functions stay warm with min instances
 
 ### Cost
+
 - ✅ **Pay-per-use** - only charged when scraping
 - ✅ **No fixed monthly cost** like Vercel Pro
 - ✅ **Estimated**: $30-50/mo vs $20/mo (but unlimited scale)
 
 ### Reliability
+
 - ✅ **Isolated failures** - scraper crash doesn't take down website
 - ✅ **Automatic retries** - Cloud Functions retry on failure
 - ✅ **Better monitoring** - Cloud Logging, Error Reporting, Trace
 
 ### Developer Experience
+
 - ✅ **Separate deployments** - update scrapers without rebuilding Next.js
 - ✅ **Local testing** - Firebase emulators
 - ✅ **Better debugging** - dedicated logs per function
@@ -130,17 +139,20 @@ User → Next.js API Route (Playwright runs here) → Database
 ### ⏳ Next Steps (Deployment)
 
 1. **Authenticate** with Firebase/GCP
+
    ```bash
    firebase login
    gcloud auth login
    ```
 
 2. **Migrate environment variables**
+
    ```bash
    ./scripts/migrate-env-to-firebase.sh
    ```
 
 3. **Deploy Cloud Functions**
+
    ```bash
    cd functions
    npm install
@@ -148,11 +160,13 @@ User → Next.js API Route (Playwright runs here) → Database
    ```
 
 4. **Update Next.js routes**
+
    ```bash
    # Replace route.ts with route.v2.ts for each scraper
    ```
 
 5. **Test end-to-end**
+
    ```bash
    npm run test:e2e
    ```
@@ -166,6 +180,7 @@ User → Next.js API Route (Playwright runs here) → Database
 ## 📊 Architecture Comparison
 
 ### Before (Vercel)
+
 ```
 ┌─────────────────────────────────────┐
 │         Vercel Edge Function        │
@@ -181,6 +196,7 @@ User → Next.js API Route (Playwright runs here) → Database
 ```
 
 ### After (Firebase)
+
 ```
 ┌─────────────────────┐    ┌──────────────────────────┐
 │   Next.js (Cloud    │───▶│  Cloud Functions (Gen2)  │
@@ -201,17 +217,20 @@ User → Next.js API Route (Playwright runs here) → Database
 ## 🔐 Security Considerations
 
 ### Secrets Management
+
 - ✅ Moved to **Google Secret Manager**
 - ✅ No secrets in code or environment variables
 - ✅ IAM-based access control
 - ✅ Automatic rotation support
 
 ### CORS
+
 - ✅ Configured in `lib/cors.ts`
 - ✅ Validates origin
 - ✅ Handles preflight requests
 
 ### Authentication
+
 - ⚠️ Currently: unauthenticated (allow-unauthenticated flag)
 - 🔮 Future: Add Firebase Auth token validation
 
@@ -220,15 +239,17 @@ User → Next.js API Route (Playwright runs here) → Database
 ## 💰 Cost Estimate
 
 ### Cloud Functions
-| Function | Invocations/mo | Cost/million | Monthly |
-|----------|---------------|--------------|---------|
-| scrapeCraigslist | 1,000 | $0.40 | $0.40 |
-| scrapeEbay | 5,000 | $0.40 | $2.00 |
-| Others | 2,000 | $0.40 | $0.80 |
+
+| Function         | Invocations/mo | Cost/million | Monthly |
+| ---------------- | -------------- | ------------ | ------- |
+| scrapeCraigslist | 1,000          | $0.40        | $0.40   |
+| scrapeEbay       | 5,000          | $0.40        | $2.00   |
+| Others           | 2,000          | $0.40        | $0.80   |
 
 **Subtotal**: ~$3.20/mo
 
 ### Cloud Run (Next.js)
+
 - **Requests**: 100,000/mo @ $0.40/million = $0.04
 - **CPU**: ~$7/mo
 - **Memory**: ~$1/mo
@@ -236,12 +257,14 @@ User → Next.js API Route (Playwright runs here) → Database
 **Subtotal**: ~$8/mo
 
 ### Cloud SQL
+
 - **Instance**: db-f1-micro = $7/mo
 - **Storage**: 10GB @ $0.17/GB = $1.70/mo
 
 **Subtotal**: ~$8.70/mo
 
 ### Bandwidth
+
 - **Egress**: 50GB @ $0.12/GB = $6/mo
 
 **Total Estimated**: **$26-30/mo**
@@ -254,15 +277,16 @@ Compare to Vercel Pro: $20/mo (but limited)
 
 ### Expected Improvements
 
-| Metric | Vercel | Firebase | Improvement |
-|--------|--------|----------|-------------|
-| Scraper timeout | 60s | 300s | **5x** |
-| Memory available | Shared | 2GB dedicated | **~4x** |
-| Cold start | ~2s | ~3s (Docker) | Slightly slower |
-| Warm latency | ~200ms | ~150ms | **25% faster** |
-| Concurrent scrapers | Limited | Unlimited | **∞** |
+| Metric              | Vercel  | Firebase      | Improvement     |
+| ------------------- | ------- | ------------- | --------------- |
+| Scraper timeout     | 60s     | 300s          | **5x**          |
+| Memory available    | Shared  | 2GB dedicated | **~4x**         |
+| Cold start          | ~2s     | ~3s (Docker)  | Slightly slower |
+| Warm latency        | ~200ms  | ~150ms        | **25% faster**  |
+| Concurrent scrapers | Limited | Unlimited     | **∞**           |
 
 ### Actual Performance (TBD)
+
 - Run `npm run test:load` after deployment
 - Monitor in Cloud Console for 1 week
 - Compare against Vercel baseline
@@ -272,6 +296,7 @@ Compare to Vercel Pro: $20/mo (but limited)
 ## 🐛 Known Issues & Limitations
 
 ### Current Limitations
+
 1. **Facebook & Mercari scrapers** are placeholders
    - Need implementation
    - May require official API access
@@ -283,6 +308,7 @@ Compare to Vercel Pro: $20/mo (but limited)
    - Mitigate with min instances or Cloud Run
 
 ### Planned Improvements
+
 - [ ] Add request caching (Redis/Firestore)
 - [ ] Implement rate limiting
 - [ ] Add scraper queue (Cloud Tasks)
@@ -294,30 +320,33 @@ Compare to Vercel Pro: $20/mo (but limited)
 
 ## 📚 Documentation Index
 
-| File | Purpose |
-|------|---------|
-| `MIGRATION.md` | Complete migration guide with all phases |
-| `DEPLOYMENT-CHECKLIST.md` | Step-by-step deployment checklist |
-| `functions/README.md` | Cloud Functions developer guide |
-| `functions/deploy.sh` | Deployment automation script |
-| `scripts/migrate-env-to-firebase.sh` | Environment variable migration |
-| This file | Executive summary |
+| File                                 | Purpose                                  |
+| ------------------------------------ | ---------------------------------------- |
+| `MIGRATION.md`                       | Complete migration guide with all phases |
+| `DEPLOYMENT-CHECKLIST.md`            | Step-by-step deployment checklist        |
+| `functions/README.md`                | Cloud Functions developer guide          |
+| `functions/deploy.sh`                | Deployment automation script             |
+| `scripts/migrate-env-to-firebase.sh` | Environment variable migration           |
+| This file                            | Executive summary                        |
 
 ---
 
 ## 🎓 Learning Resources
 
 ### Firebase
+
 - [Cloud Functions Docs](https://firebase.google.com/docs/functions)
 - [Cloud Functions 2nd Gen](https://cloud.google.com/functions/docs/2nd-gen/overview)
 - [Firebase Hosting](https://firebase.google.com/docs/hosting)
 
 ### Deployment
+
 - [Cloud Run Docs](https://cloud.google.com/run/docs)
 - [Cloud SQL Docs](https://cloud.google.com/sql/docs)
 - [Secret Manager](https://cloud.google.com/secret-manager/docs)
 
 ### Tools
+
 - [Firebase CLI](https://firebase.google.com/docs/cli)
 - [gcloud CLI](https://cloud.google.com/sdk/gcloud)
 - [Prisma Cloud SQL](https://www.prisma.io/docs/guides/deployment/deployment-guides/deploying-to-gcp)
@@ -327,18 +356,21 @@ Compare to Vercel Pro: $20/mo (but limited)
 ## ✅ Success Metrics
 
 ### Technical
+
 - [x] All Cloud Functions deploy successfully
 - [ ] < 1% error rate in production
 - [ ] p95 latency < 5s for scrapers
 - [ ] 99.9% uptime (Firebase SLA)
 
 ### Business
+
 - [ ] Cost stays within $30-50/mo budget
 - [ ] All scraper features work as before
 - [ ] Zero customer-facing downtime during migration
 - [ ] Team successfully trained on new platform
 
 ### Post-Migration
+
 - [x] 1 week stable operation
 - [x] Performance metrics improved
 - [x] Vercel project decommissioned
@@ -349,6 +381,7 @@ Compare to Vercel Pro: $20/mo (but limited)
 ## 🙏 Acknowledgments
 
 **Technologies Used**:
+
 - Firebase Cloud Functions (2nd Gen)
 - Google Cloud Platform
 - Playwright (browser automation)

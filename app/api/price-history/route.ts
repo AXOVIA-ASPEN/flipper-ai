@@ -6,10 +6,7 @@ import { handleError, ValidationError, NotFoundError, ForbiddenError } from '@/l
 import { getAuthUserId } from '@/lib/auth-middleware';
 import prisma from '@/lib/db';
 import { checkFeatureAccess } from '@/lib/tier-enforcement';
-import {
-  fetchAndStorePriceHistory,
-  getPriceHistory,
-} from '@/lib/price-history-service';
+import { fetchAndStorePriceHistory, getPriceHistory } from '@/lib/price-history-service';
 
 // GET /api/price-history?productName=iPhone+13&category=electronics
 export async function GET(request: NextRequest) {

@@ -79,9 +79,7 @@ function toTrendPeriod(date: Date, granularity: 'weekly' | 'monthly'): string {
     const diff = d.getDate() - day + (day === 0 ? -6 : 1);
     d.setDate(diff);
     const year = d.getFullYear();
-    const weekNum = Math.ceil(
-      ((d.getTime() - new Date(year, 0, 1).getTime()) / 86400000 + 1) / 7
-    );
+    const weekNum = Math.ceil(((d.getTime() - new Date(year, 0, 1).getTime()) / 86400000 + 1) / 7);
     return `${year}-W${String(weekNum).padStart(2, '0')}`;
   }
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
@@ -91,7 +89,7 @@ export async function getProfitLossAnalytics(
   userId?: string | null,
   granularity: 'weekly' | 'monthly' = 'monthly',
   dateFrom?: string | null,
-  dateTo?: string | null,
+  dateTo?: string | null
 ): Promise<ProfitLossSummary> {
   const where: Record<string, unknown> = {
     status: { in: ['PURCHASED', 'LISTED', 'SOLD'] },
@@ -154,24 +152,22 @@ export async function getProfitLossAnalytics(
   const totalNetProfit = items.reduce((s, i) => s + i.netProfit, 0);
   // overallROI: safe division guarded by totalInvested check (empty portfolio → 0)
   const overallROI = totalInvested > 0 ? (totalNetProfit / totalInvested) * 100 : 0;
-  const avgDaysHeld = items.length > 0
-    ? items.reduce((s, i) => s + i.daysHeld, 0) / items.length
-    : 0;
+  const avgDaysHeld =
+    items.length > 0 ? items.reduce((s, i) => s + i.daysHeld, 0) / items.length : 0;
 
   const completedItems = items.filter((i) => i.status === 'SOLD');
   const completedDeals = completedItems.length;
   const activeDeals = items.length - completedDeals;
-  const winRate = completedDeals > 0
-    ? (completedItems.filter((i) => i.netProfit > 0).length / completedDeals) * 100
-    : 0;
+  const winRate =
+    completedDeals > 0
+      ? (completedItems.filter((i) => i.netProfit > 0).length / completedDeals) * 100
+      : 0;
 
   const soldNetProfit = completedItems.reduce((s, i) => s + i.netProfit, 0);
-  const avgProfitPerFlip = completedDeals > 0
-    ? Math.round((soldNetProfit / completedDeals) * 100) / 100
-    : 0;
-  const successRate = items.length > 0
-    ? Math.round((completedItems.length / items.length) * 10000) / 100
-    : 0;
+  const avgProfitPerFlip =
+    completedDeals > 0 ? Math.round((soldNetProfit / completedDeals) * 100) / 100 : 0;
+  const successRate =
+    items.length > 0 ? Math.round((completedItems.length / items.length) * 10000) / 100 : 0;
 
   // Best/worst
   const sorted = [...items].sort((a, b) => b.netProfit - a.netProfit);
@@ -184,8 +180,12 @@ export async function getProfitLossAnalytics(
     const purchasePeriod = toTrendPeriod(new Date(item.purchaseDate), granularity);
     if (!trendMap.has(purchasePeriod)) {
       trendMap.set(purchasePeriod, {
-        period: purchasePeriod, revenue: 0, costs: 0, profit: 0,
-        itemsSold: 0, itemsPurchased: 0,
+        period: purchasePeriod,
+        revenue: 0,
+        costs: 0,
+        profit: 0,
+        itemsSold: 0,
+        itemsPurchased: 0,
       });
     }
     const pt = trendMap.get(purchasePeriod)!;
@@ -196,8 +196,12 @@ export async function getProfitLossAnalytics(
       const salePeriod = toTrendPeriod(new Date(item.resaleDate), granularity);
       if (!trendMap.has(salePeriod)) {
         trendMap.set(salePeriod, {
-          period: salePeriod, revenue: 0, costs: 0, profit: 0,
-          itemsSold: 0, itemsPurchased: 0,
+          period: salePeriod,
+          revenue: 0,
+          costs: 0,
+          profit: 0,
+          itemsSold: 0,
+          itemsPurchased: 0,
         });
       }
       const sp = trendMap.get(salePeriod)!;
@@ -221,39 +225,43 @@ export async function getProfitLossAnalytics(
     if (!platformMap.has(item.platform)) platformMap.set(item.platform, []);
     platformMap.get(item.platform)!.push(item);
   }
-  const platformBreakdown: PlatformBreakdown[] = [...platformMap.entries()].map(([platform, pItems]) => {
-    const profit = pItems.reduce((s, i) => s + i.netProfit, 0);
-    const sold = pItems.filter((i) => i.status === 'SOLD');
-    return {
-      platform,
-      count: pItems.length,
-      totalProfit: Math.round(profit * 100) / 100,
-      avgProfit: Math.round((pItems.length > 0 ? profit / pItems.length : 0) * 100) / 100,
-      successRate: Math.round((pItems.length > 0 ? (sold.length / pItems.length) * 100 : 0) * 100) / 100,
-    };
-  }).sort((a, b) => b.totalProfit - a.totalProfit);
+  const platformBreakdown: PlatformBreakdown[] = [...platformMap.entries()]
+    .map(([platform, pItems]) => {
+      const profit = pItems.reduce((s, i) => s + i.netProfit, 0);
+      const sold = pItems.filter((i) => i.status === 'SOLD');
+      return {
+        platform,
+        count: pItems.length,
+        totalProfit: Math.round(profit * 100) / 100,
+        avgProfit: Math.round((pItems.length > 0 ? profit / pItems.length : 0) * 100) / 100,
+        successRate:
+          Math.round((pItems.length > 0 ? (sold.length / pItems.length) * 100 : 0) * 100) / 100,
+      };
+    })
+    .sort((a, b) => b.totalProfit - a.totalProfit);
 
-  const categoryBreakdown: CategoryBreakdown[] = [...catMap.entries()].map(([cat, data]) => {
-    const catItems = data.items;
-    const invested = catItems.reduce((s, i) => s + i.purchasePrice, 0);
-    const revenue = catItems.reduce((s, i) => s + (i.resalePrice ?? 0), 0);
-    const profit = catItems.reduce((s, i) => s + i.netProfit, 0);
-    /* istanbul ignore next -- purchasePrice is always positive (validated by calculateROI), so invested > 0 always */
-    const avgROI = invested > 0 ? (profit / invested) * 100 : 0;
-    const soldItems = catItems.filter((i) => i.status === 'SOLD');
-    const avgDays = soldItems.length > 0
-      ? soldItems.reduce((s, i) => s + i.daysHeld, 0) / soldItems.length
-      : 0;
-    return {
-      category: cat,
-      count: catItems.length,
-      totalInvested: Math.round(invested * 100) / 100,
-      totalRevenue: Math.round(revenue * 100) / 100,
-      totalProfit: Math.round(profit * 100) / 100,
-      avgROI: Math.round(avgROI * 100) / 100,
-      avgDaysToSell: Math.round(avgDays),
-    };
-  }).sort((a, b) => b.totalProfit - a.totalProfit);
+  const categoryBreakdown: CategoryBreakdown[] = [...catMap.entries()]
+    .map(([cat, data]) => {
+      const catItems = data.items;
+      const invested = catItems.reduce((s, i) => s + i.purchasePrice, 0);
+      const revenue = catItems.reduce((s, i) => s + (i.resalePrice ?? 0), 0);
+      const profit = catItems.reduce((s, i) => s + i.netProfit, 0);
+      /* istanbul ignore next -- purchasePrice is always positive (validated by calculateROI), so invested > 0 always */
+      const avgROI = invested > 0 ? (profit / invested) * 100 : 0;
+      const soldItems = catItems.filter((i) => i.status === 'SOLD');
+      const avgDays =
+        soldItems.length > 0 ? soldItems.reduce((s, i) => s + i.daysHeld, 0) / soldItems.length : 0;
+      return {
+        category: cat,
+        count: catItems.length,
+        totalInvested: Math.round(invested * 100) / 100,
+        totalRevenue: Math.round(revenue * 100) / 100,
+        totalProfit: Math.round(profit * 100) / 100,
+        avgROI: Math.round(avgROI * 100) / 100,
+        avgDaysToSell: Math.round(avgDays),
+      };
+    })
+    .sort((a, b) => b.totalProfit - a.totalProfit);
 
   return {
     totalInvested: Math.round(totalInvested * 100) / 100,

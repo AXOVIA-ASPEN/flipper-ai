@@ -46,7 +46,11 @@ describe('SseEmitter', () => {
     });
 
     it('includes id field when provided', () => {
-      const msg = emitter.formatMessage({ type: 'listing.found', data: { id: 'abc' }, id: 'evt-1' });
+      const msg = emitter.formatMessage({
+        type: 'listing.found',
+        data: { id: 'abc' },
+        id: 'evt-1',
+      });
       expect(msg).toContain('id: evt-1');
     });
 

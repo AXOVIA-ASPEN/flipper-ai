@@ -2,7 +2,15 @@ import { NextResponse } from 'next/server';
 import { getAuthUserId } from '@/lib/auth-middleware';
 import { getQueueStats } from '@/lib/posting-queue-processor';
 
-import { handleError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError , AppError, ErrorCode } from '@/lib/errors';
+import {
+  handleError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  AppError,
+  ErrorCode,
+} from '@/lib/errors';
 // GET /api/posting-queue/stats - Get queue statistics
 export async function GET() {
   try {

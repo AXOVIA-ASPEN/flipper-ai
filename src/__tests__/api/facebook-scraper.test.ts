@@ -46,7 +46,8 @@ jest.mock('@/scrapers/facebook/scraper', () => ({
     askingPrice: parseFloat(item.price || '0'),
     condition: item.condition || null,
     location: item.location
-      ? [item.location.city, item.location.state, item.location.zip].filter(Boolean).join(', ') || null
+      ? [item.location.city, item.location.state, item.location.zip].filter(Boolean).join(', ') ||
+        null
       : null,
     sellerName: item.seller?.name || null,
     sellerContact: null,
@@ -623,14 +624,21 @@ describe('Facebook Marketplace Scraper API', () => {
         ok: true,
         json: async () => ({
           data: [
-            { id: '', name: 'Has Name But No ID' },   // !item.id → skip
-            { id: 'valid-id', name: '' },              // !item.name → skip
-            { id: 'valid-id-2', name: 'Valid Item', price: '100',
-              marketplace_listing_url: 'https://fb.com/item/valid-id-2' }, // saved
+            { id: '', name: 'Has Name But No ID' }, // !item.id → skip
+            { id: 'valid-id', name: '' }, // !item.name → skip
+            {
+              id: 'valid-id-2',
+              name: 'Valid Item',
+              price: '100',
+              marketplace_listing_url: 'https://fb.com/item/valid-id-2',
+            }, // saved
           ],
         }),
       });
-      (prisma.listing.upsert as jest.Mock).mockResolvedValue({ id: 'listing-valid', status: 'NEW' });
+      (prisma.listing.upsert as jest.Mock).mockResolvedValue({
+        id: 'listing-valid',
+        status: 'NEW',
+      });
       const request = new NextRequest('http://localhost/api/scraper/facebook', {
         method: 'POST',
         body: JSON.stringify({ keywords: 'test', accessToken: 'token' }),
@@ -662,7 +670,10 @@ describe('Facebook Marketplace Scraper API', () => {
           ],
         }),
       });
-      (prisma.listing.upsert as jest.Mock).mockResolvedValue({ id: 'listing-cat', status: 'OPPORTUNITY' });
+      (prisma.listing.upsert as jest.Mock).mockResolvedValue({
+        id: 'listing-cat',
+        status: 'OPPORTUNITY',
+      });
       const request = new NextRequest('http://localhost/api/scraper/facebook', {
         method: 'POST',
         body: JSON.stringify({ keywords: 'laptop', accessToken: 'token' }),
@@ -704,7 +715,9 @@ describe('Facebook Marketplace Scraper API', () => {
         }),
       });
       // Throw a non-Error object — per-item try/catch catches it gracefully
-      (prisma.listing.upsert as jest.Mock).mockImplementation(() => { throw 'string-error'; });
+      (prisma.listing.upsert as jest.Mock).mockImplementation(() => {
+        throw 'string-error';
+      });
       const request = new NextRequest('http://localhost/api/scraper/facebook', {
         method: 'POST',
         body: JSON.stringify({ keywords: 'test', accessToken: 'token' }),
@@ -726,7 +739,10 @@ describe('Facebook Marketplace Scraper API', () => {
           data: [{ id: 'fb-nocat', name: 'Mystery Item', price: '200' }],
         }),
       });
-      (prisma.listing.upsert as jest.Mock).mockResolvedValue({ id: 'listing-fallback', status: 'NEW' });
+      (prisma.listing.upsert as jest.Mock).mockResolvedValue({
+        id: 'listing-fallback',
+        status: 'NEW',
+      });
       const request = new NextRequest('http://localhost/api/scraper/facebook', {
         method: 'POST',
         body: JSON.stringify({ keywords: 'mystery', accessToken: 'token' }),
@@ -741,7 +757,7 @@ describe('Facebook Marketplace Scraper API', () => {
         expect.any(Number),
         null,
         'electronics',
-        expect.any(Number),  // feeRate
+        expect.any(Number) // feeRate
       );
     });
 
@@ -764,7 +780,10 @@ describe('Facebook Marketplace Scraper API', () => {
           ],
         }),
       });
-      (prisma.listing.upsert as jest.Mock).mockResolvedValue({ id: 'listing-minimal', status: 'NEW' });
+      (prisma.listing.upsert as jest.Mock).mockResolvedValue({
+        id: 'listing-minimal',
+        status: 'NEW',
+      });
 
       const request = new NextRequest('http://localhost/api/scraper/facebook', {
         method: 'POST',
@@ -864,7 +883,10 @@ describe('Facebook scraper - LLM sellability pipeline (Story 4.5)', () => {
     (getAuthUserId as jest.Mock).mockResolvedValue('user-llm');
     (prisma.scraperJob.create as jest.Mock).mockResolvedValue({ id: 'job-llm' });
     (prisma.scraperJob.update as jest.Mock).mockResolvedValue({});
-    (prisma.listing.upsert as jest.Mock).mockResolvedValue({ id: 'saved-llm', status: 'OPPORTUNITY' });
+    (prisma.listing.upsert as jest.Mock).mockResolvedValue({
+      id: 'saved-llm',
+      status: 'OPPORTUNITY',
+    });
 
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
@@ -946,7 +968,10 @@ describe('Facebook scraper - LLM sellability pipeline (Story 4.5)', () => {
   });
 
   it('skips item when analyzeSellability returns meetsThreshold=false', async () => {
-    mockAnalyzeSellability.mockResolvedValue({ ...defaultSellabilityAnalysis, meetsThreshold: false });
+    mockAnalyzeSellability.mockResolvedValue({
+      ...defaultSellabilityAnalysis,
+      meetsThreshold: false,
+    });
 
     const req = new NextRequest('http://localhost/api/scraper/facebook', {
       method: 'POST',
@@ -994,12 +1019,12 @@ describe('Facebook scraper - LLM sellability pipeline (Story 4.5)', () => {
     expect(res.status).toBe(200);
 
     expect(mockAnalyzeSellability).toHaveBeenCalledWith(
-      expect.any(String),   // title
-      expect.any(Number),   // price
-      expect.any(Object),   // identification
-      expect.any(Object),   // marketData
-      40,                   // discountThreshold from userSettings
-      expect.any(Number)    // feeRate from userSettings
+      expect.any(String), // title
+      expect.any(Number), // price
+      expect.any(Object), // identification
+      expect.any(Object), // marketData
+      40, // discountThreshold from userSettings
+      expect.any(Number) // feeRate from userSettings
     );
   });
 });

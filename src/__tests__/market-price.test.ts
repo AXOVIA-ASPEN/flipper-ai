@@ -42,7 +42,14 @@ jest.mock('playwright', () => ({
   },
 }));
 
-import { fetchMarketPrice, fetchMarketPricesBatch, closeBrowser, parseEbayPrice, median, buildEbaySoldUrl } from '../lib/market-price';
+import {
+  fetchMarketPrice,
+  fetchMarketPricesBatch,
+  closeBrowser,
+  parseEbayPrice,
+  median,
+  buildEbaySoldUrl,
+} from '../lib/market-price';
 
 describe('market-price', () => {
   afterAll(async () => {

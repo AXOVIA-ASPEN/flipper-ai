@@ -30,10 +30,13 @@ const CATEGORY_SIZE_DEFAULTS: Record<string, LogisticsClassification['sizeCatego
 };
 
 // Default weight/dimensions by size category for fallback
-const SIZE_CATEGORY_DEFAULTS: Record<LogisticsClassification['sizeCategory'], {
-  weightLbs: number;
-  dimensions: { length: number; width: number; height: number };
-}> = {
+const SIZE_CATEGORY_DEFAULTS: Record<
+  LogisticsClassification['sizeCategory'],
+  {
+    weightLbs: number;
+    dimensions: { length: number; width: number; height: number };
+  }
+> = {
   small_shippable: { weightLbs: 5, dimensions: { length: 12, width: 9, height: 6 } },
   large_local_only: { weightLbs: 50, dimensions: { length: 48, width: 24, height: 24 } },
   fragile_special_handling: { weightLbs: 15, dimensions: { length: 24, width: 18, height: 12 } },

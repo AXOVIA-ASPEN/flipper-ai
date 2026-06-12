@@ -143,7 +143,9 @@ export default function RegisterPage() {
                 <span className="text-2xl font-bold fp-grad-purple">Flipper.ai</span>
               </div>
             </Link>
-            <h1 className="text-2xl font-bold mb-2" style={{ color: '#e2e8f0' }}>Create your account</h1>
+            <h1 className="text-2xl font-bold mb-2" style={{ color: '#e2e8f0' }}>
+              Create your account
+            </h1>
             <p style={{ color: '#94a3b8' }}>Start finding profitable flips in minutes</p>
           </div>
 
@@ -151,7 +153,9 @@ export default function RegisterPage() {
           {errorMessage && (
             <div className="fp-alert-danger mx-8 mb-4 p-3 flex items-center gap-2" role="alert">
               <AlertCircle className="w-5 h-5 flex-shrink-0" style={{ color: '#f87171' }} />
-              <span className="text-sm" style={{ color: '#fca5a5' }}>{errorMessage}</span>
+              <span className="text-sm" style={{ color: '#fca5a5' }}>
+                {errorMessage}
+              </span>
             </div>
           )}
 
@@ -204,7 +208,9 @@ export default function RegisterPage() {
                 <div className="w-full" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-transparent" style={{ color: '#475569' }}>or create with email</span>
+                <span className="px-4 bg-transparent" style={{ color: '#475569' }}>
+                  or create with email
+                </span>
               </div>
             </div>
           </div>
@@ -212,7 +218,9 @@ export default function RegisterPage() {
           {/* Registration form */}
           <form onSubmit={handleSubmit} className="px-8 pb-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: '#e2e8f0' }}>Full name</label>
+              <label className="block text-sm font-medium mb-2" style={{ color: '#e2e8f0' }}>
+                Full name
+              </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <User className="h-5 w-5" style={{ color: '#475569' }} />
@@ -249,7 +257,9 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: '#e2e8f0' }}>Password</label>
+              <label className="block text-sm font-medium mb-2" style={{ color: '#e2e8f0' }}>
+                Password
+              </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5" style={{ color: '#475569' }} />
@@ -283,27 +293,40 @@ export default function RegisterPage() {
                         key={level}
                         className="h-1 flex-1 rounded-full transition-colors"
                         style={{
-                          background: passwordStrength >= level
-                            ? strengthBarColor(passwordStrength)
-                            : 'rgba(255,255,255,0.08)',
+                          background:
+                            passwordStrength >= level
+                              ? strengthBarColor(passwordStrength)
+                              : 'rgba(255,255,255,0.08)',
                         }}
                       />
                     ))}
                   </div>
                   <div className="grid grid-cols-2 gap-1 text-xs">
-                    <div className="flex items-center gap-1" style={{ color: passwordChecks.length ? '#34d399' : '#475569' }}>
+                    <div
+                      className="flex items-center gap-1"
+                      style={{ color: passwordChecks.length ? '#34d399' : '#475569' }}
+                    >
                       <CheckCircle className="w-3 h-3" />
                       8+ characters
                     </div>
-                    <div className="flex items-center gap-1" style={{ color: passwordChecks.uppercase ? '#34d399' : '#475569' }}>
+                    <div
+                      className="flex items-center gap-1"
+                      style={{ color: passwordChecks.uppercase ? '#34d399' : '#475569' }}
+                    >
                       <CheckCircle className="w-3 h-3" />
                       Uppercase
                     </div>
-                    <div className="flex items-center gap-1" style={{ color: passwordChecks.lowercase ? '#34d399' : '#475569' }}>
+                    <div
+                      className="flex items-center gap-1"
+                      style={{ color: passwordChecks.lowercase ? '#34d399' : '#475569' }}
+                    >
                       <CheckCircle className="w-3 h-3" />
                       Lowercase
                     </div>
-                    <div className="flex items-center gap-1" style={{ color: passwordChecks.number ? '#34d399' : '#475569' }}>
+                    <div
+                      className="flex items-center gap-1"
+                      style={{ color: passwordChecks.number ? '#34d399' : '#475569' }}
+                    >
                       <CheckCircle className="w-3 h-3" />
                       Number
                     </div>
@@ -335,7 +358,9 @@ export default function RegisterPage() {
                 />
               </div>
               {confirmPassword && password !== confirmPassword && (
-                <p className="mt-1 text-xs" style={{ color: '#f87171' }}>Passwords do not match</p>
+                <p className="mt-1 text-xs" style={{ color: '#f87171' }}>
+                  Passwords do not match
+                </p>
               )}
             </div>
 
@@ -359,7 +384,11 @@ export default function RegisterPage() {
           <div className="px-8 pb-8 text-center">
             <p className="text-sm" style={{ color: '#94a3b8' }}>
               Already have an account?{' '}
-              <Link href="/login" className="font-medium hover:underline" style={{ color: '#a78bfa' }}>
+              <Link
+                href="/login"
+                className="font-medium hover:underline"
+                style={{ color: '#a78bfa' }}
+              >
                 Sign in
               </Link>
             </p>

@@ -8,11 +8,11 @@
 
 ## Commission structure
 
-| Tier                    | Commission  | Duration                      | Notes                                    |
-| ----------------------- | ----------- | ----------------------------- | ---------------------------------------- |
-| **Standard**            | 30%         | 12 months recurring            | Default for everyone who applies         |
-| **Top-Performer Boost** | 40%         | 12 months recurring (existing referred users grandfathered) | Unlocked at 50+ paid referrals or $5k+ in lifetime commissions |
-| **Featured Partner**    | 50%         | 12 months recurring + co-marketing | By invitation only, ~3-5 partners       |
+| Tier                    | Commission | Duration                                                    | Notes                                                          |
+| ----------------------- | ---------- | ----------------------------------------------------------- | -------------------------------------------------------------- |
+| **Standard**            | 30%        | 12 months recurring                                         | Default for everyone who applies                               |
+| **Top-Performer Boost** | 40%        | 12 months recurring (existing referred users grandfathered) | Unlocked at 50+ paid referrals or $5k+ in lifetime commissions |
+| **Featured Partner**    | 50%        | 12 months recurring + co-marketing                          | By invitation only, ~3-5 partners                              |
 
 **Cooldown rules:**
 
@@ -31,13 +31,13 @@
 
 ## Tooling — pick one
 
-| Tool          | Pricing            | Pros                                        | Cons                                       |
-| ------------- | ------------------ | ------------------------------------------- | ------------------------------------------ |
-| **Rewardful** | $49-149/mo         | Stripe-native, easiest setup (1 hour), good UI for affiliates | Limited customization                      |
-| **Tolt**      | $29-99/mo          | Cheaper, similar Stripe integration         | Smaller team, less proven                  |
-| **PartnerStack** | $500+/mo         | Enterprise-grade, multi-tier, deep analytics | Overkill for early-stage                   |
-| **First Promoter** | $89-199/mo     | Decent, but UI is dated                     | Slower payouts than Rewardful              |
-| **Custom build** | Dev time only    | Full control                                 | 2-3 weeks to build properly; you don't want this distraction at launch |
+| Tool               | Pricing       | Pros                                                          | Cons                                                                   |
+| ------------------ | ------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| **Rewardful**      | $49-149/mo    | Stripe-native, easiest setup (1 hour), good UI for affiliates | Limited customization                                                  |
+| **Tolt**           | $29-99/mo     | Cheaper, similar Stripe integration                           | Smaller team, less proven                                              |
+| **PartnerStack**   | $500+/mo      | Enterprise-grade, multi-tier, deep analytics                  | Overkill for early-stage                                               |
+| **First Promoter** | $89-199/mo    | Decent, but UI is dated                                       | Slower payouts than Rewardful                                          |
+| **Custom build**   | Dev time only | Full control                                                  | 2-3 weeks to build properly; you don't want this distraction at launch |
 
 **Recommendation:** **Rewardful**. https://www.rewardful.com/
 
@@ -55,7 +55,7 @@ It's the closest to "set up in an hour, forget about it" and integrates with Str
 Most affiliate programs pay once and forget you. Ours pays for **12 months
 on every customer**, on every plan, every month.
 
-[ Apply now → ]  [ Read FAQ ]
+[ Apply now → ] [ Read FAQ ]
 
 ## What you get
 
@@ -92,7 +92,7 @@ Tell us about your platform — any of these are fine: YouTube channel,
 newsletter, Reddit, Twitter/X, blog, podcast.
 
 [ Application form: name, email, primary platform URL, audience size,
-  one sentence on why you'd recommend Flipper.ai ]
+one sentence on why you'd recommend Flipper.ai ]
 
 We respond within 48 hours.
 ```
@@ -106,6 +106,7 @@ Don't wait for affiliates to find you. Hand-pick the top 30 candidates and DM ea
 ### Where to find them
 
 **YouTube** — search:
+
 - "flipping for profit"
 - "ebay reseller"
 - "facebook marketplace flipping"
@@ -114,12 +115,14 @@ Don't wait for affiliates to find you. Hand-pick the top 30 candidates and DM ea
 - Filter by: 5,000+ subscribers, channel active in last 90 days
 
 **Twitter/X** — search:
+
 - bio contains: "reseller", "flipper", "ebay seller", "side hustle"
 - minimum 2,000 followers, posts at least weekly
 
 **Reddit** — top contributors in r/Flipping last 90 days who run their own blog/YouTube/newsletter (check their bio links)
 
 **Newsletters** — subscribe to:
+
 - Reseller's Roundup
 - Flipping Friday
 - Side Hustle Stack (broader audience)
@@ -176,10 +179,12 @@ Don't wait for affiliates to find you. Hand-pick the top 30 candidates and DM ea
 Bundle this in a Notion page or Google Drive folder; share the link in their welcome email.
 
 ### 1. Logo files
+
 - PNG (transparent), SVG, dark and light variants
 - Sizes: 512x512, 1024x1024, social-square (1080x1080), banner (1500x500)
 
 ### 2. Product screenshots (15-20 images)
+
 - Dashboard overview
 - Saved-search setup
 - Single opportunity detail (with AI analysis visible)
@@ -188,20 +193,25 @@ Bundle this in a Notion page or Google Drive folder; share the link in their wel
 - Mobile screens (5-7)
 
 ### 3. Demo video (90s) — same one used for Product Hunt
+
 - MP4 + a YouTube unlisted link
 
 ### 4. Sample copy (multiple lengths)
 
 **One-liner (Twitter bio, sponsorship reads):**
+
 > Flipper.ai — AI that finds underpriced flips on 5 marketplaces. 30% off with my link.
 
 **Three-line (newsletter sponsor read):**
+
 > Tired of scrolling Craigslist for hours looking for flips? Flipper.ai watches Craigslist, eBay, FB, OfferUp, and Mercari for you, scores items 0-100 for flip potential, and only shows you the >50%-undervalued ones. My listeners get 20% off with [affiliate link].
 
 **60s YouTube ad-read script:**
-> If you've ever found a $40 lamp on Craigslist that resold for $400 on eBay, you know how time-consuming the *finding* part of flipping is. I just spent the last few weeks using a tool called Flipper.ai — it's an AI that scans 5 marketplaces continuously and flags items that are way underpriced. It identifies what each item actually is — the brand, the model, the condition — then pulls eBay sold prices to verify the real market value. So instead of scrolling for two hours, you scroll for ten minutes through curated deals. Free tier exists. If you want to try it, my link [<your-affiliate-link>] gets you 20% off the first paid month.
+
+> If you've ever found a $40 lamp on Craigslist that resold for $400 on eBay, you know how time-consuming the _finding_ part of flipping is. I just spent the last few weeks using a tool called Flipper.ai — it's an AI that scans 5 marketplaces continuously and flags items that are way underpriced. It identifies what each item actually is — the brand, the model, the condition — then pulls eBay sold prices to verify the real market value. So instead of scrolling for two hours, you scroll for ten minutes through curated deals. Free tier exists. If you want to try it, my link [<your-affiliate-link>] gets you 20% off the first paid month.
 
 **500-word blog post template:**
+
 - Provided in the kit, ready to drop into their site
 
 ### 5. FAQ (for affiliates' audiences)
@@ -251,7 +261,7 @@ If you hit those, affiliates are a profitable channel. If you're at <$200/mo aff
 ## Don't do
 
 - ❌ Pay one-time per signup (creates noise, low quality). Recurring is the only structure that filters for affiliates who care about lifetime value.
-- ❌ Allow tier-jumping mid-month (if affiliate hits 50 referrals, the boost applies to *future* commissions, not retroactive).
+- ❌ Allow tier-jumping mid-month (if affiliate hits 50 referrals, the boost applies to _future_ commissions, not retroactive).
 - ❌ Use a closed-source tracking system that doesn't show affiliates their own data. Rewardful's affiliate dashboard is part of the value prop.
-- ❌ Run public promo codes that *also* trigger affiliate commission. Pick one or the other per campaign — otherwise you double-pay.
-- ❌ Rate-limit honest negative reviews. If an affiliate fairly criticizes the product in their content, that's *more* trust-building than a sycophantic review.
+- ❌ Run public promo codes that _also_ trigger affiliate commission. Pick one or the other per campaign — otherwise you double-pay.
+- ❌ Rate-limit honest negative reviews. If an affiliate fairly criticizes the product in their content, that's _more_ trust-building than a sycophantic review.

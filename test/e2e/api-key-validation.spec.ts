@@ -37,7 +37,9 @@ test.describe('API Key Validation Flow', () => {
   });
 
   test.describe('Feature: Validate API Key Format', () => {
-    test('Scenario: Given I enter an invalid format key, When I validate, Then I see a format error', async ({ page }) => {
+    test('Scenario: Given I enter an invalid format key, When I validate, Then I see a format error', async ({
+      page,
+    }) => {
       await page.route('**/api/user/settings/validate-key', async (route) => {
         const body = await route.request().postDataJSON();
         if (!body.apiKey.startsWith('sk-')) {
@@ -54,8 +56,11 @@ test.describe('API Key Validation Flow', () => {
       await page.goto('/settings');
 
       // Find and fill the API key input
-      const _apiKeyInput = page.locator('input[type="password"], input[type="text"]').filter({ hasText: /./}).first()
-        || page.getByPlaceholder(/sk-|api.*key|enter.*key/i);
+      const _apiKeyInput =
+        page
+          .locator('input[type="password"], input[type="text"]')
+          .filter({ hasText: /./ })
+          .first() || page.getByPlaceholder(/sk-|api.*key|enter.*key/i);
 
       // Look for any text input in the API Keys section
       const apiSection = page.locator('text=API Key').first();
@@ -63,20 +68,24 @@ test.describe('API Key Validation Flow', () => {
 
       // Find input near the API key section
       const keyInput = page.locator('input[placeholder*="sk-"]');
-      if (await keyInput.count() > 0) {
+      if ((await keyInput.count()) > 0) {
         await keyInput.fill('invalid-key-format');
 
         // Look for validate/test button
         const validateBtn = page.getByRole('button', { name: /validate|test|verify/i });
-        if (await validateBtn.count() > 0) {
+        if ((await validateBtn.count()) > 0) {
           await validateBtn.click();
           // Should show error about format
-          await expect(page.getByText(/invalid|format|sk-/i).first()).toBeVisible({ timeout: 5000 });
+          await expect(page.getByText(/invalid|format|sk-/i).first()).toBeVisible({
+            timeout: 5000,
+          });
         }
       }
     });
 
-    test('Scenario: Given I enter a valid format key, When I validate, Then I see success', async ({ page }) => {
+    test('Scenario: Given I enter a valid format key, When I validate, Then I see success', async ({
+      page,
+    }) => {
       await page.route('**/api/user/settings/validate-key', async (route) => {
         await route.fulfill({
           json: { success: true, valid: true, message: 'API key is valid' },
@@ -86,20 +95,24 @@ test.describe('API Key Validation Flow', () => {
       await page.goto('/settings');
 
       const keyInput = page.locator('input[placeholder*="sk-"]');
-      if (await keyInput.count() > 0) {
+      if ((await keyInput.count()) > 0) {
         await keyInput.fill('sk-test-valid-key-1234567890');
 
         const validateBtn = page.getByRole('button', { name: /validate|test|verify/i });
-        if (await validateBtn.count() > 0) {
+        if ((await validateBtn.count()) > 0) {
           await validateBtn.click();
-          await expect(page.getByText(/valid|success|verified/i).first()).toBeVisible({ timeout: 5000 });
+          await expect(page.getByText(/valid|success|verified/i).first()).toBeVisible({
+            timeout: 5000,
+          });
         }
       }
     });
   });
 
   test.describe('Feature: API Key Validation Endpoint', () => {
-    test('Scenario: Given no API key is provided, When I call validate-key, Then I receive a 400 error', async ({ request }) => {
+    test('Scenario: Given no API key is provided, When I call validate-key, Then I receive a 400 error', async ({
+      request,
+    }) => {
       // Mock the endpoint to simulate real behavior
       const response = await request.post('/api/user/settings/validate-key', {
         data: {},
@@ -108,7 +121,10 @@ test.describe('API Key Validation Flow', () => {
       expect([400, 404, 500]).toContain(response.status());
     });
 
-    test('Scenario: Given an invalid format key, When I call validate-key, Then valid is false', async ({ request: _request, page }) => {
+    test('Scenario: Given an invalid format key, When I call validate-key, Then valid is false', async ({
+      request: _request,
+      page,
+    }) => {
       await page.route('**/api/user/settings/validate-key', async (route) => {
         await route.fulfill({
           json: {
@@ -134,7 +150,9 @@ test.describe('API Key Validation Flow', () => {
       expect(result.error).toContain('sk-');
     });
 
-    test('Scenario: Given a valid key that is unauthorized, When I call validate-key, Then valid is false with auth error', async ({ page }) => {
+    test('Scenario: Given a valid key that is unauthorized, When I call validate-key, Then valid is false with auth error', async ({
+      page,
+    }) => {
       await page.route('**/api/user/settings/validate-key', async (route) => {
         await route.fulfill({
           json: {
@@ -159,7 +177,9 @@ test.describe('API Key Validation Flow', () => {
       expect(result.error).toContain('Invalid API key');
     });
 
-    test('Scenario: Given a rate-limited but valid key, When I call validate-key, Then valid is true', async ({ page }) => {
+    test('Scenario: Given a rate-limited but valid key, When I call validate-key, Then valid is true', async ({
+      page,
+    }) => {
       await page.route('**/api/user/settings/validate-key', async (route) => {
         await route.fulfill({
           json: {
@@ -186,11 +206,17 @@ test.describe('API Key Validation Flow', () => {
   });
 
   test.describe('Feature: Save API Key', () => {
-    test('Scenario: Given I enter a valid key, When I save settings, Then the key is persisted', async ({ page }) => {
+    test('Scenario: Given I enter a valid key, When I save settings, Then the key is persisted', async ({
+      page,
+    }) => {
       let savedKey: string | null = null;
 
       await page.route('**/api/user/settings', async (route, _request) => {
-        if (request.method() === 'PUT' || request.method() === 'PATCH' || request.method() === 'POST') {
+        if (
+          request.method() === 'PUT' ||
+          request.method() === 'PATCH' ||
+          request.method() === 'POST'
+        ) {
           const body = await request.postDataJSON();
           savedKey = body.openaiApiKey || null;
           await route.fulfill({ json: { success: true } });
@@ -211,12 +237,12 @@ test.describe('API Key Validation Flow', () => {
       await page.goto('/settings');
 
       const keyInput = page.locator('input[placeholder*="sk-"]');
-      if (await keyInput.count() > 0) {
+      if ((await keyInput.count()) > 0) {
         await keyInput.fill('sk-new-valid-key-xyz');
 
         // Look for save button
         const saveBtn = page.getByRole('button', { name: /save/i });
-        if (await saveBtn.count() > 0) {
+        if ((await saveBtn.count()) > 0) {
           await saveBtn.click();
           // Key should have been sent to the API
           expect(savedKey).toBe('sk-new-valid-key-xyz');

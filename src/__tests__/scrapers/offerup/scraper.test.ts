@@ -8,7 +8,12 @@ import {
   scrapeOfferUp,
   withRetry,
 } from '@/scrapers/offerup';
-import { USER_AGENTS, SCRAPER_CONFIG, CATEGORY_MAPPING, SUPPORTED_LOCATIONS } from '@/scrapers/offerup';
+import {
+  USER_AGENTS,
+  SCRAPER_CONFIG,
+  CATEGORY_MAPPING,
+  SUPPORTED_LOCATIONS,
+} from '@/scrapers/offerup';
 
 // Mock Prisma
 const mockFindFirst = jest.fn();
@@ -353,7 +358,9 @@ describe('OfferUp Scraper Module', () => {
       const contextCall = mockNewContext.mock.calls[0][0];
       expect(contextCall.viewport.width).toBeGreaterThanOrEqual(SCRAPER_CONFIG.VIEWPORT_MIN_WIDTH);
       expect(contextCall.viewport.width).toBeLessThanOrEqual(SCRAPER_CONFIG.VIEWPORT_MAX_WIDTH);
-      expect(contextCall.viewport.height).toBeGreaterThanOrEqual(SCRAPER_CONFIG.VIEWPORT_MIN_HEIGHT);
+      expect(contextCall.viewport.height).toBeGreaterThanOrEqual(
+        SCRAPER_CONFIG.VIEWPORT_MIN_HEIGHT
+      );
       expect(contextCall.viewport.height).toBeLessThanOrEqual(SCRAPER_CONFIG.VIEWPORT_MAX_HEIGHT);
     });
 
@@ -416,10 +423,7 @@ describe('OfferUp Scraper Module', () => {
         expect.stringContaining('offerup.com/search/tampa-fl'),
         expect.anything()
       );
-      expect(mockGoto).toHaveBeenCalledWith(
-        expect.stringContaining('q=iphone'),
-        expect.anything()
-      );
+      expect(mockGoto).toHaveBeenCalledWith(expect.stringContaining('q=iphone'), expect.anything());
       expect(mockGoto).toHaveBeenCalledWith(
         expect.stringContaining('price_min=100'),
         expect.anything()
@@ -449,9 +453,7 @@ describe('OfferUp Scraper Module', () => {
 
     it('retries on failure and succeeds', async () => {
       jest.useRealTimers();
-      const fn = jest.fn()
-        .mockRejectedValueOnce(new Error('fail1'))
-        .mockResolvedValueOnce('ok');
+      const fn = jest.fn().mockRejectedValueOnce(new Error('fail1')).mockResolvedValueOnce('ok');
       const result = await withRetry(fn, 3);
       expect(result).toBe('ok');
       expect(fn).toHaveBeenCalledTimes(2);
@@ -473,7 +475,8 @@ describe('OfferUp Scraper Module', () => {
     it('uses exponential backoff delays', async () => {
       jest.useRealTimers();
       const { sleep: mockSleep } = require('@/lib/sleep');
-      const fn = jest.fn()
+      const fn = jest
+        .fn()
         .mockRejectedValueOnce(new Error('fail'))
         .mockRejectedValueOnce(new Error('fail'))
         .mockResolvedValueOnce('ok');

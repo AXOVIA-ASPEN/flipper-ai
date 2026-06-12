@@ -120,9 +120,7 @@ test.describe('Feature: Network Resilience & Graceful Degradation', () => {
       page,
     }) => {
       // Simulate a request that never responds (abort after timeout)
-      await page.route('**/api/scraper/**', (route) =>
-        route.abort('timedout')
-      );
+      await page.route('**/api/scraper/**', (route) => route.abort('timedout'));
 
       await page.goto('/scraper');
       await page.waitForLoadState('networkidle');

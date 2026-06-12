@@ -14,17 +14,21 @@ test.describe('Resale Listing Generator', () => {
   });
 
   test.describe('Scenario: Auto-generate eBay listing', () => {
-    test('should generate optimized listing fields for eBay', async ({ page, resaleListingPage, dashboardPage }) => {
+    test('should generate optimized listing fields for eBay', async ({
+      page,
+      resaleListingPage,
+      dashboardPage,
+    }) => {
       // Given I have a purchased item
       await dashboardPage.goto('/dashboard');
       const inventoryTab = page.locator('text=Inventory');
-      if (await inventoryTab.count() > 0) {
+      if ((await inventoryTab.count()) > 0) {
         await inventoryTab.click();
       }
 
       const itemRow = page.locator('tr', { hasText: /purchased|bought/i }).first();
 
-      if (await itemRow.count() > 0) {
+      if ((await itemRow.count()) > 0) {
         await itemRow.locator('text=Create Sell Listing').click();
       } else {
         await resaleListingPage.gotoCreate();
@@ -41,7 +45,10 @@ test.describe('Resale Listing Generator', () => {
   });
 
   test.describe('Scenario: Cross-platform posting', () => {
-    test('should adapt listing for multiple platforms', async ({ page: _page, resaleListingPage }) => {
+    test('should adapt listing for multiple platforms', async ({
+      page: _page,
+      resaleListingPage,
+    }) => {
       await resaleListingPage.gotoCreate();
 
       // Fill basic info
@@ -57,7 +64,10 @@ test.describe('Resale Listing Generator', () => {
   });
 
   test.describe('Scenario: Price optimization based on demand', () => {
-    test('should suggest aggressive pricing for high-demand items', async ({ page: _page, resaleListingPage }) => {
+    test('should suggest aggressive pricing for high-demand items', async ({
+      page: _page,
+      resaleListingPage,
+    }) => {
       await resaleListingPage.gotoCreate();
 
       await resaleListingPage.fillTitle('iPad Pro 11-inch');
@@ -69,10 +79,13 @@ test.describe('Resale Listing Generator', () => {
   });
 
   test.describe('Scenario: Clone existing listing', () => {
-    test('should pre-fill fields when cloning a listing', async ({ page: _page, resaleListingPage }) => {
+    test('should pre-fill fields when cloning a listing', async ({
+      page: _page,
+      resaleListingPage,
+    }) => {
       await resaleListingPage.gotoListings();
 
-      if (await resaleListingPage.cloneButton.count() > 0) {
+      if ((await resaleListingPage.cloneButton.count()) > 0) {
         await resaleListingPage.cloneButton.click();
 
         const value = await resaleListingPage.titleInput.inputValue();
@@ -84,15 +97,18 @@ test.describe('Resale Listing Generator', () => {
   });
 
   test.describe('Scenario: Track listing performance', () => {
-    test('should display performance metrics for posted listings', async ({ page: _page, resaleListingPage }) => {
+    test('should display performance metrics for posted listings', async ({
+      page: _page,
+      resaleListingPage,
+    }) => {
       await resaleListingPage.gotoListings();
 
       const listingLink = await resaleListingPage.getFirstListingLink();
-      if (await listingLink.count() > 0) {
+      if ((await listingLink.count()) > 0) {
         await listingLink.click();
 
         const metrics = page.locator('text=/views|watchers|analytics|performance/i');
-        if (await metrics.count() > 0) {
+        if ((await metrics.count()) > 0) {
           await expect(metrics.first()).toBeVisible();
         }
       }
@@ -102,15 +118,20 @@ test.describe('Resale Listing Generator', () => {
   });
 
   test.describe('Scenario: Listing form validation', () => {
-    test('should show validation errors for empty required fields', async ({ page, resaleListingPage }) => {
+    test('should show validation errors for empty required fields', async ({
+      page,
+      resaleListingPage,
+    }) => {
       await resaleListingPage.gotoCreate();
 
       // Submit without filling required fields
       await resaleListingPage.submitListing();
 
       // Should show validation messages
-      const validationError = page.locator('[role="alert"], .error, text=/required|cannot be empty/i');
-      if (await validationError.count() > 0) {
+      const validationError = page.locator(
+        '[role="alert"], .error, text=/required|cannot be empty/i'
+      );
+      if ((await validationError.count()) > 0) {
         await expect(validationError.first()).toBeVisible();
       }
     });
@@ -123,7 +144,7 @@ test.describe('Resale Listing Generator', () => {
       await resaleListingPage.submitListing();
 
       const priceError = page.locator('text=/invalid|positive|greater than/i');
-      if (await priceError.count() > 0) {
+      if ((await priceError.count()) > 0) {
         await expect(priceError.first()).toBeVisible();
       }
 

@@ -60,7 +60,7 @@ describe('PATCH /api/notifications/[id]', () => {
     expect(res.status).toBe(404);
   });
 
-  it('returns 403 when updating another user\'s event', async () => {
+  it("returns 403 when updating another user's event", async () => {
     mockFindUnique.mockResolvedValueOnce({ ...sampleEvent, userId: 'other-user' });
     const res = await PATCH(makeRequest({ status: 'PROCESSED' }), makeContext('evt-1'));
     expect(res.status).toBe(403);

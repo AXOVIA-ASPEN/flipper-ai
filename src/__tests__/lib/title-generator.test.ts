@@ -15,7 +15,10 @@ const mockCompleteAI = jest.fn().mockResolvedValue({
 jest.mock('@/lib/ai', () => ({
   completeAI: (...args: unknown[]) => mockCompleteAI(...args),
   AIProviderUnavailableError: class extends Error {
-    constructor() { super('No AI provider available'); this.name = 'AIProviderUnavailableError'; }
+    constructor() {
+      super('No AI provider available');
+      this.name = 'AIProviderUnavailableError';
+    }
   },
 }));
 
@@ -239,7 +242,9 @@ describe('title-generator', () => {
     });
 
     it('falls back to algorithmic when no AI provider available', async () => {
-      const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as { AIProviderUnavailableError: new () => Error };
+      const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as {
+        AIProviderUnavailableError: new () => Error;
+      };
       mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
 
       const result = await generateLLMTitle(sampleInput, 'ebay');
@@ -255,7 +260,11 @@ describe('title-generator', () => {
     });
 
     it('strips quotes from LLM response', async () => {
-      mockCompleteAI.mockResolvedValue({ content: '"Quoted Title Here"', provider: 'gemini', model: 'gemini-2.0-flash' });
+      mockCompleteAI.mockResolvedValue({
+        content: '"Quoted Title Here"',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
+      });
 
       const result = await generateLLMTitle(sampleInput, 'ebay');
       expect(result.title).toBe('Quoted Title Here');
@@ -263,7 +272,8 @@ describe('title-generator', () => {
 
     it('truncates LLM title that exceeds platform limit', async () => {
       mockCompleteAI.mockResolvedValue({
-        content: 'This is an extremely long title that definitely exceeds the forty character limit for Mercari listings and should be truncated',
+        content:
+          'This is an extremely long title that definitely exceeds the forty character limit for Mercari listings and should be truncated',
         provider: 'gemini',
         model: 'gemini-2.0-flash',
       });
@@ -282,14 +292,20 @@ describe('title-generator', () => {
     });
 
     it('handles empty LLM response', async () => {
-      mockCompleteAI.mockResolvedValue({ content: '', provider: 'gemini', model: 'gemini-2.0-flash' });
+      mockCompleteAI.mockResolvedValue({
+        content: '',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
+      });
 
       const result = await generateLLMTitle(sampleInput, 'ebay');
       expect(result.platform).toBe('ebay');
     });
 
     it('uses default platform limit for unknown platform', async () => {
-      const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as { AIProviderUnavailableError: new () => Error };
+      const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as {
+        AIProviderUnavailableError: new () => Error;
+      };
       mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
 
       const result = await generateLLMTitle(sampleInput, 'amazon');
@@ -299,27 +315,43 @@ describe('title-generator', () => {
 
   describe('generateLLMTitle - additional branch coverage', () => {
     it('handles empty content from LLM', async () => {
-      mockCompleteAI.mockResolvedValue({ content: '', provider: 'gemini', model: 'gemini-2.0-flash' });
+      mockCompleteAI.mockResolvedValue({
+        content: '',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
+      });
       const result = await generateLLMTitle(sampleInput, 'ebay');
       expect(result.platform).toBe('ebay');
       expect(result.title).toBe('');
     });
 
     it('strips single quotes from LLM response', async () => {
-      mockCompleteAI.mockResolvedValue({ content: "'Single Quoted Title'", provider: 'gemini', model: 'gemini-2.0-flash' });
+      mockCompleteAI.mockResolvedValue({
+        content: "'Single Quoted Title'",
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
+      });
       const result = await generateLLMTitle(sampleInput, 'ebay');
       expect(result.title).toBe('Single Quoted Title');
     });
 
     it('uses default 80 limit for unknown platform with LLM', async () => {
-      mockCompleteAI.mockResolvedValue({ content: 'Short Title', provider: 'gemini', model: 'gemini-2.0-flash' });
+      mockCompleteAI.mockResolvedValue({
+        content: 'Short Title',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
+      });
       const result = await generateLLMTitle(sampleInput, 'unknown_platform');
       expect(result.title).toBe('Short Title');
       expect(result.charCount).toBeLessThanOrEqual(80);
     });
 
     it('passes fallback values in context when input fields are null', async () => {
-      mockCompleteAI.mockResolvedValue({ content: 'Generic Item - Good Condition', provider: 'gemini', model: 'gemini-2.0-flash' });
+      mockCompleteAI.mockResolvedValue({
+        content: 'Generic Item - Good Condition',
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
+      });
 
       const nullInput: TitleGeneratorInput = {
         brand: null,
@@ -331,12 +363,15 @@ describe('title-generator', () => {
 
       const result = await generateLLMTitle(nullInput, 'ebay');
       expect(result.title).toBe('Generic Item - Good Condition');
-      expect(mockCompleteAI).toHaveBeenCalledWith('listingTitle', expect.objectContaining({
-        brand: 'Unknown',
-        model: 'Unknown',
-        variant: 'N/A',
-        category: 'General',
-      }));
+      expect(mockCompleteAI).toHaveBeenCalledWith(
+        'listingTitle',
+        expect.objectContaining({
+          brand: 'Unknown',
+          model: 'Unknown',
+          variant: 'N/A',
+          category: 'General',
+        })
+      );
     });
   });
 
@@ -398,7 +433,9 @@ describe('generateLLMTitle - branch coverage', () => {
   });
 
   it('falls back to algorithmic when no AI provider', async () => {
-    const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as { AIProviderUnavailableError: new () => Error };
+    const { AIProviderUnavailableError } = jest.requireMock('@/lib/ai') as {
+      AIProviderUnavailableError: new () => Error;
+    };
     mockCompleteAI.mockRejectedValue(new AIProviderUnavailableError());
     const result = await generateLLMTitle(baseInput2, 'ebay');
     expect(result.title).toContain('Sony');
@@ -407,14 +444,22 @@ describe('generateLLMTitle - branch coverage', () => {
 
   it('truncates title exceeding platform character limit', async () => {
     const longTitle = 'A'.repeat(200);
-    mockCompleteAI.mockResolvedValue({ content: longTitle, provider: 'gemini', model: 'gemini-2.0-flash' });
+    mockCompleteAI.mockResolvedValue({
+      content: longTitle,
+      provider: 'gemini',
+      model: 'gemini-2.0-flash',
+    });
     const result = await generateLLMTitle(baseInput2, 'ebay');
     expect(result.title.length).toBeLessThanOrEqual(80);
     expect(result.title).toMatch(/\.\.\.$/);
   });
 
   it('strips surrounding quotes from LLM response', async () => {
-    mockCompleteAI.mockResolvedValue({ content: '"Sony WH-1000XM5 Black"', provider: 'gemini', model: 'gemini-2.0-flash' });
+    mockCompleteAI.mockResolvedValue({
+      content: '"Sony WH-1000XM5 Black"',
+      provider: 'gemini',
+      model: 'gemini-2.0-flash',
+    });
     const result = await generateLLMTitle(baseInput2, 'ebay');
     expect(result.title).not.toMatch(/^"/);
     expect(result.title).not.toMatch(/"$/);
@@ -427,7 +472,11 @@ describe('generateLLMTitle - branch coverage', () => {
   });
 
   it('uses generic platform limit for unknown platform', async () => {
-    mockCompleteAI.mockResolvedValue({ content: 'Sony WH-1000XM5', provider: 'gemini', model: 'gemini-2.0-flash' });
+    mockCompleteAI.mockResolvedValue({
+      content: 'Sony WH-1000XM5',
+      provider: 'gemini',
+      model: 'gemini-2.0-flash',
+    });
     const result = await generateLLMTitle(baseInput2, 'unknown-platform');
     expect(result.title).toBeTruthy();
   });
@@ -448,13 +497,16 @@ describe('generateAlgorithmicTitle - branch coverage', () => {
   });
 
   it('falls back to 80 char limit for unknown platform', () => {
-    const result = generateAlgorithmicTitle({
-      brand: 'Sony',
-      model: 'WH-1000XM5',
-      variant: null,
-      condition: 'good',
-      category: null,
-    }, 'unknown-marketplace');
+    const result = generateAlgorithmicTitle(
+      {
+        brand: 'Sony',
+        model: 'WH-1000XM5',
+        variant: null,
+        condition: 'good',
+        category: null,
+      },
+      'unknown-marketplace'
+    );
     expect(result.charCount).toBeLessThanOrEqual(80);
   });
 
@@ -518,35 +570,44 @@ describe('generateAlgorithmicTitle - branch coverage', () => {
 
   it('truncates title when over limit using NEW for new condition', () => {
     // Create a very long title to trigger truncation
-    const result = generateAlgorithmicTitle({
-      brand: 'VeryLongBrandNameThatExceedsTheLimit',
-      model: 'VeryLongModelNameThatAlsoExceedsTheCharacterLimitOfThePlatform',
-      variant: 'SpecialEdition',
-      condition: 'new',
-      category: null,
-    }, 'ebay'); // ebay limit is 80 chars
+    const result = generateAlgorithmicTitle(
+      {
+        brand: 'VeryLongBrandNameThatExceedsTheLimit',
+        model: 'VeryLongModelNameThatAlsoExceedsTheCharacterLimitOfThePlatform',
+        variant: 'SpecialEdition',
+        condition: 'new',
+        category: null,
+      },
+      'ebay'
+    ); // ebay limit is 80 chars
     expect(result.charCount).toBeLessThanOrEqual(80);
   });
 
   it('truncates title using LN for like_new condition', () => {
-    const result = generateAlgorithmicTitle({
-      brand: 'VeryLongBrandNameThatExceedsTheLimit',
-      model: 'VeryLongModelNameThatAlsoExceedsTheCharacterLimitSetByThePlatform',
-      variant: 'LimitedEdition',
-      condition: 'like_new',
-      category: null,
-    }, 'ebay');
+    const result = generateAlgorithmicTitle(
+      {
+        brand: 'VeryLongBrandNameThatExceedsTheLimit',
+        model: 'VeryLongModelNameThatAlsoExceedsTheCharacterLimitSetByThePlatform',
+        variant: 'LimitedEdition',
+        condition: 'like_new',
+        category: null,
+      },
+      'ebay'
+    );
     expect(result.charCount).toBeLessThanOrEqual(80);
   });
 
   it('truncates title with empty shortCondition (used condition)', () => {
-    const result = generateAlgorithmicTitle({
-      brand: 'VeryLongBrandNameThatExceedsTheLimit',
-      model: 'VeryLongModelNameThatAlsoExceedsTheCharacterLimitSetByThePlatform',
-      variant: 'SpecialEditionVersion',
-      condition: 'used', // not 'new' or 'like_new' → shortCondition = ''
-      category: null,
-    }, 'ebay');
+    const result = generateAlgorithmicTitle(
+      {
+        brand: 'VeryLongBrandNameThatExceedsTheLimit',
+        model: 'VeryLongModelNameThatAlsoExceedsTheCharacterLimitSetByThePlatform',
+        variant: 'SpecialEditionVersion',
+        condition: 'used', // not 'new' or 'like_new' → shortCondition = ''
+        category: null,
+      },
+      'ebay'
+    );
     expect(result.charCount).toBeLessThanOrEqual(80);
   });
 });

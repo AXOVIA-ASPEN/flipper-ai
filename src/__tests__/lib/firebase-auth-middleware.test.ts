@@ -153,7 +153,10 @@ describe('firebase/auth-middleware', () => {
 
       expect(handler).toHaveBeenCalledTimes(1);
 
-      const calledReq = handler.mock.calls[0][0] as NextRequest & { userId: string; userEmail: string | null };
+      const calledReq = handler.mock.calls[0][0] as NextRequest & {
+        userId: string;
+        userEmail: string | null;
+      };
       expect(calledReq.userId).toBe('prisma-user-id-456');
       expect(calledReq.userEmail).toBe('user@example.com');
 
@@ -186,7 +189,10 @@ describe('firebase/auth-middleware', () => {
 
       expect(handler).toHaveBeenCalledTimes(1);
 
-      const calledReq = handler.mock.calls[0][0] as NextRequest & { userId: string; userEmail: string | null };
+      const calledReq = handler.mock.calls[0][0] as NextRequest & {
+        userId: string;
+        userEmail: string | null;
+      };
       expect(calledReq.userId).toBe('prisma-user-id-789');
       expect(calledReq.userEmail).toBeNull();
     });

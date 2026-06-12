@@ -119,12 +119,13 @@ describe('ResaleContentEditor', () => {
     fireEvent.click(screen.getByRole('button', { name: /Generate/i }));
 
     await waitFor(() => {
-      expect((screen.getByPlaceholderText(/Generated title appears here/i) as HTMLInputElement).value).toBe(
-        'Apple iPhone 14 256GB - Good Condition'
-      );
+      expect(
+        (screen.getByPlaceholderText(/Generated title appears here/i) as HTMLInputElement).value
+      ).toBe('Apple iPhone 14 256GB - Good Condition');
     });
     expect(
-      (screen.getByPlaceholderText(/Generated description appears here/i) as HTMLTextAreaElement).value
+      (screen.getByPlaceholderText(/Generated description appears here/i) as HTMLTextAreaElement)
+        .value
     ).toBe('Great phone, lightly used. Local pickup available.');
     // Source pill should appear.
     expect(screen.getByText(/Source: AI/i)).toBeInTheDocument();
@@ -148,7 +149,13 @@ describe('ResaleContentEditor', () => {
 
   it('shows the error detail when the API responds with success=false', async () => {
     mockFetchOnce(
-      { success: false, error: { detail: 'Resale content generation is only available once the opportunity has been purchased.' } },
+      {
+        success: false,
+        error: {
+          detail:
+            'Resale content generation is only available once the opportunity has been purchased.',
+        },
+      },
       false
     );
     render(<ResaleContentEditor listingId="lst-1" />);

@@ -154,7 +154,10 @@ describe('processSmartAlertNotificationEvents', () => {
   it('sends email for review.received when notifyReviewReceived is true', async () => {
     mockPrisma.notificationEvent.findMany.mockResolvedValueOnce([makeEvent()]);
     mockPrisma.userSettings.findUnique.mockResolvedValueOnce(makeUserSettings());
-    mockEmailService.sendReviewReceived.mockResolvedValueOnce({ success: true, messageId: 'msg-1' });
+    mockEmailService.sendReviewReceived.mockResolvedValueOnce({
+      success: true,
+      messageId: 'msg-1',
+    });
     mockPrisma.notificationEvent.update.mockResolvedValue({});
 
     const result = await processSmartAlertNotificationEvents();
@@ -269,7 +272,10 @@ describe('processSmartAlertNotificationEvents', () => {
   it('marks send failures as FAILED and increments retryCount', async () => {
     mockPrisma.notificationEvent.findMany.mockResolvedValueOnce([makeEvent()]);
     mockPrisma.userSettings.findUnique.mockResolvedValueOnce(makeUserSettings());
-    mockEmailService.sendReviewReceived.mockResolvedValueOnce({ success: false, error: '500 Internal' });
+    mockEmailService.sendReviewReceived.mockResolvedValueOnce({
+      success: false,
+      error: '500 Internal',
+    });
     mockPrisma.notificationEvent.update.mockResolvedValue({});
 
     const result = await processSmartAlertNotificationEvents();
@@ -303,14 +309,16 @@ describe('processSmartAlertNotificationEvents', () => {
 
   it('creates and sends cold flip alert when detection threshold exceeded', async () => {
     mockPrisma.notificationEvent.findMany.mockResolvedValueOnce([]); // Phase 1: no events
-    mockPrisma.user.findMany.mockResolvedValueOnce([
-      {
-        id: 'user-1',
-        email: 'user@example.com',
-        name: 'Alice',
-        settings: makeUserSettings(),
-      },
-    ]).mockResolvedValueOnce([]); // Second batch: empty
+    mockPrisma.user.findMany
+      .mockResolvedValueOnce([
+        {
+          id: 'user-1',
+          email: 'user@example.com',
+          name: 'Alice',
+          settings: makeUserSettings(),
+        },
+      ])
+      .mockResolvedValueOnce([]); // Second batch: empty
 
     mockDetectColdFlips.mockResolvedValueOnce([
       {
@@ -337,14 +345,16 @@ describe('processSmartAlertNotificationEvents', () => {
 
   it('creates and sends hot flip alert when detection threshold exceeded', async () => {
     mockPrisma.notificationEvent.findMany.mockResolvedValueOnce([]); // Phase 1: no events
-    mockPrisma.user.findMany.mockResolvedValueOnce([
-      {
-        id: 'user-1',
-        email: 'user@example.com',
-        name: 'Bob',
-        settings: makeUserSettings(),
-      },
-    ]).mockResolvedValueOnce([]);
+    mockPrisma.user.findMany
+      .mockResolvedValueOnce([
+        {
+          id: 'user-1',
+          email: 'user@example.com',
+          name: 'Bob',
+          settings: makeUserSettings(),
+        },
+      ])
+      .mockResolvedValueOnce([]);
 
     mockDetectColdFlips.mockResolvedValueOnce([]);
     mockDetectHotFlips.mockResolvedValueOnce([
@@ -369,14 +379,16 @@ describe('processSmartAlertNotificationEvents', () => {
 
   it('deduplicates cold/hot events (P2002 on create → skip)', async () => {
     mockPrisma.notificationEvent.findMany.mockResolvedValueOnce([]);
-    mockPrisma.user.findMany.mockResolvedValueOnce([
-      {
-        id: 'user-1',
-        email: 'user@example.com',
-        name: 'Alice',
-        settings: makeUserSettings(),
-      },
-    ]).mockResolvedValueOnce([]);
+    mockPrisma.user.findMany
+      .mockResolvedValueOnce([
+        {
+          id: 'user-1',
+          email: 'user@example.com',
+          name: 'Alice',
+          settings: makeUserSettings(),
+        },
+      ])
+      .mockResolvedValueOnce([]);
 
     mockDetectColdFlips.mockResolvedValueOnce([
       {
@@ -403,14 +415,16 @@ describe('processSmartAlertNotificationEvents', () => {
 
   it('caps alerts at MAX_SMART_ALERTS_PER_USER_PER_CYCLE (10)', async () => {
     mockPrisma.notificationEvent.findMany.mockResolvedValueOnce([]);
-    mockPrisma.user.findMany.mockResolvedValueOnce([
-      {
-        id: 'user-1',
-        email: 'user@example.com',
-        name: 'Alice',
-        settings: makeUserSettings(),
-      },
-    ]).mockResolvedValueOnce([]);
+    mockPrisma.user.findMany
+      .mockResolvedValueOnce([
+        {
+          id: 'user-1',
+          email: 'user@example.com',
+          name: 'Alice',
+          settings: makeUserSettings(),
+        },
+      ])
+      .mockResolvedValueOnce([]);
 
     // Return 15 hot flips — should be capped at 10
     const hotFlips = Array.from({ length: 15 }, (_, i) => ({
@@ -539,14 +553,16 @@ describe('processSmartAlertNotificationEvents', () => {
 
   it('Phase 2: handles non-P2002 create error as alert failure', async () => {
     mockPrisma.notificationEvent.findMany.mockResolvedValueOnce([]);
-    mockPrisma.user.findMany.mockResolvedValueOnce([
-      {
-        id: 'user-1',
-        email: 'user@example.com',
-        name: 'Alice',
-        settings: makeUserSettings(),
-      },
-    ]).mockResolvedValueOnce([]);
+    mockPrisma.user.findMany
+      .mockResolvedValueOnce([
+        {
+          id: 'user-1',
+          email: 'user@example.com',
+          name: 'Alice',
+          settings: makeUserSettings(),
+        },
+      ])
+      .mockResolvedValueOnce([]);
 
     mockDetectColdFlips.mockResolvedValueOnce([
       {
@@ -571,14 +587,16 @@ describe('processSmartAlertNotificationEvents', () => {
 
   it('Phase 2: handles hot flip send failure', async () => {
     mockPrisma.notificationEvent.findMany.mockResolvedValueOnce([]);
-    mockPrisma.user.findMany.mockResolvedValueOnce([
-      {
-        id: 'user-1',
-        email: 'user@example.com',
-        name: 'Bob',
-        settings: makeUserSettings(),
-      },
-    ]).mockResolvedValueOnce([]);
+    mockPrisma.user.findMany
+      .mockResolvedValueOnce([
+        {
+          id: 'user-1',
+          email: 'user@example.com',
+          name: 'Bob',
+          settings: makeUserSettings(),
+        },
+      ])
+      .mockResolvedValueOnce([]);
 
     mockDetectColdFlips.mockResolvedValueOnce([]);
     mockDetectHotFlips.mockResolvedValueOnce([
@@ -591,7 +609,10 @@ describe('processSmartAlertNotificationEvents', () => {
       },
     ]);
     mockPrisma.notificationEvent.create.mockResolvedValueOnce({ id: 'ev-hot-1' });
-    mockEmailService.sendFlipTurnedHot.mockResolvedValueOnce({ success: false, error: 'Provider error' });
+    mockEmailService.sendFlipTurnedHot.mockResolvedValueOnce({
+      success: false,
+      error: 'Provider error',
+    });
     mockPrisma.notificationEvent.findFirst.mockResolvedValueOnce({ id: 'ev-hot-1' });
     mockPrisma.notificationEvent.update.mockResolvedValue({});
 
@@ -611,14 +632,16 @@ describe('processSmartAlertNotificationEvents', () => {
 
   it('Phase 2: skips cold detection when toggle is false, runs hot detection', async () => {
     mockPrisma.notificationEvent.findMany.mockResolvedValueOnce([]);
-    mockPrisma.user.findMany.mockResolvedValueOnce([
-      {
-        id: 'user-1',
-        email: 'user@example.com',
-        name: null,
-        settings: makeUserSettings({ notifyFlipGoneCold: false }),
-      },
-    ]).mockResolvedValueOnce([]);
+    mockPrisma.user.findMany
+      .mockResolvedValueOnce([
+        {
+          id: 'user-1',
+          email: 'user@example.com',
+          name: null,
+          settings: makeUserSettings({ notifyFlipGoneCold: false }),
+        },
+      ])
+      .mockResolvedValueOnce([]);
 
     mockDetectHotFlips.mockResolvedValueOnce([]);
 
@@ -753,7 +776,10 @@ describe('processSmartAlertNotificationEvents', () => {
     // Create succeeds
     mockPrisma.notificationEvent.create.mockResolvedValueOnce({ id: 'ev-cold-1' });
     // Send fails
-    mockEmailService.sendFlipGoneCold.mockResolvedValueOnce({ success: false, error: 'Email provider error' });
+    mockEmailService.sendFlipGoneCold.mockResolvedValueOnce({
+      success: false,
+      error: 'Email provider error',
+    });
     // findFirst returns null → ev === null → markEventFailed NOT called but result.failed++ still fires
     mockPrisma.notificationEvent.findFirst.mockResolvedValueOnce(null);
 
@@ -795,9 +821,10 @@ describe('processSmartAlertNotificationEvents', () => {
     //   Call 1 (line 258): retryWindowThreshold in the main function body
     //   Call 2 (line 482): phase2Start = Date.now()   ← set to 0
     //   Call 3 (line 489): timeout check               ← must be > TIMEOUT from phase2Start
-    const nowSpy = jest.spyOn(Date, 'now')
-      .mockReturnValueOnce(1000)     // call 1: retryWindowThreshold (any real-ish timestamp is fine)
-      .mockReturnValueOnce(0)        // call 2: phase2Start = 0
+    const nowSpy = jest
+      .spyOn(Date, 'now')
+      .mockReturnValueOnce(1000) // call 1: retryWindowThreshold (any real-ish timestamp is fine)
+      .mockReturnValueOnce(0) // call 2: phase2Start = 0
       .mockReturnValue(TIMEOUT + 1); // call 3+: TIMEOUT+1 − 0 > TIMEOUT → break before user.findMany
 
     try {
@@ -820,7 +847,10 @@ describe('processSmartAlertNotificationEvents', () => {
     const event = makeEvent({ eventType: 'review.received' });
     mockPrisma.notificationEvent.findMany.mockResolvedValueOnce([event]);
     mockPrisma.userSettings.findUnique.mockResolvedValueOnce(makeUserSettings());
-    mockEmailService.sendReviewReceived.mockResolvedValueOnce({ success: true, messageId: 'review-msg' });
+    mockEmailService.sendReviewReceived.mockResolvedValueOnce({
+      success: true,
+      messageId: 'review-msg',
+    });
     mockPrisma.notificationEvent.update.mockResolvedValueOnce({});
 
     await processSmartAlertNotificationEvents();
@@ -1081,7 +1111,10 @@ describe('processSmartAlertNotificationEvents', () => {
     ]);
 
     mockPrisma.notificationEvent.create.mockResolvedValueOnce({ id: 'ev-hot-1' });
-    mockEmailService.sendFlipTurnedHot.mockResolvedValueOnce({ success: false, error: 'Provider down' });
+    mockEmailService.sendFlipTurnedHot.mockResolvedValueOnce({
+      success: false,
+      error: 'Provider down',
+    });
     mockPrisma.notificationEvent.findFirst.mockResolvedValueOnce(null); // ev === null
 
     const result = await processSmartAlertNotificationEvents();

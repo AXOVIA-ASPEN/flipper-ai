@@ -30,9 +30,11 @@ import { logger } from '@/lib/logger';
 // Request body schema (minimal — body is optional for Cloud Scheduler triggers)
 // ---------------------------------------------------------------------------
 
-const RequestSchema = z.object({
-  dryRun: z.boolean().optional(),
-}).strict();
+const RequestSchema = z
+  .object({
+    dryRun: z.boolean().optional(),
+  })
+  .strict();
 
 // ---------------------------------------------------------------------------
 // Auth helpers
@@ -114,7 +116,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       _body = RequestSchema.parse(parsed);
     } catch (parseErr) {
       if (parseErr instanceof z.ZodError) {
-        return handleError(new ValidationError('Invalid request body', { issues: parseErr.issues }));
+        return handleError(
+          new ValidationError('Invalid request body', { issues: parseErr.issues })
+        );
       }
       return handleError(new ValidationError('Invalid JSON in request body'));
     }

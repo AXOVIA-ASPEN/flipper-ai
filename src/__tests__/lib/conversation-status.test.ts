@@ -64,9 +64,7 @@ describe('conversation-status', () => {
 
     it('throws NotFoundError when listing not found', async () => {
       mockListingFindFirst.mockResolvedValue(null);
-      await expect(getConversationStatus('bad-id', 'user-1')).rejects.toThrow(
-        'Listing not found'
-      );
+      await expect(getConversationStatus('bad-id', 'user-1')).rejects.toThrow('Listing not found');
     });
 
     it('scopes query to userId for ownership', async () => {
@@ -130,30 +128,30 @@ describe('conversation-status', () => {
 
     it('rejects responded → pending', async () => {
       mockListingFindFirst.mockResolvedValue({ conversationStatus: 'responded' });
-      await expect(
-        updateConversationStatus('listing-1', 'user-1', 'pending')
-      ).rejects.toThrow('Invalid conversation status transition: responded → pending');
+      await expect(updateConversationStatus('listing-1', 'user-1', 'pending')).rejects.toThrow(
+        'Invalid conversation status transition: responded → pending'
+      );
     });
 
     it('rejects purchased → pending', async () => {
       mockListingFindFirst.mockResolvedValue({ conversationStatus: 'purchased' });
-      await expect(
-        updateConversationStatus('listing-1', 'user-1', 'pending')
-      ).rejects.toThrow('Invalid conversation status transition: purchased → pending');
+      await expect(updateConversationStatus('listing-1', 'user-1', 'pending')).rejects.toThrow(
+        'Invalid conversation status transition: purchased → pending'
+      );
     });
 
     it('rejects purchased → responded', async () => {
       mockListingFindFirst.mockResolvedValue({ conversationStatus: 'purchased' });
-      await expect(
-        updateConversationStatus('listing-1', 'user-1', 'responded')
-      ).rejects.toThrow('Invalid conversation status transition: purchased → responded');
+      await expect(updateConversationStatus('listing-1', 'user-1', 'responded')).rejects.toThrow(
+        'Invalid conversation status transition: purchased → responded'
+      );
     });
 
     it('rejects null → responded (must go through pending first)', async () => {
       mockListingFindFirst.mockResolvedValue({ conversationStatus: null });
-      await expect(
-        updateConversationStatus('listing-1', 'user-1', 'responded')
-      ).rejects.toThrow('Invalid conversation status transition: null → responded');
+      await expect(updateConversationStatus('listing-1', 'user-1', 'responded')).rejects.toThrow(
+        'Invalid conversation status transition: null → responded'
+      );
     });
 
     it('transitions null → purchased (direct purchase without prior messaging)', async () => {
@@ -169,9 +167,9 @@ describe('conversation-status', () => {
 
     it('throws NotFoundError when listing not found', async () => {
       mockListingFindFirst.mockResolvedValue(null);
-      await expect(
-        updateConversationStatus('bad-id', 'user-1', 'pending')
-      ).rejects.toThrow('Listing not found');
+      await expect(updateConversationStatus('bad-id', 'user-1', 'pending')).rejects.toThrow(
+        'Listing not found'
+      );
     });
 
     it('rejects unrecognized current status (defensive fallback for unexpected DB data)', async () => {
@@ -179,9 +177,9 @@ describe('conversation-status', () => {
       // is not in VALID_TRANSITIONS (e.g., stale/corrupt DB data), allowed is
       // undefined (falsy) → returns false → transition is invalid.
       mockListingFindFirst.mockResolvedValue({ conversationStatus: 'unknown_state' });
-      await expect(
-        updateConversationStatus('listing-1', 'user-1', 'pending')
-      ).rejects.toThrow('Invalid conversation status transition: unknown_state → pending');
+      await expect(updateConversationStatus('listing-1', 'user-1', 'pending')).rejects.toThrow(
+        'Invalid conversation status transition: unknown_state → pending'
+      );
     });
   });
 

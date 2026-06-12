@@ -38,6 +38,8 @@ export async function dispatchMessage(messageId: string): Promise<DispatchResult
 
   // STUB — Replace with real platform dispatch (Craigslist email relay, eBay API, etc.)
   // WARNING: Fire-and-forget is stub-only. Real dispatch needs a durable job queue with retry and FAILED_DISPATCH status.
-  console.log(`[message-dispatcher] STUB: Would dispatch ${messageId} to ${message.platform} for ${message.sellerName}`);
+  console.log(
+    `[message-dispatcher] STUB: Would dispatch ${messageId} to ${message.platform} for ${message.sellerName}`
+  );
   return { success: true, stub: true };
 }

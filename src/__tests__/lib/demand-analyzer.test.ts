@@ -50,10 +50,7 @@ describe('analyzeDemandTrend()', () => {
 
   describe('null soldDate handling', () => {
     it('treats null soldDate as within last 30 days', () => {
-      const listings = [
-        makeSoldListing(null),
-        makeSoldListing(null),
-      ];
+      const listings = [makeSoldListing(null), makeSoldListing(null)];
       const result = analyzeDemandTrend(listings);
       expect(result.soldVolume30Days).toBe(2);
       expect(result.soldVolume60Days).toBe(2);
@@ -65,11 +62,11 @@ describe('analyzeDemandTrend()', () => {
   describe('cumulative volume buckets', () => {
     it('counts items in correct time windows', () => {
       const listings = [
-        makeSoldListing(daysAgo(5)),   // within 30d
-        makeSoldListing(daysAgo(15)),  // within 30d
-        makeSoldListing(daysAgo(40)),  // within 60d (not 30d)
-        makeSoldListing(daysAgo(75)),  // within 90d (not 60d)
-        makeSoldListing(daysAgo(95)),  // outside 90d — excluded
+        makeSoldListing(daysAgo(5)), // within 30d
+        makeSoldListing(daysAgo(15)), // within 30d
+        makeSoldListing(daysAgo(40)), // within 60d (not 30d)
+        makeSoldListing(daysAgo(75)), // within 90d (not 60d)
+        makeSoldListing(daysAgo(95)), // outside 90d — excluded
       ];
       const result = analyzeDemandTrend(listings);
       expect(result.soldVolume30Days).toBe(2);

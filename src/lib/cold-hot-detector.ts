@@ -70,7 +70,10 @@ export interface HotFlipResult {
  * @param userId   - The user whose listings to check
  * @param coldHours - Threshold in hours before a flip is considered cold
  */
-export async function detectColdFlips(userId: string, coldHours: number): Promise<ColdFlipResult[]> {
+export async function detectColdFlips(
+  userId: string,
+  coldHours: number
+): Promise<ColdFlipResult[]> {
   try {
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const coldThreshold = new Date(Date.now() - coldHours * 60 * 60 * 1000);
@@ -162,7 +165,9 @@ export async function detectHotFlips(userId: string, hotCount: number): Promise<
         userId,
         status: { in: [...ACTIVE_FLIP_STATUSES] },
         // 30-day recency filter — excludes stale listings with old unread messages
-        messages: { some: { direction: 'INBOUND', readAt: null, createdAt: { gte: thirtyDaysAgo } } },
+        messages: {
+          some: { direction: 'INBOUND', readAt: null, createdAt: { gte: thirtyDaysAgo } },
+        },
       },
       select: {
         id: true,

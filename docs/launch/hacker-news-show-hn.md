@@ -2,7 +2,7 @@
 
 **Submission URL:** https://news.ycombinator.com/submit
 **Best time:** Wednesday or Thursday, 6-9 AM PT (after PH but before EU users sleep)
-**Audience:** Engineers and founders. They care about *how it's built*, not how much money you'll make.
+**Audience:** Engineers and founders. They care about _how it's built_, not how much money you'll make.
 **Goal:** Front page = ~10k visitors and ~$30-50k in attention. Top-30 of the day = a few thousand visitors.
 
 ---
@@ -18,7 +18,7 @@
 
 ## URL
 
-`https://<your-domain>/`  *(use the bare domain, not a tracking link — HN strips UTM)*
+`https://<your-domain>/` _(use the bare domain, not a tracking link — HN strips UTM)_
 
 ## Text (optional but recommended for Show HN)
 
@@ -66,7 +66,7 @@ HN comments tend to fall into a few buckets. Pre-write your responses so you can
 
 ### "Why not just use [LLM] for everything?"
 
-> Tried that. Two problems: (1) cost scales linearly with use, (2) when one provider has an outage, *all* of your users see errors at once. With the abstraction, an OpenAI outage just means everything routes through Gemini for a few hours.
+> Tried that. Two problems: (1) cost scales linearly with use, (2) when one provider has an outage, _all_ of your users see errors at once. With the abstraction, an OpenAI outage just means everything routes through Gemini for a few hours.
 
 ### "Open source it?"
 
@@ -88,5 +88,5 @@ HN comments tend to fall into a few buckets. Pre-write your responses so you can
 - **No marketing language** in the post text. "Game-changing", "powerful", "revolutionary" are all instant downvotes.
 - **Engineering specifics earn upvotes.** Code samples, architectural choices, gotchas — all gold on HN.
 - **Reply with substance.** "Great point!" without follow-up is worse than not replying.
-- **Don't be defensive.** If someone says your scoring is circular, *agree if they're right*, then explain what you do instead. HN respects intellectual honesty more than persuasion.
+- **Don't be defensive.** If someone says your scoring is circular, _agree if they're right_, then explain what you do instead. HN respects intellectual honesty more than persuasion.
 - **Don't sock-puppet votes.** HN actively detects and shadow-bans this.

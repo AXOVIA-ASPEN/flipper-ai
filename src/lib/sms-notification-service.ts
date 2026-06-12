@@ -63,7 +63,10 @@ interface SmsContext {
   smsNotifyListingUnavailable: boolean;
 }
 
-type SmsPerEventField = keyof Omit<SmsContext, 'phoneNumber' | 'phoneVerified' | 'smsNotifications'>;
+type SmsPerEventField = keyof Omit<
+  SmsContext,
+  'phoneNumber' | 'phoneVerified' | 'smsNotifications'
+>;
 
 export interface NewDealParams {
   userId: string;

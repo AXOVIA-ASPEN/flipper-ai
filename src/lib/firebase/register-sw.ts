@@ -17,10 +17,9 @@ export async function registerFCMServiceWorker(): Promise<ServiceWorkerRegistrat
   if (!('serviceWorker' in navigator)) return null;
 
   try {
-    const registration = await navigator.serviceWorker.register(
-      '/firebase-messaging-sw.js',
-      { scope: '/' }
-    );
+    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+      scope: '/',
+    });
     console.log('FCM service worker registered:', registration.scope);
     return registration;
   } catch (error) {

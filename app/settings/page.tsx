@@ -30,8 +30,20 @@ export default function SettingsPage() {
         <Suspense>
           <CheckoutResultBanner />
         </Suspense>
-        <h1 style={{ fontSize: 28, fontWeight: 800, color: '#e2e8f0', letterSpacing: '-0.02em', marginBottom: 4 }}>Settings</h1>
-        <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 32 }}>Configure your Flipper.ai experience</p>
+        <h1
+          style={{
+            fontSize: 28,
+            fontWeight: 800,
+            color: '#e2e8f0',
+            letterSpacing: '-0.02em',
+            marginBottom: 4,
+          }}
+        >
+          Settings
+        </h1>
+        <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 32 }}>
+          Configure your Flipper.ai experience
+        </p>
 
         <div className="fp-glass" style={{ padding: 24, marginBottom: 16 }}>
           <BillingSettings />

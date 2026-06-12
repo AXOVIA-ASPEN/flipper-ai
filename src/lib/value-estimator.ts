@@ -83,7 +83,9 @@ const VALUE_KEYWORDS: ValueKeyword[] = [
     boost: 1.25, // Raised from 1.2 — Apple holds 70-90% of retail
     label: 'Apple product',
     tag: 'apple',
-    negativePatterns: [/apple compatible|case for iphone|charger for|apple cider|apple pie|apple tree|apple sauce/i],
+    negativePatterns: [
+      /apple compatible|case for iphone|charger for|apple cider|apple pie|apple tree|apple sauce/i,
+    ],
   },
   {
     pattern: /samsung|galaxy/i,
@@ -104,7 +106,9 @@ const VALUE_KEYWORDS: ValueKeyword[] = [
     boost: 1.3, // Raised from 1.25 — Switch games barely depreciate
     label: 'Nintendo',
     tag: 'nintendo',
-    negativePatterns: [/compatible with|case for|controller for|charger for|screen protector|light switch|network switch|switch plate/i],
+    negativePatterns: [
+      /compatible with|case for|controller for|charger for|screen protector|light switch|network switch|switch plate/i,
+    ],
   },
   { pattern: /xbox|microsoft/i, boost: 1.2, label: 'Xbox/Microsoft', tag: 'xbox' }, // Raised from 1.15
   { pattern: /dyson/i, boost: 1.3, label: 'Dyson', tag: 'dyson' },
@@ -135,7 +139,8 @@ const VALUE_KEYWORDS: ValueKeyword[] = [
     tag: 'premium-guitar',
   },
   {
-    pattern: /\bmarshall\b|mesa.?boogie|\bvox\s+(ac\d+|amp|guitar|tone)\b|\borange\s*(amp|amplifier)\b/i,
+    pattern:
+      /\bmarshall\b|mesa.?boogie|\bvox\s+(ac\d+|amp|guitar|tone)\b|\borange\s*(amp|amplifier)\b/i,
     boost: 1.25,
     label: 'Premium amp brand',
     tag: 'premium-amp',
@@ -233,7 +238,9 @@ const VALUE_KEYWORDS: ValueKeyword[] = [
     boost: 1.3, // Reduced from 1.4 — avoid runaway stacking with collectibles category
     label: 'Vintage/collectible',
     tag: 'vintage',
-    negativePatterns: [/vintage-style|vintage-inspired|vintage look|retro style|retro-fit|retro-inspired/i],
+    negativePatterns: [
+      /vintage-style|vintage-inspired|vintage look|retro style|retro-fit|retro-inspired/i,
+    ],
   },
   {
     pattern: /sealed|new in box|nib|bnib/i,
@@ -417,9 +424,8 @@ export function estimateValue(
   const discountPercent = Math.round(((estimatedValue - askingPrice) / estimatedValue) * 100);
 
   // Calculate profit potential (accounting for platform fees; default 13%)
-  const effectiveFeeRate = (feeRate !== undefined && isFinite(feeRate) && feeRate >= 0 && feeRate <= 1)
-    ? feeRate
-    : 0.13;
+  const effectiveFeeRate =
+    feeRate !== undefined && isFinite(feeRate) && feeRate >= 0 && feeRate <= 1 ? feeRate : 0.13;
   const profitLow = Math.round(estimatedLow * (1 - effectiveFeeRate) - askingPrice);
   const profitHigh = Math.round(estimatedHigh * (1 - effectiveFeeRate) - askingPrice);
   const profitPotential = Math.round((profitLow + profitHigh) / 2);
@@ -433,9 +439,10 @@ export function estimateValue(
   //   + cumulative boosts: >$100 → +10, >$200 → +10
   const profitMargin = profitPotential / askingPrice;
   const marginScore = Math.min(100, Math.max(0, Math.round(profitMargin * 100 + 50)));
-  const absoluteProfitScore = Math.min(100, Math.round(
-    Math.log10(Math.max(1, profitPotential)) * 36
-  ));
+  const absoluteProfitScore = Math.min(
+    100,
+    Math.round(Math.log10(Math.max(1, profitPotential)) * 36)
+  );
   let valueScore = Math.round(marginScore * 0.5 + absoluteProfitScore * 0.5);
   valueScore = Math.min(100, Math.max(0, valueScore));
 
@@ -591,8 +598,11 @@ export function detectCategory(title: string, description: string | null): strin
   // promotes the listing to "collectibles" even when a category-specific
   // noun (e.g. "dresser", "lamp") would otherwise match furniture/etc.
   // Real antique furniture is sold as collectibles, not generic furniture.
-  if (/\b(antique|collectible|memorabilia|figurine)\b/i.test(fullText) ||
-      (/\bvintage\b/i.test(fullText) && /\b(19\d{0,2}0s?|antique|rare|limited|signed|autograph)\b/i.test(fullText))) {
+  if (
+    /\b(antique|collectible|memorabilia|figurine)\b/i.test(fullText) ||
+    (/\bvintage\b/i.test(fullText) &&
+      /\b(19\d{0,2}0s?|antique|rare|limited|signed|autograph)\b/i.test(fullText))
+  ) {
     return 'collectibles';
   }
 
@@ -600,21 +610,48 @@ export function detectCategory(title: string, description: string | null): strin
   // (was ~36% of items landing in default — now catches phones by brand, watches, chromebooks, etc.)
   const categoryPatterns: [string, RegExp][] = [
     // Musical first - DJ equipment and instruments (before video games due to "controller")
-    ['musical', /guitar|piano|keyboard|drum|amplifier|instrument|\bdj\b|ddj|pioneer\s*ddj|saxophone|trumpet|violin|cello|\bbass\b|synth|synthesizer|\bmoog\b|\broland\b|\bkorg\b|\bakai\b|\bfender\b|\bgibson\b|\bmartin\b(?!\s+luther)|\bmarshall\b|mesa.?boogie|effects pedal|microphone|\bmic\b|\btaylor\b(?!\s+(swift|made))|\bovation\b|\bsquier\b|\bepiphone\b|\bibanez\b|\bprs\b|\bdbx\b|\bdrawmer\b|cajon|\bconga\b|pedals?\b/],
+    [
+      'musical',
+      /guitar|piano|keyboard|drum|amplifier|instrument|\bdj\b|ddj|pioneer\s*ddj|saxophone|trumpet|violin|cello|\bbass\b|synth|synthesizer|\bmoog\b|\broland\b|\bkorg\b|\bakai\b|\bfender\b|\bgibson\b|\bmartin\b(?!\s+luther)|\bmarshall\b|mesa.?boogie|effects pedal|microphone|\bmic\b|\btaylor\b(?!\s+(swift|made))|\bovation\b|\bsquier\b|\bepiphone\b|\bibanez\b|\bprs\b|\bdbx\b|\bdrawmer\b|cajon|\bconga\b|pedals?\b/,
+    ],
     // Video games next - consoles and gaming (before electronics due to "console", "controller")
-    ['video games', /playstation|xbox|nintendo|\bgame\b|ps5|ps4|ps3|switch\b|\bwii\b|gamecube|atari|sega|retro console|arcade|joy-?con/],
+    [
+      'video games',
+      /playstation|xbox|nintendo|\bgame\b|ps5|ps4|ps3|switch\b|\bwii\b|gamecube|atari|sega|retro console|arcade|joy-?con/,
+    ],
     // Electronics - general tech items (expanded with brands + product types)
     [
       'electronics',
       /phone|iphone|ipad|airpods|galaxy|pixel\b|oneplus|laptop|computer|chromebook|thinkpad|macbook|tablet|\btv\b|monitor|camera|dslr|speaker|headphone|earbud|sound ?bar|\bwatch\b|smartwatch|apple watch|tv mount|projector|printer|\bram\b|\bssd\b|hard drive|router|modem|wifi|keyboard\s+(mechanical|gaming|wireless)|mouse\s+(wireless|gaming)|beats|bose|sonos|jbl|canon|nikon|sony\b|\brtx\b|\bgtx\b|geforce|radeon|\bimac\b|nighthawk|ubiquiti|unifi/,
     ],
-    ['furniture', /couch|sofa|table|chair|desk|\bbed\b|dresser|cabinet|shelf|bookcase|nightstand|ottoman|stool|bench\b|wardrobe|armoire|aeron|herman miller|steelcase|restoration hardware|pottery barn|west elm|mid.?century|chippendale|eames|\bkartell\b|room\s*&?\s*board/],
-    ['appliances', /washer|dryer|refrigerator|fridge|dishwasher|microwave|oven|vacuum|blender|mixer|kitchenaid|vitamix|dyson|toaster|coffee ?maker|espresso|juicer|freezer|range\b|cooktop|stove|hood\b/],
-    ['tools', /drill|saw\b|wrench|hammer|power tool|dewalt|milwaukee|makita|snap.?on|ridgid|\brigid\b|craftsman|bosch|\bryobi\b|impact driver|miter|compressor|table saw|band saw|shop vac|tool set|tool box|greenlee|\bklein\b|chainsaw|generator|welder|grinder/],
-    ['collectibles', /vintage|antique|collectible|rare|limited|comic|\bcard\b|coin|stamp\b|\btoy\b|figurine|statue|memorabilia|signed\b|autograph|baseball\s+card/],
-    ['clothing', /shirt|pants|dress\b|shoes|jacket|coat\b|clothing|fashion|hoodie|sweater|boots?\b|sneakers|\bnike\b|adidas|north face|patagonia|\blevi\b/],
-    ['sports', /\bbike\b|bicycle|golf|tennis|fitness|\bgym\b|weights|treadmill|peloton|rowing|elliptical|kayak|\bski\b|snowboard|surfboard|helmet|football|basketball|soccer|baseball\s+(bat|glove)|\bping\b\s*(zing|anser|g\d|i\d)|cobra\s*king|taylormade|callaway|titleist|\bbow\b\s*(hunting|compound|archery)/],
-    ['automotive', /\bcar\b|truck|motorcycle|auto ?parts|\btire\b|wheel\b|engine\b|brake\b|exhaust|muffler|battery charger|floor jack/],
+    [
+      'furniture',
+      /couch|sofa|table|chair|desk|\bbed\b|dresser|cabinet|shelf|bookcase|nightstand|ottoman|stool|bench\b|wardrobe|armoire|aeron|herman miller|steelcase|restoration hardware|pottery barn|west elm|mid.?century|chippendale|eames|\bkartell\b|room\s*&?\s*board/,
+    ],
+    [
+      'appliances',
+      /washer|dryer|refrigerator|fridge|dishwasher|microwave|oven|vacuum|blender|mixer|kitchenaid|vitamix|dyson|toaster|coffee ?maker|espresso|juicer|freezer|range\b|cooktop|stove|hood\b/,
+    ],
+    [
+      'tools',
+      /drill|saw\b|wrench|hammer|power tool|dewalt|milwaukee|makita|snap.?on|ridgid|\brigid\b|craftsman|bosch|\bryobi\b|impact driver|miter|compressor|table saw|band saw|shop vac|tool set|tool box|greenlee|\bklein\b|chainsaw|generator|welder|grinder/,
+    ],
+    [
+      'collectibles',
+      /vintage|antique|collectible|rare|limited|comic|\bcard\b|coin|stamp\b|\btoy\b|figurine|statue|memorabilia|signed\b|autograph|baseball\s+card/,
+    ],
+    [
+      'clothing',
+      /shirt|pants|dress\b|shoes|jacket|coat\b|clothing|fashion|hoodie|sweater|boots?\b|sneakers|\bnike\b|adidas|north face|patagonia|\blevi\b/,
+    ],
+    [
+      'sports',
+      /\bbike\b|bicycle|golf|tennis|fitness|\bgym\b|weights|treadmill|peloton|rowing|elliptical|kayak|\bski\b|snowboard|surfboard|helmet|football|basketball|soccer|baseball\s+(bat|glove)|\bping\b\s*(zing|anser|g\d|i\d)|cobra\s*king|taylormade|callaway|titleist|\bbow\b\s*(hunting|compound|archery)/,
+    ],
+    [
+      'automotive',
+      /\bcar\b|truck|motorcycle|auto ?parts|\btire\b|wheel\b|engine\b|brake\b|exhaust|muffler|battery charger|floor jack/,
+    ],
   ];
 
   for (const [category, pattern] of categoryPatterns) {
@@ -635,7 +672,7 @@ const DEMAND_ANALYZER_MULTIPLIERS: Record<string, number> = {
   rising: 1.15,
   stable: 1.0,
   declining: 0.85,
-  low_liquidity: 0.70,
+  low_liquidity: 0.7,
 };
 
 /** LLM demandLevel output (fallback when demand analyzer unavailable) */

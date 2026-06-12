@@ -25,26 +25,23 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost:3200';
 
 // ==================== S-29: Liveness probe ====================
 
-When(
-  'Cloud Run sends a request to {string}',
-  async function (this: CustomWorld, endpoint: string) {
-    const res = await fetch(`${BASE_URL}${endpoint}`);
-    this.testData.endpointStatus = res.status;
+When('Cloud Run sends a request to {string}', async function (this: CustomWorld, endpoint: string) {
+  const res = await fetch(`${BASE_URL}${endpoint}`);
+  this.testData.endpointStatus = res.status;
 
-    const contentType = res.headers.get('content-type') || '';
-    if (contentType.includes('application/json')) {
-      this.testData.endpointResponse = (await res.json()) as Record<string, unknown>;
-    } else {
-      // Fallback: verify route file exists on disk
-      const routePath = `app${endpoint}/route.ts`;
-      const routeExists = fs.existsSync(path.join(PROJECT_ROOT, routePath));
-      expect(routeExists).toBe(true);
-      this.testData.endpointResponse = { status: 'ok', _localFallback: true };
-      this.testData.endpointStatus = 200;
-    }
-    console.log(`✅ Request to ${endpoint} returned HTTP ${this.testData.endpointStatus}`);
+  const contentType = res.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) {
+    this.testData.endpointResponse = (await res.json()) as Record<string, unknown>;
+  } else {
+    // Fallback: verify route file exists on disk
+    const routePath = `app${endpoint}/route.ts`;
+    const routeExists = fs.existsSync(path.join(PROJECT_ROOT, routePath));
+    expect(routeExists).toBe(true);
+    this.testData.endpointResponse = { status: 'ok', _localFallback: true };
+    this.testData.endpointStatus = 200;
   }
-);
+  console.log(`✅ Request to ${endpoint} returned HTTP ${this.testData.endpointStatus}`);
+});
 
 Then('a 200 response is returned', async function (this: CustomWorld) {
   expect(this.testData.endpointStatus).toBe(200);
@@ -89,7 +86,9 @@ Given('the database connection is unavailable', async function (this: CustomWorl
   expect(routeContent).toContain('not_ready');
   expect(routeContent).toContain('catch');
   expect(routeContent).toContain("status: 'error'");
-  console.log('✅ Database unavailability path verified in route handler code (code-inspection; unit tests cover actual 503)');
+  console.log(
+    '✅ Database unavailability path verified in route handler code (code-inspection; unit tests cover actual 503)'
+  );
 });
 
 Then(
@@ -137,24 +136,21 @@ Then(
 
 // ==================== S-32: Metrics endpoint ====================
 
-When(
-  'a request is made to {string}',
-  async function (this: CustomWorld, endpoint: string) {
-    const res = await fetch(`${BASE_URL}${endpoint}`);
-    this.testData.endpointStatus = res.status;
+When('a request is made to {string}', async function (this: CustomWorld, endpoint: string) {
+  const res = await fetch(`${BASE_URL}${endpoint}`);
+  this.testData.endpointStatus = res.status;
 
-    const contentType = res.headers.get('content-type') || '';
-    if (contentType.includes('application/json')) {
-      this.testData.endpointResponse = (await res.json()) as Record<string, unknown>;
-    } else {
-      // Verify via file inspection
-      const routeContent = readProjectFile(`app${endpoint}/route.ts`);
-      this.testData.endpointResponse = { _fileVerified: true, _routeContent: routeContent };
-      this.testData.endpointStatus = 200;
-    }
-    console.log(`✅ Request to ${endpoint} returned HTTP ${this.testData.endpointStatus}`);
+  const contentType = res.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) {
+    this.testData.endpointResponse = (await res.json()) as Record<string, unknown>;
+  } else {
+    // Verify via file inspection
+    const routeContent = readProjectFile(`app${endpoint}/route.ts`);
+    this.testData.endpointResponse = { _fileVerified: true, _routeContent: routeContent };
+    this.testData.endpointStatus = 200;
   }
-);
+  console.log(`✅ Request to ${endpoint} returned HTTP ${this.testData.endpointStatus}`);
+});
 
 Then(
   'the response includes {string} with totalRequests, avgResponseTimeMs, and errorRate',
@@ -240,14 +236,11 @@ Given(
   }
 );
 
-When(
-  'the readiness and liveness probes are reviewed',
-  async function (this: CustomWorld) {
-    expect(serviceYamlContent).toContain('livenessProbe');
-    expect(serviceYamlContent).toContain('startupProbe');
-    console.log('✅ Reviewing Cloud Run probe configuration...');
-  }
-);
+When('the readiness and liveness probes are reviewed', async function (this: CustomWorld) {
+  expect(serviceYamlContent).toContain('livenessProbe');
+  expect(serviceYamlContent).toContain('startupProbe');
+  console.log('✅ Reviewing Cloud Run probe configuration...');
+});
 
 Then(
   'the liveness probe points to {string} with {int}-second interval',
@@ -266,7 +259,9 @@ Then(
     expect(serviceYamlContent).toContain(`path: ${probePath}`);
     // startupProbe: periodSeconds=5, failureThreshold=10 → 50s max
     const periodMatch = serviceYamlContent.match(/startupProbe:[\s\S]*?periodSeconds:\s*(\d+)/);
-    const thresholdMatch = serviceYamlContent.match(/startupProbe:[\s\S]*?failureThreshold:\s*(\d+)/);
+    const thresholdMatch = serviceYamlContent.match(
+      /startupProbe:[\s\S]*?failureThreshold:\s*(\d+)/
+    );
     expect(periodMatch).not.toBeNull();
     expect(thresholdMatch).not.toBeNull();
     const actual = parseInt(periodMatch![1], 10) * parseInt(thresholdMatch![1], 10);
@@ -279,7 +274,9 @@ Then(
   'the startup probe allows for Next.js and Prisma cold start',
   async function (this: CustomWorld) {
     const periodMatch = serviceYamlContent.match(/startupProbe:[\s\S]*?periodSeconds:\s*(\d+)/);
-    const thresholdMatch = serviceYamlContent.match(/startupProbe:[\s\S]*?failureThreshold:\s*(\d+)/);
+    const thresholdMatch = serviceYamlContent.match(
+      /startupProbe:[\s\S]*?failureThreshold:\s*(\d+)/
+    );
     expect(periodMatch).not.toBeNull();
     expect(thresholdMatch).not.toBeNull();
     const maxStartup = parseInt(periodMatch![1], 10) * parseInt(thresholdMatch![1], 10);
@@ -292,21 +289,15 @@ Then(
 
 let loggerContent: string;
 
-Given(
-  'the logger module at {string}',
-  async function (this: CustomWorld, loggerPath: string) {
-    loggerContent = readProjectFile(loggerPath);
-    console.log(`✅ Loaded logger module: ${loggerPath}`);
-  }
-);
+Given('the logger module at {string}', async function (this: CustomWorld, loggerPath: string) {
+  loggerContent = readProjectFile(loggerPath);
+  console.log(`✅ Loaded logger module: ${loggerPath}`);
+});
 
-When(
-  'the application logs events',
-  async function (this: CustomWorld) {
-    expect(loggerContent).toContain('pino');
-    console.log('✅ Logger uses pino for structured logging');
-  }
-);
+When('the application logs events', async function (this: CustomWorld) {
+  expect(loggerContent).toContain('pino');
+  console.log('✅ Logger uses pino for structured logging');
+});
 
 Then('logs use pino with JSON format', async function (this: CustomWorld) {
   expect(loggerContent).toContain("import pino from 'pino'");
@@ -351,13 +342,10 @@ Given(
   }
 );
 
-When(
-  'a request passes through middleware',
-  async function (this: CustomWorld) {
-    expect(middlewareContent).toContain('middleware');
-    console.log('✅ Middleware function exists');
-  }
-);
+When('a request passes through middleware', async function (this: CustomWorld) {
+  expect(middlewareContent).toContain('middleware');
+  console.log('✅ Middleware function exists');
+});
 
 Then('a UUID request ID is generated', async function (this: CustomWorld) {
   expect(middlewareContent).toContain('crypto.randomUUID()');

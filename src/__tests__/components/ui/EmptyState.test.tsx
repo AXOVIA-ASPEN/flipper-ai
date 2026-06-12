@@ -19,8 +19,18 @@ import '@testing-library/jest-dom';
 import { EmptyState } from '@/components/ui/EmptyState';
 
 jest.mock('next/link', () => {
-  const MockLink = ({ href, children, ...rest }: { href: string; children: React.ReactNode; [key: string]: unknown }) => (
-    <a href={href} {...rest}>{children}</a>
+  const MockLink = ({
+    href,
+    children,
+    ...rest
+  }: {
+    href: string;
+    children: React.ReactNode;
+    [key: string]: unknown;
+  }) => (
+    <a href={href} {...rest}>
+      {children}
+    </a>
   );
   MockLink.displayName = 'Link';
   return MockLink;
@@ -28,9 +38,7 @@ jest.mock('next/link', () => {
 
 describe('EmptyState', () => {
   it('renders title and message with expected inline styles', () => {
-    const { container } = render(
-      <EmptyState title="No data" message="Nothing here yet." />
-    );
+    const { container } = render(<EmptyState title="No data" message="Nothing here yet." />);
     const title = screen.getByText('No data');
     expect(title.tagName).toBe('H3');
     expect(title).toHaveStyle({ color: '#e2e8f0' });
