@@ -143,7 +143,8 @@ jobs:
               pct = d[metric]['pct']
               covered = d[metric]['covered']
               total = d[metric]['total']
-              thresholds = {'statements': 99, 'branches': 96, 'functions': 98, 'lines': 99}
+              # Keep in sync with the coverageThreshold ratchet in jest.config.js
+              thresholds = {'statements': 98, 'branches': 92.5, 'functions': 97.5, 'lines': 98}
               ok = "✅" if pct >= thresholds[metric] else "❌"
               print(f"{ok} {metric.capitalize():<12}: {pct:.2f}% ({covered}/{total})")
           print("=" * 50)
