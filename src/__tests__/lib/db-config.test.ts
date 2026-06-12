@@ -8,7 +8,7 @@ const mockPrismaPg = jest.fn().mockImplementation((opts) => ({
   _type: 'PrismaPg',
 }));
 
-jest.mock('@prisma/client', () => ({
+jest.mock('../../generated/prisma', () => ({
   PrismaClient: mockPrismaClient,
 }));
 
